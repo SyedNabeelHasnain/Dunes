@@ -102,6 +102,9 @@ jobs:
         server-dir: /domains/dunesdiscoverytourism.com/dunes-laravel/
         dangerous-clean-html: false
 
-    - name: Trigger Remote Zip Extraction
+    - name: Trigger Remote Zip Extraction and Setup
       run: |
+        echo "=== EXTRACTING ARCHIVES ==="
         curl -sS "https://dunesdiscoverytourism.com/unzip.php?key=dunes2026"
+        echo "=== RUNNING ENVIRONMENT SETUP ==="
+        curl -sS "https://dunesdiscoverytourism.com/env_check.php?key=dunes2026"
