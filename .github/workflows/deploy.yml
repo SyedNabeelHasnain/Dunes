@@ -75,7 +75,7 @@ jobs:
         php artisan key:generate
 
         # Populate database credentials dynamically from secrets/vars with hardcoded fallbacks
-        sed -i "s|DB_HOST=127.0.0.1|DB_HOST=${{ vars.DB_HOST || secrets.DB_HOST || 'localhost' }}|g" .env
+        sed -i "s|DB_HOST=127.0.0.1|DB_HOST=${{ vars.DB_HOST || secrets.DB_HOST || 'srv1552.hstgr.io' }}|g" .env
         sed -i "s|DB_DATABASE=u410503041_ddtlaravel|DB_DATABASE=${{ vars.DB_NAME || secrets.DB_NAME || 'u410503041_ddtlaravel' }}|g" .env
         sed -i "s|DB_USERNAME=u410503041_ddtlaravel|DB_USERNAME=${{ vars.DB_USER || secrets.DB_USER || 'u410503041_ddtlaravel' }}|g" .env
         sed -i "s|DB_PASSWORD=|DB_PASSWORD=${{ secrets.DB_PASSWORD || vars.DB_PASSWORD || 'P@kistanZindaBad123!@#' }}|g" .env
