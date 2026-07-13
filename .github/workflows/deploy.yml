@@ -50,8 +50,8 @@ jobs:
 
     - name: Prepare Public Assets Staging
       run: |
-        # Copy public files to staging
-        cp -r public/* deploy/public_deploy/
+        # Copy public files to staging (including hidden files like .htaccess)
+        cp -r public/. deploy/public_deploy/
         
         # Adjust paths in index.php to point to dunes-laravel directory
         sed -i "s|__DIR__.'/../storage/framework/maintenance.php'|__DIR__.'/../dunes-laravel/storage/framework/maintenance.php'|g" deploy/public_deploy/index.php
