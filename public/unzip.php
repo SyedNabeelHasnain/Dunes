@@ -7,7 +7,7 @@ if (!isset($_GET['key']) || $_GET['key'] !== 'dunes2026') {
     exit;
 }
 
-$coreZip = __DIR__ . '/../dunes-laravel/core.zip';
+$coreZip = __DIR__ . '/dunes-laravel/core.zip';
 $publicZip = __DIR__ . '/public.zip';
 
 $extractedCore = false;
@@ -17,7 +17,7 @@ $extractedPublic = false;
 if (file_exists($coreZip)) {
     $zip = new ZipArchive;
     if ($zip->open($coreZip) === TRUE) {
-        $zip->extractTo(__DIR__ . '/../dunes-laravel/');
+        $zip->extractTo(__DIR__ . '/dunes-laravel/');
         $zip->close();
         unlink($coreZip);
         $extractedCore = true;

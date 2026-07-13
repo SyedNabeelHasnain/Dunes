@@ -53,10 +53,10 @@ jobs:
         # Copy public files to staging
         cp -r public/* deploy/public_deploy/
         
-        # Adjust paths in index.php to point to dunes-laravel directory
-        sed -i "s|__DIR__.'/../storage/framework/maintenance.php'|__DIR__.'/../dunes-laravel/storage/framework/maintenance.php'|g" deploy/public_deploy/index.php
-        sed -i "s|__DIR__.'/../vendor/autoload.php'|__DIR__.'/../dunes-laravel/vendor/autoload.php'|g" deploy/public_deploy/index.php
-        sed -i "s|__DIR__.'/../bootstrap/app.php'|__DIR__.'/../dunes-laravel/bootstrap/app.php'|g" deploy/public_deploy/index.php
+        # Adjust paths in index.php to point to dunes-laravel directory inside public_html
+        sed -i "s|__DIR__.'/../storage/framework/maintenance.php'|__DIR__.'/dunes-laravel/storage/framework/maintenance.php'|g" deploy/public_deploy/index.php
+        sed -i "s|__DIR__.'/../vendor/autoload.php'|__DIR__.'/dunes-laravel/vendor/autoload.php'|g" deploy/public_deploy/index.php
+        sed -i "s|__DIR__.'/../bootstrap/app.php'|__DIR__.'/dunes-laravel/bootstrap/app.php'|g" deploy/public_deploy/index.php
 
         # Package public assets into a zip, excluding unzip.php
         cd deploy/public_deploy
@@ -83,6 +83,9 @@ jobs:
         # Copy core Laravel directories and files, excluding public assets, node_modules, and git history
         rsync -arv --exclude="public" --exclude="node_modules" --exclude=".git" --exclude=".github" --exclude="deploy" ./ deploy/core_deploy/
 
+        # Create .htaccess inside core_deploy to block direct web access
+        echo "Deny from all" > deploy/core_deploy/.htaccess
+
         # Package core files into a zip
         cd deploy/core_deploy
         zip -r ../core.zip .
@@ -99,7 +102,7 @@ jobs:
         username: ${{ vars.FTP_USERNAME }}
         password: ${{ vars.FTP_PASSWORD }}
         local-dir: ./deploy/public_deploy/
-        server-dir: domains/dunesdiscoverytourism.com/public_html/
+        server-dir: /
         dangerous-clean-html: false
         timeout: 60000
 
@@ -110,7 +113,7 @@ jobs:
         username: ${{ vars.FTP_USERNAME }}
         password: ${{ vars.FTP_PASSWORD }}
         local-dir: ./deploy/core_deploy/
-        server-dir: domains/dunesdiscoverytourism.com/dunes-laravel/
+        server-dir: dunes-laravel/
         dangerous-clean-html: false
         timeout: 60000
 
