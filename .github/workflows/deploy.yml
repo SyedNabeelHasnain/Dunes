@@ -70,6 +70,10 @@ jobs:
 
     - name: Prepare Core Code Staging
       run: |
+        # Generate the .env file in the runner from .env.example
+        cp .env.example .env
+        php artisan key:generate
+
         # Copy core Laravel directories and files, excluding public assets, node_modules, and git history
         rsync -arv --exclude="public" --exclude="node_modules" --exclude=".git" --exclude=".github" --exclude="deploy" ./ deploy/core_deploy/
 
@@ -104,9 +108,6 @@ jobs:
         dangerous-clean-html: false
         timeout: 60000
 
-    - name: Trigger Remote Zip Extraction and Setup
+    - name: Trigger Remote Zip Extraction
       run: |
-        echo "=== EXTRACTING ARCHIVES ==="
         curl -sS "https://dunesdiscoverytourism.com/unzip.php?key=dunes2026"
-        echo "=== RUNNING ENVIRONMENT SETUP ==="
-        curl -sS "https://dunesdiscoverytourism.com/env_check.php?key=dunes2026"
