@@ -91,6 +91,7 @@ jobs:
         local-dir: ./deploy/public_deploy/
         server-dir: /domains/dunesdiscoverytourism.com/public_html/
         dangerous-clean-html: false
+        timeout: 60000
 
     - name: FTP Deploy Core Laravel Code to dunes-laravel
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -101,6 +102,7 @@ jobs:
         local-dir: ./deploy/core_deploy/
         server-dir: /domains/dunesdiscoverytourism.com/dunes-laravel/
         dangerous-clean-html: false
+        timeout: 60000
 
     - name: Trigger Remote Zip Extraction and Setup
       run: |
