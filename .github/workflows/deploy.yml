@@ -89,7 +89,7 @@ jobs:
         username: ${{ vars.FTP_USERNAME }}
         password: ${{ vars.FTP_PASSWORD }}
         local-dir: ./deploy/public_deploy/
-        server-dir: /public_html/
+        server-dir: /domains/dunesdiscoverytourism.com/public_html/
         dangerous-clean-html: false
 
     - name: FTP Deploy Core Laravel Code to dunes-laravel
@@ -99,7 +99,7 @@ jobs:
         username: ${{ vars.FTP_USERNAME }}
         password: ${{ vars.FTP_PASSWORD }}
         local-dir: ./deploy/core_deploy/
-        server-dir: /dunes-laravel/
+        server-dir: /domains/dunesdiscoverytourism.com/dunes-laravel/
         dangerous-clean-html: false
 
     - name: Trigger Remote Zip Extraction
