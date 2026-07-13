@@ -100,7 +100,7 @@ jobs:
         password: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
         local-dir: ./deploy/public_deploy/
         server-dir: public_html/
-        dangerous-clean-html: false
+        dangerous-clean-slate: true
         timeout: 60000
 
     - name: FTP Deploy Core Laravel Code to dunes-laravel
@@ -111,7 +111,7 @@ jobs:
         password: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
         local-dir: ./deploy/core_deploy/
         server-dir: dunes-laravel/
-        dangerous-clean-html: false
+        dangerous-clean-slate: true
         timeout: 60000
 
     - name: Trigger Remote Zip Extraction
