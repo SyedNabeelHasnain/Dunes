@@ -42,7 +42,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/quick-payment', [AdminDashboardController::class, 'createQuickPayment'])->name('quick-payment');
     
     // Tours, Tiers, Addons, and Pricing
-    Route::resource('tours', AdminTourController::class);
+    Route::resource('tours', AdminTourController::class)->except(['show']);
     Route::post('/tours/{id}/itinerary', [AdminTourController::class, 'addItinerary'])->name('tours.itinerary.add');
     Route::post('/itinerary/{id}/update', [AdminTourController::class, 'updateItinerary'])->name('tours.itinerary.update');
     Route::post('/itinerary/{id}/delete', [AdminTourController::class, 'deleteItinerary'])->name('tours.itinerary.delete');
@@ -56,7 +56,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/pricing/update', [AdminTourController::class, 'updatePricing'])->name('pricing.update');
     
     // Bookings & WhatsApp Leads
-    Route::resource('bookings', AdminBookingController::class);
+    Route::resource('bookings', AdminBookingController::class)->only(['index', 'show', 'update', 'destroy']);
     Route::post('/bookings/{id}/payment-link', [AdminBookingController::class, 'createPaymentLink'])->name('bookings.payment-link');
     Route::post('/bookings/{id}/resend-payment', [AdminBookingController::class, 'resendPaymentEmail'])->name('bookings.resend-payment');
     Route::get('/whatsapp-leads', [AdminWhatsappController::class, 'index'])->name('whatsapp.leads');
@@ -64,16 +64,16 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/whatsapp-settings/update', [AdminWhatsappController::class, 'updateSettings'])->name('whatsapp.settings.update');
     
     // FAQs, Reviews, and Inquiries
-    Route::resource('faqs', AdminFaqController::class);
-    Route::resource('reviews', AdminReviewController::class);
+    Route::resource('faqs', AdminFaqController::class)->except(['create', 'show', 'edit']);
+    Route::resource('reviews', AdminReviewController::class)->except(['create', 'show', 'edit']);
     Route::get('/inquiries', [AdminDashboardController::class, 'inquiries'])->name('inquiries.index');
     Route::get('/inquiries/{id}', [AdminDashboardController::class, 'viewInquiry'])->name('inquiries.show');
     Route::post('/inquiries/{id}/status', [AdminDashboardController::class, 'updateInquiryStatus'])->name('inquiries.status');
     Route::delete('/inquiries/{id}', [AdminDashboardController::class, 'deleteInquiry'])->name('inquiries.destroy');
     
     // Blog CMS
-    Route::resource('blogs', AdminBlogController::class);
-    Route::resource('blog-categories', AdminBlogCategoryController::class);
+    Route::resource('blogs', AdminBlogController::class)->except(['show']);
+    Route::resource('blog-categories', AdminBlogCategoryController::class)->except(['create', 'show', 'edit']);
 
     // Integrations Settings (Google, Meta, Cache)
     Route::get('/settings/google', [AdminSettingController::class, 'google'])->name('settings.google');
