@@ -58,10 +58,29 @@ jobs:
         sed -i "s|__DIR__.'/../vendor/autoload.php'|__DIR__.'/../dunes-laravel/vendor/autoload.php'|g" deploy/public_deploy/index.php
         sed -i "s|__DIR__.'/../bootstrap/app.php'|__DIR__.'/../dunes-laravel/bootstrap/app.php'|g" deploy/public_deploy/index.php
 
+        # Package public assets into a zip, excluding unzip.php
+        cd deploy/public_deploy
+        zip -r ../public.zip . -x unzip.php
+        cd ../..
+
+        # Clean staging and place only public.zip and unzip.php
+        rm -rf deploy/public_deploy/*
+        mv deploy/public.zip deploy/public_deploy/public.zip
+        cp public/unzip.php deploy/public_deploy/unzip.php
+
     - name: Prepare Core Code Staging
       run: |
         # Copy core Laravel directories and files, excluding public assets, node_modules, and git history
         rsync -arv --exclude="public" --exclude="node_modules" --exclude=".git" --exclude=".github" --exclude="deploy" ./ deploy/core_deploy/
+
+        # Package core files into a zip
+        cd deploy/core_deploy
+        zip -r ../core.zip .
+        cd ../..
+
+        # Clean staging and place only core.zip
+        rm -rf deploy/core_deploy/*
+        mv deploy/core.zip deploy/core_deploy/core.zip
 
     - name: FTP Deploy Public Assets to public_html
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -82,3 +101,7 @@ jobs:
         local-dir: ./deploy/core_deploy/
         server-dir: /dunes-laravel/
         dangerous-clean-html: false
+
+    - name: Trigger Remote Zip Extraction
+      run: |
+        curl -sS "https://dunesdiscoverytourism.com/unzip.php?key=dunes2026"
