@@ -92,27 +92,31 @@ jobs:
         rm -rf deploy/core_deploy/*
         mv deploy/core.zip deploy/core_deploy/core.zip
 
-    - name: SFTP Deploy Public Assets to public_html
-      uses: wlixcc/SFTP-Deploy-Action@v1.2.6
-      with:
-        username: ${{ secrets.FTP_USERNAME || vars.FTP_USERNAME }}
-        server: ${{ steps.ftp_server.outputs.host }}
-        port: 65002
-        password: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
-        local_path: './deploy/public_deploy/*'
-        remote_path: '/home/u410503041/domains/dunesdiscoverytourism.com/public_html/'
-        delete_remote_files: true
+    - name: Install SSHPass
+      run: sudo apt-get update && sudo apt-get install -y sshpass
 
-    - name: SFTP Deploy Core Laravel Code to dunes-laravel
-      uses: wlixcc/SFTP-Deploy-Action@v1.2.6
-      with:
-        username: ${{ secrets.FTP_USERNAME || vars.FTP_USERNAME }}
-        server: ${{ steps.ftp_server.outputs.host }}
-        port: 65002
-        password: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
-        local_path: './deploy/core_deploy/*'
-        remote_path: '/home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/'
-        delete_remote_files: true
+    - name: Prepare Remote Directories (Clean Slate)
+      env:
+        SSHPASS: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
+      run: |
+        # Create directories if they do not exist
+        sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no u410503041@${{ steps.ftp_server.outputs.host }} "mkdir -p /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel"
+        
+        # Clean existing files (clean slate)
+        sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no u410503041@${{ steps.ftp_server.outputs.host }} "rm -rf /home/u410503041/domains/dunesdiscoverytourism.com/public_html/*"
+        sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no u410503041@${{ steps.ftp_server.outputs.host }} "rm -rf /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/*"
+
+    - name: Upload Public Assets (SCP)
+      env:
+        SSHPASS: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
+      run: |
+        sshpass -e scp -P 65002 -o StrictHostKeyChecking=no deploy/public_deploy/public.zip deploy/public_deploy/unzip.php u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/domains/dunesdiscoverytourism.com/public_html/
+
+    - name: Upload Core Laravel Code (SCP)
+      env:
+        SSHPASS: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
+      run: |
+        sshpass -e scp -P 65002 -o StrictHostKeyChecking=no deploy/core_deploy/core.zip u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/
 
     - name: Trigger Remote Zip Extraction
       run: |
