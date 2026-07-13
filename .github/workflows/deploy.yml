@@ -1,0 +1,75 @@
+name: Deploy Laravel Application to Hostinger
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'npm'
+
+    - name: Install NPM dependencies & Build Assets
+      run: |
+        npm ci
+        npm run build
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, xml, ctype, iconv, mysql, openssl
+        coverage: none
+
+    - name: Install Composer dependencies
+      run: |
+        composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+
+    - name: Create Deploy Directories
+      run: |
+        mkdir -p deploy/public_deploy
+        mkdir -p deploy/core_deploy
+
+    - name: Prepare Public Assets Staging
+      run: |
+        # Copy public files to staging
+        cp -r public/* deploy/public_deploy/
+        
+        # Adjust paths in index.php to point to dunes-laravel directory
+        sed -i "s|__DIR__.'/../storage/framework/maintenance.php'|__DIR__.'/../dunes-laravel/storage/framework/maintenance.php'|g" deploy/public_deploy/index.php
+        sed -i "s|__DIR__.'/../vendor/autoload.php'|__DIR__.'/../dunes-laravel/vendor/autoload.php'|g" deploy/public_deploy/index.php
+        sed -i "s|__DIR__.'/../bootstrap/app.php'|__DIR__.'/../dunes-laravel/bootstrap/app.php'|g" deploy/public_deploy/index.php
+
+    - name: Prepare Core Code Staging
+      run: |
+        # Copy core Laravel directories and files, excluding public assets, node_modules, and git history
+        rsync -arv --exclude="public" --exclude="node_modules" --exclude=".git" --exclude=".github" --exclude="deploy" ./ deploy/core_deploy/
+
+    - name: FTP Deploy Public Assets to public_html
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        server: ${{ vars.FTP_SERVER }}
+        username: ${{ vars.FTP_USERNAME }}
+        password: ${{ vars.FTP_PASSWORD }}
+        local-dir: ./deploy/public_deploy/
+        server-dir: /public_html/
+        dangerous-clean-html: false
+
+    - name: FTP Deploy Core Laravel Code to dunes-laravel
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        server: ${{ vars.FTP_SERVER }}
+        username: ${{ vars.FTP_USERNAME }}
+        password: ${{ vars.FTP_PASSWORD }}
+        local-dir: ./deploy/core_deploy/
+        server-dir: /dunes-laravel/
+        dangerous-clean-html: false

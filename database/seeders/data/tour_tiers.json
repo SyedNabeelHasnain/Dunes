@@ -1,0 +1,114 @@
+[
+    {
+        "id": 1,
+        "tour_id": 1,
+        "tier_id": 1,
+        "price": 79,
+        "old_price": 130,
+        "price_type": "per person"
+    },
+    {
+        "id": 2,
+        "tour_id": 1,
+        "tier_id": 2,
+        "price": 130,
+        "old_price": 150,
+        "price_type": "per person"
+    },
+    {
+        "id": 10,
+        "tour_id": 4,
+        "tier_id": 1,
+        "price": 199,
+        "old_price": 250,
+        "price_type": "per person"
+    },
+    {
+        "id": 11,
+        "tour_id": 4,
+        "tier_id": 2,
+        "price": 249,
+        "old_price": 300,
+        "price_type": "per person"
+    },
+    {
+        "id": 25,
+        "tour_id": 2,
+        "tier_id": 4,
+        "price": 399,
+        "old_price": 499,
+        "price_type": "per person"
+    },
+    {
+        "id": 26,
+        "tour_id": 3,
+        "tier_id": 5,
+        "price": 798,
+        "old_price": 999,
+        "price_type": "per person"
+    },
+    {
+        "id": 27,
+        "tour_id": 3,
+        "tier_id": 6,
+        "price": 1596,
+        "old_price": 1750,
+        "price_type": "per person"
+    },
+    {
+        "id": 28,
+        "tour_id": 3,
+        "tier_id": 7,
+        "price": 2394,
+        "old_price": 2650,
+        "price_type": "per person"
+    },
+    {
+        "id": 29,
+        "tour_id": 7,
+        "tier_id": 8,
+        "price": 59,
+        "old_price": 70,
+        "price_type": "per person"
+    },
+    {
+        "id": 30,
+        "tour_id": 7,
+        "tier_id": 9,
+        "price": 99,
+        "old_price": 125,
+        "price_type": "per person"
+    },
+    {
+        "id": 31,
+        "tour_id": 7,
+        "tier_id": 10,
+        "price": 140,
+        "old_price": 175,
+        "price_type": "per person"
+    },
+    {
+        "id": 32,
+        "tour_id": 5,
+        "tier_id": 11,
+        "price": 79,
+        "old_price": 0,
+        "price_type": "per person"
+    },
+    {
+        "id": 33,
+        "tour_id": 5,
+        "tier_id": 12,
+        "price": 149,
+        "old_price": 175,
+        "price_type": "per person"
+    },
+    {
+        "id": 34,
+        "tour_id": 6,
+        "tier_id": 13,
+        "price": 130,
+        "old_price": 150,
+        "price_type": "per person"
+    }
+]

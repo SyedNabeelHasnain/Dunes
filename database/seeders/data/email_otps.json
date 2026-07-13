@@ -1,0 +1,93 @@
+[
+    {
+        "id": 2,
+        "email": "admin@dunesdiscoverytourism.com",
+        "otp": "cc2b8c",
+        "expires_at": "2026-03-14 03:20:34",
+        "created_at": "2026-03-13 23:15:34"
+    },
+    {
+        "id": 3,
+        "email": "dunesdiscovery85@gmail.com",
+        "otp": "de4f0e",
+        "expires_at": "2026-03-14 07:05:14",
+        "created_at": "2026-03-14 03:00:14"
+    },
+    {
+        "id": 4,
+        "email": "dunesdiscovery85@gmail.com",
+        "otp": "6cab1b",
+        "expires_at": "2026-03-14 07:06:41",
+        "created_at": "2026-03-14 03:01:41"
+    },
+    {
+        "id": 5,
+        "email": "dunesdiscovery85@gmail.com",
+        "otp": "d1de2b",
+        "expires_at": "2026-03-14 07:09:49",
+        "created_at": "2026-03-14 03:04:49"
+    },
+    {
+        "id": 6,
+        "email": "dunesdiscovery85@gmail.com",
+        "otp": "459af5",
+        "expires_at": "2026-03-14 07:11:02",
+        "created_at": "2026-03-14 03:06:02"
+    },
+    {
+        "id": 7,
+        "email": "dunesdiscovery85@gmail.com",
+        "otp": "8c66d6",
+        "expires_at": "2026-03-14 07:11:34",
+        "created_at": "2026-03-14 03:06:34"
+    },
+    {
+        "id": 8,
+        "email": "dunesdiscovery85@gmail.com",
+        "otp": "60482a0db1203a4fd9cd6417e0bbcc9d3dee017e5ce443960785aee02bd100a7",
+        "expires_at": "2026-03-14 09:17:50",
+        "created_at": "2026-03-14 05:12:50"
+    },
+    {
+        "id": 9,
+        "email": "dunesdiscovery85@gmail.com",
+        "otp": "d170cfaa1edf1a2a9fe688f7bc560a6eff179c4c550f3f579c0e537ee2b6d0f3",
+        "expires_at": "2026-03-14 09:19:05",
+        "created_at": "2026-03-14 05:14:05"
+    },
+    {
+        "id": 10,
+        "email": "syednabeeljavedzaidi@gmail.comm",
+        "otp": "d6e0034c38bde09204af79a4ecec9c54f870ce6094c3a43a3149f3aed42e3489",
+        "expires_at": "2026-04-17 14:09:49",
+        "created_at": "2026-04-17 10:04:49"
+    },
+    {
+        "id": 11,
+        "email": "rene.polacok@gmail.com",
+        "otp": "58de163126d7f9498bac5a9abb9977832c7e03fda983331f3938229925f18ad0",
+        "expires_at": "2026-05-28 23:51:35",
+        "created_at": "2026-05-28 19:46:35"
+    },
+    {
+        "id": 12,
+        "email": "rene.polacok@gmail.com",
+        "otp": "21a7172e81f2cc434cce544d31e0b0e9441bea772ebe2a63d55164d6167f1844",
+        "expires_at": "2026-05-28 23:56:07",
+        "created_at": "2026-05-28 19:51:07"
+    },
+    {
+        "id": 13,
+        "email": "rene.polacok@gmail.com",
+        "otp": "7387285d18461ee82d4c7d251aeea0e017ab7748a6a080385dd6ce0370000aa8",
+        "expires_at": "2026-05-29 00:00:19",
+        "created_at": "2026-05-28 19:55:19"
+    },
+    {
+        "id": 14,
+        "email": "mariapolacok@gmail.com",
+        "otp": "51650cd27a5363d1574a481add3570884f74a22a82e688909908646db67d13d6",
+        "expires_at": "2026-05-29 00:04:07",
+        "created_at": "2026-05-28 19:59:07"
+    }
+]

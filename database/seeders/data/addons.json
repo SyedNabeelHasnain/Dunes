@@ -1,0 +1,282 @@
+[
+    {
+        "id": 1,
+        "slug": "quad-biking",
+        "name": "Quad Biking",
+        "description": "30-minute quad bike adventure in the desert",
+        "icon": "bi-joystick",
+        "default_price": 150,
+        "status": "active",
+        "priority": 99
+    },
+    {
+        "id": 2,
+        "slug": "camel-ride",
+        "name": "Extended Camel Ride",
+        "description": "45-minute camel trek through dunes",
+        "icon": "bi-heart",
+        "default_price": 80,
+        "status": "active",
+        "priority": 99
+    },
+    {
+        "id": 3,
+        "slug": "vip-seating",
+        "name": "VIP Seating",
+        "description": "Front row seats for all shows",
+        "icon": "bi-star",
+        "default_price": 100,
+        "status": "active",
+        "priority": 99
+    },
+    {
+        "id": 4,
+        "slug": "private-table",
+        "name": "Private Dining Table",
+        "description": "Exclusive table with waiter service",
+        "icon": "bi-table",
+        "default_price": 120,
+        "status": "active",
+        "priority": 99
+    },
+    {
+        "id": 5,
+        "slug": "photography",
+        "name": "Professional Photography",
+        "description": "Professional photos delivered digitally",
+        "icon": "bi-camera",
+        "default_price": 200,
+        "status": "active",
+        "priority": 99
+    },
+    {
+        "id": 6,
+        "slug": "henna",
+        "name": "Henna Tattoo",
+        "description": "Traditional Arabic henna art",
+        "icon": "bi-brush",
+        "default_price": 50,
+        "status": "active",
+        "priority": 99
+    },
+    {
+        "id": 7,
+        "slug": "falcon-photo",
+        "name": "Falcon Photo",
+        "description": "Photo opportunity with trained falcon",
+        "icon": "bi-camera2",
+        "default_price": 75,
+        "status": "active",
+        "priority": 99
+    },
+    {
+        "id": 8,
+        "slug": "shisha",
+        "name": "Premium Shisha",
+        "description": "Selection of premium flavors",
+        "icon": "bi-wind",
+        "default_price": 60,
+        "status": "active",
+        "priority": 99
+    },
+    {
+        "id": 9,
+        "slug": "dune-buggy",
+        "name": "Dune Buggy Ride",
+        "description": "30-minute thrilling buggy adventure through the dunes",
+        "icon": "truck",
+        "default_price": 280,
+        "status": "active",
+        "priority": 9
+    },
+    {
+        "id": 10,
+        "slug": "sandboarding",
+        "name": "Sandboarding Session",
+        "description": "Surf down the golden sand dunes",
+        "icon": "activity",
+        "default_price": 60,
+        "status": "active",
+        "priority": 10
+    },
+    {
+        "id": 11,
+        "slug": "horse-riding",
+        "name": "Desert Horse Riding",
+        "description": "30-minute horse riding in the desert",
+        "icon": "heart",
+        "default_price": 200,
+        "status": "active",
+        "priority": 11
+    },
+    {
+        "id": 12,
+        "slug": "private-vehicle",
+        "name": "Private 4x4 Vehicle",
+        "description": "Exclusive Land Cruiser for your group only",
+        "icon": "truck",
+        "default_price": 350,
+        "status": "inactive",
+        "priority": 12
+    },
+    {
+        "id": 13,
+        "slug": "traditional-costume",
+        "name": "Traditional Costume Photo",
+        "description": "Dress in Arabic attire for photos",
+        "icon": "camera",
+        "default_price": 75,
+        "status": "active",
+        "priority": 13
+    },
+    {
+        "id": 14,
+        "slug": "hot-air-balloon",
+        "name": "Hot Air Balloon Ride",
+        "description": "Sunrise balloon flight over the desert",
+        "icon": "sunrise",
+        "default_price": 850,
+        "status": "active",
+        "priority": 14
+    },
+    {
+        "id": 15,
+        "slug": "burj-khalifa-124",
+        "name": "Burj Khalifa 124th Floor",
+        "description": "At The Top observation deck tickets",
+        "icon": "building",
+        "default_price": 169,
+        "status": "active",
+        "priority": 15
+    },
+    {
+        "id": 16,
+        "slug": "burj-khalifa-148",
+        "name": "Burj Khalifa 148th Floor",
+        "description": "At The Top SKY premium experience",
+        "icon": "building",
+        "default_price": 399,
+        "status": "active",
+        "priority": 16
+    },
+    {
+        "id": 17,
+        "slug": "dubai-frame",
+        "name": "Dubai Frame Entry",
+        "description": "Visit the iconic Dubai Frame landmark",
+        "icon": "frame",
+        "default_price": 55,
+        "status": "active",
+        "priority": 17
+    },
+    {
+        "id": 18,
+        "slug": "dubai-aquarium",
+        "name": "Dubai Aquarium & Zoo",
+        "description": "Underwater zoo experience at Dubai Mall",
+        "icon": "fish",
+        "default_price": 135,
+        "status": "active",
+        "priority": 18
+    },
+    {
+        "id": 19,
+        "slug": "lunch-package",
+        "name": "Lunch Package",
+        "description": "Meal at selected premium restaurant",
+        "icon": "utensils",
+        "default_price": 120,
+        "status": "active",
+        "priority": 19
+    },
+    {
+        "id": 20,
+        "slug": "louvre-abu-dhabi",
+        "name": "Louvre Abu Dhabi Entry",
+        "description": "World-class art museum experience",
+        "icon": "image",
+        "default_price": 65,
+        "status": "active",
+        "priority": 20
+    },
+    {
+        "id": 21,
+        "slug": "emirates-palace-tea",
+        "name": "Emirates Palace Tea",
+        "description": "Afternoon tea at the palace",
+        "icon": "coffee",
+        "default_price": 220,
+        "status": "active",
+        "priority": 21
+    },
+    {
+        "id": 22,
+        "slug": "ferrari-world",
+        "name": "Ferrari World Entry",
+        "description": "Theme park general admission",
+        "icon": "zap",
+        "default_price": 310,
+        "status": "active",
+        "priority": 22
+    },
+    {
+        "id": 23,
+        "slug": "qasr-al-watan",
+        "name": "Qasr Al Watan Entry",
+        "description": "Presidential palace tour",
+        "icon": "building",
+        "default_price": 65,
+        "status": "active",
+        "priority": 23
+    },
+    {
+        "id": 24,
+        "slug": "vip-upper-deck",
+        "name": "VIP Upper Deck",
+        "description": "Premium upper deck seating with best views",
+        "icon": "star",
+        "default_price": 80,
+        "status": "active",
+        "priority": 24
+    },
+    {
+        "id": 25,
+        "slug": "window-seat",
+        "name": "Guaranteed Window Seat",
+        "description": "Reserved seat by the window",
+        "icon": "eye",
+        "default_price": 40,
+        "status": "active",
+        "priority": 25
+    },
+    {
+        "id": 26,
+        "slug": "celebration-setup",
+        "name": "Celebration Setup",
+        "description": "Birthday or anniversary decoration",
+        "icon": "gift",
+        "default_price": 250,
+        "status": "active",
+        "priority": 26
+    },
+    {
+        "id": 27,
+        "slug": "alcoholic-package",
+        "name": "House Beverage Package",
+        "description": "Unlimited house wine, beer and spirits",
+        "icon": "wine",
+        "default_price": 150,
+        "status": "active",
+        "priority": 27
+    },
+    {
+        "id": 28,
+        "slug": "romantic-setup",
+        "name": "Romantic Setup",
+        "description": "Flowers, candles, and cake arrangement",
+        "icon": "heart",
+        "default_price": 350,
+        "status": "active",
+        "priority": 28
+    }
+]

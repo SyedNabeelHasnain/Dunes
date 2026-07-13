@@ -1,0 +1,20 @@
+﻿User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /includes/
+Disallow: /phpmailer/
+Disallow: /ajax.php
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+Sitemap: https://dunesdiscoverytourism.com/sitemap.xml

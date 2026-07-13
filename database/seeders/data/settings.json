@@ -1,0 +1,350 @@
+[
+    {
+        "id": 1,
+        "setting_key": "seeded",
+        "setting_value": 1,
+        "updated_at": "2026-01-13 11:36:20"
+    },
+    {
+        "id": 2,
+        "setting_key": "ziina_active",
+        "setting_value": 1,
+        "updated_at": "2026-01-31 12:39:02"
+    },
+    {
+        "id": 3,
+        "setting_key": "ziina_test_mode",
+        "setting_value": 1,
+        "updated_at": "2026-01-31 12:36:31"
+    },
+    {
+        "id": 4,
+        "setting_key": "ziina_advance_percent",
+        "setting_value": 25,
+        "updated_at": "2026-02-01 04:06:56"
+    },
+    {
+        "id": 5,
+        "setting_key": "ziina_access_token",
+        "setting_value": "9aSpdWoZfZofhiwZEr1An18\/wv1H6JDMemRIVIejH\/yQpSzYQcx3FEStNeS4k8e2",
+        "updated_at": "2026-01-31 12:36:32"
+    },
+    {
+        "id": 6,
+        "setting_key": "cache_version",
+        "setting_value": 1783366218,
+        "updated_at": "2026-07-06 19:30:18"
+    },
+    {
+        "id": 7,
+        "setting_key": "google_active",
+        "setting_value": 1,
+        "updated_at": "2026-02-07 05:13:11"
+    },
+    {
+        "id": 8,
+        "setting_key": "google_gtm_id",
+        "setting_value": "GTM-NXBSWPVR",
+        "updated_at": "2026-02-07 05:13:11"
+    },
+    {
+        "id": 9,
+        "setting_key": "google_ga4_id",
+        "setting_value": "G-7PF5SML0BT",
+        "updated_at": "2026-02-07 05:26:11"
+    },
+    {
+        "id": 10,
+        "setting_key": "google_ads_id",
+        "setting_value": 7927294548,
+        "updated_at": "2026-02-07 05:23:03"
+    },
+    {
+        "id": 11,
+        "setting_key": "google_conversion_label",
+        "setting_value": "Booking",
+        "updated_at": "2026-02-07 05:23:03"
+    },
+    {
+        "id": 12,
+        "setting_key": "google_site_verification",
+        "setting_value": "zhXtPc5kK0mpnTK0KMAM1FklSqmRMqPl-2J3T9mkh-w",
+        "updated_at": "2026-02-07 05:23:03"
+    },
+    {
+        "id": 13,
+        "setting_key": "google_maps_api_key",
+        "setting_value": "AIzaSyCgJ0nFnpujy165Am-kuiBOr3jbtf4SkxQ",
+        "updated_at": "2026-02-07 17:01:31"
+    },
+    {
+        "id": 14,
+        "setting_key": "recaptcha_site_key",
+        "setting_value": "6LdOpWEsAAAAAOhnKd4WFFtJMrShRtMV33HdZBP6",
+        "updated_at": "2026-02-07 17:01:31"
+    },
+    {
+        "id": 15,
+        "setting_key": "recaptcha_secret_key",
+        "setting_value": "6LdOpWEsAAAAAJ0htYI8Urv0gSHny-fVioD2o73G",
+        "updated_at": "2026-02-07 17:01:31"
+    },
+    {
+        "id": 16,
+        "setting_key": "whatsapp_default_country",
+        "setting_value": 971,
+        "updated_at": "2026-02-18 00:24:41"
+    },
+    {
+        "id": 17,
+        "setting_key": "whatsapp_form_enabled",
+        "setting_value": 0,
+        "updated_at": "2026-02-18 00:28:37"
+    },
+    {
+        "id": 18,
+        "setting_key": "meta_active",
+        "setting_value": 1,
+        "updated_at": "2026-03-13 22:22:40"
+    },
+    {
+        "id": 19,
+        "setting_key": "meta_pixel_id",
+        "setting_value": 2412508625829297,
+        "updated_at": "2026-03-13 22:22:40"
+    },
+    {
+        "id": 20,
+        "setting_key": "meta_test_event_code",
+        "setting_value": "",
+        "updated_at": "2026-02-21 13:23:17"
+    },
+    {
+        "id": 21,
+        "setting_key": "meta_send_advanced_matching",
+        "setting_value": 1,
+        "updated_at": "2026-03-13 22:22:40"
+    },
+    {
+        "id": 22,
+        "setting_key": "meta_capi_enabled",
+        "setting_value": 1,
+        "updated_at": "2026-03-13 22:22:40"
+    },
+    {
+        "id": 23,
+        "setting_key": "meta_access_token",
+        "setting_value": "81ce85e50fe278bb66472bb79ba331f6",
+        "updated_at": "2026-03-14 03:11:45"
+    },
+    {
+        "id": 24,
+        "setting_key": "meta_business_id",
+        "setting_value": "",
+        "updated_at": "2026-02-21 13:23:17"
+    },
+    {
+        "id": 25,
+        "setting_key": "meta_page_id",
+        "setting_value": "",
+        "updated_at": "2026-02-21 13:23:17"
+    },
+    {
+        "id": 26,
+        "setting_key": "meta_ig_business_id",
+        "setting_value": 17841407056499400,
+        "updated_at": "2026-02-24 17:26:25"
+    },
+    {
+        "id": 27,
+        "setting_key": "meta_whatsapp_phone_number_id",
+        "setting_value": "",
+        "updated_at": "2026-02-21 13:23:17"
+    },
+    {
+        "id": 28,
+        "setting_key": "meta_whatsapp_token",
+        "setting_value": "",
+        "updated_at": "2026-02-21 13:23:17"
+    },
+    {
+        "id": 29,
+        "setting_key": "meta_webhook_verify_token",
+        "setting_value": "",
+        "updated_at": "2026-02-21 13:23:17"
+    },
+    {
+        "id": 30,
+        "setting_key": "meta_catalog_enabled",
+        "setting_value": 1,
+        "updated_at": "2026-03-13 22:22:40"
+    },
+    {
+        "id": 31,
+        "setting_key": "meta_send_ip_ua",
+        "setting_value": 0,
+        "updated_at": "2026-03-14 03:12:17"
+    },
+    {
+        "id": 32,
+        "setting_key": "site_name",
+        "setting_value": "Dunes Discovery Tourism",
+        "updated_at": "2026-02-27 12:29:25"
+    },
+    {
+        "id": 33,
+        "setting_key": "site_tagline",
+        "setting_value": "",
+        "updated_at": "2026-02-27 12:29:26"
+    },
+    {
+        "id": 34,
+        "setting_key": "site_desc_meta",
+        "setting_value": "",
+        "updated_at": "2026-02-27 12:29:26"
+    },
+    {
+        "id": 35,
+        "setting_key": "footer_about",
+        "setting_value": "Your trusted partner for unforgettable Dubai desert safari and city tour experiences since 2018.",
+        "updated_at": "2026-02-27 12:29:27"
+    },
+    {
+        "id": 36,
+        "setting_key": "site_copyright",
+        "setting_value": "All rights reserved.",
+        "updated_at": "2026-02-27 12:29:27"
+    },
+    {
+        "id": 37,
+        "setting_key": "site_phone",
+        "setting_value": "+971 50 245 6056",
+        "updated_at": "2026-02-27 12:29:27"
+    },
+    {
+        "id": 38,
+        "setting_key": "site_whatsapp",
+        "setting_value": 971502456056,
+        "updated_at": "2026-02-27 12:29:28"
+    },
+    {
+        "id": 39,
+        "setting_key": "site_email",
+        "setting_value": "info@dunesdiscoverytourism.com",
+        "updated_at": "2026-02-27 12:29:28"
+    },
+    {
+        "id": 40,
+        "setting_key": "site_address",
+        "setting_value": "Dubai, United Arab Emirates",
+        "updated_at": "2026-02-27 12:29:28"
+    },
+    {
+        "id": 41,
+        "setting_key": "social_facebook",
+        "setting_value": "https:\/\/facebook.com\/dunesdiscoverytourism",
+        "updated_at": "2026-02-27 12:29:29"
+    },
+    {
+        "id": 42,
+        "setting_key": "social_instagram",
+        "setting_value": "https:\/\/instagram.com\/dunesdiscoverytourism",
+        "updated_at": "2026-02-27 12:29:29"
+    },
+    {
+        "id": 43,
+        "setting_key": "social_tripadvisor",
+        "setting_value": "https:\/\/www.tripadvisor.com\/UserReviewEdit-g295424-d29026644-Dunes_Discovery-Dubai_Emirate_of_Dubai.html",
+        "updated_at": "2026-02-27 12:29:29"
+    },
+    {
+        "id": 44,
+        "setting_key": "social_google",
+        "setting_value": "https:\/\/search.google.com\/local\/writereview?placeid=ChIJbWsIEIVEdEER4uHEhb2dbcQ",
+        "updated_at": "2026-02-27 12:29:30"
+    },
+    {
+        "id": 45,
+        "setting_key": "color_primary",
+        "setting_value": "#f69044",
+        "updated_at": "2026-02-27 12:31:21"
+    },
+    {
+        "id": 46,
+        "setting_key": "color_secondary",
+        "setting_value": "#00476d",
+        "updated_at": "2026-02-27 12:29:30"
+    },
+    {
+        "id": 47,
+        "setting_key": "color_accent",
+        "setting_value": "#f9e51e",
+        "updated_at": "2026-02-27 12:29:31"
+    },
+    {
+        "id": 48,
+        "setting_key": "color_body_bg",
+        "setting_value": "#f8fafc",
+        "updated_at": "2026-02-27 12:29:31"
+    },
+    {
+        "id": 49,
+        "setting_key": "smtp_host",
+        "setting_value": "smtp.hostinger.com",
+        "updated_at": "2026-02-27 12:29:31"
+    },
+    {
+        "id": 50,
+        "setting_key": "smtp_port",
+        "setting_value": 587,
+        "updated_at": "2026-02-27 12:29:32"
+    },
+    {
+        "id": 51,
+        "setting_key": "smtp_user",
+        "setting_value": "info@dunesdiscoverytourism.com",
+        "updated_at": "2026-02-27 12:29:32"
+    },
+    {
+        "id": 52,
+        "setting_key": "smtp_pass",
+        "setting_value": "Zubairkhan@2025",
+        "updated_at": "2026-02-27 12:29:32"
+    },
+    {
+        "id": 53,
+        "setting_key": "smtp_from_email",
+        "setting_value": "info@dunesdiscoverytourism.com",
+        "updated_at": "2026-02-27 12:29:33"
+    },
+    {
+        "id": 54,
+        "setting_key": "smtp_from_name",
+        "setting_value": "Dunes Discovery Tourism",
+        "updated_at": "2026-02-27 12:29:33"
+    },
+    {
+        "id": 55,
+        "setting_key": "admin_email",
+        "setting_value": "admin@dunesdiscoverytourism.com",
+        "updated_at": "2026-02-27 12:29:33"
+    },
+    {
+        "id": 56,
+        "setting_key": "admin_email_cc",
+        "setting_value": "dunesdiscovery85@gmail.com,zubair.malik.khan@gmail.com",
+        "updated_at": "2026-02-27 12:29:34"
+    },
+    {
+        "id": 57,
+        "setting_key": "admin_email_bcc",
+        "setting_value": "syednabeeljavedzaidi@gmail.com",
+        "updated_at": "2026-02-27 12:29:34"
+    },
+    {
+        "id": 58,
+        "setting_key": "meta_capi_token",
+        "setting_value": "81ce85e50fe278bb66472bb79ba331f6",
+        "updated_at": "2026-03-14 03:12:06"
+    }
+]

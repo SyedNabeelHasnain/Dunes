@@ -1,0 +1,18 @@
+[
+    {
+        "id": 1,
+        "slug": "terms-condition",
+        "title": "Terms and Conditions",
+        "subtitle": "Last Updated: February 2026",
+        "description": "These Terms and Conditions govern the use of the website and services of Dunes Discovery Tourism L.L.C.",
+        "updated_at": "2026-02-06 22:42:02"
+    },
+    {
+        "id": 2,
+        "slug": "privacy-policy",
+        "title": "Privacy Policy",
+        "subtitle": "Last Updated: February 2026",
+        "description": "This Privacy Policy explains how Dunes Discovery Tourism L.L.C collects, processes, and protects your personal data.",
+        "updated_at": "2026-02-06 23:03:57"
+    }
+]

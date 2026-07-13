@@ -1,0 +1,592 @@
+[
+    {
+        "id": 1,
+        "request_log_id": 5,
+        "name": "Nabeel",
+        "phone": "345 2335376",
+        "tour_name": null,
+        "page_url": "http:\/\/localhost:8000\/contact",
+        "message_text": "Hi Dunes Discovery Tourism, I Nabeel would like to inquire about:",
+        "created_at": "2026-02-04 12:17:01"
+    },
+    {
+        "id": 2,
+        "request_log_id": 6,
+        "name": "Nabeel",
+        "phone": "345 2335376",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/contact",
+        "message_text": "Hi Dunes Discovery Tourism, I Nabeel would like to inquire about:",
+        "created_at": "2026-02-05 22:13:26"
+    },
+    {
+        "id": 3,
+        "request_log_id": 10,
+        "name": "Kainat Nasir",
+        "phone": "7424 107395",
+        "tour_name": "Evening Desert Safari Dubai",
+        "page_url": "https:\/\/www.dunesdiscoverytourism.com\/",
+        "message_text": "Hi Dunes Discovery Tourism, I Kainat Nasir would like to inquire about Evening Desert Safari Dubai.",
+        "created_at": "2026-02-07 13:22:26"
+    },
+    {
+        "id": 4,
+        "request_log_id": 11,
+        "name": "Test",
+        "phone": 345233537,
+        "tour_name": null,
+        "page_url": "http:\/\/localhost:8000\/contact",
+        "message_text": "Hi Dunes Discovery Tourism, I Test would like to inquire about:",
+        "created_at": "2026-02-08 02:26:10"
+    },
+    {
+        "id": 5,
+        "request_log_id": 1011,
+        "name": "Test 14-Feb-2026",
+        "phone": "345 2335376",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-02-14 11:05:27"
+    },
+    {
+        "id": 6,
+        "request_log_id": 1013,
+        "name": "Nabeel - Test - 14 Feb 2026",
+        "phone": "345 2335376",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-02-14 11:06:52"
+    },
+    {
+        "id": 7,
+        "request_log_id": 1248,
+        "name": "claudia",
+        "phone": "868 125 8288",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/evening-desert-safari-dubai",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-02-15 21:44:24"
+    },
+    {
+        "id": 8,
+        "request_log_id": 1995,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "http:\/\/localhost:8000\/evening-desert-safari-dubai",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-02-18 00:26:19"
+    },
+    {
+        "id": 9,
+        "request_log_id": 1996,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "http:\/\/localhost:8000\/evening-desert-safari-dubai",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-02-18 00:26:37"
+    },
+    {
+        "id": 10,
+        "request_log_id": 1997,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "http:\/\/localhost:8000\/evening-desert-safari-dubai",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-02-18 00:26:56"
+    },
+    {
+        "id": 11,
+        "request_log_id": 1998,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "http:\/\/localhost:8000\/evening-desert-safari-dubai",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-02-18 00:27:08"
+    },
+    {
+        "id": 12,
+        "request_log_id": 2001,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "http:\/\/localhost:8000\/",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-02-18 00:27:40"
+    },
+    {
+        "id": 13,
+        "request_log_id": 2010,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "http:\/\/localhost:8000\/contact",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-02-18 00:30:55"
+    },
+    {
+        "id": 14,
+        "request_log_id": 2011,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "http:\/\/localhost:8000\/contact",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-02-18 00:31:10"
+    },
+    {
+        "id": 15,
+        "request_log_id": 2012,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "http:\/\/localhost:8000\/contact",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-02-18 00:31:17"
+    },
+    {
+        "id": 16,
+        "request_log_id": 2038,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "http:\/\/localhost:8000\/contact",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-02-18 01:02:00"
+    },
+    {
+        "id": 17,
+        "request_log_id": 2334,
+        "name": "Zak",
+        "phone": 6474062412,
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/abu-dhabi-city-tour-from-dubai",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-02-19 00:05:47"
+    },
+    {
+        "id": 18,
+        "request_log_id": null,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "http:\/\/localhost:8000\/",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-02-20 16:36:27"
+    },
+    {
+        "id": 19,
+        "request_log_id": null,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "http:\/\/localhost:8000\/",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-02-20 16:36:45"
+    },
+    {
+        "id": 20,
+        "request_log_id": null,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-02-20 17:38:00"
+    },
+    {
+        "id": 21,
+        "request_log_id": 2638,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/?utm_source=Google%20Ads&amp;utm_medium=CPC&amp;utm_campaign=23467597613&amp;utm_term=desert%20safari%20uae&amp;utm_content=796858019897&amp;gad_source=1&amp;gad_campaignid=23467597613&amp;gclid=Cj0KCQiAqeDMBhDcARIsAJEbU9",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-02-20 19:55:02"
+    },
+    {
+        "id": 22,
+        "request_log_id": null,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "http:\/\/localhost:8000\/morning-desert-safari-dubai",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-02-21 00:12:18"
+    },
+    {
+        "id": 23,
+        "request_log_id": 2659,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/?referrer=mobile-app",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-02-21 01:23:32"
+    },
+    {
+        "id": 24,
+        "request_log_id": 2685,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/www.dunesdiscoverytourism.com\/",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-02-21 08:46:11"
+    },
+    {
+        "id": 25,
+        "request_log_id": 2694,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": "Morning Desert Safari Dubai",
+        "page_url": "https:\/\/www.dunesdiscoverytourism.com\/",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about Morning Desert Safari Dubai.",
+        "created_at": "2026-02-21 11:11:18"
+    },
+    {
+        "id": 26,
+        "request_log_id": 2695,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": "Morning Desert Safari Dubai",
+        "page_url": "https:\/\/www.dunesdiscoverytourism.com\/",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about Morning Desert Safari Dubai.",
+        "created_at": "2026-02-21 11:11:19"
+    },
+    {
+        "id": 27,
+        "request_log_id": 2770,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/faq",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-02-22 16:06:05"
+    },
+    {
+        "id": 28,
+        "request_log_id": 2771,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/faq",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-02-22 16:06:06"
+    },
+    {
+        "id": 29,
+        "request_log_id": 2862,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/www.dunesdiscoverytourism.com\/faq",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-02-25 03:12:19"
+    },
+    {
+        "id": 30,
+        "request_log_id": 3289,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/desert-safari-quad-biking-dubai",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-03-04 19:34:58"
+    },
+    {
+        "id": 31,
+        "request_log_id": 3290,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/desert-safari-quad-biking-dubai",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-03-04 19:35:02"
+    },
+    {
+        "id": 32,
+        "request_log_id": 3291,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/desert-safari-quad-biking-dubai",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-03-04 19:35:10"
+    },
+    {
+        "id": 33,
+        "request_log_id": 3292,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/desert-safari-quad-biking-dubai",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-03-04 19:35:11"
+    },
+    {
+        "id": 34,
+        "request_log_id": null,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/tours",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-03-04 19:35:15"
+    },
+    {
+        "id": 35,
+        "request_log_id": 3293,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/desert-safari-quad-biking-dubai",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-03-04 19:35:20"
+    },
+    {
+        "id": 36,
+        "request_log_id": 3294,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/desert-safari-quad-biking-dubai",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-03-04 19:35:21"
+    },
+    {
+        "id": 37,
+        "request_log_id": 3295,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/desert-safari-quad-biking-dubai",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-03-04 19:35:52"
+    },
+    {
+        "id": 38,
+        "request_log_id": null,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/evening-desert-safari-dubai",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-03-13 19:18:41"
+    },
+    {
+        "id": 39,
+        "request_log_id": 4011,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/contact",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-03-21 15:12:24"
+    },
+    {
+        "id": 40,
+        "request_log_id": 4012,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/contact",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-03-21 15:12:26"
+    },
+    {
+        "id": 41,
+        "request_log_id": 4013,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/contact",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-03-21 15:12:28"
+    },
+    {
+        "id": 42,
+        "request_log_id": 4014,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/contact",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-03-21 15:12:30"
+    },
+    {
+        "id": 43,
+        "request_log_id": 7038,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/evening-desert-safari-dubai",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-05-01 07:33:48"
+    },
+    {
+        "id": 44,
+        "request_log_id": 8056,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/www.dunesdiscoverytourism.com\/contact",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-05-10 16:58:04"
+    },
+    {
+        "id": 45,
+        "request_log_id": 8323,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": "Evening Desert Safari Dubai",
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about Evening Desert Safari Dubai.",
+        "created_at": "2026-05-20 11:35:27"
+    },
+    {
+        "id": 46,
+        "request_log_id": 8609,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/www.dunesdiscoverytourism.com\/evening-desert-safari-dubai?utm_source=ig&amp;utm_medium=social&amp;utm_content=link_in_bio&amp;fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQPNTY3MDY3MzQzMzUyNDI3AAGnpR-Out0KhJdrwqi05d-XGn0sK7rqUfKX59dUdmMqtsfhfZCcv636gqeV",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-05-28 20:02:55"
+    },
+    {
+        "id": 47,
+        "request_log_id": 8610,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/www.dunesdiscoverytourism.com\/evening-desert-safari-dubai?utm_source=ig&amp;utm_medium=social&amp;utm_content=link_in_bio&amp;fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQPNTY3MDY3MzQzMzUyNDI3AAGnpR-Out0KhJdrwqi05d-XGn0sK7rqUfKX59dUdmMqtsfhfZCcv636gqeV",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-05-28 20:03:24"
+    },
+    {
+        "id": 48,
+        "request_log_id": 8703,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/www.dunesdiscoverytourism.com\/?utm_source=ig&amp;utm_medium=social&amp;utm_content=link_in_bio&amp;fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQPMTI0MDI0NTc0Mjg3NDE0AAGnUXKN0CbMTo3ARMTK-K-vtcPwdm2Etv6B8p23yp0orRxG-E5IfpRK5DDt4D4_aem_26xaJOVti2ejjxkIONP",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-05-31 07:21:59"
+    },
+    {
+        "id": 49,
+        "request_log_id": 8704,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/www.dunesdiscoverytourism.com\/?utm_source=ig&amp;utm_medium=social&amp;utm_content=link_in_bio&amp;fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQPMTI0MDI0NTc0Mjg3NDE0AAGnUXKN0CbMTo3ARMTK-K-vtcPwdm2Etv6B8p23yp0orRxG-E5IfpRK5DDt4D4_aem_26xaJOVti2ejjxkIONP",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-05-31 07:22:02"
+    },
+    {
+        "id": 50,
+        "request_log_id": 8773,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/evening-desert-safari-dubai",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-06-02 12:36:22"
+    },
+    {
+        "id": 51,
+        "request_log_id": 9920,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/www.dunesdiscoverytourism.com\/dubai-city-tour",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-06-23 19:53:51"
+    },
+    {
+        "id": 52,
+        "request_log_id": 9999,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/evening-desert-safari-dubai",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-06-25 19:34:34"
+    },
+    {
+        "id": 53,
+        "request_log_id": 10057,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": "Evening Desert Safari Dubai",
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/?utm_source=chatgpt.com",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about Evening Desert Safari Dubai.",
+        "created_at": "2026-06-27 20:58:05"
+    },
+    {
+        "id": 54,
+        "request_log_id": 10059,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/evening-desert-safari-dubai",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-06-27 21:03:39"
+    },
+    {
+        "id": 55,
+        "request_log_id": 10545,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-07-07 16:46:11"
+    },
+    {
+        "id": 56,
+        "request_log_id": 10556,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-07-07 16:55:12"
+    },
+    {
+        "id": 57,
+        "request_log_id": 10557,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-07-07 16:55:29"
+    },
+    {
+        "id": 58,
+        "request_log_id": 10558,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/dunesdiscoverytourism.com\/",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-07-07 16:55:31"
+    },
+    {
+        "id": 59,
+        "request_log_id": 10877,
+        "name": "N\/A",
+        "phone": "N\/A",
+        "tour_name": null,
+        "page_url": "https:\/\/www.dunesdiscoverytourism.com\/desert-safari-quad-biking-dubai",
+        "message_text": "Hi Dunes Discovery Tourism, I would like to inquire about:",
+        "created_at": "2026-07-12 06:50:19"
+    }
+]

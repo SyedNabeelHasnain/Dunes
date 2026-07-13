@@ -1,0 +1,205 @@
+[
+    {
+        "id": 1,
+        "page_id": 1,
+        "heading": "1. Company Information",
+        "subheading": "Legal identity and licensing details",
+        "priority": 1
+    },
+    {
+        "id": 2,
+        "page_id": 1,
+        "heading": "2. Acceptance of Terms",
+        "subheading": "User agreement and consent",
+        "priority": 2
+    },
+    {
+        "id": 3,
+        "page_id": 1,
+        "heading": "3. Eligibility",
+        "subheading": "Conditions to use the services",
+        "priority": 3
+    },
+    {
+        "id": 4,
+        "page_id": 1,
+        "heading": "4. Scope of Services",
+        "subheading": "Nature of services provided",
+        "priority": 4
+    },
+    {
+        "id": 5,
+        "page_id": 1,
+        "heading": "5. Pricing and Inclusions",
+        "subheading": "Rates inclusions and exclusions",
+        "priority": 5
+    },
+    {
+        "id": 6,
+        "page_id": 1,
+        "heading": "6. Payments",
+        "subheading": "Payment methods and authorization",
+        "priority": 6
+    },
+    {
+        "id": 7,
+        "page_id": 1,
+        "heading": "7. Booking Confirmation",
+        "subheading": "Voucher issuance and validation",
+        "priority": 7
+    },
+    {
+        "id": 8,
+        "page_id": 1,
+        "heading": "8. Cancellation Refund and No Show Policy",
+        "subheading": "Rules governing cancellations and refunds",
+        "priority": 8
+    },
+    {
+        "id": 9,
+        "page_id": 1,
+        "heading": "9. Amendments and Force Majeure",
+        "subheading": "Schedule changes and uncontrollable events",
+        "priority": 9
+    },
+    {
+        "id": 10,
+        "page_id": 1,
+        "heading": "10. Travel Documents and Insurance",
+        "subheading": "Customer responsibilities",
+        "priority": 10
+    },
+    {
+        "id": 11,
+        "page_id": 1,
+        "heading": "11. Limitation of Liability",
+        "subheading": "Extent of company responsibility",
+        "priority": 11
+    },
+    {
+        "id": 12,
+        "page_id": 1,
+        "heading": "12. Website Use and Intellectual Property",
+        "subheading": "Content ownership and restrictions",
+        "priority": 12
+    },
+    {
+        "id": 13,
+        "page_id": 1,
+        "heading": "13. Data Protection and Privacy",
+        "subheading": "Handling of personal information",
+        "priority": 13
+    },
+    {
+        "id": 14,
+        "page_id": 1,
+        "heading": "14. Governing Law and Jurisdiction",
+        "subheading": "Applicable law and courts",
+        "priority": 14
+    },
+    {
+        "id": 101,
+        "page_id": 2,
+        "heading": "1. Definitions",
+        "subheading": "Explanation of terms used in this Privacy Policy",
+        "priority": 1
+    },
+    {
+        "id": 102,
+        "page_id": 2,
+        "heading": "2. Data We Collect",
+        "subheading": "Types of personal data collected from users",
+        "priority": 2
+    },
+    {
+        "id": 103,
+        "page_id": 2,
+        "heading": "3. Purposes of Data Processing",
+        "subheading": "Why personal data is processed",
+        "priority": 3
+    },
+    {
+        "id": 104,
+        "page_id": 2,
+        "heading": "4. Legal Basis for Processing",
+        "subheading": "Legal grounds under UAE law, GDPR, and international standards",
+        "priority": 4
+    },
+    {
+        "id": 105,
+        "page_id": 2,
+        "heading": "5. Data Sharing and Third Parties",
+        "subheading": "Who we share data with",
+        "priority": 5
+    },
+    {
+        "id": 106,
+        "page_id": 2,
+        "heading": "6. Data Retention",
+        "subheading": "How long data is stored and deletion",
+        "priority": 6
+    },
+    {
+        "id": 107,
+        "page_id": 2,
+        "heading": "7. Cookies and Tracking",
+        "subheading": "Website tracking and cookies",
+        "priority": 7
+    },
+    {
+        "id": 108,
+        "page_id": 2,
+        "heading": "8. Data Subject Rights",
+        "subheading": "Rights of users regarding their data",
+        "priority": 8
+    },
+    {
+        "id": 109,
+        "page_id": 2,
+        "heading": "9. Security Measures",
+        "subheading": "How personal data is protected",
+        "priority": 9
+    },
+    {
+        "id": 110,
+        "page_id": 2,
+        "heading": "10. Children's Data",
+        "subheading": "Policy regarding data from children",
+        "priority": 10
+    },
+    {
+        "id": 111,
+        "page_id": 2,
+        "heading": "11. International Data Transfer",
+        "subheading": "Transferring data outside UAE",
+        "priority": 11
+    },
+    {
+        "id": 112,
+        "page_id": 2,
+        "heading": "12. Marketing and Communications",
+        "subheading": "User consent and opt-out",
+        "priority": 12
+    },
+    {
+        "id": 113,
+        "page_id": 2,
+        "heading": "13. Changes to Privacy Policy",
+        "subheading": "Updates and revisions to the policy",
+        "priority": 13
+    },
+    {
+        "id": 114,
+        "page_id": 2,
+        "heading": "14. Governing Law and Jurisdiction",
+        "subheading": "Applicable laws and courts",
+        "priority": 14
+    },
+    {
+        "id": 115,
+        "page_id": 2,
+        "heading": "15. Contact Information",
+        "subheading": "Company contact details for data inquiries",
+        "priority": 15
+    }
+]

@@ -1,0 +1,354 @@
+[
+    {
+        "id": 1,
+        "question": "What should I wear for the desert safari?",
+        "answer": "Comfortable, loose-fitting clothes are recommended. Avoid high heels. Sunglasses and sunscreen are essential.",
+        "category": "general",
+        "priority": 99,
+        "status": "active"
+    },
+    {
+        "id": 2,
+        "question": "Is the desert safari suitable for children?",
+        "answer": "Yes! Children aged 3+ can enjoy the experience. Car seats available on request.",
+        "category": "general",
+        "priority": 99,
+        "status": "active"
+    },
+    {
+        "id": 3,
+        "question": "Can I bring my camera?",
+        "answer": "Absolutely! The desert offers amazing photo opportunities. Professional photography is also available.",
+        "category": "general",
+        "priority": 99,
+        "status": "active"
+    },
+    {
+        "id": 4,
+        "question": "What is included in the BBQ dinner?",
+        "answer": "International buffet with grilled meats, salads, rice, bread, and vegetarian options. Soft drinks included.",
+        "category": "general",
+        "priority": 99,
+        "status": "active"
+    },
+    {
+        "id": 5,
+        "question": "How long is the dune bashing?",
+        "answer": "Dune bashing typically lasts 30-45 minutes, depending on the package selected.",
+        "category": "general",
+        "priority": 99,
+        "status": "active"
+    },
+    {
+        "id": 6,
+        "question": "Is pickup from all Dubai hotels included?",
+        "answer": "Yes, we offer free pickup and drop-off from any hotel or residence in Dubai.",
+        "category": "general",
+        "priority": 99,
+        "status": "active"
+    },
+    {
+        "id": 7,
+        "question": "What payment methods do you accept?",
+        "answer": "We accept cash (AED), credit cards, and bank transfers. Payment collected at pickup.",
+        "category": "general",
+        "priority": 99,
+        "status": "active"
+    },
+    {
+        "id": 8,
+        "question": "Can I cancel or reschedule my booking?",
+        "answer": "Free cancellation up to 24 hours before. Rescheduling subject to availability.",
+        "category": "general",
+        "priority": 99,
+        "status": "active"
+    },
+    {
+        "id": 9,
+        "question": "What is the difference between Standard, Premium and VIP?",
+        "answer": "Standard includes basic experience. Premium adds private vehicle and better seating. VIP includes private vehicle, front-row seating, and priority service.",
+        "category": "general",
+        "priority": 99,
+        "status": "active"
+    },
+    {
+        "id": 10,
+        "question": "Are vegetarian food options available?",
+        "answer": "Yes, we offer a variety of vegetarian dishes including salads, rice, grilled vegetables, and more.",
+        "category": "general",
+        "priority": 99,
+        "status": "active"
+    },
+    {
+        "id": 11,
+        "question": "What time does the evening desert safari start and end?",
+        "answer": "Our evening desert safari pick-up begins between 3:00 PM and 3:30 PM from your Dubai hotel. The exact time depends on your location and the seasonal sunset schedule. You are dropped back by approximately 9:00 PM to 9:30 PM. The total experience lasts about 6 hours.",
+        "category": "evening-safari",
+        "priority": 1,
+        "status": "active"
+    },
+    {
+        "id": 12,
+        "question": "Can I skip dune bashing if I have health concerns?",
+        "answer": "Absolutely. If you prefer not to participate in dune bashing due to pregnancy, back problems, or any other concern, we can arrange for you to be driven directly to the desert camp in a separate vehicle at normal speed. You will still enjoy all camp activities, dinner, and shows.",
+        "category": "evening-safari",
+        "priority": 2,
+        "status": "active"
+    },
+    {
+        "id": 13,
+        "question": "What entertainment shows are included in the evening safari?",
+        "answer": "Your evening includes a Tanoura (Sufi whirling) dance, belly dance performance, a dramatic fire show, and Dabka drumming. During the Holy Month of Ramadan, belly dance is paused out of respect, but all other shows continue.",
+        "category": "evening-safari",
+        "priority": 3,
+        "status": "active"
+    },
+    {
+        "id": 14,
+        "question": "Is the BBQ dinner suitable for vegetarians?",
+        "answer": "Yes. Our BBQ buffet always includes a variety of vegetarian dishes — grilled vegetables, salads, hummus, rice, Arabic bread, and desserts. If you have specific dietary requirements such as vegan, gluten-free, or allergies, please inform us at booking and we will accommodate you.",
+        "category": "evening-safari",
+        "priority": 4,
+        "status": "active"
+    },
+    {
+        "id": 15,
+        "question": "What type of vehicle is used for dune bashing?",
+        "answer": "We use Toyota Land Cruisers and similar high-performance 4x4 SUVs. All vehicles are fitted with safety roll cages, seatbelts for every passenger, fire extinguishers, and are maintained to the highest standards. Our drivers hold government-issued safari licences.",
+        "category": "evening-safari",
+        "priority": 5,
+        "status": "active"
+    },
+    {
+        "id": 16,
+        "question": "Is the evening desert safari suitable for elderly guests?",
+        "answer": "Guests of all ages are welcome at the camp. However, dune bashing involves vigorous movement and is not recommended for those with heart conditions, severe back issues, or limited mobility. Elderly guests can opt for a direct, gentle drive to the camp and enjoy all other activities.",
+        "category": "evening-safari",
+        "priority": 6,
+        "status": "active"
+    },
+    {
+        "id": 17,
+        "question": "Do you provide hotel pickup from all areas of Dubai?",
+        "answer": "Yes, we provide complimentary pick-up and drop-off from any hotel, apartment, or residence across Dubai including JBR, Marina, Downtown, Deira, Bur Dubai, Palm Jumeirah, Business Bay, and outlying areas. Sharjah and Ajman pickups may also be arranged.",
+        "category": "evening-safari",
+        "priority": 7,
+        "status": "active"
+    },
+    {
+        "id": 18,
+        "question": "What happens if it rains or there is a sandstorm?",
+        "answer": "Desert safaris may be rescheduled in cases of extreme weather for your safety. If a tour is cancelled due to weather, you will be offered an alternative date or a full refund. Our team will contact you as early as possible with updates.",
+        "category": "evening-safari",
+        "priority": 8,
+        "status": "active"
+    },
+    {
+        "id": 19,
+        "question": "How is the morning desert safari different from the evening?",
+        "answer": "The morning safari focuses on adventure and natural beauty in cooler, more comfortable temperatures. It includes dune bashing, sandboarding, camel riding, and photography — but does not include BBQ dinner, live entertainment shows, henna, or shisha, which are exclusive to the evening experience.",
+        "category": "morning-safari",
+        "priority": 1,
+        "status": "active"
+    },
+    {
+        "id": 20,
+        "question": "Is breakfast included in the morning desert safari?",
+        "answer": "The standard morning safari includes Arabic coffee, dates, bottled water, and light refreshments. A full breakfast is not included in the base package. If you would like a Bedouin-style breakfast, please enquire about our upgraded options at the time of booking.",
+        "category": "morning-safari",
+        "priority": 2,
+        "status": "active"
+    },
+    {
+        "id": 21,
+        "question": "What is the best time of year for a morning desert safari?",
+        "answer": "October through February offers the most pleasant morning temperatures, typically between 20 and 28 degrees Celsius. Summer mornings (June to August) heat up quickly after 9 AM. However, the morning safari is always more comfortable than the afternoon regardless of season.",
+        "category": "morning-safari",
+        "priority": 3,
+        "status": "active"
+    },
+    {
+        "id": 22,
+        "question": "Can I add quad biking to my morning safari?",
+        "answer": "Yes, quad biking can be added as a paid upgrade. A 30-minute ATV session typically costs between AED 150 and AED 200. We recommend pre-booking to guarantee availability as on-site slots fill up quickly.",
+        "category": "morning-safari",
+        "priority": 4,
+        "status": "active"
+    },
+    {
+        "id": 23,
+        "question": "Will I see a sunrise on the morning safari?",
+        "answer": "Our standard morning safari departs at 8:00 AM, so you will experience the beautiful morning light but not the actual sunrise. If you specifically want a sunrise experience, ask us about the dedicated Sunrise Safari option with an earlier 4:30 AM to 5:00 AM departure.",
+        "category": "morning-safari",
+        "priority": 5,
+        "status": "active"
+    },
+    {
+        "id": 24,
+        "question": "Is the morning safari good for families with young children?",
+        "answer": "It is excellent for families. Cooler temperatures, a shorter four-hour duration, and the adventure-focused format make it ideal for children. Kids aged 3 and above can participate in dune bashing. Younger children require a private vehicle with a child seat.",
+        "category": "morning-safari",
+        "priority": 6,
+        "status": "active"
+    },
+    {
+        "id": 25,
+        "question": "Are there restroom facilities in the desert?",
+        "answer": "Yes, basic restroom facilities are available at the meeting point before entering the deep desert and at any camp or stop area. We recommend using the facilities before the dune bashing segment begins.",
+        "category": "morning-safari",
+        "priority": 7,
+        "status": "active"
+    },
+    {
+        "id": 26,
+        "question": "What should I eat before the morning safari?",
+        "answer": "We suggest a light meal or snack before departure. Avoid heavy or greasy food as the dune bashing involves vigorous movement. Staying hydrated is important — we provide unlimited bottled water throughout the tour.",
+        "category": "morning-safari",
+        "priority": 8,
+        "status": "active"
+    },
+    {
+        "id": 27,
+        "question": "Is it safe to sleep in the desert overnight?",
+        "answer": "Yes. Our overnight camps are professionally managed with on-site staff present throughout the night. The camps are in established, secure desert locations used regularly by licensed tour operators. Security, first aid, and emergency protocols are always in place.",
+        "category": "overnight-safari",
+        "priority": 1,
+        "status": "active"
+    },
+    {
+        "id": 28,
+        "question": "What type of accommodation is provided?",
+        "answer": "Standard overnight packages include traditional open-air Bedouin-style tents with clean mattresses, pillows, and warm blankets. Premium upgrades with air-conditioned tents, thicker mattresses, and additional privacy can be arranged — please ask at booking.",
+        "category": "overnight-safari",
+        "priority": 2,
+        "status": "active"
+    },
+    {
+        "id": 29,
+        "question": "How cold does the desert get at night?",
+        "answer": "Desert temperatures can drop to 10 to 15 degrees Celsius during winter months (November through February). In summer, nights remain warmer at around 25 to 30 degrees. Blankets are provided, but we strongly recommend bringing a jacket or fleece, especially in winter.",
+        "category": "overnight-safari",
+        "priority": 3,
+        "status": "active"
+    },
+    {
+        "id": 30,
+        "question": "Is breakfast included the next morning?",
+        "answer": "Yes. A hearty Bedouin-style breakfast is included: eggs, Arabic bread, cheese, jam, honey, fresh fruits, tea, and Arabic coffee. It is served after the optional sunrise experience.",
+        "category": "overnight-safari",
+        "priority": 4,
+        "status": "active"
+    },
+    {
+        "id": 31,
+        "question": "Can I charge my phone at the desert camp?",
+        "answer": "Most standard camps have limited or no electrical outlets. We strongly recommend bringing a fully charged portable power bank. Some premium camp setups may offer basic charging facilities — confirm at booking.",
+        "category": "overnight-safari",
+        "priority": 5,
+        "status": "active"
+    },
+    {
+        "id": 32,
+        "question": "Is there mobile phone signal in the desert?",
+        "answer": "Mobile network signal is generally weak or absent at overnight camp locations deep in the desert. WiFi is available in the vehicles during transit but typically not at the camp itself. We suggest informing family or friends that you may be unreachable until morning.",
+        "category": "overnight-safari",
+        "priority": 6,
+        "status": "active"
+    },
+    {
+        "id": 33,
+        "question": "Is the overnight safari suitable for children?",
+        "answer": "Children aged 5 and above generally enjoy the overnight experience. Younger children may find the long hours and sleeping conditions challenging. Private family tent arrangements can be discussed with our team at booking to ensure maximum comfort.",
+        "category": "overnight-safari",
+        "priority": 7,
+        "status": "active"
+    },
+    {
+        "id": 34,
+        "question": "What wildlife might I see in the desert?",
+        "answer": "The Arabian desert is home to desert foxes, sand gazelles, Arabian oryx, and various reptiles and insects. During the early morning nature walk, you may spot tracks and desert-adapted wildlife. Sightings depend on the season and cannot be guaranteed.",
+        "category": "overnight-safari",
+        "priority": 8,
+        "status": "active"
+    },
+    {
+        "id": 35,
+        "question": "What if the weather turns bad during the overnight stay?",
+        "answer": "In the rare event of extreme weather such as a sandstorm or heavy rain, our team will make every effort to ensure your safety and comfort. If conditions require cancellation before departure, a full refund or rescheduling is offered. If weather changes during the stay, emergency shelter and transport are available.",
+        "category": "overnight-safari",
+        "priority": 9,
+        "status": "active"
+    },
+    {
+        "id": 36,
+        "question": "Do I need prior experience to ride a quad bike?",
+        "answer": "No prior experience is necessary. All our quad bikes are automatic (no gear changes required). Before your ride, a professional instructor provides a complete safety briefing covering controls, throttle, braking, and track rules. It is very easy to pick up within the first minute or two.",
+        "category": "quad-biking-safari",
+        "priority": 1,
+        "status": "active"
+    },
+    {
+        "id": 37,
+        "question": "What is the minimum age for quad biking?",
+        "answer": "Self-driving is available for guests aged 16 and above (some sessions may require 18). Children under 16 can ride as a passenger with a trained instructor on designated children's quad bikes within a restricted, safer area.",
+        "category": "quad-biking-safari",
+        "priority": 2,
+        "status": "active"
+    },
+    {
+        "id": 38,
+        "question": "Do I need a driving licence for quad biking?",
+        "answer": "No driving licence is required for desert quad biking. The rides take place on private desert terrain, not public roads, so no licence is necessary.",
+        "category": "quad-biking-safari",
+        "priority": 3,
+        "status": "active"
+    },
+    {
+        "id": 39,
+        "question": "How long is the quad biking session?",
+        "answer": "The standard included session is 30 minutes — plenty of time to get comfortable and enjoy the experience. If you want more, you can extend by an additional 30 to 60 minutes at an extra charge payable at the desert.",
+        "category": "quad-biking-safari",
+        "priority": 4,
+        "status": "active"
+    },
+    {
+        "id": 40,
+        "question": "What safety gear is provided for quad biking?",
+        "answer": "We provide helmets and safety goggles for every rider. Closed-toe shoes are recommended. Our ATVs are professionally maintained and inspected before each session. An instructor monitors all riders throughout the experience.",
+        "category": "quad-biking-safari",
+        "priority": 5,
+        "status": "active"
+    },
+    {
+        "id": 41,
+        "question": "Can I ride the quad bike with a passenger?",
+        "answer": "Standard ATVs are single-rider vehicles. If you want to ride with a companion, ask about our 2-seater dune buggy option, which is available at an additional charge and offers an equally thrilling experience for two.",
+        "category": "quad-biking-safari",
+        "priority": 6,
+        "status": "active"
+    },
+    {
+        "id": 42,
+        "question": "Should I pre-book the quad biking or pay at the desert?",
+        "answer": "We strongly recommend pre-booking. On-site availability is not guaranteed as quad bikes are limited, on-site prices are typically higher, and you may face wait times. Pre-booking ensures your ATV is reserved, your session is scheduled seamlessly with the safari, and you get the best rate.",
+        "category": "quad-biking-safari",
+        "priority": 7,
+        "status": "active"
+    },
+    {
+        "id": 43,
+        "question": "Can I take photos while riding the quad bike?",
+        "answer": "For safety reasons, we do not recommend using a phone while actively riding. However, the instructor can stop the group for photo opportunities during the session. GoPro or action camera mounts can often be arranged — ask your instructor.",
+        "category": "quad-biking-safari",
+        "priority": 8,
+        "status": "active"
+    },
+    {
+        "id": 44,
+        "question": "Who should avoid quad biking?",
+        "answer": "Quad biking is not recommended for pregnant women, guests with severe back or neck problems, those prone to vertigo, or anyone who has recently undergone hand, arm, or shoulder surgery. If you are unsure, please consult with our team before booking.",
+        "category": "quad-biking-safari",
+        "priority": 9,
+        "status": "active"
+    }
+]

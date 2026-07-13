@@ -1,0 +1,698 @@
+[
+    {
+        "id": 1,
+        "section_id": 1,
+        "content": "The services are provided by Dunes Discovery Tourism L.L.C, a company registered in the United Arab Emirates.",
+        "priority": 1
+    },
+    {
+        "id": 2,
+        "section_id": 1,
+        "content": "Company license number is 1430583.",
+        "priority": 2
+    },
+    {
+        "id": 3,
+        "section_id": 1,
+        "content": "Legal form of the company is Limited Liability Company.",
+        "priority": 3
+    },
+    {
+        "id": 4,
+        "section_id": 1,
+        "content": "Licensed activity is Inbound Tour Operator.",
+        "priority": 4
+    },
+    {
+        "id": 5,
+        "section_id": 1,
+        "content": "The company operates under UAE laws and regulations.",
+        "priority": 5
+    },
+    {
+        "id": 6,
+        "section_id": 2,
+        "content": "By accessing the website or making a booking you agree to be bound by these Terms and Conditions.",
+        "priority": 1
+    },
+    {
+        "id": 7,
+        "section_id": 2,
+        "content": "If you do not agree with any part of these terms you must not use the website or services.",
+        "priority": 2
+    },
+    {
+        "id": 8,
+        "section_id": 2,
+        "content": "Bookings made on behalf of others confirm acceptance for all travelers.",
+        "priority": 3
+    },
+    {
+        "id": 9,
+        "section_id": 2,
+        "content": "Continued use of the website constitutes acceptance of updated terms.",
+        "priority": 4
+    },
+    {
+        "id": 10,
+        "section_id": 3,
+        "content": "Users must be at least 18 years of age.",
+        "priority": 1
+    },
+    {
+        "id": 11,
+        "section_id": 3,
+        "content": "Users must have legal capacity to enter binding contracts.",
+        "priority": 2
+    },
+    {
+        "id": 12,
+        "section_id": 3,
+        "content": "All information provided during booking must be accurate and complete.",
+        "priority": 3
+    },
+    {
+        "id": 13,
+        "section_id": 3,
+        "content": "False or misleading information may result in cancellation without refund.",
+        "priority": 4
+    },
+    {
+        "id": 14,
+        "section_id": 4,
+        "content": "The company provides inbound tourism services and booking facilitation.",
+        "priority": 1
+    },
+    {
+        "id": 15,
+        "section_id": 4,
+        "content": "Services may include tours excursions safaris attractions transportation accommodation and visa assistance.",
+        "priority": 2
+    },
+    {
+        "id": 16,
+        "section_id": 4,
+        "content": "The company may act as an agent for third party suppliers.",
+        "priority": 3
+    },
+    {
+        "id": 17,
+        "section_id": 4,
+        "content": "Third party services are subject to supplier terms.",
+        "priority": 4
+    },
+    {
+        "id": 18,
+        "section_id": 5,
+        "content": "All prices are displayed in AED unless stated otherwise.",
+        "priority": 1
+    },
+    {
+        "id": 19,
+        "section_id": 5,
+        "content": "Prices are per person unless specified.",
+        "priority": 2
+    },
+    {
+        "id": 20,
+        "section_id": 5,
+        "content": "Inclusions are limited to those mentioned in the service description.",
+        "priority": 3
+    },
+    {
+        "id": 21,
+        "section_id": 5,
+        "content": "Prices exclude tips visas insurance meals personal expenses and hotel extras unless stated.",
+        "priority": 4
+    },
+    {
+        "id": 22,
+        "section_id": 5,
+        "content": "Prices are subject to change based on availability and supplier costs.",
+        "priority": 5
+    },
+    {
+        "id": 23,
+        "section_id": 6,
+        "content": "Payments are processed through Ziina payment gateway.",
+        "priority": 1
+    },
+    {
+        "id": 24,
+        "section_id": 6,
+        "content": "Accepted payment methods include supported debit and credit cards.",
+        "priority": 2
+    },
+    {
+        "id": 25,
+        "section_id": 6,
+        "content": "Full payment is required at the time of booking.",
+        "priority": 3
+    },
+    {
+        "id": 26,
+        "section_id": 6,
+        "content": "By submitting payment details you authorize the company to charge the total amount.",
+        "priority": 4
+    },
+    {
+        "id": 27,
+        "section_id": 7,
+        "content": "Confirmation vouchers are issued after successful payment.",
+        "priority": 1
+    },
+    {
+        "id": 28,
+        "section_id": 7,
+        "content": "Vouchers are sent electronically via email or WhatsApp.",
+        "priority": 2
+    },
+    {
+        "id": 29,
+        "section_id": 7,
+        "content": "Valid vouchers must be presented to redeem services.",
+        "priority": 3
+    },
+    {
+        "id": 30,
+        "section_id": 7,
+        "content": "Failure to present confirmation may result in service denial without refund.",
+        "priority": 4
+    },
+    {
+        "id": 31,
+        "section_id": 8,
+        "content": "All services are subject to supplier specific cancellation policies.",
+        "priority": 1
+    },
+    {
+        "id": 32,
+        "section_id": 8,
+        "content": "Cancellation requests must be submitted in writing.",
+        "priority": 2
+    },
+    {
+        "id": 33,
+        "section_id": 8,
+        "content": "Cancellations are effective only after written confirmation.",
+        "priority": 3
+    },
+    {
+        "id": 34,
+        "section_id": 8,
+        "content": "More than 72 hours before service may qualify for partial refund.",
+        "priority": 4
+    },
+    {
+        "id": 35,
+        "section_id": 8,
+        "content": "Between 72 and 24 hours cancellation charges may apply.",
+        "priority": 5
+    },
+    {
+        "id": 36,
+        "section_id": 8,
+        "content": "Less than 24 hours before service is non refundable.",
+        "priority": 6
+    },
+    {
+        "id": 37,
+        "section_id": 8,
+        "content": "No shows are charged at 100 percent.",
+        "priority": 7
+    },
+    {
+        "id": 38,
+        "section_id": 8,
+        "content": "Visa fees government charges service fees and gateway fees are non refundable.",
+        "priority": 8
+    },
+    {
+        "id": 39,
+        "section_id": 8,
+        "content": "Refunds are processed to the original payment method within 7 to 14 working days.",
+        "priority": 9
+    },
+    {
+        "id": 40,
+        "section_id": 9,
+        "content": "The company may amend itineraries due to operational or safety reasons.",
+        "priority": 1
+    },
+    {
+        "id": 41,
+        "section_id": 9,
+        "content": "Force majeure events include natural disasters pandemics government actions and flight disruptions.",
+        "priority": 2
+    },
+    {
+        "id": 42,
+        "section_id": 9,
+        "content": "No guaranteed refunds apply in force majeure situations.",
+        "priority": 3
+    },
+    {
+        "id": 43,
+        "section_id": 9,
+        "content": "Alternative services or credits may be offered at company discretion.",
+        "priority": 4
+    },
+    {
+        "id": 44,
+        "section_id": 10,
+        "content": "Travelers are responsible for valid passports visas permits and health documents.",
+        "priority": 1
+    },
+    {
+        "id": 45,
+        "section_id": 10,
+        "content": "Visa regulations may change without notice.",
+        "priority": 2
+    },
+    {
+        "id": 46,
+        "section_id": 10,
+        "content": "Travel insurance is strongly recommended.",
+        "priority": 3
+    },
+    {
+        "id": 47,
+        "section_id": 10,
+        "content": "The company is not liable for losses due to missing documents.",
+        "priority": 4
+    },
+    {
+        "id": 48,
+        "section_id": 11,
+        "content": "The company acts as an agent for third party suppliers.",
+        "priority": 1
+    },
+    {
+        "id": 49,
+        "section_id": 11,
+        "content": "The company is not liable for acts or omissions of suppliers.",
+        "priority": 2
+    },
+    {
+        "id": 50,
+        "section_id": 11,
+        "content": "Liability is limited to the amount paid for the booking.",
+        "priority": 3
+    },
+    {
+        "id": 51,
+        "section_id": 11,
+        "content": "No liability is accepted for indirect or consequential losses.",
+        "priority": 4
+    },
+    {
+        "id": 52,
+        "section_id": 12,
+        "content": "All website content is the property of the company.",
+        "priority": 1
+    },
+    {
+        "id": 53,
+        "section_id": 12,
+        "content": "Unauthorized use reproduction or distribution is prohibited.",
+        "priority": 2
+    },
+    {
+        "id": 54,
+        "section_id": 12,
+        "content": "Website use must be lawful and personal.",
+        "priority": 3
+    },
+    {
+        "id": 55,
+        "section_id": 13,
+        "content": "Personal data is processed in accordance with UAE data protection laws.",
+        "priority": 1
+    },
+    {
+        "id": 56,
+        "section_id": 13,
+        "content": "Payment data is handled securely by payment gateways.",
+        "priority": 2
+    },
+    {
+        "id": 57,
+        "section_id": 13,
+        "content": "The company does not store card details.",
+        "priority": 3
+    },
+    {
+        "id": 58,
+        "section_id": 14,
+        "content": "These Terms are governed by the laws of the United Arab Emirates.",
+        "priority": 1
+    },
+    {
+        "id": 59,
+        "section_id": 14,
+        "content": "UAE courts shall have exclusive jurisdiction.",
+        "priority": 2
+    },
+    {
+        "id": 60,
+        "section_id": 101,
+        "content": "Personal Data: Any information relating to an identifiable individual.",
+        "priority": 1
+    },
+    {
+        "id": 61,
+        "section_id": 101,
+        "content": "Processing: Any operation performed on Personal Data, including collection, storage, use, disclosure, or deletion.",
+        "priority": 2
+    },
+    {
+        "id": 62,
+        "section_id": 101,
+        "content": "Data Subject: Any individual whose Personal Data is collected or processed by the Company.",
+        "priority": 3
+    },
+    {
+        "id": 63,
+        "section_id": 102,
+        "content": "Contact information: name, email address, phone number.",
+        "priority": 1
+    },
+    {
+        "id": 64,
+        "section_id": 102,
+        "content": "Financial data: payment information processed securely via Ziina Payment Gateway, transaction history, and invoices.",
+        "priority": 2
+    },
+    {
+        "id": 65,
+        "section_id": 102,
+        "content": "Booking data: selected tours, dates, hotel preferences, transportation choices, special requests.",
+        "priority": 3
+    },
+    {
+        "id": 66,
+        "section_id": 102,
+        "content": "Website & technical data: IP address, device type, browser type, cookies, browsing behavior, analytics, referral sources.",
+        "priority": 4
+    },
+    {
+        "id": 67,
+        "section_id": 102,
+        "content": "Communications: emails, chat, and phone conversations with our support team.",
+        "priority": 5
+    },
+    {
+        "id": 68,
+        "section_id": 103,
+        "content": "To provide and manage bookings and travel services.",
+        "priority": 1
+    },
+    {
+        "id": 69,
+        "section_id": 103,
+        "content": "To process payments securely.",
+        "priority": 2
+    },
+    {
+        "id": 70,
+        "section_id": 103,
+        "content": "To comply with legal obligations including accounting and reporting.",
+        "priority": 3
+    },
+    {
+        "id": 71,
+        "section_id": 103,
+        "content": "To send booking confirmations, invoices, updates, or promotional content (if consented).",
+        "priority": 4
+    },
+    {
+        "id": 72,
+        "section_id": 103,
+        "content": "To improve services, perform analytics, and ensure website functionality.",
+        "priority": 5
+    },
+    {
+        "id": 73,
+        "section_id": 103,
+        "content": "To manage complaints, claims, or disputes.",
+        "priority": 6
+    },
+    {
+        "id": 74,
+        "section_id": 104,
+        "content": "Contractual necessity: for fulfilling bookings.",
+        "priority": 1
+    },
+    {
+        "id": 75,
+        "section_id": 104,
+        "content": "Legal obligation: under UAE law.",
+        "priority": 2
+    },
+    {
+        "id": 76,
+        "section_id": 104,
+        "content": "Consent: when explicitly given for marketing communications.",
+        "priority": 3
+    },
+    {
+        "id": 77,
+        "section_id": 104,
+        "content": "Legitimate interest: for service improvement, fraud prevention, and operational efficiency.",
+        "priority": 4
+    },
+    {
+        "id": 78,
+        "section_id": 105,
+        "content": "Service providers: hotels, transport operators, airlines, and tour guides.",
+        "priority": 1
+    },
+    {
+        "id": 79,
+        "section_id": 105,
+        "content": "Payment processors: Ziina Payment Gateway.",
+        "priority": 2
+    },
+    {
+        "id": 80,
+        "section_id": 105,
+        "content": "Government authorities: for accounting and regulatory compliance.",
+        "priority": 3
+    },
+    {
+        "id": 81,
+        "section_id": 105,
+        "content": "Legal bodies: for claims, disputes, or investigations.",
+        "priority": 4
+    },
+    {
+        "id": 82,
+        "section_id": 105,
+        "content": "We do not sell or trade personal data to unrelated third parties.",
+        "priority": 5
+    },
+    {
+        "id": 83,
+        "section_id": 106,
+        "content": "Personal data is retained only as long as necessary for contractual, legal, or legitimate purposes.",
+        "priority": 1
+    },
+    {
+        "id": 84,
+        "section_id": 106,
+        "content": "Booking and payment records are kept for minimum 5 years per UAE law.",
+        "priority": 2
+    },
+    {
+        "id": 85,
+        "section_id": 106,
+        "content": "Marketing data is retained until consent is withdrawn.",
+        "priority": 3
+    },
+    {
+        "id": 86,
+        "section_id": 106,
+        "content": "Data is securely deleted or anonymized after retention period.",
+        "priority": 4
+    },
+    {
+        "id": 87,
+        "section_id": 107,
+        "content": "Cookies are used for website functionality, analytics, and marketing.",
+        "priority": 1
+    },
+    {
+        "id": 88,
+        "section_id": 107,
+        "content": "Users can manage cookies via browser settings.",
+        "priority": 2
+    },
+    {
+        "id": 89,
+        "section_id": 107,
+        "content": "No tracking is done for children under 16 without consent.",
+        "priority": 3
+    },
+    {
+        "id": 90,
+        "section_id": 108,
+        "content": "Access personal data.",
+        "priority": 1
+    },
+    {
+        "id": 91,
+        "section_id": 108,
+        "content": "Correct inaccurate or incomplete data.",
+        "priority": 2
+    },
+    {
+        "id": 92,
+        "section_id": 108,
+        "content": "Request erasure (Right to be forgotten).",
+        "priority": 3
+    },
+    {
+        "id": 93,
+        "section_id": 108,
+        "content": "Object to processing or withdraw consent.",
+        "priority": 4
+    },
+    {
+        "id": 94,
+        "section_id": 108,
+        "content": "Request data portability.",
+        "priority": 5
+    },
+    {
+        "id": 95,
+        "section_id": 108,
+        "content": "Lodge complaints with UAE or EU authorities.",
+        "priority": 6
+    },
+    {
+        "id": 96,
+        "section_id": 108,
+        "content": "Requests can be submitted to privacy@dunesdiscoverytourism.com.",
+        "priority": 7
+    },
+    {
+        "id": 97,
+        "section_id": 109,
+        "content": "Encrypted servers store all personal data.",
+        "priority": 1
+    },
+    {
+        "id": 98,
+        "section_id": 109,
+        "content": "PCI-DSS compliant gateways handle payment details.",
+        "priority": 2
+    },
+    {
+        "id": 99,
+        "section_id": 109,
+        "content": "Regular audits, access controls, and staff training.",
+        "priority": 3
+    },
+    {
+        "id": 100,
+        "section_id": 109,
+        "content": "Breach notification procedures in line with UAE law and GDPR.",
+        "priority": 4
+    },
+    {
+        "id": 101,
+        "section_id": 110,
+        "content": "We do not knowingly collect data from children under 16 without parental consent.",
+        "priority": 1
+    },
+    {
+        "id": 102,
+        "section_id": 111,
+        "content": "Data may be shared with third-party suppliers outside the UAE.",
+        "priority": 1
+    },
+    {
+        "id": 103,
+        "section_id": 111,
+        "content": "Transfers comply with UAE law, GDPR adequacy, and contractual safeguards.",
+        "priority": 2
+    },
+    {
+        "id": 104,
+        "section_id": 112,
+        "content": "Marketing communications are sent only with consent.",
+        "priority": 1
+    },
+    {
+        "id": 105,
+        "section_id": 112,
+        "content": "Users may unsubscribe via email or links in communications.",
+        "priority": 2
+    },
+    {
+        "id": 106,
+        "section_id": 113,
+        "content": "Policy may be updated periodically.",
+        "priority": 1
+    },
+    {
+        "id": 107,
+        "section_id": 113,
+        "content": "Updates are effective upon posting.",
+        "priority": 2
+    },
+    {
+        "id": 108,
+        "section_id": 113,
+        "content": "Users are encouraged to review regularly.",
+        "priority": 3
+    },
+    {
+        "id": 109,
+        "section_id": 114,
+        "content": "This Privacy Policy is governed by UAE law.",
+        "priority": 1
+    },
+    {
+        "id": 110,
+        "section_id": 114,
+        "content": "UAE courts have exclusive jurisdiction.",
+        "priority": 2
+    },
+    {
+        "id": 111,
+        "section_id": 114,
+        "content": "GDPR applies to EU residents interacting with the website.",
+        "priority": 3
+    },
+    {
+        "id": 112,
+        "section_id": 115,
+        "content": "Dunes Discovery Tourism L.L.C",
+        "priority": 1
+    },
+    {
+        "id": 113,
+        "section_id": 115,
+        "content": "Office 323, Malik Obaid Musbah Mohammed Al Mansoori – Hoor Al Anz",
+        "priority": 2
+    },
+    {
+        "id": 114,
+        "section_id": 115,
+        "content": "Email: admin@dunesdiscoverytourism.com",
+        "priority": 3
+    },
+    {
+        "id": 115,
+        "section_id": 115,
+        "content": "Phone: +971 50 245 6056",
+        "priority": 4
+    },
+    {
+        "id": 116,
+        "section_id": 102,
+        "content": "We may collect IP address and approximate geographic location data for security, fraud prevention, service optimization, and regulatory compliance purposes. By using our website or submitting forms, you explicitly consent to this data collection and processing.",
+        "priority": 6
+    }
+]

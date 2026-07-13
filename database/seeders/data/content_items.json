@@ -1,0 +1,1890 @@
+[
+    {
+        "id": 1,
+        "type": "inclusion",
+        "icon": "bi-truck",
+        "title": "Hotel Pickup & Drop-off",
+        "description": "Complimentary transfers from any Dubai location",
+        "priority": 99
+    },
+    {
+        "id": 2,
+        "type": "inclusion",
+        "icon": "bi-car-front",
+        "title": "Dune Bashing",
+        "description": "Thrilling 4x4 dune drive with expert driver",
+        "priority": 99
+    },
+    {
+        "id": 3,
+        "type": "inclusion",
+        "icon": "bi-emoji-smile",
+        "title": "Camel Ride",
+        "description": "Traditional camel riding experience",
+        "priority": 99
+    },
+    {
+        "id": 4,
+        "type": "inclusion",
+        "icon": "bi-sunrise",
+        "title": "Sunset Views",
+        "description": "Photo stop at the best sunset point",
+        "priority": 99
+    },
+    {
+        "id": 5,
+        "type": "inclusion",
+        "icon": "bi-cup-hot",
+        "title": "Refreshments",
+        "description": "Welcome Arabic coffee, dates and soft drinks",
+        "priority": 99
+    },
+    {
+        "id": 6,
+        "type": "inclusion",
+        "icon": "bi-egg-fried",
+        "title": "BBQ Dinner",
+        "description": "International buffet with vegetarian options",
+        "priority": 99
+    },
+    {
+        "id": 7,
+        "type": "inclusion",
+        "icon": "bi-music-note",
+        "title": "Live Shows",
+        "description": "Tanoura, belly dance and fire show",
+        "priority": 99
+    },
+    {
+        "id": 8,
+        "type": "inclusion",
+        "icon": "bi-brush",
+        "title": "Henna Painting",
+        "description": "Traditional Arabic henna art",
+        "priority": 99
+    },
+    {
+        "id": 9,
+        "type": "exclusion",
+        "icon": "bi-cup-straw",
+        "title": "Alcoholic Beverages",
+        "description": "Available for purchase at camp",
+        "priority": 99
+    },
+    {
+        "id": 10,
+        "type": "exclusion",
+        "icon": "bi-camera",
+        "title": "Professional Photos",
+        "description": "Available as addon",
+        "priority": 99
+    },
+    {
+        "id": 11,
+        "type": "exclusion",
+        "icon": "bi-gift",
+        "title": "Personal Expenses",
+        "description": "Souvenirs and tips",
+        "priority": 99
+    },
+    {
+        "id": 12,
+        "type": "highlight",
+        "icon": "bi-shield-check",
+        "title": "Safety First",
+        "description": "All vehicles equipped with safety gear",
+        "priority": 99
+    },
+    {
+        "id": 13,
+        "type": "highlight",
+        "icon": "bi-award",
+        "title": "Licensed Drivers",
+        "description": "Government certified safari drivers",
+        "priority": 99
+    },
+    {
+        "id": 14,
+        "type": "highlight",
+        "icon": "bi-star",
+        "title": "Top Rated",
+        "description": "4.8 stars from 2,847 reviews",
+        "priority": 99
+    },
+    {
+        "id": 15,
+        "type": "not_allowed",
+        "icon": "bi-heart-pulse",
+        "title": "Health Conditions",
+        "description": "Not suitable for pregnant women or back problems",
+        "priority": 99
+    },
+    {
+        "id": 16,
+        "type": "not_allowed",
+        "icon": "bi-person",
+        "title": "Age Restriction",
+        "description": "Children under 3 not allowed on dune bashing",
+        "priority": 99
+    },
+    {
+        "id": 17,
+        "type": "inclusion",
+        "icon": "activity",
+        "title": "Sandboarding",
+        "description": "Surf down the golden sand dunes on a board",
+        "priority": 10
+    },
+    {
+        "id": 18,
+        "type": "inclusion",
+        "icon": "coffee",
+        "title": "Arabic Coffee & Dates",
+        "description": "Traditional welcome refreshments",
+        "priority": 11
+    },
+    {
+        "id": 19,
+        "type": "inclusion",
+        "icon": "camera",
+        "title": "Sunset Photo Stop",
+        "description": "Professional photo opportunity at golden hour",
+        "priority": 12
+    },
+    {
+        "id": 20,
+        "type": "inclusion",
+        "icon": "wind",
+        "title": "Shisha Corner",
+        "description": "Complimentary shisha at the camp",
+        "priority": 13
+    },
+    {
+        "id": 21,
+        "type": "inclusion",
+        "icon": "shirt",
+        "title": "Traditional Costume",
+        "description": "Arabic dress for photos",
+        "priority": 14
+    },
+    {
+        "id": 22,
+        "type": "inclusion",
+        "icon": "eye",
+        "title": "Falcon Display",
+        "description": "See majestic trained falcons up close",
+        "priority": 15
+    },
+    {
+        "id": 23,
+        "type": "inclusion",
+        "icon": "map-pin",
+        "title": "Desert Camp Access",
+        "description": "Full access to Bedouin-style camp facilities",
+        "priority": 16
+    },
+    {
+        "id": 24,
+        "type": "inclusion",
+        "icon": "wifi",
+        "title": "Free WiFi",
+        "description": "Complimentary WiFi at the camp",
+        "priority": 17
+    },
+    {
+        "id": 25,
+        "type": "inclusion",
+        "icon": "sunrise",
+        "title": "Sunrise Experience",
+        "description": "Watch the magical desert sunrise",
+        "priority": 18
+    },
+    {
+        "id": 26,
+        "type": "inclusion",
+        "icon": "sun",
+        "title": "Light Breakfast",
+        "description": "Continental breakfast with Arabic items",
+        "priority": 19
+    },
+    {
+        "id": 27,
+        "type": "inclusion",
+        "icon": "moon",
+        "title": "Overnight Tent Stay",
+        "description": "Traditional Bedouin tent accommodation",
+        "priority": 20
+    },
+    {
+        "id": 28,
+        "type": "inclusion",
+        "icon": "star",
+        "title": "Stargazing Session",
+        "description": "View the desert night sky away from city lights",
+        "priority": 21
+    },
+    {
+        "id": 29,
+        "type": "inclusion",
+        "icon": "coffee",
+        "title": "Morning Tea & Coffee",
+        "description": "Hot beverages to start your day",
+        "priority": 22
+    },
+    {
+        "id": 30,
+        "type": "inclusion",
+        "icon": "shield",
+        "title": "Safety Gear Provided",
+        "description": "Helmet and goggles for quad biking",
+        "priority": 23
+    },
+    {
+        "id": 31,
+        "type": "inclusion",
+        "icon": "zap",
+        "title": "30-Min Quad Bike Ride",
+        "description": "Self-drive quad biking adventure included",
+        "priority": 24
+    },
+    {
+        "id": 32,
+        "type": "inclusion",
+        "icon": "book",
+        "title": "Expert Safari Guide",
+        "description": "Knowledgeable English-speaking guide",
+        "priority": 25
+    },
+    {
+        "id": 33,
+        "type": "inclusion",
+        "icon": "droplet",
+        "title": "Bottled Water",
+        "description": "Unlimited bottled water throughout",
+        "priority": 26
+    },
+    {
+        "id": 34,
+        "type": "inclusion",
+        "icon": "image",
+        "title": "Jumeirah Mosque Photo Stop",
+        "description": "Exterior photo at iconic mosque",
+        "priority": 27
+    },
+    {
+        "id": 35,
+        "type": "inclusion",
+        "icon": "anchor",
+        "title": "Burj Al Arab Photo Stop",
+        "description": "Photo opportunity at 7-star hotel",
+        "priority": 28
+    },
+    {
+        "id": 36,
+        "type": "inclusion",
+        "icon": "navigation",
+        "title": "Palm Jumeirah Drive",
+        "description": "Scenic drive through Palm Island",
+        "priority": 29
+    },
+    {
+        "id": 37,
+        "type": "inclusion",
+        "icon": "home",
+        "title": "Dubai Museum Visit",
+        "description": "Entry to Al Fahidi Fort museum",
+        "priority": 30
+    },
+    {
+        "id": 38,
+        "type": "inclusion",
+        "icon": "shopping-bag",
+        "title": "Gold Souk Visit",
+        "description": "Time at traditional gold market",
+        "priority": 31
+    },
+    {
+        "id": 39,
+        "type": "inclusion",
+        "icon": "ship",
+        "title": "Abra Water Taxi Ride",
+        "description": "Traditional boat ride across Dubai Creek",
+        "priority": 32
+    },
+    {
+        "id": 40,
+        "type": "inclusion",
+        "icon": "clock",
+        "title": "Dubai Mall Free Time",
+        "description": "Shopping and leisure time at Dubai Mall",
+        "priority": 33
+    },
+    {
+        "id": 41,
+        "type": "inclusion",
+        "icon": "building",
+        "title": "Burj Khalifa Views",
+        "description": "See the world tallest building",
+        "priority": 34
+    },
+    {
+        "id": 42,
+        "type": "inclusion",
+        "icon": "map",
+        "title": "Marina Walk",
+        "description": "Stroll along Dubai Marina promenade",
+        "priority": 35
+    },
+    {
+        "id": 43,
+        "type": "inclusion",
+        "icon": "home",
+        "title": "Sheikh Zayed Mosque Visit",
+        "description": "Guided tour of Grand Mosque interior",
+        "priority": 36
+    },
+    {
+        "id": 44,
+        "type": "inclusion",
+        "icon": "camera",
+        "title": "Emirates Palace Photo Stop",
+        "description": "Photo at luxurious palace hotel",
+        "priority": 37
+    },
+    {
+        "id": 45,
+        "type": "inclusion",
+        "icon": "users",
+        "title": "Heritage Village Visit",
+        "description": "Experience traditional Emirati life",
+        "priority": 38
+    },
+    {
+        "id": 46,
+        "type": "inclusion",
+        "icon": "map-pin",
+        "title": "Corniche Drive",
+        "description": "Scenic coastal drive with photo stops",
+        "priority": 39
+    },
+    {
+        "id": 47,
+        "type": "inclusion",
+        "icon": "zap",
+        "title": "Ferrari World Photo Stop",
+        "description": "Exterior photos at theme park",
+        "priority": 40
+    },
+    {
+        "id": 48,
+        "type": "inclusion",
+        "icon": "building",
+        "title": "Qasr Al Watan Photo Stop",
+        "description": "View of Presidential Palace",
+        "priority": 41
+    },
+    {
+        "id": 49,
+        "type": "inclusion",
+        "icon": "compass",
+        "title": "Yas Island Visit",
+        "description": "Drive through entertainment island",
+        "priority": 42
+    },
+    {
+        "id": 50,
+        "type": "inclusion",
+        "icon": "clock",
+        "title": "Dates Market Stop",
+        "description": "Visit traditional dates souk",
+        "priority": 43
+    },
+    {
+        "id": 51,
+        "type": "inclusion",
+        "icon": "shirt",
+        "title": "Abaya & Headscarf Provided",
+        "description": "Modest clothing for mosque visit",
+        "priority": 44
+    },
+    {
+        "id": 52,
+        "type": "inclusion",
+        "icon": "users",
+        "title": "Licensed Tour Guide",
+        "description": "Government certified Abu Dhabi guide",
+        "priority": 45
+    },
+    {
+        "id": 53,
+        "type": "inclusion",
+        "icon": "gift",
+        "title": "Welcome Drink",
+        "description": "Refreshing beverage upon boarding",
+        "priority": 46
+    },
+    {
+        "id": 54,
+        "type": "inclusion",
+        "icon": "utensils",
+        "title": "International Buffet Dinner",
+        "description": "Multi-cuisine dinner spread",
+        "priority": 47
+    },
+    {
+        "id": 55,
+        "type": "inclusion",
+        "icon": "music",
+        "title": "Live Tanoura Show",
+        "description": "Traditional Sufi spinning dance",
+        "priority": 48
+    },
+    {
+        "id": 56,
+        "type": "inclusion",
+        "icon": "speaker",
+        "title": "Background Music",
+        "description": "Ambient entertainment throughout cruise",
+        "priority": 49
+    },
+    {
+        "id": 57,
+        "type": "inclusion",
+        "icon": "wind",
+        "title": "Air-Conditioned Lower Deck",
+        "description": "Climate controlled indoor seating",
+        "priority": 50
+    },
+    {
+        "id": 58,
+        "type": "inclusion",
+        "icon": "sun",
+        "title": "Open-Air Upper Deck",
+        "description": "Al fresco seating with panoramic views",
+        "priority": 51
+    },
+    {
+        "id": 59,
+        "type": "inclusion",
+        "icon": "eye",
+        "title": "Marina Skyline Views",
+        "description": "See JBR, Ain Dubai, Cayan Tower",
+        "priority": 52
+    },
+    {
+        "id": 60,
+        "type": "inclusion",
+        "icon": "eye",
+        "title": "Ain Dubai Views",
+        "description": "See world largest observation wheel",
+        "priority": 53
+    },
+    {
+        "id": 61,
+        "type": "inclusion",
+        "icon": "anchor",
+        "title": "2-Hour Cruise Duration",
+        "description": "Leisurely sailing experience",
+        "priority": 54
+    },
+    {
+        "id": 62,
+        "type": "inclusion",
+        "icon": "coffee",
+        "title": "Tea & Coffee Service",
+        "description": "Hot beverages after dinner",
+        "priority": 55
+    },
+    {
+        "id": 63,
+        "type": "inclusion",
+        "icon": "eye",
+        "title": "Creek Heritage Views",
+        "description": "See historic Dubai landmarks",
+        "priority": 56
+    },
+    {
+        "id": 64,
+        "type": "inclusion",
+        "icon": "eye",
+        "title": "Deira Skyline Views",
+        "description": "Traditional and modern architecture",
+        "priority": 57
+    },
+    {
+        "id": 65,
+        "type": "inclusion",
+        "icon": "home",
+        "title": "Passing Heritage Village",
+        "description": "View from water",
+        "priority": 58
+    },
+    {
+        "id": 66,
+        "type": "inclusion",
+        "icon": "eye",
+        "title": "Twin Towers View",
+        "description": "Iconic Deira landmarks",
+        "priority": 59
+    },
+    {
+        "id": 67,
+        "type": "exclusion",
+        "icon": "shopping-bag",
+        "title": "Souvenirs & Shopping",
+        "description": "Personal purchases not included",
+        "priority": 20
+    },
+    {
+        "id": 68,
+        "type": "exclusion",
+        "icon": "zap",
+        "title": "Quad Biking",
+        "description": "Available as optional addon",
+        "priority": 21
+    },
+    {
+        "id": 69,
+        "type": "exclusion",
+        "icon": "truck",
+        "title": "Dune Buggy",
+        "description": "Available as optional addon",
+        "priority": 22
+    },
+    {
+        "id": 70,
+        "type": "exclusion",
+        "icon": "clock",
+        "title": "Extended Activities",
+        "description": "Longer duration activities extra",
+        "priority": 23
+    },
+    {
+        "id": 71,
+        "type": "exclusion",
+        "icon": "gift",
+        "title": "Tips & Gratuities",
+        "description": "Optional tips for staff",
+        "priority": 24
+    },
+    {
+        "id": 72,
+        "type": "exclusion",
+        "icon": "star",
+        "title": "VIP Upgrades",
+        "description": "Premium seating available separately",
+        "priority": 25
+    },
+    {
+        "id": 73,
+        "type": "exclusion",
+        "icon": "utensils",
+        "title": "Lunch",
+        "description": "Meals during tour not included",
+        "priority": 26
+    },
+    {
+        "id": 74,
+        "type": "exclusion",
+        "icon": "ticket",
+        "title": "Attraction Entry Tickets",
+        "description": "Museum and attraction entries extra",
+        "priority": 27
+    },
+    {
+        "id": 75,
+        "type": "exclusion",
+        "icon": "ticket",
+        "title": "Burj Khalifa Entry",
+        "description": "Observation deck tickets separate",
+        "priority": 28
+    },
+    {
+        "id": 76,
+        "type": "exclusion",
+        "icon": "ticket",
+        "title": "Dubai Frame Entry",
+        "description": "Landmark entry not included",
+        "priority": 29
+    },
+    {
+        "id": 77,
+        "type": "exclusion",
+        "icon": "ticket",
+        "title": "Louvre Abu Dhabi Entry",
+        "description": "Museum entry available as addon",
+        "priority": 30
+    },
+    {
+        "id": 78,
+        "type": "exclusion",
+        "icon": "ticket",
+        "title": "Ferrari World Entry",
+        "description": "Theme park tickets extra",
+        "priority": 31
+    },
+    {
+        "id": 79,
+        "type": "exclusion",
+        "icon": "ticket",
+        "title": "Qasr Al Watan Entry",
+        "description": "Palace interior tour extra",
+        "priority": 32
+    },
+    {
+        "id": 80,
+        "type": "exclusion",
+        "icon": "wine",
+        "title": "Alcoholic Drinks",
+        "description": "Available for purchase onboard",
+        "priority": 33
+    },
+    {
+        "id": 81,
+        "type": "exclusion",
+        "icon": "truck",
+        "title": "Hotel Transfers",
+        "description": "Self-arrival at boarding point",
+        "priority": 34
+    },
+    {
+        "id": 82,
+        "type": "exclusion",
+        "icon": "gift",
+        "title": "Celebration Decorations",
+        "description": "Birthday setup available as addon",
+        "priority": 35
+    },
+    {
+        "id": 83,
+        "type": "exclusion",
+        "icon": "star",
+        "title": "Private Table",
+        "description": "Reserved seating extra charge",
+        "priority": 36
+    },
+    {
+        "id": 84,
+        "type": "highlight",
+        "icon": "thermometer",
+        "title": "Cool Morning Weather",
+        "description": "Pleasant temperatures for activities",
+        "priority": 30
+    },
+    {
+        "id": 85,
+        "type": "highlight",
+        "icon": "sunrise",
+        "title": "Stunning Sunrise Views",
+        "description": "Witness magical desert dawn",
+        "priority": 31
+    },
+    {
+        "id": 86,
+        "type": "highlight",
+        "icon": "moon",
+        "title": "Desert Night Sky",
+        "description": "Unpolluted stargazing opportunity",
+        "priority": 32
+    },
+    {
+        "id": 87,
+        "type": "highlight",
+        "icon": "tent",
+        "title": "Authentic Camp Experience",
+        "description": "Traditional Bedouin atmosphere",
+        "priority": 33
+    },
+    {
+        "id": 88,
+        "type": "highlight",
+        "icon": "zap",
+        "title": "Adrenaline Activities",
+        "description": "Heart-pumping desert adventures",
+        "priority": 34
+    },
+    {
+        "id": 89,
+        "type": "highlight",
+        "icon": "camera",
+        "title": "Instagram-Worthy Spots",
+        "description": "Perfect photo locations throughout",
+        "priority": 35
+    },
+    {
+        "id": 90,
+        "type": "highlight",
+        "icon": "users",
+        "title": "Small Group Experience",
+        "description": "Personalized attention guaranteed",
+        "priority": 36
+    },
+    {
+        "id": 91,
+        "type": "highlight",
+        "icon": "clock",
+        "title": "Half-Day Duration",
+        "description": "Perfect for busy schedules",
+        "priority": 37
+    },
+    {
+        "id": 92,
+        "type": "highlight",
+        "icon": "map",
+        "title": "Comprehensive City Coverage",
+        "description": "See all major landmarks",
+        "priority": 38
+    },
+    {
+        "id": 93,
+        "type": "highlight",
+        "icon": "book",
+        "title": "Cultural Insights",
+        "description": "Learn about local heritage",
+        "priority": 39
+    },
+    {
+        "id": 94,
+        "type": "highlight",
+        "icon": "building",
+        "title": "Architectural Marvels",
+        "description": "World-class modern architecture",
+        "priority": 40
+    },
+    {
+        "id": 95,
+        "type": "highlight",
+        "icon": "home",
+        "title": "UNESCO Heritage Site",
+        "description": "Visit Grand Mosque masterpiece",
+        "priority": 41
+    },
+    {
+        "id": 96,
+        "type": "highlight",
+        "icon": "truck",
+        "title": "Comfortable Transport",
+        "description": "Air-conditioned luxury vehicles",
+        "priority": 42
+    },
+    {
+        "id": 97,
+        "type": "highlight",
+        "icon": "camera",
+        "title": "Photo Opportunities",
+        "description": "Multiple scenic stops included",
+        "priority": 43
+    },
+    {
+        "id": 98,
+        "type": "highlight",
+        "icon": "utensils",
+        "title": "Gourmet Dining",
+        "description": "Chef-prepared international cuisine",
+        "priority": 44
+    },
+    {
+        "id": 99,
+        "type": "highlight",
+        "icon": "eye",
+        "title": "Panoramic City Views",
+        "description": "360-degree skyline vistas",
+        "priority": 45
+    },
+    {
+        "id": 100,
+        "type": "highlight",
+        "icon": "music",
+        "title": "Live Entertainment",
+        "description": "Traditional cultural performances",
+        "priority": 46
+    },
+    {
+        "id": 101,
+        "type": "highlight",
+        "icon": "heart",
+        "title": "Romantic Ambiance",
+        "description": "Perfect for couples",
+        "priority": 47
+    },
+    {
+        "id": 102,
+        "type": "highlight",
+        "icon": "ship",
+        "title": "Traditional Wooden Dhow",
+        "description": "Authentic Arabian sailing vessel",
+        "priority": 48
+    },
+    {
+        "id": 103,
+        "type": "not_allowed",
+        "icon": "heart",
+        "title": "Back Problems",
+        "description": "Not recommended for those with spinal issues",
+        "priority": 20
+    },
+    {
+        "id": 104,
+        "type": "not_allowed",
+        "icon": "heart",
+        "title": "Heart Conditions",
+        "description": "Avoid dune bashing with cardiac issues",
+        "priority": 21
+    },
+    {
+        "id": 105,
+        "type": "not_allowed",
+        "icon": "alert-circle",
+        "title": "Recent Surgery",
+        "description": "Not suitable post-surgery patients",
+        "priority": 22
+    },
+    {
+        "id": 106,
+        "type": "not_allowed",
+        "icon": "user",
+        "title": "Elderly with Mobility Issues",
+        "description": "Some activities require physical fitness",
+        "priority": 23
+    },
+    {
+        "id": 107,
+        "type": "not_allowed",
+        "icon": "alert-triangle",
+        "title": "Motion Sickness",
+        "description": "Dune bashing may cause discomfort",
+        "priority": 24
+    },
+    {
+        "id": 108,
+        "type": "not_allowed",
+        "icon": "user-x",
+        "title": "Unaccompanied Minors",
+        "description": "Children must be with adults",
+        "priority": 25
+    },
+    {
+        "id": 109,
+        "type": "not_allowed",
+        "icon": "shirt",
+        "title": "Inappropriate Clothing",
+        "description": "Modest dress required at mosque",
+        "priority": 26
+    },
+    {
+        "id": 110,
+        "type": "not_allowed",
+        "icon": "camera",
+        "title": "Photography Restrictions",
+        "description": "No photos in certain mosque areas",
+        "priority": 27
+    },
+    {
+        "id": 111,
+        "type": "not_allowed",
+        "icon": "alert-circle",
+        "title": "Friday Morning Visits",
+        "description": "Mosque closed Friday until 4:30 PM",
+        "priority": 28
+    },
+    {
+        "id": 112,
+        "type": "not_allowed",
+        "icon": "x-circle",
+        "title": "Outside Food & Drinks",
+        "description": "No external food allowed onboard",
+        "priority": 29
+    },
+    {
+        "id": 113,
+        "type": "not_allowed",
+        "icon": "alert-triangle",
+        "title": "Intoxicated Guests",
+        "description": "Entry refused if intoxicated",
+        "priority": 30
+    },
+    {
+        "id": 114,
+        "type": "not_allowed",
+        "icon": "clock",
+        "title": "Late Arrivals",
+        "description": "Dhow departs on schedule",
+        "priority": 31
+    },
+    {
+        "id": 115,
+        "type": "inclusion",
+        "icon": "activity",
+        "title": "Sandboarding",
+        "description": "Surf down the golden sand dunes on a board",
+        "priority": 10
+    },
+    {
+        "id": 116,
+        "type": "inclusion",
+        "icon": "coffee",
+        "title": "Arabic Coffee & Dates",
+        "description": "Traditional welcome refreshments",
+        "priority": 11
+    },
+    {
+        "id": 117,
+        "type": "inclusion",
+        "icon": "camera",
+        "title": "Sunset Photo Stop",
+        "description": "Professional photo opportunity at golden hour",
+        "priority": 12
+    },
+    {
+        "id": 118,
+        "type": "inclusion",
+        "icon": "wind",
+        "title": "Shisha Corner",
+        "description": "Complimentary shisha at the camp",
+        "priority": 13
+    },
+    {
+        "id": 119,
+        "type": "inclusion",
+        "icon": "shirt",
+        "title": "Traditional Costume",
+        "description": "Arabic dress for photos",
+        "priority": 14
+    },
+    {
+        "id": 120,
+        "type": "inclusion",
+        "icon": "eye",
+        "title": "Falcon Display",
+        "description": "See majestic trained falcons up close",
+        "priority": 15
+    },
+    {
+        "id": 121,
+        "type": "inclusion",
+        "icon": "map-pin",
+        "title": "Desert Camp Access",
+        "description": "Full access to Bedouin-style camp facilities",
+        "priority": 16
+    },
+    {
+        "id": 122,
+        "type": "inclusion",
+        "icon": "wifi",
+        "title": "Free WiFi",
+        "description": "Complimentary WiFi at the camp",
+        "priority": 17
+    },
+    {
+        "id": 123,
+        "type": "inclusion",
+        "icon": "sunrise",
+        "title": "Sunrise Experience",
+        "description": "Watch the magical desert sunrise",
+        "priority": 18
+    },
+    {
+        "id": 124,
+        "type": "inclusion",
+        "icon": "sun",
+        "title": "Light Breakfast",
+        "description": "Continental breakfast with Arabic items",
+        "priority": 19
+    },
+    {
+        "id": 125,
+        "type": "inclusion",
+        "icon": "moon",
+        "title": "Overnight Tent Stay",
+        "description": "Traditional Bedouin tent accommodation",
+        "priority": 20
+    },
+    {
+        "id": 126,
+        "type": "inclusion",
+        "icon": "star",
+        "title": "Stargazing Session",
+        "description": "View the desert night sky away from city lights",
+        "priority": 21
+    },
+    {
+        "id": 127,
+        "type": "inclusion",
+        "icon": "coffee",
+        "title": "Morning Tea & Coffee",
+        "description": "Hot beverages to start your day",
+        "priority": 22
+    },
+    {
+        "id": 128,
+        "type": "inclusion",
+        "icon": "shield",
+        "title": "Safety Gear Provided",
+        "description": "Helmet and goggles for quad biking",
+        "priority": 23
+    },
+    {
+        "id": 129,
+        "type": "inclusion",
+        "icon": "zap",
+        "title": "30-Min Quad Bike Ride",
+        "description": "Self-drive quad biking adventure included",
+        "priority": 24
+    },
+    {
+        "id": 130,
+        "type": "inclusion",
+        "icon": "book",
+        "title": "Expert Safari Guide",
+        "description": "Knowledgeable English-speaking guide",
+        "priority": 25
+    },
+    {
+        "id": 131,
+        "type": "inclusion",
+        "icon": "droplet",
+        "title": "Bottled Water",
+        "description": "Unlimited bottled water throughout",
+        "priority": 26
+    },
+    {
+        "id": 132,
+        "type": "inclusion",
+        "icon": "image",
+        "title": "Jumeirah Mosque Photo Stop",
+        "description": "Exterior photo at iconic mosque",
+        "priority": 27
+    },
+    {
+        "id": 133,
+        "type": "inclusion",
+        "icon": "anchor",
+        "title": "Burj Al Arab Photo Stop",
+        "description": "Photo opportunity at 7-star hotel",
+        "priority": 28
+    },
+    {
+        "id": 134,
+        "type": "inclusion",
+        "icon": "navigation",
+        "title": "Palm Jumeirah Drive",
+        "description": "Scenic drive through Palm Island",
+        "priority": 29
+    },
+    {
+        "id": 135,
+        "type": "inclusion",
+        "icon": "home",
+        "title": "Dubai Museum Visit",
+        "description": "Entry to Al Fahidi Fort museum",
+        "priority": 30
+    },
+    {
+        "id": 136,
+        "type": "inclusion",
+        "icon": "shopping-bag",
+        "title": "Gold Souk Visit",
+        "description": "Time at traditional gold market",
+        "priority": 31
+    },
+    {
+        "id": 137,
+        "type": "inclusion",
+        "icon": "ship",
+        "title": "Abra Water Taxi Ride",
+        "description": "Traditional boat ride across Dubai Creek",
+        "priority": 32
+    },
+    {
+        "id": 138,
+        "type": "inclusion",
+        "icon": "clock",
+        "title": "Dubai Mall Free Time",
+        "description": "Shopping and leisure time at Dubai Mall",
+        "priority": 33
+    },
+    {
+        "id": 139,
+        "type": "inclusion",
+        "icon": "building",
+        "title": "Burj Khalifa Views",
+        "description": "See the world tallest building",
+        "priority": 34
+    },
+    {
+        "id": 140,
+        "type": "inclusion",
+        "icon": "map",
+        "title": "Marina Walk",
+        "description": "Stroll along Dubai Marina promenade",
+        "priority": 35
+    },
+    {
+        "id": 141,
+        "type": "inclusion",
+        "icon": "home",
+        "title": "Sheikh Zayed Mosque Visit",
+        "description": "Guided tour of Grand Mosque interior",
+        "priority": 36
+    },
+    {
+        "id": 142,
+        "type": "inclusion",
+        "icon": "camera",
+        "title": "Emirates Palace Photo Stop",
+        "description": "Photo at luxurious palace hotel",
+        "priority": 37
+    },
+    {
+        "id": 143,
+        "type": "inclusion",
+        "icon": "users",
+        "title": "Heritage Village Visit",
+        "description": "Experience traditional Emirati life",
+        "priority": 38
+    },
+    {
+        "id": 144,
+        "type": "inclusion",
+        "icon": "map-pin",
+        "title": "Corniche Drive",
+        "description": "Scenic coastal drive with photo stops",
+        "priority": 39
+    },
+    {
+        "id": 145,
+        "type": "inclusion",
+        "icon": "zap",
+        "title": "Ferrari World Photo Stop",
+        "description": "Exterior photos at theme park",
+        "priority": 40
+    },
+    {
+        "id": 146,
+        "type": "inclusion",
+        "icon": "building",
+        "title": "Qasr Al Watan Photo Stop",
+        "description": "View of Presidential Palace",
+        "priority": 41
+    },
+    {
+        "id": 147,
+        "type": "inclusion",
+        "icon": "compass",
+        "title": "Yas Island Visit",
+        "description": "Drive through entertainment island",
+        "priority": 42
+    },
+    {
+        "id": 148,
+        "type": "inclusion",
+        "icon": "clock",
+        "title": "Dates Market Stop",
+        "description": "Visit traditional dates souk",
+        "priority": 43
+    },
+    {
+        "id": 149,
+        "type": "inclusion",
+        "icon": "shirt",
+        "title": "Abaya & Headscarf Provided",
+        "description": "Modest clothing for mosque visit",
+        "priority": 44
+    },
+    {
+        "id": 150,
+        "type": "inclusion",
+        "icon": "users",
+        "title": "Licensed Tour Guide",
+        "description": "Government certified Abu Dhabi guide",
+        "priority": 45
+    },
+    {
+        "id": 151,
+        "type": "inclusion",
+        "icon": "gift",
+        "title": "Welcome Drink",
+        "description": "Refreshing beverage upon boarding",
+        "priority": 46
+    },
+    {
+        "id": 152,
+        "type": "inclusion",
+        "icon": "utensils",
+        "title": "International Buffet Dinner",
+        "description": "Multi-cuisine dinner spread",
+        "priority": 47
+    },
+    {
+        "id": 153,
+        "type": "inclusion",
+        "icon": "music",
+        "title": "Live Tanoura Show",
+        "description": "Traditional Sufi spinning dance",
+        "priority": 48
+    },
+    {
+        "id": 154,
+        "type": "inclusion",
+        "icon": "speaker",
+        "title": "Background Music",
+        "description": "Ambient entertainment throughout cruise",
+        "priority": 49
+    },
+    {
+        "id": 155,
+        "type": "inclusion",
+        "icon": "wind",
+        "title": "Air-Conditioned Lower Deck",
+        "description": "Climate controlled indoor seating",
+        "priority": 50
+    },
+    {
+        "id": 156,
+        "type": "inclusion",
+        "icon": "sun",
+        "title": "Open-Air Upper Deck",
+        "description": "Al fresco seating with panoramic views",
+        "priority": 51
+    },
+    {
+        "id": 157,
+        "type": "inclusion",
+        "icon": "eye",
+        "title": "Marina Skyline Views",
+        "description": "See JBR, Ain Dubai, Cayan Tower",
+        "priority": 52
+    },
+    {
+        "id": 158,
+        "type": "inclusion",
+        "icon": "eye",
+        "title": "Ain Dubai Views",
+        "description": "See world largest observation wheel",
+        "priority": 53
+    },
+    {
+        "id": 159,
+        "type": "inclusion",
+        "icon": "anchor",
+        "title": "2-Hour Cruise Duration",
+        "description": "Leisurely sailing experience",
+        "priority": 54
+    },
+    {
+        "id": 160,
+        "type": "inclusion",
+        "icon": "coffee",
+        "title": "Tea & Coffee Service",
+        "description": "Hot beverages after dinner",
+        "priority": 55
+    },
+    {
+        "id": 161,
+        "type": "inclusion",
+        "icon": "eye",
+        "title": "Creek Heritage Views",
+        "description": "See historic Dubai landmarks",
+        "priority": 56
+    },
+    {
+        "id": 162,
+        "type": "inclusion",
+        "icon": "eye",
+        "title": "Deira Skyline Views",
+        "description": "Traditional and modern architecture",
+        "priority": 57
+    },
+    {
+        "id": 163,
+        "type": "inclusion",
+        "icon": "home",
+        "title": "Passing Heritage Village",
+        "description": "View from water",
+        "priority": 58
+    },
+    {
+        "id": 164,
+        "type": "inclusion",
+        "icon": "eye",
+        "title": "Twin Towers View",
+        "description": "Iconic Deira landmarks",
+        "priority": 59
+    },
+    {
+        "id": 165,
+        "type": "exclusion",
+        "icon": "shopping-bag",
+        "title": "Souvenirs & Shopping",
+        "description": "Personal purchases not included",
+        "priority": 20
+    },
+    {
+        "id": 166,
+        "type": "exclusion",
+        "icon": "zap",
+        "title": "Quad Biking",
+        "description": "Available as optional addon",
+        "priority": 21
+    },
+    {
+        "id": 167,
+        "type": "exclusion",
+        "icon": "truck",
+        "title": "Dune Buggy",
+        "description": "Available as optional addon",
+        "priority": 22
+    },
+    {
+        "id": 168,
+        "type": "exclusion",
+        "icon": "clock",
+        "title": "Extended Activities",
+        "description": "Longer duration activities extra",
+        "priority": 23
+    },
+    {
+        "id": 169,
+        "type": "exclusion",
+        "icon": "gift",
+        "title": "Tips & Gratuities",
+        "description": "Optional tips for staff",
+        "priority": 24
+    },
+    {
+        "id": 170,
+        "type": "exclusion",
+        "icon": "star",
+        "title": "VIP Upgrades",
+        "description": "Premium seating available separately",
+        "priority": 25
+    },
+    {
+        "id": 171,
+        "type": "exclusion",
+        "icon": "utensils",
+        "title": "Lunch",
+        "description": "Meals during tour not included",
+        "priority": 26
+    },
+    {
+        "id": 172,
+        "type": "exclusion",
+        "icon": "ticket",
+        "title": "Attraction Entry Tickets",
+        "description": "Museum and attraction entries extra",
+        "priority": 27
+    },
+    {
+        "id": 173,
+        "type": "exclusion",
+        "icon": "ticket",
+        "title": "Burj Khalifa Entry",
+        "description": "Observation deck tickets separate",
+        "priority": 28
+    },
+    {
+        "id": 174,
+        "type": "exclusion",
+        "icon": "ticket",
+        "title": "Dubai Frame Entry",
+        "description": "Landmark entry not included",
+        "priority": 29
+    },
+    {
+        "id": 175,
+        "type": "exclusion",
+        "icon": "ticket",
+        "title": "Louvre Abu Dhabi Entry",
+        "description": "Museum entry available as addon",
+        "priority": 30
+    },
+    {
+        "id": 176,
+        "type": "exclusion",
+        "icon": "ticket",
+        "title": "Ferrari World Entry",
+        "description": "Theme park tickets extra",
+        "priority": 31
+    },
+    {
+        "id": 177,
+        "type": "exclusion",
+        "icon": "ticket",
+        "title": "Qasr Al Watan Entry",
+        "description": "Palace interior tour extra",
+        "priority": 32
+    },
+    {
+        "id": 178,
+        "type": "exclusion",
+        "icon": "wine",
+        "title": "Alcoholic Drinks",
+        "description": "Available for purchase onboard",
+        "priority": 33
+    },
+    {
+        "id": 179,
+        "type": "exclusion",
+        "icon": "truck",
+        "title": "Hotel Transfers",
+        "description": "Self-arrival at boarding point",
+        "priority": 34
+    },
+    {
+        "id": 180,
+        "type": "exclusion",
+        "icon": "gift",
+        "title": "Celebration Decorations",
+        "description": "Birthday setup available as addon",
+        "priority": 35
+    },
+    {
+        "id": 181,
+        "type": "exclusion",
+        "icon": "star",
+        "title": "Private Table",
+        "description": "Reserved seating extra charge",
+        "priority": 36
+    },
+    {
+        "id": 182,
+        "type": "highlight",
+        "icon": "thermometer",
+        "title": "Cool Morning Weather",
+        "description": "Pleasant temperatures for activities",
+        "priority": 30
+    },
+    {
+        "id": 183,
+        "type": "highlight",
+        "icon": "sunrise",
+        "title": "Stunning Sunrise Views",
+        "description": "Witness magical desert dawn",
+        "priority": 31
+    },
+    {
+        "id": 184,
+        "type": "highlight",
+        "icon": "moon",
+        "title": "Desert Night Sky",
+        "description": "Unpolluted stargazing opportunity",
+        "priority": 32
+    },
+    {
+        "id": 185,
+        "type": "highlight",
+        "icon": "tent",
+        "title": "Authentic Camp Experience",
+        "description": "Traditional Bedouin atmosphere",
+        "priority": 33
+    },
+    {
+        "id": 186,
+        "type": "highlight",
+        "icon": "zap",
+        "title": "Adrenaline Activities",
+        "description": "Heart-pumping desert adventures",
+        "priority": 34
+    },
+    {
+        "id": 187,
+        "type": "highlight",
+        "icon": "camera",
+        "title": "Instagram-Worthy Spots",
+        "description": "Perfect photo locations throughout",
+        "priority": 35
+    },
+    {
+        "id": 188,
+        "type": "highlight",
+        "icon": "users",
+        "title": "Small Group Experience",
+        "description": "Personalized attention guaranteed",
+        "priority": 36
+    },
+    {
+        "id": 189,
+        "type": "highlight",
+        "icon": "clock",
+        "title": "Half-Day Duration",
+        "description": "Perfect for busy schedules",
+        "priority": 37
+    },
+    {
+        "id": 190,
+        "type": "highlight",
+        "icon": "map",
+        "title": "Comprehensive City Coverage",
+        "description": "See all major landmarks",
+        "priority": 38
+    },
+    {
+        "id": 191,
+        "type": "highlight",
+        "icon": "book",
+        "title": "Cultural Insights",
+        "description": "Learn about local heritage",
+        "priority": 39
+    },
+    {
+        "id": 192,
+        "type": "highlight",
+        "icon": "building",
+        "title": "Architectural Marvels",
+        "description": "World-class modern architecture",
+        "priority": 40
+    },
+    {
+        "id": 193,
+        "type": "highlight",
+        "icon": "home",
+        "title": "UNESCO Heritage Site",
+        "description": "Visit Grand Mosque masterpiece",
+        "priority": 41
+    },
+    {
+        "id": 194,
+        "type": "highlight",
+        "icon": "truck",
+        "title": "Comfortable Transport",
+        "description": "Air-conditioned luxury vehicles",
+        "priority": 42
+    },
+    {
+        "id": 195,
+        "type": "highlight",
+        "icon": "camera",
+        "title": "Photo Opportunities",
+        "description": "Multiple scenic stops included",
+        "priority": 43
+    },
+    {
+        "id": 196,
+        "type": "highlight",
+        "icon": "utensils",
+        "title": "Gourmet Dining",
+        "description": "Chef-prepared international cuisine",
+        "priority": 44
+    },
+    {
+        "id": 197,
+        "type": "highlight",
+        "icon": "eye",
+        "title": "Panoramic City Views",
+        "description": "360-degree skyline vistas",
+        "priority": 45
+    },
+    {
+        "id": 198,
+        "type": "highlight",
+        "icon": "music",
+        "title": "Live Entertainment",
+        "description": "Traditional cultural performances",
+        "priority": 46
+    },
+    {
+        "id": 199,
+        "type": "highlight",
+        "icon": "heart",
+        "title": "Romantic Ambiance",
+        "description": "Perfect for couples",
+        "priority": 47
+    },
+    {
+        "id": 200,
+        "type": "highlight",
+        "icon": "ship",
+        "title": "Traditional Wooden Dhow",
+        "description": "Authentic Arabian sailing vessel",
+        "priority": 48
+    },
+    {
+        "id": 201,
+        "type": "not_allowed",
+        "icon": "heart",
+        "title": "Back Problems",
+        "description": "Not recommended for those with spinal issues",
+        "priority": 20
+    },
+    {
+        "id": 202,
+        "type": "not_allowed",
+        "icon": "heart",
+        "title": "Heart Conditions",
+        "description": "Avoid dune bashing with cardiac issues",
+        "priority": 21
+    },
+    {
+        "id": 203,
+        "type": "not_allowed",
+        "icon": "alert-circle",
+        "title": "Recent Surgery",
+        "description": "Not suitable post-surgery patients",
+        "priority": 22
+    },
+    {
+        "id": 204,
+        "type": "not_allowed",
+        "icon": "user",
+        "title": "Elderly with Mobility Issues",
+        "description": "Some activities require physical fitness",
+        "priority": 23
+    },
+    {
+        "id": 205,
+        "type": "not_allowed",
+        "icon": "alert-triangle",
+        "title": "Motion Sickness",
+        "description": "Dune bashing may cause discomfort",
+        "priority": 24
+    },
+    {
+        "id": 206,
+        "type": "not_allowed",
+        "icon": "user-x",
+        "title": "Unaccompanied Minors",
+        "description": "Children must be with adults",
+        "priority": 25
+    },
+    {
+        "id": 207,
+        "type": "not_allowed",
+        "icon": "shirt",
+        "title": "Inappropriate Clothing",
+        "description": "Modest dress required at mosque",
+        "priority": 26
+    },
+    {
+        "id": 208,
+        "type": "not_allowed",
+        "icon": "camera",
+        "title": "Photography Restrictions",
+        "description": "No photos in certain mosque areas",
+        "priority": 27
+    },
+    {
+        "id": 209,
+        "type": "not_allowed",
+        "icon": "alert-circle",
+        "title": "Friday Morning Visits",
+        "description": "Mosque closed Friday until 4:30 PM",
+        "priority": 28
+    },
+    {
+        "id": 210,
+        "type": "not_allowed",
+        "icon": "x-circle",
+        "title": "Outside Food & Drinks",
+        "description": "No external food allowed onboard",
+        "priority": 29
+    },
+    {
+        "id": 211,
+        "type": "not_allowed",
+        "icon": "alert-triangle",
+        "title": "Intoxicated Guests",
+        "description": "Entry refused if intoxicated",
+        "priority": 30
+    },
+    {
+        "id": 212,
+        "type": "not_allowed",
+        "icon": "clock",
+        "title": "Late Arrivals",
+        "description": "Dhow departs on schedule",
+        "priority": 31
+    },
+    {
+        "id": 213,
+        "type": "inclusion",
+        "icon": "thermometer",
+        "title": "Cool Morning Temperatures",
+        "description": "Enjoy desert activities in the most comfortable conditions of the day",
+        "priority": 60
+    },
+    {
+        "id": 214,
+        "type": "inclusion",
+        "icon": "camera",
+        "title": "Golden Hour Photography",
+        "description": "Capture stunning photos in the soft, warm morning light with long dramatic shadows",
+        "priority": 61
+    },
+    {
+        "id": 215,
+        "type": "inclusion",
+        "icon": "clock",
+        "title": "Half-Day Format",
+        "description": "Back at your hotel by noon — rest of the day free for other Dubai attractions",
+        "priority": 62
+    },
+    {
+        "id": 216,
+        "type": "inclusion",
+        "icon": "fire",
+        "title": "Campfire Experience",
+        "description": "Gather around a crackling campfire for stories and warmth under the desert sky",
+        "priority": 63
+    },
+    {
+        "id": 217,
+        "type": "inclusion",
+        "icon": "tent",
+        "title": "Clean Bedding & Blankets",
+        "description": "Fresh linen, pillows, and warm blankets provided in your Bedouin tent",
+        "priority": 64
+    },
+    {
+        "id": 218,
+        "type": "inclusion",
+        "icon": "binoculars",
+        "title": "Morning Nature Walk",
+        "description": "Guided walk to discover desert flora, fauna, and animal tracks at dawn",
+        "priority": 65
+    },
+    {
+        "id": 219,
+        "type": "inclusion",
+        "icon": "zap",
+        "title": "ATV Safety Instruction",
+        "description": "Professional briefing on quad bike controls, safety rules, and track navigation",
+        "priority": 66
+    },
+    {
+        "id": 220,
+        "type": "inclusion",
+        "icon": "bike",
+        "title": "Automatic ATV Provided",
+        "description": "Easy-to-ride automatic quad bike — no gear changes, no prior experience needed",
+        "priority": 67
+    },
+    {
+        "id": 221,
+        "type": "exclusion",
+        "icon": "camera-video",
+        "title": "GoPro or Action Camera Rental",
+        "description": "Available for hire at the desert — pre-booking recommended",
+        "priority": 60
+    },
+    {
+        "id": 222,
+        "type": "exclusion",
+        "icon": "battery-charging",
+        "title": "Phone Charging at Camp",
+        "description": "Limited or no power outlets at desert camps — bring a portable power bank",
+        "priority": 61
+    },
+    {
+        "id": 223,
+        "type": "exclusion",
+        "icon": "thermometer-sun",
+        "title": "Travel or Medical Insurance",
+        "description": "Not included — guests are advised to carry their own coverage",
+        "priority": 62
+    },
+    {
+        "id": 224,
+        "type": "exclusion",
+        "icon": "horse",
+        "title": "Horse Riding",
+        "description": "Available at the desert as an optional paid activity",
+        "priority": 63
+    },
+    {
+        "id": 225,
+        "type": "exclusion",
+        "icon": "clock",
+        "title": "Extended Quad Bike Time",
+        "description": "Additional 30-minute quad sessions available at extra charge at the site",
+        "priority": 64
+    },
+    {
+        "id": 226,
+        "type": "highlight",
+        "icon": "sunset",
+        "title": "Spectacular Sunset Point",
+        "description": "Dedicated stop at the highest dune for an unforgettable golden-hour experience",
+        "priority": 50
+    },
+    {
+        "id": 227,
+        "type": "highlight",
+        "icon": "utensils",
+        "title": "Lavish BBQ Feast",
+        "description": "Generous buffet with live grilling, multiple cuisines, and unlimited beverages",
+        "priority": 51
+    },
+    {
+        "id": 228,
+        "type": "highlight",
+        "icon": "moon-stars",
+        "title": "Zero Light Pollution",
+        "description": "The desert night sky reveals thousands of stars invisible from the city",
+        "priority": 52
+    },
+    {
+        "id": 229,
+        "type": "highlight",
+        "icon": "sunrise",
+        "title": "Desert Sunrise Experience",
+        "description": "Wake to a breathtaking display of colour as the sun crests the dunes",
+        "priority": 53
+    },
+    {
+        "id": 230,
+        "type": "highlight",
+        "icon": "zap",
+        "title": "Dual Adrenaline Rush",
+        "description": "Quad biking AND dune bashing in a single action-packed outing",
+        "priority": 54
+    },
+    {
+        "id": 231,
+        "type": "highlight",
+        "icon": "heart",
+        "title": "Couples & Family Friendly",
+        "description": "Activities tailored for all ages and interests — from relaxed to extreme",
+        "priority": 55
+    },
+    {
+        "id": 232,
+        "type": "highlight",
+        "icon": "shield-check",
+        "title": "Government Licensed Operation",
+        "description": "All drivers government-certified, all vehicles maintained to top safety standards",
+        "priority": 56
+    },
+    {
+        "id": 233,
+        "type": "highlight",
+        "icon": "users",
+        "title": "Expert English-Speaking Guide",
+        "description": "Knowledgeable, friendly guide throughout your entire journey",
+        "priority": 57
+    },
+    {
+        "id": 234,
+        "type": "not_allowed",
+        "icon": "alert-triangle",
+        "title": "Vertigo or Dizziness",
+        "description": "Quad biking not recommended for guests prone to vertigo or severe dizziness",
+        "priority": 30
+    },
+    {
+        "id": 235,
+        "type": "not_allowed",
+        "icon": "hand",
+        "title": "Recent Hand or Arm Injury",
+        "description": "Quad biking requires full hand and arm control — avoid if recently injured",
+        "priority": 31
+    },
+    {
+        "id": 236,
+        "type": "not_allowed",
+        "icon": "alert-circle",
+        "title": "Children Under 16 Self-Driving",
+        "description": "Quad bike self-driving restricted to ages 16+. Younger riders ride with an instructor.",
+        "priority": 32
+    }
+]

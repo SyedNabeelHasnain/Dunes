@@ -1,0 +1,416 @@
+[
+    {
+        "id": 1,
+        "tour_id": 1,
+        "addon_id": 1,
+        "price": 150
+    },
+    {
+        "id": 2,
+        "tour_id": 1,
+        "addon_id": 9,
+        "price": 280
+    },
+    {
+        "id": 3,
+        "tour_id": 1,
+        "addon_id": 2,
+        "price": 80
+    },
+    {
+        "id": 4,
+        "tour_id": 1,
+        "addon_id": 10,
+        "price": 60
+    },
+    {
+        "id": 5,
+        "tour_id": 1,
+        "addon_id": 7,
+        "price": 75
+    },
+    {
+        "id": 6,
+        "tour_id": 1,
+        "addon_id": 6,
+        "price": 50
+    },
+    {
+        "id": 7,
+        "tour_id": 1,
+        "addon_id": 3,
+        "price": 100
+    },
+    {
+        "id": 8,
+        "tour_id": 1,
+        "addon_id": 4,
+        "price": 120
+    },
+    {
+        "id": 9,
+        "tour_id": 1,
+        "addon_id": 5,
+        "price": 200
+    },
+    {
+        "id": 10,
+        "tour_id": 1,
+        "addon_id": 8,
+        "price": 60
+    },
+    {
+        "id": 11,
+        "tour_id": 1,
+        "addon_id": 11,
+        "price": 200
+    },
+    {
+        "id": 12,
+        "tour_id": 1,
+        "addon_id": 12,
+        "price": 350
+    },
+    {
+        "id": 13,
+        "tour_id": 1,
+        "addon_id": 13,
+        "price": 75
+    },
+    {
+        "id": 14,
+        "tour_id": 2,
+        "addon_id": 1,
+        "price": 150
+    },
+    {
+        "id": 15,
+        "tour_id": 2,
+        "addon_id": 9,
+        "price": 280
+    },
+    {
+        "id": 16,
+        "tour_id": 2,
+        "addon_id": 2,
+        "price": 80
+    },
+    {
+        "id": 17,
+        "tour_id": 2,
+        "addon_id": 10,
+        "price": 60
+    },
+    {
+        "id": 18,
+        "tour_id": 2,
+        "addon_id": 7,
+        "price": 75
+    },
+    {
+        "id": 19,
+        "tour_id": 2,
+        "addon_id": 5,
+        "price": 200
+    },
+    {
+        "id": 20,
+        "tour_id": 2,
+        "addon_id": 11,
+        "price": 200
+    },
+    {
+        "id": 21,
+        "tour_id": 2,
+        "addon_id": 12,
+        "price": 350
+    },
+    {
+        "id": 22,
+        "tour_id": 2,
+        "addon_id": 14,
+        "price": 850
+    },
+    {
+        "id": 23,
+        "tour_id": 3,
+        "addon_id": 1,
+        "price": 150
+    },
+    {
+        "id": 24,
+        "tour_id": 3,
+        "addon_id": 9,
+        "price": 280
+    },
+    {
+        "id": 25,
+        "tour_id": 3,
+        "addon_id": 2,
+        "price": 80
+    },
+    {
+        "id": 26,
+        "tour_id": 3,
+        "addon_id": 10,
+        "price": 60
+    },
+    {
+        "id": 27,
+        "tour_id": 3,
+        "addon_id": 7,
+        "price": 75
+    },
+    {
+        "id": 28,
+        "tour_id": 3,
+        "addon_id": 6,
+        "price": 50
+    },
+    {
+        "id": 29,
+        "tour_id": 3,
+        "addon_id": 3,
+        "price": 100
+    },
+    {
+        "id": 30,
+        "tour_id": 3,
+        "addon_id": 4,
+        "price": 120
+    },
+    {
+        "id": 31,
+        "tour_id": 3,
+        "addon_id": 5,
+        "price": 200
+    },
+    {
+        "id": 32,
+        "tour_id": 3,
+        "addon_id": 8,
+        "price": 60
+    },
+    {
+        "id": 33,
+        "tour_id": 3,
+        "addon_id": 11,
+        "price": 200
+    },
+    {
+        "id": 34,
+        "tour_id": 3,
+        "addon_id": 12,
+        "price": 350
+    },
+    {
+        "id": 35,
+        "tour_id": 3,
+        "addon_id": 13,
+        "price": 75
+    },
+    {
+        "id": 36,
+        "tour_id": 3,
+        "addon_id": 28,
+        "price": 350
+    },
+    {
+        "id": 37,
+        "tour_id": 4,
+        "addon_id": 9,
+        "price": 250
+    },
+    {
+        "id": 38,
+        "tour_id": 4,
+        "addon_id": 2,
+        "price": 80
+    },
+    {
+        "id": 39,
+        "tour_id": 4,
+        "addon_id": 10,
+        "price": 60
+    },
+    {
+        "id": 40,
+        "tour_id": 4,
+        "addon_id": 7,
+        "price": 75
+    },
+    {
+        "id": 41,
+        "tour_id": 4,
+        "addon_id": 6,
+        "price": 50
+    },
+    {
+        "id": 42,
+        "tour_id": 4,
+        "addon_id": 3,
+        "price": 100
+    },
+    {
+        "id": 43,
+        "tour_id": 4,
+        "addon_id": 4,
+        "price": 120
+    },
+    {
+        "id": 44,
+        "tour_id": 4,
+        "addon_id": 5,
+        "price": 200
+    },
+    {
+        "id": 45,
+        "tour_id": 4,
+        "addon_id": 8,
+        "price": 60
+    },
+    {
+        "id": 46,
+        "tour_id": 4,
+        "addon_id": 11,
+        "price": 200
+    },
+    {
+        "id": 47,
+        "tour_id": 4,
+        "addon_id": 12,
+        "price": 350
+    },
+    {
+        "id": 48,
+        "tour_id": 4,
+        "addon_id": 13,
+        "price": 75
+    },
+    {
+        "id": 49,
+        "tour_id": 5,
+        "addon_id": 15,
+        "price": 169
+    },
+    {
+        "id": 50,
+        "tour_id": 5,
+        "addon_id": 16,
+        "price": 399
+    },
+    {
+        "id": 51,
+        "tour_id": 5,
+        "addon_id": 17,
+        "price": 55
+    },
+    {
+        "id": 52,
+        "tour_id": 5,
+        "addon_id": 18,
+        "price": 135
+    },
+    {
+        "id": 53,
+        "tour_id": 5,
+        "addon_id": 19,
+        "price": 120
+    },
+    {
+        "id": 54,
+        "tour_id": 5,
+        "addon_id": 5,
+        "price": 200
+    },
+    {
+        "id": 55,
+        "tour_id": 5,
+        "addon_id": 12,
+        "price": 400
+    },
+    {
+        "id": 56,
+        "tour_id": 6,
+        "addon_id": 20,
+        "price": 65
+    },
+    {
+        "id": 57,
+        "tour_id": 6,
+        "addon_id": 21,
+        "price": 220
+    },
+    {
+        "id": 58,
+        "tour_id": 6,
+        "addon_id": 22,
+        "price": 310
+    },
+    {
+        "id": 59,
+        "tour_id": 6,
+        "addon_id": 23,
+        "price": 65
+    },
+    {
+        "id": 60,
+        "tour_id": 6,
+        "addon_id": 19,
+        "price": 120
+    },
+    {
+        "id": 61,
+        "tour_id": 6,
+        "addon_id": 5,
+        "price": 200
+    },
+    {
+        "id": 62,
+        "tour_id": 6,
+        "addon_id": 12,
+        "price": 450
+    },
+    {
+        "id": 63,
+        "tour_id": 7,
+        "addon_id": 24,
+        "price": 80
+    },
+    {
+        "id": 64,
+        "tour_id": 7,
+        "addon_id": 4,
+        "price": 150
+    },
+    {
+        "id": 65,
+        "tour_id": 7,
+        "addon_id": 25,
+        "price": 40
+    },
+    {
+        "id": 66,
+        "tour_id": 7,
+        "addon_id": 26,
+        "price": 250
+    },
+    {
+        "id": 67,
+        "tour_id": 7,
+        "addon_id": 5,
+        "price": 150
+    },
+    {
+        "id": 68,
+        "tour_id": 7,
+        "addon_id": 27,
+        "price": 150
+    },
+    {
+        "id": 69,
+        "tour_id": 7,
+        "addon_id": 28,
+        "price": 350
+    }
+]

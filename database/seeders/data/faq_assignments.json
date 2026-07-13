@@ -1,0 +1,476 @@
+[
+    {
+        "id": 1,
+        "faq_id": 1,
+        "entity_type": "general",
+        "entity_id": null
+    },
+    {
+        "id": 2,
+        "faq_id": 2,
+        "entity_type": "general",
+        "entity_id": null
+    },
+    {
+        "id": 3,
+        "faq_id": 3,
+        "entity_type": "general",
+        "entity_id": null
+    },
+    {
+        "id": 4,
+        "faq_id": 4,
+        "entity_type": "general",
+        "entity_id": null
+    },
+    {
+        "id": 5,
+        "faq_id": 5,
+        "entity_type": "general",
+        "entity_id": null
+    },
+    {
+        "id": 6,
+        "faq_id": 6,
+        "entity_type": "general",
+        "entity_id": null
+    },
+    {
+        "id": 7,
+        "faq_id": 7,
+        "entity_type": "general",
+        "entity_id": null
+    },
+    {
+        "id": 8,
+        "faq_id": 8,
+        "entity_type": "general",
+        "entity_id": null
+    },
+    {
+        "id": 9,
+        "faq_id": 9,
+        "entity_type": "general",
+        "entity_id": null
+    },
+    {
+        "id": 10,
+        "faq_id": 10,
+        "entity_type": "general",
+        "entity_id": null
+    },
+    {
+        "id": 11,
+        "faq_id": 1,
+        "entity_type": "tour",
+        "entity_id": 1
+    },
+    {
+        "id": 12,
+        "faq_id": 2,
+        "entity_type": "tour",
+        "entity_id": 1
+    },
+    {
+        "id": 13,
+        "faq_id": 3,
+        "entity_type": "tour",
+        "entity_id": 1
+    },
+    {
+        "id": 14,
+        "faq_id": 4,
+        "entity_type": "tour",
+        "entity_id": 1
+    },
+    {
+        "id": 15,
+        "faq_id": 5,
+        "entity_type": "tour",
+        "entity_id": 1
+    },
+    {
+        "id": 16,
+        "faq_id": 6,
+        "entity_type": "tour",
+        "entity_id": 1
+    },
+    {
+        "id": 17,
+        "faq_id": 7,
+        "entity_type": "tour",
+        "entity_id": 1
+    },
+    {
+        "id": 18,
+        "faq_id": 8,
+        "entity_type": "tour",
+        "entity_id": 1
+    },
+    {
+        "id": 19,
+        "faq_id": 9,
+        "entity_type": "tour",
+        "entity_id": 1
+    },
+    {
+        "id": 20,
+        "faq_id": 10,
+        "entity_type": "tour",
+        "entity_id": 1
+    },
+    {
+        "id": 21,
+        "faq_id": 1,
+        "entity_type": "tour",
+        "entity_id": 2
+    },
+    {
+        "id": 22,
+        "faq_id": 2,
+        "entity_type": "tour",
+        "entity_id": 2
+    },
+    {
+        "id": 23,
+        "faq_id": 3,
+        "entity_type": "tour",
+        "entity_id": 2
+    },
+    {
+        "id": 24,
+        "faq_id": 5,
+        "entity_type": "tour",
+        "entity_id": 2
+    },
+    {
+        "id": 25,
+        "faq_id": 6,
+        "entity_type": "tour",
+        "entity_id": 2
+    },
+    {
+        "id": 26,
+        "faq_id": 7,
+        "entity_type": "tour",
+        "entity_id": 2
+    },
+    {
+        "id": 27,
+        "faq_id": 8,
+        "entity_type": "tour",
+        "entity_id": 2
+    },
+    {
+        "id": 28,
+        "faq_id": 1,
+        "entity_type": "tour",
+        "entity_id": 3
+    },
+    {
+        "id": 29,
+        "faq_id": 2,
+        "entity_type": "tour",
+        "entity_id": 3
+    },
+    {
+        "id": 30,
+        "faq_id": 3,
+        "entity_type": "tour",
+        "entity_id": 3
+    },
+    {
+        "id": 31,
+        "faq_id": 4,
+        "entity_type": "tour",
+        "entity_id": 3
+    },
+    {
+        "id": 32,
+        "faq_id": 5,
+        "entity_type": "tour",
+        "entity_id": 3
+    },
+    {
+        "id": 33,
+        "faq_id": 6,
+        "entity_type": "tour",
+        "entity_id": 3
+    },
+    {
+        "id": 34,
+        "faq_id": 7,
+        "entity_type": "tour",
+        "entity_id": 3
+    },
+    {
+        "id": 35,
+        "faq_id": 8,
+        "entity_type": "tour",
+        "entity_id": 3
+    },
+    {
+        "id": 36,
+        "faq_id": 10,
+        "entity_type": "tour",
+        "entity_id": 3
+    },
+    {
+        "id": 37,
+        "faq_id": 1,
+        "entity_type": "tour",
+        "entity_id": 4
+    },
+    {
+        "id": 38,
+        "faq_id": 2,
+        "entity_type": "tour",
+        "entity_id": 4
+    },
+    {
+        "id": 39,
+        "faq_id": 3,
+        "entity_type": "tour",
+        "entity_id": 4
+    },
+    {
+        "id": 40,
+        "faq_id": 4,
+        "entity_type": "tour",
+        "entity_id": 4
+    },
+    {
+        "id": 41,
+        "faq_id": 5,
+        "entity_type": "tour",
+        "entity_id": 4
+    },
+    {
+        "id": 42,
+        "faq_id": 6,
+        "entity_type": "tour",
+        "entity_id": 4
+    },
+    {
+        "id": 43,
+        "faq_id": 7,
+        "entity_type": "tour",
+        "entity_id": 4
+    },
+    {
+        "id": 44,
+        "faq_id": 8,
+        "entity_type": "tour",
+        "entity_id": 4
+    },
+    {
+        "id": 45,
+        "faq_id": 10,
+        "entity_type": "tour",
+        "entity_id": 4
+    },
+    {
+        "id": 46,
+        "faq_id": 11,
+        "entity_type": "tour",
+        "entity_id": 1
+    },
+    {
+        "id": 47,
+        "faq_id": 12,
+        "entity_type": "tour",
+        "entity_id": 1
+    },
+    {
+        "id": 48,
+        "faq_id": 13,
+        "entity_type": "tour",
+        "entity_id": 1
+    },
+    {
+        "id": 49,
+        "faq_id": 14,
+        "entity_type": "tour",
+        "entity_id": 1
+    },
+    {
+        "id": 50,
+        "faq_id": 15,
+        "entity_type": "tour",
+        "entity_id": 1
+    },
+    {
+        "id": 51,
+        "faq_id": 16,
+        "entity_type": "tour",
+        "entity_id": 1
+    },
+    {
+        "id": 52,
+        "faq_id": 17,
+        "entity_type": "tour",
+        "entity_id": 1
+    },
+    {
+        "id": 53,
+        "faq_id": 18,
+        "entity_type": "tour",
+        "entity_id": 1
+    },
+    {
+        "id": 54,
+        "faq_id": 19,
+        "entity_type": "tour",
+        "entity_id": 2
+    },
+    {
+        "id": 55,
+        "faq_id": 20,
+        "entity_type": "tour",
+        "entity_id": 2
+    },
+    {
+        "id": 56,
+        "faq_id": 21,
+        "entity_type": "tour",
+        "entity_id": 2
+    },
+    {
+        "id": 57,
+        "faq_id": 22,
+        "entity_type": "tour",
+        "entity_id": 2
+    },
+    {
+        "id": 58,
+        "faq_id": 23,
+        "entity_type": "tour",
+        "entity_id": 2
+    },
+    {
+        "id": 59,
+        "faq_id": 24,
+        "entity_type": "tour",
+        "entity_id": 2
+    },
+    {
+        "id": 60,
+        "faq_id": 25,
+        "entity_type": "tour",
+        "entity_id": 2
+    },
+    {
+        "id": 61,
+        "faq_id": 26,
+        "entity_type": "tour",
+        "entity_id": 2
+    },
+    {
+        "id": 62,
+        "faq_id": 27,
+        "entity_type": "tour",
+        "entity_id": 3
+    },
+    {
+        "id": 63,
+        "faq_id": 28,
+        "entity_type": "tour",
+        "entity_id": 3
+    },
+    {
+        "id": 64,
+        "faq_id": 29,
+        "entity_type": "tour",
+        "entity_id": 3
+    },
+    {
+        "id": 65,
+        "faq_id": 30,
+        "entity_type": "tour",
+        "entity_id": 3
+    },
+    {
+        "id": 66,
+        "faq_id": 31,
+        "entity_type": "tour",
+        "entity_id": 3
+    },
+    {
+        "id": 67,
+        "faq_id": 32,
+        "entity_type": "tour",
+        "entity_id": 3
+    },
+    {
+        "id": 68,
+        "faq_id": 33,
+        "entity_type": "tour",
+        "entity_id": 3
+    },
+    {
+        "id": 69,
+        "faq_id": 34,
+        "entity_type": "tour",
+        "entity_id": 3
+    },
+    {
+        "id": 70,
+        "faq_id": 35,
+        "entity_type": "tour",
+        "entity_id": 3
+    },
+    {
+        "id": 71,
+        "faq_id": 36,
+        "entity_type": "tour",
+        "entity_id": 4
+    },
+    {
+        "id": 72,
+        "faq_id": 37,
+        "entity_type": "tour",
+        "entity_id": 4
+    },
+    {
+        "id": 73,
+        "faq_id": 38,
+        "entity_type": "tour",
+        "entity_id": 4
+    },
+    {
+        "id": 74,
+        "faq_id": 39,
+        "entity_type": "tour",
+        "entity_id": 4
+    },
+    {
+        "id": 75,
+        "faq_id": 40,
+        "entity_type": "tour",
+        "entity_id": 4
+    },
+    {
+        "id": 76,
+        "faq_id": 41,
+        "entity_type": "tour",
+        "entity_id": 4
+    },
+    {
+        "id": 77,
+        "faq_id": 42,
+        "entity_type": "tour",
+        "entity_id": 4
+    },
+    {
+        "id": 78,
+        "faq_id": 43,
+        "entity_type": "tour",
+        "entity_id": 4
+    },
+    {
+        "id": 79,
+        "faq_id": 44,
+        "entity_type": "tour",
+        "entity_id": 4
+    }
+]

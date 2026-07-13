@@ -1,0 +1,362 @@
+[
+    {
+        "id": 1,
+        "tour_id": 1,
+        "time": "3:00 PM",
+        "title": "Hotel Pickup",
+        "description": "Our professional safari captain collects you from your Dubai hotel or residence in a comfortable, air-conditioned Toyota Land Cruiser. Sit back and enjoy the transition from the glittering city to the open desert highway.",
+        "icon": "bi-truck",
+        "duration": "30-60 mins",
+        "priority": 1
+    },
+    {
+        "id": 2,
+        "tour_id": 1,
+        "time": "4:00 PM",
+        "title": "Desert Drive",
+        "description": "As the desert opens up before you, enjoy a scenic drive through the sandy landscape with opportunities to photograph the stunning desert terrain and dune formations.",
+        "icon": "bi-camera",
+        "duration": "20 mins",
+        "priority": 2
+    },
+    {
+        "id": 3,
+        "tour_id": 1,
+        "time": "4:30 PM",
+        "title": "Dune Bashing",
+        "description": "Hold tight for the highlight of the journey — an adrenaline-pumping dune bashing ride across the Lahbab Red Dunes. Your expert driver navigates steep climbs, sharp drops, and sweeping slides in the powerful 4x4.",
+        "icon": "bi-speedometer",
+        "duration": "30-45 mins",
+        "priority": 3
+    },
+    {
+        "id": 4,
+        "tour_id": 1,
+        "time": "5:15 PM",
+        "title": "Sunset Stop",
+        "description": "Pause at the peak of a towering dune to witness the desert sunset in its full glory. Golden, amber, and crimson hues sweep across the endless sands — a perfect moment for photographs and quiet wonder.",
+        "icon": "bi-sunrise",
+        "duration": "15-20 mins",
+        "priority": 4
+    },
+    {
+        "id": 5,
+        "tour_id": 1,
+        "time": "5:30 PM",
+        "title": "Desert Camp",
+        "description": "Arrive at our traditional Bedouin-style desert camp and enjoy a full evening of activities: camel riding, sandboarding, henna painting, Arabic costume photos, falcon display, shisha, a lavish BBQ dinner buffet, and mesmerising live shows including Tanoura dance, belly dance, fire show, and Dabka drumming.",
+        "icon": "bi-house",
+        "duration": "3-3.5 hours",
+        "priority": 5
+    },
+    {
+        "id": 6,
+        "tour_id": 1,
+        "time": "9:00 PM",
+        "title": "Return",
+        "description": "After an unforgettable desert evening, your driver returns you safely to your Dubai hotel or residence. Sit back and relive the memories on the comfortable ride home.",
+        "icon": "bi-geo-alt",
+        "duration": "30-60 mins",
+        "priority": 6
+    },
+    {
+        "id": 7,
+        "tour_id": 2,
+        "time": "8:00 AM",
+        "title": "Hotel Pickup",
+        "description": "Your morning begins with a prompt pick-up from your Dubai hotel or residence in a comfortable, air-conditioned 4x4 vehicle. Enjoy the peaceful early-morning drive as the city wakes up around you.",
+        "icon": "bi-truck",
+        "duration": "30-45 mins",
+        "priority": 1
+    },
+    {
+        "id": 8,
+        "tour_id": 2,
+        "time": "8:45 AM",
+        "title": "Desert Arrival & Preparation",
+        "description": "Arrive at the desert entry point where your driver prepares the vehicle for off-road action. Take a quick restroom break and get ready for the adventure ahead.",
+        "icon": "bi-geo-alt",
+        "duration": "10-15 mins",
+        "priority": 2
+    },
+    {
+        "id": 9,
+        "tour_id": 2,
+        "time": "9:00 AM",
+        "title": "Dune Bashing",
+        "description": "Experience an exhilarating 20-to-30-minute dune bashing ride across the red sand dunes. The cooler morning temperatures make this a supremely comfortable and thrilling experience with incredible visibility across the desert.",
+        "icon": "bi-speedometer",
+        "duration": "20-30 mins",
+        "priority": 3
+    },
+    {
+        "id": 10,
+        "tour_id": 2,
+        "time": "9:30 AM",
+        "title": "Photo Stop & Sandboarding",
+        "description": "Pause at the crest of a panoramic dune to capture the pristine morning desert with its long shadows and untouched ripple patterns. Try sandboarding down the steep slopes for an exciting rush.",
+        "icon": "bi-camera",
+        "duration": "20-30 mins",
+        "priority": 4
+    },
+    {
+        "id": 11,
+        "tour_id": 2,
+        "time": "10:00 AM",
+        "title": "Camel Ride & Refreshments",
+        "description": "Enjoy a short camel ride through the tranquil morning landscape. Afterwards, relax with Arabic coffee, dates, and chilled refreshments while photographing a trained falcon.",
+        "icon": "bi-cup-hot",
+        "duration": "30-40 mins",
+        "priority": 5
+    },
+    {
+        "id": 12,
+        "tour_id": 2,
+        "time": "10:45 AM",
+        "title": "Free Desert Exploration",
+        "description": "Take your time to wander the desert, capture final photographs, or simply soak in the serene morning atmosphere before departure.",
+        "icon": "bi-compass",
+        "duration": "15-20 mins",
+        "priority": 6
+    },
+    {
+        "id": 13,
+        "tour_id": 2,
+        "time": "11:00 AM",
+        "title": "Return to Dubai",
+        "description": "Board your 4x4 for the comfortable drive back to the city. You are returned to your hotel by noon, leaving the entire afternoon and evening free for other Dubai experiences.",
+        "icon": "bi-geo-alt",
+        "duration": "45-60 mins",
+        "priority": 7
+    },
+    {
+        "id": 14,
+        "tour_id": 3,
+        "time": "3:00 PM",
+        "title": "Hotel Pickup",
+        "description": "Your overnight desert adventure begins with a comfortable pick-up from your Dubai hotel or residence in an air-conditioned Toyota Land Cruiser. Relax as the city skyline gradually gives way to vast desert horizons.",
+        "icon": "bi-truck",
+        "duration": "30-60 mins",
+        "priority": 1
+    },
+    {
+        "id": 15,
+        "tour_id": 3,
+        "time": "4:00 PM",
+        "title": "Desert Arrival",
+        "description": "Arrive at the desert outskirts where your vehicle is prepared for the off-road drive. A brief stop allows restroom use and a first taste of the desert scenery.",
+        "icon": "bi-geo-alt",
+        "duration": "15 mins",
+        "priority": 2
+    },
+    {
+        "id": 16,
+        "tour_id": 3,
+        "time": "4:15 PM",
+        "title": "Dune Bashing",
+        "description": "Buckle up for an adrenaline-fuelled dune bashing session across the towering Lahbab Red Dunes. Your skilled driver navigates dramatic crests and valleys for 30 to 45 minutes of pure excitement.",
+        "icon": "bi-speedometer",
+        "duration": "30-45 mins",
+        "priority": 3
+    },
+    {
+        "id": 17,
+        "tour_id": 3,
+        "time": "5:00 PM",
+        "title": "Sunset Photo Stop",
+        "description": "Stop atop a commanding dune to watch the desert sunset — a breathtaking canvas of gold, crimson, and violet stretching to every horizon. Capture this unforgettable moment and try sandboarding on the nearby slopes.",
+        "icon": "bi-sunrise",
+        "duration": "20-30 mins",
+        "priority": 4
+    },
+    {
+        "id": 18,
+        "tour_id": 3,
+        "time": "5:30 PM",
+        "title": "Desert Camp Arrival",
+        "description": "Arrive at the overnight camp and receive a traditional welcome with Arabic coffee, dates, and tea. Settle into the Bedouin atmosphere and explore the camp at your leisure.",
+        "icon": "bi-house",
+        "duration": "30 mins",
+        "priority": 5
+    },
+    {
+        "id": 19,
+        "tour_id": 3,
+        "time": "6:00 PM",
+        "title": "Camp Activities",
+        "description": "Enjoy a full range of desert activities: take a camel ride, get henna designs painted, dress in Arabic attire for photos, pose with a falcon, or relax with shisha at the dedicated corner.",
+        "icon": "bi-stars",
+        "duration": "60 mins",
+        "priority": 6
+    },
+    {
+        "id": 20,
+        "tour_id": 3,
+        "time": "7:00 PM",
+        "title": "BBQ Dinner Buffet",
+        "description": "A lavish BBQ dinner buffet is served under the open sky — grilled meats, kebabs, fresh salads, hummus, Arabic bread, rice dishes, and desserts. Vegetarian options are always available, with unlimited soft drinks, water, and hot beverages.",
+        "icon": "bi-egg-fried",
+        "duration": "60 mins",
+        "priority": 7
+    },
+    {
+        "id": 21,
+        "tour_id": 3,
+        "time": "8:00 PM",
+        "title": "Live Entertainment",
+        "description": "Sit back for an evening of cultural performances: the mesmerising Tanoura dance, an elegant belly dance, a heart-stopping fire show, and rhythmic Dabka drumming — all staged beneath the starlit desert sky.",
+        "icon": "bi-music-note",
+        "duration": "45-60 mins",
+        "priority": 8
+    },
+    {
+        "id": 22,
+        "tour_id": 3,
+        "time": "9:00 PM",
+        "title": "Campfire & Stargazing",
+        "description": "As the entertainment ends, gather around the campfire for a quieter, more intimate experience. Sip Arabic coffee, share stories, and gaze upward — the desert sky, free from city light pollution, reveals thousands of stars and constellations.",
+        "icon": "bi-moon-stars",
+        "duration": "60-90 mins",
+        "priority": 9
+    },
+    {
+        "id": 23,
+        "tour_id": 3,
+        "time": "10:30 PM",
+        "title": "Retire to Tent",
+        "description": "Retreat to your traditional Bedouin tent equipped with clean bedding and blankets. The profound silence of the desert provides an unparalleled sense of peace as you drift off to sleep.",
+        "icon": "bi-moon",
+        "duration": "Overnight",
+        "priority": 10
+    },
+    {
+        "id": 24,
+        "tour_id": 3,
+        "time": "5:30 AM",
+        "title": "Desert Sunrise",
+        "description": "Wake gently to the cool desert dawn. An optional early-morning nature walk lets you discover animal tracks and desert flora. Watch the stunning sunrise paint the sand dunes in soft peach, amber, and gold.",
+        "icon": "bi-sunrise",
+        "duration": "30-45 mins",
+        "priority": 11
+    },
+    {
+        "id": 25,
+        "tour_id": 3,
+        "time": "6:30 AM",
+        "title": "Bedouin Breakfast",
+        "description": "A hearty traditional breakfast is served: eggs, Arabic bread, cheese, jam, honey, fresh fruits, tea, and Arabic coffee — the perfect fuel for the morning ahead.",
+        "icon": "bi-cup-hot",
+        "duration": "30-45 mins",
+        "priority": 12
+    },
+    {
+        "id": 26,
+        "tour_id": 3,
+        "time": "7:30 AM",
+        "title": "Free Time & Departure",
+        "description": "Enjoy final moments in the desert — take photographs, explore, or simply absorb the morning calm. Then board your vehicle for the comfortable return journey to your Dubai hotel, arriving between 9:00 and 10:00 AM.",
+        "icon": "bi-geo-alt",
+        "duration": "60-90 mins",
+        "priority": 13
+    },
+    {
+        "id": 27,
+        "tour_id": 4,
+        "time": "2:30 PM",
+        "title": "Hotel Pickup",
+        "description": "Your adventure starts with an earlier-than-usual pick-up from your Dubai hotel or residence in an air-conditioned 4x4. The extra time ensures you enjoy both quad biking and the full evening safari programme.",
+        "icon": "bi-truck",
+        "duration": "30-60 mins",
+        "priority": 1
+    },
+    {
+        "id": 28,
+        "tour_id": 4,
+        "time": "3:30 PM",
+        "title": "Quad Bike Safety Briefing",
+        "description": "Arrive at the desert ATV compound. A professional instructor gives you a thorough safety briefing covering controls, throttle management, braking, and track boundaries. Helmets and safety gear are provided.",
+        "icon": "bi-shield-check",
+        "duration": "10-15 mins",
+        "priority": 2
+    },
+    {
+        "id": 29,
+        "tour_id": 4,
+        "time": "3:45 PM",
+        "title": "Quad Biking Adventure",
+        "description": "Mount your powerful automatic ATV and ride freely across the open desert terrain for 30 thrilling minutes. No prior experience needed — the instructor guides you throughout. Accelerate, turn, and explore the sandy landscape at your own pace.",
+        "icon": "bi-lightning",
+        "duration": "30 mins",
+        "priority": 3
+    },
+    {
+        "id": 30,
+        "tour_id": 4,
+        "time": "4:15 PM",
+        "title": "Dune Bashing",
+        "description": "Switch from handlebars to seatbelts as your expert driver launches into an intense dune bashing session across the towering red dunes. Hold on tight for 30 to 45 minutes of climbs, drops, and exhilarating slides.",
+        "icon": "bi-speedometer",
+        "duration": "30-45 mins",
+        "priority": 4
+    },
+    {
+        "id": 31,
+        "tour_id": 4,
+        "time": "5:00 PM",
+        "title": "Sunset Photo Stop",
+        "description": "Pause at a panoramic dune summit to witness the magical desert sunset. Capture golden-hour photographs of the infinite sand sea and try your hand at sandboarding on the steep slopes.",
+        "icon": "bi-sunrise",
+        "duration": "15-20 mins",
+        "priority": 5
+    },
+    {
+        "id": 32,
+        "tour_id": 4,
+        "time": "5:30 PM",
+        "title": "Desert Camp Arrival",
+        "description": "Arrive at the traditional Bedouin-style camp. Receive a warm welcome with Arabic coffee, dates, and tea. Settle in and begin exploring the camp facilities.",
+        "icon": "bi-house",
+        "duration": "15-20 mins",
+        "priority": 6
+    },
+    {
+        "id": 33,
+        "tour_id": 4,
+        "time": "5:45 PM",
+        "title": "Camp Activities",
+        "description": "Enjoy camel riding, henna painting, traditional Arabic costume photos, falcon photography, and shisha at the dedicated corner. Take your time — the evening is yours.",
+        "icon": "bi-stars",
+        "duration": "60-75 mins",
+        "priority": 7
+    },
+    {
+        "id": 34,
+        "tour_id": 4,
+        "time": "7:00 PM",
+        "title": "BBQ Dinner Buffet",
+        "description": "Savour a generous BBQ dinner buffet featuring grilled meats, kebabs, salads, hummus, Arabic bread, rice, and desserts. Vegetarian options and unlimited soft drinks, water, and hot beverages included.",
+        "icon": "bi-egg-fried",
+        "duration": "45-60 mins",
+        "priority": 8
+    },
+    {
+        "id": 35,
+        "tour_id": 4,
+        "time": "8:00 PM",
+        "title": "Live Entertainment",
+        "description": "The evening reaches its peak with spectacular cultural performances: Tanoura dance, belly dance, a daring fire show, and Dabka drumming — all performed under a blanket of desert stars.",
+        "icon": "bi-music-note",
+        "duration": "45-60 mins",
+        "priority": 9
+    },
+    {
+        "id": 36,
+        "tour_id": 4,
+        "time": "9:00 PM",
+        "title": "Return to Dubai",
+        "description": "Board your 4x4 for the comfortable return journey. You are dropped off at your Dubai hotel by approximately 9:30 PM, having packed two major adventures into one incredible evening.",
+        "icon": "bi-geo-alt",
+        "duration": "30-60 mins",
+        "priority": 10
+    }
+]
