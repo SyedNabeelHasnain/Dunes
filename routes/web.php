@@ -91,9 +91,6 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
-// ── Root-level Dynamic Tour Slugs (Fallback Route) ───────────────────────────
-Route::get('/{slug}', [TourController::class, 'show'])->name('tours.show');
-
 // ── Database Initialization Route (Triggered once after deployment) ─────────
 Route::get('/system/init-db', function() {
     if (request()->input('key') !== 'dunes2026') {
@@ -105,3 +102,6 @@ Route::get('/system/init-db', function() {
     ]);
     return 'Database initialized and seeded successfully!';
 });
+
+// ── Root-level Dynamic Tour Slugs (Fallback Route) ───────────────────────────
+Route::get('/{slug}', [TourController::class, 'show'])->name('tours.show');
