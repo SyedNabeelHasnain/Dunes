@@ -99,8 +99,8 @@ jobs:
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
         server: ${{ steps.ftp_server.outputs.host }}
-        username: ${{ vars.FTP_USERNAME }}
-        password: ${{ vars.FTP_PASSWORD }}
+        username: ${{ secrets.FTP_USERNAME || vars.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
         local-dir: ./deploy/public_deploy/
         server-dir: /
         dangerous-clean-html: false
@@ -110,8 +110,8 @@ jobs:
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
         server: ${{ steps.ftp_server.outputs.host }}
-        username: ${{ vars.FTP_USERNAME }}
-        password: ${{ vars.FTP_PASSWORD }}
+        username: ${{ secrets.FTP_USERNAME || vars.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
         local-dir: ./deploy/core_deploy/
         server-dir: dunes-laravel/
         dangerous-clean-html: false
