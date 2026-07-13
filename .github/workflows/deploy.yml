@@ -75,7 +75,7 @@ jobs:
         php artisan key:generate
 
         # Populate database credentials dynamically from secrets/vars with hardcoded fallbacks
-        sed -i "s|DB_HOST=127.0.0.1|DB_HOST=${{ vars.DB_HOST || secrets.DB_HOST || '127.0.0.1' }}|g" .env
+        sed -i "s|DB_HOST=127.0.0.1|DB_HOST=${{ vars.DB_HOST || secrets.DB_HOST || 'localhost' }}|g" .env
         sed -i "s|DB_DATABASE=u410503041_ddtlaravel|DB_DATABASE=${{ vars.DB_NAME || secrets.DB_NAME || 'u410503041_ddtlaravel' }}|g" .env
         sed -i "s|DB_USERNAME=u410503041_ddtlaravel|DB_USERNAME=${{ vars.DB_USER || secrets.DB_USER || 'u410503041_ddtlaravel' }}|g" .env
         sed -i "s|DB_PASSWORD=|DB_PASSWORD=${{ secrets.DB_PASSWORD || vars.DB_PASSWORD || 'P@kistanZindaBad123!@#' }}|g" .env
@@ -121,3 +121,9 @@ jobs:
     - name: Trigger Remote Zip Extraction
       run: |
         curl -sS "https://dunesdiscoverytourism.com/unzip.php?key=dunes2026"
+
+    - name: Clear All Laravel Caches
+      env:
+        SSHPASS: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
+      run: |
+        sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no u410503041@${{ steps.ftp_server.outputs.host }} "cd /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel && php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan event:clear && php artisan optimize:clear"
