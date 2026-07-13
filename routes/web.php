@@ -101,7 +101,7 @@ Route::get('/system/init-db', function() {
         '--force' => true
     ]);
     return 'Database initialized and seeded successfully!';
-});
+})->withoutMiddleware('web');
 
 // ── Root-level Dynamic Tour Slugs (Fallback Route) ───────────────────────────
 Route::get('/{slug}', [TourController::class, 'show'])->name('tours.show');
