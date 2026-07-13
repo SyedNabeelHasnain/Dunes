@@ -51,7 +51,7 @@ if(window.fbq){
 <!-- Schema.org metadata -->
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
+  "@@context": "https://schema.org",
   "@type": "Product",
   "name": "{{ $tour->name }}",
   "image": "{{ asset('images/' . $tour->hero_image) }}",

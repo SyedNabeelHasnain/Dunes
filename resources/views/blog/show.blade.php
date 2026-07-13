@@ -71,7 +71,7 @@
 @if ($post->faqs->count() > 0)
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
+  "@@context": "https://schema.org",
   "@type": "FAQPage",
   "mainEntity": [
     @foreach($post->faqs as $fi => $faq)

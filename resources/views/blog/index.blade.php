@@ -10,7 +10,7 @@
 
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
+  "@@context": "https://schema.org",
   "@type": "BreadcrumbList",
   "itemListElement": [
     {"@type":"ListItem","position":1,"name":"Home","item":"{{ route('home') }}"},
@@ -24,7 +24,7 @@
 
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
+  "@@context": "https://schema.org",
   "@type": "CollectionPage",
   "name": "{{ $cat ? $cat->name . ' Blog' : 'Dubai Travel Blog' }}",
   "description": "{{ $cat ? $cat->description : 'Expert guides and travel tips.' }}",
