@@ -89,7 +89,7 @@ jobs:
         username: ${{ vars.FTP_USERNAME }}
         password: ${{ vars.FTP_PASSWORD }}
         local-dir: ./deploy/public_deploy/
-        server-dir: /domains/dunesdiscoverytourism.com/public_html/
+        server-dir: /public_html/
         dangerous-clean-html: false
         timeout: 60000
 
@@ -100,7 +100,7 @@ jobs:
         username: ${{ vars.FTP_USERNAME }}
         password: ${{ vars.FTP_PASSWORD }}
         local-dir: ./deploy/core_deploy/
-        server-dir: /domains/dunesdiscoverytourism.com/dunes-laravel/
+        server-dir: /dunes-laravel/
         dangerous-clean-html: false
         timeout: 60000
 
