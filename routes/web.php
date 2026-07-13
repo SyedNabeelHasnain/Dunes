@@ -93,3 +93,15 @@ require __DIR__.'/auth.php';
 
 // ── Root-level Dynamic Tour Slugs (Fallback Route) ───────────────────────────
 Route::get('/{slug}', [TourController::class, 'show'])->name('tours.show');
+
+// ── Database Initialization Route (Triggered once after deployment) ─────────
+Route::get('/system/init-db', function() {
+    if (request()->input('key') !== 'dunes2026') {
+        abort(404);
+    }
+    \Illuminate\Support\Facades\Artisan::call('migrate:fresh', [
+        '--seed' => true,
+        '--force' => true
+    ]);
+    return 'Database initialized and seeded successfully!';
+});
