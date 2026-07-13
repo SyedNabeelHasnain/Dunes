@@ -12,6 +12,14 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
+    - name: Parse FTP Server Host
+      id: ftp_server
+      run: |
+        SERVER_HOST="${{ vars.FTP_SERVER }}"
+        SERVER_HOST="${SERVER_HOST#ftp://}"
+        SERVER_HOST="${SERVER_HOST#ftps://}"
+        echo "host=$SERVER_HOST" >> $GITHUB_OUTPUT
+
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
@@ -58,7 +66,7 @@ jobs:
     - name: FTP Deploy Public Assets to public_html
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
-        server: ${{ vars.FTP_SERVER }}
+        server: ${{ steps.ftp_server.outputs.host }}
         username: ${{ vars.FTP_USERNAME }}
         password: ${{ vars.FTP_PASSWORD }}
         local-dir: ./deploy/public_deploy/
@@ -68,7 +76,7 @@ jobs:
     - name: FTP Deploy Core Laravel Code to dunes-laravel
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
-        server: ${{ vars.FTP_SERVER }}
+        server: ${{ steps.ftp_server.outputs.host }}
         username: ${{ vars.FTP_USERNAME }}
         password: ${{ vars.FTP_PASSWORD }}
         local-dir: ./deploy/core_deploy/
