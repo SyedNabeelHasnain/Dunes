@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\AdminWhatsappController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AjaxGatewayController;
 
 // ── Front-Facing Pages ────────────────────────────────────────────────────────
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -90,6 +91,9 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+// ── Legacy AJAX Gateway Route ────────────────────────────────────────────────
+Route::post('/ajax.php', [AjaxGatewayController::class, 'handle']);
 
 // ── Database Initialization Route (Triggered once after deployment) ─────────
 Route::get('/system/init-db', function() {
