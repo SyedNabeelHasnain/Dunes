@@ -69,6 +69,8 @@ jobs:
         cp public/unzip.php deploy/public_deploy/unzip.php
 
     - name: Prepare Core Code Staging
+      env:
+        DB_PASS: ${{ secrets.DB_PASSWORD || vars.DB_PASSWORD || 'P@kistanZindaBad123!@#' }}
       run: |
         # Generate the .env file in the runner from .env.example
         cp .env.example .env
@@ -78,7 +80,9 @@ jobs:
         sed -i "s|DB_HOST=127.0.0.1|DB_HOST=${{ vars.DB_HOST || secrets.DB_HOST || 'localhost' }}|g" .env
         sed -i "s|DB_DATABASE=u410503041_ddtlaravel|DB_DATABASE=${{ vars.DB_NAME || secrets.DB_NAME || 'u410503041_ddtlaravel' }}|g" .env
         sed -i "s|DB_USERNAME=u410503041_ddtlaravel|DB_USERNAME=${{ vars.DB_USER || secrets.DB_USER || 'u410503041_ddtlaravel' }}|g" .env
-        sed -i "s|DB_PASSWORD=|DB_PASSWORD=${{ secrets.DB_PASSWORD || vars.DB_PASSWORD || 'P@kistanZindaBad123!@#' }}|g" .env
+        # Quote the password to protect # from dotenv comment parsing
+        sed -i '/^DB_PASSWORD=/d' .env
+        printf 'DB_PASSWORD="%s"\n' "$DB_PASS" >> .env
 
         # Copy core Laravel directories and files, excluding public assets, node_modules, and git history
         rsync -arv --exclude="public" --exclude="node_modules" --exclude=".git" --exclude=".github" --exclude="deploy" ./ deploy/core_deploy/
@@ -126,5 +130,5 @@ jobs:
       env:
         SSHPASS: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
       run: |
-        sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no u410503041@${{ steps.ftp_server.outputs.host }} "cd /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel && php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan event:clear && php artisan optimize:clear"
+        sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no u410503041@${{ steps.ftp_server.outputs.host }} "cd /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel && php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan event:clear"
 
