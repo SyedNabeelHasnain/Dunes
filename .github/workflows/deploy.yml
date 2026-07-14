@@ -118,13 +118,13 @@ jobs:
       env:
         SSHPASS: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
       run: |
-        sshpass -e scp -P 65002 -o StrictHostKeyChecking=no deploy/public_deploy/public.zip deploy/public_deploy/unzip.php u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/domains/dunesdiscoverytourism.com/public_html/
+        sshpass -e scp -O -P 65002 -o StrictHostKeyChecking=no deploy/public_deploy/public.zip deploy/public_deploy/unzip.php u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/domains/dunesdiscoverytourism.com/public_html/
 
     - name: Upload Core Laravel Code (SCP)
       env:
         SSHPASS: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
       run: |
-        sshpass -e scp -P 65002 -o StrictHostKeyChecking=no deploy/core_deploy/core.zip u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/
+        sshpass -e scp -O -P 65002 -o StrictHostKeyChecking=no deploy/core_deploy/core.zip u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/
 
     - name: Trigger Remote Zip Extraction
       run: |
