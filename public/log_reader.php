@@ -31,22 +31,22 @@ if (file_exists($errorLogPath)) {
 } else {
     echo "\nPHP error_log file not found at: $errorLogPath\n";
 }
-    // Check if storage directory exists
-    $storageDir = __DIR__ . '/../dunes-laravel/storage';
-    if (file_exists($storageDir)) {
-        echo "Storage directory exists.\n";
-        // List files in storage/logs
-        $logsDir = $storageDir . '/logs';
-        if (file_exists($logsDir)) {
-            echo "Logs directory exists. Files inside:\n";
-            print_r(scandir($logsDir));
-        } else {
-            echo "Logs directory does not exist.\n";
-        }
+
+// Check if storage directory exists
+$storageDir = __DIR__ . '/../dunes-laravel/storage';
+if (file_exists($storageDir)) {
+    echo "\nStorage directory exists.\n";
+    // List files in storage/logs
+    $logsDir = $storageDir . '/logs';
+    if (file_exists($logsDir)) {
+        echo "Logs directory exists. Files inside:\n";
+        print_r(scandir($logsDir));
     } else {
-        echo "dunes-laravel/storage directory does not exist.\n";
-
-
+        echo "Logs directory does not exist.\n";
+    }
+} else {
+    echo "\ndunes-laravel/storage directory does not exist.\n";
+}
 
 // Check PHP extensions required by Laravel
 echo "\n--- PHP EXTENSIONS ---\n";
