@@ -45,8 +45,8 @@ if (file_exists($errorLogPath)) {
         }
     } else {
         echo "dunes-laravel/storage directory does not exist.\n";
-    }
-}
+
+
 
 // Check PHP extensions required by Laravel
 echo "\n--- PHP EXTENSIONS ---\n";
