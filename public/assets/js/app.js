@@ -966,7 +966,7 @@ const App={
                  if (locationInput.dataset.mapsInitialized === 'true') return;
                  if (typeof google === 'undefined' || !google.maps || !google.maps.places) {
                      var s=document.createElement('script');
-                     s.src='https://maps.googleapis.com/maps/api/js?key='+apiKey+'&libraries=places&loading=async';
+                     s.src='https://maps.googleapis.com/maps/api/js?key='+apiKey+'&libraries=places&loading=async&callback=Function.prototype';
                      s.async=true; s.defer=true;
                      s.onload=initAutocomplete;
                      document.head.appendChild(s);
