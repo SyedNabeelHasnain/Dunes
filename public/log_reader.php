@@ -18,6 +18,19 @@ if (file_exists($logPath)) {
     }
 } else {
     echo "laravel.log file not found at: $logPath\n";
+}
+
+$errorLogPath = __DIR__ . '/error_log';
+if (file_exists($errorLogPath)) {
+    echo "\n--- PHP ERROR LOG ---\n";
+    $lines = file($errorLogPath);
+    $lastLines = array_slice($lines, -50);
+    foreach ($lastLines as $line) {
+        echo $line;
+    }
+} else {
+    echo "\nPHP error_log file not found at: $errorLogPath\n";
+}
     // Check if storage directory exists
     $storageDir = __DIR__ . '/../dunes-laravel/storage';
     if (file_exists($storageDir)) {
