@@ -104,6 +104,7 @@ jobs:
       run: sudo apt-get update && sudo apt-get install -y sshpass
 
     - name: Prepare Remote Directories (Clean Slate)
+      continue-on-error: true
       env:
         SSHPASS: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
       run: |
