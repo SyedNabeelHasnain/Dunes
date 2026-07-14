@@ -53,10 +53,14 @@ jobs:
         # Copy public files to staging (including hidden files like .htaccess)
         cp -r public/. deploy/public_deploy/
         
-        # Adjust paths in index.php to point to dunes-laravel directory
-        sed -i "s|__DIR__.'/../storage/framework/maintenance.php'|__DIR__.'/../dunes-laravel/storage/framework/maintenance.php'|g" deploy/public_deploy/index.php
-        sed -i "s|__DIR__.'/../vendor/autoload.php'|__DIR__.'/../dunes-laravel/vendor/autoload.php'|g" deploy/public_deploy/index.php
-        sed -i "s|__DIR__.'/../bootstrap/app.php'|__DIR__.'/../dunes-laravel/bootstrap/app.php'|g" deploy/public_deploy/index.php
+        # Adjust paths in entry points to point to dunes-laravel directory
+        for f in index.php ajax.php debug_artisan.php; do
+          if [ -f "deploy/public_deploy/$f" ]; then
+            sed -i "s|__DIR__.'/../storage/framework/maintenance.php'|__DIR__.'/../dunes-laravel/storage/framework/maintenance.php'|g" "deploy/public_deploy/$f"
+            sed -i "s|__DIR__.'/../vendor/autoload.php'|__DIR__.'/../dunes-laravel/vendor/autoload.php'|g" "deploy/public_deploy/$f"
+            sed -i "s|__DIR__.'/../bootstrap/app.php'|__DIR__.'/../dunes-laravel/bootstrap/app.php'|g" "deploy/public_deploy/$f"
+          fi
+        done
 
         # Package public assets into a zip, excluding unzip.php
         cd deploy/public_deploy

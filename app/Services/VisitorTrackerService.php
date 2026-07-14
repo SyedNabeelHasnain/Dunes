@@ -186,7 +186,7 @@ class VisitorTrackerService
         $gpsLat = $submitData['gps_lat'] ?? 'Not Available';
         $gpsLng = $submitData['gps_lng'] ?? 'Not Available';
         $gpsAccuracy = $submitData['gps_accuracy'] ?? 'Not Available';
-        $gpsTimestamp = $submitData['gps_timestamp'] ?? null;
+        $gpsTimestamp = $submitData['gps_timestamp'] ?? 'Not Available';
         $gpsSource = (!empty($submitData['gps_consent']) && $submitData['gps_consent'] === 'Yes') ? 'GPS (User Consented)' : 'Not Available';
 
         $loc = [
