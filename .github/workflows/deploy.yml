@@ -112,7 +112,7 @@ jobs:
         
         # Clean existing files (clean slate)
         sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no u410503041@${{ steps.ftp_server.outputs.host }} "rm -rf /home/u410503041/domains/dunesdiscoverytourism.com/public_html/*"
-        sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no u410503041@${{ steps.ftp_server.outputs.host }} "rm -rf /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/*"
+        sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no u410503041@${{ steps.ftp_server.outputs.host }} "find /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel -mindepth 1 -maxdepth 1 ! -name 'storage' ! -name '.env' -exec rm -rf {} +"
 
     - name: Upload Public Assets (SCP)
       env:
