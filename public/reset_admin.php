@@ -9,11 +9,9 @@ define('LARAVEL_START', microtime(true));
 require __DIR__.'/../vendor/autoload.php';
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
-// Bootstrap the HTTP application to load database connection and Eloquent
-$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
-$response = $kernel->handle(
-    $request = Illuminate\Http\Request::capture()
-);
+// Bootstrap via Console Kernel to load DB & Eloquent without routing
+$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+$kernel->bootstrap();
 
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
