@@ -338,7 +338,7 @@ class VisitorTrackerService
             'form_submit_timestamp' => date('Y-m-d H:i:s', (int)$now),
             'form_completion_seconds' => $formDuration,
             'repeat_visit_flag' => $isRepeat,
-        ], $loc);
+        ], $loc, $uaData);
     }
 
     /**

@@ -798,7 +798,7 @@ const App={
         document.getElementById('detectLocation')?.addEventListener('click',()=>this.detectLocation());
 
         if (locationInput) {
-             const initAutocomplete = () => {
+            const initAutocomplete = () => {
                 if (typeof google !== 'undefined' && google.maps && google.maps.places) {
 
                     if (locationInput.dataset.mapsInitialized === 'true') return;
@@ -809,15 +809,12 @@ const App={
                         componentRestrictions: { country: 'ae' },
                     });
 
-
                     let dropdownState = 'IDLE';
                     let lastSelectedValue = '';
 
                     const updateDropdownState = () => {
                         const pacs = document.querySelectorAll('.pac-container');
                         pacs.forEach(pac => {
-
-
                             if (dropdownState === 'SEARCHING') {
                                 pac.classList.remove('pac-force-hidden');
                             } else {
@@ -827,18 +824,13 @@ const App={
                     };
 
                     locationInput.addEventListener('keydown', (e) => {
-
                         if(e.key !== 'Tab' && e.key !== 'Enter') {
-
                             dropdownState = 'SEARCHING';
                             updateDropdownState();
                         }
                     });
 
                     locationInput.addEventListener('input', () => {
-
-
-
                         if (locationInput.value === lastSelectedValue) {
                             return;
                         }
@@ -846,7 +838,6 @@ const App={
                         if (locationInput.value.trim().length === 0) {
                             dropdownState = 'IDLE';
                         } else {
-
                             if (dropdownState !== 'SELECTED') {
                                 dropdownState = 'SEARCHING';
                             }
@@ -855,7 +846,6 @@ const App={
                     });
 
                     autocomplete.addListener('place_changed', () => {
-
                         dropdownState = 'SELECTED';
                         updateDropdownState();
 
@@ -886,17 +876,13 @@ const App={
                                 wrapper.appendChild(pac);
 
                                 if (!pac.dataset.listenersAttached) {
-
                                     document.addEventListener('click', (e) => {
-
                                         if (!wrapper.contains(e.target) && !pac.contains(e.target)) {
                                             dropdownState = 'SELECTED'; // Treat outside click as "Done"
                                             updateDropdownState();
                                         }
 
                                         if (e.target === locationInput && locationInput.value.trim() !== '') {
-
-
                                             if (dropdownState === 'SELECTED' || dropdownState === 'IDLE') {
                                                 updateDropdownState();
                                             }
@@ -904,7 +890,6 @@ const App={
                                     }, true);
 
                                     document.addEventListener('mousedown', (e) => {
-
                                         if (e.target.closest('.pac-item') || e.target.closest('.pac-container')) {
                                             dropdownState = 'SELECTED'; // Lock immediately
                                             updateDropdownState();
@@ -934,13 +919,9 @@ const App={
                         const wrapper = document.querySelector('.booking-location-wrapper');
                         if (!scrollArea || !pac) return;
 
-
-
                         const shouldBeVisible = dropdownState === 'SEARCHING' && pac.offsetHeight > 0;
 
                         if (shouldBeVisible) {
-
-
                             requestAnimationFrame(() => {
                                 const requiredSpace = pac.offsetHeight + 150;
                                 scrollArea.style.paddingBottom = requiredSpace + 'px';
@@ -957,49 +938,57 @@ const App={
                             pac.dataset.wasHidden = 'true';
                         }
                     };
-             const loadMaps = () => {
-                 const apiKey = (window.MAPS_API_KEY || '').trim();
-                 if (!apiKey) {
-                     console.warn('Google Maps API key missing; autocomplete disabled.');
-                     return;
-                 }
-                 if (locationInput.dataset.mapsInitialized === 'true') return;
-                 if (typeof google === 'undefined' || !google.maps || !google.maps.places) {
-                     var s=document.createElement('script');
-                     s.src='https://maps.googleapis.com/maps/api/js?key='+apiKey+'&libraries=places&loading=async&callback=Function.prototype';
-                     s.async=true; s.defer=true;
-                     s.onload=initAutocomplete;
-                     document.head.appendChild(s);
-                 } else {
-                     initAutocomplete();
-                 }
-             };
-             locationInput.addEventListener('focus', loadMaps, { once: true });
-             locationInput.addEventListener('click', loadMaps, { once: true });
-             locationInput.addEventListener('keydown', loadMaps, { once: true });
-             if (locationInput.value.trim().length) loadMaps();
-             var poll=setInterval(function(){
-                 if(locationInput.dataset.mapsInitialized==='true'){clearInterval(poll);return;}
-                 if(typeof google!=='undefined'&&google.maps&&google.maps.places){
-                     initAutocomplete();
-                     clearInterval(poll);
-                 }
-             },300);
                 }
-             };
+            };
 
-             if (typeof google !== 'undefined' && google.maps && google.maps.places) {
-                 initAutocomplete();
-             } else {
-                 const checkGoogle = setInterval(() => {
-                     if (typeof google !== 'undefined' && google.maps && google.maps.places) {
-                         initAutocomplete();
-                         clearInterval(checkGoogle);
-                     }
-                 }, 500);
+            const loadMaps = () => {
+                const apiKey = (window.MAPS_API_KEY || '').trim();
+                if (!apiKey) {
+                    console.warn('Google Maps API key missing; autocomplete disabled.');
+                    return;
+                }
+                if (locationInput.dataset.mapsInitialized === 'true') return;
+                if (typeof google === 'undefined' || !google.maps || !google.maps.places) {
+                    if (document.querySelector('script[src*="maps.googleapis.com"]')) return;
+                    var s = document.createElement('script');
+                    s.src = 'https://maps.googleapis.com/maps/api/js?key=' + apiKey + '&libraries=places&loading=async&callback=Function.prototype';
+                    s.async = true;
+                    s.defer = true;
+                    s.onload = initAutocomplete;
+                    document.head.appendChild(s);
+                } else {
+                    initAutocomplete();
+                }
+            };
 
-                 setTimeout(() => clearInterval(checkGoogle), 10000);
-             }
+            locationInput.addEventListener('focus', loadMaps, { once: true });
+            locationInput.addEventListener('click', loadMaps, { once: true });
+            locationInput.addEventListener('keydown', loadMaps, { once: true });
+            if (locationInput.value.trim().length) loadMaps();
+
+            var poll = setInterval(function() {
+                if (locationInput.dataset.mapsInitialized === 'true') {
+                    clearInterval(poll);
+                    return;
+                }
+                if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+                    initAutocomplete();
+                    clearInterval(poll);
+                }
+            }, 300);
+
+            if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+                initAutocomplete();
+            } else {
+                const checkGoogle = setInterval(() => {
+                    if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+                        initAutocomplete();
+                        clearInterval(checkGoogle);
+                    }
+                }, 500);
+
+                setTimeout(() => clearInterval(checkGoogle), 10000);
+            }
         }
     },
 
