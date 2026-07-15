@@ -170,7 +170,7 @@
                         <i class="bi bi-currency-exchange fs-5"></i>
                         <span class="fw-bold">Update Pricing</span>
                     </a>
-                    <a href="{{ route('admin.faqs.create') }}" class="btn btn-desert-animated text-start px-4 py-3 rounded-pill d-flex align-items-center gap-3 border-0">
+                    <a href="{{ route('admin.faqs.index') }}" class="btn btn-desert-animated text-start px-4 py-3 rounded-pill d-flex align-items-center gap-3 border-0">
                         <i class="bi bi-question-diamond-fill fs-5"></i>
                         <span class="fw-bold">Manage FAQs</span>
                     </a>
