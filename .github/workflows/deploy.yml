@@ -53,6 +53,9 @@ jobs:
         # Copy public files to staging (including hidden files like .htaccess)
         cp -r public/. deploy/public_deploy/
         
+        # Remove images directory from staging to keep the zip small and prevent re-uploading
+        rm -rf deploy/public_deploy/images
+        
         # Adjust paths in entry points to point to dunes-laravel directory
         for f in index.php ajax.php debug_artisan.php; do
           if [ -f "deploy/public_deploy/$f" ]; then
@@ -103,6 +106,18 @@ jobs:
     - name: Install SSHPass
       run: sudo apt-get update && sudo apt-get install -y sshpass
 
+    - name: Check Remote Images Status
+      env:
+        SSHPASS: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
+      run: |
+        RESULT=$(sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no u410503041@${{ steps.ftp_server.outputs.host }} "if [ -d /home/u410503041/domains/dunesdiscoverytourism.com/public_html/images ] && [ -n \"\$(ls -A /home/u410503041/domains/dunesdiscoverytourism.com/public_html/images 2>/dev/null)\" ]; then echo 'YES'; else echo 'NO'; fi" || echo "NO")
+        echo "Remote images exist: $RESULT"
+        if [ "$RESULT" = "YES" ]; then
+          echo "skip_images=true" >> $GITHUB_ENV
+        else
+          echo "skip_images=false" >> $GITHUB_ENV
+        fi
+
     - name: Prepare Remote Directories (Clean Slate)
       continue-on-error: true
       env:
@@ -111,8 +126,8 @@ jobs:
         # Create directories if they do not exist
         sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no u410503041@${{ steps.ftp_server.outputs.host }} "mkdir -p /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel"
         
-        # Clean existing files (clean slate)
-        sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no u410503041@${{ steps.ftp_server.outputs.host }} "rm -rf /home/u410503041/domains/dunesdiscoverytourism.com/public_html/*"
+        # Clean existing public files but preserve the images directory
+        sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no u410503041@${{ steps.ftp_server.outputs.host }} "find /home/u410503041/domains/dunesdiscoverytourism.com/public_html -mindepth 1 -maxdepth 1 ! -name 'images' -exec rm -rf {} +"
         sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no u410503041@${{ steps.ftp_server.outputs.host }} "find /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel -mindepth 1 -maxdepth 1 ! -name 'storage' ! -name '.env' -exec rm -rf {} +"
 
     - name: Upload Public Assets (SCP)
@@ -121,11 +136,28 @@ jobs:
       run: |
         sshpass -e scp -O -P 65002 -o StrictHostKeyChecking=no deploy/public_deploy/public.zip deploy/public_deploy/unzip.php u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/domains/dunesdiscoverytourism.com/public_html/
 
+    - name: Package & Upload Images (Only if missing on remote)
+      if: env.skip_images == 'false'
+      env:
+        SSHPASS: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
+      run: |
+        # Package only public/images
+        cd public
+        zip -r ../images.zip images
+        cd ..
+        
+        # Upload images.zip via SCP with compression enabled (-C)
+        sshpass -e scp -C -O -P 65002 -o StrictHostKeyChecking=no images.zip u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/domains/dunesdiscoverytourism.com/public_html/
+        
+        # Extract images.zip on remote server
+        sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no u410503041@${{ steps.ftp_server.outputs.host }} "unzip -o /home/u410503041/domains/dunesdiscoverytourism.com/public_html/images.zip -d /home/u410503041/domains/dunesdiscoverytourism.com/public_html/ && rm -f /home/u410503041/domains/dunesdiscoverytourism.com/public_html/images.zip"
+
     - name: Upload Core Laravel Code (SCP)
       env:
         SSHPASS: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
       run: |
         sshpass -e scp -O -P 65002 -o StrictHostKeyChecking=no deploy/core_deploy/core.zip u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/
+
 
     - name: Trigger Remote Zip Extraction
       run: |
@@ -136,4 +168,9 @@ jobs:
         SSHPASS: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
       run: |
         sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no u410503041@${{ steps.ftp_server.outputs.host }} "cd /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel && php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan event:clear"
+
+    - name: Update asset cache version and flush server cache
+      run: |
+        curl -sS "https://dunesdiscoverytourism.com/increment_cache.php?key=dunes2026"
+
 
