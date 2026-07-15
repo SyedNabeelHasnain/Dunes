@@ -6,8 +6,8 @@ if (!isset($_GET['key']) || $_GET['key'] !== 'dunes2026') {
 
 define('LARAVEL_START', microtime(true));
 
-require __DIR__.'/../vendor/autoload.php';
-$app = require_once __DIR__.'/../bootstrap/app.php';
+require_once __DIR__.'/../dunes-laravel/vendor/autoload.php';
+$app = require_once __DIR__.'/../dunes-laravel/bootstrap/app.php';
 
 // Bootstrap via Console Kernel to load DB & Eloquent without routing
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
