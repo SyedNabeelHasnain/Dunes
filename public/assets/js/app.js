@@ -796,199 +796,132 @@ const App={
         });
 
         document.getElementById('detectLocation')?.addEventListener('click',()=>this.detectLocation());
-
+        
         if (locationInput) {
-            const initAutocomplete = () => {
-                if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+            const initOpenStreetMapAutocomplete = (locationInput) => {
+                if (!locationInput || locationInput.dataset.osmInitialized === 'true') return;
+                locationInput.dataset.osmInitialized = 'true';
 
-                    if (locationInput.dataset.mapsInitialized === 'true') return;
+                const popularLocations = [
+                    { name: 'Dubai Marina', detail: 'Dubai Marina & JBR area, Dubai' },
+                    { name: 'Downtown Dubai', detail: 'Burj Khalifa, Dubai Mall & Downtown area' },
+                    { name: 'Palm Jumeirah', detail: 'Palm Jumeirah Island & Resorts, Dubai' },
+                    { name: 'Business Bay', detail: 'Business Bay & Canal area, Dubai' },
+                    { name: 'Deira Dubai', detail: 'Deira Old Town & Gold Souk area, Dubai' },
+                    { name: 'Bur Dubai', detail: 'Bur Dubai & Al Fahidi Historic District' },
+                    { name: 'Jumeirah Beach Residence (JBR)', detail: 'JBR Beach & Walk, Dubai' },
+                    { name: 'Al Barsha', detail: 'Al Barsha & Mall of the Emirates area' },
+                    { name: 'Jumeirah Lake Towers (JLT)', detail: 'JLT & Cluster towers area, Dubai' },
+                    { name: 'Atlantis The Palm', detail: 'Crescent Rd, Palm Jumeirah, Dubai' },
+                    { name: 'Dubai International Airport (DXB)', detail: 'Terminals 1, 2 & 3, Dubai' },
+                    { name: 'Abu Dhabi City Center', detail: 'Corniche & Abu Dhabi Hotels' }
+                ];
 
-                    const autocomplete = new google.maps.places.Autocomplete(locationInput, {
-                        types: ['establishment', 'geocode'],
-                        fields: ['formatted_address', 'geometry', 'name'],
-                        componentRestrictions: { country: 'ae' },
-                    });
-
-                    let dropdownState = 'IDLE';
-                    let lastSelectedValue = '';
-
-                    const updateDropdownState = () => {
-                        const pacs = document.querySelectorAll('.pac-container');
-                        pacs.forEach(pac => {
-                            if (dropdownState === 'SEARCHING') {
-                                pac.classList.remove('pac-force-hidden');
-                            } else {
-                                pac.classList.add('pac-force-hidden');
-                            }
-                        });
-                    };
-
-                    locationInput.addEventListener('keydown', (e) => {
-                        if(e.key !== 'Tab' && e.key !== 'Enter') {
-                            dropdownState = 'SEARCHING';
-                            updateDropdownState();
-                        }
-                    });
-
-                    locationInput.addEventListener('input', () => {
-                        if (locationInput.value === lastSelectedValue) {
-                            return;
-                        }
-
-                        if (locationInput.value.trim().length === 0) {
-                            dropdownState = 'IDLE';
-                        } else {
-                            if (dropdownState !== 'SELECTED') {
-                                dropdownState = 'SEARCHING';
-                            }
-                        }
-                        updateDropdownState();
-                    });
-
-                    autocomplete.addListener('place_changed', () => {
-                        dropdownState = 'SELECTED';
-                        updateDropdownState();
-
-                        const place = autocomplete.getPlace();
-
-                        if (place.formatted_address) {
-                            locationInput.value = place.formatted_address;
-                        } else if (place.name) {
-                            locationInput.value = place.name;
-                        }
-
-                        lastSelectedValue = locationInput.value;
-
-                        locationInput.dispatchEvent(new Event('input', {bubbles: true}));
-                        locationInput.dispatchEvent(new Event('change', {bubbles: true}));
-
-                        locationInput.blur();
-                    });
-
-                    locationInput.dataset.mapsInitialized = 'true';
-
-                    const observer = new MutationObserver(() => {
-                        const pac = document.querySelector('.pac-container');
-                        if (pac) {
-                            const wrapper = document.querySelector('.booking-location-wrapper');
-
-                            if (wrapper && pac.parentElement !== wrapper) {
-                                wrapper.appendChild(pac);
-
-                                if (!pac.dataset.listenersAttached) {
-                                    document.addEventListener('click', (e) => {
-                                        if (!wrapper.contains(e.target) && !pac.contains(e.target)) {
-                                            dropdownState = 'SELECTED'; // Treat outside click as "Done"
-                                            updateDropdownState();
-                                        }
-
-                                        if (e.target === locationInput && locationInput.value.trim() !== '') {
-                                            if (dropdownState === 'SELECTED' || dropdownState === 'IDLE') {
-                                                updateDropdownState();
-                                            }
-                                        }
-                                    }, true);
-
-                                    document.addEventListener('mousedown', (e) => {
-                                        if (e.target.closest('.pac-item') || e.target.closest('.pac-container')) {
-                                            dropdownState = 'SELECTED'; // Lock immediately
-                                            updateDropdownState();
-                                        }
-                                    }, true);
-
-                                    const styleObserver = new MutationObserver(() => {
-                                        updateDropdownState(); // Re-assert our force-hidden state
-                                        updatePadding(pac);
-                                    });
-                                    styleObserver.observe(pac, { attributes: true, attributeFilter: ['style', 'display'] });
-
-                                    const resizeObserver = new ResizeObserver(() => {
-                                        updatePadding(pac);
-                                    });
-                                    resizeObserver.observe(pac);
-
-                                    pac.dataset.listenersAttached = 'true';
-                                }
-                            }
-                        }
-                    });
-                    observer.observe(document.body, { childList: true, subtree: false });
-
-                    const updatePadding = (pac) => {
-                        const scrollArea = document.querySelector('.booking-scroll-area');
-                        const wrapper = document.querySelector('.booking-location-wrapper');
-                        if (!scrollArea || !pac) return;
-
-                        const shouldBeVisible = dropdownState === 'SEARCHING' && pac.offsetHeight > 0;
-
-                        if (shouldBeVisible) {
-                            requestAnimationFrame(() => {
-                                const requiredSpace = pac.offsetHeight + 150;
-                                scrollArea.style.paddingBottom = requiredSpace + 'px';
-                            });
-
-                            if (pac.dataset.wasHidden === 'true') {
-                                setTimeout(() => {
-                                    wrapper?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                }, 100);
-                                pac.dataset.wasHidden = 'false';
-                            }
-                        } else {
-                            scrollArea.style.paddingBottom = '';
-                            pac.dataset.wasHidden = 'true';
-                        }
-                    };
+                let wrapper = locationInput.closest('.booking-location-wrapper') || locationInput.parentElement;
+                if (getComputedStyle(wrapper).position === 'static') {
+                    wrapper.style.position = 'relative';
                 }
-            };
 
-            const loadMaps = () => {
-                const apiKey = (window.MAPS_API_KEY || '').trim();
-                if (!apiKey) {
-                    console.warn('Google Maps API key missing; autocomplete disabled.');
-                    return;
-                }
-                if (locationInput.dataset.mapsInitialized === 'true') return;
-                if (typeof google === 'undefined' || !google.maps || !google.maps.places) {
-                    if (document.querySelector('script[src*="maps.googleapis.com"]')) return;
-                    var s = document.createElement('script');
-                    s.src = 'https://maps.googleapis.com/maps/api/js?key=' + apiKey + '&libraries=places&loading=async&callback=Function.prototype';
-                    s.async = true;
-                    s.defer = true;
-                    s.onload = initAutocomplete;
-                    document.head.appendChild(s);
-                } else {
-                    initAutocomplete();
-                }
-            };
+                const dropdown = document.createElement('div');
+                dropdown.className = 'osm-autocomplete-dropdown shadow-lg rounded-3 border-0';
+                dropdown.style.cssText = 'position:absolute; top:100%; left:0; right:0; z-index:1060; background:#ffffff; display:none; max-height:280px; overflow-y:auto; margin-top:6px; box-shadow:0 10px 30px rgba(0,0,0,0.15); border-radius:12px; border:1px solid rgba(246,144,68,0.25);';
+                wrapper.appendChild(dropdown);
 
-            locationInput.addEventListener('focus', loadMaps, { once: true });
-            locationInput.addEventListener('click', loadMaps, { once: true });
-            locationInput.addEventListener('keydown', loadMaps, { once: true });
-            if (locationInput.value.trim().length) loadMaps();
+                let debounceTimer = null;
 
-            var poll = setInterval(function() {
-                if (locationInput.dataset.mapsInitialized === 'true') {
-                    clearInterval(poll);
-                    return;
-                }
-                if (typeof google !== 'undefined' && google.maps && google.maps.places) {
-                    initAutocomplete();
-                    clearInterval(poll);
-                }
-            }, 300);
-
-            if (typeof google !== 'undefined' && google.maps && google.maps.places) {
-                initAutocomplete();
-            } else {
-                const checkGoogle = setInterval(() => {
-                    if (typeof google !== 'undefined' && google.maps && google.maps.places) {
-                        initAutocomplete();
-                        clearInterval(checkGoogle);
+                const renderResults = (items) => {
+                    dropdown.innerHTML = '';
+                    if (!items || items.length === 0) {
+                        dropdown.style.display = 'none';
+                        return;
                     }
-                }, 500);
 
-                setTimeout(() => clearInterval(checkGoogle), 10000);
-            }
+                    items.forEach((item) => {
+                        const el = document.createElement('div');
+                        el.className = 'osm-autocomplete-item p-3 text-start d-flex align-items-center gap-3 border-bottom border-light';
+                        el.style.cssText = 'cursor:pointer; transition:all 0.15s ease; background:#ffffff;';
+                        el.innerHTML = `
+                            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width:34px; height:34px; background:#fff4eb; color:#F69044;">
+                                <i class="bi bi-geo-alt-fill" style="font-size:0.9rem;"></i>
+                            </div>
+                            <div class="overflow-hidden">
+                                <div class="fw-bold text-dark text-truncate" style="font-size:0.9rem;">${item.name}</div>
+                                <div class="text-muted text-truncate" style="font-size:0.78rem;">${item.detail || 'Dubai, United Arab Emirates'}</div>
+                            </div>
+                        `;
+                        el.addEventListener('mouseenter', () => { el.style.background = '#fff4eb'; });
+                        el.addEventListener('mouseleave', () => { el.style.background = '#ffffff'; });
+                        el.addEventListener('mousedown', (e) => {
+                            e.preventDefault();
+                            locationInput.value = item.name + (item.detail ? ', ' + item.detail : '');
+                            locationInput.dispatchEvent(new Event('input', { bubbles: true }));
+                            locationInput.dispatchEvent(new Event('change', { bubbles: true }));
+                            dropdown.style.display = 'none';
+                        });
+                        dropdown.appendChild(el);
+                    });
+
+                    dropdown.style.display = 'block';
+                };
+
+                const showPopular = () => {
+                    renderResults(popularLocations);
+                };
+
+                const searchPhoton = async (query) => {
+                    try {
+                        const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&lat=25.2048&lon=55.2708&limit=6`;
+                        const res = await fetch(url);
+                        if (!res.ok) return showPopular();
+                        const data = await res.json();
+                        if (data && data.features && data.features.length > 0) {
+                            const results = data.features.map(f => {
+                                const props = f.properties || {};
+                                const name = props.name || props.street || query;
+                                const parts = [props.district, props.city, props.country].filter(Boolean);
+                                return {
+                                    name: name,
+                                    detail: parts.join(', ') || 'United Arab Emirates'
+                                };
+                            });
+                            renderResults(results);
+                        } else {
+                            const filtered = popularLocations.filter(p => p.name.toLowerCase().includes(query.toLowerCase()) || p.detail.toLowerCase().includes(query.toLowerCase()));
+                            renderResults(filtered.length ? filtered : [{ name: query, detail: 'Dubai, UAE' }]);
+                        }
+                    } catch (e) {
+                        showPopular();
+                    }
+                };
+
+                locationInput.addEventListener('focus', () => {
+                    if (!locationInput.value.trim()) {
+                        showPopular();
+                    } else {
+                        searchPhoton(locationInput.value.trim());
+                    }
+                });
+
+                locationInput.addEventListener('input', () => {
+                    const val = locationInput.value.trim();
+                    clearTimeout(debounceTimer);
+                    if (!val) {
+                        showPopular();
+                        return;
+                    }
+                    debounceTimer = setTimeout(() => {
+                        searchPhoton(val);
+                    }, 200);
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!wrapper.contains(e.target) && !dropdown.contains(e.target)) {
+                        dropdown.style.display = 'none';
+                    }
+                });
+            };
+
+            initOpenStreetMapAutocomplete(locationInput);
         }
     },
 

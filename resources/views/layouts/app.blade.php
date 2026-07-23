@@ -132,7 +132,6 @@
         window.RECAPTCHA_SITE_KEY = @json($rcSiteKey);
         window.WHATSAPP_FORM_ENABLED = @json($settings['whatsapp_form_enabled'] ?? '1');
         window.CSRF_TOKEN = @json(csrf_token());
-        window.MAPS_API_KEY = @json($settings['google_maps_api_key'] ?? '');
     </script>
 </head>
 <body class="d-flex flex-column min-vh-100">
