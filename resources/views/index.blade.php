@@ -101,7 +101,7 @@
         <div class="row g-4 mb-5">
             @foreach($bestsellers as $t)
                 @php
-                    $minPrice = \DB::table('tour_tiers')->where('tour_id', $t->id)->min('price') ?? 0;
+                    $minPrice = $t->tiers->min('pivot.price') ?? 0;
                     $category = $categories->firstWhere('id', $t->category_id);
                 @endphp
                 <div class="col-12 col-md-6 col-lg-3">

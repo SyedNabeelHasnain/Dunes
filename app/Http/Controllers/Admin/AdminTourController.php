@@ -9,6 +9,7 @@ use App\Models\Tier;
 use App\Models\Tour;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
 
 class AdminTourController extends Controller
 {
@@ -91,6 +92,7 @@ class AdminTourController extends Controller
             $tour->addons()->sync($addonsData);
         }
 
+        Cache::forget('site_tours_header_cache');
         return redirect()->route('admin.tours.index')->with('success', 'Tour created successfully.');
     }
 
@@ -164,6 +166,7 @@ class AdminTourController extends Controller
             $tour->addons()->sync($addonsData);
         }
 
+        Cache::forget('site_tours_header_cache');
         return redirect()->route('admin.tours.index')->with('success', 'Tour updated successfully.');
     }
 
@@ -174,6 +177,7 @@ class AdminTourController extends Controller
     {
         $tour = Tour::findOrFail($id);
         $tour->delete();
+        Cache::forget('site_tours_header_cache');
         return redirect()->route('admin.tours.index')->with('success', 'Tour deleted successfully.');
     }
 

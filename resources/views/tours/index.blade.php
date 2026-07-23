@@ -54,7 +54,7 @@
         <div class="row g-4" id="tours-grid">
             @foreach($tours as $t)
                 @php
-                    $minPrice = \DB::table('tour_tiers')->where('tour_id', $t->id)->min('price') ?? 0;
+                    $minPrice = $t->tiers->min('pivot.price') ?? 0;
                     $tourCat = $categories->firstWhere('id', $t->category_id);
                     $tourCatSlug = $tourCat ? $tourCat->slug : '';
                 @endphp

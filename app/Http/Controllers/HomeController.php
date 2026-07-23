@@ -15,11 +15,12 @@ class HomeController extends Controller
     public function index()
     {
         $categories = Category::with(['tours' => function ($query) {
-            $query->where('status', 'active')->orderBy('priority', 'asc');
+            $query->where('status', 'active')->with(['tiers', 'category'])->orderBy('priority', 'asc');
         }])->orderBy('priority', 'asc')->get();
 
         $bestsellers = Tour::where('status', 'active')
             ->where('is_bestseller', true)
+            ->with(['tiers', 'category'])
             ->orderBy('priority', 'asc')
             ->get();
 

@@ -408,7 +408,7 @@ if(window.fbq){
 
         <div class="row g-4">
             @foreach($relatedTours as $t)
-            @php $minPriceRel = \DB::table('tour_tiers')->where('tour_id', $t->id)->min('price') ?? 0; @endphp
+            @php $minPriceRel = $t->tiers->min('pivot.price') ?? 0; @endphp
             <div class="col-12 col-md-6 col-lg-3">
                 <article class="card card-modern h-100 border-0 shadow-sm bg-white">
                     <a href="{{ route('tours.show', $t->slug) }}" class="text-decoration-none text-dark d-flex flex-column h-100">

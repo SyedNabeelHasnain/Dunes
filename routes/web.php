@@ -92,22 +92,48 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
-// ── Legacy AJAX Gateway Route ────────────────────────────────────────────────
-Route::post('/ajax.php', [AjaxGatewayController::class, 'handle']);
+// ── Legacy AJAX Gateway Route (Throttled for Security) ───────────────────────
+Route::post('/ajax.php', [AjaxGatewayController::class, 'handle'])->middleware('throttle:30,1');
 
-// ── Database Initialization Route (Triggered once after deployment) ─────────
-Route::get('/system/init-db', function() {
-    if (request()->input('key') !== 'dunes2026') {
-        abort(404);
+// ── Dynamic XML Sitemap ──────────────────────────────────────────────────────
+Route::get('/sitemap.xml', function() {
+    $tours = \App\Models\Tour::where('status', 'active')->select('slug', 'updated_at')->get();
+    $blogs = \App\Models\BlogPost::where('status', 'published')->select('slug', 'updated_at')->get();
+
+    $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+    $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+
+    $staticPages = ['', '/about', '/contact', '/faq', '/tours', '/blog', '/terms-condition', '/privacy-policy'];
+    foreach ($staticPages as $page) {
+        $xml .= '  <url>' . "\n";
+        $xml .= '    <loc>' . url($page) . '</loc>' . "\n";
+        $xml .= '    <changefreq>weekly</changefreq>' . "\n";
+        $xml .= '    <priority>' . ($page === '' ? '1.0' : '0.8') . '</priority>' . "\n";
+        $xml .= '  </url>' . "\n";
     }
-    \Illuminate\Support\Facades\Artisan::call('migrate:fresh', [
-        '--seed' => true,
-        '--force' => true
-    ]);
-    return 'Database initialized and seeded successfully!';
-})->withoutMiddleware('web');
 
+    foreach ($tours as $tour) {
+        $xml .= '  <url>' . "\n";
+        $xml .= '    <loc>' . url('/' . $tour->slug) . '</loc>' . "\n";
+        $xml .= '    <lastmod>' . ($tour->updated_at ? $tour->updated_at->toAtomString() : now()->toAtomString()) . '</lastmod>' . "\n";
+        $xml .= '    <changefreq>daily</changefreq>' . "\n";
+        $xml .= '    <priority>0.9</priority>' . "\n";
+        $xml .= '  </url>' . "\n";
+    }
 
+    foreach ($blogs as $blog) {
+        $xml .= '  <url>' . "\n";
+        $xml .= '    <loc>' . url('/blog/' . $blog->slug) . '</loc>' . "\n";
+        $xml .= '    <lastmod>' . ($blog->updated_at ? $blog->updated_at->toAtomString() : now()->toAtomString()) . '</lastmod>' . "\n";
+        $xml .= '    <changefreq>weekly</changefreq>' . "\n";
+        $xml .= '    <priority>0.7</priority>' . "\n";
+        $xml .= '  </url>' . "\n";
+    }
+
+    $xml .= '</urlset>';
+
+    return response($xml, 200, ['Content-Type' => 'text/xml']);
+})->name('sitemap');
 
 // ── Root-level Dynamic Tour Slugs (Fallback Route) ───────────────────────────
 Route::get('/{slug}', [TourController::class, 'show'])->name('tours.show');

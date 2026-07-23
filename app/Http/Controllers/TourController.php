@@ -19,7 +19,7 @@ class TourController extends Controller
         
         $categories = Category::orderBy('priority', 'asc')->get();
         
-        $query = Tour::where('status', 'active');
+        $query = Tour::where('status', 'active')->with(['tiers', 'category']);
         
         if ($selectedCategorySlug) {
             $category = Category::where('slug', $selectedCategorySlug)->first();
@@ -40,7 +40,7 @@ class TourController extends Controller
     {
         $tour = Tour::where('slug', $slug)
             ->where('status', 'active')
-            ->with(['itineraries', 'tiers', 'addons', 'contentItems'])
+            ->with(['itineraries', 'tiers', 'addons', 'contentItems', 'category'])
             ->firstOrFail();
 
         // Separate content items by type
@@ -74,6 +74,7 @@ class TourController extends Controller
         $relatedTours = Tour::where('category_id', $tour->category_id)
             ->where('id', '!=', $tour->id)
             ->where('status', 'active')
+            ->with(['tiers', 'category'])
             ->orderBy('priority', 'asc')
             ->limit(3)
             ->get();
@@ -83,6 +84,7 @@ class TourController extends Controller
             $extraTours = Tour::where('id', '!=', $tour->id)
                 ->where('status', 'active')
                 ->whereNotIn('id', $relatedTours->pluck('id'))
+                ->with(['tiers', 'category'])
                 ->orderBy('is_featured', 'desc')
                 ->orderBy('priority', 'asc')
                 ->limit(3 - $relatedTours->count())

@@ -1,6 +1,10 @@
 @php
-    $settings = \App\Models\Setting::pluck('setting_value', 'setting_key');
-    $allTours = \App\Models\Tour::where('status', 'active')->orderBy('priority', 'asc')->get();
+    $settings = \Illuminate\Support\Facades\Cache::remember('site_settings_cache', 86400, function() {
+        return \App\Models\Setting::pluck('setting_value', 'setting_key');
+    });
+    $allTours = \Illuminate\Support\Facades\Cache::remember('site_tours_header_cache', 3600, function() {
+        return \App\Models\Tour::where('status', 'active')->orderBy('priority', 'asc')->get();
+    });
     
     $googleActive = isset($settings['google_active']) && $settings['google_active'] === '1';
     $gtmId = $settings['google_gtm_id'] ?? '';

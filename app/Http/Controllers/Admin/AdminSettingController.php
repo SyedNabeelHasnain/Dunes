@@ -48,6 +48,8 @@ class AdminSettingController extends Controller
             );
         }
 
+        \Illuminate\Support\Facades\Cache::forget('site_settings_cache');
+
         // Return back to referring page or specific route
         return back()->with('success', 'Settings updated successfully.');
     }
@@ -61,6 +63,9 @@ class AdminSettingController extends Controller
         Artisan::call('view:clear');
         Artisan::call('config:clear');
         Artisan::call('route:clear');
+
+        \Illuminate\Support\Facades\Cache::forget('site_settings_cache');
+        \Illuminate\Support\Facades\Cache::forget('site_tours_header_cache');
 
         return back()->with('success', 'Application and view cache cleared successfully.');
     }

@@ -18,7 +18,7 @@ class BlogController extends Controller
         $tagSlug = $request->input('tag');
         $search = $request->input('search');
 
-        $query = BlogPost::where('status', 'published')->orderBy('published_at', 'desc');
+        $query = BlogPost::where('status', 'published')->with(['category', 'tags'])->orderBy('published_at', 'desc');
 
         if ($categorySlug) {
             $category = BlogCategory::where('slug', $categorySlug)->first();
