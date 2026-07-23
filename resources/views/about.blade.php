@@ -41,7 +41,7 @@
         <div class="row align-items-center g-5">
             <div class="col-lg-6">
                 <div class="position-relative">
-                    <img src="{{ asset('images/dubai-desert-safari-tour-dune-discovery-tourism.jpg') }}" alt="Dunes Discovery Story" class="img-fluid rounded-4 shadow-lg" onerror="this.src='https://placehold.co/800x600/F58F43/white?text=Our+Story'">
+                    <img src="{{ asset('images/dubai-desert-safari-tour-dune-discovery-tourism.avif') }}" alt="Dunes Discovery Story" class="img-fluid rounded-4 shadow-lg" onerror="this.src='https://placehold.co/800x600/F58F43/white?text=Our+Story'">
                     <div class="position-absolute bottom-0 end-0 bg-primary text-white p-4 rounded-4 shadow-lg d-none d-md-block" style="margin-bottom: -30px; margin-right: -30px;">
                         <h4 class="fw-bold mb-0">6+ Years</h4>
                         <p class="small mb-0 opacity-75">Of Excellence</p>

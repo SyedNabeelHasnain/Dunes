@@ -36,7 +36,7 @@
     $pageKeys = $pageKeys ?? 'dubai desert safari,desert safari dubai,evening desert safari';
     $pageRobots = $pageRobots ?? 'index,follow';
     $canonical = $canonical ?? request()->url();
-    $ogImage = $ogImage ?? asset('images/desert-safari-poster.jpg');
+    $ogImage = $ogImage ?? asset('images/desert-safari-poster.avif');
 @endphp
 <!DOCTYPE html>
 <html lang="en">
@@ -204,7 +204,7 @@
                         <img src="{{ asset('images/tripadvisor-color-logo.svg') }}" alt="TripAdvisor">
                     </div>
                     <div class="nav-review-circle" onclick="toggleReviewPopover(this, event)" id="googleCircle" style="position: relative; cursor: pointer;">
-                        <img src="{{ asset('images/Google-G.webp') }}" alt="Google">
+                        <img src="{{ asset('images/Google-G.avif') }}" alt="Google">
                     </div>
                     <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" class="btn-circle-whatsapp" aria-label="WhatsApp" target="_blank" rel="noopener"><i class="bi bi-whatsapp"></i></a>
                     <a href="#" class="btn-circle-desert-light" data-action="open-booking" aria-label="Book Now"><i class="bi bi-calendar-check"></i></a>

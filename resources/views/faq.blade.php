@@ -20,7 +20,7 @@
 </script>
 
 <section class="page-header py-3 bg-dark text-white position-relative overflow-hidden" style="margin-top: -var(--header-h);">
-    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{{ asset('images/abu-dhabi-city-tour-hero.jpg') }}') center/cover;"></div>
+    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{{ asset('images/abu-dhabi-city-tour-hero.avif') }}') center/cover;"></div>
     <div class="container position-relative z-1 pt-5">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-4">

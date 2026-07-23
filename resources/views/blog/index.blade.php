@@ -101,7 +101,7 @@
         </div>
         <div class="row g-4">
             @php
-                $featuredImg = $featuredPost->featured_image ? asset('images/blog/' . $featuredPost->featured_image) : asset('images/desert-safari-poster.jpg');
+                $featuredImg = $featuredPost->featured_image ? asset('images/blog/' . $featuredPost->featured_image) : asset('images/desert-safari-poster.avif');
             @endphp
             <div class="col-12 col-lg-8">
                 <a href="{{ route('blog.show', $featuredPost->slug) }}" class="text-decoration-none d-block h-100">
@@ -162,7 +162,7 @@
     <div class="row g-4">
         @foreach ($posts as $post)
         @php
-            $postImg = $post->featured_image ? asset('images/blog/' . $post->featured_image) : asset('images/desert-safari-poster.jpg');
+            $postImg = $post->featured_image ? asset('images/blog/' . $post->featured_image) : asset('images/desert-safari-poster.avif');
         @endphp
         <div class="col-12 col-md-6 col-xl-4">
             <article class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 card-hover bg-white">

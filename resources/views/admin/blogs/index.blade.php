@@ -35,9 +35,9 @@
                         <td class="ps-4">
                             <div class="d-flex align-items-center gap-3">
                                 @if($p->featured_image)
-                                    <img src="{{ asset('images/blog/' . $p->featured_image) }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;" class="border" onerror="this.src='{{ asset('images/desert-safari-poster.jpg') }}'">
+                                    <img src="{{ asset('images/blog/' . $p->featured_image) }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;" class="border" onerror="this.src='{{ asset('images/desert-safari-poster.avif') }}'">
                                 @else
-                                    <img src="{{ asset('images/desert-safari-poster.jpg') }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;" class="border">
+                                    <img src="{{ asset('images/desert-safari-poster.avif') }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;" class="border">
                                 @endif
                                 <div>
                                     <div class="fw-bold text-dark fs-6">{{ $p->title }}</div>
