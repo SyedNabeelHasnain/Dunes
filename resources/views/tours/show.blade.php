@@ -294,10 +294,21 @@ if(window.fbq){
                 <div class="sidebar-sticky" style="top: 100px;">
                     <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-4 bg-white">
                         <div class="card-body p-4">
-                            <div class="text-center mb-4 pb-4 border-bottom">
+                            <div class="text-center mb-4 pb-3 border-bottom">
                                 <small class="text-muted text-uppercase fw-bold ls-1" style="font-size: 11px;">Starting from</small>
                                 <div class="d-flex align-items-center justify-content-center gap-2 mt-1">
                                     <span class="h2 fw-bold text-primary mb-0">AED {{ number_format($minPrice) }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Urgency Widget -->
+                            <div class="alert alert-warning border-0 bg-warning bg-opacity-10 text-dark rounded-4 p-3 mb-4 d-flex align-items-center gap-3">
+                                <div class="icon-box-sm bg-warning text-dark rounded-circle flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;">
+                                    <i class="bi bi-fire fs-6"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-uppercase tracking-wider text-warning-emphasis" style="font-size: 10px; letter-spacing: 0.5px;">HIGH DEMAND</div>
+                                    <div class="small fw-bold text-dark" style="font-size: 12px;">14 people booked in the last 24h</div>
                                 </div>
                             </div>
 
@@ -348,6 +359,28 @@ if(window.fbq){
                                 <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',\App\Models\Setting::where('setting_key', 'site_whatsapp')->value('setting_value') ?? '971502456056') }}?text={{ urlencode('Hi! I want to book ' . $tour->name) }}" class="btn btn-whatsapp-animated btn-lg rounded-pill py-3 fw-bold border-0 transition-all hover-translate-up" target="_blank" rel="noopener">
                                     <i class="bi bi-whatsapp me-2"></i>Inquire via WhatsApp
                                 </a>
+                            </div>
+
+                            <!-- Trust Callouts -->
+                            <div class="row g-2 mt-3 pt-3 text-center border-top">
+                                <div class="col-4">
+                                    <div class="p-2 rounded-3 bg-light">
+                                        <i class="bi bi-lightning-charge-fill text-primary d-block mb-1 fs-6"></i>
+                                        <span class="d-block fw-bold text-dark" style="font-size: 10px;">Instant Voucher</span>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="p-2 rounded-3 bg-light">
+                                        <div class="d-block mb-1 text-success fw-bold" style="font-size: 13px;">24h</div>
+                                        <span class="d-block fw-bold text-dark" style="font-size: 10px;">Free Cancel</span>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="p-2 rounded-3 bg-light">
+                                        <i class="bi bi-shield-check text-info d-block mb-1 fs-6"></i>
+                                        <span class="d-block fw-bold text-dark" style="font-size: 10px;">Ziina Verified</span>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="row g-3 mt-4 text-center">
@@ -460,13 +493,13 @@ if(window.fbq){
 @endif
 
 <!-- Mobile Book Bar Sticky bottom -->
-<div class="mobile-bookbar position-fixed bottom-0 start-0 w-100 glass p-3 border-top d-md-none d-flex align-items-center justify-content-between z-3 safe-area-bottom">
+<div class="mobile-bookbar position-fixed bottom-0 start-0 w-100 bg-white p-3 border-top shadow-lg d-md-none d-flex align-items-center justify-content-between z-3 safe-area-bottom">
     <div>
         <small class="text-muted d-block opacity-75 fw-bold" style="font-size: 9px; letter-spacing: 1px; text-transform: uppercase;">Starting From</small>
         <div class="h4 fw-bold text-primary mb-0">AED {{ number_format($minPrice) }}</div>
     </div>
-    <button class="btn btn-primary rounded-pill px-5 py-3 shadow-sm fw-bold border-0" data-action="open-booking" data-tour="{{ $tour->id }}">
-        Book Now
+    <button class="btn btn-desert-animated rounded-pill px-4 py-2.5 shadow-sm fw-bold border-0" data-bs-toggle="modal" data-bs-target="#bookingModal" data-action="open-booking" data-tour="{{ $tour->id }}">
+        <i class="bi bi-calendar-check-fill me-1"></i>Book Now
     </button>
 </div>
 

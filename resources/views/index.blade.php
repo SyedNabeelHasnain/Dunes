@@ -266,7 +266,7 @@
             @endforeach
         </div>
 
-        <div class="text-center mt-5">
+        <div class="text-center mt-5 pb-3">
             <a href="{{ route('faq') }}" class="btn btn-desert-animated rounded-pill px-5 py-3 d-inline-flex align-items-center gap-2">
                 View All FAQs <i class="bi bi-arrow-right"></i>
             </a>
@@ -275,13 +275,13 @@
 </section>
 
 <!-- CTA booking banner -->
-<section class="cta-section pt-4 pb-0 position-relative overflow-hidden text-white">
-    <div class="container position-relative z-1 text-center pt-4 pb-0">
-        <h2 class="display-4 fw-bold mb-4">Ready for Your Desert Adventure?</h2>
-        <p class="lead mb-2 opacity-90 mx-auto" style="max-width: 600px;">Book now and create memories that last a lifetime. Free cancellation up to 24 hours before.</p>
-        <div>
-            <a href="#" class="btn btn-desert-animated btn-lg rounded-pill px-5 py-3 fw-bold shadow-lg" data-bs-toggle="modal" data-bs-target="#bookingModal">
-                <i class="bi bi-calendar-check me-2"></i>Book Your Tour Now
+<section class="cta-section py-5 py-lg-6 position-relative text-white">
+    <div class="container position-relative z-1 text-center py-4">
+        <h2 class="display-4 fw-bold mb-3 text-white">Ready for Your Desert Adventure?</h2>
+        <p class="lead mb-4 opacity-90 mx-auto" style="max-width: 620px;">Book now and create memories that last a lifetime. Free cancellation up to 24 hours before.</p>
+        <div class="pt-2">
+            <a href="#" class="btn btn-cta-white btn-lg rounded-pill px-5 py-3.5 fw-bold fs-5" data-bs-toggle="modal" data-bs-target="#bookingModal">
+                <i class="bi bi-calendar-check-fill me-2 text-primary"></i>Book Your Tour Now
             </a>
         </div>
     </div>

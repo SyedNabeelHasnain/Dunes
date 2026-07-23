@@ -772,9 +772,11 @@ button:focus-visible {
     border-color: var(--primary-light);
 }
 .cta-section {
-    background: linear-gradient(135deg, var(--primary) 0%, #FFB074 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, #FF9040 100%);
     position: relative;
     z-index: 1;
+    padding: 5rem 0;
+    overflow: hidden;
 }
 .cta-section::before {
     content: '';
@@ -785,6 +787,32 @@ button:focus-visible {
     bottom: 0;
     opacity: 0.1;
     z-index: -1;
+}
+.btn-cta-white {
+    background: #ffffff;
+    color: var(--primary);
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+.btn-cta-white:hover {
+    background: #fff5ee;
+    color: var(--primary-dark);
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+}
+.sticky-mobile-bookbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1040;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.12);
+    padding: 0.75rem 1.25rem;
 }
 .btn-white {
     background: var(--white);
