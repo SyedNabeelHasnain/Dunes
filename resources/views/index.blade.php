@@ -3,7 +3,7 @@
 @section('content')
 <!-- Modern Hero Section -->
 <section class="hero-modern position-relative d-flex align-items-center justify-content-center overflow-hidden" style="min-height: 90vh;">
-    <video class="hero-video position-absolute top-0 start-0 w-100 h-100" autoplay loop muted playsinline style="object-fit: cover; z-index: -1;">
+    <video class="hero-video position-absolute top-0 start-0 w-100 h-100" autoplay loop muted playsinline preload="none" style="object-fit: cover; z-index: -1;">
         <source src="{{ asset('images/desert-safar-dubai-tour-short-dune-discovery-tourism.mp4') }}" type="video/mp4">
     </video>
     <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(180deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.8) 100%); z-index: -1;"></div>
@@ -136,7 +136,7 @@
                                         <span class="h5 fw-bold text-primary mb-0">AED {{ number_format($minPrice) }}</span>
                                     </div>
                                     <div class="d-flex gap-2">
-                                        <button type="button" class="btn-circle-whatsapp fab-whatsapp" data-tour-name="{{ $t->name }}">
+                                        <button type="button" class="btn-circle-whatsapp fab-whatsapp" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp">
                                             <i class="bi bi-whatsapp"></i>
                                         </button>
                                         <div class="btn-circle-desert d-flex align-items-center justify-content-center">

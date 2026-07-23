@@ -217,7 +217,7 @@
                 <div class="offcanvas offcanvas-end border-0 rounded-start-4" tabindex="-1" id="mainOffcanvas" aria-labelledby="mainOffcanvasLabel" style="max-width: 75%;">
                     <div class="offcanvas-header border-bottom py-3">
                         <div class="offcanvas-title d-flex align-items-center" id="mainOffcanvasLabel">
-                            <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery" width="140" class="img-fluid">
+                            <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery" width="140" height="40" class="img-fluid">
                         </div>
                         <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                     </div>
@@ -279,9 +279,9 @@
                     <img src="{{ asset('images/logo-white.png') }}" alt="Dunes Discovery Tourism" width="160" height="46" class="mb-4" style="height: auto; width: 160px; object-fit: contain;">
                     <p class="text-white-50 small pe-lg-5">Your trusted partner for unforgettable Dubai desert safari and city tour experiences since 2018. We specialize in creating memories that last a lifetime.</p>
                     <div class="d-flex gap-3 mt-4">
-                        <a href="https://instagram.com/dunesdiscoverytourism" target="_blank" rel="noopener" class="btn btn-outline-light btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;"><i class="bi bi-instagram"></i></a>
-                        <a href="https://facebook.com/dunesdiscoverytourism" target="_blank" rel="noopener" class="btn btn-outline-light btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;"><i class="bi bi-facebook"></i></a>
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="btn btn-outline-light btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;"><i class="bi bi-whatsapp"></i></a>
+                        <a href="https://instagram.com/dunesdiscoverytourism" target="_blank" rel="noopener" class="btn btn-outline-light btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" aria-label="Follow Dunes Discovery Tourism on Instagram"><i class="bi bi-instagram"></i></a>
+                        <a href="https://facebook.com/dunesdiscoverytourism" target="_blank" rel="noopener" class="btn btn-outline-light btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" aria-label="Follow Dunes Discovery Tourism on Facebook"><i class="bi bi-facebook"></i></a>
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="btn btn-outline-light btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" aria-label="Chat with Dunes Discovery Tourism on WhatsApp"><i class="bi bi-whatsapp"></i></a>
                     </div>
                 </div>
                 <div class="col-6 col-lg-2">
@@ -333,7 +333,7 @@
                 <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
                     <p class="text-white-50 small mb-0">&copy; {{ date('Y') }} Dunes Discovery Tourism. All rights reserved.</p>
                     <div class="d-flex align-items-center gap-3 footer-trust-icons">
-                        <img src="{{ asset('images/ziina-icon.png') }}" alt="Ziina Payment Gateway" height="18" style="filter: invert(1); opacity: 0.6;">
+                        <img src="{{ asset('images/ziina-icon.png') }}" alt="Ziina Payment Gateway" width="18" height="18" style="filter: invert(1); opacity: 0.6;">
                     </div>
                 </div>
             </div>

@@ -47,6 +47,11 @@
     --bs-border-radius: var(--radius);
     --bs-primary-bg-subtle: #f6914433;
 }
+
+.text-primary {
+    color: #D95300 !important;
+}
+
 .form-check-input.desert-checkbox {
     width: 20px;
     height: 20px;

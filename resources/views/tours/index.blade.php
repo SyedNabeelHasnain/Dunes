@@ -90,7 +90,7 @@
                                         <span class="h5 fw-bold text-primary mb-0">AED {{ number_format($minPrice) }}</span>
                                     </div>
                                     <div class="d-flex gap-2">
-                                        <button type="button" class="btn-circle-whatsapp fab-whatsapp" data-tour-name="{{ $t->name }}">
+                                        <button type="button" class="btn-circle-whatsapp fab-whatsapp" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp">
                                             <i class="bi bi-whatsapp"></i>
                                         </button>
                                         <div class="btn-circle-desert d-flex align-items-center justify-content-center">
