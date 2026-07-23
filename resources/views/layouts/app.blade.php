@@ -1,10 +1,19 @@
 @php
     $settings = \Illuminate\Support\Facades\Cache::remember('site_settings_cache', 86400, function() {
-        return \App\Models\Setting::pluck('setting_value', 'setting_key');
+        return \App\Models\Setting::pluck('setting_value', 'setting_key')->all();
     });
+    if (!is_array($settings)) {
+        \Illuminate\Support\Facades\Cache::forget('site_settings_cache');
+        $settings = \App\Models\Setting::pluck('setting_value', 'setting_key')->all();
+    }
+
     $allTours = \Illuminate\Support\Facades\Cache::remember('site_tours_header_cache', 3600, function() {
         return \App\Models\Tour::where('status', 'active')->orderBy('priority', 'asc')->get();
     });
+    if (!is_iterable($allTours) || $allTours instanceof \__PHP_Incomplete_Class) {
+        \Illuminate\Support\Facades\Cache::forget('site_tours_header_cache');
+        $allTours = \App\Models\Tour::where('status', 'active')->orderBy('priority', 'asc')->get();
+    }
     
     $googleActive = isset($settings['google_active']) && $settings['google_active'] === '1';
     $gtmId = $settings['google_gtm_id'] ?? '';
