@@ -101,7 +101,7 @@
         </div>
         <div class="row g-4">
             @php
-                $featuredImg = $featuredPost->featured_image ? asset('images/blog/' . $featuredPost->featured_image) : asset('images/desert-safari-poster.avif');
+                $featuredImg = $featuredPost->featured_image ? asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $featuredPost->featured_image)) : asset('images/desert-safari-poster.avif');
             @endphp
             <div class="col-12 col-lg-8">
                 <a href="{{ route('blog.show', $featuredPost->slug) }}" class="text-decoration-none d-block h-100">

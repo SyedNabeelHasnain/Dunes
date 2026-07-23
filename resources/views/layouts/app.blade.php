@@ -89,89 +89,43 @@
     <link href="{{ asset('assets/vendor/bootstrap/5.3.2/css/bootstrap.min.css') }}" rel="stylesheet">
     <link rel="preload" href="{{ asset('assets/vendor/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="{{ asset('assets/vendor/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css') }}"></noscript>
-    <link href="{{ asset('assets/css/app.css') }}?v={{ $cacheVer }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/app.min.css') }}?v={{ $cacheVer }}" rel="stylesheet">
     <link rel="preload" href="{{ asset('assets/vendor/intl-tel-input/26.0.6/build/intlTelInput.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="{{ asset('assets/vendor/intl-tel-input/26.0.6/build/intlTelInput.css') }}"></noscript>
 
-    <!-- Google Analytics & GTM -->
-    @if($googleActive && !empty($ga4Id))
-    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $ga4Id }}"></script>
+    <!-- Deferred Google Analytics, GTM & Meta Pixel -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', '{{ $ga4Id }}');
+
+      var initThirdPartyTracking = function() {
+          if (window._trackingInitialized) return;
+          window._trackingInitialized = true;
+
+          @if($googleActive && !empty($ga4Id))
+          var sGa = document.createElement('script');
+          sGa.async = true;
+          sGa.src = "https://www.googletagmanager.com/gtag/js?id={{ $ga4Id }}";
+          document.head.appendChild(sGa);
+          gtag('config', '{{ $ga4Id }}');
+          @endif
+
+          @if($metaActive && !empty($metaPixelId))
+          !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+          n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+          n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+          t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+          document,'script','https://connect.facebook.net/en_US/fbevents.js');
+          if(window.fbq){ fbq('init', '{{ $metaPixelId }}'); fbq('track', 'PageView'); }
+          @endif
+      };
+
+      setTimeout(initThirdPartyTracking, 3500);
+      ['touchstart', 'scroll', 'pointermove'].forEach(function(ev) {
+          window.addEventListener(ev, initThirdPartyTracking, { once: true, passive: true });
+      });
     </script>
-    @endif
-
-    @if($googleActive && !empty($gtmId))
-        @if(strpos($gtmId, 'G-') !== 0 && $gtmId !== $ga4Id)
-        <script>
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          var loadGtm=function(){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtm.js?id={{ $gtmId }}';document.head.appendChild(s);};
-          var loadGa=function(){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id={{ $ga4Id }}';document.head.appendChild(s);};
-          var start=function(){gtag('js', new Date());@if(!empty($ga4Id))gtag('config','{{ $ga4Id }}');@endif};
-          var schedule=function(fn){if('requestIdleCallback'in window){requestIdleCallback(fn,{timeout:2000});}else{setTimeout(fn,1500);}};
-          schedule(function(){loadGa();start();loadGtm();});
-        </script>
-        @endif
-    @endif
-
-    @if($googleActive && !empty($adsId))
-        @php $adsTagId = (strpos($adsId, 'AW-') === 0) ? $adsId : 'AW-'.$adsId; @endphp
-        <script>
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          var loadAds=function(){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id={{ $adsTagId }}';document.head.appendChild(s);};
-          var start=function(){gtag('js', new Date());gtag('config','{{ $adsTagId }}');};
-          var schedule=function(fn){if('requestIdleCallback'in window){requestIdleCallback(fn,{timeout:2000});}else{setTimeout(fn,2000);}};
-          schedule(function(){loadAds();start();});
-        </script>
-    @endif
-
-    <!-- Meta Pixel -->
-    @if($metaActive && !empty($metaPixelId))
-    <script>
-    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
-    document,'script','https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init','{{ $metaPixelId }}');
-    fbq('track','PageView');
-    (function(){try{var p=new URLSearchParams(window.location.search);var c=p.get('fbclid');if(c){var ts=Math.floor(Date.now()/1000);var v='fb.1.'+ts+'.'+c;document.cookie='_fbc='+v+'; path=/; max-age='+(2*365*24*60*60)+'; SameSite=Lax';}}catch(e){}})();
-    window.addEventListener('DOMContentLoaded',function(){
-      var hasFbq = typeof window.fbq==='function';
-      if(!hasFbq) return;
-      var once=function(fn){var done=false;return function(){if(done)return;done=true;fn.apply(this,arguments);};};
-      var on=function(el,ev,fn){try{el.addEventListener(ev,fn,{passive:true});}catch(e){el.addEventListener(ev,fn);}};
-      var q=function(sel){return Array.prototype.slice.call(document.querySelectorAll(sel));};
-      var isExternal=function(a){try{var u=new URL(a.href);return u.host!==location.host;}catch(e){return false;}};
-      q('[data-action="open-booking"], [data-bs-target="#bookingModal"]').forEach(function(el){
-        on(el,'click',function(){fbq('track','InitiateCheckout');});
-      });
-      q('a[href*="wa.me"], a[href*="api.whatsapp.com"], .btn-whatsapp-animated').forEach(function(el){
-        on(el,'click',function(){fbq('track','Contact',{contact_point:'WhatsApp'});});
-      });
-      q('a[href^="tel:"]').forEach(function(el){
-        on(el,'click',function(){fbq('track','Contact',{contact_point:'Phone'});});
-      });
-      q('a[href^="mailto:"]').forEach(function(el){
-        on(el,'click',function(){fbq('track','Contact',{contact_point:'Email'});});
-      });
-      var cf=document.getElementById('contactForm');
-      if(cf){cf.addEventListener('submit',once(function(){fbq('track','Lead',{form:'contact'});}));}
-      var bf=document.getElementById('bookingForm');
-      if(bf){bf.addEventListener('submit',once(function(){fbq('track','Lead',{form:'booking'});}));}
-      document.body.addEventListener('click',function(e){
-        var a=e.target.closest&&e.target.closest('a');
-        if(!a) return;
-        if(isExternal(a)){fbq('trackCustom','OutboundLink',{url:a.href});}
-      },true);
-    });
-    </script>
-    @endif
 
     <script src="https://www.google.com/recaptcha/enterprise.js?render={{ $rcSiteKey }}" async defer></script>
     <script>

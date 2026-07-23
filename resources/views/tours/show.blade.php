@@ -66,7 +66,7 @@ if(window.fbq){
 </script>
 
 <!-- Tour Hero Section -->
-<section class="tour-hero-modern position-relative d-flex align-items-end" style="min-height: 50vh; background: url('{{ asset('images/' . $tour->hero_image) }}') center/cover no-repeat; margin-top: -var(--header-h);">
+<section class="tour-hero-modern position-relative d-flex align-items-end" style="min-height: 50vh; background: url('{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image)) }}') center/cover no-repeat; margin-top: -var(--header-h);">
     <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.85) 100%);"></div>
     <div class="container position-relative z-1 pb-5 text-white">
         <nav aria-label="breadcrumb" class="mb-4">

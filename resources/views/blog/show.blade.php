@@ -8,7 +8,7 @@
     $authorTitle = $post->author_title ?? 'Dubai Tourism Expert';
     $authorBio = $post->author_bio ?? '';
     
-    $featImgPath = $post->featured_image ? asset('images/blog/' . $post->featured_image) : asset('images/desert-safari-poster.avif');
+    $featImgPath = $post->featured_image ? asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $post->featured_image)) : asset('images/desert-safari-poster.avif');
     $canonical = $post->canonical_url ?: route('blog.show', $post->slug);
     $ogImageUrl = $post->og_image ?: $featImgPath;
     

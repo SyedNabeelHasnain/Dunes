@@ -3,8 +3,7 @@
 @section('content')
 <!-- Modern Hero Section -->
 <section class="hero-modern position-relative d-flex align-items-center justify-content-center overflow-hidden" style="min-height: 90vh;">
-    <video class="hero-video position-absolute top-0 start-0 w-100 h-100" autoplay loop muted playsinline preload="none" style="object-fit: cover; z-index: -1;">
-        <source src="{{ asset('images/desert-safar-dubai-tour-short-dune-discovery-tourism.mp4') }}" type="video/mp4">
+    <video class="hero-video position-absolute top-0 start-0 w-100 h-100" autoplay loop muted playsinline id="heroVideo" poster="{{ asset('images/desert-safari-poster.avif') }}" style="object-fit: cover; z-index: -1;">
     </video>
     <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(180deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.8) 100%); z-index: -1;"></div>
 
@@ -108,7 +107,7 @@
                     <article class="card card-modern h-100 border-0 shadow-sm">
                         <a href="{{ route('tours.show', $t->slug) }}" class="text-decoration-none text-dark d-flex flex-column h-100">
                             <div class="card-img-wrapper position-relative overflow-hidden" style="aspect-ratio: 16/10;">
-                                <img src="{{ asset('images/' . $t->thumb_image) }}" class="card-img-top w-100 h-100" alt="{{ $t->name }}" loading="lazy" style="object-fit: cover;">
+                                <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" class="card-img-top w-100 h-100" alt="{{ $t->name }}" loading="lazy" style="object-fit: cover;">
                                 @if($t->is_bestseller)
                                 <span class="badge bg-primary position-absolute top-0 start-0 m-3 rounded-pill shadow-sm">
                                     <i class="bi bi-fire me-1"></i>Best Seller
@@ -286,6 +285,30 @@
         </div>
     </div>
 </section>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var loaded = false;
+    function loadHeroVideo() {
+        if (loaded) return;
+        loaded = true;
+        var v = document.getElementById('heroVideo');
+        if (v && !v.querySelector('source')) {
+            var s = document.createElement('source');
+            s.src = "{{ asset('images/desert-safar-dubai-tour-short-dune-discovery-tourism.mp4') }}";
+            s.type = "video/mp4";
+            v.appendChild(s);
+            v.load();
+        }
+    }
+    setTimeout(loadHeroVideo, 4000);
+    ['touchstart', 'scroll', 'pointermove'].forEach(function(ev) {
+        window.addEventListener(ev, loadHeroVideo, { once: true, passive: true });
+    });
+});
+</script>
+@endpush
 
 @endsection
 
