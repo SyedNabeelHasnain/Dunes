@@ -321,8 +321,8 @@ function renderReviewCardMarkup($r) {
 
     $sourceIcon = ($r->source == 'google') ? '<i class="bi bi-google text-primary"></i>' : '<i class="bi-star-fill text-success"></i>';
     $url = !empty($r->review_url) ? $r->review_url : '#';
-    $avatar = !empty($r->reviewer_avatar_url) ? $r->reviewer_avatar_url : 'https://ui-avatars.com/api/?name='.urlencode($r->reviewer_name);
-    $fallbackAvatar = 'https://ui-avatars.com/api/?name='.urlencode($r->reviewer_name).'&background=random';
+    $avatar = !empty($r->reviewer_avatar_url) ? (str_starts_with($r->reviewer_avatar_url, 'http') ? $r->reviewer_avatar_url : asset($r->reviewer_avatar_url)) : asset('images/avatar-default.svg');
+    $fallbackAvatar = asset('images/avatar-default.svg');
 
     return '
     <div class="review-card h-100 d-flex flex-column text-start">
