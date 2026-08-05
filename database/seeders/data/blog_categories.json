@@ -3,44 +3,44 @@
     "id": 1,
     "name": "Desert Safaris",
     "slug": "desert-safari",
-    "description": "Guides, tips, and insights for Dubai desert safaris, dune bashing, quad biking, and Bedouin camping.",
-    "meta_title": "Dubai Desert Safari Guides & Tips | Dunes Discovery Tourism",
-    "meta_desc": "Explore expert guides on Dubai desert safaris, quad biking, dune buggies, overnight camping, and packing tips.",
-    "og_image": "images/desert-safari-dubai-dune-discovery-tourism-HD.avif",
-    "priority": 1,
-    "status": "active"
+    "description": "Comprehensive travel guides, dune bashing advice, quad biking tips, and safari comparisons in Dubai's Lahbab Red Dunes.",
+    "icon": "bi-sun-fill",
+    "featured_image": "desert-safari-dubai-dune-discovery-tourism-HD.avif",
+    "is_active": true,
+    "created_at": "2026-01-01 00:00:00",
+    "updated_at": "2026-08-06 00:00:00"
   },
   {
     "id": 2,
     "name": "City Tours",
     "slug": "city-tour",
-    "description": "Comprehensive itineraries, historical insights, and photography spots for exploring Dubai's iconic landmarks.",
-    "meta_title": "Dubai City Tour Guides & Sightseeing Tips | Dunes Discovery Tourism",
-    "meta_desc": "Discover 1-day Dubai city itineraries, Old vs New Dubai cultural guides, and top photography locations.",
-    "og_image": "images/dubai-city-tour-hero.avif",
-    "priority": 2,
-    "status": "active"
+    "description": "Landmark itineraries, cultural heritage guides, skyscraper view guides, and Instagram photo spots across Dubai.",
+    "icon": "bi-building-fill",
+    "featured_image": "dubai-city-tour-hero.avif",
+    "is_active": true,
+    "created_at": "2026-01-01 00:00:00",
+    "updated_at": "2026-08-06 00:00:00"
   },
   {
     "id": 3,
     "name": "Cruises & Water Activities",
     "slug": "water-activity",
-    "description": "Everything about Dhow dinner cruises, luxury mega yachts, catamaran sails, and Dubai water sports.",
-    "meta_title": "Dubai Dhow Cruise & Water Activity Guides | Dunes Discovery Tourism",
-    "meta_desc": "Compare Dubai Marina vs Creek dinner cruises, Ocean Empress mega yacht experiences, and water sports.",
-    "og_image": "images/dubai-marina-dhow-cruise-hero.avif",
-    "priority": 3,
-    "status": "active"
+    "description": "Dubai Marina dhow dinner cruises, luxury mega yacht experiences, Jet Ski adventures, and Dubai Creek dining guides.",
+    "icon": "bi-water",
+    "featured_image": "dhow-cruise-dubai-marina-dune-discovery-tourism.avif",
+    "is_active": true,
+    "created_at": "2026-01-01 00:00:00",
+    "updated_at": "2026-08-06 00:00:00"
   },
   {
     "id": 4,
     "name": "Day Trips",
     "slug": "day-trip",
-    "description": "Excursions from Dubai to Abu Dhabi, Hatta Dam, Al Ain, and UAE regional attractions.",
-    "meta_title": "Best Day Trips from Dubai Guides | Dunes Discovery Tourism",
-    "meta_desc": "Plan day trips to Abu Dhabi Sheikh Zayed Grand Mosque, Louvre Abu Dhabi, Hatta Mountains, and beyond.",
-    "og_image": "images/abu-dhabi-mosque-dune-discovery-tourism.avif",
-    "priority": 4,
-    "status": "active"
+    "description": "Abu Dhabi city tour guides, Sheikh Zayed Mosque visitor advice, Louvre Abu Dhabi tips, and Hatta Mountain day excursions.",
+    "icon": "bi-compass-fill",
+    "featured_image": "abu-dhabi-mosque-dune-discovery-tourism.avif",
+    "is_active": true,
+    "created_at": "2026-01-01 00:00:00",
+    "updated_at": "2026-08-06 00:00:00"
   }
 ]
