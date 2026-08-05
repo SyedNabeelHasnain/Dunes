@@ -2587,3 +2587,36 @@ button:focus-visible {
     background: rgba(255, 255, 255, 0.5);
     display: inline-block;
 }
+
+/* High Contrast Blog Content Tables */
+.blog-content table {
+    width: 100% !important;
+    margin: 1.5rem 0 !important;
+    border-collapse: collapse !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06) !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+}
+
+.blog-content table th,
+.blog-content table thead th,
+.blog-content table .table-dark th,
+.table-dark th {
+    background-color: #00476d !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    padding: 14px 16px !important;
+    border: none !important;
+    text-align: left !important;
+}
+
+.blog-content table td {
+    padding: 12px 16px !important;
+    color: #1C1C1E !important;
+    border-bottom: 1px solid #e5e5ea !important;
+    background-color: #ffffff !important;
+}
+
+.blog-content table tr:nth-child(even) td {
+    background-color: #f8fafc !important;
+}

@@ -162,7 +162,7 @@
     <div class="row g-4">
         @foreach ($posts as $post)
         @php
-            $postImg = $post->featured_image ? asset('images/blog/' . $post->featured_image) : asset('images/desert-safari-poster.avif');
+            $postImg = $post->featured_image ? asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $post->featured_image)) : asset('images/desert-safari-poster.avif');
         @endphp
         <div class="col-12 col-md-6 col-xl-4">
             <article class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 card-hover bg-white">

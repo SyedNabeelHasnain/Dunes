@@ -270,10 +270,10 @@
                         </div>
                         <div class="list-group list-group-flush">
                             @foreach ($relatedPosts as $rp)
-                            @php $rpImg = $rp->featured_image ? asset('images/blog/' . $rp->featured_image) : asset('images/desert-safari-poster.avif'); @endphp
+                            @php $rpImg = $rp->featured_image ? asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $rp->featured_image)) : asset('images/desert-safari-poster.avif'); @endphp
                             <a href="{{ route('blog.show', $rp->slug) }}" class="list-group-item list-group-item-action py-3 ps-4 pe-4 border-light text-decoration-none text-dark">
                                 <div class="d-flex gap-3 align-items-start">
-                                    <img src="{{ $rpImg }}" style="width:52px;height:52px;object-fit:cover;border-radius:6px;flex-shrink:0;" loading="lazy" alt="">
+                                    <img src="{{ $rpImg }}" style="width:52px;height:52px;object-fit:cover;border-radius:6px;flex-shrink:0;" loading="lazy" alt="{{ $rp->title }}">
                                     <div>
                                         <div class="fw-semibold text-dark line-clamp-2" style="font-size: 0.85rem;">{{ $rp->title }}</div>
                                         <div class="text-muted mt-1" style="font-size:.72rem;"><i class="bi bi-clock me-1 text-primary"></i>{{ $rp->read_time }} min</div>
@@ -297,7 +297,7 @@
         <h2 class="fw-800 h4 mb-4 text-dark">You Might Also Like</h2>
         <div class="row g-4">
             @foreach ($relatedPosts as $rp)
-            @php $rpImg = $rp->featured_image ? asset('images/blog/' . $rp->featured_image) : asset('images/desert-safari-poster.avif'); @endphp
+            @php $rpImg = $rp->featured_image ? asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $rp->featured_image)) : asset('images/desert-safari-poster.avif'); @endphp
             <div class="col-md-4">
                 <article class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 card-hover bg-white">
                     <a href="{{ route('blog.show', $rp->slug) }}" class="d-block position-relative text-decoration-none" style="padding-bottom:55%;">
