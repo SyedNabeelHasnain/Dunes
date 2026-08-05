@@ -1,1 +1,62 @@
-[]
+[
+  {
+    "id": 1,
+    "name": "Desert Safari",
+    "slug": "desert-safari"
+  },
+  {
+    "id": 2,
+    "name": "Quad Biking",
+    "slug": "quad-biking"
+  },
+  {
+    "id": 3,
+    "name": "Packing Tips",
+    "slug": "packing-tips"
+  },
+  {
+    "id": 4,
+    "name": "Dubai City Tour",
+    "slug": "dubai-city-tour"
+  },
+  {
+    "id": 5,
+    "name": "Old Dubai",
+    "slug": "old-dubai"
+  },
+  {
+    "id": 6,
+    "name": "Photography",
+    "slug": "photography"
+  },
+  {
+    "id": 7,
+    "name": "Dhow Cruise",
+    "slug": "dhow-cruise"
+  },
+  {
+    "id": 8,
+    "name": "Mega Yacht",
+    "slug": "mega-yacht"
+  },
+  {
+    "id": 9,
+    "name": "Water Sports",
+    "slug": "water-sports"
+  },
+  {
+    "id": 10,
+    "name": "Abu Dhabi",
+    "slug": "abu-dhabi"
+  },
+  {
+    "id": 11,
+    "name": "Grand Mosque",
+    "slug": "grand-mosque"
+  },
+  {
+    "id": 12,
+    "name": "Day Trips",
+    "slug": "day-trips"
+  }
+]

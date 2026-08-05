@@ -163,11 +163,11 @@ jobs:
       run: |
         curl -sS "https://dunesdiscoverytourism.com/unzip.php?key=dunes2026"
 
-    - name: Clear All Laravel Caches
+    - name: Clear All Laravel Caches & Seed Blog Posts
       env:
         SSHPASS: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
       run: |
-        sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no u410503041@${{ steps.ftp_server.outputs.host }} "cd /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel && php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan event:clear"
+        sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no u410503041@${{ steps.ftp_server.outputs.host }} "cd /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel && php artisan db:seed --class=BlogSeeder --force && php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan event:clear"
 
     - name: Update asset cache version and flush server cache
       run: |
