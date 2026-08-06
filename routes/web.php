@@ -135,5 +135,13 @@ Route::get('/sitemap.xml', function() {
     return response($xml, 200, ['Content-Type' => 'text/xml']);
 })->name('sitemap');
 
+// ── SEO 301 Permanent Redirects for Legacy / Shorthand Tour Slugs ───────────
+Route::redirect('/dubai-marina-dhow-cruise', '/dhow-cruise-catamaran-cruise-dinner-dubai', 301);
+Route::redirect('/ocean-empress-dhow-cruise', '/dhow-cruise-catamaran-cruise-dinner-dubai', 301);
+Route::redirect('/abu-dhabi-city-tour', '/abu-dhabi-city-tour-from-dubai', 301);
+Route::redirect('/quad-bike-tour-dubai', '/desert-safari-quad-biking-dubai', 301);
+Route::redirect('/vip-desert-safari-dubai', '/evening-desert-safari-dubai', 301);
+Route::redirect('/buggy-tour-dubai', '/desert-safari-quad-biking-dubai', 301);
+
 // ── Root-level Dynamic Tour Slugs (Fallback Route) ───────────────────────────
 Route::get('/{slug}', [TourController::class, 'show'])->name('tours.show');
