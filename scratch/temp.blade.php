@@ -173,7 +173,6 @@ if(window.fbq){
                 </div>
 
                 <!-- Tabs Navigation -->
-                @if(count($tabs))
                 <div class="mb-4">
                     <ul class="nav nav-pills tour-tabs" id="tourTabs" role="tablist">
                         @php $first = true; @endphp
@@ -185,7 +184,6 @@ if(window.fbq){
                         @endforeach
                     </ul>
                 </div>
-                @endif
 
                 <!-- Tabs Content -->
                 <div class="tab-content mb-5">
