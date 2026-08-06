@@ -345,3 +345,5 @@ function renderReviewCardMarkup($r) {
     </div>';
 }
 @endphp
+
+@endsection

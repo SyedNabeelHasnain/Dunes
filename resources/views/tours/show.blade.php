@@ -329,7 +329,6 @@ if(window.fbq){
                     @php $first = false; @endphp
                     @endif
                 </div>
-                @endif
             </div>
 
             <!-- Sidebar -->
