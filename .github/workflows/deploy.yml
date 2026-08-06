@@ -111,18 +111,19 @@ jobs:
       env:
         SSHPASS: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
       run: |
-        # Create directories if they do not exist
-        sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no u410503041@${{ steps.ftp_server.outputs.host }} "mkdir -p /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel"
-        
-        # Clean existing public files but preserve the images directory
-        sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no u410503041@${{ steps.ftp_server.outputs.host }} "find /home/u410503041/domains/dunesdiscoverytourism.com/public_html -mindepth 1 -maxdepth 1 ! -name 'images' -exec rm -rf {} +"
-        sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no u410503041@${{ steps.ftp_server.outputs.host }} "find /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel -mindepth 1 -maxdepth 1 ! -name 'storage' ! -name '.env' -exec rm -rf {} +"
+        for i in 1 2 3; do
+          sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=15 u410503041@${{ steps.ftp_server.outputs.host }} "mkdir -p /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel" && \
+          sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=15 u410503041@${{ steps.ftp_server.outputs.host }} "find /home/u410503041/domains/dunesdiscoverytourism.com/public_html -mindepth 1 -maxdepth 1 ! -name 'images' -exec rm -rf {} +" && \
+          sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=15 u410503041@${{ steps.ftp_server.outputs.host }} "find /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel -mindepth 1 -maxdepth 1 ! -name 'storage' ! -name '.env' -exec rm -rf {} +" && break || sleep 5
+        done
 
     - name: Upload Public Assets (SCP)
       env:
         SSHPASS: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
       run: |
-        sshpass -e scp -O -P 65002 -o StrictHostKeyChecking=no deploy/public_deploy/public.zip deploy/public_deploy/unzip.php u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/domains/dunesdiscoverytourism.com/public_html/
+        for i in 1 2 3; do
+          sshpass -e scp -O -P 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=15 deploy/public_deploy/public.zip deploy/public_deploy/unzip.php u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/domains/dunesdiscoverytourism.com/public_html/ && break || sleep 5
+        done
 
     - name: Package & Upload Images (Always Sync)
       env:
@@ -133,18 +134,18 @@ jobs:
         zip -r ../images.zip images
         cd ..
         
-        # Upload images.zip via SCP with compression enabled (-C)
-        sshpass -e scp -C -O -P 65002 -o StrictHostKeyChecking=no images.zip u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/domains/dunesdiscoverytourism.com/public_html/
-        
-        # Extract images.zip on remote server to sync all blog and avatar subfolders
-        sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no u410503041@${{ steps.ftp_server.outputs.host }} "unzip -o /home/u410503041/domains/dunesdiscoverytourism.com/public_html/images.zip -d /home/u410503041/domains/dunesdiscoverytourism.com/public_html/ && rm -f /home/u410503041/domains/dunesdiscoverytourism.com/public_html/images.zip"
+        for i in 1 2 3; do
+          sshpass -e scp -C -O -P 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=15 images.zip u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/domains/dunesdiscoverytourism.com/public_html/ && \
+          sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=15 u410503041@${{ steps.ftp_server.outputs.host }} "unzip -o /home/u410503041/domains/dunesdiscoverytourism.com/public_html/images.zip -d /home/u410503041/domains/dunesdiscoverytourism.com/public_html/ && rm -f /home/u410503041/domains/dunesdiscoverytourism.com/public_html/images.zip" && break || sleep 5
+        done
 
     - name: Upload Core Laravel Code (SCP)
       env:
         SSHPASS: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
       run: |
-        sshpass -e scp -O -P 65002 -o StrictHostKeyChecking=no deploy/core_deploy/core.zip u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/
-
+        for i in 1 2 3; do
+          sshpass -e scp -O -P 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=15 deploy/core_deploy/core.zip u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/ && break || sleep 5
+        done
 
     - name: Trigger Remote Zip Extraction
       run: |
@@ -154,7 +155,9 @@ jobs:
       env:
         SSHPASS: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
       run: |
-        sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no u410503041@${{ steps.ftp_server.outputs.host }} "cd /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel && rm -f storage/framework/views/*.php && php artisan db:seed --class=BlogSeeder --force && php artisan db:seed --class=ReviewSeeder --force && php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan event:clear"
+        for i in 1 2 3; do
+          sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=15 u410503041@${{ steps.ftp_server.outputs.host }} "cd /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel && rm -f storage/framework/views/*.php && php artisan db:seed --class=BlogSeeder --force && php artisan db:seed --class=ReviewSeeder --force && php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan event:clear" && break || sleep 5
+        done
 
     - name: Update asset cache version and flush server cache
       run: |
