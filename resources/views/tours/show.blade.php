@@ -39,7 +39,7 @@
         "@type": "Offer",
         "url": {!! json_encode(request()->url()) !!},
         "priceCurrency": "AED",
-        "price": "{{ number_format($minPrice, 2, '.', '') }}",
+        "price": "{{ number_format($tour->tiers->min('pivot.price') ?? 0, 2, '.', '') }}",
         "priceValidUntil": "2026-12-31",
         "availability": "https://schema.org/InStock",
         "seller": {
