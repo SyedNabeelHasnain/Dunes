@@ -1,19 +1,3 @@
-@extends('layouts.app')
-
-@section('content')
-@php
-    $notAllowed = $tour->contentItems->where('type', 'not_allowed')->sortBy('priority');
-    $minPrice = $tour->tiers->min('pivot.price') ?? 0;
-    
-    // Prepare Tabs Array
-    $tabs = [];
-    if($highlights->count()) $tabs['highlights'] = 'Highlights';
-    if($tour->itineraries->count()) $tabs['itinerary'] = 'Itinerary';
-    if($inclusions->count() || $exclusions->count()) $tabs['inex'] = 'Inclusion & Exclusion';
-    if($notAllowed->count()) $tabs['info'] = 'Important Information';
-    if($faqs->count()) $tabs['faqs'] = 'FAQ';
-@endphp
-
 @push('preloads')
     <link rel="preload" as="image" href="{{ asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image ?: 'evening-desert-safari-dubai-dune-discovery-tourism.avif')) }}" type="image/avif">
     
@@ -39,7 +23,7 @@
         "@type": "Offer",
         "url": "{{ request()->url() }}",
         "priceCurrency": "AED",
-        "price": "{{ number_format($minPrice, 2, '.', '') }}",
+        "price": "{{ number_format($tour->tiers->min('pivot.price') ?? 0, 2, '.', '') }}",
         "priceValidUntil": "2026-12-31",
         "availability": "https://schema.org/InStock",
         "seller": {
@@ -50,6 +34,22 @@
     }
     </script>
 @endpush
+
+@extends('layouts.app')
+
+@section('content')
+@php
+    $notAllowed = $tour->contentItems->where('type', 'not_allowed')->sortBy('priority');
+    $minPrice = $tour->tiers->min('pivot.price') ?? 0;
+    
+    // Prepare Tabs Array
+    $tabs = [];
+    if($highlights->count()) $tabs['highlights'] = 'Highlights';
+    if($tour->itineraries->count()) $tabs['itinerary'] = 'Itinerary';
+    if($inclusions->count() || $exclusions->count()) $tabs['inex'] = 'Inclusion & Exclusion';
+    if($notAllowed->count()) $tabs['info'] = 'Important Information';
+    if($faqs->count()) $tabs['faqs'] = 'FAQ';
+@endphp
 
 <!-- Ecommerce GTM View Item DataLayer -->
 <script>
