@@ -1613,14 +1613,19 @@ button:focus-visible {
 .btn-whatsapp-animated i,
 @media (min-width: 992px) {
     .sidebar-sticky {
-        position: sticky;
-        top: 100px;
+        position: -webkit-sticky !important;
+        position: sticky !important;
+        top: 100px !important;
+        z-index: 20 !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 }
 @media (max-width: 991.98px) {
     .sidebar-sticky {
-        position: static;
-        top: auto;
+        position: static !important;
+        top: auto !important;
+        width: 100% !important;
     }
 }
 

@@ -1628,53 +1628,8 @@ const App={
     },
 
     initStickySidebar(){
-        const sticky=document.querySelector('.sidebar-sticky');
-        if(!sticky)return;
-        const col=sticky.closest('.col-lg-4')||sticky.parentElement;
-        const update=()=>{
-            if(window.innerWidth<992){
-                sticky.style.position='';
-                sticky.style.top='';
-                sticky.style.left='';
-                sticky.style.width='';
-                sticky.style.bottom='';
-                if(col)col.style.position='';
-                return;
-            }
-            const gap=100;
-            const colRect=col.getBoundingClientRect();
-            const containerTop=colRect.top+window.scrollY;
-            const containerBottom=containerTop+col.offsetHeight;
-            const sbh=sticky.offsetHeight;
-            const y=window.scrollY;
-            const start=containerTop-gap;
-            const stop=containerBottom-sbh-20;
-            if(y<start){
-                sticky.style.position='static';
-                sticky.style.top='';
-                sticky.style.left='';
-                sticky.style.width='';
-                sticky.style.bottom='';
-                if(col)col.style.position='';
-            }else if(y>=start&&y<stop){
-                if(col)col.style.position='relative';
-                sticky.style.position='fixed';
-                sticky.style.top=gap+'px';
-                sticky.style.left=colRect.left+'px';
-                sticky.style.width=colRect.width+'px';
-                sticky.style.bottom='';
-            }else{
-                if(col)col.style.position='relative';
-                sticky.style.position='absolute';
-                sticky.style.top=(col.offsetHeight-sbh-20)+'px';
-                sticky.style.left='0px';
-                sticky.style.width='100%';
-                sticky.style.bottom='';
-            }
-        };
-        window.addEventListener('scroll',update,{passive:true});
-        window.addEventListener('resize',update);
-        setTimeout(update,0);
+        // Native CSS position: sticky is used for zero layout shift and smooth scrolling
+        return;
     },
 
     initHorizontalTabs(){
