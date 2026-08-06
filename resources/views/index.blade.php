@@ -1,3 +1,6 @@
+@extends('layouts.app')
+
+@section('content')
 @php
 if (!function_exists('renderReviewCardMarkup')) {
     function renderReviewCardMarkup($r) {
@@ -33,9 +36,7 @@ if (!function_exists('renderReviewCardMarkup')) {
     }
 }
 @endphp
-@extends('layouts.app')
 
-@section('content')
 <!-- Modern Hero Section -->
 <section class="hero-modern position-relative d-flex align-items-center justify-content-center overflow-hidden" style="min-height: 90vh;">
     <video class="hero-video position-absolute top-0 start-0 w-100 h-100" autoplay loop muted playsinline id="heroVideo" poster="{{ asset('images/desert-safari-poster.avif') }}" style="object-fit: cover; z-index: -1;">
