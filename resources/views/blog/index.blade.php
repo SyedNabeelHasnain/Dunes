@@ -141,23 +141,23 @@
                 @endphp
                 <a href="{{ route('blog.show', $sidePost->slug) }}" class="text-decoration-none d-block flex-grow-1">
                     <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 card-hover bg-white">
-                        <div class="row g-0 h-100">
-                            <div class="col-5 col-sm-5 position-relative" style="min-height: 170px;">
+                        <div class="row g-0 h-100 align-items-stretch">
+                            <div class="col-6 col-sm-6 position-relative" style="min-height: 180px;">
                                 <img src="{{ $sideImg }}" class="position-absolute w-100 h-100 object-fit-cover" alt="{{ $sidePost->featured_image_alt ?: $sidePost->title }}">
                                 @if ($sidePost->category)
                                 <span class="position-absolute top-0 start-0 m-2 badge bg-primary rounded-pill px-2 py-1 fw-bold shadow-sm" style="font-size: .7rem;">{{ $sidePost->category->name }}</span>
                                 @endif
                             </div>
-                            <div class="col-7 col-sm-7">
-                                <div class="card-body p-3.5 p-md-3 d-flex flex-column justify-content-between h-100">
+                            <div class="col-6 col-sm-6 d-flex flex-column">
+                                <div class="card-body p-3 d-flex flex-column justify-content-between h-100">
                                     <div>
-                                        <h3 class="h6 fw-800 text-dark mb-1 line-clamp-2" style="font-size: .95rem; line-height: 1.35;">{{ $sidePost->title }}</h3>
+                                        <h3 class="h6 fw-800 text-dark mb-1 line-clamp-2" style="font-size: .92rem; line-height: 1.35;">{{ $sidePost->title }}</h3>
                                         @if ($sidePost->excerpt)
-                                            <p class="text-muted small line-clamp-2 mb-2" style="font-size: .8rem; line-height: 1.35;">{{ $sidePost->excerpt }}</p>
+                                            <p class="text-muted small line-clamp-3 mb-0" style="font-size: .78rem; line-height: 1.35;">{{ $sidePost->excerpt }}</p>
                                         @endif
                                     </div>
-                                    <div class="d-flex align-items-center gap-2 text-muted pt-2 border-top mt-auto" style="font-size: .75rem;">
-                                        <span><i class="bi bi-person me-1 text-primary"></i>{{ Str::limit($sidePost->author_name ?: 'Dunes Discovery', 15) }}</span>
+                                    <div class="d-flex align-items-center gap-1 text-muted pt-2 border-top mt-2" style="font-size: .72rem;">
+                                        <span><i class="bi bi-person me-1 text-primary"></i>{{ Str::limit($sidePost->author_name ?: 'Dunes Discovery', 12) }}</span>
                                         <span>• <i class="bi bi-clock me-1 text-primary"></i>{{ $sidePost->read_time }}m</span>
                                         @if ($sidePost->published_at)
                                             <span>• {{ $sidePost->published_at->format('M j') }}</span>
