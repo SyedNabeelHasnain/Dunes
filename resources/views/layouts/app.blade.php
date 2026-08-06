@@ -132,7 +132,7 @@
     <!-- Global TravelAgency JSON-LD Structured Data Schema -->
     <script type="application/ld+json">
     {
-      "@context": "https://schema.org",
+      "@@context": "https://schema.org",
       "@type": "TravelAgency",
       "name": "Dunes Discovery Tourism",
       "image": "{{ asset('images/logo.png') }}",

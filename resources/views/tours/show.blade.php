@@ -20,7 +20,7 @@
     <!-- JSON-LD Product & TouristAttraction Structured Data -->
     <script type="application/ld+json">
     {
-      "@context": "https://schema.org/",
+      "@@context": "https://schema.org/",
       "@type": "Product",
       "name": {!! json_encode($tour->name) !!},
       "image": {!! json_encode(asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image ?: 'evening-desert-safari-dubai-dune-discovery-tourism.avif'))) !!},
