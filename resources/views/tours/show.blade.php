@@ -540,6 +540,8 @@ if(window.fbq){
     </button>
 </div>
 
+@endsection
+
 @push('scripts')
 <script>
 function toggleDescription() {
@@ -562,5 +564,3 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 </script>
 @endpush
-
-@endsection
