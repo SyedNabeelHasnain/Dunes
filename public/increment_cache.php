@@ -68,7 +68,12 @@ try {
         }
     }
 
-    echo "SUCCESS: cache_version updated to $newVer (affected rows: $affected). Server-side configuration, route caches, and compiled views cleared successfully!";
+    // 6. Reset PHP OPcache in Web Server memory
+    if (function_exists('opcache_reset')) {
+        @opcache_reset();
+    }
+
+    echo "SUCCESS: cache_version updated to $newVer (affected rows: $affected). Server-side configuration, route caches, compiled views, and OPcache reset successfully!";
 
 } catch (Exception $e) {
     echo "ERROR: " . $e->getMessage();
