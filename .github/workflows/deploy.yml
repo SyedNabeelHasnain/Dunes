@@ -91,8 +91,8 @@ jobs:
         sed -i '/^DB_PASSWORD=/d' .env
         printf 'DB_PASSWORD="%s"\n' "$DB_PASS" >> .env
 
-        # Copy core Laravel directories and files, excluding public assets, node_modules, and git history
-        rsync -arv --exclude="public" --exclude="node_modules" --exclude=".git" --exclude=".github" --exclude="deploy" ./ deploy/core_deploy/
+        # Copy core Laravel directories and files, excluding public assets, node_modules, compiled views and git history
+        rsync -arv --exclude="public" --exclude="node_modules" --exclude=".git" --exclude=".github" --exclude="deploy" --exclude="storage/framework/views/*" --exclude="storage/framework/cache/*" --exclude="storage/logs/*" ./ deploy/core_deploy/
 
         # Package core files into a zip
         cd deploy/core_deploy
