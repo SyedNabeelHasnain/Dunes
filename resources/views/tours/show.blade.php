@@ -21,29 +21,29 @@
     <script type="application/ld+json">
     {
       "@@context": "https://schema.org/",
-      "@type": "Product",
+      "@@type": "Product",
       "name": {!! json_encode($tour->name) !!},
       "image": {!! json_encode(asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image ?: 'evening-desert-safari-dubai-dune-discovery-tourism.avif'))) !!},
       "description": {!! json_encode(Str::limit(strip_tags($tour->short_desc ?: $tour->full_desc), 250)) !!},
       "sku": "TOUR-{{ $tour->id }}",
       "brand": {
-        "@type": "Brand",
+        "@@type": "Brand",
         "name": "Dunes Discovery Tourism"
       },
       "aggregateRating": {
-        "@type": "AggregateRating",
+        "@@type": "AggregateRating",
         "ratingValue": "{{ $tour->rating ?: '4.9' }}",
         "reviewCount": "{{ $tour->review_count ?: '1247' }}"
       },
       "offers": {
-        "@type": "Offer",
+        "@@type": "Offer",
         "url": {!! json_encode(request()->url()) !!},
         "priceCurrency": "AED",
         "price": "{{ number_format($tour->tiers->min('pivot.price') ?? 0, 2, '.', '') }}",
         "priceValidUntil": "2026-12-31",
         "availability": "https://schema.org/InStock",
         "seller": {
-          "@type": "Organization",
+          "@@type": "Organization",
           "name": "Dunes Discovery Tourism"
         }
       }
@@ -89,12 +89,12 @@ if(window.fbq){
 <script type="application/ld+json">
 {
   "@@context": "https://schema.org",
-  "@type": "Product",
+  "@@type": "Product",
   "name": "{{ $tour->name }}",
   "image": "{{ asset('images/' . $tour->hero_image) }}",
   "description": "{{ $tour->short_desc }}",
   "offers": {
-    "@type": "Offer",
+    "@@type": "Offer",
     "priceCurrency": "AED",
     "price": "{{ $minPrice }}",
     "availability": "https://schema.org/InStock"

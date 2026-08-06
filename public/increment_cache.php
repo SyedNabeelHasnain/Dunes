@@ -62,7 +62,18 @@ try {
         @unlink($packagesCache);
     }
 
-    // 5. Manually clear compiled views across all potential Hostinger framework directories
+    // 5. Touch all view files to update modification time and force Blade compiler re-eval
+    $viewsPath = $baseDir . '/resources/views';
+    if (is_dir($viewsPath)) {
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($viewsPath));
+        foreach ($iterator as $file) {
+            if ($file->isFile() && $file->getExtension() === 'php') {
+                @touch($file->getPathname());
+            }
+        }
+    }
+
+    // 6. Clear compiled views with explicit chmod
     $possibleViewsDirs = [
         $baseDir . '/storage/framework/views',
         __DIR__ . '/../storage/framework/views',
@@ -73,9 +84,11 @@ try {
     $clearedCount = 0;
     foreach (array_unique($possibleViewsDirs) as $vDir) {
         if (is_dir($vDir)) {
+            @chmod($vDir, 0777);
             $files = glob($vDir . '/*');
             foreach ($files as $file) {
                 if (is_file($file) && basename($file) !== '.gitignore') {
+                    @chmod($file, 0777);
                     if (@unlink($file)) {
                         $clearedCount++;
                     }

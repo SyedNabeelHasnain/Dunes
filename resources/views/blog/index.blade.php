@@ -11,12 +11,12 @@
 <script type="application/ld+json">
 {
   "@@context": "https://schema.org",
-  "@type": "BreadcrumbList",
+  "@@type": "BreadcrumbList",
   "itemListElement": [
-    {"@type":"ListItem","position":1,"name":"Home","item":"{{ route('home') }}"},
-    {"@type":"ListItem","position":2,"name":"Blog","item":"{{ route('blog.index') }}"}
+    {"@@type":"ListItem","position":1,"name":"Home","item":"{{ route('home') }}"},
+    {"@@type":"ListItem","position":2,"name":"Blog","item":"{{ route('blog.index') }}"}
     @if ($cat)
-    ,{"@type":"ListItem","position":3,"name":"{{ $cat->name }}","item":"{{ route('blog.index', ['category' => $cat->slug]) }}"}
+    ,{"@@type":"ListItem","position":3,"name":"{{ $cat->name }}","item":"{{ route('blog.index', ['category' => $cat->slug]) }}"}
     @endif
   ]
 }
@@ -25,7 +25,7 @@
 <script type="application/ld+json">
 {
   "@@context": "https://schema.org",
-  "@type": "CollectionPage",
+  "@@type": "CollectionPage",
   "name": "{{ $cat ? $cat->name . ' Blog' : 'Dubai Travel Blog' }}",
   "description": "{{ $cat ? $cat->description : 'Expert guides and travel tips.' }}",
   "url": "{{ request()->fullUrl() }}"
