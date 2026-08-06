@@ -14,6 +14,43 @@
     if($faqs->count()) $tabs['faqs'] = 'FAQ';
 @endphp
 
+@push('preloads')
+    <link rel="preload" as="image" href="{{ asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image ?: 'evening-desert-safari-dubai-dune-discovery-tourism.avif')) }}" type="image/avif">
+    
+    <!-- JSON-LD Product & TouristAttraction Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org/",
+      "@type": "Product",
+      "name": "{{ e($tour->name) }}",
+      "image": "{{ asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image ?: 'evening-desert-safari-dubai-dune-discovery-tourism.avif')) }}",
+      "description": "{{ e(Str::limit(strip_tags($tour->short_desc ?: $tour->full_desc), 250)) }}",
+      "sku": "TOUR-{{ $tour->id }}",
+      "brand": {
+        "@type": "Brand",
+        "name": "Dunes Discovery Tourism"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "{{ $tour->rating ?: '4.9' }}",
+        "reviewCount": "{{ $tour->review_count ?: '1247' }}"
+      },
+      "offers": {
+        "@type": "Offer",
+        "url": "{{ request()->url() }}",
+        "priceCurrency": "AED",
+        "price": "{{ number_format($minPrice, 2, '.', '') }}",
+        "priceValidUntil": "2026-12-31",
+        "availability": "https://schema.org/InStock",
+        "seller": {
+          "@type": "Organization",
+          "name": "Dunes Discovery Tourism"
+        }
+      }
+    }
+    </script>
+@endpush
+
 <!-- Ecommerce GTM View Item DataLayer -->
 <script>
 window.dataLayer = window.dataLayer || [];

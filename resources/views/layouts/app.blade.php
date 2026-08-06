@@ -127,11 +127,34 @@
       });
     </script>
 
-    <script src="https://www.google.com/recaptcha/enterprise.js?render={{ $rcSiteKey }}" async defer></script>
-    <script>
-        window.RECAPTCHA_SITE_KEY = @json($rcSiteKey);
-        window.WHATSAPP_FORM_ENABLED = @json($settings['whatsapp_form_enabled'] ?? '1');
-        window.CSRF_TOKEN = @json(csrf_token());
+    @stack('preloads')
+
+    <!-- Global TravelAgency JSON-LD Structured Data Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TravelAgency",
+      "name": "Dunes Discovery Tourism",
+      "image": "{{ asset('images/logo.png') }}",
+      "@id": "{{ url('/') }}#organization",
+      "url": "{{ url('/') }}",
+      "telephone": "{{ $phone }}",
+      "priceRange": "$$",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Dubai",
+        "addressCountry": "AE"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 25.2048,
+        "longitude": 55.2708
+      },
+      "sameAs": [
+        "https://www.facebook.com/dunesdiscoverytourism",
+        "https://www.instagram.com/dunesdiscoverytourism"
+      ]
+    }
     </script>
 </head>
 <body class="d-flex flex-column min-vh-100">

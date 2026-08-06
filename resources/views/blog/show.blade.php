@@ -59,6 +59,10 @@
     ];
 @endphp
 
+@push('preloads')
+    <link rel="preload" as="image" href="{{ $featImgPath }}" type="image/avif">
+@endpush
+
 <!-- Article OG Overrides & Metadata -->
 @push('scripts')
 <script>
