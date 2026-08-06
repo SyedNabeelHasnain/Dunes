@@ -10,10 +10,11 @@ except urllib.error.HTTPError as e:
     html = e.read().decode('utf-8', errors='ignore')
     print(f"HTTP ERROR {e.code}")
     
-    # Print lines containing ParseError or text
-    lines = html.split('\n')
-    for idx, l in enumerate(lines):
-        if 'ParseError' in l or 'unexpected' in l or 'InvalidArgumentException' in l:
-            for j in range(max(0, idx-5), min(len(lines), idx+10)):
-                print(f"Line {j:4d}: {lines[j][:120]}")
-            break
+    idx = html.find('const markdown = ')
+    if idx != -1:
+        end_idx = html.find(';\n', idx)
+        raw = html[idx+17:end_idx]
+        # Unescape JS string
+        clean = raw.encode('utf-8').decode('unicode_escape')
+        print("=== IGNITION MARKDOWN ERROR TRACE ===")
+        print(clean[:3000])

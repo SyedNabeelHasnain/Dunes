@@ -1,3 +1,38 @@
+@php
+if (!function_exists('renderReviewCardMarkup')) {
+    function renderReviewCardMarkup($r) {
+        $stars = '';
+        for($i = 0; $i < 5; $i++) {
+            $stars .= $i < floor($r->rating) ? '<i class="bi bi-star-fill text-warning"></i>' : '<i class="bi bi-star text-muted"></i>';
+        }
+
+        $sourceIcon = ($r->source == 'google') ? '<i class="bi bi-google text-primary"></i>' : '<i class="bi-star-fill text-success"></i>';
+        $url = !empty($r->review_url) ? $r->review_url : '#';
+        $avatar = !empty($r->reviewer_avatar_url) ? (str_starts_with($r->reviewer_avatar_url, 'http') ? $r->reviewer_avatar_url : asset($r->reviewer_avatar_url)) : asset('images/avatar-default.svg');
+        $fallbackAvatar = asset('images/avatar-default.svg');
+
+        return '
+        <div class="review-card h-100 d-flex flex-column text-start">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex align-items-center gap-2">
+                    <img src="' . htmlspecialchars($avatar) . '" alt="' . htmlspecialchars($r->reviewer_name) . '" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" referrerpolicy="no-referrer" loading="lazy" onerror="this.onerror=null;this.src=\'' . $fallbackAvatar . '\'">
+                    <div>
+                        <div class="fw-bold text-dark small">' . htmlspecialchars($r->reviewer_name) . '</div>
+                        <div class="text-muted extra-small" style="font-size: 0.75rem;">' . ($r->published_date ? $r->published_date->format('M Y') : '') . '</div>
+                    </div>
+                </div>
+                <div class="d-flex gap-1 small">' . $stars . '</div>
+            </div>
+            ' . ($r->review_title ? '<h6 class="fw-bold mb-2 text-dark line-clamp-1">' . htmlspecialchars($r->review_title) . '</h6>' : '') . '
+            <p class="text-dark small mb-3 flex-grow-1 line-clamp-3" style="font-size: 0.9rem;">"' . htmlspecialchars($r->review_text) . '"</p>
+            <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top border-light">
+                <span class="badge bg-light text-dark rounded-pill px-2 py-1 small fw-normal">' . $sourceIcon . ' ' . ucfirst($r->source) . '</span>
+                <a href="' . htmlspecialchars($url) . '" target="_blank" class="btn btn-sm btn-outline-dark rounded-pill px-3 py-1" style="font-size: 0.8rem;">View</a>
+            </div>
+        </div>';
+    }
+}
+@endphp
 @extends('layouts.app')
 
 @section('content')
@@ -311,37 +346,3 @@ document.addEventListener('DOMContentLoaded', function() {
 @endpush
 
 @endsection
-
-@php
-function renderReviewCardMarkup($r) {
-    $stars = '';
-    for($i = 0; $i < 5; $i++) {
-        $stars .= $i < floor($r->rating) ? '<i class="bi bi-star-fill text-warning"></i>' : '<i class="bi bi-star text-muted"></i>';
-    }
-
-    $sourceIcon = ($r->source == 'google') ? '<i class="bi bi-google text-primary"></i>' : '<i class="bi-star-fill text-success"></i>';
-    $url = !empty($r->review_url) ? $r->review_url : '#';
-    $avatar = !empty($r->reviewer_avatar_url) ? (str_starts_with($r->reviewer_avatar_url, 'http') ? $r->reviewer_avatar_url : asset($r->reviewer_avatar_url)) : asset('images/avatar-default.svg');
-    $fallbackAvatar = asset('images/avatar-default.svg');
-
-    return '
-    <div class="review-card h-100 d-flex flex-column text-start">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <div class="d-flex align-items-center gap-2">
-                <img src="' . htmlspecialchars($avatar) . '" alt="' . htmlspecialchars($r->reviewer_name) . '" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" referrerpolicy="no-referrer" loading="lazy" onerror="this.onerror=null;this.src=\'' . $fallbackAvatar . '\'">
-                <div>
-                    <div class="fw-bold text-dark small">' . htmlspecialchars($r->reviewer_name) . '</div>
-                    <div class="text-muted extra-small" style="font-size: 0.75rem;">' . ($r->published_date ? $r->published_date->format('M Y') : '') . '</div>
-                </div>
-            </div>
-            <div class="d-flex gap-1 small">' . $stars . '</div>
-        </div>
-        ' . ($r->review_title ? '<h6 class="fw-bold mb-2 text-dark line-clamp-1">' . htmlspecialchars($r->review_title) . '</h6>' : '') . '
-        <p class="text-dark small mb-3 flex-grow-1 line-clamp-3" style="font-size: 0.9rem;">"' . htmlspecialchars($r->review_text) . '"</p>
-        <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top border-light">
-            <span class="badge bg-light text-dark rounded-pill px-2 py-1 small fw-normal">' . $sourceIcon . ' ' . ucfirst($r->source) . '</span>
-            <a href="' . htmlspecialchars($url) . '" target="_blank" class="btn btn-sm btn-outline-dark rounded-pill px-3 py-1" style="font-size: 0.8rem;">View</a>
-        </div>
-    </div>';
-}
-@endphp
