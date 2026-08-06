@@ -43,10 +43,30 @@ if (file_exists($publicZip)) {
     echo "public.zip not found at: $publicZip\n";
 }
 
-if ($extractedCore && $extractedPublic) {
+if ($extractedCore || $extractedPublic) {
     echo "SUCCESS: Extraction completed successfully!\n";
-    // Self-destruct
-    unlink(__FILE__);
+    
+    // Purge compiled storage views
+    $possibleViewsDirs = [
+        __DIR__ . '/../storage/framework/views',
+        __DIR__ . '/../dunes-laravel/storage/framework/views',
+        '/home/u410503041/domains/dunesdiscoverytourism.com/storage/framework/views',
+        '/home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/storage/framework/views',
+    ];
+    foreach (array_unique($possibleViewsDirs) as $vDir) {
+        if (is_dir($vDir)) {
+            $files = glob($vDir . '/*');
+            foreach ($files as $file) {
+                if (is_file($file) && basename($file) !== '.gitignore') {
+                    @unlink($file);
+                }
+            }
+        }
+    }
+
+    if (function_exists('opcache_reset')) {
+        @opcache_reset();
+    }
 } else {
     echo "ERROR: Extraction failed. Core: " . ($extractedCore ? 'YES' : 'NO') . ", Public: " . ($extractedPublic ? 'YES' : 'NO') . "\n";
 }

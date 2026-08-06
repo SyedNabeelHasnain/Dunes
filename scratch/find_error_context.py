@@ -9,9 +9,6 @@ try:
 except urllib.error.HTTPError as e:
     html = e.read().decode('utf-8', errors='ignore')
     
-    # Search for any window. variable
-    window_vars = re.findall(r'window\.(\w+)\s*=\s*(.*?);', html, re.DOTALL)
-    for name, val in window_vars:
-        print(f"WINDOW VAR: {name} (len {len(val)})")
-        if len(val) < 500:
-            print("   Val:", val[:200])
+    # Print all occurrences of 'syntax error' or 'unexpected' or 'index.blade.php'
+    for match in re.finditer(r'(syntax error[^\n]*|unexpected[^\n]*|index\.blade\.php[^\n]*)', html, re.IGNORECASE):
+        print("MATCH:", match.group(0)[:150])
