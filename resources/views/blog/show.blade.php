@@ -344,10 +344,11 @@
 .blog-content blockquote { border-left: 4px solid #F58F43; padding: .75rem 1.25rem; margin: 1.5rem 0; background: #fff8f0; border-radius: 0 8px 8px 0; color: #555; font-style: italic; }
 .blog-content img { max-width: 100%; border-radius: 12px; height: auto; margin: 1rem 0; }
 .blog-content a { color: #F58F43; text-decoration: none; font-weight: 500; }
-.blog-content a:hover { text-decoration: underline; }
-.blog-content table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: .9rem; }
-.blog-content table th, .blog-content table td { padding: .6rem 1rem; border: 1px solid #dee2e6; text-align: left; }
-.blog-content table th { background: #f8f9fa; font-weight: 700; }
+.blog-content table { width: 100% !important; border-collapse: collapse !important; margin: 1.5rem 0 !important; font-size: .95rem !important; box-shadow: 0 4px 12px rgba(0,0,0,0.06) !important; border-radius: 10px !important; overflow: hidden !important; }
+.blog-content table th, .blog-content table td { padding: .75rem 1rem !important; border: 1px solid #e2e8f0 !important; text-align: left !important; }
+.blog-content table th, .blog-content table thead th, .blog-content table .table-dark th, .blog-content table tr th { background-color: #0d233a !important; color: #ffffff !important; font-weight: 700 !important; box-shadow: none !important; }
+.blog-content table td { background-color: #ffffff !important; color: #1e293b !important; }
+.blog-content table tr:nth-child(even) td { background-color: #f8fafc !important; }
 .line-clamp-2 { display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden; }
 .object-fit-cover { object-fit: cover; }
 .card-hover { transition: transform .2s, box-shadow .2s; }

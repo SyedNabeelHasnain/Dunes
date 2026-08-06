@@ -50,7 +50,7 @@
                 @endif
             </ol>
         </nav>
-        <h1 class="fw-800 display-6 mb-2">
+        <h1 class="fw-800 display-6 mb-2 text-white" style="color: #ffffff !important;">
             @if ($cat)
                 {{ $cat->name }}
             @elseif ($search)

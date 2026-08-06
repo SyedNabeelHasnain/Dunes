@@ -2588,35 +2588,49 @@ button:focus-visible {
     display: inline-block;
 }
 
-/* High Contrast Blog Content Tables */
-.blog-content table {
+/* High Contrast Global & Blog Content Tables */
+.blog-content table,
+.table-custom table,
+table.table {
     width: 100% !important;
     margin: 1.5rem 0 !important;
     border-collapse: collapse !important;
     box-shadow: 0 4px 12px rgba(0,0,0,0.06) !important;
-    border-radius: 12px !important;
+    border-radius: 10px !important;
     overflow: hidden !important;
 }
 
 .blog-content table th,
 .blog-content table thead th,
 .blog-content table .table-dark th,
-.table-dark th {
-    background-color: #00476d !important;
+.blog-content table tr th,
+.table-dark th,
+.table thead th,
+.table thead tr th {
+    background-color: #0d233a !important;
     color: #ffffff !important;
     font-weight: 700 !important;
     padding: 14px 16px !important;
     border: none !important;
     text-align: left !important;
+    box-shadow: none !important;
+    --bs-table-bg: #0d233a !important;
+    --bs-table-color: #ffffff !important;
 }
 
 .blog-content table td {
     padding: 12px 16px !important;
-    color: #1C1C1E !important;
-    border-bottom: 1px solid #e5e5ea !important;
+    color: #1e293b !important;
+    border-bottom: 1px solid #e2e8f0 !important;
     background-color: #ffffff !important;
 }
 
 .blog-content table tr:nth-child(even) td {
     background-color: #f8fafc !important;
+}
+
+/* Global Dark Section Typography Overrides */
+.bg-dark h1, .bg-dark h2, .bg-dark h3, .bg-dark h4, .bg-dark h5, .bg-dark h6,
+.text-white h1, .text-white h2, .text-white h3, .text-white h4, .text-white h5, .text-white h6 {
+    color: #ffffff !important;
 }
