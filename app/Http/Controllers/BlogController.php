@@ -48,12 +48,28 @@ class BlogController extends Controller
         $categories = BlogCategory::where('status', 'active')->orderBy('priority', 'asc')->get();
         $popularTags = BlogTag::withCount('posts')->orderBy('posts_count', 'desc')->limit(12)->get();
         
-        $featuredPost = BlogPost::where('status', 'published')
+        $featuredPosts = BlogPost::where('status', 'published')
             ->where('is_featured', true)
+            ->with('category')
             ->orderBy('published_at', 'desc')
-            ->first() ?: BlogPost::where('status', 'published')->orderBy('published_at', 'desc')->first();
+            ->take(3)
+            ->get();
 
-        return view('blog.index', compact('posts', 'categories', 'popularTags', 'featuredPost', 'categorySlug', 'tagSlug', 'search'));
+        if ($featuredPosts->count() < 3) {
+            $excludeIds = $featuredPosts->pluck('id')->toArray();
+            $fillers = BlogPost::where('status', 'published')
+                ->whereNotIn('id', $excludeIds)
+                ->with('category')
+                ->orderBy('published_at', 'desc')
+                ->take(3 - $featuredPosts->count())
+                ->get();
+            $featuredPosts = $featuredPosts->concat($fillers);
+        }
+
+        $featuredPost = $featuredPosts->first();
+        $sideFeatured = $featuredPosts->slice(1, 2);
+
+        return view('blog.index', compact('posts', 'categories', 'popularTags', 'featuredPost', 'sideFeatured', 'categorySlug', 'tagSlug', 'search'));
     }
 
     /**

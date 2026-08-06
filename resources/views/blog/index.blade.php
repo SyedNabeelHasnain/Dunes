@@ -94,40 +94,77 @@
 
 <div class="container py-5">
     @if (!$categorySlug && !$search && $page === 1 && $featuredPost)
-    <!-- Featured Post -->
+    <!-- Featured Posts Magazine Grid -->
     <div class="mb-5">
         <div class="d-flex align-items-center gap-2 mb-4">
-            <span class="badge bg-warning text-dark fw-bold px-3 py-2 rounded-pill"><i class="bi bi-star-fill me-1"></i> Featured</span>
+            <span class="badge bg-warning text-dark fw-bold px-3 py-2 rounded-pill"><i class="bi bi-star-fill me-1"></i> Featured Guides</span>
         </div>
-        <div class="row g-4">
+        <div class="row g-4 align-items-stretch">
             @php
                 $featuredImg = $featuredPost->featured_image ? asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $featuredPost->featured_image)) : asset('images/desert-safari-poster.avif');
             @endphp
-            <div class="col-12 col-lg-8">
+            <!-- Main Hero Featured Card -->
+            <div class="col-12 col-lg-7">
                 <a href="{{ route('blog.show', $featuredPost->slug) }}" class="text-decoration-none d-block h-100">
-                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 card-hover bg-white">
-                        <div class="position-relative" style="padding-bottom: 50%;">
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 card-hover bg-white d-flex flex-column">
+                        <div class="position-relative" style="padding-bottom: 54%;">
                             <img src="{{ $featuredImg }}" class="position-absolute w-100 h-100 object-fit-cover" alt="{{ $featuredPost->featured_image_alt ?: $featuredPost->title }}">
                             @if ($featuredPost->category)
-                            <span class="position-absolute top-0 start-0 m-3 badge bg-primary rounded-pill px-3 py-2 fw-bold">{{ $featuredPost->category->name }}</span>
+                            <span class="position-absolute top-0 start-0 m-3 badge bg-primary rounded-pill px-3 py-2 fw-bold shadow-sm">{{ $featuredPost->category->name }}</span>
                             @endif
                         </div>
-                        <div class="card-body p-4">
-                            <h2 class="h4 fw-800 text-dark mb-2 line-clamp-2">{{ $featuredPost->title }}</h2>
-                            @if ($featuredPost->excerpt)
-                                <p class="text-muted small line-clamp-2 mb-3">{{ $featuredPost->excerpt }}</p>
-                            @endif
-                            <div class="d-flex align-items-center gap-3 text-muted small">
-                                <span><i class="bi bi-person me-1"></i>{{ $featuredPost->author_name ?: 'Dunes Discovery' }}</span>
-                                <span><i class="bi bi-clock me-1"></i>{{ $featuredPost->read_time }} min read</span>
+                        <div class="card-body p-4 d-flex flex-column justify-content-between flex-grow-1">
+                            <div>
+                                <h2 class="h4 fw-800 text-dark mb-2 line-clamp-2">{{ $featuredPost->title }}</h2>
+                                @if ($featuredPost->excerpt)
+                                    <p class="text-muted small line-clamp-2 mb-3">{{ $featuredPost->excerpt }}</p>
+                                @endif
+                            </div>
+                            <div class="d-flex align-items-center gap-3 text-muted small pt-2 border-top">
+                                <span><i class="bi bi-person me-1 text-primary"></i>{{ $featuredPost->author_name ?: 'Dunes Discovery' }}</span>
+                                <span><i class="bi bi-clock me-1 text-primary"></i>{{ $featuredPost->read_time }} min read</span>
                                 @if ($featuredPost->published_at)
-                                    <span><i class="bi bi-calendar3 me-1"></i>{{ $featuredPost->published_at->format('M j, Y') }}</span>
+                                    <span><i class="bi bi-calendar3 me-1 text-primary"></i>{{ $featuredPost->published_at->format('M j, Y') }}</span>
                                 @endif
                             </div>
                         </div>
                     </div>
                 </a>
             </div>
+
+            <!-- Side Featured Stack (2 Cards) -->
+            @if (isset($sideFeatured) && $sideFeatured->count() > 0)
+            <div class="col-12 col-lg-5 d-flex flex-column justify-content-between gap-4">
+                @foreach ($sideFeatured as $sidePost)
+                @php
+                    $sideImg = $sidePost->featured_image ? asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $sidePost->featured_image)) : asset('images/desert-safari-poster.avif');
+                @endphp
+                <a href="{{ route('blog.show', $sidePost->slug) }}" class="text-decoration-none d-block flex-grow-1">
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 card-hover bg-white">
+                        <div class="row g-0 h-100 align-items-center">
+                            <div class="col-4 col-sm-4 position-relative h-100" style="min-height: 140px;">
+                                <img src="{{ $sideImg }}" class="position-absolute w-100 h-100 object-fit-cover" alt="{{ $sidePost->featured_image_alt ?: $sidePost->title }}">
+                            </div>
+                            <div class="col-8 col-sm-8">
+                                <div class="card-body p-3">
+                                    @if ($sidePost->category)
+                                    <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1 fw-bold small mb-2 d-inline-block" style="font-size: .75rem;">{{ $sidePost->category->name }}</span>
+                                    @endif
+                                    <h3 class="h6 fw-700 text-dark mb-2 line-clamp-2" style="font-size: .95rem; line-height: 1.35;">{{ $sidePost->title }}</h3>
+                                    <div class="d-flex align-items-center gap-2 text-muted" style="font-size: .75rem;">
+                                        <span><i class="bi bi-clock me-1 text-primary"></i>{{ $sidePost->read_time }} min read</span>
+                                        @if ($sidePost->published_at)
+                                            <span>• {{ $sidePost->published_at->format('M j') }}</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                @endforeach
+            </div>
+            @endif
         </div>
     </div>
     <hr class="my-5 opacity-10">
