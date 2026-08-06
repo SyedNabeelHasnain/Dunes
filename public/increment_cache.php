@@ -62,13 +62,24 @@ try {
         @unlink($packagesCache);
     }
 
-    // 5. Manually clear compiled views
-    $viewsDir = $baseDir . '/storage/framework/views';
-    if (is_dir($viewsDir)) {
-        $files = glob($viewsDir . '/*');
-        foreach ($files as $file) {
-            if (is_file($file) && basename($file) !== '.gitignore') {
-                @unlink($file);
+    // 5. Manually clear compiled views across all potential Hostinger framework directories
+    $possibleViewsDirs = [
+        $baseDir . '/storage/framework/views',
+        __DIR__ . '/../storage/framework/views',
+        __DIR__ . '/../dunes-laravel/storage/framework/views',
+        '/home/u410503041/domains/dunesdiscoverytourism.com/storage/framework/views',
+        '/home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/storage/framework/views',
+    ];
+    $clearedCount = 0;
+    foreach (array_unique($possibleViewsDirs) as $vDir) {
+        if (is_dir($vDir)) {
+            $files = glob($vDir . '/*');
+            foreach ($files as $file) {
+                if (is_file($file) && basename($file) !== '.gitignore') {
+                    if (@unlink($file)) {
+                        $clearedCount++;
+                    }
+                }
             }
         }
     }
