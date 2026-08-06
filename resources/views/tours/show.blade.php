@@ -22,9 +22,9 @@
     {
       "@context": "https://schema.org/",
       "@type": "Product",
-      "name": "{{ e($tour->name) }}",
-      "image": "{{ asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image ?: 'evening-desert-safari-dubai-dune-discovery-tourism.avif')) }}",
-      "description": "{{ e(Str::limit(strip_tags($tour->short_desc ?: $tour->full_desc), 250)) }}",
+      "name": {!! json_encode($tour->name) !!},
+      "image": {!! json_encode(asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image ?: 'evening-desert-safari-dubai-dune-discovery-tourism.avif'))) !!},
+      "description": {!! json_encode(Str::limit(strip_tags($tour->short_desc ?: $tour->full_desc), 250)) !!},
       "sku": "TOUR-{{ $tour->id }}",
       "brand": {
         "@type": "Brand",
@@ -37,7 +37,7 @@
       },
       "offers": {
         "@type": "Offer",
-        "url": "{{ request()->url() }}",
+        "url": {!! json_encode(request()->url()) !!},
         "priceCurrency": "AED",
         "price": "{{ number_format($minPrice, 2, '.', '') }}",
         "priceValidUntil": "2026-12-31",
