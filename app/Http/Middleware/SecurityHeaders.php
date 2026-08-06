@@ -17,10 +17,17 @@ class SecurityHeaders
     {
         $response = $next($request);
 
-        $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
-        $response->headers->set('X-Content-Type-Options', 'nosniff');
-        $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
-        $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+        if ($response && method_exists($response, 'header')) {
+            $response->header('X-Frame-Options', 'SAMEORIGIN');
+            $response->header('X-Content-Type-Options', 'nosniff');
+            $response->header('Referrer-Policy', 'strict-origin-when-cross-origin');
+            $response->header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+        } elseif ($response && isset($response->headers)) {
+            $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
+            $response->headers->set('X-Content-Type-Options', 'nosniff');
+            $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
+            $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+        }
 
         return $response;
     }
