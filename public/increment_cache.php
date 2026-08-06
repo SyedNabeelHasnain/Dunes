@@ -89,7 +89,13 @@ try {
         @opcache_reset();
     }
 
-    echo "SUCCESS: cache_version updated to $newVer (affected rows: $affected). Server-side configuration, route caches, compiled views, and OPcache reset successfully!";
+    $idxPath = $baseDir . '/resources/views/index.blade.php';
+    $appPath = $baseDir . '/resources/views/layouts/app.blade.php';
+    
+    $idxInfo = file_exists($idxPath) ? "lines=" . count(file($idxPath)) : "NOT FOUND";
+    $appInfo = file_exists($appPath) ? "lines=" . count(file($appPath)) . ", @@context=" . (strpos(file_get_contents($appPath), '@@context') !== false ? 'YES' : 'NO') : "NOT FOUND";
+
+    echo "SUCCESS: cache_version updated to $newVer (affected rows: $affected, cleared views: $clearedCount). index.blade ($idxInfo), app.blade ($appInfo). OPcache reset successfully!";
 
 } catch (Exception $e) {
     echo "ERROR: " . $e->getMessage();
