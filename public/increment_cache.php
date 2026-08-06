@@ -3,10 +3,15 @@ if (!isset($_GET['key']) || $_GET['key'] !== 'dunes2026') {
     die('Unauthorized');
 }
 
+// Determine base directory for dunes-laravel or root
+$baseDir = file_exists(__DIR__ . '/../dunes-laravel/.env') 
+    ? __DIR__ . '/../dunes-laravel' 
+    : __DIR__ . '/..';
+
 // 1. Parse .env file
-$envPath = __DIR__ . '/../.env';
+$envPath = $baseDir . '/.env';
 if (!file_exists($envPath)) {
-    die("ERROR: .env file not found");
+    die("ERROR: .env file not found at " . $envPath);
 }
 
 $config = [];
@@ -40,25 +45,25 @@ try {
     $affected = $stmt->rowCount();
 
     // 4. Manually clear Laravel config and route cache files
-    $configCache = __DIR__ . '/../bootstrap/cache/config.php';
+    $configCache = $baseDir . '/bootstrap/cache/config.php';
     if (file_exists($configCache)) {
         @unlink($configCache);
     }
-    $routesCache = __DIR__ . '/../bootstrap/cache/routes-v7.php';
+    $routesCache = $baseDir . '/bootstrap/cache/routes-v7.php';
     if (file_exists($routesCache)) {
         @unlink($routesCache);
     }
-    $servicesCache = __DIR__ . '/../bootstrap/cache/services.php';
+    $servicesCache = $baseDir . '/bootstrap/cache/services.php';
     if (file_exists($servicesCache)) {
         @unlink($servicesCache);
     }
-    $packagesCache = __DIR__ . '/../bootstrap/cache/packages.php';
+    $packagesCache = $baseDir . '/bootstrap/cache/packages.php';
     if (file_exists($packagesCache)) {
         @unlink($packagesCache);
     }
 
     // 5. Manually clear compiled views
-    $viewsDir = __DIR__ . '/../storage/framework/views';
+    $viewsDir = $baseDir . '/storage/framework/views';
     if (is_dir($viewsDir)) {
         $files = glob($viewsDir . '/*');
         foreach ($files as $file) {
