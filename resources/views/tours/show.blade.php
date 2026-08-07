@@ -49,6 +49,28 @@
       }
     }
     </script>
+
+    @if(isset($faqs) && $faqs->count() > 0)
+    <!-- Dynamic FAQPage JSON-LD Schema for Google Rich Snippets & AI Search (GEO) -->
+    <script type="application/ld+json">
+    {
+      "@@context": "https://schema.org",
+      "@@type": "FAQPage",
+      "mainEntity": [
+        @foreach($faqs as $index => $f)
+        {
+          "@@type": "Question",
+          "name": {!! json_encode($f->question) !!},
+          "acceptedAnswer": {
+            "@@type": "Answer",
+            "text": {!! json_encode($f->answer) !!}
+          }
+        }{{ $index < $faqs->count() - 1 ? ',' : '' }}
+        @endforeach
+      ]
+    }
+    </script>
+    @endif
 @endpush
 
 <!-- Ecommerce GTM View Item DataLayer -->
