@@ -52,6 +52,7 @@ jobs:
       run: |
         # Copy public files to staging (including hidden files like .htaccess)
         cp -r public/. deploy/public_deploy/
+        cp public/.htaccess deploy/public_deploy/.htaccess
         
         # Remove images directory from staging to keep the zip small and prevent re-uploading
         rm -rf deploy/public_deploy/images
@@ -65,9 +66,8 @@ jobs:
           fi
         done
 
-        # Package public assets into a zip, excluding unzip.php
-        cd deploy/public_deploy
-        zip -r ../public.zip . -x unzip.php
+        # Zip public assets ensuring .htaccess is included
+        cd deploy/public_deploy && zip -r ../public.zip . .htaccess -x unzip.php
         cd ../..
 
         # Clean staging and place only public.zip and unzip.php
