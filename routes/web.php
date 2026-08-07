@@ -95,13 +95,13 @@ require __DIR__.'/auth.php';
 // ── Legacy AJAX Gateway Route (Throttled for Security) ───────────────────────
 Route::post('/ajax.php', [AjaxGatewayController::class, 'handle'])->middleware('throttle:30,1');
 
-// ── Dynamic XML Sitemap ──────────────────────────────────────────────────────
+// ── Dynamic XML Sitemap & Image Sitemap ──────────────────────────────────────
 Route::get('/sitemap.xml', function() {
-    $tours = \App\Models\Tour::where('status', 'active')->select('slug', 'updated_at')->get();
-    $blogs = \App\Models\BlogPost::where('status', 'published')->select('slug', 'updated_at')->get();
+    $tours = \App\Models\Tour::where('status', 'active')->select('slug', 'name', 'hero_image', 'updated_at')->get();
+    $blogs = \App\Models\BlogPost::where('status', 'published')->select('slug', 'title', 'featured_image', 'updated_at')->get();
 
     $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-    $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+    $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' . "\n";
 
     $staticPages = ['', '/about', '/contact', '/faq', '/tours', '/blog', '/terms-condition', '/privacy-policy'];
     foreach ($staticPages as $page) {
@@ -118,6 +118,13 @@ Route::get('/sitemap.xml', function() {
         $xml .= '    <lastmod>' . ($tour->updated_at ? $tour->updated_at->toAtomString() : now()->toAtomString()) . '</lastmod>' . "\n";
         $xml .= '    <changefreq>daily</changefreq>' . "\n";
         $xml .= '    <priority>0.9</priority>' . "\n";
+        if (!empty($tour->hero_image)) {
+            $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image);
+            $xml .= '    <image:image>' . "\n";
+            $xml .= '      <image:loc>' . asset('images/blog/' . $imgFile) . '</image:loc>' . "\n";
+            $xml .= '      <image:title>' . htmlspecialchars($tour->name) . '</image:title>' . "\n";
+            $xml .= '    </image:image>' . "\n";
+        }
         $xml .= '  </url>' . "\n";
     }
 
@@ -127,6 +134,13 @@ Route::get('/sitemap.xml', function() {
         $xml .= '    <lastmod>' . ($blog->updated_at ? $blog->updated_at->toAtomString() : now()->toAtomString()) . '</lastmod>' . "\n";
         $xml .= '    <changefreq>weekly</changefreq>' . "\n";
         $xml .= '    <priority>0.7</priority>' . "\n";
+        if (!empty($blog->featured_image)) {
+            $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $blog->featured_image);
+            $xml .= '    <image:image>' . "\n";
+            $xml .= '      <image:loc>' . asset('images/blog/' . $imgFile) . '</image:loc>' . "\n";
+            $xml .= '      <image:title>' . htmlspecialchars($blog->title) . '</image:title>' . "\n";
+            $xml .= '    </image:image>' . "\n";
+        }
         $xml .= '  </url>' . "\n";
     }
 

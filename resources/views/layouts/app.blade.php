@@ -51,6 +51,8 @@
     <meta name="robots" content="{{ $pageRobots }}">
     <meta name="author" content="Dunes Discovery Tourism">
     <link rel="canonical" href="{{ $canonical }}">
+    <link rel="alternate" hreflang="en" href="{{ $canonical }}">
+    <link rel="alternate" hreflang="x-default" href="{{ $canonical }}">
     
     <!-- OpenGraph Metadata -->
     <meta property="og:type" content="website">
@@ -159,6 +161,9 @@
 </head>
 <body class="d-flex flex-column min-vh-100">
 
+    <!-- WCAG 2.2 SC 2.4.1 Skip to Main Content Link -->
+    <a href="#main" class="visually-hidden-focusable btn btn-primary position-absolute top-0 start-0 z-3 p-3 m-2 shadow">Skip to main content</a>
+
     @if($googleActive && !empty($gtmId) && strpos($gtmId, 'G-') !== 0)
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ $gtmId }}" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     @endif
@@ -243,7 +248,7 @@
     </header>
 
     <!-- Main Content -->
-    <main id="main">
+    <main id="main" tabindex="-1">
         @yield('content')
     </main>
 

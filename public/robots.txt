@@ -1,4 +1,4 @@
-﻿User-agent: *
+User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /includes/
@@ -15,6 +15,15 @@ User-agent: CCBot
 Allow: /
 
 User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: Diffbot
 Allow: /
 
 Sitemap: https://dunesdiscoverytourism.com/sitemap.xml
