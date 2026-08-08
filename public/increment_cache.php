@@ -44,6 +44,44 @@ try {
     $stmt->execute([$newVer]);
     $affected = $stmt->rowCount();
 
+    // Ensure dune-buggy-rental-dubai exists in tours table
+    $stmtTour = $pdo->prepare("SELECT id FROM tours WHERE slug = 'dune-buggy-rental-dubai'");
+    $stmtTour->execute();
+    $existingTour = $stmtTour->fetch();
+    if (!$existingTour) {
+        $stmtIns = $pdo->prepare("INSERT INTO tours (slug, name, category_id, short_desc, full_desc, duration, pickup_time, dropoff_time, min_age, languages, hero_image, thumb_image, og_image, rating, review_count, is_bestseller, is_featured, status, priority, meta_title, meta_desc, meta_keywords, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
+        $stmtIns->execute([
+            'dune-buggy-rental-dubai',
+            'Dune Buggy Rental Dubai',
+            1,
+            'Unleash the ultimate adrenaline rush in Dubai\'s Lahbab Red Dunes with our self-drive 1000cc Can-Am Maverick X3 and Polaris RZR dune buggies. Conquer towering sand dunes with full safety gear, expert guide instruction, and complimentary hotel pickup.',
+            'Take control of a high-powered 1000cc Can-Am Maverick X3 Turbo or Polaris RZR dune buggy and conquer the open desert of Dubai\'s famous Lahbab Red Dunes. Designed for thrill-seekers, couples, and friends, our self-drive dune buggy tours deliver an unparalleled off-road adventure under the guidance of certified desert rally instructors.',
+            '3 Hours',
+            '7:00 AM / 3:00 PM',
+            '10:00 AM / 6:00 PM',
+            16,
+            'English, Arabic',
+            'quad-biking-desert-safari-dubai-dune-discovery-tourism.avif',
+            'quad-biking-desert-safari-dubai-dune-discovery-tourism.avif',
+            'quad-biking-desert-safari-dubai-dune-discovery-tourism.avif',
+            4.9,
+            642,
+            1,
+            1,
+            'active',
+            4,
+            'Dune Buggy Rental Dubai | 1000cc Can-Am & Polaris | Dunes Discovery',
+            'Rent self-drive 1000cc Can-Am Maverick & Polaris dune buggies in Dubai Lahbab Red Dunes. High-power off-road desert safari with safety gear & hotel pickup.',
+            'dune buggy rental dubai, can am dune buggy dubai, polaris rzr dubai, self drive buggy desert safari, red dunes buggy rental'
+        ]);
+        $newTourId = $pdo->lastInsertId();
+
+        $stmtTier = $pdo->prepare("INSERT INTO tour_tiers (tour_id, tier_id, price, old_price, price_type) VALUES (?, ?, ?, ?, ?)");
+        $stmtTier->execute([$newTourId, 1, 599.00, 750.00, 'per buggy']);
+        $stmtTier->execute([$newTourId, 2, 899.00, 1100.00, 'per buggy']);
+        $stmtTier->execute([$newTourId, 4, 1299.00, 1500.00, 'per buggy']);
+    }
+
     // 4. Manually clear Laravel config and route cache files
     $configCache = $baseDir . '/bootstrap/cache/config.php';
     if (file_exists($configCache)) {
