@@ -20,6 +20,7 @@ class TourSeeder extends Seeder
             return;
         }
 
+        $toursByJsonId = [];
         $tours = json_decode(File::get($toursPath), true);
         foreach ($tours as $t) {
             // Map category enum string to category_id
@@ -56,6 +57,8 @@ class TourSeeder extends Seeder
                     'meta_keywords' => $t['meta_keywords'],
                 ]
             );
+
+            $toursByJsonId[$t['id']] = $tour->id;
         }
 
         // Seed Tour Tiers Relationships
@@ -63,8 +66,9 @@ class TourSeeder extends Seeder
         if (File::exists($tourTiersPath)) {
             $tourTiers = json_decode(File::get($tourTiersPath), true);
             foreach ($tourTiers as $tt) {
+                $actualTourId = $toursByJsonId[$tt['tour_id']] ?? $tt['tour_id'];
                 DB::table('tour_tiers')->updateOrInsert(
-                    ['tour_id' => $tt['tour_id'], 'tier_id' => $tt['tier_id']],
+                    ['tour_id' => $actualTourId, 'tier_id' => $tt['tier_id']],
                     [
                         'price' => (float)$tt['price'],
                         'old_price' => $tt['old_price'] ? (float)$tt['old_price'] : null,
@@ -79,8 +83,9 @@ class TourSeeder extends Seeder
         if (File::exists($tourAddonsPath)) {
             $tourAddons = json_decode(File::get($tourAddonsPath), true);
             foreach ($tourAddons as $ta) {
+                $actualTourId = $toursByJsonId[$ta['tour_id']] ?? $ta['tour_id'];
                 DB::table('tour_addons')->updateOrInsert(
-                    ['tour_id' => $ta['tour_id'], 'addon_id' => $ta['addon_id']],
+                    ['tour_id' => $actualTourId, 'addon_id' => $ta['addon_id']],
                     [
                         'price' => (float)$ta['price'],
                     ]
