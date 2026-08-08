@@ -149,13 +149,23 @@ Route::get('/sitemap.xml', function() {
     return response($xml, 200, ['Content-Type' => 'text/xml']);
 })->name('sitemap');
 
+// ── Explicit High-Value Tour Routes ─────────────────────────────────────────
+Route::get('/evening-desert-safari-dubai', [TourController::class, 'show'])->defaults('slug', 'evening-desert-safari-dubai');
+Route::get('/morning-desert-safari-dubai', [TourController::class, 'show'])->defaults('slug', 'morning-desert-safari-dubai');
+Route::get('/overnight-desert-safari-dubai', [TourController::class, 'show'])->defaults('slug', 'overnight-desert-safari-dubai');
+Route::get('/desert-safari-quad-biking-dubai', [TourController::class, 'show'])->defaults('slug', 'desert-safari-quad-biking-dubai');
+Route::get('/dune-buggy-rental-dubai', [TourController::class, 'show'])->defaults('slug', 'dune-buggy-rental-dubai')->name('tours.buggy');
+Route::get('/dubai-city-tour', [TourController::class, 'show'])->defaults('slug', 'dubai-city-tour');
+Route::get('/abu-dhabi-city-tour-from-dubai', [TourController::class, 'show'])->defaults('slug', 'abu-dhabi-city-tour-from-dubai');
+Route::get('/dhow-cruise-catamaran-cruise-dinner-dubai', [TourController::class, 'show'])->defaults('slug', 'dhow-cruise-catamaran-cruise-dinner-dubai');
+
 // ── SEO 301 Permanent Redirects for Legacy / Shorthand Tour Slugs ───────────
 Route::redirect('/dubai-marina-dhow-cruise', '/dhow-cruise-catamaran-cruise-dinner-dubai', 301);
 Route::redirect('/ocean-empress-dhow-cruise', '/dhow-cruise-catamaran-cruise-dinner-dubai', 301);
 Route::redirect('/abu-dhabi-city-tour', '/abu-dhabi-city-tour-from-dubai', 301);
 Route::redirect('/quad-bike-tour-dubai', '/desert-safari-quad-biking-dubai', 301);
 Route::redirect('/vip-desert-safari-dubai', '/evening-desert-safari-dubai', 301);
-Route::redirect('/buggy-tour-dubai', '/desert-safari-quad-biking-dubai', 301);
+Route::redirect('/buggy-tour-dubai', '/dune-buggy-rental-dubai', 301);
 
 // ── Root-level Dynamic Tour Slugs (Fallback Route) ───────────────────────────
 Route::get('/{slug}', [TourController::class, 'show'])->name('tours.show');
