@@ -41,7 +41,26 @@ class TourController extends Controller
         $tour = Tour::where('slug', $slug)
             ->where('status', 'active')
             ->with(['itineraries', 'tiers', 'addons', 'contentItems', 'category'])
-            ->firstOrFail();
+            ->first();
+
+        if (!$tour) {
+            $toursPath = database_path('seeders/data/tours.json');
+            if (\Illuminate\Support\Facades\File::exists($toursPath)) {
+                $allTours = json_decode(\Illuminate\Support\Facades\File::get($toursPath), true);
+                $found = collect($allTours)->firstWhere('slug', $slug);
+                if ($found) {
+                    (new \Database\Seeders\TourSeeder())->run();
+                    $tour = Tour::where('slug', $slug)
+                        ->where('status', 'active')
+                        ->with(['itineraries', 'tiers', 'addons', 'contentItems', 'category'])
+                        ->first();
+                }
+            }
+        }
+
+        if (!$tour) {
+            abort(404);
+        }
 
         // Separate content items by type
         $highlights = $tour->contentItems->where('type', 'highlight')->sortBy('priority');
