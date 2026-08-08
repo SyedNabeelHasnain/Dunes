@@ -57,14 +57,19 @@ class BlogSeeder extends Seeder
         $postsPath = database_path('seeders/data/blog_posts.json');
         if (File::exists($postsPath)) {
             $posts = json_decode(File::get($postsPath), true);
+            $catMap = BlogCategory::pluck('id', 'slug')->toArray();
+            $defaultCatId = BlogCategory::value('id');
+
             foreach ($posts as $p) {
+                $targetCatId = !empty($p['category_id']) ? (BlogCategory::where('id', $p['category_id'])->value('id') ?? $defaultCatId) : $defaultCatId;
+
                 BlogPost::updateOrCreate(
                     ['slug' => $p['slug']],
                     [
                         'slug' => $p['slug'],
                         'title' => $p['title'],
                         'subtitle' => $p['subtitle'] ?? null,
-                        'category_id' => !empty($p['category_id']) ? (int)$p['category_id'] : null,
+                        'category_id' => $targetCatId,
                         'excerpt' => $p['excerpt'] ?? null,
                         'content' => $p['content'] ?? '',
                         'author_name' => $p['author_name'] ?? 'Dunes Discovery Tourism',
