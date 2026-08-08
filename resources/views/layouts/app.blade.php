@@ -1,18 +1,26 @@
 @php
-    $settings = \Illuminate\Support\Facades\Cache::remember('site_settings_cache', 86400, function() {
-        return \App\Models\Setting::pluck('setting_value', 'setting_key')->all();
-    });
+    try {
+        $settings = \Illuminate\Support\Facades\Cache::remember('site_settings_cache', 86400, function() {
+            return \App\Models\Setting::pluck('setting_value', 'setting_key')->all();
+        });
+    } catch (\Throwable $e) {
+        $settings = null;
+    }
     if (!is_array($settings)) {
-        \Illuminate\Support\Facades\Cache::forget('site_settings_cache');
-        $settings = \App\Models\Setting::pluck('setting_value', 'setting_key')->all();
+        try { \Illuminate\Support\Facades\Cache::forget('site_settings_cache'); } catch (\Throwable $e) {}
+        try { $settings = \App\Models\Setting::pluck('setting_value', 'setting_key')->all(); } catch (\Throwable $e) { $settings = []; }
     }
 
-    $allTours = \Illuminate\Support\Facades\Cache::remember('site_tours_header_cache', 3600, function() {
-        return \App\Models\Tour::where('status', 'active')->orderBy('priority', 'asc')->get();
-    });
+    try {
+        $allTours = \Illuminate\Support\Facades\Cache::remember('site_tours_header_cache', 3600, function() {
+            return \App\Models\Tour::where('status', 'active')->orderBy('priority', 'asc')->get();
+        });
+    } catch (\Throwable $e) {
+        $allTours = null;
+    }
     if (!is_iterable($allTours) || $allTours instanceof \__PHP_Incomplete_Class) {
-        \Illuminate\Support\Facades\Cache::forget('site_tours_header_cache');
-        $allTours = \App\Models\Tour::where('status', 'active')->orderBy('priority', 'asc')->get();
+        try { \Illuminate\Support\Facades\Cache::forget('site_tours_header_cache'); } catch (\Throwable $e) {}
+        try { $allTours = \App\Models\Tour::where('status', 'active')->orderBy('priority', 'asc')->get(); } catch (\Throwable $e) { $allTours = collect(); }
     }
     
     $googleActive = isset($settings['google_active']) && $settings['google_active'] === '1';

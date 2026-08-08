@@ -1,8 +1,16 @@
 @php
-    $modalTours = \App\Models\Tour::where('status', 'active')->orderBy('priority', 'asc')->get();
+    $modalTours = isset($allTours) && count($allTours) ? $allTours : try_get_modal_tours();
     $minDate = date('Y-m-d', strtotime('+1 day'));
-    $ziinaActive = \App\Models\Setting::where('setting_key', 'ziina_active')->value('setting_value') === '1';
-    $advancePercent = (int)(\App\Models\Setting::where('setting_key', 'ziina_advance_percent')->value('setting_value') ?? 10);
+    $ziinaActive = isset($settings['ziina_active']) ? ($settings['ziina_active'] === '1') : false;
+    $advancePercent = (int)($settings['ziina_advance_percent'] ?? 10);
+
+    function try_get_modal_tours() {
+        try {
+            return \App\Models\Tour::where('status', 'active')->orderBy('priority', 'asc')->get();
+        } catch (\Throwable $e) {
+            return collect();
+        }
+    }
 @endphp
 <div class="modal fade" id="bookingModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
