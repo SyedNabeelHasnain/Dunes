@@ -149,6 +149,23 @@ Route::get('/sitemap.xml', function() {
     return response($xml, 200, ['Content-Type' => 'text/xml']);
 })->name('sitemap');
 
+// ── AI Search Engine & LLM Markdown Endpoints (GEO Optimization) ─────────────
+Route::get('/llms.txt', function () {
+    $path = public_path('llms.txt');
+    if (file_exists($path)) {
+        return response(file_get_contents($path), 200, ['Content-Type' => 'text/plain; charset=utf-8']);
+    }
+    abort(404);
+});
+
+Route::get('/llms-full.txt', function () {
+    $path = public_path('llms-full.txt');
+    if (file_exists($path)) {
+        return response(file_get_contents($path), 200, ['Content-Type' => 'text/plain; charset=utf-8']);
+    }
+    abort(404);
+});
+
 // ── Explicit High-Value Tour Routes ─────────────────────────────────────────
 Route::get('/dune-buggy-rental-dubai', [TourController::class, 'showBuggy'])->name('tours.buggy');
 

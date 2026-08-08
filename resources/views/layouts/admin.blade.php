@@ -11,7 +11,16 @@
     <link rel="preload" href="{{ asset('assets/vendor/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="{{ asset('assets/vendor/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css') }}"></noscript>
     <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-    <link href="{{ asset('assets/css/app.css') }}?v={{ \App\Models\Setting::where('setting_key', 'cache_version')->value('setting_value') ?? '1' }}" rel="stylesheet">
+    @php
+        try {
+            $adminCacheVer = \Illuminate\Support\Facades\Cache::remember('cache_ver_admin', 86400, function() {
+                return \App\Models\Setting::where('setting_key', 'cache_version')->value('setting_value') ?? '1';
+            });
+        } catch (\Throwable $e) {
+            $adminCacheVer = time();
+        }
+    @endphp
+    <link href="{{ asset('assets/css/app.css') }}?v={{ $adminCacheVer }}" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>

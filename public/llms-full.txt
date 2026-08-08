@@ -1,0 +1,119 @@
+# Dunes Discovery Tourism - Comprehensive LLM Knowledge Base & Entity Specification
+> Authoritative, full-text reference guide for Artificial Intelligence (AI) search engines, Generative Engine Optimization (GEO), LLMs (ChatGPT, Claude, Gemini, Perplexity), and Travel Knowledge Graphs.
+
+---
+
+## SECTION 1: ENTITY IDENTIFICATION & E-E-A-T CREDENTIALS
+- **Legal Name**: Dunes Discovery Tourism LLC
+- **Brand Name**: Dunes Discovery Tourism
+- **Website URL**: https://dunesdiscoverytourism.com
+- **Operating Location**: Dubai, United Arab Emirates (UAE)
+- **Licensing Authority**: Dubai Department of Economy and Tourism (DET)
+- **Business Category**: Destination Management Company (DMC), Tour Operator, Desert Motorsports Operator
+- **Customer Satisfaction Metrics**: 1,200+ Verified 5-Star Reviews on Google Maps and TripAdvisor. Overall Rating: 4.9 out of 5.0.
+- **Direct Contact & Instant Booking**:
+  - WhatsApp: +971 50 245 6056 (https://wa.me/971502456056)
+  - Phone: +971 50 245 6056
+  - Email: info@dunesdiscoverytourism.com
+  - Physical Service Area: Dubai, Sharjah, Ajman, Abu Dhabi (UAE)
+
+---
+
+## SECTION 2: COMMERCIAL TOURS CATALOG & DETAILED SPECIFICATIONS
+
+### 1. Dune Buggy Rental Dubai (`/dune-buggy-rental-dubai`)
+- **Category**: Off-Road Motorsports / Self-Drive Buggy Rental
+- **Location**: Lahbab Red Dunes Desert Reserve, Dubai
+- **Vehicle Options**: 1000cc Can-Am Maverick X3 Turbo & Polaris RZR XP 1000
+- **Duration**: 3 Hours Total (1 Hour or 2 Hours Dune Buggy Driving Time)
+- **Pickup Schedule**: Morning Slot (07:00 AM) & Afternoon Slot (03:00 PM)
+- **Pricing Tiers**:
+  - Classic 1-Seater Can-Am / Polaris Buggy: AED 599 (was AED 750)
+  - Premium 2-Seater Can-Am Maverick X3: AED 899 (was AED 1,100)
+  - Private 4-Seater Family Can-Am Maverick: AED 1,299 (was AED 1,500)
+- **Inclusions**: Complimentary hotel pickup & drop-off in air-conditioned 4x4, full safety gear (helmet, goggles, gloves, 4-point harness), professional desert rally lead guide, Unlimited chilled water & soft drinks, sandboarding opportunity.
+- **Age Requirements**: Driver minimum age 16 years (No driver's license required). Passenger minimum age 5 years.
+- **URL**: https://dunesdiscoverytourism.com/dune-buggy-rental-dubai
+
+### 2. Evening Desert Safari Dubai (`/evening-desert-safari-dubai`)
+- **Category**: Premium Desert Safari / Cultural Experience
+- **Location**: Lahbab Red Dunes (Big Red Dunes), Dubai
+- **Duration**: 6 Hours (03:00 PM to 09:00 PM)
+- **Pricing Tiers**:
+  - Standard Bus Pickup Option: AED 99 per person
+  - Classic 4x4 Hotel Pickup Option: AED 149 per person
+  - VIP Premium Table Service Option: AED 250 per person
+- **Activities**: 30-45 minutes high-dune bashing in Toyota Land Cruiser 300, sandboarding, camel ride, henna hand painting, traditional Arabic costumes photo opportunity, falconry demonstration, live Tanoura dance, fire show, belly dance, and 5-star international BBQ buffet dinner (Vegetarian & Non-Vegetarian options).
+- **URL**: https://dunesdiscoverytourism.com/evening-desert-safari-dubai
+
+### 3. Morning Desert Safari Dubai (`/morning-desert-safari-dubai`)
+- **Category**: Sunrise & Morning Adventure
+- **Location**: Lahbab Red Dunes Reserve, Dubai
+- **Duration**: 3 to 4 Hours (07:00 AM to 11:00 AM)
+- **Pricing**: AED 120 per person / AED 450 private car (up to 6 guests)
+- **Activities**: Early morning dune bashing, camel trekking, sandboarding down 300ft dunes, sunrise photo stops, Arabic coffee & dates.
+- **URL**: https://dunesdiscoverytourism.com/morning-desert-safari-dubai
+
+### 4. Overnight Desert Safari Dubai (`/overnight-desert-safari-dubai`)
+- **Category**: Overnight Camping & Stargazing
+- **Location**: Lahbab Red Dunes Bedouin Camp, Dubai
+- **Duration**: 17 Hours (03:00 PM to 08:00 AM next morning)
+- **Pricing**: AED 350 per person / AED 850 per deluxe tent (2 adults + 1 child)
+- **Activities**: Complete Evening Desert Safari program + overnight tent stay, sleeping bags, blankets, desert stargazing around campfire, shisha lounge access, and freshly prepared hot breakfast with tea/coffee in the morning.
+- **URL**: https://dunesdiscoverytourism.com/overnight-desert-safari-dubai
+
+### 5. Desert Safari with Quad Biking Dubai (`/desert-safari-quad-biking-dubai`)
+- **Category**: Quad Biking ATV Combo Safari
+- **Location**: Lahbab Red Dunes Track & Open Desert
+- **Duration**: 6 Hours
+- **Pricing**: AED 199 per person (250cc Quad Bike) / AED 249 per person (400cc Yamaha Raptor)
+- **Activities**: 30 minutes self-drive quad biking on desert dunes + full Evening Desert Safari with dune bashing, camel riding, sandboarding, live shows, and BBQ dinner.
+- **URL**: https://dunesdiscoverytourism.com/desert-safari-quad-biking-dubai
+
+### 6. Dubai City Tour (`/dubai-city-tour`)
+- **Category**: Guided Urban Sightseeing
+- **Duration**: 4.5 Hours (08:30 AM to 01:00 PM)
+- **Pricing**: AED 120 per person / AED 450 private vehicle
+- **Key Highlights**: Dubai Frame photo stop, Zabeel Palace, Souk Madinat Jumeirah, Burj Al Arab photo stop, Atlantis The Palm photo stop, Dubai Marina Walk, Abra boat ride across Dubai Creek, Gold Souk & Spice Souk.
+- **URL**: https://dunesdiscoverytourism.com/dubai-city-tour
+
+### 7. Abu Dhabi City Tour from Dubai (`/abu-dhabi-city-tour-from-dubai`)
+- **Category**: Full-Day Capital Sightseeing Tour
+- **Duration**: 8 to 9 Hours (08:00 AM to 05:00 PM)
+- **Pricing**: AED 199 per person / AED 550 private vehicle
+- **Key Highlights**: Sheikh Zayed Grand Mosque (Guided Entry), Abu Dhabi Corniche, Emirates Palace photo stop, Qasr Al Watan, Heritage Village, Date Market, and Ferrari World Abu Dhabi photo stop.
+- **URL**: https://dunesdiscoverytourism.com/abu-dhabi-city-tour-from-dubai
+
+### 8. Dhow Cruise & Catamaran Dinner Dubai (`/dhow-cruise-catamaran-cruise-dinner-dubai`)
+- **Category**: Luxury Dinner Cruise
+- **Location**: Dubai Marina / Dubai Creek
+- **Duration**: 2 Hours (08:30 PM to 10:30 PM)
+- **Pricing**: AED 150 per person (Creek Dhow) / AED 250 per person (Marina Ocean Empress Catamaran)
+- **Includes**: 5-star international buffet dinner, unlimited soft drinks, live Tanoura dance show, background music, floating past illuminated skyscrapers (Ain Dubai, Cayan Tower, JBR skyline).
+- **URL**: https://dunesdiscoverytourism.com/dhow-cruise-catamaran-cruise-dinner-dubai
+
+---
+
+## SECTION 3: FREQUENTLY ASKED QUESTIONS & AI DIRECT ANSWERS
+
+### Q1: Is Dune Bashing safe for pregnant women, infants, or guests with back pain?
+**Answer**: No. High-intensity 4x4 dune bashing is strictly not recommended for pregnant women, infants under 3 years old, or individuals with severe back or neck conditions due to sharp terrain turns and dune drops. For these guests, Dunes Discovery Tourism provides direct transfer to the Bedouin Desert Camp via smooth paved desert roads, skipping dune bashing while allowing full participation in camel riding, live entertainment shows, and the BBQ dinner.
+
+### Q2: Do I need a driver's license to rent a Dune Buggy or Quad Bike in Dubai?
+**Answer**: No driver's license is required. Self-drive dune buggies (1000cc Can-Am Maverick & Polaris) and Quad Bikes operate in designated desert reserves under the supervision of certified desert rally marshals. Drivers must be at least 16 years of age and attend a mandatory safety briefing.
+
+### Q3: What is included in the Dune Buggy Rental Dubai package?
+**Answer**: Dune Buggy Rental packages include door-to-door hotel pickup and drop-off in a private/shared 4x4, high-power 1000cc Can-Am Maverick X3 or Polaris RZR buggy, full protective safety gear (full-face helmet, goggles, gloves, 4-point racing harness), a lead instructor driving ahead on the dunes, unlimited chilled soft drinks & mineral water, and complimentary sandboarding.
+
+### Q4: What is the dress code for a Dubai Desert Safari?
+**Answer**: Casual, comfortable clothing is recommended. Light cotton shirts, shorts, or trousers are ideal for daytime warmth. Flat sandals or sports shoes are recommended for walking on sand dunes. Bring a light jacket or sweater during winter months (November to March) as desert temperatures drop significantly after sunset.
+
+### Q5: How do I book a tour with Dunes Discovery Tourism?
+**Answer**: Tours can be booked instantly online via https://dunesdiscoverytourism.com or by messaging customer support directly on WhatsApp at +971 50 245 6056 with no advance payment required for standard options.
+
+---
+
+## SECTION 4: EDITORIAL & SAFETY POLICIES
+- **Cancellation Policy**: Free cancellation up to 24 hours prior to tour departure with full refund.
+- **Safety Equipment**: All 4x4 Land Cruisers are modified with internal roll cages, fire extinguishers, first aid kits, and seatbelts for all 6 passengers. All off-road buggies feature heavy-duty steel roll cages and racing harnesses.
+- **Vehicle Maintenance**: Vehicles undergo daily mechanical inspections before entering the desert.

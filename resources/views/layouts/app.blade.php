@@ -139,30 +139,67 @@
 
     @stack('preloads')
 
-    <!-- Global TravelAgency JSON-LD Structured Data Schema -->
+    <!-- Global Unified @graph JSON-LD Entity Knowledge Graph & Speakable Schema -->
     <script type="application/ld+json">
     {
       "@@context": "https://schema.org",
-      "@@type": "TravelAgency",
-      "name": "Dunes Discovery Tourism",
-      "image": "{{ asset('images/logo.png') }}",
-      "@@id": "{{ url('/') }}#organization",
-      "url": "{{ url('/') }}",
-      "telephone": "{{ $phone }}",
-      "priceRange": "$$",
-      "address": {
-        "@@type": "PostalAddress",
-        "addressLocality": "Dubai",
-        "addressCountry": "AE"
-      },
-      "geo": {
-        "@@type": "GeoCoordinates",
-        "latitude": 25.2048,
-        "longitude": 55.2708
-      },
-      "sameAs": [
-        "https://www.facebook.com/dunesdiscoverytourism",
-        "https://www.instagram.com/dunesdiscoverytourism"
+      "@@graph": [
+        {
+          "@@type": "TravelAgency",
+          "@@id": "{{ url('/') }}#organization",
+          "name": "Dunes Discovery Tourism",
+          "url": "{{ url('/') }}",
+          "logo": "{{ asset('images/logo.png') }}",
+          "image": "{{ asset('images/desert-safari-poster.avif') }}",
+          "telephone": "{{ $phone }}",
+          "email": "{{ $email }}",
+          "priceRange": "AED 99 - AED 1299",
+          "address": {
+            "@@type": "PostalAddress",
+            "addressLocality": "Dubai",
+            "addressRegion": "Dubai",
+            "addressCountry": "AE"
+          },
+          "geo": {
+            "@@type": "GeoCoordinates",
+            "latitude": 25.2048,
+            "longitude": 55.2708
+          },
+          "openingHoursSpecification": {
+            "@@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+            "opens": "00:00",
+            "closes": "23:59"
+          },
+          "sameAs": [
+            "https://www.facebook.com/dunesdiscoverytourism",
+            "https://www.instagram.com/dunesdiscoverytourism"
+          ]
+        },
+        {
+          "@@type": "WebSite",
+          "@@id": "{{ url('/') }}#website",
+          "url": "{{ url('/') }}",
+          "name": "Dunes Discovery Tourism",
+          "publisher": {
+            "@@id": "{{ url('/') }}#organization"
+          },
+          "inLanguage": "en"
+        },
+        {
+          "@@type": "WebPage",
+          "@@id": "{{ $canonical }}#webpage",
+          "url": "{{ $canonical }}",
+          "name": {!! json_encode($pageTitle) !!},
+          "description": {!! json_encode($pageDesc) !!},
+          "isPartOf": {
+            "@@id": "{{ url('/') }}#website"
+          },
+          "speakable": {
+            "@@type": "SpeakableSpecification",
+            "cssSelector": ["#header", "#footer", "h1", ".hero-title", ".page-summary"]
+          }
+        }
       ]
     }
     </script>
