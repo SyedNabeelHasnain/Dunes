@@ -77,37 +77,26 @@ class TourController extends Controller
                         'meta_keywords' => 'dune buggy rental dubai, can am dune buggy dubai, polaris rzr dubai, self drive buggy desert safari, red dunes buggy rental'
                     ]
                 );
-            } catch (\Throwable $e) {}
 
-            $tour = Tour::where('slug', 'dune-buggy-rental-dubai')
-                ->with(['itineraries', 'tiers', 'addons', 'contentItems', 'category'])
-                ->first();
-        }
-
-            // Attach tiers to tour if missing
-            $existingTierIds = Tier::pluck('id')->toArray();
-            if (empty($existingTierIds)) {
-                try { (new \Database\Seeders\TierSeeder())->run(); } catch (\Throwable $e) {}
-                $existingTierIds = Tier::pluck('id')->toArray();
-            }
-            if ($tour->tiers()->count() === 0 && !empty($existingTierIds)) {
-                $attachData = [];
-                $tierPrices = [
-                    1 => ['price' => 599.00, 'old_price' => 750.00, 'price_type' => 'per buggy'],
-                    2 => ['price' => 899.00, 'old_price' => 1100.00, 'price_type' => 'per buggy'],
-                    4 => ['price' => 1299.00, 'old_price' => 1500.00, 'price_type' => 'per buggy'],
-                ];
-                foreach ($tierPrices as $tId => $pivotData) {
-                    if (in_array($tId, $existingTierIds)) {
-                        $attachData[$tId] = $pivotData;
+                if ($tour && $tour->tiers()->count() === 0) {
+                    $existingTierIds = Tier::pluck('id')->toArray();
+                    $tierPrices = [
+                        1 => ['price' => 599.00, 'old_price' => 750.00, 'price_type' => 'per buggy'],
+                        2 => ['price' => 899.00, 'old_price' => 1100.00, 'price_type' => 'per buggy'],
+                        4 => ['price' => 1299.00, 'old_price' => 1500.00, 'price_type' => 'per buggy'],
+                    ];
+                    $attachData = [];
+                    foreach ($tierPrices as $tId => $pivotData) {
+                        if (in_array($tId, $existingTierIds)) {
+                            $attachData[$tId] = $pivotData;
+                        }
+                    }
+                    if (!empty($attachData)) {
+                        $tour->tiers()->attach($attachData);
                     }
                 }
-                if (!empty($attachData)) {
-                    try { $tour->tiers()->attach($attachData); } catch (\Throwable $e) {}
-                }
-            }
+            } catch (\Throwable $e) {}
 
-            // Reload tour with relations
             $tour = Tour::where('slug', 'dune-buggy-rental-dubai')
                 ->with(['itineraries', 'tiers', 'addons', 'contentItems', 'category'])
                 ->first();
