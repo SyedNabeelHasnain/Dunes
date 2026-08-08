@@ -151,19 +151,31 @@ Route::get('/sitemap.xml', function() {
 
 // ── AI Search Engine & LLM Markdown Endpoints (GEO Optimization) ─────────────
 Route::get('/llms.txt', function () {
-    $path = public_path('llms.txt');
-    if (file_exists($path)) {
-        return response(file_get_contents($path), 200, ['Content-Type' => 'text/plain; charset=utf-8']);
+    $paths = [
+        public_path('llms.txt'),
+        base_path('../public_html/llms.txt'),
+        base_path('public/llms.txt')
+    ];
+    foreach ($paths as $p) {
+        if (file_exists($p)) {
+            return response(file_get_contents($p), 200, ['Content-Type' => 'text/plain; charset=utf-8']);
+        }
     }
-    abort(404);
+    return response("# Dunes Discovery Tourism\nhttps://dunesdiscoverytourism.com\n- Licensed Dubai Tour Operator\n- 1200+ 5-Star Reviews\n- Instant Booking: https://wa.me/971502456056", 200, ['Content-Type' => 'text/plain; charset=utf-8']);
 });
 
 Route::get('/llms-full.txt', function () {
-    $path = public_path('llms-full.txt');
-    if (file_exists($path)) {
-        return response(file_get_contents($path), 200, ['Content-Type' => 'text/plain; charset=utf-8']);
+    $paths = [
+        public_path('llms-full.txt'),
+        base_path('../public_html/llms-full.txt'),
+        base_path('public/llms-full.txt')
+    ];
+    foreach ($paths as $p) {
+        if (file_exists($p)) {
+            return response(file_get_contents($p), 200, ['Content-Type' => 'text/plain; charset=utf-8']);
+        }
     }
-    abort(404);
+    return response("# Dunes Discovery Tourism Full Specifications\nhttps://dunesdiscoverytourism.com\n- Full Tour Catalog & Pricing Tiers available at https://dunesdiscoverytourism.com/tours", 200, ['Content-Type' => 'text/plain; charset=utf-8']);
 });
 
 // ── Explicit High-Value Tour Routes ─────────────────────────────────────────
