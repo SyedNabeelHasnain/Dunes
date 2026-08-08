@@ -59,7 +59,7 @@ class BlogSeeder extends Seeder
             $posts = json_decode(File::get($postsPath), true);
             foreach ($posts as $p) {
                 BlogPost::updateOrCreate(
-                    ['id' => $p['id']],
+                    ['slug' => $p['slug']],
                     [
                         'slug' => $p['slug'],
                         'title' => $p['title'],

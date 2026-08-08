@@ -27,8 +27,8 @@ class TourSeeder extends Seeder
             $category = Category::where('slug', $categorySlug)->first();
             $categoryId = $category ? $category->id : null;
 
-            Tour::updateOrCreate(
-                ['id' => $t['id']],
+            $tour = Tour::updateOrCreate(
+                ['slug' => $t['slug']],
                 [
                     'slug' => $t['slug'],
                     'name' => $t['name'],
