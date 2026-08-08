@@ -110,5 +110,29 @@
         "price": 130,
         "old_price": 150,
         "price_type": "per person"
+    },
+    {
+        "id": 40,
+        "tour_id": 8,
+        "tier_id": 1,
+        "price": 599,
+        "old_price": 750,
+        "price_type": "per buggy"
+    },
+    {
+        "id": 41,
+        "tour_id": 8,
+        "tier_id": 2,
+        "price": 899,
+        "old_price": 1100,
+        "price_type": "per buggy"
+    },
+    {
+        "id": 42,
+        "tour_id": 8,
+        "tier_id": 3,
+        "price": 1299,
+        "old_price": 1500,
+        "price_type": "per buggy"
     }
 ]
