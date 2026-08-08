@@ -130,7 +130,7 @@
     {
         "id": 42,
         "tour_id": 8,
-        "tier_id": 3,
+        "tier_id": 4,
         "price": 1299,
         "old_price": 1500,
         "price_type": "per buggy"
