@@ -150,14 +150,7 @@ Route::get('/sitemap.xml', function() {
 })->name('sitemap');
 
 // ── Explicit High-Value Tour Routes ─────────────────────────────────────────
-Route::get('/evening-desert-safari-dubai', [TourController::class, 'show'])->defaults('slug', 'evening-desert-safari-dubai');
-Route::get('/morning-desert-safari-dubai', [TourController::class, 'show'])->defaults('slug', 'morning-desert-safari-dubai');
-Route::get('/overnight-desert-safari-dubai', [TourController::class, 'show'])->defaults('slug', 'overnight-desert-safari-dubai');
-Route::get('/desert-safari-quad-biking-dubai', [TourController::class, 'show'])->defaults('slug', 'desert-safari-quad-biking-dubai');
-Route::get('/dune-buggy-rental-dubai', [TourController::class, 'show'])->defaults('slug', 'dune-buggy-rental-dubai')->name('tours.buggy');
-Route::get('/dubai-city-tour', [TourController::class, 'show'])->defaults('slug', 'dubai-city-tour');
-Route::get('/abu-dhabi-city-tour-from-dubai', [TourController::class, 'show'])->defaults('slug', 'abu-dhabi-city-tour-from-dubai');
-Route::get('/dhow-cruise-catamaran-cruise-dinner-dubai', [TourController::class, 'show'])->defaults('slug', 'dhow-cruise-catamaran-cruise-dinner-dubai');
+Route::get('/dune-buggy-rental-dubai', fn() => app(TourController::class)->show('dune-buggy-rental-dubai'))->name('tours.buggy');
 
 // ── SEO 301 Permanent Redirects for Legacy / Shorthand Tour Slugs ───────────
 Route::redirect('/dubai-marina-dhow-cruise', '/dhow-cruise-catamaran-cruise-dinner-dubai', 301);
