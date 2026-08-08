@@ -44,9 +44,15 @@ class TourController extends Controller
     public function show(string $slug)
     {
         $tour = Tour::where('slug', $slug)
-            ->where('status', 'active')
             ->with(['itineraries', 'tiers', 'addons', 'contentItems', 'category'])
             ->first();
+
+        if ($tour && $tour->status !== 'active') {
+            try {
+                $tour->status = 'active';
+                $tour->save();
+            } catch (\Throwable $e) {}
+        }
 
         if (!$tour && $slug === 'dune-buggy-rental-dubai') {
             try {
