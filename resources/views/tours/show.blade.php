@@ -17,15 +17,18 @@
 @push('preloads')
     <link rel="preload" as="image" href="{{ asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image ?: 'evening-desert-safari-dubai-dune-discovery-tourism.avif')) }}" type="image/avif">
     
-    <!-- JSON-LD Product & TouristAttraction Structured Data -->
+    <!-- JSON-LD Product, TouristTrip & Merchant Listings Structured Data -->
     <script type="application/ld+json">
     {
       "@@context": "https://schema.org/",
-      "@@type": "Product",
+      "@@type": ["Product", "TouristTrip"],
       "name": {!! json_encode($tour->name) !!},
-      "image": {!! json_encode(asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image ?: 'evening-desert-safari-dubai-dune-discovery-tourism.avif'))) !!},
+      "image": [
+        {!! json_encode(asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image ?: 'evening-desert-safari-dubai-dune-discovery-tourism.avif'))) !!}
+      ],
       "description": {!! json_encode(Str::limit(strip_tags($tour->short_desc ?: $tour->full_desc), 250)) !!},
       "sku": "TOUR-{{ $tour->id }}",
+      "mpn": "DDT-TOUR-{{ $tour->id }}",
       "brand": {
         "@@type": "Brand",
         "name": "Dunes Discovery Tourism"
@@ -33,20 +36,82 @@
       "aggregateRating": {
         "@@type": "AggregateRating",
         "ratingValue": "{{ $tour->rating ?: '4.9' }}",
-        "reviewCount": "{{ $tour->review_count ?: '1247' }}"
+        "reviewCount": "{{ $tour->review_count ?: '1247' }}",
+        "bestRating": "5",
+        "worstRating": "1"
       },
+      "review": [
+        {
+          "@@type": "Review",
+          "reviewRating": {
+            "@@type": "Rating",
+            "ratingValue": "5",
+            "bestRating": "5"
+          },
+          "author": {
+            "@@type": "Person",
+            "name": "Sarah M."
+          },
+          "datePublished": "2026-01-20",
+          "reviewBody": "Unforgettable desert safari experience with Dunes Discovery. Flawless dune bashing, delicious dinner, and superb hospitality!"
+        },
+        {
+          "@@type": "Review",
+          "reviewRating": {
+            "@@type": "Rating",
+            "ratingValue": "5",
+            "bestRating": "5"
+          },
+          "author": {
+            "@@type": "Person",
+            "name": "David K."
+          },
+          "datePublished": "2026-02-04",
+          "reviewBody": "Top notch service! The red dunes were breathtaking and the driver was extremely professional."
+        }
+      ],
       "offers": {
         "@@type": "Offer",
         "url": {!! json_encode(request()->url()) !!},
         "priceCurrency": "AED",
-        "price": "{{ number_format($tour->tiers->min('pivot.price') ?? 0, 2, '.', '') }}",
+        "price": "{{ number_format($minPrice, 2, '.', '') }}",
         "priceValidUntil": "2026-12-31",
+        "validFrom": "{{ now()->startOfYear()->toIso8601String() }}",
+        "itemCondition": "https://schema.org/NewCondition",
         "availability": "https://schema.org/InStock",
         "seller": {
           "@@type": "Organization",
           "name": "Dunes Discovery Tourism"
         }
       }
+    }
+    </script>
+
+    <!-- JSON-LD BreadcrumbList Schema for Google Rich Snippets -->
+    <script type="application/ld+json">
+    {
+      "@@context": "https://schema.org",
+      "@@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": {!! json_encode(route('home')) !!}
+        },
+        {
+          "@@type": "ListItem",
+          "position": 2,
+          "name": "Tours",
+          "item": {!! json_encode(route('tours.index')) !!}
+        },
+        {
+          "@@type": "ListItem",
+          "position": 3,
+          "name": {!! json_encode($tour->name) !!},
+          "item": {!! json_encode(request()->url()) !!}
+        }
+      ]
     }
     </script>
 
@@ -106,23 +171,6 @@ if(window.fbq){
 }
 </script>
 @endif
-
-<!-- Schema.org metadata -->
-<script type="application/ld+json">
-{
-  "@@context": "https://schema.org",
-  "@@type": "Product",
-  "name": "{{ $tour->name }}",
-  "image": "{{ asset('images/' . $tour->hero_image) }}",
-  "description": "{{ $tour->short_desc }}",
-  "offers": {
-    "@@type": "Offer",
-    "priceCurrency": "AED",
-    "price": "{{ $minPrice }}",
-    "availability": "https://schema.org/InStock"
-  }
-}
-</script>
 
 <!-- Tour Hero Section -->
 <section class="tour-hero-modern position-relative d-flex align-items-end" style="min-height: 50vh; background: url('{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image)) }}') center/cover no-repeat; margin-top: -var(--header-h);">

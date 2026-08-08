@@ -18,41 +18,41 @@
     
     // Breadcrumb Schema
     $breadcrumbItems = [
-        ['@@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => route('home')],
-        ['@@type' => 'ListItem', 'position' => 2, 'name' => 'Blog', 'item' => route('blog.index')]
+        ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => route('home')],
+        ['@type' => 'ListItem', 'position' => 2, 'name' => 'Blog', 'item' => route('blog.index')]
     ];
     if ($post->category) {
-        $breadcrumbItems[] = ['@@type' => 'ListItem', 'position' => 3, 'name' => $post->category->name, 'item' => route('blog.index', ['category' => $post->category->slug])];
-        $breadcrumbItems[] = ['@@type' => 'ListItem', 'position' => 4, 'name' => $post->title, 'item' => $canonical];
+        $breadcrumbItems[] = ['@type' => 'ListItem', 'position' => 3, 'name' => $post->category->name, 'item' => route('blog.index', ['category' => $post->category->slug])];
+        $breadcrumbItems[] = ['@type' => 'ListItem', 'position' => 4, 'name' => $post->title, 'item' => $canonical];
     } else {
-        $breadcrumbItems[] = ['@@type' => 'ListItem', 'position' => 3, 'name' => $post->title, 'item' => $canonical];
+        $breadcrumbItems[] = ['@type' => 'ListItem', 'position' => 3, 'name' => $post->title, 'item' => $canonical];
     }
     
     // Article Schema
     $articleSchema = [
-        '@@context' => 'https://schema.org',
-        '@@type' => $post->schema_type ?? 'BlogPosting',
+        '@context' => 'https://schema.org',
+        '@type' => $post->schema_type ?? 'BlogPosting',
         'headline' => $post->title,
         'description' => $pageDesc,
         'image' => [$ogImageUrl],
         'author' => [
-            '@@type' => 'Person',
+            '@type' => 'Person',
             'name' => $authorName,
             'jobTitle' => $authorTitle,
-            'worksFor' => ['@@type' => 'Organization', 'name' => 'Dunes Discovery Tourism', 'url' => route('home')]
+            'worksFor' => ['@type' => 'Organization', 'name' => 'Dunes Discovery Tourism', 'url' => route('home')]
         ],
         'publisher' => [
-            '@@type' => 'Organization',
+            '@type' => 'Organization',
             'name' => 'Dunes Discovery Tourism',
             'url' => route('home'),
-            'logo' => ['@@type' => 'ImageObject', 'url' => asset('images/logo.png'), 'width' => 160, 'height' => 46]
+            'logo' => ['@type' => 'ImageObject', 'url' => asset('images/logo.png'), 'width' => 160, 'height' => 46]
         ],
         'datePublished' => $publishedAt ? $publishedAt->toIso8601String() : now()->toIso8601String(),
         'dateModified' => $modifiedAt ? $modifiedAt->toIso8601String() : now()->toIso8601String(),
-        'mainEntityOfPage' => ['@@type' => 'WebPage', '@@id' => $canonical],
+        'mainEntityOfPage' => ['@type' => 'WebPage', '@id' => $canonical],
         'url' => $canonical,
         'wordCount' => str_word_count(strip_tags($post->content ?? '')),
-        'timeRequired' => 'PT' . (int)$post->read_time . 'M',
+        'timeRequired' => 'PT' . (int)($post->read_time ?: 5) . 'M',
         'inLanguage' => 'en',
         'keywords' => $pageKeys,
         'articleSection' => $post->category ? $post->category->name : 'Travel'
@@ -71,7 +71,7 @@
 @endpush
 
 <script type="application/ld+json">{!! json_encode($articleSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
-<script type="application/ld+json">{!! json_encode(['@@context'=>'https://schema.org','@@type'=>'BreadcrumbList','itemListElement'=>$breadcrumbItems]) !!}</script>
+<script type="application/ld+json">{!! json_encode(['@context'=>'https://schema.org','@type'=>'BreadcrumbList','itemListElement'=>$breadcrumbItems], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
 @if ($post->faqs->count() > 0)
 <script type="application/ld+json">
 {
