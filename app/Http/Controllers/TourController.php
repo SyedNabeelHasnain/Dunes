@@ -15,6 +15,17 @@ class TourController extends Controller
      */
     public function index(Request $request)
     {
+        if (\App\Models\Category::count() === 0) {
+            try {
+                (new \Database\Seeders\CategorySeeder())->run();
+            } catch (\Throwable $e) {}
+        }
+        if (Tour::count() === 0) {
+            try {
+                (new \Database\Seeders\TourSeeder())->run();
+            } catch (\Throwable $e) {}
+        }
+
         $selectedCategorySlug = $request->input('category');
         
         $categories = Category::orderBy('priority', 'asc')->get();
