@@ -33,6 +33,11 @@ class TourController extends Controller
         return view('tours.index', compact('categories', 'tours', 'selectedCategorySlug'));
     }
 
+    public function showBuggy()
+    {
+        return $this->show('dune-buggy-rental-dubai');
+    }
+
     /**
      * Display details for a specific tour.
      */

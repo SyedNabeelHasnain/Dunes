@@ -150,7 +150,7 @@ Route::get('/sitemap.xml', function() {
 })->name('sitemap');
 
 // ── Explicit High-Value Tour Routes ─────────────────────────────────────────
-Route::get('/dune-buggy-rental-dubai', fn() => app(TourController::class)->show('dune-buggy-rental-dubai'))->name('tours.buggy');
+Route::get('/dune-buggy-rental-dubai', [TourController::class, 'showBuggy'])->name('tours.buggy');
 
 // ── SEO 301 Permanent Redirects for Legacy / Shorthand Tour Slugs ───────────
 Route::redirect('/dubai-marina-dhow-cruise', '/dhow-cruise-catamaran-cruise-dinner-dubai', 301);
