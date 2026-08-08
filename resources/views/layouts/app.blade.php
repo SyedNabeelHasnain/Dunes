@@ -165,6 +165,22 @@
             "latitude": 25.2048,
             "longitude": 55.2708
           },
+          "contactPoint": [
+            {
+              "@@type": "ContactPoint",
+              "telephone": "{{ $phone }}",
+              "contactType": "customer service",
+              "areaServed": "AE",
+              "availableLanguage": ["en", "ar"]
+            },
+            {
+              "@@type": "ContactPoint",
+              "telephone": "+971502456056",
+              "contactType": "reservations",
+              "areaServed": "AE",
+              "availableLanguage": ["en", "ar"]
+            }
+          ],
           "openingHoursSpecification": {
             "@@type": "OpeningHoursSpecification",
             "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
@@ -183,6 +199,14 @@
           "name": "Dunes Discovery Tourism",
           "publisher": {
             "@@id": "{{ url('/') }}#organization"
+          },
+          "potentialAction": {
+            "@@type": "SearchAction",
+            "target": {
+              "@@type": "EntryPoint",
+              "urlTemplate": "{{ url('/tours') }}?search={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
           },
           "inLanguage": "en"
         },

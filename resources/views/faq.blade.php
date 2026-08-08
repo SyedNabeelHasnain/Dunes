@@ -19,6 +19,27 @@
 }
 </script>
 
+@if(isset($faqs) && $faqs->count() > 0)
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "FAQPage",
+  "mainEntity": [
+    @foreach($faqs as $index => $f)
+    {
+      "@@type": "Question",
+      "name": {!! json_encode($f->question) !!},
+      "acceptedAnswer": {
+        "@@type": "Answer",
+        "text": {!! json_encode($f->answer) !!}
+      }
+    }{{ $index < $faqs->count() - 1 ? ',' : '' }}
+    @endforeach
+  ]
+}
+</script>
+@endif
+
 <section class="page-header py-3 bg-dark text-white position-relative overflow-hidden" style="margin-top: -var(--header-h);">
     <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{{ asset('images/abu-dhabi-city-tour-hero.avif') }}') center/cover;"></div>
     <div class="container position-relative z-1 pt-5">
