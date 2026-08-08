@@ -73,12 +73,26 @@ class TourController extends Controller
             );
 
             // Attach tiers to tour if missing
-            if ($tour->tiers()->count() === 0) {
-                $tour->tiers()->attach([
+            $existingTierIds = Tier::pluck('id')->toArray();
+            if (empty($existingTierIds)) {
+                try { (new \Database\Seeders\TierSeeder())->run(); } catch (\Throwable $e) {}
+                $existingTierIds = Tier::pluck('id')->toArray();
+            }
+            if ($tour->tiers()->count() === 0 && !empty($existingTierIds)) {
+                $attachData = [];
+                $tierPrices = [
                     1 => ['price' => 599.00, 'old_price' => 750.00, 'price_type' => 'per buggy'],
                     2 => ['price' => 899.00, 'old_price' => 1100.00, 'price_type' => 'per buggy'],
-                    4 => ['price' => 1299.00, 'old_price' => 1500.00, 'price_type' => 'per buggy']
-                ]);
+                    4 => ['price' => 1299.00, 'old_price' => 1500.00, 'price_type' => 'per buggy'],
+                ];
+                foreach ($tierPrices as $tId => $pivotData) {
+                    if (in_array($tId, $existingTierIds)) {
+                        $attachData[$tId] = $pivotData;
+                    }
+                }
+                if (!empty($attachData)) {
+                    try { $tour->tiers()->attach($attachData); } catch (\Throwable $e) {}
+                }
             }
 
             // Reload tour with relations
