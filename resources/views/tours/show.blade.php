@@ -558,7 +558,7 @@ if(window.fbq){
                 <article class="card card-modern h-100 border-0 shadow-sm bg-white">
                     <a href="{{ route('tours.show', $t->slug) }}" class="text-decoration-none text-dark d-flex flex-column h-100">
                         <div class="card-img-wrapper position-relative overflow-hidden" style="aspect-ratio: 16/10;">
-                            <img src="{{ asset('images/' . $t->thumb_image) }}" class="card-img-top w-100 h-100" alt="{{ $t->name }}" loading="lazy" style="object-fit: cover;">
+                            <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" class="card-img-top w-100 h-100" alt="{{ $t->name }}" loading="lazy" style="object-fit: cover;">
                             @if($t->is_bestseller)
                             <span class="badge bg-primary position-absolute top-0 start-0 m-3 rounded-pill shadow-sm">
                                 <i class="bi bi-fire me-1"></i>Best Seller

@@ -335,7 +335,7 @@
             <div class="mb-3">
                 <label for="hero_image" class="form-label fw-bold text-dark">Hero Banner Image</label>
                 @if($tour->hero_image)
-                    <div class="mb-2"><img src="{{ Storage::url($tour->hero_image) }}" style="max-height:80px; border-radius:6px; object-fit:cover;" class="w-100 border"></div>
+                    <div class="mb-2"><img src="{{ Storage::url($tour->hero_image) }}" alt="{{ $tour->name }}" style="max-height:80px; border-radius:6px; object-fit:cover;" class="w-100 border"></div>
                 @endif
                 <input type="file" name="hero_image" form="editTourForm" id="hero_image" class="form-control">
             </div>
@@ -343,7 +343,7 @@
             <div class="mb-0">
                 <label for="thumb_image" class="form-label fw-bold text-dark">Thumbnail Image</label>
                 @if($tour->thumb_image)
-                    <div class="mb-2"><img src="{{ Storage::url($tour->thumb_image) }}" style="max-height:80px; border-radius:6px; object-fit:cover;" class="w-100 border"></div>
+                    <div class="mb-2"><img src="{{ Storage::url($tour->thumb_image) }}" alt="{{ $tour->name }}" style="max-height:80px; border-radius:6px; object-fit:cover;" class="w-100 border"></div>
                 @endif
                 <input type="file" name="thumb_image" form="editTourForm" id="thumb_image" class="form-control">
             </div>

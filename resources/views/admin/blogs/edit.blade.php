@@ -150,7 +150,7 @@
                         <div class="mb-3">
                             <label for="featured_image" class="form-label fw-bold text-dark">Featured Image</label>
                             @if($post->featured_image)
-                                <div class="mb-2"><img src="{{ asset('images/blog/' . $post->featured_image) }}" style="max-height: 100px; border-radius:6px; object-fit:cover;" class="w-100 border"></div>
+                                <div class="mb-2"><img src="{{ asset('images/blog/' . $post->featured_image) }}" alt="{{ $post->title }}" style="max-height: 100px; border-radius:6px; object-fit:cover;" class="w-100 border"></div>
                             @endif
                             <input type="file" name="featured_image" id="featured_image" class="form-control">
                             <div class="form-text">Max size 4MB. PNG, JPG, WEBP.</div>
