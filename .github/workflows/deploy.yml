@@ -78,6 +78,7 @@ jobs:
     - name: Prepare Core Code Staging
       env:
         DB_PASS: ${{ secrets.DB_PASSWORD || vars.DB_PASSWORD || 'P@kistanZindaBad123!@#' }}
+        MAIL_PASS: ${{ secrets.MAIL_PASSWORD || vars.MAIL_PASSWORD || 'Zubairkhan@2025' }}
       run: |
         # Generate the .env file in the runner from .env.example
         cp .env.example .env
@@ -90,6 +91,15 @@ jobs:
         # Quote the password to protect # from dotenv comment parsing
         sed -i '/^DB_PASSWORD=/d' .env
         printf 'DB_PASSWORD="%s"\n' "$DB_PASS" >> .env
+
+        # Populate MAIL credentials (ROOT CAUSE FIX: MAIL_PASSWORD was empty on Hostinger)
+        sed -i '/^MAIL_PASSWORD=/d' .env
+        printf 'MAIL_PASSWORD="%s"\n' "$MAIL_PASS" >> .env
+
+        # Set production APP_* values
+        sed -i "s|APP_ENV=local|APP_ENV=production|g" .env
+        sed -i "s|APP_DEBUG=true|APP_DEBUG=false|g" .env
+        sed -i "s|APP_URL=http://localhost|APP_URL=https://dunesdiscoverytourism.com|g" .env
 
         # Copy core Laravel directories and files, excluding public assets, node_modules, compiled views and git history
         rsync -arv --exclude="public" --exclude="node_modules" --exclude=".git" --exclude=".github" --exclude="deploy" --exclude="storage/framework/views/*" --exclude="storage/framework/cache/*" --exclude="storage/logs/*" ./ deploy/core_deploy/
