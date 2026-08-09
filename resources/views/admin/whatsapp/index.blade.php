@@ -66,7 +66,7 @@
                                     data-context="{{ $lead->tour_name ?: 'General Inquiry' }}"
                                     data-url="{{ $lead->page_url }}"
                                     data-msg="{{ $lead->message_text }}"
-                                    data-ip="{{ $lead->ip_address }}"
+                                    data-ip="{{ $lead->client_ip ?? $lead->ip_address ?? 'Not Available' }}"
                                     data-location="{{ ($lead->city ?? 'Unknown') . ', ' . ($lead->country ?? '') }}"
                                     data-device="{{ ucfirst($lead->device_type ?? '-') }} ({{ $lead->os_name ?? '-' }} / {{ $lead->browser_name ?? '-' }})">
                                 <i class="bi bi-search"></i>
