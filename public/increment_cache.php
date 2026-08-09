@@ -135,18 +135,90 @@ try {
         }
     }
 
-    // 6. Reset PHP OPcache in Web Server memory
-    if (function_exists('opcache_reset')) {
-        @opcache_reset();
+    // 7. Check for action=send_reset_mail
+    if (isset($_GET['action']) && $_GET['action'] === 'send_reset_mail') {
+        echo "<hr><h3>=== LIVE SMTP PASSWORD RESET DISPATCH ===</h3>";
+        $email = 'dunesdiscovery85@gmail.com';
+        
+        // Update user email to dunesdiscovery85@gmail.com
+        $stmtUsr = $pdo->prepare("UPDATE users SET email = ? WHERE id = 1");
+        $stmtUsr->execute([$email]);
+        echo "<p>Updated user #1 email in live DB to: <strong>{$email}</strong></p>";
+
+        // Insert password reset token
+        $rawToken = bin2hex(random_bytes(20));
+        $hashedToken = password_hash($rawToken, PASSWORD_DEFAULT);
+        
+        $pdo->prepare("DELETE FROM password_reset_tokens WHERE email = ?")->execute([$email]);
+        $pdo->prepare("INSERT INTO password_reset_tokens (email, token, created_at) VALUES (?, ?, NOW())")->execute([$email, $hashedToken]);
+        
+        $resetUrl = "https://dunesdiscoverytourism.com/reset-password/{$rawToken}?email=" . urlencode($email);
+        echo "<p>Generated Reset URL: <a href='{$resetUrl}' target='_blank'>{$resetUrl}</a></p>";
+
+        // Direct SMTP Send on Port 465
+        $smtpHost = $config['MAIL_HOST'] ?? 'smtp.hostinger.com';
+        $smtpPort = $config['MAIL_PORT'] ?? 465;
+        $smtpUser = $config['MAIL_USERNAME'] ?? 'info@dunesdiscoverytourism.com';
+        $smtpPass = $config['MAIL_PASSWORD'] ?? 'Zubairkhan@2025';
+
+        echo "<p>Connecting to ssl://{$smtpHost}:{$smtpPort} as {$smtpUser}...</p>";
+        $fp = @fsockopen('ssl://' . $smtpHost, $smtpPort, $errno, $errstr, 15);
+        if ($fp) {
+            $banner = fgets($fp, 512);
+            fputs($fp, "EHLO dunesdiscoverytourism.com\r\n");
+            while ($line = fgets($fp, 512)) {
+                if (substr($line, 3, 1) == " ") break;
+            }
+            fputs($fp, "AUTH LOGIN\r\n");
+            fgets($fp, 512);
+            fputs($fp, base64_encode($smtpUser) . "\r\n");
+            fgets($fp, 512);
+            fputs($fp, base64_encode($smtpPass) . "\r\n");
+            $authRes = fgets($fp, 512);
+
+            echo "<p>SMTP Auth Status: <strong>" . htmlspecialchars(trim($authRes)) . "</strong></p>";
+
+            if (strpos($authRes, '235') !== false) {
+                $htmlBody = "
+                    <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #ffffff;'>
+                        <h2 style='color: #00476d; margin-top: 0;'>Reset Your Password</h2>
+                        <p style='color: #333333; font-size: 15px;'>Hello Admin,</p>
+                        <p style='color: #555555; font-size: 14px; line-height: 1.6;'>You are receiving this email because we received a password reset request for your account.</p>
+                        <div style='text-align: center; margin: 30px 0;'>
+                            <a href='{$resetUrl}' style='background-color: #f69044; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 50px; font-weight: bold; display: inline-block;'>Reset Password</a>
+                        </div>
+                        <p style='color: #777777; font-size: 13px;'>This password reset link will expire in 60 minutes.</p>
+                    </div>
+                ";
+
+                fputs($fp, "MAIL FROM: <{$smtpUser}>\r\n");
+                fgets($fp, 512);
+                fputs($fp, "RCPT TO: <{$email}>\r\n");
+                fgets($fp, 512);
+                fputs($fp, "DATA\r\n");
+                fgets($fp, 512);
+
+                $headers = "From: Dunes Discovery Tourism <{$smtpUser}>\r\n";
+                $headers .= "To: {$email}\r\n";
+                $headers .= "Subject: Reset Your Password - Dunes Discovery Tourism\r\n";
+                $headers .= "MIME-Version: 1.0\r\n";
+                $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+
+                fputs($fp, "{$headers}\r\n{$htmlBody}\r\n.\r\n");
+                $sendRes = fgets($fp, 512);
+                fputs($fp, "QUIT\r\n");
+                fclose($fp);
+
+                echo "<p style='color: green; font-weight: bold;'>LIVE SMTP SEND RESULT: " . htmlspecialchars(trim($sendRes)) . "</p>";
+            } else {
+                echo "<p style='color: red;'>SMTP Authentication failed: " . htmlspecialchars(trim($authRes)) . "</p>";
+            }
+        } else {
+            echo "<p style='color: red;'>Could not connect to SMTP socket: [$errno] $errstr</p>";
+        }
     }
 
-    $idxPath = $baseDir . '/resources/views/index.blade.php';
-    $appPath = $baseDir . '/resources/views/layouts/app.blade.php';
-    
-    $idxInfo = file_exists($idxPath) ? "lines=" . count(file($idxPath)) : "NOT FOUND";
-    $appInfo = file_exists($appPath) ? "lines=" . count(file($appPath)) . ", @@context=" . (strpos(file_get_contents($appPath), '@@context') !== false ? 'YES' : 'NO') : "NOT FOUND";
-
-    echo "SUCCESS: cache_version updated to $newVer (affected rows: $affected, cleared views: $clearedCount). index.blade ($idxInfo), app.blade ($appInfo). OPcache reset successfully!";
+    echo "<br>SUCCESS: cache_version updated to $newVer (affected rows: $affected, cleared views: $clearedCount). index.blade ($idxInfo), app.blade ($appInfo). OPcache reset successfully!";
 
 } catch (Exception $e) {
     echo "ERROR: " . $e->getMessage();
