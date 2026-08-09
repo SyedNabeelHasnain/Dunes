@@ -14,9 +14,15 @@ class BlogController extends Controller
      */
     public function index(Request $request)
     {
-        if (BlogCategory::count() === 0 || BlogPost::count() === 0) {
+        if (BlogPost::count() === 0) {
             try {
                 (new \Database\Seeders\BlogSeeder())->run();
+            } catch (\Throwable $e) {}
+        }
+
+        if (BlogPost::where('status', 'published')->count() === 0) {
+            try {
+                BlogPost::query()->update(['status' => 'published']);
             } catch (\Throwable $e) {}
         }
 
