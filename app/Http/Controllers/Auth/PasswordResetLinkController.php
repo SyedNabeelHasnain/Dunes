@@ -30,12 +30,14 @@ class PasswordResetLinkController extends Controller
             'email' => ['required', 'email'],
         ]);
 
-        // We will send the password reset link to this user. Once we have attempted
-        // to send the link, we will examine the response then see the message we
-        // need to show to the user. Finally, we'll send out a proper response.
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
+        try {
+            $status = Password::sendResetLink(
+                $request->only('email')
+            );
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Password reset email dispatch error: ' . $e->getMessage());
+            return back()->with('status', 'We have received your password reset request. If the email address is registered, a reset link will be dispatched shortly.');
+        }
 
         return $status == Password::RESET_LINK_SENT
                     ? back()->with('status', __($status))
