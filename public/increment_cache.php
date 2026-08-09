@@ -135,7 +135,183 @@ try {
         }
     }
 
-    // 7. Check for action=send_reset_mail
+    // --- Compute view info before any action blocks ---
+    $idxPath = $baseDir . '/resources/views/index.blade.php';
+    $appPath = $baseDir . '/resources/views/layouts/app.blade.php';
+    $idxInfo = file_exists($idxPath) ? "lines=" . count(file($idxPath)) : "NOT FOUND";
+    $appInfo = file_exists($appPath) ? "lines=" . count(file($appPath)) : "NOT FOUND";
+
+    // 6. Reset PHP OPcache in Web Server memory
+    if (function_exists('opcache_reset')) {
+        @opcache_reset();
+    }
+
+    // ── ACTION: diagnose_mail ─────────────────────────────────────────────────
+    if (isset($_GET['action']) && $_GET['action'] === 'diagnose_mail') {
+        header('Content-Type: text/plain; charset=utf-8');
+
+        echo "=== LIVE MAIL CONFIGURATION DIAGNOSIS ===\n\n";
+        echo "ENV_PATH: {$envPath}\n";
+        echo "BASE_DIR: {$baseDir}\n\n";
+
+        // Show all MAIL_* settings from .env
+        $mailKeys = ['MAIL_MAILER','MAIL_SCHEME','MAIL_HOST','MAIL_PORT',
+                     'MAIL_USERNAME','MAIL_PASSWORD','MAIL_ENCRYPTION',
+                     'MAIL_FROM_ADDRESS','MAIL_FROM_NAME','MAIL_DOMAIN_HOST'];
+        foreach ($mailKeys as $mk) {
+            $val = $config[$mk] ?? '<<NOT SET>>';
+            if ($mk === 'MAIL_PASSWORD') {
+                $len = strlen($val);
+                $masked = $len > 0 ? substr($val, 0, 2) . str_repeat('*', max(0, $len - 4)) . substr($val, -2) : '<<EMPTY>>';
+                echo "{$mk} = {$masked} (length={$len})\n";
+            } else {
+                echo "{$mk} = {$val}\n";
+            }
+        }
+
+        // Show APP_* settings
+        echo "\nAPP_ENV = " . ($config['APP_ENV'] ?? '<<NOT SET>>') . "\n";
+        echo "APP_DEBUG = " . ($config['APP_DEBUG'] ?? '<<NOT SET>>') . "\n";
+        echo "APP_URL = " . ($config['APP_URL'] ?? '<<NOT SET>>') . "\n";
+
+        // Check if password is empty
+        $smtpUser = $config['MAIL_USERNAME'] ?? '';
+        $smtpPass = $config['MAIL_PASSWORD'] ?? '';
+        $smtpHost = $config['MAIL_HOST'] ?? 'smtp.hostinger.com';
+        $smtpPort = 465;
+
+        echo "\n=== RAW SMTP SOCKET TEST (ssl://{$smtpHost}:{$smtpPort}) ===\n";
+
+        if (empty($smtpPass)) {
+            echo "\n*** CRITICAL: MAIL_PASSWORD IS EMPTY! ***\n";
+            echo "This is the ROOT CAUSE - SMTP authentication will fail\n";
+            echo "because the deployment workflow does not populate MAIL_PASSWORD.\n";
+        }
+
+        $fp = @fsockopen('ssl://' . $smtpHost, $smtpPort, $errno, $errstr, 15);
+        if (!$fp) {
+            echo "SOCKET CONNECT FAILED: [{$errno}] {$errstr}\n";
+        } else {
+            $banner = fgets($fp, 512);
+            echo "BANNER: " . trim($banner) . "\n";
+
+            fputs($fp, "EHLO dunesdiscoverytourism.com\r\n");
+            $ehloResp = '';
+            while ($line = fgets($fp, 512)) {
+                $ehloResp .= $line;
+                if (substr($line, 3, 1) == " ") break;
+            }
+            echo "EHLO OK\n";
+
+            fputs($fp, "AUTH LOGIN\r\n");
+            $r = fgets($fp, 512);
+            echo "AUTH LOGIN: " . trim($r) . "\n";
+
+            fputs($fp, base64_encode($smtpUser) . "\r\n");
+            $r = fgets($fp, 512);
+            echo "USERNAME SENT: " . trim($r) . "\n";
+
+            fputs($fp, base64_encode($smtpPass) . "\r\n");
+            $authResult = fgets($fp, 512);
+            echo "AUTH RESULT: " . trim($authResult) . "\n";
+
+            if (strpos($authResult, '235') !== false) {
+                echo "\n*** SMTP AUTH SUCCEEDED ***\n";
+
+                // Send a test email
+                fputs($fp, "MAIL FROM: <{$smtpUser}>\r\n");
+                $r = fgets($fp, 512);
+                echo "MAIL FROM: " . trim($r) . "\n";
+
+                fputs($fp, "RCPT TO: <dunesdiscovery85@gmail.com>\r\n");
+                $r = fgets($fp, 512);
+                echo "RCPT TO: " . trim($r) . "\n";
+
+                fputs($fp, "DATA\r\n");
+                $r = fgets($fp, 512);
+                echo "DATA: " . trim($r) . "\n";
+
+                $msgId = uniqid('diag-', true);
+                $body = "From: Dunes Discovery Tourism <{$smtpUser}>\r\n";
+                $body .= "To: dunesdiscovery85@gmail.com\r\n";
+                $body .= "Subject: [DIAGNOSTIC] Password Reset SMTP Test - {$msgId}\r\n";
+                $body .= "MIME-Version: 1.0\r\n";
+                $body .= "Content-Type: text/html; charset=UTF-8\r\n";
+                $body .= "\r\n";
+                $body .= "<p>This is a diagnostic test email sent from increment_cache.php diagnose_mail action.</p>";
+                $body .= "<p>Message ID: {$msgId}</p>";
+                $body .= "<p>Timestamp: " . date('Y-m-d H:i:s T') . "</p>";
+                $body .= "\r\n.\r\n";
+
+                fputs($fp, $body);
+                $sendResult = fgets($fp, 512);
+                echo "SEND RESULT: " . trim($sendResult) . "\n";
+
+                if (strpos($sendResult, '250') !== false) {
+                    echo "\n*** EMAIL SENT SUCCESSFULLY! Check dunesdiscovery85@gmail.com ***\n";
+                } else {
+                    echo "\n*** EMAIL SEND FAILED ***\n";
+                }
+            } else {
+                echo "\n*** SMTP AUTH FAILED ***\n";
+                echo "The MAIL_PASSWORD in .env is incorrect or empty.\n";
+            }
+
+            fputs($fp, "QUIT\r\n");
+            fclose($fp);
+        }
+
+        // Check what users table has
+        echo "\n=== USER TABLE CHECK ===\n";
+        $stmtU = $pdo->prepare("SELECT id, name, email FROM users LIMIT 5");
+        $stmtU->execute();
+        $users = $stmtU->fetchAll();
+        foreach ($users as $u) {
+            echo "User #{$u['id']}: {$u['name']} <{$u['email']}>\n";
+        }
+
+        // Check password_reset_tokens
+        echo "\n=== PASSWORD RESET TOKENS ===\n";
+        $stmtT = $pdo->prepare("SELECT email, LEFT(token,20) as token_prefix, created_at FROM password_reset_tokens ORDER BY created_at DESC LIMIT 5");
+        $stmtT->execute();
+        $tokens = $stmtT->fetchAll();
+        if (empty($tokens)) {
+            echo "No tokens found.\n";
+        } else {
+            foreach ($tokens as $t) {
+                echo "{$t['email']} | token: {$t['token_prefix']}... | created: {$t['created_at']}\n";
+            }
+        }
+
+        // Check Laravel log for recent errors
+        echo "\n=== RECENT LARAVEL LOG ERRORS ===\n";
+        $logPath = $baseDir . '/storage/logs/laravel.log';
+        if (file_exists($logPath)) {
+            $logLines = file($logPath);
+            $totalLines = count($logLines);
+            $startLine = max(0, $totalLines - 100);
+            $errorLines = [];
+            for ($i = $startLine; $i < $totalLines; $i++) {
+                if (stripos($logLines[$i], 'error') !== false || stripos($logLines[$i], 'mail') !== false || stripos($logLines[$i], 'smtp') !== false || stripos($logLines[$i], 'password') !== false) {
+                    $errorLines[] = trim($logLines[$i]);
+                }
+            }
+            if (empty($errorLines)) {
+                echo "No recent mail/smtp/password errors in last 100 lines.\n";
+            } else {
+                foreach (array_slice($errorLines, -20) as $el) {
+                    echo $el . "\n";
+                }
+            }
+        } else {
+            echo "Laravel log not found at: {$logPath}\n";
+        }
+
+        echo "\n=== DIAGNOSIS COMPLETE ===\n";
+        exit;
+    }
+
+    // ── ACTION: send_reset_mail ───────────────────────────────────────────────
     if (isset($_GET['action']) && $_GET['action'] === 'send_reset_mail') {
         echo "<hr><h3>=== LIVE SMTP PASSWORD RESET DISPATCH ===</h3>";
         $email = 'dunesdiscovery85@gmail.com';
@@ -157,11 +333,13 @@ try {
 
         // Direct SMTP Send on Port 465
         $smtpHost = $config['MAIL_HOST'] ?? 'smtp.hostinger.com';
-        $smtpPort = $config['MAIL_PORT'] ?? 465;
+        $smtpPort = 465;
         $smtpUser = $config['MAIL_USERNAME'] ?? 'info@dunesdiscoverytourism.com';
-        $smtpPass = $config['MAIL_PASSWORD'] ?? 'Zubairkhan@2025';
+        $smtpPass = $config['MAIL_PASSWORD'] ?? '';
 
         echo "<p>Connecting to ssl://{$smtpHost}:{$smtpPort} as {$smtpUser}...</p>";
+        echo "<p>Password length: " . strlen($smtpPass) . "</p>";
+
         $fp = @fsockopen('ssl://' . $smtpHost, $smtpPort, $errno, $errstr, 15);
         if ($fp) {
             $banner = fgets($fp, 512);
@@ -223,3 +401,4 @@ try {
 } catch (Exception $e) {
     echo "ERROR: " . $e->getMessage();
 }
+
