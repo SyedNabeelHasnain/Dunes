@@ -101,7 +101,6 @@ return [
         'failover' => [
             'transport' => 'failover',
             'mailers' => [
-                'smtp_domain',
                 'smtp_hostinger_tls',
                 'smtp_hostinger_starttls',
                 'sendmail',
