@@ -14,6 +14,12 @@ class BlogController extends Controller
      */
     public function index(Request $request)
     {
+        if (BlogCategory::count() === 0 || BlogPost::count() === 0) {
+            try {
+                (new \Database\Seeders\BlogSeeder())->run();
+            } catch (\Throwable $e) {}
+        }
+
         $categorySlug = $request->input('category');
         $tagSlug = $request->input('tag');
         $search = $request->input('search');
