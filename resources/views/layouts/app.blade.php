@@ -62,6 +62,11 @@
     <link rel="alternate" hreflang="en" href="{{ $canonical }}">
     <link rel="alternate" hreflang="x-default" href="{{ $canonical }}">
     
+    <link rel="preconnect" href="https://www.googletagmanager.com">
+    <link rel="preconnect" href="https://connect.facebook.net">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+    <link rel="dns-prefetch" href="https://connect.facebook.net">
+
     <!-- OpenGraph Metadata -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ $canonical }}">
@@ -245,7 +250,7 @@
         <nav class="navbar navbar-expand-lg navbar-light glass-nav sticky-sm-top sticky-md-top sticky-lg-top">
             <div class="container">
                 <a class="navbar-brand d-flex align-items-center p-0" href="{{ route('home') }}">
-                    <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery Tourism" width="160" height="46" class="img-fluid logo-img" fetchpriority="high">
+                    <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery Tourism" width="160" height="103" class="img-fluid logo-img" fetchpriority="high" style="height: auto; max-height: 46px; object-fit: contain;">
                 </a>
                 
                 <!-- Mobile Review Badges & Buttons -->
@@ -267,19 +272,19 @@
                 <div class="offcanvas offcanvas-end border-0 rounded-start-4" tabindex="-1" id="mainOffcanvas" aria-labelledby="mainOffcanvasLabel" style="max-width: 75%;">
                     <div class="offcanvas-header border-bottom py-3">
                         <div class="offcanvas-title d-flex align-items-center" id="mainOffcanvasLabel">
-                            <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery" width="140" height="40" class="img-fluid">
+                            <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery" width="140" height="90" class="img-fluid" style="height: auto; max-height: 40px; object-fit: contain;">
                         </div>
                         <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                     </div>
                     <div class="offcanvas-body p-4 p-lg-0">
                         <ul class="navbar-nav mx-auto mb-4 mb-lg-0 gap-lg-1 text-nowrap">
                             <li class="nav-item">
-                                <a class="nav-link px-3 px-lg-2 py-2 rounded-3 {{ request()->routeIs('home') ? 'active bg-primary-subtle text-primary fw-semibold' : '' }}" href="{{ route('home') }}">Home</a>
+                                <a class="nav-link px-3 px-lg-2 py-2 rounded-3 {{ request()->routeIs('home') ? 'active bg-warning-subtle text-dark fw-bold' : '' }}" href="{{ route('home') }}">Home</a>
                             </li>
                             <li class="nav-item dropdown align-items-center flex-wrap w-100 w-lg-auto">
-                                <div class="d-flex flex-wrap align-items-stretch w-100 rounded-3 position-relative {{ request()->routeIs('tours.*') ? 'bg-primary-subtle' : '' }}">
-                                    <a class="nav-link px-3 px-lg-2 py-2 flex-grow-1 rounded-start-3 {{ request()->routeIs('tours.*') ? 'active text-primary fw-semibold' : '' }}" href="{{ route('tours.index') }}">Tours</a>
-                                    <a class="nav-link px-2 py-2 dropdown-toggle dropdown-toggle-split d-flex align-items-center rounded-end-3 border-start border-primary border-opacity-10 {{ request()->routeIs('tours.*') ? 'active text-primary' : '' }}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="d-flex flex-wrap align-items-stretch w-100 rounded-3 position-relative {{ request()->routeIs('tours.*') ? 'bg-warning-subtle' : '' }}">
+                                    <a class="nav-link px-3 px-lg-2 py-2 flex-grow-1 rounded-start-3 {{ request()->routeIs('tours.*') ? 'active text-dark fw-bold' : '' }}" href="{{ route('tours.index') }}">Tours</a>
+                                    <a class="nav-link px-3 py-2 dropdown-toggle dropdown-toggle-split d-flex align-items-center justify-content-center rounded-end-3 border-start border-primary border-opacity-10 {{ request()->routeIs('tours.*') ? 'active text-dark' : '' }}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="min-width: 44px; min-height: 44px;">
                                         <span class="visually-hidden">Toggle Dropdown</span>
                                     </a>
                                     <ul class="dropdown-menu border-0 shadow-lg rounded-4 overflow-hidden p-0 mt-2 dropdown-animated-border">
