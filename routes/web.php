@@ -233,5 +233,8 @@ Route::redirect('/quad-bike-tour-dubai', '/desert-safari-quad-biking-dubai', 301
 Route::redirect('/vip-desert-safari-dubai', '/evening-desert-safari-dubai', 301);
 Route::redirect('/buggy-tour-dubai', '/dune-buggy-rental-dubai', 301);
 
+// ── Auth Routes (Login, Register, Password Reset) ────────────────────────────
+require __DIR__.'/auth.php';
+
 // ── Root-level Dynamic Tour Slugs (Fallback Route) ───────────────────────────
 Route::get('/{slug}', [TourController::class, 'show'])->name('tours.show');
