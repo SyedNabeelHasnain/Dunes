@@ -29,10 +29,11 @@ class UserSeeder extends Seeder
         $users = json_decode(File::get($path), true);
         foreach ($users as $u) {
             User::updateOrCreate(
-                ['email' => $u['email']],
+                ['id' => $u['id']],
                 [
                     'name' => ucfirst($u['username']),
-                    'password' => $u['password'], // Preserve the existing hashed password
+                    'email' => $u['email'],
+                    'password' => $u['password'],
                 ]
             );
         }
