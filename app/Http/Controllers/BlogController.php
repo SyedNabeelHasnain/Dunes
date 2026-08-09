@@ -111,7 +111,7 @@ class BlogController extends Controller
                         'author_name' => 'Dunes Discovery Team',
                         'author_title' => 'Dubai Tourism Experts',
                         'author_bio' => 'Certified UAE tour operators and desert rally guides.',
-                        'featured_image' => 'quad-biking-desert-safari-dubai-dune-discovery-tourism.avif',
+                        'featured_image' => 'desert-safari-quad-biking-hero.avif',
                         'read_time' => 6,
                         'is_featured' => 1,
                         'status' => 'published',
