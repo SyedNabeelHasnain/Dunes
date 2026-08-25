@@ -173,6 +173,19 @@ try {
         exit;
     }
 
+    if (isset($_GET['action']) && $_GET['action'] === 'check_routes') {
+        header('Content-Type: text/plain; charset=utf-8');
+        chdir($baseDir);
+        echo shell_exec('php artisan route:list --name=analytics');
+        echo "\n\n=== PUBLIC HTML DIRECTORY ITEMS ===\n";
+        print_r(glob(__DIR__ . '/*'));
+        if (file_exists(__DIR__ . '/admin')) {
+            echo "\n\n=== ADMIN DIR ITEMS ===\n";
+            print_r(glob(__DIR__ . '/admin/*'));
+        }
+        exit;
+    }
+
     echo "SUCCESS: cache_version updated to $newVer (affected rows: $affected, cleared views: $clearedCount). index.blade ($idxInfo), app.blade ($appInfo). OPcache reset successfully!";
 
 } catch (Exception $e) {
