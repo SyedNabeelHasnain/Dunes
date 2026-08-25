@@ -18,7 +18,7 @@
 <div class="card card-modern border shadow-sm rounded-4 overflow-hidden bg-white">
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table align-middle mb-0 table-hover" id="bookingsTable">
+            <table class="table align-middle mb-0 table-hover no-datatable" id="bookingsTable">
                 <thead class="table-light">
                     <tr>
                         <th class="ps-4">Ref</th>

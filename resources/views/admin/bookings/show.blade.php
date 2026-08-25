@@ -159,7 +159,7 @@
     
     <h6 class="fw-bold mb-3 text-dark">Payment Links History</h6>
     <div class="table-responsive mb-4">
-        <table class="table table-sm table-hover align-middle border" id="paymentLinksTable">
+        <table class="table table-sm table-hover align-middle border no-datatable" id="paymentLinksTable">
             <thead class="table-light">
                 <tr>
                     <th>Date</th>

@@ -232,22 +232,32 @@
             $('.admin-main-content').addClass('collapsed');
         }
 
-        // Initialize DataTable
-        $('.table:not(.no-datatable)').DataTable({
-            pageLength: 25,
-            ordering: true,
-            responsive: true,
-            language: {
-                search: "",
-                searchPlaceholder: "Search records...",
-                paginate: {
-                    previous: '<i class="bi bi-chevron-left"></i>',
-                    next: '<i class="bi bi-chevron-right"></i>'
-                }
-            },
-            dom: "<'row mb-3 mt-3'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
-                 "<'row'<'col-sm-12'tr>>" +
-                 "<'row mt-3'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>"
+        // Suppress DataTables alert popups in UI
+        if ($.fn.dataTable) {
+            $.fn.dataTable.ext.errMode = 'none';
+        }
+
+        // Initialize DataTable only on tables without .no-datatable and without colspan empty rows
+        $('.table:not(.no-datatable)').each(function() {
+            var $table = $(this);
+            if ($table.find('tbody td[colspan]').length === 0 && $table.find('tbody tr').length > 0) {
+                $table.DataTable({
+                    pageLength: 25,
+                    ordering: true,
+                    responsive: true,
+                    language: {
+                        search: "",
+                        searchPlaceholder: "Search records...",
+                        paginate: {
+                            previous: '<i class="bi bi-chevron-left"></i>',
+                            next: '<i class="bi bi-chevron-right"></i>'
+                        }
+                    },
+                    dom: "<'row mb-3 mt-3'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+                         "<'row'<'col-sm-12'tr>>" +
+                         "<'row mt-3'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>"
+                });
+            }
         });
 
         // Hide sidebar on clicking outside (mobile)

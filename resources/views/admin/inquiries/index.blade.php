@@ -10,7 +10,7 @@
 <div class="card card-modern border shadow-sm rounded-4 overflow-hidden bg-white mb-4">
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table align-middle mb-0 table-hover" id="inquiriesTable">
+            <table class="table align-middle mb-0 table-hover no-datatable" id="inquiriesTable">
                 <thead class="table-light">
                     <tr>
                         <th class="ps-4">Date</th>
