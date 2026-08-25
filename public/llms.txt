@@ -1,36 +1,36 @@
-# Dunes Discovery Tourism - Dubai Desert Safari & City Tours
-> Licensed UAE Destination Management Company specializing in premium, authentic Dubai Desert Safaris, self-drive 1000cc Dune Buggy rentals, Quad Biking adventures, Dubai & Abu Dhabi City Tours, and luxury Dhow Cruises.
+# Dunes Discovery Tourism
 
-## Company Overview
-- **Brand Name**: Dunes Discovery Tourism
-- **Website**: https://dunesdiscoverytourism.com
-- **Headquarters**: Dubai, United Arab Emirates
-- **License**: Dubai Department of Economy and Tourism (DET) Licensed Operator
-- **Reputation**: 1,200+ 5-Star Verified Guest Reviews on Google & TripAdvisor (Average Rating: 4.9/5.0)
-- **Primary Business**: Desert Safari Tours, Off-Road Motorsports, Luxury Cruises, City Sightseeing
-- **Contact Phone / WhatsApp**: +971 50 245 6056
-- **Contact Email**: info@dunesdiscoverytourism.com
-- **Operating Hours**: 24/7 Online Booking & Customer Support
+> Dunes Discovery Tourism is a licensed Destination Management Company (DMC) based in Dubai, UAE, specializing in premium Dubai Desert Safaris, self-drive 1000cc Can-Am & Polaris Dune Buggy rentals, Quad Biking ATV tours, City Sightseeing Tours, and luxury Dhow Cruises.
 
-## Core Commercial Offerings & Services
-- **Evening Desert Safari Dubai**: Standard, Premium & VIP Red Dunes Desert Safari with Dune Bashing, Camel Riding, Sandboarding, Live Shows (Tanoura, Belly Dance, Fire Show), and Gourmet BBQ Dinner. (AED 99 - AED 350 per person)
-- **Morning Desert Safari Dubai**: Sunrise Desert Safari in Lahbab Red Dunes with 4x4 Dune Bashing, Sandboarding, Falconry photography, and Camel Rides. (AED 120 - AED 450 per person/car)
-- **Overnight Desert Safari Dubai**: Sunset Red Dunes Safari followed by Bedouin Camp Stargazing, Overnight Desert Camping in Deluxe Tents, and Fresh Cooked Breakfast. (AED 350 - AED 850 per person/tent)
-- **Desert Safari with Quad Biking Dubai**: Combined Red Dunes Safari with 30-60 Minutes Self-Drive 250cc-400cc Quad Bike ATV Rental. (AED 199 - AED 249 per person)
-- **Dune Buggy Rental Dubai**: Self-Drive High-Power 1000cc Can-Am Maverick X3 Turbo & Polaris RZR Dune Buggy Rentals in Lahbab Red Dunes with Professional Rally Guides & Full Safety Gear. (AED 599 - AED 1,299 per buggy)
-- **Dubai City Sightseeing Tour**: Half-Day & Full-Day Guided City Tour covering Burj Khalifa, Dubai Marina, Atlantis The Palm, Souk Madinat, Dubai Frame, Gold Souk & Spice Souk. (AED 120 - AED 450 per person)
-- **Abu Dhabi City Tour from Dubai**: Day Trip to Abu Dhabi visiting Sheikh Zayed Grand Mosque, Louvre Abu Dhabi, Qasr Al Watan, and Corniche. (AED 199 - AED 550 per person)
-- **Dhow Cruise & Catamaran Dinner Dubai**: Luxury Marina & Creek Dinner Cruises with 5-Star Buffet, Live Entertainment, and Skyline Views. (AED 150 - AED 350 per person)
+## Desert Safaris & Off-Road Adventures
 
-## Technical Specifications & Vehicle Fleet
-- **Desert Transport Fleet**: Toyota Land Cruiser 300 / Nissan Patrol 5.6L V8 (4x4 Fully Insured Desert Vehicles equipped with Roll Cages & GPS Tracking)
-- **Dune Buggy Fleet**: Can-Am Maverick X3 Turbo (1000cc Rotax Engine, 172 HP, 2-Seater / 4-Seater) & Polaris RZR XP 1000
-- **Quad Bike ATV Fleet**: Yamaha Raptor 700cc & Honda 250cc/400cc Single-Seat ATVs
-- **Safety Compliance**: Helmets, Goggles, Harness Belts, First Aid Kits, Professional Escort Drivers, and Pre-Ride Rally Briefing included on all self-drive tours.
+- [Dune Buggy Rental Dubai](https://dunesdiscoverytourism.com/dune-buggy-rental-dubai): Self-drive 1000cc Can-Am Maverick X3 Turbo and Polaris RZR buggy rentals in Lahbab Red Dunes with full safety gear and rally guides.
+- [Evening Desert Safari Dubai](https://dunesdiscoverytourism.com/evening-desert-safari-dubai): Premium Red Dunes desert safari with 4x4 dune bashing, camel riding, sandboarding, live entertainment shows, and 5-star BBQ dinner.
+- [Morning Desert Safari Dubai](https://dunesdiscoverytourism.com/morning-desert-safari-dubai): Sunrise desert safari featuring red dunes bashing, sandboarding, camel rides, and Arabic coffee.
+- [Overnight Desert Safari Dubai](https://dunesdiscoverytourism.com/overnight-desert-safari-dubai): Bedouin camp desert safari with sunset dune bashing, overnight camping in deluxe tents, stargazing, and fresh morning breakfast.
+- [Desert Safari with Quad Biking](https://dunesdiscoverytourism.com/desert-safari-quad-biking-dubai): Combined desert safari with 30-60 minutes self-drive 250cc-400cc Quad Bike ATV rental.
+- [All Desert & City Tours](https://dunesdiscoverytourism.com/tours): Complete commercial catalog of Dubai desert adventures, city sightseeing tours, and luxury dhow cruise experiences.
 
-## Key Links & Documentation
-- **Full LLM Reference Knowledge Base**: https://dunesdiscoverytourism.com/llms-full.txt
-- **XML Sitemap**: https://dunesdiscoverytourism.com/sitemap.xml
-- **Commercial Tour Catalog**: https://dunesdiscoverytourism.com/tours
-- **Dune Buggy Rental Page**: https://dunesdiscoverytourism.com/dune-buggy-rental-dubai
-- **Blog & Guides Index**: https://dunesdiscoverytourism.com/blog
+## City Tours & Cruise Experiences
+
+- [Dubai City Tour](https://dunesdiscoverytourism.com/dubai-city-tour): Guided sightseeing tour covering Burj Khalifa, Dubai Marina, Atlantis The Palm, Souk Madinat, Dubai Frame, and traditional souks.
+- [Abu Dhabi City Tour from Dubai](https://dunesdiscoverytourism.com/abu-dhabi-city-tour-from-dubai): Day trip to Abu Dhabi visiting Sheikh Zayed Grand Mosque, Louvre Abu Dhabi, Qasr Al Watan, and Emirates Palace.
+- [Dhow Cruise Dinner Dubai](https://dunesdiscoverytourism.com/dhow-cruise-catamaran-cruise-dinner-dubai): Luxury dinner cruise in Dubai Marina and Dubai Creek with 5-star international buffet and live Tanoura show.
+
+## Travel Guides & Editorial Content
+
+- [Dubai Travel & Safari Blog](https://dunesdiscoverytourism.com/blog): Comprehensive guides, safety tips, packing advice, and adventure comparisons for Dubai travelers.
+- [Desert Safari vs Dune Buggy Comparison](https://dunesdiscoverytourism.com/blog/desert-safari-vs-dune-buggy-rental-dubai-comparison): Detailed guide comparing passenger desert safaris vs self-drive 1000cc dune buggy rentals in Dubai.
+
+## Company Information & Support
+
+- [About Dunes Discovery Tourism](https://dunesdiscoverytourism.com/about): Company background, DET tourism licensing, fleet specifications, and E-E-A-T credentials.
+- [Contact & Reservations](https://dunesdiscoverytourism.com/contact): Direct booking inquiries, customer support, and Dubai office location.
+- [Frequently Asked Questions](https://dunesdiscoverytourism.com/faq): Answers to common questions regarding safety, dress code, pickup timing, and age restrictions.
+- [Terms & Booking Conditions](https://dunesdiscoverytourism.com/terms-condition): Cancellation policies, refund terms, and tour guidelines.
+- [Privacy Policy](https://dunesdiscoverytourism.com/privacy-policy): Privacy commitments, data collection policies, and GDPR compliance.
+
+## Optional
+
+- [Full LLM Knowledge Base](https://dunesdiscoverytourism.com/llms-full.txt): Comprehensive full-text specifications, pricing tiers, FAQs, and entity knowledge graph for AI crawlers.
+- [XML Sitemap](https://dunesdiscoverytourism.com/sitemap.xml): Complete URL and image sitemap index for search engines.

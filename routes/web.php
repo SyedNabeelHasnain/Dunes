@@ -121,7 +121,7 @@ Route::get('/llms.txt', function () {
             return response(file_get_contents($p), 200, ['Content-Type' => 'text/plain; charset=utf-8']);
         }
     }
-    return response("# Dunes Discovery Tourism\nhttps://dunesdiscoverytourism.com\n- Licensed Dubai Tour Operator\n- 1200+ 5-Star Reviews\n- Instant Booking: https://wa.me/971502456056", 200, ['Content-Type' => 'text/plain; charset=utf-8']);
+    return response("# Dunes Discovery Tourism\n\n> Licensed UAE Destination Management Company.\n\n## Core Tours\n\n- [Tour Catalog](https://dunesdiscoverytourism.com/tours): Full catalog of desert safaris, dune buggy rentals and city tours.\n- [Dune Buggy Rental](https://dunesdiscoverytourism.com/dune-buggy-rental-dubai): Self-drive 1000cc dune buggy rentals.\n- [Contact Us](https://dunesdiscoverytourism.com/contact): Direct booking and customer support.", 200, ['Content-Type' => 'text/plain; charset=utf-8']);
 });
 
 Route::get('/llms-full.txt', function () {
@@ -135,7 +135,7 @@ Route::get('/llms-full.txt', function () {
             return response(file_get_contents($p), 200, ['Content-Type' => 'text/plain; charset=utf-8']);
         }
     }
-    return response("# Dunes Discovery Tourism Full Specifications\nhttps://dunesdiscoverytourism.com\n- Full Tour Catalog & Pricing Tiers available at https://dunesdiscoverytourism.com/tours", 200, ['Content-Type' => 'text/plain; charset=utf-8']);
+    return response("# Dunes Discovery Tourism Full Specifications\n\n> Comprehensive guide for LLM search engines.\n\n## Core Links\n\n- [Tour Catalog](https://dunesdiscoverytourism.com/tours): Full pricing and tours.\n- [XML Sitemap](https://dunesdiscoverytourism.com/sitemap.xml): Full XML sitemap.", 200, ['Content-Type' => 'text/plain; charset=utf-8']);
 });
 
 // ── Explicit High-Value Tour Routes ─────────────────────────────────────────
