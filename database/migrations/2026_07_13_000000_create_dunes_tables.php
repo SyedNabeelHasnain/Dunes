@@ -11,6 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::disableForeignKeyConstraints();
+
         // 1. Settings Table
         Schema::create('settings', function (Blueprint $table) {
             $table->increments('id');
@@ -499,6 +501,8 @@ return new class extends Migration
 
             $table->foreign('post_id')->references('id')->on('blog_posts')->onDelete('cascade');
         });
+
+        Schema::enableForeignKeyConstraints();
     }
 
     /**
