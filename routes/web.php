@@ -49,8 +49,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/itinerary/{id}/delete', [AdminTourController::class, 'deleteItinerary'])->name('tours.itinerary.delete');
     Route::post('/content-items/create', [AdminTourController::class, 'addContentItem'])->name('tours.content-items.create');
     Route::post('/tours/{id}/content', [AdminTourController::class, 'setTourContent'])->name('tours.content.set');
-    Route::post('/categories/create', [AdminTourController::class, 'addCategory'])->name('tours.categories.create');
-    Route::post('/categories/rename', [AdminTourController::class, 'renameCategory'])->name('tours.categories.rename');
+    Route::post('/categories/create', [AdminTourController::class, 'addCategory'])->name('categories.create');
+    Route::post('/categories/rename', [AdminTourController::class, 'renameCategory'])->name('categories.rename');
     Route::get('/tiers', [AdminTourController::class, 'tiers'])->name('tiers.index');
     Route::get('/addons', [AdminTourController::class, 'addons'])->name('addons.index');
     Route::get('/pricing', [AdminTourController::class, 'pricing'])->name('pricing.index');
