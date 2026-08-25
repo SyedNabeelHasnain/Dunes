@@ -82,6 +82,52 @@ try {
         $stmtTier->execute([$newTourId, 4, 1299.00, 1500.00, 'per buggy']);
     }
 
+    // Sync all blog posts from database/seeders/data/blog_posts.json directly via PDO
+    $jsonPath = $baseDir . '/database/seeders/data/blog_posts.json';
+    $blogsSynced = 0;
+    if (file_exists($jsonPath)) {
+        $postsData = json_decode(file_get_contents($jsonPath), true);
+        if (is_array($postsData)) {
+            $stmtCheck = $pdo->prepare("SELECT id FROM blog_posts WHERE slug = ?");
+            $stmtInsert = $pdo->prepare("INSERT INTO blog_posts (category_id, title, slug, subtitle, meta_title, meta_desc, meta_keywords, canonical_url, excerpt, content, ai_summary, featured_image, featured_image_alt, featured_image_caption, og_image, status, is_featured, is_trending, views_count, likes_count, read_time, author_name, author_title, author_bio, author_avatar, published_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
+            
+            foreach ($postsData as $bp) {
+                $stmtCheck->execute([$bp['slug']]);
+                if (!$stmtCheck->fetch()) {
+                    $stmtInsert->execute([
+                        $bp['category_id'] ?? 1,
+                        $bp['title'],
+                        $bp['slug'],
+                        $bp['subtitle'] ?? null,
+                        $bp['meta_title'] ?? null,
+                        $bp['meta_desc'] ?? null,
+                        $bp['meta_keywords'] ?? null,
+                        $bp['canonical_url'] ?? null,
+                        $bp['excerpt'] ?? null,
+                        $bp['content'] ?? '',
+                        $bp['ai_summary'] ?? null,
+                        $bp['featured_image'] ?? null,
+                        $bp['featured_image_alt'] ?? null,
+                        $bp['featured_image_caption'] ?? null,
+                        $bp['og_image'] ?? null,
+                        $bp['status'] ?? 'published',
+                        !empty($bp['is_featured']) ? 1 : 0,
+                        !empty($bp['is_trending']) ? 1 : 0,
+                        $bp['views_count'] ?? 500,
+                        $bp['likes_count'] ?? 100,
+                        $bp['read_time'] ?? 5,
+                        $bp['author_name'] ?? 'Dunes Discovery Team',
+                        $bp['author_title'] ?? 'Dubai Tourism Experts',
+                        $bp['author_bio'] ?? null,
+                        $bp['author_avatar'] ?? null,
+                        !empty($bp['published_at']) ? $bp['published_at'] : date('Y-m-d H:i:s')
+                    ]);
+                    $blogsSynced++;
+                }
+            }
+        }
+    }
+
     // 4. Manually clear Laravel config and route cache files
     $configCache = $baseDir . '/bootstrap/cache/config.php';
     if (file_exists($configCache)) {
