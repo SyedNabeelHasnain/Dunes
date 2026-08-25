@@ -79,13 +79,13 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::resource('blog-categories', AdminBlogCategoryController::class)->except(['create', 'show', 'edit']);
 
     // Legal Pages Manager
-    Route::get('/legal', [AdminLegalController::class, 'index'])->name('legal.index');
-    Route::get('/legal/{id}/edit', [AdminLegalController::class, 'edit'])->name('legal.edit');
-    Route::post('/legal/{id}/update', [AdminLegalController::class, 'update'])->name('legal.update');
-    Route::post('/legal/{id}/section/add', [AdminLegalController::class, 'addSection'])->name('legal.section.add');
-    Route::post('/legal/section/{sectionId}/item/add', [AdminLegalController::class, 'addItem'])->name('legal.item.add');
-    Route::delete('/legal/section/{id}', [AdminLegalController::class, 'deleteSection'])->name('legal.section.delete');
-    Route::delete('/legal/item/{id}', [AdminLegalController::class, 'deleteItem'])->name('legal.item.delete');
+    Route::get('/legal-pages', [AdminLegalController::class, 'index'])->name('legal.index');
+    Route::get('/legal-pages/{id}/edit', [AdminLegalController::class, 'edit'])->name('legal.edit');
+    Route::post('/legal-pages/{id}/update', [AdminLegalController::class, 'update'])->name('legal.update');
+    Route::post('/legal-pages/{id}/section/add', [AdminLegalController::class, 'addSection'])->name('legal.section.add');
+    Route::post('/legal-pages/section/{sectionId}/item/add', [AdminLegalController::class, 'addItem'])->name('legal.item.add');
+    Route::delete('/legal-pages/section/{id}', [AdminLegalController::class, 'deleteSection'])->name('legal.section.delete');
+    Route::delete('/legal-pages/item/{id}', [AdminLegalController::class, 'deleteItem'])->name('legal.item.delete');
 
     // Integrations Settings (Google, Meta, Cache)
     Route::get('/settings/google', [AdminSettingController::class, 'google'])->name('settings.google');
