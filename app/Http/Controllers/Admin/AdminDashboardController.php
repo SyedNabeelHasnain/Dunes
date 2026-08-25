@@ -53,6 +53,72 @@ class AdminDashboardController extends Controller
     }
 
     /**
+     * Display Analytics & Traffic Intelligence Dashboard.
+     */
+    public function analytics(Request $request)
+    {
+        $days = (int)$request->input('days', 30);
+        $startDate = now()->subDays($days)->startOfDay();
+
+        // 1. Core Traffic Stats
+        $totalPageviews = RequestLog::where('request_timestamp', '>=', $startDate)->count();
+        $humanPageviews = RequestLog::where('request_timestamp', '>=', $startDate)
+            ->where('bot_indicator', 'Likely Human')
+            ->count();
+        $uniqueVisitors = RequestLog::where('request_timestamp', '>=', $startDate)
+            ->where('bot_indicator', 'Likely Human')
+            ->distinct('session_id')
+            ->count('session_id');
+        $uniqueIPs = RequestLog::where('request_timestamp', '>=', $startDate)
+            ->where('bot_indicator', 'Likely Human')
+            ->distinct('client_ip')
+            ->count('client_ip');
+
+        // 2. Top Visited Pages
+        $topPages = RequestLog::where('request_timestamp', '>=', $startDate)
+            ->where('bot_indicator', 'Likely Human')
+            ->select('request_uri', \DB::raw('COUNT(*) as views'), \DB::raw('COUNT(DISTINCT session_id) as visitors'))
+            ->groupBy('request_uri')
+            ->orderBy('views', 'desc')
+            ->limit(10)
+            ->get();
+
+        // 3. Top Countries
+        $topCountries = RequestLog::where('request_timestamp', '>=', $startDate)
+            ->where('bot_indicator', 'Likely Human')
+            ->where('country', '!=', 'Not Available')
+            ->select('country', \DB::raw('COUNT(*) as count'))
+            ->groupBy('country')
+            ->orderBy('count', 'desc')
+            ->limit(8)
+            ->get();
+
+        // 4. Device & Browser Breakdown
+        $devices = RequestLog::where('request_timestamp', '>=', $startDate)
+            ->where('bot_indicator', 'Likely Human')
+            ->select('device_type', \DB::raw('COUNT(*) as count'))
+            ->groupBy('device_type')
+            ->orderBy('count', 'desc')
+            ->get();
+
+        $browsers = RequestLog::where('request_timestamp', '>=', $startDate)
+            ->where('bot_indicator', 'Likely Human')
+            ->select('browser_name', \DB::raw('COUNT(*) as count'))
+            ->groupBy('browser_name')
+            ->orderBy('count', 'desc')
+            ->limit(5)
+            ->get();
+
+        // 5. Recent Request Logs (Paginated)
+        $logs = RequestLog::orderBy('request_timestamp', 'desc')->paginate(25);
+
+        return view('admin.analytics.index', compact(
+            'days', 'totalPageviews', 'humanPageviews', 'uniqueVisitors', 'uniqueIPs',
+            'topPages', 'topCountries', 'devices', 'browsers', 'logs'
+        ));
+    }
+
+    /**
      * Polling endpoint for active visitors in the last 5 minutes.
      */
     public function activeVisitors(): JsonResponse

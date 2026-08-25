@@ -82,6 +82,9 @@
             <a href="{{ route('admin.dashboard') }}" class="sidebar-link {{ request()->routeIs('admin.dashboard*') ? 'active' : '' }}">
                 <i class="bi bi-grid-1x2-fill"></i> <span>Dashboard</span>
             </a>
+            <a href="{{ route('admin.analytics.index') }}" class="sidebar-link {{ request()->routeIs('admin.analytics*') ? 'active' : '' }}">
+                <i class="bi bi-graph-up-arrow"></i> <span>Analytics</span>
+            </a>
             <a href="{{ route('admin.bookings.index') }}" class="sidebar-link {{ request()->routeIs('admin.bookings*') ? 'active' : '' }}">
                 <i class="bi bi-calendar2-check-fill"></i> <span>Bookings</span>
             </a>

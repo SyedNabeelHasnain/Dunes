@@ -39,6 +39,7 @@ Route::get('/payment-cancel', [BookingController::class, 'paymentCancel'])->name
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard.alias');
+    Route::get('/analytics', [AdminDashboardController::class, 'analytics'])->name('analytics.index');
     Route::get('/active-visitors', [AdminDashboardController::class, 'activeVisitors'])->name('active-visitors');
     Route::post('/quick-payment', [AdminDashboardController::class, 'createQuickPayment'])->name('quick-payment');
     
