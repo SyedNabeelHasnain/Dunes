@@ -28,7 +28,7 @@ class TourSeeder extends Seeder
             $category = Category::where('slug', $categorySlug)->first();
             $categoryId = $category ? $category->id : null;
 
-            $tour = Tour::updateOrCreate(
+            $tour = Tour::firstOrCreate(
                 ['slug' => $t['slug']],
                 [
                     'slug' => $t['slug'],
@@ -61,35 +61,33 @@ class TourSeeder extends Seeder
             $toursByJsonId[$t['id']] = $tour->id;
         }
 
-        // Seed Tour Tiers Relationships
+        // Seed Tour Tiers Relationships (insertOrIgnore prevents overwriting admin custom prices)
         $tourTiersPath = database_path('seeders/data/tour_tiers.json');
         if (File::exists($tourTiersPath)) {
             $tourTiers = json_decode(File::get($tourTiersPath), true);
             foreach ($tourTiers as $tt) {
                 $actualTourId = $toursByJsonId[$tt['tour_id']] ?? $tt['tour_id'];
-                DB::table('tour_tiers')->updateOrInsert(
-                    ['tour_id' => $actualTourId, 'tier_id' => $tt['tier_id']],
-                    [
-                        'price' => (float)$tt['price'],
-                        'old_price' => $tt['old_price'] ? (float)$tt['old_price'] : null,
-                        'price_type' => $tt['price_type'] ?: 'per person',
-                    ]
-                );
+                DB::table('tour_tiers')->insertOrIgnore([
+                    'tour_id' => $actualTourId,
+                    'tier_id' => $tt['tier_id'],
+                    'price' => (float)$tt['price'],
+                    'old_price' => $tt['old_price'] ? (float)$tt['old_price'] : null,
+                    'price_type' => $tt['price_type'] ?: 'per person',
+                ]);
             }
         }
 
-        // Seed Tour Addons Relationships
+        // Seed Tour Addons Relationships (insertOrIgnore prevents overwriting admin custom addon prices)
         $tourAddonsPath = database_path('seeders/data/tour_addons.json');
         if (File::exists($tourAddonsPath)) {
             $tourAddons = json_decode(File::get($tourAddonsPath), true);
             foreach ($tourAddons as $ta) {
                 $actualTourId = $toursByJsonId[$ta['tour_id']] ?? $ta['tour_id'];
-                DB::table('tour_addons')->updateOrInsert(
-                    ['tour_id' => $actualTourId, 'addon_id' => $ta['addon_id']],
-                    [
-                        'price' => (float)$ta['price'],
-                    ]
-                );
+                DB::table('tour_addons')->insertOrIgnore([
+                    'tour_id' => $actualTourId,
+                    'addon_id' => $ta['addon_id'],
+                    'price' => (float)$ta['price'],
+                ]);
             }
         }
     }

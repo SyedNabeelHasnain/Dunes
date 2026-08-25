@@ -22,7 +22,7 @@ class BlogSeeder extends Seeder
         if (File::exists($catsPath)) {
             $cats = json_decode(File::get($catsPath), true);
             foreach ($cats as $cat) {
-                BlogCategory::updateOrCreate(
+                BlogCategory::firstOrCreate(
                     ['id' => $cat['id']],
                     [
                         'name' => $cat['name'],
@@ -43,7 +43,7 @@ class BlogSeeder extends Seeder
         if (File::exists($tagsPath)) {
             $tags = json_decode(File::get($tagsPath), true);
             foreach ($tags as $tag) {
-                BlogTag::updateOrCreate(
+                BlogTag::firstOrCreate(
                     ['id' => $tag['id']],
                     [
                         'name' => $tag['name'],
@@ -63,7 +63,7 @@ class BlogSeeder extends Seeder
             foreach ($posts as $p) {
                 $targetCatId = !empty($p['category_id']) ? (BlogCategory::where('id', $p['category_id'])->value('id') ?? $defaultCatId) : $defaultCatId;
 
-                BlogPost::updateOrCreate(
+                BlogPost::firstOrCreate(
                     ['slug' => $p['slug']],
                     [
                         'slug' => $p['slug'],
@@ -106,7 +106,7 @@ class BlogSeeder extends Seeder
         if (File::exists($postTagsPath)) {
             $postTags = json_decode(File::get($postTagsPath), true);
             foreach ($postTags as $pt) {
-                DB::table('blog_post_tags')->updateOrInsert(
+                DB::table('blog_post_tags')->insertOrIgnore(
                     ['post_id' => $pt['post_id'], 'tag_id' => $pt['tag_id']]
                 );
             }

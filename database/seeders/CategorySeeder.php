@@ -44,7 +44,7 @@ class CategorySeeder extends Seeder
         ];
 
         foreach ($categories as $cat) {
-            Category::updateOrCreate(['id' => $cat['id']], $cat);
+            Category::firstOrCreate(['id' => $cat['id']], $cat);
         }
     }
 }
