@@ -4,8 +4,14 @@ if (($_GET['key'] ?? '') !== 'dunes2026') {
     die('Unauthorized');
 }
 
-require __DIR__ . '/../bootstrap/app.php';
-$app = require_once __DIR__ . '/../bootstrap/app.php';
+if (file_exists(__DIR__ . '/../bootstrap/app.php')) {
+    $app = require_once __DIR__ . '/../bootstrap/app.php';
+} elseif (file_exists(__DIR__ . '/../dunes-laravel/bootstrap/app.php')) {
+    $app = require_once __DIR__ . '/../dunes-laravel/bootstrap/app.php';
+} else {
+    die('Bootstrap app not found');
+}
+
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
