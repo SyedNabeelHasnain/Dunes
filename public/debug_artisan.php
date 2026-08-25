@@ -51,12 +51,15 @@ try {
     echo "DB Check Error: " . $e->getMessage() . "\n";
 }
 
-echo "\n--- Recent Laravel Logs (Last 80 Lines) ---\n";
+echo "\n--- Recent Laravel Errors ---\n";
 $logPath = storage_path('logs/laravel.log');
 if (file_exists($logPath)) {
-    $lines = file($logPath);
-    $lastLines = array_slice($lines, -80);
-    echo htmlspecialchars(implode('', $lastLines));
+    $content = file_get_contents($logPath);
+    preg_match_all('/\[\d{4}-\d{2}-\d{2} [^\]]+\] [^\n]+/', $content, $matches);
+    $recent = array_slice($matches[0] ?? [], -20);
+    foreach ($recent as $err) {
+        echo htmlspecialchars($err) . "\n";
+    }
 } else {
     echo "No log file found at {$logPath}\n";
 }
