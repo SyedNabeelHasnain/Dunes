@@ -14,24 +14,52 @@ $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 echo "<pre>";
-echo "Clearing caches...\n";
+echo "=== System Diagnostic ===\n";
 
-try {
-    Artisan::call('route:clear');
-    echo "route:clear: " . Artisan::output() . "\n";
-    
-    Artisan::call('config:clear');
-    echo "config:clear: " . Artisan::output() . "\n";
-    
-    Artisan::call('view:clear');
-    echo "view:clear: " . Artisan::output() . "\n";
-    
+if (isset($_GET['migrate'])) {
+    echo "\n--- Running Migrations ---\n";
+    try {
+        Artisan::call('migrate', ['--force' => true]);
+        echo Artisan::output();
+    } catch (\Throwable $e) {
+        echo "Migration Error: " . $e->getMessage() . "\n";
+    }
+}
+
+if (isset($_GET['clear'])) {
+    echo "\n--- Clearing Caches ---\n";
     Artisan::call('optimize:clear');
-    echo "optimize:clear: " . Artisan::output() . "\n";
-} catch (\Exception $e) {
-    echo "Error: " . $e->getMessage() . "\n";
+    echo Artisan::output();
+}
+
+echo "\n--- Database Tables & Columns ---\n";
+try {
+    $tables = ['bookings', 'contacts', 'booking_payments', 'users', 'settings'];
+    foreach ($tables as $table) {
+        if (Schema::hasTable($table)) {
+            $cols = Schema::getColumnListing($table);
+            echo "Table [{$table}]: " . implode(', ', $cols) . "\n";
+        } else {
+            echo "Table [{$table}]: MISSING!\n";
+        }
+    }
+} catch (\Throwable $e) {
+    echo "DB Check Error: " . $e->getMessage() . "\n";
+}
+
+echo "\n--- Recent Laravel Logs (Last 80 Lines) ---\n";
+$logPath = storage_path('logs/laravel.log');
+if (file_exists($logPath)) {
+    $lines = file($logPath);
+    $lastLines = array_slice($lines, -80);
+    echo htmlspecialchars(implode('', $lastLines));
+} else {
+    echo "No log file found at {$logPath}\n";
 }
 
 echo "\nDone!\n";
+
