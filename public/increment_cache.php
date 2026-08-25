@@ -142,6 +142,14 @@ try {
     $appInfo = file_exists($appPath) ? "lines=" . count(file($appPath)) : "NOT FOUND";
 
     // 8. Reset PHP OPcache in Web Server memory
+    try {
+        \Illuminate\Support\Facades\Artisan::call('route:clear');
+        \Illuminate\Support\Facades\Artisan::call('view:clear');
+        \Illuminate\Support\Facades\Artisan::call('config:clear');
+    } catch (\Throwable $e) {
+        // ignore if framework not booted
+    }
+
     if (function_exists('opcache_reset')) {
         @opcache_reset();
     }
