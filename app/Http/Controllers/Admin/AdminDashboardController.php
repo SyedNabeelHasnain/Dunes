@@ -17,39 +17,48 @@ class AdminDashboardController extends Controller
      */
     public function index()
     {
-        $revenue = Booking::whereIn('status', ['confirmed', 'completed'])
-            ->whereIn('payment_status', ['paid', 'partial'])
-            ->sum('payment_amount');
+        try {
+            $revenue = Booking::whereIn('status', ['confirmed', 'completed'])
+                ->whereIn('payment_status', ['paid', 'partial'])
+                ->sum('payment_amount');
 
-        $totalBookings = Booking::count();
-        $confirmedBookings = Booking::whereIn('status', ['confirmed', 'completed'])->count();
-        $pendingBookings = Booking::where('status', 'pending')->count();
+            $totalBookings = Booking::count();
+            $confirmedBookings = Booking::whereIn('status', ['confirmed', 'completed'])->count();
+            $pendingBookings = Booking::where('status', 'pending')->count();
 
-        $stats = [
-            'revenue' => (float)$revenue,
-            'total' => $totalBookings,
-            'confirmed' => $confirmedBookings,
-            'pending' => $pendingBookings,
-        ];
+            $stats = [
+                'revenue' => (float)$revenue,
+                'total' => $totalBookings,
+                'confirmed' => $confirmedBookings,
+                'pending' => $pendingBookings,
+            ];
 
-        // Recent bookings (latest 10)
-        $recentBookings = Booking::orderBy('created_at', 'desc')->limit(10)->get();
+            // Recent bookings (latest 10)
+            $recentBookings = Booking::orderBy('created_at', 'desc')->limit(10)->get();
 
-        // Top Tours (by booking counts)
-        $topTours = Booking::whereIn('status', ['confirmed', 'completed'])
-            ->select('tour_name', \DB::raw('COUNT(*) as count'), \DB::raw('SUM(total) as revenue'))
-            ->groupBy('tour_name')
-            ->orderBy('count', 'desc')
-            ->limit(5)
-            ->get();
+            // Top Tours (by booking counts)
+            $topTours = Booking::whereIn('status', ['confirmed', 'completed'])
+                ->select('tour_name', \DB::raw('COUNT(*) as count'), \DB::raw('SUM(total) as revenue'))
+                ->groupBy('tour_name')
+                ->orderBy('count', 'desc')
+                ->limit(5)
+                ->get();
 
-        // Recent WhatsApp leads
-        $whatsappLeads = \DB::table('whatsapp_inquiries')
-            ->orderBy('created_at', 'desc')
-            ->limit(5)
-            ->get();
+            // Recent WhatsApp leads
+            $whatsappLeads = \DB::table('whatsapp_inquiries')
+                ->orderBy('created_at', 'desc')
+                ->limit(5)
+                ->get();
 
-        return view('admin.dashboard', compact('stats', 'recentBookings', 'topTours', 'whatsappLeads'));
+            return view('admin.dashboard', compact('stats', 'recentBookings', 'topTours', 'whatsappLeads'));
+        } catch (\Throwable $e) {
+            \Log::error("Admin dashboard error: " . $e->getMessage());
+            $stats = ['revenue' => 0, 'total' => 0, 'confirmed' => 0, 'pending' => 0];
+            $recentBookings = collect();
+            $topTours = collect();
+            $whatsappLeads = collect();
+            return view('admin.dashboard', compact('stats', 'recentBookings', 'topTours', 'whatsappLeads'));
+        }
     }
 
     /**

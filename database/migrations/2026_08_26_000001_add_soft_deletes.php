@@ -8,33 +8,61 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('bookings', function (Blueprint $table) {
-            $table->softDeletes();
-        });
+        if (Schema::hasTable('bookings')) {
+            Schema::table('bookings', function (Blueprint $table) {
+                if (!Schema::hasColumn('bookings', 'deleted_at')) {
+                    $table->softDeletes();
+                }
+            });
+        }
 
-        Schema::table('contacts', function (Blueprint $table) {
-            $table->timestamp('updated_at')->nullable()->after('created_at');
-            $table->softDeletes();
-        });
+        if (Schema::hasTable('contacts')) {
+            Schema::table('contacts', function (Blueprint $table) {
+                if (!Schema::hasColumn('contacts', 'updated_at')) {
+                    $table->timestamp('updated_at')->nullable()->after('created_at');
+                }
+                if (!Schema::hasColumn('contacts', 'deleted_at')) {
+                    $table->softDeletes();
+                }
+            });
+        }
 
-        Schema::table('booking_payments', function (Blueprint $table) {
-            $table->softDeletes();
-        });
+        if (Schema::hasTable('booking_payments')) {
+            Schema::table('booking_payments', function (Blueprint $table) {
+                if (!Schema::hasColumn('booking_payments', 'deleted_at')) {
+                    $table->softDeletes();
+                }
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('bookings', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-        });
+        if (Schema::hasTable('bookings')) {
+            Schema::table('bookings', function (Blueprint $table) {
+                if (Schema::hasColumn('bookings', 'deleted_at')) {
+                    $table->dropSoftDeletes();
+                }
+            });
+        }
 
-        Schema::table('contacts', function (Blueprint $table) {
-            $table->dropColumn('updated_at');
-            $table->dropSoftDeletes();
-        });
+        if (Schema::hasTable('contacts')) {
+            Schema::table('contacts', function (Blueprint $table) {
+                if (Schema::hasColumn('contacts', 'deleted_at')) {
+                    $table->dropSoftDeletes();
+                }
+                if (Schema::hasColumn('contacts', 'updated_at')) {
+                    $table->dropColumn('updated_at');
+                }
+            });
+        }
 
-        Schema::table('booking_payments', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-        });
+        if (Schema::hasTable('booking_payments')) {
+            Schema::table('booking_payments', function (Blueprint $table) {
+                if (Schema::hasColumn('booking_payments', 'deleted_at')) {
+                    $table->dropSoftDeletes();
+                }
+            });
+        }
     }
 };
