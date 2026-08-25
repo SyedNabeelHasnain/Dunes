@@ -146,6 +146,20 @@ try {
         @opcache_reset();
     }
 
+    // 9. Check for action=read_log
+    if (isset($_GET['action']) && $_GET['action'] === 'read_log') {
+        header('Content-Type: text/plain; charset=utf-8');
+        $logFile = $baseDir . '/storage/logs/laravel.log';
+        if (file_exists($logFile)) {
+            $lines = file($logFile);
+            $last = array_slice($lines, -150);
+            echo implode('', $last);
+        } else {
+            echo "LOG FILE NOT FOUND at " . $logFile;
+        }
+        exit;
+    }
+
     echo "SUCCESS: cache_version updated to $newVer (affected rows: $affected, cleared views: $clearedCount). index.blade ($idxInfo), app.blade ($appInfo). OPcache reset successfully!";
 
 } catch (Exception $e) {
