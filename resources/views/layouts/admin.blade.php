@@ -123,8 +123,14 @@
             <a href="{{ route('admin.blog-categories.index') }}" class="sidebar-link {{ request()->routeIs('admin.blog-categories*') ? 'active' : '' }}">
                 <i class="bi bi-tags-fill"></i> <span>Blog Categories</span>
             </a>
+            <a href="{{ route('admin.legal.index') }}" class="sidebar-link {{ request()->routeIs('admin.legal*') ? 'active' : '' }}">
+                <i class="bi bi-file-earmark-text-fill"></i> <span>Legal & Policies</span>
+            </a>
 
             <div class="sidebar-header small fw-bold text-uppercase text-white opacity-50 px-3 mt-3 mb-2">System</div>
+            <a href="{{ route('profile.edit') }}" class="sidebar-link {{ request()->routeIs('profile*') ? 'active' : '' }}">
+                <i class="bi bi-person-gear"></i> <span>Admin Profile</span>
+            </a>
             <a href="{{ route('admin.settings.google') }}" class="sidebar-link {{ request()->routeIs('admin.settings.google*') ? 'active' : '' }}">
                 <i class="bi bi-google"></i> <span>Google Integration</span>
             </a>

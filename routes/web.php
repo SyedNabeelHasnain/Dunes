@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\AdminFaqController;
 use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\AdminWhatsappController;
+use App\Http\Controllers\Admin\AdminLegalController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AjaxGatewayController;
 
@@ -76,6 +77,15 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Blog CMS
     Route::resource('blogs', AdminBlogController::class)->except(['show']);
     Route::resource('blog-categories', AdminBlogCategoryController::class)->except(['create', 'show', 'edit']);
+
+    // Legal Pages Manager
+    Route::get('/legal', [AdminLegalController::class, 'index'])->name('legal.index');
+    Route::get('/legal/{id}/edit', [AdminLegalController::class, 'edit'])->name('legal.edit');
+    Route::post('/legal/{id}/update', [AdminLegalController::class, 'update'])->name('legal.update');
+    Route::post('/legal/{id}/section/add', [AdminLegalController::class, 'addSection'])->name('legal.section.add');
+    Route::post('/legal/section/{sectionId}/item/add', [AdminLegalController::class, 'addItem'])->name('legal.item.add');
+    Route::delete('/legal/section/{id}', [AdminLegalController::class, 'deleteSection'])->name('legal.section.delete');
+    Route::delete('/legal/item/{id}', [AdminLegalController::class, 'deleteItem'])->name('legal.item.delete');
 
     // Integrations Settings (Google, Meta, Cache)
     Route::get('/settings/google', [AdminSettingController::class, 'google'])->name('settings.google');
