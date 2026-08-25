@@ -59,7 +59,7 @@
                     <div class="row g-3 mb-4">
                         @foreach($tiers as $tier)
                         @php
-                            $pivot = $tour->tiers->firstWhere('id', $tier->id)->pivot ?? null;
+                            $pivot = $tour->tiers->firstWhere('id', $tier->id)?->pivot;
                         @endphp
                         <div class="col-12 border-bottom pb-3 mb-2">
                             <div class="row g-3 align-items-center">
@@ -96,7 +96,7 @@
                     <div class="row g-3 mb-4">
                         @foreach($addons as $addon)
                         @php
-                            $pivotAddon = $tour->addons->firstWhere('id', $addon->id)->pivot ?? null;
+                            $pivotAddon = $tour->addons->firstWhere('id', $addon->id)?->pivot;
                             $hasAddon = $pivotAddon !== null;
                         @endphp
                         <div class="col-md-6">

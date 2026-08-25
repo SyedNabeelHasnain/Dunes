@@ -39,7 +39,7 @@
                             </td>
                             @foreach($tiers as $tier)
                                 @php
-                                    $pivot = $tour->tiers->firstWhere('id', $tier->id)->pivot ?? null;
+                                    $pivot = $tour->tiers->firstWhere('id', $tier->id)?->pivot;
                                 @endphp
                                 <td style="background-color: {{ $pivot ? '#f8fff8' : '#fffcfc' }};">
                                     <div class="d-flex flex-column gap-2 p-1">
