@@ -110,7 +110,7 @@
                         <div class="position-relative" style="padding-bottom: 54%;">
                             <img src="{{ $featuredImg }}" class="position-absolute w-100 h-100 object-fit-cover" alt="{{ $featuredPost->featured_image_alt ?: $featuredPost->title }}">
                             @if ($featuredPost->category)
-                            <span class="position-absolute top-0 start-0 m-3 badge bg-primary rounded-pill px-3 py-2 fw-bold shadow-sm">{{ $featuredPost->category->name }}</span>
+                            <span class="position-absolute top-0 start-0 m-3 badge bg-primary rounded-pill px-3 py-2 fw-bold shadow-sm">{{ $featuredPost->category?->name }}</span>
                             @endif
                         </div>
                         <div class="card-body p-4 d-flex flex-column justify-content-between flex-grow-1">
@@ -145,7 +145,7 @@
                             <div class="col-6 col-sm-6 position-relative" style="min-height: 180px;">
                                 <img src="{{ $sideImg }}" class="position-absolute w-100 h-100 object-fit-cover" alt="{{ $sidePost->featured_image_alt ?: $sidePost->title }}">
                                 @if ($sidePost->category)
-                                <span class="position-absolute top-0 start-0 m-2 badge bg-primary rounded-pill px-2 py-1 fw-bold shadow-sm" style="font-size: .7rem;">{{ $sidePost->category->name }}</span>
+                                <span class="position-absolute top-0 start-0 m-2 badge bg-primary rounded-pill px-2 py-1 fw-bold shadow-sm" style="font-size: .7rem;">{{ $sidePost->category?->name }}</span>
                                 @endif
                             </div>
                             <div class="col-6 col-sm-6 d-flex flex-column">
@@ -212,7 +212,7 @@
                 <a href="{{ route('blog.show', $post->slug) }}" class="text-decoration-none d-block position-relative" style="padding-bottom:60%;">
                     <img src="{{ $postImg }}" class="position-absolute w-100 h-100 object-fit-cover" alt="{{ $post->featured_image_alt ?: $post->title }}" loading="lazy">
                     @if ($post->category)
-                    <span class="position-absolute top-0 start-0 m-3 badge bg-primary rounded-pill px-2 py-1 small fw-bold">{{ $post->category->name }}</span>
+                    <span class="position-absolute top-0 start-0 m-3 badge bg-primary rounded-pill px-2 py-1 small fw-bold">{{ $post->category?->name }}</span>
                     @endif
                 </a>
                 <div class="card-body p-4 d-flex flex-column">

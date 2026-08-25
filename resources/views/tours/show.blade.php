@@ -431,8 +431,8 @@ if(window.fbq){
                                 <div class="d-grid gap-3">
                                     @foreach($tour->tiers->sortBy('priority') as $tier)
                                     @php
-                                        $tPrice = $tier->pivot->price;
-                                        $tOldPrice = $tier->pivot->old_price;
+                                        $tPrice = $tier->pivot?->price ?? 0;
+                                        $tOldPrice = $tier->pivot?->old_price ?? 0;
                                         $save = ($tOldPrice > 0 && $tOldPrice > $tPrice) ? ($tOldPrice - $tPrice) : 0;
                                     @endphp
                                     <div class="package-option p-3 border rounded-4 position-relative cursor-pointer transition-all hover-shadow-sm {{ $tier->is_popular ? 'border-primary bg-soft-primary' : 'bg-white' }}" data-action="open-booking" data-tour="{{ $tour->id }}" data-tier="{{ $tier->id }}">

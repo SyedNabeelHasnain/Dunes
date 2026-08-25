@@ -22,7 +22,7 @@
         ['@type' => 'ListItem', 'position' => 2, 'name' => 'Blog', 'item' => route('blog.index')]
     ];
     if ($post->category) {
-        $breadcrumbItems[] = ['@type' => 'ListItem', 'position' => 3, 'name' => $post->category->name, 'item' => route('blog.index', ['category' => $post->category->slug])];
+        $breadcrumbItems[] = ['@type' => 'ListItem', 'position' => 3, 'name' => $post->category?->name, 'item' => route('blog.index', ['category' => $post->category?->slug])];
         $breadcrumbItems[] = ['@type' => 'ListItem', 'position' => 4, 'name' => $post->title, 'item' => $canonical];
     } else {
         $breadcrumbItems[] = ['@type' => 'ListItem', 'position' => 3, 'name' => $post->title, 'item' => $canonical];
@@ -111,14 +111,14 @@
                     <li class="breadcrumb-item"><a href="{{ route('home') }}" class="text-white-50 text-decoration-none">Home</a></li>
                     <li class="breadcrumb-item"><a href="{{ route('blog.index') }}" class="text-white-50 text-decoration-none">Blog</a></li>
                     @if ($post->category)
-                    <li class="breadcrumb-item"><a href="{{ route('blog.index', ['category' => $post->category->slug]) }}" class="text-white-50 text-decoration-none">{{ $post->category->name }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('blog.index', ['category' => $post->category?->slug]) }}" class="text-white-50 text-decoration-none">{{ $post->category?->name }}</a></li>
                     @endif
                     <li class="breadcrumb-item active text-white-75 d-none d-md-list-item">{{ Str::limit($post->title, 40) }}</li>
                 </ol>
             </nav>
 
             @if ($post->category)
-            <a href="{{ route('blog.index', ['category' => $post->category->slug]) }}" class="badge bg-primary text-white rounded-pill px-3 py-2 fw-bold mb-3 text-decoration-none d-inline-block">{{ $post->category->name }}</a>
+            <a href="{{ route('blog.index', ['category' => $post->category?->slug]) }}" class="badge bg-primary text-white rounded-pill px-3 py-2 fw-bold mb-3 text-decoration-none d-inline-block">{{ $post->category?->name }}</a>
             @endif
 
             <h1 itemprop="headline" class="post-headline fw-800 display-6 text-white mb-3" style="max-width:780px;">{{ $post->title }}</h1>
@@ -313,7 +313,7 @@
                     <a href="{{ route('blog.show', $rp->slug) }}" class="d-block position-relative text-decoration-none" style="padding-bottom:55%;">
                         <img src="{{ $rpImg }}" class="position-absolute w-100 h-100 object-fit-cover" alt="{{ $rp->featured_image_alt ?: $rp->title }}" loading="lazy">
                         @if ($rp->category)
-                            <span class="position-absolute top-0 start-0 m-3 badge bg-primary rounded-pill small">{{ $rp->category->name }}</span>
+                            <span class="position-absolute top-0 start-0 m-3 badge bg-primary rounded-pill small">{{ $rp->category?->name }}</span>
                         @endif
                     </a>
                     <div class="card-body p-4">
