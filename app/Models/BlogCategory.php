@@ -9,7 +9,7 @@ class BlogCategory extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'slug', 'description', 'meta_title', 'meta_desc', 'og_image', 'priority', 'status'];
+    protected $fillable = ['id', 'name', 'slug', 'description', 'meta_title', 'meta_desc', 'og_image', 'priority', 'status'];
 
     protected $casts = [
         'priority' => 'integer'

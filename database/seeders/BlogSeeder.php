@@ -63,7 +63,7 @@ class BlogSeeder extends Seeder
             foreach ($posts as $p) {
                 $targetCatId = !empty($p['category_id']) ? (BlogCategory::where('id', $p['category_id'])->value('id') ?? $defaultCatId) : $defaultCatId;
 
-                BlogPost::firstOrCreate(
+                BlogPost::updateOrCreate(
                     ['slug' => $p['slug']],
                     [
                         'slug' => $p['slug'],
