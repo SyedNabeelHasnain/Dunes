@@ -82,7 +82,11 @@ jobs:
       run: |
         # Generate the .env file in the runner from .env.example
         cp .env.example .env
-        php artisan key:generate
+
+        # Set persistent APP_KEY so session encryption and tokens remain valid across deployments
+        APP_KEY_VAL="${{ secrets.APP_KEY || 'base64:ngOeg2+e92G5HDAl8P23nWUQQI1mYRjssKdf0L5PsTI=' }}"
+        sed -i '/^APP_KEY=/d' .env
+        printf 'APP_KEY="%s"\n' "$APP_KEY_VAL" >> .env
 
         # Populate database credentials dynamically from secrets/vars with hardcoded fallbacks
         sed -i "s|DB_HOST=127.0.0.1|DB_HOST=${{ vars.DB_HOST || secrets.DB_HOST || 'localhost' }}|g" .env
@@ -100,9 +104,10 @@ jobs:
         sed -i "s|APP_ENV=local|APP_ENV=production|g" .env
         sed -i "s|APP_DEBUG=true|APP_DEBUG=false|g" .env
         sed -i "s|APP_URL=http://localhost|APP_URL=https://dunesdiscoverytourism.com|g" .env
-        sed -i "s|SESSION_ENCRYPT=false|SESSION_ENCRYPT=true|g" .env
-        grep -q "^SESSION_SECURE_COOKIE=" .env || echo "SESSION_SECURE_COOKIE=true" >> .env
-        sed -i "s|SESSION_SECURE_COOKIE=false|SESSION_SECURE_COOKIE=true|g" .env
+        sed -i "s|SESSION_ENCRYPT=true|SESSION_ENCRYPT=false|g" .env
+        sed -i "s|SESSION_ENCRYPT=false|SESSION_ENCRYPT=false|g" .env
+        sed -i "s|SESSION_SECURE_COOKIE=true|SESSION_SECURE_COOKIE=false|g" .env
+        sed -i "s|SESSION_SECURE_COOKIE=false|SESSION_SECURE_COOKIE=false|g" .env
 
         # Copy core Laravel directories and files, excluding public assets, node_modules, compiled views and git history
         rsync -arv --exclude="public" --exclude="node_modules" --exclude=".git" --exclude=".github" --exclude="deploy" --exclude="storage/framework/views/*" --exclude="storage/framework/cache/*" --exclude="storage/logs/*" ./ deploy/core_deploy/
@@ -166,7 +171,7 @@ jobs:
         SSHPASS: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
       run: |
         for i in 1 2 3; do
-          sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=15 u410503041@${{ steps.ftp_server.outputs.host }} "cd /home/u410503041/domains/dunesdiscoverytourism.com/public_html && unzip -o public.zip && rm -f public.zip && cd /home/u410503041/public_html && unzip -o public.zip && rm -f public.zip && cd /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel && unzip -o core.zip && rm -f core.zip && rm -rf storage/framework/views && mkdir -p storage/framework/views && find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html -type d -exec chmod 755 {} + && find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html -type f -exec chmod 644 {} + && chmod -R 775 /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/storage /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/bootstrap/cache && php artisan migrate --force && php artisan db:seed --class=CategorySeeder --force && php artisan db:seed --class=TourSeeder --force && php artisan db:seed --class=BlogSeeder --force && php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan event:clear" && break || sleep 5
+          sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=15 u410503041@${{ steps.ftp_server.outputs.host }} "cd /home/u410503041/domains/dunesdiscoverytourism.com/public_html && unzip -o public.zip && rm -f public.zip && cd /home/u410503041/public_html && unzip -o public.zip && rm -f public.zip && cd /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel && unzip -o core.zip && rm -f core.zip && rm -rf storage/framework/views && mkdir -p storage/framework/views && find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html -type d -exec chmod 755 {} + && find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html -type f -exec chmod 644 {} + && chmod -R 775 /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/storage /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/bootstrap/cache && php artisan migrate --force && php artisan db:seed --class=CategorySeeder --force && php artisan db:seed --class=TourSeeder --force && php artisan db:seed --class=BlogSeeder --force && php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear && php artisan event:clear" && break || sleep 5
         done
 
     - name: Update asset cache version and flush server cache
