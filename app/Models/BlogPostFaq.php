@@ -11,7 +11,7 @@ class BlogPostFaq extends Model
 
     public $timestamps = false;
 
-    protected $fillable = ['post_id', 'question', 'answer', 'priority'];
+    protected $fillable = ['id', 'post_id', 'question', 'answer', 'priority'];
 
     protected $casts = [
         'priority' => 'integer'
