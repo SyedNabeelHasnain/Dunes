@@ -25,4 +25,19 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->is('ajax.php') || $request->ajax(),
         );
+
+        $exceptions->render(function (\Illuminate\Contracts\Encryption\DecryptException $e, Request $request) {
+            if ($request->is('api/*') || $request->is('ajax.php') || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Session expired. Please refresh the page.'
+                ], 200);
+            }
+
+            return redirect($request->fullUrl())
+                ->withCookie(cookie()->forget('laravel_session'))
+                ->withCookie(cookie()->forget('laravel-session'))
+                ->withCookie(cookie()->forget('XSRF-TOKEN'))
+                ->withCookie(cookie()->forget('remember_web'));
+        });
     })->create();
