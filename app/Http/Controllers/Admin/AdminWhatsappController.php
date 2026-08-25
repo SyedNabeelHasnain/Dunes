@@ -41,7 +41,12 @@ class AdminWhatsappController extends Controller
      */
     public function updateSettings(Request $request)
     {
-        $settings = $request->except(['_token']);
+        $allowedKeys = [
+            'site_whatsapp', 'whatsapp_number', 'whatsapp_default_country',
+            'whatsapp_greeting', 'whatsapp_prefill_message',
+        ];
+
+        $settings = $request->only($allowedKeys);
 
         foreach ($settings as $key => $value) {
             Setting::updateOrCreate(

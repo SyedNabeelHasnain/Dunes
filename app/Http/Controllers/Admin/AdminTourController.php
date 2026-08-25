@@ -252,7 +252,7 @@ class AdminTourController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $tour->itineraries()->create($request->all());
+        $tour->itineraries()->create($request->validated());
 
         return response()->json(['success' => true, 'message' => 'Itinerary item added successfully.']);
     }
@@ -273,7 +273,7 @@ class AdminTourController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $itinerary->update($request->all());
+        $itinerary->update($request->validated());
 
         return response()->json(['success' => true, 'message' => 'Itinerary item updated successfully.']);
     }
@@ -302,7 +302,7 @@ class AdminTourController extends Controller
             'priority' => 'required|integer',
         ]);
 
-        $item = \App\Models\ContentItem::create($request->all());
+        $item = \App\Models\ContentItem::create($request->validated());
 
         return response()->json(['success' => true, 'message' => 'Content item created successfully.', 'item' => $item]);
     }

@@ -159,7 +159,10 @@
             <a href="{{ route('home') }}" target="_blank" class="sidebar-link">
                 <i class="bi bi-globe2"></i> <span>Live Website</span>
             </a>
-            <a href="{{ route('admin.clear-cache') }}" class="sidebar-link text-warning">
+            <form id="clear-cache-form" action="{{ route('admin.clear-cache') }}" method="POST" style="display: none;">
+                @csrf
+            </form>
+            <a href="#" class="sidebar-link text-warning" onclick="event.preventDefault(); document.getElementById('clear-cache-form').submit();">
                 <i class="bi bi-arrow-clockwise"></i> <span>Clear Cache</span>
             </a>
             

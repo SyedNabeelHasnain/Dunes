@@ -16,6 +16,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use App\Mail\BookingNotification;
+use App\Mail\BookingAdminNotification;
+use App\Services\SettingsService;
 
 class BookingController extends Controller
 {
@@ -140,7 +143,7 @@ class BookingController extends Controller
         }
 
         // Generate Unique Booking Reference DDT + ymd + 5 random chars
-        $ref = 'DDT' . date('ymd') . strtoupper(substr(uniqid(), -5));
+        $ref = 'DDT' . date('ymd') . strtoupper(\Illuminate\Support\Str::random(5));
 
         // Request context logging
         $gpsPost = [
@@ -428,145 +431,24 @@ class BookingController extends Controller
     protected function sendEmailNotification(string $type, Booking $booking): void
     {
         try {
-            $brandColor = '#F58F43';
-            $subject = '';
-            $content = '';
-            $pickupLine = "<p><strong>Dune Discovery will contact to confirm the pickup time</strong></p>";
+            $settings = app(SettingsService::class);
+            $fromEmail = $settings->getFromEmail();
+            $adminEmail = $settings->getAdminEmail();
+            $ccEmails = $settings->getCcEmails();
+            $bccEmails = $settings->getBccEmails();
 
-            $name = $booking->name ?: 'Guest';
-            $reference = $booking->reference;
-            $tourName = $booking->tour_name;
-            $dateStr = $booking->tour_date ? $booking->tour_date->format('Y-m-d') : '';
-            $totalStr = $booking->total;
-            $paidStr = $booking->payment_amount;
-            $balStr = $booking->balance_due;
-            $pickup = $booking->pickup_location;
-            $phone = $booking->phone;
+            // Send to customer
+            Mail::mailer('smtp')
+                ->to($booking->email)
+                ->send((new BookingNotification($type, $booking))->from($fromEmail, 'Dunes Discovery Tourism'));
 
-            switch ($type) {
-                case 'booking_cash':
-                    $subject = "Booking Received - Ref: {$reference}";
-                    $content = "<h1 style='color:{$brandColor};'>Booking Received (Pay on Pickup)</h1>
-                                <p>Dear {$name},</p>
-                                <p>Your booking for <strong>{$tourName}</strong> is reserved.</p>
-                                <div style='background-color:#f9f9f9;padding:15px;border-radius:5px;margin:20px 0;'>
-                                    <p><strong>Reference:</strong> {$reference}</p>
-                                    <p><strong>Date:</strong> {$dateStr}</p>
-                                    <p><strong>Total:</strong> AED {$totalStr}</p>
-                                    <p><strong>Payment:</strong> Cash on pickup</p>
-                                </div>
-                                {$pickupLine}";
-                    break;
-                case 'booking_advance':
-                    $subject = "Advance Payment Received - Ref: {$reference}";
-                    $content = "<h1 style='color:{$brandColor};'>Advance Received</h1>
-                                <p>Dear {$name},</p>
-                                <p>Your booking slot for <strong>{$tourName}</strong> is held with an advance payment.</p>
-                                <div style='background-color:#f9f9f9;padding:15px;border-radius:5px;margin:20px 0;'>
-                                    <p><strong>Reference:</strong> {$reference}</p>
-                                    <p><strong>Date:</strong> {$dateStr}</p>
-                                    <p><strong>Advance Paid:</strong> AED {$paidStr}</p>
-                                    <p><strong>Balance Due:</strong> AED {$balStr}</p>
-                                </div>
-                                {$pickupLine}";
-                    break;
-                case 'booking_full':
-                    $subject = "Payment Successful - Ref: {$reference}";
-                    $content = "<h1 style='color:{$brandColor};'>Payment Successful</h1>
-                                <p>Dear {$name},</p>
-                                <p>Your booking for <strong>{$tourName}</strong> is confirmed.</p>
-                                <div style='background-color:#f9f9f9;padding:15px;border-radius:5px;margin:20px 0;'>
-                                    <p><strong>Reference:</strong> {$reference}</p>
-                                    <p><strong>Date:</strong> {$dateStr}</p>
-                                    <p><strong>Paid:</strong> AED {$paidStr}</p>
-                                    <p><strong>Status:</strong> Confirmed</p>
-                                </div>
-                                {$pickupLine}";
-                    break;
-            }
-
-            $siteEmailSetting = Setting::where('setting_key', 'site_email')->first();
-            $fromEmail = $siteEmailSetting ? $siteEmailSetting->setting_value : 'info@dunesdiscoverytourism.com';
-
-            $userEmailBody = "
-                <div style='text-align:center;margin:0 auto;padding:20px;'>
-                    <img src='https://dunesdiscoverytourism.com/images/logo.png' alt='Dunes Discovery Tourism Logo' style='max-width:180px;width:100%;height:auto;display:block;margin:0 auto;'/>
-                </div>
-                <div style='font-family:Arial,sans-serif;max-width:600px;margin:0 auto;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;'>
-                    <div style='background-color:{$brandColor};padding:20px;text-align:center;'>
-                        <h2 style='color:white;margin:0;'>Dunes Discovery Tourism</h2>
-                    </div>
-                    <div style='padding:20px;background-color:#ffffff;color:#333;line-height:1.6;'>
-                        {$content}
-                        <p>Thank you for choosing Dunes Discovery Tourism.</p>
-                    </div>
-                    <div style='padding:15px;text-align:center;color:#888;font-size:12px;background-color:#f9f9f9;border-top:1px solid #eee;'>
-                        &copy; " . date('Y') . " Dunes Discovery Tourism. All rights reserved.<br>
-                        <a href='https://dunesdiscoverytourism.com' style='color:#888;text-decoration:none;'>https://dunesdiscoverytourism.com</a>
-                    </div>
-                </div>";
-
-            // Send to user
-            Mail::send([], [], function ($message) use ($booking, $subject, $userEmailBody, $fromEmail) {
-                $message->to($booking->email)
-                    ->from($fromEmail, 'Dunes Discovery Tourism')
-                    ->subject($subject)
-                    ->html($userEmailBody);
-            });
-
-            // Send notification to Admin
-            $adminSubject = "New Booking - Ref: {$reference}";
-            $adminContent = "
-                <h1 style='color:{$brandColor};'>New Booking Received</h1>
-                <p><strong>Reference:</strong> {$reference}</p>
-                <p><strong>Customer:</strong> {$name} ({$phone})</p>
-                <p><strong>Email:</strong> {$booking->email}</p>
-                <p><strong>Tour:</strong> {$tourName}</p>
-                <p><strong>Total:</strong> AED {$totalStr}</p>
-                <p><strong>Payment Method:</strong> " . ucfirst($booking->payment_method) . "</p>
-                <p><strong>Payment Status:</strong> " . ucfirst($booking->payment_status) . "</p>";
-
-            $adminEmailBody = "
-                <div style='text-align:center;margin:0 auto;padding:20px;'>
-                    <img src='https://dunesdiscoverytourism.com/images/logo.png' alt='Dunes Discovery Tourism Logo' style='max-width:180px;width:100%;height:auto;display:block;margin:0 auto;'/>
-                </div>
-                <div style='font-family:Arial,sans-serif;max-width:600px;margin:0 auto;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;'>
-                    <div style='background-color:{$brandColor};padding:20px;text-align:center;'>
-                        <h2 style='color:white;margin:0;'>Dunes Discovery Tourism</h2>
-                    </div>
-                    <div style='padding:20px;background-color:#ffffff;color:#333;line-height:1.6;'>
-                        {$adminContent}
-                    </div>
-                    <div style='padding:15px;text-align:center;color:#888;font-size:12px;background-color:#f9f9f9;border-top:1px solid #eee;'>
-                        &copy; " . date('Y') . " Dunes Discovery Tourism. All rights reserved.
-                    </div>
-                </div>";
-
-            $adminEmailSetting = Setting::where('setting_key', 'admin_email')->first();
-            $adminEmail = $adminEmailSetting ? $adminEmailSetting->setting_value : 'admin@dunesdiscoverytourism.com';
-
-            $ccSetting = Setting::where('setting_key', 'admin_email_cc')->first();
-            $ccEmails = $ccSetting && !empty($ccSetting->setting_value) ? array_filter(array_map('trim', explode(',', $ccSetting->setting_value))) : [];
-
-            $bccSetting = Setting::where('setting_key', 'admin_email_bcc')->first();
-            $bccEmails = $bccSetting && !empty($bccSetting->setting_value) ? array_filter(array_map('trim', explode(',', $bccSetting->setting_value))) : [];
-
-            Mail::send([], [], function ($message) use ($fromEmail, $adminEmail, $ccEmails, $bccEmails, $adminSubject, $adminEmailBody) {
-                $message->to($adminEmail)
-                    ->from($fromEmail, 'Dunes Discovery Tourism')
-                    ->subject($adminSubject)
-                    ->html($adminEmailBody);
-                
-                if (!empty($ccEmails)) {
-                    $message->cc($ccEmails);
-                }
-                if (!empty($bccEmails)) {
-                    $message->bcc($bccEmails);
-                }
-            });
-
+            // Send to admin
+            $adminMail = (new BookingAdminNotification($booking))->from($fromEmail, 'Dunes Discovery Tourism');
+            if (!empty($ccEmails)) $adminMail->cc($ccEmails);
+            if (!empty($bccEmails)) $adminMail->bcc($bccEmails);
+            Mail::mailer('smtp')->to($adminEmail)->send($adminMail);
         } catch (\Exception $e) {
-            Log::error("Failed to send booking checkout email notifications for booking {$booking->reference}: " . $e->getMessage());
+            Log::error("Failed to send booking email for {$booking->reference}: " . $e->getMessage());
         }
     }
 }

@@ -11,6 +11,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use App\Mail\OtpMail;
+use App\Services\SettingsService;
 
 class EmailVerificationController extends Controller
 {
@@ -86,31 +88,8 @@ class EmailVerificationController extends Controller
 
         // Send the OTP email using Laravel Mail facade
         try {
-            // Check if setting for site email and settings is loaded
-            $settingEmail = \App\Models\Setting::where('setting_key', 'site_email')->first();
-            $fromEmail = $settingEmail ? $settingEmail->setting_value : 'info@dunesdiscoverytourism.com';
-
-            Mail::send([], [], function ($message) use ($email, $otp, $fromEmail) {
-                $message->to($email)
-                    ->from($fromEmail, 'Dunes Discovery Tourism')
-                    ->subject('Your Email Verification Code - Dunes Discovery Tourism')
-                    ->html("
-                        <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px;'>
-                            <div style='text-align: center; margin-bottom: 20px;'>
-                                <img src='https://dunesdiscoverytourism.com/images/logo.png' alt='Dunes Discovery Tourism' style='max-width: 150px;'>
-                            </div>
-                            <h2 style='color: #d2a13b; text-align: center;'>Verify Your Email Address</h2>
-                            <p>Thank you for booking with Dunes Discovery Tourism. Please use the verification code below to complete your booking:</p>
-                            <div style='background-color: #f9f9f9; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 5px; color: #333; border: 1px dashed #d2a13b; margin: 20px 0;'>
-                                {$otp}
-                            </div>
-                            <p style='color: #666; font-size: 12px; text-align: center;'>This verification code is valid for 5 minutes. If you did not request this code, please ignore this email.</p>
-                            <hr style='border: 0; border-top: 1px solid #eee; margin-top: 30px;'>
-                            <p style='color: #999; font-size: 11px; text-align: center;'>&copy; " . date('Y') . " Dunes Discovery Tourism. All rights reserved.</p>
-                        </div>
-                    ");
-            });
-
+            $fromEmail = app(SettingsService::class)->getFromEmail();
+            Mail::to($email)->send((new OtpMail($otp))->from($fromEmail, 'Dunes Discovery Tourism'));
             return response()->json(['success' => true, 'message' => 'OTP sent successfully to ' . $email]);
 
         } catch (\Exception $e) {

@@ -39,7 +39,16 @@ class AdminSettingController extends Controller
      */
     public function update(Request $request)
     {
-        $settings = $request->except(['_token']);
+        $allowedKeys = [
+            'google_analytics_id', 'google_tag_manager_id', 'google_ads_id',
+            'google_maps_api_key', 'recaptcha_site_key', 'recaptcha_secret_key',
+            'meta_pixel_id', 'meta_access_token', 'meta_active', 'meta_capi_enabled',
+            'site_email', 'admin_email', 'admin_email_cc', 'admin_email_bcc',
+            'ziina_active', 'ziina_access_token', 'ziina_test_mode', 'ziina_advance_percent',
+            'cache_version',
+        ];
+
+        $settings = $request->only($allowedKeys);
 
         foreach ($settings as $key => $value) {
             Setting::updateOrCreate(

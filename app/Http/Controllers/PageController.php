@@ -11,6 +11,10 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use App\Mail\ContactNotification;
+use App\Mail\ContactAcknowledgement;
+use App\Mail\WhatsappLeadNotification;
+use App\Services\SettingsService;
 
 class PageController extends Controller
 {
@@ -115,54 +119,20 @@ class PageController extends Controller
             }
 
             // Send Email Notifications
-            $siteEmailSetting = \App\Models\Setting::where('setting_key', 'site_email')->first();
-            $fromEmail = $siteEmailSetting ? $siteEmailSetting->setting_value : 'info@dunesdiscoverytourism.com';
+            $settings = app(SettingsService::class);
+            $fromEmail = $settings->getFromEmail();
+            $adminEmail = $settings->getAdminEmail();
+            $ccEmails = $settings->getCcEmails();
+            $bccEmails = $settings->getBccEmails();
 
-            $adminEmailSetting = \App\Models\Setting::where('setting_key', 'admin_email')->first();
-            $adminEmail = $adminEmailSetting ? $adminEmailSetting->setting_value : 'admin@dunesdiscoverytourism.com';
+            // Admin notification
+            $adminMail = (new ContactNotification($name, $email, $phone, $subject, $messageText))->from($fromEmail, 'Dunes Discovery Tourism');
+            if (!empty($ccEmails)) $adminMail->cc($ccEmails);
+            if (!empty($bccEmails)) $adminMail->bcc($bccEmails);
+            Mail::to($adminEmail)->send($adminMail);
 
-            $ccSetting = \App\Models\Setting::where('setting_key', 'admin_email_cc')->first();
-            $ccEmails = $ccSetting && !empty($ccSetting->setting_value) ? array_filter(array_map('trim', explode(',', $ccSetting->setting_value))) : [];
-
-            $bccSetting = \App\Models\Setting::where('setting_key', 'admin_email_bcc')->first();
-            $bccEmails = $bccSetting && !empty($bccSetting->setting_value) ? array_filter(array_map('trim', explode(',', $bccSetting->setting_value))) : [];
-
-            // 1. To Admin
-            Mail::send([], [], function ($message) use ($name, $email, $phone, $subject, $messageText, $adminEmail, $fromEmail, $ccEmails, $bccEmails) {
-                $message->to($adminEmail)
-                    ->from($fromEmail, 'Dunes Discovery Tourism')
-                    ->subject("New Contact Message: {$subject}")
-                    ->html("
-                        <h2>New Contact Inquiry Received</h2>
-                        <p><strong>Name:</strong> {$name}</p>
-                        <p><strong>Email:</strong> {$email}</p>
-                        <p><strong>Phone:</strong> {$phone}</p>
-                        <p><strong>Subject:</strong> {$subject}</p>
-                        <p><strong>Message:</strong></p>
-                        <p style='background: #f9f9f9; padding: 15px; border-left: 4px solid #d2a13b;'>{$messageText}</p>
-                    ");
-                
-                if (!empty($ccEmails)) {
-                    $message->cc($ccEmails);
-                }
-                if (!empty($bccEmails)) {
-                    $message->bcc($bccEmails);
-                }
-            });
-
-            // 2. To User (Acknowledgement)
-            Mail::send([], [], function ($message) use ($email, $name, $fromEmail) {
-                $message->to($email)
-                    ->from($fromEmail, 'Dunes Discovery Tourism')
-                    ->subject("We received your message - Dunes Discovery Tourism")
-                    ->html("
-                        <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee;'>
-                            <h3>Dear {$name},</h3>
-                            <p>Thank you for contacting Dunes Discovery Tourism. We have received your inquiry and our support team will get back to you shortly.</p>
-                            <p>Best Regards,<br><strong>Dunes Discovery Tourism Team</strong></p>
-                        </div>
-                    ");
-            });
+            // User acknowledgement
+            Mail::to($email)->send((new ContactAcknowledgement($name))->from($fromEmail, 'Dunes Discovery Tourism'));
 
             return response()->json([
                 'success' => true,
@@ -218,23 +188,11 @@ class PageController extends Controller
             }
 
             // Send Admin Email Notification
-            $siteEmailSetting = \App\Models\Setting::where('setting_key', 'site_email')->first();
-            $adminEmail = $siteEmailSetting ? $siteEmailSetting->setting_value : 'info@dunesdiscoverytourism.com';
-
-            Mail::send([], [], function ($message) use ($name, $phone, $tourName, $pageUrl, $messageText, $adminEmail) {
-                $message->to($adminEmail)
-                    ->from($adminEmail, 'Dunes Discovery Tourism')
-                    ->subject("New WhatsApp Lead: {$name} - {$tourName}")
-                    ->html("
-                        <h2>New WhatsApp Click Lead</h2>
-                        <p><strong>Name:</strong> {$name}</p>
-                        <p><strong>Phone:</strong> {$phone}</p>
-                        <p><strong>Tour / Topic:</strong> {$tourName}</p>
-                        <p><strong>Page URL:</strong> <a href='{$pageUrl}'>{$pageUrl}</a></p>
-                        <p><strong>Prefilled Message:</strong></p>
-                        <p style='background: #f9f9f9; padding: 15px; border-left: 4px solid #25d366;'>{$messageText}</p>
-                    ");
-            });
+            $settings = app(SettingsService::class);
+            $adminEmail = $settings->get('site_email', 'info@dunesdiscoverytourism.com');
+            Mail::to($adminEmail)->send(
+                (new WhatsappLeadNotification($name, $phone, $tourName, $pageUrl, $messageText))->from($adminEmail, 'Dunes Discovery Tourism')
+            );
 
             return response()->json([
                 'success' => true,

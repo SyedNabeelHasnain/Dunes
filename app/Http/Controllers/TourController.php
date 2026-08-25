@@ -15,16 +15,6 @@ class TourController extends Controller
      */
     public function index(Request $request)
     {
-        if (\App\Models\Category::count() === 0) {
-            try {
-                (new \Database\Seeders\CategorySeeder())->run();
-            } catch (\Throwable $e) {}
-        }
-        if (Tour::count() === 0) {
-            try {
-                (new \Database\Seeders\TourSeeder())->run();
-            } catch (\Throwable $e) {}
-        }
 
         $selectedCategorySlug = $request->input('category');
         
@@ -57,22 +47,6 @@ class TourController extends Controller
         $tour = Tour::where('slug', $slug)
             ->with(['itineraries', 'tiers', 'addons', 'contentItems', 'category'])
             ->first();
-
-        if ($tour && $tour->status !== 'active') {
-            try {
-                $tour->status = 'active';
-                $tour->save();
-            } catch (\Throwable $e) {}
-        }
-
-        if (!$tour) {
-            try {
-                (new \Database\Seeders\TourSeeder())->run();
-                $tour = Tour::where('slug', $slug)
-                    ->with(['itineraries', 'tiers', 'addons', 'contentItems', 'category'])
-                    ->first();
-            } catch (\Throwable $e) {}
-        }
 
         if (!$tour) {
             abort(404);

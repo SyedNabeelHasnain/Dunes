@@ -7,6 +7,9 @@ use App\Models\Booking;
 use App\Models\RequestLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\BookingNotification;
+use App\Mail\PaymentLinkMail;
+use App\Services\SettingsService;
 
 class AdminBookingController extends Controller
 {
@@ -59,54 +62,17 @@ class AdminBookingController extends Controller
 
         // If status changed to confirmed or cancelled, trigger notifications
         if ($oldStatus !== $booking->status) {
-            $brandColor = '#F58F43';
-            $siteEmailSetting = \App\Models\Setting::where('setting_key', 'site_email')->first();
-            $fromEmail = $siteEmailSetting ? $siteEmailSetting->setting_value : 'info@dunesdiscoverytourism.com';
-
+            $settings = app(SettingsService::class);
+            $fromEmail = $settings->getFromEmail();
+            
             if ($booking->status === 'confirmed') {
-                // Send booking confirmation email
-                $subject = "Booking Confirmed - Ref: {$booking->reference}";
-                $bodyContent = "
-                    <h1 style='color:{$brandColor};'>Booking Confirmed!</h1>
-                    <p>Dear {$booking->name},</p>
-                    <p>Your booking for <strong>{$booking->tour_name}</strong> is officially confirmed!</p>
-                    <div style='background-color:#f9f9f9;padding:15px;border-radius:5px;margin:20px 0;'>
-                        <p><strong>Reference:</strong> {$booking->reference}</p>
-                        <p><strong>Date:</strong> " . ($booking->tour_date ? $booking->tour_date->format('Y-m-d') : '') . "</p>
-                        <p><strong>Pickup:</strong> {$booking->pickup_location}</p>
-                        <p><strong>Total:</strong> AED {$booking->total}</p>
-                        <p><strong>Balance Due:</strong> AED {$booking->balance_due}</p>
-                    </div>";
-
-                Mail::send([], [], function ($message) use ($booking, $subject, $bodyContent, $fromEmail, $brandColor) {
-                    $message->to($booking->email)
-                        ->from($fromEmail, 'Dunes Discovery Tourism')
-                        ->subject($subject)
-                        ->html("
-                            <div style='text-align:center;margin:0 auto;padding:20px;'><img src='https://dunesdiscoverytourism.com/images/logo.png' alt='Dunes Logo' style='max-width:180px;'/></div>
-                            <div style='font-family:Arial,sans-serif;max-width:600px;margin:0 auto;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;'>
-                                <div style='background-color:{$brandColor};padding:20px;text-align:center;'><h2 style='color:white;margin:0;'>Dunes Discovery</h2></div>
-                                <div style='padding:20px;background-color:#ffffff;'>{$bodyContent}</div>
-                            </div>");
-                });
+                Mail::to($booking->email)->send(
+                    (new BookingNotification('booking_confirmed', $booking))->from($fromEmail, 'Dunes Discovery Tourism')
+                );
             } elseif ($booking->status === 'cancelled') {
-                // Send cancellation email
-                $subject = "Booking Cancelled - Ref: {$booking->reference}";
-                $bodyContent = "
-                    <h1>Booking Cancelled</h1>
-                    <p>Dear {$booking->name},</p>
-                    <p>Your booking for <strong>{$booking->tour_name}</strong> (Ref: {$booking->reference}) has been cancelled as requested.</p>";
-
-                Mail::send([], [], function ($message) use ($booking, $subject, $bodyContent, $fromEmail, $brandColor) {
-                    $message->to($booking->email)
-                        ->from($fromEmail, 'Dunes Discovery Tourism')
-                        ->subject($subject)
-                        ->html("
-                            <div style='font-family:Arial,sans-serif;max-width:600px;margin:0 auto;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;'>
-                                <div style='background-color:{$brandColor};padding:20px;text-align:center;'><h2 style='color:white;margin:0;'>Dunes Discovery</h2></div>
-                                <div style='padding:20px;background-color:#ffffff;'>{$bodyContent}</div>
-                            </div>");
-                });
+                Mail::to($booking->email)->send(
+                    (new BookingNotification('booking_cancelled', $booking))->from($fromEmail, 'Dunes Discovery Tourism')
+                );
             }
         }
 
@@ -194,34 +160,10 @@ class AdminBookingController extends Controller
             ]);
         } elseif ($sendMethod === 'email') {
             try {
-                $brandColor = '#F58F43';
-                $siteEmailSetting = \App\Models\Setting::where('setting_key', 'site_email')->first();
-                $fromEmail = $siteEmailSetting ? $siteEmailSetting->setting_value : 'info@dunesdiscoverytourism.com';
-
-                $subject = "Payment Link for Booking #{$booking->reference}";
-                $bodyContent = "
-                    <h1 style='color:{$brandColor};'>Payment Link Generated</h1>
-                    <p>Dear {$booking->name},</p>
-                    <p>A payment link has been generated to complete your payment for <strong>{$booking->tour_name}</strong>.</p>
-                    <div style='background-color:#f9f9f9;padding:15px;border-radius:5px;margin:20px 0;text-align:center;'>
-                        <p><strong>Amount:</strong> AED " . number_format($amount) . "</p>
-                        " . ($notes ? "<p><strong>Notes:</strong> {$notes}</p>" : "") . "
-                        <p style='margin-top: 15px;'>
-                            <a href='{$payment->payment_url}' style='background-color:{$brandColor};color:white;padding:10px 20px;text-decoration:none;font-weight:bold;border-radius:5px;display:inline-block;'>Pay Now</a>
-                        </p>
-                    </div>";
-
-                Mail::send([], [], function ($msg) use ($booking, $subject, $bodyContent, $fromEmail, $brandColor) {
-                    $msg->to($booking->email)
-                        ->from($fromEmail, 'Dunes Discovery Tourism')
-                        ->subject($subject)
-                        ->html("
-                            <div style='text-align:center;margin:0 auto;padding:20px;'><img src='https://dunesdiscoverytourism.com/images/logo.png' alt='Dunes Logo' style='max-width:180px;'/></div>
-                            <div style='font-family:Arial,sans-serif;max-width:600px;margin:0 auto;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;'>
-                                <div style='background-color:{$brandColor};padding:20px;text-align:center;'><h2 style='color:white;margin:0;'>Dunes Discovery</h2></div>
-                                <div style='padding:20px;background-color:#ffffff;'>{$bodyContent}</div>
-                            </div>");
-                });
+                $fromEmail = app(SettingsService::class)->getFromEmail();
+                Mail::to($booking->email)->send(
+                    (new PaymentLinkMail($booking, $amount, $payment->payment_url, $notes))->from($fromEmail, 'Dunes Discovery Tourism')
+                );
                 $message = 'Payment link created and email sent successfully.';
             } catch (\Exception $e) {
                 \Log::error("Failed to send payment link email: " . $e->getMessage());
@@ -258,33 +200,10 @@ class AdminBookingController extends Controller
         $amount = (float)$request->input('amount');
 
         try {
-            $brandColor = '#F58F43';
-            $siteEmailSetting = \App\Models\Setting::where('setting_key', 'site_email')->first();
-            $fromEmail = $siteEmailSetting ? $siteEmailSetting->setting_value : 'info@dunesdiscoverytourism.com';
-
-            $subject = "Complete Payment for Booking #{$booking->reference}";
-            $bodyContent = "
-                <h1 style='color:{$brandColor};'>Complete Your Payment</h1>
-                <p>Dear {$booking->name},</p>
-                <p>Please use the link below to complete your payment of <strong>AED " . number_format($amount) . "</strong> for your booking <strong>{$booking->tour_name}</strong>.</p>
-                <div style='background-color:#f9f9f9;padding:15px;border-radius:5px;margin:20px 0;text-align:center;'>
-                    <p style='margin-top: 15px;'>
-                        <a href='{$link}' style='background-color:{$brandColor};color:white;padding:10px 20px;text-decoration:none;font-weight:bold;border-radius:5px;display:inline-block;'>Pay Now</a>
-                    </p>
-                </div>";
-
-            Mail::send([], [], function ($msg) use ($booking, $subject, $bodyContent, $fromEmail, $brandColor) {
-                $msg->to($booking->email)
-                    ->from($fromEmail, 'Dunes Discovery Tourism')
-                    ->subject($subject)
-                    ->html("
-                        <div style='text-align:center;margin:0 auto;padding:20px;'><img src='https://dunesdiscoverytourism.com/images/logo.png' alt='Dunes Logo' style='max-width:180px;'/></div>
-                        <div style='font-family:Arial,sans-serif;max-width:600px;margin:0 auto;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;'>
-                            <div style='background-color:{$brandColor};padding:20px;text-align:center;'><h2 style='color:white;margin:0;'>Dunes Discovery</h2></div>
-                            <div style='padding:20px;background-color:#ffffff;'>{$bodyContent}</div>
-                        </div>");
-            });
-
+            $fromEmail = app(SettingsService::class)->getFromEmail();
+            Mail::to($booking->email)->send(
+                (new PaymentLinkMail($booking, $amount, $link, ''))->from($fromEmail, 'Dunes Discovery Tourism')
+            );
             return response()->json(['success' => true, 'message' => 'Email sent successfully.']);
         } catch (\Exception $e) {
             \Log::error("Failed to resend payment email: " . $e->getMessage());
