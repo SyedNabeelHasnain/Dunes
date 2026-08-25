@@ -62,17 +62,21 @@ class AdminBookingController extends Controller
 
         // If status changed to confirmed or cancelled, trigger notifications
         if ($oldStatus !== $booking->status) {
-            $settings = app(SettingsService::class);
-            $fromEmail = $settings->getFromEmail();
-            
-            if ($booking->status === 'confirmed') {
-                Mail::to($booking->email)->send(
-                    (new BookingNotification('booking_confirmed', $booking))->from($fromEmail, 'Dunes Discovery Tourism')
-                );
-            } elseif ($booking->status === 'cancelled') {
-                Mail::to($booking->email)->send(
-                    (new BookingNotification('booking_cancelled', $booking))->from($fromEmail, 'Dunes Discovery Tourism')
-                );
+            try {
+                $settings = app(SettingsService::class);
+                $fromEmail = $settings->getFromEmail();
+                
+                if ($booking->status === 'confirmed') {
+                    Mail::to($booking->email)->send(
+                        (new BookingNotification('booking_confirmed', $booking))->from($fromEmail, 'Dunes Discovery Tourism')
+                    );
+                } elseif ($booking->status === 'cancelled') {
+                    Mail::to($booking->email)->send(
+                        (new BookingNotification('booking_cancelled', $booking))->from($fromEmail, 'Dunes Discovery Tourism')
+                    );
+                }
+            } catch (\Throwable $e) {
+                \Log::error("Failed to send booking status change email: " . $e->getMessage());
             }
         }
 
@@ -165,7 +169,7 @@ class AdminBookingController extends Controller
                     (new PaymentLinkMail($booking, $amount, $payment->payment_url, $notes))->from($fromEmail, 'Dunes Discovery Tourism')
                 );
                 $message = 'Payment link created and email sent successfully.';
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 \Log::error("Failed to send payment link email: " . $e->getMessage());
                 $message = 'Payment link created but email sending failed.';
             }
@@ -205,7 +209,7 @@ class AdminBookingController extends Controller
                 (new PaymentLinkMail($booking, $amount, $link, ''))->from($fromEmail, 'Dunes Discovery Tourism')
             );
             return response()->json(['success' => true, 'message' => 'Email sent successfully.']);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::error("Failed to resend payment email: " . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Failed to send email.'], 500);
         }

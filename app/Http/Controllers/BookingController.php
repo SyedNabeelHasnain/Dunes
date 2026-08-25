@@ -438,17 +438,24 @@ class BookingController extends Controller
             $bccEmails = $settings->getBccEmails();
 
             // Send to customer
-            Mail::mailer('smtp')
-                ->to($booking->email)
-                ->send((new BookingNotification($type, $booking))->from($fromEmail, 'Dunes Discovery Tourism'));
+            try {
+                Mail::to($booking->email)
+                    ->send((new BookingNotification($type, $booking))->from($fromEmail, 'Dunes Discovery Tourism'));
+            } catch (\Throwable $e) {
+                Log::error("Failed to send customer booking email for {$booking->reference}: " . $e->getMessage());
+            }
 
             // Send to admin
-            $adminMail = (new BookingAdminNotification($booking))->from($fromEmail, 'Dunes Discovery Tourism');
-            if (!empty($ccEmails)) $adminMail->cc($ccEmails);
-            if (!empty($bccEmails)) $adminMail->bcc($bccEmails);
-            Mail::mailer('smtp')->to($adminEmail)->send($adminMail);
-        } catch (\Exception $e) {
-            Log::error("Failed to send booking email for {$booking->reference}: " . $e->getMessage());
+            try {
+                $adminMail = (new BookingAdminNotification($booking))->from($fromEmail, 'Dunes Discovery Tourism');
+                if (!empty($ccEmails)) $adminMail->cc($ccEmails);
+                if (!empty($bccEmails)) $adminMail->bcc($bccEmails);
+                Mail::to($adminEmail)->send($adminMail);
+            } catch (\Throwable $e) {
+                Log::error("Failed to send admin booking email for {$booking->reference}: " . $e->getMessage());
+            }
+        } catch (\Throwable $e) {
+            Log::error("Failed to prepare booking email for {$booking->reference}: " . $e->getMessage());
         }
     }
 }

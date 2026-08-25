@@ -92,7 +92,7 @@ class EmailVerificationController extends Controller
             Mail::to($email)->send((new OtpMail($otp))->from($fromEmail, 'Dunes Discovery Tourism'));
             return response()->json(['success' => true, 'message' => 'OTP sent successfully to ' . $email]);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error("Failed to dispatch OTP email to {$email}: " . $e->getMessage());
             return response()->json([
                 'success' => false,

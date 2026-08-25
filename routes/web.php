@@ -104,7 +104,7 @@ Route::middleware('auth')->group(function () {
 require __DIR__.'/auth.php';
 
 // ── Legacy AJAX Gateway Route (Throttled for Security) ───────────────────────
-Route::post('/ajax.php', [AjaxGatewayController::class, 'handle'])->middleware('throttle:30,1');
+Route::match(['get', 'post'], '/ajax.php', [AjaxGatewayController::class, 'handle'])->middleware('throttle:60,1');
 
 // ── Dynamic XML Sitemap & Image Sitemap ──────────────────────────────────────
 Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');

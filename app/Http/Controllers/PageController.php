@@ -119,20 +119,24 @@ class PageController extends Controller
             }
 
             // Send Email Notifications
-            $settings = app(SettingsService::class);
-            $fromEmail = $settings->getFromEmail();
-            $adminEmail = $settings->getAdminEmail();
-            $ccEmails = $settings->getCcEmails();
-            $bccEmails = $settings->getBccEmails();
+            try {
+                $settings = app(SettingsService::class);
+                $fromEmail = $settings->getFromEmail();
+                $adminEmail = $settings->getAdminEmail();
+                $ccEmails = $settings->getCcEmails();
+                $bccEmails = $settings->getBccEmails();
 
-            // Admin notification
-            $adminMail = (new ContactNotification($name, $email, $phone, $subject, $messageText))->from($fromEmail, 'Dunes Discovery Tourism');
-            if (!empty($ccEmails)) $adminMail->cc($ccEmails);
-            if (!empty($bccEmails)) $adminMail->bcc($bccEmails);
-            Mail::to($adminEmail)->send($adminMail);
+                // Admin notification
+                $adminMail = (new ContactNotification($name, $email, $phone, $subject, $messageText))->from($fromEmail, 'Dunes Discovery Tourism');
+                if (!empty($ccEmails)) $adminMail->cc($ccEmails);
+                if (!empty($bccEmails)) $adminMail->bcc($bccEmails);
+                Mail::to($adminEmail)->send($adminMail);
 
-            // User acknowledgement
-            Mail::to($email)->send((new ContactAcknowledgement($name))->from($fromEmail, 'Dunes Discovery Tourism'));
+                // User acknowledgement
+                Mail::to($email)->send((new ContactAcknowledgement($name))->from($fromEmail, 'Dunes Discovery Tourism'));
+            } catch (\Throwable $e) {
+                Log::error("Failed to send contact emails: " . $e->getMessage());
+            }
 
             return response()->json([
                 'success' => true,
@@ -140,7 +144,7 @@ class PageController extends Controller
                 'verified' => $isVerified
             ]);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error("Failed to process contact submission: " . $e->getMessage());
             return response()->json([
                 'success' => false,
@@ -188,11 +192,15 @@ class PageController extends Controller
             }
 
             // Send Admin Email Notification
-            $settings = app(SettingsService::class);
-            $adminEmail = $settings->get('site_email', 'info@dunesdiscoverytourism.com');
-            Mail::to($adminEmail)->send(
-                (new WhatsappLeadNotification($name, $phone, $tourName, $pageUrl, $messageText))->from($adminEmail, 'Dunes Discovery Tourism')
-            );
+            try {
+                $settings = app(SettingsService::class);
+                $adminEmail = $settings->get('site_email', 'info@dunesdiscoverytourism.com');
+                Mail::to($adminEmail)->send(
+                    (new WhatsappLeadNotification($name, $phone, $tourName, $pageUrl, $messageText))->from($adminEmail, 'Dunes Discovery Tourism')
+                );
+            } catch (\Throwable $e) {
+                Log::error("Failed to send WhatsApp lead email: " . $e->getMessage());
+            }
 
             return response()->json([
                 'success' => true,
@@ -200,7 +208,7 @@ class PageController extends Controller
                 'inquiry_id' => $inquiry->id
             ]);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error("Failed to log WhatsApp click: " . $e->getMessage());
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
