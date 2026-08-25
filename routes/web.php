@@ -91,7 +91,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/settings/google', [AdminSettingController::class, 'google'])->name('settings.google');
     Route::get('/settings/meta', [AdminSettingController::class, 'meta'])->name('settings.meta');
     Route::post('/settings/update', [AdminSettingController::class, 'update'])->name('settings.update');
-    Route::post('/clear-cache', [AdminSettingController::class, 'clearCache'])->name('admin.clear-cache');
+    Route::post('/clear-cache', [AdminSettingController::class, 'clearCache'])->name('clear-cache');
 });
 
 // ── Profile routes (Breeze default) ──────────────────────────────────────────
