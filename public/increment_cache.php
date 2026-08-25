@@ -149,13 +149,26 @@ try {
     // 9. Check for action=read_log
     if (isset($_GET['action']) && $_GET['action'] === 'read_log') {
         header('Content-Type: text/plain; charset=utf-8');
-        $logFile = $baseDir . '/storage/logs/laravel.log';
-        if (file_exists($logFile)) {
-            $lines = file($logFile);
-            $last = array_slice($lines, -150);
-            echo implode('', $last);
-        } else {
-            echo "LOG FILE NOT FOUND at " . $logFile;
+        $possibleLogs = [
+            $baseDir . '/storage/logs/laravel.log',
+            __DIR__ . '/../storage/logs/laravel.log',
+            __DIR__ . '/../dunes-laravel/storage/logs/laravel.log',
+            '/home/u410503041/domains/dunesdiscoverytourism.com/storage/logs/laravel.log',
+            '/home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/storage/logs/laravel.log',
+        ];
+        $found = false;
+        foreach (array_unique($possibleLogs) as $logFile) {
+            if (file_exists($logFile)) {
+                echo "=== FOUND LOG AT {$logFile} ===\n";
+                $lines = file($logFile);
+                $last = array_slice($lines, -150);
+                echo implode('', $last);
+                $found = true;
+                break;
+            }
+        }
+        if (!$found) {
+            echo "LOG FILE NOT FOUND IN ANY OF THE PLACES:\n" . implode("\n", $possibleLogs);
         }
         exit;
     }

@@ -101,11 +101,16 @@ class AdminTourController extends Controller
      */
     public function edit(string $id)
     {
-        $tour = Tour::with(['tiers', 'addons'])->findOrFail($id);
-        $categories = Category::all();
-        $tiers = Tier::where('status', 'active')->get();
-        $addons = Addon::where('status', 'active')->get();
-        return view('admin.tours.edit', compact('tour', 'categories', 'tiers', 'addons'));
+        try {
+            $tour = Tour::with(['tiers', 'addons'])->findOrFail($id);
+            $categories = Category::all();
+            $tiers = Tier::where('status', 'active')->get();
+            $addons = Addon::where('status', 'active')->get();
+            return view('admin.tours.edit', compact('tour', 'categories', 'tiers', 'addons'));
+        } catch (\Throwable $e) {
+            return response("DEBUG EXCEPTION IN EDIT TOUR:\n" . $e->getMessage() . "\nFILE: " . $e->getFile() . ":" . $e->getLine() . "\n\nTRACE:\n" . $e->getTraceAsString(), 500)
+                ->header('Content-Type', 'text/plain');
+        }
     }
 
     /**
