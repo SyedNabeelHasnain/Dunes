@@ -24,6 +24,25 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
+        /* Global SVG & Pagination Safeguards */
+        svg {
+            max-width: 100%;
+        }
+        .pagination svg, nav svg, nav[role="navigation"] svg {
+            width: 1.25rem !important;
+            height: 1.25rem !important;
+            max-width: 1.25rem !important;
+            max-height: 1.25rem !important;
+            display: inline-block !important;
+            vertical-align: middle !important;
+        }
+        nav[role="navigation"] {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
         .loader-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255,255,255,0.8); z-index: 9999; display: none;

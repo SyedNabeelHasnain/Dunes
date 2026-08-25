@@ -85,7 +85,7 @@
 </div>
 
 <div class="mt-4">
-    {{ $leads->links() }}
+    {{ $leads->links('pagination::bootstrap-5') }}
 </div>
 
 <!-- View Details Modal -->

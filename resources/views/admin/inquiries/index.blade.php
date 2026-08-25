@@ -81,6 +81,6 @@
 </div>
 
 <div class="mt-4">
-    {{ $inquiries->links() }}
+    {{ $inquiries->links('pagination::bootstrap-5') }}
 </div>
 @endsection

@@ -203,7 +203,7 @@
         </div>
     </div>
     <div class="card-footer bg-white border-top p-3 ps-4 pe-4">
-        {{ $logs->appends(['days' => $days])->links() }}
+        {{ $logs->appends(['days' => $days])->links('pagination::bootstrap-5') }}
     </div>
 </div>
 @endsection
