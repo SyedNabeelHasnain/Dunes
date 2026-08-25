@@ -340,7 +340,7 @@
                     </div>
                 </div>
                 <div class="col-6 col-lg-2">
-                    <h4 class="h6 fw-bold text-uppercase mb-4">Desert Safaris</h4>
+                    <h3 class="h6 fw-bold text-uppercase mb-4">Desert Safaris</h3>
                     <ul class="list-unstyled mb-0 d-grid gap-2">
                         <li><a href="{{ route('tours.show', 'evening-desert-safari-dubai') }}" class="text-white-50 text-decoration-none small">Evening Safari</a></li>
                         <li><a href="{{ route('tours.show', 'morning-desert-safari-dubai') }}" class="text-white-50 text-decoration-none small">Morning Safari</a></li>
@@ -358,7 +358,7 @@
                     </a>
                 </div>
                 <div class="col-6 col-lg-2">
-                    <h4 class="h6 fw-bold text-uppercase mb-4">Tours & Cruises</h4>
+                    <h3 class="h6 fw-bold text-uppercase mb-4">Tours & Cruises</h3>
                     <ul class="list-unstyled mb-0 d-grid gap-2">
                         <li><a href="{{ route('tours.show', 'dubai-city-tour') }}" class="text-white-50 text-decoration-none small">Dubai City Tour</a></li>
                         <li><a href="{{ route('tours.show', 'abu-dhabi-city-tour-from-dubai') }}" class="text-white-50 text-decoration-none small">Abu Dhabi Tour</a></li>
@@ -375,7 +375,7 @@
                     </a>
                 </div>
                 <div class="col-12 col-lg-4">
-                    <h4 class="h6 fw-bold text-uppercase mb-4">Contact Us</h4>
+                    <h3 class="h6 fw-bold text-uppercase mb-4">Contact Us</h3>
                     <ul class="list-unstyled mb-0 d-grid gap-3">
                         <li><a href="tel:{{ preg_replace('/[^0-9+]/','',$phone) }}" class="text-white-50 text-decoration-none small d-flex align-items-center gap-2"><i class="bi bi-telephone text-primary"></i>{{ $phone }}</a></li>
                         <li><a href="mailto:{{ $email }}" class="text-white-50 text-decoration-none small d-flex align-items-center gap-2"><i class="bi bi-envelope text-primary"></i>{{ $email }}</a></li>

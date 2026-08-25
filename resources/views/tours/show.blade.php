@@ -298,7 +298,7 @@ if(window.fbq){
                                     <small class="text-muted fw-semibold"><i class="bi bi-clock me-1 text-primary"></i>{{ $it->duration }}</small>
                                     @endif
                                 </div>
-                                <h5 class="fw-bold text-dark mb-2">{{ $it->title }}</h5>
+                                <h3 class="h5 fw-bold text-dark mb-2">{{ $it->title }}</h3>
                                 <p class="text-muted mb-0 small opacity-75">{{ $it->description }}</p>
                             </div>
                             @endforeach
@@ -320,7 +320,7 @@ if(window.fbq){
                                     <ul class="list-unstyled mb-0">
                                         @foreach($inclusions as $inc)
                                         <li class="d-flex gap-2 mb-3 align-items-start">
-                                            <i class="bi bi-check-lg text-success fw-bold mt-1"></i>
+                                             <i class="bi bi-check-lg text-success fw-bold mt-1"></i>
                                             <span class="text-dark fw-medium opacity-90">{{ $inc->title }}</span>
                                         </li>
                                         @endforeach
@@ -331,9 +331,9 @@ if(window.fbq){
                             @if($exclusions->count())
                             <div class="col-md-6">
                                 <div class="card border-0 bg-soft-danger p-4 rounded-4 border-start border-4 border-danger h-100">
-                                    <h5 class="fw-bold mb-4 d-flex align-items-center gap-2 text-danger">
+                                    <h3 class="h6 fw-bold mb-4 d-flex align-items-center gap-2 text-danger">
                                         <i class="bi bi-x-circle-fill"></i>Not Included
-                                    </h5>
+                                    </h3>
                                     <ul class="list-unstyled mb-0">
                                         @foreach($exclusions as $exc)
                                         <li class="d-flex gap-2 mb-3 align-items-start">
@@ -381,12 +381,12 @@ if(window.fbq){
                         <div class="accordion accordion-flush" id="tourFaqAccordion">
                             @foreach($faqs as $index => $f)
                             <div class="accordion-item mb-3 border-animated rounded-4 shadow-sm overflow-hidden bg-white">
-                                <h2 class="accordion-header">
+                                <h3 class="accordion-header">
                                     <button class="accordion-button collapsed fw-bold py-4 px-4" type="button" data-bs-toggle="collapse" data-bs-target="#tour-faq-{{ $index }}">
                                         <i class="bi bi-question-circle-fill me-3 text-primary"></i>
                                         {{ $f->question }}
                                     </button>
-                                </h2>
+                                </h3>
                                 <div id="tour-faq-{{ $index }}" class="accordion-collapse collapse" data-bs-parent="#tourFaqAccordion">
                                     <div class="accordion-body py-4 px-4 text-muted leading-relaxed">
                                         {{ $f->answer }}
@@ -425,9 +425,9 @@ if(window.fbq){
                             </div>
 
                             <div class="mb-4">
-                                <h6 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                                <h3 class="h6 fw-bold mb-3 d-flex align-items-center gap-2">
                                     <i class="bi bi-box-seam text-primary"></i>Select Package
-                                </h6>
+                                </h3>
                                 <div class="d-grid gap-3">
                                     @foreach($tour->tiers->sortBy('priority') as $tier)
                                     @php
@@ -516,7 +516,7 @@ if(window.fbq){
 
                     <div class="card border-0 bg-dark text-white rounded-4 overflow-hidden shadow-lg">
                         <div class="card-body p-4 position-relative z-1">
-                            <h5 class="fw-bold text-light mb-3">Need Help?</h5>
+                            <h3 class="h5 fw-bold text-light mb-3">Need Help?</h3>
                             <p class="small opacity-75 mb-4">Our travel experts are available 24/7 to help you with your booking.</p>
                             @php
                                 $phoneVal = \App\Models\Setting::where('setting_key', 'site_phone')->value('setting_value') ?? '+971 50 245 6056';
@@ -544,10 +544,10 @@ if(window.fbq){
 <section class="section py-5 bg-light">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
-             <h3 class="fw-bold mb-0 d-flex align-items-center gap-3">
+             <h2 class="h3 fw-bold mb-0 d-flex align-items-center gap-3">
                 <span class="bg-soft-primary p-2 rounded-3 text-primary"><i class="bi bi-compass"></i></span>
                 You Might Also Like
-            </h3>
+            </h2>
             <a href="{{ route('tours.index') }}" class="btn btn-link text-decoration-none fw-bold">View All Tours <i class="bi bi-arrow-right ms-1"></i></a>
         </div>
 

@@ -50,7 +50,7 @@
                         <div class="icon-box mb-3 d-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-circle mx-auto" style="width: 50px; height: 50px; font-size: 20px;">
                             <i class="bi bi-telephone"></i>
                         </div>
-                        <h4 class="h5 fw-bold text-dark">Phone</h4>
+                        <p class="h5 fw-bold text-dark mb-1">Phone</p>
                         <p class="text-secondary mb-0">{{ $phoneVal }}</p>
                     </div>
                 </a>
@@ -61,7 +61,7 @@
                         <div class="icon-box mb-3 d-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-circle mx-auto" style="width: 50px; height: 50px; font-size: 20px;">
                             <i class="bi bi-envelope"></i>
                         </div>
-                        <h4 class="h5 fw-bold text-dark">Email</h4>
+                        <p class="h5 fw-bold text-dark mb-1">Email</p>
                         <p class="text-secondary mb-0">{{ $emailVal }}</p>
                     </div>
                 </a>
@@ -72,7 +72,7 @@
                         <div class="icon-box mb-3 d-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-circle mx-auto" style="width: 50px; height: 50px; font-size: 20px;">
                             <i class="bi bi-whatsapp"></i>
                         </div>
-                        <h4 class="h5 fw-bold text-dark">WhatsApp</h4>
+                        <p class="h5 fw-bold text-dark mb-1">WhatsApp</p>
                         <p class="text-secondary mb-0">Chat with us</p>
                     </div>
                 </a>

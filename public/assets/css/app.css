@@ -795,16 +795,16 @@ button:focus-visible {
 }
 .btn-cta-white {
     background: #ffffff;
-    color: var(--primary);
+    color: #18181b;
     border: none;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     transition: all 0.3s ease;
 }
 .btn-cta-white:hover {
-    background: #fff5ee;
-    color: var(--primary-dark);
+    background: #ffffff;
+    color: #c25907;
     transform: translateY(-3px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
 }
 .sticky-mobile-bookbar {
     position: fixed;

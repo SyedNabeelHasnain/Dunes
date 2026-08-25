@@ -82,7 +82,7 @@
                     <div class="d-inline-flex align-items-center justify-content-center bg-white rounded-circle shadow-sm mb-4" style="width: 80px; height: 80px;">
                         <i class="bi bi-chat-dots-fill fs-2 text-primary"></i>
                     </div>
-                    <h3 class="fw-bold mb-3">Still Have Questions?</h3>
+                    <h2 class="h3 fw-bold mb-3">Still Have Questions?</h2>
                     <p class="text-muted mb-4 mx-auto" style="max-width: 500px;">Our dedicated team is ready to help you with any inquiries or custom tour requests.</p>
                     <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
                         <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',\App\Models\Setting::where('setting_key', 'site_whatsapp')->value('setting_value') ?? '971502456056') }}?text={{ urlencode('Hi! I have a question about your tours.') }}" class="btn btn-whatsapp-animated btn-lg rounded-pill px-4 d-flex align-items-center justify-content-center gap-2" target="_blank" rel="noopener">

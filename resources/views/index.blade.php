@@ -26,7 +26,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                 </div>
                 <div class="d-flex gap-1 small">' . $stars . '</div>
             </div>
-            ' . ($r->review_title ? '<h6 class="fw-bold mb-2 text-dark line-clamp-1">' . htmlspecialchars($r->review_title) . '</h6>' : '') . '
+            ' . ($r->review_title ? '<h3 class="h6 fw-bold mb-2 text-dark line-clamp-1">' . htmlspecialchars($r->review_title) . '</h3>' : '') . '
             <p class="text-dark small mb-3 flex-grow-1 line-clamp-3" style="font-size: 0.9rem;">"' . htmlspecialchars($r->review_text) . '"</p>
             <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top border-light">
                 <span class="badge bg-light text-dark rounded-pill px-2 py-1 small fw-normal">' . $sourceIcon . ' ' . ucfirst($r->source) . '</span>
