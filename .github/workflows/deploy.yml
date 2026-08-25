@@ -58,7 +58,7 @@ jobs:
         rm -rf deploy/public_deploy/images
         
         # Adjust paths in entry points to point to dunes-laravel directory
-        for f in index.php ajax.php debug_artisan.php increment_cache.php seed_blogs_now.php; do
+        for f in index.php ajax.php debug_artisan.php increment_cache.php seed_blogs_now.php check_error.php; do
           if [ -f "deploy/public_deploy/$f" ]; then
             sed -i "s|__DIR__.'/../storage/framework/maintenance.php'|__DIR__.'/../dunes-laravel/storage/framework/maintenance.php'|g" "deploy/public_deploy/$f"
             sed -i "s|__DIR__.'/../vendor/autoload.php'|__DIR__.'/../dunes-laravel/vendor/autoload.php'|g" "deploy/public_deploy/$f"
