@@ -40,8 +40,10 @@ class ResetPasswordNotification extends Notification
             'email' => $notifiable->getEmailForPasswordReset(),
         ], false));
 
+        $fromEmail = app(\App\Services\SettingsService::class)->getFromEmail();
+
         return (new MailMessage)
-            ->from('info@dunesdiscoverytourism.com', 'Dunes Discovery Tourism')
+            ->from($fromEmail, 'Dunes Discovery Tourism')
             ->subject('Reset Your Password - Dunes Discovery Tourism')
             ->greeting('Hello ' . ($notifiable->name ?? 'User') . ',')
             ->line('You are receiving this email because we received a password reset request for your account.')

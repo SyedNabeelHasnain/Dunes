@@ -12,9 +12,9 @@
         <li><strong>Customer Name:</strong> {{ $booking->name }}</li>
         <li><strong>Email:</strong> {{ $booking->email }}</li>
         <li><strong>Phone:</strong> {{ $booking->phone }}</li>
-        <li><strong>Tour:</strong> {{ $booking->tour->title ?? 'N/A' }}</li>
-        <li><strong>Date:</strong> {{ \Carbon\Carbon::parse($booking->booking_date)->format('M d, Y') }}</li>
-        <li><strong>Total Amount:</strong> AED {{ number_format($booking->total_amount, 2) }}</li>
+        <li><strong>Tour:</strong> {{ $booking->tour_name ?? ($booking->tour->name ?? 'N/A') }}</li>
+        <li><strong>Date:</strong> {{ \Carbon\Carbon::parse($booking->tour_date)->format('M d, Y') }}</li>
+        <li><strong>Total Amount:</strong> AED {{ number_format($booking->total, 2) }}</li>
         <li><strong>Payment Method:</strong> {{ ucfirst($booking->payment_method) }}</li>
         <li><strong>Payment Status:</strong> {{ ucfirst($booking->payment_status) }}</li>
     </ul>

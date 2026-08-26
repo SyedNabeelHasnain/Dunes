@@ -184,7 +184,7 @@ class AdminTourController extends Controller
     /**
      * Display listing of Tiers.
      */
-    public function Tiers()
+    public function tiers()
     {
         $tiers = Tier::orderBy('priority', 'asc')->get();
         return view('admin.tiers.index', compact('tiers'));
@@ -193,7 +193,7 @@ class AdminTourController extends Controller
     /**
      * Display listing of Addons.
      */
-    public function Addons()
+    public function addons()
     {
         $addons = Addon::orderBy('priority', 'asc')->get();
         return view('admin.addons.index', compact('addons'));
@@ -202,7 +202,7 @@ class AdminTourController extends Controller
     /**
      * Display Pricing Grid Matrix.
      */
-    public function Pricing()
+    public function pricing()
     {
         $tours = Tour::where('status', 'active')->with('tiers')->orderBy('priority', 'asc')->get();
         $tiers = Tier::where('status', 'active')->orderBy('priority', 'asc')->get();
