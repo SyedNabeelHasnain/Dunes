@@ -738,56 +738,133 @@ const App={
         let tooltipInstance = null;
 
         if(btnWrapper && typeof bootstrap !== 'undefined' && bootstrap.Tooltip){
-            tooltipInstance = new bootstrap.Tooltip(btnWrapper, { trigger: 'hover click' });
+            tooltipInstance = new bootstrap.Tooltip(btnWrapper, {
+                trigger: 'hover',
+                placement: 'top'
+            });
         }
 
-        const validateStep1 = () => {
-            if(!next) return;
+        const triggerShakeAndHighlight = (el) => {
+            if (!el) return;
+            el.classList.remove('shake-field', 'missing-field-highlight');
+            void el.offsetWidth; // Force reflow
+            el.classList.add('shake-field', 'missing-field-highlight');
+            setTimeout(() => {
+                el.classList.remove('shake-field', 'missing-field-highlight');
+            }, 600);
+        };
+
+        const validateStep1 = (shakeIfInvalid = false) => {
+            if(!next) return false;
+            const tourWrapper = document.getElementById('tourSelectWrapper');
+            const tourIsRequired = !tourWrapper || !tourWrapper.classList.contains('d-none');
             const tour = tourSelect ? tourSelect.value : '';
             const tier = tierInput ? tierInput.value : '';
             const date = dateInput ? dateInput.value : '';
             const loc = locationInput ? locationInput.value.trim() : '';
 
             const missing = [];
-            if(!tour) missing.push('Tour');
-            if(!tier) missing.push('Package');
-            if(!date) missing.push('Date');
-            if(!loc) missing.push('Pickup Location');
+            const missingElements = [];
+
+            if(tourIsRequired && !tour) {
+                missing.push('Tour');
+                missingElements.push(tourWrapper || tourSelect);
+            }
+            if(!tier) {
+                missing.push('Package');
+                const tierCardsContainer = document.getElementById('tierCards');
+                missingElements.push(tierCardsContainer);
+            }
+            if(!date) {
+                missing.push('Date');
+                const dateCardsWrapper = document.getElementById('dateCardsWrapper');
+                missingElements.push(dateCardsWrapper ? dateCardsWrapper.parentElement : dateInput);
+            }
+            if(!loc) {
+                missing.push('Pickup Location');
+                const locWrapper = locationInput ? locationInput.closest('.booking-location-wrapper') || locationInput.closest('.booking-field-container') : null;
+                missingElements.push(locWrapper || locationInput);
+            }
 
             if(missing.length === 0) {
-                next.disabled = false;
-                next.classList.remove('opacity-50', 'pe-none');
-                if(tooltipInstance) tooltipInstance.disable();
-                if(btnWrapper) btnWrapper.removeAttribute('title');
+                next.classList.remove('btn-disabled-visual', 'opacity-50');
+                if(btnWrapper) {
+                    btnWrapper.removeAttribute('title');
+                    btnWrapper.removeAttribute('data-bs-original-title');
+                }
+                if(tooltipInstance) {
+                    tooltipInstance.hide();
+                    tooltipInstance.disable();
+                }
+                return true;
             } else {
-                next.disabled = true;
-                next.classList.add('opacity-50', 'pe-none');
+                next.classList.add('btn-disabled-visual');
+                const msg = 'Please select: ' + missing.join(', ');
+
+                if(btnWrapper) {
+                    btnWrapper.setAttribute('data-bs-original-title', msg);
+                    btnWrapper.setAttribute('title', msg);
+                }
+
                 if(tooltipInstance) {
                     tooltipInstance.enable();
-                    const msg = 'Please select/fill: ' + missing.join(', ');
-                    btnWrapper.setAttribute('data-bs-original-title', msg);
-
-                    if(document.querySelector('.tooltip')) tooltipInstance.show();
+                    if(typeof tooltipInstance.setContent === 'function') {
+                        tooltipInstance.setContent({ '.tooltip-inner': msg });
+                    }
                 }
+
+                if(shakeIfInvalid) {
+                    missingElements.forEach(el => triggerShakeAndHighlight(el));
+
+                    if(tooltipInstance) {
+                        tooltipInstance.show();
+                        setTimeout(() => {
+                            if(tooltipInstance) tooltipInstance.hide();
+                        }, 2500);
+                    }
+
+                    if(missingElements.length > 0 && missingElements[0]) {
+                        missingElements[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                }
+
+                return false;
             }
         };
 
-        validateStep1();
+        this.validateStep1 = validateStep1;
+        validateStep1(false);
 
         tourSelect?.addEventListener('change', () => {
             this.loadTiers(tourSelect.value);
-            validateStep1();
+            validateStep1(false);
         });
 
-        tierInput?.addEventListener('change', validateStep1);
+        tierInput?.addEventListener('change', () => validateStep1(false));
 
-        dateInput?.addEventListener('change', validateStep1);
-        dateInput?.addEventListener('input', validateStep1);
+        dateInput?.addEventListener('change', () => validateStep1(false));
+        dateInput?.addEventListener('input', () => validateStep1(false));
 
-        locationInput?.addEventListener('input', validateStep1);
-        locationInput?.addEventListener('change', validateStep1);
+        locationInput?.addEventListener('input', () => validateStep1(false));
+        locationInput?.addEventListener('change', () => validateStep1(false));
 
-        next?.addEventListener('click',()=>this.nextStep());
+        btnWrapper?.addEventListener('click', (e) => {
+            if(this.currentStep === 1 && !validateStep1(false)) {
+                e.preventDefault();
+                e.stopPropagation();
+                validateStep1(true);
+            }
+        });
+
+        next?.addEventListener('click', (e) => {
+            if(this.currentStep === 1 && !validateStep1(false)) {
+                e.preventDefault();
+                e.stopPropagation();
+                validateStep1(true);
+                return;
+            }
+            this.nextStep();
+        });
         prev?.addEventListener('click',()=>this.prevStep());
         edit?.addEventListener('click',(e)=>{
             e.preventDefault();
@@ -1232,22 +1309,7 @@ const App={
 
     validateStep(step){
         if(step===1){
-            if(!document.getElementById('bookingTour')?.value){
-                this.toast('Please select a tour','error');
-                return false;
-            }
-            if(!this.selectedTier){
-                this.toast('Please select a package','error');
-                return false;
-            }
-            if(!document.getElementById('bookingDate')?.value){
-                this.toast('Please select a date','error');
-                return false;
-            }
-            if(!document.getElementById('bookingLocation')?.value.trim()){
-                this.toast('Please enter pickup location','error');
-                return false;
-            }
+            return this.validateStep1 ? this.validateStep1(true) : true;
         }
         if(step===2){
             if(!document.getElementById('paymentMethod')?.value){
