@@ -279,12 +279,12 @@
                     <div class="offcanvas-body p-4 p-lg-0">
                         <ul class="navbar-nav mx-auto mb-4 mb-lg-0 gap-lg-1 text-nowrap">
                             <li class="nav-item">
-                                <a class="nav-link px-3 px-lg-2 py-2 rounded-3 {{ request()->routeIs('home') ? 'active bg-warning-subtle text-dark fw-bold' : '' }}" href="{{ route('home') }}">Home</a>
+                                <a class="nav-link px-3 px-lg-2 py-2 rounded-3 {{ request()->routeIs('home') ? 'active nav-active-pill' : '' }}" href="{{ route('home') }}">Home</a>
                             </li>
                             <li class="nav-item dropdown align-items-center flex-wrap w-100 w-lg-auto">
-                                <div class="d-flex flex-wrap align-items-stretch w-100 rounded-3 position-relative {{ request()->routeIs('tours.*') ? 'bg-warning-subtle' : '' }}">
-                                    <a class="nav-link px-3 px-lg-2 py-2 flex-grow-1 rounded-start-3 {{ request()->routeIs('tours.*') ? 'active text-dark fw-bold' : '' }}" href="{{ route('tours.index') }}">Tours</a>
-                                    <a class="nav-link px-3 py-2 dropdown-toggle dropdown-toggle-split d-flex align-items-center justify-content-center rounded-end-3 border-start border-primary border-opacity-10 {{ request()->routeIs('tours.*') ? 'active text-dark' : '' }}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="min-width: 44px; min-height: 44px;">
+                                <div class="d-flex flex-wrap align-items-stretch w-100 rounded-3 position-relative {{ request()->routeIs('tours.*') ? 'nav-active-pill-wrapper' : '' }}">
+                                    <a class="nav-link px-3 px-lg-2 py-2 flex-grow-1 rounded-start-3 {{ request()->routeIs('tours.*') ? 'active nav-active-pill' : '' }}" href="{{ route('tours.index') }}">Tours</a>
+                                    <a class="nav-link px-3 py-2 dropdown-toggle dropdown-toggle-split d-flex align-items-center justify-content-center rounded-end-3 border-start border-primary border-opacity-10 {{ request()->routeIs('tours.*') ? 'active text-white' : '' }}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="min-width: 44px; min-height: 44px;">
                                         <span class="visually-hidden">Toggle Dropdown</span>
                                     </a>
                                     <ul class="dropdown-menu border-0 shadow-lg rounded-4 overflow-hidden p-0 mt-2 dropdown-animated-border">
@@ -295,16 +295,16 @@
                                 </div>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link px-3 px-lg-2 py-2 rounded-3 {{ request()->routeIs('about') ? 'active bg-primary-subtle text-primary fw-semibold' : '' }}" href="{{ route('about') }}">About Us</a>
+                                <a class="nav-link px-3 px-lg-2 py-2 rounded-3 {{ request()->routeIs('about') ? 'active nav-active-pill' : '' }}" href="{{ route('about') }}">About Us</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link px-3 px-lg-2 py-2 rounded-3 {{ request()->routeIs('blog.*') ? 'active bg-primary-subtle text-primary fw-semibold' : '' }}" href="{{ route('blog.index') }}">Blog</a>
+                                <a class="nav-link px-3 px-lg-2 py-2 rounded-3 {{ request()->routeIs('blog.*') ? 'active nav-active-pill' : '' }}" href="{{ route('blog.index') }}">Blog</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link px-3 px-lg-2 py-2 rounded-3 {{ request()->routeIs('faq') ? 'active bg-primary-subtle text-primary fw-semibold' : '' }}" href="{{ route('faq') }}">FAQ</a>
+                                <a class="nav-link px-3 px-lg-2 py-2 rounded-3 {{ request()->routeIs('faq') ? 'active nav-active-pill' : '' }}" href="{{ route('faq') }}">FAQ</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link px-3 px-lg-2 py-2 rounded-3 {{ request()->routeIs('contact') ? 'active bg-primary-subtle text-primary fw-semibold' : '' }}" href="{{ route('contact') }}">Contact</a>
+                                <a class="nav-link px-3 px-lg-2 py-2 rounded-3 {{ request()->routeIs('contact') ? 'active nav-active-pill' : '' }}" href="{{ route('contact') }}">Contact</a>
                             </li>
                         </ul>
                         <div class="d-flex flex-column flex-lg-row gap-3 align-items-stretch align-items-lg-center">
