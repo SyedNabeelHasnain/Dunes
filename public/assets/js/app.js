@@ -750,8 +750,11 @@ const App={
             void el.offsetWidth; // Force reflow
             el.classList.add('shake-field', 'missing-field-highlight');
             setTimeout(() => {
-                el.classList.remove('shake-field', 'missing-field-highlight');
-            }, 600);
+                el.classList.remove('shake-field');
+            }, 650);
+            setTimeout(() => {
+                el.classList.remove('missing-field-highlight');
+            }, 1800);
         };
 
         const validateStep1 = (shakeIfInvalid = false) => {
@@ -768,22 +771,23 @@ const App={
 
             if(tourIsRequired && !tour) {
                 missing.push('Tour');
-                missingElements.push(tourWrapper || tourSelect);
+                const tourBox = document.getElementById('tourSelectWrapper') || tourSelect;
+                missingElements.push(tourBox);
             }
             if(!tier) {
                 missing.push('Package');
-                const tierCardsContainer = document.getElementById('tierCards');
-                missingElements.push(tierCardsContainer);
+                const tierBox = document.getElementById('tierCards')?.parentElement || document.getElementById('tierCards');
+                missingElements.push(tierBox);
             }
             if(!date) {
                 missing.push('Date');
-                const dateCardsWrapper = document.getElementById('dateCardsWrapper');
-                missingElements.push(dateCardsWrapper ? dateCardsWrapper.parentElement : dateInput);
+                const dateBox = document.getElementById('dateCardsWrapper')?.parentElement || document.getElementById('dateCardsWrapper');
+                missingElements.push(dateBox);
             }
             if(!loc) {
                 missing.push('Pickup Location');
-                const locWrapper = locationInput ? locationInput.closest('.booking-location-wrapper') || locationInput.closest('.booking-field-container') : null;
-                missingElements.push(locWrapper || locationInput);
+                const locBox = locationInput ? locationInput.closest('.booking-location-wrapper') || locationInput.closest('.booking-field-container') : null;
+                missingElements.push(locBox || locationInput);
             }
 
             if(missing.length === 0) {
@@ -826,6 +830,8 @@ const App={
                     if(missingElements.length > 0 && missingElements[0]) {
                         missingElements[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                     }
+
+                    this.toast(msg, 'error');
                 }
 
                 return false;
@@ -848,22 +854,26 @@ const App={
         locationInput?.addEventListener('input', () => validateStep1(false));
         locationInput?.addEventListener('change', () => validateStep1(false));
 
-        btnWrapper?.addEventListener('click', (e) => {
-            if(this.currentStep === 1 && !validateStep1(false)) {
-                e.preventDefault();
-                e.stopPropagation();
-                validateStep1(true);
+        const handleContinueClick = (e) => {
+            if (this.currentStep === 1) {
+                const isValid = validateStep1(false);
+                if (!isValid) {
+                    if (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    validateStep1(true);
+                    return false;
+                }
+                this.nextStep();
             }
-        });
+        };
 
-        next?.addEventListener('click', (e) => {
-            if(this.currentStep === 1 && !validateStep1(false)) {
-                e.preventDefault();
-                e.stopPropagation();
-                validateStep1(true);
-                return;
+        next?.addEventListener('click', handleContinueClick);
+        btnWrapper?.addEventListener('click', (e) => {
+            if (e.target !== next && !next.contains(e.target)) {
+                handleContinueClick(e);
             }
-            this.nextStep();
         });
         prev?.addEventListener('click',()=>this.prevStep());
         edit?.addEventListener('click',(e)=>{
