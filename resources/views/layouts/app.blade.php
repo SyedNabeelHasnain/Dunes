@@ -136,7 +136,11 @@
           @endif
       };
 
-      setTimeout(initThirdPartyTracking, 3500);
+      if ('requestIdleCallback' in window) {
+          requestIdleCallback(function() { setTimeout(initThirdPartyTracking, 2000); });
+      } else {
+          setTimeout(initThirdPartyTracking, 3500);
+      }
       ['touchstart', 'scroll', 'pointermove'].forEach(function(ev) {
           window.addEventListener(ev, initThirdPartyTracking, { once: true, passive: true });
       });
@@ -497,9 +501,9 @@
     @include('partials.booking-modal')
 
     <!-- Scripts -->
-    <script src="{{ asset('assets/vendor/bootstrap/5.3.2/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/intl-tel-input/26.0.6/build/intlTelInput.min.js') }}"></script>
-    <script src="{{ asset('assets/js/app.js') }}?v={{ $cacheVer }}"></script>
+    <script src="{{ asset('assets/vendor/bootstrap/5.3.2/js/bootstrap.bundle.min.js') }}" defer></script>
+    <script src="{{ asset('assets/vendor/intl-tel-input/26.0.6/build/intlTelInput.min.js') }}" defer></script>
+    <script src="{{ asset('assets/js/app.min.js') }}?v={{ $cacheVer }}" defer></script>
 
     @stack('scripts')
 </body>

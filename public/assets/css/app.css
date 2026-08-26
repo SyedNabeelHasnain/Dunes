@@ -1530,7 +1530,7 @@ button:focus-visible {
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
-    will-change: background-position;
+    will-change: transform, opacity;
     animation: desertBorderFlow 8s linear infinite;
     filter: drop-shadow(0 0 2px rgba(255, 140, 0, 0.5));
 }
@@ -1570,7 +1570,7 @@ button:focus-visible {
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
-    will-change: background-position;
+    will-change: transform, opacity;
     animation: desertBorderFlow 8s linear infinite;
 }
 .btn-circle-desert:hover {
@@ -1613,7 +1613,7 @@ button:focus-visible {
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
-    will-change: background-position;
+    will-change: transform, opacity;
     animation: desertBorderFlow 8s linear infinite;
 }
 .btn-circle-desert-light:hover {
@@ -1726,7 +1726,7 @@ button:focus-visible {
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
-    will-change: background-position;
+    will-change: transform, opacity;
     animation: desertBorderFlow 4s linear infinite;
     filter: drop-shadow(0 0 2px rgba(37, 211, 102, 0.5));
 }
@@ -1787,7 +1787,7 @@ button:focus-visible {
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
-    will-change: background-position;
+    will-change: transform, opacity;
     animation: desertBorderFlow 8s linear infinite;
 }
 .btn-circle-whatsapp:hover {
