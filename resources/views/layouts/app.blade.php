@@ -367,6 +367,7 @@
                         <li><a href="{{ route('tours.show', 'dubai-city-tour') }}" class="text-white-50 text-decoration-none small">Dubai City Tour</a></li>
                         <li><a href="{{ route('tours.show', 'abu-dhabi-city-tour-from-dubai') }}" class="text-white-50 text-decoration-none small">Abu Dhabi Tour</a></li>
                         <li><a href="{{ route('tours.show', 'dhow-cruise-catamaran-cruise-dinner-dubai') }}" class="text-white-50 text-decoration-none small">Marina Cruise</a></li>
+                        <li><a href="{{ route('rate-card') }}" class="text-white-50 text-decoration-none small"><i class="bi bi-file-earmark-pdf text-warning me-1"></i>Rate Card (PDF)</a></li>
                     </ul>
                     <a href="https://www.google.com/maps/search/?api=1&query=Google&query_place_id=ChIJbWsIEIVEdEER4uHEhb2dbcQ" target="_blank" rel="noopener" class="footer-badge mt-4 d-flex align-items-center text-decoration-none">
                         <img src="https://www.gstatic.com/marketing-cms/assets/images/d5/dc/cfe9ce8b4425b410b49b7f2dd3f3/g.webp=s48-fcrop64=1,00000000ffffffff-rw" alt="Google" class="footer-badge-logo" style="width:24px; height:24px; margin-right:8px;">

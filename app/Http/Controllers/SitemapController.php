@@ -19,7 +19,7 @@ class SitemapController extends Controller
         $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' . "\n";
 
-        $staticPages = ['', '/about', '/contact', '/faq', '/tours', '/blog', '/terms-condition', '/privacy-policy'];
+        $staticPages = ['', '/about', '/contact', '/faq', '/tours', '/rate-card', '/blog', '/terms-condition', '/privacy-policy'];
         foreach ($staticPages as $page) {
             $xml .= '  <url>' . "\n";
             $xml .= '    <loc>' . url($page) . '</loc>' . "\n";
