@@ -112,23 +112,21 @@
 
     @stack('styles')
 
-    <!-- Deferred Google Analytics, GTM & Meta Pixel -->
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17859624049"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
 
+      gtag('config', 'AW-17859624049');
+      @if($googleActive && !empty($ga4Id))
+      gtag('config', '{{ $ga4Id }}');
+      @endif
+
       var initThirdPartyTracking = function() {
           if (window._trackingInitialized) return;
           window._trackingInitialized = true;
-
-          @if($googleActive && !empty($ga4Id))
-          var sGa = document.createElement('script');
-          sGa.async = true;
-          sGa.src = "https://www.googletagmanager.com/gtag/js?id={{ $ga4Id }}";
-          document.head.appendChild(sGa);
-          gtag('config', '{{ $ga4Id }}');
-          @endif
 
           @if($metaActive && !empty($metaPixelId))
           !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?

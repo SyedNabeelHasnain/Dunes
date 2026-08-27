@@ -48,26 +48,19 @@
     </script>
     @endif
 
-    <!-- Google Ads Specific Conversion -->
-    @if($googleActive && !empty($adsIdSetting))
-        @php
-            if(strpos($adsIdSetting, 'AW-') === 0) {
-                $conversionId = $adsIdSetting;
-            } else {
-                $conversionId = 'AW-' . preg_replace('/[^0-9]/', '', $adsIdSetting);
-            }
-        @endphp
-        <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('event', 'conversion_event_page_view', {
-            'send_to': '{{ $conversionId }}',
-            'transaction_id': '{{ $booking->reference }}',
-            'value': {{ $booking->total }},
-            'currency': 'AED'
-        });
-        </script>
-    @endif
+    <!-- Event snippet for Submit lead form conversion page -->
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('event', 'conversion', {
+        'send_to': 'AW-17859624049/eR3SCLimtvobEPH4kMRC'
+        @if($booking && $booking->total)
+        , 'value': {{ $booking->total }},
+        'currency': 'AED',
+        'transaction_id': '{{ $booking->reference }}'
+        @endif
+    });
+    </script>
 @endif
 
 <section class="section py-5" style="margin-top: 5vh;">
