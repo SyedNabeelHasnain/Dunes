@@ -112,7 +112,7 @@
 
     @stack('styles')
 
-    <!-- Google tag (gtag.js) -->
+    <!-- Google tag (gtag.js) AW-17859624049 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17859624049"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
