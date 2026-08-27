@@ -483,7 +483,7 @@
                                 @endif
                             </div>
                             <div class="fw-800 fs-6 text-nowrap ms-2" style="color: #D95300 !important; font-weight: 800;">
-                                AED {{ number_format($addon->price) }}
+                                AED {{ number_format($addon->default_price ?: $addon->price ?: 0) }}
                             </div>
                         </div>
                     </div>

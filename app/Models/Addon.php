@@ -16,6 +16,11 @@ class Addon extends Model
         'priority' => 'integer'
     ];
 
+    public function getPriceAttribute()
+    {
+        return $this->attributes['default_price'] ?? 0;
+    }
+
     public function tours()
     {
         return $this->belongsToMany(Tour::class, 'tour_addons')

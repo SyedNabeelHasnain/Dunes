@@ -29,7 +29,10 @@ class RateCardController extends Controller
             $q->where('status', 'active')->with(['tiers', 'addons'])->orderBy('priority', 'asc');
         }])->get();
 
-        $globalAddons = Addon::where('status', 'active')->get();
+        $globalAddons = Addon::where('status', 'active')
+            ->where('default_price', '>', 0)
+            ->orderBy('priority', 'asc')
+            ->get();
 
         $autoPrint = $request->has('print') || $request->has('download');
 
