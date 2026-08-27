@@ -5,19 +5,21 @@
 
 @push('styles')
 <style>
-/* ── SCREEN STYLING ── */
+/* Page Wrapper */
 .rate-card-wrapper {
-    background-color: #f8fafc;
+    background-color: #F8FAFC;
     min-height: 100vh;
 }
 
+/* Hero Dark Card */
 .rate-hero-banner {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #334155 100%);
+    background: linear-gradient(135deg, #0F172A 0%, #1E293B 60%, #334155 100%) !important;
     border-radius: 24px;
     position: relative;
     overflow: hidden;
-    color: #ffffff;
+    color: #FFFFFF !important;
     border: 1px solid #334155;
+    box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.4);
 }
 .rate-hero-banner::after {
     content: '';
@@ -25,67 +27,73 @@
     top: 0;
     right: 0;
     bottom: 0;
-    width: 40%;
-    background: radial-gradient(circle at 80% 50%, rgba(246, 144, 68, 0.22) 0%, transparent 70%);
+    width: 45%;
+    background: radial-gradient(circle at 85% 50%, rgba(246, 144, 68, 0.25) 0%, transparent 70%);
     pointer-events: none;
 }
+.rate-hero-banner h1 {
+    color: #FFFFFF !important;
+}
+.rate-hero-banner p {
+    color: #CBD5E1 !important;
+}
 
+/* Free Pickup Marquee Banner */
 .pickup-marquee-banner {
-    background: linear-gradient(90deg, #fff7ed 0%, #ffedd5 100%);
-    border: 1.5px solid #fdba74;
+    background: linear-gradient(90deg, #FFF7ED 0%, #FFEDD5 100%) !important;
+    border: 2px solid #FDBA74 !important;
     border-radius: 16px;
-    padding: 12px 20px;
+    padding: 14px 22px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    box-shadow: 0 4px 15px rgba(246, 144, 68, 0.08);
+    box-shadow: 0 4px 15px rgba(246, 144, 68, 0.1);
 }
 
+/* Category Headers */
 .category-section-header {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-left: 6px solid #F69044;
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin-bottom: 20px;
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding-bottom: 12px;
-    border-bottom: 2px solid #e2e8f0;
-    margin-bottom: 20px;
-}
-.category-section-header .cat-bar {
-    width: 6px;
-    height: 28px;
-    background: #F69044;
-    border-radius: 3px;
+    justify-content: space-between;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
 }
 .category-section-header h2 {
-    font-size: 20px;
+    font-size: 19px;
     font-weight: 800;
-    color: #0f172a;
+    color: #0F172A;
     letter-spacing: -0.01em;
     margin: 0;
     text-transform: uppercase;
 }
 
-/* 1 Tour Per Row Card Layout */
+/* 1 Tour Per Row Luxury Card */
 .tour-row-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 18px;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 20px;
     overflow: hidden;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-    margin-bottom: 20px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+    margin-bottom: 24px;
 }
 .tour-row-card:hover {
-    border-color: #cbd5e1;
+    border-color: #CBD5E1;
     transform: translateY(-2px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.07);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.08);
 }
 
 .tour-row-img-wrap {
     position: relative;
     height: 100%;
-    min-height: 190px;
-    background: #0f172a;
+    min-height: 220px;
+    background: #0F172A;
     overflow: hidden;
 }
 .tour-row-img-wrap img {
@@ -99,18 +107,18 @@
 }
 
 .tour-row-title {
-    font-size: 17px;
+    font-size: 18px;
     font-weight: 800;
-    color: #0f172a;
+    color: #0F172A;
     line-height: 1.3;
     letter-spacing: -0.01em;
 }
 
 .tour-row-desc {
-    font-size: 12.5px;
+    font-size: 13px;
     color: #475569;
-    line-height: 1.5;
-    margin-bottom: 12px;
+    line-height: 1.55;
+    margin-bottom: 14px;
 }
 
 .inclusions-pills {
@@ -120,32 +128,33 @@
 }
 .inc-pill {
     font-size: 11px;
-    background: #f1f5f9;
+    background: #F1F5F9;
     color: #334155;
-    padding: 3px 8px;
+    padding: 4px 10px;
     border-radius: 6px;
     font-weight: 600;
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
+    border: 1px solid #E2E8F0;
 }
 .inc-pill i {
     color: #F69044;
 }
 
 .tier-pricing-box {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 12px 14px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    padding: 16px;
     height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
 .tier-item-row {
-    padding: 6px 0;
-    border-bottom: 1px dashed #cbd5e1;
+    padding: 8px 0;
+    border-bottom: 1px dashed #CBD5E1;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -158,26 +167,26 @@
     padding-top: 0;
 }
 .tier-item-name {
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 700;
-    color: #1e293b;
+    color: #1E293B;
 }
 .tier-item-sub {
-    font-size: 10.5px;
-    color: #64748b;
+    font-size: 11px;
+    color: #64748B;
 }
 .tier-item-price {
     text-align: right;
 }
 .tier-item-price .cur-price {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 800;
     color: #D95300;
 }
 .tier-item-price .old-price {
-    font-size: 11px;
+    font-size: 11.5px;
     text-decoration: line-through;
-    color: #94a3b8;
+    color: #94A3B8;
     margin-right: 4px;
 }
 
@@ -186,19 +195,19 @@
     top: 76px;
     z-index: 99;
     backdrop-filter: blur(12px);
-    background: rgba(255, 255, 255, 0.94);
+    background: rgba(255, 255, 255, 0.95);
     border: 1px solid rgba(0,0,0,0.08);
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.06);
 }
 
-/* ── PRINT & PDF EXPORT STYLING ── */
+/* Print CSS */
 @media print {
     #header, .footer, .btn-circle-whatsapp, .whatsapp-floating-btn, .print-floating-bar, .modal, #tabBar, .toast-container, .visually-hidden-focusable, .btn-card-action {
         display: none !important;
     }
     body, main, #main, .rate-card-wrapper {
-        background: #ffffff !important;
+        background: #FFFFFF !important;
         padding: 0 !important;
         margin: 0 !important;
         min-height: auto !important;
@@ -219,13 +228,9 @@
     .tour-row-card {
         break-inside: avoid;
         page-break-inside: avoid;
-        border: 1px solid #cbd5e1 !important;
+        border: 1px solid #CBD5E1 !important;
         box-shadow: none !important;
-        margin-bottom: 14px !important;
-    }
-    .page-break-before {
-        page-break-before: always;
-        break-before: page;
+        margin-bottom: 16px !important;
     }
 }
 </style>
@@ -235,7 +240,7 @@
 <div class="rate-card-wrapper py-4 py-lg-5">
     <div class="container">
 
-        <!-- Top Floating Action Toolbar -->
+        <!-- Top Floating Toolbar -->
         <div class="print-floating-bar p-3 mb-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
             <div class="d-flex align-items-center gap-2">
                 <a href="{{ route('tours.index') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
@@ -255,45 +260,47 @@
             </div>
         </div>
 
-        <!-- Official Header & Banner -->
-        <div class="rate-hero-banner p-4 p-lg-5 mb-4 shadow-sm">
+        <!-- Official Hero Banner (Explicit High Contrast) -->
+        <div class="rate-hero-banner p-4 p-lg-5 mb-4" style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 60%, #334155 100%) !important; color: #FFFFFF !important;">
             <div class="row align-items-center g-4 position-relative z-2">
                 <div class="col-lg-8">
                     <div class="d-flex align-items-center gap-3 mb-3">
                         <img src="{{ asset('images/logo-white.png') }}" alt="Dunes Discovery Tourism" style="height: 44px; width: auto;">
-                        <span class="badge bg-warning text-dark fw-800 rounded-pill px-3 py-1 text-uppercase" style="font-size: 11px;">
+                        <span class="badge bg-warning text-dark fw-bold rounded-pill px-3 py-1 text-uppercase" style="font-size: 11px;">
                             ⭐ Official 2026 Price Guide
                         </span>
                     </div>
-                    <h1 class="display-6 fw-800 text-white mb-2" style="letter-spacing: -0.02em;">Dubai Desert Safaris & Tours <span class="text-primary">Rate Card</span></h1>
-                    <p class="text-white-50 mb-3 fs-6" style="max-width: 620px; line-height: 1.5;">
+                    <h1 class="display-6 fw-bold mb-2" style="color: #FFFFFF !important; letter-spacing: -0.02em;">
+                        Dubai Desert Safaris & Tours <span class="text-primary" style="color: #F69044 !important;">Rate Card</span>
+                    </h1>
+                    <p class="mb-3 fs-6" style="color: #CBD5E1 !important; max-width: 620px; line-height: 1.55;">
                         Official tour portfolio & pricing catalog by Dunes Discovery Tourism LLC. Direct operator rates with best price guarantee across all UAE excursions.
                     </p>
                     <div class="d-flex flex-wrap gap-2 text-white small">
-                        <span class="d-flex align-items-center gap-1.5 bg-white bg-opacity-10 px-3 py-1.5 rounded-3 border border-white border-opacity-15">
-                            <i class="bi bi-telephone-fill text-primary"></i> {{ $phone }}
+                        <span class="d-flex align-items-center gap-1.5 px-3 py-1.5 rounded-3 border" style="background: rgba(255,255,255,0.1) !important; color: #FFFFFF !important; border-color: rgba(255,255,255,0.18) !important;">
+                            <i class="bi bi-telephone-fill" style="color: #F69044;"></i> {{ $phone }}
                         </span>
-                        <span class="d-flex align-items-center gap-1.5 bg-white bg-opacity-10 px-3 py-1.5 rounded-3 border border-white border-opacity-15">
-                            <i class="bi bi-whatsapp text-success"></i> WhatsApp: {{ $waPhone }}
+                        <span class="d-flex align-items-center gap-1.5 px-3 py-1.5 rounded-3 border" style="background: rgba(255,255,255,0.1) !important; color: #FFFFFF !important; border-color: rgba(255,255,255,0.18) !important;">
+                            <i class="bi bi-whatsapp" style="color: #25D366;"></i> WhatsApp: {{ $waPhone }}
                         </span>
-                        <span class="d-flex align-items-center gap-1.5 bg-white bg-opacity-10 px-3 py-1.5 rounded-3 border border-white border-opacity-15">
-                            <i class="bi bi-envelope-fill text-primary"></i> {{ $email }}
+                        <span class="d-flex align-items-center gap-1.5 px-3 py-1.5 rounded-3 border" style="background: rgba(255,255,255,0.1) !important; color: #FFFFFF !important; border-color: rgba(255,255,255,0.18) !important;">
+                            <i class="bi bi-envelope-fill" style="color: #F69044;"></i> {{ $email }}
                         </span>
-                        <span class="d-flex align-items-center gap-1.5 bg-white bg-opacity-10 px-3 py-1.5 rounded-3 border border-white border-opacity-15">
-                            <i class="bi bi-globe text-primary"></i> dunesdiscoverytourism.com
+                        <span class="d-flex align-items-center gap-1.5 px-3 py-1.5 rounded-3 border" style="background: rgba(255,255,255,0.1) !important; color: #FFFFFF !important; border-color: rgba(255,255,255,0.18) !important;">
+                            <i class="bi bi-globe" style="color: #F69044;"></i> dunesdiscoverytourism.com
                         </span>
                     </div>
                 </div>
                 <div class="col-lg-4 text-lg-end d-none d-lg-block">
-                    <div class="p-3.5 rounded-4 bg-white bg-opacity-10 border border-white border-opacity-15 d-inline-block text-start" style="min-width: 220px;">
-                        <div class="text-white-50 small mb-1">Customer Ratings & Trust</div>
+                    <div class="p-3.5 rounded-4 border d-inline-block text-start" style="background: rgba(255,255,255,0.08) !important; border-color: rgba(255,255,255,0.15) !important; min-width: 220px;">
+                        <div class="small mb-1" style="color: #CBD5E1 !important;">Customer Ratings & Trust</div>
                         <div class="d-flex align-items-center gap-2 mb-1">
                             <span class="fs-3 fw-bold text-white">4.9 / 5.0</span>
                             <div class="text-warning">
                                 <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                             </div>
                         </div>
-                        <div class="text-white-50 small">TripAdvisor & Google Verified • Licensed Operator</div>
+                        <div class="small" style="color: #CBD5E1 !important;">TripAdvisor & Google Verified</div>
                     </div>
                 </div>
             </div>
@@ -302,15 +309,15 @@
         <!-- Marquee Key Value Banner: Free Doorstep Pickup -->
         <div class="pickup-marquee-banner mb-5">
             <div class="d-flex align-items-center gap-3">
-                <div class="rounded-circle d-flex align-items-center justify-content-center bg-primary text-white shadow-sm" style="width: 42px; height: 42px; font-size: 20px; flex-shrink: 0;">
+                <div class="rounded-circle d-flex align-items-center justify-content-center bg-primary text-white shadow-sm" style="width: 44px; height: 44px; font-size: 22px; flex-shrink: 0;">
                     <i class="bi bi-car-front-fill"></i>
                 </div>
                 <div>
-                    <div class="fw-800 text-dark" style="font-size: 14px; letter-spacing: -0.01em;">
+                    <div class="fw-800 text-dark" style="font-size: 15px; letter-spacing: -0.01em;">
                         🚐 COMPLIMENTARY 4X4 DOORSTEP HOTEL PICKUP & DROP-OFF INCLUDED
                     </div>
-                    <div class="text-secondary small">
-                        Enjoy hassle-free door-to-door transportation in clean, air-conditioned Toyota Land Cruisers from any hotel, residence, or cruise terminal in Dubai & Sharjah.
+                    <div class="text-secondary small" style="font-size: 12.5px;">
+                        Enjoy seamless door-to-door transportation in clean, air-conditioned Toyota Land Cruisers from any hotel, residence, or cruise terminal across Dubai & Sharjah.
                     </div>
                 </div>
             </div>
@@ -326,9 +333,10 @@
             @if($cat->tours && $cat->tours->count() > 0)
             <div class="mb-5">
                 <div class="category-section-header">
-                    <div class="cat-bar"></div>
-                    <h2>{{ $cat->name }}</h2>
-                    <span class="badge bg-secondary-subtle text-secondary ms-auto rounded-pill px-3 py-1.5 fw-bold">
+                    <div class="d-flex align-items-center gap-2">
+                        <h2>{{ $cat->name }}</h2>
+                    </div>
+                    <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-1.5 fw-bold">
                         {{ $cat->tours->count() }} Available {{ Str::plural('Experience', $cat->tours->count()) }}
                     </span>
                 </div>
@@ -452,7 +460,6 @@
         @if($globalAddons && $globalAddons->count() > 0)
         <div class="mb-5">
             <div class="category-section-header">
-                <div class="cat-bar"></div>
                 <h2>Safari Add-Ons & Custom Upgrades</h2>
             </div>
 

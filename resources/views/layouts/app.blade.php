@@ -108,6 +108,8 @@
     <link rel="preload" href="{{ asset('assets/vendor/intl-tel-input/26.0.6/build/intlTelInput.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="{{ asset('assets/vendor/intl-tel-input/26.0.6/build/intlTelInput.css') }}"></noscript>
 
+    @stack('styles')
+
     <!-- Deferred Google Analytics, GTM & Meta Pixel -->
     <script>
       window.dataLayer = window.dataLayer || [];

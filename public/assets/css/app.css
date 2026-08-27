@@ -2712,3 +2712,215 @@ nav[role="navigation"] {
     flex-wrap: wrap;
 }
 
+/* ══════════════════════════════════════════════════════════════════════════════
+   RATE CARD & TOURS CATALOG STYLING
+   ══════════════════════════════════════════════════════════════════════════════ */
+.rate-card-wrapper {
+    background-color: #F8FAFC !important;
+    min-height: 100vh;
+}
+
+.rate-hero-banner {
+    background: linear-gradient(135deg, #0F172A 0%, #1E293B 60%, #334155 100%) !important;
+    border-radius: 24px !important;
+    position: relative;
+    overflow: hidden;
+    color: #FFFFFF !important;
+    border: 1px solid #334155 !important;
+    box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.4) !important;
+}
+
+.rate-hero-banner::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 45%;
+    background: radial-gradient(circle at 85% 50%, rgba(246, 144, 68, 0.25) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.rate-hero-banner h1 {
+    color: #FFFFFF !important;
+}
+
+.rate-hero-banner p {
+    color: #CBD5E1 !important;
+}
+
+.pickup-marquee-banner {
+    background: linear-gradient(90deg, #FFF7ED 0%, #FFEDD5 100%) !important;
+    border: 2px solid #FDBA74 !important;
+    border-radius: 16px !important;
+    padding: 14px 22px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 16px !important;
+    box-shadow: 0 4px 15px rgba(246, 144, 68, 0.1) !important;
+}
+
+.category-section-header {
+    background: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    border-left: 6px solid #F69044 !important;
+    border-radius: 12px !important;
+    padding: 14px 20px !important;
+    margin-bottom: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.02) !important;
+}
+
+.category-section-header h2 {
+    font-size: 19px !important;
+    font-weight: 800 !important;
+    color: #0F172A !important;
+    letter-spacing: -0.01em !important;
+    margin: 0 !important;
+    text-transform: uppercase !important;
+}
+
+/* 1 Tour Per Row Luxury Card */
+.tour-row-card {
+    background: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 20px !important;
+    overflow: hidden !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04) !important;
+    margin-bottom: 24px !important;
+}
+
+.tour-row-card:hover {
+    border-color: #CBD5E1 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.08) !important;
+}
+
+.tour-row-img-wrap {
+    position: relative !important;
+    height: 100% !important;
+    min-height: 220px !important;
+    background: #0F172A !important;
+    overflow: hidden !important;
+}
+
+.tour-row-img-wrap img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    transition: transform 0.4s ease !important;
+}
+
+.tour-row-card:hover .tour-row-img-wrap img {
+    transform: scale(1.04) !important;
+}
+
+.tour-row-title {
+    font-size: 18px !important;
+    font-weight: 800 !important;
+    color: #0F172A !important;
+    line-height: 1.3 !important;
+    letter-spacing: -0.01em !important;
+}
+
+.tour-row-desc {
+    font-size: 13px !important;
+    color: #475569 !important;
+    line-height: 1.55 !important;
+    margin-bottom: 14px !important;
+}
+
+.inclusions-pills {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+}
+
+.inc-pill {
+    font-size: 11px !important;
+    background: #F1F5F9 !important;
+    color: #334155 !important;
+    padding: 4px 10px !important;
+    border-radius: 6px !important;
+    font-weight: 600 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    border: 1px solid #E2E8F0 !important;
+}
+
+.inc-pill i {
+    color: #F69044 !important;
+}
+
+.tier-pricing-box {
+    background: #F8FAFC !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 14px !important;
+    padding: 16px !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+}
+
+.tier-item-row {
+    padding: 8px 0 !important;
+    border-bottom: 1px dashed #CBD5E1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+
+.tier-item-row:last-child {
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+}
+
+.tier-item-row:first-child {
+    padding-top: 0 !important;
+}
+
+.tier-item-name {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: #1E293B !important;
+}
+
+.tier-item-sub {
+    font-size: 11px !important;
+    color: #64748B !important;
+}
+
+.tier-item-price {
+    text-align: right !important;
+}
+
+.tier-item-price .cur-price {
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    color: #D95300 !important;
+}
+
+.tier-item-price .old-price {
+    font-size: 11.5px !important;
+    text-decoration: line-through !important;
+    color: #94A3B8 !important;
+    margin-right: 4px !important;
+}
+
+.print-floating-bar {
+    position: sticky !important;
+    top: 76px !important;
+    z-index: 99 !important;
+    backdrop-filter: blur(12px) !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: 1px solid rgba(0,0,0,0.08) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06) !important;
+}
+
