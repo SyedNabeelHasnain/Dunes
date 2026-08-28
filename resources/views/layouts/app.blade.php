@@ -124,6 +124,23 @@
       gtag('config', '{{ $ga4Id }}');
       @endif
 
+      // Google Ads Lead Form Conversion Tracker (AW-17859624049/eR3SCLimtvobEPH4kMRC)
+      function gtagReportConversion(url) {
+        var callback = function () {
+          if (typeof(url) != 'undefined' && url) {
+            window.location = url;
+          }
+        };
+        if (typeof gtag === 'function') {
+          gtag('event', 'conversion', {
+              'send_to': 'AW-17859624049/eR3SCLimtvobEPH4kMRC',
+              'event_callback': callback
+          });
+        }
+        return false;
+      }
+      window.gtagReportConversion = gtagReportConversion;
+
       var initThirdPartyTracking = function() {
           if (window._trackingInitialized) return;
           window._trackingInitialized = true;

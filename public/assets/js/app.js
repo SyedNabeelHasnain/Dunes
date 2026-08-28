@@ -1551,21 +1551,18 @@ const App={
 
                     if(data.success){
 
-                        if(window.dataLayer){
-                            if(action === 'contact'){
-                                window.dataLayer.push({
-                                    event: 'generate_lead',
-                                    form_name: 'contact_form'
-                                });
-                                if (typeof gtag === 'function') {
-                                    gtag('event', 'conversion', {'send_to': 'AW-17859624049/eR3SCLimtvobEPH4kMRC'});
-                                }
-                            } else if(action === 'logWhatsApp'){
-                                window.dataLayer.push({
-                                    event: 'generate_lead',
-                                    conversion_type: 'whatsapp'
-                                });
-                            }
+                        // Google Ads Conversion Tag: Submit lead form (AW-17859624049/eR3SCLimtvobEPH4kMRC)
+                        if (typeof window.gtag === 'function') {
+                            window.gtag('event', 'conversion', {
+                                'send_to': 'AW-17859624049/eR3SCLimtvobEPH4kMRC'
+                            });
+                        }
+                        if (window.dataLayer) {
+                            window.dataLayer.push({
+                                event: 'generate_lead',
+                                form_name: action || 'lead_form',
+                                conversion_label: 'eR3SCLimtvobEPH4kMRC'
+                            });
                         }
 
                         if(data.redirect_url){

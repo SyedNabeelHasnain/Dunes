@@ -207,4 +207,21 @@
         </div>
     </div>
 </section>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var contactForm = document.getElementById('contactForm');
+    if (contactForm) {
+        contactForm.addEventListener('submit', function() {
+            if (typeof window.gtag === 'function') {
+                window.gtag('event', 'conversion', {
+                    'send_to': 'AW-17859624049/eR3SCLimtvobEPH4kMRC'
+                });
+            }
+        });
+    }
+});
+</script>
+@endpush
 @endsection

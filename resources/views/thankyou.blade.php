@@ -9,6 +9,20 @@
     $whatsappVal = \App\Models\Setting::where('setting_key', 'site_whatsapp')->value('setting_value') ?? '971502456056';
 @endphp
 
+<!-- Google Ads Conversion Tag: Submit lead form (AW-17859624049/eR3SCLimtvobEPH4kMRC) -->
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('event', 'conversion', {
+    'send_to': 'AW-17859624049/eR3SCLimtvobEPH4kMRC'
+    @if($booking && $booking->total)
+    , 'value': {{ (float)$booking->total }},
+    'currency': 'AED',
+    'transaction_id': '{{ $booking->reference }}'
+    @endif
+});
+</script>
+
 @if($booking && ($paymentStatus === 'completed' || $method === 'cash'))
     <!-- Google Ecommerce Purchase Conversion -->
     @if($googleActive)
@@ -47,20 +61,6 @@
     }
     </script>
     @endif
-
-    <!-- Event snippet for Submit lead form conversion page -->
-    <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('event', 'conversion', {
-        'send_to': 'AW-17859624049/eR3SCLimtvobEPH4kMRC'
-        @if($booking && $booking->total)
-        , 'value': {{ $booking->total }},
-        'currency': 'AED',
-        'transaction_id': '{{ $booking->reference }}'
-        @endif
-    });
-    </script>
 @endif
 
 <section class="section py-5" style="margin-top: 5vh;">
