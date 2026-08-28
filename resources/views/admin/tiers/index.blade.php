@@ -16,7 +16,7 @@
 <div class="card card-modern border-0 shadow-sm rounded-4 overflow-hidden bg-white">
     <div class="card-body p-4">
         <div class="table-responsive">
-            <table class="table align-middle mb-0 table-hover" id="tiersTable">
+            <table class="table align-middle mb-0 table-hover datatable" id="tiersTable">
                 <thead class="table-light small text-uppercase fw-bold text-muted">
                     <tr>
                         <th class="ps-3">Tier Identity</th>
@@ -25,7 +25,7 @@
                         <th>Tour Adoption</th>
                         <th>Status</th>
                         <th>Priority</th>
-                        <th class="text-end pe-3">Actions</th>
+                        <th class="text-end pe-3 no-sort">Actions</th>
                     </tr>
                 </thead>
                 <tbody>

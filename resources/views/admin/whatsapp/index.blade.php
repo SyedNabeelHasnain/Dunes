@@ -18,10 +18,10 @@
     </div>
 </div>
 
-<div class="card card-modern border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+<div class="card card-modern border-0 shadow-sm rounded-4 overflow-hidden bg-white p-3">
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table align-middle mb-0 table-hover no-datatable" id="whatsappLeadsTable">
+            <table class="table align-middle mb-0 table-hover datatable" id="whatsappLeadsTable">
                 <thead class="table-light small text-uppercase fw-bold text-muted">
                     <tr>
                         <th class="ps-4">Date & Time</th>
@@ -30,7 +30,7 @@
                         <th>Message Snippet</th>
                         <th>Location</th>
                         <th>Device</th>
-                        <th class="pe-4 text-end">Action</th>
+                        <th class="pe-4 text-end no-sort">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -104,10 +104,6 @@
             </table>
         </div>
     </div>
-</div>
-
-<div class="mt-4">
-    {{ $leads->links('pagination::bootstrap-5') }}
 </div>
 
 <!-- View Details Modal -->

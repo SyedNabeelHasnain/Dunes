@@ -14,16 +14,16 @@
 <div class="card card-modern border shadow-sm rounded-4 overflow-hidden bg-white mb-4">
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table align-middle mb-0 table-hover no-datatable" id="reviewsTable">
-                <thead class="table-light">
+            <table class="table align-middle mb-0 table-hover datatable" id="reviewsTable">
+                <thead class="table-light small text-uppercase fw-bold text-muted">
                     <tr>
                         <th class="ps-4">Reviewer</th>
                         <th>Review Content</th>
                         <th>Source</th>
-                        <th>Rating</th>
-                        <th>Status</th>
+                        <th class="text-center">Rating</th>
+                        <th class="text-center">Status</th>
                         <th>Date</th>
-                        <th class="pe-4">Actions</th>
+                        <th class="pe-4 text-end no-sort">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -42,14 +42,14 @@
                         <td>
                             <span class="badge bg-light text-secondary border px-3 py-1 rounded-pill text-capitalize">{{ $r->source }}</span>
                         </td>
-                        <td>
+                        <td class="text-center">
                             <div class="text-warning">
                                 @for($i = 1; $i <= 5; $i++)
                                     <i class="bi bi-star{{ $i <= $r->rating ? '-fill' : '' }}"></i>
                                 @endfor
                             </div>
                         </td>
-                        <td>
+                        <td class="text-center">
                             @php
                                 $badgeColor = [
                                     'approved' => 'success',
@@ -57,18 +57,18 @@
                                     'rejected' => 'danger'
                                 ][$r->status] ?? 'secondary';
                             @endphp
-                            <span class="badge bg-{{ $badgeColor }} text-capitalize px-3 py-1 rounded-pill">{{ $r->status }}</span>
+                            <span class="badge bg-{{ $badgeColor }} text-capitalize px-3 py-1 rounded-pill badge-interactive ajax-toggle-status" data-url="{{ route('admin.reviews.toggle-status', $r->id) }}" title="Click to toggle status">{{ $r->status }}</span>
                         </td>
                         <td>
                             <div class="small fw-semibold text-muted">
                                 {{ $r->published_date ? \Carbon\Carbon::parse($r->published_date)->format('M j, Y') : '' }}
                             </div>
                         </td>
-                        <td class="pe-4">
-                            <div class="d-flex gap-2">
+                        <td class="pe-4 text-end">
+                            <div class="d-flex justify-content-end gap-2">
                                 <button type="button" 
                                         class="btn btn-sm btn-outline-primary rounded-circle d-flex align-items-center justify-content-center edit-review-btn" 
-                                        style="width: 32px; height: 32px;" 
+                                        style="width: 34px; height: 34px;" 
                                         title="Edit Review"
                                         data-id="{{ $r->id }}"
                                         data-name="{{ $r->reviewer_name }}"
@@ -84,7 +84,7 @@
                                 <form action="{{ route('admin.reviews.destroy', $r->id) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Delete Review" onclick="return confirm('Delete this review?')">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="Delete Review" onclick="return confirm('Delete this review?')">
                                         <i class="bi bi-trash3-fill"></i>
                                     </button>
                                 </form>
@@ -93,17 +93,13 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="text-center py-4 text-muted">No reviews recorded.</td>
+                        <td colspan="7" class="text-center py-5 text-muted">No reviews recorded.</td>
                     </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
     </div>
-</div>
-
-<div class="mt-4">
-    {{ $reviews->links('pagination::bootstrap-5') }}
 </div>
 
 <!-- Create Review Modal -->

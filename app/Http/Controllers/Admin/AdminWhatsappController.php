@@ -18,7 +18,7 @@ class AdminWhatsappController extends Controller
             ->leftJoin('request_logs', 'whatsapp_inquiries.request_log_id', '=', 'request_logs.id')
             ->select('whatsapp_inquiries.*', 'request_logs.client_ip', 'request_logs.country', 'request_logs.city', 'request_logs.device_type', 'request_logs.browser_name', 'request_logs.os_name')
             ->orderBy('whatsapp_inquiries.created_at', 'desc')
-            ->paginate(20);
+            ->get();
 
         return view('admin.whatsapp.index', compact('leads'));
     }

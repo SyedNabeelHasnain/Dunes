@@ -102,11 +102,10 @@
     </form>
 </div>
 
-<!-- Bookings Table -->
-<div class="card card-modern border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+<div class="card card-modern border-0 shadow-sm rounded-4 overflow-hidden bg-white p-3">
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table align-middle mb-0 table-hover no-datatable" id="bookingsTable">
+            <table class="table align-middle mb-0 table-hover datatable" id="bookingsTable">
                 <thead class="table-light small text-uppercase fw-bold text-muted">
                     <tr>
                         <th class="ps-4">Ref & Time</th>
@@ -114,8 +113,8 @@
                         <th>Tour / Activity</th>
                         <th>Tour Date</th>
                         <th>Total & Paid</th>
-                        <th>Status</th>
-                        <th class="pe-4 text-end">Actions</th>
+                        <th class="text-center">Status</th>
+                        <th class="pe-4 text-end no-sort">Actions</th>
                     </tr>
                 </thead>
                 <tbody>

@@ -18,15 +18,15 @@
 <div class="card card-modern border shadow-sm rounded-4 overflow-hidden bg-white mb-4">
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table align-middle mb-0 table-hover no-datatable" id="blogsTable">
-                <thead class="table-light">
+            <table class="table align-middle mb-0 table-hover datatable" id="blogsTable">
+                <thead class="table-light small text-uppercase fw-bold text-muted">
                     <tr>
                         <th class="ps-4">Article Title</th>
                         <th>Category</th>
-                        <th>Status</th>
-                        <th>Read Time</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Read Time</th>
                         <th>Published Date</th>
-                        <th class="pe-4">Actions</th>
+                        <th class="pe-4 text-end no-sort">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -46,40 +46,40 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border px-3 py-1 rounded-pill small">
+                            <span class="badge bg-light text-dark border px-3 py-1 rounded-pill small fw-bold">
                                 {{ $p->category ? $p->category->name : 'Uncategorized' }}
                             </span>
                         </td>
-                        <td>
+                        <td class="text-center">
                             @php
                                 $badgeColor = [
                                     'published' => 'success',
                                     'draft' => 'secondary',
                                     'scheduled' => 'warning'
-                                ][$p->status] ?? 'info';
+                                ] [$p->status] ?? 'info';
                             @endphp
-                            <span class="badge bg-{{ $badgeColor }} text-capitalize px-3 py-1 rounded-pill">{{ $p->status }}</span>
+                            <span class="badge bg-{{ $badgeColor }} text-capitalize px-3 py-1 rounded-pill badge-interactive ajax-toggle-status" data-url="{{ route('admin.blogs.toggle-status', $p->id) }}" title="Click to toggle status">{{ $p->status }}</span>
                         </td>
-                        <td>
+                        <td class="text-center">
                             <div class="small fw-semibold text-dark"><i class="bi bi-clock me-1 text-primary"></i>{{ $p->read_time ?: '5' }} min</div>
                         </td>
                         <td>
                             <div class="small fw-semibold text-muted">
-                                {{ $p->published_at ? \Carbon\Carbon::parse($p->published_at)->format('M j, Y') : 'Not Published' }}
+                                {{ $p->published_at ? \Carbon\Carbon::parse($p->published_at)->format('M j, Y') : 'Draft / Unpublished' }}
                             </div>
                         </td>
-                        <td class="pe-4">
-                            <div class="d-flex gap-2">
-                                <a href="{{ route('admin.blogs.edit', $p->id) }}" class="btn btn-sm btn-outline-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Edit Post">
+                        <td class="pe-4 text-end">
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="{{ route('admin.blogs.edit', $p->id) }}" class="btn btn-sm btn-outline-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="Edit Post">
                                     <i class="bi bi-pencil-fill"></i>
                                 </a>
-                                <a href="{{ route('blog.show', $p->slug) }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-info rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Preview Post">
+                                <a href="{{ route('blog.show', $p->slug) }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-info rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="Preview Post">
                                     <i class="bi bi-box-arrow-up-right"></i>
                                 </a>
                                 <form action="{{ route('admin.blogs.destroy', $p->id) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Delete Post" onclick="return confirm('Delete this post?')">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="Delete Post" onclick="return confirm('Delete this post?')">
                                         <i class="bi bi-trash3-fill"></i>
                                     </button>
                                 </form>
@@ -88,16 +88,12 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center py-4 text-muted">No blog articles found.</td>
+                        <td colspan="6" class="text-center py-5 text-muted">No blog articles found.</td>
                     </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
     </div>
-</div>
-
-<div class="mt-4">
-    {{ $posts->links('pagination::bootstrap-5') }}
 </div>
 @endsection

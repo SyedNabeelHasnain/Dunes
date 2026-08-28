@@ -520,4 +520,20 @@ class AdminTourController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Category renamed successfully.']);
     }
+
+    /**
+     * Toggle active/inactive status of a tour.
+     */
+    public function toggleStatus(string $id)
+    {
+        $tour = Tour::findOrFail($id);
+        $tour->status = $tour->status === 'active' ? 'inactive' : 'active';
+        $tour->save();
+
+        return response()->json([
+            'success' => true,
+            'status' => $tour->status,
+            'message' => 'Tour status updated to ' . ucfirst($tour->status) . '.'
+        ]);
+    }
 }

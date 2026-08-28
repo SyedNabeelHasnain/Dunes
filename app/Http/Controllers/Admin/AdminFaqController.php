@@ -99,4 +99,20 @@ class AdminFaqController extends Controller
         $faq->delete();
         return redirect()->route('admin.faqs.index')->with('success', 'FAQ deleted successfully.');
     }
+
+    /**
+     * Toggle active/inactive status of an FAQ.
+     */
+    public function toggleStatus(string $id)
+    {
+        $faq = Faq::findOrFail($id);
+        $faq->status = $faq->status === 'active' ? 'inactive' : 'active';
+        $faq->save();
+
+        return response()->json([
+            'success' => true,
+            'status' => $faq->status,
+            'message' => 'FAQ status updated to ' . ucfirst($faq->status) . '.'
+        ]);
+    }
 }

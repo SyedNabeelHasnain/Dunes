@@ -49,6 +49,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     
     // Tours, Tiers, Addons, and Pricing
     Route::resource('tours', AdminTourController::class)->except(['show']);
+    Route::post('/tours/{id}/toggle-status', [AdminTourController::class, 'toggleStatus'])->name('tours.toggle-status');
     Route::post('/tours/{id}/itinerary', [AdminTourController::class, 'addItinerary'])->name('tours.itinerary.add');
     Route::post('/itinerary/{id}/update', [AdminTourController::class, 'updateItinerary'])->name('tours.itinerary.update');
     Route::post('/itinerary/{id}/delete', [AdminTourController::class, 'deleteItinerary'])->name('tours.itinerary.delete');
@@ -81,7 +82,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     
     // FAQs, Reviews, and Inquiries
     Route::resource('faqs', AdminFaqController::class)->except(['create', 'show', 'edit']);
+    Route::post('/faqs/{id}/toggle-status', [AdminFaqController::class, 'toggleStatus'])->name('faqs.toggle-status');
     Route::resource('reviews', AdminReviewController::class)->except(['create', 'show', 'edit']);
+    Route::post('/reviews/{id}/toggle-status', [AdminReviewController::class, 'toggleStatus'])->name('reviews.toggle-status');
     Route::get('/inquiries', [AdminDashboardController::class, 'inquiries'])->name('inquiries.index');
     Route::get('/inquiries/{id}', [AdminDashboardController::class, 'viewInquiry'])->name('inquiries.show');
     Route::post('/inquiries/{id}/status', [AdminDashboardController::class, 'updateInquiryStatus'])->name('inquiries.status');
@@ -89,6 +92,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     
     // Blog CMS
     Route::resource('blogs', AdminBlogController::class)->except(['show']);
+    Route::post('/blogs/{id}/toggle-status', [AdminBlogController::class, 'toggleStatus'])->name('blogs.toggle-status');
     Route::resource('blog-categories', AdminBlogCategoryController::class)->except(['create', 'show', 'edit']);
 
     // Legal Pages Manager

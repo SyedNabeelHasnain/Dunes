@@ -11,18 +11,18 @@
 </div>
 
 <!-- Categories Table -->
-<div class="card card-modern border shadow-sm rounded-4 overflow-hidden bg-white mb-4">
+<div class="card card-modern border-0 shadow-sm rounded-4 overflow-hidden bg-white mb-4 p-3">
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table align-middle mb-0 table-hover" id="categoriesTable">
-                <thead class="table-light">
+            <table class="table align-middle mb-0 table-hover datatable" id="categoriesTable">
+                <thead class="table-light small text-uppercase fw-bold text-muted">
                     <tr>
                         <th class="ps-4">Category Name</th>
                         <th>Slug</th>
                         <th>Description</th>
-                        <th>Priority</th>
-                        <th>Status</th>
-                        <th class="pe-4">Actions</th>
+                        <th class="text-center">Priority</th>
+                        <th class="text-center">Status</th>
+                        <th class="pe-4 text-end no-sort">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -31,21 +31,21 @@
                         <td class="ps-4">
                             <div class="fw-bold text-dark fs-6">{{ $cat->name }}</div>
                         </td>
-                        <td><code>{{ $cat->slug }}</code></td>
+                        <td><code class="text-primary font-monospace">{{ $cat->slug }}</code></td>
                         <td><span class="text-muted small">{{ $cat->description ?: '-' }}</span></td>
-                        <td class="fw-bold text-dark">{{ $cat->priority }}</td>
-                        <td>
+                        <td class="fw-bold text-dark text-center">{{ $cat->priority }}</td>
+                        <td class="text-center">
                             @if($cat->status === 'active')
                                 <span class="badge bg-success text-capitalize px-3 py-1 rounded-pill">Active</span>
                             @else
                                 <span class="badge bg-secondary text-capitalize px-3 py-1 rounded-pill">Inactive</span>
                             @endif
                         </td>
-                        <td class="pe-4">
-                            <div class="d-flex gap-2">
+                        <td class="pe-4 text-end">
+                            <div class="d-flex justify-content-end gap-2">
                                 <button type="button" 
                                         class="btn btn-sm btn-outline-primary rounded-circle d-flex align-items-center justify-content-center edit-cat-btn" 
-                                        style="width: 32px; height: 32px;" 
+                                        style="width: 34px; height: 34px;" 
                                         title="Edit Category"
                                         data-id="{{ $cat->id }}"
                                         data-name="{{ $cat->name }}"
@@ -57,7 +57,7 @@
                                 <form action="{{ route('admin.blog-categories.destroy', $cat->id) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Delete Category" onclick="return confirm('Delete this blog category?')">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="Delete Category" onclick="return confirm('Delete this blog category?')">
                                         <i class="bi bi-trash3-fill"></i>
                                     </button>
                                 </form>
@@ -66,7 +66,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center py-4 text-muted">No categories defined.</td>
+                        <td colspan="6" class="text-center py-5 text-muted">No categories defined.</td>
                     </tr>
                     @endforelse
                 </tbody>

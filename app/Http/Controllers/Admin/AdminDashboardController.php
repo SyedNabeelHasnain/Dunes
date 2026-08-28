@@ -25,12 +25,24 @@ class AdminDashboardController extends Controller
             $totalBookings = Booking::count();
             $confirmedBookings = Booking::whereIn('status', ['confirmed', 'completed'])->count();
             $pendingBookings = Booking::where('status', 'pending')->count();
+            $avgOrderValue = $confirmedBookings > 0 ? round($revenue / $confirmedBookings, 2) : 0;
+
+            // 30-day human visitors count for conversion rate calculation
+            $visitorsCount = RequestLog::where('request_timestamp', '>=', now()->subDays(30))
+                ->where('bot_indicator', 'Likely Human')
+                ->distinct('session_id')
+                ->count('session_id') ?: 1;
+
+            $recentBookingsCount = Booking::where('created_at', '>=', now()->subDays(30))->count();
+            $conversionRate = round(($recentBookingsCount / $visitorsCount) * 100, 2);
 
             $stats = [
                 'revenue' => (float)$revenue,
                 'total' => $totalBookings,
                 'confirmed' => $confirmedBookings,
                 'pending' => $pendingBookings,
+                'aov' => $avgOrderValue,
+                'conversion_rate' => $conversionRate,
             ];
 
             // Recent bookings (latest 10)
@@ -224,7 +236,7 @@ class AdminDashboardController extends Controller
      */
     public function inquiries()
     {
-        $inquiries = Contact::orderBy('id', 'desc')->paginate(20);
+        $inquiries = Contact::orderBy('id', 'desc')->get();
         return view('admin.inquiries.index', compact('inquiries'));
     }
 

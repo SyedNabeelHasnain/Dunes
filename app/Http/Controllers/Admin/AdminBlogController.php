@@ -16,7 +16,7 @@ class AdminBlogController extends Controller
      */
     public function index()
     {
-        $posts = BlogPost::with('category')->orderBy('created_at', 'desc')->paginate(20);
+        $posts = BlogPost::with('category')->orderBy('created_at', 'desc')->get();
         return view('admin.blogs.index', compact('posts'));
     }
 
@@ -132,5 +132,24 @@ class AdminBlogController extends Controller
         $post = BlogPost::findOrFail($id);
         $post->delete();
         return redirect()->route('admin.blogs.index')->with('success', 'Blog post deleted successfully.');
+    }
+
+    /**
+     * Toggle published/draft status of a blog post.
+     */
+    public function toggleStatus(string $id)
+    {
+        $post = BlogPost::findOrFail($id);
+        $post->status = $post->status === 'published' ? 'draft' : 'published';
+        if ($post->status === 'published' && empty($post->published_at)) {
+            $post->published_at = now();
+        }
+        $post->save();
+
+        return response()->json([
+            'success' => true,
+            'status' => $post->status,
+            'message' => 'Article status updated to ' . ucfirst($post->status) . '.'
+        ]);
     }
 }

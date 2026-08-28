@@ -14,15 +14,15 @@
 <div class="card card-modern border shadow-sm rounded-4 overflow-hidden bg-white mb-4">
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table align-middle mb-0 table-hover" id="faqsTable">
-                <thead class="table-light">
+            <table class="table align-middle mb-0 table-hover datatable" id="faqsTable">
+                <thead class="table-light small text-uppercase fw-bold text-muted">
                     <tr>
                         <th class="ps-4">Question</th>
                         <th>Answer Snippet</th>
                         <th>Assignment</th>
-                        <th>Status</th>
-                        <th>Priority</th>
-                        <th class="pe-4">Actions</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Priority</th>
+                        <th class="pe-4 text-end no-sort">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -41,29 +41,29 @@
                         </td>
                         <td>
                             @if($assignmentType === 'general')
-                                <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-1 rounded-pill">General FAQ</span>
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 rounded-pill fw-bold small">General FAQ</span>
                             @else
                                 @php
                                     $tourName = $tours->firstWhere('id', $entityId)->name ?? 'Deleted Tour';
                                 @endphp
-                                <span class="badge bg-info bg-opacity-10 text-info px-3 py-1 rounded-pill" title="{{ $tourName }}">
+                                <span class="badge bg-info-subtle text-info border border-info-subtle px-3 py-1 rounded-pill fw-bold small" title="{{ $tourName }}">
                                     Tour: {{ Str::limit($tourName, 25) }}
                                 </span>
                             @endif
                         </td>
-                        <td>
+                        <td class="text-center">
                             @if($faq->status === 'active')
-                                <span class="badge bg-success text-capitalize px-3 py-1 rounded-pill">Active</span>
+                                <span class="badge bg-success text-capitalize px-3 py-1 rounded-pill badge-interactive ajax-toggle-status" data-url="{{ route('admin.faqs.toggle-status', $faq->id) }}" title="Click to toggle status">Active</span>
                             @else
-                                <span class="badge bg-secondary text-capitalize px-3 py-1 rounded-pill">Inactive</span>
+                                <span class="badge bg-secondary text-capitalize px-3 py-1 rounded-pill badge-interactive ajax-toggle-status" data-url="{{ route('admin.faqs.toggle-status', $faq->id) }}" title="Click to toggle status">Inactive</span>
                             @endif
                         </td>
-                        <td class="fw-bold text-dark">{{ $faq->priority }}</td>
-                        <td class="pe-4">
-                            <div class="d-flex gap-2">
+                        <td class="fw-bold text-dark text-center">{{ $faq->priority }}</td>
+                        <td class="pe-4 text-end">
+                            <div class="d-flex justify-content-end gap-2">
                                 <button type="button" 
                                         class="btn btn-sm btn-outline-primary rounded-circle d-flex align-items-center justify-content-center edit-faq-btn" 
-                                        style="width: 32px; height: 32px;" 
+                                        style="width: 34px; height: 34px;" 
                                         title="Edit FAQ"
                                         data-id="{{ $faq->id }}"
                                         data-question="{{ $faq->question }}"

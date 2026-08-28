@@ -13,7 +13,7 @@ class AdminReviewController extends Controller
      */
     public function index()
     {
-        $reviews = Review::orderBy('published_date', 'desc')->paginate(20);
+        $reviews = Review::orderBy('published_date', 'desc')->get();
         return view('admin.reviews.index', compact('reviews'));
     }
 
@@ -79,5 +79,21 @@ class AdminReviewController extends Controller
         $review = Review::findOrFail($id);
         $review->delete();
         return redirect()->route('admin.reviews.index')->with('success', 'Review deleted successfully.');
+    }
+
+    /**
+     * Toggle status of a review (approved <-> pending).
+     */
+    public function toggleStatus(string $id)
+    {
+        $review = Review::findOrFail($id);
+        $review->status = $review->status === 'approved' ? 'pending' : 'approved';
+        $review->save();
+
+        return response()->json([
+            'success' => true,
+            'status' => $review->status,
+            'message' => 'Review status updated to ' . ucfirst($review->status) . '.'
+        ]);
     }
 }
