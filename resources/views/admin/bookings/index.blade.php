@@ -189,11 +189,6 @@
                                     'confirmed' => 'success',
                                     'completed' => 'info',
                                     'cancelled' => 'danger'
-                                ] = [
-                                    'pending' => 'warning',
-                                    'confirmed' => 'success',
-                                    'completed' => 'info',
-                                    'cancelled' => 'danger'
                                 ];
                                 $bCol = $badgeColor[$b->status] ?? 'secondary';
                             @endphp
