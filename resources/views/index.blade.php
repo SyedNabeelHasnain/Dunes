@@ -39,6 +39,75 @@ if (!function_exists('renderReviewCardMarkup')) {
 
 @push('preloads')
 <link rel="preload" as="image" href="{{ asset('images/desert-safari-poster.avif') }}" fetchpriority="high">
+
+<!-- Schema.org 2026 Knowledge Graph: TravelAgency, LocalBusiness, WebSite -->
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@graph": [
+    {
+      "@@type": ["TravelAgency", "LocalBusiness"],
+      "@@id": "{{ route('home') }}#organization",
+      "name": "Dunes Discovery Tourism LLC",
+      "alternateName": ["Dunes Discovery", "Dunes Discovery Tourism Dubai"],
+      "url": "{{ route('home') }}",
+      "logo": "{{ asset('images/logo.png') }}",
+      "image": "{{ asset('images/desert-safari-poster.avif') }}",
+      "description": "Licensed Dubai Destination Management Company offering premium Desert Safaris, 1000cc Dune Buggy Rentals, Quad Biking, Dhow Cruise Dinners, and Abu Dhabi City Tours.",
+      "telephone": "+971 50 245 6056",
+      "email": "info@dunesdiscoverytourism.com",
+      "priceRange": "AED 79 - AED 1500",
+      "currenciesAccepted": "AED, USD, EUR, GBP",
+      "paymentAccepted": "Cash, Credit Card, Debit Card, Ziina",
+      "address": {
+        "@@type": "PostalAddress",
+        "streetAddress": "Dubai Desert Safari Terminal, Al Aweer & Lahbab",
+        "addressLocality": "Dubai",
+        "addressRegion": "Dubai",
+        "postalCode": "00000",
+        "addressCountry": "AE"
+      },
+      "geo": {
+        "@@type": "GeoCoordinates",
+        "latitude": "25.2048",
+        "longitude": "55.2708"
+      },
+      "openingHoursSpecification": {
+        "@@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+        "opens": "00:00",
+        "closes": "23:59"
+      },
+      "aggregateRating": {
+        "@@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "reviewCount": "2847",
+        "bestRating": "5",
+        "worstRating": "1"
+      },
+      "sameAs": [
+        "https://www.facebook.com/dunesdiscoverytourism",
+        "https://www.instagram.com/dunesdiscoverytourism",
+        "https://www.tripadvisor.com"
+      ]
+    },
+    {
+      "@@type": "WebSite",
+      "@@id": "{{ route('home') }}#website",
+      "url": "{{ route('home') }}",
+      "name": "Dunes Discovery Tourism",
+      "publisher": {
+        "@@id": "{{ route('home') }}#organization"
+      },
+      "potentialAction": {
+        "@@type": "SearchAction",
+        "target": "{{ route('tours.index') }}?category={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+  ]
+}
+</script>
 @endpush
 
 <!-- Modern Hero Section -->

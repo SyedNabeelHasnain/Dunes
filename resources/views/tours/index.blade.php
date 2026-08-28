@@ -180,5 +180,52 @@ window.addEventListener('popstate', () => {
     filterTours(cat);
 });
 </script>
+@push('preloads')
+<!-- Schema.org 2026 CollectionPage, ItemList & BreadcrumbList -->
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@graph": [
+    {
+      "@@type": "CollectionPage",
+      "@@id": "{{ route('tours.index') }}#webpage",
+      "url": "{{ route('tours.index') }}",
+      "name": "Dubai Desert Safari Tours & City Experiences | Dunes Discovery",
+      "description": "Browse and book the best Dubai desert safari tours, dune buggy rentals, quad biking, and dhow cruise dinners with Dunes Discovery Tourism.",
+      "breadcrumb": {
+        "@@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "{{ route('home') }}"
+          },
+          {
+            "@@type": "ListItem",
+            "position": 2,
+            "name": "Tours",
+            "item": "{{ route('tours.index') }}"
+          }
+        ]
+      },
+      "mainEntity": {
+        "@@type": "ItemList",
+        "numberOfItems": {{ $tours->count() }},
+        "itemListElement": [
+          @foreach($tours as $idx => $t)
+          {
+            "@@type": "ListItem",
+            "position": {{ $idx + 1 }},
+            "name": {!! json_encode($t->name) !!},
+            "url": "{{ route('tours.show', $t->slug) }}"
+          }{{ $idx < $tours->count() - 1 ? ',' : '' }}
+          @endforeach
+        ]
+      }
+    }
+  ]
+}
+</script>
 @endpush
 @endsection

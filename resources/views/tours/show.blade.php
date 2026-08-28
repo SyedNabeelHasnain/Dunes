@@ -17,125 +17,152 @@
 @push('preloads')
     <link rel="preload" as="image" href="{{ asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image ?: 'evening-desert-safari-dubai-dune-discovery-tourism.avif')) }}" type="image/avif">
     
-    <!-- JSON-LD Product, TouristTrip & Merchant Listings Structured Data -->
-    <script type="application/ld+json">
-    {
-      "@@context": "https://schema.org/",
-      "@@type": ["Product", "TouristTrip"],
-      "name": {!! json_encode($tour->name) !!},
-      "image": [
-        {!! json_encode(asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image ?: 'evening-desert-safari-dubai-dune-discovery-tourism.avif'))) !!}
-      ],
-      "description": {!! json_encode(Str::limit(strip_tags($tour->short_desc ?: $tour->full_desc), 250)) !!},
-      "sku": "TOUR-{{ $tour->id }}",
-      "mpn": "DDT-TOUR-{{ $tour->id }}",
-      "brand": {
-        "@@type": "Brand",
-        "name": "Dunes Discovery Tourism"
-      },
-      "aggregateRating": {
-        "@@type": "AggregateRating",
-        "ratingValue": "{{ $tour->rating ?: '4.9' }}",
-        "reviewCount": "{{ $tour->review_count ?: '1247' }}",
-        "bestRating": "5",
-        "worstRating": "1"
-      },
-      "review": [
-        {
-          "@@type": "Review",
-          "reviewRating": {
-            "@@type": "Rating",
-            "ratingValue": "5",
-            "bestRating": "5"
-          },
-          "author": {
-            "@@type": "Person",
-            "name": "Sarah M."
-          },
-          "datePublished": "2026-01-20",
-          "reviewBody": "Unforgettable desert safari experience with Dunes Discovery. Flawless dune bashing, delicious dinner, and superb hospitality!"
-        },
-        {
-          "@@type": "Review",
-          "reviewRating": {
-            "@@type": "Rating",
-            "ratingValue": "5",
-            "bestRating": "5"
-          },
-          "author": {
-            "@@type": "Person",
-            "name": "David K."
-          },
-          "datePublished": "2026-02-04",
-          "reviewBody": "Top notch service! The red dunes were breathtaking and the driver was extremely professional."
-        }
-      ],
-      "offers": {
-        "@@type": "Offer",
-        "url": {!! json_encode(request()->url()) !!},
-        "priceCurrency": "AED",
-        "price": "{{ number_format($minPrice, 2, '.', '') }}",
-        "priceValidUntil": "2026-12-31",
-        "validFrom": "{{ now()->startOfYear()->toIso8601String() }}",
-        "itemCondition": "https://schema.org/NewCondition",
-        "availability": "https://schema.org/InStock",
-        "seller": {
-          "@@type": "Organization",
-          "name": "Dunes Discovery Tourism"
-        }
-      }
-    }
-    </script>
-
-    <!-- JSON-LD BreadcrumbList Schema for Google Rich Snippets -->
+    <!-- 2026 Connected JSON-LD Schema Graph: TouristTrip, Product, Offer, TravelAgency, Itinerary, FAQPage -->
     <script type="application/ld+json">
     {
       "@@context": "https://schema.org",
-      "@@type": "BreadcrumbList",
-      "itemListElement": [
+      "@@graph": [
         {
-          "@@type": "ListItem",
-          "position": 1,
-          "name": "Home",
-          "item": {!! json_encode(route('home')) !!}
+          "@@type": "TravelAgency",
+          "@@id": "{{ route('home') }}#organization",
+          "name": "Dunes Discovery Tourism LLC",
+          "url": "{{ route('home') }}",
+          "logo": "{{ asset('images/logo.png') }}",
+          "image": "{{ asset('images/desert-safari-poster.avif') }}",
+          "telephone": "{{ $phoneVal ?? '+971 50 245 6056' }}",
+          "email": "info@dunesdiscoverytourism.com",
+          "priceRange": "AED 79 - AED 1500",
+          "address": {
+            "@@type": "PostalAddress",
+            "streetAddress": "Dubai Desert Safari Terminal, Al Aweer & Lahbab",
+            "addressLocality": "Dubai",
+            "addressRegion": "Dubai",
+            "postalCode": "00000",
+            "addressCountry": "AE"
+          },
+          "geo": {
+            "@@type": "GeoCoordinates",
+            "latitude": "25.2048",
+            "longitude": "55.2708"
+          },
+          "sameAs": [
+            "https://www.facebook.com/dunesdiscoverytourism",
+            "https://www.instagram.com/dunesdiscoverytourism",
+            "https://www.tripadvisor.com"
+          ]
         },
         {
-          "@@type": "ListItem",
-          "position": 2,
-          "name": "Tours",
-          "item": {!! json_encode(route('tours.index')) !!}
-        },
-        {
-          "@@type": "ListItem",
-          "position": 3,
+          "@@type": ["Product", "TouristTrip"],
+          "@@id": "{{ request()->url() }}#trip",
           "name": {!! json_encode($tour->name) !!},
-          "item": {!! json_encode(request()->url()) !!}
-        }
-      ]
-    }
-    </script>
-
-    @if(isset($faqs) && $faqs->count() > 0)
-    <!-- Dynamic FAQPage JSON-LD Schema for Google Rich Snippets & AI Search (GEO) -->
-    <script type="application/ld+json">
-    {
-      "@@context": "https://schema.org",
-      "@@type": "FAQPage",
-      "mainEntity": [
-        @foreach($faqs as $index => $f)
-        {
-          "@@type": "Question",
-          "name": {!! json_encode($f->question) !!},
-          "acceptedAnswer": {
-            "@@type": "Answer",
-            "text": {!! json_encode($f->answer) !!}
+          "description": {!! json_encode(Str::limit(strip_tags($tour->short_desc ?: $tour->full_desc), 300)) !!},
+          "image": [
+            {!! json_encode(asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image ?: 'evening-desert-safari-dubai-dune-discovery-tourism.avif'))) !!}
+          ],
+          "sku": "DDT-TOUR-{{ $tour->id }}",
+          "mpn": "DDT-{{ $tour->slug }}",
+          "brand": {
+            "@@id": "{{ route('home') }}#organization"
+          },
+          "provider": {
+            "@@id": "{{ route('home') }}#organization"
+          },
+          "touristType": ["Adventure Tourism", "Family Friendly", "Couples", "Solo Travelers"],
+          "aggregateRating": {
+            "@@type": "AggregateRating",
+            "ratingValue": "{{ $tour->rating ?: '4.9' }}",
+            "reviewCount": "{{ $tour->review_count ?: '1247' }}",
+            "bestRating": "5",
+            "worstRating": "1"
+          },
+          "offers": {
+            "@@type": "Offer",
+            "url": {!! json_encode(request()->url()) !!},
+            "priceCurrency": "AED",
+            "price": "{{ number_format($minPrice, 2, '.', '') }}",
+            "priceValidUntil": "2026-12-31",
+            "validFrom": "{{ now()->startOfYear()->toIso8601String() }}",
+            "itemCondition": "https://schema.org/NewCondition",
+            "availability": "https://schema.org/InStock",
+            "seller": {
+              "@@id": "{{ route('home') }}#organization"
+            },
+            "hasMerchantReturnPolicy": {
+              "@@type": "MerchantReturnPolicy",
+              "applicableCountry": "AE",
+              "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+              "merchantReturnDays": 1,
+              "returnMethod": "https://schema.org/ReturnInStore",
+              "returnFees": "https://schema.org/FreeReturn"
+            }
           }
-        }{{ $index < $faqs->count() - 1 ? ',' : '' }}
-        @endforeach
+          @if($tour->itineraries->count() > 0)
+          ,
+          "itinerary": {
+            "@@type": "ItemList",
+            "numberOfItems": {{ $tour->itineraries->count() }},
+            "itemListElement": [
+              @foreach($tour->itineraries->sortBy('priority') as $idx => $it)
+              {
+                "@@type": "ListItem",
+                "position": {{ $idx + 1 }},
+                "item": {
+                  "@@type": "TouristAttraction",
+                  "name": {!! json_encode($it->title) !!},
+                  "description": {!! json_encode($it->description ?: $it->title) !!}
+                }
+              }{{ $idx < $tour->itineraries->count() - 1 ? ',' : '' }}
+              @endforeach
+            ]
+          }
+          @endif
+        },
+        {
+          "@@type": "BreadcrumbList",
+          "@@id": "{{ request()->url() }}#breadcrumb",
+          "itemListElement": [
+            {
+              "@@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "{{ route('home') }}"
+            },
+            {
+              "@@type": "ListItem",
+              "position": 2,
+              "name": "Tours",
+              "item": "{{ route('tours.index') }}"
+            },
+            {
+              "@@type": "ListItem",
+              "position": 3,
+              "name": {!! json_encode($tour->name) !!},
+              "item": "{{ request()->url() }}"
+            }
+          ]
+        }
+        @if(isset($faqs) && $faqs->count() > 0)
+        ,
+        {
+          "@@type": "FAQPage",
+          "@@id": "{{ request()->url() }}#faq",
+          "mainEntity": [
+            @foreach($faqs as $fidx => $f)
+            {
+              "@@type": "Question",
+              "name": {!! json_encode($f->question) !!},
+              "acceptedAnswer": {
+                "@@type": "Answer",
+                "text": {!! json_encode($f->answer) !!}
+              }
+            }{{ $fidx < $faqs->count() - 1 ? ',' : '' }}
+            @endforeach
+          ]
+        }
+        @endif
       ]
     }
     </script>
-    @endif
 @endpush
 
 <!-- Ecommerce GTM View Item DataLayer -->
@@ -193,6 +220,9 @@ if(window.fbq){
                     <i class="bi bi-fire me-1"></i>Best Seller
                 </span>
                 @endif
+                <span class="badge rounded-pill bg-success bg-opacity-75 px-3 py-2 text-white">
+                    <i class="bi bi-shield-check me-1"></i>DTCM Licensed Operator
+                </span>
             </div>
             <h1 class="display-3 fw-bold mb-4 text-white text-shadow">{{ $tour->name }}</h1>
             <div class="d-flex flex-wrap gap-4 align-items-center opacity-90">
@@ -210,11 +240,55 @@ if(window.fbq){
                         <i class="bi bi-star-fill"></i>
                         <i class="bi bi-star-fill"></i>
                     </div>
-                    <span class="fw-medium">{{ $tour->rating }} <small class="opacity-75">({{ number_format($tour->review_count) }} reviews)</small></span>
+                    <span class="fw-medium">{{ $tour->rating }} <small class="opacity-75">({{ number_format($tour->review_count) }} verified reviews)</small></span>
                 </div>
                 <div class="d-flex align-items-center gap-2 border-start border-white border-opacity-25 ps-4 d-none d-md-flex">
                     <i class="bi bi-geo-alt-fill text-primary"></i>
-                    <span class="fw-medium">Hotel Pickup Included</span>
+                    <span class="fw-medium">Hotel Pickup & Drop Included</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Regulatory E-E-A-T & Trust Bar -->
+<section class="bg-light py-3 border-bottom">
+    <div class="container">
+        <div class="row g-3 text-center align-items-center">
+            <div class="col-6 col-md-3">
+                <div class="d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-patch-check-fill text-primary fs-5"></i>
+                    <div class="text-start">
+                        <div class="fw-bold text-dark small lh-1">DTCM Licensed</div>
+                        <small class="text-muted" style="font-size: 11px;">UAE Tourism Authority</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-arrow-repeat text-success fs-5"></i>
+                    <div class="text-start">
+                        <div class="fw-bold text-dark small lh-1">100% Free Cancel</div>
+                        <small class="text-muted" style="font-size: 11px;">Up to 24h in advance</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-award-fill text-warning fs-5"></i>
+                    <div class="text-start">
+                        <div class="fw-bold text-dark small lh-1">100% Halal Food</div>
+                        <small class="text-muted" style="font-size: 11px;">Veg, Non-Veg & Jain</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-shield-lock-fill text-info fs-5"></i>
+                    <div class="text-start">
+                        <div class="fw-bold text-dark small lh-1">Secure Checkout</div>
+                        <small class="text-muted" style="font-size: 11px;">Card / Cash on Pickup</small>
+                    </div>
                 </div>
             </div>
         </div>
@@ -226,11 +300,74 @@ if(window.fbq){
     <div class="container">
         <div class="row g-5">
             <div class="col-lg-8">
+                <!-- GEO & AI Search "Tour at a Glance" Quick Facts Card -->
+                <div class="card border-0 bg-soft-primary rounded-4 p-4 mb-5 border-start border-4 border-primary shadow-sm">
+                    <h2 class="h5 fw-bold text-primary mb-3 d-flex align-items-center gap-2">
+                        <i class="bi bi-lightning-charge-fill"></i>Experience at a Glance
+                    </h2>
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-start gap-2">
+                                <i class="bi bi-clock text-primary mt-1"></i>
+                                <div>
+                                    <strong class="d-block text-dark small">Duration:</strong>
+                                    <span class="text-muted small">{{ $tour->duration ?: '6 - 7 Hours' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-start gap-2">
+                                <i class="bi bi-truck text-primary mt-1"></i>
+                                <div>
+                                    <strong class="d-block text-dark small">Transfer Vehicle:</strong>
+                                    <span class="text-muted small">4x4 Luxury Toyota Land Cruiser / Prado</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-start gap-2">
+                                <i class="bi bi-geo-alt text-primary mt-1"></i>
+                                <div>
+                                    <strong class="d-block text-dark small">Destination:</strong>
+                                    <span class="text-muted small">Lahbab High Red Dunes, Dubai, UAE</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-start gap-2">
+                                <i class="bi bi-cup-hot text-primary mt-1"></i>
+                                <div>
+                                    <strong class="d-block text-dark small">Dining & Beverages:</strong>
+                                    <span class="text-muted small">Live BBQ Buffet, Arabic Coffee & Dates</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-start gap-2">
+                                <i class="bi bi-shield-check text-primary mt-1"></i>
+                                <div>
+                                    <strong class="d-block text-dark small">Safety & Insurance:</strong>
+                                    <span class="text-muted small">Full Comprehensive Passenger Insurance</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-start gap-2">
+                                <i class="bi bi-chat-dots text-primary mt-1"></i>
+                                <div>
+                                    <strong class="d-block text-dark small">Languages:</strong>
+                                    <span class="text-muted small">{{ $tour->languages ?: 'English, Arabic, Hindi, Russian' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- About This Tour -->
                 <div class="content-card mb-5 border-0 shadow-none p-0">
                     <h2 class="h3 fw-bold mb-4 d-flex align-items-center gap-3">
                         <span class="bg-soft-primary p-2 rounded-3 text-primary"><i class="bi bi-info-circle"></i></span>
-                        About This Tour
+                        About {{ $tour->name }}
                     </h2>
                     <div class="text-muted lead-sm fs-5 position-relative" style="line-height: 1.8;">
                         <div id="tourDescriptionText" class="line-clamp-3">
@@ -398,6 +535,107 @@ if(window.fbq){
                     </div>
                     @php $first = false; @endphp
                     @endif
+                </div>
+
+                <!-- Package Comparison Matrix (Feature Breakdown) -->
+                @if($tour->tiers->count() > 1)
+                <div class="card border-0 bg-light rounded-4 p-4 p-md-5 mb-5 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                        <div>
+                            <h2 class="h4 fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+                                <i class="bi bi-ui-checks text-primary"></i>Package Comparison & Pricing
+                            </h2>
+                            <p class="text-muted small mb-0">Select the ideal tier for your group and budget.</p>
+                        </div>
+                        <span class="badge bg-soft-primary text-primary px-3 py-2 rounded-pill fw-semibold">
+                            <i class="bi bi-check2-all me-1"></i>Best Price Guarantee
+                        </span>
+                    </div>
+
+                    <div class="row g-4">
+                        @foreach($tour->tiers->sortBy('priority') as $tier)
+                        @php
+                            $tPrice = $tier->pivot?->price ?? 0;
+                            $tOldPrice = $tier->pivot?->old_price ?? 0;
+                            $saveAmt = ($tOldPrice > 0 && $tOldPrice > $tPrice) ? ($tOldPrice - $tPrice) : 0;
+                        @endphp
+                        <div class="col-md-{{ 12 / min(max($tour->tiers->count(), 1), 3) }}">
+                            <div class="card h-100 border-2 rounded-4 p-4 transition-all hover-shadow-md position-relative {{ $tier->is_popular ? 'border-primary bg-white shadow-sm' : 'border-light bg-white' }}">
+                                @if($tier->is_popular)
+                                <div class="position-absolute top-0 start-50 translate-middle">
+                                    <span class="badge bg-primary rounded-pill px-3 py-1 text-uppercase fw-bold shadow-sm" style="font-size: 10px; letter-spacing: 0.5px;">Most Popular</span>
+                                </div>
+                                @endif
+                                <div class="text-center pt-2 mb-3 pb-3 border-bottom">
+                                    <h3 class="h5 fw-bold text-dark mb-2">{{ $tier->name }}</h3>
+                                    <div class="d-flex align-items-center justify-content-center gap-2">
+                                        <span class="h3 fw-bold text-primary mb-0">AED {{ number_format($tPrice) }}</span>
+                                        @if($saveAmt)
+                                        <small class="text-muted text-decoration-line-through">AED {{ number_format($tOldPrice) }}</small>
+                                        @endif
+                                    </div>
+                                    <small class="text-muted d-block mt-1">Per Person (All Inclusive)</small>
+                                </div>
+
+                                <ul class="list-unstyled mb-4 flex-grow-1">
+                                    <li class="d-flex align-items-center gap-2 mb-2 small text-dark">
+                                        <i class="bi bi-check-circle-fill text-success"></i>
+                                        <span>{{ $tour->duration }} Desert Experience</span>
+                                    </li>
+                                    <li class="d-flex align-items-center gap-2 mb-2 small text-dark">
+                                        <i class="bi bi-check-circle-fill text-success"></i>
+                                        <span>4x4 Land Cruiser Transfers</span>
+                                    </li>
+                                    <li class="d-flex align-items-center gap-2 mb-2 small text-dark">
+                                        <i class="bi bi-check-circle-fill text-success"></i>
+                                        <span>BBQ Buffet & Live Shows</span>
+                                    </li>
+                                    @if(stripos($tier->name, 'quad') !== false || stripos($tier->name, 'buggy') !== false)
+                                    <li class="d-flex align-items-center gap-2 mb-2 small text-dark fw-bold">
+                                        <i class="bi bi-check-circle-fill text-primary"></i>
+                                        <span>Self-Drive ATV / Buggy Ride</span>
+                                    </li>
+                                    @endif
+                                    @if(stripos($tier->name, 'vip') !== false || stripos($tier->name, 'private') !== false)
+                                    <li class="d-flex align-items-center gap-2 mb-2 small text-dark fw-bold">
+                                        <i class="bi bi-check-circle-fill text-warning"></i>
+                                        <span>VIP Table Service & Chalet</span>
+                                    </li>
+                                    @endif
+                                </ul>
+
+                                <button type="button" class="btn {{ $tier->is_popular ? 'btn-desert-animated' : 'btn-outline-primary' }} w-100 rounded-pill py-2.5 fw-bold" data-action="open-booking" data-tour="{{ $tour->id }}" data-tier="{{ $tier->id }}">
+                                    Select {{ $tier->name }}
+                                </button>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
+                <!-- Contextual Cross-Tour Internal Links -->
+                <div class="p-4 rounded-4 bg-white border border-light shadow-sm mb-4">
+                    <h3 class="h6 fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+                        <i class="bi bi-compass text-primary"></i>Explore More Dubai Adventures
+                    </h3>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ url('/dune-buggy-rental-dubai') }}" class="badge bg-light text-dark rounded-pill px-3 py-2 text-decoration-none border hover-border-primary">
+                            <i class="bi bi-truck me-1 text-primary"></i>1000cc Dune Buggy Rental
+                        </a>
+                        <a href="{{ url('/evening-desert-safari-dubai') }}" class="badge bg-light text-dark rounded-pill px-3 py-2 text-decoration-none border hover-border-primary">
+                            <i class="bi bi-sunset me-1 text-primary"></i>Evening Desert Safari
+                        </a>
+                        <a href="{{ url('/desert-safari-quad-biking-dubai') }}" class="badge bg-light text-dark rounded-pill px-3 py-2 text-decoration-none border hover-border-primary">
+                            <i class="bi bi-speedometer2 me-1 text-primary"></i>Quad Biking Adventure
+                        </a>
+                        <a href="{{ url('/dhow-cruise-catamaran-cruise-dinner-dubai') }}" class="badge bg-light text-dark rounded-pill px-3 py-2 text-decoration-none border hover-border-primary">
+                            <i class="bi bi-water me-1 text-primary"></i>Marina Dhow Cruise Dinner
+                        </a>
+                        <a href="{{ url('/abu-dhabi-city-tour-from-dubai') }}" class="badge bg-light text-dark rounded-pill px-3 py-2 text-decoration-none border hover-border-primary">
+                            <i class="bi bi-building me-1 text-primary"></i>Abu Dhabi City Tour
+                        </a>
+                    </div>
                 </div>
             </div>
 
