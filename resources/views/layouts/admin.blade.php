@@ -217,6 +217,7 @@
     <script src="{{ asset('assets/vendor/bootstrap/5.3.2/js/bootstrap.bundle.min.js') }}"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
     $(document).ready(function() {
@@ -237,28 +238,60 @@
             $.fn.dataTable.ext.errMode = 'none';
         }
 
-        // Initialize DataTable only on tables without .no-datatable and without colspan empty rows
+        // Initialize DataTable on tables without .no-datatable
         $('.table:not(.no-datatable)').each(function() {
             var $table = $(this);
             if ($table.find('tbody td[colspan]').length === 0 && $table.find('tbody tr').length > 0) {
-                $table.DataTable({
-                    pageLength: 25,
-                    ordering: true,
-                    responsive: true,
-                    language: {
-                        search: "",
-                        searchPlaceholder: "Search records...",
-                        paginate: {
-                            previous: '<i class="bi bi-chevron-left"></i>',
-                            next: '<i class="bi bi-chevron-right"></i>'
-                        }
-                    },
-                    dom: "<'row mb-3 mt-3'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
-                         "<'row'<'col-sm-12'tr>>" +
-                         "<'row mt-3'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>"
-                });
+                if (!$.fn.DataTable.isDataTable($table)) {
+                    $table.DataTable({
+                        pageLength: 25,
+                        ordering: true,
+                        responsive: true,
+                        language: {
+                            search: "",
+                            searchPlaceholder: "Quick search...",
+                            paginate: {
+                                previous: '<i class="bi bi-chevron-left"></i>',
+                                next: '<i class="bi bi-chevron-right"></i>'
+                            }
+                        },
+                        dom: "<'row mb-3 mt-3 align-items-center'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+                             "<'row'<'col-sm-12'tr>>" +
+                             "<'row mt-3 align-items-center'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>"
+                    });
+                }
             }
         });
+
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: "{{ session('success') }}",
+                timer: 3000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+        @endif
+
+        @if(session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: "{{ session('error') }}",
+                confirmButtonColor: '#F58F43'
+            });
+        @endif
+
+        @if($errors->any())
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                html: '<ul style="text-align:left; font-size:13px;">@foreach($errors->all() as $err)<li>{{ $err }}</li>@endforeach</ul>',
+                confirmButtonColor: '#F58F43'
+            });
+        @endif
 
         // Hide sidebar on clicking outside (mobile)
         $(document).on('click', function(e) {

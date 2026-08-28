@@ -3,79 +3,101 @@
 @section('page_title', 'WhatsApp Leads')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="h4 fw-800 text-dark mb-0">WhatsApp Click Leads</h2>
-    <a href="{{ route('admin.whatsapp.settings') }}" class="btn btn-sm btn-light border rounded-pill px-3 fw-bold">
-        <i class="bi bi-gear-fill me-1 text-primary"></i> WhatsApp Settings
-    </a>
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+        <h2 class="h4 fw-800 text-dark mb-1">WhatsApp Inquiries & Click Leads</h2>
+        <p class="text-muted small mb-0">Live leads generated through website WhatsApp widgets with visitor telemetry.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ route('admin.whatsapp.export') }}" class="btn btn-outline-success rounded-pill px-4 fw-bold shadow-sm">
+            <i class="bi bi-file-earmark-spreadsheet me-2"></i> Export CSV
+        </a>
+        <a href="{{ route('admin.whatsapp.settings') }}" class="btn btn-light border rounded-pill px-3 fw-bold shadow-sm">
+            <i class="bi bi-gear-fill me-1 text-primary"></i> Settings
+        </a>
+    </div>
 </div>
 
-<div class="card card-modern border shadow-sm rounded-4 overflow-hidden bg-white">
+<div class="card card-modern border-0 shadow-sm rounded-4 overflow-hidden bg-white">
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table align-middle mb-0 table-hover no-datatable" id="whatsappLeadsTable">
-                <thead class="table-light">
+                <thead class="table-light small text-uppercase fw-bold text-muted">
                     <tr>
-                        <th class="ps-4">Date</th>
+                        <th class="ps-4">Date & Time</th>
                         <th>Customer</th>
                         <th>Interest Context</th>
                         <th>Message Snippet</th>
                         <th>Location</th>
                         <th>Device</th>
-                        <th class="pe-4">Action</th>
+                        <th class="pe-4 text-end">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($leads as $lead)
                     <tr>
                         <td class="ps-4">
-                            <div class="small fw-medium text-muted">
-                                {{ \Carbon\Carbon::parse($lead->created_at)->format('M j, g:ia') }}
+                            <div class="small fw-bold text-dark">
+                                {{ \Carbon\Carbon::parse($lead->created_at)->format('M j, Y') }}
+                            </div>
+                            <div class="text-muted small" style="font-size: 0.72rem;">
+                                {{ \Carbon\Carbon::parse($lead->created_at)->format('g:ia') }}
                             </div>
                         </td>
                         <td>
-                            <div class="fw-bold text-dark">{{ $lead->name }}</div>
-                            <div class="text-success small fw-bold" style="font-size: 0.75rem;">
+                            <div class="fw-bold text-dark">{{ $lead->name ?: 'Visitor' }}</div>
+                            <div class="text-success small fw-bold font-monospace" style="font-size: 0.75rem;">
                                 {{ $lead->phone }}
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-primary border rounded-pill fw-bold small">
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill fw-bold small">
                                 {{ $lead->tour_name ?: 'General Inquiry' }}
                             </span>
                         </td>
-                        <td class="text-muted small">
-                            {{ Str::limit($lead->message_text, 70) }}
+                        <td class="text-muted small" style="max-width: 220px;">
+                            {{ Str::limit($lead->message_text, 65) }}
                         </td>
                         <td>
                             <div class="small text-dark fw-semibold">
-                                {{ $lead->city ?: 'Unknown' }}, {{ $lead->country ?: '' }}
+                                <i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ $lead->city ?: 'Unknown' }}, {{ $lead->country ?: '' }}
                             </div>
                         </td>
                         <td>
                             <div class="small text-muted text-capitalize">
-                                {{ $lead->device_type ?: '-' }} ({{ $lead->os_name ?: '-' }})
+                                <span class="badge bg-light text-dark border">{{ $lead->device_type ?: 'Desktop' }}</span>
                             </div>
                         </td>
-                        <td class="pe-4">
-                            <button class="btn btn-sm btn-outline-primary rounded-circle d-flex align-items-center justify-content-center view-lead-btn" 
-                                    style="width: 32px; height: 32px;" 
-                                    title="View Full Lead Details"
-                                    data-name="{{ $lead->name }}"
-                                    data-phone="{{ $lead->phone }}"
-                                    data-context="{{ $lead->tour_name ?: 'General Inquiry' }}"
-                                    data-url="{{ $lead->page_url }}"
-                                    data-msg="{{ $lead->message_text }}"
-                                    data-ip="{{ $lead->client_ip ?? $lead->ip_address ?? 'Not Available' }}"
-                                    data-location="{{ ($lead->city ?? 'Unknown') . ', ' . ($lead->country ?? '') }}"
-                                    data-device="{{ ucfirst($lead->device_type ?? '-') }} ({{ $lead->os_name ?? '-' }} / {{ $lead->browser_name ?? '-' }})">
-                                <i class="bi bi-search"></i>
-                            </button>
+                        <td class="pe-4 text-end">
+                            <div class="d-flex justify-content-end gap-2">
+                                @if($lead->phone)
+                                @php
+                                    $waClean = preg_replace('/[^0-9]/', '', $lead->phone);
+                                    $replyMsg = 'Hi ' . ($lead->name ?: 'there') . '! Thanks for contacting Dunes Discovery regarding ' . ($lead->tour_name ?: 'our tours') . '. How may we assist you today?';
+                                @endphp
+                                <a href="https://wa.me/{{ $waClean }}?text={{ urlencode($replyMsg) }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-success rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="Reply on WhatsApp">
+                                    <i class="bi bi-whatsapp"></i>
+                                </a>
+                                @endif
+                                <button class="btn btn-sm btn-outline-primary rounded-circle d-flex align-items-center justify-content-center view-lead-btn" 
+                                        style="width: 34px; height: 34px;" 
+                                        title="View Full Lead Details"
+                                        data-name="{{ $lead->name }}"
+                                        data-phone="{{ $lead->phone }}"
+                                        data-context="{{ $lead->tour_name ?: 'General Inquiry' }}"
+                                        data-url="{{ $lead->page_url }}"
+                                        data-msg="{{ $lead->message_text }}"
+                                        data-ip="{{ $lead->client_ip ?? $lead->ip_address ?? 'Not Available' }}"
+                                        data-location="{{ ($lead->city ?? 'Unknown') . ', ' . ($lead->country ?? '') }}"
+                                        data-device="{{ ucfirst($lead->device_type ?? '-') }} ({{ $lead->os_name ?? '-' }} / {{ $lead->browser_name ?? '-' }})">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="text-center py-4 text-muted">No WhatsApp leads found.</td>
+                        <td colspan="7" class="text-center py-5 text-muted">No WhatsApp leads found.</td>
                     </tr>
                     @endforelse
                 </tbody>

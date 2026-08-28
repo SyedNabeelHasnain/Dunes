@@ -103,7 +103,67 @@ class AdminDashboardController extends Controller
                 ->limit(8)
                 ->get();
 
-            // 4. Device & Browser Breakdown
+            // 4. Traffic Sources Channel Grouping
+            $trafficSources = RequestLog::where('request_timestamp', '>=', $startDate)
+                ->where('bot_indicator', 'Likely Human')
+                ->select(
+                    \DB::raw("CASE 
+                        WHEN utm_source IS NOT NULL AND utm_source != '' AND utm_source != 'Not Available' THEN utm_source
+                        WHEN gclid IS NOT NULL AND gclid != '' THEN 'Google Ads'
+                        WHEN referrer LIKE '%google%' THEN 'Google Organic'
+                        WHEN referrer LIKE '%facebook%' OR referrer LIKE '%fb.com%' THEN 'Facebook'
+                        WHEN referrer LIKE '%instagram%' THEN 'Instagram'
+                        WHEN referrer LIKE '%wa.me%' OR referrer LIKE '%whatsapp%' THEN 'WhatsApp'
+                        WHEN referrer LIKE '%bing%' THEN 'Bing Organic'
+                        WHEN referrer LIKE '%tiktok%' THEN 'TikTok'
+                        WHEN referrer IS NULL OR referrer = '' OR referrer = 'Not Available' OR referrer = 'direct' THEN 'Direct / Bookmark'
+                        ELSE 'External Referral'
+                    END as channel"),
+                    \DB::raw('COUNT(*) as views'),
+                    \DB::raw('COUNT(DISTINCT session_id) as visitors')
+                )
+                ->groupBy('channel')
+                ->orderBy('views', 'desc')
+                ->get();
+
+            // 5. Top Referring Domains & URLs
+            $topReferrers = RequestLog::where('request_timestamp', '>=', $startDate)
+                ->where('bot_indicator', 'Likely Human')
+                ->whereNotNull('referrer')
+                ->where('referrer', '!=', 'Not Available')
+                ->where('referrer', '!=', '')
+                ->where('referrer', '!=', 'direct')
+                ->select('referrer', \DB::raw('COUNT(*) as views'), \DB::raw('COUNT(DISTINCT session_id) as visitors'))
+                ->groupBy('referrer')
+                ->orderBy('views', 'desc')
+                ->limit(15)
+                ->get();
+
+            // 6. Campaign & UTM Attribution
+            $campaigns = RequestLog::where('request_timestamp', '>=', $startDate)
+                ->where('bot_indicator', 'Likely Human')
+                ->whereNotNull('utm_campaign')
+                ->where('utm_campaign', '!=', 'Not Available')
+                ->where('utm_campaign', '!=', '')
+                ->select('utm_campaign', 'utm_source', 'utm_medium', \DB::raw('COUNT(*) as views'), \DB::raw('COUNT(DISTINCT session_id) as visitors'))
+                ->groupBy('utm_campaign', 'utm_source', 'utm_medium')
+                ->orderBy('views', 'desc')
+                ->limit(10)
+                ->get();
+
+            // 7. Daily Traffic Trend (Time-Series for Chart.js)
+            $dailyTrend = RequestLog::where('request_timestamp', '>=', $startDate)
+                ->select(
+                    \DB::raw('DATE(request_timestamp) as date'),
+                    \DB::raw('COUNT(*) as total_views'),
+                    \DB::raw("SUM(CASE WHEN bot_indicator = 'Likely Human' THEN 1 ELSE 0 END) as human_views"),
+                    \DB::raw("COUNT(DISTINCT CASE WHEN bot_indicator = 'Likely Human' THEN session_id ELSE NULL END) as human_sessions")
+                )
+                ->groupBy('date')
+                ->orderBy('date', 'asc')
+                ->get();
+
+            // 8. Device & Browser Breakdown
             $devices = RequestLog::where('request_timestamp', '>=', $startDate)
                 ->where('bot_indicator', 'Likely Human')
                 ->select('device_type', \DB::raw('COUNT(*) as count'))
@@ -119,12 +179,13 @@ class AdminDashboardController extends Controller
                 ->limit(5)
                 ->get();
 
-            // 5. Recent Request Logs (Paginated)
+            // 9. Recent Request Logs (Paginated)
             $logs = RequestLog::orderBy('request_timestamp', 'desc')->paginate(25);
 
             return view('admin.analytics.index', compact(
                 'days', 'totalPageviews', 'humanPageviews', 'uniqueVisitors', 'uniqueIPs',
-                'topPages', 'topCountries', 'devices', 'browsers', 'logs'
+                'topPages', 'topCountries', 'trafficSources', 'topReferrers', 'campaigns', 'dailyTrend',
+                'devices', 'browsers', 'logs'
             ));
         } catch (\Throwable $e) {
             return response("ANALYTICS ERROR: " . $e->getMessage() . "\n" . $e->getTraceAsString(), 500)

@@ -186,8 +186,87 @@ class AdminTourController extends Controller
      */
     public function tiers()
     {
-        $tiers = Tier::orderBy('priority', 'asc')->get();
+        $tiers = Tier::withCount('tours')->orderBy('priority', 'asc')->get();
         return view('admin.tiers.index', compact('tiers'));
+    }
+
+    /**
+     * Store a newly created pricing tier.
+     */
+    public function storeTier(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'display_name' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255|unique:tiers,slug',
+            'description' => 'nullable|string',
+            'icon' => 'nullable|string|max:100',
+            'is_popular' => 'nullable',
+            'status' => 'required|string|in:active,inactive',
+            'priority' => 'required|integer',
+        ]);
+
+        $slug = $request->slug ? Str::slug($request->slug) : Str::slug($request->name);
+        if (Tier::where('slug', $slug)->exists()) {
+            $slug .= '-' . time();
+        }
+
+        Tier::create([
+            'name' => $request->name,
+            'display_name' => $request->display_name,
+            'slug' => $slug,
+            'description' => $request->description,
+            'icon' => $request->icon ?: 'star-fill',
+            'is_popular' => $request->has('is_popular') ? 1 : 0,
+            'status' => $request->status,
+            'priority' => (int)$request->priority,
+        ]);
+
+        return redirect()->route('admin.tiers.index')->with('success', 'Pricing tier created successfully.');
+    }
+
+    /**
+     * Update the specified pricing tier.
+     */
+    public function updateTier(Request $request, string $id)
+    {
+        $tier = Tier::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'display_name' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:tiers,slug,' . $tier->id,
+            'description' => 'nullable|string',
+            'icon' => 'nullable|string|max:100',
+            'is_popular' => 'nullable',
+            'status' => 'required|string|in:active,inactive',
+            'priority' => 'required|integer',
+        ]);
+
+        $tier->update([
+            'name' => $request->name,
+            'display_name' => $request->display_name,
+            'slug' => Str::slug($request->slug),
+            'description' => $request->description,
+            'icon' => $request->icon ?: 'star-fill',
+            'is_popular' => $request->has('is_popular') ? 1 : 0,
+            'status' => $request->status,
+            'priority' => (int)$request->priority,
+        ]);
+
+        return redirect()->route('admin.tiers.index')->with('success', 'Pricing tier updated successfully.');
+    }
+
+    /**
+     * Delete the specified pricing tier.
+     */
+    public function deleteTier(string $id)
+    {
+        $tier = Tier::findOrFail($id);
+        $tier->tours()->detach();
+        $tier->delete();
+
+        return redirect()->route('admin.tiers.index')->with('success', 'Pricing tier deleted successfully.');
     }
 
     /**
@@ -195,8 +274,83 @@ class AdminTourController extends Controller
      */
     public function addons()
     {
-        $addons = Addon::orderBy('priority', 'asc')->get();
+        $addons = Addon::withCount('tours')->orderBy('priority', 'asc')->get();
         return view('admin.addons.index', compact('addons'));
+    }
+
+    /**
+     * Store a newly created addon.
+     */
+    public function storeAddon(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255|unique:addons,slug',
+            'description' => 'nullable|string',
+            'icon' => 'nullable|string|max:100',
+            'default_price' => 'required|numeric|min:0',
+            'status' => 'required|string|in:active,inactive',
+            'priority' => 'required|integer',
+        ]);
+
+        $slug = $request->slug ? Str::slug($request->slug) : Str::slug($request->name);
+        if (Addon::where('slug', $slug)->exists()) {
+            $slug .= '-' . time();
+        }
+
+        Addon::create([
+            'name' => $request->name,
+            'slug' => $slug,
+            'description' => $request->description,
+            'icon' => $request->icon ?: 'plus-lg',
+            'default_price' => (float)$request->default_price,
+            'status' => $request->status,
+            'priority' => (int)$request->priority,
+        ]);
+
+        return redirect()->route('admin.addons.index')->with('success', 'Addon created successfully.');
+    }
+
+    /**
+     * Update the specified addon.
+     */
+    public function updateAddon(Request $request, string $id)
+    {
+        $addon = Addon::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:addons,slug,' . $addon->id,
+            'description' => 'nullable|string',
+            'icon' => 'nullable|string|max:100',
+            'default_price' => 'required|numeric|min:0',
+            'status' => 'required|string|in:active,inactive',
+            'priority' => 'required|integer',
+        ]);
+
+        $addon->update([
+            'name' => $request->name,
+            'slug' => Str::slug($request->slug),
+            'description' => $request->description,
+            'icon' => $request->icon ?: 'plus-lg',
+            'default_price' => (float)$request->default_price,
+            'status' => $request->status,
+            'priority' => (int)$request->priority,
+        ]);
+
+        return redirect()->route('admin.addons.index')->with('success', 'Addon updated successfully.');
+    }
+
+    /**
+     * Delete the specified addon.
+     */
+    public function deleteAddon(string $id)
+    {
+        $addon = Addon::findOrFail($id);
+        $addon->tours()->detach();
+        $addon->delete();
+
+        return redirect()->route('admin.addons.index')->with('success', 'Addon deleted successfully.');
     }
 
     /**

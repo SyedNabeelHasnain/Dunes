@@ -19,14 +19,120 @@ class AdminBookingController extends Controller
     public function index(Request $request)
     {
         $status = $request->input('status');
-        $query = Booking::with('tour');
+        $search = $request->input('search');
+        $paymentStatus = $request->input('payment_status');
+        $fromDate = $request->input('from_date');
+        $toDate = $request->input('to_date');
+
+        $query = Booking::with(['tour', 'tier']);
 
         if ($status) {
             $query->where('status', $status);
         }
+        if ($paymentStatus) {
+            $query->where('payment_status', $paymentStatus);
+        }
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('reference', 'like', "%{$search}%")
+                  ->orWhere('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%")
+                  ->orWhere('tour_name', 'like', "%{$search}%");
+            });
+        }
+        if ($fromDate) {
+            $query->whereDate('tour_date', '>=', $fromDate);
+        }
+        if ($toDate) {
+            $query->whereDate('tour_date', '<=', $toDate);
+        }
 
-        $bookings = $query->orderBy('created_at', 'desc')->paginate(20)->withQueryString();
-        return view('admin.bookings.index', compact('bookings', 'status'));
+        $stats = [
+            'total' => Booking::count(),
+            'pending' => Booking::where('status', 'pending')->count(),
+            'confirmed' => Booking::where('status', 'confirmed')->count(),
+            'completed' => Booking::where('status', 'completed')->count(),
+            'revenue' => (float)Booking::whereIn('status', ['confirmed', 'completed'])->sum('payment_amount'),
+        ];
+
+        $bookings = $query->orderBy('created_at', 'desc')->paginate(25)->withQueryString();
+        return view('admin.bookings.index', compact('bookings', 'status', 'search', 'paymentStatus', 'fromDate', 'toDate', 'stats'));
+    }
+
+    /**
+     * Export bookings to CSV.
+     */
+    public function exportCsv(Request $request)
+    {
+        $fileName = 'dunes-bookings-export-' . date('Y-m-d-His') . '.csv';
+        $query = Booking::with(['tour', 'tier'])->orderBy('created_at', 'desc');
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('payment_status')) {
+            $query->where('payment_status', $request->payment_status);
+        }
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where(function($q) use ($s) {
+                $q->where('reference', 'like', "%{$s}%")
+                  ->orWhere('name', 'like', "%{$s}%")
+                  ->orWhere('email', 'like', "%{$s}%")
+                  ->orWhere('phone', 'like', "%{$s}%");
+            });
+        }
+
+        $headers = [
+            "Content-type" => "text/csv; charset=UTF-8",
+            "Content-Disposition" => "attachment; filename={$fileName}",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
+        ];
+
+        $columns = [
+            'Reference', 'Created At', 'Customer Name', 'Email', 'Phone',
+            'Tour Name', 'Package Tier', 'Tour Date', 'Pickup Time', 'Adults',
+            'Children', 'Infants', 'Pickup Location', 'Total (AED)', 'Paid (AED)',
+            'Balance Due (AED)', 'Payment Method', 'Payment Status', 'Booking Status'
+        ];
+
+        $callback = function() use ($query, $columns) {
+            $file = fopen('php://output', 'w');
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+            fputcsv($file, $columns);
+
+            $query->chunk(100, function($rows) use ($file) {
+                foreach ($rows as $b) {
+                    fputcsv($file, [
+                        $b->reference,
+                        $b->created_at ? $b->created_at->format('Y-m-d H:i') : '',
+                        $b->name,
+                        $b->email,
+                        $b->phone,
+                        $b->tour_name,
+                        $b->tier_name ?: ($b->tier ? $b->tier->display_name : 'Standard'),
+                        $b->tour_date ? $b->tour_date->format('Y-m-d') : '',
+                        $b->pickup_time ?: '',
+                        $b->adults ?? 1,
+                        $b->children ?? 0,
+                        $b->infants ?? 0,
+                        $b->pickup_location ?: '',
+                        $b->total,
+                        $b->payment_amount,
+                        $b->balance_due,
+                        $b->payment_method,
+                        $b->payment_status,
+                        $b->status
+                    ]);
+                }
+            });
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
     /**

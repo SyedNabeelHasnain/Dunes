@@ -57,14 +57,24 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/categories/create', [AdminTourController::class, 'addCategory'])->name('categories.create');
     Route::post('/categories/rename', [AdminTourController::class, 'renameCategory'])->name('categories.rename');
     Route::get('/tiers', [AdminTourController::class, 'tiers'])->name('tiers.index');
+    Route::post('/tiers', [AdminTourController::class, 'storeTier'])->name('tiers.store');
+    Route::post('/tiers/{id}/update', [AdminTourController::class, 'updateTier'])->name('tiers.update');
+    Route::delete('/tiers/{id}', [AdminTourController::class, 'deleteTier'])->name('tiers.destroy');
+
     Route::get('/addons', [AdminTourController::class, 'addons'])->name('addons.index');
+    Route::post('/addons', [AdminTourController::class, 'storeAddon'])->name('addons.store');
+    Route::post('/addons/{id}/update', [AdminTourController::class, 'updateAddon'])->name('addons.update');
+    Route::delete('/addons/{id}', [AdminTourController::class, 'deleteAddon'])->name('addons.destroy');
+
     Route::get('/pricing', [AdminTourController::class, 'pricing'])->name('pricing.index');
     Route::post('/pricing/update', [AdminTourController::class, 'updatePricing'])->name('pricing.update');
     
     // Bookings & WhatsApp Leads
+    Route::get('/bookings/export/csv', [AdminBookingController::class, 'exportCsv'])->name('bookings.export');
     Route::resource('bookings', AdminBookingController::class)->only(['index', 'show', 'update', 'destroy']);
     Route::post('/bookings/{id}/payment-link', [AdminBookingController::class, 'createPaymentLink'])->name('bookings.payment-link');
     Route::post('/bookings/{id}/resend-payment', [AdminBookingController::class, 'resendPaymentEmail'])->name('bookings.resend-payment');
+    Route::get('/whatsapp-leads/export/csv', [AdminWhatsappController::class, 'exportCsv'])->name('whatsapp.export');
     Route::get('/whatsapp-leads', [AdminWhatsappController::class, 'index'])->name('whatsapp.leads');
     Route::get('/whatsapp-settings', [AdminWhatsappController::class, 'settings'])->name('whatsapp.settings');
     Route::post('/whatsapp-settings/update', [AdminWhatsappController::class, 'updateSettings'])->name('whatsapp.settings.update');
