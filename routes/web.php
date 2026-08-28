@@ -99,12 +99,16 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
     // Legal Pages Manager
     Route::get('/legal-pages', [AdminLegalController::class, 'index'])->name('legal.index');
+    Route::get('/legal', function() { return redirect()->route('admin.legal.index'); })->name('legal.alias');
     Route::get('/legal-pages/{id}/edit', [AdminLegalController::class, 'edit'])->name('legal.edit');
     Route::post('/legal-pages/{id}/update', [AdminLegalController::class, 'update'])->name('legal.update');
     Route::post('/legal-pages/{id}/section/add', [AdminLegalController::class, 'addSection'])->name('legal.section.add');
     Route::post('/legal-pages/section/{sectionId}/item/add', [AdminLegalController::class, 'addItem'])->name('legal.item.add');
     Route::delete('/legal-pages/section/{id}', [AdminLegalController::class, 'deleteSection'])->name('legal.section.delete');
     Route::delete('/legal-pages/item/{id}', [AdminLegalController::class, 'deleteItem'])->name('legal.item.delete');
+
+    // Admin Profile & Security
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile');
 
     // Integrations Settings (Google, Meta, Cache)
     Route::get('/settings/google', [AdminSettingController::class, 'google'])->name('settings.google');
