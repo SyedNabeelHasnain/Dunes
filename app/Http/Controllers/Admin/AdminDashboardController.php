@@ -232,12 +232,81 @@ class AdminDashboardController extends Controller
     }
 
     /**
-     * List Contact Inquiries.
+     * List Contact Inquiries with Analytics & Filters.
      */
-    public function inquiries()
+    public function inquiries(Request $request)
     {
-        $inquiries = Contact::orderBy('id', 'desc')->get();
-        return view('admin.inquiries.index', compact('inquiries'));
+        $status = $request->input('status');
+        $fromDate = $request->input('from_date');
+        $toDate = $request->input('to_date');
+        $search = $request->input('search');
+
+        $query = Contact::query();
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+        if ($fromDate) {
+            $query->whereDate('created_at', '>=', $fromDate);
+        }
+        if ($toDate) {
+            $query->whereDate('created_at', '<=', $toDate);
+        }
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('subject', 'like', "%{$search}%")
+                  ->orWhere('message', 'like', "%{$search}%");
+            });
+        }
+
+        $inquiries = $query->orderBy('id', 'desc')->get();
+
+        // 1. Inquiries Key Performance Statistics
+        $totalInquiries = Contact::count();
+        $newInquiries = Contact::where('status', 'new')->count();
+        $readInquiries = Contact::where('status', 'read')->count();
+        $repliedInquiries = Contact::where('status', 'replied')->count();
+        $responseRate = $totalInquiries > 0 ? round(($repliedInquiries / $totalInquiries) * 100) : 0;
+
+        $stats = [
+            'total' => $totalInquiries,
+            'new' => $newInquiries,
+            'read' => $readInquiries,
+            'replied' => $repliedInquiries,
+            'response_rate' => $responseRate,
+        ];
+
+        // 2. 14-Day Inquiries Acquisition Trend
+        $trendData = [];
+        for ($i = 13; $i >= 0; $i--) {
+            $date = now()->subDays($i)->format('Y-m-d');
+            $label = now()->subDays($i)->format('M j');
+            $count = Contact::whereDate('created_at', $date)->count();
+            $trendData[] = [
+                'date' => $label,
+                'count' => $count
+            ];
+        }
+
+        // 3. Status Breakdown
+        $statusBreakdown = [
+            'new' => $newInquiries,
+            'read' => $readInquiries,
+            'replied' => $repliedInquiries,
+        ];
+
+        return view('admin.inquiries.index', compact(
+            'inquiries',
+            'stats',
+            'trendData',
+            'statusBreakdown',
+            'status',
+            'fromDate',
+            'toDate',
+            'search'
+        ));
     }
 
     /**

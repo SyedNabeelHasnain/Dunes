@@ -9,12 +9,76 @@ use Illuminate\Http\Request;
 class AdminReviewController extends Controller
 {
     /**
-     * Display a listing of reviews.
+     * Display a listing of reviews with Analytics & Filters.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $reviews = Review::orderBy('published_date', 'desc')->get();
-        return view('admin.reviews.index', compact('reviews'));
+        $rating = $request->input('rating');
+        $status = $request->input('status');
+        $source = $request->input('source');
+        $search = $request->input('search');
+
+        $query = Review::query();
+
+        if ($rating) {
+            $query->where('rating', (float)$rating);
+        }
+        if ($status) {
+            $query->where('status', $status);
+        }
+        if ($source) {
+            $query->where('source', $source);
+        }
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('reviewer_name', 'like', "%{$search}%")
+                  ->orWhere('review_title', 'like', "%{$search}%")
+                  ->orWhere('review_text', 'like', "%{$search}%");
+            });
+        }
+
+        $reviews = $query->orderBy('published_date', 'desc')->get();
+
+        // 1. Review Key Performance Statistics
+        $totalReviews = Review::count();
+        $avgRating = $totalReviews > 0 ? round((float)Review::avg('rating'), 1) : 5.0;
+        $approvedCount = Review::where('status', 'approved')->count();
+        $pendingCount = Review::where('status', 'pending')->count();
+        $fiveStarCount = Review::where('rating', '>=', 5)->count();
+        $fiveStarPct = $totalReviews > 0 ? round(($fiveStarCount / $totalReviews) * 100) : 100;
+
+        $stats = [
+            'total' => $totalReviews,
+            'avg_rating' => $avgRating,
+            'approved' => $approvedCount,
+            'pending' => $pendingCount,
+            'five_star_pct' => $fiveStarPct,
+        ];
+
+        // 2. Star Rating Distribution
+        $ratingDistribution = [
+            5 => Review::where('rating', '>=', 4.5)->count(),
+            4 => Review::whereBetween('rating', [3.5, 4.49])->count(),
+            3 => Review::whereBetween('rating', [2.5, 3.49])->count(),
+            2 => Review::whereBetween('rating', [1.5, 2.49])->count(),
+            1 => Review::where('rating', '<', 1.5)->count(),
+        ];
+
+        // 3. Review Source Breakdown
+        $sourceBreakdown = Review::select('source', \Illuminate\Support\Facades\DB::raw('count(*) as count'))
+            ->groupBy('source')
+            ->get();
+
+        return view('admin.reviews.index', compact(
+            'reviews',
+            'stats',
+            'ratingDistribution',
+            'sourceBreakdown',
+            'rating',
+            'status',
+            'source',
+            'search'
+        ));
     }
 
     /**

@@ -10,17 +10,116 @@ use Illuminate\Support\Facades\DB;
 class AdminWhatsappController extends Controller
 {
     /**
-     * Display a listing of WhatsApp click leads.
+     * Display a listing of WhatsApp click leads with analytics & filters.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $leads = DB::table('whatsapp_inquiries')
+        $fromDate = $request->input('from_date');
+        $toDate = $request->input('to_date');
+        $tourName = $request->input('tour_name');
+        $deviceType = $request->input('device_type');
+        $search = $request->input('search');
+
+        $query = DB::table('whatsapp_inquiries')
             ->leftJoin('request_logs', 'whatsapp_inquiries.request_log_id', '=', 'request_logs.id')
-            ->select('whatsapp_inquiries.*', 'request_logs.client_ip', 'request_logs.country', 'request_logs.city', 'request_logs.device_type', 'request_logs.browser_name', 'request_logs.os_name')
-            ->orderBy('whatsapp_inquiries.created_at', 'desc')
+            ->select(
+                'whatsapp_inquiries.*',
+                'request_logs.client_ip',
+                'request_logs.country',
+                'request_logs.city',
+                'request_logs.device_type',
+                'request_logs.browser_name',
+                'request_logs.os_name'
+            );
+
+        if ($fromDate) {
+            $query->whereDate('whatsapp_inquiries.created_at', '>=', $fromDate);
+        }
+        if ($toDate) {
+            $query->whereDate('whatsapp_inquiries.created_at', '<=', $toDate);
+        }
+        if ($tourName) {
+            $query->where('whatsapp_inquiries.tour_name', $tourName);
+        }
+        if ($deviceType) {
+            $query->where('request_logs.device_type', $deviceType);
+        }
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('whatsapp_inquiries.name', 'like', "%{$search}%")
+                  ->orWhere('whatsapp_inquiries.phone', 'like', "%{$search}%")
+                  ->orWhere('whatsapp_inquiries.tour_name', 'like', "%{$search}%")
+                  ->orWhere('whatsapp_inquiries.message_text', 'like', "%{$search}%");
+            });
+        }
+
+        $leads = $query->orderBy('whatsapp_inquiries.created_at', 'desc')->get();
+
+        // 1. Overall Key Metric Statistics
+        $totalLeads = DB::table('whatsapp_inquiries')->count();
+        $todayLeads = DB::table('whatsapp_inquiries')->whereDate('created_at', today())->count();
+        $monthLeads = DB::table('whatsapp_inquiries')->where('created_at', '>=', now()->startOfMonth())->count();
+        
+        $mobileCount = DB::table('whatsapp_inquiries')
+            ->leftJoin('request_logs', 'whatsapp_inquiries.request_log_id', '=', 'request_logs.id')
+            ->where('request_logs.device_type', 'mobile')
+            ->count();
+        $mobilePct = $totalLeads > 0 ? round(($mobileCount / $totalLeads) * 100) : 0;
+
+        $stats = [
+            'total' => $totalLeads,
+            'today' => $todayLeads,
+            'this_month' => $monthLeads,
+            'mobile_pct' => $mobilePct,
+        ];
+
+        // 2. 14-Day Acquisition Trend Chart Data
+        $trendData = [];
+        for ($i = 13; $i >= 0; $i--) {
+            $date = now()->subDays($i)->format('Y-m-d');
+            $label = now()->subDays($i)->format('M j');
+            $count = DB::table('whatsapp_inquiries')->whereDate('created_at', $date)->count();
+            $trendData[] = [
+                'date' => $label,
+                'count' => $count
+            ];
+        }
+
+        // 3. Tour Interest Breakdown Chart Data
+        $tourBreakdown = DB::table('whatsapp_inquiries')
+            ->select(DB::raw("COALESCE(NULLIF(tour_name, ''), 'General Inquiry') as tour_label"), DB::raw('count(*) as count'))
+            ->groupBy('tour_label')
+            ->orderBy('count', 'desc')
+            ->limit(5)
             ->get();
 
-        return view('admin.whatsapp.index', compact('leads'));
+        // 4. Device Breakdown Chart Data
+        $deviceBreakdown = DB::table('whatsapp_inquiries')
+            ->leftJoin('request_logs', 'whatsapp_inquiries.request_log_id', '=', 'request_logs.id')
+            ->select(DB::raw("COALESCE(NULLIF(request_logs.device_type, ''), 'Desktop') as device_label"), DB::raw('count(*) as count'))
+            ->groupBy('device_label')
+            ->get();
+
+        // 5. Available distinct tours for filter dropdown
+        $availableTours = DB::table('whatsapp_inquiries')
+            ->whereNotNull('tour_name')
+            ->where('tour_name', '!=', '')
+            ->distinct()
+            ->pluck('tour_name');
+
+        return view('admin.whatsapp.index', compact(
+            'leads',
+            'stats',
+            'trendData',
+            'tourBreakdown',
+            'deviceBreakdown',
+            'availableTours',
+            'fromDate',
+            'toDate',
+            'tourName',
+            'deviceType',
+            'search'
+        ));
     }
 
     /**

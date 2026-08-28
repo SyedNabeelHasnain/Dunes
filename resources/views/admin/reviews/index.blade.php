@@ -1,17 +1,133 @@
 @extends('layouts.admin')
 
-@section('page_title', 'Reviews')
+@section('page_title', 'Customer Reviews & Ratings')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="h4 fw-800 text-dark mb-0">Customer Reviews</h2>
-    <button class="btn btn-primary rounded-pill px-4 fw-800" data-bs-toggle="modal" data-bs-target="#createReviewModal">
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+        <h2 class="h4 fw-800 text-dark mb-1">Customer Reviews & Ratings Hub</h2>
+        <p class="text-muted small mb-0">Manage customer testimonials, moderate Google/TripAdvisor reviews, and showcase ratings on the website.</p>
+    </div>
+    <button class="btn btn-primary rounded-pill px-4 fw-800 shadow-sm" data-bs-toggle="modal" data-bs-target="#createReviewModal">
         <i class="bi bi-plus-lg me-2"></i> Log New Review
     </button>
 </div>
 
+<!-- 4 Key Performance Metric Cards -->
+<div class="row g-3 g-lg-4 mb-4">
+    <div class="col-xl-3 col-sm-6">
+        <div class="card card-modern h-100 p-3 bg-white border-0 shadow-sm rounded-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-muted small fw-bold text-uppercase" style="font-size:0.75rem;">Total Reviews</span>
+                <span class="badge bg-primary-subtle text-primary rounded-circle p-2"><i class="bi bi-chat-heart-fill fs-5"></i></span>
+            </div>
+            <h3 class="fw-800 text-dark mb-0">{{ number_format($stats['total'] ?? 0) }}</h3>
+            <span class="text-muted small" style="font-size: 0.75rem;">All logged customer feedback</span>
+        </div>
+    </div>
+    <div class="col-xl-3 col-sm-6">
+        <div class="card card-modern h-100 p-3 bg-white border-0 shadow-sm rounded-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-muted small fw-bold text-uppercase" style="font-size:0.75rem;">Average Rating</span>
+                <span class="badge bg-warning-subtle text-warning rounded-circle p-2"><i class="bi bi-star-fill fs-5"></i></span>
+            </div>
+            <h3 class="fw-800 text-dark mb-0">★ {{ number_format($stats['avg_rating'] ?? 5.0, 1) }}</h3>
+            <span class="text-success small fw-bold" style="font-size: 0.75rem;">{{ $stats['five_star_pct'] ?? 100 }}% 5-Star Reviews</span>
+        </div>
+    </div>
+    <div class="col-xl-3 col-sm-6">
+        <div class="card card-modern h-100 p-3 bg-white border-0 shadow-sm rounded-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-muted small fw-bold text-uppercase" style="font-size:0.75rem;">Live on Site</span>
+                <span class="badge bg-success-subtle text-success rounded-circle p-2"><i class="bi bi-check-circle-fill fs-5"></i></span>
+            </div>
+            <h3 class="fw-800 text-success mb-0">{{ number_format($stats['approved'] ?? 0) }}</h3>
+            <span class="text-muted small" style="font-size: 0.75rem;">Approved testimonials</span>
+        </div>
+    </div>
+    <div class="col-xl-3 col-sm-6">
+        <div class="card card-modern h-100 p-3 bg-white border-0 shadow-sm rounded-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-muted small fw-bold text-uppercase" style="font-size:0.75rem;">Pending Moderation</span>
+                <span class="badge bg-danger-subtle text-danger rounded-circle p-2"><i class="bi bi-clock-history fs-5"></i></span>
+            </div>
+            <h3 class="fw-800 text-danger mb-0">{{ number_format($stats['pending'] ?? 0) }}</h3>
+            <span class="text-muted small" style="font-size: 0.75rem;">Awaiting approval</span>
+        </div>
+    </div>
+</div>
+
+<!-- 2 Interactive Analytics Charts -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-7">
+        <div class="card card-modern bg-white border-0 shadow-sm rounded-4 p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h6 class="fw-800 text-dark mb-1"><i class="bi bi-bar-chart-fill text-warning me-2"></i>Star Rating Distribution</h6>
+                    <span class="text-muted small">Customer satisfaction across star ratings</span>
+                </div>
+            </div>
+            <div style="height: 220px;">
+                <canvas id="ratingDistributionChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card card-modern bg-white border-0 shadow-sm rounded-4 p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h6 class="fw-800 text-dark mb-1"><i class="bi bi-pie-chart-fill text-primary me-2"></i>Review Sources</h6>
+                    <span class="text-muted small">Google vs TripAdvisor vs Direct</span>
+                </div>
+            </div>
+            <div style="height: 220px; position: relative;">
+                <canvas id="reviewSourceChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Multi-Parameter Filter Toolbar -->
+<div class="card card-modern border-0 shadow-sm rounded-4 p-3 bg-white mb-4">
+    <form method="GET" action="{{ route('admin.reviews.index') }}">
+        <div class="row g-2 align-items-end">
+            <div class="col-lg-4 col-md-6">
+                <label for="reviewSearch" class="form-label small fw-bold text-dark mb-1">Search Reviews</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" name="search" id="reviewSearch" class="form-control border-start-0" placeholder="Reviewer, Title, Content..." value="{{ request('search') }}">
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <label for="ratingFilter" class="form-label small fw-bold text-dark mb-1">Rating</label>
+                <select name="rating" id="ratingFilter" class="form-select">
+                    <option value="">All Ratings</option>
+                    <option value="5" {{ request('rating') == '5' ? 'selected' : '' }}>5 Stars ★★★★★</option>
+                    <option value="4" {{ request('rating') == '4' ? 'selected' : '' }}>4 Stars ★★★★☆</option>
+                    <option value="3" {{ request('rating') == '3' ? 'selected' : '' }}>3 Stars ★★★☆☆</option>
+                    <option value="2" {{ request('rating') == '2' ? 'selected' : '' }}>2 Stars ★★☆☆☆</option>
+                    <option value="1" {{ request('rating') == '1' ? 'selected' : '' }}>1 Star ★☆☆☆☆</option>
+                </select>
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <label for="statusFilter" class="form-label small fw-bold text-dark mb-1">Status</label>
+                <select name="status" id="statusFilter" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Approved (Live)</option>
+                    <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
+                    <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Rejected</option>
+                </select>
+            </div>
+            <div class="col-lg-3 col-md-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary w-100 fw-bold" title="Apply Filter"><i class="bi bi-funnel-fill me-1"></i> Filter</button>
+                <a href="{{ route('admin.reviews.index') }}" class="btn btn-light border" title="Reset Filters"><i class="bi bi-arrow-counterclockwise"></i></a>
+            </div>
+        </div>
+    </form>
+</div>
+
 <!-- Reviews Table Card -->
-<div class="card card-modern border shadow-sm rounded-4 overflow-hidden bg-white mb-4">
+<div class="card card-modern border shadow-sm rounded-4 overflow-hidden bg-white mb-4 p-3">
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table align-middle mb-0 table-hover datatable" id="reviewsTable">
@@ -42,14 +158,14 @@
                         <td>
                             <span class="badge bg-light text-secondary border px-3 py-1 rounded-pill text-capitalize">{{ $r->source }}</span>
                         </td>
-                        <td class="text-center">
+                        <td class="text-center" data-order="{{ $r->rating }}">
                             <div class="text-warning">
                                 @for($i = 1; $i <= 5; $i++)
                                     <i class="bi bi-star{{ $i <= $r->rating ? '-fill' : '' }}"></i>
                                 @endfor
                             </div>
                         </td>
-                        <td class="text-center">
+                        <td class="text-center" data-order="{{ $r->status }}">
                             @php
                                 $badgeColor = [
                                     'approved' => 'success',
@@ -59,7 +175,7 @@
                             @endphp
                             <span class="badge bg-{{ $badgeColor }} text-capitalize px-3 py-1 rounded-pill badge-interactive ajax-toggle-status" data-url="{{ route('admin.reviews.toggle-status', $r->id) }}" title="Click to toggle status">{{ $r->status }}</span>
                         </td>
-                        <td>
+                        <td data-order="{{ $r->published_date ? \Carbon\Carbon::parse($r->published_date)->timestamp : 0 }}">
                             <div class="small fw-semibold text-muted">
                                 {{ $r->published_date ? \Carbon\Carbon::parse($r->published_date)->format('M j, Y') : '' }}
                             </div>
@@ -93,7 +209,10 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="text-center py-5 text-muted">No reviews recorded.</td>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-chat-square-dots fs-1 d-block mb-2 text-muted opacity-50"></i>
+                            No customer reviews match your filter parameters.
+                        </td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -248,6 +367,61 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
+    // Rating Distribution Chart
+    const ratingCtx = document.getElementById('ratingDistributionChart');
+    if (ratingCtx) {
+        const ratingData = @json($ratingDistribution);
+        new Chart(ratingCtx, {
+            type: 'bar',
+            data: {
+                labels: ['5 Stars ★', '4 Stars ★', '3 Stars ★', '2 Stars ★', '1 Star ★'],
+                datasets: [{
+                    label: 'Reviews',
+                    data: [ratingData[5] || 0, ratingData[4] || 0, ratingData[3] || 0, ratingData[2] || 0, ratingData[1] || 0],
+                    backgroundColor: ['#F58F43', '#fbbf24', '#fcd34d', '#9ca3af', '#ef4444'],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: { grid: { color: '#f5f5f5' } },
+                    y: { beginAtZero: true, grid: { color: '#f5f5f5' }, ticks: { stepSize: 1 } }
+                }
+            }
+        });
+    }
+
+    // Review Source Breakdown Doughnut Chart
+    const sourceCtx = document.getElementById('reviewSourceChart');
+    if (sourceCtx) {
+        const sourceData = @json($sourceBreakdown);
+        new Chart(sourceCtx, {
+            type: 'doughnut',
+            data: {
+                labels: sourceData.map(s => (s.source || 'Direct').toUpperCase()),
+                datasets: [{
+                    data: sourceData.map(s => s.count),
+                    backgroundColor: ['#4285F4', '#00af87', '#F58F43', '#8b5cf6'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } }
+                },
+                cutout: '65%'
+            }
+        });
+    }
+
+    // Edit Review Modal
     $('.edit-review-btn').on('click', function() {
         const id = $(this).data('id');
         const name = $(this).data('name');

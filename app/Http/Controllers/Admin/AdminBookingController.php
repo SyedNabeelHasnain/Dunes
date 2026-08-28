@@ -48,16 +48,43 @@ class AdminBookingController extends Controller
             $query->whereDate('tour_date', '<=', $toDate);
         }
 
+        $revenue = (float)Booking::whereIn('status', ['confirmed', 'completed'])->sum('payment_amount');
+        $confirmedCount = Booking::whereIn('status', ['confirmed', 'completed'])->count();
+        $avgOrderValue = $confirmedCount > 0 ? round($revenue / $confirmedCount, 2) : 0;
+
         $stats = [
             'total' => Booking::count(),
             'pending' => Booking::where('status', 'pending')->count(),
             'confirmed' => Booking::where('status', 'confirmed')->count(),
             'completed' => Booking::where('status', 'completed')->count(),
-            'revenue' => (float)Booking::whereIn('status', ['confirmed', 'completed'])->sum('payment_amount'),
+            'revenue' => $revenue,
+            'aov' => $avgOrderValue,
         ];
 
-        $bookings = $query->orderBy('created_at', 'desc')->paginate(25)->withQueryString();
-        return view('admin.bookings.index', compact('bookings', 'status', 'search', 'paymentStatus', 'fromDate', 'toDate', 'stats'));
+        // 14-Day Booking & Revenue Acquisition Trend Data
+        $trendData = [];
+        for ($i = 13; $i >= 0; $i--) {
+            $date = now()->subDays($i)->format('Y-m-d');
+            $label = now()->subDays($i)->format('M j');
+            $count = Booking::whereDate('created_at', $date)->count();
+            $dayRev = (float)Booking::whereDate('created_at', $date)->whereIn('status', ['confirmed', 'completed'])->sum('payment_amount');
+            $trendData[] = [
+                'date' => $label,
+                'count' => $count,
+                'revenue' => $dayRev,
+            ];
+        }
+
+        // Status Breakdown
+        $statusDistribution = [
+            'confirmed' => Booking::where('status', 'confirmed')->count(),
+            'pending' => Booking::where('status', 'pending')->count(),
+            'completed' => Booking::where('status', 'completed')->count(),
+            'cancelled' => Booking::where('status', 'cancelled')->count(),
+        ];
+
+        $bookings = $query->orderBy('created_at', 'desc')->get();
+        return view('admin.bookings.index', compact('bookings', 'status', 'search', 'paymentStatus', 'fromDate', 'toDate', 'stats', 'trendData', 'statusDistribution'));
     }
 
     /**

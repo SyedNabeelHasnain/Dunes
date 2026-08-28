@@ -76,29 +76,77 @@
         }
 
         /* DataTables Sorting & Clean Table Styling */
-        table.dataTable thead th {
+        table.dataTable thead th,
+        table.table thead th {
             position: relative;
             cursor: pointer;
             user-select: none;
-            transition: background 0.15s ease;
+            transition: background-color 0.15s ease, color 0.15s ease;
+            white-space: nowrap;
         }
-        table.dataTable thead th:not(.no-sort):hover {
-            background-color: #f1f3f5 !important;
+        table.dataTable thead th:not(.no-sort):hover,
+        table.table thead th:not(.no-sort):hover {
+            background-color: rgba(245, 143, 67, 0.08) !important;
+            color: #F58F43 !important;
         }
-        table.dataTable thead th.no-sort {
+        table.dataTable thead th.no-sort,
+        table.table thead th.no-sort {
             cursor: default !important;
         }
+        /* Prominent High-Contrast Sort Arrows */
+        table.dataTable thead th.sorting::after {
+            content: " \21C5" !important;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.4;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+        table.dataTable thead th.sorting_asc::after {
+            content: " \25B2" !important;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 1;
+            color: #F58F43 !important;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+        table.dataTable thead th.sorting_desc::after {
+            content: " \25BC" !important;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 1;
+            color: #F58F43 !important;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+        table.dataTable thead th.no-sort::after,
+        table.dataTable thead th.no-sort::before {
+            display: none !important;
+            content: "" !important;
+        }
+
         .dataTables_wrapper .dataTables_filter input {
             border-radius: 50rem;
-            padding: 0.35rem 1rem;
+            padding: 0.4rem 1.25rem;
             border: 1px solid #dee2e6;
             outline: none;
             box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.04);
             font-size: 0.875rem;
         }
+        .dataTables_wrapper .dataTables_filter input:focus {
+            border-color: #F58F43;
+            box-shadow: 0 0 0 0.25rem rgba(245, 143, 67, 0.25);
+        }
         .dataTables_wrapper .dataTables_length select {
             border-radius: 50rem;
-            padding: 0.25rem 2rem 0.25rem 0.75rem;
+            padding: 0.35rem 2rem 0.35rem 0.85rem;
             border: 1px solid #dee2e6;
             font-size: 0.875rem;
         }
@@ -106,10 +154,12 @@
             border-radius: 50rem;
             margin: 0 2px;
             font-size: 0.875rem;
+            color: #0f2239;
         }
         .dataTables_wrapper .dataTables_paginate .page-item.active .page-link {
             background-color: #F58F43;
             border-color: #F58F43;
+            color: #ffffff;
         }
 
         /* Interactive Command Palette */
@@ -404,13 +454,13 @@
                         pageLength: 25,
                         ordering: true,
                         responsive: true,
+                        order: [], // Preserve natural server-side sort order
                         columnDefs: [
-                            { orderable: false, targets: 'no-sort' },
-                            { orderable: false, targets: -1 } // Disable sorting on the last (Actions) column by default
+                            { orderable: false, targets: 'no-sort' }
                         ],
                         language: {
                             search: "",
-                            searchPlaceholder: "Quick search table...",
+                            searchPlaceholder: "Quick search table records...",
                             lengthMenu: "Show _MENU_ entries",
                             info: "Showing _START_ to _END_ of _TOTAL_ entries",
                             paginate: {
