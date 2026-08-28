@@ -65,20 +65,37 @@
       gtag('config', '{{ $ga4Id }}');
       @endif
 
-      // Global Google Ads Lead Form Conversion Tracker (AW-17859624049/eR3SCLimtvobEPH4kMRC)
-      function gtagReportConversion(url) {
+      // Helper function to delay opening a URL until a gtag event is sent.
+      function gtagSendEvent(url, params) {
+        var navigated = false;
         var callback = function () {
-          if (typeof(url) != 'undefined' && url) {
+          if (!navigated && typeof url === 'string' && url) {
+            navigated = true;
             window.location = url;
           }
         };
+
+        // Fallback safety timeout (1.5s) in case beacon takes too long
+        setTimeout(callback, 1500);
+
+        var eventData = Object.assign({
+          'event_callback': callback,
+          'event_timeout': 2000,
+          'send_to': 'AW-17859624049/eR3SCLimtvobEPH4kMRC'
+        }, params || {});
+
         if (typeof gtag === 'function') {
-          gtag('event', 'conversion', {
-              'send_to': 'AW-17859624049/eR3SCLimtvobEPH4kMRC',
-              'event_callback': callback
-          });
+          gtag('event', 'conversion', eventData);
+          gtag('event', 'conversion_event_submit_lead_form', eventData);
+        } else {
+          callback();
         }
         return false;
+      }
+      window.gtagSendEvent = gtagSendEvent;
+
+      function gtagReportConversion(url, params) {
+        return gtagSendEvent(url, params);
       }
       window.gtagReportConversion = gtagReportConversion;
     </script>

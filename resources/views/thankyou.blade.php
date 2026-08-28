@@ -21,6 +21,14 @@ gtag('event', 'conversion', {
     'transaction_id': '{{ $booking->reference }}'
     @endif
 });
+gtag('event', 'conversion_event_submit_lead_form', {
+    'send_to': 'AW-17859624049/eR3SCLimtvobEPH4kMRC'
+    @if($booking && $booking->total)
+    , 'value': {{ (float)$booking->total }},
+    'currency': 'AED',
+    'transaction_id': '{{ $booking->reference }}'
+    @endif
+});
 </script>
 
 @if($booking && ($paymentStatus === 'completed' || $method === 'cash'))

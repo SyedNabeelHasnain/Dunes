@@ -1563,32 +1563,43 @@ const App={
                     }
 
                     if(data.success){
+                        const totalVal = parseFloat(document.getElementById('bookingTotal')?.textContent?.replace(/[^0-9.]/g, '') || 1.0) || 1.0;
+                        const targetUrl = data.redirect_url || (data.reference ? ('/thankyou?ref=' + encodeURIComponent(data.reference)) : null);
 
-                        // Google Ads Conversion Tag: Submit lead form (AW-17859624049/eR3SCLimtvobEPH4kMRC)
+                        const eventParams = {
+                            'send_to': 'AW-17859624049/eR3SCLimtvobEPH4kMRC',
+                            'value': totalVal,
+                            'currency': 'AED',
+                            'transaction_id': data.reference || ('REF-' + Date.now())
+                        };
+
+                        // Google Ads Conversion Tag & Event: Submit lead form (AW-17859624049/eR3SCLimtvobEPH4kMRC)
                         if (typeof window.gtag === 'function') {
-                            window.gtag('event', 'conversion', {
-                                'send_to': 'AW-17859624049/eR3SCLimtvobEPH4kMRC'
-                            });
+                            window.gtag('event', 'conversion', eventParams);
+                            window.gtag('event', 'conversion_event_submit_lead_form', eventParams);
                         }
                         if (window.dataLayer) {
                             window.dataLayer.push({
                                 event: 'generate_lead',
                                 form_name: action || 'lead_form',
-                                conversion_label: 'eR3SCLimtvobEPH4kMRC'
+                                conversion_label: 'eR3SCLimtvobEPH4kMRC',
+                                transaction_id: data.reference || '',
+                                value: totalVal,
+                                currency: 'AED'
                             });
                         }
 
-                        if(data.redirect_url){
-                            window.location.href=data.redirect_url;
+                        if(targetUrl){
+                            if(typeof window.gtagSendEvent === 'function'){
+                                window.gtagSendEvent(targetUrl, eventParams);
+                            } else {
+                                window.location.href = targetUrl;
+                            }
                             return;
                         }
+
                         this.toast(data.message||'Success!','success');
                         if(data.reference)setTimeout(()=>this.toast('Reference: '+data.reference,'success'),1500);
-
-                        if(data.reference && !data.redirect_url){
-                            window.location.href = '/thankyou?ref='+encodeURIComponent(data.reference);
-                            return;
-                        }
 
                         const bookingEl=document.getElementById('bookingModal');
                         const waEl=document.getElementById('whatsappModal');
