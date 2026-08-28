@@ -51,6 +51,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Google tag (gtag.js) AW-17859624049 (Sitewide First-Party Conversion Tag) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17859624049"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'AW-17859624049', {
+        'allow_enhanced_conversions': true
+      });
+      @if($googleActive && !empty($ga4Id))
+      gtag('config', '{{ $ga4Id }}');
+      @endif
+
+      // Global Google Ads Lead Form Conversion Tracker (AW-17859624049/eR3SCLimtvobEPH4kMRC)
+      function gtagReportConversion(url) {
+        var callback = function () {
+          if (typeof(url) != 'undefined' && url) {
+            window.location = url;
+          }
+        };
+        if (typeof gtag === 'function') {
+          gtag('event', 'conversion', {
+              'send_to': 'AW-17859624049/eR3SCLimtvobEPH4kMRC',
+              'event_callback': callback
+          });
+        }
+        return false;
+      }
+      window.gtagReportConversion = gtagReportConversion;
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -112,35 +144,7 @@
 
     @stack('styles')
 
-    <!-- Google tag (gtag.js) AW-17859624049 -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17859624049"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'AW-17859624049');
-      @if($googleActive && !empty($ga4Id))
-      gtag('config', '{{ $ga4Id }}');
-      @endif
-
-      // Google Ads Lead Form Conversion Tracker (AW-17859624049/eR3SCLimtvobEPH4kMRC)
-      function gtagReportConversion(url) {
-        var callback = function () {
-          if (typeof(url) != 'undefined' && url) {
-            window.location = url;
-          }
-        };
-        if (typeof gtag === 'function') {
-          gtag('event', 'conversion', {
-              'send_to': 'AW-17859624049/eR3SCLimtvobEPH4kMRC',
-              'event_callback': callback
-          });
-        }
-        return false;
-      }
-      window.gtagReportConversion = gtagReportConversion;
-
       var initThirdPartyTracking = function() {
           if (window._trackingInitialized) return;
           window._trackingInitialized = true;

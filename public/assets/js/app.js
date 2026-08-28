@@ -575,6 +575,19 @@ const App={
                 fd.append('phone','N/A');
                 fd.append('tour_name',tourName);
                 fd.append('page_url',window.location.href);
+
+                // Google Ads Conversion Event on WhatsApp Lead Click
+                if(typeof window.gtag==='function'){
+                    window.gtag('event','conversion',{'send_to':'AW-17859624049/eR3SCLimtvobEPH4kMRC'});
+                }
+                if(window.dataLayer){
+                    window.dataLayer.push({
+                        event:'generate_lead',
+                        conversion_type:'whatsapp',
+                        conversion_label:'eR3SCLimtvobEPH4kMRC'
+                    });
+                }
+
                 fetch('/ajax.php',{method:'POST',body:fd})
                 .then(r=>r.text())
                 .then(t=>{ try { return JSON.parse(t.replace(/^\uFEFF+/, '').trim()); } catch(e){ throw e; } })

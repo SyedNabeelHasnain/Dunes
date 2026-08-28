@@ -190,7 +190,7 @@
                             </div>
 
                             <div class="col-12 text-center">
-                                <button type="submit" class="btn btn-desert-animated btn-lg rounded-pill px-5 fw-bold shadow-primary d-inline-flex align-items-center gap-2" id="submitContactBtn">
+                                <button type="submit" class="btn btn-desert-animated btn-lg rounded-pill px-5 fw-bold shadow-primary d-inline-flex align-items-center gap-2" id="submitContactBtn" onclick="if(typeof gtagReportConversion==='function'){gtagReportConversion();}">
                                     <span>Send Message</span>
                                     <i class="bi bi-send fs-5"></i>
                                 </button>

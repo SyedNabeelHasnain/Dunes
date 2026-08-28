@@ -260,7 +260,7 @@
                             </div>
                             <div class="d-flex align-items-center ms-auto" id="continueBtnWrapper">
                                 <button type="button" class="btn btn-desert-animated rounded-pill w-100 w-sm-auto px-5 py-3 fw-800 shadow-lg d-inline-flex align-items-center justify-content-center gap-2" id="nextStep"> Continue <i class="bi bi-arrow-right"></i> </button>
-                                <button type="submit" class="btn btn-whatsapp-animated rounded-pill w-100 w-sm-auto px-5 py-3 fw-800 shadow-lg d-none align-items-center justify-content-center gap-2" id="submitBooking"> Confirm <i class="bi bi-check-lg"></i> </button>
+                                <button type="submit" class="btn btn-whatsapp-animated rounded-pill w-100 w-sm-auto px-5 py-3 fw-800 shadow-lg d-none align-items-center justify-content-center gap-2" id="submitBooking" onclick="if(typeof gtagReportConversion==='function'){gtagReportConversion();}"> Confirm <i class="bi bi-check-lg"></i> </button>
                             </div>
                         </div>
                     </div>
