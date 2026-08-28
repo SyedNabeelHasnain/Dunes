@@ -88,6 +88,10 @@ class AdminSettingController extends Controller
         Artisan::call('config:clear');
         Artisan::call('route:clear');
 
+        if (function_exists('opcache_reset')) {
+            @opcache_reset();
+        }
+
         \Illuminate\Support\Facades\Cache::forget('site_settings_cache');
         \Illuminate\Support\Facades\Cache::forget('site_tours_header_cache');
 
