@@ -109,14 +109,14 @@ class AdminDashboardController extends Controller
                 ->select(
                     \DB::raw("CASE 
                         WHEN utm_source IS NOT NULL AND utm_source != '' AND utm_source != 'Not Available' THEN utm_source
-                        WHEN gclid IS NOT NULL AND gclid != '' THEN 'Google Ads'
-                        WHEN referrer LIKE '%google%' THEN 'Google Organic'
-                        WHEN referrer LIKE '%facebook%' OR referrer LIKE '%fb.com%' THEN 'Facebook'
-                        WHEN referrer LIKE '%instagram%' THEN 'Instagram'
-                        WHEN referrer LIKE '%wa.me%' OR referrer LIKE '%whatsapp%' THEN 'WhatsApp'
-                        WHEN referrer LIKE '%bing%' THEN 'Bing Organic'
-                        WHEN referrer LIKE '%tiktok%' THEN 'TikTok'
-                        WHEN referrer IS NULL OR referrer = '' OR referrer = 'Not Available' OR referrer = 'direct' THEN 'Direct / Bookmark'
+                        WHEN query_string LIKE '%gclid%' OR query_string LIKE '%gad_source%' THEN 'Google Ads'
+                        WHEN referrer_url LIKE '%google%' THEN 'Google Organic'
+                        WHEN referrer_url LIKE '%facebook%' OR referrer_url LIKE '%fb.com%' THEN 'Facebook'
+                        WHEN referrer_url LIKE '%instagram%' THEN 'Instagram'
+                        WHEN referrer_url LIKE '%wa.me%' OR referrer_url LIKE '%whatsapp%' THEN 'WhatsApp'
+                        WHEN referrer_url LIKE '%bing%' THEN 'Bing Organic'
+                        WHEN referrer_url LIKE '%tiktok%' THEN 'TikTok'
+                        WHEN referrer_url IS NULL OR referrer_url = '' OR referrer_url = 'Not Available' OR referrer_url = 'direct' THEN 'Direct / Bookmark'
                         ELSE 'External Referral'
                     END as channel"),
                     \DB::raw('COUNT(*) as views'),
@@ -129,12 +129,12 @@ class AdminDashboardController extends Controller
             // 5. Top Referring Domains & URLs
             $topReferrers = RequestLog::where('request_timestamp', '>=', $startDate)
                 ->where('bot_indicator', 'Likely Human')
-                ->whereNotNull('referrer')
-                ->where('referrer', '!=', 'Not Available')
-                ->where('referrer', '!=', '')
-                ->where('referrer', '!=', 'direct')
-                ->select('referrer', \DB::raw('COUNT(*) as views'), \DB::raw('COUNT(DISTINCT session_id) as visitors'))
-                ->groupBy('referrer')
+                ->whereNotNull('referrer_url')
+                ->where('referrer_url', '!=', 'Not Available')
+                ->where('referrer_url', '!=', '')
+                ->where('referrer_url', '!=', 'direct')
+                ->select('referrer_url as referrer', \DB::raw('COUNT(*) as views'), \DB::raw('COUNT(DISTINCT session_id) as visitors'))
+                ->groupBy('referrer_url')
                 ->orderBy('views', 'desc')
                 ->limit(15)
                 ->get();
