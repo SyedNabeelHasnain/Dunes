@@ -75,6 +75,32 @@
             min-width: 250px;
         }
 
+        /* Ensure Admin Sidebar is a fixed flex column with permanently pinned footer */
+        .admin-sidebar {
+            display: flex !important;
+            flex-direction: column !important;
+            height: 100vh !important;
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            z-index: 1040;
+        }
+        .sidebar-brand {
+            flex-shrink: 0 !important;
+        }
+        .sidebar-scroll {
+            flex: 1 1 auto !important;
+            height: auto !important;
+            overflow-y: auto !important;
+            scrollbar-width: thin;
+        }
+        .sidebar-footer {
+            flex-shrink: 0 !important;
+            background: #08172c !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+            padding: 12px 16px !important;
+        }
+
         /* DataTables Sorting & Clean Table Styling */
         table.dataTable thead th,
         table.table thead th {
@@ -261,6 +287,9 @@
             <a href="{{ route('admin.whatsapp.settings') }}" class="sidebar-link {{ request()->routeIs('admin.whatsapp.settings*') ? 'active' : '' }}">
                 <i class="bi bi-gear-wide-connected"></i> <span>WhatsApp Setup</span>
             </a>
+            <a href="javascript:void(0);" class="sidebar-link clear-cache-trigger">
+                <i class="bi bi-arrow-repeat text-warning"></i> <span>Purge Cache</span>
+            </a>
 
             <div class="sidebar-heading">External Tools</div>
             <a href="{{ url('/rate-card') }}" target="_blank" class="sidebar-link">
@@ -275,9 +304,14 @@
             <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                 @csrf
             </form>
-            <a href="#" class="sidebar-link text-danger" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                <i class="bi bi-power"></i> <span>Sign Out</span>
-            </a>
+            <div class="d-flex flex-column gap-2">
+                <button type="button" class="btn btn-outline-light btn-sm rounded-pill w-100 d-flex align-items-center justify-content-center gap-2 clear-cache-trigger" style="font-size: 0.8rem; padding: 6px 12px; border-color: rgba(255,255,255,0.18);">
+                    <i class="bi bi-arrow-repeat text-warning"></i> <span>Purge Caches</span>
+                </button>
+                <a href="#" class="btn btn-danger btn-sm rounded-pill w-100 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm" style="font-size: 0.8rem; padding: 6px 12px;" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i class="bi bi-power"></i> <span>Sign Out</span>
+                </a>
+            </div>
         </div>
     </aside>
 
@@ -291,13 +325,19 @@
                 <h1 class="h5 fw-800 mb-0 text-capitalize text-dark">@yield('page_title', 'Dashboard')</h1>
             </div>
 
-            <!-- Top Actions: Command Palette & Active Online Visitors Widget -->
+            <!-- Top Actions: Command Palette, Purge Cache, Online Visitors, & User Profile -->
             <div class="d-flex align-items-center gap-2">
                 <!-- Command Palette Shortcut Button -->
                 <button type="button" class="btn btn-white shadow-sm border-0 d-flex align-items-center gap-2 px-3 py-2 rounded-pill text-muted small fw-bold" data-bs-toggle="modal" data-bs-target="#commandPaletteModal">
                     <i class="bi bi-search text-primary"></i>
                     <span class="d-none d-sm-inline">Jump to...</span>
                     <kbd class="bg-light border text-dark px-2 py-0.5 rounded shadow-none" style="font-size: 0.7rem;">Ctrl K</kbd>
+                </button>
+
+                <!-- 1-Click Purge System Cache Button -->
+                <button type="button" class="btn btn-white shadow-sm border-0 d-flex align-items-center gap-2 px-3 py-2 rounded-pill text-muted small fw-bold clear-cache-trigger" title="Purge application views, routes, and config caches">
+                    <i class="bi bi-arrow-repeat text-warning"></i>
+                    <span class="d-none d-md-inline">Purge Cache</span>
                 </button>
 
                 <!-- Active Online Visitors Widget -->
@@ -319,6 +359,39 @@
                     </span>
                     <span id="activeVisitorsCount">0 Online</span>
                 </button>
+
+                <!-- User Profile & Sign Out Dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-white shadow-sm border-0 d-flex align-items-center gap-2 px-3 py-2 rounded-pill" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 28px; height: 28px; font-size: 0.8rem;">
+                            {{ strtoupper(substr(Auth::user()->name ?? 'A', 0, 1)) }}
+                        </div>
+                        <span class="d-none d-md-inline small fw-bold text-dark">{{ Auth::user()->name ?? 'Admin' }}</span>
+                        <i class="bi bi-chevron-down small text-muted"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-2 mt-2" style="min-width: 220px;">
+                        <li class="px-3 py-2 border-bottom mb-1">
+                            <div class="fw-bold small text-dark">{{ Auth::user()->name ?? 'Administrator' }}</div>
+                            <div class="text-muted small" style="font-size: 0.75rem;">{{ Auth::user()->email ?? 'admin@dunesdiscoverytourism.com' }}</div>
+                        </li>
+                        <li>
+                            <a class="dropdown-item rounded-3 py-2 small fw-semibold" href="{{ url('/') }}" target="_blank">
+                                <i class="bi bi-box-arrow-up-right me-2 text-info"></i> View Live Website
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item rounded-3 py-2 small fw-semibold clear-cache-trigger" href="javascript:void(0);">
+                                <i class="bi bi-arrow-repeat me-2 text-warning"></i> Purge All Caches
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider my-1"></li>
+                        <li>
+                            <a class="dropdown-item rounded-3 py-2 small fw-bold text-danger" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                <i class="bi bi-power me-2"></i> Sign Out
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </nav>
 
@@ -363,6 +436,18 @@
                                 <a href="{{ route('admin.bookings.export') }}" class="d-flex align-items-center p-2 rounded-3 border bg-light text-dark cmd-item">
                                     <i class="bi bi-file-earmark-spreadsheet-fill text-success fs-5 me-2"></i>
                                     <div><strong class="d-block small">Export Bookings (CSV)</strong><span class="text-muted" style="font-size: 0.75rem;">Download customer reservations spreadsheet</span></div>
+                                </a>
+                            </div>
+                            <div class="col-md-6 cmd-entry" data-keywords="clear cache purge system views routes config">
+                                <a href="javascript:void(0);" class="d-flex align-items-center p-2 rounded-3 border bg-light text-dark cmd-item clear-cache-trigger">
+                                    <i class="bi bi-arrow-repeat text-warning fs-5 me-2"></i>
+                                    <div><strong class="d-block small">Purge System Cache</strong><span class="text-muted" style="font-size: 0.75rem;">Flush views, routes, and config caches</span></div>
+                                </a>
+                            </div>
+                            <div class="col-md-6 cmd-entry" data-keywords="sign out logout exit disconnect">
+                                <a href="#" class="d-flex align-items-center p-2 rounded-3 border bg-light text-danger cmd-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                    <i class="bi bi-power text-danger fs-5 me-2"></i>
+                                    <div><strong class="d-block small text-danger">Sign Out</strong><span class="text-muted" style="font-size: 0.75rem;">End current administrator session</span></div>
                                 </a>
                             </div>
                         </div>
@@ -567,6 +652,46 @@
             $('.cmd-section').each(function() {
                 const visibleEntries = $(this).find('.cmd-entry:visible').length;
                 $(this).toggle(visibleEntries > 0);
+            });
+        });
+
+        // 1-Click Universal AJAX Clear Cache Handler
+        $(document).on('click', '.clear-cache-trigger', function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Purging Caches...',
+                text: 'Flushing application views, routes, and config caches.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            $.ajax({
+                url: "{{ route('admin.clear-cache') }}",
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(res) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Cache Purged',
+                        text: res.message || 'System caches cleared successfully.',
+                        timer: 2500,
+                        showConfirmButton: false,
+                        toast: true,
+                        position: 'top-end'
+                    });
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to purge cache. Please try again.',
+                        confirmButtonColor: '#F58F43'
+                    });
+                }
             });
         });
 

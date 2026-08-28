@@ -66,7 +66,7 @@ class AdminSettingController extends Controller
     /**
      * Clear application cache.
      */
-    public function clearCache()
+    public function clearCache(Request $request)
     {
         Artisan::call('cache:clear');
         Artisan::call('view:clear');
@@ -75,6 +75,13 @@ class AdminSettingController extends Controller
 
         \Illuminate\Support\Facades\Cache::forget('site_settings_cache');
         \Illuminate\Support\Facades\Cache::forget('site_tours_header_cache');
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'All system, route, configuration, and view caches purged successfully.'
+            ]);
+        }
 
         return back()->with('success', 'Application and view cache cleared successfully.');
     }
