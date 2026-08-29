@@ -537,6 +537,51 @@ if(window.fbq){
                     @endif
                 </div>
 
+                <!-- Practical Travel Tips & Packing Guide -->
+                <div class="card border-0 bg-white border border-light rounded-4 p-4 p-md-4 mb-4 shadow-sm">
+                    <h2 class="h5 fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+                        <i class="bi bi-info-square-fill text-primary"></i>Essential Tips & What to Pack
+                    </h2>
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-start gap-2">
+                                <i class="bi bi-check2-circle text-success mt-1"></i>
+                                <div>
+                                    <strong class="d-block text-dark small">Recommended Attire:</strong>
+                                    <span class="text-muted small">Casual loose-fitting clothes. Light jacket during winter evenings (Nov - Feb).</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-start gap-2">
+                                <i class="bi bi-check2-circle text-success mt-1"></i>
+                                <div>
+                                    <strong class="d-block text-dark small">Footwear:</strong>
+                                    <span class="text-muted small">Sandals, flip-flops, or sneakers suitable for walking on soft sand dunes.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-start gap-2">
+                                <i class="bi bi-check2-circle text-success mt-1"></i>
+                                <div>
+                                    <strong class="d-block text-dark small">Sun & Dust Protection:</strong>
+                                    <span class="text-muted small">Sunglasses, sunblock, and a camera or smartphone for sunset photography.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-start gap-2">
+                                <i class="bi bi-check2-circle text-success mt-1"></i>
+                                <div>
+                                    <strong class="d-block text-dark small">Families & Seniors:</strong>
+                                    <span class="text-muted small">Child booster seats and gentle direct-to-camp scenic transfers available on request.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Package Comparison Matrix (Feature Breakdown) -->
                 @if($tour->tiers->count() > 1)
                 <div class="card border-0 bg-light rounded-4 p-4 p-md-5 mb-5 shadow-sm">
