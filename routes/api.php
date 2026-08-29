@@ -25,6 +25,7 @@ Route::prefix('v1')->group(function () {
     // Coupon Validation & Marketing
     Route::post('/coupon/validate', [\App\Http\Controllers\Api\CouponController::class, 'validateCoupon'])->middleware('throttle:30,1');
     Route::get('/coupon/featured', [\App\Http\Controllers\Api\CouponController::class, 'featured']);
+    Route::post('/welcome-offer/claim', [\App\Http\Controllers\Api\WelcomeOfferController::class, 'claimOffer'])->middleware('throttle:15,1');
 
     // Booking Checkout
     Route::post('/booking/checkout', [BookingController::class, 'checkout']);

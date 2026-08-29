@@ -541,6 +541,7 @@
     </script>
 
     @include('partials.booking-modal')
+    @include('partials.welcome-offer-modal')
 
     <!-- Scripts -->
     <script src="{{ asset('assets/vendor/bootstrap/5.3.2/js/bootstrap.bundle.min.js') }}" defer></script>
