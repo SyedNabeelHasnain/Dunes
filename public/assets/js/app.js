@@ -1169,13 +1169,44 @@ const App={
         this.updateTotal();
     },
 
+    calculateBaseTotal(){
+        const adults=parseInt(document.getElementById('bookingAdults')?.value)||1;
+        const children=parseInt(document.getElementById('bookingChildren')?.value)||0;
+        let total=(this.selectedPrice*adults)+(this.selectedPrice*0.7*children);
+        this.selectedAddons.forEach(a=>total+=a.price);
+        return total;
+    },
+
     updateTotal(){
         const adults=parseInt(document.getElementById('bookingAdults')?.value)||1;
         const children=parseInt(document.getElementById('bookingChildren')?.value)||0;
 
-        let total=(this.selectedPrice*adults)+(this.selectedPrice*0.7*children);
+        let baseTotal=(this.selectedPrice*adults)+(this.selectedPrice*0.7*children);
+        this.selectedAddons.forEach(a=>baseTotal+=a.price);
 
-        this.selectedAddons.forEach(a=>total+=a.price);
+        // Apply discount if active coupon is present
+        let discount = 0;
+        if (window.appliedPromoCoupon) {
+            const c = window.appliedPromoCoupon;
+            if (c.discount_type === 'percentage') {
+                discount = (baseTotal * parseFloat(c.discount_value)) / 100;
+                if (c.max_discount && discount > parseFloat(c.max_discount)) {
+                    discount = parseFloat(c.max_discount);
+                }
+            } else if (c.discount_type === 'fixed') {
+                discount = Math.min(baseTotal, parseFloat(c.discount_value));
+            } else if (c.discount_type === 'per_person') {
+                discount = parseFloat(c.discount_value) * (adults + children);
+            }
+            discount = Math.min(baseTotal, Math.max(0, discount));
+
+            const promoSavingsText = document.getElementById('promoSavingsText');
+            if (promoSavingsText) {
+                promoSavingsText.textContent = `AED ${discount.toFixed(2)} saved (${c.discount_type === 'percentage' ? parseInt(c.discount_value) + '% OFF' : 'Discount Applied'})`;
+            }
+        }
+
+        let total = Math.max(0, baseTotal - discount);
 
         const totalEl = document.getElementById('bookingTotal');
         const summaryTotalEl = document.getElementById('summaryTotal');
@@ -1187,21 +1218,25 @@ const App={
         let payNow=0;
         if(method==='advance') payNow=(total*advancePercent)/100;
         else if(method==='full') payNow=total;
+        else if(method==='cash') payNow=total;
 
         const formatMoney = (v)=>'AED '+Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
         if(totalEl) {
             const formatted=formatMoney(total);
             totalEl.innerHTML = formatted.replace('AED ','<span class="currency">AED</span> ');
         }
-        if(summaryTotalEl) summaryTotalEl.textContent = formatMoney(total);
-        if(method==='cash'){
-            payNow = total;
+        if(summaryTotalEl) {
+            if (discount > 0) {
+                summaryTotalEl.innerHTML = `<span class="text-decoration-line-through text-muted small me-2">${formatMoney(baseTotal)}</span> <span class="text-success fw-bold">${formatMoney(total)}</span>`;
+            } else {
+                summaryTotalEl.textContent = formatMoney(total);
+            }
         }
         if(payInput) payInput.value = Number(payNow).toFixed(2);
         const submitBtn = document.getElementById('submitBooking');
         if(submitBtn){
             if(method==='cash'){
-                submitBtn.innerHTML='Continue <i class="bi bi-arrow-right"></i>';
+                submitBtn.innerHTML='Confirm <i class="bi bi-check-lg"></i>';
             }else{
                 submitBtn.innerHTML=`Pay ${formatMoney(payNow)} <i class="bi bi-credit-card"></i>`;
             }
@@ -1612,17 +1647,24 @@ const App={
                         document.body.style.overflow='';
                         form.reset();
                     }else{
+                        let msg = data.message || 'An error occurred';
+                        if (data.errors && typeof data.errors === 'object') {
+                            const errorList = Object.values(data.errors).flat();
+                            if (errorList.length > 0) {
+                                msg = errorList.join('<br>');
+                            }
+                        }
                         if(errEl){
-                            errEl.textContent=data.message||'An error occurred';
+                            errEl.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i>' + msg;
                             errEl.classList.remove('d-none');
                         }else{
-                            this.toast(data.message||'An error occurred','error');
+                            this.toast(msg,'error');
                         }
 
                     }
                 }catch(e){
                     if(errEl){
-                        errEl.textContent='Network error. Please try again.';
+                        errEl.innerHTML='<i class="bi bi-exclamation-triangle-fill me-2"></i>Network error. Please try again.';
                         errEl.classList.remove('d-none');
                     }else{
                         this.toast('Network error. Please try again.','error');
@@ -1780,6 +1822,7 @@ const App={
 };
 
 window.App=App;
+window.DunesApp=App;
 document.addEventListener('DOMContentLoaded',()=>App.init());
 const style=document.createElement('style');
 style.textContent='@keyframes spin{to{transform:rotate(360deg)}}.spin{animation:spin 1s linear infinite}';

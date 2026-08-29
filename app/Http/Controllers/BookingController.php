@@ -40,21 +40,30 @@ class BookingController extends Controller
      */
     public function checkout(Request $request): JsonResponse
     {
-        $request->validate([
-            'tour_id' => 'required|integer',
-            'tier_id' => 'required|integer',
-            'date' => 'required|date|after_or_equal:today',
-            'adults' => 'required|integer|min:1',
-            'children' => 'nullable|integer|min:0',
-            'location' => 'required|string|max:500',
-            'requests' => 'nullable|string',
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'required|string|max:50',
-            'payment_method' => 'required|string|in:cash,advance,full',
-            'addons' => 'nullable|array',
-            'addons.*' => 'integer',
-        ]);
+        try {
+            $request->validate([
+                'tour_id' => 'required|integer',
+                'tier_id' => 'required|integer',
+                'date' => 'required|date|after_or_equal:today',
+                'adults' => 'required|integer|min:1',
+                'children' => 'nullable|integer|min:0',
+                'location' => 'required|string|max:500',
+                'requests' => 'nullable|string',
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|max:255',
+                'phone' => 'required|string|max:50',
+                'payment_method' => 'required|string|in:cash,advance,full',
+                'addons' => 'nullable|array',
+                'addons.*' => 'integer',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $ve) {
+            $firstError = collect($ve->errors())->flatten()->first();
+            return response()->json([
+                'success' => false,
+                'message' => $firstError ?: 'Please complete all required fields.',
+                'errors' => $ve->errors()
+            ], 422);
+        }
 
         $tourId = (int)$request->input('tour_id');
         $tierId = (int)$request->input('tier_id');
@@ -186,7 +195,7 @@ class BookingController extends Controller
                 'tour_id' => $tourId,
                 'tier_id' => $tierId,
                 'tour_name' => $tour->name,
-                'tier_name' => $tier->display_name,
+                'tier_name' => $tier->display_name ?: $tier->name,
                 'tour_date' => $date,
                 'adults' => $adults,
                 'children' => $children,
@@ -347,11 +356,11 @@ class BookingController extends Controller
                 'redirect_url' => $intent['redirect_url']
             ]);
 
-        } catch (\Exception $e) {
-            Log::error("Failed to process checkout: " . $e->getMessage());
+        } catch (\Throwable $e) {
+            Log::error("Failed to process checkout: " . $e->getMessage() . "\n" . $e->getTraceAsString());
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while saving your booking. Please try again.'
+                'message' => 'Unable to complete booking: ' . $e->getMessage()
             ], 500);
         }
     }

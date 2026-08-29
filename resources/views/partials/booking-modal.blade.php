@@ -336,17 +336,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Fetch current subtotal
         let subtotal = 0;
-        if (window.DunesApp && typeof window.DunesApp.calculateBaseTotal === 'function') {
+        if (window.App && typeof window.App.calculateBaseTotal === 'function') {
+            subtotal = window.App.calculateBaseTotal();
+        } else if (window.DunesApp && typeof window.DunesApp.calculateBaseTotal === 'function') {
             subtotal = window.DunesApp.calculateBaseTotal();
-        } else {
-            const rawTxt = document.getElementById('summaryTotal')?.innerText?.replace(/[^0-9.]/g, '') || '0';
+        }
+
+        const adults = parseInt(document.getElementById('bookingAdults')?.value || '1', 10);
+
+        if (subtotal <= 0) {
+            const selectedTierCard = document.querySelector('.tier-card.selected');
+            if (selectedTierCard && selectedTierCard.dataset.price) {
+                subtotal = parseFloat(selectedTierCard.dataset.price) * adults;
+            }
+        }
+
+        if (subtotal <= 0) {
+            const rawTxt = document.getElementById('bookingTotal')?.innerText?.replace(/[^0-9.]/g, '') || document.getElementById('summaryTotal')?.innerText?.replace(/[^0-9.]/g, '') || '0';
             subtotal = parseFloat(rawTxt) || 0;
         }
 
         const tourId = document.getElementById('bookingTour')?.value || null;
         const tierId = document.getElementById('selectedTier')?.value || null;
         const email = document.getElementById('bookingEmail')?.value || null;
-        const adults = parseInt(document.getElementById('bookingAdults')?.value || '1', 10);
         const tourDate = document.getElementById('bookingDate')?.value || null;
 
         if (applyBtn) {
