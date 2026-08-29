@@ -95,7 +95,8 @@ class CouponController extends Controller
 
         return response()->json([
             'success' => true,
-            'featured' => $featured
+            'featured' => $featured,
+            'coupons' => $featured,
         ]);
     }
 }

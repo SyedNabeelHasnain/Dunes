@@ -130,14 +130,14 @@ class Coupon extends Model
         }
 
         // 3. Tour specific restriction
-        if ($this->tour_id && $tourId && (int)$this->tour_id !== (int)$tourId) {
+        if ($this->tour_id && ((int)$this->tour_id !== (int)$tourId)) {
             $targetTour = Tour::find($this->tour_id);
             $tourName = $targetTour ? $targetTour->name : 'a specific tour';
             return ['valid' => false, 'message' => "This promo code is exclusive to the '{$tourName}'. Please select that tour to apply."];
         }
 
         // 4. Tier specific restriction
-        if ($this->tier_id && $tierId && (int)$this->tier_id !== (int)$tierId) {
+        if ($this->tier_id && ((int)$this->tier_id !== (int)$tierId)) {
             $targetTier = Tier::find($this->tier_id);
             $tierName = $targetTier ? $targetTier->display_name : 'a specific package';
             return ['valid' => false, 'message' => "This promo code is exclusive to the '{$tierName}' package."];
@@ -164,10 +164,10 @@ class Coupon extends Model
 
             if ($this->first_time_only) {
                 $pastBookings = Booking::where('email', $userEmail)
-                    ->whereIn('status', ['confirmed', 'completed'])
+                    ->whereIn('status', ['confirmed', 'completed', 'paid', 'advance_paid', 'pending'])
                     ->exists();
                 if ($pastBookings) {
-                    return ['valid' => false, 'message' => 'This promo code is exclusively for first-time guests.'];
+                    return ['valid' => false, 'message' => 'This promo code is exclusively for first-time customers.'];
                 }
             }
 
