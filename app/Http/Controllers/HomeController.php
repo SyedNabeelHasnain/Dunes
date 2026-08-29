@@ -14,18 +14,40 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $categories = Category::with(['tours' => function ($query) {
-            $query->where('status', 'active')->with(['tiers', 'category'])->orderBy('priority', 'asc');
-        }])->orderBy('priority', 'asc')->get();
+        try {
+            $categories = Category::with(['tours' => function ($query) {
+                $query->where('status', 'active')->with(['tiers', 'category'])->orderBy('priority', 'asc');
+            }])->orderBy('priority', 'asc')->get();
+        } catch (\Throwable $e) {
+            $categories = collect();
+        }
 
-        $bestsellers = Tour::where('status', 'active')
-            ->where('is_bestseller', true)
-            ->with(['tiers', 'category'])
-            ->orderBy('priority', 'asc')
-            ->get();
+        try {
+            $bestsellers = Tour::where('status', 'active')
+                ->where('is_bestseller', true)
+                ->with(['tiers', 'category'])
+                ->orderBy('priority', 'asc')
+                ->get();
+        } catch (\Throwable $e) {
+            $bestsellers = collect();
+        }
 
-        $generalFaqIds = \App\Models\FaqAssignment::where('entity_type', 'general')->pluck('faq_id');
-        $faqs = \App\Models\Faq::whereIn('id', $generalFaqIds)->where('status', 'active')->orderBy('priority', 'asc')->limit(6)->get();
+        try {
+            $reviews = Review::where('status', 'approved')
+                ->where('is_featured', true)
+                ->orderBy('published_date', 'desc')
+                ->limit(10)
+                ->get();
+        } catch (\Throwable $e) {
+            $reviews = collect();
+        }
+
+        try {
+            $generalFaqIds = \App\Models\FaqAssignment::where('entity_type', 'general')->pluck('faq_id');
+            $faqs = \App\Models\Faq::whereIn('id', $generalFaqIds)->where('status', 'active')->orderBy('priority', 'asc')->limit(6)->get();
+        } catch (\Throwable $e) {
+            $faqs = collect();
+        }
 
         $currentYear = date('Y');
         $pageTitle = "Dubai Desert Safari Tours {$currentYear} | Best Price from AED 79 | Dunes Discovery Tourism";

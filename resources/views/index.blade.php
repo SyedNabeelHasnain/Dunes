@@ -571,12 +571,6 @@ if (!function_exists('renderReviewCardMarkup')) {
             <h2 class="display-5 fw-bold mb-3">Common <span class="text-primary">Questions</span></h2>
             <p class="text-muted lead">Everything you need to know about our desert safari tours.</p>
         </div>
-
-        @php
-            $generalFaqIds = \App\Models\FaqAssignment::where('entity_type', 'general')->pluck('faq_id');
-            $faqs = \App\Models\Faq::whereIn('id', $generalFaqIds)->where('status', 'active')->orderBy('priority', 'asc')->limit(6)->get();
-        @endphp
-
         <div class="accordion accordion-flush mx-auto" id="faqAccordion" style="max-width: 800px;">
             @foreach($faqs as $index => $f)
             <div class="accordion-item border-animated bg-white mb-3 rounded-4 border-0 shadow-sm">
