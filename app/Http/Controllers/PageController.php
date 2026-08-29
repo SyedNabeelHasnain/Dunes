@@ -30,7 +30,14 @@ class PageController extends Controller
      */
     public function about()
     {
-        return view('about');
+        $currentYear = date('Y');
+        $pageTitle = "About Dunes Discovery Tourism ({$currentYear}) | Leading Dubai Desert Safari Operator";
+        $pageDesc = "Learn about Dunes Discovery Tourism LLC, Dubai's premier DTCM-licensed desert safari & adventure operator since 2018. Over 25+ luxury 4x4 Land Cruisers, 5-star live BBQ camps, and 10,000+ happy travelers.";
+        $pageKeys = "about dunes discovery tourism, dubai desert safari operator, licensed tourism company dubai, luxury desert safaris";
+        $canonical = route('about');
+        $ogImage = asset('images/dubai-desert-safari-tour-dune-discovery-tourism.avif');
+
+        return view('about', compact('pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
     }
 
     /**
@@ -39,7 +46,15 @@ class PageController extends Controller
     public function contact()
     {
         session(['form_load.contact' => microtime(true)]);
-        return view('contact');
+
+        $currentYear = date('Y');
+        $pageTitle = "Contact Dunes Discovery Tourism ({$currentYear}) | 24/7 Dubai Support & Booking";
+        $pageDesc = "Get in touch with Dunes Discovery Tourism Dubai. 24/7 WhatsApp assistance (+971 50 245 6056), instant bookings, custom group tours, and corporate desert safaris.";
+        $pageKeys = "contact dunes discovery, dubai desert safari contact, book desert safari whatsapp, tourism office dubai";
+        $canonical = route('contact');
+        $ogImage = asset('images/desert-safari-poster.avif');
+
+        return view('contact', compact('pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
     }
 
     /**
@@ -55,7 +70,14 @@ class PageController extends Controller
             ->orderBy('priority', 'asc')
             ->get();
 
-        return view('faq', compact('faqs'));
+        $currentYear = date('Y');
+        $pageTitle = "Dubai Desert Safari FAQs ({$currentYear}) | Complete Traveler Guide | Dunes Discovery";
+        $pageDesc = "Find instant answers to all questions about Dubai desert safaris, what to wear, dune bashing safety, child booster seats, 100% Halal live BBQ dining, and free 24h cancellations.";
+        $pageKeys = "dubai desert safari faq, desert safari questions, what to wear desert safari dubai, halal bbq desert safari";
+        $canonical = route('faq');
+        $ogImage = asset('images/desert-safari-poster.avif');
+
+        return view('faq', compact('faqs', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
     }
 
     /**

@@ -1,36 +1,137 @@
 @extends('layouts.app')
 
 @section('content')
+@push('preloads')
 <script type="application/ld+json">
 {
   "@@context": "https://schema.org",
-  "@@type": "BreadcrumbList",
-  "itemListElement": [{
-    "@@type": "ListItem",
-    "position": 1,
-    "name": "Home",
-    "item": "{{ route('home') }}"
-  },{
-    "@@type": "ListItem",
-    "position": 2,
-    "name": "Contact Us",
-    "item": "{{ route('contact') }}"
-  }]
+  "@@graph": [
+    {
+      "@@type": "ContactPage",
+      "@@id": "{{ route('contact') }}#webpage",
+      "url": "{{ route('contact') }}",
+      "name": "Contact Dunes Discovery Tourism Dubai",
+      "description": "Contact Dunes Discovery Tourism LLC for 24/7 Dubai desert safari bookings, dune buggy inquiries, and private group packages.",
+      "breadcrumb": {
+        "@@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "{{ route('home') }}"
+          },
+          {
+            "@@type": "ListItem",
+            "position": 2,
+            "name": "Contact Us",
+            "item": "{{ route('contact') }}"
+          }
+        ]
+      },
+      "mainEntity": {
+        "@@type": "TravelAgency",
+        "@@id": "{{ route('home') }}#organization",
+        "name": "Dunes Discovery Tourism LLC",
+        "telephone": "+971 50 245 6056",
+        "email": "info@dunesdiscoverytourism.com",
+        "address": {
+          "@@type": "PostalAddress",
+          "streetAddress": "Dubai Desert Safari Terminal, Al Aweer & Lahbab",
+          "addressLocality": "Dubai",
+          "addressRegion": "Dubai",
+          "postalCode": "00000",
+          "addressCountry": "AE"
+        },
+        "geo": {
+          "@@type": "GeoCoordinates",
+          "latitude": "25.2048",
+          "longitude": "55.2708"
+        },
+        "openingHoursSpecification": {
+          "@@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+          "opens": "00:00",
+          "closes": "23:59"
+        }
+      }
+    }
+  ]
 }
 </script>
+@endpush
 
-<section class="page-header-modern">
-    <div class="container position-relative" style="z-index: 1;">
+<!-- Page Header Section -->
+<section class="page-header py-4 bg-dark text-white position-relative overflow-hidden" style="margin-top: -var(--header-h);">
+    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: radial-gradient(circle at 15% 20%, rgba(246, 144, 68, 0.15) 0%, transparent 60%);"></div>
+    <div class="container position-relative z-1 pt-3">
         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-4">
-                <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Contact Us</li>
+            <ol class="breadcrumb mb-3">
+                <li class="breadcrumb-item"><a href="{{ route('home') }}" class="text-white text-opacity-75 text-decoration-none">Home</a></li>
+                <li class="breadcrumb-item active text-white" aria-current="page">Contact Us</li>
             </ol>
         </nav>
-        <div class="row align-items-center">
-            <div class="col-lg-8">
-                <h1 class="display-4 fw-bold mb-3">Contact Us</h1>
-                <p class="lead mb-0 text-black">We are here to help with your Dubai adventure</p>
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3">
+            <div>
+                <div class="d-flex flex-wrap gap-2 mb-2">
+                    <span class="badge glass rounded-pill px-3 py-1.5">
+                        <i class="bi bi-headset me-1 text-primary"></i>24/7 Dedicated Concierge
+                    </span>
+                    <span class="badge bg-success bg-opacity-75 rounded-pill px-3 py-1.5 text-white">
+                        <i class="bi bi-patch-check-fill me-1"></i>DTCM Licensed Operator
+                    </span>
+                </div>
+                <h1 class="display-4 fw-bold text-white mb-2">Get in Touch with Us</h1>
+                <p class="lead text-white text-opacity-75 mb-0">We are ready 24/7 to assist with your Dubai safari reservations, custom itineraries & group inquiries.</p>
+            </div>
+            <div class="d-none d-lg-block text-end">
+                <span class="badge bg-soft-primary text-primary px-3 py-2 rounded-pill fw-bold fs-6">
+                    <i class="bi bi-lightning-charge me-1"></i>Instant WhatsApp Response
+                </span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Regulatory E-E-A-T & Trust Bar -->
+<section class="bg-light py-3 border-bottom shadow-sm">
+    <div class="container">
+        <div class="row g-3 text-center align-items-center">
+            <div class="col-6 col-md-3">
+                <div class="d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-patch-check-fill text-primary fs-5"></i>
+                    <div class="text-start">
+                        <div class="fw-bold text-dark small lh-1">DTCM Licensed Operator</div>
+                        <small class="text-muted" style="font-size: 11px;">Dubai Tourism Authority</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-arrow-repeat text-success fs-5"></i>
+                    <div class="text-start">
+                        <div class="fw-bold text-dark small lh-1">100% Free Cancellation</div>
+                        <small class="text-muted" style="font-size: 11px;">Full refund 24h prior</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-award-fill text-warning fs-5"></i>
+                    <div class="text-start">
+                        <div class="fw-bold text-dark small lh-1">100% Halal Food</div>
+                        <small class="text-muted" style="font-size: 11px;">Veg, Non-Veg & Jain</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-shield-lock-fill text-info fs-5"></i>
+                    <div class="text-start">
+                        <div class="fw-bold text-dark small lh-1">Direct Operator</div>
+                        <small class="text-muted" style="font-size: 11px;">No Middleman Markup</small>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
