@@ -394,14 +394,18 @@ document.addEventListener('DOMContentLoaded', function() {
             if (status === 200 && body.success && body.coupon) {
                 window.appliedPromoCoupon = body.coupon;
                 codeLabel.innerText = body.coupon.code;
-                savingsLabel.innerText = body.coupon.savings_text;
+                if (body.coupon.savings_text) {
+                    savingsLabel.innerText = body.coupon.savings_text;
+                }
                 
                 inputGroup.classList.add('d-none');
                 successBox.classList.remove('d-none');
                 successBox.classList.add('d-flex');
                 if (appliedBadge) appliedBadge.classList.remove('d-none');
 
-                if (window.DunesApp && typeof window.DunesApp.updateTotal === 'function') {
+                if (window.App && typeof window.App.updateTotal === 'function') {
+                    window.App.updateTotal();
+                } else if (window.DunesApp && typeof window.DunesApp.updateTotal === 'function') {
                     window.DunesApp.updateTotal();
                 } else {
                     const originalTotal = parseFloat(body.coupon.original_total);
@@ -445,7 +449,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (appliedBadge) appliedBadge.classList.add('d-none');
         if (errorBox) errorBox.classList.add('d-none');
 
-        if (window.DunesApp && typeof window.DunesApp.updateTotal === 'function') {
+        if (window.App && typeof window.App.updateTotal === 'function') {
+            window.App.updateTotal();
+        } else if (window.DunesApp && typeof window.DunesApp.updateTotal === 'function') {
             window.DunesApp.updateTotal();
         }
     };

@@ -55,6 +55,17 @@ class CouponController extends Controller
         $adults = (int)$request->input('adults', 1);
         $tourDate = $request->input('date');
 
+        // If client sent 0 subtotal but specified tour & tier, resolve price from database
+        if ($subtotal <= 0 && $tourId && $tierId) {
+            $pricing = \Illuminate\Support\Facades\DB::table('tour_tiers')
+                ->where('tour_id', $tourId)
+                ->where('tier_id', $tierId)
+                ->first();
+            if ($pricing && (float)$pricing->price > 0) {
+                $subtotal = (float)$pricing->price * max(1, $adults);
+            }
+        }
+
         $coupon = Coupon::where('code', $code)->first();
 
         if (!$coupon) {
@@ -79,11 +90,23 @@ class CouponController extends Controller
         // Format savings text
         $savingsText = '';
         if ($coupon->discount_type === 'percentage') {
-            $savingsText = "AED " . number_format($discountAmount, 2) . " saved (" . (float)$coupon->discount_value . "% OFF)";
+            if ($discountAmount > 0) {
+                $savingsText = "AED " . number_format($discountAmount, 2) . " saved (" . (int)$coupon->discount_value . "% OFF)";
+            } else {
+                $savingsText = (int)$coupon->discount_value . "% OFF Discount Applied";
+            }
         } elseif ($coupon->discount_type === 'per_person') {
-            $savingsText = "AED " . number_format($discountAmount, 2) . " saved (AED " . number_format($coupon->discount_value, 2) . "/guest)";
+            if ($discountAmount > 0) {
+                $savingsText = "AED " . number_format($discountAmount, 2) . " saved (AED " . number_format($coupon->discount_value, 2) . "/guest)";
+            } else {
+                $savingsText = "AED " . number_format($coupon->discount_value, 2) . "/guest OFF Applied";
+            }
         } else {
-            $savingsText = "AED " . number_format($discountAmount, 2) . " saved (Flat Discount)";
+            if ($discountAmount > 0) {
+                $savingsText = "AED " . number_format($discountAmount, 2) . " saved (Flat Discount)";
+            } else {
+                $savingsText = "AED " . number_format($coupon->discount_value, 2) . " Flat Discount Applied";
+            }
         }
 
         return response()->json([
@@ -95,6 +118,7 @@ class CouponController extends Controller
                 'name' => $coupon->name,
                 'discount_type' => $coupon->discount_type,
                 'discount_value' => (float)$coupon->discount_value,
+                'max_discount' => $coupon->max_discount ? (float)$coupon->max_discount : null,
                 'discount_amount' => $discountAmount,
                 'original_total' => $subtotal,
                 'new_total' => $newTotal,

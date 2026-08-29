@@ -1172,7 +1172,15 @@ const App={
     calculateBaseTotal(){
         const adults=parseInt(document.getElementById('bookingAdults')?.value)||1;
         const children=parseInt(document.getElementById('bookingChildren')?.value)||0;
-        let total=(this.selectedPrice*adults)+(this.selectedPrice*0.7*children);
+        let price = this.selectedPrice || 0;
+        if (price <= 0) {
+            const selectedTierCard = document.querySelector('.tier-card.selected');
+            if (selectedTierCard && selectedTierCard.dataset.price) {
+                price = parseFloat(selectedTierCard.dataset.price) || 0;
+                this.selectedPrice = price;
+            }
+        }
+        let total=(price * adults)+(price * 0.7 * children);
         this.selectedAddons.forEach(a=>total+=a.price);
         return total;
     },
@@ -1337,16 +1345,7 @@ const App={
 
         if(this.currentStep === 2){
             this.updateSummary();
-
-            const submitBtn = document.getElementById('submitBooking');
-            const method = document.getElementById('paymentMethod')?.value || 'cash';
-            if(submitBtn){
-                if(method==='cash'){
-                    submitBtn.innerHTML='Confirm <i class="bi bi-check-lg"></i>';
-                }else{
-                    submitBtn.innerHTML='Pay Now <i class="bi bi-credit-card"></i>';
-                }
-            }
+            this.updateTotal();
         }
     },
 

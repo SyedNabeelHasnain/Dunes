@@ -546,7 +546,7 @@
     <!-- Scripts -->
     <script src="{{ asset('assets/vendor/bootstrap/5.3.2/js/bootstrap.bundle.min.js') }}" defer></script>
     <script src="{{ asset('assets/vendor/intl-tel-input/26.0.6/build/intlTelInput.min.js') }}" defer></script>
-    <script src="{{ asset('assets/js/app.min.js') }}?v={{ $cacheVer }}" defer></script>
+    <script src="{{ asset('assets/js/app.min.js') }}?v={{ file_exists(public_path('assets/js/app.min.js')) ? filemtime(public_path('assets/js/app.min.js')) : time() }}" defer></script>
 
     @stack('scripts')
 </body>
