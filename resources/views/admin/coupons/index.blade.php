@@ -1,4 +1,4 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 
 @section('page_title', 'Coupons & Promo Codes')
 
@@ -65,6 +65,16 @@
 </div>
 
 <!-- Coupons Table Card -->
+<style>
+.table-responsive {
+    min-height: 260px;
+    padding-bottom: 70px;
+    overflow-y: visible !important;
+}
+.dropdown-menu {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+}
+</style>
 <div class="card card-modern bg-white border-0 shadow-sm rounded-4 mb-4">
     <div class="card-body p-4">
         
@@ -227,40 +237,45 @@
 
                         <!-- Action Buttons -->
                         <td class="text-end pe-3">
-                            <div class="dropdown d-inline-block">
-                                <button class="btn btn-sm btn-light border-0 rounded-circle p-2 shadow-none" type="button" data-bs-toggle="dropdown">
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4 p-2">
-                                    <li>
-                                        <a class="dropdown-item rounded-3 py-2 fw-bold" href="{{ route('admin.coupons.edit', $coupon->id) }}">
-                                            <i class="bi bi-pencil me-2 text-primary"></i> Edit Promo
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <form action="{{ route('admin.coupons.duplicate', $coupon->id) }}" method="POST">
-                                            @csrf
-                                            <button type="submit" class="dropdown-item rounded-3 py-2 fw-bold">
-                                                <i class="bi bi-copy me-2 text-info"></i> Duplicate Promo
+                            <div class="d-flex align-items-center justify-content-end gap-1">
+                                <a href="{{ route('admin.coupons.edit', $coupon->id) }}" class="btn btn-sm btn-light border rounded-circle p-2 text-primary" title="Edit Promo" style="width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;">
+                                    <i class="bi bi-pencil-fill" style="font-size: 0.8rem;"></i>
+                                </a>
+                                <div class="dropdown d-inline-block">
+                                    <button class="btn btn-sm btn-light border-0 rounded-circle p-2 shadow-none" type="button" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false" title="More Actions" style="width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4 p-2" style="z-index: 1065; min-width: 200px;">
+                                        <li>
+                                            <a class="dropdown-item rounded-3 py-2 fw-bold" href="{{ route('admin.coupons.edit', $coupon->id) }}">
+                                                <i class="bi bi-pencil me-2 text-primary"></i> Edit Promo
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <form action="{{ route('admin.coupons.duplicate', $coupon->id) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="dropdown-item rounded-3 py-2 fw-bold">
+                                                    <i class="bi bi-copy me-2 text-info"></i> Duplicate Promo
+                                                </button>
+                                            </form>
+                                        </li>
+                                        <li>
+                                            <button type="button" class="dropdown-item rounded-3 py-2 fw-bold view-usages-btn" data-id="{{ $coupon->id }}" data-code="{{ $coupon->code }}">
+                                                <i class="bi bi-receipt me-2 text-success"></i> View Redemptions ({{ $coupon->used_count }})
                                             </button>
-                                        </form>
-                                    </li>
-                                    <li>
-                                        <button type="button" class="dropdown-item rounded-3 py-2 fw-bold view-usages-btn" data-id="{{ $coupon->id }}" data-code="{{ $coupon->code }}">
-                                            <i class="bi bi-receipt me-2 text-success"></i> View Redemptions ({{ $coupon->used_count }})
-                                        </button>
-                                    </li>
-                                    <li><hr class="dropdown-divider my-1"></li>
-                                    <li>
-                                        <form action="{{ route('admin.coupons.destroy', $coupon->id) }}" method="POST" class="delete-coupon-form">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="button" class="dropdown-item rounded-3 py-2 fw-bold text-danger delete-coupon-btn" data-code="{{ $coupon->code }}">
-                                                <i class="bi bi-trash me-2"></i> Archive Promo
-                                            </button>
-                                        </form>
-                                    </li>
-                                </ul>
+                                        </li>
+                                        <li><hr class="dropdown-divider my-1"></li>
+                                        <li>
+                                            <form action="{{ route('admin.coupons.destroy', $coupon->id) }}" method="POST" class="delete-coupon-form">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" class="dropdown-item rounded-3 py-2 fw-bold text-danger delete-coupon-btn" data-code="{{ $coupon->code }}">
+                                                    <i class="bi bi-trash me-2"></i> Archive Promo
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </td>
                     </tr>
