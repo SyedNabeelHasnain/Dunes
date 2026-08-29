@@ -8,6 +8,12 @@
         <h2 class="h4 fw-800 text-dark mb-1">Customer Contact Inquiries Hub</h2>
         <p class="text-muted small mb-0">Manage customer inquiries from website contact forms, track response times, and reply quickly.</p>
     </div>
+    <div class="d-flex gap-2 align-items-center">
+        <a href="{{ route('admin.inquiries.export', request()->query()) }}" class="btn btn-white shadow-sm border-0 rounded-pill px-3 py-2 fw-bold text-dark d-flex align-items-center gap-2">
+            <i class="bi bi-file-earmark-arrow-down text-success fs-5"></i>
+            <span>Export CSV</span>
+        </a>
+    </div>
 </div>
 
 <!-- 4 Key Performance Metric Cards -->

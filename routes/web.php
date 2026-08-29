@@ -87,6 +87,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/faqs/{id}/toggle-status', [AdminFaqController::class, 'toggleStatus'])->name('faqs.toggle-status');
     Route::resource('reviews', AdminReviewController::class)->except(['create', 'show', 'edit']);
     Route::post('/reviews/{id}/toggle-status', [AdminReviewController::class, 'toggleStatus'])->name('reviews.toggle-status');
+    Route::get('/inquiries/export/csv', [AdminDashboardController::class, 'exportInquiriesCsv'])->name('inquiries.export');
     Route::get('/inquiries', [AdminDashboardController::class, 'inquiries'])->name('inquiries.index');
     Route::get('/inquiries/{id}', [AdminDashboardController::class, 'viewInquiry'])->name('inquiries.show');
     Route::post('/inquiries/{id}/status', [AdminDashboardController::class, 'updateInquiryStatus'])->name('inquiries.status');

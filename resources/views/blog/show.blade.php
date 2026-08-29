@@ -42,7 +42,8 @@
             'worksFor' => ['@type' => 'Organization', 'name' => 'Dunes Discovery Tourism', 'url' => route('home')]
         ],
         'publisher' => [
-            '@type' => 'Organization',
+            '@type' => 'TravelAgency',
+            '@id' => route('home') . '#organization',
             'name' => 'Dunes Discovery Tourism',
             'url' => route('home'),
             'logo' => ['@type' => 'ImageObject', 'url' => asset('images/logo.png'), 'width' => 160, 'height' => 46]

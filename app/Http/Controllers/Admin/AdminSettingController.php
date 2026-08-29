@@ -73,6 +73,7 @@ class AdminSettingController extends Controller
         }
 
         \Illuminate\Support\Facades\Cache::forget('site_settings_cache');
+        \Illuminate\Support\Facades\Cache::forget('site_home_cache');
 
         // Return back to referring page or specific route
         return back()->with('success', 'Settings updated successfully.');
@@ -94,6 +95,7 @@ class AdminSettingController extends Controller
 
         \Illuminate\Support\Facades\Cache::forget('site_settings_cache');
         \Illuminate\Support\Facades\Cache::forget('site_tours_header_cache');
+        \Illuminate\Support\Facades\Cache::forget('site_home_cache');
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([

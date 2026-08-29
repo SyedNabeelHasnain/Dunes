@@ -41,7 +41,8 @@
     $cssFile = public_path('assets/css/app.min.css');
     $cacheVer = file_exists($cssFile) ? filemtime($cssFile) : ($settings['cache_version'] ?? time());
 
-    $pageTitle = $pageTitle ?? 'Dunes Discovery Tourism | Dubai Desert Safari Tours';
+    $currentYear = date('Y');
+    $pageTitle = $pageTitle ?? "Dunes Discovery Tourism | Dubai Desert Safari Tours ({$currentYear})";
     $pageDesc = $pageDesc ?? 'Book Dubai best desert safari tours from AED 99. Evening safari, city tours, dhow cruises with instant confirmation.';
     $pageKeys = $pageKeys ?? 'dubai desert safari,desert safari dubai,evening desert safari';
     $pageRobots = $pageRobots ?? 'index,follow';

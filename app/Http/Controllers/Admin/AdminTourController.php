@@ -167,6 +167,7 @@ class AdminTourController extends Controller
         }
 
         Cache::forget('site_tours_header_cache');
+        Cache::forget('site_home_cache');
         return redirect()->route('admin.tours.index')->with('success', 'Tour updated successfully.');
     }
 
@@ -178,6 +179,7 @@ class AdminTourController extends Controller
         $tour = Tour::findOrFail($id);
         $tour->delete();
         Cache::forget('site_tours_header_cache');
+        Cache::forget('site_home_cache');
         return redirect()->route('admin.tours.index')->with('success', 'Tour deleted successfully.');
     }
 

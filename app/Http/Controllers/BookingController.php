@@ -321,6 +321,16 @@ class BookingController extends Controller
 
         if (!empty($pi)) {
             $booking = Booking::where('ziina_payment_intent_id', $pi)->first();
+            $paymentRecord = null;
+
+            if (!$booking) {
+                $paymentRecord = BookingPayment::where('payment_intent_id', $pi)->first();
+                if ($paymentRecord && $paymentRecord->booking) {
+                    $booking = $paymentRecord->booking;
+                }
+            } else {
+                $paymentRecord = BookingPayment::where('payment_intent_id', $pi)->first();
+            }
             
             if ($booking) {
                 $method = $booking->payment_method;
@@ -328,27 +338,39 @@ class BookingController extends Controller
                 $intentStatus = $intent['status'] ?? '';
 
                 if ($intentStatus === 'completed') {
-                    $newStatus = ($method === 'advance') ? 'partial' : 'paid';
+                    $wasCompleted = ($paymentRecord && $paymentRecord->status === 'completed');
                     
-                    if ($booking->payment_status !== $newStatus) {
-                        $balanceDue = ($method === 'advance') ? $booking->balance_due : 0;
-                        
+                    if ($paymentRecord && !$wasCompleted) {
+                        $paymentRecord->update(['status' => 'completed']);
+                    }
+
+                    $totalPaid = BookingPayment::where('booking_id', $booking->id)
+                        ->where('status', 'completed')
+                        ->sum('amount');
+                    
+                    if ($totalPaid <= 0 && isset($intent['amount'])) {
+                        $totalPaid = (float)($intent['amount'] / 100);
+                    }
+
+                    $remBalance = max(0, (float)$booking->total - (float)$totalPaid);
+                    $newStatus = ($remBalance <= 0) ? 'paid' : (($method === 'advance' || $totalPaid > 0) ? 'partial' : 'paid');
+
+                    if ($booking->payment_status !== $newStatus || $booking->balance_due != $remBalance) {
                         $booking->update([
                             'payment_status' => $newStatus,
                             'ziina_status' => $intentStatus,
                             'status' => 'confirmed',
-                            'balance_due' => $balanceDue
+                            'balance_due' => $remBalance,
+                            'payment_amount' => $totalPaid,
                         ]);
 
-                        BookingPayment::where('payment_intent_id', $pi)->update([
-                            'status' => $intentStatus
-                        ]);
-
-                        // Send booking confirmation email
-                        if ($method === 'advance') {
-                            $this->sendEmailNotification('booking_advance', $booking);
-                        } else {
-                            $this->sendEmailNotification('booking_full', $booking);
+                        // Send booking confirmation email on first completion
+                        if (!$wasCompleted) {
+                            if ($newStatus === 'partial') {
+                                $this->sendEmailNotification('booking_advance', $booking);
+                            } else {
+                                $this->sendEmailNotification('booking_full', $booking);
+                            }
                         }
 
                         // Dispatch Purchase Event to Meta Conversions API

@@ -413,4 +413,69 @@ class AdminDashboardController extends Controller
 
         return redirect()->route('admin.inquiries.index')->with('success', 'Inquiry deleted successfully.');
     }
+
+    /**
+     * Export inquiries to CSV.
+     */
+    public function exportInquiriesCsv(Request $request)
+    {
+        $fileName = 'dunes-inquiries-export-' . date('Y-m-d-His') . '.csv';
+        $query = Contact::orderBy('created_at', 'desc');
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where(function($q) use ($s) {
+                $q->where('name', 'like', "%{$s}%")
+                  ->orWhere('email', 'like', "%{$s}%")
+                  ->orWhere('phone', 'like', "%{$s}%")
+                  ->orWhere('subject', 'like', "%{$s}%")
+                  ->orWhere('message', 'like', "%{$s}%");
+            });
+        }
+        if ($request->filled('from_date')) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+        if ($request->filled('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        $headers = [
+            "Content-type" => "text/csv; charset=UTF-8",
+            "Content-Disposition" => "attachment; filename={$fileName}",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
+        ];
+
+        $columns = ['ID', 'Date', 'Name', 'Email', 'Phone', 'Subject', 'Message', 'Status', 'IP Address'];
+
+        $callback = function() use ($query, $columns) {
+            $file = fopen('php://output', 'w');
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM for UTF-8
+            fputcsv($file, $columns);
+
+            $query->chunk(100, function($inquiries) use ($file) {
+                foreach ($inquiries as $inq) {
+                    fputcsv($file, [
+                        $inq->id,
+                        $inq->created_at ? $inq->created_at->format('Y-m-d H:i:s') : '',
+                        $inq->name,
+                        $inq->email,
+                        $inq->phone,
+                        $inq->subject,
+                        $inq->message,
+                        $inq->status,
+                        $inq->ip_address
+                    ]);
+                }
+            });
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }

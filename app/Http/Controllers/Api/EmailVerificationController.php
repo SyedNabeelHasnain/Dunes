@@ -121,14 +121,35 @@ class EmailVerificationController extends Controller
         $sessionCode = session('otp_code');
         $sessionExpiry = session('otp_expiry');
 
+        $isValid = false;
+
+        // 1. Session check
         if ($sessionEmail === $email 
             && hash_equals((string)$sessionCode, $otp) 
             && time() < (int)$sessionExpiry
         ) {
-            session(['email_verified_' . md5($email) => true]);
-            
-            // Cleanup OTP session variables
+            $isValid = true;
             session()->forget(['otp_email', 'otp_code', 'otp_expiry']);
+        }
+
+        // 2. Database audit log fallback check
+        if (!$isValid) {
+            $hashedOtp = hash('sha256', $otp);
+            $dbOtp = EmailOtp::where('email', $email)
+                ->where('otp', $hashedOtp)
+                ->where('expires_at', '>', now())
+                ->first();
+
+            if ($dbOtp) {
+                $isValid = true;
+                try {
+                    $dbOtp->delete();
+                } catch (\Throwable $e) {}
+            }
+        }
+
+        if ($isValid) {
+            session(['email_verified_' . md5($email) => true]);
 
             // Persist email to verified_emails table
             try {
