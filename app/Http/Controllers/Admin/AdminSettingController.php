@@ -106,4 +106,35 @@ class AdminSettingController extends Controller
 
         return back()->with('success', 'Application and view cache cleared successfully.');
     }
+
+    /**
+     * Run all pending database migrations securely from admin.
+     */
+    public function runMigrations(Request $request)
+    {
+        try {
+            Artisan::call('migrate', ['--force' => true]);
+            $output = trim(Artisan::output());
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Database migrations executed successfully: ' . $output
+                ]);
+            }
+
+            return back()->with('success', 'Database migrations executed successfully: ' . $output);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Admin migration execution error: ' . $e->getMessage());
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Migration error: ' . $e->getMessage()
+                ], 500);
+            }
+
+            return back()->with('error', 'Migration error: ' . $e->getMessage());
+        }
+    }
 }

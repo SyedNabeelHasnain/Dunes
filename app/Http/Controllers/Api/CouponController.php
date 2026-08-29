@@ -11,11 +11,32 @@ use Illuminate\Http\Request;
 
 class CouponController extends Controller
 {
+    public function __construct()
+    {
+        $this->ensureSchema();
+    }
+
+    /**
+     * Ensure coupons table exists.
+     */
+    protected function ensureSchema(): void
+    {
+        try {
+            if (!\Illuminate\Support\Facades\Schema::hasTable('coupons')) {
+                $migration = require database_path('migrations/2026_08_30_000001_create_coupons_table.php');
+                $migration->up();
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error("Coupon schema auto-creation error: " . $e->getMessage());
+        }
+    }
+
     /**
      * Real-time coupon validation endpoint.
      */
     public function validateCoupon(Request $request): JsonResponse
     {
+        $this->ensureSchema();
         $request->validate([
             'code' => 'required|string|max:50',
             'subtotal' => 'required|numeric|min:0',

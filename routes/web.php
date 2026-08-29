@@ -124,6 +124,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/settings/meta', [AdminSettingController::class, 'meta'])->name('settings.meta');
     Route::post('/settings/update', [AdminSettingController::class, 'update'])->name('settings.update');
     Route::match(['get', 'post'], '/clear-cache', [AdminSettingController::class, 'clearCache'])->name('clear-cache');
+    Route::match(['get', 'post'], '/run-migrations', [AdminSettingController::class, 'runMigrations'])->name('run-migrations');
 });
 
 // ── Profile routes (Breeze default) ──────────────────────────────────────────

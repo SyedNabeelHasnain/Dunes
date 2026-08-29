@@ -13,38 +13,69 @@ use Illuminate\Support\Str;
 
 class AdminCouponController extends Controller
 {
+    public function __construct()
+    {
+        $this->ensureSchema();
+    }
+
+    /**
+     * Ensure coupons and coupon_usages tables exist on production.
+     */
+    protected function ensureSchema(): void
+    {
+        try {
+            if (!\Illuminate\Support\Facades\Schema::hasTable('coupons') || !\Illuminate\Support\Facades\Schema::hasTable('coupon_usages')) {
+                $migration = require database_path('migrations/2026_08_30_000001_create_coupons_table.php');
+                $migration->up();
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error("Coupon schema auto-creation error: " . $e->getMessage());
+        }
+    }
+
     /**
      * Display a listing of coupons with statistics.
      */
     public function index(Request $request)
     {
+        $this->ensureSchema();
+
         $status = $request->input('status');
         $type = $request->input('type');
         $search = $request->input('search');
 
-        $query = Coupon::with(['tour', 'tier'])->withCount('usages');
+        try {
+            $query = Coupon::with(['tour', 'tier'])->withCount('usages');
 
-        if ($status) {
-            $query->where('status', $status);
-        }
-        if ($type) {
-            $query->where('discount_type', $type);
-        }
-        if ($search) {
-            $query->where(function($q) use ($search) {
-                $q->where('code', 'like', "%{$search}%")
-                  ->orWhere('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
-            });
-        }
+            if ($status) {
+                $query->where('status', $status);
+            }
+            if ($type) {
+                $query->where('discount_type', $type);
+            }
+            if ($search) {
+                $query->where(function($q) use ($search) {
+                    $q->where('code', 'like', "%{$search}%")
+                      ->orWhere('name', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%");
+                });
+            }
 
-        $coupons = $query->orderBy('created_at', 'desc')->get();
+            $coupons = $query->orderBy('created_at', 'desc')->get();
 
-        // 4 KPI Statistics
-        $totalActive = Coupon::where('status', 'active')->count();
-        $totalRedemptions = CouponUsage::count();
-        $totalDiscountGiven = (float)CouponUsage::sum('discount_amount');
-        $totalRevenueViaPromos = (float)CouponUsage::sum('order_final_total');
+            // 4 KPI Statistics
+            $totalActive = Coupon::where('status', 'active')->count();
+            $totalRedemptions = CouponUsage::count();
+            $totalDiscountGiven = (float)CouponUsage::sum('discount_amount');
+            $totalRevenueViaPromos = (float)CouponUsage::sum('order_final_total');
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error("Error loading coupons in index: " . $e->getMessage());
+            $coupons = collect([]);
+            $totalActive = 0;
+            $totalRedemptions = 0;
+            $totalDiscountGiven = 0;
+            $totalRevenueViaPromos = 0;
+        }
 
         $stats = [
             'total_active' => $totalActive,
