@@ -100,6 +100,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::resource('blog-categories', AdminBlogCategoryController::class)->except(['create', 'show', 'edit']);
 
     // Coupons & Promo Codes
+    Route::get('/coupons/popup-settings', [AdminCouponController::class, 'popupSettings'])->name('coupons.popup-settings');
+    Route::post('/coupons/popup-settings', [AdminCouponController::class, 'updatePopupSettings'])->name('coupons.popup-settings.update');
     Route::get('/coupons/export/csv', [AdminCouponController::class, 'exportCsv'])->name('coupons.export');
     Route::post('/coupons/{id}/toggle-status', [AdminCouponController::class, 'toggleStatus'])->name('coupons.toggle-status');
     Route::post('/coupons/{id}/duplicate', [AdminCouponController::class, 'duplicate'])->name('coupons.duplicate');

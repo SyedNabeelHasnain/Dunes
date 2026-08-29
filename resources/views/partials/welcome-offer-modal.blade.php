@@ -1,3 +1,32 @@
+@php
+    $settingsService = app(\App\Services\SettingsService::class);
+    $popupActive = $settingsService->get('welcome_popup_active', '1') === '1';
+    $popupDiscount = (float)$settingsService->get('welcome_popup_discount', '25');
+    $popupTimerMins = (int)$settingsService->get('welcome_popup_timer_mins', '15');
+    $popupDelaySec = (int)$settingsService->get('welcome_popup_delay_sec', '5');
+    $popupScrollTrigger = $settingsService->get('welcome_popup_scroll_trigger', '1') === '1';
+    $popupExitTrigger = $settingsService->get('welcome_popup_exit_trigger', '1') === '1';
+    $popupHeadline = $settingsService->get('welcome_popup_headline', 'Unlock 25% OFF Your Dubai Desert Adventure');
+    $popupSubheadline = $settingsService->get('welcome_popup_subheadline', 'Valid for today\'s booking • Tour date can be selected for any future date!');
+    
+    $topBannerActive = $settingsService->get('top_promo_banner_active', '1') === '1';
+    $topBannerText = $settingsService->get('top_promo_banner_text', '🎟️ First-Time Traveler? Claim 25% OFF Your Desert Safari Today with Code FIRST25! • 100% Free 24h Cancellation');
+    $topBannerCode = $settingsService->get('top_promo_banner_code', 'FIRST25');
+@endphp
+
+@if($topBannerActive)
+<!-- Top Sticky Announcement Bar -->
+<div id="dunesTopPromoBanner" class="py-2 px-3 text-white text-center position-relative z-3 shadow-sm d-flex align-items-center justify-content-center flex-wrap gap-2" style="background: linear-gradient(90deg, #111827 0%, #1f2937 50%, #0f172a 100%); border-bottom: 2px solid #F58F43; font-size: 0.85rem;">
+    <span class="fw-bold">{{ $topBannerText }}</span>
+    <button type="button" class="btn btn-warning btn-sm rounded-pill px-3 py-0 fw-800 text-dark d-inline-flex align-items-center gap-1 shadow-sm top-banner-copy-btn" data-code="{{ $topBannerCode }}" style="font-size: 0.75rem; height: 26px;">
+        <span>CODE: <strong class="font-monospace">{{ $topBannerCode }}</strong></span>
+        <i class="bi bi-clipboard"></i>
+    </button>
+    <button type="button" class="btn-close btn-close-white ms-2 shadow-none position-absolute end-0 me-3" style="font-size: 0.65rem;" onclick="document.getElementById('dunesTopPromoBanner').style.display='none';"></button>
+</div>
+@endif
+
+@if($popupActive)
 <!-- First-Time Visitor 25% Discount Voucher Modal -->
 <div class="modal fade" id="welcomeOfferModal" tabindex="-1" aria-labelledby="welcomeOfferLabel" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -16,15 +45,15 @@
                     <div class="col-lg-5 text-center text-lg-start">
                         <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-primary-subtle text-primary fw-800 small text-uppercase mb-3" style="font-size: 0.75rem; letter-spacing: 0.5px;">
                             <i class="bi bi-gift-fill"></i>
-                            <span>First-Time Guest Gift</span>
+                            <span>First-Time Guest Special</span>
                         </div>
 
                         <h2 class="display-6 fw-800 text-dark lh-1 mb-3" style="letter-spacing: -0.5px;">
-                            Unlock <span class="text-primary" style="color: #F58F43 !important;">25% OFF</span> Today
+                            {{ $popupHeadline }}
                         </h2>
 
                         <p class="text-muted small mb-4 lh-base">
-                            Book your authentic Dubai desert adventure today and save <strong>25% instantly</strong>. Travel anytime with full flexibility!
+                            {{ $popupSubheadline }}
                         </p>
 
                         <!-- Trust Pillars -->
@@ -50,7 +79,7 @@
                         <!-- Session Countdown Box -->
                         <div class="p-3 rounded-4 text-center border" style="background: #fff8f3; border-color: rgba(245, 143, 67, 0.25) !important;">
                             <span class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.7rem; letter-spacing: 1px;">Session Offer Expires In</span>
-                            <div class="fw-800 fs-4 text-primary font-monospace" id="welcomeOfferCountdown" style="letter-spacing: 2px;">14:59</div>
+                            <div class="fw-800 fs-4 text-primary font-monospace" id="welcomeOfferCountdown" style="letter-spacing: 2px;">{{ sprintf('%02d', $popupTimerMins) }}:00</div>
                         </div>
                     </div>
 
@@ -62,7 +91,7 @@
                             <div id="welcomeOfferFormState">
                                 <div class="text-center mb-4">
                                     <h4 class="fw-800 text-dark mb-1">Claim Your Voucher</h4>
-                                    <p class="text-muted small mb-0">Enter your email to receive your exclusive 25% promo code instantly.</p>
+                                    <p class="text-muted small mb-0">Enter your email to receive your exclusive {{ (int)$popupDiscount }}% promo voucher instantly.</p>
                                 </div>
 
                                 <form id="welcomeOfferForm">
@@ -85,7 +114,7 @@
                                     <div class="alert alert-danger p-2 small mt-2 d-none mb-3 rounded-3" id="welcomeOfferError"></div>
 
                                     <button type="submit" class="btn btn-primary rounded-pill w-100 py-3 fw-800 fs-6 shadow-lg d-flex align-items-center justify-content-center gap-2 mb-3" id="claimOfferSubmitBtn" style="background: linear-gradient(135deg, #F58F43 0%, #e07425 100%); border: none;">
-                                        <span>Claim My 25% Discount</span>
+                                        <span>Claim My {{ (int)$popupDiscount }}% Discount</span>
                                         <i class="bi bi-arrow-right"></i>
                                     </button>
 
@@ -100,7 +129,7 @@
                                 <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow-lg" style="width: 60px; height: 60px;">
                                     <i class="bi bi-check-lg fs-2 fw-bold"></i>
                                 </div>
-                                <h3 class="fw-800 text-dark mb-1">25% Discount Unlocked!</h3>
+                                <h3 class="fw-800 text-dark mb-1">{{ (int)$popupDiscount }}% Discount Unlocked!</h3>
                                 <p class="text-muted small mb-4">Your personalized promo voucher is generated and ready to apply.</p>
 
                                 <!-- Golden Ticket Display -->
@@ -114,7 +143,7 @@
 
                                 <button type="button" class="btn btn-primary rounded-pill w-100 py-3 fw-800 fs-6 shadow-lg d-flex align-items-center justify-content-center gap-2 mb-2" id="applyVoucherAndBookBtn" style="background: linear-gradient(135deg, #F58F43 0%, #e07425 100%); border: none;">
                                     <i class="bi bi-cart-check-fill me-1"></i>
-                                    <span>Apply 25% OFF & Book Safari Now</span>
+                                    <span>Apply {{ (int)$popupDiscount }}% OFF & Book Safari Now</span>
                                 </button>
                                 
                                 <small class="text-muted d-block mt-2" style="font-size: 0.75rem;">
@@ -130,11 +159,11 @@
     </div>
 </div>
 
-<!-- Floating Persistent Voucher Reminder Pill (Appears when claimed/dismissed) -->
+<!-- Floating Persistent Voucher Reminder Pill (Appears when claimed) -->
 <div id="welcomeFloatingPill" class="d-none position-fixed bottom-0 start-0 m-3 z-3 shadow-lg rounded-pill p-2 ps-3 pe-3 bg-dark text-white border border-secondary d-flex align-items-center gap-2" style="cursor: pointer; transition: all 0.3s ease; animation: slideInPill 0.4s ease forwards;">
-    <span class="badge bg-warning text-dark fw-800 rounded-pill px-2 py-1">25% OFF</span>
+    <span class="badge bg-warning text-dark fw-800 rounded-pill px-2 py-1">{{ (int)$popupDiscount }}% OFF</span>
     <span class="small fw-bold font-monospace text-white" id="floatingPillCode">FIRST25-OFF</span>
-    <span class="small text-muted font-monospace d-none d-sm-inline" id="floatingPillTimer">14:59</span>
+    <span class="small text-muted font-monospace d-none d-sm-inline" id="floatingPillTimer">{{ sprintf('%02d', $popupTimerMins) }}:00</span>
     <button type="button" class="btn btn-sm btn-primary rounded-pill px-2 py-1 fw-bold ms-1" style="background: #F58F43; border: none; font-size: 0.75rem;">
         Apply
     </button>
@@ -152,246 +181,315 @@
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const modalEl = document.getElementById('welcomeOfferModal');
-    if (!modalEl) return;
+(function() {
+    const popupDelaySec = {{ (int)$popupDelaySec }};
+    const popupTimerMins = {{ (int)$popupTimerMins }};
+    const enableScroll = {{ $popupScrollTrigger ? 'true' : 'false' }};
+    const enableExit = {{ $popupExitTrigger ? 'true' : 'false' }};
 
-    let offerModal = null;
-    try {
-        offerModal = new bootstrap.Modal(modalEl);
-    } catch(e) {}
+    function initWelcomeOffer() {
+        const modalEl = document.getElementById('welcomeOfferModal');
+        if (!modalEl) return;
 
-    const form = document.getElementById('welcomeOfferForm');
-    const formState = document.getElementById('welcomeOfferFormState');
-    const successState = document.getElementById('welcomeOfferSuccessState');
-    const errorBox = document.getElementById('welcomeOfferError');
-    const submitBtn = document.getElementById('claimOfferSubmitBtn');
-    const countdownEl = document.getElementById('welcomeOfferCountdown');
-    const codeDisplay = document.getElementById('generatedVoucherCode');
-    const copyBtn = document.getElementById('copyVoucherBtn');
-    const applyBookBtn = document.getElementById('applyVoucherAndBookBtn');
-    const floatingPill = document.getElementById('welcomeFloatingPill');
-    const floatingCode = document.getElementById('floatingPillCode');
-    const floatingTimer = document.getElementById('floatingPillTimer');
+        const form = document.getElementById('welcomeOfferForm');
+        const formState = document.getElementById('welcomeOfferFormState');
+        const successState = document.getElementById('welcomeOfferSuccessState');
+        const errorBox = document.getElementById('welcomeOfferError');
+        const submitBtn = document.getElementById('claimOfferSubmitBtn');
+        const countdownEl = document.getElementById('welcomeOfferCountdown');
+        const codeDisplay = document.getElementById('generatedVoucherCode');
+        const copyBtn = document.getElementById('copyVoucherBtn');
+        const applyBookBtn = document.getElementById('applyVoucherAndBookBtn');
+        const floatingPill = document.getElementById('welcomeFloatingPill');
+        const floatingCode = document.getElementById('floatingPillCode');
+        const floatingTimer = document.getElementById('floatingPillTimer');
 
-    // 15-Minute Urgency Timer
-    let durationSeconds = 15 * 60;
-    let timerInterval = null;
-
-    function startTimer() {
-        const savedEndTime = sessionStorage.getItem('dunes_welcome_offer_end');
-        let endTime = savedEndTime ? parseInt(savedEndTime, 10) : (Date.now() + (durationSeconds * 1000));
-        sessionStorage.setItem('dunes_welcome_offer_end', endTime);
-
-        if (timerInterval) clearInterval(timerInterval);
-
-        timerInterval = setInterval(() => {
-            const now = Date.now();
-            const diff = Math.max(0, Math.floor((endTime - now) / 1000));
-            const mins = String(Math.floor(diff / 60)).padStart(2, '0');
-            const secs = String(diff % 60).padStart(2, '0');
-            const timeStr = `${mins}:${secs}`;
-
-            if (countdownEl) countdownEl.innerText = timeStr;
-            if (floatingTimer) floatingTimer.innerText = timeStr;
-
-            if (diff <= 0) {
-                clearInterval(timerInterval);
-                if (countdownEl) countdownEl.innerText = '00:00';
+        // Robust Modal Show Helper (works with Bootstrap or custom fallback)
+        function showOfferModal() {
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                try {
+                    const bModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                    bModal.show();
+                    return;
+                } catch(e) {}
             }
-        }, 1000);
-    }
-
-    // Trigger Mechanics: 6.5s delay OR 35% scroll OR exit intent
-    function shouldShowWelcomePopup() {
-        const claimed = localStorage.getItem('dunes_welcome_claimed');
-        if (claimed) {
-            showFloatingPill(claimed);
-            return false;
+            
+            // Fallback if bootstrap is still loading
+            modalEl.classList.add('show');
+            modalEl.style.display = 'block';
+            document.body.classList.add('modal-open');
+            let backdrop = document.querySelector('.modal-backdrop');
+            if (!backdrop) {
+                backdrop = document.createElement('div');
+                backdrop.className = 'modal-backdrop fade show';
+                document.body.appendChild(backdrop);
+            }
         }
 
-        const dismissedUntil = localStorage.getItem('dunes_welcome_dismissed_until');
-        if (dismissedUntil && Date.now() < parseInt(dismissedUntil, 10)) {
-            return false;
+        function hideOfferModal() {
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                try {
+                    const bModal = bootstrap.Modal.getInstance(modalEl);
+                    if (bModal) bModal.hide();
+                } catch(e) {}
+            }
+            modalEl.classList.remove('show');
+            modalEl.style.display = 'none';
+            document.body.classList.remove('modal-open');
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) backdrop.remove();
         }
 
-        return true;
-    }
+        const closeBtn = document.getElementById('closeWelcomeOfferBtn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', hideOfferModal);
+        }
 
-    function triggerModal() {
-        if (!shouldShowWelcomePopup()) return;
-        if (sessionStorage.getItem('dunes_welcome_shown_session')) return;
+        // Urgency Timer
+        let durationSeconds = popupTimerMins * 60;
+        let timerInterval = null;
 
-        sessionStorage.setItem('dunes_welcome_shown_session', 'true');
-        startTimer();
-        if (offerModal) offerModal.show();
-    }
+        function startTimer() {
+            const savedEndTime = sessionStorage.getItem('dunes_welcome_offer_end');
+            let endTime = savedEndTime ? parseInt(savedEndTime, 10) : (Date.now() + (durationSeconds * 1000));
+            sessionStorage.setItem('dunes_welcome_offer_end', endTime);
 
-    // Trigger 1: 6.5s Delay
-    setTimeout(() => {
-        triggerModal();
-    }, 6500);
+            if (timerInterval) clearInterval(timerInterval);
 
-    // Trigger 2: 35% Scroll
-    let scrollTriggered = false;
-    window.addEventListener('scroll', () => {
-        if (scrollTriggered) return;
-        const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
-        if (scrollPercent >= 35) {
-            scrollTriggered = true;
+            timerInterval = setInterval(() => {
+                const now = Date.now();
+                const diff = Math.max(0, Math.floor((endTime - now) / 1000));
+                const mins = String(Math.floor(diff / 60)).padStart(2, '0');
+                const secs = String(diff % 60).padStart(2, '0');
+                const timeStr = `${mins}:${secs}`;
+
+                if (countdownEl) countdownEl.innerText = timeStr;
+                if (floatingTimer) floatingTimer.innerText = timeStr;
+
+                if (diff <= 0) {
+                    clearInterval(timerInterval);
+                    if (countdownEl) countdownEl.innerText = '00:00';
+                }
+            }, 1000);
+        }
+
+        function shouldShowWelcomePopup() {
+            const claimed = localStorage.getItem('dunes_welcome_claimed');
+            if (claimed) {
+                showFloatingPill(claimed);
+                return false;
+            }
+
+            const dismissedUntil = localStorage.getItem('dunes_welcome_dismissed_until');
+            if (dismissedUntil && Date.now() < parseInt(dismissedUntil, 10)) {
+                return false;
+            }
+
+            return true;
+        }
+
+        function triggerModal() {
+            if (!shouldShowWelcomePopup()) return;
+            if (sessionStorage.getItem('dunes_welcome_shown_session')) return;
+
+            sessionStorage.setItem('dunes_welcome_shown_session', 'true');
+            startTimer();
+            showOfferModal();
+        }
+
+        // Trigger 1: Delay Timer
+        setTimeout(() => {
             triggerModal();
+        }, popupDelaySec * 1000);
+
+        // Trigger 2: Scroll Depth
+        if (enableScroll) {
+            let scrollTriggered = false;
+            window.addEventListener('scroll', () => {
+                if (scrollTriggered) return;
+                const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+                if (scrollPercent >= 35) {
+                    scrollTriggered = true;
+                    triggerModal();
+                }
+            }, { passive: true });
         }
-    }, { passive: true });
 
-    // Trigger 3: Desktop Exit Intent
-    let exitTriggered = false;
-    document.addEventListener('mouseleave', (e) => {
-        if (exitTriggered || e.clientY > 20) return;
-        exitTriggered = true;
-        triggerModal();
-    });
-
-    // Dismissal Handler
-    modalEl.addEventListener('hidden.bs.modal', function() {
-        const claimed = localStorage.getItem('dunes_welcome_claimed');
-        if (!claimed) {
-            // Set 24 hour cooldown if dismissed without claiming
-            localStorage.setItem('dunes_welcome_dismissed_until', Date.now() + (24 * 60 * 60 * 1000));
+        // Trigger 3: Desktop Exit Intent
+        if (enableExit) {
+            let exitTriggered = false;
+            document.addEventListener('mouseleave', (e) => {
+                if (exitTriggered || e.clientY > 20) return;
+                exitTriggered = true;
+                triggerModal();
+            });
         }
-    });
 
-    // Lead Capture Submission
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = document.getElementById('welcomeEmail')?.value.trim();
-            const name = document.getElementById('welcomeName')?.value.trim();
+        // Dismissal Handler
+        modalEl.addEventListener('hidden.bs.modal', function() {
+            const claimed = localStorage.getItem('dunes_welcome_claimed');
+            if (!claimed) {
+                localStorage.setItem('dunes_welcome_dismissed_until', Date.now() + (24 * 60 * 60 * 1000));
+            }
+        });
 
-            if (!email) return;
+        // Form Submission
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = document.getElementById('welcomeEmail')?.value.trim();
+                const name = document.getElementById('welcomeName')?.value.trim();
 
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Generating 25% Voucher...';
-            if (errorBox) errorBox.classList.add('d-none');
+                if (!email) return;
 
-            fetch('/api/v1/welcome-offer/claim', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-                },
-                body: JSON.stringify({
-                    email: email,
-                    name: name
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Generating Voucher...';
+                if (errorBox) errorBox.classList.add('d-none');
+
+                fetch('/api/v1/welcome-offer/claim', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    },
+                    body: JSON.stringify({ email: email, name: name })
                 })
-            })
-            .then(res => res.json().then(data => ({ status: res.status, body: data })))
-            .then(({ status, body }) => {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<span>Claim My 25% Discount</span> <i class="bi bi-arrow-right"></i>';
+                .then(res => res.json().then(data => ({ status: res.status, body: data })))
+                .then(({ status, body }) => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<span>Claim My Discount</span> <i class="bi bi-arrow-right"></i>';
 
-                if (status === 200 && body.success && body.coupon) {
-                    const code = body.coupon.code;
-                    localStorage.setItem('dunes_welcome_claimed', code);
-                    localStorage.removeItem('dunes_welcome_dismissed_until');
+                    if (status === 200 && body.success && body.coupon) {
+                        const code = body.coupon.code;
+                        localStorage.setItem('dunes_welcome_claimed', code);
+                        localStorage.removeItem('dunes_welcome_dismissed_until');
 
-                    // Google Ads & Conversion Trigger
-                    if (typeof gtag === 'function') {
-                        gtag('event', 'conversion_event_submit_lead_form', {
-                            'event_category': 'Welcome Offer',
-                            'event_label': code
-                        });
+                        if (typeof gtag === 'function') {
+                            gtag('event', 'conversion_event_submit_lead_form', {
+                                'event_category': 'Welcome Offer',
+                                'event_label': code
+                            });
+                        }
+
+                        if (codeDisplay) codeDisplay.innerText = code;
+                        formState.classList.add('d-none');
+                        successState.classList.remove('d-none');
+
+                        showFloatingPill(code);
+                    } else {
+                        if (errorBox) {
+                            errorBox.innerText = body.message || 'Unable to generate voucher. Please try again.';
+                            errorBox.classList.remove('d-none');
+                        }
                     }
-
-                    if (codeDisplay) codeDisplay.innerText = code;
-                    formState.classList.add('d-none');
-                    successState.classList.remove('d-none');
-
-                    showFloatingPill(code);
-                } else {
+                })
+                .catch(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<span>Claim My Discount</span> <i class="bi bi-arrow-right"></i>';
                     if (errorBox) {
-                        errorBox.innerText = body.message || 'Unable to generate voucher. Please try again.';
+                        errorBox.innerText = 'Network error. Please try again.';
                         errorBox.classList.remove('d-none');
                     }
-                }
-            })
-            .catch(() => {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<span>Claim My 25% Discount</span> <i class="bi bi-arrow-right"></i>';
-                if (errorBox) {
-                    errorBox.innerText = 'Network error occurred. Please check your connection and try again.';
-                    errorBox.classList.remove('d-none');
-                }
+                });
             });
-        });
-    }
+        }
 
-    // 1-Click Copy Voucher Button
-    if (copyBtn) {
-        copyBtn.addEventListener('click', function() {
-            const code = codeDisplay.innerText.trim();
-            navigator.clipboard.writeText(code).then(() => {
-                copyBtn.innerHTML = '<i class="bi bi-check-lg text-success me-1"></i> Copied!';
-                setTimeout(() => { copyBtn.innerHTML = '<i class="bi bi-clipboard me-1"></i> Copy Code'; }, 2000);
+        // Copy Code
+        if (copyBtn) {
+            copyBtn.addEventListener('click', function() {
+                const code = codeDisplay.innerText.trim();
+                navigator.clipboard.writeText(code).then(() => {
+                    copyBtn.innerHTML = '<i class="bi bi-check-lg text-success me-1"></i> Copied!';
+                    setTimeout(() => { copyBtn.innerHTML = '<i class="bi bi-clipboard me-1"></i> Copy Code'; }, 2000);
+                });
             });
-        });
-    }
+        }
 
-    // 1-Click Apply & Open Booking Modal
-    if (applyBookBtn) {
-        applyBookBtn.addEventListener('click', function() {
-            const code = codeDisplay.innerText.trim();
-            navigator.clipboard.writeText(code);
+        // Apply & Book
+        if (applyBookBtn) {
+            applyBookBtn.addEventListener('click', function() {
+                const code = codeDisplay.innerText.trim();
+                navigator.clipboard.writeText(code);
+                hideOfferModal();
 
-            // Hide Welcome Offer Modal
-            if (offerModal) offerModal.hide();
+                setTimeout(() => {
+                    const bookingModalEl = document.getElementById('bookingModal');
+                    if (bookingModalEl) {
+                        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                            const bModal = bootstrap.Modal.getOrCreateInstance(bookingModalEl);
+                            bModal.show();
+                        }
+                        const promoInput = document.getElementById('bookingPromoCode');
+                        if (promoInput) promoInput.value = code;
+                        if (typeof window.validateCurrentPromo === 'function') {
+                            setTimeout(() => window.validateCurrentPromo(), 400);
+                        }
+                    }
+                }, 300);
+            });
+        }
 
-            // Open Booking Modal and Auto-Apply Voucher
-            setTimeout(() => {
+        function showFloatingPill(code) {
+            if (!floatingPill) return;
+            if (floatingCode) floatingCode.innerText = code;
+            floatingPill.classList.remove('d-none');
+            floatingPill.classList.add('d-flex');
+            startTimer();
+
+            floatingPill.onclick = function() {
                 const bookingModalEl = document.getElementById('bookingModal');
                 if (bookingModalEl) {
-                    const bModal = bootstrap.Modal.getOrCreateInstance(bookingModalEl);
-                    bModal.show();
-
+                    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                        const bModal = bootstrap.Modal.getOrCreateInstance(bookingModalEl);
+                        bModal.show();
+                    }
                     const promoInput = document.getElementById('bookingPromoCode');
-                    if (promoInput) {
-                        promoInput.value = code;
-                    }
+                    if (promoInput) promoInput.value = code;
                     if (typeof window.validateCurrentPromo === 'function') {
-                        setTimeout(() => {
-                            window.validateCurrentPromo();
-                        }, 500);
+                        setTimeout(() => window.validateCurrentPromo(), 400);
                     }
                 }
-            }, 300);
-        });
+            };
+        }
+
+        const savedClaimedCode = localStorage.getItem('dunes_welcome_claimed');
+        if (savedClaimedCode) {
+            showFloatingPill(savedClaimedCode);
+        }
     }
 
-    function showFloatingPill(code) {
-        if (!floatingPill) return;
-        if (floatingCode) floatingCode.innerText = code;
-        floatingPill.classList.remove('d-none');
-        floatingPill.classList.add('d-flex');
-        startTimer();
+    // Initialize on DOM or Window Load
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initWelcomeOffer);
+    } else {
+        initWelcomeOffer();
+    }
 
-        floatingPill.onclick = function() {
-            const bookingModalEl = document.getElementById('bookingModal');
-            if (bookingModalEl) {
-                const bModal = bootstrap.Modal.getOrCreateInstance(bookingModalEl);
-                bModal.show();
-                const promoInput = document.getElementById('bookingPromoCode');
-                if (promoInput) promoInput.value = code;
-                if (typeof window.validateCurrentPromo === 'function') {
-                    setTimeout(() => window.validateCurrentPromo(), 400);
+    // Top Banner Copy listener
+    document.querySelectorAll('.top-banner-copy-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const code = this.dataset.code || 'FIRST25';
+            navigator.clipboard.writeText(code).then(() => {
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = '<span class="text-success fw-bold">COPIED!</span>';
+                setTimeout(() => { btn.innerHTML = originalHtml; }, 2000);
+
+                const bookingModalEl = document.getElementById('bookingModal');
+                if (bookingModalEl) {
+                    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                        const bModal = bootstrap.Modal.getOrCreateInstance(bookingModalEl);
+                        bModal.show();
+                    }
+                    const promoInput = document.getElementById('bookingPromoCode');
+                    if (promoInput) promoInput.value = code;
+                    if (typeof window.validateCurrentPromo === 'function') {
+                        setTimeout(() => window.validateCurrentPromo(), 400);
+                    }
                 }
-            }
-        };
-    }
-
-    // Check if voucher was already claimed on page load
-    const savedClaimedCode = localStorage.getItem('dunes_welcome_claimed');
-    if (savedClaimedCode) {
-        showFloatingPill(savedClaimedCode);
-    }
-});
+            });
+        });
+    });
+})();
 </script>
+@endif

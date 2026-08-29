@@ -7,6 +7,9 @@ use App\Models\Coupon;
 use App\Models\CouponUsage;
 use App\Models\Tour;
 use App\Models\Tier;
+use App\Models\Setting;
+use App\Services\SettingsService;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -303,5 +306,57 @@ class AdminCouponController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Show First-Time Visitor Popup & Banner Promotion Settings.
+     */
+    public function popupSettings()
+    {
+        $settingsService = app(SettingsService::class);
+        $settings = $settingsService->all();
+        $coupons = Coupon::where('status', 'active')->orderBy('created_at', 'desc')->get();
+
+        return view('admin.coupons.popup-settings', compact('settings', 'coupons'));
+    }
+
+    /**
+     * Update First-Time Visitor Popup & Banner Promotion Settings.
+     */
+    public function updatePopupSettings(Request $request)
+    {
+        $allowed = [
+            'welcome_popup_active',
+            'welcome_popup_discount',
+            'welcome_popup_timer_mins',
+            'welcome_popup_delay_sec',
+            'welcome_popup_scroll_trigger',
+            'welcome_popup_exit_trigger',
+            'welcome_popup_headline',
+            'welcome_popup_subheadline',
+            'top_promo_banner_active',
+            'top_promo_banner_text',
+            'top_promo_banner_code',
+        ];
+
+        $data = $request->only($allowed);
+
+        // Checkbox fields handling
+        $checkboxes = ['welcome_popup_active', 'welcome_popup_scroll_trigger', 'welcome_popup_exit_trigger', 'top_promo_banner_active'];
+        foreach ($checkboxes as $cb) {
+            $data[$cb] = $request->has($cb) ? '1' : '0';
+        }
+
+        foreach ($data as $key => $value) {
+            Setting::updateOrCreate(
+                ['setting_key' => $key],
+                ['setting_value' => $value !== null ? trim((string)$value) : '']
+            );
+        }
+
+        Cache::forget('site_settings_cache');
+        Cache::forget('site_home_cache');
+
+        return redirect()->route('admin.coupons.popup-settings')->with('success', 'Welcome offer popup and promo banner settings updated successfully!');
     }
 }

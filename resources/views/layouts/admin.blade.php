@@ -264,8 +264,11 @@
             </a>
 
             <div class="sidebar-heading">Marketing & Content</div>
-            <a href="{{ route('admin.coupons.index') }}" class="sidebar-link {{ request()->routeIs('admin.coupons*') ? 'active' : '' }}">
+            <a href="{{ route('admin.coupons.index') }}" class="sidebar-link {{ request()->routeIs('admin.coupons.index') || request()->routeIs('admin.coupons.create') || request()->routeIs('admin.coupons.edit') ? 'active' : '' }}">
                 <i class="bi bi-ticket-perforated-fill"></i> <span>Coupons & Promos</span>
+            </a>
+            <a href="{{ route('admin.coupons.popup-settings') }}" class="sidebar-link {{ request()->routeIs('admin.coupons.popup-settings*') ? 'active' : '' }}">
+                <i class="bi bi-gift-fill text-warning"></i> <span>Welcome Offer & Banner</span>
             </a>
             <a href="{{ route('admin.blogs.index') }}" class="sidebar-link {{ request()->routeIs('admin.blogs*') ? 'active' : '' }}">
                 <i class="bi bi-journal-richtext"></i> <span>Blog Articles</span>
