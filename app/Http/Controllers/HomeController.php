@@ -24,12 +24,16 @@ class HomeController extends Controller
             ->orderBy('priority', 'asc')
             ->get();
 
-        $reviews = Review::where('status', 'approved')
-            ->where('is_featured', true)
-            ->orderBy('published_date', 'desc')
-            ->limit(10)
-            ->get();
+        $generalFaqIds = \App\Models\FaqAssignment::where('entity_type', 'general')->pluck('faq_id');
+        $faqs = \App\Models\Faq::whereIn('id', $generalFaqIds)->where('status', 'active')->orderBy('priority', 'asc')->limit(6)->get();
 
-        return view('index', compact('categories', 'bestsellers', 'reviews'));
+        $currentYear = date('Y');
+        $pageTitle = "Dubai Desert Safari Tours {$currentYear} | Best Price from AED 79 | Dunes Discovery Tourism";
+        $pageDesc = "Book top-rated Dubai Desert Safari, 1000cc Dune Buggy, Quad Biking, & Dhow Cruise dinners from AED 79. 4x4 Land Cruiser pickup, live BBQ, & 24h free cancellation.";
+        $pageKeys = "dubai desert safari, desert safari dubai, evening desert safari dubai, dune buggy rental dubai, quad biking dubai, dhow cruise dubai, abu dhabi city tour";
+        $canonical = route('home');
+        $ogImage = asset('images/desert-safari-poster.avif');
+
+        return view('index', compact('categories', 'bestsellers', 'reviews', 'faqs', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
     }
 }

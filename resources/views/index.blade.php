@@ -40,7 +40,7 @@ if (!function_exists('renderReviewCardMarkup')) {
 @push('preloads')
 <link rel="preload" as="image" href="{{ asset('images/desert-safari-poster.avif') }}" fetchpriority="high">
 
-<!-- Schema.org 2026 Knowledge Graph: TravelAgency, LocalBusiness, WebSite -->
+<!-- Schema.org 2026 Connected Knowledge Graph: TravelAgency, LocalBusiness, WebSite, FAQPage, VideoObject -->
 <script type="application/ld+json">
 {
   "@@context": "https://schema.org",
@@ -85,6 +85,14 @@ if (!function_exists('renderReviewCardMarkup')) {
         "bestRating": "5",
         "worstRating": "1"
       },
+      "hasMerchantReturnPolicy": {
+        "@@type": "MerchantReturnPolicy",
+        "applicableCountry": "AE",
+        "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+        "merchantReturnDays": 1,
+        "returnMethod": "https://schema.org/ReturnInStore",
+        "returnFees": "https://schema.org/FreeReturn"
+      },
       "sameAs": [
         "https://www.facebook.com/dunesdiscoverytourism",
         "https://www.instagram.com/dunesdiscoverytourism",
@@ -104,7 +112,38 @@ if (!function_exists('renderReviewCardMarkup')) {
         "target": "{{ route('tours.index') }}?category={search_term_string}",
         "query-input": "required name=search_term_string"
       }
+    },
+    {
+      "@@type": "VideoObject",
+      "@@id": "{{ route('home') }}#video",
+      "name": "Dubai Desert Safari Experience - Dunes Discovery Tourism",
+      "description": "Experience thrilling dune bashing across the Lahbab Red Dunes, sandboarding, 1000cc dune buggy rentals, and 5-star live BBQ dinner under the desert stars.",
+      "thumbnailUrl": ["{{ asset('images/desert-safari-poster.avif') }}"],
+      "uploadDate": "2026-01-01T00:00:00+04:00",
+      "contentUrl": "{{ asset('images/desert-safar-dubai-tour-short-dune-discovery-tourism.mp4') }}",
+      "publisher": {
+        "@@id": "{{ route('home') }}#organization"
+      }
     }
+    @if(isset($faqs) && $faqs->count() > 0)
+    ,
+    {
+      "@@type": "FAQPage",
+      "@@id": "{{ route('home') }}#faq",
+      "mainEntity": [
+        @foreach($faqs as $fidx => $f)
+        {
+          "@@type": "Question",
+          "name": {!! json_encode($f->question) !!},
+          "acceptedAnswer": {
+            "@@type": "Answer",
+            "text": {!! json_encode($f->answer) !!}
+          }
+        }{{ $fidx < $faqs->count() - 1 ? ',' : '' }}
+        @endforeach
+      ]
+    }
+    @endif
   ]
 }
 </script>
@@ -122,12 +161,12 @@ if (!function_exists('renderReviewCardMarkup')) {
             <i class="bi bi-star-fill text-warning me-2"></i>
             <span class="fw-semibold">Rated 4.9/5 by 2,847+ Travelers</span>
         </div>
-        <h1 class="display-3 fw-bold mb-3 text-white">Discover the Magic of <span class="text-gradient-primary">Dubai Desert</span></h1>
-        <p class="lead mb-5 mx-auto opacity-90" style="max-width: 700px;">Experience thrilling dune bashing, magical sunsets, authentic BBQ dinner, and unforgettable entertainment under the stars.</p>
+        <h1 class="display-3 fw-bold mb-3 text-white">Top-Rated <span class="text-gradient-primary">Dubai Desert Safari</span> Tours & Adventures</h1>
+        <p class="lead mb-5 mx-auto opacity-90" style="max-width: 750px;">Experience thrilling dune bashing across the Lahbab Red Dunes, 1000cc dune buggy rentals, magical sunsets, authentic live BBQ dinner, and 5-star entertainment under the desert stars.</p>
 
         <div class="d-flex flex-column flex-md-row gap-3 justify-content-center align-items-center mb-5">
             <a href="#" class="btn btn-desert-animated btn-lg rounded-pill px-5 py-3 shadow-primary fw-bold" data-bs-toggle="modal" data-bs-target="#bookingModal">
-                <i class="bi bi-calendar-check me-2"></i>Book Now
+                <i class="bi bi-calendar-check me-2"></i>Book Online Now
             </a>
             <a href="#" class="btn btn-desert-animated-dark btn-lg rounded-pill px-5 py-3 fw-bold d-inline-flex align-items-center gap-2" data-action="open-booking" data-tour="1" data-tier="1">
                 <span class="fw-bold me-2 text-white">Starting from</span>
@@ -161,8 +200,52 @@ if (!function_exists('renderReviewCardMarkup')) {
     </div>
 </section>
 
+<!-- Regulatory E-E-A-T & Trust Bar -->
+<section class="bg-light py-3 border-bottom shadow-sm">
+    <div class="container">
+        <div class="row g-3 text-center align-items-center">
+            <div class="col-6 col-md-3">
+                <div class="d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-patch-check-fill text-primary fs-5"></i>
+                    <div class="text-start">
+                        <div class="fw-bold text-dark small lh-1">DTCM Licensed Operator</div>
+                        <small class="text-muted" style="font-size: 11px;">Dubai Tourism Authority</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-arrow-repeat text-success fs-5"></i>
+                    <div class="text-start">
+                        <div class="fw-bold text-dark small lh-1">100% Free Cancellation</div>
+                        <small class="text-muted" style="font-size: 11px;">Full refund 24h prior</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-award-fill text-warning fs-5"></i>
+                    <div class="text-start">
+                        <div class="fw-bold text-dark small lh-1">100% Halal Food</div>
+                        <small class="text-muted" style="font-size: 11px;">Veg, Non-Veg & Jain</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-shield-lock-fill text-info fs-5"></i>
+                    <div class="text-start">
+                        <div class="fw-bold text-dark small lh-1">Secure Reservation</div>
+                        <small class="text-muted" style="font-size: 11px;">Online / Cash on Pickup</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- Stats Bar Section -->
-<div class="stats-bar bg-dark py-4 shadow-lg position-relative z-2" style="margin-top: -50px; border-radius: 24px 24px 0 0;">
+<div class="stats-bar bg-dark py-4 shadow-lg position-relative z-2" style="border-radius: 0;">
     <div class="container">
         <div class="row g-0 text-center stats-grid">
             <div class="col-4 col-lg-2 stats-item">
@@ -198,6 +281,75 @@ if (!function_exists('renderReviewCardMarkup')) {
         </div>
     </div>
 </div>
+
+<!-- Category Silos Section: Explore Dubai by Adventure Type -->
+<section class="section py-5 bg-white">
+    <div class="container py-lg-3">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold mb-3">Explore Dubai <span class="text-primary">by Experience</span></h2>
+            <p class="text-muted lead mx-auto" style="max-width: 650px;">Choose from our signature desert expeditions, high-power self-drive rentals, skyline cruises, and cultural city tours.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card h-100 border-0 rounded-4 shadow-sm overflow-hidden transition-all hover-translate-up bg-light">
+                    <div class="p-4 d-flex flex-column h-100">
+                        <div class="icon-box-md bg-soft-primary text-primary rounded-3 mb-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                            <i class="bi bi-sunset-fill fs-4"></i>
+                        </div>
+                        <h3 class="h5 fw-bold text-dark mb-2">Evening Desert Safari</h3>
+                        <p class="text-muted small flex-grow-1">Red dune bashing, camel rides, sandboarding, live Tanoura & fire shows, plus a 5-star live BBQ dinner.</p>
+                        <a href="{{ url('/evening-desert-safari-dubai') }}" class="btn btn-outline-primary btn-sm rounded-pill fw-bold mt-2">
+                            Explore Safaris <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card h-100 border-0 rounded-4 shadow-sm overflow-hidden transition-all hover-translate-up bg-light">
+                    <div class="p-4 d-flex flex-column h-100">
+                        <div class="icon-box-md bg-soft-primary text-primary rounded-3 mb-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                            <i class="bi bi-speedometer2 fs-4"></i>
+                        </div>
+                        <h3 class="h5 fw-bold text-dark mb-2">Dune Buggy & ATV</h3>
+                        <p class="text-muted small flex-grow-1">Self-drive 1000cc Can-Am Maverick and Polaris RZR buggies across the untamed Lahbab dunes.</p>
+                        <a href="{{ url('/dune-buggy-rental-dubai') }}" class="btn btn-outline-primary btn-sm rounded-pill fw-bold mt-2">
+                            Explore Buggies <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card h-100 border-0 rounded-4 shadow-sm overflow-hidden transition-all hover-translate-up bg-light">
+                    <div class="p-4 d-flex flex-column h-100">
+                        <div class="icon-box-md bg-soft-primary text-primary rounded-3 mb-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                            <i class="bi bi-water fs-4"></i>
+                        </div>
+                        <h3 class="h5 fw-bold text-dark mb-2">Marina Dhow Cruise</h3>
+                        <p class="text-muted small flex-grow-1">Gourmet international buffet dinner cruise along the illuminated Dubai Marina & JBR skyline.</p>
+                        <a href="{{ url('/dhow-cruise-catamaran-cruise-dinner-dubai') }}" class="btn btn-outline-primary btn-sm rounded-pill fw-bold mt-2">
+                            Explore Cruises <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card h-100 border-0 rounded-4 shadow-sm overflow-hidden transition-all hover-translate-up bg-light">
+                    <div class="p-4 d-flex flex-column h-100">
+                        <div class="icon-box-md bg-soft-primary text-primary rounded-3 mb-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                            <i class="bi bi-building fs-4"></i>
+                        </div>
+                        <h3 class="h5 fw-bold text-dark mb-2">Abu Dhabi City Tour</h3>
+                        <p class="text-muted small flex-grow-1">Chauffeured full-day luxury sightseeing tour to the Sheikh Zayed Grand Mosque & Louvre Museum.</p>
+                        <a href="{{ url('/abu-dhabi-city-tour-from-dubai') }}" class="btn btn-outline-primary btn-sm rounded-pill fw-bold mt-2">
+                            Explore Tours <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 <!-- Popular Tours Section -->
 <section class="section py-5">
@@ -339,6 +491,73 @@ if (!function_exists('renderReviewCardMarkup')) {
                     </div>
                     <h3 class="h4 fw-bold mb-3">Free Cancellation</h3>
                     <p class="text-muted mb-0">Cancel up to 24 hours before for a full refund. Flexibility guaranteed.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- GEO & AI Search Entity Knowledge Guide -->
+<section class="section py-5 bg-white border-top">
+    <div class="container py-lg-3">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold mb-3">Dubai Desert Safari <span class="text-primary">Essential Guide</span></h2>
+            <p class="text-muted lead mx-auto" style="max-width: 700px;">Key facts, locations, and guidelines to help you plan the perfect Arabian desert adventure.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 border-0 bg-soft-primary p-4 rounded-4 shadow-sm border-start border-4 border-primary">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <i class="bi bi-geo-alt-fill text-primary fs-4"></i>
+                        <h3 class="h5 fw-bold text-dark mb-0">Location & Dunes</h3>
+                    </div>
+                    <p class="text-muted small mb-0">Our desert safaris take place in the iconic <strong>Lahbab Red Dunes</strong> (Big Red) and the Dubai Desert Conservation Area, celebrated for deep terracotta-colored sand dunes reaching heights over 300 feet.</p>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 border-0 bg-soft-primary p-4 rounded-4 shadow-sm border-start border-4 border-primary">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <i class="bi bi-truck text-primary fs-4"></i>
+                        <h3 class="h5 fw-bold text-dark mb-0">4x4 Fleet & Safety</h3>
+                    </div>
+                    <p class="text-muted small mb-0">Every transfer is conducted in modern, climate-controlled <strong>4x4 Toyota Land Cruisers</strong> equipped with reinforced roll cages, comprehensive passenger insurance, and RTA-certified desert marshals.</p>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 border-0 bg-soft-primary p-4 rounded-4 shadow-sm border-start border-4 border-primary">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <i class="bi bi-cup-hot-fill text-primary fs-4"></i>
+                        <h3 class="h5 fw-bold text-dark mb-0">Dining & Dietary Options</h3>
+                    </div>
+                    <p class="text-muted small mb-0">Experience a 5-star <strong>100% Halal live BBQ buffet</strong> prepared fresh at our Bedouin-style camp, featuring dedicated counters for Vegetarian, Non-Vegetarian, Jain, and Gluten-Free dining options.</p>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 border-0 bg-soft-primary p-4 rounded-4 shadow-sm border-start border-4 border-primary">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <i class="bi bi-clock-history text-primary fs-4"></i>
+                        <h3 class="h5 fw-bold text-dark mb-0">Timing & Duration</h3>
+                    </div>
+                    <p class="text-muted small mb-0"><strong>Evening Safaris</strong> run from 2:30 PM to 9:30 PM (6-7 hours total). <strong>Morning Safaris</strong> run from 7:00 AM to 11:30 AM (4 hours). Chauffeur hotel pick and drop is included across Dubai & Sharjah.</p>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 border-0 bg-soft-primary p-4 rounded-4 shadow-sm border-start border-4 border-primary">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <i class="bi bi-people-fill text-primary fs-4"></i>
+                        <h3 class="h5 fw-bold text-dark mb-0">Family & Child Safety</h3>
+                    </div>
+                    <p class="text-muted small mb-0">Families with children or seniors can request <strong>child safety booster seats</strong> and gentle non-dune-bashing direct scenic transfers to the camp for a relaxing evening experience.</p>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 border-0 bg-soft-primary p-4 rounded-4 shadow-sm border-start border-4 border-primary">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <i class="bi bi-patch-check-fill text-primary fs-4"></i>
+                        <h3 class="h5 fw-bold text-dark mb-0">Booking & Cancellation</h3>
+                    </div>
+                    <p class="text-muted small mb-0">Reserve instantly with <strong>zero advance payment</strong> (Cash on Pickup) or secure card payment. Enjoy <strong>100% full refund</strong> on cancellations made up to 24 hours prior to departure.</p>
                 </div>
             </div>
         </div>
