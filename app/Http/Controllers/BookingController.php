@@ -16,6 +16,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use App\Models\Coupon;
+use App\Models\CouponUsage;
 use App\Mail\BookingNotification;
 use App\Mail\BookingAdminNotification;
 use App\Services\SettingsService;
@@ -110,7 +112,25 @@ class BookingController extends Controller
             }
         }
 
-        $total = $subtotal + $addonsTotal;
+        $rawSubtotal = $subtotal + $addonsTotal;
+        $originalTotal = $rawSubtotal;
+        $discountAmount = 0.00;
+        $appliedCoupon = null;
+
+        // Process promo code if provided
+        $couponCodeInput = strtoupper(trim($request->input('coupon_code', '')));
+        if (!empty($couponCodeInput)) {
+            $coupon = Coupon::where('code', $couponCodeInput)->first();
+            if ($coupon) {
+                $check = $coupon->validateEligibility($rawSubtotal, $tourId, $tierId, $email, $adults, $date);
+                if ($check['valid']) {
+                    $appliedCoupon = $coupon;
+                    $discountAmount = (float)$check['discount'];
+                }
+            }
+        }
+
+        $total = max(0, round($originalTotal - $discountAmount, 2));
 
         // Force cash if Ziina is not active
         if (!$this->ziina->isActive()) {
@@ -175,6 +195,12 @@ class BookingController extends Controller
                 'phone' => $phone,
                 'pickup_location' => $location,
                 'special_requests' => $requests,
+                'coupon_id' => $appliedCoupon ? $appliedCoupon->id : null,
+                'coupon_code' => $appliedCoupon ? $appliedCoupon->code : null,
+                'discount_type' => $appliedCoupon ? $appliedCoupon->discount_type : null,
+                'discount_rate' => $appliedCoupon ? (float)$appliedCoupon->discount_value : 0.00,
+                'discount_amount' => $discountAmount,
+                'original_total' => $originalTotal,
                 'subtotal' => $subtotal,
                 'addons_total' => $addonsTotal,
                 'total' => $total,
@@ -201,6 +227,27 @@ class BookingController extends Controller
                 'utm_content' => $ctx['utm_content'],
                 'is_verified' => $isVerified,
             ]);
+
+            // Record Coupon Usage & increment counter
+            if ($appliedCoupon && $discountAmount > 0) {
+                try {
+                    CouponUsage::create([
+                        'coupon_id' => $appliedCoupon->id,
+                        'booking_id' => $booking->id,
+                        'booking_reference' => $booking->reference,
+                        'customer_name' => $name,
+                        'customer_email' => strtolower($email),
+                        'customer_phone' => $phone,
+                        'discount_amount' => $discountAmount,
+                        'order_subtotal' => $originalTotal,
+                        'order_final_total' => $total,
+                        'used_at' => now(),
+                    ]);
+                    $appliedCoupon->increment('used_count');
+                } catch (\Throwable $e) {
+                    Log::error("Failed to record coupon usage: " . $e->getMessage());
+                }
+            }
 
             // Save Booking Addons
             foreach ($selectedAddons as $sa) {
@@ -229,7 +276,9 @@ class BookingController extends Controller
                     'currency' => 'AED',
                     'content_ids' => ['TOUR-' . $booking->tour_id],
                     'content_type' => 'product',
-                    'contents' => [['id' => 'TOUR-' . $booking->tour_id, 'quantity' => 1]]
+                    'contents' => [['id' => 'TOUR-' . $booking->tour_id, 'quantity' => 1]],
+                    'coupon' => $booking->coupon_code,
+                    'discount_amount' => (float)$booking->discount_amount,
                 ];
                 $this->metaCapi->dispatchEvent('Purchase', [
                     'event_id' => 'BOOK-' . $booking->reference,

@@ -85,6 +85,15 @@
             </div>
             <div class="mb-3">
                 <label class="text-muted small fw-bold">Financial Summary</label>
+                @if($booking->coupon_code && $booking->discount_amount > 0)
+                    <div class="small text-muted text-decoration-line-through">Original Subtotal: AED {{ number_format($booking->original_total) }}</div>
+                    <div class="d-flex align-items-center gap-2 my-1">
+                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill font-monospace fw-bold">
+                            <i class="bi bi-ticket-perforated-fill me-1"></i>{{ $booking->coupon_code }}
+                        </span>
+                        <span class="text-success small fw-bold">-AED {{ number_format($booking->discount_amount) }} Saved</span>
+                    </div>
+                @endif
                 <div class="fw-800 fs-3 text-primary">AED {{ number_format($booking->total) }}</div>
             </div>
             <div class="mb-3">

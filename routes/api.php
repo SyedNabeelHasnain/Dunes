@@ -22,6 +22,10 @@ Route::prefix('v1')->group(function () {
     Route::post('/email/otp/send', [EmailVerificationController::class, 'sendOtp']);
     Route::post('/email/otp/verify', [EmailVerificationController::class, 'verifyOtp']);
     
+    // Coupon Validation & Marketing
+    Route::post('/coupon/validate', [\App\Http\Controllers\Api\CouponController::class, 'validateCoupon'])->middleware('throttle:30,1');
+    Route::get('/coupon/featured', [\App\Http\Controllers\Api\CouponController::class, 'featured']);
+
     // Booking Checkout
     Route::post('/booking/checkout', [BookingController::class, 'checkout']);
     

@@ -14,7 +14,8 @@ class Booking extends Model
     protected $fillable = [
         'reference', 'tour_id', 'tier_id', 'tour_name', 'tier_name', 'tour_date',
         'adults', 'children', 'name', 'email', 'phone', 'pickup_location',
-        'special_requests', 'subtotal', 'addons_total', 'total', 'currency',
+        'special_requests', 'coupon_id', 'coupon_code', 'discount_type', 'discount_rate',
+        'discount_amount', 'original_total', 'subtotal', 'addons_total', 'total', 'currency',
         'status', 'payment_method', 'payment_status', 'payment_amount',
         'balance_due', 'ziina_payment_intent_id', 'ziina_status',
         'ziina_redirect_url', 'request_log_id', 'ip_address', 'ip_location',
@@ -27,6 +28,9 @@ class Booking extends Model
         'tour_date' => 'date',
         'adults' => 'integer',
         'children' => 'integer',
+        'discount_rate' => 'float',
+        'discount_amount' => 'float',
+        'original_total' => 'float',
         'subtotal' => 'float',
         'addons_total' => 'float',
         'total' => 'float',
@@ -45,6 +49,11 @@ class Booking extends Model
         return $this->belongsTo(Tier::class);
     }
 
+    public function coupon()
+    {
+        return $this->belongsTo(Coupon::class);
+    }
+
     public function addons()
     {
         return $this->hasMany(BookingAddon::class);
@@ -53,5 +62,10 @@ class Booking extends Model
     public function payments()
     {
         return $this->hasMany(BookingPayment::class);
+    }
+
+    public function couponUsage()
+    {
+        return $this->hasOne(CouponUsage::class);
     }
 }

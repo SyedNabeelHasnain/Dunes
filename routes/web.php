@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\AdminWhatsappController;
 use App\Http\Controllers\Admin\AdminLegalController;
+use App\Http\Controllers\Admin\AdminCouponController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AjaxGatewayController;
 
@@ -97,6 +98,13 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::resource('blogs', AdminBlogController::class)->except(['show']);
     Route::post('/blogs/{id}/toggle-status', [AdminBlogController::class, 'toggleStatus'])->name('blogs.toggle-status');
     Route::resource('blog-categories', AdminBlogCategoryController::class)->except(['create', 'show', 'edit']);
+
+    // Coupons & Promo Codes
+    Route::get('/coupons/export/csv', [AdminCouponController::class, 'exportCsv'])->name('coupons.export');
+    Route::post('/coupons/{id}/toggle-status', [AdminCouponController::class, 'toggleStatus'])->name('coupons.toggle-status');
+    Route::post('/coupons/{id}/duplicate', [AdminCouponController::class, 'duplicate'])->name('coupons.duplicate');
+    Route::get('/coupons/{id}/usages', [AdminCouponController::class, 'usages'])->name('coupons.usages');
+    Route::resource('coupons', AdminCouponController::class);
 
     // Legal Pages Manager
     Route::get('/legal-pages', [AdminLegalController::class, 'index'])->name('legal.index');

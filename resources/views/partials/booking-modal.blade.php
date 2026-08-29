@@ -221,6 +221,38 @@
                                 ]) !!}
                             </div>
 
+                            <!-- Promo / Coupon Code Section -->
+                            <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white p-3" id="promoCodeCard">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <label class="fw-800 small text-muted text-uppercase mb-0" for="bookingPromoCode">
+                                        <i class="bi bi-tag-fill text-primary me-1"></i> Have a Promo Code?
+                                    </label>
+                                    <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1 small fw-bold d-none" id="promoAppliedBadge">
+                                        <i class="bi bi-check-circle-fill me-1"></i>Applied
+                                    </span>
+                                </div>
+                                <div class="input-group rounded-4 overflow-hidden border" id="promoInputGroup">
+                                    <input type="text" class="form-control border-0 shadow-none fw-bold text-uppercase px-3 font-monospace" id="bookingPromoCode" name="coupon_code" placeholder="ENTER CODE (e.g. SUMMER2026)" style="height: 48px; letter-spacing: 1px;" autocomplete="off">
+                                    <button class="btn btn-dark px-4 fw-800" type="button" id="applyPromoBtn">Apply</button>
+                                </div>
+                                
+                                <div class="d-none mt-2 align-items-center justify-content-between p-3 rounded-4 bg-success-subtle text-success border border-success-subtle" id="promoSuccessBox">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width: 28px; height: 28px;">
+                                            <i class="bi bi-check-lg fw-bold"></i>
+                                        </div>
+                                        <div>
+                                            <strong class="d-block font-monospace fs-6" id="promoCodeLabel">CODE</strong>
+                                            <small class="fw-bold" id="promoSavingsText">Savings applied</small>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-link text-danger text-decoration-none fw-bold p-0" id="removePromoBtn">
+                                        <i class="bi bi-x-circle-fill me-1"></i>Remove
+                                    </button>
+                                </div>
+                                <div class="alert alert-danger p-2 small mt-2 d-none mb-0 rounded-3" id="promoErrorBox"></div>
+                            </div>
+
                             <div class="mb-4" id="paymentOptions" data-ziina-active="{{ $ziinaActive ? '1' : '0' }}" data-advance-percent="{{ $advancePercent }}">
                                 <div class="fw-800 small text-muted text-uppercase mb-2">Payment Options</div>
                                 <div class="payment-options">
@@ -269,3 +301,153 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    window.appliedPromoCoupon = null;
+
+    const promoInput = document.getElementById('bookingPromoCode');
+    const applyBtn = document.getElementById('applyPromoBtn');
+    const removeBtn = document.getElementById('removePromoBtn');
+    const successBox = document.getElementById('promoSuccessBox');
+    const inputGroup = document.getElementById('promoInputGroup');
+    const errorBox = document.getElementById('promoErrorBox');
+    const codeLabel = document.getElementById('promoCodeLabel');
+    const savingsLabel = document.getElementById('promoSavingsText');
+    const appliedBadge = document.getElementById('promoAppliedBadge');
+
+    // Auto-apply promo from URL (?promo=CODE or ?coupon=CODE)
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlPromo = urlParams.get('promo') || urlParams.get('coupon');
+    if (urlPromo && promoInput) {
+        promoInput.value = urlPromo.toUpperCase().trim();
+    }
+
+    window.validateCurrentPromo = function() {
+        if (!promoInput) return;
+        const code = promoInput.value.trim().toUpperCase();
+        if (!code) {
+            if (errorBox) {
+                errorBox.innerText = 'Please enter a promo code.';
+                errorBox.classList.remove('d-none');
+            }
+            return;
+        }
+
+        // Fetch current subtotal
+        let subtotal = 0;
+        if (window.DunesApp && typeof window.DunesApp.calculateBaseTotal === 'function') {
+            subtotal = window.DunesApp.calculateBaseTotal();
+        } else {
+            const rawTxt = document.getElementById('summaryTotal')?.innerText?.replace(/[^0-9.]/g, '') || '0';
+            subtotal = parseFloat(rawTxt) || 0;
+        }
+
+        const tourId = document.getElementById('bookingTour')?.value || null;
+        const tierId = document.getElementById('selectedTier')?.value || null;
+        const email = document.getElementById('bookingEmail')?.value || null;
+        const adults = parseInt(document.getElementById('bookingAdults')?.value || '1', 10);
+        const tourDate = document.getElementById('bookingDate')?.value || null;
+
+        if (applyBtn) {
+            applyBtn.disabled = true;
+            applyBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span>';
+        }
+        if (errorBox) errorBox.classList.add('d-none');
+
+        fetch('/api/v1/coupon/validate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+            },
+            body: JSON.stringify({
+                code: code,
+                subtotal: subtotal,
+                tour_id: tourId,
+                tier_id: tierId,
+                email: email,
+                adults: adults,
+                date: tourDate
+            })
+        })
+        .then(res => res.json().then(data => ({ status: res.status, body: data })))
+        .then(({ status, body }) => {
+            if (applyBtn) {
+                applyBtn.disabled = false;
+                applyBtn.innerText = 'Apply';
+            }
+
+            if (status === 200 && body.success && body.coupon) {
+                window.appliedPromoCoupon = body.coupon;
+                codeLabel.innerText = body.coupon.code;
+                savingsLabel.innerText = body.coupon.savings_text;
+                
+                inputGroup.classList.add('d-none');
+                successBox.classList.remove('d-none');
+                successBox.classList.add('d-flex');
+                if (appliedBadge) appliedBadge.classList.remove('d-none');
+
+                if (window.DunesApp && typeof window.DunesApp.updateTotal === 'function') {
+                    window.DunesApp.updateTotal();
+                } else {
+                    const originalTotal = parseFloat(body.coupon.original_total);
+                    const newTotal = parseFloat(body.coupon.new_total);
+                    const totalEl = document.getElementById('bookingTotal');
+                    const summaryTotalEl = document.getElementById('summaryTotal');
+
+                    if (totalEl) totalEl.innerText = `AED ${newTotal.toFixed(2)}`;
+                    if (summaryTotalEl) {
+                        summaryTotalEl.innerHTML = `<span class="text-decoration-line-through text-muted small me-2">AED ${originalTotal.toFixed(2)}</span> <span class="text-success">AED ${newTotal.toFixed(2)}</span>`;
+                    }
+                }
+            } else {
+                window.appliedPromoCoupon = null;
+                if (errorBox) {
+                    errorBox.innerText = body.message || 'Invalid promo code.';
+                    errorBox.classList.remove('d-none');
+                }
+            }
+        })
+        .catch(err => {
+            if (applyBtn) {
+                applyBtn.disabled = false;
+                applyBtn.innerText = 'Apply';
+            }
+            if (errorBox) {
+                errorBox.innerText = 'Unable to validate promo code. Please try again.';
+                errorBox.classList.remove('d-none');
+            }
+        });
+    };
+
+    window.removeCurrentPromo = function() {
+        window.appliedPromoCoupon = null;
+        if (promoInput) promoInput.value = '';
+        if (inputGroup) inputGroup.classList.remove('d-none');
+        if (successBox) {
+            successBox.classList.add('d-none');
+            successBox.classList.remove('d-flex');
+        }
+        if (appliedBadge) appliedBadge.classList.add('d-none');
+        if (errorBox) errorBox.classList.add('d-none');
+
+        if (window.DunesApp && typeof window.DunesApp.updateTotal === 'function') {
+            window.DunesApp.updateTotal();
+        }
+    };
+
+    if (applyBtn) applyBtn.addEventListener('click', window.validateCurrentPromo);
+    if (removeBtn) removeBtn.addEventListener('click', window.removeCurrentPromo);
+    if (promoInput) {
+        promoInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                window.validateCurrentPromo();
+            }
+        });
+    }
+});
+</script>
+

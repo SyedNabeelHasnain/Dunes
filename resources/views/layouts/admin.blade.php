@@ -264,6 +264,9 @@
             </a>
 
             <div class="sidebar-heading">Marketing & Content</div>
+            <a href="{{ route('admin.coupons.index') }}" class="sidebar-link {{ request()->routeIs('admin.coupons*') ? 'active' : '' }}">
+                <i class="bi bi-ticket-perforated-fill"></i> <span>Coupons & Promos</span>
+            </a>
             <a href="{{ route('admin.blogs.index') }}" class="sidebar-link {{ request()->routeIs('admin.blogs*') ? 'active' : '' }}">
                 <i class="bi bi-journal-richtext"></i> <span>Blog Articles</span>
             </a>
@@ -430,6 +433,12 @@
                                 <a href="{{ route('admin.blogs.create') }}" class="d-flex align-items-center p-2 rounded-3 border bg-light text-dark cmd-item">
                                     <i class="bi bi-journal-plus text-success fs-5 me-2"></i>
                                     <div><strong class="d-block small">Write Blog Post</strong><span class="text-muted" style="font-size: 0.75rem;">Publish travel guides and tips</span></div>
+                                </a>
+                            </div>
+                            <div class="col-md-6 cmd-entry" data-keywords="coupon promo discount voucher code create">
+                                <a href="{{ route('admin.coupons.create') }}" class="d-flex align-items-center p-2 rounded-3 border bg-light text-dark cmd-item">
+                                    <i class="bi bi-ticket-perforated-fill text-danger fs-5 me-2"></i>
+                                    <div><strong class="d-block small">Create Promo Code</strong><span class="text-muted" style="font-size: 0.75rem;">Add discounts and promotional campaigns</span></div>
                                 </a>
                             </div>
                             <div class="col-md-6 cmd-entry" data-keywords="export bookings csv download excel">
