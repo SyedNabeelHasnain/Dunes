@@ -158,6 +158,7 @@
         </div>
     </div>
 </div>
+@endif
 
 <!-- Floating Persistent Voucher Reminder Pill (Appears when claimed) -->
 <div id="welcomeFloatingPill" class="d-none position-fixed bottom-0 start-0 m-3 z-3 shadow-lg rounded-pill p-2 ps-3 pe-3 bg-dark text-white border border-secondary d-flex align-items-center gap-2" style="cursor: pointer; transition: all 0.3s ease; animation: slideInPill 0.4s ease forwards;">
@@ -189,8 +190,6 @@
 
     function initWelcomeOffer() {
         const modalEl = document.getElementById('welcomeOfferModal');
-        if (!modalEl) return;
-
         const form = document.getElementById('welcomeOfferForm');
         const formState = document.getElementById('welcomeOfferFormState');
         const successState = document.getElementById('welcomeOfferSuccessState');
@@ -289,7 +288,7 @@
         }
 
         function triggerModal() {
-            if (!shouldShowWelcomePopup()) return;
+            if (!modalEl || !shouldShowWelcomePopup()) return;
             if (sessionStorage.getItem('dunes_welcome_shown_session')) return;
 
             sessionStorage.setItem('dunes_welcome_shown_session', 'true');
@@ -297,41 +296,43 @@
             showOfferModal();
         }
 
-        // Trigger 1: Delay Timer
-        setTimeout(() => {
-            triggerModal();
-        }, popupDelaySec * 1000);
-
-        // Trigger 2: Scroll Depth
-        if (enableScroll) {
-            let scrollTriggered = false;
-            window.addEventListener('scroll', () => {
-                if (scrollTriggered) return;
-                const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
-                if (scrollPercent >= 35) {
-                    scrollTriggered = true;
-                    triggerModal();
-                }
-            }, { passive: true });
-        }
-
-        // Trigger 3: Desktop Exit Intent
-        if (enableExit) {
-            let exitTriggered = false;
-            document.addEventListener('mouseleave', (e) => {
-                if (exitTriggered || e.clientY > 20) return;
-                exitTriggered = true;
+        if (modalEl) {
+            // Trigger 1: Delay Timer
+            setTimeout(() => {
                 triggerModal();
+            }, popupDelaySec * 1000);
+
+            // Trigger 2: Scroll Depth
+            if (enableScroll) {
+                let scrollTriggered = false;
+                window.addEventListener('scroll', () => {
+                    if (scrollTriggered) return;
+                    const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+                    if (scrollPercent >= 35) {
+                        scrollTriggered = true;
+                        triggerModal();
+                    }
+                }, { passive: true });
+            }
+
+            // Trigger 3: Desktop Exit Intent
+            if (enableExit) {
+                let exitTriggered = false;
+                document.addEventListener('mouseleave', (e) => {
+                    if (exitTriggered || e.clientY > 20) return;
+                    exitTriggered = true;
+                    triggerModal();
+                });
+            }
+
+            // Dismissal Handler
+            modalEl.addEventListener('hidden.bs.modal', function() {
+                const claimed = localStorage.getItem('dunes_welcome_claimed');
+                if (!claimed) {
+                    localStorage.setItem('dunes_welcome_dismissed_until', Date.now() + (24 * 60 * 60 * 1000));
+                }
             });
         }
-
-        // Dismissal Handler
-        modalEl.addEventListener('hidden.bs.modal', function() {
-            const claimed = localStorage.getItem('dunes_welcome_claimed');
-            if (!claimed) {
-                localStorage.setItem('dunes_welcome_dismissed_until', Date.now() + (24 * 60 * 60 * 1000));
-            }
-        });
 
         // Form Submission
         if (form) {
@@ -492,4 +493,3 @@
     });
 })();
 </script>
-@endif
