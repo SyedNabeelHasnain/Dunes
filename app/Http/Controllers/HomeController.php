@@ -49,6 +49,35 @@ class HomeController extends Controller
             $faqs = collect();
         }
 
+        try {
+            $allActiveTours = Tour::where('status', 'active')
+                ->with(['category', 'tiers' => function ($query) {
+                    $query->orderBy('price', 'asc');
+                }])
+                ->orderBy('priority', 'asc')
+                ->get()
+                ->map(function ($t) {
+                    $minPrice = $t->tiers->min('price') ?: 79;
+                    return [
+                        'id' => (string)$t->id,
+                        'name' => $t->name,
+                        'slug' => $t->slug,
+                        'category_slug' => $t->category ? $t->category->slug : 'desert-safari',
+                        'category_name' => $t->category ? $t->category->name : 'Desert Safari',
+                        'duration' => $t->duration ?: '4-6 Hours',
+                        'rating' => (float)($t->rating ?: 4.9),
+                        'review_count' => (int)($t->review_count ?: 500),
+                        'min_price' => (float)$minPrice,
+                        'short_desc' => $t->short_desc ?: 'Top-rated Dubai tour experience.',
+                        'is_bestseller' => (bool)$t->is_bestseller,
+                        'is_featured' => (bool)$t->is_featured,
+                        'priority' => (int)$t->priority,
+                    ];
+                });
+        } catch (\Throwable $e) {
+            $allActiveTours = collect();
+        }
+
         $currentYear = date('Y');
         $pageTitle = "Dubai Desert Safari Tours {$currentYear} | Best Price from AED 79 | Dunes Discovery Tourism";
         $pageDesc = "Book top-rated Dubai Desert Safari, 1000cc Dune Buggy, Quad Biking, & Dhow Cruise dinners from AED 79. 4x4 Land Cruiser pickup, live BBQ, & 24h free cancellation.";
@@ -56,6 +85,6 @@ class HomeController extends Controller
         $canonical = route('home');
         $ogImage = asset('images/desert-safari-poster.avif');
 
-        return view('index', compact('categories', 'bestsellers', 'reviews', 'faqs', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
+        return view('index', compact('categories', 'bestsellers', 'reviews', 'faqs', 'allActiveTours', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
     }
 }

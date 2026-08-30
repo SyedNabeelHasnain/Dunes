@@ -1874,11 +1874,64 @@ const App={
         },{passive:false});
     },
 
+    openBooking(tourId, tierId = null){
+        this.preselectedTourId = String(tourId);
+        this.preselectedTierId = tierId ? String(tierId) : null;
+
+        const modal = document.getElementById('bookingModal');
+        if (!modal) return;
+
+        const tourSel = document.getElementById('bookingTour');
+        if (tourSel) {
+            tourSel.value = String(tourId);
+            this.loadTiers(String(tourId));
+            const wrapper = document.getElementById('tourSelectWrapper');
+            if (wrapper) wrapper.classList.add('d-none');
+            const titleEl = document.getElementById('bookingModalTitle');
+            if (titleEl && tourSel.selectedIndex >= 0) {
+                titleEl.textContent = tourSel.options[tourSel.selectedIndex].text;
+            }
+        }
+
+        const getModal = () => (typeof bootstrap !== 'undefined' && bootstrap.Modal) ? (bootstrap.Modal.getInstance(modal) || new bootstrap.Modal(modal)) : null;
+        const m = getModal();
+        if (m) m.show();
+    },
+
     initSafariMatcher(){
         const section = document.getElementById('safariMatcherSection');
         if(!section) return;
 
-        let answers = { group: null, time: null, style: null };
+        let activeTours = [];
+        try {
+            const raw = document.getElementById('activeToursDataset')?.textContent;
+            if (raw) activeTours = JSON.parse(raw);
+        } catch(e) {}
+
+        // If dataset is empty, fall back to tours options from the select dropdown
+        if (!activeTours.length) {
+            const tourSelect = document.getElementById('bookingTour');
+            if (tourSelect) {
+                for (let i = 0; i < tourSelect.options.length; i++) {
+                    const opt = tourSelect.options[i];
+                    if (opt.value) {
+                        activeTours.push({
+                            id: String(opt.value),
+                            name: opt.text,
+                            slug: opt.text.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+                            category_slug: opt.text.toLowerCase().includes('city') ? 'city-tour' : (opt.text.toLowerCase().includes('cruise') ? 'water-activity' : 'desert-safari'),
+                            category_name: opt.text.toLowerCase().includes('city') ? 'City Tour' : (opt.text.toLowerCase().includes('cruise') ? 'Water Cruise' : 'Desert Safari'),
+                            duration: '4-6 Hours',
+                            rating: 4.9,
+                            min_price: 79,
+                            short_desc: opt.text + ' - Top rated Dubai experience with 5-star service.'
+                        });
+                    }
+                }
+            }
+        }
+
+        let answers = { experience: null, time: null, style: null };
 
         const step1 = document.getElementById('quizStep1');
         const step2 = document.getElementById('quizStep2');
@@ -1890,105 +1943,81 @@ const App={
         const progressText = document.getElementById('quizProgressText');
 
         const matchedTitle = document.getElementById('quizMatchedTitle');
-        const matchedTagline = document.getElementById('quizMatchedTagline');
+        const matchedCategory = document.getElementById('quizMatchedCategory');
+        const matchedMeta = document.getElementById('quizMatchedMeta');
+        const matchedDesc = document.getElementById('quizMatchedDesc');
         const matchedPrice = document.getElementById('quizMatchedPrice');
-        const matchedFeatures = document.getElementById('quizMatchedFeatures');
         const bookBtn = document.getElementById('quizBookBtn');
         const resetBtn = document.getElementById('quizResetBtn');
 
-        let matchedTour = {
-            id: '1',
-            slug: 'evening-desert-safari',
-            name: 'Evening Red Dune Desert Safari',
-            price: 79,
-            tagline: "Dubai's #1 Rated Desert Adventure with Live 5-Star Camp Shows & BBQ",
-            features: [
-                'Includes 45-min Red Dune Bashing in Lahbab Desert',
-                'Live Fire Show, Belly Dance & Tanoura Spectacle',
-                'Lavish 5-Star BBQ Dinner (Veg & Non-Veg)',
-                'Free Sandboarding, Camel Ride & Arabic Costume Photos'
-            ]
-        };
+        let matchedTour = activeTours[0] || null;
 
-        const updateRecommendation = () => {
-            if (answers.time === 'morning') {
-                matchedTour = {
-                    id: '2',
-                    slug: 'morning-desert-safari',
-                    name: 'Morning Desert Safari with Camel Ride & Sandboarding',
-                    price: 99,
-                    tagline: 'Beat the Afternoon Heat with Golden Sunrise Dunes & Quad Biking Options',
-                    features: [
-                        'Thrilling 35-min Morning Red Dune Bashing',
-                        'Picturesque Sunrise Photo Stops & Sandboarding',
-                        'Extended Camel Ride & Arabic Coffee Welcome',
-                        'Optional 400cc Quad Bike Self-Drive'
-                    ]
-                };
-            } else if (answers.time === 'overnight') {
-                matchedTour = {
-                    id: '3',
-                    slug: 'overnight-desert-safari',
-                    name: 'VIP Overnight Desert Safari with Stargazing & Breakfast',
-                    price: 299,
-                    tagline: 'Sleep Under the Arabian Starlit Sky in a Traditional Bedouin Camp',
-                    features: [
-                        'Complete Evening Safari + 5-Star BBQ Buffet & Shows',
-                        'Private Overnight Bedouin Tent with Cozy Bedding',
-                        'Late Night Desert Campfire & Stargazing',
-                        'Fresh Arabian Sunrise Breakfast with Hot Beverages'
-                    ]
-                };
-            } else if (answers.style === 'luxury' || answers.group === 'couples') {
-                matchedTour = {
-                    id: '4',
-                    slug: 'vip-desert-safari',
-                    name: 'VIP Premium Desert Safari with Private Luxury Dining',
-                    price: 250,
-                    tagline: 'Exclusive VIP AC Lounge, Table-Side Waiter Service & Private 4x4 Transfer',
-                    features: [
-                        'Private 4x4 Luxury Land Cruiser Pick & Drop',
-                        'VIP Raised Dining Area with Table-Side Food Service',
-                        'Gourmet Live BBQ Buffet & Premium Falcon Photography',
-                        'Front-Row Seats for Fire & Cultural Shows'
-                    ]
-                };
-            } else if (answers.style === 'thrill') {
-                matchedTour = {
-                    id: '5',
-                    slug: 'red-dune-safari-with-quad-bike',
-                    name: 'Extreme Red Dune Safari + 400cc Quad Biking Combo',
-                    price: 180,
-                    tagline: 'High-Power Self-Drive Quad Biking + Extreme Lahbab Red Dune Bashing',
-                    features: [
-                        '60-Min Self-Drive Quad Bike in Open Desert Dunes',
-                        'Extreme Dune Bashing on 300ft High Red Dunes',
-                        'Sandboarding Down Towering Dunes',
-                        'Full 5-Star Camp Dinner & Live Entertainment'
-                    ]
-                };
-            } else {
-                matchedTour = {
-                    id: '1',
-                    slug: 'evening-desert-safari',
-                    name: 'Evening Red Dune Desert Safari',
-                    price: 79,
-                    tagline: "Dubai's #1 Rated Desert Adventure with Live 5-Star Camp Shows & BBQ",
-                    features: [
-                        'Includes 45-min Red Dune Bashing in Lahbab Desert',
-                        'Live Fire Show, Belly Dance & Tanoura Spectacle',
-                        'Lavish 5-Star BBQ Dinner (Veg & Non-Veg)',
-                        'Free Sandboarding, Camel Ride & Arabic Costume Photos'
-                    ]
-                };
-            }
+        const calculateBestMatch = () => {
+            if (!activeTours.length) return;
+
+            // 1. Primary Category Pool Filtering
+            let pool = activeTours.filter(t => {
+                const catLow = (t.category_slug || '').toLowerCase();
+                const nameLow = (t.name || '').toLowerCase();
+                const slugLow = (t.slug || '').toLowerCase();
+
+                if (answers.experience === 'desert') {
+                    return catLow.includes('desert') || slugLow.includes('desert') || slugLow.includes('safari');
+                } else if (answers.experience === 'city') {
+                    return catLow.includes('city') || slugLow.includes('city') || slugLow.includes('abu-dhabi') || slugLow.includes('sightseeing');
+                } else if (answers.experience === 'water') {
+                    return catLow.includes('water') || slugLow.includes('cruise') || slugLow.includes('dhow') || slugLow.includes('catamaran') || slugLow.includes('yacht');
+                } else if (answers.experience === 'quad_buggy') {
+                    return slugLow.includes('buggy') || slugLow.includes('quad') || nameLow.includes('quad') || nameLow.includes('buggy') || slugLow.includes('atv');
+                }
+                return true;
+            });
+
+            if (!pool.length) pool = activeTours;
+
+            // 2. Score Candidates within the selected experience pool
+            let candidates = pool.map(t => {
+                let score = 0;
+                const nameLow = (t.name || '').toLowerCase();
+                const slugLow = (t.slug || '').toLowerCase();
+                const descLow = (t.short_desc || '').toLowerCase();
+                const haystack = `${nameLow} ${slugLow} ${descLow}`;
+
+                // Time match
+                if (answers.time === 'morning') {
+                    if (haystack.includes('morning') || haystack.includes('sunrise') || haystack.includes('half day') || slugLow.includes('morning')) score += 50;
+                } else if (answers.time === 'evening') {
+                    if (haystack.includes('evening') || haystack.includes('sunset') || haystack.includes('dinner') || haystack.includes('bbq') || slugLow.includes('evening')) score += 50;
+                } else if (answers.time === 'overnight') {
+                    if (haystack.includes('overnight') || haystack.includes('camping') || slugLow.includes('overnight')) score += 60;
+                }
+
+                // Style match
+                if (answers.style === 'thrill') {
+                    if (haystack.includes('quad') || haystack.includes('buggy') || haystack.includes('bashing') || haystack.includes('extreme')) score += 40;
+                } else if (answers.style === 'luxury') {
+                    if (haystack.includes('vip') || haystack.includes('luxury') || haystack.includes('private') || haystack.includes('abu dhabi') || haystack.includes('catamaran')) score += 40;
+                } else if (answers.style === 'family') {
+                    if (haystack.includes('city') || haystack.includes('evening') || haystack.includes('cruise') || haystack.includes('family') || t.is_bestseller) score += 30;
+                }
+
+                if (t.is_bestseller) score += 15;
+                if (t.is_featured) score += 10;
+                score -= (t.priority || 10);
+
+                return { tour: t, score: score };
+            });
+
+            candidates.sort((a, b) => b.score - a.score);
+            matchedTour = candidates[0]?.tour || pool[0];
 
             if (matchedTitle) matchedTitle.textContent = matchedTour.name;
-            if (matchedTagline) matchedTagline.textContent = matchedTour.tagline;
-            if (matchedPrice) matchedPrice.textContent = 'AED ' + matchedTour.price;
-            if (matchedFeatures) {
-                matchedFeatures.innerHTML = matchedTour.features.map(f => `<li><i class="bi bi-check-circle-fill text-success me-2"></i>${f}</li>`).join('');
+            if (matchedCategory) matchedCategory.textContent = matchedTour.category_name || 'Experience';
+            if (matchedMeta) {
+                matchedMeta.innerHTML = `<i class="bi bi-clock me-1"></i>${matchedTour.duration || '4-6 Hours'} • ⭐ ${matchedTour.rating || 4.9} (${matchedTour.review_count || '500+'} Reviews)`;
             }
+            if (matchedDesc) matchedDesc.textContent = matchedTour.short_desc || 'Top-rated Dubai experience with authentic 5-star hospitality.';
+            if (matchedPrice) matchedPrice.textContent = 'AED ' + Math.round(matchedTour.min_price || 79);
         };
 
         section.querySelectorAll('.quiz-choice-card').forEach(card => {
@@ -1997,26 +2026,26 @@ const App={
                 const val = card.dataset.val;
 
                 if (step === '1') {
-                    answers.group = val;
+                    answers.experience = val;
                     step1.classList.add('d-none');
                     step2.classList.remove('d-none');
                     stepNum.textContent = '2';
-                    stepTitle.textContent = 'Time of Day';
+                    stepTitle.textContent = 'Preferred Timing';
                     progressText.textContent = 'Step 2 of 3';
                 } else if (step === '2') {
                     answers.time = val;
                     step2.classList.add('d-none');
                     step3.classList.remove('d-none');
                     stepNum.textContent = '3';
-                    stepTitle.textContent = 'Adventure Style';
+                    stepTitle.textContent = 'Group Style';
                     progressText.textContent = 'Step 3 of 3';
                 } else if (step === '3') {
                     answers.style = val;
-                    updateRecommendation();
+                    calculateBestMatch();
                     step3.classList.add('d-none');
                     result.classList.remove('d-none');
                     stepNum.textContent = '✓';
-                    stepTitle.textContent = 'Your Safari Match';
+                    stepTitle.textContent = 'Your Matched Tour';
                     progressText.textContent = 'Matched!';
                 }
             });
@@ -2024,38 +2053,21 @@ const App={
 
         if (bookBtn) {
             bookBtn.addEventListener('click', () => {
-                const modalEl = document.getElementById('bookingModal');
-                if (modalEl) {
-                    const tourSelect = document.getElementById('bookingTour');
-                    if (tourSelect) {
-                        let found = false;
-                        for (let opt of tourSelect.options) {
-                            if (opt.value == matchedTour.id || opt.text.toLowerCase().includes(matchedTour.slug.replace(/-/g, ' '))) {
-                                tourSelect.value = opt.value;
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (!found && tourSelect.options.length > 1) {
-                            tourSelect.selectedIndex = 1;
-                        }
-                        tourSelect.dispatchEvent(new Event('change', { bubbles: true }));
-                    }
-                    const bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-                    bsModal.show();
+                if (matchedTour && matchedTour.id) {
+                    this.openBooking(matchedTour.id);
                 }
             });
         }
 
         if (resetBtn) {
             resetBtn.addEventListener('click', () => {
-                answers = { group: null, time: null, style: null };
+                answers = { experience: null, time: null, style: null };
                 result.classList.add('d-none');
                 step2.classList.add('d-none');
                 step3.classList.add('d-none');
                 step1.classList.remove('d-none');
                 stepNum.textContent = '1';
-                stepTitle.textContent = 'Who is traveling?';
+                stepTitle.textContent = 'Choose Experience Type';
                 progressText.textContent = 'Step 1 of 3';
             });
         }
