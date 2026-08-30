@@ -141,7 +141,7 @@
                                 </div>
                                 <div class="col-md-5 text-md-end text-center border-start-md">
                                     <div class="small text-muted text-uppercase fw-bold">Starting From</div>
-                                    <div class="h2 fw-800 text-primary mb-2" id="quizMatchedPrice">AED 79</div>
+                                    <div class="h2 fw-800 text-primary mb-2" id="quizMatchedPrice">--</div>
                                     <button type="button" class="btn btn-primary rounded-pill px-4 py-2 fw-800 text-white shadow-sm w-100" id="quizBookBtn">
                                         <i class="bi bi-lightning-charge-fill me-1"></i> Book This Tour
                                     </button>

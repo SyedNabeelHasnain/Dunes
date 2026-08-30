@@ -51,13 +51,18 @@ class HomeController extends Controller
 
         try {
             $allActiveTours = Tour::where('status', 'active')
-                ->with(['category', 'tiers' => function ($query) {
-                    $query->orderBy('price', 'asc');
-                }])
+                ->with(['category', 'tiers'])
                 ->orderBy('priority', 'asc')
                 ->get()
                 ->map(function ($t) {
-                    $minPrice = $t->tiers->min('price') ?: 79;
+                    $minPrice = $t->tiers->pluck('pivot.price')->filter(function ($p) {
+                        return $p !== null && (float)$p > 0;
+                    })->min();
+
+                    if (!$minPrice) {
+                        $minPrice = 79;
+                    }
+
                     return [
                         'id' => (string)$t->id,
                         'name' => $t->name,
