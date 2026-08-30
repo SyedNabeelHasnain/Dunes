@@ -96,6 +96,14 @@
 
                                 <form id="welcomeOfferForm">
                                     <div class="mb-3">
+                                        <label class="form-label small fw-bold text-muted text-uppercase mb-1" for="welcomeName">Full Name <span class="text-danger">*</span></label>
+                                        <div class="input-group shadow-sm rounded-4 overflow-hidden">
+                                            <span class="input-group-text bg-white border-0 ps-3 text-muted"><i class="bi bi-person-fill text-primary"></i></span>
+                                            <input type="text" class="form-control border-0 shadow-none py-3 fw-bold ps-2" id="welcomeName" name="name" placeholder="e.g. Sarah Connor" required autocomplete="name">
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
                                         <label class="form-label small fw-bold text-muted text-uppercase mb-1" for="welcomeEmail">Email Address <span class="text-danger">*</span></label>
                                         <div class="input-group shadow-sm rounded-4 overflow-hidden">
                                             <span class="input-group-text bg-white border-0 ps-3 text-muted"><i class="bi bi-envelope-fill text-primary"></i></span>
@@ -104,11 +112,12 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <label class="form-label small fw-bold text-muted text-uppercase mb-1" for="welcomeName">Your Name (Optional)</label>
+                                        <label class="form-label small fw-bold text-muted text-uppercase mb-1" for="welcomePhone">Phone / WhatsApp Number <span class="text-danger">*</span></label>
                                         <div class="input-group shadow-sm rounded-4 overflow-hidden">
-                                            <span class="input-group-text bg-white border-0 ps-3 text-muted"><i class="bi bi-person-fill"></i></span>
-                                            <input type="text" class="form-control border-0 shadow-none py-3 fw-bold ps-2" id="welcomeName" name="name" placeholder="e.g. Sarah Connor" autocomplete="name">
+                                            <span class="input-group-text bg-white border-0 ps-3 text-muted"><i class="bi bi-whatsapp text-success"></i></span>
+                                            <input type="tel" class="form-control border-0 shadow-none py-3 fw-bold ps-2" id="welcomePhone" name="phone" placeholder="e.g. +971 50 123 4567" required autocomplete="tel">
                                         </div>
+                                        <small class="text-muted d-block mt-1" style="font-size: 0.72rem;"><i class="bi bi-shield-check text-success me-1"></i>We'll send your voucher code via Email & WhatsApp.</small>
                                     </div>
 
                                     <div class="alert alert-danger p-2 small mt-2 d-none mb-3 rounded-3" id="welcomeOfferError"></div>
@@ -119,7 +128,7 @@
                                     </button>
 
                                     <div class="text-center text-muted small" style="font-size: 0.72rem;">
-                                        <i class="bi bi-lock-fill me-1"></i> No spam ever. Single-use voucher valid for 24h.
+                                        <i class="bi bi-lock-fill me-1"></i> 100% Privacy. Single-use voucher valid for 24h.
                                     </div>
                                 </form>
                             </div>
@@ -338,10 +347,17 @@
         if (form) {
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
-                const email = document.getElementById('welcomeEmail')?.value.trim();
                 const name = document.getElementById('welcomeName')?.value.trim();
+                const email = document.getElementById('welcomeEmail')?.value.trim();
+                const phone = document.getElementById('welcomePhone')?.value.trim();
 
-                if (!email) return;
+                if (!name || !email || !phone) {
+                    if (errorBox) {
+                        errorBox.innerText = 'Please provide your full name, email, and phone/WhatsApp number.';
+                        errorBox.classList.remove('d-none');
+                    }
+                    return;
+                }
 
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Generating Voucher...';
@@ -354,7 +370,7 @@
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
                     },
-                    body: JSON.stringify({ email: email, name: name })
+                    body: JSON.stringify({ name: name, email: email, phone: phone })
                 })
                 .then(res => res.json().then(data => ({ status: res.status, body: data })))
                 .then(({ status, body }) => {
@@ -380,7 +396,7 @@
                         showFloatingPill(code);
                     } else {
                         if (errorBox) {
-                            errorBox.innerText = body.message || 'Unable to generate voucher. Please try again.';
+                            errorBox.innerText = body.message || 'Unable to generate voucher. Please check your details and try again.';
                             errorBox.classList.remove('d-none');
                         }
                     }
@@ -395,6 +411,23 @@
                 });
             });
         }
+
+        // Top Banner Claim / Copy Button
+        document.querySelectorAll('.top-banner-copy-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const claimed = localStorage.getItem('dunes_welcome_claimed');
+                if (claimed) {
+                    navigator.clipboard.writeText(claimed).then(() => {
+                        const orig = btn.innerHTML;
+                        btn.innerHTML = '<span>COPIED!</span> <i class="bi bi-check-lg text-success"></i>';
+                        setTimeout(() => { btn.innerHTML = orig; }, 2000);
+                    });
+                } else {
+                    showOfferModal();
+                }
+            });
+        });
 
         // Copy Code
         if (copyBtn) {

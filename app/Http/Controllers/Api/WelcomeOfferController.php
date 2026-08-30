@@ -52,14 +52,14 @@ class WelcomeOfferController extends Controller
         $this->ensureSchema();
 
         $request->validate([
+            'name' => 'required|string|min:2|max:255',
             'email' => 'required|email|max:255',
-            'name' => 'nullable|string|max:255',
-            'phone' => 'nullable|string|max:50',
+            'phone' => 'required|string|min:7|max:50',
         ]);
 
         $email = strtolower(trim($request->input('email')));
-        $name = trim($request->input('name', 'Valued Traveler')) ?: 'Valued Traveler';
-        $phone = trim($request->input('phone', ''));
+        $name = trim($request->input('name'));
+        $phone = trim($request->input('phone'));
 
         // Check if there is already an active welcome coupon generated for this email today
         $existing = Coupon::where('code', 'like', 'FIRST25-%')
@@ -79,7 +79,7 @@ class WelcomeOfferController extends Controller
             $coupon = Coupon::create([
                 'code' => $code,
                 'name' => 'First-Time 25% Welcome Offer (' . $email . ')',
-                'description' => 'Claimed via welcome offer popup modal on ' . now()->format('Y-m-d H:i'),
+                'description' => 'Claimed via welcome offer popup modal by ' . $name . ' (' . $phone . ') on ' . now()->format('Y-m-d H:i'),
                 'discount_type' => 'percentage',
                 'discount_value' => 25.00,
                 'min_spend' => 0.00,
@@ -106,14 +106,16 @@ class WelcomeOfferController extends Controller
         ];
         $ctx = $this->tracker->collectRequestContext('popup_offer', $gpsPost);
 
+        $logId = null;
+
         // Record Lead in Contacts Table
         try {
             $contact = Contact::create([
                 'name' => $name,
                 'email' => $email,
-                'phone' => $phone ?: 'N/A',
+                'phone' => $phone,
                 'subject' => 'First-Time 25% Voucher Claimed (' . $coupon->code . ')',
-                'message' => "Customer claimed 25% first-time visitor voucher {$coupon->code}. Voucher expires in 24 hours.",
+                'message' => "Customer {$name} claimed 25% first-time visitor voucher {$coupon->code}.\nPhone/WhatsApp: {$phone}\nEmail: {$email}\nExpires in 24 hours.",
                 'status' => 'new',
                 'ip_address' => $ctx['client_ip'],
                 'is_verified' => false,
@@ -124,7 +126,22 @@ class WelcomeOfferController extends Controller
                 $contact->update(['request_log_id' => $logId]);
             }
         } catch (\Throwable $e) {
-            Log::error("Failed to log welcome offer lead: " . $e->getMessage());
+            Log::error("Failed to log welcome offer lead to contacts: " . $e->getMessage());
+        }
+
+        // Record Lead in WhatsApp Inquiries Hub for 1-Click Retargeting
+        try {
+            \Illuminate\Support\Facades\DB::table('whatsapp_inquiries')->insert([
+                'name' => $name,
+                'phone' => $phone,
+                'tour_name' => '25% Welcome Offer (' . $coupon->code . ')',
+                'page_url' => $request->header('referer') ?: url('/'),
+                'message_text' => "Customer claimed 25% discount voucher {$coupon->code}. Phone: {$phone}, Email: {$email}.",
+                'request_log_id' => $logId,
+                'created_at' => now(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error("Failed to log welcome offer lead to whatsapp_inquiries: " . $e->getMessage());
         }
 
         // Send Email Voucher to Customer

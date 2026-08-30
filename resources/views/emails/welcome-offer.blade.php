@@ -36,9 +36,19 @@
     </div>
 
     <!-- Call to Action Button -->
-    <div style="text-align: center; margin-bottom: 25px;">
+    <div style="text-align: center; margin-bottom: 15px;">
         <a href="{{ $bookingUrl }}" style="display: inline-block; background-color: #F58F43; color: #ffffff; text-decoration: none; font-weight: 800; font-size: 16px; padding: 16px 36px; border-radius: 50px; box-shadow: 0 4px 15px rgba(245,143,67,0.4); text-transform: uppercase; letter-spacing: 0.5px;">
             Book My Safari with 25% OFF &rarr;
+        </a>
+    </div>
+
+    <!-- WhatsApp Instant Booking Helper -->
+    @php
+        $whatsappNum = preg_replace('/[^0-9]/', '', app(\App\Services\SettingsService::class)->get('site_whatsapp', '971501234567'));
+    @endphp
+    <div style="text-align: center; margin-bottom: 25px;">
+        <a href="https://wa.me/{{ $whatsappNum }}?text={{ urlencode('Hi Dunes Discovery! I received my 25% discount voucher ' . $code . ' and want to reserve a tour.') }}" style="display: inline-block; color: #16a34a; text-decoration: none; font-weight: 700; font-size: 13px;">
+            <span style="display: inline-block; margin-right: 4px;">💬</span> Prefer to book via WhatsApp? Chat with our team now
         </a>
     </div>
 
