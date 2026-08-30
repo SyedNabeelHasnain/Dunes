@@ -108,6 +108,7 @@
                     <option value="confirmed" {{ request('status') === 'confirmed' ? 'selected' : '' }}>Confirmed</option>
                     <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completed</option>
                     <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                    <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Abandoned Checkouts (Drafts)</option>
                 </select>
             </div>
             <div class="col-lg-2 col-md-3">
@@ -165,10 +166,17 @@
                         </td>
                         <td>
                             <div class="fw-bold text-dark">{{ $b->tour_name }}</div>
-                            <div class="badge bg-light text-primary border rounded-pill mt-1" style="font-size: 0.72rem;">
-                                {{ $b->tier_name ?: ($b->tier ? $b->tier->display_name : 'Standard') }}
+                            <div class="d-flex align-items-center gap-1 flex-wrap mt-1">
+                                <span class="badge bg-light text-primary border rounded-pill" style="font-size: 0.72rem;">
+                                    {{ $b->tier_name ?: ($b->tier ? $b->tier->display_name : 'Standard') }}
+                                </span>
+                                @if($b->addons && $b->addons->count() > 0)
+                                    <span class="badge bg-success-subtle text-success rounded-pill" style="font-size: 0.7rem;" title="{{ $b->addons->pluck('addon_name')->implode(', ') }}">
+                                        +{{ $b->addons->count() }} Addon{{ $b->addons->count() > 1 ? 's' : '' }}
+                                    </span>
+                                @endif
                             </div>
-                            <span class="small text-muted ms-1">({{ $b->adults }} Adults, {{ $b->children }} Child)</span>
+                            <span class="small text-muted">({{ $b->adults }} Adults, {{ $b->children }} Child)</span>
                         </td>
                         <td data-order="{{ $b->tour_date ? $b->tour_date->timestamp : 0 }}">
                             <div class="small fw-bold text-dark">{{ $b->tour_date ? $b->tour_date->format('M j, Y') : 'Open Date' }}</div>
@@ -188,27 +196,43 @@
                                     'pending' => 'warning',
                                     'confirmed' => 'success',
                                     'completed' => 'info',
-                                    'cancelled' => 'danger'
+                                    'cancelled' => 'danger',
+                                    'draft' => 'secondary'
                                 ];
                                 $bCol = $badgeColor[$b->status] ?? 'secondary';
                             @endphp
-                            <span class="badge bg-{{ $bCol }} text-capitalize px-3 py-1 rounded-pill">{{ $b->status }}</span>
+                            @if($b->status === 'draft')
+                                <span class="badge bg-warning-subtle text-warning border border-warning px-2 py-1 rounded-pill fw-bold" style="font-size: 0.72rem;">Abandoned Lead</span>
+                            @else
+                                <span class="badge bg-{{ $bCol }} text-capitalize px-3 py-1 rounded-pill">{{ $b->status }}</span>
+                            @endif
                             <div class="small mt-1 text-capitalize text-muted" style="font-size: 0.7rem;">
                                 Payment: <span class="fw-bold text-dark">{{ $b->payment_status }}</span>
                             </div>
                         </td>
                         <td class="pe-4 text-end">
-                            <div class="d-flex justify-content-end gap-2">
-                                <a href="{{ route('admin.bookings.show', $b->id) }}" class="btn btn-sm btn-outline-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="View Booking Details">
-                                    <i class="bi bi-eye-fill"></i>
-                                </a>
-                                @php
-                                    $waVal = preg_replace('/[^0-9]/', '', $b->phone);
-                                    $waMsg = 'Hi ' . $b->name . '! This is Dunes Discovery regarding your booking #' . $b->reference;
-                                @endphp
-                                <a href="https://wa.me/{{ $waVal }}?text={{ urlencode($waMsg) }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-success rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="WhatsApp Customer">
-                                    <i class="bi bi-whatsapp"></i>
-                                </a>
+                            <div class="d-flex justify-content-end gap-2 align-items-center">
+                                @if($b->status === 'draft')
+                                    @php
+                                        $waVal = preg_replace('/[^0-9]/', '', $b->phone);
+                                        $waMsg = 'Hi ' . $b->name . '! We noticed you started reserving the ' . $b->tour_name . ' on Dunes Discovery. Your spot is held for ' . ($b->tour_date ? $b->tour_date->format('M j') : 'your chosen date') . '. Would you like help completing your reservation with code FIRST25 (25% OFF)?';
+                                    @endphp
+                                    <a href="https://wa.me/{{ $waVal }}?text={{ urlencode($waMsg) }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-warning text-dark rounded-pill px-3 py-1 fw-bold shadow-sm d-flex align-items-center gap-1" title="Send WhatsApp Recovery">
+                                        <i class="bi bi-whatsapp"></i>
+                                        <span>Recover</span>
+                                    </a>
+                                @else
+                                    <a href="{{ route('admin.bookings.show', $b->id) }}" class="btn btn-sm btn-outline-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="View Booking Details">
+                                        <i class="bi bi-eye-fill"></i>
+                                    </a>
+                                    @php
+                                        $waVal = preg_replace('/[^0-9]/', '', $b->phone);
+                                        $waMsg = 'Hi ' . $b->name . '! This is Dunes Discovery regarding your booking #' . $b->reference;
+                                    @endphp
+                                    <a href="https://wa.me/{{ $waVal }}?text={{ urlencode($waMsg) }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-success rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="WhatsApp Customer">
+                                        <i class="bi bi-whatsapp"></i>
+                                    </a>
+                                @endif
                             </div>
                         </td>
                     </tr>

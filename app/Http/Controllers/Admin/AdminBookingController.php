@@ -24,11 +24,14 @@ class AdminBookingController extends Controller
         $fromDate = $request->input('from_date');
         $toDate = $request->input('to_date');
 
-        $query = Booking::with(['tour', 'tier']);
+        $query = Booking::with(['tour', 'tier', 'addons']);
 
         if ($status) {
             $query->where('status', $status);
+        } else {
+            $query->where('status', '!=', 'draft');
         }
+
         if ($paymentStatus) {
             $query->where('payment_status', $paymentStatus);
         }
@@ -51,12 +54,15 @@ class AdminBookingController extends Controller
         $revenue = (float)Booking::whereIn('status', ['confirmed', 'completed'])->sum('payment_amount');
         $confirmedCount = Booking::whereIn('status', ['confirmed', 'completed'])->count();
         $avgOrderValue = $confirmedCount > 0 ? round($revenue / $confirmedCount, 2) : 0;
+        $addonsRevenue = (float)Booking::whereIn('status', ['confirmed', 'completed'])->sum('addons_total');
 
         $stats = [
-            'total' => Booking::count(),
+            'total' => Booking::where('status', '!=', 'draft')->count(),
             'pending' => Booking::where('status', 'pending')->count(),
             'confirmed' => Booking::where('status', 'confirmed')->count(),
             'completed' => Booking::where('status', 'completed')->count(),
+            'drafts' => Booking::where('status', 'draft')->count(),
+            'addons_revenue' => $addonsRevenue,
             'revenue' => $revenue,
             'aov' => $avgOrderValue,
         ];
@@ -66,7 +72,7 @@ class AdminBookingController extends Controller
         for ($i = 13; $i >= 0; $i--) {
             $date = now()->subDays($i)->format('Y-m-d');
             $label = now()->subDays($i)->format('M j');
-            $count = Booking::whereDate('created_at', $date)->count();
+            $count = Booking::whereDate('created_at', $date)->where('status', '!=', 'draft')->count();
             $dayRev = (float)Booking::whereDate('created_at', $date)->whereIn('status', ['confirmed', 'completed'])->sum('payment_amount');
             $trendData[] = [
                 'date' => $label,
@@ -81,6 +87,7 @@ class AdminBookingController extends Controller
             'pending' => Booking::where('status', 'pending')->count(),
             'completed' => Booking::where('status', 'completed')->count(),
             'cancelled' => Booking::where('status', 'cancelled')->count(),
+            'draft' => Booking::where('status', 'draft')->count(),
         ];
 
         $bookings = $query->orderBy('created_at', 'desc')->get();

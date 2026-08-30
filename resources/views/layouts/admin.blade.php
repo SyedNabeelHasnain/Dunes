@@ -242,6 +242,9 @@
             <a href="{{ route('admin.bookings.index') }}" class="sidebar-link {{ request()->routeIs('admin.bookings*') ? 'active' : '' }}">
                 <i class="bi bi-calendar2-check-fill"></i> <span>Bookings</span>
             </a>
+            <a href="{{ route('admin.operations.index') }}" class="sidebar-link {{ request()->routeIs('admin.operations*') ? 'active' : '' }}">
+                <i class="bi bi-truck-flatbed text-warning"></i> <span>Daily Operations</span>
+            </a>
             <a href="{{ route('admin.inquiries.index') }}" class="sidebar-link {{ request()->routeIs('admin.inquiries*') ? 'active' : '' }}">
                 <i class="bi bi-envelope-paper-fill"></i> <span>Inquiries</span>
             </a>

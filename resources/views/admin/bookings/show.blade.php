@@ -103,12 +103,18 @@
                 <div class="fw-medium text-dark">Paid: AED {{ number_format($booking->payment_amount ?? 0) }}</div>
                 <div class="fw-medium text-dark">Balance: AED {{ number_format($booking->balance_due ?? 0) }}</div>
             </div>
-            @if($booking->addons->count() > 0)
-            <div>
-                <label class="text-muted small fw-bold mb-2 d-block">Selected Addons</label>
-                <div class="d-flex flex-wrap gap-2">
+            @if($booking->addons && $booking->addons->count() > 0)
+            <div class="mt-3 pt-3 border-top">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <label class="text-muted small fw-bold mb-0 text-uppercase">Selected Addons</label>
+                    <span class="badge bg-success-subtle text-success fw-bold rounded-pill">+AED {{ number_format($booking->addons_total ?? $booking->addons->sum('price'), 2) }}</span>
+                </div>
+                <div class="d-flex flex-column gap-2">
                     @foreach($booking->addons as $addon)
-                        <span class="badge bg-light text-dark border px-3 py-2 rounded-pill shadow-sm"><i class="bi bi-plus-lg text-success me-1"></i>{{ $addon->addon_name }}</span>
+                        <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded-3 border">
+                            <span class="fw-bold text-dark small"><i class="bi bi-plus-circle text-success me-2"></i>{{ $addon->addon_name }}</span>
+                            <span class="badge bg-white text-primary border fw-bold">+AED {{ number_format($addon->price, 2) }}</span>
+                        </div>
                     @endforeach
                 </div>
             </div>

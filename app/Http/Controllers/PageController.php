@@ -235,4 +235,60 @@ class PageController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
+
+    /**
+     * Handle Post-Tour Review Rating click.
+     */
+    public function reviewRate(Request $request, string $ref)
+    {
+        $booking = \App\Models\Booking::where('reference', $ref)->firstOrFail();
+        $score = (int)$request->input('score', 5);
+
+        // If high rating (4-5 stars), redirect straight to Google Review Profile
+        if ($score >= 4) {
+            $googleReviewUrl = app(SettingsService::class)->get('google_review_url', 'https://maps.google.com/?cid=123456789');
+            
+            // Auto-create an approved review record
+            try {
+                \App\Models\Review::firstOrCreate(
+                    ['customer_name' => $booking->name, 'tour_id' => $booking->tour_id],
+                    [
+                        'rating' => $score,
+                        'customer_name' => $booking->name,
+                        'country' => 'United Arab Emirates',
+                        'title' => 'Unforgettable Desert Adventure!',
+                        'content' => 'Outstanding desert safari experience organized by Dunes Discovery Tourism. Highly recommended!',
+                        'status' => 'approved',
+                        'is_featured' => true,
+                        'priority' => 1,
+                        'tour_id' => $booking->tour_id,
+                        'source' => 'email_booster'
+                    ]
+                );
+            } catch (\Throwable $e) {}
+
+            return redirect()->away($googleReviewUrl);
+        }
+
+        // Lower ratings redirect to private feedback form
+        return view('review-feedback', compact('booking', 'score'));
+    }
+
+    /**
+     * Submit private customer feedback for service recovery.
+     */
+    public function submitFeedback(Request $request, string $ref)
+    {
+        $booking = \App\Models\Booking::where('reference', $ref)->firstOrFail();
+        $feedback = trim($request->input('feedback', ''));
+
+        if (!empty($feedback)) {
+            $notes = $booking->special_requests ?: '';
+            $booking->update([
+                'special_requests' => trim($notes . "\n[GUEST FEEDBACK: " . $feedback . "]")
+            ]);
+        }
+
+        return redirect()->route('home')->with('success', 'Thank you for your valuable feedback. Our management team will review your comments.');
+    }
 }

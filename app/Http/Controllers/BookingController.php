@@ -538,4 +538,75 @@ class BookingController extends Controller
             Log::error("Failed to prepare booking email for {$booking->reference}: " . $e->getMessage());
         }
     }
+
+    /**
+     * Auto-save dropped-off checkout draft for lead recovery.
+     */
+    public function saveDraft(Request $request)
+    {
+        $name = trim($request->input('name', ''));
+        $email = strtolower(trim($request->input('email', '')));
+        $phone = trim($request->input('phone', ''));
+        $tourId = $request->input('tour_id');
+        $tierId = $request->input('tier_id');
+        $date = $request->input('date');
+
+        // Only save if at least phone or email or name is provided
+        if (empty($name) && empty($email) && empty($phone)) {
+            return response()->json(['success' => false, 'message' => 'Insufficient lead data.']);
+        }
+
+        $tour = $tourId ? Tour::find($tourId) : null;
+        $tier = $tierId ? Tier::find($tierId) : null;
+
+        $adults = max(1, (int)$request->input('adults', 1));
+        $children = max(0, (int)$request->input('children', 0));
+        $subtotal = (float)$request->input('subtotal', 0);
+        $total = (float)$request->input('total', $subtotal);
+
+        // Check if there is an existing draft for this session or email in the last 4 hours
+        $draftId = $request->input('draft_id');
+        $draft = null;
+        if ($draftId) {
+            $draft = Booking::where('id', $draftId)->where('status', 'draft')->first();
+        }
+        if (!$draft && !empty($email)) {
+            $draft = Booking::where('email', $email)
+                ->where('status', 'draft')
+                ->where('created_at', '>=', now()->subHours(4))
+                ->first();
+        }
+
+        if (!$draft) {
+            $ref = 'DFT' . date('ymd') . strtoupper(\Illuminate\Support\Str::random(5));
+            $draft = new Booking();
+            $draft->reference = $ref;
+            $draft->status = 'draft';
+        }
+
+        $draft->tour_id = $tour ? $tour->id : null;
+        $draft->tier_id = $tier ? $tier->id : null;
+        $draft->tour_name = $tour ? $tour->name : 'Desert Safari Experience';
+        $draft->tier_name = $tier ? ($tier->display_name ?: $tier->name) : 'Standard Package';
+        $draft->tour_date = $date ? date('Y-m-d', strtotime($date)) : now()->addDay()->format('Y-m-d');
+        $draft->adults = $adults;
+        $draft->children = $children;
+        $draft->name = $name ?: 'Prospective Guest';
+        $draft->email = $email ?: 'abandoned@guest.local';
+        $draft->phone = $phone;
+        $draft->pickup_location = $request->input('pickup_location', 'Dubai Hotel');
+        $draft->subtotal = $subtotal;
+        $draft->total = $total;
+        $draft->currency = 'AED';
+        $draft->payment_method = $request->input('payment_method', 'cash');
+        $draft->payment_status = 'unpaid';
+        $draft->ip_address = $request->ip();
+        $draft->save();
+
+        return response()->json([
+            'success' => true,
+            'draft_id' => $draft->id,
+            'reference' => $draft->reference
+        ]);
+    }
 }

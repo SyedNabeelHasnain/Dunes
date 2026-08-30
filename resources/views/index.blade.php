@@ -157,6 +157,9 @@ if (!function_exists('renderReviewCardMarkup')) {
     <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(180deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.8) 100%); z-index: -1;"></div>
 
     <div class="container position-relative z-1 text-center text-white" style="margin-top:-5vh;">
+        <div class="d-flex justify-content-center mb-2">
+            @include('partials.sunset-weather-widget')
+        </div>
         <div class="badge rounded-pill glass px-3 py-2 mb-4">
             <i class="bi bi-star-fill text-warning me-2"></i>
             <span class="fw-semibold">Rated 4.9/5 by 2,847+ Travelers</span>
@@ -419,6 +422,9 @@ if (!function_exists('renderReviewCardMarkup')) {
         </div>
     </div>
 </section>
+
+<!-- Interactive Safari Matcher Quiz -->
+@include('partials.safari-matcher-quiz')
 
 <!-- Guest Reviews Marquee Section -->
 <section class="reviews-section bg-soft-primary py-5 overflow-hidden">

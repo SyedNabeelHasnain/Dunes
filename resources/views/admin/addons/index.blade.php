@@ -13,6 +13,40 @@
     </button>
 </div>
 
+<!-- 3 Summary KPI Cards -->
+<div class="row g-3 g-lg-4 mb-4">
+    <div class="col-md-4">
+        <div class="card card-modern h-100 p-3 bg-white border-0 shadow-sm rounded-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-muted small fw-bold text-uppercase" style="font-size:0.75rem;">Addons in Catalog</span>
+                <span class="badge bg-primary-subtle text-primary rounded-circle p-2"><i class="bi bi-puzzle-fill fs-5"></i></span>
+            </div>
+            <h3 class="fw-800 text-dark mb-0">{{ number_format(count($addons)) }}</h3>
+            <span class="text-muted small" style="font-size: 0.75rem;">Active tour enhancements</span>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-modern h-100 p-3 bg-white border-0 shadow-sm rounded-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-muted small fw-bold text-uppercase" style="font-size:0.75rem;">Total Add-ons Booked</span>
+                <span class="badge bg-success-subtle text-success rounded-circle p-2"><i class="bi bi-cart-check-fill fs-5"></i></span>
+            </div>
+            <h3 class="fw-800 text-success mb-0">{{ number_format($totalAddonsBooked) }} <small class="fs-6 fw-normal text-muted">Units</small></h3>
+            <span class="text-muted small" style="font-size: 0.75rem;">Across all customer reservations</span>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-modern h-100 p-3 bg-white border-0 shadow-sm rounded-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-muted small fw-bold text-uppercase" style="font-size:0.75rem;">Add-on Revenue Earned</span>
+                <span class="badge bg-info-subtle text-info rounded-circle p-2"><i class="bi bi-cash-stack fs-5"></i></span>
+            </div>
+            <h3 class="fw-800 text-primary mb-0">AED {{ number_format($totalAddonsRevenue) }}</h3>
+            <span class="text-muted small" style="font-size: 0.75rem;">Incremental upsell revenue</span>
+        </div>
+    </div>
+</div>
+
 <div class="card card-modern border-0 shadow-sm rounded-4 overflow-hidden bg-white">
     <div class="card-body p-4">
         <div class="table-responsive">
@@ -20,9 +54,10 @@
                 <thead class="table-light small text-uppercase fw-bold text-muted">
                     <tr>
                         <th class="ps-3">Addon Identity</th>
-                        <th>Slug</th>
                         <th>Default Price</th>
                         <th>Tour Adoption</th>
+                        <th>Times Booked</th>
+                        <th>Revenue Earned</th>
                         <th>Status</th>
                         <th>Priority</th>
                         <th class="text-end pe-3 no-sort">Actions</th>
@@ -42,12 +77,19 @@
                                 </div>
                             </div>
                         </td>
-                        <td><code class="text-primary bg-light px-2 py-1 rounded">{{ $addon->slug }}</code></td>
                         <td class="fw-800 text-dark">AED {{ number_format($addon->default_price, 2) }}</td>
                         <td>
-                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 fw-bold">
+                            <span class="badge bg-light text-dark border rounded-pill px-3 py-1 fw-bold">
                                 <i class="bi bi-link-45deg me-1"></i>{{ $addon->tours_count ?? $addon->tours->count() }} Tours
                             </span>
+                        </td>
+                        <td>
+                            <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1 fw-bold">
+                                {{ number_format($addon->times_booked ?? 0) }} Sold ({{ $addon->attachment_rate ?? 0 }}%)
+                            </span>
+                        </td>
+                        <td class="fw-800 text-primary">
+                            AED {{ number_format($addon->total_revenue ?? 0) }}
                         </td>
                         <td>
                             @if($addon->status === 'active')

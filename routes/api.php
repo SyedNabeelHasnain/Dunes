@@ -27,8 +27,9 @@ Route::prefix('v1')->group(function () {
     Route::get('/coupon/featured', [\App\Http\Controllers\Api\CouponController::class, 'featured']);
     Route::post('/welcome-offer/claim', [\App\Http\Controllers\Api\WelcomeOfferController::class, 'claimOffer'])->middleware('throttle:15,1');
 
-    // Booking Checkout
+    // Booking Checkout & Draft Lead Recovery
     Route::post('/booking/checkout', [BookingController::class, 'checkout']);
+    Route::post('/booking/draft', [BookingController::class, 'saveDraft']);
     
     // Contact submission
     Route::post('/contact/submit', [PageController::class, 'submitContact']);

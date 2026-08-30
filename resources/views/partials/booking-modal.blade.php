@@ -148,8 +148,16 @@
                                 </div>
                             </div>
 
+                            <!-- Dynamic Tour-Specific Addons Section -->
                             <div class="mb-4" id="addonsSection" style="display:none">
-                                <div style="display: none;" class="addon-horizontal-wrapper" id="addonList"></div>
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <div class="fw-800 small text-muted text-uppercase d-flex align-items-center gap-1">
+                                        <i class="bi bi-stars text-warning"></i>
+                                        <span>Enhance Your Safari (Optional Add-ons)</span>
+                                    </div>
+                                    <span class="badge bg-primary-subtle text-primary fw-bold rounded-pill px-2 py-1" style="font-size: 0.7rem;">1-Click Add</span>
+                                </div>
+                                <div class="addon-horizontal-wrapper" id="addonList"></div>
                             </div>
 
                             <!-- OTP verification state banners -->

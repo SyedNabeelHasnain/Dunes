@@ -64,7 +64,8 @@ class AjaxGatewayController extends Controller
                             'id' => $addon->id,
                             'name' => $addon->name,
                             'description' => $addon->description,
-                            'price' => $addon->pivot->price,
+                            'icon' => $addon->icon ?: 'plus-circle',
+                            'price' => (float)$addon->pivot->price,
                         ];
                     });
 

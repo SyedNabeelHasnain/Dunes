@@ -39,6 +39,9 @@ Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
 Route::get('/thankyou', [BookingController::class, 'thankyou'])->name('booking.thankyou');
 Route::get('/payment-cancel', [BookingController::class, 'paymentCancel'])->name('booking.cancel');
+Route::post('/booking/draft', [BookingController::class, 'saveDraft'])->name('booking.draft');
+Route::get('/review/{ref}', [PageController::class, 'reviewRate'])->name('review.rate');
+Route::post('/review/{ref}/feedback', [PageController::class, 'submitFeedback'])->name('review.feedback');
 
 // ── Admin CMS Panel (Guarded by auth) ──────────────────────────────────────────
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
@@ -76,6 +79,12 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::resource('bookings', AdminBookingController::class)->only(['index', 'show', 'update', 'destroy']);
     Route::post('/bookings/{id}/payment-link', [AdminBookingController::class, 'createPaymentLink'])->name('bookings.payment-link');
     Route::post('/bookings/{id}/resend-payment', [AdminBookingController::class, 'resendPaymentEmail'])->name('bookings.resend-payment');
+    
+    // Daily Tour Operations & Driver Dispatch Manifest
+    Route::get('/operations', [\App\Http\Controllers\Admin\AdminOperationsController::class, 'index'])->name('operations.index');
+    Route::post('/operations/{id}/assign-driver', [\App\Http\Controllers\Admin\AdminOperationsController::class, 'assignDriver'])->name('operations.assign-driver');
+    Route::get('/operations/export/csv', [\App\Http\Controllers\Admin\AdminOperationsController::class, 'exportManifest'])->name('operations.export');
+
     Route::get('/whatsapp-leads/export/csv', [AdminWhatsappController::class, 'exportCsv'])->name('whatsapp.export');
     Route::get('/whatsapp-leads', [AdminWhatsappController::class, 'index'])->name('whatsapp.leads');
     Route::get('/whatsapp', [AdminWhatsappController::class, 'index'])->name('whatsapp.index');

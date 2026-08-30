@@ -26,6 +26,8 @@ const App={
         this.initDateCards();
         this.initEmailVerification();
         this.initLegalModal();
+        this.initSafariMatcher();
+        this.initSunsetWidget();
     },
 
     initLegalModal() {
@@ -1023,6 +1025,65 @@ const App={
 
             initOpenStreetMapAutocomplete(locationInput);
         }
+
+        this.initDraftAutoSave();
+    },
+
+    initDraftAutoSave(){
+        let draftTimer = null;
+        let activeDraftId = null;
+
+        const triggerDraftSave = () => {
+            clearTimeout(draftTimer);
+            draftTimer = setTimeout(async () => {
+                const name = document.getElementById('bookingName')?.value.trim();
+                const email = document.getElementById('bookingEmail')?.value.trim();
+                const phone = document.getElementById('bookingPhone')?.value.trim();
+
+                if ((name && name.length >= 2) || (email && email.includes('@')) || (phone && phone.length >= 7)) {
+                    const tourId = document.getElementById('bookingTour')?.value;
+                    const tierId = document.getElementById('selectedTier')?.value || this.selectedTier;
+                    const date = document.getElementById('bookingDate')?.value;
+                    const adults = document.getElementById('bookingAdults')?.value || 1;
+                    const children = document.getElementById('bookingChildren')?.value || 0;
+                    const location = document.getElementById('bookingLocation')?.value;
+                    const baseTotal = this.calculateBaseTotal();
+
+                    try {
+                        const res = await fetch('/api/v1/booking/draft', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                            },
+                            body: JSON.stringify({
+                                draft_id: activeDraftId,
+                                name: name,
+                                email: email,
+                                phone: phone,
+                                tour_id: tourId,
+                                tier_id: tierId,
+                                date: date,
+                                adults: adults,
+                                children: children,
+                                pickup_location: location,
+                                subtotal: baseTotal,
+                                total: baseTotal
+                            })
+                        });
+                        const data = await res.json();
+                        if (data.success && data.draft_id) {
+                            activeDraftId = data.draft_id;
+                        }
+                    } catch (e) {}
+                }
+            }, 800);
+        };
+
+        ['bookingName', 'bookingEmail', 'bookingPhone'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', triggerDraftSave);
+        });
     },
 
     initPaymentOptions(){
@@ -1109,18 +1170,26 @@ const App={
             if(data.addons?.length){
                 let ah='';
                 data.addons.forEach(a=>{
+                    const iconName = a.icon ? (a.icon.startsWith('bi-') ? a.icon : 'bi-' + a.icon) : 'bi-plus-circle';
                     ah+=`<div class="addon-card-horizontal" data-addon="${a.id}" data-price="${a.price}">
                         <input type="checkbox" name="addons[]" value="${a.id}">
                         <div class="addon-check-abs"><i class="bi bi-check-lg"></i></div>
-                        <div class="addon-h-info">
-                            <h5>${a.name}</h5>
-                            <p>${a.description||''}</p>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; font-size: 0.95rem;">
+                                <i class="${iconName}"></i>
+                            </div>
+                            <h5 class="fw-bold text-dark mb-0 fs-6 text-truncate" style="max-width: 140px;">${a.name}</h5>
                         </div>
-                        <div class="addon-h-price">+AED ${a.price}</div>
+                        <p class="small text-muted mb-2 lh-sm text-truncate-2" style="font-size: 0.78rem; min-height: 28px;">${a.description || 'Optional safari enhancement'}</p>
+                        <div class="mt-auto d-flex align-items-center justify-content-between">
+                            <span class="badge bg-light text-dark border fw-bold rounded-pill">+AED ${parseFloat(a.price).toFixed(2)}</span>
+                            <span class="small fw-bold text-primary addon-status-label" style="font-size: 0.75rem;">+ Add</span>
+                        </div>
                     </div>`;
                 });
                 addonList.innerHTML=ah;
-                addons.style.display='block';
+                addonList.style.display='flex';
+                if(addons) addons.style.display='block';
 
                 addonList.querySelectorAll('.addon-card-horizontal').forEach(item=>{
                     item.addEventListener('click',e=>{
@@ -1128,7 +1197,13 @@ const App={
                             const inp=item.querySelector('input');
                             inp.checked=!inp.checked;
                         }
-                        item.classList.toggle('selected',item.querySelector('input').checked);
+                        const isChecked = item.querySelector('input').checked;
+                        item.classList.toggle('selected', isChecked);
+                        const statusLabel = item.querySelector('.addon-status-label');
+                        if (statusLabel) {
+                            statusLabel.textContent = isChecked ? '✓ Added' : '+ Add';
+                            statusLabel.className = isChecked ? 'small fw-bold text-success addon-status-label' : 'small fw-bold text-primary addon-status-label';
+                        }
                         this.updateAddons();
                     });
                 });
@@ -1797,6 +1872,219 @@ const App={
                 tabs.scrollLeft+=e.deltaY;
             }
         },{passive:false});
+    },
+
+    initSafariMatcher(){
+        const section = document.getElementById('safariMatcherSection');
+        if(!section) return;
+
+        let answers = { group: null, time: null, style: null };
+
+        const step1 = document.getElementById('quizStep1');
+        const step2 = document.getElementById('quizStep2');
+        const step3 = document.getElementById('quizStep3');
+        const result = document.getElementById('quizResult');
+
+        const stepNum = document.getElementById('quizStepNum');
+        const stepTitle = document.getElementById('quizStepTitle');
+        const progressText = document.getElementById('quizProgressText');
+
+        const matchedTitle = document.getElementById('quizMatchedTitle');
+        const matchedTagline = document.getElementById('quizMatchedTagline');
+        const matchedPrice = document.getElementById('quizMatchedPrice');
+        const matchedFeatures = document.getElementById('quizMatchedFeatures');
+        const bookBtn = document.getElementById('quizBookBtn');
+        const resetBtn = document.getElementById('quizResetBtn');
+
+        let matchedTour = {
+            id: '1',
+            slug: 'evening-desert-safari',
+            name: 'Evening Red Dune Desert Safari',
+            price: 79,
+            tagline: "Dubai's #1 Rated Desert Adventure with Live 5-Star Camp Shows & BBQ",
+            features: [
+                'Includes 45-min Red Dune Bashing in Lahbab Desert',
+                'Live Fire Show, Belly Dance & Tanoura Spectacle',
+                'Lavish 5-Star BBQ Dinner (Veg & Non-Veg)',
+                'Free Sandboarding, Camel Ride & Arabic Costume Photos'
+            ]
+        };
+
+        const updateRecommendation = () => {
+            if (answers.time === 'morning') {
+                matchedTour = {
+                    id: '2',
+                    slug: 'morning-desert-safari',
+                    name: 'Morning Desert Safari with Camel Ride & Sandboarding',
+                    price: 99,
+                    tagline: 'Beat the Afternoon Heat with Golden Sunrise Dunes & Quad Biking Options',
+                    features: [
+                        'Thrilling 35-min Morning Red Dune Bashing',
+                        'Picturesque Sunrise Photo Stops & Sandboarding',
+                        'Extended Camel Ride & Arabic Coffee Welcome',
+                        'Optional 400cc Quad Bike Self-Drive'
+                    ]
+                };
+            } else if (answers.time === 'overnight') {
+                matchedTour = {
+                    id: '3',
+                    slug: 'overnight-desert-safari',
+                    name: 'VIP Overnight Desert Safari with Stargazing & Breakfast',
+                    price: 299,
+                    tagline: 'Sleep Under the Arabian Starlit Sky in a Traditional Bedouin Camp',
+                    features: [
+                        'Complete Evening Safari + 5-Star BBQ Buffet & Shows',
+                        'Private Overnight Bedouin Tent with Cozy Bedding',
+                        'Late Night Desert Campfire & Stargazing',
+                        'Fresh Arabian Sunrise Breakfast with Hot Beverages'
+                    ]
+                };
+            } else if (answers.style === 'luxury' || answers.group === 'couples') {
+                matchedTour = {
+                    id: '4',
+                    slug: 'vip-desert-safari',
+                    name: 'VIP Premium Desert Safari with Private Luxury Dining',
+                    price: 250,
+                    tagline: 'Exclusive VIP AC Lounge, Table-Side Waiter Service & Private 4x4 Transfer',
+                    features: [
+                        'Private 4x4 Luxury Land Cruiser Pick & Drop',
+                        'VIP Raised Dining Area with Table-Side Food Service',
+                        'Gourmet Live BBQ Buffet & Premium Falcon Photography',
+                        'Front-Row Seats for Fire & Cultural Shows'
+                    ]
+                };
+            } else if (answers.style === 'thrill') {
+                matchedTour = {
+                    id: '5',
+                    slug: 'red-dune-safari-with-quad-bike',
+                    name: 'Extreme Red Dune Safari + 400cc Quad Biking Combo',
+                    price: 180,
+                    tagline: 'High-Power Self-Drive Quad Biking + Extreme Lahbab Red Dune Bashing',
+                    features: [
+                        '60-Min Self-Drive Quad Bike in Open Desert Dunes',
+                        'Extreme Dune Bashing on 300ft High Red Dunes',
+                        'Sandboarding Down Towering Dunes',
+                        'Full 5-Star Camp Dinner & Live Entertainment'
+                    ]
+                };
+            } else {
+                matchedTour = {
+                    id: '1',
+                    slug: 'evening-desert-safari',
+                    name: 'Evening Red Dune Desert Safari',
+                    price: 79,
+                    tagline: "Dubai's #1 Rated Desert Adventure with Live 5-Star Camp Shows & BBQ",
+                    features: [
+                        'Includes 45-min Red Dune Bashing in Lahbab Desert',
+                        'Live Fire Show, Belly Dance & Tanoura Spectacle',
+                        'Lavish 5-Star BBQ Dinner (Veg & Non-Veg)',
+                        'Free Sandboarding, Camel Ride & Arabic Costume Photos'
+                    ]
+                };
+            }
+
+            if (matchedTitle) matchedTitle.textContent = matchedTour.name;
+            if (matchedTagline) matchedTagline.textContent = matchedTour.tagline;
+            if (matchedPrice) matchedPrice.textContent = 'AED ' + matchedTour.price;
+            if (matchedFeatures) {
+                matchedFeatures.innerHTML = matchedTour.features.map(f => `<li><i class="bi bi-check-circle-fill text-success me-2"></i>${f}</li>`).join('');
+            }
+        };
+
+        section.querySelectorAll('.quiz-choice-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const step = card.dataset.step;
+                const val = card.dataset.val;
+
+                if (step === '1') {
+                    answers.group = val;
+                    step1.classList.add('d-none');
+                    step2.classList.remove('d-none');
+                    stepNum.textContent = '2';
+                    stepTitle.textContent = 'Time of Day';
+                    progressText.textContent = 'Step 2 of 3';
+                } else if (step === '2') {
+                    answers.time = val;
+                    step2.classList.add('d-none');
+                    step3.classList.remove('d-none');
+                    stepNum.textContent = '3';
+                    stepTitle.textContent = 'Adventure Style';
+                    progressText.textContent = 'Step 3 of 3';
+                } else if (step === '3') {
+                    answers.style = val;
+                    updateRecommendation();
+                    step3.classList.add('d-none');
+                    result.classList.remove('d-none');
+                    stepNum.textContent = '✓';
+                    stepTitle.textContent = 'Your Safari Match';
+                    progressText.textContent = 'Matched!';
+                }
+            });
+        });
+
+        if (bookBtn) {
+            bookBtn.addEventListener('click', () => {
+                const modalEl = document.getElementById('bookingModal');
+                if (modalEl) {
+                    const tourSelect = document.getElementById('bookingTour');
+                    if (tourSelect) {
+                        let found = false;
+                        for (let opt of tourSelect.options) {
+                            if (opt.value == matchedTour.id || opt.text.toLowerCase().includes(matchedTour.slug.replace(/-/g, ' '))) {
+                                tourSelect.value = opt.value;
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found && tourSelect.options.length > 1) {
+                            tourSelect.selectedIndex = 1;
+                        }
+                        tourSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                    const bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                    bsModal.show();
+                }
+            });
+        }
+
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                answers = { group: null, time: null, style: null };
+                result.classList.add('d-none');
+                step2.classList.add('d-none');
+                step3.classList.add('d-none');
+                step1.classList.remove('d-none');
+                stepNum.textContent = '1';
+                stepTitle.textContent = 'Who is traveling?';
+                progressText.textContent = 'Step 1 of 3';
+            });
+        }
+    },
+
+    initSunsetWidget(){
+        const label = document.getElementById('sunsetCountdownLabel');
+        if (!label) return;
+
+        const updateCountdown = () => {
+            const now = new Date();
+            const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+            const dubaiTime = new Date(utcTime + (3600000 * 4));
+
+            const sunsetToday = new Date(dubaiTime);
+            sunsetToday.setHours(18, 38, 0, 0);
+
+            const diffMs = sunsetToday - dubaiTime;
+            if (diffMs > 0) {
+                const diffHrs = Math.floor(diffMs / 3600000);
+                const diffMins = Math.floor((diffMs % 3600000) / 60000);
+                label.innerHTML = `Sunset: 6:38 PM • Golden Hour in ${diffHrs > 0 ? diffHrs + 'h ' : ''}${diffMins}m`;
+            } else {
+                label.innerHTML = `Stargazing Safari Live Tonight • Clear Skies`;
+            }
+        };
+
+        updateCountdown();
+        setInterval(updateCountdown, 60000);
     },
 
     initTooltips(){},

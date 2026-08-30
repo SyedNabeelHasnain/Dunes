@@ -272,12 +272,27 @@ class AdminTourController extends Controller
     }
 
     /**
-     * Display listing of Addons.
+     * Display listing of Addons with Sales Analytics.
      */
     public function addons()
     {
         $addons = Addon::withCount('tours')->orderBy('priority', 'asc')->get();
-        return view('admin.addons.index', compact('addons'));
+        $totalBookingsCount = \App\Models\Booking::where('status', '!=', 'draft')->count();
+
+        foreach ($addons as $addon) {
+            $bookedCount = \Illuminate\Support\Facades\DB::table('booking_addons')->where('addon_id', $addon->id)->count();
+            $bookedRevenue = (float)\Illuminate\Support\Facades\DB::table('booking_addons')->where('addon_id', $addon->id)->sum('price');
+            $attachmentRate = $totalBookingsCount > 0 ? round(($bookedCount / $totalBookingsCount) * 100, 1) : 0;
+
+            $addon->times_booked = $bookedCount;
+            $addon->total_revenue = $bookedRevenue;
+            $addon->attachment_rate = $attachmentRate;
+        }
+
+        $totalAddonsRevenue = (float)\Illuminate\Support\Facades\DB::table('booking_addons')->sum('price');
+        $totalAddonsBooked = \Illuminate\Support\Facades\DB::table('booking_addons')->count();
+
+        return view('admin.addons.index', compact('addons', 'totalAddonsRevenue', 'totalAddonsBooked'));
     }
 
     /**
