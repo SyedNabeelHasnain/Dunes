@@ -86,14 +86,16 @@ class AdminOperationsController extends Controller
             'driver_name' => 'nullable|string|max:100',
             'driver_phone' => 'nullable|string|max:50',
             'vehicle_plate' => 'nullable|string|max:50',
+            'driver_notes' => 'nullable|string|max:500',
         ]);
 
-        $booking->pickup_time = $request->input('pickup_time');
-        
+        $pickupTime = $request->input('pickup_time');
         $driverInfo = array_filter([
-            'Driver: ' . $request->input('driver_name'),
-            'Phone: ' . $request->input('driver_phone'),
-            'Plate: ' . $request->input('vehicle_plate'),
+            $pickupTime ? 'Pickup: ' . $pickupTime : null,
+            $request->input('driver_name') ? 'Driver: ' . $request->input('driver_name') : null,
+            $request->input('driver_phone') ? 'Phone: ' . $request->input('driver_phone') : null,
+            $request->input('vehicle_plate') ? 'Plate: ' . $request->input('vehicle_plate') : null,
+            $request->input('driver_notes') ? 'Notes: ' . $request->input('driver_notes') : null,
         ]);
 
         if (!empty($driverInfo)) {

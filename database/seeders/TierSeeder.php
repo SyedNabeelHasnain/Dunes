@@ -20,21 +20,21 @@ class TierSeeder extends Seeder
 
         $tiers = json_decode(File::get($path), true);
         foreach ($tiers as $t) {
-            Tier::updateOrCreate(
-                ['id' => $t['id']],
-                [
-                    'slug' => $t['slug'],
-                    'name' => $t['name'],
-                    'display_name' => $t['display_name'],
-                    'description' => $t['description'],
-                    'icon' => $t['icon'],
-                    'badge' => $t['badge'],
-                    'color' => $t['color'],
-                    'is_popular' => (bool)$t['is_popular'],
-                    'priority' => (int)$t['priority'],
-                    'status' => $t['status'] ?: 'active',
-                ]
-            );
+            \Illuminate\Support\Facades\DB::table('tiers')->insertOrIgnore([
+                'id' => $t['id'],
+                'slug' => $t['slug'],
+                'name' => $t['name'],
+                'display_name' => $t['display_name'],
+                'description' => $t['description'],
+                'icon' => $t['icon'],
+                'badge' => $t['badge'],
+                'color' => $t['color'],
+                'is_popular' => (bool)$t['is_popular'],
+                'priority' => (int)$t['priority'],
+                'status' => $t['status'] ?: 'active',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
     }
 }
