@@ -255,18 +255,19 @@ class AdminBookingController extends Controller
         $successUrl = route('booking.thankyou', ['pi' => '{PAYMENT_INTENT_ID}']);
         $cancelUrl = route('booking.cancel', ['pi' => '{PAYMENT_INTENT_ID}']);
         
-        $description = 'Booking #' . $booking->reference;
-        if ($booking->tour_name) {
-            $description .= ' - ' . $booking->tour_name;
-        }
-        if ($notes) {
-            $description .= ' (' . $notes . ')';
+        $description = 'Booking ' . $booking->reference;
+        if (!empty($notes)) {
+            $description .= ' ' . $notes;
         }
 
         $intent = $ziina->createPaymentIntent($amount, 'AED', $successUrl, $cancelUrl, $description);
 
         if (isset($intent['error'])) {
             return response()->json(['success' => false, 'message' => $intent['error']], 400);
+        }
+
+        if (empty($intent['redirect_url']) || empty($intent['id'])) {
+            return response()->json(['success' => false, 'message' => 'Payment link could not be generated.'], 400);
         }
 
         $payment = \App\Models\BookingPayment::create([

@@ -64,8 +64,16 @@ class ZiinaPaymentService
             'cancel_url' => $cancelUrl,
         ];
 
+        // Clean & truncate message for Ziina API constraints (max 50 chars, alphanumeric/spaces/hyphen)
         if (!empty($message)) {
-            $payload['message'] = $message;
+            $cleanMessage = trim(preg_replace('/[^a-zA-Z0-9 \-_.]/', ' ', $message));
+            $cleanMessage = preg_replace('/\s+/', ' ', $cleanMessage);
+            if (mb_strlen($cleanMessage) > 50) {
+                $cleanMessage = mb_substr($cleanMessage, 0, 50);
+            }
+            if (!empty($cleanMessage)) {
+                $payload['message'] = $cleanMessage;
+            }
         }
 
         if ($this->isTestMode()) {
@@ -86,8 +94,17 @@ class ZiinaPaymentService
                 ]);
 
                 $data = $response->json();
+                $errorMsg = 'Payment gateway error. Please try again.';
+                if (isset($data['message']) && is_string($data['message'])) {
+                    $errorMsg = $data['message'];
+                } elseif (isset($data['error']) && is_string($data['error'])) {
+                    $errorMsg = $data['error'];
+                } elseif (isset($data['errors']) && is_array($data['errors'])) {
+                    $errorMsg = implode(', ', array_map(fn($e) => is_array($e) ? implode(' ', $e) : $e, $data['errors']));
+                }
+
                 return [
-                    'error' => $data['message'] ?? 'Ziina error',
+                    'error' => $errorMsg,
                     'details' => $data
                 ];
             }

@@ -307,7 +307,7 @@ class BookingController extends Controller
             // Generate Ziina Payment Link
             $successUrl = route('booking.thankyou', ['pi' => '{PAYMENT_INTENT_ID}']);
             $cancelUrl = route('booking.cancel', ['pi' => '{PAYMENT_INTENT_ID}']);
-            $messageStr = "Booking {$booking->reference} - {$booking->tour_name}";
+            $messageStr = 'Booking ' . $booking->reference;
 
             $intent = $this->ziina->createPaymentIntent($payNow, 'AED', $successUrl, $cancelUrl, $messageStr);
 
