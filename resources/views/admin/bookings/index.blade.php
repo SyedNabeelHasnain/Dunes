@@ -187,7 +187,13 @@
                         <td data-order="{{ (float)$b->total }}">
                             <div class="fw-800 text-primary">AED {{ number_format($b->total) }}</div>
                             <div class="small text-muted" style="font-size: 0.72rem;">
-                                Paid: <strong class="text-success">AED {{ number_format($b->payment_amount) }}</strong> | Due: AED {{ number_format($b->balance_due) }}
+                                @if($b->payment_status === 'paid')
+                                    Paid: <strong class="text-success">AED {{ number_format($b->payment_amount ?: $b->total) }}</strong> | Due: AED 0
+                                @elseif($b->payment_status === 'partial')
+                                    Paid: <strong class="text-warning">AED {{ number_format($b->payment_amount) }}</strong> | Due: AED {{ number_format($b->balance_due) }}
+                                @else
+                                    Paid: <strong class="text-secondary">AED 0</strong> | Due: AED {{ number_format($b->total) }}
+                                @endif
                             </div>
                         </td>
                         <td class="text-center" data-order="{{ $b->status }}">

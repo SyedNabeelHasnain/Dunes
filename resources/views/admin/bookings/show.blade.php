@@ -99,9 +99,36 @@
             <div class="mb-3">
                 <label class="text-muted small fw-bold">Payment</label>
                 <div class="fw-medium text-dark">Method: <span class="text-capitalize">{{ $booking->payment_method }}</span></div>
-                <div class="fw-medium text-dark">Status: <span class="text-capitalize">{{ $booking->payment_status }}</span></div>
-                <div class="fw-medium text-dark">Paid: AED {{ number_format($booking->payment_amount ?? 0) }}</div>
-                <div class="fw-medium text-dark">Balance: AED {{ number_format($booking->balance_due ?? 0) }}</div>
+                <div class="fw-medium text-dark">Status: 
+                    @php
+                        $payBadge = match($booking->payment_status) {
+                            'paid' => 'success',
+                            'partial' => 'warning',
+                            default => 'secondary',
+                        };
+                    @endphp
+                    <span class="badge bg-{{ $payBadge }} text-capitalize">{{ $booking->payment_status }}</span>
+                </div>
+                <div class="fw-medium text-dark">
+                    Paid: 
+                    @if($booking->payment_status === 'paid')
+                        AED {{ number_format($booking->payment_amount ?: $booking->total) }}
+                    @elseif($booking->payment_status === 'partial')
+                        AED {{ number_format($booking->payment_amount) }}
+                    @else
+                        AED 0
+                    @endif
+                </div>
+                <div class="fw-medium text-dark">
+                    Balance: 
+                    @if($booking->payment_status === 'paid')
+                        AED 0
+                    @elseif($booking->payment_status === 'partial')
+                        AED {{ number_format($booking->balance_due) }}
+                    @else
+                        AED {{ number_format($booking->total) }}
+                    @endif
+                </div>
             </div>
             @if($booking->addons && $booking->addons->count() > 0)
             <div class="mt-3 pt-3 border-top">

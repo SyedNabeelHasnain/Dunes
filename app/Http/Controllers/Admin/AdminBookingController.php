@@ -197,8 +197,29 @@ class AdminBookingController extends Controller
             'balance_due' => 'required|numeric|min:0',
         ]);
 
+        $paymentStatus = $request->input('payment_status');
+        $balanceDue = (float)$request->input('balance_due');
+        $paymentAmount = (float)$booking->payment_amount;
+
+        if ($paymentStatus === 'paid') {
+            $balanceDue = 0.00;
+            $paymentAmount = (float)$booking->total;
+        } elseif ($paymentStatus === 'unpaid') {
+            $balanceDue = (float)$booking->total;
+            $paymentAmount = 0.00;
+        } else {
+            $paymentAmount = max(0, (float)$booking->total - $balanceDue);
+        }
+
         $oldStatus = $booking->status;
-        $booking->update($request->only(['status', 'payment_status', 'balance_due', 'special_requests', 'pickup_location']));
+        $booking->update([
+            'status' => $request->input('status'),
+            'payment_status' => $paymentStatus,
+            'payment_amount' => $paymentAmount,
+            'balance_due' => $balanceDue,
+            'special_requests' => $request->input('special_requests'),
+            'pickup_location' => $request->input('pickup_location'),
+        ]);
 
         // If status changed to confirmed or cancelled, trigger notifications
         if ($oldStatus !== $booking->status) {
