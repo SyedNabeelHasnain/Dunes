@@ -218,6 +218,9 @@
                 try {
                     const bModal = bootstrap.Modal.getOrCreateInstance(modalEl);
                     bModal.show();
+                    if (window.App && typeof window.App.initPhoneInputs === 'function') {
+                        setTimeout(() => window.App.initPhoneInputs(), 100);
+                    }
                     return;
                 } catch(e) {}
             }
@@ -349,7 +352,10 @@
                 e.preventDefault();
                 const name = document.getElementById('welcomeName')?.value.trim();
                 const email = document.getElementById('welcomeEmail')?.value.trim();
-                const phone = document.getElementById('welcomePhone')?.value.trim();
+                const phoneInput = document.getElementById('welcomePhone');
+                const phone = (phoneInput && phoneInput._iti && typeof phoneInput._iti.getNumber === 'function' && phoneInput._iti.getNumber())
+                    ? phoneInput._iti.getNumber()
+                    : phoneInput?.value.trim();
 
                 if (!name || !email || !phone) {
                     if (errorBox) {

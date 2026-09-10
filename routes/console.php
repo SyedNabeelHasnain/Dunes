@@ -13,3 +13,7 @@ Schedule::command('tours:send-review-requests')->dailyAt('10:00');
 
 // Recover abandoned booking checkouts created in the last 24 hours (hourly frequency)
 Schedule::command('bookings:recover-abandoned')->hourly();
+
+// Process queued background jobs (e.g. Meta CAPI, notifications, recovery) every minute
+Schedule::command('queue:work --stop-when-empty --tries=3')->everyMinute();
+

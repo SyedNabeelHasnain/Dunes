@@ -29,6 +29,7 @@ const App={
         this.initSafariMatcher();
         this.initSunsetWidget();
         this.initCurrency();
+        this.initPhoneInputs();
     },
 
     currency: {
@@ -693,6 +694,37 @@ const App={
         });
     },
 
+    initPhoneInputs(){
+        if(typeof window.intlTelInput === 'undefined') return;
+
+        const inputs = document.querySelectorAll('input[type="tel"], #bookingPhone, #waPhone, #welcomePhone');
+        inputs.forEach(input => {
+            if(!input || input.dataset.itiInitialized === 'true') return;
+            input.dataset.itiInitialized = 'true';
+
+            try {
+                const iti = window.intlTelInput(input, {
+                    utilsScript: '/assets/vendor/intl-tel-input/26.0.6/build/utils.js',
+                    separateDialCode: true,
+                    initialCountry: 'ae',
+                    preferredCountries: ['ae', 'sa', 'om', 'kw', 'qa', 'bh', 'gb', 'us', 'in', 'de', 'ru'],
+                    autoPlaceholder: 'aggressive',
+                    customPlaceholder: function(selectedCountryPlaceholder) {
+                        return selectedCountryPlaceholder ? selectedCountryPlaceholder : "50 123 4567";
+                    }
+                });
+
+                input._iti = iti;
+
+                input.addEventListener('countrychange', () => {
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                });
+            } catch (err) {
+                console.warn('intlTelInput init error:', err);
+            }
+        });
+    },
+
     initWhatsApp(){
         const modal=document.getElementById('whatsappModal');
         if(!modal)return;
@@ -701,9 +733,7 @@ const App={
         const nameInp=document.getElementById('waName');
         const phoneInp=document.getElementById('waPhone');
 
-        if(phoneInp && window.intlTelInput && !phoneInp.dataset.itiInitialized){
-
-        }
+        this.initPhoneInputs();
 
         const tourNameInp=document.getElementById('waTourName');
         const pageUrlInp=document.getElementById('waPageUrl');
@@ -716,6 +746,10 @@ const App={
         phoneInp.addEventListener('input',check);
 
         const getModal=()=>typeof bootstrap!=='undefined'&&bootstrap.Modal?bootstrap.Modal.getOrCreateInstance(modal):null;
+
+        modal.addEventListener('shown.bs.modal',()=>{
+            this.initPhoneInputs();
+        });
 
         modal.addEventListener('hidden.bs.modal',()=>{
             form.reset();
@@ -865,6 +899,7 @@ const App={
 
         modal.addEventListener('shown.bs.modal',()=>{
             this.currentStep=1;
+            this.initPhoneInputs();
 
             const titleEl = document.getElementById('bookingModalTitle');
             const wrapper = document.getElementById('tourSelectWrapper');
@@ -1231,7 +1266,10 @@ const App={
             draftTimer = setTimeout(async () => {
                 const name = document.getElementById('bookingName')?.value.trim();
                 const email = document.getElementById('bookingEmail')?.value.trim();
-                const phone = document.getElementById('bookingPhone')?.value.trim();
+                const phoneEl = document.getElementById('bookingPhone');
+                const phone = (phoneEl && phoneEl._iti && typeof phoneEl._iti.getNumber === 'function' && phoneEl._iti.getNumber())
+                    ? phoneEl._iti.getNumber()
+                    : phoneEl?.value.trim();
 
                 if ((name && name.length >= 2) || (email && email.includes('@')) || (phone && phone.length >= 7)) {
                     const tourId = document.getElementById('bookingTour')?.value;
@@ -1827,6 +1865,16 @@ const App={
                 }
 
                 try{
+                    // Sync international telephone number if intl-tel-input is initialized
+                    form.querySelectorAll('input[type="tel"], #bookingPhone, #waPhone, #welcomePhone, #phone').forEach(inp => {
+                        if (inp._iti && typeof inp._iti.getNumber === 'function') {
+                            const fullNum = inp._iti.getNumber();
+                            if (fullNum) {
+                                inp.value = fullNum;
+                            }
+                        }
+                    });
+
                     const fd=new FormData(form);
                     const action=String(fd.get('action')||'');
 

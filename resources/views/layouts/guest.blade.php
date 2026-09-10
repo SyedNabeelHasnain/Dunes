@@ -18,7 +18,7 @@
         @if($hasVite)
             @vite(['resources/css/app.css', 'resources/js/app.js'])
         @else
-            <script src="https://cdn.tailwindcss.com"></script>
+            <link href="{{ asset('assets/css/app.min.css') }}" rel="stylesheet">
         @endif
     </head>
     <body class="font-sans text-gray-900 antialiased">

@@ -15,71 +15,70 @@ class HomeController extends Controller
     public function index()
     {
         try {
-            $categories = Category::with(['tours' => function ($query) {
-                $query->where('status', 'active')->with(['tiers', 'category'])->orderBy('priority', 'asc');
-            }])->orderBy('priority', 'asc')->get();
+            $cachedData = \Illuminate\Support\Facades\Cache::remember('site_home_cache', 3600, function() {
+                $categories = Category::with(['tours' => function ($query) {
+                    $query->where('status', 'active')->with(['tiers', 'category'])->orderBy('priority', 'asc');
+                }])->orderBy('priority', 'asc')->get();
+
+                $bestsellers = Tour::where('status', 'active')
+                    ->where('is_bestseller', true)
+                    ->with(['tiers', 'category'])
+                    ->orderBy('priority', 'asc')
+                    ->get();
+
+                $reviews = Review::where('status', 'approved')
+                    ->where('is_featured', true)
+                    ->orderBy('published_date', 'desc')
+                    ->limit(10)
+                    ->get();
+
+                $generalFaqIds = \App\Models\FaqAssignment::where('entity_type', 'general')->pluck('faq_id');
+                $faqs = \App\Models\Faq::whereIn('id', $generalFaqIds)->where('status', 'active')->orderBy('priority', 'asc')->limit(6)->get();
+
+                $allActiveTours = Tour::where('status', 'active')
+                    ->with(['category', 'tiers'])
+                    ->orderBy('priority', 'asc')
+                    ->get()
+                    ->map(function ($t) {
+                        $minPrice = $t->tiers->pluck('pivot.price')->filter(function ($p) {
+                            return $p !== null && (float)$p > 0;
+                        })->min();
+
+                        if (!$minPrice) {
+                            $minPrice = 79;
+                        }
+
+                        return [
+                            'id' => (string)$t->id,
+                            'name' => $t->name,
+                            'slug' => $t->slug,
+                            'category_slug' => $t->category ? $t->category->slug : 'desert-safari',
+                            'category_name' => $t->category ? $t->category->name : 'Desert Safari',
+                            'duration' => $t->duration ?: '4-6 Hours',
+                            'rating' => (float)($t->rating ?: 4.9),
+                            'review_count' => (int)($t->review_count ?: 500),
+                            'min_price' => (float)$minPrice,
+                            'short_desc' => $t->short_desc ?: 'Top-rated Dubai tour experience.',
+                            'is_bestseller' => (bool)$t->is_bestseller,
+                            'is_featured' => (bool)$t->is_featured,
+                            'priority' => (int)$t->priority,
+                        ];
+                    });
+
+                return compact('categories', 'bestsellers', 'reviews', 'faqs', 'allActiveTours');
+            });
+
+            $categories = $cachedData['categories'] ?? collect();
+            $bestsellers = $cachedData['bestsellers'] ?? collect();
+            $reviews = $cachedData['reviews'] ?? collect();
+            $faqs = $cachedData['faqs'] ?? collect();
+            $allActiveTours = $cachedData['allActiveTours'] ?? collect();
         } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('HomeController cache read failed, falling back: ' . $e->getMessage());
             $categories = collect();
-        }
-
-        try {
-            $bestsellers = Tour::where('status', 'active')
-                ->where('is_bestseller', true)
-                ->with(['tiers', 'category'])
-                ->orderBy('priority', 'asc')
-                ->get();
-        } catch (\Throwable $e) {
             $bestsellers = collect();
-        }
-
-        try {
-            $reviews = Review::where('status', 'approved')
-                ->where('is_featured', true)
-                ->orderBy('published_date', 'desc')
-                ->limit(10)
-                ->get();
-        } catch (\Throwable $e) {
             $reviews = collect();
-        }
-
-        try {
-            $generalFaqIds = \App\Models\FaqAssignment::where('entity_type', 'general')->pluck('faq_id');
-            $faqs = \App\Models\Faq::whereIn('id', $generalFaqIds)->where('status', 'active')->orderBy('priority', 'asc')->limit(6)->get();
-        } catch (\Throwable $e) {
             $faqs = collect();
-        }
-
-        try {
-            $allActiveTours = Tour::where('status', 'active')
-                ->with(['category', 'tiers'])
-                ->orderBy('priority', 'asc')
-                ->get()
-                ->map(function ($t) {
-                    $minPrice = $t->tiers->pluck('pivot.price')->filter(function ($p) {
-                        return $p !== null && (float)$p > 0;
-                    })->min();
-
-                    if (!$minPrice) {
-                        $minPrice = 79;
-                    }
-
-                    return [
-                        'id' => (string)$t->id,
-                        'name' => $t->name,
-                        'slug' => $t->slug,
-                        'category_slug' => $t->category ? $t->category->slug : 'desert-safari',
-                        'category_name' => $t->category ? $t->category->name : 'Desert Safari',
-                        'duration' => $t->duration ?: '4-6 Hours',
-                        'rating' => (float)($t->rating ?: 4.9),
-                        'review_count' => (int)($t->review_count ?: 500),
-                        'min_price' => (float)$minPrice,
-                        'short_desc' => $t->short_desc ?: 'Top-rated Dubai tour experience.',
-                        'is_bestseller' => (bool)$t->is_bestseller,
-                        'is_featured' => (bool)$t->is_featured,
-                        'priority' => (int)$t->priority,
-                    ];
-                });
-        } catch (\Throwable $e) {
             $allActiveTours = collect();
         }
 
