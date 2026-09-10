@@ -319,7 +319,12 @@
                         <div class="offcanvas-title d-flex align-items-center" id="mainOffcanvasLabel">
                             <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery" width="140" height="90" class="img-fluid" style="height: auto; max-height: 40px; object-fit: contain;">
                         </div>
-                        <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-lg-none">
+                                @include('partials.currency-switcher')
+                            </div>
+                            <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                        </div>
                     </div>
                     <div class="offcanvas-body p-4 p-lg-0">
                         <ul class="navbar-nav mx-auto mb-4 mb-lg-0 gap-lg-1 text-nowrap">
@@ -353,6 +358,9 @@
                             </li>
                         </ul>
                         <div class="d-flex flex-column flex-lg-row gap-3 align-items-stretch align-items-lg-center">
+                            <div class="d-none d-lg-block">
+                                @include('partials.currency-switcher')
+                            </div>
                             <a class="btn btn-whatsapp-animated rounded-pill px-4 fw-semibold d-inline-flex align-items-center justify-content-center gap-2" href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener">
                                 <i class="bi bi-whatsapp fs-5"></i>WhatsApp
                             </a>

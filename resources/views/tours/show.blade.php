@@ -659,6 +659,9 @@ if(window.fbq){
                 </div>
                 @endif
 
+                <!-- Detailed Side-by-Side Feature Inclusion Matrix -->
+                @include('partials.tier-comparison-matrix')
+
                 <!-- Contextual Cross-Tour Internal Links -->
                 <div class="p-4 rounded-4 bg-white border border-light shadow-sm mb-4">
                     <h3 class="h6 fw-bold text-dark mb-3 d-flex align-items-center gap-2">

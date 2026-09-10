@@ -28,6 +28,94 @@ const App={
         this.initLegalModal();
         this.initSafariMatcher();
         this.initSunsetWidget();
+        this.initCurrency();
+    },
+
+    currency: {
+        code: localStorage.getItem('dunes_currency') || 'AED',
+        rates: {
+            'AED': 1.0,
+            'USD': 0.2723,
+            'EUR': 0.2510,
+            'GBP': 0.2150,
+            'SAR': 1.0210,
+            'INR': 22.85
+        },
+        symbols: {
+            'AED': 'AED',
+            'USD': '$',
+            'EUR': '€',
+            'GBP': '£',
+            'SAR': 'SAR',
+            'INR': '₹'
+        },
+        flags: {
+            'AED': '🇦🇪',
+            'USD': '🇺🇸',
+            'EUR': '🇪🇺',
+            'GBP': '🇬🇧',
+            'SAR': '🇸🇦',
+            'INR': '🇮🇳'
+        }
+    },
+
+    initCurrency() {
+        const saved = localStorage.getItem('dunes_currency') || 'AED';
+        this.setCurrency(saved, false);
+
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('.currency-option');
+            if (!btn) return;
+            e.preventDefault();
+            const cur = btn.dataset.currency;
+            if (cur) {
+                this.setCurrency(cur, true);
+            }
+        });
+    },
+
+    setCurrency(code, showToast = false) {
+        if (!this.currency.rates[code]) return;
+        this.currency.code = code;
+        localStorage.setItem('dunes_currency', code);
+
+        const flag = this.currency.flags[code] || '';
+        const symbol = this.currency.symbols[code] || code;
+
+        document.querySelectorAll('.current-currency-flag').forEach(el => el.textContent = flag);
+        document.querySelectorAll('.current-currency-code').forEach(el => el.textContent = code);
+
+        document.querySelectorAll('.currency-option').forEach(btn => {
+            const isMatch = btn.dataset.currency === code;
+            btn.classList.toggle('active', isMatch);
+            const check = btn.querySelector('.checkmark');
+            if (check) {
+                check.classList.toggle('d-none', !isMatch);
+            }
+        });
+
+        if (typeof this.updateTotal === 'function') {
+            this.updateTotal();
+        }
+
+        if (showToast) {
+            this.toast(`Display currency set to ${code} (${symbol})`, 'success');
+        }
+    },
+
+    formatDisplayPrice(aedAmount) {
+        const code = this.currency.code;
+        const formattedAED = 'AED ' + Number(aedAmount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        if (code === 'AED') {
+            return formattedAED;
+        }
+
+        const rate = this.currency.rates[code] || 1;
+        const converted = aedAmount * rate;
+        const symbol = this.currency.symbols[code] || code;
+        const formattedForeign = `${symbol} ${Number(converted).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+        return `${formattedAED} <span class="text-muted fw-normal small" style="font-size: 0.85em;">(~ ${formattedForeign})</span>`;
     },
 
     initLegalModal() {
@@ -1303,16 +1391,15 @@ const App={
         else if(method==='full') payNow=total;
         else if(method==='cash') payNow=total;
 
-        const formatMoney = (v)=>'AED '+Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+        const formatMoney = (v)=> this.formatDisplayPrice(v);
         if(totalEl) {
-            const formatted=formatMoney(total);
-            totalEl.innerHTML = formatted.replace('AED ','<span class="currency">AED</span> ');
+            totalEl.innerHTML = formatMoney(total);
         }
         if(summaryTotalEl) {
             if (discount > 0) {
                 summaryTotalEl.innerHTML = `<span class="text-decoration-line-through text-muted small me-2">${formatMoney(baseTotal)}</span> <span class="text-success fw-bold">${formatMoney(total)}</span>`;
             } else {
-                summaryTotalEl.textContent = formatMoney(total);
+                summaryTotalEl.innerHTML = formatMoney(total);
             }
         }
         if(payInput) payInput.value = Number(payNow).toFixed(2);
@@ -1321,7 +1408,10 @@ const App={
             if(method==='cash'){
                 submitBtn.innerHTML='Confirm <i class="bi bi-check-lg"></i>';
             }else{
-                submitBtn.innerHTML=`Pay ${formatMoney(payNow)} <i class="bi bi-credit-card"></i>`;
+                const cur = this.currency.code;
+                const converted = payNow * (this.currency.rates[cur] || 1);
+                const approx = cur !== 'AED' ? ` (~ ${this.currency.symbols[cur]}${Math.round(converted)})` : '';
+                submitBtn.innerHTML=`Pay AED ${Number(payNow).toFixed(2)}${approx} <i class="bi bi-credit-card"></i>`;
             }
         }
     },
