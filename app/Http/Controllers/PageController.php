@@ -251,17 +251,15 @@ class PageController extends Controller
             // Auto-create an approved review record
             try {
                 \App\Models\Review::firstOrCreate(
-                    ['customer_name' => $booking->name, 'tour_id' => $booking->tour_id],
+                    ['reviewer_name' => $booking->name, 'source' => 'email_booster'],
                     [
                         'rating' => $score,
-                        'customer_name' => $booking->name,
-                        'country' => 'United Arab Emirates',
-                        'title' => 'Unforgettable Desert Adventure!',
-                        'content' => 'Outstanding desert safari experience organized by Dunes Discovery Tourism. Highly recommended!',
+                        'reviewer_name' => $booking->name,
+                        'published_date' => now()->toDateString(),
+                        'review_title' => 'Unforgettable Desert Adventure!',
+                        'review_text' => 'Outstanding desert safari experience organized by Dunes Discovery Tourism. Highly recommended!',
                         'status' => 'approved',
                         'is_featured' => true,
-                        'priority' => 1,
-                        'tour_id' => $booking->tour_id,
                         'source' => 'email_booster'
                     ]
                 );

@@ -321,6 +321,8 @@ window.addEventListener('popstate', () => {
     filterTours(cat);
 });
 </script>
+@endpush
+
 @push('preloads')
 <!-- Schema.org 2026 CollectionPage, ItemList & BreadcrumbList -->
 <script type="application/ld+json">

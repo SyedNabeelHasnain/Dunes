@@ -40,12 +40,9 @@ class SendMetaCapiEvent implements ShouldQueue
      */
     public function handle(): void
     {
-        $pixelIdSetting = Setting::where('setting_key', 'meta_pixel_id')->first();
-        $capiTokenSetting = Setting::where('setting_key', 'meta_capi_token')->first()
-            ?? Setting::where('setting_key', 'meta_access_token')->first();
-
-        $pixelId = $pixelIdSetting ? trim($pixelIdSetting->setting_value) : '';
-        $token = $capiTokenSetting ? trim($capiTokenSetting->setting_value) : '';
+        $settings = app(\App\Services\SettingsService::class);
+        $pixelId = trim($settings->get('meta_pixel_id', ''));
+        $token = trim($settings->get('meta_capi_token', '') ?: $settings->get('meta_access_token', ''));
 
         if (empty($pixelId) || empty($token)) {
             return;

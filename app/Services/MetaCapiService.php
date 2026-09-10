@@ -13,9 +13,8 @@ class MetaCapiService
      */
     public function isActive(): bool
     {
-        $active = Setting::where('setting_key', 'meta_active')->first();
-        $capi = Setting::where('setting_key', 'meta_capi_enabled')->first();
-        return $active && $active->setting_value === '1' && $capi && $capi->setting_value === '1';
+        $settings = app(SettingsService::class);
+        return $settings->get('meta_active') === '1' && $settings->get('meta_capi_enabled') === '1';
     }
 
     /**

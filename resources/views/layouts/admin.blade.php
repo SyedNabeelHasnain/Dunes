@@ -21,7 +21,6 @@
         }
     @endphp
     <link href="{{ asset('assets/css/app.css') }}?v={{ $adminCacheVer }}" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
         /* Global SVG & Pagination Safeguards */
@@ -520,11 +519,12 @@
     </div>
 
     <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" crossorigin="anonymous"></script>
     <script src="{{ asset('assets/vendor/bootstrap/5.3.2/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.all.min.js" crossorigin="anonymous"></script>
 
     <script>
     $(document).ready(function() {
@@ -753,12 +753,19 @@
         // Active visitors popover and polling
         const widget = document.getElementById('activeVisitorsWidget');
         const countSpan = document.getElementById('activeVisitorsCount');
-        let popoverInstance = new bootstrap.Popover(widget);
+        let popoverInstance = widget ? new bootstrap.Popover(widget) : null;
+        let lastVisitorsPayload = '';
 
         function updateActiveVisitors() {
+            if (document.hidden || !widget || !countSpan) return;
+
             fetch("{{ route('admin.active-visitors') }}")
                 .then(res => res.json())
                 .then(data => {
+                    const currentPayload = JSON.stringify(data);
+                    if (currentPayload === lastVisitorsPayload) return;
+                    lastVisitorsPayload = currentPayload;
+
                     countSpan.textContent = `${data.count} Online`;
                     
                     let html = '<div class="popover-body-content p-3" style="max-height:220px; overflow-y:auto; font-size:12px; min-width:260px;">';
@@ -787,7 +794,9 @@
                     widget.setAttribute('data-bs-content', html);
                     
                     // Re-init popover to update content
-                    popoverInstance.dispose();
+                    if (popoverInstance) {
+                        popoverInstance.dispose();
+                    }
                     popoverInstance = new bootstrap.Popover(widget);
                 })
                 .catch(err => console.error("Failed to fetch active visitors", err));
@@ -796,6 +805,13 @@
         // Run immediately and poll every 15s
         updateActiveVisitors();
         setInterval(updateActiveVisitors, 15000);
+
+        // Resume immediately when admin tab becomes visible
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                updateActiveVisitors();
+            }
+        });
     });
 
     // Global Loader Controls

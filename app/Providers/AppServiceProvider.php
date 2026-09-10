@@ -28,22 +28,5 @@ class AppServiceProvider extends ServiceProvider
                 return true;
             });
         } catch (\Throwable $e) {}
-
-        // Invalidate PHP-FPM OPcache for compiled Blade view files to ensure fresh rendering
-        if (function_exists('opcache_invalidate')) {
-            \Illuminate\Support\Facades\View::composer('*', function () {
-                static $invalidated = false;
-                if (!$invalidated) {
-                    $invalidated = true;
-                    $viewsDir = storage_path('framework/views');
-                    if (is_dir($viewsDir)) {
-                        $files = glob($viewsDir . '/*.php');
-                        foreach ($files as $f) {
-                            @opcache_invalidate($f, true);
-                        }
-                    }
-                }
-            });
-        }
     }
 }

@@ -79,7 +79,9 @@
 .form-check-input.desert-checkbox:hover {
     border-color: var(--primary-dark);
 }
-.was-validated .form-check-input.desert-checkbox:valid,
+.was-validated .form-check-input.desert-checkbox:valid {
+    border-color: var(--primary);
+}
 .sticky-right-bar {
     position: fixed;
     right: 0;

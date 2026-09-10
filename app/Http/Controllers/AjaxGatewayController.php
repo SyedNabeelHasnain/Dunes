@@ -93,6 +93,7 @@ class AjaxGatewayController extends Controller
                 return response()->json(['success' => true, 'html' => $html]);
 
             case 'geoip':
+            case 'get_geoip':
                 return $this->apiController->geoip();
 
             case 'booking':

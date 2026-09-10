@@ -25,8 +25,7 @@ class VisitorTrackerService
             }
         }
 
-        $saltSetting = Setting::where('setting_key', 'tracking_ip_salt')->first();
-        $salt = $saltSetting ? $saltSetting->setting_value : 'dunes-discovery-tracking-salt';
+        $salt = app(SettingsService::class)->get('tracking_ip_salt', 'dunes-discovery-tracking-salt');
         $hash = ($ip !== '0.0.0.0') ? hash('sha256', $salt . $ip) : 'Not Available';
 
         return [

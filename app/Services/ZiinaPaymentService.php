@@ -13,8 +13,7 @@ class ZiinaPaymentService
      */
     public function isActive(): bool
     {
-        $setting = Setting::where('setting_key', 'ziina_active')->first();
-        return $setting && $setting->setting_value === '1';
+        return app(SettingsService::class)->get('ziina_active') === '1';
     }
 
     /**
@@ -22,8 +21,8 @@ class ZiinaPaymentService
      */
     public function getAdvancePercent(): int
     {
-        $setting = Setting::where('setting_key', 'ziina_advance_percent')->first();
-        return $setting ? (int)$setting->setting_value : 10;
+        $percent = app(SettingsService::class)->get('ziina_advance_percent', '10');
+        return is_numeric($percent) ? (int)$percent : 10;
     }
 
     /**
@@ -31,8 +30,7 @@ class ZiinaPaymentService
      */
     public function isTestMode(): bool
     {
-        $setting = Setting::where('setting_key', 'ziina_test_mode')->first();
-        return $setting && $setting->setting_value === '1';
+        return app(SettingsService::class)->get('ziina_test_mode') === '1';
     }
 
     /**
@@ -40,8 +38,7 @@ class ZiinaPaymentService
      */
     protected function getToken(): string
     {
-        $setting = Setting::where('setting_key', 'ziina_access_token')->first();
-        return $setting ? trim($setting->setting_value) : '';
+        return trim(app(SettingsService::class)->get('ziina_access_token', ''));
     }
 
     /**

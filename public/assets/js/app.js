@@ -113,7 +113,7 @@ const App={
             if(!parent.querySelector('.email-verify-loader')){
                 const loader = document.createElement('span');
                 loader.className = 'email-verify-loader';
-                loader.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
+                loader.innerHTML = '<span class="spinner-border spinner-border-sm text-primary" role="status"></span>';
                 parent.appendChild(loader);
             }
 
@@ -1556,16 +1556,17 @@ const App={
 
     async ipLocation(inp){
         try{
-            const res=await fetch('http://ip-api.com/json/?fields=city,regionName,country');
+            const res=await fetch('/ajax.php?action=geoip');
             const t=await res.text();
             const d=JSON.parse(t.replace(/^\uFEFF+/, '').trim());
-            if(d.city){
-                inp.value=[d.city,d.regionName].filter(Boolean).join(', ');
+            const locCity = d.city || d.region;
+            if(locCity){
+                inp.value=[d.city, d.region].filter(Boolean).join(', ');
                 this.toast('Approximate location detected','success');
+                return;
             }
-        }catch(e){
-            inp.value='Dubai, UAE';
-        }
+        }catch(e){}
+        inp.value='Dubai, UAE';
     },
 
     initForms(){
