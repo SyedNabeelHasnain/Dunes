@@ -11,7 +11,13 @@
         <h2 class="h4 fw-800 text-dark mb-0">Booking #{{ $booking->reference }}</h2>
     </div>
     
-    <div class="d-flex gap-2">
+    <div class="d-flex gap-2 align-items-center flex-wrap">
+        <a href="{{ route('admin.bookings.ticket', $booking->id) }}" class="btn btn-outline-primary rounded-pill px-3 py-2 fw-bold shadow-sm" title="Download Official A4 PDF Voucher">
+            <i class="bi bi-file-earmark-pdf me-1"></i> E-Ticket PDF
+        </a>
+        <a href="{{ route('booking.voucher', $booking->reference) }}" target="_blank" class="btn btn-outline-secondary rounded-pill px-3 py-2 fw-bold shadow-sm" title="Open Digital Boarding Pass">
+            <i class="bi bi-box-arrow-up-right me-1"></i> View Voucher
+        </a>
         @if($booking->status === 'pending')
             <form action="{{ route('admin.bookings.update', $booking->id) }}" method="POST" class="d-inline">
                 @csrf

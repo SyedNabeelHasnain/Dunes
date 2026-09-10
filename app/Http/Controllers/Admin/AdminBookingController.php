@@ -417,4 +417,26 @@ class AdminBookingController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Download booking voucher / e-ticket as PDF.
+     */
+    public function downloadTicket(int $id)
+    {
+        $booking = Booking::with(['addons', 'tier'])->findOrFail($id);
+
+        $verificationUrl = route('booking.voucher', $booking->reference);
+        $qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=4&data=' . urlencode($verificationUrl);
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('booking.ticket-pdf', compact('booking', 'qrCodeUrl'))
+            ->setPaper('a4', 'portrait')
+            ->setOption([
+                'isRemoteEnabled' => true,
+                'dpi' => 120,
+                'defaultFont' => 'sans-serif'
+            ]);
+
+        return $pdf->download('Dunes-Voucher-' . $booking->reference . '.pdf');
+    }
 }
+

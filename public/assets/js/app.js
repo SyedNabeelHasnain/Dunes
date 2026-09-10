@@ -34,7 +34,14 @@ const App={
 
     currency: {
         code: localStorage.getItem('dunes_currency') || 'AED',
-        rates: {
+        rates: (window.DunesRates && typeof window.DunesRates === 'object') ? Object.assign({
+            'AED': 1.0,
+            'USD': 0.2723,
+            'EUR': 0.2510,
+            'GBP': 0.2150,
+            'SAR': 1.0210,
+            'INR': 22.85
+        }, window.DunesRates) : {
             'AED': 1.0,
             'USD': 0.2723,
             'EUR': 0.2510,
@@ -61,6 +68,9 @@ const App={
     },
 
     initCurrency() {
+        if (window.DunesRates && typeof window.DunesRates === 'object') {
+            this.currency.rates = Object.assign({}, this.currency.rates, window.DunesRates);
+        }
         const saved = localStorage.getItem('dunes_currency') || 'AED';
         this.setCurrency(saved, false);
 

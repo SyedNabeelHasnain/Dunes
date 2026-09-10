@@ -237,6 +237,9 @@
                                     <a href="{{ route('admin.bookings.show', $b->id) }}" class="btn btn-sm btn-outline-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="View Booking Details">
                                         <i class="bi bi-eye-fill"></i>
                                     </a>
+                                    <a href="{{ route('admin.bookings.ticket', $b->id) }}" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="Download E-Ticket PDF">
+                                        <i class="bi bi-file-earmark-pdf"></i>
+                                    </a>
                                     @php
                                         $waVal = preg_replace('/[^0-9]/', '', $b->phone);
                                         $waMsg = 'Hi ' . $b->name . '! This is Dunes Discovery regarding your booking #' . $b->reference;

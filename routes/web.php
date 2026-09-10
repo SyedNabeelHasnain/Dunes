@@ -40,6 +40,8 @@ Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 Route::get('/thankyou', [BookingController::class, 'thankyou'])->name('booking.thankyou');
 Route::get('/payment-cancel', [BookingController::class, 'paymentCancel'])->name('booking.cancel');
 Route::post('/booking/draft', [BookingController::class, 'saveDraft'])->name('booking.draft');
+Route::get('/booking/{reference}/voucher', [\App\Http\Controllers\VoucherController::class, 'show'])->name('booking.voucher');
+Route::get('/booking/{reference}/ticket-pdf', [\App\Http\Controllers\VoucherController::class, 'downloadPdf'])->name('booking.ticket.pdf');
 Route::get('/review/{ref}', [PageController::class, 'reviewRate'])->name('review.rate');
 Route::post('/review/{ref}/feedback', [PageController::class, 'submitFeedback'])->name('review.feedback');
 
@@ -80,6 +82,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::resource('bookings', AdminBookingController::class)->only(['index', 'show', 'update', 'destroy']);
     Route::post('/bookings/{id}/payment-link', [AdminBookingController::class, 'createPaymentLink'])->name('bookings.payment-link');
     Route::post('/bookings/{id}/resend-payment', [AdminBookingController::class, 'resendPaymentEmail'])->name('bookings.resend-payment');
+    Route::get('/bookings/{id}/ticket', [AdminBookingController::class, 'downloadTicket'])->name('bookings.ticket');
     
     // Daily Tour Operations & Driver Dispatch Manifest
     Route::get('/operations', [\App\Http\Controllers\Admin\AdminOperationsController::class, 'index'])->name('operations.index');
@@ -136,7 +139,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Integrations Settings (Google, Meta, Cache)
     Route::get('/settings/google', [AdminSettingController::class, 'google'])->name('settings.google');
     Route::get('/settings/meta', [AdminSettingController::class, 'meta'])->name('settings.meta');
+    Route::get('/settings/currency', [AdminSettingController::class, 'currency'])->name('settings.currency');
     Route::post('/settings/update', [AdminSettingController::class, 'update'])->name('settings.update');
+    Route::post('/settings/sync-currency', [AdminSettingController::class, 'syncExchangeRates'])->name('settings.sync-currency');
     Route::match(['get', 'post'], '/clear-cache', [AdminSettingController::class, 'clearCache'])->name('clear-cache');
     Route::match(['get', 'post'], '/run-migrations', [AdminSettingController::class, 'runMigrations'])->name('run-migrations');
 });

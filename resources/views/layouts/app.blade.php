@@ -550,6 +550,18 @@
 
     @include('partials.booking-modal')
     @include('partials.welcome-offer-modal')
+    @include('partials.social-proof')
+
+    <script>
+        window.DunesRates = {
+            'AED': 1.0,
+            'USD': {{ (float) ($settings['currency_rate_usd'] ?? 0.2723) }},
+            'EUR': {{ (float) ($settings['currency_rate_eur'] ?? 0.2510) }},
+            'GBP': {{ (float) ($settings['currency_rate_gbp'] ?? 0.2150) }},
+            'SAR': {{ (float) ($settings['currency_rate_sar'] ?? 1.0210) }},
+            'INR': {{ (float) ($settings['currency_rate_inr'] ?? 22.85) }}
+        };
+    </script>
 
     <!-- Scripts -->
     <script src="{{ asset('assets/vendor/bootstrap/5.3.2/js/bootstrap.bundle.min.js') }}" defer></script>

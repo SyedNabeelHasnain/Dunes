@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Services\SettingsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 
@@ -35,6 +36,24 @@ class AdminSettingController extends Controller
     }
 
     /**
+     * Show multi-currency and live exchange rate management.
+     */
+    public function currency()
+    {
+        $settings = app(SettingsService::class);
+        $rates = [
+            'usd' => $settings->get('currency_rate_usd', '0.2723'),
+            'eur' => $settings->get('currency_rate_eur', '0.2510'),
+            'gbp' => $settings->get('currency_rate_gbp', '0.2150'),
+            'sar' => $settings->get('currency_rate_sar', '1.0210'),
+            'inr' => $settings->get('currency_rate_inr', '22.85'),
+            'synced_at' => $settings->get('currency_rates_last_synced', 'Never'),
+        ];
+
+        return view('admin.settings.currency', compact('rates'));
+    }
+
+    /**
      * Update bulk settings.
      */
     public function update(Request $request)
@@ -52,6 +71,10 @@ class AdminSettingController extends Controller
             'site_email', 'admin_email', 'admin_email_cc', 'admin_email_bcc', 'site_phone',
             'ziina_active', 'ziina_access_token', 'ziina_test_mode', 'ziina_advance_percent',
             'cache_version',
+
+            // Multi-Currency Exchange Rates
+            'currency_rate_usd', 'currency_rate_eur', 'currency_rate_gbp', 'currency_rate_sar', 'currency_rate_inr',
+            'currency_rates_last_synced',
         ];
 
         $settings = $request->only($allowedKeys);
@@ -139,4 +162,36 @@ class AdminSettingController extends Controller
             return back()->with('error', 'Migration error: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Trigger immediate live currency exchange rate synchronization.
+     */
+    public function syncExchangeRates(Request $request)
+    {
+        try {
+            Artisan::call('currency:sync-rates');
+            $settings = app(SettingsService::class);
+            $settings->clearCache();
+            $rates = [
+                'usd' => $settings->get('currency_rate_usd', '0.2723'),
+                'eur' => $settings->get('currency_rate_eur', '0.2510'),
+                'gbp' => $settings->get('currency_rate_gbp', '0.2150'),
+                'sar' => $settings->get('currency_rate_sar', '1.0210'),
+                'inr' => $settings->get('currency_rate_inr', '22.85'),
+                'synced_at' => $settings->get('currency_rates_last_synced', now()->toDateTimeString()),
+            ];
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Foreign exchange rates synchronized successfully with Open Exchange Rates API.',
+                'rates' => $rates
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to synchronize currency rates: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
+

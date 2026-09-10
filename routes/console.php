@@ -17,3 +17,7 @@ Schedule::command('bookings:recover-abandoned')->hourly();
 // Process queued background jobs (e.g. Meta CAPI, notifications, recovery) every minute
 Schedule::command('queue:work --stop-when-empty --tries=3')->everyMinute();
 
+// Synchronize foreign currency exchange rates (USD, EUR, GBP, SAR, INR) daily at 02:00 AM
+Schedule::command('currency:sync-rates')->dailyAt('02:00');
+
+

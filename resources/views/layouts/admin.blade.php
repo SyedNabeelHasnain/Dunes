@@ -349,6 +349,9 @@
             <a href="{{ route('admin.whatsapp.settings') }}" class="sidebar-link {{ request()->routeIs('admin.whatsapp.settings*') ? 'active' : '' }}">
                 <i class="bi bi-gear-wide-connected"></i> <span>WhatsApp Setup</span>
             </a>
+            <a href="{{ route('admin.settings.currency') }}" class="sidebar-link {{ request()->routeIs('admin.settings.currency*') ? 'active' : '' }}">
+                <i class="bi bi-currency-exchange text-info"></i> <span>Currency & Rates</span>
+            </a>
             <a href="javascript:void(0);" class="sidebar-link clear-cache-trigger">
                 <i class="bi bi-arrow-repeat text-warning"></i> <span>Purge Cache</span>
             </a>
