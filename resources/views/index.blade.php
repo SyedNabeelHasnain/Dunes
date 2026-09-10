@@ -173,7 +173,7 @@ if (!function_exists('renderReviewCardMarkup')) {
             </a>
             <a href="#" class="btn btn-desert-animated-dark btn-lg rounded-pill px-5 py-3 fw-bold d-inline-flex align-items-center gap-2" data-action="open-booking" data-tour="1" data-tier="1">
                 <span class="fw-bold me-2 text-white">Starting from</span>
-                <span class="fs-4 fw-bold text-primary">AED 79</span>
+                <span class="fs-4 fw-bold text-primary" data-aed="79">AED 79</span>
             </a>
         </div>
 
@@ -397,7 +397,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                                 <div class="d-flex justify-content-between align-items-center mt-auto pt-3">
                                     <div>
                                         <small class="text-muted d-block" style="font-size: 10px; text-transform: uppercase; font-weight: 700;">Starting from</small>
-                                        <span class="h5 fw-bold text-primary mb-0">AED {{ number_format($minPrice) }}</span>
+                                        <span class="h5 fw-bold text-primary mb-0" data-aed="{{ $minPrice }}">AED {{ number_format($minPrice) }}</span>
                                     </div>
                                     <div class="d-flex gap-2">
                                         <button type="button" class="btn-circle-whatsapp fab-whatsapp" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp">

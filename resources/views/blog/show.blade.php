@@ -245,7 +245,7 @@
                     <!-- CTA Widget -->
                     <div class="rounded-4 p-4 mb-4 text-white" style="background:linear-gradient(135deg,#F58F43,#e07020);">
                         <h3 class="fw-800 h5 mb-2">Book a Desert Safari</h3>
-                        <p class="small opacity-75 mb-3">From AED 99 per person. Instant confirmation.</p>
+                        <p class="small opacity-75 mb-3">From <span data-aed="99">AED 99</span> per person. Instant confirmation.</p>
                         <button data-action="open-booking" class="btn btn-white rounded-pill fw-bold w-100">
                             <i class="bi bi-calendar-check me-1"></i>Book Now
                         </button>

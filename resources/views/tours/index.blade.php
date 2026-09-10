@@ -171,7 +171,7 @@
                                 <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top border-light">
                                     <div>
                                         <small class="text-muted d-block" style="font-size: 10px; text-transform: uppercase; font-weight: 700;">Starting from</small>
-                                        <span class="h5 fw-bold text-primary mb-0">AED {{ number_format($minPrice) }}</span>
+                                        <span class="h5 fw-bold text-primary mb-0" data-aed="{{ $minPrice }}">AED {{ number_format($minPrice) }}</span>
                                     </div>
                                     <div class="d-flex gap-2">
                                         <button type="button" class="btn-circle-whatsapp fab-whatsapp" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp">

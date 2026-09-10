@@ -425,9 +425,9 @@
                                             </div>
                                             <div class="text-end">
                                                 @if(!empty($tier->pivot->old_price))
-                                                <span class="rc-old-price" style="font-size: 11.5px !important; text-decoration: line-through !important; color: #94A3B8 !important; margin-right: 4px !important;">AED {{ number_format($tier->pivot->old_price) }}</span>
+                                                <span class="rc-old-price" data-aed="{{ $tier->pivot->old_price }}" style="font-size: 11.5px !important; text-decoration: line-through !important; color: #94A3B8 !important; margin-right: 4px !important;">AED {{ number_format($tier->pivot->old_price) }}</span>
                                                 @endif
-                                                <span class="rc-cur-price" style="font-size: 16px !important; font-weight: 800 !important; color: #D95300 !important;">AED {{ number_format($tier->pivot->price) }}</span>
+                                                <span class="rc-cur-price" data-aed="{{ $tier->pivot->price }}" style="font-size: 16px !important; font-weight: 800 !important; color: #D95300 !important;">AED {{ number_format($tier->pivot->price) }}</span>
                                                 <div class="text-muted" style="font-size: 9.5px;">/ {{ $tier->pivot->price_type ?? 'person' }}</div>
                                             </div>
                                         </div>
@@ -438,7 +438,7 @@
                                                 <div class="rc-tier-name" style="font-size: 13px !important; font-weight: 700 !important; color: #1E293B !important;">Standard Experience</div>
                                             </div>
                                             <div class="text-end">
-                                                <span class="rc-cur-price" style="font-size: 16px !important; font-weight: 800 !important; color: #D95300 !important;">AED {{ number_format($t->price) }}</span>
+                                                <span class="rc-cur-price" data-aed="{{ $t->price }}" style="font-size: 16px !important; font-weight: 800 !important; color: #D95300 !important;">AED {{ number_format($t->price) }}</span>
                                                 <div class="text-muted" style="font-size: 9.5px;">/ person</div>
                                             </div>
                                         </div>
@@ -482,7 +482,7 @@
                                 <div class="text-muted" style="font-size: 11px; color: #64748B !important;">{{ Str::limit($addon->description, 45) }}</div>
                                 @endif
                             </div>
-                            <div class="fw-800 fs-6 text-nowrap ms-2" style="color: #D95300 !important; font-weight: 800;">
+                            <div class="fw-800 fs-6 text-nowrap ms-2" style="color: #D95300 !important; font-weight: 800;" data-aed="{{ $addon->default_price ?: $addon->price ?: 0 }}">
                                 AED {{ number_format($addon->default_price ?: $addon->price ?: 0) }}
                             </div>
                         </div>

@@ -614,9 +614,9 @@ if(window.fbq){
                                 <div class="text-center pt-2 mb-3 pb-3 border-bottom">
                                     <h3 class="h5 fw-bold text-dark mb-2">{{ $tier->name }}</h3>
                                     <div class="d-flex align-items-center justify-content-center gap-2">
-                                        <span class="h3 fw-bold text-primary mb-0">AED {{ number_format($tPrice) }}</span>
+                                        <span class="h3 fw-bold text-primary mb-0" data-aed="{{ $tPrice }}">AED {{ number_format($tPrice) }}</span>
                                         @if($saveAmt)
-                                        <small class="text-muted text-decoration-line-through">AED {{ number_format($tOldPrice) }}</small>
+                                        <small class="text-muted text-decoration-line-through" data-aed="{{ $tOldPrice }}">AED {{ number_format($tOldPrice) }}</small>
                                         @endif
                                     </div>
                                     <small class="text-muted d-block mt-1">Per Person (All Inclusive)</small>
@@ -695,7 +695,7 @@ if(window.fbq){
                             <div class="text-center mb-4 pb-3 border-bottom">
                                 <small class="text-muted text-uppercase fw-bold ls-1" style="font-size: 11px;">Starting from</small>
                                 <div class="d-flex align-items-center justify-content-center gap-2 mt-1">
-                                    <span class="h2 fw-bold text-primary mb-0">AED {{ number_format($minPrice) }}</span>
+                                    <span class="h2 fw-bold text-primary mb-0" data-aed="{{ $minPrice }}">AED {{ number_format($minPrice) }}</span>
                                 </div>
                             </div>
 
@@ -736,11 +736,11 @@ if(window.fbq){
                                                 <div class="d-flex flex-column align-items-end">
                                                     @if($save)
                                                     <div class="d-flex align-items-center gap-2">
-                                                        <small class="text-secondary text-decoration-line-through fw-semibold" style="font-size: 11px;">AED {{ number_format($tOldPrice) }}</small>
-                                                        <div class="fw-bold text-primary">AED {{ number_format($tPrice) }}</div>
+                                                        <small class="text-secondary text-decoration-line-through fw-semibold" style="font-size: 11px;" data-aed="{{ $tOldPrice }}">AED {{ number_format($tOldPrice) }}</small>
+                                                        <div class="fw-bold text-primary" data-aed="{{ $tPrice }}">AED {{ number_format($tPrice) }}</div>
                                                     </div>
                                                     @else
-                                                    <div class="fw-bold text-primary">AED {{ number_format($tPrice) }}</div>
+                                                    <div class="fw-bold text-primary" data-aed="{{ $tPrice }}">AED {{ number_format($tPrice) }}</div>
                                                     @endif
                                                 </div>
                                             </div>
@@ -869,7 +869,7 @@ if(window.fbq){
                             <div class="d-flex justify-content-between align-items-center mt-auto pt-3">
                                 <div>
                                     <small class="text-muted d-block" style="font-size: 10px; text-transform: uppercase; font-weight: 700;">Starting from</small>
-                                    <span class="h5 fw-bold text-primary mb-0">AED {{ number_format($minPriceRel) }}</span>
+                                    <span class="h5 fw-bold text-primary mb-0" data-aed="{{ $minPriceRel }}">AED {{ number_format($minPriceRel) }}</span>
                                 </div>
                                 <div class="d-flex gap-2">
                                     <button type="button" class="btn-circle-whatsapp fab-whatsapp" data-tour-name="{{ $t->name }}">
@@ -894,7 +894,7 @@ if(window.fbq){
 <div class="mobile-bookbar position-fixed bottom-0 start-0 w-100 bg-white p-3 border-top shadow-lg d-md-none d-flex align-items-center justify-content-between z-3 safe-area-bottom">
     <div>
         <small class="text-muted d-block opacity-75 fw-bold" style="font-size: 9px; letter-spacing: 1px; text-transform: uppercase;">Starting From</small>
-        <div class="h4 fw-bold text-primary mb-0">AED {{ number_format($minPrice) }}</div>
+        <div class="h4 fw-bold text-primary mb-0" data-aed="{{ $minPrice }}">AED {{ number_format($minPrice) }}</div>
     </div>
     <button class="btn btn-desert-animated rounded-pill px-4 py-2.5 shadow-sm fw-bold border-0" data-bs-toggle="modal" data-bs-target="#bookingModal" data-action="open-booking" data-tour="{{ $tour->id }}">
         <i class="bi bi-calendar-check-fill me-1"></i>Book Now

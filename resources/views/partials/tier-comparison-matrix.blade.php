@@ -26,7 +26,7 @@
                         <span class="badge bg-primary text-white rounded-pill px-2.5 py-1 small mb-1" style="font-size: 10px;">MOST POPULAR</span>
                         @endif
                         <div class="fw-bold fs-6">{{ $tier->name }}</div>
-                        <div class="fs-5 fw-800 text-primary mt-1">AED {{ number_format($tier->pivot?->price ?? 0) }}</div>
+                        <div class="fs-5 fw-800 text-primary mt-1" data-aed="{{ $tier->pivot?->price ?? 0 }}">AED {{ number_format($tier->pivot?->price ?? 0) }}</div>
                         <small class="text-muted d-block fw-normal" style="font-size: 11px;">per person</small>
                     </th>
                     @endforeach

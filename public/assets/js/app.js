@@ -78,6 +78,9 @@ const App={
         if (!this.currency.rates[code]) return;
         this.currency.code = code;
         localStorage.setItem('dunes_currency', code);
+        try {
+            document.cookie = `dunes_currency=${encodeURIComponent(code)};path=/;max-age=31536000;SameSite=Lax`;
+        } catch (e) {}
 
         const flag = this.currency.flags[code] || '';
         const symbol = this.currency.symbols[code] || code;
@@ -94,6 +97,9 @@ const App={
             }
         });
 
+        // Convert and reflect all prices across the site
+        this.convertAllPrices(code);
+
         if (typeof this.updateTotal === 'function') {
             this.updateTotal();
         }
@@ -101,21 +107,120 @@ const App={
         if (showToast) {
             this.toast(`Display currency set to ${code} (${symbol})`, 'success');
         }
+
+        try {
+            window.dispatchEvent(new CustomEvent('currencyChanged', { detail: { currency: code, symbol: symbol } }));
+        } catch (e) {}
+    },
+
+    formatPriceHtml(aedAmount, isOldPrice = false, showAedSuffix = true, isAddon = false) {
+        const aed = parseFloat(aedAmount) || 0;
+        const code = this.currency?.code || 'AED';
+        const prefix = isAddon ? '+' : '';
+
+        if (code === 'AED') {
+            const formatted = Number(aed).toLocaleString('en-US', {
+                minimumFractionDigits: (aed % 1 !== 0) ? 2 : 0,
+                maximumFractionDigits: 2
+            });
+            return `${prefix}AED ${formatted}`;
+        }
+
+        const rate = this.currency?.rates?.[code] || 1;
+        const symbol = this.currency?.symbols?.[code] || code;
+        const converted = aed * rate;
+
+        let formattedForeign;
+        if (code === 'INR') {
+            formattedForeign = `${prefix}${symbol}${Math.round(converted).toLocaleString('en-US')}`;
+        } else if (code === 'SAR') {
+            formattedForeign = `${prefix}${Math.round(converted).toLocaleString('en-US')} SAR`;
+        } else {
+            if (converted >= 10) {
+                formattedForeign = `${prefix}${symbol}${Math.round(converted).toLocaleString('en-US')}`;
+            } else {
+                formattedForeign = `${prefix}${symbol}${Number(converted).toFixed(2)}`;
+            }
+        }
+
+        if (isOldPrice) {
+            return formattedForeign;
+        }
+
+        if (showAedSuffix) {
+            const baseStr = Number(aed).toLocaleString('en-US', {
+                minimumFractionDigits: (aed % 1 !== 0) ? 2 : 0,
+                maximumFractionDigits: 2
+            });
+            return `${formattedForeign} <small class="text-muted fw-normal" style="font-size: 0.75em; letter-spacing: 0;">(${prefix}AED ${baseStr})</small>`;
+        }
+
+        return formattedForeign;
+    },
+
+    convertAllPrices(code) {
+        if (!this.currency || !this.currency.rates) return;
+        const targetCode = code || this.currency.code || 'AED';
+
+        // 1. Update elements with explicit [data-aed]
+        document.querySelectorAll('[data-aed]').forEach(el => {
+            const aed = parseFloat(el.dataset.aed);
+            if (isNaN(aed) || aed <= 0) return;
+
+            const isOld = el.classList.contains('text-decoration-line-through') || 
+                          el.classList.contains('old') || 
+                          el.classList.contains('rc-old-price');
+            const isAddon = el.dataset.isAddon === 'true' || el.textContent.trim().startsWith('+');
+            const noSub = el.dataset.noSub === 'true' || isOld;
+
+            el.innerHTML = this.formatPriceHtml(aed, isOld, !noSub, isAddon);
+        });
+
+        // 2. Auto-scan elements with price classes that might not yet have data-aed initialized
+        const priceSelectors = [
+            '.rc-cur-price', '.rc-old-price', '.tier-card-price .current', '.tier-card-price .old',
+            '.package-option .text-primary', '.package-option .text-secondary'
+        ];
+        document.querySelectorAll(priceSelectors.join(',')).forEach(el => {
+            if (!el.dataset.aed) {
+                const txt = el.textContent.trim();
+                const match = txt.match(/AED\s*([0-9,]+(?:\.[0-9]{1,2})?)/i) || txt.match(/([0-9,]+(?:\.[0-9]{1,2})?)/);
+                if (match) {
+                    const val = parseFloat(match[1].replace(/,/g, ''));
+                    if (!isNaN(val) && val > 0) {
+                        el.dataset.aed = val;
+                        const isOld = el.classList.contains('text-decoration-line-through') || el.classList.contains('old') || el.classList.contains('rc-old-price');
+                        el.innerHTML = this.formatPriceHtml(val, isOld, !isOld);
+                    }
+                }
+            }
+        });
+
+        // 3. Update modal totals if available
+        if (typeof this.updateTotal === 'function') {
+            this.updateTotal();
+        }
     },
 
     formatDisplayPrice(aedAmount) {
-        const code = this.currency.code;
-        const formattedAED = 'AED ' + Number(aedAmount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        const aed = parseFloat(aedAmount) || 0;
+        const code = this.currency?.code || 'AED';
+        const formattedAED = 'AED ' + Number(aed).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         if (code === 'AED') {
             return formattedAED;
         }
 
-        const rate = this.currency.rates[code] || 1;
-        const converted = aedAmount * rate;
-        const symbol = this.currency.symbols[code] || code;
-        const formattedForeign = `${symbol} ${Number(converted).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        const rate = this.currency?.rates?.[code] || 1;
+        const converted = aed * rate;
+        const symbol = this.currency?.symbols?.[code] || code;
+        let formattedForeign;
+        if (code === 'INR' || code === 'SAR') {
+            formattedForeign = `${symbol} ${Number(converted).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        } else {
+            formattedForeign = `${symbol}${Number(converted).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        }
 
-        return `${formattedAED} <span class="text-muted fw-normal small" style="font-size: 0.85em;">(~ ${formattedForeign})</span>`;
+        return `${formattedForeign} <span class="text-muted fw-normal small" style="font-size: 0.85em;">(~ ${formattedAED})</span>`;
     },
 
     initLegalModal() {
@@ -1236,8 +1341,8 @@ const App={
                                 <p>${t.description||''}</p>
                             </div>
                             <div class="tier-card-price">
-                                ${save?`<div class="old">AED ${t.old_price}</div>`:''}
-                                <div class="current">AED ${t.price}</div>
+                                ${save?`<div class="old" data-aed="${t.old_price}">AED ${t.old_price}</div>`:''}
+                                <div class="current" data-aed="${t.price}">AED ${t.price}</div>
                             </div>
                         </div>
                     </div>`;
@@ -1270,7 +1375,7 @@ const App={
                         </div>
                         <p class="small text-muted mb-2 lh-sm text-truncate-2" style="font-size: 0.78rem; min-height: 28px;">${a.description || 'Optional safari enhancement'}</p>
                         <div class="mt-auto d-flex align-items-center justify-content-between">
-                            <span class="badge bg-light text-dark border fw-bold rounded-pill">+AED ${parseFloat(a.price).toFixed(2)}</span>
+                            <span class="badge bg-light text-dark border fw-bold rounded-pill" data-aed="${a.price}" data-is-addon="true">+AED ${parseFloat(a.price).toFixed(2)}</span>
                             <span class="small fw-bold text-primary addon-status-label" style="font-size: 0.75rem;">+ Add</span>
                         </div>
                     </div>`;
@@ -1278,6 +1383,9 @@ const App={
                 addonList.innerHTML=ah;
                 addonList.style.display='flex';
                 if(addons) addons.style.display='block';
+
+                // Convert all freshly injected tiers and addons to active currency
+                this.convertAllPrices(this.currency.code);
 
                 addonList.querySelectorAll('.addon-card-horizontal').forEach(item=>{
                     item.addEventListener('click',e=>{
