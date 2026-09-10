@@ -36,7 +36,6 @@ jobs:
       with:
         php-version: '8.4'
         extensions: mbstring, xml, ctype, iconv, mysql, openssl
-        cache-control: no-cache
         coverage: none
 
     - name: Install Composer dependencies
@@ -58,7 +57,7 @@ jobs:
         rm -rf deploy/public_deploy/images
         
         # Adjust paths in entry points to point to dunes-laravel directory
-        for f in index.php ajax.php debug_artisan.php; do
+        for f in index.php ajax.php; do
           if [ -f "deploy/public_deploy/$f" ]; then
             sed -i "s|__DIR__.'/../storage/framework/maintenance.php'|__DIR__.'/../dunes-laravel/storage/framework/maintenance.php'|g" "deploy/public_deploy/$f"
             sed -i "s|__DIR__.'/../vendor/autoload.php'|__DIR__.'/../dunes-laravel/vendor/autoload.php'|g" "deploy/public_deploy/$f"
@@ -67,13 +66,12 @@ jobs:
         done
 
         # Zip public assets ensuring .htaccess is included
-        cd deploy/public_deploy && zip -r ../public.zip . .htaccess -x unzip.php
+        cd deploy/public_deploy && zip -r ../public.zip . .htaccess
         cd ../..
 
-        # Clean staging and place only public.zip and unzip.php
+        # Clean staging and place only public.zip
         rm -rf deploy/public_deploy/*
         mv deploy/public.zip deploy/public_deploy/public.zip
-        cp public/unzip.php deploy/public_deploy/unzip.php
 
     - name: Prepare Core Code Staging
       env:
@@ -174,7 +172,7 @@ jobs:
           sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=15 u410503041@${{ steps.ftp_server.outputs.host }} "cd /home/u410503041/domains/dunesdiscoverytourism.com/public_html && unzip -o public.zip && rm -f public.zip && cd /home/u410503041/public_html && unzip -o public.zip && rm -f public.zip && cd /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel && unzip -o core.zip && rm -f core.zip && rm -rf storage/framework/views && mkdir -p storage/framework/views && find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html -type d -exec chmod 755 {} + && find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html -type f -exec chmod 644 {} + && chmod -R 775 /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/storage /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/bootstrap/cache && php artisan migrate --force; php artisan config:clear; php artisan cache:clear; php artisan route:clear; php artisan view:clear; php artisan event:clear" && break || sleep 5
         done
 
-    - name: Trigger Web-Based Cache Reset & Extraction Verification
+    - name: Trigger Web-Based Health Check
       run: |
-        curl -s "https://dunesdiscoverytourism.com/unzip.php?key=dunes2026" || true
+        curl -s -f "https://dunesdiscoverytourism.com/" > /dev/null || true
 
