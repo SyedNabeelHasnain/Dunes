@@ -46,7 +46,7 @@
 
                         <div class="mb-0">
                             <label for="full_desc" class="form-label fw-bold text-dark">Full Description</label>
-                            <textarea name="full_desc" id="full_desc" class="form-control" rows="6" placeholder="Detailed description shown on details page" required style="border-radius: 8px;"></textarea>
+                            <textarea name="full_desc" id="full_desc" class="form-control wysiwyg-editor" rows="6" placeholder="Detailed description shown on details page" required style="border-radius: 8px;"></textarea>
                         </div>
                     </div>
 

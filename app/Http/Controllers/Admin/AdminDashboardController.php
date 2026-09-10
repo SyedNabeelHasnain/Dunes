@@ -18,43 +18,47 @@ class AdminDashboardController extends Controller
     public function index()
     {
         try {
-            $revenue = Booking::whereIn('status', ['confirmed', 'completed'])
-                ->whereIn('payment_status', ['paid', 'partial'])
-                ->sum('payment_amount');
+            $stats = \Illuminate\Support\Facades\Cache::remember('admin_dashboard_kpis', 300, function() {
+                $revenue = Booking::whereIn('status', ['confirmed', 'completed'])
+                    ->whereIn('payment_status', ['paid', 'partial'])
+                    ->sum('payment_amount');
 
-            $totalBookings = Booking::count();
-            $confirmedBookings = Booking::whereIn('status', ['confirmed', 'completed'])->count();
-            $pendingBookings = Booking::where('status', 'pending')->count();
-            $avgOrderValue = $confirmedBookings > 0 ? round($revenue / $confirmedBookings, 2) : 0;
+                $totalBookings = Booking::count();
+                $confirmedBookings = Booking::whereIn('status', ['confirmed', 'completed'])->count();
+                $pendingBookings = Booking::where('status', 'pending')->count();
+                $avgOrderValue = $confirmedBookings > 0 ? round($revenue / $confirmedBookings, 2) : 0;
 
-            // 30-day human visitors count for conversion rate calculation
-            $visitorsCount = RequestLog::where('request_timestamp', '>=', now()->subDays(30))
-                ->where('bot_indicator', 'Likely Human')
-                ->distinct('session_id')
-                ->count('session_id') ?: 1;
+                // 30-day human visitors count for conversion rate calculation
+                $visitorsCount = RequestLog::where('request_timestamp', '>=', now()->subDays(30))
+                    ->where('bot_indicator', 'Likely Human')
+                    ->distinct('session_id')
+                    ->count('session_id') ?: 1;
 
-            $recentBookingsCount = Booking::where('created_at', '>=', now()->subDays(30))->count();
-            $conversionRate = round(($recentBookingsCount / $visitorsCount) * 100, 2);
+                $recentBookingsCount = Booking::where('created_at', '>=', now()->subDays(30))->count();
+                $conversionRate = round(($recentBookingsCount / $visitorsCount) * 100, 2);
 
-            $stats = [
-                'revenue' => (float)$revenue,
-                'total' => $totalBookings,
-                'confirmed' => $confirmedBookings,
-                'pending' => $pendingBookings,
-                'aov' => $avgOrderValue,
-                'conversion_rate' => $conversionRate,
-            ];
+                return [
+                    'revenue' => (float)$revenue,
+                    'total' => (int)$totalBookings,
+                    'confirmed' => (int)$confirmedBookings,
+                    'pending' => (int)$pendingBookings,
+                    'aov' => (float)$avgOrderValue,
+                    'conversion_rate' => (float)$conversionRate,
+                ];
+            });
 
-            // Recent bookings (latest 10)
+            // Recent bookings (latest 10) - always real-time fresh
             $recentBookings = Booking::orderBy('created_at', 'desc')->limit(10)->get();
 
-            // Top Tours (by booking counts)
-            $topTours = Booking::whereIn('status', ['confirmed', 'completed'])
-                ->select('tour_name', \DB::raw('COUNT(*) as count'), \DB::raw('SUM(total) as revenue'))
-                ->groupBy('tour_name')
-                ->orderBy('count', 'desc')
-                ->limit(5)
-                ->get();
+            // Top Tours (by booking counts) - cached for 300s
+            $topTours = \Illuminate\Support\Facades\Cache::remember('admin_dashboard_top_tours', 300, function() {
+                return Booking::whereIn('status', ['confirmed', 'completed'])
+                    ->select('tour_name', \DB::raw('COUNT(*) as count'), \DB::raw('SUM(total) as revenue'))
+                    ->groupBy('tour_name')
+                    ->orderBy('count', 'desc')
+                    ->limit(5)
+                    ->get();
+            });
 
             // Recent WhatsApp leads
             $whatsappLeads = \DB::table('whatsapp_inquiries')
@@ -65,7 +69,7 @@ class AdminDashboardController extends Controller
             return view('admin.dashboard', compact('stats', 'recentBookings', 'topTours', 'whatsappLeads'));
         } catch (\Throwable $e) {
             \Log::error("Admin dashboard error: " . $e->getMessage());
-            $stats = ['revenue' => 0, 'total' => 0, 'confirmed' => 0, 'pending' => 0];
+            $stats = ['revenue' => 0, 'total' => 0, 'confirmed' => 0, 'pending' => 0, 'aov' => 0, 'conversion_rate' => 0];
             $recentBookings = collect();
             $topTours = collect();
             $whatsappLeads = collect();
@@ -478,4 +482,44 @@ class AdminDashboardController extends Controller
 
         return response()->stream($callback, 200, $headers);
     }
+
+    /**
+     * Perform batch operations across multiple inquiries.
+     */
+    public function bulkInquiriesAction(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'required|integer|exists:contacts,id',
+            'action' => 'required|string|in:status_new,status_read,status_replied,delete',
+        ]);
+
+        $ids = $request->input('ids');
+        $action = $request->input('action');
+
+        try {
+            if ($action === 'delete') {
+                $count = Contact::whereIn('id', $ids)->delete();
+                return response()->json([
+                    'success' => true,
+                    'message' => "{$count} inquiry(s) deleted successfully."
+                ]);
+            }
+
+            $newStatus = str_replace('status_', '', $action);
+            $count = Contact::whereIn('id', $ids)->update(['status' => $newStatus]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "{$count} inquiry(s) marked as " . ucfirst($newStatus) . " successfully."
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error("Bulk action failed on inquiries: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to process bulk action: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
+

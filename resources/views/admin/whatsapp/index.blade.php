@@ -139,7 +139,10 @@
             <table class="table align-middle mb-0 table-hover datatable" id="whatsappLeadsTable">
                 <thead class="table-light small text-uppercase fw-bold text-muted">
                     <tr>
-                        <th class="ps-4">Date & Time</th>
+                        <th class="ps-4 no-sort no-export" style="width: 36px;">
+                            <input type="checkbox" class="form-check-input whatsapp-select-all" title="Select All">
+                        </th>
+                        <th>Date & Time</th>
                         <th>Customer</th>
                         <th>Interest Context</th>
                         <th>Message Snippet</th>
@@ -151,7 +154,10 @@
                 <tbody>
                     @forelse($leads as $lead)
                     <tr>
-                        <td class="ps-4">
+                        <td class="ps-4 no-export">
+                            <input type="checkbox" class="form-check-input whatsapp-row-select" value="{{ $lead->id }}">
+                        </td>
+                        <td data-order="{{ \Carbon\Carbon::parse($lead->created_at)->timestamp }}">
                             <div class="small fw-bold text-dark">
                                 {{ \Carbon\Carbon::parse($lead->created_at)->format('M j, Y') }}
                             </div>
@@ -203,7 +209,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="text-center py-5 text-muted">
+                        <td colspan="8" class="text-center py-5 text-muted">
                             <i class="bi bi-whatsapp fs-1 d-block mb-2 text-muted opacity-50"></i>
                             No WhatsApp leads found matching your criteria.
                         </td>
@@ -213,6 +219,21 @@
             </table>
         </div>
     </div>
+</div>
+
+<!-- Floating Batch Bulk Action Toolbar -->
+<div id="whatsappBulkBar" class="bulk-action-bar">
+    <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-success rounded-pill px-2 py-1"><span id="whatsappSelectedCount">0</span></span>
+        <span class="fw-semibold small text-white">leads selected</span>
+    </div>
+    <div class="vr bg-secondary opacity-50" style="height: 20px;"></div>
+    <button type="button" class="btn btn-sm btn-danger rounded-pill px-3" id="whatsappBulkDelete">
+        <i class="bi bi-trash3 me-1"></i> Delete Selected
+    </button>
+    <button type="button" class="btn btn-sm btn-link text-white-50 p-0 ms-1 text-decoration-none" id="whatsappBulkClear" title="Deselect all">
+        <i class="bi bi-x-lg"></i>
+    </button>
 </div>
 
 <!-- View Details Modal -->
@@ -378,6 +399,86 @@ $(document).ready(function() {
         }
 
         $('#leadDetailsModal').modal('show');
+    });
+
+    // WhatsApp Batch Bulk Selection & Processing
+    const $waBulkBar = $('#whatsappBulkBar');
+    const $waSelectAll = $('.whatsapp-select-all');
+    const $waCountBadge = $('#whatsappSelectedCount');
+
+    function updateWaBulkBar() {
+        const checkedBoxes = $('.whatsapp-row-select:checked');
+        const count = checkedBoxes.length;
+        $waCountBadge.text(count);
+        if (count > 0) {
+            $waBulkBar.addClass('show');
+        } else {
+            $waBulkBar.removeClass('show');
+        }
+    }
+
+    $waSelectAll.on('change', function() {
+        $('.whatsapp-row-select').prop('checked', $(this).is(':checked'));
+        updateWaBulkBar();
+    });
+
+    $(document).on('change', '.whatsapp-row-select', function() {
+        const total = $('.whatsapp-row-select').length;
+        const checked = $('.whatsapp-row-select:checked').length;
+        $waSelectAll.prop('checked', total > 0 && total === checked);
+        updateWaBulkBar();
+    });
+
+    $('#whatsappBulkClear').on('click', function() {
+        $('.whatsapp-row-select, .whatsapp-select-all').prop('checked', false);
+        updateWaBulkBar();
+    });
+
+    $('#whatsappBulkDelete').on('click', function(e) {
+        e.preventDefault();
+        const selectedIds = $('.whatsapp-row-select:checked').map(function() { return $(this).val(); }).get();
+
+        if (selectedIds.length === 0) return;
+
+        Swal.fire({
+            title: 'Delete Selected Leads?',
+            text: `Are you sure you want to permanently delete ${selectedIds.length} WhatsApp lead inquiry record(s)?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, Delete',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $('#appLoader').fadeIn(200);
+                $.ajax({
+                    url: '{{ route("admin.whatsapp.bulk") }}',
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        ids: selectedIds,
+                        action: 'delete'
+                    },
+                    success: function(res) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Deleted!',
+                            text: res.message || 'Leads deleted successfully.',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    },
+                    error: function(xhr) {
+                        $('#appLoader').fadeOut(200);
+                        const msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Error deleting leads.';
+                        Swal.fire('Failed', msg, 'error');
+                    }
+                });
+            }
+        });
     });
 });
 </script>

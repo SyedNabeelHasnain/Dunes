@@ -35,7 +35,7 @@
                 </div>
                 <div class="mb-4">
                     <label for="description" class="form-label fw-bold text-dark">Introductory Description</label>
-                    <textarea name="description" id="description" class="form-control" rows="4">{{ $page->description }}</textarea>
+                    <textarea name="description" id="description" class="form-control wysiwyg-editor" rows="4">{{ $page->description }}</textarea>
                 </div>
                 <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 fw-bold w-100">Save Page Details</button>
             </form>

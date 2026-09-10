@@ -129,7 +129,10 @@
             <table class="table align-middle mb-0 table-hover datatable" id="inquiriesTable">
                 <thead class="table-light small text-uppercase fw-bold text-muted">
                     <tr>
-                        <th class="ps-4">Date</th>
+                        <th class="ps-4 no-sort no-export" style="width: 36px;">
+                            <input type="checkbox" class="form-check-input inquiries-select-all" title="Select All">
+                        </th>
+                        <th>Date</th>
                         <th>Customer</th>
                         <th>Subject</th>
                         <th class="text-center">Status</th>
@@ -139,7 +142,10 @@
                 <tbody>
                     @forelse($inquiries as $c)
                     <tr>
-                        <td class="ps-4">
+                        <td class="ps-4 no-export">
+                            <input type="checkbox" class="form-check-input inquiries-row-select" value="{{ $c->id }}">
+                        </td>
+                        <td data-order="{{ $c->created_at ? $c->created_at->timestamp : 0 }}">
                             <div class="small fw-bold text-dark">
                                 {{ $c->created_at ? $c->created_at->format('M j, Y') : '' }}
                             </div>
@@ -190,7 +196,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="text-center py-5 text-muted">
+                        <td colspan="6" class="text-center py-5 text-muted">
                             <i class="bi bi-envelope-x fs-1 d-block mb-2 text-muted opacity-50"></i>
                             No contact inquiries match your filter criteria.
                         </td>
@@ -200,6 +206,31 @@
             </table>
         </div>
     </div>
+</div>
+
+<!-- Floating Batch Bulk Action Toolbar -->
+<div id="inquiriesBulkBar" class="bulk-action-bar">
+    <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-primary rounded-pill px-2 py-1"><span id="inquiriesSelectedCount">0</span></span>
+        <span class="fw-semibold small text-white">selected</span>
+    </div>
+    <div class="vr bg-secondary opacity-50" style="height: 20px;"></div>
+    <div class="btn-group btn-group-sm">
+        <button type="button" class="btn btn-sm btn-outline-light rounded-pill px-3 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-arrow-repeat me-1 text-warning"></i> Set Status
+        </button>
+        <ul class="dropdown-menu dropdown-menu-dark shadow-lg">
+            <li><a class="dropdown-item inquiries-bulk-action" href="javascript:void(0)" data-action="status_read"><i class="bi bi-eye text-warning me-2"></i>Mark as Read</a></li>
+            <li><a class="dropdown-item inquiries-bulk-action" href="javascript:void(0)" data-action="status_replied"><i class="bi bi-check-circle text-success me-2"></i>Mark as Replied</a></li>
+            <li><a class="dropdown-item inquiries-bulk-action" href="javascript:void(0)" data-action="status_new"><i class="bi bi-bell text-danger me-2"></i>Mark as New</a></li>
+        </ul>
+    </div>
+    <button type="button" class="btn btn-sm btn-danger rounded-pill px-3 inquiries-bulk-action" data-action="delete">
+        <i class="bi bi-trash3 me-1"></i> Delete
+    </button>
+    <button type="button" class="btn btn-sm btn-link text-white-50 p-0 ms-1 text-decoration-none" id="inquiriesBulkClear" title="Deselect all">
+        <i class="bi bi-x-lg"></i>
+    </button>
 </div>
 
 @push('scripts')
@@ -263,6 +294,90 @@ $(document).ready(function() {
             }
         });
     }
+
+    // Inquiries Batch Bulk Selection & Processing
+    const $inqBulkBar = $('#inquiriesBulkBar');
+    const $inqSelectAll = $('.inquiries-select-all');
+    const $inqCountBadge = $('#inquiriesSelectedCount');
+
+    function updateInqBulkBar() {
+        const checkedBoxes = $('.inquiries-row-select:checked');
+        const count = checkedBoxes.length;
+        $inqCountBadge.text(count);
+        if (count > 0) {
+            $inqBulkBar.addClass('show');
+        } else {
+            $inqBulkBar.removeClass('show');
+        }
+    }
+
+    $inqSelectAll.on('change', function() {
+        $('.inquiries-row-select').prop('checked', $(this).is(':checked'));
+        updateInqBulkBar();
+    });
+
+    $(document).on('change', '.inquiries-row-select', function() {
+        const total = $('.inquiries-row-select').length;
+        const checked = $('.inquiries-row-select:checked').length;
+        $inqSelectAll.prop('checked', total > 0 && total === checked);
+        updateInqBulkBar();
+    });
+
+    $('#inquiriesBulkClear').on('click', function() {
+        $('.inquiries-row-select, .inquiries-select-all').prop('checked', false);
+        updateInqBulkBar();
+    });
+
+    $('.inquiries-bulk-action').on('click', function(e) {
+        e.preventDefault();
+        const action = $(this).data('action');
+        const selectedIds = $('.inquiries-row-select:checked').map(function() { return $(this).val(); }).get();
+
+        if (selectedIds.length === 0) return;
+
+        const isDelete = action === 'delete';
+        const actionLabel = isDelete ? 'delete' : 'mark as ' + action.replace('status_', '');
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: `You are about to ${actionLabel} for ${selectedIds.length} selected inquiry message(s).`,
+            icon: isDelete ? 'warning' : 'question',
+            showCancelButton: true,
+            confirmButtonColor: isDelete ? '#dc3545' : '#F58F43',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: `Yes, ${isDelete ? 'Delete' : 'Update'}`,
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $('#appLoader').fadeIn(200);
+                $.ajax({
+                    url: '{{ route("admin.inquiries.bulk") }}',
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        ids: selectedIds,
+                        action: action
+                    },
+                    success: function(res) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: res.message || 'Inquiries updated successfully.',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    },
+                    error: function(xhr) {
+                        $('#appLoader').fadeOut(200);
+                        const msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Error processing bulk action.';
+                        Swal.fire('Failed', msg, 'error');
+                    }
+                });
+            }
+        });
+    });
 });
 </script>
 @endpush

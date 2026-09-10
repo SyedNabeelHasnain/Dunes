@@ -143,7 +143,10 @@
             <table class="table align-middle mb-0 table-hover datatable" id="bookingsTable">
                 <thead class="table-light small text-uppercase fw-bold text-muted">
                     <tr>
-                        <th class="ps-4">Ref & Time</th>
+                        <th class="ps-4 no-sort no-export" style="width: 36px;">
+                            <input type="checkbox" class="form-check-input bulk-select-all" title="Select All">
+                        </th>
+                        <th>Ref & Time</th>
                         <th>Customer</th>
                         <th>Tour / Activity</th>
                         <th>Tour Date</th>
@@ -155,7 +158,10 @@
                 <tbody>
                     @forelse($bookings as $b)
                     <tr>
-                        <td class="ps-4" data-order="{{ $b->created_at ? $b->created_at->timestamp : 0 }}">
+                        <td class="ps-4 no-export">
+                            <input type="checkbox" class="form-check-input bulk-row-select" value="{{ $b->id }}">
+                        </td>
+                        <td data-order="{{ $b->created_at ? $b->created_at->timestamp : 0 }}">
                             <div class="fw-800 text-dark">#{{ $b->reference }}</div>
                             <div class="text-muted small" style="font-size: 0.75rem;">{{ $b->created_at ? $b->created_at->format('M j, Y g:ia') : '' }}</div>
                         </td>
@@ -244,7 +250,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="text-center py-5 text-muted">
+                        <td colspan="8" class="text-center py-5 text-muted">
                             <i class="bi bi-calendar-x fs-1 d-block mb-2 text-muted opacity-50"></i>
                             No bookings match your current filter parameters.
                         </td>
@@ -254,6 +260,32 @@
             </table>
         </div>
     </div>
+</div>
+
+<!-- Floating Batch Bulk Action Toolbar -->
+<div id="bookingBulkBar" class="bulk-action-bar">
+    <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-primary rounded-pill px-2 py-1"><span id="bookingSelectedCount">0</span></span>
+        <span class="fw-semibold small text-white">selected</span>
+    </div>
+    <div class="vr bg-secondary opacity-50" style="height: 20px;"></div>
+    <div class="btn-group btn-group-sm">
+        <button type="button" class="btn btn-sm btn-outline-light rounded-pill px-3 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-arrow-repeat me-1 text-warning"></i> Set Status
+        </button>
+        <ul class="dropdown-menu dropdown-menu-dark shadow-lg">
+            <li><a class="dropdown-item booking-bulk-action" href="javascript:void(0)" data-action="status_confirmed"><i class="bi bi-check-circle text-success me-2"></i>Confirmed</a></li>
+            <li><a class="dropdown-item booking-bulk-action" href="javascript:void(0)" data-action="status_completed"><i class="bi bi-check2-all text-info me-2"></i>Completed</a></li>
+            <li><a class="dropdown-item booking-bulk-action" href="javascript:void(0)" data-action="status_pending"><i class="bi bi-clock-history text-warning me-2"></i>Pending</a></li>
+            <li><a class="dropdown-item booking-bulk-action" href="javascript:void(0)" data-action="status_cancelled"><i class="bi bi-x-circle text-danger me-2"></i>Cancelled</a></li>
+        </ul>
+    </div>
+    <button type="button" class="btn btn-sm btn-danger rounded-pill px-3 booking-bulk-action" data-action="delete">
+        <i class="bi bi-trash3 me-1"></i> Delete
+    </button>
+    <button type="button" class="btn btn-sm btn-link text-white-50 p-0 ms-1 text-decoration-none" id="bookingBulkClear" title="Deselect all">
+        <i class="bi bi-x-lg"></i>
+    </button>
 </div>
 
 @push('scripts')
@@ -326,6 +358,90 @@ $(document).ready(function() {
             }
         });
     }
+
+    // Batch Bulk Selection & Processing
+    const $bulkBar = $('#bookingBulkBar');
+    const $selectAll = $('.bulk-select-all');
+    const $countBadge = $('#bookingSelectedCount');
+
+    function updateBulkBar() {
+        const checkedBoxes = $('.bulk-row-select:checked');
+        const count = checkedBoxes.length;
+        $countBadge.text(count);
+        if (count > 0) {
+            $bulkBar.addClass('show');
+        } else {
+            $bulkBar.removeClass('show');
+        }
+    }
+
+    $selectAll.on('change', function() {
+        $('.bulk-row-select').prop('checked', $(this).is(':checked'));
+        updateBulkBar();
+    });
+
+    $(document).on('change', '.bulk-row-select', function() {
+        const total = $('.bulk-row-select').length;
+        const checked = $('.bulk-row-select:checked').length;
+        $selectAll.prop('checked', total > 0 && total === checked);
+        updateBulkBar();
+    });
+
+    $('#bookingBulkClear').on('click', function() {
+        $('.bulk-row-select, .bulk-select-all').prop('checked', false);
+        updateBulkBar();
+    });
+
+    $('.booking-bulk-action').on('click', function(e) {
+        e.preventDefault();
+        const action = $(this).data('action');
+        const selectedIds = $('.bulk-row-select:checked').map(function() { return $(this).val(); }).get();
+
+        if (selectedIds.length === 0) return;
+
+        const isDelete = action === 'delete';
+        const actionLabel = isDelete ? 'delete' : 'update status to ' + action.replace('status_', '');
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: `You are about to ${actionLabel} for ${selectedIds.length} selected booking(s).`,
+            icon: isDelete ? 'warning' : 'question',
+            showCancelButton: true,
+            confirmButtonColor: isDelete ? '#dc3545' : '#F58F43',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: `Yes, ${isDelete ? 'Delete' : 'Update'}`,
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $('#appLoader').fadeIn(200);
+                $.ajax({
+                    url: '{{ route("admin.bookings.bulk") }}',
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        ids: selectedIds,
+                        action: action
+                    },
+                    success: function(res) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: res.message || 'Bookings updated successfully.',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    },
+                    error: function(xhr) {
+                        $('#appLoader').fadeOut(200);
+                        const msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Error processing bulk action.';
+                        Swal.fire('Failed', msg, 'error');
+                    }
+                });
+            }
+        });
+    });
 });
 </script>
 @endpush

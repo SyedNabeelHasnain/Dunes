@@ -45,8 +45,8 @@
                         </div>
 
                         <div class="mb-0">
-                            <label for="content" class="form-label fw-bold text-dark">Main Article Content (HTML allowed)</label>
-                            <textarea name="content" id="content" class="form-control" rows="12" placeholder="Write article here..." required style="border-radius: 8px; font-family: Courier, monospace;"></textarea>
+                            <label for="content" class="form-label fw-bold text-dark">Main Article Content</label>
+                            <textarea name="content" id="content" class="form-control wysiwyg-editor" rows="12" placeholder="Write article here..." required style="border-radius: 8px;"></textarea>
                         </div>
                     </div>
 

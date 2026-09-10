@@ -48,8 +48,8 @@
                         </div>
 
                         <div class="mb-0">
-                            <label for="content" class="form-label fw-bold text-dark">Main Article Content (HTML allowed)</label>
-                            <textarea name="content" id="content" class="form-control" rows="12" required style="border-radius: 8px; font-family: Courier, monospace;">{{ $post->content }}</textarea>
+                            <label for="content" class="form-label fw-bold text-dark">Main Article Content</label>
+                            <textarea name="content" id="content" class="form-control wysiwyg-editor" rows="12" required style="border-radius: 8px;">{{ $post->content }}</textarea>
                         </div>
                     </div>
 

@@ -376,4 +376,45 @@ class AdminBookingController extends Controller
             return response()->json(['success' => false, 'message' => 'Failed to send email.'], 500);
         }
     }
+
+    /**
+     * Perform batch operations across multiple bookings.
+     */
+    public function bulkAction(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'required|integer|exists:bookings,id',
+            'action' => 'required|string|in:status_confirmed,status_completed,status_cancelled,status_pending,delete',
+        ]);
+
+        $ids = $request->input('ids');
+        $action = $request->input('action');
+
+        try {
+            if ($action === 'delete') {
+                $count = Booking::whereIn('id', $ids)->delete();
+                \Illuminate\Support\Facades\Cache::forget('admin_dashboard_kpis');
+                return response()->json([
+                    'success' => true,
+                    'message' => "{$count} booking(s) deleted successfully."
+                ]);
+            }
+
+            $newStatus = str_replace('status_', '', $action);
+            $count = Booking::whereIn('id', $ids)->update(['status' => $newStatus]);
+            \Illuminate\Support\Facades\Cache::forget('admin_dashboard_kpis');
+
+            return response()->json([
+                'success' => true,
+                'message' => "{$count} booking(s) updated to " . ucfirst($newStatus) . " successfully."
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error("Bulk action failed on bookings: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to process bulk action: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

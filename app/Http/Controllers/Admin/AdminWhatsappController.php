@@ -221,4 +221,37 @@ class AdminWhatsappController extends Controller
 
         return response()->stream($callback, 200, $headers);
     }
+
+    /**
+     * Perform batch operations across multiple WhatsApp inquiries.
+     */
+    public function bulkAction(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'required|integer',
+            'action' => 'required|string|in:delete',
+        ]);
+
+        $ids = $request->input('ids');
+        $action = $request->input('action');
+
+        try {
+            if ($action === 'delete') {
+                $count = DB::table('whatsapp_inquiries')->whereIn('id', $ids)->delete();
+                return response()->json([
+                    'success' => true,
+                    'message' => "{$count} lead(s) deleted successfully."
+                ]);
+            }
+
+            return response()->json(['success' => false, 'message' => 'Invalid action.'], 400);
+        } catch (\Throwable $e) {
+            \Log::error("Bulk action failed on WhatsApp inquiries: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to process bulk action: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

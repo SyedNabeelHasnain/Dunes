@@ -76,6 +76,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     
     // Bookings & WhatsApp Leads
     Route::get('/bookings/export/csv', [AdminBookingController::class, 'exportCsv'])->name('bookings.export');
+    Route::post('/bookings/bulk-action', [AdminBookingController::class, 'bulkAction'])->name('bookings.bulk');
     Route::resource('bookings', AdminBookingController::class)->only(['index', 'show', 'update', 'destroy']);
     Route::post('/bookings/{id}/payment-link', [AdminBookingController::class, 'createPaymentLink'])->name('bookings.payment-link');
     Route::post('/bookings/{id}/resend-payment', [AdminBookingController::class, 'resendPaymentEmail'])->name('bookings.resend-payment');
@@ -86,6 +87,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/operations/export/csv', [\App\Http\Controllers\Admin\AdminOperationsController::class, 'exportManifest'])->name('operations.export');
 
     Route::get('/whatsapp-leads/export/csv', [AdminWhatsappController::class, 'exportCsv'])->name('whatsapp.export');
+    Route::post('/whatsapp-leads/bulk-action', [AdminWhatsappController::class, 'bulkAction'])->name('whatsapp.bulk');
     Route::get('/whatsapp-leads', [AdminWhatsappController::class, 'index'])->name('whatsapp.leads');
     Route::get('/whatsapp', [AdminWhatsappController::class, 'index'])->name('whatsapp.index');
     Route::get('/whatsapp/leads', [AdminWhatsappController::class, 'index'])->name('whatsapp.leads.alias');
@@ -98,6 +100,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::resource('reviews', AdminReviewController::class)->except(['create', 'show', 'edit']);
     Route::post('/reviews/{id}/toggle-status', [AdminReviewController::class, 'toggleStatus'])->name('reviews.toggle-status');
     Route::get('/inquiries/export/csv', [AdminDashboardController::class, 'exportInquiriesCsv'])->name('inquiries.export');
+    Route::post('/inquiries/bulk-action', [AdminDashboardController::class, 'bulkInquiriesAction'])->name('inquiries.bulk');
     Route::get('/inquiries', [AdminDashboardController::class, 'inquiries'])->name('inquiries.index');
     Route::get('/inquiries/{id}', [AdminDashboardController::class, 'viewInquiry'])->name('inquiries.show');
     Route::post('/inquiries/{id}/status', [AdminDashboardController::class, 'updateInquiryStatus'])->name('inquiries.status');

@@ -9,8 +9,9 @@
     <!-- CSS Stylesheets -->
     <link href="{{ asset('assets/vendor/bootstrap/5.3.2/css/bootstrap.min.css') }}" rel="stylesheet">
     <link rel="preload" href="{{ asset('assets/vendor/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="{{ asset('assets/vendor/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css') }}"></noscript>
     <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
     @php
         try {
             $adminCacheVer = \Illuminate\Support\Facades\Cache::remember('cache_ver_admin', 86400, function() {
@@ -23,6 +24,59 @@
     <link href="{{ asset('assets/css/app.css') }}?v={{ $adminCacheVer }}" rel="stylesheet">
     
     <style>
+        /* Quill WYSIWYG Editor Styling */
+        .ql-toolbar.ql-snow {
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            border-color: #dee2e6 !important;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .ql-container.ql-snow {
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            border-color: #dee2e6 !important;
+            font-family: inherit;
+            font-size: 0.95rem;
+            min-height: 220px;
+        }
+        .ql-editor {
+            min-height: 200px;
+            line-height: 1.6;
+        }
+        /* DataTables Buttons Styling */
+        .dt-buttons .btn {
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 0.35rem 0.75rem;
+            border-radius: 50px !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+        }
+        .dt-buttons .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        /* Floating Batch Bulk Action Toolbar */
+        .bulk-action-bar {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120%);
+            z-index: 1050;
+            background: #1e293b;
+            color: #ffffff;
+            border-radius: 50px;
+            padding: 10px 24px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .bulk-action-bar.show {
+            transform: translateX(-50%) translateY(0);
+        }
         /* Global SVG & Pagination Safeguards */
         svg {
             max-width: 100%;
@@ -523,6 +577,15 @@
     <script src="{{ asset('assets/vendor/bootstrap/5.3.2/js/bootstrap.bundle.min.js') }}"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.all.min.js" crossorigin="anonymous"></script>
 
@@ -545,7 +608,7 @@
             $.fn.dataTable.ext.errMode = 'none';
         }
 
-        // Initialize Universal DataTables with column sorting across all admin tables
+        // Initialize Universal DataTables with column sorting & native export suite across all admin tables
         $('.table:not(.no-datatable), .datatable').each(function() {
             var $table = $(this);
             if ($table.find('tbody tr').length > 0 && $table.find('tbody td[colspan]').length === 0) {
@@ -558,6 +621,37 @@
                         columnDefs: [
                             { orderable: false, targets: 'no-sort' }
                         ],
+                        buttons: [
+                            {
+                                extend: 'excelHtml5',
+                                text: '<i class="bi bi-file-earmark-excel me-1 text-success"></i>Excel',
+                                className: 'btn btn-sm btn-white border shadow-sm rounded-pill px-3 me-1',
+                                exportOptions: { columns: ':visible:not(.no-export):not(.no-sort)' }
+                            },
+                            {
+                                extend: 'pdfHtml5',
+                                text: '<i class="bi bi-file-earmark-pdf me-1 text-danger"></i>PDF',
+                                className: 'btn btn-sm btn-white border shadow-sm rounded-pill px-3 me-1',
+                                exportOptions: { columns: ':visible:not(.no-export):not(.no-sort)' }
+                            },
+                            {
+                                extend: 'csvHtml5',
+                                text: '<i class="bi bi-file-earmark-text me-1 text-primary"></i>CSV',
+                                className: 'btn btn-sm btn-white border shadow-sm rounded-pill px-3 me-1',
+                                exportOptions: { columns: ':visible:not(.no-export):not(.no-sort)' }
+                            },
+                            {
+                                extend: 'print',
+                                text: '<i class="bi bi-printer me-1 text-dark"></i>Print',
+                                className: 'btn btn-sm btn-white border shadow-sm rounded-pill px-3 me-1',
+                                exportOptions: { columns: ':visible:not(.no-export):not(.no-sort)' }
+                            },
+                            {
+                                extend: 'colvis',
+                                text: '<i class="bi bi-columns-gap me-1 text-muted"></i>Columns',
+                                className: 'btn btn-sm btn-white border shadow-sm rounded-pill px-3'
+                            }
+                        ],
                         language: {
                             search: "",
                             searchPlaceholder: "Quick search table records...",
@@ -568,11 +662,51 @@
                                 next: '<i class="bi bi-chevron-right"></i>'
                             }
                         },
-                        dom: "<'row mb-3 mt-3 align-items-center'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+                        dom: "<'row mb-3 mt-2 align-items-center'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-4 text-md-center mb-2 mb-md-0'B><'col-sm-12 col-md-4'f>>" +
                              "<'row'<'col-sm-12'tr>>" +
                              "<'row mt-3 align-items-center'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>"
                     });
                 }
+            }
+        });
+
+        // Universal Quill WYSIWYG Editor Auto-initializer
+        document.querySelectorAll('textarea.wysiwyg-editor').forEach(function(textarea) {
+            if (textarea.dataset.quillInitialized === 'true') return;
+            textarea.dataset.quillInitialized = 'true';
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'quill-editor-container mb-3 bg-white rounded-3 shadow-sm';
+            textarea.parentNode.insertBefore(wrapper, textarea);
+            textarea.style.display = 'none';
+
+            const quill = new Quill(wrapper, {
+                theme: 'snow',
+                placeholder: textarea.getAttribute('placeholder') || 'Compose rich content...',
+                modules: {
+                    toolbar: [
+                        [{ 'header': [2, 3, 4, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        ['blockquote', 'code-block'],
+                        ['link', 'clean']
+                    ]
+                }
+            });
+
+            if (textarea.value) {
+                quill.clipboard.dangerouslyPasteHTML(textarea.value);
+            }
+
+            quill.on('text-change', function() {
+                textarea.value = quill.root.innerHTML === '<p><br></p>' ? '' : quill.root.innerHTML;
+            });
+
+            const form = textarea.closest('form');
+            if (form) {
+                form.addEventListener('submit', function() {
+                    textarea.value = quill.root.innerHTML === '<p><br></p>' ? '' : quill.root.innerHTML;
+                });
             }
         });
 

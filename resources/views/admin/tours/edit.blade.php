@@ -51,7 +51,7 @@
 
                     <div class="mb-4">
                         <label for="full_desc" class="form-label fw-bold text-dark">Full Description</label>
-                        <textarea name="full_desc" id="full_desc" class="form-control" rows="6" required style="border-radius: 8px;">{{ $tour->full_desc }}</textarea>
+                        <textarea name="full_desc" id="full_desc" class="form-control wysiwyg-editor" rows="6" required style="border-radius: 8px;">{{ $tour->full_desc }}</textarea>
                     </div>
 
                     <!-- Package Tiers -->

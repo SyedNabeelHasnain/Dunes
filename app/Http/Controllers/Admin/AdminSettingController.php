@@ -96,6 +96,8 @@ class AdminSettingController extends Controller
         \Illuminate\Support\Facades\Cache::forget('site_settings_cache');
         \Illuminate\Support\Facades\Cache::forget('site_tours_header_cache');
         \Illuminate\Support\Facades\Cache::forget('site_home_cache');
+        \Illuminate\Support\Facades\Cache::forget('admin_dashboard_kpis');
+        \Illuminate\Support\Facades\Cache::forget('admin_dashboard_top_tours');
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
