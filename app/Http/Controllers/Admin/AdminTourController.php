@@ -125,6 +125,8 @@ class AdminTourController extends Controller
             'dropoff_time' => 'required|string|max:255',
             'priority' => 'required|integer',
             'status' => 'required|string|in:active,inactive',
+            'hero_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:5120',
+            'thumb_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:3072',
         ]);
 
         $data = $request->except(['tiers', 'addons', 'hero_image', 'thumb_image']);

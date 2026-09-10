@@ -456,14 +456,25 @@ class AdminDashboardController extends Controller
 
         $columns = ['ID', 'Date', 'Name', 'Email', 'Phone', 'Subject', 'Message', 'Status', 'IP Address'];
 
-        $callback = function() use ($query, $columns) {
+        $sanitize = function(array $row): array {
+            return array_map(function($val) {
+                if ($val === null) return '';
+                $str = (string) $val;
+                if (isset($str[0]) && in_array($str[0], ['=', '+', '-', '@', "\t", "\r"], true)) {
+                    return "'" . $str;
+                }
+                return $str;
+            }, $row);
+        };
+
+        $callback = function() use ($query, $columns, $sanitize) {
             $file = fopen('php://output', 'w');
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM for UTF-8
             fputcsv($file, $columns);
 
-            $query->chunk(100, function($inquiries) use ($file) {
+            $query->chunk(100, function($inquiries) use ($file, $sanitize) {
                 foreach ($inquiries as $inq) {
-                    fputcsv($file, [
+                    fputcsv($file, $sanitize([
                         $inq->id,
                         $inq->created_at ? $inq->created_at->format('Y-m-d H:i:s') : '',
                         $inq->name,
@@ -473,7 +484,7 @@ class AdminDashboardController extends Controller
                         $inq->message,
                         $inq->status,
                         $inq->ip_address
-                    ]);
+                    ]));
                 }
             });
 

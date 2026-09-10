@@ -27,13 +27,13 @@
                 <input type="hidden" name="balance_due" value="{{ $booking->balance_due }}">
                 <button type="submit" class="btn btn-success rounded-pill px-4 py-2 fw-bold">Confirm Booking</button>
             </form>
-            <form action="{{ route('admin.bookings.update', $booking->id) }}" method="POST" class="d-inline">
+            <form action="{{ route('admin.bookings.update', $booking->id) }}" method="POST" class="d-inline" id="cancelBookingForm">
                 @csrf
                 @method('PUT')
                 <input type="hidden" name="status" value="cancelled">
                 <input type="hidden" name="payment_status" value="{{ $booking->payment_status }}">
                 <input type="hidden" name="balance_due" value="{{ $booking->balance_due }}">
-                <button type="submit" class="btn btn-danger rounded-pill px-4 py-2 fw-bold">Cancel Booking</button>
+                <button type="button" class="btn btn-danger rounded-pill px-4 py-2 fw-bold" onclick="confirmCancelBooking()">Cancel Booking</button>
             </form>
         @endif
         @if($booking->status === 'confirmed')
@@ -395,6 +395,22 @@ $(document).ready(function() {
         });
     });
 });
+
+function confirmCancelBooking() {
+    Swal.fire({
+        title: 'Cancel Booking #{{ $booking->reference }}?',
+        text: 'Are you sure you want to cancel this booking? This will notify the customer and release reserved inventory.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, cancel booking'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('cancelBookingForm').submit();
+        }
+    });
+}
 </script>
 @endpush
 @endsection

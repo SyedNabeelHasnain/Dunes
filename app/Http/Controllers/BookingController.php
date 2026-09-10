@@ -47,6 +47,7 @@ class BookingController extends Controller
                 'date' => 'required|date|after_or_equal:today',
                 'adults' => 'required|integer|min:1',
                 'children' => 'nullable|integer|min:0',
+                'infants' => 'nullable|integer|min:0',
                 'location' => 'required|string|max:500',
                 'requests' => 'nullable|string',
                 'name' => 'required|string|max:255',
@@ -70,6 +71,7 @@ class BookingController extends Controller
         $date = $request->input('date');
         $adults = (int)$request->input('adults');
         $children = (int)$request->input('children', 0);
+        $infants = max(0, (int)$request->input('infants', 0));
         $location = trim($request->input('location'));
         $requests = trim($request->input('requests', ''));
         $name = trim($request->input('name'));
@@ -95,8 +97,15 @@ class BookingController extends Controller
         }
 
         $price = (float)$pricing->price;
-        // Children get a 30% discount (they pay 70% of the adult price)
-        $subtotal = ($price * $adults) + ($price * 0.7 * $children);
+        $priceType = strtolower($pricing->price_type ?? 'per person');
+        $childPrice = round($price * 0.70, 2);
+
+        if (in_array($priceType, ['per buggy', 'per vehicle', 'per group', 'private'])) {
+            $subtotal = $price;
+        } else {
+            // Children get a 30% discount (they pay 70% of the adult price)
+            $subtotal = ($price * $adults) + ($childPrice * $children);
+        }
 
         // Addons total
         $addonsTotal = 0;
@@ -131,11 +140,24 @@ class BookingController extends Controller
         if (!empty($couponCodeInput)) {
             $coupon = Coupon::where('code', $couponCodeInput)->first();
             if ($coupon) {
-                $check = $coupon->validateEligibility($rawSubtotal, $tourId, $tierId, $email, $adults, $date);
+                $payingGuests = max(1, (int)$adults + (int)$children);
+                $check = $coupon->validateEligibility($rawSubtotal, $tourId, $tierId, $email, $payingGuests, $date);
                 if ($check['valid']) {
                     $appliedCoupon = $coupon;
                     $discountAmount = (float)$check['discount'];
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => $check['message'] ?: 'Coupon is invalid or cannot be applied to this booking.',
+                        'errors' => ['coupon_code' => [$check['message']]]
+                    ], 422);
                 }
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid promo coupon code.',
+                    'errors' => ['coupon_code' => ['Invalid promo coupon code.']]
+                ], 422);
             }
         }
 
@@ -158,12 +180,16 @@ class BookingController extends Controller
             $balanceDue = 0;
         }
 
-        // Email Verification check
+        // Email Verification check (strictly require verified session for current booking)
         $sessionVerified = session()->has('email_verified_' . md5($email));
-        $isVerified = $sessionVerified || 
-            \App\Models\VerifiedEmail::where('email', $email)->exists() ||
-            Booking::where('email', $email)->where('is_verified', true)->exists() ||
-            \App\Models\Contact::where('email', $email)->where('is_verified', true)->exists();
+        $requireVerification = app(SettingsService::class)->get('email_verification_required', '1') === '1';
+        if ($requireVerification && !$sessionVerified) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please verify your email address before completing your booking.',
+                'require_verification' => true
+            ], 422);
+        }
 
         if ($paymentMethod !== 'cash') {
             if ($payNow < 2.00) {
@@ -189,85 +215,79 @@ class BookingController extends Controller
         $ctx = $this->tracker->collectRequestContext('booking', $gpsPost);
 
         try {
-            // Save Booking
-            $booking = Booking::create([
-                'reference' => $ref,
-                'tour_id' => $tourId,
-                'tier_id' => $tierId,
-                'tour_name' => $tour->name,
-                'tier_name' => $tier->display_name ?: $tier->name,
-                'tour_date' => $date,
-                'adults' => $adults,
-                'children' => $children,
-                'name' => $name,
-                'email' => $email,
-                'phone' => $phone,
-                'pickup_location' => $location,
-                'special_requests' => $requests,
-                'coupon_id' => $appliedCoupon ? $appliedCoupon->id : null,
-                'coupon_code' => $appliedCoupon ? $appliedCoupon->code : null,
-                'discount_type' => $appliedCoupon ? $appliedCoupon->discount_type : null,
-                'discount_rate' => $appliedCoupon ? (float)$appliedCoupon->discount_value : 0.00,
-                'discount_amount' => $discountAmount,
-                'original_total' => $originalTotal,
-                'subtotal' => $subtotal,
-                'addons_total' => $addonsTotal,
-                'total' => $total,
-                'currency' => 'AED',
-                'status' => 'pending',
-                'payment_method' => $paymentMethod,
-                'payment_status' => 'unpaid',
-                'payment_amount' => 0.00,
-                'balance_due' => $total,
-                'ip_address' => $ctx['client_ip'],
-                'ip_location' => implode(', ', array_filter([$ctx['city'] ?? '', $ctx['region'] ?? '', $ctx['country'] ?? ''])),
-                'gps_lat' => $ctx['gps_latitude'],
-                'gps_lng' => $ctx['gps_longitude'],
-                'gps_address' => $ctx['gps_source'] ?? 'Not Available',
-                'device_type' => $ctx['device_type'],
-                'browser' => $ctx['browser_name'],
-                'platform' => $ctx['os_name'],
-                'user_agent' => $ctx['user_agent'],
-                'referrer' => $ctx['referrer_url'],
-                'utm_source' => $ctx['utm_source'],
-                'utm_medium' => $ctx['utm_medium'],
-                'utm_campaign' => $ctx['utm_campaign'],
-                'utm_term' => $ctx['utm_term'],
-                'utm_content' => $ctx['utm_content'],
-                'is_verified' => $isVerified,
-            ]);
-
-            // Record Coupon Usage & increment counter
-            if ($appliedCoupon && $discountAmount > 0) {
-                try {
-                    CouponUsage::create([
-                        'coupon_id' => $appliedCoupon->id,
-                        'booking_id' => $booking->id,
-                        'booking_reference' => $booking->reference,
-                        'customer_name' => $name,
-                        'customer_email' => strtolower($email),
-                        'customer_phone' => $phone,
-                        'discount_amount' => $discountAmount,
-                        'order_subtotal' => $originalTotal,
-                        'order_final_total' => $total,
-                        'used_at' => now(),
-                    ]);
-                    $appliedCoupon->increment('used_count');
-                } catch (\Throwable $e) {
-                    Log::error("Failed to record coupon usage: " . $e->getMessage());
-                }
-            }
-
-            // Save Booking Addons
-            foreach ($selectedAddons as $sa) {
-                BookingAddon::create([
-                    'booking_id' => $booking->id,
-                    'addon_id' => $sa['id'],
-                    'addon_name' => $sa['name'],
-                    'quantity' => 1,
-                    'price' => $sa['price'],
+            // Save Booking atomically inside transaction
+            $booking = \Illuminate\Support\Facades\DB::transaction(function () use (
+                $ref, $tourId, $tierId, $tour, $tier, $date, $adults, $children, $infants,
+                $name, $email, $phone, $location, $requests, $appliedCoupon, $discountAmount,
+                $originalTotal, $subtotal, $addonsTotal, $total, $paymentMethod, $ctx,
+                $isVerified, $selectedAddons
+            ) {
+                $b = Booking::create([
+                    'reference' => $ref,
+                    'tour_id' => $tourId,
+                    'tier_id' => $tierId,
+                    'tour_name' => $tour->name,
+                    'tier_name' => $tier->display_name ?: $tier->name,
+                    'tour_date' => $date,
+                    'adults' => $adults,
+                    'children' => $children,
+                    'infants' => $infants,
+                    'name' => $name,
+                    'email' => $email,
+                    'phone' => $phone,
+                    'pickup_location' => $location,
+                    'special_requests' => $requests,
+                    'coupon_id' => $appliedCoupon ? $appliedCoupon->id : null,
+                    'coupon_code' => $appliedCoupon ? $appliedCoupon->code : null,
+                    'discount_type' => $appliedCoupon ? $appliedCoupon->discount_type : null,
+                    'discount_rate' => $appliedCoupon ? (float)$appliedCoupon->discount_value : 0.00,
+                    'discount_amount' => $discountAmount,
+                    'original_total' => $originalTotal,
+                    'subtotal' => $subtotal,
+                    'addons_total' => $addonsTotal,
+                    'total' => $total,
+                    'currency' => 'AED',
+                    'status' => 'pending',
+                    'payment_method' => $paymentMethod,
+                    'payment_status' => 'unpaid',
+                    'payment_amount' => 0.00,
+                    'balance_due' => $total,
+                    'ip_address' => $ctx['client_ip'],
+                    'ip_location' => implode(', ', array_filter([$ctx['city'] ?? '', $ctx['region'] ?? '', $ctx['country'] ?? ''])),
+                    'gps_lat' => $ctx['gps_latitude'],
+                    'gps_lng' => $ctx['gps_longitude'],
+                    'gps_address' => $ctx['gps_source'] ?? 'Not Available',
+                    'device_type' => $ctx['device_type'],
+                    'browser' => $ctx['browser_name'],
+                    'platform' => $ctx['os_name'],
+                    'user_agent' => $ctx['user_agent'],
+                    'referrer' => $ctx['referrer_url'],
+                    'utm_source' => $ctx['utm_source'],
+                    'utm_medium' => $ctx['utm_medium'],
+                    'utm_campaign' => $ctx['utm_campaign'],
+                    'utm_term' => $ctx['utm_term'],
+                    'utm_content' => $ctx['utm_content'],
+                    'is_verified' => $isVerified,
                 ]);
-            }
+
+                // Record Coupon Usage immediately for cash bookings (instant confirmation)
+                if ($appliedCoupon && $discountAmount > 0 && $paymentMethod === 'cash') {
+                    $this->recordCouponUsage($b);
+                }
+
+                // Save Booking Addons
+                foreach ($selectedAddons as $sa) {
+                    BookingAddon::create([
+                        'booking_id' => $b->id,
+                        'addon_id' => $sa['id'],
+                        'addon_name' => $sa['name'],
+                        'quantity' => 1,
+                        'price' => $sa['price'],
+                    ]);
+                }
+
+                return $b;
+            });
 
             // Log detailed context in request_logs table
             $logId = $this->tracker->logRequest('booking', $booking->id, 'booking', $ctx);
@@ -360,7 +380,7 @@ class BookingController extends Controller
             Log::error("Failed to process checkout: " . $e->getMessage() . "\n" . $e->getTraceAsString());
             return response()->json([
                 'success' => false,
-                'message' => 'Unable to complete booking: ' . $e->getMessage()
+                'message' => 'Unable to complete booking at this time. Please try again or contact us directly on WhatsApp.'
             ], 500);
         }
     }
@@ -374,20 +394,13 @@ class BookingController extends Controller
         $ref = $request->input('ref', '');
 
         $booking = null;
-        $paymentStatus = '';
+        $paymentStatus = 'pending';
         $method = 'cash';
 
         if (!empty($pi)) {
-            $booking = Booking::where('ziina_payment_intent_id', $pi)->first();
-            $paymentRecord = null;
-
-            if (!$booking) {
-                $paymentRecord = BookingPayment::where('payment_intent_id', $pi)->first();
-                if ($paymentRecord && $paymentRecord->booking) {
-                    $booking = $paymentRecord->booking;
-                }
-            } else {
-                $paymentRecord = BookingPayment::where('payment_intent_id', $pi)->first();
+            $paymentRecord = BookingPayment::where('payment_intent_id', $pi)->first();
+            if ($paymentRecord && $paymentRecord->booking_id) {
+                $booking = Booking::with(['addons'])->find($paymentRecord->booking_id);
             }
             
             if ($booking) {
@@ -424,6 +437,7 @@ class BookingController extends Controller
 
                         // Send booking confirmation email on first completion
                         if (!$wasCompleted) {
+                            $this->recordCouponUsage($booking);
                             if ($newStatus === 'partial') {
                                 $this->sendEmailNotification('booking_advance', $booking);
                             } else {
@@ -448,27 +462,63 @@ class BookingController extends Controller
                     }
                     $paymentStatus = 'completed';
                 } elseif ($intentStatus === 'failed') {
-                    $booking->update([
-                        'payment_status' => 'failed',
-                        'ziina_status' => $intentStatus
-                    ]);
-                    
-                    BookingPayment::where('payment_intent_id', $pi)->update([
-                        'status' => $intentStatus
-                    ]);
-                    
-                    $paymentStatus = 'failed';
+                    $alreadyCompleted = ($paymentRecord && $paymentRecord->status === 'completed') || 
+                                        ($booking && in_array($booking->payment_status, ['paid', 'partial']) && $booking->status === 'confirmed');
+                    if (!$alreadyCompleted) {
+                        $booking->update([
+                            'payment_status' => 'failed',
+                            'ziina_status' => $intentStatus
+                        ]);
+                        
+                        BookingPayment::where('payment_intent_id', $pi)->update([
+                            'status' => $intentStatus
+                        ]);
+                    }
+                    $paymentStatus = $alreadyCompleted ? 'completed' : 'failed';
                 } else {
-                    $booking->update([
-                        'ziina_status' => $intentStatus
-                    ]);
-                    
-                    BookingPayment::where('payment_intent_id', $pi)->update([
-                        'status' => $intentStatus
-                    ]);
-                    
-                    $paymentStatus = 'pending';
+                    $alreadyCompleted = ($paymentRecord && $paymentRecord->status === 'completed') || 
+                                        ($booking && in_array($booking->payment_status, ['paid', 'partial']) && $booking->status === 'confirmed');
+                    if ($alreadyCompleted) {
+                        $paymentStatus = 'completed';
+                    } else {
+                        if (!empty($intentStatus)) {
+                            $booking->update([
+                                'ziina_status' => $intentStatus
+                            ]);
+                            
+                            BookingPayment::where('payment_intent_id', $pi)->update([
+                                'status' => $intentStatus
+                            ]);
+                        }
+                        $paymentStatus = 'pending';
+                    }
                 }
+            } elseif (!$booking && $paymentRecord) {
+                $intent = $this->ziina->fetchPaymentIntent($pi);
+                $intentStatus = $intent['status'] ?? '';
+                if ($intentStatus === 'completed') {
+                    $paymentRecord->update(['status' => 'completed']);
+                    $paymentStatus = 'completed';
+                } else {
+                    $paymentStatus = $intentStatus;
+                }
+                $booking = (object)[
+                    'reference' => 'PAY-' . strtoupper(substr(preg_replace('/[^a-zA-Z0-9]/', '', $pi), -8)),
+                    'tour_name' => 'Direct / Quick Payment',
+                    'tier_name' => 'Confirmed Payment',
+                    'adults' => 1,
+                    'children' => 0,
+                    'infants' => 0,
+                    'tour_date' => null,
+                    'total' => (float)$paymentRecord->amount,
+                    'payment_amount' => (float)$paymentRecord->amount,
+                    'balance_due' => 0.00,
+                    'subtotal' => (float)$paymentRecord->amount,
+                    'addons_total' => 0.00,
+                    'payment_method' => 'card',
+                    'payment_status' => $paymentStatus ?: 'completed',
+                ];
+                $method = 'card';
             }
         } elseif (!empty($ref)) {
             $booking = Booking::where('reference', $ref)->first();
@@ -490,19 +540,79 @@ class BookingController extends Controller
 
         if (!empty($pi)) {
             $booking = Booking::where('ziina_payment_intent_id', $pi)->first();
-            if ($booking) {
-                $booking->update([
-                    'payment_status' => 'cancelled',
-                    'ziina_status' => 'cancelled'
-                ]);
 
-                BookingPayment::where('payment_intent_id', $pi)->update([
-                    'status' => 'cancelled'
-                ]);
+            // Only allow cancellation if booking exists and is not already confirmed/paid
+            if ($booking && in_array($booking->status, ['pending', 'draft']) && !in_array($booking->payment_status, ['paid', 'completed'])) {
+                $ziinaData = $this->ziina->fetchPaymentIntent($pi);
+                $gatewayStatus = $ziinaData['status'] ?? 'cancelled';
+
+                // Do not cancel if the payment was actually completed
+                if ($gatewayStatus !== 'completed') {
+                    // Release any coupon reservation if present
+                    if ($booking->coupon_id) {
+                        try {
+                            $usage = CouponUsage::where('booking_id', $booking->id)->first();
+                            if ($usage) {
+                                $coupon = Coupon::find($booking->coupon_id);
+                                if ($coupon && $coupon->used_count > 0) {
+                                    $coupon->decrement('used_count');
+                                }
+                                $usage->delete();
+                            }
+                        } catch (\Throwable $e) {
+                            Log::error("Failed to release coupon on cancellation: " . $e->getMessage());
+                        }
+                    }
+
+                    $booking->update([
+                        'status' => 'cancelled',
+                        'payment_status' => 'cancelled',
+                        'ziina_status' => 'cancelled'
+                    ]);
+
+                    BookingPayment::where('payment_intent_id', $pi)->update([
+                        'status' => 'cancelled'
+                    ]);
+                }
             }
         }
 
         return view('payment-cancel', compact('booking'));
+    }
+
+    /**
+     * Record coupon usage upon confirmed payment.
+     */
+    protected function recordCouponUsage(Booking $booking): void
+    {
+        if (!$booking->coupon_id || (float)$booking->discount_amount <= 0) {
+            return;
+        }
+
+        try {
+            $alreadyRecorded = CouponUsage::where('booking_id', $booking->id)->exists();
+            if (!$alreadyRecorded) {
+                CouponUsage::create([
+                    'coupon_id' => $booking->coupon_id,
+                    'booking_id' => $booking->id,
+                    'booking_reference' => $booking->reference,
+                    'customer_name' => $booking->name,
+                    'customer_email' => strtolower($booking->email),
+                    'customer_phone' => $booking->phone,
+                    'discount_amount' => (float)$booking->discount_amount,
+                    'order_subtotal' => (float)$booking->original_total,
+                    'order_final_total' => (float)$booking->total,
+                    'used_at' => now(),
+                ]);
+
+                $coupon = Coupon::find($booking->coupon_id);
+                if ($coupon) {
+                    $coupon->increment('used_count');
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::error("Failed to record coupon usage for {$booking->reference}: " . $e->getMessage());
+        }
     }
 
     /**
@@ -561,19 +671,28 @@ class BookingController extends Controller
 
         $adults = max(1, (int)$request->input('adults', 1));
         $children = max(0, (int)$request->input('children', 0));
+        $infants = max(0, (int)$request->input('infants', 0));
         $subtotal = (float)$request->input('subtotal', 0);
         $total = (float)$request->input('total', $subtotal);
 
         // Check if there is an existing draft for this session or email in the last 4 hours
+        $sessionDraftId = session('active_booking_draft_id');
         $draftId = $request->input('draft_id');
         $draft = null;
-        if ($draftId) {
+
+        // Strictly ensure caller owns the draft they are attempting to update
+        if ($draftId && $sessionDraftId && (int)$draftId === (int)$sessionDraftId) {
             $draft = Booking::where('id', $draftId)->where('status', 'draft')->first();
         }
-        if (!$draft && !empty($email)) {
+
+        if (!$draft && !empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $draft = Booking::where('email', $email)
                 ->where('status', 'draft')
                 ->where('created_at', '>=', now()->subHours(4))
+                ->where(function($q) use ($request) {
+                    $q->where('ip_address', $request->ip())
+                      ->orWhereNull('ip_address');
+                })
                 ->first();
         }
 
@@ -591,6 +710,7 @@ class BookingController extends Controller
         $draft->tour_date = $date ? date('Y-m-d', strtotime($date)) : now()->addDay()->format('Y-m-d');
         $draft->adults = $adults;
         $draft->children = $children;
+        $draft->infants = $infants;
         $draft->name = $name ?: 'Prospective Guest';
         $draft->email = $email ?: 'abandoned@guest.local';
         $draft->phone = $phone;
@@ -602,6 +722,8 @@ class BookingController extends Controller
         $draft->payment_status = 'unpaid';
         $draft->ip_address = $request->ip();
         $draft->save();
+
+        session(['active_booking_draft_id' => $draft->id]);
 
         return response()->json([
             'success' => true,

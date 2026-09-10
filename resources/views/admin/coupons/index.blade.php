@@ -318,142 +318,140 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // 1-Click Code Copy
-    document.querySelectorAll('.copy-code-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const code = this.dataset.code;
+$(document).ready(function() {
+    // 1-Click Code Copy (Delegated for DataTables)
+    $(document).on('click', '.copy-code-btn', function() {
+        const btn = this;
+        const code = $(this).data('code');
+        if (navigator.clipboard) {
             navigator.clipboard.writeText(code).then(() => {
-                const icon = this.querySelector('i');
-                icon.className = 'bi bi-check-lg text-success';
-                setTimeout(() => { icon.className = 'bi bi-clipboard'; }, 1500);
+                const $icon = $(btn).find('i');
+                $icon.attr('class', 'bi bi-check-lg text-success');
+                setTimeout(() => { $icon.attr('class', 'bi bi-clipboard'); }, 1500);
             });
+        }
+    });
+
+    // AJAX Toggle Status Switch (Delegated for DataTables)
+    $(document).on('change', '.status-toggle-switch', function() {
+        const toggle = this;
+        const couponId = $(this).data('id');
+        const originalState = !toggle.checked;
+
+        fetch(`/admin/coupons/${couponId}/toggle-status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: data.message,
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            } else {
+                toggle.checked = originalState;
+                Swal.fire('Error', data.message || 'Failed to update status.', 'error');
+            }
+        })
+        .catch(() => {
+            toggle.checked = originalState;
+            Swal.fire('Error', 'Network error occurred.', 'error');
         });
     });
 
-    // AJAX Toggle Status Switch
-    document.querySelectorAll('.status-toggle-switch').forEach(toggle => {
-        toggle.addEventListener('change', function() {
-            const couponId = this.dataset.id;
-            const originalState = !this.checked;
+    // Usages Audit Modal (Delegated for DataTables)
+    const usagesModalElem = document.getElementById('couponUsagesModal');
+    const usagesModal = usagesModalElem ? new bootstrap.Modal(usagesModalElem) : null;
+    $(document).on('click', '.view-usages-btn', function() {
+        const couponId = $(this).data('id');
+        const code = $(this).data('code');
+        document.getElementById('modalCouponTitle').innerText = `Redemptions for ${code}`;
+        document.getElementById('modalCouponBody').innerHTML = `
+            <div class="text-center py-4">
+                <div class="spinner-border text-primary" role="status"></div>
+                <div class="mt-2 text-muted small fw-bold">Loading redemption logs...</div>
+            </div>
+        `;
+        if (usagesModal) usagesModal.show();
 
-            fetch(`/admin/coupons/${couponId}/toggle-status`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                }
-            })
+        fetch(`/admin/coupons/${couponId}/usages`)
             .then(res => res.json())
             .then(data => {
-                if (data.success) {
-                    Swal.fire({
-                        toast: true,
-                        position: 'top-end',
-                        icon: 'success',
-                        title: data.message,
-                        showConfirmButton: false,
-                        timer: 2000
+                if (data.success && data.usages.length > 0) {
+                    let html = `
+                        <div class="table-responsive">
+                            <table class="table align-middle table-sm small mb-0">
+                                <thead class="bg-light text-muted text-uppercase">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Customer</th>
+                                        <th>Booking Ref</th>
+                                        <th class="text-end">Discount</th>
+                                        <th class="text-end">Order Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+                    data.usages.forEach(u => {
+                        const dateStr = new Date(u.used_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                        html += `
+                            <tr>
+                                <td>${dateStr}</td>
+                                <td>
+                                    <div class="fw-bold text-dark">${u.customer_name || 'Guest'}</div>
+                                    <div class="text-muted">${u.customer_email}</div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">${u.booking_reference || ('#' + u.booking_id)}</span>
+                                </td>
+                                <td class="text-end fw-bold text-success">-AED ${parseFloat(u.discount_amount).toFixed(2)}</td>
+                                <td class="text-end fw-800 text-dark">AED ${parseFloat(u.order_final_total).toFixed(2)}</td>
+                            </tr>
+                        `;
                     });
+                    html += `</tbody></table></div>`;
+                    document.getElementById('modalCouponBody').innerHTML = html;
                 } else {
-                    this.checked = originalState;
-                    Swal.fire('Error', data.message || 'Failed to update status.', 'error');
+                    document.getElementById('modalCouponBody').innerHTML = `
+                        <div class="text-center py-4 text-muted">
+                            <i class="bi bi-inbox fs-2 mb-2 d-block opacity-50"></i>
+                            <div class="fw-bold">No redemptions yet</div>
+                            <small>This promo code has not been redeemed by any customers so far.</small>
+                        </div>
+                    `;
                 }
             })
             .catch(() => {
-                this.checked = originalState;
-                Swal.fire('Error', 'Network error occurred.', 'error');
+                document.getElementById('modalCouponBody').innerHTML = `<div class="alert alert-danger mb-0">Failed to load redemptions log.</div>`;
             });
-        });
     });
 
-    // Usages Audit Modal
-    const usagesModal = new bootstrap.Modal(document.getElementById('couponUsagesModal'));
-    document.querySelectorAll('.view-usages-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const couponId = this.dataset.id;
-            const code = this.dataset.code;
-            document.getElementById('modalCouponTitle').innerText = `Redemptions for ${code}`;
-            document.getElementById('modalCouponBody').innerHTML = `
-                <div class="text-center py-4">
-                    <div class="spinner-border text-primary" role="status"></div>
-                    <div class="mt-2 text-muted small fw-bold">Loading redemption logs...</div>
-                </div>
-            `;
-            usagesModal.show();
+    // Delete Confirmation (Delegated for DataTables)
+    $(document).on('click', '.delete-coupon-btn', function(e) {
+        e.preventDefault();
+        const form = $(this).closest('.delete-coupon-form')[0];
+        const code = $(this).data('code');
 
-            fetch(`/admin/coupons/${couponId}/usages`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success && data.usages.length > 0) {
-                        let html = `
-                            <div class="table-responsive">
-                                <table class="table align-middle table-sm small mb-0">
-                                    <thead class="bg-light text-muted text-uppercase">
-                                        <tr>
-                                            <th>Date</th>
-                                            <th>Customer</th>
-                                            <th>Booking Ref</th>
-                                            <th class="text-end">Discount</th>
-                                            <th class="text-end">Order Total</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                        `;
-                        data.usages.forEach(u => {
-                            const dateStr = new Date(u.used_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-                            html += `
-                                <tr>
-                                    <td>${dateStr}</td>
-                                    <td>
-                                        <div class="fw-bold text-dark">${u.customer_name || 'Guest'}</div>
-                                        <div class="text-muted">${u.customer_email}</div>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-light text-dark border">${u.booking_reference || ('#' + u.booking_id)}</span>
-                                    </td>
-                                    <td class="text-end fw-bold text-success">-AED ${parseFloat(u.discount_amount).toFixed(2)}</td>
-                                    <td class="text-end fw-800 text-dark">AED ${parseFloat(u.order_final_total).toFixed(2)}</td>
-                                </tr>
-                            `;
-                        });
-                        html += `</tbody></table></div>`;
-                        document.getElementById('modalCouponBody').innerHTML = html;
-                    } else {
-                        document.getElementById('modalCouponBody').innerHTML = `
-                            <div class="text-center py-4 text-muted">
-                                <i class="bi bi-inbox fs-2 mb-2 d-block opacity-50"></i>
-                                <div class="fw-bold">No redemptions yet</div>
-                                <small>This promo code has not been redeemed by any customers so far.</small>
-                            </div>
-                        `;
-                    }
-                })
-                .catch(() => {
-                    document.getElementById('modalCouponBody').innerHTML = `<div class="alert alert-danger mb-0">Failed to load redemptions log.</div>`;
-                });
-        });
-    });
-
-    // Delete Confirmation
-    document.querySelectorAll('.delete-coupon-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const form = this.closest('.delete-coupon-form');
-            const code = this.dataset.code;
-
-            Swal.fire({
-                title: `Archive Promo ${code}?`,
-                text: "This promo code will be deactivated and archived from the active promotions list.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, Archive It'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    form.submit();
-                }
-            });
+        Swal.fire({
+            title: `Archive Promo ${code}?`,
+            text: "This promo code will be deactivated and archived from the active promotions list.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, Archive It'
+        }).then((result) => {
+            if (result.isConfirmed && form) {
+                form.submit();
+            }
         });
     });
 });

@@ -26,7 +26,7 @@
                         
                         <div class="mb-3">
                             <label for="tour_name" class="form-label fw-bold text-dark">Tour Name</label>
-                            <input type="text" name="name" id="tour_name" class="form-control" placeholder="e.g. Premium Desert Safari" required style="height: 48px; border-radius: 8px;">
+                            <input type="text" name="name" id="tour_name" class="form-control" value="{{ old('name') }}" placeholder="e.g. Premium Desert Safari" required style="height: 48px; border-radius: 8px;">
                         </div>
 
                         <div class="mb-3">
@@ -34,19 +34,19 @@
                             <select name="category_id" id="category_id" class="form-select" required style="height: 48px; border-radius: 8px;">
                                 <option value="">Select Category</option>
                                 @foreach($categories as $category)
-                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                    <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                                 @endforeach
                             </select>
                         </div>
 
                         <div class="mb-3">
                             <label for="short_desc" class="form-label fw-bold text-dark">Short Description (Excerpt)</label>
-                            <textarea name="short_desc" id="short_desc" class="form-control" rows="2" placeholder="Brief tagline shown on cards" required style="border-radius: 8px;"></textarea>
+                            <textarea name="short_desc" id="short_desc" class="form-control" rows="2" placeholder="Brief tagline shown on cards" required style="border-radius: 8px;">{{ old('short_desc') }}</textarea>
                         </div>
 
                         <div class="mb-0">
                             <label for="full_desc" class="form-label fw-bold text-dark">Full Description</label>
-                            <textarea name="full_desc" id="full_desc" class="form-control wysiwyg-editor" rows="6" placeholder="Detailed description shown on details page" required style="border-radius: 8px;"></textarea>
+                            <textarea name="full_desc" id="full_desc" class="form-control wysiwyg-editor" rows="6" placeholder="Detailed description shown on details page" required style="border-radius: 8px;">{{ old('full_desc') }}</textarea>
                         </div>
                     </div>
 
@@ -121,45 +121,45 @@
                         
                         <div class="mb-3">
                             <label for="duration" class="form-label fw-bold text-dark">Duration (Hours)</label>
-                            <input type="text" name="duration" id="duration" class="form-control" placeholder="e.g. 6 Hours" required style="border-radius: 8px;">
+                            <input type="text" name="duration" id="duration" class="form-control" value="{{ old('duration') }}" placeholder="e.g. 6 Hours" required style="border-radius: 8px;">
                         </div>
 
                         <div class="mb-3">
                             <label for="pickup_time" class="form-label fw-bold text-dark">Pickup Time Range</label>
-                            <input type="text" name="pickup_time" id="pickup_time" class="form-control" placeholder="e.g. 2:30 PM - 3:00 PM" required style="border-radius: 8px;">
+                            <input type="text" name="pickup_time" id="pickup_time" class="form-control" value="{{ old('pickup_time') }}" placeholder="e.g. 2:30 PM - 3:00 PM" required style="border-radius: 8px;">
                         </div>
 
                         <div class="mb-3">
                             <label for="dropoff_time" class="form-label fw-bold text-dark">Dropoff Time Range</label>
-                            <input type="text" name="dropoff_time" id="dropoff_time" class="form-control" placeholder="e.g. 9:00 PM - 9:30 PM" required style="border-radius: 8px;">
+                            <input type="text" name="dropoff_time" id="dropoff_time" class="form-control" value="{{ old('dropoff_time') }}" placeholder="e.g. 9:00 PM - 9:30 PM" required style="border-radius: 8px;">
                         </div>
 
                         <div class="row g-2 mb-3">
                             <div class="col-6">
                                 <label for="min_age" class="form-label fw-bold text-dark">Min Age</label>
-                                <input type="number" name="min_age" id="min_age" class="form-control" value="3" required style="border-radius: 8px;">
+                                <input type="number" name="min_age" id="min_age" class="form-control" value="{{ old('min_age', 3) }}" required style="border-radius: 8px;">
                             </div>
                             <div class="col-6">
                                 <label for="group_size" class="form-label fw-bold text-dark">Group Size</label>
-                                <input type="text" name="group_size" id="group_size" class="form-control" placeholder="e.g. Up to 6" style="border-radius: 8px;">
+                                <input type="text" name="group_size" id="group_size" class="form-control" value="{{ old('group_size') }}" placeholder="e.g. Up to 6" style="border-radius: 8px;">
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <label for="languages" class="form-label fw-bold text-dark">Languages Supported</label>
-                            <input type="text" name="languages" id="languages" class="form-control" value="English, Arabic" required style="border-radius: 8px;">
+                            <input type="text" name="languages" id="languages" class="form-control" value="{{ old('languages', 'English, Arabic') }}" required style="border-radius: 8px;">
                         </div>
 
                         <div class="mb-3">
                             <label for="priority" class="form-label fw-bold text-dark">Priority Sort Order</label>
-                            <input type="number" name="priority" id="priority" class="form-control" value="99" required style="border-radius: 8px;">
+                            <input type="number" name="priority" id="priority" class="form-control" value="{{ old('priority', 99) }}" required style="border-radius: 8px;">
                         </div>
 
                         <div class="mb-0">
                             <label for="status" class="form-label fw-bold text-dark">Status</label>
                             <select name="status" id="status" class="form-select" required style="border-radius: 8px;">
-                                <option value="active">Active & Published</option>
-                                <option value="inactive">Hidden / Draft</option>
+                                <option value="active" {{ old('status', 'active') === 'active' ? 'selected' : '' }}>Active & Published</option>
+                                <option value="inactive" {{ old('status') === 'inactive' ? 'selected' : '' }}>Hidden / Draft</option>
                             </select>
                         </div>
                     </div>
@@ -168,12 +168,12 @@
                         <h6 class="text-primary fw-800 text-uppercase small mb-4">Attribution Flags</h6>
                         
                         <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" name="is_featured" id="is_featured" value="1">
+                            <input class="form-check-input" type="checkbox" name="is_featured" id="is_featured" value="1" {{ old('is_featured') ? 'checked' : '' }}>
                             <label class="form-check-label fw-bold text-dark" for="is_featured">Featured Tour</label>
                         </div>
 
                         <div class="form-check form-switch mb-0">
-                            <input class="form-check-input" type="checkbox" name="is_bestseller" id="is_bestseller" value="1">
+                            <input class="form-check-input" type="checkbox" name="is_bestseller" id="is_bestseller" value="1" {{ old('is_bestseller') ? 'checked' : '' }}>
                             <label class="form-check-label fw-bold text-dark" for="is_bestseller">Bestseller Badge</label>
                         </div>
                     </div>

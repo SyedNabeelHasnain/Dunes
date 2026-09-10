@@ -26,10 +26,10 @@
             </form>
         @endif
         
-        <form action="{{ route('admin.inquiries.destroy', $inquiry->id) }}" method="POST" class="d-inline">
+        <form action="{{ route('admin.inquiries.destroy', $inquiry->id) }}" method="POST" class="d-inline delete-form" data-confirm="Are you sure you want to delete this inquiry? This action cannot be undone.">
             @csrf
             @method('DELETE')
-            <button type="submit" class="btn btn-danger rounded-pill px-4 py-2 fw-bold" onclick="return confirm('Delete this inquiry?')">Delete Inquiry</button>
+            <button type="submit" class="btn btn-danger rounded-pill px-4 py-2 fw-bold">Delete Inquiry</button>
         </form>
     </div>
 </div>

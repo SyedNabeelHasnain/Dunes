@@ -33,7 +33,7 @@
 </script>
 
 <!-- Blog Hero -->
-<section class="bg-dark text-white py-5 position-relative overflow-hidden" style="background:linear-gradient(135deg,#1a0a00 0%,#3d1f00 50%,#1a0a00 100%) !important; margin-top: -var(--header-h);">
+<section class="bg-dark text-white py-5 position-relative overflow-hidden" style="background:linear-gradient(135deg,#1a0a00 0%,#3d1f00 50%,#1a0a00 100%) !important; margin-top: calc(-1 * var(--header-h));">
     <div class="container position-relative z-1">
         <nav aria-label="breadcrumb" class="mb-3">
             <ol class="breadcrumb breadcrumb-dark mb-0 small">
@@ -72,7 +72,7 @@
 </section>
 
 <!-- Category Filter + Search -->
-<section class="bg-white border-bottom py-3 sticky-top" style="top:68px;z-index:100;">
+<section class="bg-white border-bottom py-3 sticky-top" style="top: var(--header-h, 72px); z-index: 100;">
     <div class="container">
         <div class="d-flex align-items-center gap-3 flex-wrap justify-content-between">
             <div class="d-flex gap-2 flex-wrap align-items-center">
@@ -86,7 +86,7 @@
                     <input type="hidden" name="category" value="{{ $categorySlug }}">
                 @endif
                 <input type="search" name="search" class="form-control form-control-sm rounded-pill px-3" placeholder="Search articles..." value="{{ $search }}" style="min-width:200px;">
-                <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3"><i class="bi bi-search"></i></button>
+                <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3" aria-label="Search articles"><i class="bi bi-search"></i></button>
             </form>
         </div>
     </div>

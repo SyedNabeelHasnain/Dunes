@@ -13,7 +13,7 @@ class Booking extends Model
 
     protected $fillable = [
         'reference', 'tour_id', 'tier_id', 'tour_name', 'tier_name', 'tour_date',
-        'adults', 'children', 'name', 'email', 'phone', 'pickup_location',
+        'adults', 'children', 'infants', 'name', 'email', 'phone', 'pickup_location',
         'special_requests', 'coupon_id', 'coupon_code', 'discount_type', 'discount_rate',
         'discount_amount', 'original_total', 'subtotal', 'addons_total', 'total', 'currency',
         'status', 'payment_method', 'payment_status', 'payment_amount',
@@ -28,6 +28,7 @@ class Booking extends Model
         'tour_date' => 'date',
         'adults' => 'integer',
         'children' => 'integer',
+        'infants' => 'integer',
         'discount_rate' => 'float',
         'discount_amount' => 'float',
         'original_total' => 'float',
@@ -38,6 +39,30 @@ class Booking extends Model
         'balance_due' => 'float',
         'is_verified' => 'boolean'
     ];
+
+    /**
+     * Backward-compatible accessor for notes -> special_requests.
+     */
+    public function getNotesAttribute(): ?string
+    {
+        return $this->special_requests;
+    }
+
+    /**
+     * Backward-compatible accessor for discount -> discount_amount.
+     */
+    public function getDiscountAttribute(): float
+    {
+        return (float)($this->discount_amount ?? 0);
+    }
+
+    /**
+     * Accessor for pickup_time from tour relationship.
+     */
+    public function getPickupTimeAttribute(): ?string
+    {
+        return $this->tour?->pickup_time;
+    }
 
     public function tour()
     {

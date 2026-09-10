@@ -101,7 +101,7 @@
 @endif
 
 <article itemscope itemtype="https://schema.org/{{ $post->schema_type ?? 'BlogPosting' }}" class="blog-article">
-    <header class="bg-dark text-white position-relative overflow-hidden" style="min-height:420px; margin-top: -var(--header-h);">
+    <header class="bg-dark text-white position-relative overflow-hidden" style="min-height:420px; margin-top: calc(-1 * var(--header-h));">
         @if ($post->featured_image)
         <img src="{{ $featImgPath }}" class="position-absolute w-100 h-100" style="object-fit:cover;opacity:.3;top:0;left:0;" alt="{{ $post->featured_image_alt ?: $post->title }}" fetchpriority="high" itemprop="image">
         @endif
@@ -241,7 +241,7 @@
 
             <!-- Sidebar Widgets -->
             <aside class="col-lg-4">
-                <div class="sticky-top" style="top:90px;">
+                <div class="sticky-top" style="top: calc(var(--header-h, 72px) + 20px);">
                     <!-- CTA Widget -->
                     <div class="rounded-4 p-4 mb-4 text-white" style="background:linear-gradient(135deg,#F58F43,#e07020);">
                         <h3 class="fw-800 h5 mb-2">Book a Desert Safari</h3>

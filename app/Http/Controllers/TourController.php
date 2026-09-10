@@ -48,9 +48,14 @@ class TourController extends Controller
      */
     public function show(string $slug)
     {
-        $tour = Tour::where('slug', $slug)
-            ->with(['itineraries', 'tiers', 'addons', 'contentItems', 'category'])
-            ->first();
+        $query = Tour::where('slug', $slug)
+            ->with(['itineraries', 'tiers', 'addons', 'contentItems', 'category']);
+
+        if (!auth()->check()) {
+            $query->where('status', 'active');
+        }
+
+        $tour = $query->first();
 
         if (!$tour) {
             abort(404);
@@ -114,7 +119,7 @@ class TourController extends Controller
         $pageTitle = $tour->meta_title ?: "{$tour->name} Dubai {$currentYear}: {$priceText} | Dunes Discovery";
         
         $defaultDesc = "Book {$tour->name} in Dubai. Luxury 4x4 Land Cruiser transfers, live BBQ dining, thrilling dune bashing, and 24/7 WhatsApp assistance. Instant confirmation {$priceText}.";
-        $pageDesc = $tour->meta_description ?: (strlen($tour->short_desc ?? '') > 50 ? strip_tags($tour->short_desc) : $defaultDesc);
+        $pageDesc = $tour->meta_desc ?: (strlen($tour->short_desc ?? '') > 50 ? strip_tags($tour->short_desc) : $defaultDesc);
         
         $pageKeys = $tour->meta_keywords ?: strtolower("{$tour->name}, {$tour->name} dubai, book {$tour->name}, desert safari dubai, dubai tours {$currentYear}");
         $canonical = url('/' . $tour->slug);

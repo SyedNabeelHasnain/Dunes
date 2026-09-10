@@ -130,8 +130,20 @@ class AdminOperationsController extends Controller
             'Content-Disposition' => 'attachment; filename="dunes-dispatch-manifest-' . $selectedDate . '.csv"',
         ];
 
-        $callback = function () use ($bookings, $selectedDate) {
+        $sanitize = function (array $row): array {
+            return array_map(function ($val) {
+                if ($val === null) return '';
+                $str = (string) $val;
+                if (isset($str[0]) && in_array($str[0], ['=', '+', '-', '@', "\t", "\r"], true)) {
+                    return "'" . $str;
+                }
+                return $str;
+            }, $row);
+        };
+
+        $callback = function () use ($bookings, $selectedDate, $sanitize) {
             $file = fopen('php://output', 'w');
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
             fputcsv($file, [
                 'Date', 'Reference', 'Customer Name', 'Phone', 'Email',
                 'Pickup Location', 'Pickup Time', 'Tour Name', 'Tier',
@@ -141,7 +153,7 @@ class AdminOperationsController extends Controller
 
             foreach ($bookings as $b) {
                 $addonsStr = $b->addons->pluck('addon_name')->implode(', ');
-                fputcsv($file, [
+                fputcsv($file, $sanitize([
                     $selectedDate,
                     $b->reference,
                     $b->name,
@@ -158,7 +170,7 @@ class AdminOperationsController extends Controller
                     $b->total,
                     $b->payment_status,
                     $b->status
-                ]);
+                ]));
             }
 
             fclose($file);

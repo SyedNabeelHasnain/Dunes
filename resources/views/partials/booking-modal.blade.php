@@ -87,8 +87,8 @@
                                             <span class="small fw-bold">Select from Calendar</span>
                                         </button>
                                         <div class="date-nav d-flex align-items-center">
-                                            <button type="button" class="btn btn-light btn-sm rounded-circle" id="datePrev"><i class="bi bi-chevron-left"></i></button>
-                                            <button type="button" class="btn btn-light btn-sm rounded-circle ms-1" id="dateNext"><i class="bi bi-chevron-right"></i></button>
+                                            <button type="button" class="btn btn-light btn-sm rounded-circle" id="datePrev" aria-label="Previous date" style="width: 36px; height: 36px;"><i class="bi bi-chevron-left"></i></button>
+                                            <button type="button" class="btn btn-light btn-sm rounded-circle ms-1" id="dateNext" aria-label="Next date" style="width: 36px; height: 36px;"><i class="bi bi-chevron-right"></i></button>
                                         </div>
                                     </div>
                                 </div>
@@ -99,14 +99,14 @@
                             <div class="row g-3 mb-3 booking-guest-pickup-row align-items-stretch">
                                 <div class="col-12 col-sm-4 col-lg-3">
                                     <label class="form-label fw-800 small text-muted text-uppercase mb-2" for="bookingAdults">Guests</label>
-                                    <div class="booking-field-container d-flex align-items-center justify-content-between bg-white shadow-sm rounded-4 p-0">
-                                        <button type="button" class="btn btn-link text-primary shadow-none p-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 100%;" data-action="minus" data-target="adults">
+                                    <div class="booking-field-container d-flex align-items-center justify-content-between bg-white shadow-sm rounded-4 p-0" style="min-height: 52px;">
+                                        <button type="button" class="btn btn-link text-primary shadow-none p-0 d-flex align-items-center justify-content-center" style="width: 44px; min-width: 44px; height: 100%; min-height: 44px;" data-action="minus" data-target="adults" aria-label="Decrease guest count">
                                             <i class="bi bi-dash-circle-fill fs-5"></i>
                                         </button>
                                         <div class="text-center lh-1 flex-grow-1 d-flex justify-content-center">
                                             <input type="number" class="form-control border-0 bg-transparent text-center fw-800 shadow-none p-0 fs-5" name="adults" id="bookingAdults" value="1" min="1" max="50" readonly style="width: 3ch;" autocomplete="off">
                                         </div>
-                                        <button type="button" class="btn btn-link text-primary shadow-none p-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 100%;" data-action="plus" data-target="adults">
+                                        <button type="button" class="btn btn-link text-primary shadow-none p-0 d-flex align-items-center justify-content-center" style="width: 44px; min-width: 44px; height: 100%; min-height: 44px;" data-action="plus" data-target="adults" aria-label="Increase guest count">
                                             <i class="bi bi-plus-circle-fill fs-5"></i>
                                         </button>
                                     </div>
@@ -118,7 +118,7 @@
                                         <div class="booking-field-container input-group shadow-sm rounded-4 overflow-hidden">
                                             <span class="input-group-text bg-white border-0 ps-3 pe-2"><i class="bi bi-geo-alt-fill text-primary"></i></span>
                                             <input type="text" class="form-control border-0 shadow-none fw-bold px-0" name="location" id="bookingLocation" required placeholder="Hotel/Area" style="height: 60px;" autocomplete="street-address">
-                                            <button class="btn btn-white border-start px-3" type="button" id="detectLocation">
+                                            <button class="btn btn-white border-start px-3" type="button" id="detectLocation" aria-label="Detect current location">
                                                 <i class="bi bi-crosshair"></i>
                                             </button>
                                         </div>
@@ -299,8 +299,8 @@
                                 <div class="fw-800 text-primary mb-0 booking-total-value" id="bookingTotal">AED 0.00</div>
                             </div>
                             <div class="d-flex align-items-center ms-auto" id="continueBtnWrapper">
-                                <button type="button" class="btn btn-desert-animated rounded-pill w-100 w-sm-auto px-5 py-3 fw-800 shadow-lg d-inline-flex align-items-center justify-content-center gap-2" id="nextStep"> Continue <i class="bi bi-arrow-right"></i> </button>
-                                <button type="submit" class="btn btn-whatsapp-animated rounded-pill w-100 w-sm-auto px-5 py-3 fw-800 shadow-lg d-none align-items-center justify-content-center gap-2" id="submitBooking" onclick="if(typeof gtagReportConversion==='function'){gtagReportConversion();}"> Confirm <i class="bi bi-check-lg"></i> </button>
+                                <button type="button" class="btn btn-desert-animated rounded-pill px-4 px-sm-5 py-2.5 py-sm-3 fw-800 shadow-lg d-inline-flex align-items-center justify-content-center gap-2" id="nextStep"> Continue <i class="bi bi-arrow-right"></i> </button>
+                                <button type="submit" class="btn btn-whatsapp-animated rounded-pill px-4 px-sm-5 py-2.5 py-sm-3 fw-800 shadow-lg d-none align-items-center justify-content-center gap-2" id="submitBooking"> Confirm <i class="bi bi-check-lg"></i> </button>
                             </div>
                         </div>
                     </div>

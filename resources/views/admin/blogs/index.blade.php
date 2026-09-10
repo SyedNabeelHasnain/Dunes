@@ -76,10 +76,10 @@
                                 <a href="{{ route('blog.show', $p->slug) }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-info rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="Preview Post">
                                     <i class="bi bi-box-arrow-up-right"></i>
                                 </a>
-                                <form action="{{ route('admin.blogs.destroy', $p->id) }}" method="POST" class="d-inline">
+                                <form action="{{ route('admin.blogs.destroy', $p->id) }}" method="POST" class="d-inline delete-form" data-confirm="Are you sure you want to delete this blog post?">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="Delete Post" onclick="return confirm('Delete this post?')">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="Delete Post">
                                         <i class="bi bi-trash3-fill"></i>
                                     </button>
                                 </form>

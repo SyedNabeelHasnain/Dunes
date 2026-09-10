@@ -8,18 +8,6 @@
     <p class="text-muted small mb-0">Update your administrator account name, registered email, and security password.</p>
 </div>
 
-@if(session('status') === 'profile-updated')
-    <div class="alert alert-success border-0 rounded-4 shadow-sm mb-4">
-        <i class="bi bi-check-circle-fill me-2"></i>Profile details updated successfully!
-    </div>
-@endif
-
-@if(session('status') === 'password-updated')
-    <div class="alert alert-success border-0 rounded-4 shadow-sm mb-4">
-        <i class="bi bi-shield-check me-2"></i>Password changed successfully!
-    </div>
-@endif
-
 <div class="row g-4 mb-5">
     <!-- Profile Info Card -->
     <div class="col-lg-6">

@@ -22,7 +22,6 @@ class Coupon extends Model
         'min_guests',
         'usage_limit',
         'usage_limit_per_user',
-        'used_count',
         'valid_from',
         'valid_until',
         'tour_date_from',
@@ -35,9 +34,9 @@ class Coupon extends Model
     ];
 
     protected $casts = [
-        'discount_value' => 'float',
-        'min_spend' => 'float',
-        'max_discount' => 'float',
+        'discount_value' => 'decimal:2',
+        'min_spend' => 'decimal:2',
+        'max_discount' => 'decimal:2',
         'min_guests' => 'integer',
         'usage_limit' => 'integer',
         'usage_limit_per_user' => 'integer',
@@ -164,7 +163,10 @@ class Coupon extends Model
 
             if ($this->first_time_only) {
                 $pastBookings = Booking::where('email', $userEmail)
-                    ->whereIn('status', ['confirmed', 'completed', 'paid', 'advance_paid', 'pending'])
+                    ->where(function ($q) {
+                        $q->whereIn('status', ['confirmed', 'completed'])
+                          ->orWhereIn('payment_status', ['paid', 'partial', 'advance_paid']);
+                    })
                     ->exists();
                 if ($pastBookings) {
                     return ['valid' => false, 'message' => 'This promo code is exclusively for first-time customers.'];
@@ -204,7 +206,11 @@ class Coupon extends Model
                 $discount = min($discount, (float)$this->max_discount);
             }
         } elseif ($this->discount_type === 'fixed') {
-            $discount = min($subtotal, (float)$this->discount_value);
+            $discount = (float)$this->discount_value;
+            if ($this->max_discount !== null && $this->max_discount > 0) {
+                $discount = min($discount, (float)$this->max_discount);
+            }
+            $discount = min($subtotal, $discount);
         } elseif ($this->discount_type === 'per_person') {
             $calculated = (float)$this->discount_value * max(1, $guests);
             if ($this->max_discount !== null && $this->max_discount > 0) {

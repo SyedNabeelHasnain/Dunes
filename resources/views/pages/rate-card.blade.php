@@ -196,7 +196,7 @@
 
 .rc-floating-bar {
     position: sticky !important;
-    top: 76px !important;
+    top: calc(var(--header-h, 72px) + 12px) !important;
     z-index: 99 !important;
     backdrop-filter: blur(12px) !important;
     background: rgba(255, 255, 255, 0.95) !important;
@@ -449,7 +449,7 @@
                                     <a href="{{ route('tours.show', $t->slug) }}" class="btn btn-outline-dark btn-sm rounded-pill flex-grow-1 fw-bold" style="font-size: 11.5px;">
                                         Details <i class="bi bi-arrow-right"></i>
                                     </a>
-                                    <button type="button" class="btn btn-desert-animated btn-sm rounded-pill px-3 fw-bold" data-action="open-booking" data-tour-id="{{ $t->id }}" style="font-size: 11.5px;">
+                                    <button type="button" class="btn btn-desert-animated btn-sm rounded-pill px-3 fw-bold" data-action="open-booking" data-tour="{{ $t->id }}" data-tour-id="{{ $t->id }}" style="font-size: 11.5px;">
                                         Book Tour
                                     </button>
                                 </div>

@@ -197,10 +197,10 @@
                                         data-date="{{ $r->published_date }}">
                                     <i class="bi bi-pencil-fill"></i>
                                 </button>
-                                <form action="{{ route('admin.reviews.destroy', $r->id) }}" method="POST" class="d-inline">
+                                <form action="{{ route('admin.reviews.destroy', $r->id) }}" method="POST" class="d-inline delete-form" data-confirm="Are you sure you want to delete this review?">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="Delete Review" onclick="return confirm('Delete this review?')">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="Delete Review">
                                         <i class="bi bi-trash3-fill"></i>
                                     </button>
                                 </form>

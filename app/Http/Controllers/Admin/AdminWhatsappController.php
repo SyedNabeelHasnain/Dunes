@@ -196,25 +196,36 @@ class AdminWhatsappController extends Controller
             'Source Page URL', 'Prefill Message', 'Client IP', 'Location', 'Device Type', 'OS / Browser'
         ];
 
-        $callback = function() use ($leads, $columns) {
+        $sanitize = function(array $row): array {
+            return array_map(function($val) {
+                if ($val === null) return '';
+                $str = (string) $val;
+                if (isset($str[0]) && in_array($str[0], ['=', '+', '-', '@', "\t", "\r"], true)) {
+                    return "'" . $str;
+                }
+                return $str;
+            }, $row);
+        };
+
+        $callback = function() use ($leads, $columns, $sanitize) {
             $file = fopen('php://output', 'w');
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
             fputcsv($file, $columns);
 
             foreach ($leads as $lead) {
-                fputcsv($file, [
+                fputcsv($file, $sanitize([
                     $lead->id,
                     $lead->created_at,
                     $lead->name ?: 'Visitor',
                     $lead->phone ?: '',
                     $lead->tour_name ?: 'General',
                     $lead->page_url ?: '',
-                    $lead->message ?: '',
+                    $lead->message_text ?: '',
                     $lead->client_ip ?: '',
                     ($lead->city ?: 'Unknown') . ', ' . ($lead->country ?: ''),
                     $lead->device_type ?: 'Desktop',
                     ($lead->os_name ?: '') . ' / ' . ($lead->browser_name ?: '')
-                ]);
+                ]));
             }
             fclose($file);
         };

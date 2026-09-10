@@ -95,6 +95,7 @@ class AdminBlogController extends Controller
             'excerpt' => 'required|string|max:500',
             'category_id' => 'required|integer',
             'status' => 'required|string|in:draft,published,scheduled',
+            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:5120',
         ]);
 
         $data = $request->except(['tags', 'featured_image']);

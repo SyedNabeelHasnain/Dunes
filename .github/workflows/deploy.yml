@@ -75,37 +75,41 @@ jobs:
 
     - name: Prepare Core Code Staging
       env:
-        DB_PASS: ${{ secrets.DB_PASSWORD || vars.DB_PASSWORD || 'P@kistanZindaBad123!@#' }}
-        MAIL_PASS: ${{ secrets.MAIL_PASSWORD || vars.MAIL_PASSWORD || 'Zubairkhan@2025' }}
+        DB_PASS: ${{ secrets.DB_PASSWORD || vars.DB_PASSWORD }}
+        MAIL_PASS: ${{ secrets.MAIL_PASSWORD || vars.MAIL_PASSWORD }}
       run: |
         # Generate the .env file in the runner from .env.example
         cp .env.example .env
 
         # Set persistent APP_KEY so session encryption and tokens remain valid across deployments
-        APP_KEY_VAL="${{ secrets.APP_KEY || 'base64:ngOeg2+e92G5HDAl8P23nWUQQI1mYRjssKdf0L5PsTI=' }}"
-        sed -i '/^APP_KEY=/d' .env
-        printf 'APP_KEY="%s"\n' "$APP_KEY_VAL" >> .env
+        APP_KEY_VAL="${{ secrets.APP_KEY }}"
+        if [ -n "$APP_KEY_VAL" ]; then
+          sed -i '/^APP_KEY=/d' .env
+          printf 'APP_KEY="%s"\n' "$APP_KEY_VAL" >> .env
+        fi
 
-        # Populate database credentials dynamically from secrets/vars with hardcoded fallbacks
+        # Populate database credentials dynamically from secrets/vars
         sed -i "s|DB_HOST=127.0.0.1|DB_HOST=${{ vars.DB_HOST || secrets.DB_HOST || 'localhost' }}|g" .env
         sed -i "s|DB_DATABASE=u410503041_ddtlaravel|DB_DATABASE=${{ vars.DB_NAME || secrets.DB_NAME || 'u410503041_ddtlaravel' }}|g" .env
         sed -i "s|DB_USERNAME=u410503041_ddtlaravel|DB_USERNAME=${{ vars.DB_USER || secrets.DB_USER || 'u410503041_ddtlaravel' }}|g" .env
         # Quote the password to protect # from dotenv comment parsing
-        sed -i '/^DB_PASSWORD=/d' .env
-        printf 'DB_PASSWORD="%s"\n' "$DB_PASS" >> .env
+        if [ -n "$DB_PASS" ]; then
+          sed -i '/^DB_PASSWORD=/d' .env
+          printf 'DB_PASSWORD="%s"\n' "$DB_PASS" >> .env
+        fi
 
-        # Populate MAIL credentials (ROOT CAUSE FIX: MAIL_PASSWORD was empty on Hostinger)
-        sed -i '/^MAIL_PASSWORD=/d' .env
-        printf 'MAIL_PASSWORD="%s"\n' "$MAIL_PASS" >> .env
+        # Populate MAIL credentials
+        if [ -n "$MAIL_PASS" ]; then
+          sed -i '/^MAIL_PASSWORD=/d' .env
+          printf 'MAIL_PASSWORD="%s"\n' "$MAIL_PASS" >> .env
+        fi
 
         # Set production APP_* and security values
         sed -i "s|APP_ENV=local|APP_ENV=production|g" .env
         sed -i "s|APP_DEBUG=true|APP_DEBUG=false|g" .env
         sed -i "s|APP_URL=http://localhost|APP_URL=https://dunesdiscoverytourism.com|g" .env
-        sed -i "s|SESSION_ENCRYPT=true|SESSION_ENCRYPT=false|g" .env
-        sed -i "s|SESSION_ENCRYPT=false|SESSION_ENCRYPT=false|g" .env
-        sed -i "s|SESSION_SECURE_COOKIE=true|SESSION_SECURE_COOKIE=false|g" .env
-        sed -i "s|SESSION_SECURE_COOKIE=false|SESSION_SECURE_COOKIE=false|g" .env
+        sed -i "s|SESSION_ENCRYPT=.*|SESSION_ENCRYPT=true|g" .env
+        sed -i "s|SESSION_SECURE_COOKIE=.*|SESSION_SECURE_COOKIE=true|g" .env
 
         # Copy core Laravel directories and files, excluding public assets, node_modules, compiled views and git history
         rsync -arv --exclude="public" --exclude="node_modules" --exclude=".git" --exclude=".github" --exclude="deploy" --exclude="storage/framework/views/*" --exclude="storage/framework/cache/*" --exclude="storage/logs/*" ./ deploy/core_deploy/

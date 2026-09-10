@@ -2,7 +2,7 @@
 
 @section('content')
 <!-- Page Header Section -->
-<section class="page-header py-4 bg-dark text-white position-relative overflow-hidden" style="margin-top: -var(--header-h);">
+<section class="page-header py-4 bg-dark text-white position-relative overflow-hidden" style="margin-top: calc(-1 * var(--header-h));">
     <div class="position-absolute top-0 start-0 w-100 h-100" style="background: radial-gradient(circle at 15% 20%, rgba(246, 144, 68, 0.15) 0%, transparent 60%);"></div>
     <div class="container position-relative z-1 pt-3">
         <nav aria-label="breadcrumb">
@@ -97,8 +97,8 @@
                     </div>
                 </div>
                 <div class="col-12 col-lg-8">
-                    <div class="d-flex gap-2 overflow-auto pb-1" style="min-width: max-content;">
-                        <button onclick="filterTours('')" data-category="" class="btn filter-btn {{ !$selectedCategorySlug ? 'btn-desert-animated-dark' : 'btn-white border' }} rounded-pill px-3 py-2 fw-semibold d-flex align-items-center gap-2 transition-all small">
+                    <div class="d-flex gap-2 overflow-x-auto pb-1 flex-nowrap w-100" style="scrollbar-width: none; -webkit-overflow-scrolling: touch;">
+                        <button onclick="filterTours('')" data-category="" class="btn filter-btn {{ !$selectedCategorySlug ? 'btn-desert-animated-dark' : 'btn-white border' }} rounded-pill px-3 py-2 fw-semibold d-flex align-items-center gap-2 transition-all small flex-shrink-0 text-nowrap">
                             <i class="bi bi-grid-fill"></i> All ({{ $tours->count() }})
                         </button>
                         @foreach($categories as $cat)
@@ -112,7 +112,7 @@
                                 ];
                                 $icon = $iconMap[$cat->slug] ?? 'bi-compass-fill';
                             @endphp
-                            <button onclick="filterTours('{{ $cat->slug }}')" data-category="{{ $cat->slug }}" class="btn filter-btn {{ $selectedCategorySlug === $cat->slug ? 'btn-desert-animated-dark' : 'btn-white border' }} rounded-pill px-3 py-2 fw-semibold d-flex align-items-center gap-2 transition-all small">
+                            <button onclick="filterTours('{{ $cat->slug }}')" data-category="{{ $cat->slug }}" class="btn filter-btn {{ $selectedCategorySlug === $cat->slug ? 'btn-desert-animated-dark' : 'btn-white border' }} rounded-pill px-3 py-2 fw-semibold d-flex align-items-center gap-2 transition-all small flex-shrink-0 text-nowrap">
                                 <i class="bi {{ $icon }}"></i> {{ $cat->name }} ({{ $catCount }})
                             </button>
                         @endforeach
@@ -174,7 +174,7 @@
                                         <span class="h5 fw-bold text-primary mb-0" data-aed="{{ $minPrice }}">AED {{ number_format($minPrice) }}</span>
                                     </div>
                                     <div class="d-flex gap-2">
-                                        <button type="button" class="btn-circle-whatsapp fab-whatsapp" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp">
+                                        <button type="button" class="btn-circle-whatsapp fab-whatsapp" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp" onclick="event.preventDefault(); event.stopPropagation(); if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp('{{ addslashes($t->name) }}'); }">
                                             <i class="bi bi-whatsapp"></i>
                                         </button>
                                         <div class="btn-circle-desert d-flex align-items-center justify-content-center">

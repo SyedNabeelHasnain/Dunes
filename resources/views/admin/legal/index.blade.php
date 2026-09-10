@@ -10,12 +10,6 @@
     </div>
 </div>
 
-@if(session('success'))
-    <div class="alert alert-success border-0 rounded-4 shadow-sm mb-4">
-        <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
-    </div>
-@endif
-
 <div class="row g-4">
     @foreach($pages as $page)
     <div class="col-md-6">

@@ -263,10 +263,14 @@ const App={
                 const bsModal = new bootstrap.Modal(modal);
                 bsModal.show();
 
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || window.CSRF_TOKEN || '';
                 fetch('/ajax.php', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                    body: `action=get_legal_content&type=${type}`
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: `action=get_legal_content&type=${type}&_token=${encodeURIComponent(csrfToken)}`
                 })
                 .then(r => r.text())
                 .then(t => { try { return JSON.parse(t.replace(/^\uFEFF+/, '').trim()); } catch(e){ throw e; } })
@@ -339,10 +343,14 @@ const App={
                 input.classList.add('field-processing');
                 parent.classList.add('email-processing');
                 try {
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || window.CSRF_TOKEN || '';
                     const res = await fetch('/ajax.php', {
                         method: 'POST',
-                        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                        body: `action=check_email_status&email=${encodeURIComponent(email)}`
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: `action=check_email_status&email=${encodeURIComponent(email)}&_token=${encodeURIComponent(csrfToken)}`
                     });
                     const raw = await res.text();
                     const data = JSON.parse(raw.replace(/^\uFEFF+/, '').trim());
@@ -444,11 +452,14 @@ const App={
         parent.classList.add('email-processing');
         try {
             const form = input.closest('form');
-            const csrf = form?.querySelector('[name="csrf_token"]')?.value || '';
+            const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || form?.querySelector('[name="_token"]')?.value || form?.querySelector('[name="csrf_token"]')?.value || window.CSRF_TOKEN || '';
             const res = await fetch('/ajax.php', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                body: `action=send_otp&email=${encodeURIComponent(email)}&csrf_token=${encodeURIComponent(csrf)}`
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRF-TOKEN': csrf
+                },
+                body: `action=send_otp&email=${encodeURIComponent(email)}&csrf_token=${encodeURIComponent(csrf)}&_token=${encodeURIComponent(csrf)}`
             });
             const raw = await res.text();
             const data = JSON.parse(raw.replace(/^\uFEFF+/, '').trim());
@@ -525,13 +536,16 @@ const App={
             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
 
             const form = input.closest('form');
-            const csrf = form?.querySelector('[name="csrf_token"]')?.value || '';
+            const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || form?.querySelector('[name="_token"]')?.value || form?.querySelector('[name="csrf_token"]')?.value || window.CSRF_TOKEN || '';
 
             try {
                 const res = await fetch('/ajax.php', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                    body: `action=verify_otp&email=${encodeURIComponent(input.value)}&otp=${code}&csrf_token=${encodeURIComponent(csrf)}`
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRF-TOKEN': csrf
+                    },
+                    body: `action=verify_otp&email=${encodeURIComponent(input.value)}&otp=${code}&csrf_token=${encodeURIComponent(csrf)}&_token=${encodeURIComponent(csrf)}`
                 });
                 const raw = await res.text();
                 const data = JSON.parse(raw.replace(/^\uFEFF+/, '').trim());
@@ -729,6 +743,24 @@ const App={
                 input.addEventListener('countrychange', () => {
                     input.dispatchEvent(new Event('input', { bubbles: true }));
                 });
+
+                input.addEventListener('blur', () => {
+                    if (input.value.trim() !== '') {
+                        if (typeof iti.isValidNumber === 'function' && !iti.isValidNumber()) {
+                            input.classList.add('is-invalid');
+                        } else {
+                            input.classList.remove('is-invalid');
+                        }
+                    } else {
+                        input.classList.remove('is-invalid');
+                    }
+                });
+
+                input.addEventListener('input', () => {
+                    if (input.classList.contains('is-invalid') && typeof iti.isValidNumber === 'function' && iti.isValidNumber()) {
+                        input.classList.remove('is-invalid');
+                    }
+                });
             } catch (err) {
                 console.warn('intlTelInput init error:', err);
             }
@@ -785,75 +817,108 @@ const App={
             }
         };
 
-        document.addEventListener('click',e=>{
-            const link=e.target.closest('a');
-            if(!link)return;
-            const href=link.getAttribute('href')||'';
-
-            const isWa=href.includes('wa.me')||href.includes('api.whatsapp.com')||link.classList.contains('fab-whatsapp');
-
-            if(!isWa)return;
+        document.addEventListener('click', e => {
+            const el = e.target.closest('a, button, .fab-whatsapp, .btn-circle-whatsapp, .btn-whatsapp-animated');
+            if (!el) return;
+            const href = el.getAttribute ? (el.getAttribute('href') || '') : '';
+            const isWa = href.includes('wa.me') || href.includes('api.whatsapp.com') ||
+                         el.classList.contains('fab-whatsapp') || el.classList.contains('btn-circle-whatsapp') ||
+                         el.classList.contains('btn-whatsapp-animated') || el.closest('.fab-whatsapp, .btn-circle-whatsapp');
+            if (!isWa) return;
 
             e.preventDefault();
+            e.stopPropagation();
 
-            let tourName='';
-
-            if(location.pathname.includes('/tours/')||document.querySelector('.tour-hero')){
-                const h1=document.querySelector('h1');
-                if(h1)tourName=h1.innerText.trim();
+            let tourName = '';
+            if (el.dataset?.tourName) {
+                tourName = el.dataset.tourName;
+            } else if (location.pathname.includes('/tours/') || document.querySelector('.tour-hero')) {
+                const h1 = document.querySelector('h1');
+                if (h1) tourName = h1.innerText.trim();
             }
 
-            if(link.dataset.tourName)tourName=link.dataset.tourName;
-
-            const formEnabled=(window.WHATSAPP_FORM_ENABLED==='1');
-            if(!formEnabled){
-                const fd=new FormData();
-                fd.append('action','logWhatsApp');
-                fd.append('csrf_token',window.CSRF_TOKEN||'');
-                fd.append('name','N/A');
-                fd.append('phone','N/A');
-                fd.append('tour_name',tourName);
-                fd.append('page_url',window.location.href);
-
-                // Google Ads Conversion Event on WhatsApp Lead Click
-                if(typeof window.gtag==='function'){
-                    window.gtag('event','conversion',{'send_to':'AW-17859624049/eR3SCLimtvobEPH4kMRC'});
-                }
-                if(window.dataLayer){
-                    window.dataLayer.push({
-                        event:'generate_lead',
-                        conversion_type:'whatsapp',
-                        conversion_label:'eR3SCLimtvobEPH4kMRC'
-                    });
-                }
-
-                fetch('/ajax.php',{method:'POST',body:fd})
-                .then(r=>r.text())
-                .then(t=>{ try { return JSON.parse(t.replace(/^\uFEFF+/, '').trim()); } catch(e){ throw e; } })
-                .then(d=>{
-                    const url=d.redirect_url||href;
-                    if(link.target==='_blank') window.open(url,'_blank'); else location.href=url;
-                }).catch(()=>{
-                    if(link.target==='_blank') window.open(href,'_blank'); else location.href=href;
-                });
-                return;
-            }
-
-            tourNameInp.value=tourName;
-            pageUrlInp.value=window.location.href;
-
-            syncGpsData();
-
-            check();
-
-            const m=getModal();
-            if(m)m.show();
-            else{
-                modal.classList.add('active');
-                document.body.style.overflow='hidden';
-            }
-            setTimeout(()=>window.dispatchEvent(new Event('resize')),0);
+            this.openWhatsApp(tourName, href);
         });
+    },
+
+    openWhatsApp(tourName = '', directHref = '') {
+        const modal = document.getElementById('whatsappModal');
+        const formEnabled = (window.WHATSAPP_FORM_ENABLED === '1');
+        const defaultNum = (window.WHATSAPP_NUMBER || '971502456056').replace(/[^0-9]/g, '');
+        const defaultMsg = encodeURIComponent(tourName ? `Hello, I would like to inquire about ${tourName}.` : 'Hello, I would like to inquire about Dubai desert safaris.');
+        const fallbackUrl = directHref || `https://wa.me/${defaultNum}?text=${defaultMsg}`;
+
+        if (!formEnabled || !modal) {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || window.CSRF_TOKEN || '';
+            const fd = new FormData();
+            fd.append('action', 'logWhatsApp');
+            fd.append('csrf_token', csrfToken);
+            fd.append('_token', csrfToken);
+            fd.append('name', 'N/A');
+            fd.append('phone', 'N/A');
+            fd.append('tour_name', tourName || 'General Inquiry');
+            fd.append('page_url', window.location.href);
+
+            if (typeof window.gtag === 'function') {
+                window.gtag('event', 'conversion', { 'send_to': 'AW-17859624049/eR3SCLimtvobEPH4kMRC' });
+            }
+            if (window.dataLayer) {
+                window.dataLayer.push({
+                    event: 'generate_lead',
+                    conversion_type: 'whatsapp',
+                    conversion_label: 'eR3SCLimtvobEPH4kMRC'
+                });
+            }
+
+            fetch('/ajax.php', {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': csrfToken },
+                body: fd
+            })
+            .then(r => r.text())
+            .then(t => { try { return JSON.parse(t.replace(/^\uFEFF+/, '').trim()); } catch (e) { throw e; } })
+            .then(d => {
+                const url = d.redirect_url || fallbackUrl;
+                window.open(url, '_blank');
+            }).catch(() => {
+                window.open(fallbackUrl, '_blank');
+            });
+            return;
+        }
+
+        const tourNameInp = document.getElementById('waTourName');
+        const pageUrlInp = document.getElementById('waPageUrl');
+        if (tourNameInp) tourNameInp.value = tourName;
+        if (pageUrlInp) pageUrlInp.value = window.location.href;
+
+        const map = {
+            'gpsLat': 'waGpsLat',
+            'gpsLng': 'waGpsLng',
+            'gpsAccuracy': 'waGpsAccuracy',
+            'gpsTimestamp': 'waGpsTimestamp',
+            'gpsConsent': 'waGpsConsent',
+            'gpsSource': 'waGpsSource'
+        };
+        for (const [srcId, destId] of Object.entries(map)) {
+            const src = document.getElementById(srcId);
+            const dest = document.getElementById(destId);
+            if (src && dest && src.value) dest.value = src.value;
+        }
+
+        const startBtn = document.getElementById('startChatBtn');
+        const nameInp = document.getElementById('waName');
+        const phoneInp = document.getElementById('waPhone');
+        if (startBtn && nameInp && phoneInp) {
+            startBtn.disabled = !(nameInp.value.trim() && phoneInp.value.trim());
+        }
+
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            bootstrap.Modal.getOrCreateInstance(modal).show();
+        } else {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        setTimeout(() => window.dispatchEvent(new Event('resize')), 50);
     },
 
     initUTM(){
@@ -933,7 +998,7 @@ const App={
                     }
                 }
 
-                const tourName = tourSel.options[tourSel.selectedIndex].text;
+                const tourName = (tourSel && tourSel.selectedIndex >= 0 && tourSel.options[tourSel.selectedIndex]) ? tourSel.options[tourSel.selectedIndex].text : 'Book Your Adventure';
                 if(titleEl) titleEl.textContent = tourName;
                 if(wrapper) wrapper.classList.add('d-none');
             } else {
@@ -953,8 +1018,8 @@ const App={
 
         document.querySelectorAll('[data-action="open-booking"]').forEach(el=>el.addEventListener('click',e=>{
             e.preventDefault();
-            this.preselectedTierId=el.dataset.tier||null;
-            this.preselectedTourId=el.dataset.tour||null;
+            this.preselectedTierId=el.dataset.tier||el.dataset.tierId||null;
+            this.preselectedTourId=el.dataset.tour||el.dataset.tourId||null;
 
             const m=getModal();
             if(m)m.show();
@@ -971,7 +1036,7 @@ const App={
                         const wrapper = document.getElementById('tourSelectWrapper');
                         if(wrapper) wrapper.classList.add('d-none');
                         const titleEl = document.getElementById('bookingModalTitle');
-                        if(titleEl) titleEl.textContent = tourSel.options[tourSel.selectedIndex].text;
+                        if(titleEl) titleEl.textContent = (tourSel && tourSel.selectedIndex >= 0 && tourSel.options[tourSel.selectedIndex]) ? tourSel.options[tourSel.selectedIndex].text : 'Book Your Adventure';
                     }
                 }
                 this.updateStep();
@@ -1368,10 +1433,14 @@ const App={
         this.updateTotal();
 
         try{
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || window.CSRF_TOKEN || '';
             const res=await fetch('/ajax.php',{
                 method:'POST',
-                headers:{'Content-Type':'application/x-www-form-urlencoded'},
-                body:'action=getTiers&tour_id='+tourId
+                headers:{
+                    'Content-Type':'application/x-www-form-urlencoded',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body:'action=getTiers&tour_id='+tourId+'&_token='+encodeURIComponent(csrfToken)
             });
             const raw=await res.text();
             const data=JSON.parse(raw.replace(/^\uFEFF+/, '').trim());
@@ -1867,6 +1936,38 @@ const App={
                     return;
                 }
 
+                // Sync and validate international telephone number if intl-tel-input is initialized
+                let phoneError = null;
+                const phoneInputs = form.querySelectorAll('input[type="tel"], #bookingPhone, #waPhone, #welcomePhone, #phone');
+                phoneInputs.forEach(inp => {
+                    if (inp._iti && typeof inp._iti.getNumber === 'function') {
+                        const fullNum = inp._iti.getNumber();
+                        if (fullNum) {
+                            inp.value = fullNum;
+                        }
+                        const val = inp.value.trim();
+                        if (inp.hasAttribute('required') || val !== '') {
+                            if (typeof inp._iti.isValidNumber === 'function' && !inp._iti.isValidNumber()) {
+                                phoneError = 'Please enter a valid phone number with country code.';
+                                inp.classList.add('is-invalid');
+                                inp.focus();
+                            } else {
+                                inp.classList.remove('is-invalid');
+                            }
+                        }
+                    }
+                });
+
+                if (phoneError) {
+                    if (errEl) {
+                        errEl.textContent = phoneError;
+                        errEl.classList.remove('d-none');
+                    } else {
+                        this.toast(phoneError, 'error');
+                    }
+                    return;
+                }
+
                 const btn=form.querySelector('[type="submit"]');
                 const orig=btn?.innerHTML;
                 if(btn){
@@ -1875,15 +1976,6 @@ const App={
                 }
 
                 try{
-                    // Sync international telephone number if intl-tel-input is initialized
-                    form.querySelectorAll('input[type="tel"], #bookingPhone, #waPhone, #welcomePhone, #phone').forEach(inp => {
-                        if (inp._iti && typeof inp._iti.getNumber === 'function') {
-                            const fullNum = inp._iti.getNumber();
-                            if (fullNum) {
-                                inp.value = fullNum;
-                            }
-                        }
-                    });
 
                     const fd=new FormData(form);
                     const action=String(fd.get('action')||'');
@@ -1914,7 +2006,17 @@ const App={
                         }
                     }
 
-                    const res=await fetch('/ajax.php',{method:'POST',body:fd});
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || window.CSRF_TOKEN || '';
+                    if (!fd.has('_token') && csrfToken) {
+                        fd.append('_token', csrfToken);
+                    }
+                    const res=await fetch('/ajax.php',{
+                        method:'POST',
+                        headers:{
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body:fd
+                    });
                     const raw=await res.text();
                     let data=null;
                     try{ data=JSON.parse(raw.replace(/^\uFEFF+/, '').trim()); }catch(e){ data=null; }
@@ -2273,8 +2375,14 @@ const App={
             if (matchedMeta) {
                 matchedMeta.innerHTML = `<i class="bi bi-clock me-1"></i>${matchedTour.duration || '4-6 Hours'} • ⭐ ${matchedTour.rating || 4.9} (${matchedTour.review_count || '500+'} Reviews)`;
             }
-            if (matchedDesc) matchedDesc.textContent = matchedTour.short_desc || 'Top-rated Dubai experience with authentic 5-star hospitality.';
-            if (matchedPrice) matchedPrice.textContent = 'AED ' + Math.round(matchedTour.min_price || 79);
+            if (matchedPrice) {
+                const pVal = Math.round(matchedTour.min_price || 79);
+                matchedPrice.dataset.aed = pVal;
+                matchedPrice.textContent = 'AED ' + pVal;
+                if (typeof this.convertAllPrices === 'function' && this.currency?.code) {
+                    this.convertAllPrices(this.currency.code);
+                }
+            }
         };
 
         section.querySelectorAll('.quiz-choice-card').forEach(card => {
@@ -2334,19 +2442,63 @@ const App={
         const label = document.getElementById('sunsetCountdownLabel');
         if (!label) return;
 
+        const getDubaiSunset = (date) => {
+            const lat = 25.2048;
+            const lng = 55.2708;
+            const rad = Math.PI / 180;
+            const deg = 180 / Math.PI;
+
+            const start = new Date(date.getFullYear(), 0, 0);
+            const diff = date - start;
+            const oneDay = 1000 * 60 * 60 * 24;
+            const dayOfYear = Math.floor(diff / oneDay);
+
+            const lngHour = lng / 15;
+            const t = dayOfYear + ((18 - lngHour) / 24);
+            const M = (0.9856 * t) - 3.289;
+            let L = M + (1.916 * Math.sin(M * rad)) + (0.020 * Math.sin(2 * M * rad)) + 282.634;
+            L = ((L % 360) + 360) % 360;
+
+            let RA = deg * Math.atan(0.91764 * Math.tan(L * rad));
+            RA = ((RA % 360) + 360) % 360;
+            const Lquadrant = Math.floor(L / 90) * 90;
+            const RAquadrant = Math.floor(RA / 90) * 90;
+            RA = (RA + (Lquadrant - RAquadrant)) / 15;
+
+            const sinDec = 0.39782 * Math.sin(L * rad);
+            const cosDec = Math.cos(Math.asin(sinDec));
+            const zenith = 90.833;
+            const cosH = (Math.cos(zenith * rad) - (sinDec * Math.sin(lat * rad))) / (cosDec * Math.cos(lat * rad));
+
+            if (cosH > 1 || cosH < -1) return { hours: 18, minutes: 30 };
+            const H = (deg * Math.acos(cosH)) / 15;
+            const T = H + RA - (0.06571 * t) - 6.622;
+            let UT = T - lngHour;
+            UT = ((UT % 24) + 24) % 24;
+            const localHour = UT + 4;
+            const hours = Math.floor(localHour);
+            const minutes = Math.round((localHour - hours) * 60);
+            return { hours, minutes };
+        };
+
         const updateCountdown = () => {
             const now = new Date();
             const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
             const dubaiTime = new Date(utcTime + (3600000 * 4));
 
+            const sunsetCalc = getDubaiSunset(dubaiTime);
             const sunsetToday = new Date(dubaiTime);
-            sunsetToday.setHours(18, 38, 0, 0);
+            sunsetToday.setHours(sunsetCalc.hours, sunsetCalc.minutes, 0, 0);
+
+            const displayHour = sunsetCalc.hours > 12 ? sunsetCalc.hours - 12 : sunsetCalc.hours;
+            const displayMin = sunsetCalc.minutes.toString().padStart(2, '0');
+            const sunsetFormatted = `${displayHour}:${displayMin} PM`;
 
             const diffMs = sunsetToday - dubaiTime;
             if (diffMs > 0) {
                 const diffHrs = Math.floor(diffMs / 3600000);
                 const diffMins = Math.floor((diffMs % 3600000) / 60000);
-                label.innerHTML = `Sunset: 6:38 PM • Golden Hour in ${diffHrs > 0 ? diffHrs + 'h ' : ''}${diffMins}m`;
+                label.innerHTML = `Sunset: ${sunsetFormatted} • Golden Hour in ${diffHrs > 0 ? diffHrs + 'h ' : ''}${diffMins}m`;
             } else {
                 label.innerHTML = `Stargazing Safari Live Tonight • Clear Skies`;
             }

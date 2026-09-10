@@ -18,22 +18,6 @@ class AdminCouponController extends Controller
 {
     public function __construct()
     {
-        $this->ensureSchema();
-    }
-
-    /**
-     * Ensure coupons and coupon_usages tables exist on production.
-     */
-    protected function ensureSchema(): void
-    {
-        try {
-            if (!\Illuminate\Support\Facades\Schema::hasTable('coupons') || !\Illuminate\Support\Facades\Schema::hasTable('coupon_usages')) {
-                $migration = require database_path('migrations/2026_08_30_000001_create_coupons_table.php');
-                $migration->up();
-            }
-        } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error("Coupon schema auto-creation error: " . $e->getMessage());
-        }
     }
 
     /**
@@ -41,8 +25,6 @@ class AdminCouponController extends Controller
      */
     public function index(Request $request)
     {
-        $this->ensureSchema();
-
         $status = $request->input('status');
         $type = $request->input('type');
         $search = $request->input('search');
@@ -275,13 +257,24 @@ class AdminCouponController extends Controller
 
         $columns = ['ID', 'Code', 'Name', 'Type', 'Value', 'Min Spend', 'Max Discount', 'Min Guests', 'Usage Limit', 'Redemptions', 'Valid From', 'Valid Until', 'Applicable Tour', 'Applicable Tier', 'First Time Only', 'Status', 'Created Date'];
 
-        $callback = function() use ($coupons, $columns) {
+        $sanitize = function(array $row): array {
+            return array_map(function($val) {
+                if ($val === null) return '';
+                $str = (string) $val;
+                if (isset($str[0]) && in_array($str[0], ['=', '+', '-', '@', "\t", "\r"], true)) {
+                    return "'" . $str;
+                }
+                return $str;
+            }, $row);
+        };
+
+        $callback = function() use ($coupons, $columns, $sanitize) {
             $file = fopen('php://output', 'w');
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // UTF-8 BOM
             fputcsv($file, $columns);
 
             foreach ($coupons as $c) {
-                fputcsv($file, [
+                fputcsv($file, $sanitize([
                     $c->id,
                     $c->code,
                     $c->name,
@@ -299,7 +292,7 @@ class AdminCouponController extends Controller
                     $c->first_time_only ? 'Yes' : 'No',
                     ucfirst($c->status),
                     $c->created_at ? $c->created_at->format('Y-m-d H:i') : '',
-                ]);
+                ]));
             }
 
             fclose($file);

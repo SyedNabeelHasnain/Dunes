@@ -28,13 +28,6 @@
         </div>
     </div>
 
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show rounded-4 border-0 shadow-sm mb-4" role="alert">
-            <i class="bi bi-check-circle-fill me-2 fs-5"></i> {{ session('success') }}
-            <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
     <form action="{{ route('admin.coupons.popup-settings.update') }}" method="POST">
         @csrf
         <div class="row g-4">

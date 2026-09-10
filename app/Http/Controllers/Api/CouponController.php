@@ -13,22 +13,6 @@ class CouponController extends Controller
 {
     public function __construct()
     {
-        $this->ensureSchema();
-    }
-
-    /**
-     * Ensure coupons table exists.
-     */
-    protected function ensureSchema(): void
-    {
-        try {
-            if (!\Illuminate\Support\Facades\Schema::hasTable('coupons')) {
-                $migration = require database_path('migrations/2026_08_30_000001_create_coupons_table.php');
-                $migration->up();
-            }
-        } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error("Coupon schema auto-creation error: " . $e->getMessage());
-        }
     }
 
     /**
@@ -36,7 +20,6 @@ class CouponController extends Controller
      */
     public function validateCoupon(Request $request): JsonResponse
     {
-        $this->ensureSchema();
         $request->validate([
             'code' => 'required|string|max:50',
             'subtotal' => 'required|numeric|min:0',
@@ -44,6 +27,7 @@ class CouponController extends Controller
             'tier_id' => 'nullable|integer',
             'email' => 'nullable|email|max:255',
             'adults' => 'nullable|integer|min:1',
+            'children' => 'nullable|integer|min:0',
             'date' => 'nullable|date',
         ]);
 
@@ -53,6 +37,8 @@ class CouponController extends Controller
         $tierId = $request->filled('tier_id') ? (int)$request->input('tier_id') : null;
         $email = $request->input('email');
         $adults = (int)$request->input('adults', 1);
+        $children = (int)$request->input('children', 0);
+        $totalGuests = max(1, $adults + $children);
         $tourDate = $request->input('date');
 
         // If client sent 0 subtotal but specified tour & tier, resolve price from database
@@ -62,7 +48,7 @@ class CouponController extends Controller
                 ->where('tier_id', $tierId)
                 ->first();
             if ($pricing && (float)$pricing->price > 0) {
-                $subtotal = (float)$pricing->price * max(1, $adults);
+                $subtotal = (float)$pricing->price * $totalGuests;
             }
         }
 
@@ -75,7 +61,7 @@ class CouponController extends Controller
             ], 422);
         }
 
-        $check = $coupon->validateEligibility($subtotal, $tourId, $tierId, $email, $adults, $tourDate);
+        $check = $coupon->validateEligibility($subtotal, $tourId, $tierId, $email, $totalGuests, $tourDate);
 
         if (!$check['valid']) {
             return response()->json([

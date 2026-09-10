@@ -74,10 +74,10 @@
                                         data-tour-id="{{ $entityId }}">
                                     <i class="bi bi-pencil-fill"></i>
                                 </button>
-                                <form action="{{ route('admin.faqs.destroy', $faq->id) }}" method="POST" class="d-inline">
+                                <form action="{{ route('admin.faqs.destroy', $faq->id) }}" method="POST" class="d-inline delete-form" data-confirm="Are you sure you want to delete this FAQ?">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Delete FAQ" onclick="return confirm('Delete this FAQ?')">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Delete FAQ">
                                         <i class="bi bi-trash3-fill"></i>
                                     </button>
                                 </form>

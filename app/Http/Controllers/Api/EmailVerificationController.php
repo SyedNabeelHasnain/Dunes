@@ -27,18 +27,8 @@ class EmailVerificationController extends Controller
         }
 
         $sessionVerified = session()->has('email_verified_' . md5($email));
-        
-        $dbVerified = $sessionVerified || 
-            VerifiedEmail::where('email', $email)->exists() ||
-            Booking::where('email', $email)->where('is_verified', true)->exists() ||
-            Contact::where('email', $email)->where('is_verified', true)->exists();
 
-        if ($dbVerified) {
-            session(['email_verified_' . md5($email) => true]);
-            return response()->json(['success' => true, 'verified' => true]);
-        }
-
-        return response()->json(['success' => true, 'verified' => false]);
+        return response()->json(['success' => true, 'verified' => $sessionVerified]);
     }
 
     /**
@@ -51,7 +41,17 @@ class EmailVerificationController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid email address'], 400);
         }
 
-        // Rate limiting check (60 seconds)
+        // Global rate limiting per email (max 5 OTPs per 10 minutes)
+        $emailRateKey = 'send_otp:' . md5($email);
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($emailRateKey, 5)) {
+            $seconds = \Illuminate\Support\Facades\RateLimiter::availableIn($emailRateKey);
+            return response()->json([
+                'success' => false,
+                'message' => "Too many OTP requests. Please wait {$seconds}s before requesting another."
+            ], 429);
+        }
+
+        // Session rate limiting check (60 seconds cooldown)
         $rateKey = 'otp_sent_' . md5($email);
         if (session()->has($rateKey)) {
             $lastSent = (int)session($rateKey);
@@ -64,6 +64,8 @@ class EmailVerificationController extends Controller
                 ]);
             }
         }
+
+        \Illuminate\Support\Facades\RateLimiter::hit($emailRateKey, 600);
 
         // Generate 6-digit OTP
         $otp = str_pad((string)random_int(0, 999999), 6, '0', STR_PAD_LEFT);
@@ -117,6 +119,15 @@ class EmailVerificationController extends Controller
             return response()->json(['success' => false, 'message' => 'OTP must be exactly 6 digits'], 400);
         }
 
+        $attemptKey = 'verify_otp_attempts:' . md5($email);
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($attemptKey, 5)) {
+            $seconds = \Illuminate\Support\Facades\RateLimiter::availableIn($attemptKey);
+            return response()->json([
+                'success' => false,
+                'message' => "Too many incorrect attempts. Please wait {$seconds}s before trying again."
+            ], 429);
+        }
+
         $sessionEmail = session('otp_email');
         $sessionCode = session('otp_code');
         $sessionExpiry = session('otp_expiry');
@@ -149,6 +160,7 @@ class EmailVerificationController extends Controller
         }
 
         if ($isValid) {
+            \Illuminate\Support\Facades\RateLimiter::clear($attemptKey);
             session(['email_verified_' . md5($email) => true]);
 
             // Persist email to verified_emails table
@@ -160,6 +172,8 @@ class EmailVerificationController extends Controller
 
             return response()->json(['success' => true, 'message' => 'Email verified successfully']);
         }
+
+        \Illuminate\Support\Facades\RateLimiter::hit($attemptKey, 300);
 
         return response()->json([
             'success' => false,

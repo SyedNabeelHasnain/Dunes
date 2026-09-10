@@ -133,14 +133,25 @@ class AdminBookingController extends Controller
             'Balance Due (AED)', 'Payment Method', 'Payment Status', 'Booking Status'
         ];
 
-        $callback = function() use ($query, $columns) {
+        $sanitize = function(array $row): array {
+            return array_map(function($val) {
+                if ($val === null) return '';
+                $str = (string) $val;
+                if (isset($str[0]) && in_array($str[0], ['=', '+', '-', '@', "\t", "\r"], true)) {
+                    return "'" . $str;
+                }
+                return $str;
+            }, $row);
+        };
+
+        $callback = function() use ($query, $columns, $sanitize) {
             $file = fopen('php://output', 'w');
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
             fputcsv($file, $columns);
 
-            $query->chunk(100, function($rows) use ($file) {
+            $query->chunk(100, function($rows) use ($file, $sanitize) {
                 foreach ($rows as $b) {
-                    fputcsv($file, [
+                    fputcsv($file, $sanitize([
                         $b->reference,
                         $b->created_at ? $b->created_at->format('Y-m-d H:i') : '',
                         $b->name,
@@ -160,7 +171,7 @@ class AdminBookingController extends Controller
                         $b->payment_method,
                         $b->payment_status,
                         $b->status
-                    ]);
+                    ]));
                 }
             });
             fclose($file);
@@ -426,7 +437,12 @@ class AdminBookingController extends Controller
         $booking = Booking::with(['addons', 'tier'])->findOrFail($id);
 
         $verificationUrl = route('booking.voucher', $booking->reference);
-        $qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=4&data=' . urlencode($verificationUrl);
+        try {
+            $qrSvg = (string) \SimpleSoftwareIO\QrCode\Facades\QrCode::size(150)->margin(1)->generate($verificationUrl);
+            $qrCodeUrl = 'data:image/svg+xml;base64,' . base64_encode($qrSvg);
+        } catch (\Throwable $e) {
+            $qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=4&data=' . urlencode($verificationUrl);
+        }
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('booking.ticket-pdf', compact('booking', 'qrCodeUrl'))
             ->setPaper('a4', 'portrait')

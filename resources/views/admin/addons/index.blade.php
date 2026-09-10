@@ -117,13 +117,12 @@
                                     data-action="{{ route('admin.addons.update', $addon->id) }}">
                                     <i class="bi bi-pencil-fill"></i>
                                 </button>
-                                <form action="{{ route('admin.addons.destroy', $addon->id) }}" method="POST" class="d-inline delete-form">
+                                <form action="{{ route('admin.addons.destroy', $addon->id) }}" method="POST" class="d-inline delete-form" data-confirm="Are you sure you want to delete this addon? It will be detached from all linked tours.">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" 
                                         style="width: 34px; height: 34px;" 
-                                        title="Delete Addon"
-                                        onclick="return confirm('Are you sure you want to delete this addon? It will be detached from all linked tours.')">
+                                        title="Delete Addon">
                                         <i class="bi bi-trash3-fill"></i>
                                     </button>
                                 </form>

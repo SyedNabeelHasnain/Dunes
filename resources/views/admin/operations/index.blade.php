@@ -95,7 +95,7 @@
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table align-middle mb-0 table-hover">
+                    <table class="table align-middle mb-0 table-hover no-datatable">
                         <thead class="table-light small text-uppercase fw-bold text-muted" style="font-size: 0.72rem;">
                             <tr>
                                 <th class="ps-4">Ref & Time</th>
@@ -254,5 +254,46 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+@endpush
+
+@push('styles')
+<style>
+@media print {
+    #sidebar, #sidebarOverlay, .sidebar-overlay, .top-navbar, #headerNav, .btn, form, .modal, .bulk-action-bar, .no-print, .breadcrumb, .nav-tabs, th:last-child, td:last-child {
+        display: none !important;
+    }
+    .admin-main-content {
+        margin: 0 !important;
+        margin-left: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    .card {
+        border: 1px solid #ddd !important;
+        box-shadow: none !important;
+        page-break-inside: avoid;
+        margin-bottom: 20px !important;
+    }
+    .card-header {
+        background-color: #f0f0f0 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    body {
+        background: #fff !important;
+        color: #000 !important;
+        font-size: 10pt;
+    }
+    table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+    }
+    th, td {
+        border: 1px solid #ccc !important;
+        padding: 6px 8px !important;
+    }
+}
+</style>
 @endpush
 @endsection

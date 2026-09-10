@@ -5,14 +5,15 @@
     $rateGbp = $settingsService->get('currency_rate_gbp', '0.2150');
     $rateSar = $settingsService->get('currency_rate_sar', '1.0210');
     $rateInr = $settingsService->get('currency_rate_inr', '22.85');
+    $dropdownId = $switcherId ?? 'currencyDropdownBtn';
 @endphp
 <div class="dropdown currency-switcher-dropdown d-inline-block">
-    <button class="btn btn-outline-light btn-sm rounded-pill px-3 py-1.5 fw-bold d-inline-flex align-items-center gap-1.5 border-opacity-25 shadow-sm text-dark bg-white" type="button" id="currencyDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 13px; border: 1px solid rgba(0,0,0,0.12); min-height: 38px;">
+    <button class="btn btn-outline-light btn-sm rounded-pill px-3 py-1.5 fw-bold d-inline-flex align-items-center gap-1.5 border-opacity-25 shadow-sm text-dark bg-white" type="button" id="{{ $dropdownId }}" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 13px; border: 1px solid rgba(0,0,0,0.12); min-height: 38px;">
         <span class="current-currency-flag">🇦🇪</span>
         <span class="current-currency-code fw-bold ms-1">AED</span>
         <i class="bi bi-chevron-down ms-1 text-muted" style="font-size: 10px;"></i>
     </button>
-    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4 p-2 mt-2" aria-labelledby="currencyDropdownBtn" style="min-width: 175px; z-index: 1060;">
+    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4 p-2 mt-2" aria-labelledby="{{ $dropdownId }}" style="min-width: 175px; z-index: 1060;">
         <li><h6 class="dropdown-header text-uppercase small fw-bold text-muted py-1" style="font-size: 11px; letter-spacing: 0.5px;">Display Currency</h6></li>
         <li>
             <button type="button" class="dropdown-item rounded-3 py-2 d-flex align-items-center justify-content-between currency-option active" data-currency="AED" data-flag="🇦🇪" data-symbol="AED" data-rate="1">

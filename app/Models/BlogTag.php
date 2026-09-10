@@ -9,7 +9,7 @@ class BlogTag extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['id', 'name', 'slug'];
+    protected $fillable = ['name', 'slug'];
 
     public function posts()
     {

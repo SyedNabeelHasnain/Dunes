@@ -30,26 +30,26 @@
                         
                         <div class="mb-3">
                             <label for="post_title" class="form-label fw-bold text-dark">Article Title</label>
-                            <input type="text" name="title" id="post_title" class="form-control" value="{{ $post->title }}" required style="height: 48px; border-radius: 8px;">
+                            <input type="text" name="title" id="post_title" class="form-control" value="{{ old('title', $post->title) }}" required style="height: 48px; border-radius: 8px;">
                         </div>
 
                         <div class="mb-3">
                             <label for="category_id" class="form-label fw-bold text-dark">Blog Category</label>
                             <select name="category_id" id="category_id" class="form-select" required style="height: 48px; border-radius: 8px;">
                                 @foreach($categories as $category)
-                                    <option value="{{ $category->id }}" {{ $post->category_id === $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                    <option value="{{ $category->id }}" {{ old('category_id', $post->category_id) == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                                 @endforeach
                             </select>
                         </div>
 
                         <div class="mb-3">
                             <label for="excerpt" class="form-label fw-bold text-dark">Short Excerpt (Summary)</label>
-                            <textarea name="excerpt" id="excerpt" class="form-control" rows="2" required style="border-radius: 8px;">{{ $post->excerpt }}</textarea>
+                            <textarea name="excerpt" id="excerpt" class="form-control" rows="2" required style="border-radius: 8px;">{{ old('excerpt', $post->excerpt) }}</textarea>
                         </div>
 
                         <div class="mb-0">
                             <label for="content" class="form-label fw-bold text-dark">Main Article Content</label>
-                            <textarea name="content" id="content" class="form-control wysiwyg-editor" rows="12" required style="border-radius: 8px;">{{ $post->content }}</textarea>
+                            <textarea name="content" id="content" class="form-control wysiwyg-editor" rows="12" required style="border-radius: 8px;">{{ old('content', $post->content) }}</textarea>
                         </div>
                     </div>
 
@@ -59,15 +59,15 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label for="author_name" class="form-label fw-bold text-dark">Author Name</label>
-                                <input type="text" name="author_name" id="author_name" class="form-control" value="{{ $post->author_name }}" placeholder="Dunes Discovery">
+                                <input type="text" name="author_name" id="author_name" class="form-control" value="{{ old('author_name', $post->author_name) }}" placeholder="Dunes Discovery">
                             </div>
                             <div class="col-md-6">
                                 <label for="author_title" class="form-label fw-bold text-dark">Author Job Title</label>
-                                <input type="text" name="author_title" id="author_title" class="form-control" value="{{ $post->author_title }}" placeholder="Dubai Tourism Expert">
+                                <input type="text" name="author_title" id="author_title" class="form-control" value="{{ old('author_title', $post->author_title) }}" placeholder="Dubai Tourism Expert">
                             </div>
                             <div class="col-12">
                                 <label for="author_bio" class="form-label fw-bold text-dark">Author Short Biography</label>
-                                <textarea name="author_bio" id="author_bio" class="form-control" rows="2" placeholder="Biographical details shown at post footer">{{ $post->author_bio }}</textarea>
+                                <textarea name="author_bio" id="author_bio" class="form-control" rows="2" placeholder="Biographical details shown at post footer">{{ old('author_bio', $post->author_bio) }}</textarea>
                             </div>
                         </div>
                     </div>
@@ -76,7 +76,7 @@
                     <div class="p-4 bg-light rounded-4 border mb-0">
                         <h6 class="text-primary fw-800 text-uppercase small mb-4">AI Quick Summary (Optional)</h6>
                         <div class="mb-0">
-                            <textarea name="ai_summary" id="ai_summary" class="form-control" rows="2" placeholder="A brief bulleted AI-generated summary shown in an highlight box at the top of the post">{{ $post->ai_summary }}</textarea>
+                            <textarea name="ai_summary" id="ai_summary" class="form-control" rows="2" placeholder="A brief bulleted AI-generated summary shown in an highlight box at the top of the post">{{ old('ai_summary', $post->ai_summary) }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -89,29 +89,29 @@
                         <div class="mb-3">
                             <label for="status" class="form-label fw-bold text-dark">Publish Status</label>
                             <select name="status" id="status" class="form-select" required style="border-radius: 8px;">
-                                <option value="draft" {{ $post->status === 'draft' ? 'selected' : '' }}>Draft</option>
-                                <option value="published" {{ $post->status === 'published' ? 'selected' : '' }}>Published</option>
-                                <option value="scheduled" {{ $post->status === 'scheduled' ? 'selected' : '' }}>Scheduled</option>
+                                <option value="draft" {{ old('status', $post->status) === 'draft' ? 'selected' : '' }}>Draft</option>
+                                <option value="published" {{ old('status', $post->status) === 'published' ? 'selected' : '' }}>Published</option>
+                                <option value="scheduled" {{ old('status', $post->status) === 'scheduled' ? 'selected' : '' }}>Scheduled</option>
                             </select>
                         </div>
 
                         <div class="mb-3">
                             <label for="published_at" class="form-label fw-bold text-dark">Publish Date / Time</label>
-                            <input type="datetime-local" name="published_at" id="published_at" class="form-control" value="{{ $post->published_at ? $post->published_at->format('Y-m-d\TH:i') : '' }}" style="border-radius: 8px;">
+                            <input type="datetime-local" name="published_at" id="published_at" class="form-control" value="{{ old('published_at', $post->published_at ? $post->published_at->format('Y-m-d\TH:i') : '') }}" style="border-radius: 8px;">
                         </div>
 
                         <div class="mb-3">
                             <label for="read_time" class="form-label fw-bold text-dark">Est. Read Time (Minutes)</label>
-                            <input type="number" name="read_time" id="read_time" class="form-control" value="{{ $post->read_time }}" required style="border-radius: 8px;">
+                            <input type="number" name="read_time" id="read_time" class="form-control" value="{{ old('read_time', $post->read_time) }}" required style="border-radius: 8px;">
                         </div>
 
                         <div class="mb-0">
                             <label for="schema_type" class="form-label fw-bold text-dark">SEO Schema Type</label>
                             <select name="schema_type" id="schema_type" class="form-select" style="border-radius: 8px;">
-                                <option value="BlogPosting" {{ $post->schema_type === 'BlogPosting' ? 'selected' : '' }}>BlogPosting (Default)</option>
-                                <option value="Article" {{ $post->schema_type === 'Article' ? 'selected' : '' }}>Article</option>
-                                <option value="NewsArticle" {{ $post->schema_type === 'NewsArticle' ? 'selected' : '' }}>NewsArticle</option>
-                                <option value="TravelAdvisory" {{ $post->schema_type === 'TravelAdvisory' ? 'selected' : '' }}>TravelAdvisory</option>
+                                <option value="BlogPosting" {{ old('schema_type', $post->schema_type) === 'BlogPosting' ? 'selected' : '' }}>BlogPosting (Default)</option>
+                                <option value="Article" {{ old('schema_type', $post->schema_type) === 'Article' ? 'selected' : '' }}>Article</option>
+                                <option value="NewsArticle" {{ old('schema_type', $post->schema_type) === 'NewsArticle' ? 'selected' : '' }}>NewsArticle</option>
+                                <option value="TravelAdvisory" {{ old('schema_type', $post->schema_type) === 'TravelAdvisory' ? 'selected' : '' }}>TravelAdvisory</option>
                             </select>
                         </div>
                     </div>
@@ -120,7 +120,7 @@
                         <h6 class="text-primary fw-800 text-uppercase small mb-4">Tags</h6>
                         <div class="mb-0">
                             <label for="tags_input" class="form-label fw-bold text-dark small">Article Tags (Comma separated)</label>
-                            <input type="text" name="tags[]" id="tags_input" class="form-control" value="{{ implode(', ', $post->tags->pluck('name')->toArray()) }}" placeholder="dubai, safari, adventure">
+                            <input type="text" name="tags[]" id="tags_input" class="form-control" value="{{ old('tags') ? (is_array(old('tags')) ? implode(', ', old('tags')) : old('tags')) : implode(', ', $post->tags->pluck('name')->toArray()) }}" placeholder="dubai, safari, adventure">
                             <div class="form-text">Press comma to separate tags.</div>
                         </div>
                     </div>
@@ -129,19 +129,19 @@
                         <h6 class="text-primary fw-800 text-uppercase small mb-4">SEO & Metadata</h6>
                         <div class="mb-3">
                             <label for="meta_title" class="form-label fw-bold text-dark small">Meta Title</label>
-                            <input type="text" name="meta_title" id="meta_title" class="form-control form-control-sm" value="{{ $post->meta_title }}">
+                            <input type="text" name="meta_title" id="meta_title" class="form-control form-control-sm" value="{{ old('meta_title', $post->meta_title) }}">
                         </div>
                         <div class="mb-3">
                             <label for="meta_desc" class="form-label fw-bold text-dark small">Meta Description</label>
-                            <textarea name="meta_desc" id="meta_desc" class="form-control form-control-sm" rows="3">{{ $post->meta_desc }}</textarea>
+                            <textarea name="meta_desc" id="meta_desc" class="form-control form-control-sm" rows="3">{{ old('meta_desc', $post->meta_desc) }}</textarea>
                         </div>
                         <div class="mb-3">
                             <label for="meta_keywords" class="form-label fw-bold text-dark small">Meta Keywords</label>
-                            <input type="text" name="meta_keywords" id="meta_keywords" class="form-control form-control-sm" value="{{ $post->meta_keywords }}">
+                            <input type="text" name="meta_keywords" id="meta_keywords" class="form-control form-control-sm" value="{{ old('meta_keywords', $post->meta_keywords) }}">
                         </div>
                         <div class="mb-0">
                             <label for="canonical_url" class="form-label fw-bold text-dark small">Canonical URL Override</label>
-                            <input type="url" name="canonical_url" id="canonical_url" class="form-control form-control-sm" value="{{ $post->canonical_url }}" placeholder="https://...">
+                            <input type="url" name="canonical_url" id="canonical_url" class="form-control form-control-sm" value="{{ old('canonical_url', $post->canonical_url) }}" placeholder="https://...">
                         </div>
                     </div>
 

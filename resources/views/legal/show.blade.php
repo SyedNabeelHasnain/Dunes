@@ -19,7 +19,7 @@
 }
 </script>
 
-<section class="page-header py-3 bg-dark text-white position-relative overflow-hidden" style="margin-top: -var(--header-h);">
+<section class="page-header py-3 bg-dark text-white position-relative overflow-hidden" style="margin-top: calc(-1 * var(--header-h));">
     <div class="container position-relative z-1 pt-5">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-4">

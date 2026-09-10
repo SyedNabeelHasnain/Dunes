@@ -200,7 +200,7 @@ if(window.fbq){
 @endif
 
 <!-- Tour Hero Section -->
-<section class="tour-hero-modern position-relative d-flex align-items-end" style="min-height: 50vh; background: url('{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image)) }}') center/cover no-repeat; margin-top: -var(--header-h);">
+<section class="tour-hero-modern position-relative d-flex align-items-end" style="min-height: 50vh; background: url('{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image)) }}') center/cover no-repeat; margin-top: calc(-1 * var(--header-h));">
     <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.85) 100%);"></div>
     <div class="container position-relative z-1 pb-5 text-white">
         <nav aria-label="breadcrumb" class="mb-4">
@@ -689,7 +689,7 @@ if(window.fbq){
 
             <!-- Sidebar -->
             <div class="col-lg-4">
-                <div class="sidebar-sticky" style="top: 100px;">
+                <div class="sidebar-sticky" style="top: calc(var(--header-h, 72px) + 20px);">
                     <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-4 bg-white">
                         <div class="card-body p-4">
                             <div class="text-center mb-4 pb-3 border-bottom">
@@ -872,7 +872,7 @@ if(window.fbq){
                                     <span class="h5 fw-bold text-primary mb-0" data-aed="{{ $minPriceRel }}">AED {{ number_format($minPriceRel) }}</span>
                                 </div>
                                 <div class="d-flex gap-2">
-                                    <button type="button" class="btn-circle-whatsapp fab-whatsapp" data-tour-name="{{ $t->name }}">
+                                    <button type="button" class="btn-circle-whatsapp fab-whatsapp" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp" onclick="event.preventDefault(); event.stopPropagation(); if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp('{{ addslashes($t->name) }}'); }">
                                         <i class="bi bi-whatsapp"></i>
                                     </button>
                                     <div class="btn-circle-desert d-flex align-items-center justify-content-center">
@@ -890,8 +890,8 @@ if(window.fbq){
 </section>
 @endif
 
-<!-- Mobile Book Bar Sticky bottom -->
-<div class="mobile-bookbar position-fixed bottom-0 start-0 w-100 bg-white p-3 border-top shadow-lg d-md-none d-flex align-items-center justify-content-between z-3 safe-area-bottom">
+<!-- Mobile Book Bar Sticky bottom (visible up to lg breakpoint) -->
+<div class="mobile-bookbar position-fixed bottom-0 start-0 w-100 bg-white p-3 border-top shadow-lg d-lg-none d-flex align-items-center justify-content-between z-3 safe-area-bottom">
     <div>
         <small class="text-muted d-block opacity-75 fw-bold" style="font-size: 9px; letter-spacing: 1px; text-transform: uppercase;">Starting From</small>
         <div class="h4 fw-bold text-primary mb-0" data-aed="{{ $minPrice }}">AED {{ number_format($minPrice) }}</div>

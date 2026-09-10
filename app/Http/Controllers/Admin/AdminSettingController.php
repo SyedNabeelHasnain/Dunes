@@ -69,7 +69,7 @@ class AdminSettingController extends Controller
 
             // Email & General Settings
             'site_email', 'admin_email', 'admin_email_cc', 'admin_email_bcc', 'site_phone',
-            'ziina_active', 'ziina_access_token', 'ziina_test_mode', 'ziina_advance_percent',
+            'ziina_active', 'ziina_access_token', 'ziina_webhook_secret', 'ziina_test_mode', 'ziina_advance_percent',
             'cache_version',
 
             // Multi-Currency Exchange Rates

@@ -11,6 +11,7 @@
     <link rel="preload" href="{{ asset('assets/vendor/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
     @php
         try {
@@ -262,7 +263,24 @@
             transform: scale(1.06);
             box-shadow: 0 2px 5px rgba(0,0,0,0.15);
         }
+
+        /* Mobile Sidebar Overlay */
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(2px);
+            z-index: 1039;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+        .sidebar-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
     </style>
+    @stack('styles')
 </head>
 <body>
 
@@ -384,7 +402,7 @@
     <div class="admin-main-content">
         <nav class="top-navbar d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
             <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-white shadow-sm d-lg-none rounded-3 border-0" onclick="document.getElementById('sidebar').classList.toggle('show'); document.getElementById('sidebarOverlay').classList.toggle('show')">
+                <button class="btn btn-white shadow-sm d-lg-none rounded-3 border-0" id="sidebarToggleMobile" onclick="document.getElementById('sidebar').classList.toggle('show'); document.getElementById('sidebarOverlay').classList.toggle('show')">
                     <i class="bi bi-list fs-4"></i>
                 </button>
                 <h1 class="h5 fw-800 mb-0 text-capitalize text-dark">@yield('page_title', 'Dashboard')</h1>
@@ -588,12 +606,37 @@
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.all.min.js" crossorigin="anonymous"></script>
 
     <script>
     $(document).ready(function() {
+        // Universal SweetAlert2 confirmation for forms with delete-form or data-confirm
+        $(document).on('submit', 'form.delete-form, form[data-confirm]', function(e) {
+            const form = this;
+            if (form.dataset.confirmed === 'true') return true;
+            e.preventDefault();
+            const message = form.dataset.confirm || $(form).find('[type="submit"]').attr('title') || 'Are you sure you want to delete this record? This action cannot be undone.';
+            Swal.fire({
+                title: 'Are you sure?',
+                text: message,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, delete',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.dataset.confirmed = 'true';
+                    form.submit();
+                }
+            });
+        });
+
         // Toggle Sidebar collapsed state on desktop
         $('#sidebarToggleDesktop').on('click', function() {
             $('#sidebar').toggleClass('collapsed');
@@ -629,19 +672,40 @@
                                 extend: 'excelHtml5',
                                 text: '<i class="bi bi-file-earmark-excel me-1 text-success"></i>Excel',
                                 className: 'btn btn-sm btn-white border shadow-sm rounded-pill px-3 me-1',
-                                exportOptions: { columns: ':visible:not(.no-export):not(.no-sort)' }
+                                exportOptions: {
+                                    columns: ':visible:not(.no-export):not(.no-sort)',
+                                    format: {
+                                        body: function(data, row, column, node) {
+                                            return typeof data === 'string' ? data.replace(/<br\s*[\/]?>/gi, ' ').replace(/<\/p>/gi, ' ').replace(/<\/div>/gi, ' ').replace(/<[^>]*>/g, '').trim() : data;
+                                        }
+                                    }
+                                }
                             },
                             {
                                 extend: 'pdfHtml5',
                                 text: '<i class="bi bi-file-earmark-pdf me-1 text-danger"></i>PDF',
                                 className: 'btn btn-sm btn-white border shadow-sm rounded-pill px-3 me-1',
-                                exportOptions: { columns: ':visible:not(.no-export):not(.no-sort)' }
+                                exportOptions: {
+                                    columns: ':visible:not(.no-export):not(.no-sort)',
+                                    format: {
+                                        body: function(data, row, column, node) {
+                                            return typeof data === 'string' ? data.replace(/<br\s*[\/]?>/gi, '\n').replace(/<\/p>/gi, '\n').replace(/<\/div>/gi, '\n').replace(/<[^>]*>/g, '').trim() : data;
+                                        }
+                                    }
+                                }
                             },
                             {
                                 extend: 'csvHtml5',
                                 text: '<i class="bi bi-file-earmark-text me-1 text-primary"></i>CSV',
                                 className: 'btn btn-sm btn-white border shadow-sm rounded-pill px-3 me-1',
-                                exportOptions: { columns: ':visible:not(.no-export):not(.no-sort)' }
+                                exportOptions: {
+                                    columns: ':visible:not(.no-export):not(.no-sort)',
+                                    format: {
+                                        body: function(data, row, column, node) {
+                                            return typeof data === 'string' ? data.replace(/<br\s*[\/]?>/gi, ' ').replace(/<\/p>/gi, ' ').replace(/<\/div>/gi, ' ').replace(/<[^>]*>/g, '').trim() : data;
+                                        }
+                                    }
+                                }
                             },
                             {
                                 extend: 'print',
@@ -859,6 +923,18 @@
             });
         @endif
 
+        @if(session('status'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: "{{ session('status') === 'profile-updated' ? 'Profile details updated successfully!' : (session('status') === 'password-updated' ? 'Password changed successfully!' : session('status')) }}",
+                timer: 3000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+        @endif
+
         @if(session('error'))
             Swal.fire({
                 icon: 'error',
@@ -880,7 +956,7 @@
         // Hide sidebar on clicking outside (mobile)
         $(document).on('click', function(e) {
             if ($(window).width() < 992) {
-                if (!$(e.target).closest('#sidebar, #sidebarToggleDesktop, .btn-white').length) {
+                if (!$(e.target).closest('#sidebar, #sidebarToggleMobile, #sidebarToggleDesktop').length) {
                     $('#sidebar').removeClass('show');
                     $('#sidebarOverlay').removeClass('show');
                 }

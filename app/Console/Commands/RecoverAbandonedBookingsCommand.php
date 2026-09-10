@@ -39,17 +39,41 @@ class RecoverAbandonedBookingsCommand extends Command
 
         $this->info("Scanning abandoned bookings created between {$startTime->toDateTimeString()} and {$endTime->toDateTimeString()}...");
 
-        $bookings = Booking::where('status', 'pending')
-            ->where('payment_status', 'unpaid')
+        $bookings = Booking::whereIn('status', ['pending', 'draft'])
+            ->where(function ($query) {
+                $query->where('payment_status', 'unpaid')
+                    ->orWhereNull('payment_status');
+            })
+            ->where(function ($query) {
+                $query->where('payment_method', '!=', 'cash')
+                    ->orWhereNull('payment_method');
+            })
             ->whereBetween('created_at', [$startTime, $endTime])
             ->whereNotNull('email')
             ->where('email', '!=', '')
+            ->where('email', 'not like', '%@guest.local')
             ->get();
 
         $count = 0;
         foreach ($bookings as $booking) {
-            // Prevent duplicate recovery emails
-            if ($booking->special_requests && str_contains($booking->special_requests, '[RECOVERY_DISPATCHED]')) {
+            if (!filter_var($booking->email, FILTER_VALIDATE_EMAIL)) {
+                continue;
+            }
+
+            // Prevent duplicate recovery emails (check cache and tag)
+            $cacheKey = 'abandoned_recovery_sent_' . $booking->id;
+            if (\Illuminate\Support\Facades\Cache::has($cacheKey) || 
+                ($booking->special_requests && str_contains($booking->special_requests, '[RECOVERY_DISPATCHED]'))) {
+                continue;
+            }
+
+            // Exclude if customer has already completed another booking subsequently
+            $hasCompletedOther = Booking::where('email', $booking->email)
+                ->whereIn('status', ['confirmed', 'completed'])
+                ->where('created_at', '>=', $booking->created_at)
+                ->exists();
+
+            if ($hasCompletedOther) {
                 continue;
             }
 
@@ -58,10 +82,7 @@ class RecoverAbandonedBookingsCommand extends Command
                     (new AbandonedBookingRecoveryMail($booking))->from($fromEmail, 'Dunes Discovery Tourism')
                 );
 
-                $notes = $booking->special_requests ?: '';
-                $booking->update([
-                    'special_requests' => trim($notes . "\n[RECOVERY_DISPATCHED: " . now()->toIso8601String() . "]")
-                ]);
+                \Illuminate\Support\Facades\Cache::put($cacheKey, now()->toIso8601String(), 86400 * 7);
 
                 $count++;
                 $this->info("Dispatched recovery invitation to: {$booking->email} (Ref: #{$booking->reference})");

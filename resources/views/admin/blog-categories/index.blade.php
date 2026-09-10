@@ -54,10 +54,10 @@
                                         data-status="{{ $cat->status }}">
                                     <i class="bi bi-pencil-fill"></i>
                                 </button>
-                                <form action="{{ route('admin.blog-categories.destroy', $cat->id) }}" method="POST" class="d-inline">
+                                <form action="{{ route('admin.blog-categories.destroy', $cat->id) }}" method="POST" class="d-inline delete-form" data-confirm="Are you sure you want to delete this category?">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="Delete Category" onclick="return confirm('Delete this blog category?')">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="Delete Category">
                                         <i class="bi bi-trash3-fill"></i>
                                     </button>
                                 </form>

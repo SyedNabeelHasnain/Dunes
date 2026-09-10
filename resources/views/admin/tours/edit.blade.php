@@ -32,26 +32,26 @@
 
                     <div class="mb-3">
                         <label for="tour_name" class="form-label fw-bold text-dark">Tour Name</label>
-                        <input type="text" name="name" id="tour_name" class="form-control" value="{{ $tour->name }}" required style="height: 48px; border-radius: 8px;">
+                        <input type="text" name="name" id="tour_name" class="form-control" value="{{ old('name', $tour->name) }}" required style="height: 48px; border-radius: 8px;">
                     </div>
 
                     <div class="mb-3">
                         <label for="category_id" class="form-label fw-bold text-dark">Category</label>
                         <select name="category_id" id="category_id" class="form-select" required style="height: 48px; border-radius: 8px;">
                             @foreach($categories as $category)
-                                <option value="{{ $category->id }}" {{ $tour->category_id === $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                <option value="{{ $category->id }}" {{ old('category_id', $tour->category_id) == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                             @endforeach
                         </select>
                     </div>
 
                     <div class="mb-3">
                         <label for="short_desc" class="form-label fw-bold text-dark">Short Description</label>
-                        <textarea name="short_desc" id="short_desc" class="form-control" rows="2" required style="border-radius: 8px;">{{ $tour->short_desc }}</textarea>
+                        <textarea name="short_desc" id="short_desc" class="form-control" rows="2" required style="border-radius: 8px;">{{ old('short_desc', $tour->short_desc) }}</textarea>
                     </div>
 
                     <div class="mb-4">
                         <label for="full_desc" class="form-label fw-bold text-dark">Full Description</label>
-                        <textarea name="full_desc" id="full_desc" class="form-control wysiwyg-editor" rows="6" required style="border-radius: 8px;">{{ $tour->full_desc }}</textarea>
+                        <textarea name="full_desc" id="full_desc" class="form-control wysiwyg-editor" rows="6" required style="border-radius: 8px;">{{ old('full_desc', $tour->full_desc) }}</textarea>
                     </div>
 
                     <!-- Package Tiers -->
@@ -255,45 +255,45 @@
             
             <div class="mb-3">
                 <label for="tour_duration" class="form-label fw-bold text-dark">Duration Info</label>
-                <input type="text" name="duration" form="editTourForm" id="tour_duration" class="form-control" value="{{ $tour->duration }}" placeholder="e.g. 6 Hours">
+                <input type="text" name="duration" form="editTourForm" id="tour_duration" class="form-control" value="{{ old('duration', $tour->duration) }}" placeholder="e.g. 6 Hours">
             </div>
 
             <div class="mb-3">
                 <label for="tour_pickup" class="form-label fw-bold text-dark">Pickup Time</label>
-                <input type="text" name="pickup_time" form="editTourForm" id="tour_pickup" class="form-control" value="{{ $tour->pickup_time }}" placeholder="e.g. 2:30 PM">
+                <input type="text" name="pickup_time" form="editTourForm" id="tour_pickup" class="form-control" value="{{ old('pickup_time', $tour->pickup_time) }}" placeholder="e.g. 2:30 PM">
             </div>
 
             <div class="mb-3">
                 <label for="tour_dropoff" class="form-label fw-bold text-dark">Dropoff Time</label>
-                <input type="text" name="dropoff_time" form="editTourForm" id="tour_dropoff" class="form-control" value="{{ $tour->dropoff_time }}" placeholder="e.g. 9:30 PM">
+                <input type="text" name="dropoff_time" form="editTourForm" id="tour_dropoff" class="form-control" value="{{ old('dropoff_time', $tour->dropoff_time) }}" placeholder="e.g. 9:30 PM">
             </div>
 
             <div class="row g-2 mb-3">
                 <div class="col-6">
                     <label for="tour_min_age" class="form-label fw-bold text-dark">Min Age</label>
-                    <input type="number" name="min_age" form="editTourForm" id="tour_min_age" class="form-control" value="{{ $tour->min_age }}">
+                    <input type="number" name="min_age" form="editTourForm" id="tour_min_age" class="form-control" value="{{ old('min_age', $tour->min_age) }}">
                 </div>
                 <div class="col-6">
                     <label for="tour_group_size" class="form-label fw-bold text-dark">Group Size</label>
-                    <input type="text" name="group_size" form="editTourForm" id="tour_group_size" class="form-control" value="{{ $tour->group_size }}" placeholder="e.g. Up to 6">
+                    <input type="text" name="group_size" form="editTourForm" id="tour_group_size" class="form-control" value="{{ old('group_size', $tour->group_size) }}" placeholder="e.g. Up to 6">
                 </div>
             </div>
 
             <div class="mb-3">
                 <label for="tour_languages" class="form-label fw-bold text-dark">Languages</label>
-                <input type="text" name="languages" form="editTourForm" id="tour_languages" class="form-control" value="{{ $tour->languages }}">
+                <input type="text" name="languages" form="editTourForm" id="tour_languages" class="form-control" value="{{ old('languages', $tour->languages) }}">
             </div>
 
             <div class="mb-3">
                 <label for="tour_priority" class="form-label fw-bold text-dark">Sort Order</label>
-                <input type="number" name="priority" form="editTourForm" id="tour_priority" class="form-control" value="{{ $tour->priority }}">
+                <input type="number" name="priority" form="editTourForm" id="tour_priority" class="form-control" value="{{ old('priority', $tour->priority) }}">
             </div>
 
             <div class="mb-0">
                 <label for="tour_status" class="form-label fw-bold text-dark">Visibility Status</label>
                 <select name="status" form="editTourForm" id="tour_status" class="form-select">
-                    <option value="active" {{ $tour->status === 'active' ? 'selected' : '' }}>Active & Published</option>
-                    <option value="inactive" {{ $tour->status === 'inactive' ? 'selected' : '' }}>Hidden / Draft</option>
+                    <option value="active" {{ old('status', $tour->status) === 'active' ? 'selected' : '' }}>Active & Published</option>
+                    <option value="inactive" {{ old('status', $tour->status) === 'inactive' ? 'selected' : '' }}>Hidden / Draft</option>
                 </select>
             </div>
         </div>
@@ -302,11 +302,11 @@
         <div class="p-4 bg-light rounded-4 border mb-4 bg-white shadow-sm">
             <h6 class="text-primary fw-800 text-uppercase small mb-4">Attribution Flags</h6>
             <div class="form-check form-switch mb-3">
-                <input class="form-check-input" type="checkbox" name="is_featured" form="editTourForm" id="is_featured" value="1" {{ $tour->is_featured ? 'checked' : '' }}>
+                <input class="form-check-input" type="checkbox" name="is_featured" form="editTourForm" id="is_featured" value="1" {{ old('is_featured', $tour->is_featured) ? 'checked' : '' }}>
                 <label class="form-check-label fw-bold text-dark" for="is_featured">Featured Tour</label>
             </div>
             <div class="form-check form-switch mb-0">
-                <input class="form-check-input" type="checkbox" name="is_bestseller" form="editTourForm" id="is_bestseller" value="1" {{ $tour->is_bestseller ? 'checked' : '' }}>
+                <input class="form-check-input" type="checkbox" name="is_bestseller" form="editTourForm" id="is_bestseller" value="1" {{ old('is_bestseller', $tour->is_bestseller) ? 'checked' : '' }}>
                 <label class="form-check-label fw-bold text-dark" for="is_bestseller">Bestseller Badge</label>
             </div>
         </div>
@@ -316,15 +316,15 @@
             <h6 class="text-primary fw-800 text-uppercase small mb-3">SEO Customization</h6>
             <div class="mb-3">
                 <label for="meta_title" class="form-label fw-bold text-dark small">Meta Title</label>
-                <input type="text" name="meta_title" form="editTourForm" id="meta_title" class="form-control form-control-sm" value="{{ $tour->meta_title }}">
+                <input type="text" name="meta_title" form="editTourForm" id="meta_title" class="form-control form-control-sm" value="{{ old('meta_title', $tour->meta_title) }}">
             </div>
             <div class="mb-3">
                 <label for="meta_desc" class="form-label fw-bold text-dark small">Meta Description</label>
-                <textarea name="meta_desc" form="editTourForm" id="meta_desc" class="form-control form-control-sm" rows="3">{{ $tour->meta_desc }}</textarea>
+                <textarea name="meta_desc" form="editTourForm" id="meta_desc" class="form-control form-control-sm" rows="3">{{ old('meta_desc', $tour->meta_desc) }}</textarea>
             </div>
             <div class="mb-0">
                 <label for="meta_keywords" class="form-label fw-bold text-dark small">Meta Keywords</label>
-                <input type="text" name="meta_keywords" form="editTourForm" id="meta_keywords" class="form-control form-control-sm" value="{{ $tour->meta_keywords }}">
+                <input type="text" name="meta_keywords" form="editTourForm" id="meta_keywords" class="form-control form-control-sm" value="{{ old('meta_keywords', $tour->meta_keywords) }}">
             </div>
         </div>
 
@@ -457,7 +457,7 @@ function openCategoryManager() {
 }
 function addCategory() {
     const name = $('#newCat').val().trim();
-    if(!name) { alert('Category name cannot be empty'); return; }
+    if(!name) { Swal.fire('Error', 'Category name cannot be empty.', 'error'); return; }
     
     showLoader();
     $.ajax({
@@ -475,14 +475,14 @@ function addCategory() {
         },
         error: function(xhr) {
             hideLoader();
-            alert('Failed to add category.');
+            Swal.fire('Error', 'Failed to add category.', 'error');
         }
     });
 }
 function renameCategory() {
     const oldName = $('#oldCat').val();
     const newName = $('#renCat').val().trim();
-    if(!oldName || !newName) { alert('Provide both old and new names'); return; }
+    if(!oldName || !newName) { Swal.fire('Error', 'Provide both old and new names.', 'error'); return; }
     
     showLoader();
     $.ajax({
@@ -501,7 +501,7 @@ function renameCategory() {
         },
         error: function(xhr) {
             hideLoader();
-            alert('Failed to rename category.');
+            Swal.fire('Error', 'Failed to rename category.', 'error');
         }
     });
 }
@@ -536,7 +536,7 @@ $('#newContentItemForm').on('submit', function(e) {
         },
         error: function(xhr) {
             hideLoader();
-            alert('Failed to create content item.');
+            Swal.fire('Error', 'Failed to create content item.', 'error');
         }
     });
 });
@@ -558,7 +558,7 @@ $('#tourContentForm').on('submit', function(e) {
         },
         error: function(xhr) {
             hideLoader();
-            alert('Failed to save assignments.');
+            Swal.fire('Error', 'Failed to save assignments.', 'error');
         }
     });
 });
@@ -586,32 +586,43 @@ function saveItinerary(id) {
         },
         error: function() {
             hideLoader();
-            alert('Failed to update itinerary item.');
+            Swal.fire('Error', 'Failed to update itinerary item.', 'error');
         }
     });
 }
 function deleteItinerary(id) {
-    if(!confirm('Delete this itinerary item?')) return;
-    showLoader();
-    
-    $.ajax({
-        url: `/admin/itinerary/${id}/delete`,
-        type: "POST",
-        data: {
-            _token: "{{ csrf_token() }}"
-        },
-        success: function(res) {
-            hideLoader();
-            if(res.success) {
-                $(`#it_item_${id}`).remove();
-                if($('#itineraryListContainer').children().length === 0) {
-                    $('#itineraryListContainer').html('<p class="text-muted small text-center py-3">No itinerary items defined yet.</p>');
+    Swal.fire({
+        title: 'Are you sure?',
+        text: 'Delete this itinerary item? This action cannot be undone.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, delete',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            showLoader();
+            $.ajax({
+                url: `/admin/itinerary/${id}/delete`,
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function(res) {
+                    hideLoader();
+                    if(res.success) {
+                        $(`#it_item_${id}`).remove();
+                        if($('#itineraryListContainer').children().length === 0) {
+                            $('#itineraryListContainer').html('<p class="text-muted small text-center py-3">No itinerary items defined yet.</p>');
+                        }
+                    }
+                },
+                error: function() {
+                    hideLoader();
+                    Swal.fire('Error', 'Failed to delete itinerary item.', 'error');
                 }
-            }
-        },
-        error: function() {
-            hideLoader();
-            alert('Failed to delete.');
+            });
         }
     });
 }
@@ -632,7 +643,7 @@ $('#newItineraryForm').on('submit', function(e) {
         },
         error: function() {
             hideLoader();
-            alert('Failed to add step.');
+            Swal.fire('Error', 'Failed to add itinerary step.', 'error');
         }
     });
 });

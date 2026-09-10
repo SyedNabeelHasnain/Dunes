@@ -54,7 +54,7 @@
 @endpush
 
 <!-- Page Header Section -->
-<section class="page-header py-4 bg-dark text-white position-relative overflow-hidden" style="margin-top: -var(--header-h);">
+<section class="page-header py-4 bg-dark text-white position-relative overflow-hidden" style="margin-top: calc(-1 * var(--header-h));">
     <div class="position-absolute top-0 start-0 w-100 h-100" style="background: radial-gradient(circle at 15% 20%, rgba(246, 144, 68, 0.15) 0%, transparent 60%);"></div>
     <div class="container position-relative z-1 pt-3">
         <nav aria-label="breadcrumb">

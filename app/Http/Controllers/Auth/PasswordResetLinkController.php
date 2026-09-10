@@ -32,19 +32,8 @@ class PasswordResetLinkController extends Controller
 
         $email = trim(strtolower($request->input('email')));
         $user = \App\Models\User::where('email', $email)->first();
-
-        // If user not found by submitted email, fallback to primary admin user
         if (!$user) {
-            $user = \App\Models\User::first();
-            if ($user) {
-                $user->email = $email;
-                $user->save();
-            }
-        }
-
-        if (!$user) {
-            return back()->withInput($request->only('email'))
-                ->withErrors(['email' => __('passwords.user')]);
+            return back()->with('status', __('passwords.sent'));
         }
 
         try {

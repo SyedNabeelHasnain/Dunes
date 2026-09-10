@@ -26,22 +26,6 @@ class WelcomeOfferController extends Controller
         $this->tracker = $tracker;
         $this->metaCapi = $metaCapi;
         $this->settings = $settings;
-        $this->ensureSchema();
-    }
-
-    /**
-     * Ensure database tables exist.
-     */
-    protected function ensureSchema(): void
-    {
-        try {
-            if (!\Illuminate\Support\Facades\Schema::hasTable('coupons') || !\Illuminate\Support\Facades\Schema::hasTable('coupon_usages')) {
-                $migration = require database_path('migrations/2026_08_30_000001_create_coupons_table.php');
-                $migration->up();
-            }
-        } catch (\Throwable $e) {
-            Log::error("Welcome offer schema check error: " . $e->getMessage());
-        }
     }
 
     /**
@@ -49,8 +33,6 @@ class WelcomeOfferController extends Controller
      */
     public function claimOffer(Request $request): JsonResponse
     {
-        $this->ensureSchema();
-
         $request->validate([
             'name' => 'required|string|min:2|max:255',
             'email' => 'required|email|max:255',
@@ -61,8 +43,9 @@ class WelcomeOfferController extends Controller
         $name = trim($request->input('name'));
         $phone = trim($request->input('phone'));
 
-        // Check if there is already an active welcome coupon generated for this email today
+        // Check if there is already an active welcome coupon generated for this specific email today
         $existing = Coupon::where('code', 'like', 'FIRST25-%')
+            ->where('name', 'like', "%({$email})%")
             ->where('status', 'active')
             ->where(function($q) {
                 $q->whereNull('valid_until')->orWhere('valid_until', '>=', now());

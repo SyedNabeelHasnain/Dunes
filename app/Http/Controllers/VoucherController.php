@@ -19,7 +19,12 @@ class VoucherController extends Controller
             ->firstOrFail();
 
         $verificationUrl = route('booking.voucher', $booking->reference);
-        $qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=4&data=' . urlencode($verificationUrl);
+        try {
+            $qrSvg = (string) \SimpleSoftwareIO\QrCode\Facades\QrCode::size(150)->margin(1)->generate($verificationUrl);
+            $qrCodeUrl = 'data:image/svg+xml;base64,' . base64_encode($qrSvg);
+        } catch (\Throwable $e) {
+            $qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=4&data=' . urlencode($verificationUrl);
+        }
 
         return view('booking.voucher', compact('booking', 'qrCodeUrl'));
     }
@@ -34,7 +39,12 @@ class VoucherController extends Controller
             ->firstOrFail();
 
         $verificationUrl = route('booking.voucher', $booking->reference);
-        $qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=4&data=' . urlencode($verificationUrl);
+        try {
+            $qrSvg = (string) \SimpleSoftwareIO\QrCode\Facades\QrCode::size(150)->margin(1)->generate($verificationUrl);
+            $qrCodeUrl = 'data:image/svg+xml;base64,' . base64_encode($qrSvg);
+        } catch (\Throwable $e) {
+            $qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=4&data=' . urlencode($verificationUrl);
+        }
 
         $pdf = Pdf::loadView('booking.ticket-pdf', compact('booking', 'qrCodeUrl'))
             ->setPaper('a4', 'portrait')

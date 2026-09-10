@@ -184,10 +184,10 @@
                                     </button>
                                 </form>
 
-                                <form action="{{ route('admin.inquiries.destroy', $c->id) }}" method="POST" class="d-inline">
+                                <form action="{{ route('admin.inquiries.destroy', $c->id) }}" method="POST" class="d-inline delete-form" data-confirm="Are you sure you want to delete this inquiry?">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="Delete" onclick="return confirm('Delete this inquiry?')">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="Delete">
                                         <i class="bi bi-trash3-fill"></i>
                                     </button>
                                 </form>

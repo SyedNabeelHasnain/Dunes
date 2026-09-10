@@ -105,6 +105,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script>window.CSRF_TOKEN = "{{ csrf_token() }}";</script>
     <title>{{ $pageTitle }}</title>
     <meta name="description" content="{{ $pageDesc }}">
     <meta name="keywords" content="{{ $pageKeys }}">
@@ -291,7 +292,8 @@
     @endif
 
     <!-- Header Navigation -->
-    <header id="header" class="fixed-top transition-all">
+    <header id="header" class="fixed-top transition-all" style="z-index: 1045;">
+        @include('partials.top-banner')
         <nav class="navbar navbar-expand-lg navbar-light glass-nav sticky-sm-top sticky-md-top sticky-lg-top">
             <div class="container">
                 <a class="navbar-brand d-flex align-items-center p-0" href="{{ route('home') }}">
@@ -321,7 +323,7 @@
                         </div>
                         <div class="d-flex align-items-center gap-2">
                             <div class="d-lg-none">
-                                @include('partials.currency-switcher')
+                                @include('partials.currency-switcher', ['switcherId' => 'mobileCurrencyDropdownBtn'])
                             </div>
                             <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                         </div>
@@ -359,7 +361,7 @@
                         </ul>
                         <div class="d-flex flex-column flex-lg-row gap-3 align-items-stretch align-items-lg-center">
                             <div class="d-none d-lg-block">
-                                @include('partials.currency-switcher')
+                                @include('partials.currency-switcher', ['switcherId' => 'desktopCurrencyDropdownBtn'])
                             </div>
                             <a class="btn btn-whatsapp-animated rounded-pill px-4 fw-semibold d-inline-flex align-items-center justify-content-center gap-2" href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener">
                                 <i class="bi bi-whatsapp fs-5"></i>WhatsApp
@@ -373,6 +375,25 @@
             </div>
         </nav>
     </header>
+
+    <script>
+        function syncHeaderHeight() {
+            var h = document.getElementById('header');
+            if (h) {
+                var height = h.offsetHeight || 72;
+                document.documentElement.style.setProperty('--header-h', height + 'px');
+            }
+        }
+        syncHeaderHeight();
+        window.addEventListener('resize', syncHeaderHeight);
+        window.addEventListener('DOMContentLoaded', syncHeaderHeight);
+        window.addEventListener('load', syncHeaderHeight);
+        if (window.ResizeObserver) {
+            var headerObserver = new ResizeObserver(function() { syncHeaderHeight(); });
+            var headerEl = document.getElementById('header');
+            if (headerEl) headerObserver.observe(headerEl);
+        }
+    </script>
 
     <!-- Main Content -->
     <main id="main" tabindex="-1">
@@ -551,6 +572,9 @@
     @include('partials.booking-modal')
     @include('partials.welcome-offer-modal')
     @include('partials.social-proof')
+
+    <!-- Global Toast Container for App.toast notifications -->
+    <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1090;" aria-live="polite" aria-atomic="true"></div>
 
     <script>
         window.DunesRates = {

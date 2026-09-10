@@ -60,10 +60,10 @@
                                 <a href="{{ route('tours.show', $t->slug) }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-info rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="Live Preview">
                                     <i class="bi bi-box-arrow-up-right"></i>
                                 </a>
-                                <form action="{{ route('admin.tours.destroy', $t->id) }}" method="POST" class="d-inline delete-form">
+                                <form action="{{ route('admin.tours.destroy', $t->id) }}" method="POST" class="d-inline delete-form" data-confirm="Are you sure you want to delete this tour and all its associations?">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="Delete Tour" onclick="return confirm('Are you sure you want to delete this tour and all its associations?')">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="Delete Tour">
                                         <i class="bi bi-trash3-fill"></i>
                                     </button>
                                 </form>

@@ -12,12 +12,6 @@
     </a>
 </div>
 
-@if(session('success'))
-    <div class="alert alert-success border-0 rounded-4 shadow-sm mb-4">
-        <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
-    </div>
-@endif
-
 <div class="row g-4 mb-5">
     <!-- Page Meta Info -->
     <div class="col-lg-5">
@@ -27,15 +21,15 @@
                 @csrf
                 <div class="mb-3">
                     <label for="title" class="form-label fw-bold text-dark">Page Title</label>
-                    <input type="text" name="title" id="title" class="form-control" value="{{ $page->title }}" required>
+                    <input type="text" name="title" id="title" class="form-control" value="{{ old('title', $page->title) }}" required>
                 </div>
                 <div class="mb-3">
                     <label for="subtitle" class="form-label fw-bold text-dark">Subtitle</label>
-                    <input type="text" name="subtitle" id="subtitle" class="form-control" value="{{ $page->subtitle }}">
+                    <input type="text" name="subtitle" id="subtitle" class="form-control" value="{{ old('subtitle', $page->subtitle) }}">
                 </div>
                 <div class="mb-4">
                     <label for="description" class="form-label fw-bold text-dark">Introductory Description</label>
-                    <textarea name="description" id="description" class="form-control wysiwyg-editor" rows="4">{{ $page->description }}</textarea>
+                    <textarea name="description" id="description" class="form-control wysiwyg-editor" rows="4">{{ old('description', $page->description) }}</textarea>
                 </div>
                 <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 fw-bold w-100">Save Page Details</button>
             </form>
@@ -59,10 +53,10 @@
                             <div class="text-muted small ms-1">{{ $sec->subheading }}</div>
                         @endif
                     </div>
-                    <form action="{{ route('admin.legal.section.delete', $sec->id) }}" method="POST" onsubmit="return confirm('Delete this section and all its items?')">
+                    <form action="{{ route('admin.legal.section.delete', $sec->id) }}" method="POST" class="delete-form" data-confirm="Are you sure you want to delete this section and all its items?">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" style="width:32px; height:32px;"><i class="bi bi-trash"></i></button>
+                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" style="width:32px; height:32px;" title="Delete Section"><i class="bi bi-trash"></i></button>
                     </form>
                 </div>
 
@@ -71,10 +65,10 @@
                     @forelse($sec->items as $item)
                     <div class="d-flex justify-content-between align-items-start mb-2 bg-white p-2 rounded-3 border">
                         <span class="small text-dark">{{ $item->content }}</span>
-                        <form action="{{ route('admin.legal.item.delete', $item->id) }}" method="POST" class="ms-2">
+                        <form action="{{ route('admin.legal.item.delete', $item->id) }}" method="POST" class="ms-2 delete-form" data-confirm="Are you sure you want to delete this clause item?">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-link text-danger p-0 border-0"><i class="bi bi-x-circle"></i></button>
+                            <button type="submit" class="btn btn-link text-danger p-0 border-0" title="Delete Item"><i class="bi bi-x-circle"></i></button>
                         </form>
                     </div>
                     @empty
