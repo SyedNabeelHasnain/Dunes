@@ -46,10 +46,13 @@ Route::redirect('/cookies', '/cookie-policy', 301);
 Route::redirect('/refund-policy', '/cancellation-refund-policy', 301);
 Route::redirect('/cancellation-policy', '/cancellation-refund-policy', 301);
 Route::redirect('/payment-policy', '/payment-security-policy', 301);
+Route::redirect('/payment-security', '/payment-security-policy', 301);
 Route::redirect('/security-policy', '/payment-security-policy', 301);
 Route::redirect('/waiver', '/safety-liability-waiver', 301);
+Route::redirect('/safety-waiver', '/safety-liability-waiver', 301);
 Route::redirect('/safety-policy', '/safety-liability-waiver', 301);
 Route::redirect('/ai-policy', '/ai-editorial-policy', 301);
+Route::redirect('/editorial-policy', '/ai-editorial-policy', 301);
 Route::redirect('/sustainability', '/responsible-tourism-policy', 301);
 Route::redirect('/responsible-tourism', '/responsible-tourism-policy', 301);
 
