@@ -2,204 +2,442 @@
     {
         "id": 1,
         "page_id": 1,
-        "heading": "1. Company Information",
-        "subheading": "Legal identity and licensing details",
+        "heading": "1. Company Identity & Commercial Licensing",
+        "heading_ar": "1. هوية الشركة والترخيص التجاري",
+        "subheading": "Legal registration and regulatory compliance in Dubai, UAE",
+        "subheading_ar": "التسجيل القانوني والامتثال التنظيمي في إمارة دبي، دولة الإمارات",
         "priority": 1
     },
     {
         "id": 2,
         "page_id": 1,
-        "heading": "2. Acceptance of Terms",
-        "subheading": "User agreement and consent",
+        "heading": "2. Acceptance of Terms & Digital Contract Formation",
+        "heading_ar": "2. الموافقة على الشروط وإبرام العقد الرقمي",
+        "subheading": "Binding agreement between traveler and tour operator",
+        "subheading_ar": "اتفاقية قانونية ملزمة بين المسافر ومنظم الرحلات",
         "priority": 2
     },
     {
         "id": 3,
         "page_id": 1,
-        "heading": "3. Eligibility",
-        "subheading": "Conditions to use the services",
+        "heading": "3. Passenger Eligibility & Age Restrictions",
+        "heading_ar": "3. الأهلية والقيود العمرية للمشاركين",
+        "subheading": "Participation guidelines, minor supervision and health advisories",
+        "subheading_ar": "إرشادات المشاركة وإشراف القاصرين والتوصيات الصحية",
         "priority": 3
     },
     {
         "id": 4,
         "page_id": 1,
-        "heading": "4. Scope of Services",
-        "subheading": "Nature of services provided",
+        "heading": "4. Pricing, Taxes & 5% UAE VAT Compliance",
+        "heading_ar": "4. الأسعار والضرائب وضريبة القيمة المضافة 5%",
+        "subheading": "Currency standards, tax invoices and package inclusions",
+        "subheading_ar": "معايير العملة والفواتير الضريبية ومشتملات الباقات",
         "priority": 4
     },
     {
         "id": 5,
         "page_id": 1,
-        "heading": "5. Pricing and Inclusions",
-        "subheading": "Rates inclusions and exclusions",
+        "heading": "5. Booking Confirmations, Digital Vouchers & QR Verification",
+        "heading_ar": "5. تأكيد الحجز والقسائم الإلكترونية والتحقق بالرمز السريع",
+        "subheading": "Issuance of travel vouchers and pickup coordination",
+        "subheading_ar": "إصدار قسائم السفر وتنسيق مواعيد التوصيل",
         "priority": 5
     },
     {
         "id": 6,
         "page_id": 1,
-        "heading": "6. Payments",
-        "subheading": "Payment methods and authorization",
+        "heading": "6. Passenger Conduct & Compliance with UAE Laws",
+        "heading_ar": "6. سلوك الضيوف والامتثال للقوانين والتقاليد الإماراتية",
+        "subheading": "Public decency, cultural sensitivity and safety directives",
+        "subheading_ar": "الاحتشام العام ومراعاة التقاليد المحلية وتوجيهات السلامة",
         "priority": 6
     },
     {
         "id": 7,
         "page_id": 1,
-        "heading": "7. Booking Confirmation",
-        "subheading": "Voucher issuance and validation",
+        "heading": "7. Weather Conditions, Route Alterations & Force Majeure",
+        "heading_ar": "7. الظروف الجوية وتعديل المسارات والقوة القاهرة",
+        "subheading": "Safety adjustments for sandstorms, rain and extreme environmental conditions",
+        "subheading_ar": "إجراءات السلامة عند العواصف الرملية والأمطار والظروف المناخية",
         "priority": 7
     },
     {
         "id": 8,
         "page_id": 1,
-        "heading": "8. Cancellation Refund and No Show Policy",
-        "subheading": "Rules governing cancellations and refunds",
+        "heading": "8. Governing Law & Dispute Resolution",
+        "heading_ar": "8. القانون الواجب التطبيق وتسوية المنازعات",
+        "subheading": "Jurisdiction of Dubai Courts and consumer protection channels",
+        "subheading_ar": "اختصاص محاكم دبي وقنوات حماية المستهلك",
         "priority": 8
     },
     {
         "id": 9,
-        "page_id": 1,
-        "heading": "9. Amendments and Force Majeure",
-        "subheading": "Schedule changes and uncontrollable events",
-        "priority": 9
-    },
-    {
-        "id": 10,
-        "page_id": 1,
-        "heading": "10. Travel Documents and Insurance",
-        "subheading": "Customer responsibilities",
-        "priority": 10
-    },
-    {
-        "id": 11,
-        "page_id": 1,
-        "heading": "11. Limitation of Liability",
-        "subheading": "Extent of company responsibility",
-        "priority": 11
-    },
-    {
-        "id": 12,
-        "page_id": 1,
-        "heading": "12. Website Use and Intellectual Property",
-        "subheading": "Content ownership and restrictions",
-        "priority": 12
-    },
-    {
-        "id": 13,
-        "page_id": 1,
-        "heading": "13. Data Protection and Privacy",
-        "subheading": "Handling of personal information",
-        "priority": 13
-    },
-    {
-        "id": 14,
-        "page_id": 1,
-        "heading": "14. Governing Law and Jurisdiction",
-        "subheading": "Applicable law and courts",
-        "priority": 14
-    },
-    {
-        "id": 101,
         "page_id": 2,
-        "heading": "1. Definitions",
-        "subheading": "Explanation of terms used in this Privacy Policy",
+        "heading": "1. Data Controller Identification & Contact Information",
+        "heading_ar": "1. هوية جهة التحكم في البيانات ومعلومات الاتصال",
+        "subheading": "Legal entity responsible for customer data privacy",
+        "subheading_ar": "الكيان القانوني المسؤول عن خصوصية بيانات العملاء",
         "priority": 1
     },
     {
-        "id": 102,
+        "id": 10,
         "page_id": 2,
-        "heading": "2. Data We Collect",
-        "subheading": "Types of personal data collected from users",
+        "heading": "2. Categories of Personal Data Collected",
+        "heading_ar": "2. فئات البيانات الشخصية التي يتم جمعها",
+        "subheading": "Personal identification, booking details, logistics and technical telemetrics",
+        "subheading_ar": "البيانات الشخصية وتفاصيل الحجز واللوجستيات والمؤشرات التقنية",
         "priority": 2
     },
     {
-        "id": 103,
+        "id": 11,
         "page_id": 2,
-        "heading": "3. Purposes of Data Processing",
-        "subheading": "Why personal data is processed",
+        "heading": "3. Lawful Bases for Processing under UAE PDPL & GDPR",
+        "heading_ar": "3. الأسس القانونية لمعالجة البيانات وفقاً للقوانين",
+        "subheading": "Contractual necessity, legal compliance, legitimate interest and consent",
+        "subheading_ar": "الضرورة التعاقدية والامتثال القانوني والمصالح المشروعة والموافقة الصريحة",
         "priority": 3
     },
     {
-        "id": 104,
+        "id": 12,
         "page_id": 2,
-        "heading": "4. Legal Basis for Processing",
-        "subheading": "Legal grounds under UAE law, GDPR, and international standards",
+        "heading": "4. Third-Party Service Providers & Data Processors",
+        "heading_ar": "4. معالجو البيانات ومزودو الخدمات من الأطراف الثالثة",
+        "subheading": "Payment processors, analytics engines, advertising networks and cloud hosts",
+        "subheading_ar": "بوابات الدفع ومحركات التحليلات والشبكات الإعلانية وخدمات الاستضافة السحابية",
         "priority": 4
     },
     {
-        "id": 105,
+        "id": 13,
         "page_id": 2,
-        "heading": "5. Data Sharing and Third Parties",
-        "subheading": "Who we share data with",
+        "heading": "5. Data Security Standards & International Transfers",
+        "heading_ar": "5. معايير أمان البيانات وعمليات النقل الدولي",
+        "subheading": "TLS 1.3 encryption, AES-256 database protection and cross-border safeguards",
+        "subheading_ar": "تشفير TLS 1.3 وحماية قواعد البيانات بمعيار AES-256 وضمانات نقل البيانات",
         "priority": 5
     },
     {
-        "id": 106,
+        "id": 14,
         "page_id": 2,
-        "heading": "6. Data Retention",
-        "subheading": "How long data is stored and deletion",
+        "heading": "6. Data Retention Periods",
+        "heading_ar": "6. فترات الاحتفاظ بالبيانات الشخصية",
+        "subheading": "Statutory tax archiving, booking history and automated data purging",
+        "subheading_ar": "الأرشفة الضريبية القانونية وسجل الحجوزات والإتلاف الآلي للبيانات المؤقتة",
         "priority": 6
     },
     {
-        "id": 107,
+        "id": 15,
         "page_id": 2,
-        "heading": "7. Cookies and Tracking",
-        "subheading": "Website tracking and cookies",
+        "heading": "7. Customer Data Rights & Requests",
+        "heading_ar": "7. حقوق أصحاب البيانات وآلية تقديم الطلبات",
+        "subheading": "Access, rectification, erasure, restriction and data portability rights",
+        "subheading_ar": "حقوق الوصول والتصحيح والمحو والتقييد ونقل البيانات الشخصية",
         "priority": 7
     },
     {
-        "id": 108,
-        "page_id": 2,
-        "heading": "8. Data Subject Rights",
-        "subheading": "Rights of users regarding their data",
-        "priority": 8
+        "id": 16,
+        "page_id": 3,
+        "heading": "1. What Are Cookies & Web Tracking Technologies",
+        "heading_ar": "1. ما هي ملفات تعريف الارتباط وتقنيات التتبع الرقمي",
+        "subheading": "Fundamental principles of browser cookies and tracking beacons",
+        "subheading_ar": "المبادئ الأساسية لملفات تعريف الارتباط بالمتصفح وإشارات التتبع",
+        "priority": 1
     },
     {
-        "id": 109,
-        "page_id": 2,
-        "heading": "9. Security Measures",
-        "subheading": "How personal data is protected",
-        "priority": 9
+        "id": 17,
+        "page_id": 3,
+        "heading": "2. Strictly Necessary Essential Cookies",
+        "heading_ar": "2. ملفات تعريف الارتباط الضرورية والأساسية للتشغيل",
+        "subheading": "Indispensable cookies required for secure booking and site functionality",
+        "subheading_ar": "ملفات لا غنى عنها لضمان أمان الحجز وتشغيل وظائف الموقع",
+        "priority": 2
     },
     {
-        "id": 110,
-        "page_id": 2,
-        "heading": "10. Children's Data",
-        "subheading": "Policy regarding data from children",
-        "priority": 10
+        "id": 18,
+        "page_id": 3,
+        "heading": "3. Performance & Web Analytics Cookies",
+        "heading_ar": "3. ملفات تعريف ارتباط الأداء والتحليلات الإحصائية",
+        "subheading": "Aggregated visitor insights to improve portal speed and usability",
+        "subheading_ar": "بيانات مجمعة لفهم حركة الزوار وتحسين سرعة الموقع وسهولة استخدامه",
+        "priority": 3
     },
     {
-        "id": 111,
-        "page_id": 2,
-        "heading": "11. International Data Transfer",
-        "subheading": "Transferring data outside UAE",
-        "priority": 11
+        "id": 19,
+        "page_id": 3,
+        "heading": "4. Marketing, Advertising & Conversion Tracking",
+        "heading_ar": "4. ملفات تعريف الارتباط للتسويق وتتبع تحويلات الإعلانات",
+        "subheading": "Attribution measurement for Google Ads and Meta campaigns",
+        "subheading_ar": "قياس نتائج الحملات الإعلانية على جوجل ومنصات ميتا",
+        "priority": 4
     },
     {
-        "id": 112,
-        "page_id": 2,
-        "heading": "12. Marketing and Communications",
-        "subheading": "User consent and opt-out",
-        "priority": 12
+        "id": 20,
+        "page_id": 3,
+        "heading": "5. Security, Anti-Abuse & Infrastructure Beacons",
+        "heading_ar": "5. ملفات الأمان ومكافحة إساءة الاستخدام والبنية التحتية",
+        "subheading": "Bot protection, rate limiting and content delivery acceleration",
+        "subheading_ar": "الحماية من الروبوتات والتحكم بمعدل الطلبات وتسريع تسليم المحتوى",
+        "priority": 5
     },
     {
-        "id": 113,
-        "page_id": 2,
-        "heading": "13. Changes to Privacy Policy",
-        "subheading": "Updates and revisions to the policy",
-        "priority": 13
+        "id": 21,
+        "page_id": 3,
+        "heading": "6. How to Manage, Block, or Delete Cookies",
+        "heading_ar": "6. كيفية إدارة ملفات تعريف الارتباط وحظرها وحذفها",
+        "subheading": "Browser configuration instructions for desktop and mobile devices",
+        "subheading_ar": "إرشادات ضبط المتصفحات لأجهزة الكمبيوتر والهواتف الذكية",
+        "priority": 6
     },
     {
-        "id": 114,
-        "page_id": 2,
-        "heading": "14. Governing Law and Jurisdiction",
-        "subheading": "Applicable laws and courts",
-        "priority": 14
+        "id": 22,
+        "page_id": 4,
+        "heading": "1. 24-Hour Free Cancellation & 100% Refund Guarantee",
+        "heading_ar": "1. الإلغاء المجاني خلال 24 ساعة وضمان استرداد 100%",
+        "subheading": "No fees, full reimbursement when cancelled 24 hours prior to pickup",
+        "subheading_ar": "بدون أي رسوم واسترداد كامل عند الإلغاء قبل 24 ساعة من موعد التجمع",
+        "priority": 1
     },
     {
-        "id": 115,
-        "page_id": 2,
-        "heading": "15. Contact Information",
-        "subheading": "Company contact details for data inquiries",
-        "priority": 15
+        "id": 23,
+        "page_id": 4,
+        "heading": "2. Late Cancellations & No-Show Policy",
+        "heading_ar": "2. سياسة الإلغاء المتأخر وحالات عدم الحضور",
+        "subheading": "Provisions governing short notice cancellations and driver dispatches",
+        "subheading_ar": "الأحكام المنظمة للإلغاءات في اللحظات الأخيرة وتحرك مركبات السفاري",
+        "priority": 2
+    },
+    {
+        "id": 24,
+        "page_id": 4,
+        "heading": "3. Free Date & Time Rescheduling",
+        "heading_ar": "3. تغيير مواعيد وتواريخ الرحلات مجاناً",
+        "subheading": "Flexibility to change tour dates without cancellation fees",
+        "subheading_ar": "مرونة تامة لتغيير تاريخ وتوقيت الرحلة دون دفع أي رسوم إضافية",
+        "priority": 3
+    },
+    {
+        "id": 25,
+        "page_id": 4,
+        "heading": "4. Adverse Weather & Official Force Majeure Cancellations",
+        "heading_ar": "4. إلغاءات الطقس السيئ والظروف القاهرة الرسمية",
+        "subheading": "Safety protocols for sandstorms, rainstorms and government safety warnings",
+        "subheading_ar": "بروتوكولات السلامة عند العواصف الرملية والأمطار والتحذيرات الحكومية",
+        "priority": 4
+    },
+    {
+        "id": 26,
+        "page_id": 4,
+        "heading": "5. Refund Processing Timelines & Methods",
+        "heading_ar": "5. المدد الزمنية وطرق معالجة واسترداد الأموال",
+        "subheading": "Automated reversal through Ziina Payment Gateway and banking timelines",
+        "subheading_ar": "إجراءات الإرجاع الآلي عبر بوابة زينة والمدد الزمنية للقطاع المصرفي",
+        "priority": 5
+    },
+    {
+        "id": 27,
+        "page_id": 4,
+        "heading": "6. How to Submit an Expedited Cancellation or Refund Request",
+        "heading_ar": "6. كيفية تقديم طلب إلغاء أو استرداد سريع",
+        "subheading": "Step-by-step procedures to request tour cancellation or voucher adjustments",
+        "subheading_ar": "خطوات تقديم طلب إلغاء الجولة أو تعديل قسيمة الحجز بسهولة",
+        "priority": 6
+    },
+    {
+        "id": 28,
+        "page_id": 5,
+        "heading": "1. Authorized Payment Methods & Processing Architecture",
+        "heading_ar": "1. وسائل الدفع المعتمدة ومعمارية المعالجة المالية",
+        "subheading": "Credit cards, digital wallets, cash settlements and corporate transfers",
+        "subheading_ar": "البطاقات الائتمانية والمحافظ الرقمية والدفع النقدي والتحويلات المؤسسية",
+        "priority": 1
+    },
+    {
+        "id": 29,
+        "page_id": 5,
+        "heading": "2. PCI-DSS Level 1 Compliance & Tokenized Architecture",
+        "heading_ar": "2. الامتثال لمعايير PCI-DSS المستوى الأول وتشفير البيانات",
+        "subheading": "Bank-grade payment security and complete elimination of local card storage",
+        "subheading_ar": "أمان مالي بمستوى بنكي وعدم تخزين أرقام البطاقات نهائياً على خوادمنا",
+        "priority": 2
+    },
+    {
+        "id": 30,
+        "page_id": 5,
+        "heading": "3. High-Grade SSL\/TLS Encryption & 3D Secure 2.0 Defense",
+        "heading_ar": "3. التشفير عالي المستوى وبروتوكول الحماية 3D Secure 2.0",
+        "subheading": "Cryptographic session defense and two-factor cardholder authentication",
+        "subheading_ar": "حماية الجلسات بالتشفير والمصادقة الثنائية لحاملي البطاقات المصرفية",
+        "priority": 3
+    },
+    {
+        "id": 31,
+        "page_id": 5,
+        "heading": "4. Billing Currency & Exchange Rate Transparency",
+        "heading_ar": "4. عملة الفواتير وشفافية أسعار الصرف",
+        "subheading": "Official AED settlement and foreign exchange rate considerations",
+        "subheading_ar": "التسوية الرسمية بالدرهم الإماراتي واعتبارات فروق أسعار الصرف",
+        "priority": 4
+    },
+    {
+        "id": 32,
+        "page_id": 5,
+        "heading": "5. Anti-Fraud Screening & Chargeback Mitigation",
+        "heading_ar": "5. فحص مكافحة الاحتيال والحد من النزاعات المالية",
+        "subheading": "Automated risk evaluation and resolution protocols for billing disputes",
+        "subheading_ar": "التقييم الآلي للمخاطر وبروتوكولات تسوية النزاعات المالية والاعتراضات",
+        "priority": 5
+    },
+    {
+        "id": 33,
+        "page_id": 6,
+        "heading": "1. Off-Road Fleet Standards & RTA Driver Certification",
+        "heading_ar": "1. معايير أسطول سيارات الدفع الرباعي وتراخيص السائقين",
+        "subheading": "Commercial vehicle safety equipment and licensed safari captains in Dubai",
+        "subheading_ar": "تجهيزات السلامة للمركبات وسائقو السفاري المرخصون في دبي",
+        "priority": 1
+    },
+    {
+        "id": 34,
+        "page_id": 6,
+        "heading": "2. Mandatory Health Disclosures & Medical Restrictions",
+        "heading_ar": "2. الإفصاح الصحي الإلزامي والقيود الطبية المانعة للمشاركة",
+        "subheading": "Essential health safeguards for pregnant women, infants and chronic conditions",
+        "subheading_ar": "ضمانات صحية أساسية للسيدات الحوامل والرضّع وأصحاب الحالات المزمنة",
+        "priority": 2
+    },
+    {
+        "id": 35,
+        "page_id": 6,
+        "heading": "3. Voluntary Assumption of Inherent Off-Road Risks",
+        "heading_ar": "3. الإقرار والقبول الطوعي بالمخاطر المصاحبة للمغامرات",
+        "subheading": "Understanding the physical dynamics of desert off-roading and sand sports",
+        "subheading_ar": "إدراك الطبيعة الديناميكية للقيادة الصحراوية والرياضات الرملية",
+        "priority": 3
+    },
+    {
+        "id": 36,
+        "page_id": 6,
+        "heading": "4. Quad Biking & Dune Buggy Self-Drive Safety Regulations",
+        "heading_ar": "4. لوائح السلامة لقيادة الدراجات الرباعية وعربات البجي",
+        "subheading": "Protective gear, convoy rules, minimum driving age and speed limits",
+        "subheading_ar": "معدات الحماية وقواعد القوافل والسن الأدنى للقيادة والحد الأقصى للسرعة",
+        "priority": 4
+    },
+    {
+        "id": 37,
+        "page_id": 6,
+        "heading": "5. Zero Tolerance for Intoxicants & Passenger Conduct",
+        "heading_ar": "5. الحظر التام للمسكرات والمخدرات وقواعد الانضباط",
+        "subheading": "Strict sobriety standards, behavioral dignity and operator right of refusal",
+        "subheading_ar": "معايير الصرامة بشأن اليقظة والوقار السلوكي وحق المنظم في رفض المشاركة",
+        "priority": 5
+    },
+    {
+        "id": 38,
+        "page_id": 6,
+        "heading": "6. Personal Belongings, Valuables & Photography Disclaimer",
+        "heading_ar": "6. إخلاء المسؤولية عن المقتنيات الشخصية والتصوير",
+        "subheading": "Guest care for electronics, jewelry, eyewear and lost items in deep desert sands",
+        "subheading_ar": "مسؤولية الضيف عن الأجهزة والمجوهرات والنظارات والمفقودات في الرمال",
+        "priority": 6
+    },
+    {
+        "id": 39,
+        "page_id": 6,
+        "heading": "7. Emergency Readiness & Desert Medical Evacuation",
+        "heading_ar": "7. الجاهزية لحالات الطوارئ والإخلاء الطبي الصحراوي",
+        "subheading": "On-board first-aid, satellite connectivity and Dubai Emergency Services links",
+        "subheading_ar": "حقائب الإسعافات بالمركبات والاتصال عبر الأقمار الصناعية وروابط طوارئ دبي",
+        "priority": 7
+    },
+    {
+        "id": 40,
+        "page_id": 7,
+        "heading": "1. Support for AI Search Engines & Generative Discovery",
+        "heading_ar": "1. دعم محركات البحث التوليدية والاستكشاف بالذكاء الاصطناعي",
+        "subheading": "Fair-use indexing, structured answer engines and real-time discovery bots",
+        "subheading_ar": "الفهرسة العادلة ومحركات الإجابة المنظمة وروبوتات الاستكشاف المباشرة",
+        "priority": 1
+    },
+    {
+        "id": 41,
+        "page_id": 7,
+        "heading": "2. Mandatory Source Attribution & Canonical Citation Requirements",
+        "heading_ar": "2. متطلبات الإسناد والروابط المرجعية الإلزامية",
+        "subheading": "Attribution obligations for generative engines and conversational agents",
+        "subheading_ar": "التزامات الإسناد لمحركات الذكاء الاصطناعي والمساعدات الحوارية",
+        "priority": 2
+    },
+    {
+        "id": 42,
+        "page_id": 7,
+        "heading": "3. Prohibition of Automated Bulk Scraping & Commercial Re-Hosting",
+        "heading_ar": "3. حظر التجريف الآلي الشامل وإعادة الاستضافة التجارية",
+        "subheading": "Protection against data extraction, price stealing and unauthorized resale",
+        "subheading_ar": "حماية قواعد البيانات من الاستخراج غير المصرح به وسرقة الأسعار وإعادة البيع",
+        "priority": 3
+    },
+    {
+        "id": 43,
+        "page_id": 7,
+        "heading": "4. Editorial Integrity & Expert Human Verification Standards",
+        "heading_ar": "4. النزاهة التحريرية ومعايير التحقق البشري المتخصص",
+        "subheading": "Authoritativeness, licensed guide reviews and cultural accuracy",
+        "subheading_ar": "الموثوقية ومراجعة المرشدين المرخصين والدقة التاريخية والثقافية",
+        "priority": 4
+    },
+    {
+        "id": 44,
+        "page_id": 7,
+        "heading": "5. Intellectual Property, Trademarks & Copyright Protection",
+        "heading_ar": "5. حقوق الملكية الفكرية والعلامات التجارية وحقوق النشر",
+        "subheading": "Ownership of digital photography, drone footage, brand marks and texts",
+        "subheading_ar": "ملكية الصور الاحترافية والفيديوهات الجوية والعلامات التجارية والنصوص",
+        "priority": 5
+    },
+    {
+        "id": 45,
+        "page_id": 8,
+        "heading": "1. Commitment to Desert Ecosystem Conservation",
+        "heading_ar": "1. الالتزام بحماية وصون النظام البيئي الصحراوي",
+        "subheading": "Preserving Arabian desert biodiversity and designated conservation corridors",
+        "subheading_ar": "حماية التنوع الحيوي الصحراوي والممرات البيئية المحمية في دبي",
+        "priority": 1
+    },
+    {
+        "id": 46,
+        "page_id": 8,
+        "heading": "2. \"Leave No Trace\" Wilderness Protocol & Waste Management",
+        "heading_ar": "2. ميثاق \"لا تترك أثراً\" للحفاظ على البرية وإدارة النفايات",
+        "subheading": "Zero-waste desert stewardship and elimination of single-use plastics",
+        "subheading_ar": "حماية الصحراء دون ترك نفايات والاستغناء عن البلاستيك أحادي الاستخدام",
+        "priority": 2
+    },
+    {
+        "id": 47,
+        "page_id": 8,
+        "heading": "3. Ethical Animal Welfare Standards & Summer Protections",
+        "heading_ar": "3. المعايير الأخلاقية لرعاية الحيوانات وحمايتها صيفاً",
+        "subheading": "Humane treatment, veterinary care and regulated hours for camels and falcons",
+        "subheading_ar": "المعاملة الإنسانية والرعاية البيطرية وساعات العمل المنظمة للإبل والصقور",
+        "priority": 3
+    },
+    {
+        "id": 48,
+        "page_id": 8,
+        "heading": "4. Bedouin Cultural Preservation & Community Empowerment",
+        "heading_ar": "4. صون التراث البدوي الأصيل وتمكين المجتمع المحلي",
+        "subheading": "Celebrating Emirati history, traditional craftsmanship and respectful hospitality",
+        "subheading_ar": "الاحتفاء بالتاريخ الإماراتي والحرف التقليدية والضيافة الأصيلة",
+        "priority": 4
+    },
+    {
+        "id": 49,
+        "page_id": 8,
+        "heading": "5. Guest Education & Environmental Stewardship",
+        "heading_ar": "5. توعية الضيوف والريادة في حماية البيئة الصحراوية",
+        "subheading": "Promoting conservation awareness and low-impact tourism among travelers",
+        "subheading_ar": "نشر ثقافة الاستدامة والسياحة البيئية المسؤولة بين المسافرين",
+        "priority": 5
     }
 ]

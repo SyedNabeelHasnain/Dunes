@@ -19,12 +19,28 @@ class SitemapController extends Controller
         $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' . "\n";
 
-        $staticPages = ['', '/about', '/contact', '/faq', '/tours', '/rate-card', '/blog', '/terms-condition', '/privacy-policy'];
-        foreach ($staticPages as $page) {
+        $staticPages = [
+            '' => ['changefreq' => 'weekly', 'priority' => '1.0'],
+            '/about' => ['changefreq' => 'weekly', 'priority' => '0.8'],
+            '/contact' => ['changefreq' => 'weekly', 'priority' => '0.8'],
+            '/faq' => ['changefreq' => 'weekly', 'priority' => '0.8'],
+            '/tours' => ['changefreq' => 'weekly', 'priority' => '0.9'],
+            '/rate-card' => ['changefreq' => 'weekly', 'priority' => '0.8'],
+            '/blog' => ['changefreq' => 'weekly', 'priority' => '0.8'],
+            '/terms-condition' => ['changefreq' => 'monthly', 'priority' => '0.6'],
+            '/privacy-policy' => ['changefreq' => 'monthly', 'priority' => '0.6'],
+            '/cookie-policy' => ['changefreq' => 'monthly', 'priority' => '0.6'],
+            '/cancellation-refund-policy' => ['changefreq' => 'monthly', 'priority' => '0.6'],
+            '/payment-security-policy' => ['changefreq' => 'monthly', 'priority' => '0.6'],
+            '/safety-liability-waiver' => ['changefreq' => 'monthly', 'priority' => '0.6'],
+            '/ai-editorial-policy' => ['changefreq' => 'monthly', 'priority' => '0.6'],
+            '/responsible-tourism-policy' => ['changefreq' => 'monthly', 'priority' => '0.6'],
+        ];
+        foreach ($staticPages as $page => $meta) {
             $xml .= '  <url>' . "\n";
             $xml .= '    <loc>' . url($page) . '</loc>' . "\n";
-            $xml .= '    <changefreq>weekly</changefreq>' . "\n";
-            $xml .= '    <priority>' . ($page === '' ? '1.0' : '0.8') . '</priority>' . "\n";
+            $xml .= '    <changefreq>' . $meta['changefreq'] . '</changefreq>' . "\n";
+            $xml .= '    <priority>' . $meta['priority'] . '</priority>' . "\n";
             $xml .= '  </url>' . "\n";
         }
 

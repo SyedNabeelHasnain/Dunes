@@ -241,7 +241,9 @@
           "sameAs": [
             "https://www.facebook.com/dunesdiscoverytourism",
             "https://www.instagram.com/dunesdiscoverytourism"
-          ]
+          ],
+          "termsOfService": "{{ route('terms') }}",
+          "privacyPolicy": "{{ route('privacy') }}"
         },
         {
           "@@type": "WebSite",
@@ -278,6 +280,9 @@
       ]
     }
     </script>
+    <style>
+        .footer a:hover, .hover-white:hover { color: #fff !important; transition: color 0.15s ease; }
+    </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
 
@@ -404,66 +409,111 @@
     <footer class="footer bg-dark text-white pt-5 pb-4">
         <div class="container">
             <div class="row g-4 mb-5">
-                <div class="col-12 col-lg-4">
-                    <img src="{{ asset('images/logo-white.png') }}" alt="Dunes Discovery Tourism" width="160" height="46" class="mb-4" style="height: auto; width: 160px; object-fit: contain;">
-                    <p class="text-white-50 small pe-lg-5">Your trusted partner for unforgettable Dubai desert safari and city tour experiences since 2018. We specialize in creating memories that last a lifetime.</p>
-                    <div class="d-flex gap-3 mt-4">
+                <div class="col-12 col-lg-3">
+                    <img src="{{ asset('images/logo-white.png') }}" alt="Dunes Discovery Tourism" width="160" height="46" class="mb-3" style="height: auto; width: 160px; object-fit: contain;">
+                    <p class="text-white-50 small pe-lg-2">Your trusted partner for unforgettable Dubai desert safari and city tour experiences since 2018. Licensed by Dubai Economy & Tourism (DET License: 1430583).</p>
+                    <div class="d-flex gap-3 mt-3">
                         <a href="https://instagram.com/dunesdiscoverytourism" target="_blank" rel="noopener" class="btn btn-outline-light btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" aria-label="Follow Dunes Discovery Tourism on Instagram"><i class="bi bi-instagram"></i></a>
                         <a href="https://facebook.com/dunesdiscoverytourism" target="_blank" rel="noopener" class="btn btn-outline-light btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" aria-label="Follow Dunes Discovery Tourism on Facebook"><i class="bi bi-facebook"></i></a>
                         <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="btn btn-outline-light btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" aria-label="Chat with Dunes Discovery Tourism on WhatsApp"><i class="bi bi-whatsapp"></i></a>
                     </div>
                 </div>
                 <div class="col-6 col-lg-2">
-                    <h3 class="h6 fw-bold text-uppercase mb-4">Desert Safaris</h3>
+                    <h3 class="h6 fw-bold text-uppercase mb-3 text-warning">Desert Safaris</h3>
                     <ul class="list-unstyled mb-0 d-grid gap-2">
-                        <li><a href="{{ route('tours.show', 'evening-desert-safari-dubai') }}" class="text-white-50 text-decoration-none small">Evening Safari</a></li>
-                        <li><a href="{{ route('tours.show', 'morning-desert-safari-dubai') }}" class="text-white-50 text-decoration-none small">Morning Safari</a></li>
-                        <li><a href="{{ route('tours.show', 'overnight-desert-safari-dubai') }}" class="text-white-50 text-decoration-none small">Overnight Safari</a></li>
-                        <li><a href="{{ route('tours.show', 'desert-safari-quad-biking-dubai') }}" class="text-white-50 text-decoration-none small">Quad Biking Safari</a></li>
+                        <li><a href="{{ route('tours.show', 'evening-desert-safari-dubai') }}" class="text-white-50 text-decoration-none small hover-white">Evening Safari</a></li>
+                        <li><a href="{{ route('tours.show', 'morning-desert-safari-dubai') }}" class="text-white-50 text-decoration-none small hover-white">Morning Safari</a></li>
+                        <li><a href="{{ route('tours.show', 'overnight-desert-safari-dubai') }}" class="text-white-50 text-decoration-none small hover-white">Overnight Safari</a></li>
+                        <li><a href="{{ route('tours.show', 'desert-safari-quad-biking-dubai') }}" class="text-white-50 text-decoration-none small hover-white">Quad Biking Safari</a></li>
+                        <li><a href="{{ route('tours.show', 'luxury-vip-desert-safari-dubai') }}" class="text-white-50 text-decoration-none small hover-white">VIP Desert Safari</a></li>
                     </ul>
-                    <a href="https://www.tripadvisor.com/Attraction_Review-g295424-d29026644-Reviews-Dunes_Discovery-Dubai_Emirate_of_Dubai.html" target="_blank" rel="noopener" class="footer-badge mt-4 d-flex align-items-center text-decoration-none">
-                        <img src="{{ asset('images/tripadvisor-logo-circle-owl-icon-black-green.png') }}" alt="TripAdvisor" class="footer-badge-logo" style="width:24px; height:24px; margin-right:8px;">
-                        <div class="footer-badge-header">
-                            <span class="footer-badge-score text-white fw-bold">4.9</span>
-                            <div class="footer-badge-stars text-warning small" style="font-size:10px;">
-                                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                            </div>
-                        </div>
-                    </a>
                 </div>
                 <div class="col-6 col-lg-2">
-                    <h3 class="h6 fw-bold text-uppercase mb-4">Tours & Cruises</h3>
+                    <h3 class="h6 fw-bold text-uppercase mb-3 text-warning">Tours & Cruises</h3>
                     <ul class="list-unstyled mb-0 d-grid gap-2">
-                        <li><a href="{{ route('tours.show', 'dubai-city-tour') }}" class="text-white-50 text-decoration-none small">Dubai City Tour</a></li>
-                        <li><a href="{{ route('tours.show', 'abu-dhabi-city-tour-from-dubai') }}" class="text-white-50 text-decoration-none small">Abu Dhabi Tour</a></li>
-                        <li><a href="{{ route('tours.show', 'dhow-cruise-catamaran-cruise-dinner-dubai') }}" class="text-white-50 text-decoration-none small">Marina Cruise</a></li>
-                        <li><a href="{{ route('rate-card') }}" class="text-white-50 text-decoration-none small"><i class="bi bi-file-earmark-pdf text-warning me-1"></i>Rate Card (PDF)</a></li>
+                        <li><a href="{{ route('tours.show', 'dubai-city-tour') }}" class="text-white-50 text-decoration-none small hover-white">Dubai City Tour</a></li>
+                        <li><a href="{{ route('tours.show', 'abu-dhabi-city-tour-from-dubai') }}" class="text-white-50 text-decoration-none small hover-white">Abu Dhabi Tour</a></li>
+                        <li><a href="{{ route('tours.show', 'dhow-cruise-catamaran-cruise-dinner-dubai') }}" class="text-white-50 text-decoration-none small hover-white">Marina Cruise</a></li>
+                        <li><a href="{{ route('rate-card') }}" class="text-white-50 text-decoration-none small hover-white"><i class="bi bi-file-earmark-pdf text-warning me-1"></i>Rate Card (PDF)</a></li>
+                        <li><a href="{{ route('blog.index') }}" class="text-white-50 text-decoration-none small hover-white">Travel Guides & Blog</a></li>
                     </ul>
-                    <a href="https://www.google.com/maps/search/?api=1&query=Google&query_place_id=ChIJbWsIEIVEdEER4uHEhb2dbcQ" target="_blank" rel="noopener" class="footer-badge mt-4 d-flex align-items-center text-decoration-none">
-                        <img src="https://www.gstatic.com/marketing-cms/assets/images/d5/dc/cfe9ce8b4425b410b49b7f2dd3f3/g.webp=s48-fcrop64=1,00000000ffffffff-rw" alt="Google" class="footer-badge-logo" style="width:24px; height:24px; margin-right:8px;">
-                        <div class="footer-badge-header">
-                            <span class="footer-badge-score text-white fw-bold">5.0</span>
-                            <div class="footer-badge-stars text-warning small" style="font-size:10px;">
-                                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                            </div>
-                        </div>
-                    </a>
                 </div>
-                <div class="col-12 col-lg-4">
-                    <h3 class="h6 fw-bold text-uppercase mb-4">Contact Us</h3>
-                    <ul class="list-unstyled mb-0 d-grid gap-3">
-                        <li><a href="tel:{{ preg_replace('/[^0-9+]/','',$phone) }}" class="text-white-50 text-decoration-none small d-flex align-items-center gap-2"><i class="bi bi-telephone text-primary"></i>{{ $phone }}</a></li>
-                        <li><a href="mailto:{{ $email }}" class="text-white-50 text-decoration-none small d-flex align-items-center gap-2"><i class="bi bi-envelope text-primary"></i>{{ $email }}</a></li>
-                        <li><a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="text-white-50 text-decoration-none small d-flex align-items-center gap-2"><i class="bi bi-whatsapp text-primary"></i>WhatsApp Chat</a></li>
+                <div class="col-6 col-lg-2">
+                    <h3 class="h6 fw-bold text-uppercase mb-3 text-warning">Trust & Policies</h3>
+                    <ul class="list-unstyled mb-0 d-grid gap-2">
+                        <li><a href="{{ route('terms') }}" class="text-white-50 text-decoration-none small hover-white">Terms & Conditions</a></li>
+                        <li><a href="{{ route('privacy') }}" class="text-white-50 text-decoration-none small hover-white">Privacy Policy</a></li>
+                        <li><a href="{{ route('cookies') }}" class="text-white-50 text-decoration-none small hover-white">Cookie Policy</a></li>
+                        <li><a href="{{ route('cancellation') }}" class="text-white-50 text-decoration-none small hover-white">Cancellation & Refund</a></li>
+                        <li><a href="{{ route('payment.security') }}" class="text-white-50 text-decoration-none small hover-white">Payment Security</a></li>
+                        <li><a href="{{ route('safety.waiver') }}" class="text-white-50 text-decoration-none small hover-white">Safety & Waiver</a></li>
+                        <li><a href="{{ route('ai.editorial') }}" class="text-white-50 text-decoration-none small hover-white">AI & Editorial Policy</a></li>
+                        <li><a href="{{ route('responsible.tourism') }}" class="text-white-50 text-decoration-none small hover-white">Responsible Tourism</a></li>
+                    </ul>
+                </div>
+                <div class="col-12 col-lg-3">
+                    <h3 class="h6 fw-bold text-uppercase mb-3 text-warning">Contact & Help</h3>
+                    <ul class="list-unstyled mb-0 d-grid gap-2">
+                        <li><a href="tel:{{ preg_replace('/[^0-9+]/','',$phone) }}" class="text-white-50 text-decoration-none small d-flex align-items-center gap-2 hover-white"><i class="bi bi-telephone text-primary"></i>{{ $phone }}</a></li>
+                        <li><a href="mailto:{{ $email }}" class="text-white-50 text-decoration-none small d-flex align-items-center gap-2 hover-white"><i class="bi bi-envelope text-primary"></i>{{ $email }}</a></li>
+                        <li><a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="text-white-50 text-decoration-none small d-flex align-items-center gap-2 hover-white"><i class="bi bi-whatsapp text-primary"></i>24/7 WhatsApp Chat</a></li>
                         <li class="text-white-50 small d-flex align-items-center gap-2"><i class="bi bi-geo-alt text-primary"></i>Dubai, United Arab Emirates</li>
                     </ul>
+
+                    <div class="d-flex flex-wrap gap-2 mt-3">
+                        <a href="https://www.tripadvisor.com/Attraction_Review-g295424-d29026644-Reviews-Dunes_Discovery-Dubai_Emirate_of_Dubai.html" target="_blank" rel="noopener" class="footer-badge d-flex align-items-center text-decoration-none p-1 px-2 rounded-2 bg-black bg-opacity-40 border border-secondary border-opacity-25">
+                            <img src="{{ asset('images/tripadvisor-logo-circle-owl-icon-black-green.png') }}" alt="TripAdvisor" class="footer-badge-logo" style="width:20px; height:20px; margin-right:6px;">
+                            <div class="footer-badge-header">
+                                <span class="footer-badge-score text-white fw-bold small">4.9</span>
+                                <div class="footer-badge-stars text-warning small" style="font-size:9px;">
+                                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="https://www.google.com/maps/search/?api=1&query=Google&query_place_id=ChIJbWsIEIVEdEER4uHEhb2dbcQ" target="_blank" rel="noopener" class="footer-badge d-flex align-items-center text-decoration-none p-1 px-2 rounded-2 bg-black bg-opacity-40 border border-secondary border-opacity-25">
+                            <img src="https://www.gstatic.com/marketing-cms/assets/images/d5/dc/cfe9ce8b4425b410b49b7f2dd3f3/g.webp=s48-fcrop64=1,00000000ffffffff-rw" alt="Google" class="footer-badge-logo" style="width:20px; height:20px; margin-right:6px;">
+                            <div class="footer-badge-header">
+                                <span class="footer-badge-score text-white fw-bold small">5.0</span>
+                                <div class="footer-badge-stars text-warning small" style="font-size:9px;">
+                                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
                 </div>
             </div>
-            <div class="border-top border-secondary pt-4">
-                <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
-                    <p class="text-white-50 small mb-0">&copy; {{ date('Y') }} Dunes Discovery Tourism. All rights reserved.</p>
-                    <div class="d-flex align-items-center gap-3 footer-trust-icons">
-                        <img src="{{ asset('images/ziina-icon.png') }}" alt="Ziina Payment Gateway" width="18" height="18" style="filter: invert(1); opacity: 0.6;">
+            
+            <!-- Bottom Bar with Legal Links and Payment Badges -->
+            <div class="border-top border-secondary border-opacity-50 pt-4">
+                <div class="d-flex flex-column flex-lg-row align-items-center justify-content-between gap-3 text-center text-lg-start">
+                    <div>
+                        <p class="text-white-50 small mb-1">&copy; {{ date('Y') }} Dunes Discovery Tourism L.L.C. All rights reserved. Department of Economy & Tourism License #1430583.</p>
+                        <div class="d-flex flex-wrap justify-content-center justify-content-lg-start gap-2 small">
+                            <a href="{{ route('terms') }}" class="text-white-50 text-decoration-none hover-white">Terms & Conditions</a>
+                            <span class="text-white-50">&bull;</span>
+                            <a href="{{ route('privacy') }}" class="text-white-50 text-decoration-none hover-white">Privacy Policy</a>
+                            <span class="text-white-50">&bull;</span>
+                            <a href="{{ route('cookies') }}" class="text-white-50 text-decoration-none hover-white">Cookie Policy</a>
+                            <span class="text-white-50">&bull;</span>
+                            <a href="{{ route('cancellation') }}" class="text-white-50 text-decoration-none hover-white">100% Refund Policy</a>
+                            <span class="text-white-50">&bull;</span>
+                            <a href="{{ route('payment.security') }}" class="text-white-50 text-decoration-none hover-white">Payment Security</a>
+                            <span class="text-white-50">&bull;</span>
+                            <a href="{{ route('safety.waiver') }}" class="text-white-50 text-decoration-none hover-white">Safety Waiver</a>
+                            <span class="text-white-50">&bull;</span>
+                            <a href="{{ route('ai.editorial') }}" class="text-white-50 text-decoration-none hover-white">AI Policy</a>
+                            <span class="text-white-50">&bull;</span>
+                            <a href="{{ route('responsible.tourism') }}" class="text-white-50 text-decoration-none hover-white">Sustainability</a>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-center gap-2 footer-trust-icons bg-black bg-opacity-30 px-3 py-2 rounded-pill border border-secondary border-opacity-25 flex-wrap">
+                        <span class="text-white-50 small me-1"><i class="bi bi-shield-lock-fill text-success me-1"></i>Secure Checkout:</span>
+                        <img src="{{ asset('images/visa-card.svg') }}" alt="Visa" width="32" height="20" style="height: 18px; width: auto; object-fit: contain;">
+                        <img src="{{ asset('images/mastercard.svg') }}" alt="Mastercard" width="28" height="20" style="height: 18px; width: auto; object-fit: contain;">
+                        <img src="{{ asset('images/americanexpress.svg') }}" alt="American Express" width="28" height="20" style="height: 18px; width: auto; object-fit: contain;">
+                        <img src="{{ asset('images/applepay.svg') }}" alt="Apple Pay" width="32" height="20" style="height: 18px; width: auto; object-fit: contain;">
+                        <img src="{{ asset('images/googlepay.svg') }}" alt="Google Pay" width="32" height="20" style="height: 18px; width: auto; object-fit: contain;">
+                        <img src="{{ asset('images/ziina-icon.png') }}" alt="Ziina Payment Gateway" width="18" height="18" style="filter: invert(1); opacity: 0.85;">
                     </div>
                 </div>
             </div>

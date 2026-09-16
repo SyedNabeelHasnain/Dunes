@@ -29,8 +29,30 @@ Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 Route::get('/faq', [PageController::class, 'faq'])->name('faq');
 Route::get('/rate-card', [RateCardController::class, 'index'])->name('rate-card');
 Route::get('/pricing-guide', [RateCardController::class, 'index'])->name('pricing-guide');
+// ── Legal, Privacy & Compliance Policies ──────────────────────────────────
 Route::get('/terms-condition', [LegalController::class, 'terms'])->name('terms');
 Route::get('/privacy-policy', [LegalController::class, 'privacy'])->name('privacy');
+Route::get('/cookie-policy', [LegalController::class, 'cookies'])->name('cookies');
+Route::get('/cancellation-refund-policy', [LegalController::class, 'cancellation'])->name('cancellation');
+Route::get('/payment-security-policy', [LegalController::class, 'paymentSecurity'])->name('payment.security');
+Route::get('/safety-liability-waiver', [LegalController::class, 'safetyWaiver'])->name('safety.waiver');
+Route::get('/ai-editorial-policy', [LegalController::class, 'aiEditorial'])->name('ai.editorial');
+Route::get('/responsible-tourism-policy', [LegalController::class, 'responsibleTourism'])->name('responsible.tourism');
+
+// Aliases & 301 redirects for legal routes
+Route::redirect('/terms', '/terms-condition', 301);
+Route::redirect('/privacy', '/privacy-policy', 301);
+Route::redirect('/cookies', '/cookie-policy', 301);
+Route::redirect('/refund-policy', '/cancellation-refund-policy', 301);
+Route::redirect('/cancellation-policy', '/cancellation-refund-policy', 301);
+Route::redirect('/payment-policy', '/payment-security-policy', 301);
+Route::redirect('/security-policy', '/payment-security-policy', 301);
+Route::redirect('/waiver', '/safety-liability-waiver', 301);
+Route::redirect('/safety-policy', '/safety-liability-waiver', 301);
+Route::redirect('/ai-policy', '/ai-editorial-policy', 301);
+Route::redirect('/sustainability', '/responsible-tourism-policy', 301);
+Route::redirect('/responsible-tourism', '/responsible-tourism-policy', 301);
+
 Route::redirect('/dashboard', '/admin')->name('dashboard');
 
 Route::get('/tours', [TourController::class, 'index'])->name('tours.index');

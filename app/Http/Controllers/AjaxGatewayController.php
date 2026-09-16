@@ -78,8 +78,8 @@ class AjaxGatewayController extends Controller
 
             case 'get_legal_content':
                 $type = $request->input('type');
-                if (!in_array($type, ['terms-condition', 'privacy-policy'])) {
-                    return response()->json(['success' => false, 'message' => 'Invalid content type']);
+                if (!$type) {
+                    return response()->json(['success' => false, 'message' => 'Missing content type']);
                 }
 
                 $page = LegalPage::where('slug', $type)->first();

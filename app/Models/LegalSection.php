@@ -9,7 +9,7 @@ class LegalSection extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['page_id', 'heading', 'subheading', 'priority'];
+    protected $fillable = ['page_id', 'heading', 'heading_ar', 'subheading', 'subheading_ar', 'priority'];
 
     protected $casts = [
         'priority' => 'integer'

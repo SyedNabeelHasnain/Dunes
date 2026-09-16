@@ -15,7 +15,7 @@ class AdminLegalController extends Controller
      */
     public function index()
     {
-        $pages = LegalPage::withCount('sections')->get();
+        $pages = LegalPage::withCount('sections')->orderBy('id', 'asc')->get();
         return view('admin.legal.index', compact('pages'));
     }
 
@@ -37,14 +37,20 @@ class AdminLegalController extends Controller
 
         $request->validate([
             'title' => 'required|string|max:255',
+            'title_ar' => 'nullable|string|max:255',
             'subtitle' => 'nullable|string|max:255',
+            'subtitle_ar' => 'nullable|string|max:255',
             'description' => 'nullable|string',
+            'description_ar' => 'nullable|string',
         ]);
 
         $page->update([
             'title' => $request->input('title'),
+            'title_ar' => $request->input('title_ar'),
             'subtitle' => $request->input('subtitle'),
+            'subtitle_ar' => $request->input('subtitle_ar'),
             'description' => $request->input('description'),
+            'description_ar' => $request->input('description_ar'),
         ]);
 
         return redirect()->route('admin.legal.index')->with('success', 'Legal page updated successfully.');
@@ -59,11 +65,13 @@ class AdminLegalController extends Controller
 
         $request->validate([
             'heading' => 'required|string|max:255',
+            'heading_ar' => 'nullable|string|max:255',
             'subheading' => 'nullable|string|max:255',
+            'subheading_ar' => 'nullable|string|max:255',
             'priority' => 'required|integer',
         ]);
 
-        $page->sections()->create($request->only(['heading', 'subheading', 'priority']));
+        $page->sections()->create($request->only(['heading', 'heading_ar', 'subheading', 'subheading_ar', 'priority']));
 
         return redirect()->route('admin.legal.edit', $id)->with('success', 'Section added successfully.');
     }
@@ -77,10 +85,11 @@ class AdminLegalController extends Controller
 
         $request->validate([
             'content' => 'required|string',
+            'content_ar' => 'nullable|string',
             'priority' => 'required|integer',
         ]);
 
-        $section->items()->create($request->only(['content', 'priority']));
+        $section->items()->create($request->only(['content', 'content_ar', 'priority']));
 
         return redirect()->route('admin.legal.edit', $section->page_id)->with('success', 'Item added successfully.');
     }

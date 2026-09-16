@@ -9,7 +9,7 @@ class LegalPage extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['slug', 'title', 'subtitle', 'description'];
+    protected $fillable = ['slug', 'title', 'title_ar', 'subtitle', 'subtitle_ar', 'description', 'description_ar'];
 
     public function sections()
     {

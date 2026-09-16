@@ -9,7 +9,7 @@ class LegalItem extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['section_id', 'content', 'priority'];
+    protected $fillable = ['section_id', 'content', 'content_ar', 'priority'];
 
     protected $casts = [
         'priority' => 'integer'

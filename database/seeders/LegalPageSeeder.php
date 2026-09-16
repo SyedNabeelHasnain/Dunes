@@ -24,8 +24,11 @@ class LegalPageSeeder extends Seeder
                     [
                         'slug' => $p['slug'],
                         'title' => $p['title'],
-                        'subtitle' => $p['subtitle'],
-                        'description' => $p['description'],
+                        'title_ar' => $p['title_ar'] ?? null,
+                        'subtitle' => $p['subtitle'] ?? null,
+                        'subtitle_ar' => $p['subtitle_ar'] ?? null,
+                        'description' => $p['description'] ?? null,
+                        'description_ar' => $p['description_ar'] ?? null,
                     ]
                 );
             }
@@ -41,7 +44,9 @@ class LegalPageSeeder extends Seeder
                     [
                         'page_id' => $s['page_id'],
                         'heading' => $s['heading'],
-                        'subheading' => $s['subheading'],
+                        'heading_ar' => $s['heading_ar'] ?? null,
+                        'subheading' => $s['subheading'] ?? null,
+                        'subheading_ar' => $s['subheading_ar'] ?? null,
                         'priority' => (int)$s['priority'],
                     ]
                 );
@@ -58,6 +63,7 @@ class LegalPageSeeder extends Seeder
                     [
                         'section_id' => $item['section_id'],
                         'content' => $item['content'],
+                        'content_ar' => $item['content_ar'] ?? null,
                         'priority' => (int)$item['priority'],
                     ]
                 );
