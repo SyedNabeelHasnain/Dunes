@@ -1,1 +1,212 @@
-[]
+[
+    {
+        "id": 1,
+        "post_id": 31,
+        "question": "What is the difference between a standard and VIP private desert safari?",
+        "answer": "A VIP private safari includes non-shared door-to-door luxury 4x4 transport, customized driving speeds, an exclusive air-conditioned majlis lounge, dedicated waiter table service, premium cuts of meat, and personal shisha served tableside.",
+        "priority": 1
+    },
+    {
+        "id": 2,
+        "post_id": 31,
+        "question": "Can the dune bashing intensity be customized for our private group?",
+        "answer": "Yes. Because your vehicle is 100% private, you dictate the experience. You can request high-adrenaline extreme dune bashing, a smooth and gentle nature photography drive, or bypass off-road bashing entirely.",
+        "priority": 2
+    },
+    {
+        "id": 3,
+        "post_id": 31,
+        "question": "Can VIP safaris cater to corporate groups and private celebrations?",
+        "answer": "Absolutely. Dunes Discovery Tourism specializes in full camp buyouts, corporate gala dinners, wedding proposals, and VIP state delegation hosting with custom branding and entertainment.",
+        "priority": 3
+    },
+    {
+        "id": 4,
+        "post_id": 32,
+        "question": "What is a fair and realistic price for an evening desert safari in Dubai?",
+        "answer": "A legitimate, high-quality evening desert safari with 4x4 hotel pickup from Dubai, 35 minutes of genuine Lahbab red dunes bashing, sandboarding, BBQ buffet dinner, and live shows typically costs between AED 130 and AED 200 per adult.",
+        "priority": 1
+    },
+    {
+        "id": 5,
+        "post_id": 32,
+        "question": "Are children and infants charged the same price as adults?",
+        "answer": "No. At Dunes Discovery Tourism, infants under 3 years travel completely free of charge. Children aged 3 to 10 enjoy a 30% discount off standard adult pricing across all our regular tour packages.",
+        "priority": 2
+    },
+    {
+        "id": 6,
+        "post_id": 32,
+        "question": "Does the listed tour price include 5% UAE VAT and government tourism fees?",
+        "answer": "Yes. All rates displayed on our website and digital booking receipts are 100% net and inclusive of the mandatory 5% UAE Value Added Tax, fuel charges, camp entry, and passenger insurance.",
+        "priority": 3
+    },
+    {
+        "id": 7,
+        "post_id": 33,
+        "question": "Do tourists need an International Driving Permit (IDP) to rent a dune buggy in Dubai?",
+        "answer": "No. Because dune buggy adventures take place in dedicated desert conservation zones rather than public highways, an International Driving Permit is not required. A standard driving license or valid passport is sufficient.",
+        "priority": 1
+    },
+    {
+        "id": 8,
+        "post_id": 33,
+        "question": "What safety gear is provided with a dune buggy rental?",
+        "answer": "All rentals include sanitized full-face motocross helmets, UV dust goggles, convoy safety flags, and vehicles equipped with roll cages and 4-point racing harness seatbelts.",
+        "priority": 2
+    },
+    {
+        "id": 9,
+        "post_id": 33,
+        "question": "Can two people take turns driving a 2-seater buggy?",
+        "answer": "Yes! As long as both participants are 18 years of age or older, you can switch drivers at designated scenic photostops during your tour at no extra charge.",
+        "priority": 3
+    },
+    {
+        "id": 10,
+        "post_id": 34,
+        "question": "Is dune bashing safe for babies and toddlers under 3 years old?",
+        "answer": "High-intensity dune bashing is not recommended for children under 3 years. Instead, families booking a private vehicle enjoy a gentle, scenic nature drive directly across flat sand trails to the camp.",
+        "priority": 1
+    },
+    {
+        "id": 11,
+        "post_id": 34,
+        "question": "Can we bring our baby stroller or pram into the desert camp?",
+        "answer": "Standard wheeled strollers struggle in soft sand. We recommend a baby carrier or sling, while strollers can be safely stored in the luggage compartment of our 4x4.",
+        "priority": 2
+    },
+    {
+        "id": 12,
+        "post_id": 34,
+        "question": "Do infants pay full ticket price on desert safaris?",
+        "answer": "No. Infants under 3 years old travel 100% free of charge with Dunes Discovery Tourism. Children aged 3 to 10 receive an automatic 30% discount.",
+        "priority": 3
+    },
+    {
+        "id": 13,
+        "post_id": 35,
+        "question": "Is water and soft drinks included in the desert safari dinner price?",
+        "answer": "Yes! Cold bottled mineral water, soft drinks, Arabic tea (Chai), and traditional Gahwa coffee are unlimited and completely free throughout the evening.",
+        "priority": 1
+    },
+    {
+        "id": 14,
+        "post_id": 35,
+        "question": "How do I request a special Jain or strictly vegan meal?",
+        "answer": "Simply add a note in the Special Requests field during checkout or message our WhatsApp team with your reference. There is zero surcharge for dietary requests.",
+        "priority": 2
+    },
+    {
+        "id": 15,
+        "post_id": 35,
+        "question": "Are alcoholic beverages served at the desert safari camp?",
+        "answer": "Standard packages feature non-alcoholic refreshments. Licensed beverages (beer, wine, spirits) are available for purchase at the camp bar counter, except on religious holidays.",
+        "priority": 3
+    },
+    {
+        "id": 16,
+        "post_id": 36,
+        "question": "How can I confirm my tour company is taking me to Lahbab Red Dunes?",
+        "answer": "Check driving time from your hotel. If travel time is under 25 minutes, you are likely heading to flat roadside patches. Authentic Lahbab red dunes take 45 to 50 minutes of highway driving.",
+        "priority": 1
+    },
+    {
+        "id": 17,
+        "post_id": 36,
+        "question": "Can I see wild animals like the Arabian Oryx in Lahbab?",
+        "answer": "Lahbab is home to desert foxes and wild camels. The endangered Arabian Oryx is primarily found inside the protected Dubai Desert Conservation Reserve (DDCR).",
+        "priority": 2
+    },
+    {
+        "id": 18,
+        "post_id": 36,
+        "question": "Is Lahbab Red Dunes accessible by standard sedan rental cars?",
+        "answer": "Paved highways reach the edge of the desert village, but entering the sand dunes strictly requires a modified 4x4 with deflated tires and recovery equipment.",
+        "priority": 3
+    },
+    {
+        "id": 19,
+        "post_id": 37,
+        "question": "Do I have to take all combo tours on consecutive days?",
+        "answer": "No. You have total flexibility to schedule bundled tours on consecutive days or spread them over 7 days to suit your itinerary.",
+        "priority": 1
+    },
+    {
+        "id": 20,
+        "post_id": 37,
+        "question": "Is door-to-door hotel pickup included for each individual tour?",
+        "answer": "Yes! Every tour included in our combo bundles features air-conditioned door-to-door hotel transfers from Dubai and Sharjah.",
+        "priority": 2
+    },
+    {
+        "id": 21,
+        "post_id": 37,
+        "question": "Can I swap a tour within a combo package?",
+        "answer": "Yes. Our reservation team easily customizes bundles. Contact our WhatsApp concierge to tailor your inclusions and get an immediate quote.",
+        "priority": 3
+    },
+    {
+        "id": 22,
+        "post_id": 38,
+        "question": "How long is the camel ride included in the desert safari?",
+        "answer": "Standard packages include a scenic 10-to-15 minute introductory camel trek. Extended 45-minute sunrise or sunset camel treks can also be pre-booked.",
+        "priority": 1
+    },
+    {
+        "id": 23,
+        "post_id": 38,
+        "question": "Is henna tattooing safe for sensitive skin and children?",
+        "answer": "Yes. Our artists use 100% natural, organic red henna paste free of synthetic chemicals or harmful black dye. It naturally fades within 10 to 14 days.",
+        "priority": 2
+    },
+    {
+        "id": 24,
+        "post_id": 38,
+        "question": "Are traditional Arabic costumes available for photography?",
+        "answer": "Yes. Guests are welcome to try on traditional Emirati attire—including white Kanduras for men and elegant Abayas for women—at no extra cost.",
+        "priority": 3
+    },
+    {
+        "id": 25,
+        "post_id": 39,
+        "question": "What if there is heavy highway traffic returning to Dubai Port?",
+        "answer": "Our excursions utilize real-time satellite GPS traffic routing and maintain a strict 2-hour buffer before ship all-aboard times. Zero passengers have ever missed their ship.",
+        "priority": 1
+    },
+    {
+        "id": 26,
+        "post_id": 39,
+        "question": "What is the dress code for cruise passengers visiting the Grand Mosque?",
+        "answer": "Modest attire is required. Men must wear long trousers and covered shoulders. Women must fully cover hair, arms, and legs in non-transparent, loose clothing.",
+        "priority": 2
+    },
+    {
+        "id": 27,
+        "post_id": 39,
+        "question": "Can cruise passengers store their luggage in the tour vehicle?",
+        "answer": "Yes! If you are disembarking your cruise in Dubai, our vehicles have secure luggage space to store your bags before dropping you off at Dubai Airport (DXB).",
+        "priority": 3
+    },
+    {
+        "id": 28,
+        "post_id": 40,
+        "question": "Can I guarantee an upper-deck table when booking online?",
+        "answer": "Yes! Select Upper Deck in your seating preferences or add a note at checkout. We allocate edge tables on a priority pre-reserved basis.",
+        "priority": 1
+    },
+    {
+        "id": 29,
+        "post_id": 40,
+        "question": "What route does the Dubai Marina dhow cruise sail?",
+        "answer": "The cruise glides along the 3.5 km Marina canal past Cayan Tower and yacht clubs before sailing toward JBR and Ain Dubai on Bluewaters Island.",
+        "priority": 2
+    },
+    {
+        "id": 30,
+        "post_id": 40,
+        "question": "Do passengers experience motion sickness or seasickness?",
+        "answer": "No. Dubai Marina is a calm inland canal protected by breakwaters with virtually zero swell, ensuring a smooth, stable dining cruise.",
+        "priority": 3
+    }
+]
