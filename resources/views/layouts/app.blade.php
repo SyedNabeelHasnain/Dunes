@@ -26,7 +26,9 @@
     $googleActive = isset($settings['google_active']) && $settings['google_active'] === '1';
     $gtmId = $settings['google_gtm_id'] ?? '';
     $ga4Id = $settings['google_ga4_id'] ?? '';
-    $adsId = $settings['google_ads_id'] ?? '';
+    $adsId = $settings['google_ads_id'] ?? 'AW-17859624049';
+    $conversionLabel = $settings['google_conversion_label'] ?? 'eR3SCLimtvobEPH4kMRC';
+    $conversionSendTo = (!empty($adsId) && !empty($conversionLabel)) ? "{$adsId}/{$conversionLabel}" : '';
     $gVerify = $settings['google_site_verification'] ?? '';
     
     $metaActive = isset($settings['meta_active']) && $settings['meta_active'] === '1';
@@ -52,14 +54,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) AW-17859624049 (Sitewide First-Party Conversion Tag) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17859624049"></script>
+    @if(!empty($adsId))
+    <!-- Google tag (gtag.js) {{ $adsId }} (Sitewide First-Party Conversion Tag) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $adsId }}"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
 
-      gtag('config', 'AW-17859624049', {
+      gtag('config', '{{ $adsId }}', {
         'allow_enhanced_conversions': true
       });
       @if($googleActive && !empty($ga4Id))
@@ -82,7 +85,9 @@
         var eventData = Object.assign({
           'event_callback': callback,
           'event_timeout': 2000,
-          'send_to': 'AW-17859624049/eR3SCLimtvobEPH4kMRC'
+          @if(!empty($conversionSendTo))
+          'send_to': '{{ $conversionSendTo }}'
+          @endif
         }, params || {});
 
         if (typeof gtag === 'function') {
@@ -100,6 +105,12 @@
       }
       window.gtagReportConversion = gtagReportConversion;
     </script>
+    @else
+    <script>
+      window.gtagSendEvent = function(url) { if (url) window.location = url; return false; };
+      window.gtagReportConversion = window.gtagSendEvent;
+    </script>
+    @endif
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -457,11 +468,11 @@
                         <li><a href="tel:{{ preg_replace('/[^0-9+]/','',$phone) }}" class="text-white-50 text-decoration-none small d-flex align-items-center gap-2 hover-white"><i class="bi bi-telephone text-primary"></i>{{ $phone }}</a></li>
                         <li><a href="mailto:{{ $email }}" class="text-white-50 text-decoration-none small d-flex align-items-center gap-2 hover-white"><i class="bi bi-envelope text-primary"></i>{{ $email }}</a></li>
                         <li><a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="text-white-50 text-decoration-none small d-flex align-items-center gap-2 hover-white"><i class="bi bi-whatsapp text-primary"></i>24/7 WhatsApp Chat</a></li>
-                        <li class="text-white-50 small d-flex align-items-center gap-2"><i class="bi bi-geo-alt text-primary"></i>Dubai, United Arab Emirates</li>
+                        <li class="text-white-50 small d-flex align-items-center gap-2"><i class="bi bi-geo-alt text-primary"></i>{{ $settings['site_address'] ?? 'Dubai, United Arab Emirates' }}</li>
                     </ul>
 
                     <div class="d-flex flex-wrap gap-2 mt-3">
-                        <a href="https://www.tripadvisor.com/Attraction_Review-g295424-d29026644-Reviews-Dunes_Discovery-Dubai_Emirate_of_Dubai.html" target="_blank" rel="noopener" class="footer-badge d-flex align-items-center text-decoration-none p-1 px-2 rounded-2 bg-black bg-opacity-40 border border-secondary border-opacity-25">
+                        <a href="{{ $settings['social_tripadvisor'] ?? 'https://www.tripadvisor.com/Attraction_Review-g295424-d29026644-Reviews-Dunes_Discovery-Dubai_Emirate_of_Dubai.html' }}" target="_blank" rel="noopener" class="footer-badge d-flex align-items-center text-decoration-none p-1 px-2 rounded-2 bg-black bg-opacity-40 border border-secondary border-opacity-25">
                             <img src="{{ asset('images/tripadvisor-logo-circle-owl-icon-black-green.png') }}" alt="TripAdvisor" class="footer-badge-logo" style="width:20px; height:20px; margin-right:6px;">
                             <div class="footer-badge-header">
                                 <span class="footer-badge-score text-white fw-bold small">4.9</span>
@@ -470,7 +481,7 @@
                                 </div>
                             </div>
                         </a>
-                        <a href="https://www.google.com/maps/search/?api=1&query=Google&query_place_id=ChIJbWsIEIVEdEER4uHEhb2dbcQ" target="_blank" rel="noopener" class="footer-badge d-flex align-items-center text-decoration-none p-1 px-2 rounded-2 bg-black bg-opacity-40 border border-secondary border-opacity-25">
+                        <a href="{{ $settings['social_google'] ?? 'https://search.google.com/local/writereview?placeid=ChIJbWsIEIVEdEER4uHEhb2dbcQ' }}" target="_blank" rel="noopener" class="footer-badge d-flex align-items-center text-decoration-none p-1 px-2 rounded-2 bg-black bg-opacity-40 border border-secondary border-opacity-25">
                             <img src="https://www.gstatic.com/marketing-cms/assets/images/d5/dc/cfe9ce8b4425b410b49b7f2dd3f3/g.webp=s48-fcrop64=1,00000000ffffffff-rw" alt="Google" class="footer-badge-logo" style="width:20px; height:20px; margin-right:6px;">
                             <div class="footer-badge-header">
                                 <span class="footer-badge-score text-white fw-bold small">5.0</span>
@@ -487,7 +498,7 @@
             <div class="border-top border-secondary border-opacity-50 pt-4">
                 <div class="d-flex flex-column flex-lg-row align-items-center justify-content-between gap-3 text-center text-lg-start">
                     <div>
-                        <p class="text-white-50 small mb-1">&copy; {{ date('Y') }} Dunes Discovery Tourism L.L.C. All rights reserved. Department of Economy & Tourism License #1430583.</p>
+                        <p class="text-white-50 small mb-1">&copy; {{ date('Y') }} {{ $settings['site_name'] ?? 'Dunes Discovery Tourism L.L.C.' }} {{ $settings['site_copyright'] ?? 'All rights reserved.' }} Department of Economy & Tourism License #{{ $settings['company_license_number'] ?? '1430583' }}.</p>
                         <div class="d-flex flex-wrap justify-content-center justify-content-lg-start gap-2 small">
                             <a href="{{ route('terms') }}" class="text-white-50 text-decoration-none hover-white">Terms & Conditions</a>
                             <span class="text-white-50">&bull;</span>

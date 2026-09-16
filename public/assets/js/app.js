@@ -934,6 +934,28 @@ const App={
     initHeader(){
         const h=document.getElementById('header');
         if(!h)return;
+
+        const updateHeight = () => {
+            const banner = document.getElementById('dunesTopPromoBanner');
+            const hHeight = h.offsetHeight || 72;
+            document.documentElement.style.setProperty('--header-h', hHeight + 'px');
+            if (banner && banner.offsetHeight) {
+                document.documentElement.style.setProperty('--promo-banner-h', banner.offsetHeight + 'px');
+            } else {
+                document.documentElement.style.setProperty('--promo-banner-h', '0px');
+            }
+        };
+
+        updateHeight();
+        window.addEventListener('resize', updateHeight, {passive: true});
+        window.addEventListener('orientationchange', updateHeight, {passive: true});
+
+        if (typeof ResizeObserver !== 'undefined') {
+            try {
+                new ResizeObserver(updateHeight).observe(h);
+            } catch (e) {}
+        }
+
         let ly=0;
         window.addEventListener('scroll',()=>{
             const y=window.pageYOffset;

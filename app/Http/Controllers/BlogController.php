@@ -70,14 +70,20 @@ class BlogController extends Controller
         $featuredPost = $featuredPosts->first();
         $sideFeatured = $featuredPosts->slice(1, 2);
 
+        $settingsService = app(\App\Services\SettingsService::class);
         $currentYear = date('Y');
+        $defaultTitle = "Dubai Desert Safari & Travel Blog ({$currentYear}) | Expert Insights | Dunes Discovery";
+        $defaultDesc = "Read insider travel tips, desert safari packing guides, buggy safety advice, and Dubai itinerary recommendations by Dunes Discovery Tourism.";
+        $defaultKeys = "dubai travel blog, desert safari guide, dubai desert tips, travel advice dubai";
+
         $pageTitle = $categorySlug 
             ? ucwords(str_replace('-', ' ', $categorySlug)) . " Guides ({$currentYear}) | Dunes Discovery Blog" 
-            : "Dubai Desert Safari & Travel Blog ({$currentYear}) | Expert Insights | Dunes Discovery";
-        $pageDesc = "Read insider travel tips, desert safari packing guides, buggy safety advice, and Dubai itinerary recommendations by Dunes Discovery Tourism.";
-        $pageKeys = "dubai travel blog, desert safari guide, dubai desert tips, travel advice dubai";
+            : ($settingsService->get('seo_blog_title') ?: $defaultTitle);
+        $pageDesc = $settingsService->get('seo_blog_description') ?: $defaultDesc;
+        $pageKeys = $settingsService->get('seo_blog_keywords') ?: $defaultKeys;
+        $ogImageSetting = $settingsService->get('seo_blog_og_image');
+        $ogImage = $ogImageSetting ? asset(ltrim($ogImageSetting, '/')) : asset('images/desert-safari-poster.avif');
         $canonical = $categorySlug ? route('blog.index', ['category' => $categorySlug]) : route('blog.index');
-        $ogImage = asset('images/desert-safari-poster.avif');
 
         return view('blog.index', compact('posts', 'categories', 'popularTags', 'featuredPost', 'sideFeatured', 'categorySlug', 'tagSlug', 'search', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
     }
@@ -100,6 +106,7 @@ class BlogController extends Controller
         $relatedPosts = BlogPost::where('category_id', $post->category_id)
             ->where('id', '!=', $post->id)
             ->where('status', 'published')
+            ->with('category')
             ->orderBy('published_at', 'desc')
             ->limit(3)
             ->get();
@@ -108,6 +115,7 @@ class BlogController extends Controller
             $extra = BlogPost::where('id', '!=', $post->id)
                 ->where('status', 'published')
                 ->whereNotIn('id', $relatedPosts->pluck('id'))
+                ->with('category')
                 ->orderBy('published_at', 'desc')
                 ->limit(3 - $relatedPosts->count())
                 ->get();

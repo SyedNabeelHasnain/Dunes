@@ -30,12 +30,18 @@ class PageController extends Controller
      */
     public function about()
     {
+        $settings = app(SettingsService::class);
         $currentYear = date('Y');
-        $pageTitle = "About Dunes Discovery Tourism ({$currentYear}) | Leading Dubai Desert Safari Operator";
-        $pageDesc = "Learn about Dunes Discovery Tourism LLC, Dubai's premier DTCM-licensed desert safari & adventure operator since 2018. Over 25+ luxury 4x4 Land Cruisers, 5-star live BBQ camps, and 10,000+ happy travelers.";
-        $pageKeys = "about dunes discovery tourism, dubai desert safari operator, licensed tourism company dubai, luxury desert safaris";
+        $defaultTitle = "About Dunes Discovery Tourism ({$currentYear}) | Leading Dubai Desert Safari Operator";
+        $defaultDesc = "Learn about Dunes Discovery Tourism LLC, Dubai's premier DTCM-licensed desert safari & adventure operator since 2018. Over 25+ luxury 4x4 Land Cruisers, 5-star live BBQ camps, and 10,000+ happy travelers.";
+        $defaultKeys = "about dunes discovery tourism, dubai desert safari operator, licensed tourism company dubai, luxury desert safaris";
+
+        $pageTitle = $settings->get('seo_about_title') ?: $defaultTitle;
+        $pageDesc = $settings->get('seo_about_description') ?: $defaultDesc;
+        $pageKeys = $settings->get('seo_about_keywords') ?: $defaultKeys;
+        $ogImageSetting = $settings->get('seo_about_og_image');
+        $ogImage = $ogImageSetting ? asset(ltrim($ogImageSetting, '/')) : asset('images/dubai-desert-safari-tour-dune-discovery-tourism.avif');
         $canonical = route('about');
-        $ogImage = asset('images/dubai-desert-safari-tour-dune-discovery-tourism.avif');
 
         return view('about', compact('pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
     }
@@ -47,12 +53,18 @@ class PageController extends Controller
     {
         session(['form_load.contact' => microtime(true)]);
 
+        $settings = app(SettingsService::class);
         $currentYear = date('Y');
-        $pageTitle = "Contact Dunes Discovery Tourism ({$currentYear}) | 24/7 Dubai Support & Booking";
-        $pageDesc = "Get in touch with Dunes Discovery Tourism Dubai. 24/7 WhatsApp assistance (+971 50 245 6056), instant bookings, custom group tours, and corporate desert safaris.";
-        $pageKeys = "contact dunes discovery, dubai desert safari contact, book desert safari whatsapp, tourism office dubai";
+        $defaultTitle = "Contact Dunes Discovery Tourism ({$currentYear}) | 24/7 Dubai Support & Booking";
+        $defaultDesc = "Get in touch with Dunes Discovery Tourism Dubai. 24/7 WhatsApp assistance (+971 50 245 6056), instant bookings, custom group tours, and corporate desert safaris.";
+        $defaultKeys = "contact dunes discovery, dubai desert safari contact, book desert safari whatsapp, tourism office dubai";
+
+        $pageTitle = $settings->get('seo_contact_title') ?: $defaultTitle;
+        $pageDesc = $settings->get('seo_contact_description') ?: $defaultDesc;
+        $pageKeys = $settings->get('seo_contact_keywords') ?: $defaultKeys;
+        $ogImageSetting = $settings->get('seo_contact_og_image');
+        $ogImage = $ogImageSetting ? asset(ltrim($ogImageSetting, '/')) : asset('images/desert-safari-poster.avif');
         $canonical = route('contact');
-        $ogImage = asset('images/desert-safari-poster.avif');
 
         return view('contact', compact('pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
     }
@@ -70,12 +82,18 @@ class PageController extends Controller
             ->orderBy('priority', 'asc')
             ->get();
 
+        $settings = app(SettingsService::class);
         $currentYear = date('Y');
-        $pageTitle = "Dubai Desert Safari FAQs ({$currentYear}) | Complete Traveler Guide | Dunes Discovery";
-        $pageDesc = "Find instant answers to all questions about Dubai desert safaris, what to wear, dune bashing safety, child booster seats, 100% Halal live BBQ dining, and free 24h cancellations.";
-        $pageKeys = "dubai desert safari faq, desert safari questions, what to wear desert safari dubai, halal bbq desert safari";
+        $defaultTitle = "Dubai Desert Safari FAQs ({$currentYear}) | Complete Traveler Guide | Dunes Discovery";
+        $defaultDesc = "Find instant answers to all questions about Dubai desert safaris, what to wear, dune bashing safety, child booster seats, 100% Halal live BBQ dining, and free 24h cancellations.";
+        $defaultKeys = "dubai desert safari faq, desert safari questions, what to wear desert safari dubai, halal bbq desert safari";
+
+        $pageTitle = $settings->get('seo_faq_title') ?: $defaultTitle;
+        $pageDesc = $settings->get('seo_faq_description') ?: $defaultDesc;
+        $pageKeys = $settings->get('seo_faq_keywords') ?: $defaultKeys;
+        $ogImageSetting = $settings->get('seo_faq_og_image');
+        $ogImage = $ogImageSetting ? asset(ltrim($ogImageSetting, '/')) : asset('images/desert-safari-poster.avif');
         $canonical = route('faq');
-        $ogImage = asset('images/desert-safari-poster.avif');
 
         return view('faq', compact('faqs', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
     }
@@ -232,7 +250,7 @@ class PageController extends Controller
 
         } catch (\Throwable $e) {
             Log::error("Failed to log WhatsApp click: " . $e->getMessage());
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            return response()->json(['success' => false, 'message' => 'An error occurred while logging WhatsApp inquiry.'], 500);
         }
     }
 

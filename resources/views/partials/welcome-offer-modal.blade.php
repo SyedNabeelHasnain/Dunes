@@ -1,13 +1,13 @@
 @php
     $settingsService = app(\App\Services\SettingsService::class);
-    $popupActive = $settingsService->get('welcome_popup_active', '1') === '1';
-    $popupDiscount = (float)$settingsService->get('welcome_popup_discount', '25');
-    $popupTimerMins = (int)$settingsService->get('welcome_popup_timer_mins', '15');
-    $popupDelaySec = (int)$settingsService->get('welcome_popup_delay_sec', '5');
+    $popupActive = ($settingsService->get('promo_welcome_modal_enabled', $settingsService->get('welcome_popup_active', '1'))) === '1';
+    $popupDiscount = (float)$settingsService->get('promo_welcome_modal_discount', $settingsService->get('welcome_popup_discount', '25'));
+    $popupTimerMins = (int)$settingsService->get('promo_welcome_modal_timer_minutes', $settingsService->get('welcome_popup_timer_mins', '15'));
+    $popupDelaySec = (int)$settingsService->get('promo_welcome_modal_delay_seconds', $settingsService->get('welcome_popup_delay_sec', '5'));
     $popupScrollTrigger = $settingsService->get('welcome_popup_scroll_trigger', '1') === '1';
     $popupExitTrigger = $settingsService->get('welcome_popup_exit_trigger', '1') === '1';
-    $popupHeadline = $settingsService->get('welcome_popup_headline', 'Unlock 25% OFF Your Dubai Desert Adventure');
-    $popupSubheadline = $settingsService->get('welcome_popup_subheadline', 'Valid for today\'s booking • Tour date can be selected for any future date!');
+    $popupHeadline = $settingsService->get('promo_welcome_modal_headline', $settingsService->get('welcome_popup_headline', 'Unlock Exclusive 25% OFF'));
+    $popupSubheadline = $settingsService->get('promo_welcome_modal_subheadline', $settingsService->get('welcome_popup_subheadline', 'Book your unforgettable Dubai Desert Safari today with our premier welcome discount.'));
 @endphp
 
 @if($popupActive)

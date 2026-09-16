@@ -32,12 +32,12 @@
       "mainEntity": {
         "@@type": "TravelAgency",
         "@@id": "{{ route('home') }}#organization",
-        "name": "Dunes Discovery Tourism LLC",
-        "telephone": "+971 50 245 6056",
-        "email": "info@dunesdiscoverytourism.com",
+        "name": "{{ $settings['site_name'] ?? 'Dunes Discovery Tourism LLC' }}",
+        "telephone": "{{ $settings['site_phone'] ?? '+971 50 245 6056' }}",
+        "email": "{{ $settings['site_email'] ?? 'info@dunesdiscoverytourism.com' }}",
         "address": {
           "@@type": "PostalAddress",
-          "streetAddress": "Dubai Desert Safari Terminal, Al Aweer & Lahbab",
+          "streetAddress": "{{ $settings['site_address'] ?? 'Al Fahidi, Bur Dubai' }}",
           "addressLocality": "Dubai",
           "addressRegion": "Dubai",
           "postalCode": "00000",
@@ -303,7 +303,7 @@
             </div>
             <div class="col-12 col-lg-5">
                 <div class="card card-modern h-100 border-0 overflow-hidden shadow-lg rounded-4">
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d462560.68279754556!2d54.89782249453am!3d25.076280448324027!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f43496ad9c645%3A0xbde66e5084295162!2sDubai%20-%20United%20Arab%20Emirates!5e0!3m2!1sen!2s!4v1704067200000" style="border:0;width:100%;height:100%;min-height: 400px;" allowfullscreen loading="lazy"></iframe>
+                    <iframe src="{{ $settings['google_maps_embed_url'] ?? 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14439.467468694034!2d55.2707828!3d25.2048493!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f434910086b6d%3A0xc4db9db186e4e1e2!2sDunes%20Discovery%20Tourism%20LLC!5e0!3m2!1sen!2sae!4v1700000000000!5m2!1sen!2sae' }}" style="border:0;width:100%;height:100%;min-height: 400px;" allowfullscreen loading="lazy"></iframe>
                 </div>
             </div>
         </div>
@@ -318,7 +318,7 @@ document.addEventListener('DOMContentLoaded', function() {
         contactForm.addEventListener('submit', function() {
             if (typeof window.gtag === 'function') {
                 window.gtag('event', 'conversion', {
-                    'send_to': 'AW-17859624049/eR3SCLimtvobEPH4kMRC'
+                    'send_to': '{{ (!empty($settings['google_ads_id']) && !empty($settings['google_conversion_label'])) ? ($settings['google_ads_id'] . "/" . $settings['google_conversion_label']) : "AW-17859624049/eR3SCLimtvobEPH4kMRC" }}'
                 });
             }
         });

@@ -83,12 +83,18 @@ class HomeController extends Controller
             $allActiveTours = collect();
         }
 
+        $settingsService = app(\App\Services\SettingsService::class);
         $currentYear = date('Y');
-        $pageTitle = "Dubai Desert Safari Tours {$currentYear} | Best Price from AED 79 | Dunes Discovery Tourism";
-        $pageDesc = "Book top-rated Dubai Desert Safari, 1000cc Dune Buggy, Quad Biking, & Dhow Cruise dinners from AED 79. 4x4 Land Cruiser pickup, live BBQ, & 24h free cancellation.";
-        $pageKeys = "dubai desert safari, desert safari dubai, evening desert safari dubai, dune buggy rental dubai, quad biking dubai, dhow cruise dubai, abu dhabi city tour";
+        $defaultTitle = "Dubai Desert Safari Tours {$currentYear} | Best Price from AED 79 | Dunes Discovery Tourism";
+        $defaultDesc = "Book top-rated Dubai Desert Safari, 1000cc Dune Buggy, Quad Biking, & Dhow Cruise dinners from AED 79. 4x4 Land Cruiser pickup, live BBQ, & 24h free cancellation.";
+        $defaultKeys = "dubai desert safari, desert safari dubai, evening desert safari dubai, dune buggy rental dubai, quad biking dubai, dhow cruise dubai, abu dhabi city tour";
+
+        $pageTitle = $settingsService->get('seo_home_title') ?: $defaultTitle;
+        $pageDesc = $settingsService->get('seo_home_description') ?: $defaultDesc;
+        $pageKeys = $settingsService->get('seo_home_keywords') ?: $defaultKeys;
+        $ogImageSetting = $settingsService->get('seo_home_og_image');
+        $ogImage = $ogImageSetting ? asset(ltrim($ogImageSetting, '/')) : asset('images/desert-safari-poster.avif');
         $canonical = route('home');
-        $ogImage = asset('images/desert-safari-poster.avif');
 
         return view('index', compact('categories', 'bestsellers', 'reviews', 'faqs', 'allActiveTours', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
     }

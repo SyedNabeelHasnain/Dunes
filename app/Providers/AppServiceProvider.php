@@ -21,6 +21,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        \Illuminate\Support\Facades\View::composer('*', function ($view) {
+            try {
+                $settings = app(\App\Services\SettingsService::class)->all()->all();
+                $view->with('settings', $settings);
+            } catch (\Throwable $e) {
+                $view->with('settings', []);
+            }
+        });
     }
 }

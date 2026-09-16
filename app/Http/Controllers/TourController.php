@@ -28,12 +28,18 @@ class TourController extends Controller
         
         $tours = $query->orderBy('priority', 'asc')->get();
         
+        $settingsService = app(\App\Services\SettingsService::class);
         $currentYear = date('Y');
-        $pageTitle = "Top Dubai Desert Safari & City Tours ({$currentYear}) | Best Deals | Dunes Discovery";
-        $pageDesc = "Explore top-rated Dubai desert safaris, 1000cc dune buggy rentals, dhow cruise dinners, and luxury Abu Dhabi city tours. Instant confirmation & 24h free cancellation.";
-        $pageKeys = "dubai desert safari tours, dune buggy dubai, quad biking dubai, dhow cruise dubai, abu dhabi city tour";
+        $defaultTitle = "Top Dubai Desert Safari & City Tours ({$currentYear}) | Best Deals | Dunes Discovery";
+        $defaultDesc = "Explore top-rated Dubai desert safaris, 1000cc dune buggy rentals, dhow cruise dinners, and luxury Abu Dhabi city tours. Instant confirmation & 24h free cancellation.";
+        $defaultKeys = "dubai desert safari tours, dune buggy dubai, quad biking dubai, dhow cruise dubai, abu dhabi city tour";
+
+        $pageTitle = $settingsService->get('seo_tours_title') ?: $defaultTitle;
+        $pageDesc = $settingsService->get('seo_tours_description') ?: $defaultDesc;
+        $pageKeys = $settingsService->get('seo_tours_keywords') ?: $defaultKeys;
+        $ogImageSetting = $settingsService->get('seo_tours_og_image');
+        $ogImage = $ogImageSetting ? asset(ltrim($ogImageSetting, '/')) : asset('images/desert-safari-poster.avif');
         $canonical = route('tours.index');
-        $ogImage = asset('images/desert-safari-poster.avif');
         
         return view('tours.index', compact('categories', 'tours', 'selectedCategorySlug', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
     }
@@ -125,7 +131,7 @@ class TourController extends Controller
         $canonical = url('/' . $tour->slug);
         
         $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image ?: 'evening-desert-safari-dubai-dune-discovery-tourism.avif');
-        $ogImage = asset('images/blog/' . $imgFile);
+        $ogImage = asset('images/' . $imgFile);
 
         // Track form load timestamp for analytics
         session(["form_load.booking_{$tour->id}" => microtime(true)]);

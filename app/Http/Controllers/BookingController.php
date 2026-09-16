@@ -182,6 +182,7 @@ class BookingController extends Controller
 
         // Email Verification check (strictly require verified session for current booking)
         $sessionVerified = session()->has('email_verified_' . md5($email));
+        $isVerified = $sessionVerified ? 1 : 0;
         $requireVerification = app(SettingsService::class)->get('email_verification_required', '1') === '1';
         if ($requireVerification && !$sessionVerified) {
             return response()->json([

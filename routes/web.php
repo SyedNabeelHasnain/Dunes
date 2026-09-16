@@ -164,7 +164,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Admin Profile & Security
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile');
 
-    // Integrations Settings (Google, Meta, Cache)
+    // Integrations & Portal Settings (General, SEO, Marketing, Google, Meta, Currency, Cache)
+    Route::get('/settings/general', [AdminSettingController::class, 'general'])->name('settings.general');
+    Route::get('/settings/seo', [AdminSettingController::class, 'seo'])->name('settings.seo');
+    Route::get('/settings/marketing', [AdminSettingController::class, 'marketing'])->name('settings.marketing');
     Route::get('/settings/google', [AdminSettingController::class, 'google'])->name('settings.google');
     Route::get('/settings/meta', [AdminSettingController::class, 'meta'])->name('settings.meta');
     Route::get('/settings/currency', [AdminSettingController::class, 'currency'])->name('settings.currency');

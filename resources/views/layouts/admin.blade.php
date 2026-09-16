@@ -357,15 +357,24 @@
                 <i class="bi bi-shield-check"></i> <span>Legal Policies</span>
             </a>
 
-            <div class="sidebar-heading">System & Integrations</div>
+            <div class="sidebar-heading">Portal Settings & SEO</div>
+            <a href="{{ route('admin.settings.general') }}" class="sidebar-link {{ request()->routeIs('admin.settings.general*') ? 'active' : '' }}">
+                <i class="bi bi-sliders text-warning"></i> <span>General Identity</span>
+            </a>
+            <a href="{{ route('admin.settings.seo') }}" class="sidebar-link {{ request()->routeIs('admin.settings.seo*') ? 'active' : '' }}">
+                <i class="bi bi-search text-primary"></i> <span>SEO & Metadata</span>
+            </a>
+            <a href="{{ route('admin.settings.marketing') }}" class="sidebar-link {{ request()->routeIs('admin.settings.marketing*') ? 'active' : '' }}">
+                <i class="bi bi-megaphone text-danger"></i> <span>Marketing & Promos</span>
+            </a>
             <a href="{{ route('admin.settings.google') }}" class="sidebar-link {{ request()->routeIs('admin.settings.google*') ? 'active' : '' }}">
-                <i class="bi bi-google"></i> <span>Google Integrations</span>
+                <i class="bi bi-google text-danger"></i> <span>Google Integrations</span>
             </a>
             <a href="{{ route('admin.settings.meta') }}" class="sidebar-link {{ request()->routeIs('admin.settings.meta*') ? 'active' : '' }}">
-                <i class="bi bi-meta"></i> <span>Meta / Facebook</span>
+                <i class="bi bi-meta text-primary"></i> <span>Meta / Facebook</span>
             </a>
             <a href="{{ route('admin.whatsapp.settings') }}" class="sidebar-link {{ request()->routeIs('admin.whatsapp.settings*') ? 'active' : '' }}">
-                <i class="bi bi-gear-wide-connected"></i> <span>WhatsApp Setup</span>
+                <i class="bi bi-gear-wide-connected text-success"></i> <span>WhatsApp Setup</span>
             </a>
             <a href="{{ route('admin.settings.currency') }}" class="sidebar-link {{ request()->routeIs('admin.settings.currency*') ? 'active' : '' }}">
                 <i class="bi bi-currency-exchange text-info"></i> <span>Currency & Rates</span>
@@ -676,7 +685,12 @@
                                     columns: ':visible:not(.no-export):not(.no-sort)',
                                     format: {
                                         body: function(data, row, column, node) {
-                                            return typeof data === 'string' ? data.replace(/<br\s*[\/]?>/gi, ' ').replace(/<\/p>/gi, ' ').replace(/<\/div>/gi, ' ').replace(/<[^>]*>/g, '').trim() : data;
+                                            if (typeof data !== 'string') return data;
+                                            var cleaned = data.replace(/<br\s*[\/]?>/gi, ' ').replace(/<\/p>/gi, ' ').replace(/<\/div>/gi, ' ').replace(/<[^>]*>/g, '').trim();
+                                            if (/^[=+\-@\t\r]/.test(cleaned)) {
+                                                cleaned = "'" + cleaned;
+                                            }
+                                            return cleaned;
                                         }
                                     }
                                 }
@@ -702,7 +716,12 @@
                                     columns: ':visible:not(.no-export):not(.no-sort)',
                                     format: {
                                         body: function(data, row, column, node) {
-                                            return typeof data === 'string' ? data.replace(/<br\s*[\/]?>/gi, ' ').replace(/<\/p>/gi, ' ').replace(/<\/div>/gi, ' ').replace(/<[^>]*>/g, '').trim() : data;
+                                            if (typeof data !== 'string') return data;
+                                            var cleaned = data.replace(/<br\s*[\/]?>/gi, ' ').replace(/<\/p>/gi, ' ').replace(/<\/div>/gi, ' ').replace(/<[^>]*>/g, '').trim();
+                                            if (/^[=+\-@\t\r]/.test(cleaned)) {
+                                                cleaned = "'" + cleaned;
+                                            }
+                                            return cleaned;
                                         }
                                     }
                                 }

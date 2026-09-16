@@ -7,9 +7,72 @@ use App\Models\Setting;
 use App\Services\SettingsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
 
 class AdminSettingController extends Controller
 {
+    /**
+     * Show General Site Identity, Contact Information & Licensing.
+     */
+    public function general()
+    {
+        $keys = [
+            'site_name', 'site_phone', 'site_whatsapp', 'site_email', 'site_support_email',
+            'site_address', 'company_license_number', 'google_maps_embed_url',
+            'social_tripadvisor', 'social_google', 'social_facebook', 'social_instagram',
+            'social_youtube', 'social_tiktok', 'footer_about', 'site_copyright'
+        ];
+
+        $settings = Setting::whereIn('setting_key', $keys)
+            ->get()
+            ->pluck('setting_value', 'setting_key');
+
+        return view('admin.settings.general', compact('settings'));
+    }
+
+    /**
+     * Show Sitewide & Per-Page SEO / Meta Management.
+     */
+    public function seo()
+    {
+        $keys = [
+            'seo_default_title', 'seo_default_description', 'seo_default_keywords', 'seo_default_og_image',
+            'seo_home_title', 'seo_home_description', 'seo_home_keywords', 'seo_home_og_image',
+            'seo_tours_title', 'seo_tours_description', 'seo_tours_keywords', 'seo_tours_og_image',
+            'seo_blog_title', 'seo_blog_description', 'seo_blog_keywords', 'seo_blog_og_image',
+            'seo_about_title', 'seo_about_description', 'seo_about_keywords', 'seo_about_og_image',
+            'seo_contact_title', 'seo_contact_description', 'seo_contact_keywords', 'seo_contact_og_image',
+            'seo_faq_title', 'seo_faq_description', 'seo_faq_keywords', 'seo_faq_og_image',
+            'seo_rate_card_title', 'seo_rate_card_description', 'seo_rate_card_keywords', 'seo_rate_card_og_image',
+        ];
+
+        $settings = Setting::whereIn('setting_key', $keys)
+            ->get()
+            ->pluck('setting_value', 'setting_key');
+
+        return view('admin.settings.seo', compact('settings'));
+    }
+
+    /**
+     * Show Marketing, Top Promo Banner & Welcome Modal Controls.
+     */
+    public function marketing()
+    {
+        $keys = [
+            'promo_top_banner_enabled', 'promo_top_banner_badge', 'promo_top_banner_text',
+            'promo_top_banner_code', 'promo_top_banner_discount',
+            'promo_welcome_modal_enabled', 'promo_welcome_modal_headline',
+            'promo_welcome_modal_subheadline', 'promo_welcome_modal_discount',
+            'promo_welcome_modal_timer_minutes', 'promo_welcome_modal_delay_seconds'
+        ];
+
+        $settings = Setting::whereIn('setting_key', $keys)
+            ->get()
+            ->pluck('setting_value', 'setting_key');
+
+        return view('admin.settings.marketing', compact('settings'));
+    }
+
     /**
      * Show Google integrations settings.
      */
@@ -59,6 +122,29 @@ class AdminSettingController extends Controller
     public function update(Request $request)
     {
         $allowedKeys = [
+            // Site Identity & Licensing
+            'site_name', 'site_phone', 'site_whatsapp', 'site_email', 'site_support_email',
+            'site_address', 'company_license_number', 'google_maps_embed_url',
+            'social_tripadvisor', 'social_google', 'social_facebook', 'social_instagram',
+            'social_youtube', 'social_tiktok', 'footer_about', 'site_copyright',
+
+            // Global & Per-Page SEO
+            'seo_default_title', 'seo_default_description', 'seo_default_keywords', 'seo_default_og_image',
+            'seo_home_title', 'seo_home_description', 'seo_home_keywords', 'seo_home_og_image',
+            'seo_tours_title', 'seo_tours_description', 'seo_tours_keywords', 'seo_tours_og_image',
+            'seo_blog_title', 'seo_blog_description', 'seo_blog_keywords', 'seo_blog_og_image',
+            'seo_about_title', 'seo_about_description', 'seo_about_keywords', 'seo_about_og_image',
+            'seo_contact_title', 'seo_contact_description', 'seo_contact_keywords', 'seo_contact_og_image',
+            'seo_faq_title', 'seo_faq_description', 'seo_faq_keywords', 'seo_faq_og_image',
+            'seo_rate_card_title', 'seo_rate_card_description', 'seo_rate_card_keywords', 'seo_rate_card_og_image',
+
+            // Marketing & Promos
+            'promo_top_banner_enabled', 'promo_top_banner_badge', 'promo_top_banner_text',
+            'promo_top_banner_code', 'promo_top_banner_discount',
+            'promo_welcome_modal_enabled', 'promo_welcome_modal_headline',
+            'promo_welcome_modal_subheadline', 'promo_welcome_modal_discount',
+            'promo_welcome_modal_timer_minutes', 'promo_welcome_modal_delay_seconds',
+
             // Google Integrations
             'google_active', 'google_gtm_id', 'google_ga4_id', 'google_analytics_id', 'google_tag_manager_id',
             'google_ads_id', 'google_conversion_label', 'google_site_verification', 'google_maps_api_key',
@@ -67,8 +153,8 @@ class AdminSettingController extends Controller
             // Meta Integrations
             'meta_active', 'meta_pixel_id', 'meta_access_token', 'meta_capi_enabled', 'meta_test_event_code',
 
-            // Email & General Settings
-            'site_email', 'admin_email', 'admin_email_cc', 'admin_email_bcc', 'site_phone',
+            // Email & Payment Settings
+            'admin_email', 'admin_email_cc', 'admin_email_bcc',
             'ziina_active', 'ziina_access_token', 'ziina_webhook_secret', 'ziina_test_mode', 'ziina_advance_percent',
             'cache_version',
 
@@ -79,13 +165,21 @@ class AdminSettingController extends Controller
 
         $settings = $request->only($allowedKeys);
 
-        // Handle boolean switch checkboxes that are omitted by browsers when unchecked
+        // Handle boolean switches that are omitted when unchecked
         if ($request->has('google_gtm_id') || $request->has('google_ga4_id') || $request->has('google_ads_id')) {
             $settings['google_active'] = $request->has('google_active') ? '1' : '0';
         }
 
         if ($request->has('meta_pixel_id') || $request->has('meta_access_token')) {
             $settings['meta_active'] = $request->has('meta_active') ? '1' : '0';
+        }
+
+        if ($request->has('promo_banner_form_submitted')) {
+            $settings['promo_top_banner_enabled'] = $request->has('promo_top_banner_enabled') ? '1' : '0';
+        }
+
+        if ($request->has('promo_modal_form_submitted')) {
+            $settings['promo_welcome_modal_enabled'] = $request->has('promo_welcome_modal_enabled') ? '1' : '0';
         }
 
         foreach ($settings as $key => $value) {
@@ -98,7 +192,6 @@ class AdminSettingController extends Controller
         \Illuminate\Support\Facades\Cache::forget('site_settings_cache');
         \Illuminate\Support\Facades\Cache::forget('site_home_cache');
 
-        // Return back to referring page or specific route
         return back()->with('success', 'Settings updated successfully.');
     }
 
@@ -150,16 +243,16 @@ class AdminSettingController extends Controller
 
             return back()->with('success', 'Database migrations executed successfully: ' . $output);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('Admin migration execution error: ' . $e->getMessage());
+            Log::error('Admin migration execution error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Migration error: ' . $e->getMessage()
+                    'message' => 'An error occurred while running migrations. Details have been logged.'
                 ], 500);
             }
 
-            return back()->with('error', 'Migration error: ' . $e->getMessage());
+            return back()->with('error', 'An error occurred while executing migrations.');
         }
     }
 
@@ -187,11 +280,11 @@ class AdminSettingController extends Controller
                 'rates' => $rates
             ]);
         } catch (\Throwable $e) {
+            Log::error('Currency sync error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to synchronize currency rates: ' . $e->getMessage()
+                'message' => 'Failed to synchronize currency rates. Please verify connection.'
             ], 500);
         }
     }
 }
-

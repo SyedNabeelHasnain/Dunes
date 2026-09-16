@@ -48,20 +48,20 @@ if (!function_exists('renderReviewCardMarkup')) {
     {
       "@@type": ["TravelAgency", "LocalBusiness"],
       "@@id": "{{ route('home') }}#organization",
-      "name": "Dunes Discovery Tourism LLC",
+      "name": "{{ $settings['site_name'] ?? 'Dunes Discovery Tourism LLC' }}",
       "alternateName": ["Dunes Discovery", "Dunes Discovery Tourism Dubai"],
       "url": "{{ route('home') }}",
       "logo": "{{ asset('images/logo.png') }}",
       "image": "{{ asset('images/desert-safari-poster.avif') }}",
-      "description": "Licensed Dubai Destination Management Company offering premium Desert Safaris, 1000cc Dune Buggy Rentals, Quad Biking, Dhow Cruise Dinners, and Abu Dhabi City Tours.",
-      "telephone": "+971 50 245 6056",
-      "email": "info@dunesdiscoverytourism.com",
+      "description": "{{ $settings['site_description'] ?? 'Licensed Dubai Destination Management Company offering premium Desert Safaris, 1000cc Dune Buggy Rentals, Quad Biking, Dhow Cruise Dinners, and Abu Dhabi City Tours.' }}",
+      "telephone": "{{ $settings['contact_phone'] ?? '+971 50 245 6056' }}",
+      "email": "{{ $settings['contact_email'] ?? 'info@dunesdiscoverytourism.com' }}",
       "priceRange": "AED 79 - AED 1500",
       "currenciesAccepted": "AED, USD, EUR, GBP",
       "paymentAccepted": "Cash, Credit Card, Debit Card, Ziina",
       "address": {
         "@@type": "PostalAddress",
-        "streetAddress": "Dubai Desert Safari Terminal, Al Aweer & Lahbab",
+        "streetAddress": "{{ $settings['contact_address'] ?? 'Dubai Desert Safari Terminal, Al Aweer & Lahbab' }}",
         "addressLocality": "Dubai",
         "addressRegion": "Dubai",
         "postalCode": "00000",
@@ -94,9 +94,9 @@ if (!function_exists('renderReviewCardMarkup')) {
         "returnFees": "https://schema.org/FreeReturn"
       },
       "sameAs": [
-        "https://www.facebook.com/dunesdiscoverytourism",
-        "https://www.instagram.com/dunesdiscoverytourism",
-        "https://www.tripadvisor.com"
+        "{{ $settings['social_facebook'] ?? 'https://www.facebook.com/dunesdiscoverytourism' }}",
+        "{{ $settings['social_instagram'] ?? 'https://www.instagram.com/dunesdiscoverytourism' }}",
+        "{{ $settings['social_tripadvisor'] ?? 'https://www.tripadvisor.com' }}"
       ]
     },
     {
@@ -400,9 +400,9 @@ if (!function_exists('renderReviewCardMarkup')) {
                                         <span class="h5 fw-bold text-primary mb-0" data-aed="{{ $minPrice }}">AED {{ number_format($minPrice) }}</span>
                                     </div>
                                     <div class="d-flex gap-2">
-                                        <button type="button" class="btn-circle-whatsapp fab-whatsapp" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp" onclick="event.preventDefault(); event.stopPropagation(); if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp('{{ addslashes($t->name) }}'); }">
+                                        <span role="button" tabindex="0" class="btn-circle-whatsapp fab-whatsapp" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp" onclick="event.preventDefault(); event.stopPropagation(); if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp('{{ addslashes($t->name) }}'); }" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();if(window.App&&typeof window.App.openWhatsApp==='function'){window.App.openWhatsApp('{{ addslashes($t->name) }}');}}">
                                             <i class="bi bi-whatsapp"></i>
-                                        </button>
+                                        </span>
                                         <div class="btn-circle-desert d-flex align-items-center justify-content-center">
                                             <i class="bi bi-arrow-right"></i>
                                         </div>
