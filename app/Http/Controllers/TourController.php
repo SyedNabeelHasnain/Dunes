@@ -220,6 +220,10 @@ class TourController extends Controller
 
         // 5. Generative Engine Optimization (GEO) Direct-Answer Synthesis
         $aiOverview = $this->generateGeoDirectAnswer($cleanQuery, $intent, $minPrice, $tours->count());
+        if ($isFallback) {
+            $aiOverview['title'] = "Recommended Dubai Desert Safaris (Bestsellers)";
+            $aiOverview['summary'] = "While no specific package directly matches \"{$displayQuery}\", here are Dubai's highest-rated desert safari adventures. Each package includes 4x4 hotel transfers, red dune bashing in Lahbab, 5-star halal live BBQ dinner, and live entertainment shows.";
+        }
 
         return view('tours.search', compact(
             'cleanQuery',
@@ -424,35 +428,52 @@ class TourController extends Controller
                 }
             }
 
-            // Intent-specific boosts
-            if ($intent['type'] === 'quad_biking' && (str_contains($tName, 'quad') || str_contains($tName, 'atv') || str_contains($tierNames, 'quad'))) {
-                $score += 40;
-            }
-            if ($intent['type'] === 'dune_buggy' && (str_contains($tName, 'buggy') || str_contains($tName, 'can-am') || str_contains($tName, 'polaris'))) {
-                $score += 40;
-            }
-            if ($intent['type'] === 'vip_luxury' && (str_contains($tName, 'vip') || str_contains($tName, 'private') || str_contains($tierNames, 'vip'))) {
-                $score += 35;
-            }
-            if ($intent['type'] === 'morning' && str_contains($tName, 'morning')) {
-                $score += 35;
-            }
-            if ($intent['type'] === 'overnight' && str_contains($tName, 'overnight')) {
-                $score += 35;
-            }
-            if ($intent['type'] === 'dhow_cruise' && (str_contains($tName, 'cruise') || str_contains($tName, 'dhow') || $catSlug === 'water-activity')) {
-                $score += 35;
+            // Only apply intent boost & quality boost if the tour actually matched the search terms
+            $hasTermMatch = (
+                str_contains($tName, $qLower) ||
+                str_contains($tKeys, $qLower) ||
+                str_contains($catSlug, $qLower) ||
+                str_contains($catName, $qLower)
+            );
+
+            if (!$hasTermMatch) {
+                foreach ($tokens as $token) {
+                    if (str_contains($tName, $token) || str_contains($tKeys, $token) || str_contains($catSlug, $token) || str_contains($catName, $token) || str_contains($tierNames, $token) || str_contains($tDesc, $token)) {
+                        $hasTermMatch = true;
+                        break;
+                    }
+                }
             }
 
-            // Quality score boosts
-            if ($tour->is_bestseller) {
-                $score += 5;
-            }
-            if ($tour->is_featured) {
-                $score += 3;
-            }
+            if ($hasTermMatch) {
+                // Intent-specific boosts
+                if ($intent['type'] === 'quad_biking' && (str_contains($tName, 'quad') || str_contains($tName, 'atv') || str_contains($tierNames, 'quad'))) {
+                    $score += 40;
+                }
+                if ($intent['type'] === 'dune_buggy' && (str_contains($tName, 'buggy') || str_contains($tName, 'can-am') || str_contains($tName, 'polaris'))) {
+                    $score += 40;
+                }
+                if ($intent['type'] === 'vip_luxury' && (str_contains($tName, 'vip') || str_contains($tName, 'private') || str_contains($tierNames, 'vip'))) {
+                    $score += 35;
+                }
+                if ($intent['type'] === 'morning' && str_contains($tName, 'morning')) {
+                    $score += 35;
+                }
+                if ($intent['type'] === 'overnight' && str_contains($tName, 'overnight')) {
+                    $score += 35;
+                }
+                if ($intent['type'] === 'dhow_cruise' && (str_contains($tName, 'cruise') || str_contains($tName, 'dhow') || $catSlug === 'water-activity')) {
+                    $score += 35;
+                }
 
-            if ($score > 0) {
+                // Quality score boosts
+                if ($tour->is_bestseller) {
+                    $score += 5;
+                }
+                if ($tour->is_featured) {
+                    $score += 3;
+                }
+
                 $scored[] = [
                     'tour' => $tour,
                     'score' => $score,
