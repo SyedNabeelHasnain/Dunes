@@ -68,6 +68,40 @@
             "@@id": "{{ route('home') }}#organization"
           },
           "touristType": ["Adventure Tourism", "Family Friendly", "Couples", "Solo Travelers"],
+          "about": [
+            {
+              "@@type": "Place",
+              "name": "Lahbab High Red Dunes",
+              "sameAs": "https://www.wikidata.org/wiki/Q6473133"
+            },
+            {
+              "@@type": "Place",
+              "name": "Dubai Desert Conservation Reserve",
+              "sameAs": "https://www.wikidata.org/wiki/Q5310543"
+            },
+            {
+              "@@type": "Thing",
+              "name": "Dune Bashing",
+              "sameAs": "https://www.wikidata.org/wiki/Q5315003"
+            }
+          ],
+          "mentions": [
+            {
+              "@@type": "Brand",
+              "name": "Can-Am Off-Road",
+              "sameAs": "https://www.wikidata.org/wiki/Q1032873"
+            },
+            {
+              "@@type": "Brand",
+              "name": "Polaris Inc.",
+              "sameAs": "https://www.wikidata.org/wiki/Q2102146"
+            },
+            {
+              "@@type": "Place",
+              "name": "Dubai",
+              "sameAs": "https://www.wikidata.org/wiki/Q612"
+            }
+          ],
           "aggregateRating": {
             "@@type": "AggregateRating",
             "ratingValue": "{{ $tour->rating ?: '4.9' }}",
@@ -75,6 +109,26 @@
             "bestRating": "5",
             "worstRating": "1"
           },
+          @if(isset($approvedReviews) && $approvedReviews->count() > 0)
+          "review": [
+            @foreach($approvedReviews as $ridx => $rev)
+            {
+              "@@type": "Review",
+              "reviewRating": {
+                "@@type": "Rating",
+                "ratingValue": "{{ $rev->rating }}",
+                "bestRating": "5"
+              },
+              "author": {
+                "@@type": "Person",
+                "name": {!! json_encode($rev->reviewer_name ?: 'Verified Traveler') !!}
+              },
+              "datePublished": "{{ $rev->published_date ? $rev->published_date->format('Y-m-d') : $rev->created_at->format('Y-m-d') }}",
+              "reviewBody": {!! json_encode(Str::limit($rev->review_text, 280)) !!}
+            }{{ $ridx < $approvedReviews->count() - 1 ? ',' : '' }}
+            @endforeach
+          ],
+          @endif
           "offers": {
             "@@type": "Offer",
             "url": {!! json_encode(request()->url()) !!},
@@ -160,6 +214,18 @@
           ]
         }
         @endif
+        ,
+        {
+          "@@type": "WebPage",
+          "@@id": "{{ request()->url() }}#webpage",
+          "url": "{{ request()->url() }}",
+          "name": {!! json_encode($pageTitle) !!},
+          "description": {!! json_encode($pageDesc) !!},
+          "speakable": {
+            "@@type": "SpeakableSpecification",
+            "cssSelector": ["h1", ".tour-at-a-glance", "#tourDescriptionText"]
+          }
+        }
       ]
     }
     </script>
@@ -301,10 +367,20 @@ if(window.fbq){
         <div class="row g-5">
             <div class="col-lg-8">
                 <!-- GEO & AI Search "Tour at a Glance" Quick Facts Card -->
-                <div class="card border-0 bg-soft-primary rounded-4 p-4 mb-5 border-start border-4 border-primary shadow-sm">
-                    <h2 class="h5 fw-bold text-primary mb-3 d-flex align-items-center gap-2">
-                        <i class="bi bi-lightning-charge-fill"></i>Experience at a Glance
-                    </h2>
+                <div class="card border-0 bg-soft-primary rounded-4 p-4 mb-5 border-start border-4 border-primary shadow-sm tour-at-a-glance">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <h2 class="h5 fw-bold text-primary mb-0 d-flex align-items-center gap-2">
+                            <i class="bi bi-lightning-charge-fill"></i>Experience at a Glance
+                        </h2>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <span class="badge bg-success bg-opacity-15 text-success rounded-pill px-3 py-1.5 fw-bold border border-success border-opacity-25" style="font-size: 11px;">
+                                <i class="bi bi-patch-check-fill me-1"></i>DTCM License #1430583
+                            </span>
+                            <span class="badge bg-primary bg-opacity-15 text-primary rounded-pill px-3 py-1.5 fw-bold border border-primary border-opacity-25" style="font-size: 11px;">
+                                <i class="bi bi-check-circle-fill me-1"></i>No Driver's License Required
+                            </span>
+                        </div>
+                    </div>
                     <div class="row g-3">
                         <div class="col-sm-6">
                             <div class="d-flex align-items-start gap-2">
@@ -338,7 +414,25 @@ if(window.fbq){
                                 <i class="bi bi-cup-hot text-primary mt-1"></i>
                                 <div>
                                     <strong class="d-block text-dark small">Dining & Beverages:</strong>
-                                    <span class="text-muted small">Live BBQ Buffet, Arabic Coffee & Dates</span>
+                                    <span class="text-muted small">100% Halal BBQ Buffet, Arabic Coffee & Dates</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-start gap-2">
+                                <i class="bi bi-arrow-repeat text-primary mt-1"></i>
+                                <div>
+                                    <strong class="d-block text-dark small">Cancellation Policy:</strong>
+                                    <span class="text-muted small">100% Free Cancellation up to 24h</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-start gap-2">
+                                <i class="bi bi-ticket-perforated text-primary mt-1"></i>
+                                <div>
+                                    <strong class="d-block text-dark small">Instant Confirmation:</strong>
+                                    <span class="text-muted small">Immediate WhatsApp & Email e-Ticket</span>
                                 </div>
                             </div>
                         </div>

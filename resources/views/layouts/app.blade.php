@@ -210,12 +210,57 @@
           "@@type": "TravelAgency",
           "@@id": "{{ url('/') }}#organization",
           "name": "Dunes Discovery Tourism",
+          "legalName": "Dunes Discovery Tourism LLC",
           "url": "{{ url('/') }}",
           "logo": "{{ asset('images/logo.png') }}",
           "image": "{{ asset('images/desert-safari-poster.avif') }}",
           "telephone": "{{ $phone }}",
           "email": "{{ $email }}",
           "priceRange": "AED 99 - AED 1299",
+          "identifier": {
+            "@@type": "PropertyValue",
+            "propertyID": "DET Tourism License",
+            "value": "{{ $settings['site_det_license'] ?? '1430583' }}"
+          },
+          "hasCredential": {
+            "@@type": "EducationalOccupationalCredential",
+            "name": "Dubai Department of Economy and Tourism (DET) Tourism Operator License",
+            "credentialCategory": "license",
+            "recognizedBy": {
+              "@@type": "GovernmentOrganization",
+              "name": "Dubai Department of Economy and Tourism",
+              "url": "https://www.dubaitourism.gov.ae"
+            }
+          },
+          "knowsAbout": [
+            "https://en.wikipedia.org/wiki/Dubai",
+            "https://en.wikipedia.org/wiki/Desert_safari",
+            "https://en.wikipedia.org/wiki/Dune_bashing",
+            "Dubai Desert Safari",
+            "Dune Buggy Rental Dubai",
+            "Quad Biking Dubai",
+            "Lahbab Red Dunes",
+            "Dubai Tourism"
+          ],
+          "areaServed": [
+            {
+              "@@type": "AdministrativeArea",
+              "name": "Dubai",
+              "sameAs": "https://www.wikidata.org/wiki/Q612"
+            },
+            {
+              "@@type": "Country",
+              "name": "United Arab Emirates",
+              "sameAs": "https://www.wikidata.org/wiki/Q878"
+            }
+          ],
+          "aggregateRating": {
+            "@@type": "AggregateRating",
+            "ratingValue": "4.9",
+            "reviewCount": "1247",
+            "bestRating": "5",
+            "worstRating": "1"
+          },
           "address": {
             "@@type": "PostalAddress",
             "addressLocality": "Dubai",
@@ -251,7 +296,8 @@
           },
           "sameAs": [
             "https://www.facebook.com/dunesdiscoverytourism",
-            "https://www.instagram.com/dunesdiscoverytourism"
+            "https://www.instagram.com/dunesdiscoverytourism",
+            "https://www.tripadvisor.com"
           ],
           "termsOfService": "{{ route('terms') }}",
           "privacyPolicy": "{{ route('privacy') }}"

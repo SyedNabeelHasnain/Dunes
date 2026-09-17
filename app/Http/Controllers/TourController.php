@@ -133,9 +133,16 @@ class TourController extends Controller
         $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image ?: 'evening-desert-safari-dubai-dune-discovery-tourism.avif');
         $ogImage = asset('images/' . $imgFile);
 
+        // Top verified reviews for Schema.org review rich snippets
+        $approvedReviews = \App\Models\Review::where('status', 'approved')
+            ->where('rating', '>=', 4.5)
+            ->latest('published_date')
+            ->take(5)
+            ->get();
+
         // Track form load timestamp for analytics
         session(["form_load.booking_{$tour->id}" => microtime(true)]);
 
-        return view('tours.show', compact('tour', 'highlights', 'inclusions', 'exclusions', 'faqs', 'relatedTours', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage', 'minPrice'));
+        return view('tours.show', compact('tour', 'highlights', 'inclusions', 'exclusions', 'faqs', 'relatedTours', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage', 'minPrice', 'approvedReviews'));
     }
 }

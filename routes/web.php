@@ -225,37 +225,17 @@ Route::get('/email/track/click/{token}', [SubscriberController::class, 'trackCli
 Route::get('/unsubscribe/{token}', [SubscriberController::class, 'unsubscribe'])->name('unsubscribe');
 Route::post('/unsubscribe/{token}', [SubscriberController::class, 'processUnsubscribe'])->name('unsubscribe.submit');
 
-// ── Dynamic XML Sitemap & Image Sitemap ──────────────────────────────────────
-Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
+// ── Dynamic XML Sitemap & Sitemap Index ──────────────────────────────────────
+Route::get('/sitemap_index.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap.index');
+Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'unified'])->name('sitemap');
+Route::get('/sitemap-tours.xml', [\App\Http\Controllers\SitemapController::class, 'tours'])->name('sitemap.tours');
+Route::get('/sitemap-blogs.xml', [\App\Http\Controllers\SitemapController::class, 'blogs'])->name('sitemap.blogs');
+Route::get('/sitemap-pages.xml', [\App\Http\Controllers\SitemapController::class, 'pages'])->name('sitemap.pages');
+Route::get('/sitemap-images.xml', [\App\Http\Controllers\SitemapController::class, 'images'])->name('sitemap.images');
 
 // ── AI Search Engine & LLM Markdown Endpoints (GEO Optimization) ─────────────
-Route::get('/llms.txt', function () {
-    $paths = [
-        public_path('llms.txt'),
-        base_path('../public_html/llms.txt'),
-        base_path('public/llms.txt')
-    ];
-    foreach ($paths as $p) {
-        if (file_exists($p)) {
-            return response(file_get_contents($p), 200, ['Content-Type' => 'text/plain; charset=utf-8']);
-        }
-    }
-    return response("# Dunes Discovery Tourism\n\n> Licensed UAE Destination Management Company.\n\n## Core Tours\n\n- [Tour Catalog](https://dunesdiscoverytourism.com/tours): Full catalog of desert safaris, dune buggy rentals and city tours.\n- [Dune Buggy Rental](https://dunesdiscoverytourism.com/dune-buggy-rental-dubai): Self-drive 1000cc dune buggy rentals.\n- [Contact Us](https://dunesdiscoverytourism.com/contact): Direct booking and customer support.", 200, ['Content-Type' => 'text/plain; charset=utf-8']);
-});
-
-Route::get('/llms-full.txt', function () {
-    $paths = [
-        public_path('llms-full.txt'),
-        base_path('../public_html/llms-full.txt'),
-        base_path('public/llms-full.txt')
-    ];
-    foreach ($paths as $p) {
-        if (file_exists($p)) {
-            return response(file_get_contents($p), 200, ['Content-Type' => 'text/plain; charset=utf-8']);
-        }
-    }
-    return response("# Dunes Discovery Tourism Full Specifications\n\n> Comprehensive guide for LLM search engines.\n\n## Core Links\n\n- [Tour Catalog](https://dunesdiscoverytourism.com/tours): Full pricing and tours.\n- [XML Sitemap](https://dunesdiscoverytourism.com/sitemap.xml): Full XML sitemap.", 200, ['Content-Type' => 'text/plain; charset=utf-8']);
-});
+Route::get('/llms.txt', [\App\Http\Controllers\LlmsController::class, 'index'])->name('llms.txt');
+Route::get('/llms-full.txt', [\App\Http\Controllers\LlmsController::class, 'full'])->name('llms.full');
 
 // ── Explicit High-Value Tour Routes ─────────────────────────────────────────
 Route::get('/dune-buggy-rental-dubai', [TourController::class, 'showBuggy'])->name('tours.buggy');
