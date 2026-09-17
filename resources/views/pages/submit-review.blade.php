@@ -158,6 +158,14 @@
                                 </div>
                             </div>
 
+                            @if(!$booking->id)
+                            <!-- Guest Name -->
+                            <div class="mb-3">
+                                <label for="guestName" class="form-label text-white small fw-bold">Your Full Name <span class="text-danger">*</span></label>
+                                <input type="text" name="guest_name" id="guestName" required class="form-control bg-dark text-white border-secondary rounded-3 py-2.5 shadow-none" placeholder="e.g., Sarah Jenkins" value="{{ old('guest_name') }}">
+                            </div>
+                            @endif
+
                             <!-- Review Title -->
                             <div class="mb-3">
                                 <label for="reviewTitle" class="form-label text-white small fw-bold">Headline / Short Title</label>

@@ -259,7 +259,15 @@ class PageController extends Controller
      */
     public function reviewRate(Request $request, string $ref)
     {
-        $booking = \App\Models\Booking::where('reference', $ref)->with('tour')->firstOrFail();
+        $booking = \App\Models\Booking::where('reference', $ref)->with('tour')->first();
+        if (!$booking) {
+            $booking = new \App\Models\Booking([
+                'tour_name' => 'Dubai Desert Safari Experience',
+            ]);
+            $booking->id = null;
+            $booking->reference = strtoupper($ref);
+            $booking->name = 'Valued Guest';
+        }
         $score = (int)$request->input('score', 5);
         if ($score < 1 || $score > 5) {
             $score = 5;
@@ -284,15 +292,23 @@ class PageController extends Controller
      */
     public function submitReview(Request $request, string $ref)
     {
-        $booking = \App\Models\Booking::where('reference', $ref)->firstOrFail();
+        $booking = \App\Models\Booking::where('reference', $ref)->first();
+        $isGuestMode = !$booking;
 
-        $request->validate([
+        $rules = [
             'rating' => 'required|numeric|min:1|max:5',
             'review_title' => 'nullable|string|max:255',
             'review_text' => 'required|string|min:10|max:3000',
             'photos' => 'nullable|array|max:4',
             'photos.*' => 'image|mimes:jpeg,png,jpg,webp,avif|max:5120',
-        ]);
+        ];
+        if ($isGuestMode) {
+            $rules['guest_name'] = 'required|string|min:2|max:100';
+        }
+        $request->validate($rules);
+
+        $reviewerName = $booking ? $booking->name : trim($request->input('guest_name', 'Guest Traveler'));
+        $bookingId = $booking ? $booking->id : null;
 
         $rating = (float)$request->input('rating');
         $storedPhotos = [];
@@ -313,14 +329,16 @@ class PageController extends Controller
             }
         }
 
+        $sourceReviewId = $booking ? $booking->reference : ('GUEST-' . strtoupper($ref) . '-' . substr(md5($reviewerName . ($storedPhotos[0] ?? time())), 0, 8));
+
         $review = \App\Models\Review::updateOrCreate(
             [
                 'source' => 'direct_ugc',
-                'source_review_id' => $booking->reference,
+                'source_review_id' => $sourceReviewId,
             ],
             [
-                'booking_id' => $booking->id,
-                'reviewer_name' => $booking->name,
+                'booking_id' => $bookingId,
+                'reviewer_name' => $reviewerName,
                 'rating' => $rating,
                 'review_title' => $request->input('review_title') ?: 'Unforgettable Desert Safari Experience',
                 'review_text' => $request->input('review_text'),

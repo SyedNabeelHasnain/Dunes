@@ -125,20 +125,36 @@ jobs:
       env:
         SSHPASS: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
       run: |
+        SUCCESS=0
         for i in 1 2 3; do
-          sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=15 u410503041@${{ steps.ftp_server.outputs.host }} "mkdir -p /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html && find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html -type d -exec chmod 755 {} + && find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html -type f -exec chmod 644 {} +" && \
-          sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=15 u410503041@${{ steps.ftp_server.outputs.host }} "find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/public_html -mindepth 1 -maxdepth 1 ! -name 'images' -exec rm -rf {} +" && \
-          sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=15 u410503041@${{ steps.ftp_server.outputs.host }} "find /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel -mindepth 1 -maxdepth 1 ! -name 'storage' ! -name '.env' -exec rm -rf {} +" && break || sleep 5
+          if sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 u410503041@${{ steps.ftp_server.outputs.host }} "mkdir -p /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html && find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html -type d -exec chmod 755 {} + && find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html -type f -exec chmod 644 {} +" && \
+             sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 u410503041@${{ steps.ftp_server.outputs.host }} "find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/public_html -mindepth 1 -maxdepth 1 ! -name 'images' -exec rm -rf {} +" && \
+             sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 u410503041@${{ steps.ftp_server.outputs.host }} "find /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel -mindepth 1 -maxdepth 1 ! -name 'storage' ! -name '.env' -exec rm -rf {} +"; then
+            SUCCESS=1
+            break
+          fi
+          echo "Clean slate attempt $i failed, retrying in 8s..."
+          sleep 8
         done
 
     - name: Upload Public Assets (SCP)
       env:
         SSHPASS: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
       run: |
+        SUCCESS=0
         for i in 1 2 3; do
-          sshpass -e scp -O -P 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=15 public/.htaccess deploy/public_deploy/public.zip u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/domains/dunesdiscoverytourism.com/public_html/ && \
-          sshpass -e scp -O -P 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=15 public/.htaccess deploy/public_deploy/public.zip u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/public_html/ && break || sleep 5
+          if sshpass -e scp -O -P 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 public/.htaccess deploy/public_deploy/public.zip u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/domains/dunesdiscoverytourism.com/public_html/ && \
+             sshpass -e scp -O -P 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 public/.htaccess deploy/public_deploy/public.zip u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/public_html/; then
+            SUCCESS=1
+            break
+          fi
+          echo "Public assets upload attempt $i failed, retrying in 8s..."
+          sleep 8
         done
+        if [ $SUCCESS -ne 1 ]; then
+          echo "Failed to upload public assets."
+          exit 1
+        fi
 
     - name: Package & Upload Images (Always Sync)
       env:
@@ -149,28 +165,59 @@ jobs:
         zip -r ../images.zip images
         cd ..
         
+        SUCCESS=0
         for i in 1 2 3; do
-          sshpass -e scp -C -O -P 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=15 images.zip u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/domains/dunesdiscoverytourism.com/public_html/ && \
-          sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=15 u410503041@${{ steps.ftp_server.outputs.host }} "unzip -o /home/u410503041/domains/dunesdiscoverytourism.com/public_html/images.zip -d /home/u410503041/domains/dunesdiscoverytourism.com/public_html/ && unzip -o /home/u410503041/domains/dunesdiscoverytourism.com/public_html/images.zip -d /home/u410503041/public_html/ && rm -f /home/u410503041/domains/dunesdiscoverytourism.com/public_html/images.zip" && break || sleep 5
+          if sshpass -e scp -C -O -P 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 images.zip u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/domains/dunesdiscoverytourism.com/public_html/ && \
+             sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 u410503041@${{ steps.ftp_server.outputs.host }} "unzip -o /home/u410503041/domains/dunesdiscoverytourism.com/public_html/images.zip -d /home/u410503041/domains/dunesdiscoverytourism.com/public_html/ && unzip -o /home/u410503041/domains/dunesdiscoverytourism.com/public_html/images.zip -d /home/u410503041/public_html/ && rm -f /home/u410503041/domains/dunesdiscoverytourism.com/public_html/images.zip"; then
+            SUCCESS=1
+            break
+          fi
+          echo "Images sync attempt $i failed, retrying in 8s..."
+          sleep 8
         done
+        if [ $SUCCESS -ne 1 ]; then
+          echo "Failed to sync images."
+          exit 1
+        fi
 
     - name: Upload Core Laravel Code (SCP)
       env:
         SSHPASS: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
       run: |
+        SUCCESS=0
         for i in 1 2 3; do
-          sshpass -e scp -O -P 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=15 deploy/core_deploy/core.zip u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/ && break || sleep 5
+          if sshpass -e scp -O -P 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 deploy/core_deploy/core.zip u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/; then
+            SUCCESS=1
+            break
+          fi
+          echo "Core upload attempt $i failed, retrying in 8s..."
+          sleep 8
         done
+        if [ $SUCCESS -ne 1 ]; then
+          echo "Failed to upload core zip."
+          exit 1
+        fi
 
     - name: Extract Code Zips & Rebuild Laravel Cache (Direct SSH)
       env:
         SSHPASS: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
       run: |
+        SUCCESS=0
         for i in 1 2 3; do
-          sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=15 u410503041@${{ steps.ftp_server.outputs.host }} "cd /home/u410503041/domains/dunesdiscoverytourism.com/public_html && unzip -o public.zip && rm -f public.zip && cd /home/u410503041/public_html && unzip -o public.zip && rm -f public.zip && cd /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel && unzip -o core.zip && rm -f core.zip && rm -rf storage/framework/views && mkdir -p storage/framework/views && find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html -type d -exec chmod 755 {} + && find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html -type f -exec chmod 644 {} + && chmod -R 775 /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/storage /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/bootstrap/cache && php artisan migrate --force; php artisan config:clear; php artisan cache:clear; php artisan route:clear; php artisan view:clear; php artisan event:clear" && break || sleep 5
+          if sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 u410503041@${{ steps.ftp_server.outputs.host }} "cd /home/u410503041/domains/dunesdiscoverytourism.com/public_html && unzip -o public.zip && rm -f public.zip && cd /home/u410503041/public_html && unzip -o public.zip && rm -f public.zip && cd /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel && unzip -o core.zip && rm -f core.zip && rm -rf storage/framework/views && mkdir -p storage/framework/views && find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html -type d -exec chmod 755 {} + && find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html -type f -exec chmod 644 {} + && chmod -R 775 /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/storage /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/bootstrap/cache && php artisan migrate --force; php artisan config:clear; php artisan cache:clear; php artisan route:clear; php artisan view:clear; php artisan event:clear; touch /home/u410503041/domains/dunesdiscoverytourism.com/public_html/.htaccess /home/u410503041/public_html/.htaccess"; then
+            SUCCESS=1
+            break
+          fi
+          echo "Extraction & cache clear attempt $i failed, retrying in 8s..."
+          sleep 8
         done
+        if [ $SUCCESS -ne 1 ]; then
+          echo "Failed to extract code and rebuild cache."
+          exit 1
+        fi
 
     - name: Trigger Web-Based Health Check
       run: |
         curl -i -s "https://dunesdiscoverytourism.com/" | head -n 25
+        curl -i -s "https://dunesdiscoverytourism.com/desert-safari-from-dubai-marina" | head -n 15
 

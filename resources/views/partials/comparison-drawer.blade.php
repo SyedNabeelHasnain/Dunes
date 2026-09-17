@@ -1,5 +1,15 @@
 @php
-    $compareToursData = ($allTours ?? collect())->map(function($t) {
+    if (!function_exists('try_get_compare_tours')) {
+        function try_get_compare_tours() {
+            try {
+                return \App\Models\Tour::where('status', 'active')->with(['tiers'])->orderBy('priority', 'asc')->get();
+            } catch (\Throwable $e) {
+                return collect();
+            }
+        }
+    }
+    $sourceTours = (isset($allTours) && count($allTours)) ? $allTours : try_get_compare_tours();
+    $compareToursData = $sourceTours->map(function($t) {
         $minPrice = $t->tiers ? $t->tiers->pluck('pivot.price')->filter(fn($p) => (float)$p > 0)->min() : 99;
         $minPrice = $minPrice ? (float)$minPrice : 99;
         
