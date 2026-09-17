@@ -46,6 +46,9 @@
                 <button type="submit" class="btn btn-primary rounded-pill px-4 py-2 fw-bold">Mark Completed</button>
             </form>
         @endif
+        <button type="button" class="btn btn-outline-danger rounded-pill px-3 py-2 fw-bold shadow-sm" onclick="promptPermanentDeleteShow('{{ $booking->id }}', '{{ $booking->reference }}', '{{ addslashes($booking->name) }}')" title="Permanently Delete Booking & All Related Records">
+            <i class="bi bi-trash3 me-1"></i> Delete Booking
+        </button>
     </div>
 </div>
 
@@ -409,6 +412,110 @@ function confirmCancelBooking() {
         if (result.isConfirmed) {
             document.getElementById('cancelBookingForm').submit();
         }
+    });
+}
+
+function promptPermanentDeleteShow(id, reference, name) {
+    // Step 1: Caution Dialog
+    Swal.fire({
+        title: '⚠️ CAUTION: Permanent Booking Deletion',
+        html: `
+            <div class="text-start small text-secondary">
+                <div class="alert alert-danger py-2 px-3 mb-3 border-danger border-opacity-25 bg-danger bg-opacity-10 text-danger fw-semibold">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                    <strong>IRREVERSIBLE ACTION:</strong> You are about to permanently eradicate Booking <span class="font-monospace fw-bold">#${reference}</span> from the database.
+                </div>
+                <p class="mb-2 text-dark"><strong>Customer:</strong> ${name || 'N/A'}</p>
+                <div class="card bg-light border-0 p-2.5 mb-3">
+                    <div class="fw-bold text-dark mb-1 small text-uppercase" style="font-size: 11px;">The following records will be permanently purged:</div>
+                    <ul class="mb-0 ps-3 text-muted" style="font-size: 12px; line-height: 1.6;">
+                        <li>Primary Booking Record & Guest Information</li>
+                        <li>All Booked Add-ons, Buggies & Extra Selections</li>
+                        <li>Complete Payment History & Gateway Transaction Records</li>
+                        <li>Visitor Analytics, Telemetry & Request Logs</li>
+                        <li>Guest Reviews submitted for this booking</li>
+                        <li>Coupon usage quota will be released back to pool</li>
+                    </ul>
+                </div>
+                <p class="mb-0 text-muted">Are you sure you want to proceed to the final verification?</p>
+            </div>
+        `,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Proceed to Final Confirmation <i class="bi bi-arrow-right ms-1"></i>',
+        cancelButtonText: 'Cancel (Keep Booking)',
+        focusCancel: true
+    }).then((step1Result) => {
+        if (!step1Result.isConfirmed) return;
+
+        // Step 2: Final Safeguard Double Confirmation
+        Swal.fire({
+            title: '🔒 Double Confirmation Required',
+            html: `
+                <div class="text-start small">
+                    <p class="text-dark mb-2">To prevent accidental deletion, please type the booking reference below to authorize permanent destruction:</p>
+                    <div class="text-center my-3">
+                        <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 fs-6 font-monospace py-2 px-3">
+                            ${reference}
+                        </span>
+                    </div>
+                </div>
+            `,
+            input: 'text',
+            inputPlaceholder: `Type ${reference} to confirm`,
+            inputAttributes: {
+                autocapitalize: 'off',
+                autocorrect: 'off',
+                autocomplete: 'off',
+                style: 'text-align: center; font-family: monospace; font-weight: bold; font-size: 1.1rem; letter-spacing: 1px;'
+            },
+            icon: 'error',
+            showCancelButton: true,
+            confirmButtonColor: '#b02a37',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '<i class="bi bi-trash3-fill me-1"></i> PERMANENTLY PURGE EVERYTHING',
+            cancelButtonText: 'Abort',
+            focusCancel: true,
+            showLoaderOnConfirm: true,
+            preConfirm: (inputValue) => {
+                if (!inputValue || inputValue.trim() !== reference) {
+                    Swal.showValidationMessage(`Reference mismatch! You must type exactly "${reference}" to authorize deletion.`);
+                    return false;
+                }
+                return $.ajax({
+                    url: `/admin/bookings/${id}`,
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        _method: 'DELETE'
+                    },
+                    headers: { 'Accept': 'application/json' }
+                }).then(response => {
+                    if (!response.success) {
+                        throw new Error(response.message || 'Failed to delete booking.');
+                    }
+                    return response;
+                }).catch(error => {
+                    const msg = error.responseJSON ? error.responseJSON.message : error.message;
+                    Swal.showValidationMessage(`Purge Failed: ${msg}`);
+                });
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((step2Result) => {
+            if (step2Result.isConfirmed && step2Result.value) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Purged!',
+                    text: step2Result.value.message || `Booking #${reference} was permanently deleted.`,
+                    timer: 1600,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = "{{ route('admin.bookings.index') }}";
+                });
+            }
+        });
     });
 }
 </script>

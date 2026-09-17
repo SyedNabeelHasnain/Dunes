@@ -4,9 +4,18 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\BookingAddon;
+use App\Models\BookingPayment;
+use App\Models\Coupon;
+use App\Models\CouponUsage;
+use App\Models\Review;
 use App\Models\RequestLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use App\Mail\BookingNotification;
 use App\Mail\PaymentLinkMail;
 use App\Services\SettingsService;
@@ -256,13 +265,110 @@ class AdminBookingController extends Controller
     }
 
     /**
-     * Delete a booking.
+     * Permanently delete a booking and all associated relational & analytical data.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
-        $booking = Booking::findOrFail($id);
-        $booking->delete();
-        return redirect()->route('admin.bookings.index')->with('success', 'Booking deleted successfully.');
+        $booking = Booking::withTrashed()->findOrFail($id);
+        $reference = $booking->reference;
+
+        try {
+            $this->purgeBookingData($booking);
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => "Booking #{$reference} and all associated records permanently purged."
+                ]);
+            }
+
+            return redirect()->route('admin.bookings.index')
+                ->with('success', "Booking #{$reference} and all associated records permanently purged.");
+        } catch (\Throwable $e) {
+            Log::error("Failed to permanently delete booking #{$reference}: " . $e->getMessage(), [
+                'booking_id' => $id,
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to delete booking: ' . $e->getMessage()
+                ], 500);
+            }
+
+            return redirect()->back()
+                ->with('error', 'Failed to delete booking: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Execute complete cascade purge of all records and relations for a booking.
+     */
+    private function purgeBookingData(Booking $booking): void
+    {
+        DB::transaction(function () use ($booking) {
+            $bookingId = $booking->id;
+            $bookingRef = $booking->reference;
+            $logId = $booking->request_log_id;
+            $couponId = $booking->coupon_id;
+
+            // 1. Delete all booking addons
+            BookingAddon::where('booking_id', $bookingId)->delete();
+
+            // 2. Delete all booking payment history
+            BookingPayment::where('booking_id', $bookingId)->forceDelete();
+
+            // 3. Handle Coupon Usage & Quota Restoration
+            $couponUsage = CouponUsage::where('booking_id', $bookingId)
+                ->orWhere('booking_reference', $bookingRef)
+                ->first();
+            if ($couponUsage) {
+                if ($couponUsage->coupon_id) {
+                    Coupon::where('id', $couponUsage->coupon_id)
+                        ->where('used_count', '>', 0)
+                        ->decrement('used_count');
+                }
+                $couponUsage->delete();
+            } elseif ($couponId) {
+                Coupon::where('id', $couponId)
+                    ->where('used_count', '>', 0)
+                    ->decrement('used_count');
+            }
+
+            // 4. Delete Reviews directly linked to this booking & cleanup storage photos
+            $reviews = Review::where('booking_id', $bookingId)->get();
+            foreach ($reviews as $review) {
+                if (!empty($review->photos) && is_array($review->photos)) {
+                    foreach ($review->photos as $photo) {
+                        if (is_string($photo) && str_starts_with($photo, '/storage/')) {
+                            $relativePath = str_replace('/storage/', '', $photo);
+                            Storage::disk('public')->delete($relativePath);
+                        }
+                    }
+                }
+                $review->delete();
+            }
+
+            // 5. Delete Analytical and Telemetry Data (request_logs)
+            if ($logId) {
+                RequestLog::where('id', $logId)->delete();
+            }
+            RequestLog::where('entity_type', 'booking')
+                ->where('entity_id', $bookingId)
+                ->delete();
+
+            // 6. Forget draft session if this was the active session draft
+            if (session('active_booking_draft_id') == $bookingId) {
+                session()->forget('active_booking_draft_id');
+            }
+
+            // 7. Permanently Delete the Booking record itself from the database
+            $booking->forceDelete();
+
+            // 8. Flush Dashboard KPI Cache
+            Cache::forget('admin_dashboard_kpis');
+        });
     }
 
     /**
@@ -404,11 +510,19 @@ class AdminBookingController extends Controller
 
         try {
             if ($action === 'delete') {
-                $count = Booking::whereIn('id', $ids)->delete();
-                \Illuminate\Support\Facades\Cache::forget('admin_dashboard_kpis');
+                $count = 0;
+                DB::transaction(function () use ($ids, &$count) {
+                    $bookings = Booking::withTrashed()->whereIn('id', $ids)->get();
+                    foreach ($bookings as $booking) {
+                        $this->purgeBookingData($booking);
+                        $count++;
+                    }
+                });
+
+                Cache::forget('admin_dashboard_kpis');
                 return response()->json([
                     'success' => true,
-                    'message' => "{$count} booking(s) deleted successfully."
+                    'message' => "{$count} booking(s) and all associated records permanently purged."
                 ]);
             }
 

@@ -6,6 +6,13 @@ use Tests\TestCase;
 use App\Models\Tour;
 use App\Models\TourTier;
 use App\Models\Coupon;
+use App\Models\CouponUsage;
+use App\Models\Booking;
+use App\Models\BookingAddon;
+use App\Models\BookingPayment;
+use App\Models\Review;
+use App\Models\RequestLog;
+use App\Models\User;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -203,5 +210,173 @@ class BookingEngineTest extends TestCase
         $response = $this->get('/admin/dashboard');
         $response->assertStatus(302);
         $response->assertRedirect('/login');
+    }
+
+    /**
+     * Test permanent booking deletion and complete cascade purge of relations & analytics.
+     */
+    public function test_permanent_booking_deletion_cascades_all_relational_and_analytical_data(): void
+    {
+        $admin = User::create([
+            'name' => 'Admin User',
+            'email' => 'admin@dunesdiscovery.com',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $coupon = Coupon::create([
+            'code' => 'PURGE5',
+            'name' => 'Purge Test Coupon',
+            'discount_type' => 'percentage',
+            'discount_value' => 5.00,
+            'is_active' => true,
+        ]);
+        $coupon->increment('used_count');
+
+        $booking = Booking::create([
+            'reference' => 'DDT-PURGE-001',
+            'tour_name' => 'VIP Desert Safari',
+            'tier_name' => 'Private Land Cruiser',
+            'tour_date' => now()->addDays(3)->format('Y-m-d'),
+            'adults' => 2,
+            'children' => 1,
+            'infants' => 0,
+            'name' => 'Alexander Pierce',
+            'email' => 'alexander.pierce@example.com',
+            'phone' => '+971501112233',
+            'pickup_location' => 'Burj Al Arab Hotel',
+            'coupon_id' => $coupon->id,
+            'coupon_code' => 'PURGE5',
+            'subtotal' => 600.00,
+            'total' => 570.00,
+            'status' => 'confirmed',
+            'payment_method' => 'card',
+            'payment_status' => 'paid',
+            'payment_amount' => 570.00,
+            'balance_due' => 0.00,
+        ]);
+
+        $addon = BookingAddon::create([
+            'booking_id' => $booking->id,
+            'addon_name' => 'Quad Biking 30 Mins',
+            'quantity' => 1,
+            'price' => 150.00,
+        ]);
+
+        $payment = BookingPayment::create([
+            'booking_id' => $booking->id,
+            'payment_intent_id' => 'pi_purge_test_999',
+            'amount' => 570.00,
+            'currency' => 'AED',
+            'status' => 'completed',
+        ]);
+
+        $usage = CouponUsage::create([
+            'coupon_id' => $coupon->id,
+            'booking_id' => $booking->id,
+            'booking_reference' => $booking->reference,
+            'customer_email' => $booking->email,
+            'discount_amount' => 30.00,
+            'order_subtotal' => 600.00,
+            'order_final_total' => 570.00,
+            'used_at' => now(),
+        ]);
+
+        $review = Review::create([
+            'source' => 'guest',
+            'booking_id' => $booking->id,
+            'reviewer_name' => 'Alexander Pierce',
+            'rating' => 5.0,
+            'review_title' => 'Incredible Service',
+            'review_text' => 'Best desert safari ever experienced.',
+            'status' => 'published',
+        ]);
+
+        $log = RequestLog::create([
+            'entity_type' => 'booking',
+            'entity_id' => $booking->id,
+            'request_timestamp' => now(),
+            'client_ip' => '192.168.1.1',
+        ]);
+        $booking->update(['request_log_id' => $log->id]);
+
+        // Verify all entities exist prior to deletion
+        $this->assertDatabaseHas('bookings', ['id' => $booking->id]);
+        $this->assertDatabaseHas('booking_addons', ['id' => $addon->id]);
+        $this->assertDatabaseHas('booking_payments', ['id' => $payment->id]);
+        $this->assertDatabaseHas('coupon_usages', ['id' => $usage->id]);
+        $this->assertDatabaseHas('reviews', ['id' => $review->id]);
+        $this->assertDatabaseHas('request_logs', ['id' => $log->id]);
+        $this->assertEquals(1, $coupon->fresh()->used_count);
+
+        // Execute permanent delete request as admin
+        $response = $this->actingAs($admin)->deleteJson("/admin/bookings/{$booking->id}");
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        // Verify permanent eradication across all database tables
+        $this->assertDatabaseMissing('bookings', ['id' => $booking->id]);
+        $this->assertDatabaseMissing('booking_addons', ['id' => $addon->id]);
+        $this->assertDatabaseMissing('booking_payments', ['id' => $payment->id]);
+        $this->assertDatabaseMissing('coupon_usages', ['id' => $usage->id]);
+        $this->assertDatabaseMissing('reviews', ['id' => $review->id]);
+        $this->assertDatabaseMissing('request_logs', ['id' => $log->id]);
+
+        // Verify coupon used quota was restored (decremented from 1 to 0)
+        $this->assertEquals(0, $coupon->fresh()->used_count);
+    }
+
+    /**
+     * Test permanent bulk booking deletion.
+     */
+    public function test_bulk_permanent_booking_deletion(): void
+    {
+        $admin = User::create([
+            'name' => 'Admin User',
+            'email' => 'admin_bulk@dunesdiscovery.com',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $b1 = Booking::create([
+            'reference' => 'DDT-BULK-001',
+            'tour_name' => 'Safari 1',
+            'tier_name' => 'Standard',
+            'tour_date' => now()->addDays(2)->format('Y-m-d'),
+            'adults' => 1,
+            'children' => 0,
+            'infants' => 0,
+            'name' => 'Guest 1',
+            'email' => 'guest1@example.com',
+            'phone' => '+971500000001',
+            'subtotal' => 150.00,
+            'total' => 150.00,
+            'status' => 'pending',
+        ]);
+
+        $b2 = Booking::create([
+            'reference' => 'DDT-BULK-002',
+            'tour_name' => 'Safari 2',
+            'tier_name' => 'Standard',
+            'tour_date' => now()->addDays(2)->format('Y-m-d'),
+            'adults' => 2,
+            'children' => 0,
+            'infants' => 0,
+            'name' => 'Guest 2',
+            'email' => 'guest2@example.com',
+            'phone' => '+971500000002',
+            'subtotal' => 300.00,
+            'total' => 300.00,
+            'status' => 'pending',
+        ]);
+
+        $response = $this->actingAs($admin)->postJson('/admin/bookings/bulk-action', [
+            'ids' => [$b1->id, $b2->id],
+            'action' => 'delete',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        $this->assertDatabaseMissing('bookings', ['id' => $b1->id]);
+        $this->assertDatabaseMissing('bookings', ['id' => $b2->id]);
     }
 }
