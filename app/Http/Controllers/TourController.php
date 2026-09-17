@@ -514,15 +514,27 @@ class TourController extends Controller
      */
     public function customizer(Request $request)
     {
-        $allTours = Tour::where('status', 'active')->with(['tiers', 'category'])->orderBy('priority', 'asc')->get();
-        $categories = Category::orderBy('priority', 'asc')->get();
+        try {
+            $allTours = Tour::where('status', 'active')->with(['tiers', 'category'])->orderBy('priority', 'asc')->get();
+            $categories = Category::orderBy('priority', 'asc')->get();
 
-        $pageTitle = "Build Your Own Dubai Desert Safari (Customizer 2026) | Dunes Discovery";
-        $pageDesc = "Customize your bespoke Dubai desert safari experience. Configure private Land Cruisers, 1000cc Can-Am buggies, 400cc quad bikes, and VIP waiter table service with live real-time pricing.";
-        $pageKeys = "custom desert safari dubai, build your own safari dubai, bespoke desert safari, private land cruiser safari, vip desert safari customizer";
-        $canonical = route('tours.customizer');
-        $ogImage = asset('images/desert-safari-poster.avif');
+            $pageTitle = "Build Your Own Dubai Desert Safari (Customizer 2026) | Dunes Discovery";
+            $pageDesc = "Customize your bespoke Dubai desert safari experience. Configure private Land Cruisers, 1000cc Can-Am buggies, 400cc quad bikes, and VIP waiter table service with live real-time pricing.";
+            $pageKeys = "custom desert safari dubai, build your own safari dubai, bespoke desert safari, private land cruiser safari, vip desert safari customizer";
+            $canonical = route('tours.customizer');
+            $ogImage = asset('images/desert-safari-poster.avif');
 
-        return view('tours.customizer', compact('allTours', 'categories', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
+            $html = view('tours.customizer', compact('allTours', 'categories', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'))->render();
+            return response($html);
+        } catch (\Throwable $e) {
+            if ($request->has('debug')) {
+                return response()->json([
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ], 500);
+            }
+            throw $e;
+        }
     }
 }
