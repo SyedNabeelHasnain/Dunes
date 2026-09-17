@@ -683,6 +683,7 @@
     @include('partials.booking-modal')
     @include('partials.welcome-offer-modal')
     @include('partials.social-proof')
+    @include('partials.comparison-drawer')
 
     <!-- Global Toast Container for App.toast notifications -->
     <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1090;" aria-live="polite" aria-atomic="true"></div>

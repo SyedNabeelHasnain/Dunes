@@ -255,39 +255,99 @@ class PageController extends Controller
     }
 
     /**
-     * Handle Post-Tour Review Rating click.
+     * Display Public Customer Review & Photo UGC Submission Portal.
      */
     public function reviewRate(Request $request, string $ref)
     {
-        $booking = \App\Models\Booking::where('reference', $ref)->firstOrFail();
+        $booking = \App\Models\Booking::where('reference', $ref)->with('tour')->firstOrFail();
         $score = (int)$request->input('score', 5);
+        if ($score < 1 || $score > 5) {
+            $score = 5;
+        }
 
-        // If high rating (4-5 stars), redirect straight to Google Review Profile
-        if ($score >= 4) {
-            $googleReviewUrl = app(SettingsService::class)->get('google_review_url', 'https://maps.google.com/?cid=123456789');
-            
-            // Auto-create an approved review record
-            try {
-                \App\Models\Review::firstOrCreate(
-                    ['reviewer_name' => $booking->name, 'source' => 'email_booster'],
-                    [
-                        'rating' => $score,
-                        'reviewer_name' => $booking->name,
-                        'published_date' => now()->toDateString(),
-                        'review_title' => 'Unforgettable Desert Adventure!',
-                        'review_text' => 'Outstanding desert safari experience organized by Dunes Discovery Tourism. Highly recommended!',
-                        'status' => 'approved',
-                        'is_featured' => true,
-                        'source' => 'email_booster'
-                    ]
-                );
-            } catch (\Throwable $e) {}
+        $settings = app(SettingsService::class);
+        $googleReviewUrl = $settings->get('google_review_url', 'https://maps.google.com/?cid=123456789');
 
+        // Optional direct redirect if explicitly requested
+        if ($request->has('google_direct') && $score >= 4) {
             return redirect()->away($googleReviewUrl);
         }
 
-        // Lower ratings redirect to private feedback form
-        return view('review-feedback', compact('booking', 'score'));
+        $pageTitle = "Review Your Safari Adventure | Dunes Discovery Tourism";
+        $pageDesc = "Share your verified guest review, rate your desert safari captain, and upload your tour photos.";
+
+        return view('pages.submit-review', compact('booking', 'score', 'googleReviewUrl', 'pageTitle', 'pageDesc'));
+    }
+
+    /**
+     * Process Public Customer Review & Photo UGC Submission.
+     */
+    public function submitReview(Request $request, string $ref)
+    {
+        $booking = \App\Models\Booking::where('reference', $ref)->firstOrFail();
+
+        $request->validate([
+            'rating' => 'required|numeric|min:1|max:5',
+            'review_title' => 'nullable|string|max:255',
+            'review_text' => 'required|string|min:10|max:3000',
+            'photos' => 'nullable|array|max:4',
+            'photos.*' => 'image|mimes:jpeg,png,jpg,webp,avif|max:5120',
+        ]);
+
+        $rating = (float)$request->input('rating');
+        $storedPhotos = [];
+
+        if ($request->hasFile('photos')) {
+            $uploadDir = public_path('uploads/reviews');
+            if (!file_exists($uploadDir)) {
+                @mkdir($uploadDir, 0755, true);
+            }
+
+            foreach ($request->file('photos') as $photoFile) {
+                if ($photoFile->isValid()) {
+                    $ext = $photoFile->getClientOriginalExtension() ?: 'jpg';
+                    $filename = 'rev_' . uniqid() . '_' . time() . '.' . $ext;
+                    $photoFile->move($uploadDir, $filename);
+                    $storedPhotos[] = 'uploads/reviews/' . $filename;
+                }
+            }
+        }
+
+        $review = \App\Models\Review::updateOrCreate(
+            [
+                'source' => 'direct_ugc',
+                'source_review_id' => $booking->reference,
+            ],
+            [
+                'booking_id' => $booking->id,
+                'reviewer_name' => $booking->name,
+                'rating' => $rating,
+                'review_title' => $request->input('review_title') ?: 'Unforgettable Desert Safari Experience',
+                'review_text' => $request->input('review_text'),
+                'photos' => $storedPhotos,
+                'status' => ($rating >= 4) ? 'approved' : 'pending',
+                'is_featured' => ($rating >= 4.5 && count($storedPhotos) > 0),
+                'published_date' => now()->toDateString(),
+                'imported_at' => now(),
+            ]
+        );
+
+        $settings = app(SettingsService::class);
+        $googleReviewUrl = $settings->get('google_review_url', 'https://maps.google.com/?cid=123456789');
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Thank you! Your review and photos have been received.',
+                'rating' => $rating,
+                'google_review_url' => ($rating >= 4) ? $googleReviewUrl : null,
+            ]);
+        }
+
+        return redirect()->route('review.rate', ['ref' => $ref])
+            ->with('review_submitted', true)
+            ->with('submitted_rating', $rating)
+            ->with('google_review_url', $googleReviewUrl);
     }
 
     /**

@@ -154,6 +154,16 @@
                         <td>
                             <div class="fw-bold text-dark small">{{ $r->review_title }}</div>
                             <div class="text-muted small text-truncate" style="max-width: 380px;">{{ $r->review_text }}</div>
+                            @if(!empty($r->photos) && is_array($r->photos))
+                                <div class="d-flex gap-1 mt-2">
+                                    @foreach($r->photos as $p)
+                                        <a href="{{ asset($p) }}" target="_blank" rel="noopener" title="View customer photo">
+                                            <img src="{{ asset($p) }}" class="rounded border shadow-sm" style="width: 32px; height: 32px; object-fit: cover;">
+                                        </a>
+                                    @endforeach
+                                    <span class="badge bg-light text-muted border align-self-center small" style="font-size: 10px;">{{ count($r->photos) }} photo(s)</span>
+                                </div>
+                            @endif
                         </td>
                         <td>
                             <span class="badge bg-light text-secondary border px-3 py-1 rounded-pill text-capitalize">{{ $r->source }}</span>

@@ -399,7 +399,10 @@ if (!function_exists('renderReviewCardMarkup')) {
                                         <small class="text-muted d-block" style="font-size: 10px; text-transform: uppercase; font-weight: 700;">Starting from</small>
                                         <span class="h5 fw-bold text-primary mb-0" data-aed="{{ $minPrice }}">AED {{ number_format($minPrice) }}</span>
                                     </div>
-                                    <div class="d-flex gap-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-2.5 py-1 text-nowrap btn-toggle-compare small" style="font-size: 0.78rem;" data-tour-id="{{ $t->id }}" onclick="event.preventDefault(); event.stopPropagation(); window.DunesCompare && window.DunesCompare.toggle(this);">
+                                            <i class="bi bi-shuffle me-1"></i> <span class="compare-btn-text">Compare</span>
+                                        </button>
                                         <span role="button" tabindex="0" class="btn-circle-whatsapp fab-whatsapp" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp" onclick="event.preventDefault(); event.stopPropagation(); if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp('{{ addslashes($t->name) }}'); }" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();if(window.App&&typeof window.App.openWhatsApp==='function'){window.App.openWhatsApp('{{ addslashes($t->name) }}');}}">
                                             <i class="bi bi-whatsapp"></i>
                                         </span>

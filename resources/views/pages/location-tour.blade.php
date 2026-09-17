@@ -578,9 +578,14 @@
                                         <span class="h4 fw-bold text-warning mb-0" data-aed="{{ $minPrice }}">AED {{ number_format($minPrice, 0) }}</span>
                                         <small class="text-white-50" style="font-size: 0.75rem;">/ person</small>
                                     </div>
-                                    <a href="{{ route('tours.show', $tour->slug) }}" class="btn btn-sm btn-outline-light rounded-pill px-3 py-1.5">
-                                        Details <i class="bi bi-chevron-right ms-1"></i>
-                                    </a>
+                                    <div class="d-flex align-items-center gap-1.5">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-2.5 py-1 text-nowrap btn-toggle-compare small" style="font-size: 0.78rem;" data-tour-id="{{ $tour->id }}" onclick="event.preventDefault(); event.stopPropagation(); window.DunesCompare && window.DunesCompare.toggle(this);">
+                                            <i class="bi bi-shuffle me-1"></i> <span class="compare-btn-text">Compare</span>
+                                        </button>
+                                        <a href="{{ route('tours.show', $tour->slug) }}" class="btn btn-sm btn-outline-light rounded-pill px-3 py-1.5">
+                                            Details <i class="bi bi-chevron-right ms-1"></i>
+                                        </a>
+                                    </div>
                                 </div>
 
                                 <button type="button" class="btn btn-desert-animated w-100 rounded-pill py-2.5 fw-bold btn-book-location shadow-sm"
