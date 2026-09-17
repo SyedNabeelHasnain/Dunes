@@ -340,6 +340,7 @@
     <style>
         .footer a:hover, .hover-white:hover { color: #fff !important; transition: color 0.15s ease; }
     </style>
+    @stack('schema')
 </head>
 <body class="d-flex flex-column min-vh-100">
 

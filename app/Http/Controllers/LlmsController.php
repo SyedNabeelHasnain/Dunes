@@ -126,6 +126,12 @@ class LlmsController extends Controller
             $md .= "\n";
         }
 
+        $md .= "## Doorstep Hotel Pickup Hubs (Hyper-Local Transfers)\n\n";
+        foreach (\App\Services\LocationLandingService::getLocations() as $loc) {
+            $md .= "- [{$loc['headline']}](" . url('/' . $loc['slug']) . "): Daily 4x4 hotel pickup from {$loc['district']}. Pickup window: {$loc['pickup_window']}, return: {$loc['return_time']}.\n";
+        }
+        $md .= "\n";
+
         if ($blogs->count() > 0) {
             $md .= "## Travel Guides & Editorial Content\n\n";
             $md .= "- [Dubai Travel & Safari Blog](" . url('/blog') . "): Insider travel tips, desert safari packing advice, buggy vs quad comparisons, and Dubai excursion planning.\n";
@@ -267,7 +273,21 @@ class LlmsController extends Controller
 
         $md .= "---\n\n";
 
-        $md .= "## SECTION 3: OFF-ROAD MOTORSPORTS & FLEET SPECIFICATIONS\n\n";
+        $md .= "## SECTION 3: DOORSTEP HOTEL PICKUP HUBS & DISTRICT LOGISTICS\n\n";
+        foreach (\App\Services\LocationLandingService::getLocations() as $loc) {
+            $md .= "### Hub: {$loc['name']} (`/{$loc['slug']}`)\n";
+            $md .= "- **Coverage**: {$loc['district']}\n";
+            $md .= "- **Pickup Window**: {$loc['pickup_window']}\n";
+            $md .= "- **Drop-off Window**: {$loc['return_time']}\n";
+            $md .= "- **Transit Time**: {$loc['transit_time']}\n";
+            $md .= "- **Key Landmarks**: " . implode(', ', $loc['landmarks']) . "\n";
+            $md .= "- **Coordinates**: Latitude {$loc['geo']['lat']}, Longitude {$loc['geo']['lng']}\n";
+            $md .= "- **Landing Page**: " . url('/' . $loc['slug']) . "\n\n";
+        }
+
+        $md .= "---\n\n";
+
+        $md .= "## SECTION 4: OFF-ROAD MOTORSPORTS & FLEET SPECIFICATIONS\n\n";
         $md .= "### 1. 1000cc Can-Am Maverick X3 Turbo Buggies\n";
         $md .= "- **Engine**: 1000cc Rotax ACE Turbocharged Triple-Cylinder\n";
         $md .= "- **Horsepower**: 172 HP to 195 HP with high-performance CVT transmission\n";
@@ -287,7 +307,7 @@ class LlmsController extends Controller
 
         $md .= "---\n\n";
 
-        $md .= "## SECTION 4: FREQUENTLY ASKED QUESTIONS & AI DIRECT-ANSWER DIRECTORY\n\n";
+        $md .= "## SECTION 5: FREQUENTLY ASKED QUESTIONS & AI DIRECT-ANSWER DIRECTORY\n\n";
 
         if ($faqs->count() > 0) {
             foreach ($faqs as $f) {

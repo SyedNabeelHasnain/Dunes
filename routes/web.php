@@ -240,6 +240,10 @@ Route::get('/llms-full.txt', [\App\Http\Controllers\LlmsController::class, 'full
 // ── Explicit High-Value Tour Routes ─────────────────────────────────────────
 Route::get('/dune-buggy-rental-dubai', [TourController::class, 'showBuggy'])->name('tours.buggy');
 
+// ── Programmatic Geo-Location Pickup Routes (Pillar 2 SEO) ───────────────────
+Route::get('/desert-safari-from-{location}', [\App\Http\Controllers\LocationLandingController::class, 'show'])->name('tours.location');
+
+
 // ── SEO 301 Permanent Redirects for Legacy / Shorthand Tour Slugs ───────────
 Route::redirect('/dubai-marina-dhow-cruise', '/dhow-cruise-catamaran-cruise-dinner-dubai', 301);
 Route::redirect('/ocean-empress-dhow-cruise', '/dhow-cruise-catamaran-cruise-dinner-dubai', 301);

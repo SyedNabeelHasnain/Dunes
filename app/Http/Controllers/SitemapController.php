@@ -138,6 +138,11 @@ class SitemapController extends Controller
             '/responsible-tourism-policy' => ['changefreq' => 'monthly', 'priority' => '0.6'],
         ];
 
+        // Pillar 2: Programmatic Geo-Location Pickup Pages
+        foreach (\App\Services\LocationLandingService::getLocations() as $loc) {
+            $staticPages['/' . $loc['slug']] = ['changefreq' => 'weekly', 'priority' => '0.9'];
+        }
+
         foreach ($staticPages as $page => $meta) {
             $xml .= "  <url>\n";
             $xml .= "    <loc>" . url($page) . "</loc>\n";
@@ -185,6 +190,17 @@ class SitemapController extends Controller
                 $xml .= "    <image:image>\n";
                 $xml .= "      <image:loc>" . asset('images/blog/' . $imgFile) . "</image:loc>\n";
                 $xml .= "      <image:title>" . htmlspecialchars($blog->title) . "</image:title>\n";
+                $xml .= "    </image:image>\n";
+                $xml .= "  </url>\n";
+            }
+
+            foreach (\App\Services\LocationLandingService::getLocations() as $loc) {
+                $xml .= "  <url>\n";
+                $xml .= "    <loc>" . url('/' . $loc['slug']) . "</loc>\n";
+                $xml .= "    <image:image>\n";
+                $xml .= "      <image:loc>" . asset('images/desert-safari-poster.avif') . "</image:loc>\n";
+                $xml .= "      <image:title>" . htmlspecialchars($loc['headline']) . "</image:title>\n";
+                $xml .= "      <image:caption>" . htmlspecialchars($loc['subheadline']) . "</image:caption>\n";
                 $xml .= "    </image:image>\n";
                 $xml .= "  </url>\n";
             }
