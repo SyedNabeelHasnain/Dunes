@@ -417,14 +417,14 @@
                                 </a>
                             </div>
                         </div>
-                        <ul class="navbar-nav mx-auto mb-4 mb-lg-0 gap-lg-1 text-nowrap">
+                        <ul class="navbar-nav mx-auto mb-4 mb-lg-0 gap-lg-1 gap-xl-2 text-nowrap flex-nowrap align-items-center">
                             <li class="nav-item">
                                 <a class="nav-link px-3 px-lg-2 py-2 rounded-3 {{ request()->routeIs('home') ? 'active nav-active-pill' : '' }}" href="{{ route('home') }}">Home</a>
                             </li>
-                            <li class="nav-item dropdown align-items-center flex-wrap w-100 w-lg-auto">
-                                <div class="d-flex flex-wrap align-items-stretch w-100 rounded-3 position-relative {{ request()->routeIs('tours.*') ? 'nav-active-pill-wrapper' : '' }}">
-                                    <a class="nav-link px-3 px-lg-2 py-2 flex-grow-1 rounded-start-3 {{ request()->routeIs('tours.*') ? 'active nav-active-pill' : '' }}" href="{{ route('tours.index') }}">Tours</a>
-                                    <a class="nav-link px-3 py-2 dropdown-toggle dropdown-toggle-split d-flex align-items-center justify-content-center rounded-end-3 border-start border-primary border-opacity-10 {{ request()->routeIs('tours.*') ? 'active text-white' : '' }}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="min-width: 44px; min-height: 44px;">
+                            <li class="nav-item dropdown d-inline-flex flex-nowrap align-items-center">
+                                <div class="d-inline-flex flex-nowrap align-items-stretch rounded-3 position-relative {{ request()->routeIs('tours.*') ? 'nav-active-pill-wrapper' : '' }}">
+                                    <a class="nav-link px-2.5 py-2 text-nowrap rounded-start-3 {{ request()->routeIs('tours.*') ? 'active nav-active-pill' : '' }}" href="{{ route('tours.index') }}">Tours</a>
+                                    <a class="nav-link px-2 py-2 dropdown-toggle dropdown-toggle-split d-inline-flex align-items-center justify-content-center rounded-end-3 border-start border-primary border-opacity-10 {{ request()->routeIs('tours.*') ? 'active text-white' : '' }}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Toggle Tours Submenu">
                                         <span class="visually-hidden">Toggle Dropdown</span>
                                     </a>
                                     <ul class="dropdown-menu border-0 shadow-lg rounded-4 overflow-hidden p-0 mt-2 dropdown-animated-border">
@@ -449,25 +449,23 @@
                                 <a class="nav-link px-3 px-lg-2 py-2 rounded-3 {{ request()->routeIs('contact') ? 'active nav-active-pill' : '' }}" href="{{ route('contact') }}">Contact</a>
                             </li>
                         </ul>
-                        <div class="d-flex flex-column flex-lg-row gap-2 gap-xl-3 align-items-stretch align-items-lg-center">
-                            <button type="button" class="btn btn-outline-warning rounded-pill px-3 py-1.5 d-none d-xl-inline-flex align-items-center gap-1.5 small shadow-none hover-shadow-sm transition-all" data-bs-toggle="modal" data-bs-target="#safariMatcherModal" style="font-size: 0.82rem; border-color: rgba(246, 144, 68, 0.45); color: #F69044;" aria-label="Safari Matcher AI">
+                        <div class="d-flex flex-column flex-lg-row gap-2 gap-xl-2.5 align-items-stretch align-items-lg-center flex-nowrap">
+                            <button type="button" class="btn btn-outline-warning rounded-pill px-2.5 py-1.5 d-none d-xxl-inline-flex align-items-center gap-1.5 small shadow-none hover-shadow-sm transition-all text-nowrap" data-bs-toggle="modal" data-bs-target="#safariMatcherModal" style="font-size: 0.82rem; border-color: rgba(246, 144, 68, 0.45); color: #F69044;" aria-label="Safari Matcher AI">
                                 <i class="bi bi-stars text-warning"></i>
                                 <span class="fw-bold">Safari Matcher</span>
                                 <span class="badge bg-warning text-dark rounded-pill px-1.5 py-0.5" style="font-size: 9px;">5% OFF</span>
                             </button>
-                            <button type="button" class="btn btn-white border rounded-pill px-3 py-1.5 d-none d-lg-inline-flex align-items-center gap-2 small text-muted shadow-none hover-shadow-sm transition-all" data-bs-toggle="modal" data-bs-target="#globalSearchModal" style="font-size: 0.82rem;" aria-label="Search Dubai tours">
-                                <i class="bi bi-search text-primary"></i>
-                                <span>Search tours...</span>
-                                <kbd class="badge bg-light text-muted border px-1.5 py-0.5 rounded small" style="font-size: 10px; font-family: inherit;">/</kbd>
+                            <button type="button" class="btn btn-light border rounded-circle shadow-sm d-none d-lg-inline-flex align-items-center justify-content-center flex-shrink-0" data-bs-toggle="modal" data-bs-target="#globalSearchModal" style="width: 38px; height: 38px; padding: 0;" title="Search Dubai tours" aria-label="Search Dubai tours">
+                                <i class="bi bi-search text-primary" style="font-size: 14px;"></i>
                             </button>
-                            <div class="d-none d-lg-block">
+                            <div class="d-none d-lg-block flex-shrink-0">
                                 @include('partials.currency-switcher', ['switcherId' => 'desktopCurrencyDropdownBtn'])
                             </div>
-                            <a class="btn btn-whatsapp-animated rounded-pill px-4 fw-semibold d-inline-flex align-items-center justify-content-center gap-2" href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener">
-                                <i class="bi bi-whatsapp fs-5"></i>WhatsApp
+                            <a class="btn btn-whatsapp-animated rounded-pill px-3 px-xl-3.5 py-2 fw-semibold d-inline-flex align-items-center justify-content-center gap-1.5 text-nowrap" href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" style="font-size: 13.5px;">
+                                <i class="bi bi-whatsapp fs-6"></i><span>WhatsApp</span>
                             </a>
-                            <a class="btn btn-desert-animated rounded-pill px-4 py-2 fw-bold shadow-primary d-inline-flex align-items-center justify-content-center gap-2" href="#" data-action="open-booking" data-bs-dismiss="offcanvas">
-                                <i class="bi bi-calendar-check fs-5"></i>Book Now
+                            <a class="btn btn-desert-animated rounded-pill px-3 px-xl-3.5 py-2 fw-bold shadow-primary d-inline-flex align-items-center justify-content-center gap-1.5 text-nowrap" href="#" data-action="open-booking" data-bs-dismiss="offcanvas" style="font-size: 13.5px;">
+                                <i class="bi bi-calendar-check fs-6"></i><span>Book Now</span>
                             </a>
                         </div>
                     </div>

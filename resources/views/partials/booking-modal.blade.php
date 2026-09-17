@@ -371,10 +371,14 @@ document.addEventListener('DOMContentLoaded', function() {
             subtotal = parseFloat(rawTxt) || 0;
         }
 
-        const tourId = document.getElementById('bookingTour')?.value || null;
-        const tierId = document.getElementById('selectedTier')?.value || null;
-        const email = document.getElementById('bookingEmail')?.value || null;
-        const tourDate = document.getElementById('bookingDate')?.value || null;
+        const emailVal = document.getElementById('bookingEmail')?.value?.trim();
+        const email = (emailVal && emailVal.includes('@')) ? emailVal : null;
+        const dateVal = document.getElementById('bookingDate')?.value?.trim();
+        const tourDate = dateVal || null;
+        const tourVal = document.getElementById('bookingTour')?.value;
+        const tourId = tourVal ? parseInt(tourVal, 10) : null;
+        const tierVal = document.getElementById('selectedTier')?.value || (window.App ? window.App.selectedTier : null);
+        const tierId = tierVal ? parseInt(tierVal, 10) : null;
 
         if (applyBtn) {
             applyBtn.disabled = true;
@@ -474,6 +478,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (applyBtn) applyBtn.addEventListener('click', window.validateCurrentPromo);
     if (removeBtn) removeBtn.addEventListener('click', window.removeCurrentPromo);
     if (promoInput) {
+        promoInput.addEventListener('input', function() {
+            if (errorBox) errorBox.classList.add('d-none');
+        });
         promoInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();

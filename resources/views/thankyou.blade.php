@@ -134,12 +134,18 @@ gtag('event', 'conversion_event_submit_lead_form', {
                                 <div class="p-3 bg-light rounded-4 h-100 border">
                                     <div class="text-muted small fw-bold">Payment Method</div>
                                     <div class="fw-semibold text-capitalize text-dark">{{ $method }}</div>
+                                    @if($booking->coupon_code && $booking->discount_amount > 0)
+                                    <div class="text-muted small fw-bold mt-2">Original Subtotal</div>
+                                    <div class="fw-semibold text-muted text-decoration-line-through">AED {{ number_format($booking->original_total, 2) }}</div>
+                                    <div class="text-muted small fw-bold mt-2">Promo Discount ({{ $booking->coupon_code }})</div>
+                                    <div class="fw-bold text-success">-AED {{ number_format($booking->discount_amount, 2) }}</div>
+                                    @endif
                                     <div class="text-muted small fw-bold mt-3">Total</div>
-                                    <div class="fw-800 text-primary fs-5">AED {{ number_format($booking->total) }}</div>
+                                    <div class="fw-800 text-primary fs-5">AED {{ number_format($booking->total, 2) }}</div>
                                     <div class="text-muted small fw-bold mt-3">Paid</div>
-                                    <div class="fw-semibold text-success">AED {{ number_format($booking->payment_amount ?? 0) }}</div>
+                                    <div class="fw-semibold text-success">AED {{ number_format($booking->payment_amount ?? 0, 2) }}</div>
                                     <div class="text-muted small fw-bold mt-3">Balance Due</div>
-                                    <div class="fw-semibold text-danger">AED {{ number_format($booking->balance_due ?? 0) }}</div>
+                                    <div class="fw-semibold text-danger">AED {{ number_format($booking->balance_due ?? 0, 2) }}</div>
                                 </div>
                             </div>
                         </div>
@@ -147,13 +153,37 @@ gtag('event', 'conversion_event_submit_lead_form', {
                         @if($method === 'full' && $paymentStatus === 'completed')
                             <div class="mt-4 p-3 bg-white border rounded-4">
                                 <div class="fw-bold mb-2 text-dark">Invoice Summary</div>
-                                <div class="d-flex justify-content-between text-muted small"><span>Subtotal</span><span>AED {{ number_format($booking->subtotal) }}</span></div>
-                                <div class="d-flex justify-content-between text-muted small"><span>Addons</span><span>AED {{ number_format($booking->addons_total) }}</span></div>
-                                <div class="d-flex justify-content-between fw-bold mt-2 text-dark"><span>Total Paid</span><span>AED {{ number_format($booking->payment_amount) }}</span></div>
+                                <div class="d-flex justify-content-between text-muted small"><span>Subtotal</span><span>AED {{ number_format($booking->subtotal, 2) }}</span></div>
+                                <div class="d-flex justify-content-between text-muted small"><span>Addons</span><span>AED {{ number_format($booking->addons_total, 2) }}</span></div>
+                                @if($booking->coupon_code && $booking->discount_amount > 0)
+                                <div class="d-flex justify-content-between text-success small"><span>Promo Code ({{ $booking->coupon_code }})</span><span>-AED {{ number_format($booking->discount_amount, 2) }}</span></div>
+                                @endif
+                                <div class="d-flex justify-content-between fw-bold mt-2 text-dark"><span>Total Paid</span><span>AED {{ number_format($booking->payment_amount, 2) }}</span></div>
                             </div>
                         @endif
                     @endif
                 </div>
+
+                @if($booking)
+                <!-- Official E-Ticket Voucher Card -->
+                <div class="card card-modern border-0 shadow-sm rounded-4 p-4 p-lg-5 mt-4 bg-white text-center position-relative overflow-hidden" style="border-top: 4px solid #F58F43 !important;">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-warning bg-opacity-10 text-primary p-3 mb-3 mx-auto" style="width: 64px; height: 64px;">
+                        <i class="bi bi-ticket-perforated-fill fs-2"></i>
+                    </div>
+                    <h3 class="fw-800 text-dark mb-2">Your Official E-Ticket & Boarding Pass</h3>
+                    <p class="text-muted mb-4 mx-auto" style="max-width: 540px;">
+                        Your DTCM-certified digital voucher with real-time driver verification QR code is ready. You can present it directly from your phone or download an official PDF copy.
+                    </p>
+                    <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+                        <a href="{{ route('booking.voucher', $booking->reference) }}" target="_blank" class="btn btn-desert-animated rounded-pill px-4 py-3 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-phone fs-5"></i> View Digital Boarding Pass
+                        </a>
+                        <a href="{{ route('booking.voucher.pdf', $booking->reference) }}" class="btn btn-outline-dark rounded-pill px-4 py-3 fw-bold d-inline-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-file-earmark-pdf fs-5 text-danger"></i> Download PDF Voucher
+                        </a>
+                    </div>
+                </div>
+                @endif
 
                 <!-- Action Links -->
                 <div class="card card-modern border-0 shadow-sm rounded-4 p-4 p-lg-5 mt-4 bg-white">

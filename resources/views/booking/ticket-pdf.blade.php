@@ -272,14 +272,23 @@
                 <div class="price-box">
                     <div style="font-size: 11px; font-weight: bold; color: #0f172a; text-transform: uppercase; margin-bottom: 6px;">Payment Breakdown</div>
                     <table class="price-table">
+                        @if($booking->coupon_code && (float)$booking->discount_amount > 0)
+                        <tr>
+                            <td style="color: #64748b;">Package Total:</td>
+                            <td style="text-align: right; text-decoration: line-through; color: #94a3b8;">AED {{ number_format($booking->original_total ?: ($booking->total + $booking->discount_amount), 2) }}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #16a34a;">Promo ({{ $booking->coupon_code }}):</td>
+                            <td style="text-align: right; color: #16a34a; font-weight: bold;">- AED {{ number_format($booking->discount_amount, 2) }}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #64748b;">Net Total:</td>
+                            <td style="text-align: right; font-weight: bold;">AED {{ number_format($booking->total, 2) }}</td>
+                        </tr>
+                        @else
                         <tr>
                             <td style="color: #64748b;">Total Price:</td>
                             <td style="text-align: right; font-weight: bold;">AED {{ number_format($booking->total, 2) }}</td>
-                        </tr>
-                        @if($booking->discount > 0)
-                        <tr>
-                            <td style="color: #16a34a;">Discount Applied:</td>
-                            <td style="text-align: right; color: #16a34a; font-weight: bold;">- AED {{ number_format($booking->discount, 2) }}</td>
                         </tr>
                         @endif
                         <tr>

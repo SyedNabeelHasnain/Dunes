@@ -79,6 +79,7 @@ Route::get('/payment-cancel', [BookingController::class, 'paymentCancel'])->name
 Route::post('/booking/draft', [BookingController::class, 'saveDraft'])->name('booking.draft');
 Route::get('/booking/{reference}/voucher', [\App\Http\Controllers\VoucherController::class, 'show'])->name('booking.voucher');
 Route::get('/booking/{reference}/ticket-pdf', [\App\Http\Controllers\VoucherController::class, 'downloadPdf'])->name('booking.ticket.pdf');
+Route::get('/booking/{reference}/voucher-pdf', [\App\Http\Controllers\VoucherController::class, 'downloadPdf'])->name('booking.voucher.pdf');
 Route::get('/review/{ref}', [PageController::class, 'reviewRate'])->name('review.rate');
 Route::post('/review/{ref}', [PageController::class, 'submitReview'])->name('review.submit');
 Route::post('/review/{ref}/feedback', [PageController::class, 'submitFeedback'])->name('review.feedback');

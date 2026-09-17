@@ -228,10 +228,25 @@
                 <div class="col-md-4">
                     <div class="p-3 bg-white rounded-4 border h-100 shadow-sm">
                         <div class="section-label">Financial Reconciliation</div>
+                        @if($booking->coupon_code && (float)$booking->discount_amount > 0)
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="small text-muted">Original Total:</span>
+                            <span class="text-muted text-decoration-line-through small">AED {{ number_format($booking->original_total ?: ($booking->total + $booking->discount_amount), 2) }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="small text-success fw-bold">Promo ({{ $booking->coupon_code }}):</span>
+                            <span class="fw-bold text-success">-AED {{ number_format($booking->discount_amount, 2) }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="small text-muted">Net Package:</span>
+                            <span class="fw-bold text-dark">AED {{ number_format($booking->total, 2) }}</span>
+                        </div>
+                        @else
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <span class="small text-muted">Total Package:</span>
                             <span class="fw-bold text-dark">AED {{ number_format($booking->total, 2) }}</span>
                         </div>
+                        @endif
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <span class="small text-muted">Amount Paid:</span>
                             <span class="fw-bold text-success">AED {{ number_format($booking->payment_amount ?: ($booking->payment_status === 'paid' ? $booking->total : 0), 2) }}</span>

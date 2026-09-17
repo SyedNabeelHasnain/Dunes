@@ -58,12 +58,12 @@ const App={
             'INR': '₹'
         },
         flags: {
-            'AED': '🇦🇪',
-            'USD': '🇺🇸',
-            'EUR': '🇪🇺',
-            'GBP': '🇬🇧',
-            'SAR': '🇸🇦',
-            'INR': '🇮🇳'
+            'AED': '\uD83C\uDDE6\uD83C\uDDEA',
+            'USD': '\uD83C\uDDFA\uD83C\uDDF8',
+            'EUR': '\uD83C\uDDEA\uD83C\uDDFA',
+            'GBP': '\uD83C\uDDEC\uD83C\uDDE7',
+            'SAR': '\uD83C\uDDF8\uD83C\uDDE6',
+            'INR': '\uD83C\uDDEE\uD83C\uDDF3'
         }
     },
 
