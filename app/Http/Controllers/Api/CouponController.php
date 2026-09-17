@@ -52,7 +52,7 @@ class CouponController extends Controller
             }
         }
 
-        $coupon = Coupon::where('code', $code)->first();
+        $coupon = Coupon::findByCode($code);
 
         if (!$coupon) {
             return response()->json([

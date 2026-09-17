@@ -140,7 +140,7 @@ class BookingController extends Controller
         // Process promo code if provided
         $couponCodeInput = strtoupper(trim($request->input('coupon_code', '')));
         if (!empty($couponCodeInput)) {
-            $coupon = Coupon::where('code', $couponCodeInput)->first();
+            $coupon = Coupon::findByCode($couponCodeInput);
             if ($coupon) {
                 $payingGuests = max(1, (int)$adults + (int)$children);
                 $check = $coupon->validateEligibility($rawSubtotal, $tourId, $tierId, $email, $payingGuests, $date);

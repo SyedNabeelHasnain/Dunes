@@ -221,4 +221,52 @@ class Coupon extends Model
 
         return round($discount, 2);
     }
+
+    /**
+     * Resilient coupon lookup with self-healing fallback for core system promotional codes.
+     */
+    public static function findByCode(?string $code): ?self
+    {
+        if (empty($code)) {
+            return null;
+        }
+
+        $normalized = strtoupper(trim($code));
+        $coupon = static::where('code', $normalized)->first();
+        if ($coupon) {
+            return $coupon;
+        }
+
+        // Automatic fallback for system-defined gamified codes (MATCH5, SAVE5)
+        if (in_array($normalized, ['MATCH5', 'SAVE5'])) {
+            try {
+                return static::firstOrCreate(
+                    ['code' => $normalized],
+                    [
+                        'name' => $normalized === 'MATCH5' ? 'Safari Matcher AI 5% Discount' : 'Exit-Intent Cart Saver 5% Discount',
+                        'description' => 'System discount code (5% off)',
+                        'discount_type' => 'percentage',
+                        'discount_value' => 5.00,
+                        'min_spend' => 0.00,
+                        'min_guests' => 1,
+                        'usage_limit_per_user' => 10,
+                        'status' => 'active',
+                        'valid_from' => now()->subDay(),
+                        'is_featured' => true,
+                    ]
+                );
+            } catch (\Throwable $e) {
+                $c = new static([
+                    'code' => $normalized,
+                    'name' => $normalized === 'MATCH5' ? 'Safari Matcher AI 5% Discount' : 'Exit-Intent Cart Saver 5% Discount',
+                    'discount_type' => 'percentage',
+                    'discount_value' => 5.00,
+                    'status' => 'active',
+                ]);
+                return $c;
+            }
+        }
+
+        return null;
+    }
 }
