@@ -3,14 +3,14 @@
 @push('schema')
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
-  "@graph": [
+  "@@context": "https://schema.org",
+  "@@graph": [
     {
-      "@type": "Service",
-      "@id": "{{ route('tours.customizer') }}#service",
+      "@@type": "Service",
+      "@@id": "{{ route('tours.customizer') }}#service",
       "name": "Custom Dubai Desert Safari Builder & Configurator",
       "provider": {
-        "@type": "TravelAgency",
+        "@@type": "TravelAgency",
         "name": "Dunes Discovery Tourism LLC",
         "url": "{{ url('/') }}",
         "telephone": "+971502456056"
@@ -19,29 +19,29 @@
       "description": "Design and build your bespoke Dubai desert safari with private 4x4 Land Cruisers, 1000cc Can-Am buggies, 400cc quad bikes, and VIP table service.",
       "areaServed": "Dubai, United Arab Emirates",
       "offers": {
-        "@type": "AggregateOffer",
+        "@@type": "AggregateOffer",
         "priceCurrency": "AED",
         "lowPrice": "120",
         "highPrice": "1500"
       }
     },
     {
-      "@type": "BreadcrumbList",
+      "@@type": "BreadcrumbList",
       "itemListElement": [
         {
-          "@type": "ListItem",
+          "@@type": "ListItem",
           "position": 1,
           "name": "Home",
           "item": "{{ route('home') }}"
         },
         {
-          "@type": "ListItem",
+          "@@type": "ListItem",
           "position": 2,
           "name": "Tours",
           "item": "{{ route('tours.index') }}"
         },
         {
-          "@type": "ListItem",
+          "@@type": "ListItem",
           "position": 3,
           "name": "Build Your Own Safari",
           "item": "{{ route('tours.customizer') }}"
