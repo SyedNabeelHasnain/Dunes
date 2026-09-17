@@ -40,14 +40,14 @@ class Tour extends Model
     {
         return $this->belongsToMany(Tier::class, 'tour_tiers')
             ->withPivot('price', 'old_price', 'price_type')
-            ->orderBy('priority', 'asc');
+            ->orderBy('tiers.priority', 'asc');
     }
 
     public function addons()
     {
         return $this->belongsToMany(Addon::class, 'tour_addons')
             ->withPivot('price')
-            ->orderBy('priority', 'asc');
+            ->orderBy('addons.priority', 'asc');
     }
 
     public function contentItems()

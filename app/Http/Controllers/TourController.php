@@ -514,7 +514,7 @@ class TourController extends Controller
      */
     public function customizer(Request $request)
     {
-        $allTours = Tour::where('status', 'active')->with(['tiers', 'addons'])->orderBy('priority', 'asc')->get();
+        $allTours = Tour::where('status', 'active')->with(['tiers', 'category'])->orderBy('priority', 'asc')->get();
         $categories = Category::orderBy('priority', 'asc')->get();
 
         $pageTitle = "Build Your Own Dubai Desert Safari (Customizer 2026) | Dunes Discovery";

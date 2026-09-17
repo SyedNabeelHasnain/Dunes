@@ -372,7 +372,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // WhatsApp
         const waMsg = `Hi Dunes Discovery! I configured a custom safari: Base: ${encodeURIComponent(modalState.base.name)}, Vehicle: ${encodeURIComponent(modalState.transfer.name)}, Sports: ${encodeURIComponent(modalState.sports.name)}, Addons: ${encodeURIComponent(summaryAddonsEl.innerText)}, Guests: ${modalState.adults} Adults, Total: AED ${grandTotal}. Can you check availability?`;
-        waBtn.href = `https://wa.me/{{ preg_replace('/[^0-9]/','',\App\Models\Setting::where('setting_key', 'site_whatsapp')->value('setting_value') ?? '971502456056') }}?text=${waMsg}`;
+        waBtn.href = `https://wa.me/{{ preg_replace('/[^0-9]/','',(string)(\App\Models\Setting::where('setting_key', 'site_whatsapp')->value('setting_value') ?? '971502456056')) }}?text=${waMsg}`;
     }
 
     if (bookBtn) {
