@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Models\WhatsappInquiry;
+use App\Models\RequestLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AdminWhatsappController extends Controller
 {
@@ -234,6 +237,62 @@ class AdminWhatsappController extends Controller
     }
 
     /**
+     * Permanently delete a single WhatsApp lead and its telemetry footprints.
+     */
+    public function destroy(Request $request, int $id)
+    {
+        try {
+            $lead = DB::table('whatsapp_inquiries')->where('id', $id)->first();
+            if (!$lead) {
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json(['success' => false, 'message' => 'WhatsApp lead not found.'], 404);
+                }
+                return redirect()->route('admin.whatsapp.leads')->with('error', 'WhatsApp lead not found.');
+            }
+
+            $leadName = $lead->name ?: 'Lead';
+            $this->purgeLeadData($id, $lead->request_log_id ? (int)$lead->request_log_id : null);
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => "WhatsApp lead ({$leadName}) and all associated records permanently purged."
+                ]);
+            }
+
+            return redirect()->route('admin.whatsapp.leads')
+                ->with('success', "WhatsApp lead ({$leadName}) and all associated records permanently purged.");
+        } catch (\Throwable $e) {
+            Log::error("Failed to delete WhatsApp lead #{$id}: " . $e->getMessage());
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Failed to delete lead: ' . $e->getMessage()], 500);
+            }
+            return redirect()->back()->with('error', 'Failed to delete lead: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Execute complete cascade purge of a WhatsApp lead and its telemetry footprints.
+     */
+    private function purgeLeadData(int $id, ?int $requestLogId = null): void
+    {
+        DB::transaction(function () use ($id, $requestLogId) {
+            // 1. Delete associated request_log by direct ID
+            if ($requestLogId) {
+                RequestLog::where('id', $requestLogId)->delete();
+            }
+
+            // 2. Delete any request_logs linked by entity_type and entity_id
+            RequestLog::whereIn('entity_type', ['whatsapp', 'whatsapp_inquiry', 'whatsapp_lead'])
+                ->where('entity_id', $id)
+                ->delete();
+
+            // 3. Delete WhatsApp inquiry record
+            DB::table('whatsapp_inquiries')->where('id', $id)->delete();
+        });
+    }
+
+    /**
      * Perform batch operations across multiple WhatsApp inquiries.
      */
     public function bulkAction(Request $request)
@@ -249,16 +308,24 @@ class AdminWhatsappController extends Controller
 
         try {
             if ($action === 'delete') {
-                $count = DB::table('whatsapp_inquiries')->whereIn('id', $ids)->delete();
+                $count = 0;
+                DB::transaction(function () use ($ids, &$count) {
+                    $leads = DB::table('whatsapp_inquiries')->whereIn('id', $ids)->get();
+                    foreach ($leads as $lead) {
+                        $this->purgeLeadData($lead->id, $lead->request_log_id ? (int)$lead->request_log_id : null);
+                        $count++;
+                    }
+                });
+
                 return response()->json([
                     'success' => true,
-                    'message' => "{$count} lead(s) deleted successfully."
+                    'message' => "{$count} lead(s) and all associated analytics permanently purged."
                 ]);
             }
 
             return response()->json(['success' => false, 'message' => 'Invalid action.'], 400);
         } catch (\Throwable $e) {
-            \Log::error("Bulk action failed on WhatsApp inquiries: " . $e->getMessage());
+            Log::error("Bulk action failed on WhatsApp inquiries: " . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to process bulk action: ' . $e->getMessage()

@@ -11,6 +11,8 @@ use App\Models\Subscriber;
 use App\Models\Tour;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AdminDashboardController extends Controller
 {
@@ -417,14 +419,61 @@ class AdminDashboardController extends Controller
     }
 
     /**
-     * Delete an inquiry.
+     * Permanently delete an inquiry and all associated analytics footprints.
      */
-    public function deleteInquiry(int $id)
+    public function deleteInquiry(Request $request, int $id)
     {
-        $inquiry = Contact::findOrFail($id);
-        $inquiry->delete();
+        try {
+            $inquiry = Contact::withTrashed()->findOrFail($id);
+            $name = $inquiry->name ?: 'Inquiry';
 
-        return redirect()->route('admin.inquiries.index')->with('success', 'Inquiry deleted successfully.');
+            $this->purgeInquiryData($inquiry);
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => "Inquiry from {$name} and all associated records permanently purged."
+                ]);
+            }
+
+            return redirect()->route('admin.inquiries.index')
+                ->with('success', "Inquiry from {$name} and all associated records permanently purged.");
+        } catch (\Throwable $e) {
+            Log::error("Failed to delete contact inquiry #{$id}: " . $e->getMessage());
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to delete inquiry: ' . $e->getMessage()
+                ], 500);
+            }
+
+            return redirect()->back()->with('error', 'Failed to delete inquiry: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Execute complete cascade purge of a Contact inquiry and its telemetry footprints.
+     */
+    private function purgeInquiryData(Contact $inquiry): void
+    {
+        DB::transaction(function () use ($inquiry) {
+            $inquiryId = $inquiry->id;
+            $requestLogId = $inquiry->request_log_id;
+
+            // 1. Delete associated request_log by direct ID
+            if ($requestLogId) {
+                RequestLog::where('id', $requestLogId)->delete();
+            }
+
+            // 2. Delete any request_logs linked by entity_type and entity_id
+            RequestLog::whereIn('entity_type', ['contact', 'inquiry'])
+                ->where('entity_id', $inquiryId)
+                ->delete();
+
+            // 3. Permanently force-delete the Contact record from database (bypassing SoftDeletes)
+            $inquiry->forceDelete();
+        });
     }
 
     /**
@@ -519,10 +568,18 @@ class AdminDashboardController extends Controller
 
         try {
             if ($action === 'delete') {
-                $count = Contact::whereIn('id', $ids)->delete();
+                $count = 0;
+                DB::transaction(function () use ($ids, &$count) {
+                    $inquiries = Contact::withTrashed()->whereIn('id', $ids)->get();
+                    foreach ($inquiries as $inquiry) {
+                        $this->purgeInquiryData($inquiry);
+                        $count++;
+                    }
+                });
+
                 return response()->json([
                     'success' => true,
-                    'message' => "{$count} inquiry(s) deleted successfully."
+                    'message' => "{$count} inquiry(s) and all associated analytics permanently purged."
                 ]);
             }
 

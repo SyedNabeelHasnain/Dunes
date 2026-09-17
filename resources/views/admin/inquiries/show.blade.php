@@ -26,11 +26,15 @@
             </form>
         @endif
         
-        <form action="{{ route('admin.inquiries.destroy', $inquiry->id) }}" method="POST" class="d-inline delete-form" data-confirm="Are you sure you want to delete this inquiry? This action cannot be undone.">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-danger rounded-pill px-4 py-2 fw-bold">Delete Inquiry</button>
-        </form>
+        <button type="button" 
+                class="btn btn-danger rounded-pill px-4 py-2 fw-bold" 
+                id="btnDeleteInquiryShow"
+                data-id="{{ $inquiry->id }}"
+                data-name="{{ $inquiry->name }}"
+                data-email="{{ $inquiry->email }}"
+                data-subject="{{ $inquiry->subject }}">
+            <i class="bi bi-trash3-fill me-1"></i> Delete Inquiry
+        </button>
     </div>
 </div>
 
@@ -111,3 +115,117 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+$(document).ready(function() {
+    $('#btnDeleteInquiryShow').on('click', function(e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        const name = $(this).data('name') || 'Customer';
+        const email = $(this).data('email') || '';
+        const subject = $(this).data('subject') || '';
+        const verifyTarget = (email && email.trim()) ? email.trim() : (name ? name.trim() : 'CONFIRM');
+
+        // Step 1: Caution Dialog
+        Swal.fire({
+            title: '⚠️ CAUTION: Permanent Inquiry Deletion',
+            html: `
+                <div class="text-start small text-secondary">
+                    <div class="alert alert-danger py-2 px-3 mb-3 border-danger border-opacity-25 bg-danger bg-opacity-10 text-danger fw-semibold">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                        <strong>IRREVERSIBLE ACTION:</strong> You are about to permanently eradicate contact inquiry <strong class="text-dark">#${id} (${name})</strong> from the database.
+                    </div>
+                    <div class="card bg-light border-0 p-2.5 mb-3">
+                        <div class="fw-bold text-dark mb-1 small text-uppercase" style="font-size: 11px;">The following records will be permanently purged:</div>
+                        <ul class="mb-0 ps-3 text-muted" style="font-size: 12px; line-height: 1.6;">
+                            <li>Contact Inquiry Record (${email || 'No Email'})</li>
+                            <li>Customer message content & subject ("${subject || 'Inquiry'}")</li>
+                            <li>Visitor Analytics, Telemetry & Request Logs (${id})</li>
+                            <li>Client IP & Geolocation Audit Trail</li>
+                        </ul>
+                    </div>
+                    <p class="mb-0 text-muted">Are you sure you want to proceed to the final verification?</p>
+                </div>
+            `,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Proceed to Final Confirmation <i class="bi bi-arrow-right ms-1"></i>',
+            cancelButtonText: 'Cancel (Keep Inquiry)',
+            focusCancel: true
+        }).then((step1Result) => {
+            if (!step1Result.isConfirmed) return;
+
+            // Step 2: Final Safeguard Double Confirmation
+            Swal.fire({
+                title: '🔒 Double Confirmation Required',
+                html: `
+                    <div class="text-start small">
+                        <p class="text-dark mb-2">To prevent accidental deletion, please type the customer email below to authorize permanent destruction:</p>
+                        <div class="text-center my-3">
+                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 fs-6 font-monospace py-2 px-3">
+                                ${verifyTarget}
+                            </span>
+                        </div>
+                    </div>
+                `,
+                input: 'text',
+                inputPlaceholder: `Type ${verifyTarget} to confirm`,
+                inputAttributes: {
+                    autocapitalize: 'off',
+                    autocorrect: 'off',
+                    autocomplete: 'off',
+                    style: 'text-align: center; font-family: monospace; font-weight: bold; font-size: 1.1rem; letter-spacing: 1px;'
+                },
+                icon: 'error',
+                showCancelButton: true,
+                confirmButtonColor: '#b02a37',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="bi bi-trash3-fill me-1"></i> PERMANENTLY PURGE EVERYTHING',
+                cancelButtonText: 'Abort',
+                focusCancel: true,
+                showLoaderOnConfirm: true,
+                preConfirm: (inputValue) => {
+                    if (!inputValue || inputValue.trim().toLowerCase() !== verifyTarget.toLowerCase()) {
+                        Swal.showValidationMessage(`Verification mismatch! You must type exactly "${verifyTarget}" to authorize deletion.`);
+                        return false;
+                    }
+                    return $.ajax({
+                        url: `/admin/inquiries/${id}`,
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            _method: 'DELETE'
+                        },
+                        headers: { 'Accept': 'application/json' }
+                    }).then(response => {
+                        if (!response.success) {
+                            throw new Error(response.message || 'Failed to delete inquiry.');
+                        }
+                        return response;
+                    }).catch(error => {
+                        const msg = error.responseJSON ? error.responseJSON.message : error.message;
+                        Swal.showValidationMessage(`Purge Failed: ${msg}`);
+                    });
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((step2Result) => {
+                if (step2Result.isConfirmed && step2Result.value) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Purged!',
+                        text: step2Result.value.message || 'Inquiry and all analytics footprints permanently deleted.',
+                        timer: 1600,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = "{{ route('admin.inquiries.index') }}";
+                    });
+                }
+            });
+        });
+    });
+});
+</script>
+@endpush

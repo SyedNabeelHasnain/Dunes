@@ -132,6 +132,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
     Route::get('/whatsapp-leads/export/csv', [AdminWhatsappController::class, 'exportCsv'])->name('whatsapp.export');
     Route::post('/whatsapp-leads/bulk-action', [AdminWhatsappController::class, 'bulkAction'])->name('whatsapp.bulk');
+    Route::delete('/whatsapp-leads/{id}', [AdminWhatsappController::class, 'destroy'])->name('whatsapp.destroy');
     Route::get('/whatsapp-leads', [AdminWhatsappController::class, 'index'])->name('whatsapp.leads');
     Route::get('/whatsapp', [AdminWhatsappController::class, 'index'])->name('whatsapp.index');
     Route::get('/whatsapp/leads', [AdminWhatsappController::class, 'index'])->name('whatsapp.leads.alias');

@@ -12,6 +12,8 @@ use App\Models\BookingAddon;
 use App\Models\BookingPayment;
 use App\Models\Review;
 use App\Models\RequestLog;
+use App\Models\WhatsappInquiry;
+use App\Models\Contact;
 use App\Models\User;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Cache;
@@ -378,5 +380,184 @@ class BookingEngineTest extends TestCase
 
         $this->assertDatabaseMissing('bookings', ['id' => $b1->id]);
         $this->assertDatabaseMissing('bookings', ['id' => $b2->id]);
+    }
+
+    /**
+     * Test permanent single and bulk WhatsApp lead deletion with cascade footprint purge.
+     */
+    public function test_permanent_whatsapp_lead_deletion_cascades_request_logs(): void
+    {
+        $admin = User::create([
+            'name' => 'Admin WhatsApp',
+            'email' => 'admin_wa@dunesdiscovery.com',
+            'password' => bcrypt('password123'),
+        ]);
+
+        // 1. Single Lead Deletion Test
+        $logPrimary = RequestLog::create([
+            'entity_type' => 'whatsapp',
+            'request_timestamp' => now(),
+            'client_ip' => '192.168.10.50',
+            'city' => 'Dubai',
+            'country' => 'United Arab Emirates',
+        ]);
+
+        $lead = WhatsappInquiry::create([
+            'request_log_id' => $logPrimary->id,
+            'name' => 'Fatima Al-Zahra',
+            'phone' => '+971551234567',
+            'tour_name' => 'Premium Desert Safari',
+            'page_url' => 'https://dunesdiscovery.com/tours/evening-desert-safari',
+            'message_text' => 'Hello, I want to book for 4 people.',
+        ]);
+
+        $logRelational = RequestLog::create([
+            'entity_type' => 'whatsapp_inquiry',
+            'entity_id' => $lead->id,
+            'request_timestamp' => now(),
+            'client_ip' => '192.168.10.50',
+        ]);
+
+        $this->assertDatabaseHas('whatsapp_inquiries', ['id' => $lead->id]);
+        $this->assertDatabaseHas('request_logs', ['id' => $logPrimary->id]);
+        $this->assertDatabaseHas('request_logs', ['id' => $logRelational->id]);
+
+        // Execute single delete as admin
+        $response = $this->actingAs($admin)->deleteJson("/admin/whatsapp-leads/{$lead->id}");
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        // Assert permanent eradication with zero orphaned footprints
+        $this->assertDatabaseMissing('whatsapp_inquiries', ['id' => $lead->id]);
+        $this->assertDatabaseMissing('request_logs', ['id' => $logPrimary->id]);
+        $this->assertDatabaseMissing('request_logs', ['id' => $logRelational->id]);
+
+        // 2. Bulk Lead Deletion Test
+        $leadA = WhatsappInquiry::create([
+            'name' => 'Lead Alpha',
+            'phone' => '+971501111111',
+            'tour_name' => 'Morning Safari',
+        ]);
+        $leadB = WhatsappInquiry::create([
+            'name' => 'Lead Beta',
+            'phone' => '+971502222222',
+            'tour_name' => 'Quad Biking',
+        ]);
+
+        $bulkLogA = RequestLog::create([
+            'entity_type' => 'whatsapp_lead',
+            'entity_id' => $leadA->id,
+            'request_timestamp' => now(),
+        ]);
+        $bulkLogB = RequestLog::create([
+            'entity_type' => 'whatsapp',
+            'entity_id' => $leadB->id,
+            'request_timestamp' => now(),
+        ]);
+
+        $bulkResp = $this->actingAs($admin)->postJson('/admin/whatsapp-leads/bulk-action', [
+            'ids' => [$leadA->id, $leadB->id],
+            'action' => 'delete',
+        ]);
+        $bulkResp->assertStatus(200);
+        $bulkResp->assertJson(['success' => true]);
+
+        $this->assertDatabaseMissing('whatsapp_inquiries', ['id' => $leadA->id]);
+        $this->assertDatabaseMissing('whatsapp_inquiries', ['id' => $leadB->id]);
+        $this->assertDatabaseMissing('request_logs', ['id' => $bulkLogA->id]);
+        $this->assertDatabaseMissing('request_logs', ['id' => $bulkLogB->id]);
+    }
+
+    /**
+     * Test permanent single and bulk Contact Inquiry deletion bypassing SoftDeletes and cascading logs.
+     */
+    public function test_permanent_contact_inquiry_deletion_cascades_request_logs(): void
+    {
+        $admin = User::create([
+            'name' => 'Admin Inquiries',
+            'email' => 'admin_inq@dunesdiscovery.com',
+            'password' => bcrypt('password123'),
+        ]);
+
+        // 1. Single Inquiry Deletion Test
+        $logPrimary = RequestLog::create([
+            'entity_type' => 'contact',
+            'request_timestamp' => now(),
+            'client_ip' => '192.168.20.100',
+            'city' => 'Abu Dhabi',
+        ]);
+
+        $inquiry = Contact::create([
+            'request_log_id' => $logPrimary->id,
+            'name' => 'John Doe',
+            'email' => 'john.doe@example.com',
+            'phone' => '+971520000000',
+            'subject' => 'Corporate Event Safari',
+            'message' => 'Looking to book a private corporate group of 50 delegates.',
+            'status' => 'new',
+            'ip_address' => '192.168.20.100',
+        ]);
+
+        $logRelational = RequestLog::create([
+            'entity_type' => 'contact',
+            'entity_id' => $inquiry->id,
+            'request_timestamp' => now(),
+        ]);
+
+        $this->assertDatabaseHas('contacts', ['id' => $inquiry->id]);
+        $this->assertDatabaseHas('request_logs', ['id' => $logPrimary->id]);
+        $this->assertDatabaseHas('request_logs', ['id' => $logRelational->id]);
+
+        // Execute single delete as admin
+        $response = $this->actingAs($admin)->deleteJson("/admin/inquiries/{$inquiry->id}");
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        // Assert permanent database eradication (assertDatabaseMissing checks the table directly, ensuring no soft-deleted row remains)
+        $this->assertDatabaseMissing('contacts', ['id' => $inquiry->id]);
+        $this->assertNull(Contact::withTrashed()->find($inquiry->id));
+        $this->assertDatabaseMissing('request_logs', ['id' => $logPrimary->id]);
+        $this->assertDatabaseMissing('request_logs', ['id' => $logRelational->id]);
+
+        // 2. Bulk Inquiries Deletion Test
+        $inqA = Contact::create([
+            'name' => 'Inquiry A',
+            'email' => 'inqA@example.com',
+            'subject' => 'Subject A',
+            'message' => 'Message A',
+            'status' => 'new',
+        ]);
+        $inqB = Contact::create([
+            'name' => 'Inquiry B',
+            'email' => 'inqB@example.com',
+            'subject' => 'Subject B',
+            'message' => 'Message B',
+            'status' => 'read',
+        ]);
+
+        $bulkLogA = RequestLog::create([
+            'entity_type' => 'inquiry',
+            'entity_id' => $inqA->id,
+            'request_timestamp' => now(),
+        ]);
+        $bulkLogB = RequestLog::create([
+            'entity_type' => 'contact',
+            'entity_id' => $inqB->id,
+            'request_timestamp' => now(),
+        ]);
+
+        $bulkResp = $this->actingAs($admin)->postJson('/admin/inquiries/bulk-action', [
+            'ids' => [$inqA->id, $inqB->id],
+            'action' => 'delete',
+        ]);
+        $bulkResp->assertStatus(200);
+        $bulkResp->assertJson(['success' => true]);
+
+        $this->assertDatabaseMissing('contacts', ['id' => $inqA->id]);
+        $this->assertDatabaseMissing('contacts', ['id' => $inqB->id]);
+        $this->assertNull(Contact::withTrashed()->find($inqA->id));
+        $this->assertNull(Contact::withTrashed()->find($inqB->id));
+        $this->assertDatabaseMissing('request_logs', ['id' => $bulkLogA->id]);
+        $this->assertDatabaseMissing('request_logs', ['id' => $bulkLogB->id]);
     }
 }

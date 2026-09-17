@@ -194,6 +194,7 @@
                                 <button class="btn btn-sm btn-outline-primary rounded-circle d-flex align-items-center justify-content-center view-lead-btn" 
                                         style="width: 34px; height: 34px;" 
                                         title="View Full Lead Details"
+                                        data-id="{{ $lead->id }}"
                                         data-name="{{ $lead->name }}"
                                         data-phone="{{ $lead->phone }}"
                                         data-context="{{ $lead->tour_name ?: 'General Inquiry' }}"
@@ -203,6 +204,12 @@
                                         data-location="{{ ($lead->city ?? 'Unknown') . ', ' . ($lead->country ?? '') }}"
                                         data-device="{{ ucfirst($lead->device_type ?? '-') }} ({{ $lead->os_name ?? '-' }} / {{ $lead->browser_name ?? '-' }})">
                                     <i class="bi bi-search"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center btn-delete-lead" 
+                                        style="width: 34px; height: 34px;" 
+                                        title="Permanently Delete WhatsApp Lead & All Footprints"
+                                        onclick="promptPermanentDeleteLead({{ $lead->id }}, '{{ addslashes($lead->name ?: 'Visitor') }}', '{{ addslashes($lead->phone ?: '') }}')">
+                                    <i class="bi bi-trash3"></i>
                                 </button>
                             </div>
                         </td>
@@ -297,11 +304,16 @@
                     </div>
                 </div>
             </div>
-            <div class="modal-footer border-0 pt-0">
-                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Close</button>
-                <a href="#" id="modalDirectChatBtn" target="_blank" class="btn btn-success rounded-pill px-4 fw-bold">
-                    <i class="bi bi-whatsapp me-1"></i> Open Chat on WhatsApp
-                </a>
+            <div class="modal-footer border-0 pt-0 d-flex justify-content-between">
+                <button type="button" class="btn btn-outline-danger rounded-pill px-3" id="modalDeleteLeadBtn">
+                    <i class="bi bi-trash3 me-1"></i> Delete Lead
+                </button>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+                    <a href="#" id="modalDirectChatBtn" target="_blank" class="btn btn-success rounded-pill px-4 fw-bold">
+                        <i class="bi bi-whatsapp me-1"></i> Open Chat on WhatsApp
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -398,6 +410,12 @@ $(document).ready(function() {
             $('#modalDirectChatBtn').hide();
         }
 
+        const id = btn.data('id');
+        $('#modalDeleteLeadBtn').off('click').on('click', function() {
+            $('#leadDetailsModal').modal('hide');
+            promptPermanentDeleteLead(id, name, phone);
+        });
+
         $('#leadDetailsModal').modal('show');
     });
 
@@ -411,14 +429,15 @@ $(document).ready(function() {
         const count = checkedBoxes.length;
         $waCountBadge.text(count);
         if (count > 0) {
-            $waBulkBar.addClass('show');
+            $waBulkBar.addClass('active');
         } else {
-            $waBulkBar.removeClass('show');
+            $waBulkBar.removeClass('active');
         }
     }
 
     $waSelectAll.on('change', function() {
-        $('.whatsapp-row-select').prop('checked', $(this).is(':checked'));
+        const isChecked = $(this).prop('checked');
+        $('.whatsapp-row-select').prop('checked', isChecked);
         updateWaBulkBar();
     });
 
@@ -440,47 +459,198 @@ $(document).ready(function() {
 
         if (selectedIds.length === 0) return;
 
+        // Step 1: Bulk Caution Dialog
         Swal.fire({
-            title: 'Delete Selected Leads?',
-            text: `Are you sure you want to permanently delete ${selectedIds.length} WhatsApp lead inquiry record(s)?`,
+            title: '⚠️ CAUTION: Permanent Bulk Deletion',
+            html: `
+                <div class="text-start small text-secondary">
+                    <div class="alert alert-danger py-2 px-3 mb-3 border-danger border-opacity-25 bg-danger bg-opacity-10 text-danger fw-semibold">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                        <strong>IRREVERSIBLE BULK ACTION:</strong> You are about to permanently purge <strong class="text-dark">${selectedIds.length}</strong> selected WhatsApp lead inquiry record(s) from the database.
+                    </div>
+                    <p class="mb-2 text-dark">This will permanently delete all associated customer messages, client IP telemetry, and request log analytics. No orphaned footprints will remain.</p>
+                    <p class="mb-0 text-muted">Are you sure you want to proceed to the final confirmation?</p>
+                </div>
+            `,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#dc3545',
             cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Yes, Delete',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $('#appLoader').fadeIn(200);
-                $.ajax({
-                    url: '{{ route("admin.whatsapp.bulk") }}',
+            confirmButtonText: 'Proceed to Final Confirmation <i class="bi bi-arrow-right ms-1"></i>',
+            cancelButtonText: 'Cancel (Keep Leads)',
+            focusCancel: true
+        }).then((step1Result) => {
+            if (!step1Result.isConfirmed) return;
+
+            // Step 2: Final Safeguard Double Confirmation
+            Swal.fire({
+                title: '🔒 Confirm Bulk Deletion',
+                html: `
+                    <div class="text-start small">
+                        <p class="text-dark mb-2">To confirm permanent deletion of <strong>${selectedIds.length}</strong> WhatsApp leads and all analytics footprints, type <strong>DELETE</strong> in capital letters below:</p>
+                    </div>
+                `,
+                input: 'text',
+                inputPlaceholder: 'DELETE',
+                inputAttributes: {
+                    autocapitalize: 'characters',
+                    style: 'text-align: center; font-family: monospace; font-weight: bold; font-size: 1.1rem; letter-spacing: 2px;'
+                },
+                icon: 'error',
+                showCancelButton: true,
+                confirmButtonColor: '#b02a37',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="bi bi-trash3-fill me-1"></i> PURGE ALL SELECTED',
+                cancelButtonText: 'Abort',
+                focusCancel: true,
+                showLoaderOnConfirm: true,
+                preConfirm: (inputValue) => {
+                    if (!inputValue || inputValue.trim() !== 'DELETE') {
+                        Swal.showValidationMessage('Verification failed! You must type "DELETE" exactly.');
+                        return false;
+                    }
+                    return $.ajax({
+                        url: '{{ route("admin.whatsapp.bulk") }}',
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            ids: selectedIds,
+                            action: 'delete'
+                        },
+                        headers: { 'Accept': 'application/json' }
+                    }).then(response => {
+                        if (!response.success) {
+                            throw new Error(response.message || 'Failed to process bulk action.');
+                        }
+                        return response;
+                    }).catch(error => {
+                        const msg = error.responseJSON ? error.responseJSON.message : error.message;
+                        Swal.showValidationMessage(`Bulk Purge Failed: ${msg}`);
+                    });
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((step2Result) => {
+                if (step2Result.isConfirmed && step2Result.value) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Purged!',
+                        text: step2Result.value.message || 'Selected WhatsApp leads permanently deleted.',
+                        timer: 1600,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                }
+            });
+        });
+    });
+});
+
+/**
+ * 2-Step Cautionary Double Confirmation for Permanent Single WhatsApp Lead Deletion
+ */
+window.promptPermanentDeleteLead = function(id, name, phone) {
+    const verifyTarget = (phone && phone !== 'No Phone') ? phone.trim() : name.trim();
+
+    // Step 1: Caution Dialog
+    Swal.fire({
+        title: '⚠️ CAUTION: Permanent Lead Deletion',
+        html: `
+            <div class="text-start small text-secondary">
+                <div class="alert alert-danger py-2 px-3 mb-3 border-danger border-opacity-25 bg-danger bg-opacity-10 text-danger fw-semibold">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                    <strong>IRREVERSIBLE ACTION:</strong> You are about to permanently eradicate WhatsApp lead inquiry <strong class="text-dark">#${id} (${name})</strong> from the database.
+                </div>
+                <div class="card bg-light border-0 p-2.5 mb-3">
+                    <div class="fw-bold text-dark mb-1 small text-uppercase" style="font-size: 11px;">The following records will be permanently purged:</div>
+                    <ul class="mb-0 ps-3 text-muted" style="font-size: 12px; line-height: 1.6;">
+                        <li>WhatsApp Lead Record & Contact Information (${phone || 'No Phone'})</li>
+                        <li>Prefilled inquiry message & campaign source URL</li>
+                        <li>Visitor Analytics, Telemetry & Request Logs (${id})</li>
+                        <li>Client IP & Geolocation Audit Trail</li>
+                    </ul>
+                </div>
+                <p class="mb-0 text-muted">Are you sure you want to proceed to the final verification?</p>
+            </div>
+        `,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Proceed to Final Confirmation <i class="bi bi-arrow-right ms-1"></i>',
+        cancelButtonText: 'Cancel (Keep Lead)',
+        focusCancel: true
+    }).then((step1Result) => {
+        if (!step1Result.isConfirmed) return;
+
+        // Step 2: Final Safeguard Double Confirmation
+        Swal.fire({
+            title: '🔒 Double Confirmation Required',
+            html: `
+                <div class="text-start small">
+                    <p class="text-dark mb-2">To prevent accidental deletion, please type the verification value below to authorize permanent destruction:</p>
+                    <div class="text-center my-3">
+                        <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 fs-6 font-monospace py-2 px-3">
+                            ${verifyTarget}
+                        </span>
+                    </div>
+                </div>
+            `,
+            input: 'text',
+            inputPlaceholder: `Type ${verifyTarget} to confirm`,
+            inputAttributes: {
+                autocapitalize: 'off',
+                autocorrect: 'off',
+                autocomplete: 'off',
+                style: 'text-align: center; font-family: monospace; font-weight: bold; font-size: 1.1rem; letter-spacing: 1px;'
+            },
+            icon: 'error',
+            showCancelButton: true,
+            confirmButtonColor: '#b02a37',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '<i class="bi bi-trash3-fill me-1"></i> PERMANENTLY PURGE EVERYTHING',
+            cancelButtonText: 'Abort',
+            focusCancel: true,
+            showLoaderOnConfirm: true,
+            preConfirm: (inputValue) => {
+                if (!inputValue || inputValue.trim() !== verifyTarget) {
+                    Swal.showValidationMessage(`Verification mismatch! You must type exactly "${verifyTarget}" to authorize deletion.`);
+                    return false;
+                }
+                return $.ajax({
+                    url: `/admin/whatsapp-leads/${id}`,
                     method: 'POST',
                     data: {
                         _token: '{{ csrf_token() }}',
-                        ids: selectedIds,
-                        action: 'delete'
+                        _method: 'DELETE'
                     },
-                    success: function(res) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Deleted!',
-                            text: res.message || 'Leads deleted successfully.',
-                            timer: 1500,
-                            showConfirmButton: false
-                        }).then(() => {
-                            window.location.reload();
-                        });
-                    },
-                    error: function(xhr) {
-                        $('#appLoader').fadeOut(200);
-                        const msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Error deleting leads.';
-                        Swal.fire('Failed', msg, 'error');
+                    headers: { 'Accept': 'application/json' }
+                }).then(response => {
+                    if (!response.success) {
+                        throw new Error(response.message || 'Failed to delete WhatsApp lead.');
                     }
+                    return response;
+                }).catch(error => {
+                    const msg = error.responseJSON ? error.responseJSON.message : error.message;
+                    Swal.showValidationMessage(`Purge Failed: ${msg}`);
+                });
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((step2Result) => {
+            if (step2Result.isConfirmed && step2Result.value) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Purged!',
+                    text: step2Result.value.message || 'WhatsApp lead and all analytics footprints permanently deleted.',
+                    timer: 1600,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.reload();
                 });
             }
         });
     });
-});
+};
 </script>
 @endpush
 @endsection
