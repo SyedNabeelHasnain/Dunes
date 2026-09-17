@@ -47,6 +47,8 @@ Route::get('/responsible-tourism-policy', [LegalController::class, 'responsibleT
 
 // Aliases & 301 redirects for legal routes
 Route::redirect('/terms', '/terms-condition', 301);
+Route::redirect('/terms-and-conditions', '/terms-condition', 301);
+Route::redirect('/terms-conditions', '/terms-condition', 301);
 Route::redirect('/privacy', '/privacy-policy', 301);
 Route::redirect('/cookies', '/cookie-policy', 301);
 Route::redirect('/refund-policy', '/cancellation-refund-policy', 301);
