@@ -65,6 +65,7 @@ Route::redirect('/responsible-tourism', '/responsible-tourism-policy', 301);
 Route::redirect('/dashboard', '/admin')->name('dashboard');
 
 Route::get('/tours', [TourController::class, 'index'])->name('tours.index');
+Route::get('/search', [TourController::class, 'search'])->name('tours.search');
 Route::get('/tours/{slug}', function ($slug) {
     return redirect('/' . $slug, 301);
 });

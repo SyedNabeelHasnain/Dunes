@@ -120,7 +120,7 @@
     <title>{{ $pageTitle }}</title>
     <meta name="description" content="{{ $pageDesc }}">
     <meta name="keywords" content="{{ $pageKeys }}">
-    <meta name="robots" content="{{ $pageRobots }}">
+    <meta name="robots" content="{{ $pageRobots ?? 'index, follow, max-image-preview:large' }}">
     <meta name="author" content="Dunes Discovery Tourism">
     <link rel="canonical" href="{{ $canonical }}">
     <link rel="alternate" hreflang="en" href="{{ $canonical }}">
@@ -371,6 +371,7 @@
                     <div class="nav-review-circle" onclick="toggleReviewPopover(this, event)" id="googleCircle" style="position: relative; cursor: pointer;">
                         <img src="{{ asset('images/Google-G.avif') }}" alt="Google">
                     </div>
+                    <button type="button" class="btn-circle-desert-light" data-bs-toggle="modal" data-bs-target="#globalSearchModal" aria-label="Search Dubai Tours"><i class="bi bi-search"></i></button>
                     <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" class="btn-circle-whatsapp" aria-label="WhatsApp" target="_blank" rel="noopener"><i class="bi bi-whatsapp"></i></a>
                     <a href="#" class="btn-circle-desert-light" data-action="open-booking" aria-label="Book Now"><i class="bi bi-calendar-check"></i></a>
                     <button class="navbar-toggler border-0 shadow-none p-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mainOffcanvas" aria-controls="mainOffcanvas" aria-label="Menu">
@@ -392,6 +393,12 @@
                         </div>
                     </div>
                     <div class="offcanvas-body p-4 p-lg-0">
+                        <div class="d-lg-none mb-3">
+                            <form action="{{ route('tours.search') }}" method="GET" class="position-relative">
+                                <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                                <input type="text" name="q" class="form-control rounded-pill ps-5 pe-4 py-2 bg-light border-0 small" placeholder="Search safaris, buggies, VIP..." required>
+                            </form>
+                        </div>
                         <ul class="navbar-nav mx-auto mb-4 mb-lg-0 gap-lg-1 text-nowrap">
                             <li class="nav-item">
                                 <a class="nav-link px-3 px-lg-2 py-2 rounded-3 {{ request()->routeIs('home') ? 'active nav-active-pill' : '' }}" href="{{ route('home') }}">Home</a>
@@ -422,7 +429,12 @@
                                 <a class="nav-link px-3 px-lg-2 py-2 rounded-3 {{ request()->routeIs('contact') ? 'active nav-active-pill' : '' }}" href="{{ route('contact') }}">Contact</a>
                             </li>
                         </ul>
-                        <div class="d-flex flex-column flex-lg-row gap-3 align-items-stretch align-items-lg-center">
+                        <div class="d-flex flex-column flex-lg-row gap-2 gap-xl-3 align-items-stretch align-items-lg-center">
+                            <button type="button" class="btn btn-white border rounded-pill px-3 py-1.5 d-none d-lg-inline-flex align-items-center gap-2 small text-muted shadow-none hover-shadow-sm transition-all" data-bs-toggle="modal" data-bs-target="#globalSearchModal" style="font-size: 0.82rem;" aria-label="Search Dubai tours">
+                                <i class="bi bi-search text-primary"></i>
+                                <span>Search tours...</span>
+                                <kbd class="badge bg-light text-muted border px-1.5 py-0.5 rounded small" style="font-size: 10px; font-family: inherit;">/</kbd>
+                            </button>
                             <div class="d-none d-lg-block">
                                 @include('partials.currency-switcher', ['switcherId' => 'desktopCurrencyDropdownBtn'])
                             </div>
@@ -684,6 +696,7 @@
     @include('partials.welcome-offer-modal')
     @include('partials.social-proof')
     @include('partials.comparison-drawer')
+    @include('partials.search-modal')
 
     <!-- Global Toast Container for App.toast notifications -->
     <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1090;" aria-live="polite" aria-atomic="true"></div>
