@@ -249,6 +249,12 @@ return new class extends Migration
         }
 
         // 4. Seed Dynamic SMTP & Newsletter Settings
+        if (!\Illuminate\Support\Facades\Schema::hasColumn('settings', 'description')) {
+            \Illuminate\Support\Facades\Schema::table('settings', function (\Illuminate\Database\Schema\Blueprint $table) {
+                $table->text('description')->nullable();
+            });
+        }
+
         $settings = [
             ['setting_key' => 'smtp_driver', 'setting_value' => 'smtp', 'description' => 'Mail Transport Driver (smtp, sendmail, log)'],
             ['setting_key' => 'smtp_host', 'setting_value' => 'smtp.hostinger.com', 'description' => 'SMTP Host Server'],

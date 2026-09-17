@@ -18,6 +18,7 @@ return new class extends Migration
             $table->increments('id');
             $table->string('setting_key', 100)->unique();
             $table->text('setting_value')->nullable();
+            $table->text('description')->nullable();
             $table->timestamps();
         });
 

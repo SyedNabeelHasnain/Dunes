@@ -92,10 +92,12 @@ return new class extends Migration
                 if (is_array($tagRels)) {
                     foreach ($tagRels as $tr) {
                         if (($tr['post_id'] ?? null) == ($p['id'] ?? null)) {
-                            DB::table('blog_post_tags')->insertOrIgnore([
-                                'post_id' => $post->id,
-                                'tag_id' => $tr['tag_id']
-                            ]);
+                            if (DB::table('blog_tags')->where('id', $tr['tag_id'])->exists()) {
+                                DB::table('blog_post_tags')->insertOrIgnore([
+                                    'post_id' => $post->id,
+                                    'tag_id' => $tr['tag_id']
+                                ]);
+                            }
                         }
                     }
                 }
