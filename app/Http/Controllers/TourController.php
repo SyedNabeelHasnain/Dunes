@@ -210,6 +210,7 @@ class TourController extends Controller
         $pageKeys = strtolower("{$cleanQuery}, {$cleanQuery} dubai, best {$cleanQuery} dubai, desert safari dubai, dunes discovery");
         $canonical = route('tours.search', ['q' => $cleanQuery]);
         $robotsMeta = $isFallback ? 'noindex, follow' : 'index, follow, max-snippet:-1, max-image-preview:large';
+        $pageRobots = $robotsMeta;
 
         $ogImage = asset('images/desert-safari-poster.avif');
         if ($tours->isNotEmpty() && $tours->first()->hero_image) {
@@ -234,6 +235,7 @@ class TourController extends Controller
             'pageKeys',
             'canonical',
             'robotsMeta',
+            'pageRobots',
             'ogImage'
         ));
     }
