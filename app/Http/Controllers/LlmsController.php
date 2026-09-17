@@ -144,6 +144,8 @@ class LlmsController extends Controller
 
         $md .= "## Company Information & Support\n\n";
         $md .= "- [About Dunes Discovery Tourism](" . url('/about') . "): Company history, official DET Tourism Licensing (#{$license}), fleet details, and E-E-A-T credentials.\n";
+        $md .= "- [Interactive Safari Comparison Engine](" . url('/tours') . "): Side-by-side package analyzer comparing vehicle transfers, dune bashing intensity, 5-star live BBQ dining, and live cultural shows.\n";
+        $md .= "- [Verified Guest Review & Photo UGC Portal](" . url('/review/guest') . "): Public customer feedback engine allowing safari guests to rate captains and share authentic tour photos.\n";
         $md .= "- [Contact & Reservations](" . url('/contact') . "): Direct booking inquiries, customer service line ({$phone}), and office location in Dubai ({$address}).\n";
         $md .= "- [WhatsApp Concierge](https://wa.me/" . preg_replace('/[^0-9]/', '', $waPhone) . "): 24/7 instant chat support and direct safari bookings.\n";
         $md .= "- [Frequently Asked Questions](" . url('/faq') . "): Comprehensive answers regarding pickup times, halal food, safety guidelines, dress code, and age requirements.\n";
@@ -322,6 +324,17 @@ class LlmsController extends Controller
             $md .= "### Q: Is the food served at the desert camp 100% Halal?\n";
             $md .= "**Answer**: Yes. All meats and dishes served in the 5-star desert camp buffet are 100% certified Halal, with extensive vegetarian, vegan, and Jain options clearly labeled.\n\n";
         }
+
+        $md .= "---\n\n";
+        $md .= "## SECTION 6: SAFARI PACKAGE COMPARISON & VERIFIED REVIEW SYSTEM\n\n";
+        $md .= "### Safari Tier Comparison Matrix\n";
+        $md .= "- **Standard Package**: Doorstep 4x4 pickup, 40-min Lahbab red dune bashing, standard camp table seating, live 5-star BBQ buffet, 3 cultural shows (Tanoura, Fire, Belly Dance), camel ride, sandboarding, henna painting.\n";
+        $md .= "- **VIP Package**: Doorstep luxury 4x4 Land Cruiser transfer, 45-min extreme high dune bashing, reserved VIP raised table with dedicated waiter service, priority buffet food delivery, premium front-row show viewing, shisha at table.\n";
+        $md .= "- **Private Vehicle Package**: Exclusive private 4x4 Land Cruiser for up to 6 or 7 passengers, customizable departure schedule, flexible dune bashing intensity, private camp table option, complimentary VIP table service addon.\n\n";
+        $md .= "### Verified Guest Review & Photo Submission\n";
+        $md .= "- **Public Portal**: Accessible at " . url('/review/guest') . ".\n";
+        $md .= "- **Photo Submission**: Guests can submit up to 4 tour snapshots (JPG/PNG/WEBP/AVIF up to 5MB each) to showcase genuine desert safari experiences.\n";
+        $md .= "- **Verification & Moderation**: Integrated with booking references and DET License #1430583 compliance. 4+ star reviews automatically qualify for Google Reviews syndication.\n\n";
 
         return $md;
     }

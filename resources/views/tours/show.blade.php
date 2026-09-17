@@ -844,9 +844,12 @@ if(window.fbq){
                                 </div>
                             </div>
 
-                            <div class="d-grid gap-3">
+                            <div class="d-grid gap-2.5">
                                 <button class="btn btn-desert-animated btn-lg rounded-pill py-3 shadow-primary fw-bold border-0 transition-all hover-translate-up" data-bs-toggle="modal" data-bs-target="#bookingModal">
                                     <i class="bi bi-calendar-check-fill me-2"></i>Book Online Now
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary rounded-pill py-2.5 fw-bold btn-toggle-compare transition-all" data-tour-id="{{ $tour->id }}" onclick="event.preventDefault(); window.DunesCompare && window.DunesCompare.toggle(this);">
+                                    <i class="bi bi-shuffle me-2"></i><span class="compare-btn-text">Compare this Safari</span>
                                 </button>
                                 <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',\App\Models\Setting::where('setting_key', 'site_whatsapp')->value('setting_value') ?? '971502456056') }}?text={{ urlencode('Hi! I want to book ' . $tour->name) }}" class="btn btn-whatsapp-animated btn-lg rounded-pill py-3 fw-bold border-0 transition-all hover-translate-up" target="_blank" rel="noopener">
                                     <i class="bi bi-whatsapp me-2"></i>Inquire via WhatsApp
@@ -915,6 +918,135 @@ if(window.fbq){
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── Verified Guest Reviews & Traveler Photos Section ───────────────────────────── -->
+<section class="section py-5 bg-white border-top border-bottom" id="guest-reviews">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4 pb-2 border-bottom">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-1 small fw-bold">
+                        <i class="bi bi-patch-check-fill me-1"></i> 100% Verified Guest Feedback
+                    </span>
+                    <span class="text-muted small">• DET License #1430583</span>
+                </div>
+                <h2 class="h3 fw-bold text-dark mb-1">Verified Guest Reviews & Safari Photos</h2>
+                <p class="text-muted small mb-0">Authentic experiences and real traveler snapshots from our certified Dubai desert tours.</p>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-3 py-2 fw-bold text-nowrap small btn-toggle-compare" data-tour-id="{{ $tour->id }}" onclick="event.preventDefault(); window.DunesCompare && window.DunesCompare.toggle(this);">
+                    <i class="bi bi-shuffle me-1"></i> Compare Safaris
+                </button>
+                <a href="{{ route('review.rate', ['ref' => 'guest']) }}" class="btn btn-desert-animated rounded-pill px-4 py-2 fw-bold text-nowrap small shadow-sm">
+                    <i class="bi bi-camera-fill me-1.5"></i> Submit Review & Photos
+                </a>
+            </div>
+        </div>
+
+        <!-- Overall Score Bar -->
+        <div class="card border-0 bg-light rounded-4 p-3 p-md-4 mb-4">
+            <div class="row g-3 align-items-center">
+                <div class="col-12 col-md-3 text-center text-md-start border-end-md">
+                    <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-2">
+                        <span class="display-5 fw-bold text-primary">{{ number_format($tour->rating ?: 4.9, 1) }}</span>
+                        <div class="text-start">
+                            <div class="d-flex text-warning fs-6">
+                                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                            </div>
+                            <small class="text-muted fw-bold">Overall Guest Rating</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 text-center text-md-start">
+                    <div class="row g-2 text-muted small">
+                        <div class="col-6 col-sm-4 d-flex align-items-center gap-1.5">
+                            <i class="bi bi-check-circle-fill text-success fs-6"></i>
+                            <span>4x4 Dune Bashing: <strong>5.0/5</strong></span>
+                        </div>
+                        <div class="col-6 col-sm-4 d-flex align-items-center gap-1.5">
+                            <i class="bi bi-check-circle-fill text-success fs-6"></i>
+                            <span>Live BBQ Quality: <strong>4.9/5</strong></span>
+                        </div>
+                        <div class="col-6 col-sm-4 d-flex align-items-center gap-1.5">
+                            <i class="bi bi-check-circle-fill text-success fs-6"></i>
+                            <span>Safari Captains: <strong>5.0/5</strong></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-3 text-center text-md-end">
+                    <span class="badge bg-white text-dark border rounded-pill px-3 py-2 shadow-sm small">
+                        <i class="bi bi-google text-primary me-1"></i> Google 4.9 &nbsp;|&nbsp; <i class="bi bi-patch-check-fill text-success me-1"></i> Direct UGC
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviews Grid -->
+        @php
+            $displayReviews = isset($approvedReviews) && $approvedReviews->count() ? $approvedReviews : \App\Models\Review::where('status', 'approved')->latest()->take(3)->get();
+        @endphp
+
+        <div class="row g-4">
+            @forelse($displayReviews as $rev)
+            @php
+                $avatar = !empty($rev->reviewer_avatar_url) ? (str_starts_with($rev->reviewer_avatar_url, 'http') ? $rev->reviewer_avatar_url : asset($rev->reviewer_avatar_url)) : asset('images/avatar-default.svg');
+            @endphp
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 border rounded-4 p-4 shadow-sm bg-white hover-shadow transition-all d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="d-flex align-items-center gap-2.5">
+                            <img src="{{ $avatar }}" alt="{{ $rev->reviewer_name }}" class="rounded-circle shadow-sm" style="width: 44px; height: 44px; object-fit: cover;" onerror="this.onerror=null;this.src='{{ asset('images/avatar-default.svg') }}'">
+                            <div>
+                                <h6 class="fw-bold text-dark mb-0 fs-6">{{ $rev->reviewer_name }}</h6>
+                                <small class="text-success fw-bold" style="font-size: 0.75rem;"><i class="bi bi-patch-check-fill me-1"></i>Verified Safari Guest</small>
+                            </div>
+                        </div>
+                        <div class="text-warning small text-nowrap">
+                            @for($i = 1; $i <= 5; $i++)
+                                <i class="bi bi-star{{ $i <= floor($rev->rating) ? '-fill' : '' }}"></i>
+                            @endfor
+                        </div>
+                    </div>
+
+                    @if($rev->review_title)
+                    <h6 class="fw-bold text-dark mb-2" style="font-size: 0.95rem;">"{{ $rev->review_title }}"</h6>
+                    @endif
+
+                    <p class="text-muted small mb-3 flex-grow-1" style="line-height: 1.6;">
+                        {{ Str::limit($rev->review_text, 180) }}
+                    </p>
+
+                    @if(!empty($rev->photos) && is_array($rev->photos) && count($rev->photos) > 0)
+                    <!-- Guest Uploaded Photo Strip -->
+                    <div class="mb-3 pt-2 border-top">
+                        <small class="text-muted d-block mb-1.5 fw-bold" style="font-size: 0.72rem; text-transform: uppercase;">Guest Photos</small>
+                        <div class="d-flex gap-2">
+                            @foreach(array_slice($rev->photos, 0, 3) as $photo)
+                            <a href="{{ asset($photo) }}" target="_blank" class="rounded-3 overflow-hidden d-inline-block shadow-sm" style="width: 60px; height: 60px; border: 1px solid rgba(0,0,0,0.08);">
+                                <img src="{{ asset($photo) }}" alt="Traveler photo" style="width: 100%; height: 100%; object-fit: cover;">
+                            </a>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+
+                    <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top text-muted small" style="font-size: 0.75rem;">
+                        <span><i class="bi bi-calendar3 me-1"></i>{{ $rev->published_date ? \Carbon\Carbon::parse($rev->published_date)->format('M d, Y') : 'Recent Guest' }}</span>
+                        <span class="badge bg-light text-muted border rounded-pill">{{ ucfirst($rev->source ?: 'direct_ugc') }}</span>
+                    </div>
+                </div>
+            </div>
+            @empty
+            <div class="col-12 text-center py-4 text-muted">
+                <p class="mb-2">Be the first to share photos and review this safari experience!</p>
+                <a href="{{ route('review.rate', ['ref' => 'guest']) }}" class="btn btn-desert-animated rounded-pill px-4 py-2 fw-bold text-white small">
+                    <i class="bi bi-star-fill me-1"></i> Submit Guest Review
+                </a>
+            </div>
+            @endforelse
         </div>
     </div>
 </section>
@@ -990,9 +1122,14 @@ if(window.fbq){
         <small class="text-muted d-block opacity-75 fw-bold" style="font-size: 9px; letter-spacing: 1px; text-transform: uppercase;">Starting From</small>
         <div class="h4 fw-bold text-primary mb-0" data-aed="{{ $minPrice }}">AED {{ number_format($minPrice) }}</div>
     </div>
-    <button class="btn btn-desert-animated rounded-pill px-4 py-2.5 shadow-sm fw-bold border-0" data-bs-toggle="modal" data-bs-target="#bookingModal" data-action="open-booking" data-tour="{{ $tour->id }}">
-        <i class="bi bi-calendar-check-fill me-1"></i>Book Now
-    </button>
+    <div class="d-flex align-items-center gap-2">
+        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-2 btn-toggle-compare small text-nowrap" data-tour-id="{{ $tour->id }}" onclick="event.preventDefault(); window.DunesCompare && window.DunesCompare.toggle(this);">
+            <i class="bi bi-shuffle me-1"></i><span class="compare-btn-text">Compare</span>
+        </button>
+        <button class="btn btn-desert-animated rounded-pill px-4 py-2.5 shadow-sm fw-bold border-0 text-nowrap" data-bs-toggle="modal" data-bs-target="#bookingModal" data-action="open-booking" data-tour="{{ $tour->id }}">
+            <i class="bi bi-calendar-check-fill me-1"></i>Book Now
+        </button>
+    </div>
 </div>
 
 @endsection

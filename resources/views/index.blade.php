@@ -9,10 +9,24 @@ if (!function_exists('renderReviewCardMarkup')) {
             $stars .= $i < floor($r->rating) ? '<i class="bi bi-star-fill text-warning"></i>' : '<i class="bi bi-star text-muted"></i>';
         }
 
-        $sourceIcon = ($r->source == 'google') ? '<i class="bi bi-google text-primary"></i>' : '<i class="bi-star-fill text-success"></i>';
-        $url = !empty($r->review_url) ? $r->review_url : '#';
+        $isUgc = ($r->source === 'direct_ugc');
+        $sourceBadge = $isUgc 
+            ? '<span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-2 py-0.5 extra-small fw-bold"><i class="bi bi-patch-check-fill me-1"></i> Verified Guest</span>'
+            : '<span class="badge bg-light text-dark rounded-pill px-2 py-1 small fw-normal">' . (($r->source == 'google') ? '<i class="bi bi-google text-primary me-1"></i> Google' : '<i class="bi-star-fill text-success me-1"></i> ' . ucfirst($r->source)) . '</span>';
+
+        $url = !empty($r->review_url) ? $r->review_url : route('review.rate', ['ref' => 'guest']);
         $avatar = !empty($r->reviewer_avatar_url) ? (str_starts_with($r->reviewer_avatar_url, 'http') ? $r->reviewer_avatar_url : asset($r->reviewer_avatar_url)) : asset('images/avatar-default.svg');
         $fallbackAvatar = asset('images/avatar-default.svg');
+
+        $photosHtml = '';
+        if (!empty($r->photos) && is_array($r->photos) && count($r->photos) > 0) {
+            $photosHtml .= '<div class="d-flex gap-1.5 mb-2 mt-1">';
+            foreach (array_slice($r->photos, 0, 3) as $p) {
+                $pUrl = asset($p);
+                $photosHtml .= '<a href="' . htmlspecialchars($pUrl) . '" target="_blank" rel="noopener" class="rounded-3 overflow-hidden d-inline-block shadow-sm" style="width: 52px; height: 52px; border: 1px solid rgba(0,0,0,0.1);"><img src="' . htmlspecialchars($pUrl) . '" alt="Traveler photo" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy"></a>';
+            }
+            $photosHtml .= '</div>';
+        }
 
         return '
         <div class="review-card h-100 d-flex flex-column text-start">
@@ -27,10 +41,11 @@ if (!function_exists('renderReviewCardMarkup')) {
                 <div class="d-flex gap-1 small">' . $stars . '</div>
             </div>
             ' . ($r->review_title ? '<h3 class="h6 fw-bold mb-2 text-dark line-clamp-1">' . htmlspecialchars($r->review_title) . '</h3>' : '') . '
-            <p class="text-dark small mb-3 flex-grow-1 line-clamp-3" style="font-size: 0.9rem;">"' . htmlspecialchars($r->review_text) . '"</p>
+            <p class="text-dark small mb-2 flex-grow-1 line-clamp-3" style="font-size: 0.9rem;">"' . htmlspecialchars($r->review_text) . '"</p>
+            ' . $photosHtml . '
             <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top border-light">
-                <span class="badge bg-light text-dark rounded-pill px-2 py-1 small fw-normal">' . $sourceIcon . ' ' . ucfirst($r->source) . '</span>
-                <a href="' . htmlspecialchars($url) . '" target="_blank" class="btn btn-sm btn-outline-dark rounded-pill px-3 py-1" style="font-size: 0.8rem;">View</a>
+                ' . $sourceBadge . '
+                <a href="' . htmlspecialchars($url) . '" ' . ($isUgc ? '' : 'target="_blank" rel="noopener"') . ' class="btn btn-sm btn-outline-dark rounded-pill px-3 py-1" style="font-size: 0.8rem;">' . ($isUgc ? 'Review' : 'View') . '</a>
             </div>
         </div>';
     }

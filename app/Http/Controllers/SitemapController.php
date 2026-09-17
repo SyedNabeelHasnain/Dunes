@@ -136,6 +136,7 @@ class SitemapController extends Controller
             '/safety-liability-waiver' => ['changefreq' => 'monthly', 'priority' => '0.6'],
             '/ai-editorial-policy' => ['changefreq' => 'monthly', 'priority' => '0.6'],
             '/responsible-tourism-policy' => ['changefreq' => 'monthly', 'priority' => '0.6'],
+            '/review/guest' => ['changefreq' => 'weekly', 'priority' => '0.7'],
         ];
 
         // Pillar 2: Programmatic Geo-Location Pickup Pages
