@@ -19,6 +19,9 @@
             <button type="button" class="btn btn-outline-info rounded-pill px-3 py-2 btn-sm fw-bold shadow-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#testEmailModal">
                 <i class="bi bi-send-check"></i> Send Test Email
             </button>
+            <button type="button" class="btn btn-outline-warning text-dark rounded-pill px-3 py-2 btn-sm fw-bold shadow-sm d-flex align-items-center gap-1.5" data-bs-toggle="modal" data-bs-target="#scheduleModal">
+                <i class="bi bi-clock-history text-warning"></i> Schedule
+            </button>
             <button type="button" class="btn btn-outline-secondary rounded-pill px-4 py-2 btn-sm fw-bold" onclick="submitCampaignForm('save_draft')">
                 <i class="bi bi-save me-1"></i> Save Draft
             </button>
@@ -32,6 +35,7 @@
     <form id="campaignForm" action="{{ route('admin.campaigns.store') }}" method="POST">
         @csrf
         <input type="hidden" name="action" id="campaignAction" value="save_draft">
+        <input type="hidden" name="scheduled_at" id="campaignScheduledAt" value="">
 
         <div class="row g-4">
             <!-- Left Column: Settings & Content -->
@@ -246,6 +250,39 @@
     </div>
 </div>
 
+<!-- Schedule Broadcast Modal -->
+<div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header border-0 bg-light p-4 pb-3">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-3 bg-warning bg-opacity-10 text-warning p-2">
+                        <i class="bi bi-clock-history fs-5"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-800 text-dark mb-0" id="scheduleModalLabel">Schedule Email Broadcast</h5>
+                        <div class="text-muted extra-small">Automate campaign delivery at a future date and time</div>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 pt-2">
+                <div class="mb-3">
+                    <label class="form-label fw-bold small text-dark">Broadcast Date & Time (Dubai Local Time / UTC+4):</label>
+                    <input type="datetime-local" id="scheduleDatetimeInput" class="form-control rounded-3 py-2" min="{{ now()->addMinutes(5)->format('Y-m-d\TH:i') }}" value="{{ now()->addHours(2)->format('Y-m-d\TH:i') }}">
+                    <div class="form-text extra-small text-muted mt-1">The system scheduler scans and broadcasts automatically every 5 minutes.</div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 bg-light p-3 px-4">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-warning text-dark rounded-pill px-4 fw-bold" onclick="confirmSchedule()">
+                    <i class="bi bi-calendar-check me-1"></i> Confirm Schedule
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script>
 const templatesMap = JSON.parse(document.getElementById('templatesData').textContent || '{}');
@@ -360,6 +397,47 @@ function confirmDispatch() {
             submitCampaignForm('send_now');
         }
     }
+}
+
+function confirmSchedule() {
+    const isGroup = document.getElementById('targetGroup').checked;
+    const groupSelect = document.getElementById('groupSelect');
+
+    if (isGroup && !groupSelect.value) {
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'Target Group Required',
+                text: 'Please select a specific audience group to target before scheduling.',
+                icon: 'warning',
+                confirmButtonColor: '#F58F43'
+            });
+        } else {
+            alert('Please select a target group.');
+        }
+        return;
+    }
+
+    const val = document.getElementById('scheduleDatetimeInput').value;
+    if (!val) {
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'Broadcast Time Required',
+                text: 'Please select a future date and time for the broadcast.',
+                icon: 'warning',
+                confirmButtonColor: '#F58F43'
+            });
+        } else {
+            alert('Please select a date and time.');
+        }
+        return;
+    }
+
+    document.getElementById('campaignScheduledAt').value = val;
+    const modalEl = document.getElementById('scheduleModal');
+    const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+    modal.hide();
+
+    submitCampaignForm('schedule');
 }
 
 async function sendDiagnosticTestEmail() {

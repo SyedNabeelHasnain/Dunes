@@ -87,8 +87,17 @@ class AdminEmailCampaignController extends Controller
             'target_type' => 'required|in:all,group',
             'group_id' => 'nullable|required_if:target_type,group|exists:subscriber_groups,id',
             'content_html' => 'required|string',
-            'action' => 'required|in:save_draft,send_now',
+            'action' => 'required|in:save_draft,send_now,schedule',
+            'scheduled_at' => 'nullable|required_if:action,schedule|date',
         ]);
+
+        $status = 'draft';
+        $scheduledAt = null;
+
+        if ($validated['action'] === 'schedule' && !empty($validated['scheduled_at'])) {
+            $status = 'scheduled';
+            $scheduledAt = \Carbon\Carbon::parse($validated['scheduled_at']);
+        }
 
         $campaign = EmailCampaign::create([
             'title' => trim($validated['title']),
@@ -101,7 +110,8 @@ class AdminEmailCampaignController extends Controller
             'target_type' => $validated['target_type'],
             'group_id' => $validated['target_type'] === 'group' ? $validated['group_id'] : null,
             'content_html' => $validated['content_html'],
-            'status' => 'draft',
+            'status' => $status,
+            'scheduled_at' => $scheduledAt,
         ]);
 
         if ($validated['action'] === 'send_now') {
@@ -112,6 +122,11 @@ class AdminEmailCampaignController extends Controller
 
             return redirect()->route('admin.campaigns.show', $campaign->id)
                 ->with('success', "Campaign dispatched to {$res['sent']} recipient(s)!");
+        }
+
+        if ($validated['action'] === 'schedule') {
+            return redirect()->route('admin.campaigns.show', $campaign->id)
+                ->with('success', "Campaign '{$campaign->title}' scheduled for broadcast on " . ($scheduledAt ? $scheduledAt->format('M d, Y h:i A') : 'scheduled time') . ".");
         }
 
         return redirect()->route('admin.campaigns.show', $campaign->id)

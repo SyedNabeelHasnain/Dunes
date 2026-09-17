@@ -553,6 +553,18 @@
                                     <div><strong class="d-block small">Export Bookings (CSV)</strong><span class="text-muted" style="font-size: 0.75rem;">Download customer reservations spreadsheet</span></div>
                                 </a>
                             </div>
+                            <div class="col-md-6 cmd-entry" data-keywords="campaign broadcast newsletter email send create marketing">
+                                <a href="{{ route('admin.campaigns.create') }}" class="d-flex align-items-center p-2 rounded-3 border bg-light text-dark cmd-item">
+                                    <i class="bi bi-megaphone-fill text-warning fs-5 me-2"></i>
+                                    <div><strong class="d-block small">Create Email Campaign</strong><span class="text-muted" style="font-size: 0.75rem;">Broadcast newsletter or promotional offer</span></div>
+                                </a>
+                            </div>
+                            <div class="col-md-6 cmd-entry" data-keywords="add subscriber new audience import csv email list">
+                                <a href="{{ route('admin.subscribers.index') }}" class="d-flex align-items-center p-2 rounded-3 border bg-light text-dark cmd-item">
+                                    <i class="bi bi-person-plus-fill text-primary fs-5 me-2"></i>
+                                    <div><strong class="d-block small">Manage Subscribers</strong><span class="text-muted" style="font-size: 0.75rem;">View, import, or export email audience</span></div>
+                                </a>
+                            </div>
                             <div class="col-md-6 cmd-entry" data-keywords="clear cache purge system views routes config">
                                 <a href="javascript:void(0);" class="d-flex align-items-center p-2 rounded-3 border bg-light text-dark cmd-item clear-cache-trigger">
                                     <i class="bi bi-arrow-repeat text-warning fs-5 me-2"></i>
@@ -574,6 +586,26 @@
                         <div class="list-group list-group-flush mt-1">
                             <a href="{{ route('admin.dashboard') }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between rounded-3 border-0 py-2 cmd-entry cmd-item" data-keywords="dashboard overview revenue kpi stats">
                                 <span><i class="bi bi-grid-1x2-fill text-primary me-2"></i> Dashboard Overview</span>
+                                <span class="badge bg-light text-muted border">Nav</span>
+                            </a>
+                            <a href="{{ route('admin.campaigns.index') }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between rounded-3 border-0 py-2 cmd-entry cmd-item" data-keywords="campaigns email marketing newsletters broadcasts analytics stats clicks opens">
+                                <span><i class="bi bi-megaphone-fill text-warning me-2"></i> Email Campaigns & Analytics</span>
+                                <span class="badge bg-light text-muted border">Nav</span>
+                            </a>
+                            <a href="{{ route('admin.subscribers.index') }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between rounded-3 border-0 py-2 cmd-entry cmd-item" data-keywords="subscribers audience mailing lists contacts emails">
+                                <span><i class="bi bi-people-fill text-primary me-2"></i> Subscribers & Audience Lists</span>
+                                <span class="badge bg-light text-muted border">Nav</span>
+                            </a>
+                            <a href="{{ route('admin.subscriber-groups.index') }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between rounded-3 border-0 py-2 cmd-entry cmd-item" data-keywords="groups segments audience tagging customers leads">
+                                <span><i class="bi bi-diagram-3-fill text-info me-2"></i> Audience Groups & Segments</span>
+                                <span class="badge bg-light text-muted border">Nav</span>
+                            </a>
+                            <a href="{{ route('admin.email-templates.index') }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between rounded-3 border-0 py-2 cmd-entry cmd-item" data-keywords="templates email html designs builder layout gallery">
+                                <span><i class="bi bi-envelope-paper-heart-fill text-danger me-2"></i> Email Templates Gallery</span>
+                                <span class="badge bg-light text-muted border">Nav</span>
+                            </a>
+                            <a href="{{ route('admin.settings.mail') }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between rounded-3 border-0 py-2 cmd-entry cmd-item" data-keywords="smtp mail server host port credentials settings email tester">
+                                <span><i class="bi bi-envelope-gear text-primary me-2"></i> SMTP & Mailer Settings</span>
                                 <span class="badge bg-light text-muted border">Nav</span>
                             </a>
                             <a href="{{ route('admin.analytics.index') }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between rounded-3 border-0 py-2 cmd-entry cmd-item" data-keywords="analytics traffic visitors acquisition referrers sources campaigns utm">

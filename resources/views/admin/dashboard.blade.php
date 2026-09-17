@@ -121,6 +121,78 @@
     </div>
 </div>
 
+<!-- Email Marketing & Audience Performance Card -->
+<div class="card card-modern border-0 shadow-sm rounded-4 bg-white mb-4 p-4">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+        <div class="d-flex align-items-center gap-3">
+            <div class="icon-box bg-warning-subtle text-warning rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px; font-size: 22px;">
+                <i class="bi bi-megaphone-fill"></i>
+            </div>
+            <div>
+                <div class="d-flex align-items-center gap-2">
+                    <h6 class="fw-800 text-dark mb-0">Email Marketing & Audience Hub</h6>
+                    <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-0.5 small fw-bold">Live</span>
+                </div>
+                <div class="text-muted small">Manage subscriber lists, automated campaigns, and deliverability performance.</div>
+            </div>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <a href="{{ route('admin.campaigns.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-sm d-flex align-items-center gap-1.5">
+                <i class="bi bi-send-fill"></i> Create Campaign
+            </a>
+            <a href="{{ route('admin.subscribers.index') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold d-flex align-items-center gap-1.5">
+                <i class="bi bi-people-fill"></i> Audience Lists
+            </a>
+            <a href="{{ route('admin.email-templates.index') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold d-flex align-items-center gap-1.5">
+                <i class="bi bi-palette-fill"></i> Templates
+            </a>
+            <a href="{{ route('admin.settings.mail') }}" class="btn btn-light border btn-sm rounded-pill px-3 fw-bold text-muted" title="Mailer Settings">
+                <i class="bi bi-gear-fill"></i> SMTP
+            </a>
+        </div>
+    </div>
+    <div class="row g-3 mt-2 pt-2 border-top">
+        <div class="col-6 col-md-3">
+            <div class="p-2 rounded-3 bg-light d-flex align-items-center gap-2.5">
+                <i class="bi bi-people text-primary fs-4 ms-1"></i>
+                <div>
+                    <div class="text-muted extra-small text-uppercase fw-bold">Active Subscribers</div>
+                    <div class="fw-800 text-dark fs-6">{{ number_format($stats['subscribers_count'] ?? 0) }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="p-2 rounded-3 bg-light d-flex align-items-center gap-2.5">
+                <i class="bi bi-broadcast text-warning fs-4 ms-1"></i>
+                <div>
+                    <div class="text-muted extra-small text-uppercase fw-bold">Total Campaigns</div>
+                    <div class="fw-800 text-dark fs-6">{{ number_format($stats['campaigns_count'] ?? 0) }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="p-2 rounded-3 bg-light d-flex align-items-center gap-2.5">
+                <i class="bi bi-check2-circle text-success fs-4 ms-1"></i>
+                <div>
+                    <div class="text-muted extra-small text-uppercase fw-bold">Dispatched Broadcasts</div>
+                    <div class="fw-800 text-success fs-6">{{ number_format($stats['campaigns_sent'] ?? 0) }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="p-2 rounded-3 bg-light d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="text-muted extra-small text-uppercase fw-bold">Campaign Delivery</div>
+                    <div class="text-success fw-bold small"><i class="bi bi-shield-check me-1"></i> Ready & Armed</div>
+                </div>
+                <a href="{{ route('admin.campaigns.index') }}" class="btn btn-xs btn-outline-primary rounded-pill px-2 py-1 text-decoration-none extra-small fw-bold">
+                    View Hub <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Recent Bookings Table -->
 <div class="card card-modern border-0 shadow-sm rounded-4 overflow-hidden bg-white mb-4 p-3">
     <div class="card-header bg-white py-2 border-0 d-flex justify-content-between align-items-center ps-2 pe-2 mb-2">

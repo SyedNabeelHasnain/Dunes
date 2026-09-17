@@ -20,4 +20,7 @@ Schedule::command('queue:work --stop-when-empty --tries=3')->everyMinute();
 // Synchronize foreign currency exchange rates (USD, EUR, GBP, SAR, INR) daily at 02:00 AM
 Schedule::command('currency:sync-rates')->dailyAt('02:00');
 
+// Dispatch scheduled email marketing campaigns (every 5 minutes)
+Schedule::command('campaigns:send-scheduled')->everyFiveMinutes();
+
 

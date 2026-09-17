@@ -31,4 +31,12 @@ class EmailCampaignClick extends Model
     {
         return $this->belongsTo(EmailCampaignLog::class, 'campaign_log_id');
     }
+
+    /**
+     * Target URL accessor for template and view compatibility
+     */
+    public function getTargetUrlAttribute(): string
+    {
+        return $this->url ?? '';
+    }
 }

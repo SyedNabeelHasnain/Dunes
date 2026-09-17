@@ -39,14 +39,26 @@ class SubscriberController extends Controller
         // 2. Validate input
         $validated = $request->validate([
             'email' => 'required|email:filter|max:255',
+            'name' => 'nullable|string|max:150',
             'first_name' => 'nullable|string|max:100',
+            'last_name' => 'nullable|string|max:100',
             'phone' => 'nullable|string|max:50',
             'consent' => 'nullable',
             'source' => 'nullable|string|max:50',
         ]);
 
         $email = strtolower(trim($validated['email']));
-        $firstName = !empty($validated['first_name']) ? trim($validated['first_name']) : null;
+
+        $fullName = !empty($validated['name']) ? trim($validated['name']) : null;
+        if ($fullName) {
+            $parts = preg_split('/\s+/', $fullName, 2);
+            $firstName = $parts[0] ?? null;
+            $lastName = $parts[1] ?? null;
+        } else {
+            $firstName = !empty($validated['first_name']) ? trim($validated['first_name']) : null;
+            $lastName = !empty($validated['last_name']) ? trim($validated['last_name']) : null;
+        }
+
         $phone = !empty($validated['phone']) ? trim($validated['phone']) : null;
         $source = !empty($validated['source']) ? trim($validated['source']) : 'footer';
 
@@ -65,6 +77,7 @@ class SubscriberController extends Controller
             $subscriber->update([
                 'status' => 'subscribed',
                 'first_name' => $firstName ?: $subscriber->first_name,
+                'last_name' => $lastName ?: $subscriber->last_name,
                 'phone' => $phone ?: $subscriber->phone,
                 'subscribed_at' => now(),
                 'unsubscribed_at' => null,
@@ -75,6 +88,7 @@ class SubscriberController extends Controller
             $subscriber = Subscriber::create([
                 'email' => $email,
                 'first_name' => $firstName,
+                'last_name' => $lastName,
                 'phone' => $phone,
                 'status' => 'subscribed',
                 'source' => $source,

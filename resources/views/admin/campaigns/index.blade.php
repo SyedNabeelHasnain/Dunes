@@ -110,6 +110,11 @@
                     Sending
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link rounded-pill px-3 py-1.5 fw-bold {{ request('status') === 'scheduled' ? 'active' : '' }}" href="{{ route('admin.campaigns.index', ['status' => 'scheduled']) }}">
+                    Scheduled
+                </a>
+            </li>
         </ul>
     </div>
 
@@ -160,6 +165,10 @@
                             @elseif($campaign->status === 'sending')
                                 <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2.5 py-1 small fw-bold">
                                     <i class="bi bi-arrow-repeat spin me-1"></i> Sending...
+                                </span>
+                            @elseif($campaign->status === 'scheduled')
+                                <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2.5 py-1 small fw-bold" title="{{ $campaign->scheduled_at ? $campaign->scheduled_at->format('M d, Y h:i A') : '' }}">
+                                    <i class="bi bi-clock-history me-1"></i> Scheduled
                                 </span>
                             @elseif($campaign->status === 'draft')
                                 <span class="badge bg-secondary-subtle text-dark border rounded-pill px-2.5 py-1 small fw-bold">

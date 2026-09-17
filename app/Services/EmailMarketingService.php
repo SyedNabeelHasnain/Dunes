@@ -137,6 +137,21 @@ class EmailMarketingService
             }
         }
 
+        // CAN-SPAM & GDPR Compliance: Guarantee unsubscribe link exists in every email
+        if (!str_contains($html, $subscriber->unsubscribe_url)) {
+            $siteName = htmlspecialchars($this->settings->get('site_name', 'Dunes Discovery Tourism'), ENT_QUOTES, 'UTF-8');
+            $unsubFooter = '<div style="margin-top: 36px; padding-top: 20px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #94a3b8; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, Helvetica, Arial, sans-serif; line-height: 1.5;">'
+                . 'You are receiving this communication because you are subscribed to updates from ' . $siteName . '.<br>'
+                . '<a href="' . $subscriber->unsubscribe_url . '" style="color: #64748b; text-decoration: underline; font-weight: 500;">Unsubscribe from future marketing emails</a>'
+                . '</div>';
+
+            if (stripos($html, '</body>') !== false) {
+                $html = str_ireplace('</body>', $unsubFooter . '</body>', $html);
+            } else {
+                $html .= $unsubFooter;
+            }
+        }
+
         return $html;
     }
 

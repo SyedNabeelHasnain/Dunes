@@ -20,6 +20,10 @@
                     <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2.5 py-1 small fw-bold ms-2">
                         <i class="bi bi-arrow-repeat spin me-1"></i> Sending...
                     </span>
+                @elseif($campaign->status === 'scheduled')
+                    <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2.5 py-1 small fw-bold ms-2">
+                        <i class="bi bi-clock-history me-1"></i> Scheduled
+                    </span>
                 @elseif($campaign->status === 'draft')
                     <span class="badge bg-secondary-subtle text-dark border rounded-pill px-2.5 py-1 small fw-bold ms-2">
                         <i class="bi bi-pencil-square me-1"></i> Draft
@@ -30,6 +34,8 @@
                 <strong>Subject:</strong> {{ $campaign->subject }}
                 @if($campaign->sent_at)
                     • Dispatched on {{ $campaign->sent_at->format('M d, Y h:i A') }}
+                @elseif($campaign->scheduled_at)
+                    • Scheduled for {{ $campaign->scheduled_at->format('M d, Y h:i A') }}
                 @endif
             </div>
         </div>
@@ -38,7 +44,7 @@
             <button type="button" class="btn btn-outline-info rounded-pill px-3 py-2 btn-sm fw-bold shadow-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#testEmailModal">
                 <i class="bi bi-send-check"></i> Send Test Copy
             </button>
-            @if($campaign->status === 'draft')
+            @if(in_array($campaign->status, ['draft', 'scheduled']))
                 <form action="{{ route('admin.campaigns.send', $campaign->id) }}" method="POST" class="d-inline" id="sendNowForm">
                     @csrf
                     <button type="button" class="btn btn-success rounded-pill px-4 py-2 btn-sm fw-bold shadow-sm d-flex align-items-center gap-2" id="btnSendNow">
@@ -232,8 +238,8 @@
                                 <span class="badge bg-warning rounded-pill px-2.5 py-1 text-dark fw-bold">
                                     {{ $log->clicks->count() }} click(s)
                                 </span>
-                                <div class="text-muted extra-small text-truncate" style="max-width: 180px;" title="{{ $log->clicks->first()->target_url }}">
-                                    {{ $log->clicks->first()->target_url }}
+                                <div class="text-muted extra-small text-truncate" style="max-width: 180px;" title="{{ $log->clicks->first()->target_url ?? $log->clicks->first()->url }}">
+                                    {{ $log->clicks->first()->target_url ?? $log->clicks->first()->url }}
                                 </div>
                             @else
                                 <span class="text-muted extra-small fst-italic">No clicks</span>

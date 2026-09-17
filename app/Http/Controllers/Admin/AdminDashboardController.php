@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Contact;
+use App\Models\EmailCampaign;
 use App\Models\RequestLog;
+use App\Models\Subscriber;
 use App\Models\Tour;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -37,6 +39,10 @@ class AdminDashboardController extends Controller
                 $recentBookingsCount = Booking::where('created_at', '>=', now()->subDays(30))->count();
                 $conversionRate = round(($recentBookingsCount / $visitorsCount) * 100, 2);
 
+                $subscribersCount = Subscriber::where('status', 'subscribed')->count();
+                $campaignsCount = EmailCampaign::count();
+                $campaignsSent = EmailCampaign::where('status', 'sent')->count();
+
                 return [
                     'revenue' => (float)$revenue,
                     'total' => (int)$totalBookings,
@@ -44,6 +50,9 @@ class AdminDashboardController extends Controller
                     'pending' => (int)$pendingBookings,
                     'aov' => (float)$avgOrderValue,
                     'conversion_rate' => (float)$conversionRate,
+                    'subscribers_count' => (int)$subscribersCount,
+                    'campaigns_count' => (int)$campaignsCount,
+                    'campaigns_sent' => (int)$campaignsSent,
                 ];
             });
 
@@ -69,7 +78,7 @@ class AdminDashboardController extends Controller
             return view('admin.dashboard', compact('stats', 'recentBookings', 'topTours', 'whatsappLeads'));
         } catch (\Throwable $e) {
             \Log::error("Admin dashboard error: " . $e->getMessage());
-            $stats = ['revenue' => 0, 'total' => 0, 'confirmed' => 0, 'pending' => 0, 'aov' => 0, 'conversion_rate' => 0];
+            $stats = ['revenue' => 0, 'total' => 0, 'confirmed' => 0, 'pending' => 0, 'aov' => 0, 'conversion_rate' => 0, 'subscribers_count' => 0, 'campaigns_count' => 0, 'campaigns_sent' => 0];
             $recentBookings = collect();
             $topTours = collect();
             $whatsappLeads = collect();
