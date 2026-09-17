@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const consent = consentInput ? consentInput.checked : true;
         const honeypot = form.querySelector('input[name="website_url"]')?.value || '';
 
-        if (!email || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             showAlert('Please enter a valid email address.', 'danger');
             emailInput.focus();
             return;

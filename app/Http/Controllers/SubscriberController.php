@@ -136,7 +136,14 @@ class SubscriberController extends Controller
      */
     public function processUnsubscribe(Request $request, string $token)
     {
-        $subscriber = Subscriber::where('unsubscribe_token', $token)->firstOrFail();
+        $subscriber = Subscriber::where('unsubscribe_token', $token)->first();
+
+        if (!$subscriber) {
+            return response()->view('subscribers.unsubscribe', [
+                'subscriber' => null,
+                'message' => 'Invalid or expired unsubscribe link.',
+            ], 404);
+        }
 
         $reason = $request->input('reason', 'User requested opt-out');
         if ($request->filled('other_reason')) {
