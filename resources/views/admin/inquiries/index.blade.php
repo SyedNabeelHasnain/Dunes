@@ -353,7 +353,7 @@ $(document).ready(function() {
         if (isDelete) {
             // Step 1: Caution Dialog for Bulk Inquiries Purge
             Swal.fire({
-                title: '⚠️ CAUTION: Permanent Bulk Inquiries Purge',
+                title: 'CAUTION: Permanent Bulk Inquiries Purge',
                 html: `
                     <div class="text-start small text-secondary">
                         <div class="alert alert-danger py-2 px-3 mb-3 border-danger border-opacity-25 bg-danger bg-opacity-10 text-danger fw-semibold">
@@ -383,7 +383,7 @@ $(document).ready(function() {
 
                 // Step 2: Final Safeguard Bulk Purge Double Confirmation
                 Swal.fire({
-                    title: '🔒 Double Confirmation: Bulk Purge',
+                    title: 'Double Confirmation: Bulk Purge',
                     html: `
                         <div class="text-start small">
                             <p class="text-dark mb-2">To permanently purge all <strong>${selectedIds.length}</strong> selected inquiry record(s) and their analytics footprints, type <span class="badge bg-danger text-white font-monospace">DELETE</span> below:</p>
@@ -497,7 +497,7 @@ window.promptPermanentDeleteInquiry = function(id, name, email, subject) {
 
     // Step 1: Caution Dialog
     Swal.fire({
-        title: '⚠️ CAUTION: Permanent Inquiry Deletion',
+        title: 'CAUTION: Permanent Inquiry Deletion',
         html: `
             <div class="text-start small text-secondary">
                 <div class="alert alert-danger py-2 px-3 mb-3 border-danger border-opacity-25 bg-danger bg-opacity-10 text-danger fw-semibold">
@@ -528,7 +528,7 @@ window.promptPermanentDeleteInquiry = function(id, name, email, subject) {
 
         // Step 2: Final Safeguard Double Confirmation
         Swal.fire({
-            title: '🔒 Double Confirmation Required',
+            title: 'Double Confirmation Required',
             html: `
                 <div class="text-start small">
                     <p class="text-dark mb-2">To prevent accidental deletion, please type the customer email below to authorize permanent destruction:</p>

@@ -401,9 +401,9 @@
                             <div class="d-grid gap-2 mb-2">
                                 <button type="button" class="btn btn-dark w-100 rounded-pill py-2.5 px-3 d-flex align-items-center justify-content-between text-start border border-warning border-opacity-25 shadow-sm" data-bs-toggle="modal" data-bs-target="#safariMatcherModal" data-bs-dismiss="offcanvas" style="background: linear-gradient(135deg, #1E293B, #0F172A);">
                                     <div class="d-flex align-items-center gap-2">
-                                        <span class="text-warning fs-5">✨</span>
+                                        <span class="text-warning fs-5"><i class="bi bi-compass"></i></span>
                                         <div>
-                                            <div class="fw-bold text-white small lh-1">Safari Matcher AI</div>
+                                            <div class="fw-bold text-white small lh-1">Safari Match Concierge</div>
                                             <small class="text-white-50" style="font-size: 11px;">Find ideal tour in 30 seconds</small>
                                         </div>
                                     </div>
@@ -450,9 +450,9 @@
                             </li>
                         </ul>
                         <div class="d-flex flex-column flex-lg-row gap-2 gap-xl-2.5 align-items-stretch align-items-lg-center flex-nowrap">
-                            <button type="button" class="btn btn-outline-warning rounded-pill px-2.5 py-1.5 d-none d-xxl-inline-flex align-items-center gap-1.5 small shadow-none hover-shadow-sm transition-all text-nowrap" data-bs-toggle="modal" data-bs-target="#safariMatcherModal" style="font-size: 0.82rem; border-color: rgba(246, 144, 68, 0.45); color: #F69044;" aria-label="Safari Matcher AI">
-                                <i class="bi bi-stars text-warning"></i>
-                                <span class="fw-bold">Safari Matcher</span>
+                            <button type="button" class="btn btn-outline-warning rounded-pill px-2.5 py-1.5 d-none d-xxl-inline-flex align-items-center gap-1.5 small shadow-none hover-shadow-sm transition-all text-nowrap" data-bs-toggle="modal" data-bs-target="#safariMatcherModal" style="font-size: 0.82rem; border-color: rgba(246, 144, 68, 0.45); color: #F69044;" aria-label="Safari Match Concierge">
+                                <i class="bi bi-compass text-warning"></i>
+                                <span class="fw-bold">Safari Concierge</span>
                                 <span class="badge bg-warning text-dark rounded-pill px-1.5 py-0.5" style="font-size: 9px;">5% OFF</span>
                             </button>
                             <button type="button" class="btn btn-light border rounded-circle shadow-sm d-none d-lg-inline-flex align-items-center justify-content-center flex-shrink-0" data-bs-toggle="modal" data-bs-target="#globalSearchModal" style="width: 38px; height: 38px; padding: 0;" title="Search Dubai tours" aria-label="Search Dubai tours">

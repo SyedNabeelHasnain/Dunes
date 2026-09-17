@@ -290,7 +290,7 @@
             <div class="guidelines-card mb-4">
                 <h6 class="fw-bold text-uppercase mb-2" style="font-size: 0.8rem;"><i class="bi bi-info-circle-fill me-1"></i> Important Safari Information & Advisory</h6>
                 <ul class="mb-0 ps-3">
-                    <li class="mb-1"><strong>Pickup Notice:</strong> Your licensed safari captain will call or WhatsApp 30–45 minutes prior to pickup to confirm your exact vehicle arrival time.</li>
+                    <li class="mb-1"><strong>Pickup Notice:</strong> Your licensed safari captain will call or WhatsApp 30 to 45 minutes prior to pickup to confirm your exact vehicle arrival time.</li>
                     <li class="mb-1"><strong>Identification:</strong> Please present this voucher (digital or printed) together with valid photo ID upon boarding.</li>
                     <li class="mb-1"><strong>Clothing:</strong> Casual comfortable wear and sports footwear recommended. Light jackets are advisable for desert evenings in winter.</li>
                     <li><strong>Advisory:</strong> Dune bashing is not suitable for pregnant women or guests with back/neck conditions. Gentle scenic desert transfer is provided on request.</li>

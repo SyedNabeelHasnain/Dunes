@@ -29,28 +29,28 @@
                         <div class="row g-3">
                             <div class="col-sm-6">
                                 <div class="card quiz-choice-card h-100 p-3 rounded-4 border text-center cursor-pointer" data-step="1" data-val="desert">
-                                    <div class="fs-1 mb-2">🏜️</div>
+                                    <div class="fs-1 mb-2 text-warning"><i class="bi bi-compass"></i></div>
                                     <h6 class="fw-bold text-dark mb-1">Desert Safari & Red Dunes</h6>
                                     <p class="text-muted small mb-0" style="font-size: 0.78rem;">4x4 Dune Bashing, Camel Rides, Live Camp Shows & BBQ Dinner</p>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="card quiz-choice-card h-100 p-3 rounded-4 border text-center cursor-pointer" data-step="1" data-val="city">
-                                    <div class="fs-1 mb-2">🏙️</div>
+                                    <div class="fs-1 mb-2 text-warning"><i class="bi bi-buildings"></i></div>
                                     <h6 class="fw-bold text-dark mb-1">City Sightseeing & Landmarks</h6>
                                     <p class="text-muted small mb-0" style="font-size: 0.78rem;">Dubai & Abu Dhabi iconic tours, Burj Khalifa & Grand Mosque</p>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="card quiz-choice-card h-100 p-3 rounded-4 border text-center cursor-pointer" data-step="1" data-val="water">
-                                    <div class="fs-1 mb-2">🚢</div>
+                                    <div class="fs-1 mb-2 text-warning"><i class="bi bi-water"></i></div>
                                     <h6 class="fw-bold text-dark mb-1">Marina Dhow & Luxury Cruise</h6>
                                     <p class="text-muted small mb-0" style="font-size: 0.78rem;">Dubai Marina dinner cruise with skyline views & entertainment</p>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="card quiz-choice-card h-100 p-3 rounded-4 border text-center cursor-pointer" data-step="1" data-val="quad_buggy">
-                                    <div class="fs-1 mb-2">🏎️</div>
+                                    <div class="fs-1 mb-2 text-warning"><i class="bi bi-speedometer2"></i></div>
                                     <h6 class="fw-bold text-dark mb-1">Quad Bike & Dune Buggy Rentals</h6>
                                     <p class="text-muted small mb-0" style="font-size: 0.78rem;">Self-drive 1000cc Buggy & 400cc ATV adrenaline in open red dunes</p>
                                 </div>
@@ -64,21 +64,21 @@
                         <div class="row g-3">
                             <div class="col-sm-4">
                                 <div class="card quiz-choice-card h-100 p-3 rounded-4 border text-center cursor-pointer" data-step="2" data-val="morning">
-                                    <div class="fs-1 mb-2">🌅</div>
+                                    <div class="fs-1 mb-2 text-warning"><i class="bi bi-sunrise"></i></div>
                                     <h6 class="fw-bold text-dark mb-1">Morning Experience</h6>
-                                    <p class="text-muted small mb-0" style="font-size: 0.78rem;">8:00 AM – 12:00 PM • Crisp breeze, cool weather & sightseeing</p>
+                                    <p class="text-muted small mb-0" style="font-size: 0.78rem;">8:00 AM - 12:00 PM • Crisp breeze, cool weather & sightseeing</p>
                                 </div>
                             </div>
                             <div class="col-sm-4">
                                 <div class="card quiz-choice-card h-100 p-3 rounded-4 border text-center cursor-pointer" data-step="2" data-val="evening">
-                                    <div class="fs-1 mb-2">🌇</div>
+                                    <div class="fs-1 mb-2 text-warning"><i class="bi bi-sunset"></i></div>
                                     <h6 class="fw-bold text-dark mb-1">Evening & Sunset</h6>
-                                    <p class="text-muted small mb-0" style="font-size: 0.78rem;">3:00 PM – 9:30 PM • Sunset, 5-Star Buffet & Live Shows</p>
+                                    <p class="text-muted small mb-0" style="font-size: 0.78rem;">3:00 PM - 9:30 PM • Sunset, 5-Star Buffet & Live Shows</p>
                                 </div>
                             </div>
                             <div class="col-sm-4">
                                 <div class="card quiz-choice-card h-100 p-3 rounded-4 border text-center cursor-pointer" data-step="2" data-val="overnight">
-                                    <div class="fs-1 mb-2">🌌</div>
+                                    <div class="fs-1 mb-2 text-warning"><i class="bi bi-moon-stars"></i></div>
                                     <h6 class="fw-bold text-dark mb-1">Overnight Stay</h6>
                                     <p class="text-muted small mb-0" style="font-size: 0.78rem;">Camp under desert stars with campfire & morning breakfast</p>
                                 </div>
@@ -92,21 +92,21 @@
                         <div class="row g-3">
                             <div class="col-sm-4">
                                 <div class="card quiz-choice-card h-100 p-3 rounded-4 border text-center cursor-pointer" data-step="3" data-val="family">
-                                    <div class="fs-1 mb-2">👨‍👩‍👧‍👦</div>
+                                    <div class="fs-1 mb-2 text-warning"><i class="bi bi-people"></i></div>
                                     <h6 class="fw-bold text-dark mb-1">Family & Friends</h6>
                                     <p class="text-muted small mb-0" style="font-size: 0.78rem;">Relaxed sightseeing, great photo stops & family-friendly fun</p>
                                 </div>
                             </div>
                             <div class="col-sm-4">
                                 <div class="card quiz-choice-card h-100 p-3 rounded-4 border text-center cursor-pointer" data-step="3" data-val="thrill">
-                                    <div class="fs-1 mb-2">🏎️</div>
+                                    <div class="fs-1 mb-2 text-warning"><i class="bi bi-speedometer2"></i></div>
                                     <h6 class="fw-bold text-dark mb-1">Thrill & Adrenaline</h6>
                                     <p class="text-muted small mb-0" style="font-size: 0.78rem;">Dune bashing, quad biking, sandboarding & high excitement</p>
                                 </div>
                             </div>
                             <div class="col-sm-4">
                                 <div class="card quiz-choice-card h-100 p-3 rounded-4 border text-center cursor-pointer" data-step="3" data-val="luxury">
-                                    <div class="fs-1 mb-2">👑</div>
+                                    <div class="fs-1 mb-2 text-warning"><i class="bi bi-award"></i></div>
                                     <h6 class="fw-bold text-dark mb-1">VIP Luxury & Romance</h6>
                                     <p class="text-muted small mb-0" style="font-size: 0.78rem;">Private 4x4, reserved VIP dining & premium comfort</p>
                                 </div>
@@ -117,11 +117,11 @@
                     <!-- Step 4: Quiz Recommendation Result Card -->
                     <div class="quiz-step-panel d-none" id="quizResult">
                         <div class="text-center mb-3">
-                            <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1 fw-bold">🎯 99% Match From Live Catalog</span>
+                            <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1 fw-bold"><i class="bi bi-patch-check-fill me-1"></i> Top Recommendation Based on Your Choices</span>
                             <h3 class="h4 fw-800 text-dark mt-2 mb-1" id="quizMatchedTitle">Evening Desert Safari Dubai</h3>
                             <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
                                 <span class="badge bg-light text-primary border rounded-pill" id="quizMatchedCategory">Desert Safari</span>
-                                <span class="small text-muted" id="quizMatchedMeta"><i class="bi bi-clock me-1"></i>6 Hours • ⭐ 4.9 (1,200+ Reviews)</span>
+                                <span class="small text-muted" id="quizMatchedMeta"><i class="bi bi-clock me-1"></i>6 Hours • <i class="bi bi-star-fill text-warning me-1"></i>4.9 (1,200+ Reviews)</span>
                             </div>
                             <p class="text-muted small mx-auto" style="max-width: 600px;" id="quizMatchedDesc">Top-rated Dubai tour experience.</p>
                         </div>
@@ -130,7 +130,7 @@
                             <!-- Unlocked Reward Badge -->
                             <div class="p-2.5 rounded-3 mb-3 bg-warning-subtle text-dark border border-warning border-opacity-50 d-flex align-items-center justify-content-between flex-wrap gap-2">
                                 <div class="d-flex align-items-center gap-2">
-                                    <span class="fs-5">🎉</span>
+                                    <span class="fs-5"><i class="bi bi-gift-fill text-primary"></i></span>
                                     <span class="small fw-bold">5% Matcher Promo Unlocked: <span class="font-monospace text-primary fw-800">MATCH5</span></span>
                                 </div>
                                 <span class="badge bg-dark text-warning rounded-pill px-2 py-1 small">Auto-Applies at Checkout</span>

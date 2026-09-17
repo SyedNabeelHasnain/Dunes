@@ -2,7 +2,8 @@
     $settingsService = app(\App\Services\SettingsService::class);
     $topBannerActive = ($settingsService->get('promo_top_banner_enabled', $settingsService->get('top_promo_banner_active', '1'))) === '1';
     $topBannerBadge = $settingsService->get('promo_top_banner_badge', 'Limited Time Offer');
-    $topBannerText = $settingsService->get('promo_top_banner_text', $settingsService->get('top_promo_banner_text', '🎟️ Special Online Exclusive: Get 25% OFF on all Desert Safari Tours! • 100% Free 24h Cancellation'));
+    $rawBannerText = $settingsService->get('promo_top_banner_text', $settingsService->get('top_promo_banner_text', 'Special Online Exclusive: Get 25% OFF on all Desert Safari Tours! • 100% Free 24h Cancellation'));
+    $topBannerText = trim(preg_replace('/[\x{1F300}-\x{1F64F}\x{1F680}-\x{1F6FF}\x{1F900}-\x{1F9FF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}]/u', '', $rawBannerText));
     $topBannerCode = $settingsService->get('promo_top_banner_code', $settingsService->get('top_promo_banner_code', 'DUNESWELCOME'));
 @endphp
 
@@ -12,7 +13,7 @@
     @if(!empty($topBannerBadge))
     <span class="badge bg-warning text-dark fw-800 rounded-pill px-2.5 py-1 text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">{{ $topBannerBadge }}</span>
     @endif
-    <span class="fw-bold">{{ $topBannerText }}</span>
+    <span class="fw-bold"><i class="bi bi-tag-fill text-warning me-1"></i>{{ $topBannerText }}</span>
     <button type="button" class="btn btn-warning btn-sm rounded-pill px-3 py-0 fw-800 text-dark d-inline-flex align-items-center gap-1 shadow-sm top-banner-copy-btn" data-code="{{ $topBannerCode }}" style="font-size: 0.75rem; height: 26px;">
         <span>CODE: <strong class="font-monospace">{{ $topBannerCode }}</strong></span>
         <i class="bi bi-clipboard"></i>

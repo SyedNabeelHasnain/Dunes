@@ -333,12 +333,12 @@
 @endif
 
 <!-- Bottom CTA -->
-<section class="py-5" style="background:linear-gradient(135deg,#1a0a00,#3d1f00);">
+<section class="py-5" style="background: linear-gradient(135deg, #0f172a 0%, #0b1325 100%); border-top: 1px solid rgba(246, 144, 68, 0.25);">
     <div class="container text-center text-white">
         <h2 class="fw-800 display-6 mb-3">Ready for Your Dubai Adventure?</h2>
         <p class="text-white-50 mb-4 lead">Join thousands of satisfied guests who have experienced Dubai with Dunes Discovery Tourism.</p>
         <div class="d-flex gap-3 justify-content-center flex-wrap">
-            <button data-action="open-booking" class="btn btn-primary rounded-pill px-5 py-3 fw-bold shadow-lg">Book a Desert Safari</button>
+            <button data-action="open-booking" class="btn btn-desert-animated rounded-pill px-5 py-3 fw-bold shadow-lg">Book a Desert Safari</button>
             <a href="{{ route('tours.index') }}" class="btn btn-outline-light rounded-pill px-5 py-3 fw-bold">Browse All Tours</a>
         </div>
     </div>

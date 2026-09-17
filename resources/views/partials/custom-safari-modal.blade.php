@@ -41,7 +41,7 @@
                                 <div class="col-6">
                                     <div class="modal-custom-card p-3 rounded-4 cursor-pointer transition-all h-100 selected" data-group="modal-base" data-name="Standard Evening Red Dunes" data-price="150" data-tour-id="1">
                                         <div class="d-flex justify-content-between mb-1">
-                                            <span>🌇</span>
+                                            <span><i class="bi bi-sunset fs-5 text-warning"></i></span>
                                             <span class="badge bg-warning text-dark fw-bold rounded-pill" style="font-size: 9px;">Popular</span>
                                         </div>
                                         <div class="fw-bold text-white small lh-1 mb-1">Standard Evening</div>
@@ -52,7 +52,7 @@
                                 <div class="col-6">
                                     <div class="modal-custom-card p-3 rounded-4 cursor-pointer transition-all h-100" data-group="modal-base" data-name="VIP Luxury Evening Safari" data-price="250" data-tour-id="2">
                                         <div class="d-flex justify-content-between mb-1">
-                                            <span>👑</span>
+                                            <span><i class="bi bi-award fs-5 text-warning"></i></span>
                                             <span class="badge bg-dark text-warning border border-warning rounded-pill" style="font-size: 9px;">VIP</span>
                                         </div>
                                         <div class="fw-bold text-white small lh-1 mb-1">VIP Luxury Safari</div>
@@ -63,7 +63,7 @@
                                 <div class="col-6">
                                     <div class="modal-custom-card p-3 rounded-4 cursor-pointer transition-all h-100" data-group="modal-base" data-name="Morning Desert Safari" data-price="120" data-tour-id="4">
                                         <div class="d-flex justify-content-between mb-1">
-                                            <span>🌅</span>
+                                            <span><i class="bi bi-sunrise fs-5 text-warning"></i></span>
                                             <span class="badge bg-info text-white rounded-pill" style="font-size: 9px;">Cooler</span>
                                         </div>
                                         <div class="fw-bold text-white small lh-1 mb-1">Morning Safari</div>
@@ -74,7 +74,7 @@
                                 <div class="col-6">
                                     <div class="modal-custom-card p-3 rounded-4 cursor-pointer transition-all h-100" data-group="modal-base" data-name="Overnight Stargazing Safari" data-price="350" data-tour-id="5">
                                         <div class="d-flex justify-content-between mb-1">
-                                            <span>🌌</span>
+                                            <span><i class="bi bi-moon-stars fs-5 text-warning"></i></span>
                                             <span class="badge bg-success text-white rounded-pill" style="font-size: 9px;">Glamping</span>
                                         </div>
                                         <div class="fw-bold text-white small lh-1 mb-1">Overnight Safari</div>

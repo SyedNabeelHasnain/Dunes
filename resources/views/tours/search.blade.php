@@ -186,7 +186,7 @@
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
                 <div class="d-flex align-items-center gap-2">
                     <span class="badge bg-primary text-white rounded-pill px-3 py-1.5 fw-bold d-inline-flex align-items-center gap-1">
-                        <i class="bi bi-stars"></i> AI Overview
+                        <i class="bi bi-compass-fill me-1"></i> Expert Safari Overview
                     </span>
                     <h2 class="h5 fw-bold text-dark mb-0">{{ $aiOverview['title'] }}</h2>
                 </div>

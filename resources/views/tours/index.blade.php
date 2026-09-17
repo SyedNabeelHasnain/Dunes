@@ -87,10 +87,10 @@
 
 <section class="section py-5">
     <div class="container">
-        <!-- Safari Matcher AI Recommendation Banner -->
+        <!-- Safari Match Concierge Recommendation Banner -->
         <div class="card border-0 rounded-4 p-4 p-md-4 mb-4 shadow-sm position-relative overflow-hidden" style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); border: 1.5px solid rgba(246, 144, 68, 0.3) !important;">
-            <div class="position-absolute top-0 end-0 translate-middle-y me-4 opacity-10 d-none d-md-block" style="font-size: 8rem; pointer-events: none; line-height: 1;">
-                🐪
+            <div class="position-absolute top-0 end-0 translate-middle-y me-4 opacity-10 d-none d-md-block" style="font-size: 8rem; pointer-events: none; line-height: 1; color: #F69044;">
+                <i class="bi bi-compass"></i>
             </div>
             <div class="row align-items-center position-relative z-1 g-3">
                 <div class="col-12 col-lg-8">
@@ -99,18 +99,18 @@
                             <i class="bi bi-stars me-1"></i> Interactive Concierge
                         </span>
                         <span class="badge bg-warning text-dark rounded-pill px-2.5 py-1 fw-bold" style="font-size: 0.72rem;">
-                            🎁 5% OFF Match Bonus
+                            <i class="bi bi-gift-fill me-1"></i> 5% OFF Match Bonus
                         </span>
                     </div>
                     <h3 class="fw-800 text-white mb-2 fs-4">Not sure which Dubai Safari to choose?</h3>
                     <p class="text-white-50 mb-0 small" style="max-width: 620px;">
-                        Answer 3 quick questions about your group style, timing, and must-have perks. Our <strong>Safari Matcher AI</strong> will calculate your ideal adventure and unlock an instant <strong>5% promo code (MATCH5)</strong>.
+                        Answer 3 quick questions about your group style, timing, and must-have perks. Our <strong>Safari Match Concierge</strong> will recommend your ideal adventure and unlock an instant <strong>5% promo code (MATCH5)</strong>.
                     </p>
                 </div>
                 <div class="col-12 col-lg-4 text-lg-end">
                     <button type="button" class="btn btn-desert-animated rounded-pill px-4 py-3 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-2" data-bs-toggle="modal" data-bs-target="#safariMatcherModal">
-                        <i class="bi bi-magic fs-5"></i>
-                        <span>Launch Safari Matcher</span>
+                        <i class="bi bi-compass fs-5"></i>
+                        <span>Launch Safari Concierge</span>
                     </button>
                 </div>
             </div>

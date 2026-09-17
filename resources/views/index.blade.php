@@ -187,8 +187,8 @@ if (!function_exists('renderReviewCardMarkup')) {
                 <i class="bi bi-calendar-check me-2"></i>Book Online Now
             </a>
             <button type="button" class="btn btn-outline-warning btn-lg rounded-pill px-4 py-3 fw-bold d-inline-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#safariMatcherModal" style="border-color: rgba(246, 144, 68, 0.6); color: #F69044; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px);">
-                <i class="bi bi-stars text-warning fs-5"></i>
-                <span>Safari Matcher AI</span>
+                <i class="bi bi-compass text-warning fs-5"></i>
+                <span>Safari Match Concierge</span>
                 <span class="badge bg-warning text-dark rounded-pill px-2 py-1 small" style="font-size: 10px;">5% OFF</span>
             </button>
             <a href="#" class="btn btn-desert-animated-dark btn-lg rounded-pill px-4 py-3 fw-bold d-inline-flex align-items-center gap-2" data-action="open-booking" data-tour="1" data-tier="1">
@@ -377,7 +377,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                 <div class="col-12 col-lg-8">
                     <div class="d-flex align-items-center gap-2 mb-1">
                         <span class="badge rounded-pill px-2.5 py-1 small fw-bold" style="background: rgba(246, 144, 68, 0.2); color: #F69044; border: 1px solid #F69044;">
-                            <i class="bi bi-stars me-1"></i> AI Recommendation Concierge
+                            <i class="bi bi-compass me-1"></i> Safari Selection Concierge
                         </span>
                         <span class="badge bg-warning text-dark rounded-pill px-2 py-0.5 small fw-bold">
                             5% OFF Unlocked
@@ -389,7 +389,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                 <div class="col-12 col-lg-4 text-lg-end">
                     <div class="d-flex flex-column flex-sm-row gap-2 justify-content-lg-end">
                         <button type="button" class="btn btn-desert-animated rounded-pill px-3 py-2.5 fw-bold text-nowrap" data-bs-toggle="modal" data-bs-target="#safariMatcherModal">
-                            <i class="bi bi-stars me-1"></i> Safari Matcher AI
+                            <i class="bi bi-compass me-1"></i> Safari Match Concierge
                         </button>
                         <a href="{{ route('tours.customizer') }}" class="btn btn-outline-light rounded-pill px-3 py-2.5 fw-bold text-nowrap">
                             <i class="bi bi-sliders me-1"></i> Custom Safari
@@ -660,12 +660,25 @@ if (!function_exists('renderReviewCardMarkup')) {
 <!-- CTA booking banner -->
 <section class="cta-section py-5 py-lg-6 position-relative text-white">
     <div class="container position-relative z-1 text-center py-4">
-        <h2 class="display-4 fw-bold mb-3 text-white">Ready for Your Desert Adventure?</h2>
-        <p class="lead mb-4 opacity-90 mx-auto" style="max-width: 620px;">Book now and create memories that last a lifetime. Free cancellation up to 24 hours before.</p>
-        <div class="pt-2">
-            <a href="#" class="btn btn-cta-white btn-lg rounded-pill px-5 py-3.5 fw-bold fs-5" data-bs-toggle="modal" data-bs-target="#bookingModal">
-                <i class="bi bi-calendar-check-fill me-2 text-primary"></i>Book Your Tour Now
+        <div class="d-inline-flex align-items-center gap-2 px-3 py-1.5 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-15 text-warning small fw-bold text-uppercase mb-3 shadow-sm">
+            <i class="bi bi-shield-check"></i> Licensed Dubai Tour Operator • DTCM Permit #1430583
+        </div>
+        <h2 class="display-4 fw-bold mb-3 text-white">Ready for Your <span class="text-gradient-primary">Dubai Desert Adventure</span>?</h2>
+        <p class="lead mb-4 text-white-50 mx-auto" style="max-width: 680px;">Reserve your safari experience in 60 seconds with instant booking confirmation. Free cancellation up to 24 hours prior with full refund.</p>
+        <div class="d-flex flex-wrap justify-content-center gap-3 pt-2">
+            <a href="#" class="btn btn-desert-animated btn-lg rounded-pill px-5 py-3.5 fw-bold fs-5 shadow-lg" data-bs-toggle="modal" data-bs-target="#bookingModal">
+                <i class="bi bi-calendar-check me-2"></i>Book Your Tour Now
             </a>
+            @php $waNumClean = preg_replace('/[^0-9]/', '', $settings['whatsapp_phone'] ?? '971502456056'); @endphp
+            <a href="https://wa.me/{{ $waNumClean }}?text={{ urlencode('Hi Dunes Discovery Tourism! I would like to inquire about booking a desert safari.') }}" target="_blank" rel="noopener" class="btn btn-outline-light btn-lg rounded-pill px-4 py-3.5 fw-bold d-inline-flex align-items-center gap-2 shadow-sm">
+                <i class="bi bi-whatsapp text-success fs-5"></i> WhatsApp Us
+            </a>
+        </div>
+        <div class="d-flex flex-wrap justify-content-center align-items-center gap-3 gap-md-4 mt-4 pt-2 text-white-50 small">
+            <div><i class="bi bi-check-circle-fill text-warning me-1"></i> Free 24h Cancellation</div>
+            <div><i class="bi bi-check-circle-fill text-warning me-1"></i> Luxury 4x4 Land Cruiser Transfers</div>
+            <div><i class="bi bi-check-circle-fill text-warning me-1"></i> Pay Online or Cash on Pickup</div>
+            <div><i class="bi bi-check-circle-fill text-warning me-1"></i> Instant Digital Voucher</div>
         </div>
     </div>
 </section>

@@ -319,9 +319,9 @@
     <div class="guidelines-box">
         <strong>IMPORTANT GUEST INFORMATION & TOUR GUIDELINES:</strong>
         <ul>
-            <li><strong>Driver Contact:</strong> Your licensed safari captain will contact you via WhatsApp/Call 30–45 minutes prior to pickup to confirm your exact arrival time.</li>
+            <li><strong>Driver Contact:</strong> Your licensed safari captain will contact you via WhatsApp/Call 30 to 45 minutes prior to pickup to confirm your exact arrival time.</li>
             <li><strong>Identification:</strong> Please carry a digital or printed copy of this voucher along with a valid photo ID (Passport / Emirates ID).</li>
-            <li><strong>Recommended Attire:</strong> Comfortable casual clothing and closed-toe footwear. Light jackets or shawls are recommended for desert evenings during winter months (Nov–Mar).</li>
+            <li><strong>Recommended Attire:</strong> Comfortable casual clothing and closed-toe footwear. Light jackets or shawls are recommended for desert evenings during winter months (November to March).</li>
             <li><strong>Safety Advisory:</strong> Dune bashing is not recommended for expectant mothers, guests with severe back/neck conditions, or infants under 3 years old (gentle scenic transfer available upon advance request).</li>
             <li><strong>Cancellation / Changes:</strong> Free cancellation up to 24 hours prior to tour departure time. Contact our concierge hotline below for immediate itinerary adjustments.</li>
         </ul>

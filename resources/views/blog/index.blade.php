@@ -263,10 +263,10 @@
     @endif
 
     <!-- Newsletter / CTA Banner -->
-    <div class="rounded-4 p-5 text-center mt-5" style="background:linear-gradient(135deg,#F58F43 0%,#e07020 100%);">
+    <div class="rounded-4 p-5 text-center mt-5 position-relative overflow-hidden" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border: 1px solid rgba(246, 144, 68, 0.25); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);">
         <h2 class="fw-800 text-white mb-2">Ready for Your Dubai Adventure?</h2>
-        <p class="text-white opacity-75 mb-4">Book a desert safari tour and make memories that last a lifetime.</p>
-        <button data-action="open-booking" class="btn btn-white rounded-pill px-5 py-3 fw-bold shadow-lg">Book a Tour Now</button>
+        <p class="text-white text-opacity-75 mb-4">Book a desert safari tour and make memories that last a lifetime.</p>
+        <button data-action="open-booking" class="btn btn-desert-animated rounded-pill px-5 py-3 fw-bold shadow-lg">Book a Tour Now</button>
     </div>
 </div>
 

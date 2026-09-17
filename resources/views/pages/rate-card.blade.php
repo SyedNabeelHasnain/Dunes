@@ -318,7 +318,7 @@
                 </div>
                 <div>
                     <div class="fw-800 text-dark" style="font-size: 15px; letter-spacing: -0.01em; color: #0F172A !important;">
-                        🚐 COMPLIMENTARY 4X4 DOORSTEP HOTEL PICKUP & DROP-OFF INCLUDED
+                        COMPLIMENTARY 4X4 DOORSTEP HOTEL PICKUP & DROP-OFF INCLUDED
                     </div>
                     <div class="text-secondary small" style="font-size: 13px; color: #475569 !important;">
                         Enjoy seamless door-to-door transportation in clean, air-conditioned Toyota Land Cruisers from any hotel, residence, or cruise terminal across Dubai & Sharjah.
@@ -327,7 +327,7 @@
             </div>
             <div class="d-none d-md-block text-end text-nowrap">
                 <span class="badge bg-dark text-white px-3.5 py-2 rounded-pill fw-bold" style="font-size: 11px;">
-                    ✓ Zero Hidden Fees
+                    <i class="bi bi-check-circle-fill text-success me-1"></i> Zero Hidden Fees
                 </span>
             </div>
         </div>

@@ -1,4 +1,4 @@
-<!-- Safari Matcher AI Recommendation Concierge & Gamified Discount Modal -->
+<!-- Safari Match Concierge Recommendation & Special Offer Modal -->
 <div class="modal fade" id="safariMatcherModal" tabindex="-1" aria-labelledby="safariMatcherModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
         <div class="modal-content border-0 shadow-lg" style="background: #0B1120; border: 1px solid rgba(246, 144, 68, 0.35) !important; border-radius: 26px; color: #ffffff; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85);">
@@ -8,10 +8,10 @@
                 <div class="w-100 d-flex align-items-center justify-content-between">
                     <div>
                         <span class="badge rounded-pill px-3 py-1.5 small mb-1 d-inline-flex align-items-center gap-1" style="background: rgba(246, 144, 68, 0.18); border: 1px solid rgba(246, 144, 68, 0.4); color: #F69044; font-size: 0.75rem; letter-spacing: 0.5px;">
-                            <i class="bi bi-stars"></i> Smart Recommendation Concierge
+                            <i class="bi bi-compass-fill"></i> Safari Concierge Recommendation
                         </span>
                         <h4 class="modal-title fw-800 text-white mb-0" id="safariMatcherModalLabel">
-                            Safari Matcher <span style="background: linear-gradient(135deg, #F69044, #FBBF24); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">AI</span>
+                            Safari Match <span style="background: linear-gradient(135deg, #F69044, #FBBF24); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Concierge</span>
                         </h4>
                     </div>
                     <button type="button" class="btn btn-outline-light rounded-circle p-2 d-flex align-items-center justify-content-center shadow-none border-0" data-bs-dismiss="modal" aria-label="Close" style="background: rgba(255, 255, 255, 0.08); width: 38px; height: 38px;">
@@ -36,14 +36,14 @@
                 
                 <!-- Step 1: Group Style -->
                 <div class="matcher-step-view" id="matcherStep1">
-                    <h5 class="fw-bold text-white mb-1">Who is embarking on this desert adventure with you?</h5>
+                    <h5 class="fw-bold text-white mb-1">Who is joining you on this desert safari?</h5>
                     <p class="text-white-50 small mb-4">Choose your party style so we can optimize dune pacing, vehicle safety, and camp seating.</p>
 
                     <div class="row g-3">
                         <div class="col-12 col-md-6">
                             <div class="matcher-option-card p-3 rounded-4 cursor-pointer transition-all h-100" data-step="1" data-val="family" style="background: rgba(30, 41, 59, 0.7); border: 1.5px solid rgba(255, 255, 255, 0.08);">
                                 <div class="d-flex align-items-start gap-3">
-                                    <div class="fs-2 text-warning flex-shrink-0">👨‍👩‍👧‍👦</div>
+                                    <div class="fs-2 text-warning flex-shrink-0"><i class="bi bi-people-fill"></i></div>
                                     <div>
                                         <div class="fw-bold text-white fs-6 mb-1">Family with Kids & Seniors</div>
                                         <div class="text-white-50 small" style="font-size: 0.8rem; line-height: 1.4;">
@@ -57,7 +57,7 @@
                         <div class="col-12 col-md-6">
                             <div class="matcher-option-card p-3 rounded-4 cursor-pointer transition-all h-100" data-step="1" data-val="adventure" style="background: rgba(30, 41, 59, 0.7); border: 1.5px solid rgba(255, 255, 255, 0.08);">
                                 <div class="d-flex align-items-start gap-3">
-                                    <div class="fs-2 text-warning flex-shrink-0">⚡</div>
+                                    <div class="fs-2 text-warning flex-shrink-0"><i class="bi bi-lightning-charge-fill"></i></div>
                                     <div>
                                         <div class="fw-bold text-white fs-6 mb-1">Thrill & Adrenaline Seekers</div>
                                         <div class="text-white-50 small" style="font-size: 0.8rem; line-height: 1.4;">
@@ -71,7 +71,7 @@
                         <div class="col-12 col-md-6">
                             <div class="matcher-option-card p-3 rounded-4 cursor-pointer transition-all h-100" data-step="1" data-val="luxury" style="background: rgba(30, 41, 59, 0.7); border: 1.5px solid rgba(255, 255, 255, 0.08);">
                                 <div class="d-flex align-items-start gap-3">
-                                    <div class="fs-2 text-warning flex-shrink-0">👑</div>
+                                    <div class="fs-2 text-warning flex-shrink-0"><i class="bi bi-award-fill"></i></div>
                                     <div>
                                         <div class="fw-bold text-white fs-6 mb-1">VIP Luxury & Couples / Romance</div>
                                         <div class="text-white-50 small" style="font-size: 0.8rem; line-height: 1.4;">
@@ -85,7 +85,7 @@
                         <div class="col-12 col-md-6">
                             <div class="matcher-option-card p-3 rounded-4 cursor-pointer transition-all h-100" data-step="1" data-val="budget" style="background: rgba(30, 41, 59, 0.7); border: 1.5px solid rgba(255, 255, 255, 0.08);">
                                 <div class="d-flex align-items-start gap-3">
-                                    <div class="fs-2 text-warning flex-shrink-0">💰</div>
+                                    <div class="fs-2 text-warning flex-shrink-0"><i class="bi bi-tag-fill"></i></div>
                                     <div>
                                         <div class="fw-bold text-white fs-6 mb-1">Best Value / Solo Explorer</div>
                                         <div class="text-white-50 small" style="font-size: 0.8rem; line-height: 1.4;">
@@ -107,7 +107,7 @@
                         <div class="col-12 col-md-6">
                             <div class="matcher-option-card p-3 rounded-4 cursor-pointer transition-all h-100" data-step="2" data-val="evening" style="background: rgba(30, 41, 59, 0.7); border: 1.5px solid rgba(255, 255, 255, 0.08);">
                                 <div class="d-flex align-items-start gap-3">
-                                    <div class="fs-2 text-warning flex-shrink-0">🌇</div>
+                                    <div class="fs-2 text-warning flex-shrink-0"><i class="bi bi-sunset-fill"></i></div>
                                     <div>
                                         <div class="fw-bold text-white fs-6 mb-1">Sunset Evening Safari (Classic)</div>
                                         <div class="text-white-50 small" style="font-size: 0.8rem; line-height: 1.4;">
@@ -121,7 +121,7 @@
                         <div class="col-12 col-md-6">
                             <div class="matcher-option-card p-3 rounded-4 cursor-pointer transition-all h-100" data-step="2" data-val="morning" style="background: rgba(30, 41, 59, 0.7); border: 1.5px solid rgba(255, 255, 255, 0.08);">
                                 <div class="d-flex align-items-start gap-3">
-                                    <div class="fs-2 text-warning flex-shrink-0">🌅</div>
+                                    <div class="fs-2 text-warning flex-shrink-0"><i class="bi bi-sunrise-fill"></i></div>
                                     <div>
                                         <div class="fw-bold text-white fs-6 mb-1">Crisp Morning Safari (Cooler)</div>
                                         <div class="text-white-50 small" style="font-size: 0.8rem; line-height: 1.4;">
@@ -135,7 +135,7 @@
                         <div class="col-12 col-md-6">
                             <div class="matcher-option-card p-3 rounded-4 cursor-pointer transition-all h-100" data-step="2" data-val="overnight" style="background: rgba(30, 41, 59, 0.7); border: 1.5px solid rgba(255, 255, 255, 0.08);">
                                 <div class="d-flex align-items-start gap-3">
-                                    <div class="fs-2 text-warning flex-shrink-0">🌌</div>
+                                    <div class="fs-2 text-warning flex-shrink-0"><i class="bi bi-moon-stars-fill"></i></div>
                                     <div>
                                         <div class="fw-bold text-white fs-6 mb-1">Overnight Stargazing Glamping</div>
                                         <div class="text-white-50 small" style="font-size: 0.8rem; line-height: 1.4;">
@@ -149,7 +149,7 @@
                         <div class="col-12 col-md-6">
                             <div class="matcher-option-card p-3 rounded-4 cursor-pointer transition-all h-100" data-step="2" data-val="cruise" style="background: rgba(30, 41, 59, 0.7); border: 1.5px solid rgba(255, 255, 255, 0.08);">
                                 <div class="d-flex align-items-start gap-3">
-                                    <div class="fs-2 text-warning flex-shrink-0">⛵</div>
+                                    <div class="fs-2 text-warning flex-shrink-0"><i class="bi bi-water"></i></div>
                                     <div>
                                         <div class="fw-bold text-white fs-6 mb-1">Dubai Marina Luxury Dhow Cruise</div>
                                         <div class="text-white-50 small" style="font-size: 0.8rem; line-height: 1.4;">
@@ -171,7 +171,7 @@
                         <div class="col-12 col-md-6">
                             <div class="matcher-option-card p-3 rounded-4 cursor-pointer transition-all h-100" data-step="3" data-val="quad_buggy" style="background: rgba(30, 41, 59, 0.7); border: 1.5px solid rgba(255, 255, 255, 0.08);">
                                 <div class="d-flex align-items-start gap-3">
-                                    <div class="fs-2 text-warning flex-shrink-0">🏎️</div>
+                                    <div class="fs-2 text-warning flex-shrink-0"><i class="bi bi-speedometer2"></i></div>
                                     <div>
                                         <div class="fw-bold text-white fs-6 mb-1">Quad Biking or Dune Buggy Drive</div>
                                         <div class="text-white-50 small" style="font-size: 0.8rem; line-height: 1.4;">
@@ -185,7 +185,7 @@
                         <div class="col-12 col-md-6">
                             <div class="matcher-option-card p-3 rounded-4 cursor-pointer transition-all h-100" data-step="3" data-val="vip_service" style="background: rgba(30, 41, 59, 0.7); border: 1.5px solid rgba(255, 255, 255, 0.08);">
                                 <div class="d-flex align-items-start gap-3">
-                                    <div class="fs-2 text-warning flex-shrink-0">🍷</div>
+                                    <div class="fs-2 text-warning flex-shrink-0"><i class="bi bi-cup-hot-fill"></i></div>
                                     <div>
                                         <div class="fw-bold text-white fs-6 mb-1">VIP Raised Table & Private Waiter</div>
                                         <div class="text-white-50 small" style="font-size: 0.8rem; line-height: 1.4;">
@@ -199,7 +199,7 @@
                         <div class="col-12 col-md-6">
                             <div class="matcher-option-card p-3 rounded-4 cursor-pointer transition-all h-100" data-step="3" data-val="private_car" style="background: rgba(30, 41, 59, 0.7); border: 1.5px solid rgba(255, 255, 255, 0.08);">
                                 <div class="d-flex align-items-start gap-3">
-                                    <div class="fs-2 text-warning flex-shrink-0">🚙</div>
+                                    <div class="fs-2 text-warning flex-shrink-0"><i class="bi bi-car-front-fill"></i></div>
                                     <div>
                                         <div class="fw-bold text-white fs-6 mb-1">Private 4x4 Vehicle (No Sharing)</div>
                                         <div class="text-white-50 small" style="font-size: 0.8rem; line-height: 1.4;">
@@ -213,7 +213,7 @@
                         <div class="col-12 col-md-6">
                             <div class="matcher-option-card p-3 rounded-4 cursor-pointer transition-all h-100" data-step="3" data-val="all_inclusive" style="background: rgba(30, 41, 59, 0.7); border: 1.5px solid rgba(255, 255, 255, 0.08);">
                                 <div class="d-flex align-items-start gap-3">
-                                    <div class="fs-2 text-warning flex-shrink-0">🌟</div>
+                                    <div class="fs-2 text-warning flex-shrink-0"><i class="bi bi-star-fill"></i></div>
                                     <div>
                                         <div class="fw-bold text-white fs-6 mb-1">All-Inclusive Standard Package</div>
                                         <div class="text-white-50 small" style="font-size: 0.8rem; line-height: 1.4;">
@@ -226,7 +226,7 @@
                     </div>
                 </div>
 
-                <!-- Step Loading State (Simulated AI Engine) -->
+                <!-- Step Loading State (Concierge Engine) -->
                 <div class="matcher-step-view d-none text-center py-5" id="matcherStepLoading">
                     <div class="spinner-border text-warning mb-3" style="width: 3.5rem; height: 3.5rem;" role="status">
                         <span class="visually-hidden">Calculating...</span>
@@ -571,7 +571,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             // Set WhatsApp link
-            const waText = encodeURIComponent(`Hi Dunes Discovery! Your Safari Matcher AI recommended "${bestTour.name}" for my party with code MATCH5. Could you please share availability and details?`);
+            const waText = encodeURIComponent(`Hi Dunes Discovery! Your Safari Match Concierge recommended "${bestTour.name}" for my party with code MATCH5. Could you please share availability and details?`);
             whatsAppBtn.href = `https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}?text=${waText}`;
 
         }, 600);

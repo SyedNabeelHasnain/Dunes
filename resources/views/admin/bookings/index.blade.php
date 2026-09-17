@@ -414,7 +414,7 @@ $(document).ready(function() {
         if (isDelete) {
             // Step 1: Caution Dialog for Bulk Deletion
             Swal.fire({
-                title: '⚠️ CAUTION: Permanent Bulk Deletion',
+                title: 'CAUTION: Permanent Bulk Deletion',
                 html: `
                     <div class="text-start small text-secondary">
                         <div class="alert alert-danger py-2 px-3 mb-3 border-danger border-opacity-25 bg-danger bg-opacity-10 text-danger fw-semibold">
@@ -437,7 +437,7 @@ $(document).ready(function() {
 
                 // Step 2: Final Safeguard Double Confirmation
                 Swal.fire({
-                    title: '🔒 Confirm Bulk Deletion',
+                    title: 'Confirm Bulk Deletion',
                     html: `
                         <div class="text-start small">
                             <p class="text-dark mb-2">To confirm permanent deletion of <strong>${selectedIds.length}</strong> bookings and all related records, type <strong>DELETE</strong> in capital letters below:</p>
@@ -610,7 +610,7 @@ $(document).ready(function() {
 window.promptPermanentDelete = function(id, reference, name) {
     // Step 1: Caution Dialog
     Swal.fire({
-        title: '⚠️ CAUTION: Permanent Booking Deletion',
+        title: 'CAUTION: Permanent Booking Deletion',
         html: `
             <div class="text-start small text-secondary">
                 <div class="alert alert-danger py-2 px-3 mb-3 border-danger border-opacity-25 bg-danger bg-opacity-10 text-danger fw-semibold">
@@ -644,7 +644,7 @@ window.promptPermanentDelete = function(id, reference, name) {
 
         // Step 2: Final Safeguard Double Confirmation
         Swal.fire({
-            title: '🔒 Double Confirmation Required',
+            title: 'Double Confirmation Required',
             html: `
                 <div class="text-start small">
                     <p class="text-dark mb-2">To prevent accidental deletion, please type the booking reference below to authorize permanent destruction:</p>

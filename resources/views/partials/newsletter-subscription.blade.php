@@ -5,29 +5,25 @@
 @endphp
 
 @if($newsletterEnabled)
-<section class="newsletter-section py-5 position-relative overflow-hidden" id="newsletterBlock" style="background: linear-gradient(135deg, #091a2f 0%, #0d233f 50%, #152b47 100%);">
-    <!-- Decorative Ambient Glows -->
-    <div class="position-absolute top-0 end-0 translate-middle-y bg-primary rounded-circle opacity-10 blur-3xl pointer-events-none" style="width: 450px; height: 450px; filter: blur(90px);"></div>
-    <div class="position-absolute bottom-0 start-0 translate-middle-y bg-warning rounded-circle opacity-10 blur-3xl pointer-events-none" style="width: 400px; height: 400px; filter: blur(80px);"></div>
-
+<section class="newsletter-section py-5 position-relative overflow-hidden" id="newsletterBlock" style="background: linear-gradient(180deg, #0b1325 0%, #060a13 100%); border-top: 1px solid rgba(255, 255, 255, 0.08);">
     <div class="container position-relative z-2">
         <div class="row justify-content-center">
             <div class="col-12 col-lg-10 col-xl-8 text-center">
                 <!-- Eyebrow Badge -->
-                <div class="d-inline-flex align-items-center gap-2 px-3 py-1.5 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-10 text-primary-subtle extra-small fw-bold text-uppercase mb-3 shadow-sm" style="color: #F58F43 !important;">
-                    <i class="bi bi-stars"></i> VIP Insider Club & Early Access
+                <div class="d-inline-flex align-items-center gap-2 px-3 py-1.5 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-15 text-warning extra-small fw-bold text-uppercase mb-3 shadow-sm">
+                    <i class="bi bi-envelope-paper-heart"></i> VIP Travel Club & Special Offers
                 </div>
 
                 <!-- Section Heading -->
                 <h2 class="display-6 fw-800 text-white mb-3">
-                    Unlock Exclusive <span style="color: #F58F43;">Desert Experiences</span> & Deals
+                    Receive Exclusive <span class="text-gradient-primary">Desert Safari Offers</span> & Guides
                 </h2>
                 <p class="text-white-50 lead fs-6 mb-4 px-md-4">
-                    Subscribe to {{ $siteName }} updates for secret member discounts, seasonal adventure rates, and insider Dubai travel guides delivered to your inbox.
+                    Subscribe to {{ $siteName }} for verified member discounts, seasonal adventure rates, and insider Dubai desert travel guides delivered directly to your inbox.
                 </p>
 
                 <!-- Subscription Card / Form -->
-                <div class="card border-0 rounded-4 shadow-lg p-3 p-md-4 bg-white bg-opacity-10 backdrop-blur border border-white border-opacity-15 text-start" style="backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);">
+                <div class="card border-0 rounded-4 shadow-lg p-3 p-md-4 text-start" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1) !important; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);">
                     <form id="publicNewsletterForm" class="row g-3 align-items-center" novalidate>
                         @csrf
                         <!-- Anti-Bot Honeypot -->
@@ -39,7 +35,7 @@
                         <div class="col-12 col-md-4">
                             <div class="position-relative">
                                 <i class="bi bi-person position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-                                <input type="text" name="name" id="newsletterName" class="form-control rounded-pill ps-5 py-2.5 bg-white border-0 shadow-sm fw-semibold" placeholder="Your Name (Optional)" maxlength="100">
+                                <input type="text" name="name" id="newsletterName" class="form-control rounded-pill ps-5 py-2.5 bg-white border border-light shadow-sm fw-semibold" placeholder="Your Name (Optional)" maxlength="100">
                             </div>
                         </div>
 
@@ -47,13 +43,13 @@
                         <div class="col-12 col-md-5">
                             <div class="position-relative">
                                 <i class="bi bi-envelope position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-                                <input type="email" name="email" id="newsletterEmail" class="form-control rounded-pill ps-5 py-2.5 bg-white border-0 shadow-sm fw-semibold" placeholder="Enter your email address *" required maxlength="255">
+                                <input type="email" name="email" id="newsletterEmail" class="form-control rounded-pill ps-5 py-2.5 bg-white border border-light shadow-sm fw-semibold" placeholder="Enter your email address *" required maxlength="255">
                             </div>
                         </div>
 
                         <!-- Submit Button -->
                         <div class="col-12 col-md-3">
-                            <button type="submit" id="btnNewsletterSubmit" class="btn btn-primary w-100 rounded-pill py-2.5 fw-800 shadow-sm d-flex align-items-center justify-content-center gap-2" style="background-color: #F58F43; border-color: #F58F43;">
+                            <button type="submit" id="btnNewsletterSubmit" class="btn btn-desert-animated w-100 rounded-pill py-2.5 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
                                 <span>Join Club</span>
                                 <i class="bi bi-arrow-right"></i>
                             </button>
@@ -78,9 +74,9 @@
 
                 <!-- Trust Badges -->
                 <div class="d-flex flex-wrap align-items-center justify-content-center gap-4 mt-4 text-white-50 extra-small">
-                    <div><i class="bi bi-shield-check text-success me-1"></i> No spam ever</div>
-                    <div><i class="bi bi-lock text-primary me-1" style="color: #F58F43 !important;"></i> 100% Privacy protected</div>
-                    <div><i class="bi bi-x-circle text-muted me-1"></i> One-click instant unsubscribe</div>
+                    <div><i class="bi bi-shield-check text-success me-1"></i> Zero spam guarantee</div>
+                    <div><i class="bi bi-lock-fill text-warning me-1"></i> 100% Privacy protected</div>
+                    <div><i class="bi bi-check2-circle text-muted me-1"></i> Instant one-click unsubscribe</div>
                 </div>
             </div>
         </div>

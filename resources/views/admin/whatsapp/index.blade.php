@@ -461,7 +461,7 @@ $(document).ready(function() {
 
         // Step 1: Bulk Caution Dialog
         Swal.fire({
-            title: '⚠️ CAUTION: Permanent Bulk Deletion',
+            title: 'CAUTION: Permanent Bulk Deletion',
             html: `
                 <div class="text-start small text-secondary">
                     <div class="alert alert-danger py-2 px-3 mb-3 border-danger border-opacity-25 bg-danger bg-opacity-10 text-danger fw-semibold">
@@ -484,7 +484,7 @@ $(document).ready(function() {
 
             // Step 2: Final Safeguard Double Confirmation
             Swal.fire({
-                title: '🔒 Confirm Bulk Deletion',
+                title: 'Confirm Bulk Deletion',
                 html: `
                     <div class="text-start small">
                         <p class="text-dark mb-2">To confirm permanent deletion of <strong>${selectedIds.length}</strong> WhatsApp leads and all analytics footprints, type <strong>DELETE</strong> in capital letters below:</p>
@@ -554,7 +554,7 @@ window.promptPermanentDeleteLead = function(id, name, phone) {
 
     // Step 1: Caution Dialog
     Swal.fire({
-        title: '⚠️ CAUTION: Permanent Lead Deletion',
+        title: 'CAUTION: Permanent Lead Deletion',
         html: `
             <div class="text-start small text-secondary">
                 <div class="alert alert-danger py-2 px-3 mb-3 border-danger border-opacity-25 bg-danger bg-opacity-10 text-danger fw-semibold">
@@ -585,7 +585,7 @@ window.promptPermanentDeleteLead = function(id, name, phone) {
 
         // Step 2: Final Safeguard Double Confirmation
         Swal.fire({
-            title: '🔒 Double Confirmation Required',
+            title: 'Double Confirmation Required',
             html: `
                 <div class="text-start small">
                     <p class="text-dark mb-2">To prevent accidental deletion, please type the verification value below to authorize permanent destruction:</p>

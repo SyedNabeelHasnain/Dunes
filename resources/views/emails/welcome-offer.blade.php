@@ -48,7 +48,7 @@
     @endphp
     <div style="text-align: center; margin-bottom: 25px;">
         <a href="https://wa.me/{{ $whatsappNum }}?text={{ urlencode('Hi Dunes Discovery! I received my 25% discount voucher ' . $code . ' and want to reserve a tour.') }}" style="display: inline-block; color: #16a34a; text-decoration: none; font-weight: 700; font-size: 13px;">
-            <span style="display: inline-block; margin-right: 4px;">💬</span> Prefer to book via WhatsApp? Chat with our team now
+            Prefer to book via WhatsApp? Chat with our team now &rarr;
         </a>
     </div>
 

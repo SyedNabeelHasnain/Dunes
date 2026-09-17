@@ -795,21 +795,24 @@ button:focus-visible {
     border-color: var(--primary-light);
 }
 .cta-section {
-    background: linear-gradient(135deg, var(--primary) 0%, #FF9040 100%);
+    background: linear-gradient(180deg, #0F172A 0%, #0B1325 100%);
     position: relative;
     z-index: 1;
     padding: 5rem 0;
     overflow: hidden;
+    border-top: 1px solid rgba(246, 144, 68, 0.2);
 }
 .cta-section::before {
     content: '';
     position: absolute;
     top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    opacity: 0.1;
-    z-index: -1;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70%;
+    height: 100%;
+    background: radial-gradient(ellipse at 50% 0%, rgba(246, 144, 68, 0.12) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
 }
 .btn-cta-white {
     background: #ffffff;

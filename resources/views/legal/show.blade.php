@@ -163,14 +163,14 @@
             <!-- Language Switcher Pills -->
             <div class="legal-lang-switch bg-black bg-opacity-50 p-1 rounded-pill border border-white border-opacity-25 d-inline-flex flex-shrink-0 align-self-start align-self-md-center">
                 <input type="radio" class="btn-check" name="legalLang" id="langEn" autocomplete="off" checked onchange="switchLegalLanguage('en')">
-                <label class="btn btn-sm text-white rounded-pill px-3 py-1 mb-0 d-flex align-items-center gap-2" for="langEn">
-                    <span>🇬🇧</span>
+                <label class="btn btn-sm text-white rounded-pill px-3 py-1 mb-0 d-flex align-items-center gap-1.5" for="langEn">
+                    <span class="badge bg-white bg-opacity-25 rounded-pill px-1.5 py-0.5" style="font-size: 10px;">EN</span>
                     <span>English</span>
                 </label>
 
                 <input type="radio" class="btn-check" name="legalLang" id="langAr" autocomplete="off" onchange="switchLegalLanguage('ar')">
-                <label class="btn btn-sm text-white rounded-pill px-3 py-1 mb-0 d-flex align-items-center gap-2" for="langAr">
-                    <span>🇦🇪</span>
+                <label class="btn btn-sm text-white rounded-pill px-3 py-1 mb-0 d-flex align-items-center gap-1.5" for="langAr">
+                    <span class="badge bg-warning text-dark rounded-pill px-1.5 py-0.5" style="font-size: 10px;">AR</span>
                     <span>العربية</span>
                 </label>
             </div>

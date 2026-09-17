@@ -35,7 +35,7 @@ class WelcomeOfferMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "🎟️ Your 25% OFF Voucher: {$this->code} - Dunes Discovery Tourism"
+            subject: "Your 25% OFF Voucher: {$this->code} - Dunes Discovery Tourism"
         );
     }
 

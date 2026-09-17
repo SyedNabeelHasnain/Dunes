@@ -632,7 +632,7 @@
                         <div class="p-4 rounded-4 d-flex align-items-start gap-4" style="background: #1E293B; border: 1px solid rgba(255, 255, 255, 0.08);">
                             <div class="loc-timeline-dot">2</div>
                             <div>
-                                <span class="badge bg-warning text-dark fw-bold mb-2">03:45 PM – 04:15 PM</span>
+                                <span class="badge bg-warning text-dark fw-bold mb-2">03:45 PM - 04:15 PM</span>
                                 <h4 class="h5 fw-bold text-white mb-1">Desert Arrival & Quad Buggy Warm-up</h4>
                                 <p class="text-white-50 small mb-0">Arrive at our desert staging area in Lahbab. Tire pressure is adjusted for extreme sand drifting. Guests who added Quad Biking or Can-Am Maverick rentals can take their high-powered ride across the dunes.</p>
                             </div>
@@ -642,7 +642,7 @@
                         <div class="p-4 rounded-4 d-flex align-items-start gap-4" style="background: #1E293B; border: 1px solid rgba(255, 255, 255, 0.08);">
                             <div class="loc-timeline-dot">3</div>
                             <div>
-                                <span class="badge bg-warning text-dark fw-bold mb-2">04:30 PM – 05:15 PM</span>
+                                <span class="badge bg-warning text-dark fw-bold mb-2">04:30 PM - 05:15 PM</span>
                                 <h4 class="h5 fw-bold text-white mb-1">High Red Dune Bashing Adventure</h4>
                                 <p class="text-white-50 small mb-0">Experience 40 to 45 minutes of adrenaline-pumping dune bashing across the highest red sand peaks of Dubai, driven by DTCM licensed desert masters.</p>
                             </div>
@@ -652,7 +652,7 @@
                         <div class="p-4 rounded-4 d-flex align-items-start gap-4" style="background: #1E293B; border: 1px solid rgba(255, 255, 255, 0.08);">
                             <div class="loc-timeline-dot">4</div>
                             <div>
-                                <span class="badge bg-warning text-dark fw-bold mb-2">05:15 PM – 05:45 PM</span>
+                                <span class="badge bg-warning text-dark fw-bold mb-2">05:15 PM - 05:45 PM</span>
                                 <h4 class="h5 fw-bold text-white mb-1">Golden Hour Sunset Stop & Sandboarding</h4>
                                 <p class="text-white-50 small mb-0">Stop at the summit of the tallest virgin dune for panoramic sunset photos overlooking the endless desert. Grab a custom sandboard and surf down the silky dunes.</p>
                             </div>
@@ -662,7 +662,7 @@
                         <div class="p-4 rounded-4 d-flex align-items-start gap-4" style="background: #1E293B; border: 1px solid rgba(255, 255, 255, 0.08);">
                             <div class="loc-timeline-dot">5</div>
                             <div>
-                                <span class="badge bg-warning text-dark fw-bold mb-2">06:00 PM – 08:45 PM</span>
+                                <span class="badge bg-warning text-dark fw-bold mb-2">06:00 PM - 08:45 PM</span>
                                 <h4 class="h5 fw-bold text-white mb-1">Bedouin Camp, 5-Star Live BBQ & Shows</h4>
                                 <p class="text-white-50 small mb-0">Arrive at our authentic desert fortress camp. Enjoy complimentary camel riding, Arabian coffee (Gahwa), fresh dates, henna body painting, and a sumptuous 5-star live BBQ buffet accompanied by live Fire, Tanoura, and Belly Dance performances.</p>
                             </div>

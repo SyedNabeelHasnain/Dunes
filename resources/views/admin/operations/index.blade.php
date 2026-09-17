@@ -121,7 +121,7 @@
                                     $plateNum = trim($m[3]);
                                 }
 
-                                $dispatchMsg = "Hi {$b->name}! Your Dunes Discovery Tourism safari captain {$driverName} in {$plateNum} will pick you up at {$b->pickup_location} around {$pickupTime} on {$targetDate->format('M j')}. See you in the dunes! 🏜️";
+                                $dispatchMsg = "Hi {$b->name}! Your Dunes Discovery Tourism safari captain {$driverName} in {$plateNum} will pick you up at {$b->pickup_location} around {$pickupTime} on {$targetDate->format('M j')}. See you in the dunes!";
                             @endphp
                             <tr>
                                 <td class="ps-4">

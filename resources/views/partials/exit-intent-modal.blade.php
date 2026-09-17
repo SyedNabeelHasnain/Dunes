@@ -18,7 +18,9 @@
             <!-- Modal Body -->
             <div class="modal-body p-4 p-md-5 text-center position-relative z-1">
                 <div class="mb-3">
-                    <span class="display-3 d-inline-block animate-bounce" style="line-height: 1;">🏜️</span>
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-warning bg-opacity-10 p-3" style="width: 76px; height: 76px; border: 1.5px solid rgba(246, 144, 68, 0.4);">
+                        <i class="bi bi-compass fs-1 text-warning"></i>
+                    </div>
                 </div>
 
                 <h3 class="fw-800 text-white mb-2 fs-3" id="exitIntentModalLabel">

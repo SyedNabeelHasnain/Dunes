@@ -123,7 +123,7 @@
                         <div class="row g-3">
                             <div class="col-12">
                                 <label class="form-label small fw-bold text-muted text-uppercase mb-1" for="top_promo_banner_text">Banner Announcement Text</label>
-                                <input type="text" class="form-control fw-bold" id="top_promo_banner_text" name="top_promo_banner_text" value="{{ $settings->get('top_promo_banner_text', '🎟️ First-Time Visitor? Claim 25% OFF Your Desert Safari Today with Code FIRST25! • 100% Free 24h Cancellation') }}">
+                                <input type="text" class="form-control fw-bold" id="top_promo_banner_text" name="top_promo_banner_text" value="{{ $settings->get('top_promo_banner_text', 'First-Time Visitor? Claim 25% OFF Your Desert Safari Today with Code FIRST25! • 100% Free 24h Cancellation') }}">
                             </div>
 
                             <div class="col-md-6">
@@ -154,7 +154,7 @@
                         <div class="mb-4">
                             <span class="text-muted small fw-bold text-uppercase d-block mb-2">Top Banner Preview:</span>
                             <div class="p-2 rounded-3 text-white text-center small fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm" style="background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%); border-bottom: 2px solid #F58F43; font-size: 0.8rem;">
-                                <span>🎟️ Claim 25% OFF Today with Code</span>
+                                <span><i class="bi bi-tag-fill text-warning me-1"></i> Claim 25% OFF Today with Code</span>
                                 <span class="badge bg-warning text-dark font-monospace px-2 py-1">FIRST25</span>
                             </div>
                         </div>

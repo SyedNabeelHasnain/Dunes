@@ -72,7 +72,7 @@
         <p><strong>Dune Discovery will contact you to confirm the exact pickup time.</strong></p>
         <div style="text-align: center; margin: 25px 0;">
             <a href="{{ route('booking.voucher', $booking->reference) }}" target="_blank" style="background-color: #F58F43; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 50px; font-weight: bold; display: inline-block; font-size: 14px; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(245, 143, 67, 0.3);">
-                📄 View & Download E-Ticket Voucher (PDF)
+                View & Download E-Ticket Voucher (PDF)
             </a>
         </div>
     @endif

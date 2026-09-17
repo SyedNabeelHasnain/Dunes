@@ -75,7 +75,7 @@
                         <i class="bi bi-patch-check-fill me-1"></i>DET Licensed #1430583
                     </span>
                     <span class="badge bg-warning text-dark rounded-pill px-3 py-1.5 fw-bold">
-                        ⚡ Real-Time Live Pricing
+                        <i class="bi bi-lightning-charge-fill me-1"></i> Real-Time Live Pricing
                     </span>
                 </div>
                 <h1 class="display-4 fw-800 text-white mb-2">
@@ -87,7 +87,7 @@
             </div>
             <div class="d-none d-lg-block text-end flex-shrink-0">
                 <button type="button" class="btn btn-outline-warning rounded-pill px-3 py-2 fw-bold small" data-bs-toggle="modal" data-bs-target="#safariMatcherModal">
-                    <i class="bi bi-stars me-1"></i> Try Safari Matcher AI
+                    <i class="bi bi-compass me-1"></i> Try Safari Match Concierge
                 </button>
             </div>
         </div>
@@ -156,7 +156,7 @@
                         <div class="col-12 col-sm-6">
                             <div class="custom-card p-3 rounded-4 cursor-pointer transition-all h-100 selected" data-group="base" data-name="Standard Evening Safari" data-price="150" data-tour-id="1">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <span class="fs-3">🌇</span>
+                                    <span class="fs-3"><i class="bi bi-sunset fs-3 text-warning"></i></span>
                                     <span class="badge bg-warning text-dark fw-bold rounded-pill">Popular</span>
                                 </div>
                                 <h6 class="fw-bold text-dark mb-1">Sunset Evening Red Dunes</h6>
@@ -170,7 +170,7 @@
                         <div class="col-12 col-sm-6">
                             <div class="custom-card p-3 rounded-4 cursor-pointer transition-all h-100" data-group="base" data-name="VIP Luxury Evening Safari" data-price="250" data-tour-id="2">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <span class="fs-3">👑</span>
+                                    <span class="fs-3"><i class="bi bi-award fs-3 text-warning"></i></span>
                                     <span class="badge bg-dark text-warning fw-bold rounded-pill">VIP Perks</span>
                                 </div>
                                 <h6 class="fw-bold text-dark mb-1">VIP Luxury Red Dunes Safari</h6>
@@ -184,7 +184,7 @@
                         <div class="col-12 col-sm-6">
                             <div class="custom-card p-3 rounded-4 cursor-pointer transition-all h-100" data-group="base" data-name="Morning Desert Safari" data-price="120" data-tour-id="4">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <span class="fs-3">🌅</span>
+                                    <span class="fs-3"><i class="bi bi-sunrise fs-3 text-warning"></i></span>
                                     <span class="badge bg-info text-white fw-bold rounded-pill">Cooler</span>
                                 </div>
                                 <h6 class="fw-bold text-dark mb-1">Fresh Morning Desert Adventure</h6>
@@ -198,7 +198,7 @@
                         <div class="col-12 col-sm-6">
                             <div class="custom-card p-3 rounded-4 cursor-pointer transition-all h-100" data-group="base" data-name="Overnight Stargazing Safari" data-price="350" data-tour-id="5">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <span class="fs-3">🌌</span>
+                                    <span class="fs-3"><i class="bi bi-moon-stars fs-3 text-warning"></i></span>
                                     <span class="badge bg-success text-white fw-bold rounded-pill">Glamping</span>
                                 </div>
                                 <h6 class="fw-bold text-dark mb-1">Overnight Desert Camp & Stargazing</h6>
@@ -220,7 +220,7 @@
                     <div class="row g-3">
                         <div class="col-12 col-md-4">
                             <div class="custom-card p-3 rounded-4 cursor-pointer transition-all h-100 selected" data-group="transfer" data-name="Shared 4x4 Land Cruiser" data-price="0" data-type="flat">
-                                <div class="fs-3 mb-2">🚙</div>
+                                <div class="fs-3 mb-2 text-warning"><i class="bi bi-car-front-fill"></i></div>
                                 <h6 class="fw-bold text-dark mb-1">Shared 4x4 Pickup</h6>
                                 <p class="text-muted small mb-2" style="font-size: 0.8rem; line-height: 1.4;">
                                     Doorstep hotel pickup in a 6-passenger Land Cruiser shared with other friendly travelers.
@@ -231,7 +231,7 @@
 
                         <div class="col-12 col-md-4">
                             <div class="custom-card p-3 rounded-4 cursor-pointer transition-all h-100" data-group="transfer" data-name="Private 7-Seater Land Cruiser" data-price="350" data-type="flat">
-                                <div class="fs-3 mb-2">💎</div>
+                                <div class="fs-3 mb-2 text-warning"><i class="bi bi-gem"></i></div>
                                 <h6 class="fw-bold text-dark mb-1">Private 7-Seater 4x4</h6>
                                 <p class="text-muted small mb-2" style="font-size: 0.8rem; line-height: 1.4;">
                                     Exclusive Land Cruiser strictly for your party. Flexible pickup timing & customized dune drive intensity.
@@ -242,7 +242,7 @@
 
                         <div class="col-12 col-md-4">
                             <div class="custom-card p-3 rounded-4 cursor-pointer transition-all h-100" data-group="transfer" data-name="VIP Luxury SUV / Range Rover" data-price="750" data-type="flat">
-                                <div class="fs-3 mb-2">🏎️</div>
+                                <div class="fs-3 mb-2 text-warning"><i class="bi bi-speedometer2"></i></div>
                                 <h6 class="fw-bold text-dark mb-1">VIP Luxury Range Rover</h6>
                                 <p class="text-muted small mb-2" style="font-size: 0.8rem; line-height: 1.4;">
                                     Ultra-luxury VIP SUV pickup with premium chilled amenities, cold towels, and first-class chauffeur.
@@ -262,7 +262,7 @@
                     <div class="row g-3">
                         <div class="col-12 col-sm-6 col-md-3">
                             <div class="custom-card p-3 rounded-4 cursor-pointer transition-all h-100 selected" data-group="sports" data-name="No Motorized Sports" data-price="0" data-type="per_person">
-                                <div class="fs-3 mb-2">🐪</div>
+                                <div class="fs-3 mb-2 text-warning"><i class="bi bi-compass"></i></div>
                                 <h6 class="fw-bold text-dark mb-1">Scenic Only</h6>
                                 <p class="text-muted small mb-2" style="font-size: 0.78rem; line-height: 1.35;">
                                     Enjoy 4x4 dune bashing, camel riding, and sandboarding without motor sports.
@@ -273,7 +273,7 @@
 
                         <div class="col-12 col-sm-6 col-md-3">
                             <div class="custom-card p-3 rounded-4 cursor-pointer transition-all h-100" data-group="sports" data-name="30-Min 250cc Quad Biking" data-price="120" data-type="per_person">
-                                <div class="fs-3 mb-2">🏍️</div>
+                                <div class="fs-3 mb-2 text-warning"><i class="bi bi-bicycle"></i></div>
                                 <h6 class="fw-bold text-dark mb-1">30-Min 250cc Quad</h6>
                                 <p class="text-muted small mb-2" style="font-size: 0.78rem; line-height: 1.35;">
                                     Dedicated desert quad track session with helmet, goggles & guide assistance.
@@ -284,7 +284,7 @@
 
                         <div class="col-12 col-sm-6 col-md-3">
                             <div class="custom-card p-3 rounded-4 cursor-pointer transition-all h-100" data-group="sports" data-name="60-Min 400cc Quad Biking" data-price="220" data-type="per_person">
-                                <div class="fs-3 mb-2">⚡</div>
+                                <div class="fs-3 mb-2 text-warning"><i class="bi bi-lightning-charge"></i></div>
                                 <h6 class="fw-bold text-dark mb-1">60-Min 400cc Quad</h6>
                                 <p class="text-muted small mb-2" style="font-size: 0.78rem; line-height: 1.35;">
                                     Open red dunes exploration with high-power Yamaha 400cc automatic ATV.
@@ -295,7 +295,7 @@
 
                         <div class="col-12 col-sm-6 col-md-3">
                             <div class="custom-card p-3 rounded-4 cursor-pointer transition-all h-100" data-group="sports" data-name="1000cc Can-Am Buggy (2-Seater)" data-price="550" data-type="flat">
-                                <div class="fs-3 mb-2">🏎️</div>
+                                <div class="fs-3 mb-2 text-warning"><i class="bi bi-speedometer2"></i></div>
                                 <h6 class="fw-bold text-dark mb-1">1000cc Can-Am Buggy</h6>
                                 <p class="text-muted small mb-2" style="font-size: 0.78rem; line-height: 1.35;">
                                     2-Seater Can-Am Maverick Turbo buggy with roll cage & 4-point racing harness.
@@ -428,7 +428,7 @@
                     
                     <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-white border-opacity-10">
                         <div class="d-flex align-items-center gap-2">
-                            <span class="fs-4">🧾</span>
+                            <span class="fs-4 text-warning"><i class="bi bi-receipt"></i></span>
                             <div>
                                 <h5 class="fw-800 text-white mb-0 fs-6">Custom Safari Spec</h5>
                                 <small class="text-white-50" style="font-size: 11px;">Live Calculation</small>
