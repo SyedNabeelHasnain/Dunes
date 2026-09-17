@@ -41,6 +41,9 @@ Route::prefix('v1')->group(function () {
     // WhatsApp lead logging
     Route::post('/whatsapp/log', [PageController::class, 'logWhatsapp'])->middleware('throttle:20,1');
 
+    // Public Newsletter & Marketing Subscription
+    Route::post('/subscribers/subscribe', [\App\Http\Controllers\SubscriberController::class, 'subscribe'])->middleware('throttle:10,1');
+
     // Admin Real-time Active Visitors tracking
     Route::middleware('auth:sanctum')->get('/visitors/active', [AdminDashboardController::class, 'activeVisitors']);
 });

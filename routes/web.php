@@ -19,6 +19,12 @@ use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\AdminWhatsappController;
 use App\Http\Controllers\Admin\AdminLegalController;
 use App\Http\Controllers\Admin\AdminCouponController;
+use App\Http\Controllers\SubscriberController;
+use App\Http\Controllers\Admin\AdminSubscriberController;
+use App\Http\Controllers\Admin\AdminSubscriberGroupController;
+use App\Http\Controllers\Admin\AdminEmailTemplateController;
+use App\Http\Controllers\Admin\AdminEmailCampaignController;
+use App\Http\Controllers\Admin\AdminMailSettingController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AjaxGatewayController;
 
@@ -175,6 +181,30 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/settings/sync-currency', [AdminSettingController::class, 'syncExchangeRates'])->name('settings.sync-currency');
     Route::post('/clear-cache', [AdminSettingController::class, 'clearCache'])->name('clear-cache');
     Route::post('/run-migrations', [AdminSettingController::class, 'runMigrations'])->name('run-migrations');
+
+    // ── Email Marketing: Subscribers & Audience Lists ───────────────────────
+    Route::get('/subscribers/export', [AdminSubscriberController::class, 'exportCsv'])->name('subscribers.export');
+    Route::post('/subscribers/import', [AdminSubscriberController::class, 'importCsv'])->name('subscribers.import');
+    Route::post('/subscribers/bulk', [AdminSubscriberController::class, 'bulkAction'])->name('subscribers.bulk');
+    Route::post('/subscribers/{id}/toggle-status', [AdminSubscriberController::class, 'toggleStatus'])->name('subscribers.toggle-status');
+    Route::resource('subscribers', AdminSubscriberController::class);
+
+    // ── Email Marketing: Audience Groups / Segments ─────────────────────────
+    Route::resource('subscriber-groups', AdminSubscriberGroupController::class);
+
+    // ── Email Marketing: Responsive Templates ───────────────────────────────
+    Route::get('/email-templates/{id}/preview', [AdminEmailTemplateController::class, 'preview'])->name('email-templates.preview');
+    Route::resource('email-templates', AdminEmailTemplateController::class);
+
+    // ── Email Marketing: Campaigns & Analytics ──────────────────────────────
+    Route::post('/campaigns/{id}/send', [AdminEmailCampaignController::class, 'send'])->name('campaigns.send');
+    Route::post('/campaigns/{id}/send-test', [AdminEmailCampaignController::class, 'sendTest'])->name('campaigns.send-test');
+    Route::resource('campaigns', AdminEmailCampaignController::class);
+
+    // ── Mailer & SMTP Server Settings ───────────────────────────────────────
+    Route::get('/settings/mail', [AdminMailSettingController::class, 'index'])->name('settings.mail');
+    Route::post('/settings/mail', [AdminMailSettingController::class, 'update'])->name('settings.mail.update');
+    Route::post('/settings/mail/test', [AdminMailSettingController::class, 'testConnection'])->name('settings.mail.test');
 });
 
 // ── Profile routes (Breeze default) ──────────────────────────────────────────
@@ -188,6 +218,12 @@ require __DIR__.'/auth.php';
 
 // ── Legacy AJAX Gateway Route (Throttled for Security) ───────────────────────
 Route::match(['get', 'post'], '/ajax.php', [AjaxGatewayController::class, 'handle'])->middleware('throttle:60,1');
+
+// ── Email Marketing Tracking & Unsubscribe ──────────────────────────────────
+Route::get('/email/track/open/{token}.gif', [SubscriberController::class, 'trackOpen'])->name('email.track.open');
+Route::get('/email/track/click/{token}', [SubscriberController::class, 'trackClick'])->name('email.track.click');
+Route::get('/unsubscribe/{token}', [SubscriberController::class, 'unsubscribe'])->name('unsubscribe');
+Route::post('/unsubscribe/{token}', [SubscriberController::class, 'processUnsubscribe'])->name('unsubscribe.submit');
 
 // ── Dynamic XML Sitemap & Image Sitemap ──────────────────────────────────────
 Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');

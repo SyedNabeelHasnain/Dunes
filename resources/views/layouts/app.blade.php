@@ -416,6 +416,9 @@
         @yield('content')
     </main>
 
+    <!-- Newsletter Subscription Section -->
+    @include('partials.newsletter-subscription')
+
     <!-- Footer Section -->
     <footer class="footer bg-dark text-white pt-5 pb-4">
         <div class="container">

@@ -357,6 +357,20 @@
                 <i class="bi bi-shield-check"></i> <span>Legal Policies</span>
             </a>
 
+            <div class="sidebar-heading">Email Marketing</div>
+            <a href="{{ route('admin.subscribers.index') }}" class="sidebar-link {{ request()->routeIs('admin.subscribers*') ? 'active' : '' }}">
+                <i class="bi bi-people-fill text-primary"></i> <span>Subscribers & Lists</span>
+            </a>
+            <a href="{{ route('admin.subscriber-groups.index') }}" class="sidebar-link {{ request()->routeIs('admin.subscriber-groups*') ? 'active' : '' }}">
+                <i class="bi bi-diagram-3-fill text-info"></i> <span>Subscriber Groups</span>
+            </a>
+            <a href="{{ route('admin.email-templates.index') }}" class="sidebar-link {{ request()->routeIs('admin.email-templates*') ? 'active' : '' }}">
+                <i class="bi bi-envelope-paper-heart-fill text-danger"></i> <span>Email Templates</span>
+            </a>
+            <a href="{{ route('admin.campaigns.index') }}" class="sidebar-link {{ request()->routeIs('admin.campaigns*') ? 'active' : '' }}">
+                <i class="bi bi-megaphone-fill text-warning"></i> <span>Campaigns & Analytics</span>
+            </a>
+
             <div class="sidebar-heading">Portal Settings & SEO</div>
             <a href="{{ route('admin.settings.general') }}" class="sidebar-link {{ request()->routeIs('admin.settings.general*') ? 'active' : '' }}">
                 <i class="bi bi-sliders text-warning"></i> <span>General Identity</span>
@@ -366,6 +380,9 @@
             </a>
             <a href="{{ route('admin.settings.marketing') }}" class="sidebar-link {{ request()->routeIs('admin.settings.marketing*') ? 'active' : '' }}">
                 <i class="bi bi-megaphone text-danger"></i> <span>Marketing & Promos</span>
+            </a>
+            <a href="{{ route('admin.settings.mail') }}" class="sidebar-link {{ request()->routeIs('admin.settings.mail*') ? 'active' : '' }}">
+                <i class="bi bi-envelope-gear text-primary"></i> <span>SMTP & Mailer</span>
             </a>
             <a href="{{ route('admin.settings.google') }}" class="sidebar-link {{ request()->routeIs('admin.settings.google*') ? 'active' : '' }}">
                 <i class="bi bi-google text-danger"></i> <span>Google Integrations</span>

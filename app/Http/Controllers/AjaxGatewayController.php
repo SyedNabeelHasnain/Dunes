@@ -120,6 +120,10 @@ class AjaxGatewayController extends Controller
             case 'social_proof':
                 return $this->getSocialProof();
 
+            case 'subscribe_newsletter':
+            case 'subscribe':
+                return app(\App\Http\Controllers\SubscriberController::class)->subscribe($request);
+
             default:
                 return response()->json(['error' => 'Invalid action'], 400);
         }

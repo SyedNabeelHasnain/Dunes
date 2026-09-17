@@ -290,6 +290,12 @@
                                         I agree to the <a href="{{ route('terms') }}" target="_blank" class="legal-link">Terms & Conditions</a> and <a href="{{ route('privacy') }}" target="_blank" class="legal-link">Privacy Policy</a>.
                                     </label>
                                 </div>
+                                <div class="legal-agreement-wrapper mt-2">
+                                    <input class="form-check-input desert-checkbox border-primary" type="checkbox" id="bookingNewsletter" name="subscribe_newsletter" value="1" checked>
+                                    <label class="legal-agreement-text text-muted small" for="bookingNewsletter">
+                                        Keep me updated with exclusive desert safari deals, seasonal discounts & travel guides.
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>

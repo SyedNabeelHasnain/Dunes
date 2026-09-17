@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use App\Models\Coupon;
 use App\Models\CouponUsage;
+use App\Models\Subscriber;
+use App\Models\SubscriberGroup;
 use App\Mail\BookingNotification;
 use App\Mail\BookingAdminNotification;
 use App\Services\SettingsService;
@@ -294,6 +296,38 @@ class BookingController extends Controller
             $logId = $this->tracker->logRequest('booking', $booking->id, 'booking', $ctx);
             if ($logId) {
                 $booking->update(['request_log_id' => $logId]);
+            }
+
+            // Auto-subscribe guest to newsletter if consent given
+            if ($request->boolean('subscribe_newsletter') || $request->input('subscribe_newsletter') == '1') {
+                try {
+                    $parts = preg_split('/\s+/', trim((string)$name), 2);
+                    $subFirstName = $parts[0] ?? '';
+                    $subLastName = $parts[1] ?? '';
+
+                    $subscriber = Subscriber::firstOrNew(['email' => strtolower(trim((string)$email))]);
+                    if (!$subscriber->exists) {
+                        $subscriber->first_name = $subFirstName;
+                        $subscriber->last_name = $subLastName;
+                        $subscriber->phone = $phone;
+                        $subscriber->source = 'checkout';
+                        $subscriber->status = 'subscribed';
+                        $subscriber->save();
+                    } else {
+                        if (empty($subscriber->first_name)) $subscriber->first_name = $subFirstName;
+                        if (empty($subscriber->last_name)) $subscriber->last_name = $subLastName;
+                        if (empty($subscriber->phone)) $subscriber->phone = $phone;
+                        $subscriber->save();
+                    }
+
+                    // Attach to Booked Guests group
+                    $bookedGroup = SubscriberGroup::where('slug', 'booked-guests')->first();
+                    if ($bookedGroup && !$subscriber->groups()->where('subscriber_groups.id', $bookedGroup->id)->exists()) {
+                        $subscriber->groups()->attach($bookedGroup->id);
+                    }
+                } catch (\Throwable $e) {
+                    Log::warning("Newsletter auto-subscription on checkout failed: " . $e->getMessage());
+                }
             }
 
             // Cash checkout is complete instantly
