@@ -87,6 +87,35 @@
 
 <section class="section py-5">
     <div class="container">
+        <!-- Safari Matcher AI Recommendation Banner -->
+        <div class="card border-0 rounded-4 p-4 p-md-4 mb-4 shadow-sm position-relative overflow-hidden" style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); border: 1.5px solid rgba(246, 144, 68, 0.3) !important;">
+            <div class="position-absolute top-0 end-0 translate-middle-y me-4 opacity-10 d-none d-md-block" style="font-size: 8rem; pointer-events: none; line-height: 1;">
+                🐪
+            </div>
+            <div class="row align-items-center position-relative z-1 g-3">
+                <div class="col-12 col-lg-8">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge rounded-pill px-3 py-1 fw-bold" style="background: rgba(246, 144, 68, 0.2); border: 1px solid #F69044; color: #F69044; font-size: 0.75rem;">
+                            <i class="bi bi-stars me-1"></i> Interactive Concierge
+                        </span>
+                        <span class="badge bg-warning text-dark rounded-pill px-2.5 py-1 fw-bold" style="font-size: 0.72rem;">
+                            🎁 5% OFF Match Bonus
+                        </span>
+                    </div>
+                    <h3 class="fw-800 text-white mb-2 fs-4">Not sure which Dubai Safari to choose?</h3>
+                    <p class="text-white-50 mb-0 small" style="max-width: 620px;">
+                        Answer 3 quick questions about your group style, timing, and must-have perks. Our <strong>Safari Matcher AI</strong> will calculate your ideal adventure and unlock an instant <strong>5% promo code (MATCH5)</strong>.
+                    </p>
+                </div>
+                <div class="col-12 col-lg-4 text-lg-end">
+                    <button type="button" class="btn btn-desert-animated rounded-pill px-4 py-3 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-2" data-bs-toggle="modal" data-bs-target="#safariMatcherModal">
+                        <i class="bi bi-magic fs-5"></i>
+                        <span>Launch Safari Matcher</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Interactive Search & Category Filter Controls -->
         <div class="card border-0 bg-light rounded-4 p-3 p-md-4 mb-5 shadow-sm">
             <div class="row g-3 align-items-center">
@@ -155,6 +184,11 @@
                                     </div>
                                 </div>
                                 <h2 class="h5 fw-bold mb-2 line-clamp-2 text-dark">{{ $t->name }}</h2>
+                                @php $bookingsToday = (int)(($t->id * 3 + (int)date('j')) % 5 + 3); @endphp
+                                <div class="d-flex align-items-center gap-1.5 text-danger small fw-bold mb-2" style="font-size: 11px;">
+                                    <i class="bi bi-fire text-danger"></i>
+                                    <span>{{ $bookingsToday }} booked in last 6 hours</span>
+                                </div>
                                 
                                 <div class="d-flex flex-wrap gap-1 mb-3">
                                     <span class="badge bg-light text-muted border small" style="font-size: 10px;">

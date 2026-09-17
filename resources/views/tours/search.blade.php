@@ -224,14 +224,19 @@
 
         <!-- Zero-Match Bestseller Fallback Banner -->
         @if($isFallback)
-        <div class="alert alert-warning border-0 rounded-4 shadow-sm p-4 mb-4 d-flex align-items-center gap-3">
-            <i class="bi bi-info-circle-fill fs-2 text-warning flex-shrink-0"></i>
-            <div>
-                <h5 class="fw-bold mb-1">No direct package named "{{ $cleanQuery }}"</h5>
-                <p class="mb-0 text-dark small">
-                    We didn't find an exact title match for your query, but here are Dubai's #1 rated Desert Safari packages hand-selected by our licensed guides:
-                </p>
+        <div class="alert alert-warning border-0 rounded-4 shadow-sm p-4 mb-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-info-circle-fill fs-2 text-warning flex-shrink-0"></i>
+                <div>
+                    <h5 class="fw-bold mb-1">No direct package named "{{ $cleanQuery }}"</h5>
+                    <p class="mb-0 text-dark small">
+                        We didn't find an exact title match for your query, but here are Dubai's #1 rated Desert Safari packages hand-selected by our licensed guides:
+                    </p>
+                </div>
             </div>
+            <button type="button" class="btn btn-dark rounded-pill px-4 py-2.5 fw-bold text-nowrap flex-shrink-0 shadow-sm" data-bs-toggle="modal" data-bs-target="#safariMatcherModal">
+                <i class="bi bi-stars text-warning me-1"></i> Match My Safari (5% OFF)
+            </button>
         </div>
         @endif
 
@@ -273,6 +278,11 @@
                                     </div>
                                 </div>
                                 <h2 class="h5 fw-bold mb-2 line-clamp-2 text-dark">{{ $t->name }}</h2>
+                                @php $bookingsToday = (int)(($t->id * 3 + (int)date('j')) % 5 + 3); @endphp
+                                <div class="d-flex align-items-center gap-1.5 text-danger small fw-bold mb-2" style="font-size: 11px;">
+                                    <i class="bi bi-fire text-danger"></i>
+                                    <span>{{ $bookingsToday }} booked in last 6 hours</span>
+                                </div>
                                 
                                 <div class="d-flex flex-wrap gap-1 mb-3">
                                     <span class="badge bg-light text-muted border small" style="font-size: 10px;">

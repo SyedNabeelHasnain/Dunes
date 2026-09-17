@@ -394,10 +394,28 @@
                     </div>
                     <div class="offcanvas-body p-4 p-lg-0">
                         <div class="d-lg-none mb-3">
-                            <form action="{{ route('tours.search') }}" method="GET" class="position-relative">
+                            <form action="{{ route('tours.search') }}" method="GET" class="position-relative mb-2">
                                 <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
                                 <input type="text" name="q" class="form-control rounded-pill ps-5 pe-4 py-2 bg-light border-0 small" placeholder="Search safaris, buggies, VIP..." required>
                             </form>
+                            <div class="d-grid gap-2 mb-2">
+                                <button type="button" class="btn btn-dark w-100 rounded-pill py-2.5 px-3 d-flex align-items-center justify-content-between text-start border border-warning border-opacity-25 shadow-sm" data-bs-toggle="modal" data-bs-target="#safariMatcherModal" data-bs-dismiss="offcanvas" style="background: linear-gradient(135deg, #1E293B, #0F172A);">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="text-warning fs-5">✨</span>
+                                        <div>
+                                            <div class="fw-bold text-white small lh-1">Safari Matcher AI</div>
+                                            <small class="text-white-50" style="font-size: 11px;">Find ideal tour in 30 seconds</small>
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-warning text-dark rounded-pill px-2 py-1 fw-bold" style="font-size: 10px;">5% OFF</span>
+                                </button>
+                                <a href="{{ route('tours.customizer') }}" class="btn btn-light w-100 rounded-pill py-2 px-3 d-flex align-items-center justify-content-between text-start border small fw-bold text-dark">
+                                    <span class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-sliders text-primary"></i> Build Your Own Safari
+                                    </span>
+                                    <i class="bi bi-chevron-right text-muted small"></i>
+                                </a>
+                            </div>
                         </div>
                         <ul class="navbar-nav mx-auto mb-4 mb-lg-0 gap-lg-1 text-nowrap">
                             <li class="nav-item">
@@ -410,8 +428,10 @@
                                         <span class="visually-hidden">Toggle Dropdown</span>
                                     </a>
                                     <ul class="dropdown-menu border-0 shadow-lg rounded-4 overflow-hidden p-0 mt-2 dropdown-animated-border">
+                                        <li><a class="dropdown-item py-2.5 fw-bold text-primary" href="{{ route('tours.customizer') }}"><i class="bi bi-sliders me-1.5 text-warning"></i> Build Your Own Safari</a></li>
+                                        <li><hr class="dropdown-divider my-0"></li>
                                         @foreach($allTours as $t)
-                                        <li><a class="dropdown-item rounded-0 py-3 position-relative animated-divider-item" href="{{ route('tours.show', $t->slug) }}">{{ $t->name }}</a></li>
+                                        <li><a class="dropdown-item rounded-0 py-2.5 position-relative animated-divider-item" href="{{ route('tours.show', $t->slug) }}">{{ $t->name }}</a></li>
                                         @endforeach
                                     </ul>
                                 </div>
@@ -430,6 +450,11 @@
                             </li>
                         </ul>
                         <div class="d-flex flex-column flex-lg-row gap-2 gap-xl-3 align-items-stretch align-items-lg-center">
+                            <button type="button" class="btn btn-outline-warning rounded-pill px-3 py-1.5 d-none d-xl-inline-flex align-items-center gap-1.5 small shadow-none hover-shadow-sm transition-all" data-bs-toggle="modal" data-bs-target="#safariMatcherModal" style="font-size: 0.82rem; border-color: rgba(246, 144, 68, 0.45); color: #F69044;" aria-label="Safari Matcher AI">
+                                <i class="bi bi-stars text-warning"></i>
+                                <span class="fw-bold">Safari Matcher</span>
+                                <span class="badge bg-warning text-dark rounded-pill px-1.5 py-0.5" style="font-size: 9px;">5% OFF</span>
+                            </button>
                             <button type="button" class="btn btn-white border rounded-pill px-3 py-1.5 d-none d-lg-inline-flex align-items-center gap-2 small text-muted shadow-none hover-shadow-sm transition-all" data-bs-toggle="modal" data-bs-target="#globalSearchModal" style="font-size: 0.82rem;" aria-label="Search Dubai tours">
                                 <i class="bi bi-search text-primary"></i>
                                 <span>Search tours...</span>
@@ -697,6 +722,9 @@
     @include('partials.social-proof')
     @include('partials.comparison-drawer')
     @include('partials.search-modal')
+    @include('partials.safari-matcher-modal')
+    @include('partials.exit-intent-modal')
+    @include('partials.custom-safari-modal')
 
     <!-- Global Toast Container for App.toast notifications -->
     <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1090;" aria-live="polite" aria-atomic="true"></div>

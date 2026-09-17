@@ -127,6 +127,15 @@
                         </div>
 
                         <div class="card bg-light border-0 rounded-4 p-3 p-md-4 mb-4">
+                            <!-- Unlocked Reward Badge -->
+                            <div class="p-2.5 rounded-3 mb-3 bg-warning-subtle text-dark border border-warning border-opacity-50 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="fs-5">🎉</span>
+                                    <span class="small fw-bold">5% Matcher Promo Unlocked: <span class="font-monospace text-primary fw-800">MATCH5</span></span>
+                                </div>
+                                <span class="badge bg-dark text-warning rounded-pill px-2 py-1 small">Auto-Applies at Checkout</span>
+                            </div>
+
                             <div class="row align-items-center g-3">
                                 <div class="col-md-7">
                                     <div class="d-flex align-items-center gap-2 mb-2">
@@ -143,7 +152,7 @@
                                     <div class="small text-muted text-uppercase fw-bold">Starting From</div>
                                     <div class="h2 fw-800 text-primary mb-2" id="quizMatchedPrice">--</div>
                                     <button type="button" class="btn btn-primary rounded-pill px-4 py-2 fw-800 text-white shadow-sm w-100" id="quizBookBtn">
-                                        <i class="bi bi-lightning-charge-fill me-1"></i> Book This Tour
+                                        <i class="bi bi-lightning-charge-fill me-1"></i> Book with 5% OFF
                                     </button>
                                 </div>
                             </div>

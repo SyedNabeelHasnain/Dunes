@@ -508,4 +508,21 @@ class TourController extends Controller
             'verified_note' => "All tours operated by Dunes Discovery Tourism LLC are licensed by the Dubai Department of Economy and Tourism (DET License #1430583) and include 24-hour free cancellation and instant confirmation."
         ];
     }
+
+    /**
+     * Display the interactive Build Your Own Safari Customizer.
+     */
+    public function customizer(Request $request)
+    {
+        $allTours = Tour::where('status', 'active')->with(['tiers', 'addons'])->orderBy('priority', 'asc')->get();
+        $categories = Category::orderBy('priority', 'asc')->get();
+
+        $pageTitle = "Build Your Own Dubai Desert Safari (Customizer 2026) | Dunes Discovery";
+        $pageDesc = "Customize your bespoke Dubai desert safari experience. Configure private Land Cruisers, 1000cc Can-Am buggies, 400cc quad bikes, and VIP waiter table service with live real-time pricing.";
+        $pageKeys = "custom desert safari dubai, build your own safari dubai, bespoke desert safari, private land cruiser safari, vip desert safari customizer";
+        $canonical = route('tours.customizer');
+        $ogImage = asset('images/desert-safari-poster.avif');
+
+        return view('tours.customizer', compact('allTours', 'categories', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
+    }
 }

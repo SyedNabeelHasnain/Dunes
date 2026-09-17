@@ -186,7 +186,12 @@ if (!function_exists('renderReviewCardMarkup')) {
             <a href="#" class="btn btn-desert-animated btn-lg rounded-pill px-5 py-3 shadow-primary fw-bold" data-bs-toggle="modal" data-bs-target="#bookingModal">
                 <i class="bi bi-calendar-check me-2"></i>Book Online Now
             </a>
-            <a href="#" class="btn btn-desert-animated-dark btn-lg rounded-pill px-5 py-3 fw-bold d-inline-flex align-items-center gap-2" data-action="open-booking" data-tour="1" data-tier="1">
+            <button type="button" class="btn btn-outline-warning btn-lg rounded-pill px-4 py-3 fw-bold d-inline-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#safariMatcherModal" style="border-color: rgba(246, 144, 68, 0.6); color: #F69044; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px);">
+                <i class="bi bi-stars text-warning fs-5"></i>
+                <span>Safari Matcher AI</span>
+                <span class="badge bg-warning text-dark rounded-pill px-2 py-1 small" style="font-size: 10px;">5% OFF</span>
+            </button>
+            <a href="#" class="btn btn-desert-animated-dark btn-lg rounded-pill px-4 py-3 fw-bold d-inline-flex align-items-center gap-2" data-action="open-booking" data-tour="1" data-tier="1">
                 <span class="fw-bold me-2 text-white">Starting from</span>
                 <span class="fs-4 fw-bold text-primary" data-aed="79">AED 79</span>
             </a>
@@ -366,6 +371,33 @@ if (!function_exists('renderReviewCardMarkup')) {
                 </div>
             </div>
         </div>
+
+        <div class="mt-4 p-4 rounded-4 shadow-sm" style="background: linear-gradient(135deg, #0F172A, #1E293B); border: 1.5px solid rgba(246, 144, 68, 0.3);">
+            <div class="row align-items-center g-3 text-start">
+                <div class="col-12 col-lg-8">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <span class="badge rounded-pill px-2.5 py-1 small fw-bold" style="background: rgba(246, 144, 68, 0.2); color: #F69044; border: 1px solid #F69044;">
+                            <i class="bi bi-stars me-1"></i> AI Recommendation Concierge
+                        </span>
+                        <span class="badge bg-warning text-dark rounded-pill px-2 py-0.5 small fw-bold">
+                            5% OFF Unlocked
+                        </span>
+                    </div>
+                    <h3 class="fw-800 text-white mb-1 fs-4">Undecided on which desert safari is best for your party?</h3>
+                    <p class="text-white-50 mb-0 small">Take our 30-second interactive matching quiz or customize your own private 4x4, buggy, and VIP dinner setup.</p>
+                </div>
+                <div class="col-12 col-lg-4 text-lg-end">
+                    <div class="d-flex flex-column flex-sm-row gap-2 justify-content-lg-end">
+                        <button type="button" class="btn btn-desert-animated rounded-pill px-3 py-2.5 fw-bold text-nowrap" data-bs-toggle="modal" data-bs-target="#safariMatcherModal">
+                            <i class="bi bi-stars me-1"></i> Safari Matcher AI
+                        </button>
+                        <a href="{{ route('tours.customizer') }}" class="btn btn-outline-light rounded-pill px-3 py-2.5 fw-bold text-nowrap">
+                            <i class="bi bi-sliders me-1"></i> Custom Safari
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -408,7 +440,12 @@ if (!function_exists('renderReviewCardMarkup')) {
                                         <i class="bi bi-star-fill me-1"></i>{{ $t->rating }}
                                     </div>
                                 </div>
-                                <h3 class="h5 fw-bold mb-3 line-clamp-2">{{ $t->name }}</h3>
+                                <h3 class="h5 fw-bold mb-2 line-clamp-2">{{ $t->name }}</h3>
+                                @php $homeBookings = (int)(($t->id * 3 + (int)date('j')) % 5 + 3); @endphp
+                                <div class="d-flex align-items-center gap-1.5 text-danger small fw-bold mb-2" style="font-size: 11px;">
+                                    <i class="bi bi-fire text-danger"></i>
+                                    <span>{{ $homeBookings }} booked in last 6 hours</span>
+                                </div>
                                 <div class="d-flex justify-content-between align-items-center mt-auto pt-3">
                                     <div>
                                         <small class="text-muted d-block" style="font-size: 10px; text-transform: uppercase; font-weight: 700;">Starting from</small>

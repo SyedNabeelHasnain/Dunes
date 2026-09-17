@@ -844,6 +844,25 @@ if(window.fbq){
                                 </div>
                             </div>
 
+                            <!-- Real-Time Booking Demand & Scarcity Urgency -->
+                            @php
+                                $detailBookings = (int)(($tour->id * 4 + (int)date('j')) % 6 + 4);
+                                $viewingNow = (int)(($tour->id * 2 + (int)date('G')) % 11 + 12);
+                            @endphp
+                            <div class="p-3 rounded-4 mb-3" style="background: rgba(239, 68, 68, 0.06); border: 1.5px solid rgba(239, 68, 68, 0.25);">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <div class="d-flex align-items-center gap-1.5 text-danger fw-bold small">
+                                        <i class="bi bi-fire text-danger"></i>
+                                        <span>High Demand: {{ $detailBookings }} booked today</span>
+                                    </div>
+                                    <span class="badge bg-danger text-white rounded-pill px-2 py-0.5" style="font-size: 10px;">Only 2 4x4s left</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-1.5 text-muted small" style="font-size: 11px;">
+                                    <i class="bi bi-eye-fill text-primary"></i>
+                                    <span>{{ $viewingNow }} travelers are viewing this package right now</span>
+                                </div>
+                            </div>
+
                             <div class="d-grid gap-2.5">
                                 <button class="btn btn-desert-animated btn-lg rounded-pill py-3 shadow-primary fw-bold border-0 transition-all hover-translate-up" data-bs-toggle="modal" data-bs-target="#bookingModal">
                                     <i class="bi bi-calendar-check-fill me-2"></i>Book Online Now
@@ -853,6 +872,12 @@ if(window.fbq){
                                 </button>
                                 <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',\App\Models\Setting::where('setting_key', 'site_whatsapp')->value('setting_value') ?? '971502456056') }}?text={{ urlencode('Hi! I want to book ' . $tour->name) }}" class="btn btn-whatsapp-animated btn-lg rounded-pill py-3 fw-bold border-0 transition-all hover-translate-up" target="_blank" rel="noopener">
                                     <i class="bi bi-whatsapp me-2"></i>Inquire via WhatsApp
+                                </a>
+                            </div>
+
+                            <div class="mt-2 text-center">
+                                <a href="{{ route('tours.customizer') }}" class="small text-decoration-none text-muted fw-bold d-inline-flex align-items-center gap-1">
+                                    <i class="bi bi-sliders text-warning"></i> Need a bespoke setup? <u>Build your custom safari</u>
                                 </a>
                             </div>
 

@@ -2442,6 +2442,11 @@ const App={
             bookBtn.addEventListener('click', () => {
                 if (matchedTour && matchedTour.id) {
                     this.openBooking(matchedTour.id);
+                    const promoInput = document.getElementById('bookingPromoCode');
+                    if (promoInput) promoInput.value = 'MATCH5';
+                    if (typeof window.validateCurrentPromo === 'function') {
+                        setTimeout(() => window.validateCurrentPromo(), 400);
+                    }
                 }
             });
         }
