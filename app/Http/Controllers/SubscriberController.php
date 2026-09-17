@@ -86,7 +86,7 @@ class SubscriberController extends Controller
 
         // Auto-assign to default General Newsletter group
         $defaultGroup = SubscriberGroup::where('slug', 'general-newsletter')->first();
-        if ($defaultGroup && !$subscriber->groups()->where('group_id', $defaultGroup->id)->exists()) {
+        if ($defaultGroup && !$subscriber->groups()->where('subscriber_groups.id', $defaultGroup->id)->exists()) {
             $subscriber->groups()->attach($defaultGroup->id);
         }
 

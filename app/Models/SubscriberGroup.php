@@ -39,8 +39,7 @@ class SubscriberGroup extends Model
      */
     public function subscribers(): BelongsToMany
     {
-        return $this->belongsToMany(Subscriber::class, 'subscriber_group_pivot', 'group_id', 'subscriber_id')
-            ->withTimestamps();
+        return $this->belongsToMany(Subscriber::class, 'subscriber_group_pivot', 'group_id', 'subscriber_id');
     }
 
     /**
