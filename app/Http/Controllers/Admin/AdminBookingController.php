@@ -10,6 +10,7 @@ use App\Models\Coupon;
 use App\Models\CouponUsage;
 use App\Models\Review;
 use App\Models\RequestLog;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
@@ -60,9 +61,14 @@ class AdminBookingController extends Controller
             $query->whereDate('tour_date', '<=', $toDate);
         }
 
-        $revenue = (float)Booking::whereIn('status', ['confirmed', 'completed'])->sum('payment_amount');
-        $confirmedCount = Booking::whereIn('status', ['confirmed', 'completed'])->count();
-        $avgOrderValue = $confirmedCount > 0 ? round($revenue / $confirmedCount, 2) : 0;
+        $revenue = (float) Booking::whereIn('status', ['confirmed', 'completed'])
+            ->whereIn('payment_status', ['paid', 'partial'])
+            ->sum(DB::raw("CASE WHEN payment_amount > 0 THEN payment_amount ELSE (CASE WHEN payment_status = 'paid' THEN total ELSE 0 END) END"));
+
+        $paidCount = Booking::whereIn('status', ['confirmed', 'completed'])
+            ->whereIn('payment_status', ['paid', 'partial'])
+            ->count();
+        $avgOrderValue = $paidCount > 0 ? round($revenue / $paidCount, 2) : 0;
         $addonsRevenue = (float)Booking::whereIn('status', ['confirmed', 'completed'])->sum('addons_total');
 
         $stats = [
@@ -567,6 +573,40 @@ class AdminBookingController extends Controller
             ]);
 
         return $pdf->download('Dunes-Voucher-' . $booking->reference . '.pdf');
+    }
+
+    /**
+     * Real-time JSON endpoint for live Bookings KPI refresh without stale cache.
+     */
+    public function liveStats(Request $request): JsonResponse
+    {
+        $revenue = (float) Booking::whereIn('status', ['confirmed', 'completed'])
+            ->whereIn('payment_status', ['paid', 'partial'])
+            ->sum(DB::raw("CASE WHEN payment_amount > 0 THEN payment_amount ELSE (CASE WHEN payment_status = 'paid' THEN total ELSE 0 END) END"));
+
+        $paidCount = Booking::whereIn('status', ['confirmed', 'completed'])
+            ->whereIn('payment_status', ['paid', 'partial'])
+            ->count();
+        $avgOrderValue = $paidCount > 0 ? round($revenue / $paidCount, 2) : 0;
+        $addonsRevenue = (float)Booking::whereIn('status', ['confirmed', 'completed'])->sum('addons_total');
+
+        $stats = [
+            'total' => Booking::where('status', '!=', 'draft')->count(),
+            'pending' => Booking::where('status', 'pending')->count(),
+            'confirmed' => Booking::where('status', 'confirmed')->count(),
+            'completed' => Booking::where('status', 'completed')->count(),
+            'confirmed_and_completed' => Booking::whereIn('status', ['confirmed', 'completed'])->count(),
+            'drafts' => Booking::where('status', 'draft')->count(),
+            'addons_revenue' => $addonsRevenue,
+            'revenue' => $revenue,
+            'aov' => $avgOrderValue,
+            'timestamp' => now()->toIso8601String(),
+        ];
+
+        return response()->json([
+            'success' => true,
+            'stats' => $stats,
+        ]);
     }
 }
 

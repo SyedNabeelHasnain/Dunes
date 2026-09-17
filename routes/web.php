@@ -86,12 +86,14 @@ Route::get('/review/{ref}', [PageController::class, 'reviewRate'])->name('review
 Route::post('/review/{ref}', [PageController::class, 'submitReview'])->name('review.submit');
 Route::post('/review/{ref}/feedback', [PageController::class, 'submitFeedback'])->name('review.feedback');
 
-// ── Admin CMS Panel (Guarded by auth) ──────────────────────────────────────────
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+// ── Admin CMS Panel (Guarded by auth & strict no-cache headers) ──────────────
+Route::middleware(['auth', \App\Http\Middleware\AdminNoCacheMiddleware::class])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard.alias');
     Route::get('/analytics', [AdminDashboardController::class, 'analytics'])->name('analytics.index');
     Route::get('/active-visitors', [AdminDashboardController::class, 'activeVisitors'])->name('active-visitors');
+    Route::get('/api/kpis', [AdminDashboardController::class, 'liveKpis'])->name('api.kpis');
+    Route::get('/api/bookings-stats', [AdminBookingController::class, 'liveStats'])->name('api.bookings.stats');
     Route::post('/quick-payment', [AdminDashboardController::class, 'createQuickPayment'])->name('quick-payment');
     
     // Tours, Tiers, Addons, and Pricing

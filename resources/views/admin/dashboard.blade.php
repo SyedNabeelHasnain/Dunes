@@ -3,7 +3,27 @@
 @section('page_title', 'Executive Dashboard')
 
 @section('content')
-<!-- 6 KPI Metric Cards Row -->
+<!-- Top Executive Header with Real-Time Database Sync & Live Refresh Trigger -->
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <h2 class="h4 fw-800 text-dark mb-0">Executive Dashboard</h2>
+            <span class="badge bg-success-subtle text-success border border-success border-opacity-25 rounded-pill px-2.5 py-1 small fw-bold d-inline-flex align-items-center gap-1.5">
+                <span class="live-pulse-dot"></span> Live Real-Time Database Sync
+            </span>
+        </div>
+        <p class="text-muted small mb-0">Direct live counts from database transactions. Zero caching, instant precision.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <span class="text-muted extra-small text-uppercase fw-semibold d-none d-sm-inline" id="kpiSyncStatus" style="font-size: 0.72rem;">Live as of {{ now()->format('g:i:s A') }}</span>
+        <button type="button" class="btn btn-white shadow-sm border rounded-pill px-3 py-2 fw-bold text-dark d-flex align-items-center gap-2" id="btnRefreshDashboardKpis" title="Recount all metrics live directly from database">
+            <i class="bi bi-arrow-repeat text-primary fs-6" id="kpiSyncIcon"></i>
+            <span>Refresh Metrics</span>
+        </button>
+    </div>
+</div>
+
+<!-- 6 Core Business Performance KPI Cards Row -->
 <div class="row g-3 g-lg-4 mb-4">
     <div class="col-xl-2 col-md-4 col-6">
         <div class="card-modern h-100 p-3 bg-white border-0 shadow-sm rounded-4">
@@ -11,7 +31,8 @@
                 <i class="bi bi-calendar-event-fill"></i>
             </div>
             <div class="text-muted small fw-bold text-uppercase mb-1" style="font-size:0.72rem;">Total Bookings</div>
-            <h3 class="fw-800 mb-0 text-dark">{{ number_format($stats['total']) }}</h3>
+            <h3 class="fw-800 mb-0 text-dark kpi-number" id="kpiTotalBookings">{{ number_format($stats['total']) }}</h3>
+            <span class="text-muted small" style="font-size: 0.7rem;">Active reservations</span>
         </div>
     </div>
     <div class="col-xl-2 col-md-4 col-6">
@@ -19,8 +40,9 @@
             <div class="stat-card-icon bg-success-subtle text-success mb-2 d-flex align-items-center justify-content-center rounded-circle" style="width:40px; height:40px; font-size:18px;">
                 <i class="bi bi-check-circle-fill"></i>
             </div>
-            <div class="text-muted small fw-bold text-uppercase mb-1" style="font-size:0.72rem;">Confirmed</div>
-            <h3 class="fw-800 mb-0 text-dark">{{ number_format($stats['confirmed']) }}</h3>
+            <div class="text-muted small fw-bold text-uppercase mb-1" style="font-size:0.72rem;">Confirmed & Done</div>
+            <h3 class="fw-800 mb-0 text-dark kpi-number" id="kpiConfirmedBookings">{{ number_format($stats['confirmed_and_completed'] ?? ($stats['confirmed'] + ($stats['completed'] ?? 0))) }}</h3>
+            <span class="text-success small fw-bold" style="font-size: 0.7rem;"><span id="kpiConfirmedCount">{{ $stats['confirmed'] }}</span> Confirmed, <span id="kpiCompletedCount">{{ $stats['completed'] ?? 0 }}</span> Done</span>
         </div>
     </div>
     <div class="col-xl-2 col-md-4 col-6">
@@ -28,8 +50,9 @@
             <div class="stat-card-icon bg-warning-subtle text-warning mb-2 d-flex align-items-center justify-content-center rounded-circle" style="width:40px; height:40px; font-size:18px;">
                 <i class="bi bi-clock-history"></i>
             </div>
-            <div class="text-muted small fw-bold text-uppercase mb-1" style="font-size:0.72rem;">Pending Inquiries</div>
-            <h3 class="fw-800 mb-0 text-dark">{{ number_format($stats['pending']) }}</h3>
+            <div class="text-muted small fw-bold text-uppercase mb-1" style="font-size:0.72rem;">Pending Bookings</div>
+            <h3 class="fw-800 mb-0 text-dark kpi-number" id="kpiPendingBookings">{{ number_format($stats['pending']) }}</h3>
+            <span class="text-warning small fw-bold" style="font-size: 0.7rem;"><i class="bi bi-hourglass-split me-1"></i>Awaiting review</span>
         </div>
     </div>
     <div class="col-xl-2 col-md-4 col-6">
@@ -38,7 +61,8 @@
                 <i class="bi bi-cash-stack"></i>
             </div>
             <div class="text-muted small fw-bold text-uppercase mb-1" style="font-size:0.72rem;">Collected Revenue</div>
-            <h4 class="fw-800 mb-0 text-primary">AED {{ number_format($stats['revenue']) }}</h4>
+            <h4 class="fw-800 mb-0 text-primary kpi-number" id="kpiRevenue">AED {{ number_format($stats['revenue']) }}</h4>
+            <span class="text-muted small" style="font-size: 0.7rem;">Verified payments</span>
         </div>
     </div>
     <div class="col-xl-2 col-md-4 col-6">
@@ -47,7 +71,8 @@
                 <i class="bi bi-bag-check-fill"></i>
             </div>
             <div class="text-muted small fw-bold text-uppercase mb-1" style="font-size:0.72rem;">Avg Order Value</div>
-            <h4 class="fw-800 mb-0 text-dark">AED {{ number_format($stats['aov'] ?? 0) }}</h4>
+            <h4 class="fw-800 mb-0 text-dark kpi-number" id="kpiAov">AED {{ number_format($stats['aov'] ?? 0) }}</h4>
+            <span class="text-muted small" style="font-size: 0.7rem;">Per paid booking</span>
         </div>
     </div>
     <div class="col-xl-2 col-md-4 col-6">
@@ -56,7 +81,70 @@
                 <i class="bi bi-percent"></i>
             </div>
             <div class="text-muted small fw-bold text-uppercase mb-1" style="font-size:0.72rem;">30d Conversion</div>
-            <h3 class="fw-800 mb-0 text-dark">{{ $stats['conversion_rate'] ?? 0 }}%</h3>
+            <h3 class="fw-800 mb-0 text-dark kpi-number" id="kpiConversion">{{ $stats['conversion_rate'] ?? 0 }}%</h3>
+            <span class="text-muted small" style="font-size: 0.7rem;">Visitors to bookings</span>
+        </div>
+    </div>
+</div>
+
+<!-- Real-Time Customer Communications & Leads Hub Summary -->
+<div class="card card-modern border-0 shadow-sm rounded-4 p-3 bg-white mb-4">
+    <div class="row g-3 align-items-center">
+        <div class="col-lg-3 col-sm-6 border-end-lg">
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-box bg-danger-subtle text-danger rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 42px; height: 42px; font-size: 18px;">
+                    <i class="bi bi-envelope-exclamation-fill"></i>
+                </div>
+                <div>
+                    <div class="text-muted extra-small text-uppercase fw-bold">Action Needed Inquiries</div>
+                    <div class="d-flex align-items-baseline gap-2">
+                        <span class="fw-800 text-danger fs-5 kpi-number" id="kpiNewInquiries">{{ number_format($stats['new_inquiries'] ?? 0) }}</span>
+                        <a href="{{ route('admin.inquiries.index') }}" class="small text-decoration-none fw-semibold">View Inquiries <i class="bi bi-chevron-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 border-end-lg">
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-box bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 42px; height: 42px; font-size: 18px;">
+                    <i class="bi bi-whatsapp"></i>
+                </div>
+                <div>
+                    <div class="text-muted extra-small text-uppercase fw-bold">WhatsApp Leads Captured</div>
+                    <div class="d-flex align-items-baseline gap-2">
+                        <span class="fw-800 text-success fs-5 kpi-number" id="kpiWhatsappLeads">{{ number_format($stats['whatsapp_leads'] ?? 0) }}</span>
+                        <a href="{{ route('admin.whatsapp.leads') }}" class="small text-decoration-none fw-semibold">View Leads <i class="bi bi-chevron-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 border-end-lg">
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-box bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 42px; height: 42px; font-size: 18px;">
+                    <i class="bi bi-inbox-fill"></i>
+                </div>
+                <div>
+                    <div class="text-muted extra-small text-uppercase fw-bold">Total Contact Messages</div>
+                    <div class="d-flex align-items-baseline gap-2">
+                        <span class="fw-800 text-dark fs-5 kpi-number" id="kpiTotalInquiries">{{ number_format($stats['total_inquiries'] ?? 0) }}</span>
+                        <span class="text-muted extra-small">Website submissions</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-box bg-warning-subtle text-warning rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 42px; height: 42px; font-size: 18px;">
+                    <i class="bi bi-file-earmark-diff-fill"></i>
+                </div>
+                <div>
+                    <div class="text-muted extra-small text-uppercase fw-bold">Incomplete Drafts</div>
+                    <div class="d-flex align-items-baseline gap-2">
+                        <span class="fw-800 text-muted fs-5 kpi-number" id="kpiDrafts">{{ number_format($stats['drafts'] ?? 0) }}</span>
+                        <span class="text-muted extra-small">Unfinished checkouts</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -356,6 +444,85 @@ $(document).ready(function() {
                     title: 'Oops...',
                     text: msg
                 });
+            }
+        });
+    });
+
+    // Real-Time KPI Refresh with Shimmer Placeholders
+    $('#btnRefreshDashboardKpis').on('click', function(e) {
+        e.preventDefault();
+        const $btn = $(this);
+        const $icon = $('#kpiSyncIcon');
+        const $status = $('#kpiSyncStatus');
+
+        $btn.prop('disabled', true);
+        $icon.addClass('kpi-sync-spin');
+        $status.html('<span class="text-primary fw-bold"><i class="bi bi-hourglass-split me-1"></i>Counting live from database...</span>');
+
+        // Render shimmer loaders as placeholders on all counter cards
+        $('.kpi-number').each(function() {
+            $(this).data('cached-html', $(this).html());
+            $(this).html('<span class="counter-shimmer"></span>');
+        });
+
+        $.ajax({
+            url: "{{ route('admin.api.kpis') }}",
+            type: "GET",
+            dataType: "json",
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache'
+            },
+            success: function(res) {
+                $icon.removeClass('kpi-sync-spin');
+                $btn.prop('disabled', false);
+
+                if (res && res.success && res.stats) {
+                    const s = res.stats;
+                    const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+                    $('#kpiTotalBookings').text(Number(s.total).toLocaleString());
+                    $('#kpiConfirmedBookings').text(Number(s.confirmed_and_completed || (s.confirmed + s.completed)).toLocaleString());
+                    $('#kpiConfirmedCount').text(Number(s.confirmed).toLocaleString());
+                    $('#kpiCompletedCount').text(Number(s.completed).toLocaleString());
+                    $('#kpiPendingBookings').text(Number(s.pending).toLocaleString());
+                    $('#kpiRevenue').text('AED ' + Number(s.revenue).toLocaleString());
+                    $('#kpiAov').text('AED ' + Number(s.aov).toLocaleString());
+                    $('#kpiConversion').text(s.conversion_rate + '%');
+
+                    $('#kpiNewInquiries').text(Number(s.new_inquiries).toLocaleString());
+                    $('#kpiWhatsappLeads').text(Number(s.whatsapp_leads).toLocaleString());
+                    $('#kpiTotalInquiries').text(Number(s.total_inquiries).toLocaleString());
+                    $('#kpiDrafts').text(Number(s.drafts).toLocaleString());
+
+                    $status.html(`Live as of <span class="fw-bold text-success">${nowTime}</span>`);
+
+                    // Brief toast notification
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 2000,
+                        timerProgressBar: true
+                    });
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'All Metrics Recounted Live!'
+                    });
+                } else {
+                    $('.kpi-number').each(function() {
+                        $(this).html($(this).data('cached-html'));
+                    });
+                    $status.text('Recount failed.');
+                }
+            },
+            error: function(xhr) {
+                $icon.removeClass('kpi-sync-spin');
+                $btn.prop('disabled', false);
+                $('.kpi-number').each(function() {
+                    $(this).html($(this).data('cached-html'));
+                });
+                $status.html('<span class="text-danger">Sync error</span>');
             }
         });
     });

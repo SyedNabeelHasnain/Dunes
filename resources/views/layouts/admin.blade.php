@@ -110,6 +110,40 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+        /* Real-Time Insightful Counter & Loader States */
+        @keyframes kpiShimmer {
+            0% { opacity: 0.35; transform: scale(0.98); }
+            50% { opacity: 0.85; transform: scale(1); }
+            100% { opacity: 0.35; transform: scale(0.98); }
+        }
+        .counter-shimmer {
+            display: inline-block;
+            min-width: 48px;
+            height: 1.2em;
+            background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+            background-size: 200% 100%;
+            border-radius: 6px;
+            animation: kpiShimmer 1.2s ease-in-out infinite;
+            vertical-align: middle;
+        }
+        .kpi-sync-spin {
+            animation: spin 0.8s linear infinite !important;
+        }
+        .live-pulse-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #10b981;
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: livePulse 2s infinite;
+        }
+        @keyframes livePulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
         .popover-primary {
             --bs-popover-border-color: var(--bs-primary);
             --bs-popover-header-bg: var(--bs-primary);

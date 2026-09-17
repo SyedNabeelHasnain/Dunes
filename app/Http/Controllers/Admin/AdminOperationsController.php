@@ -36,11 +36,17 @@ class AdminOperationsController extends Controller
         $totalGuests = 0;
         $totalAdults = 0;
         $totalChildren = 0;
+        $totalInfants = 0;
 
         foreach ($bookings as $b) {
-            $totalAdults += (int)$b->adults;
-            $totalChildren += (int)$b->children;
-            $totalGuests += ((int)$b->adults + (int)$b->children);
+            $adults = (int)$b->adults;
+            $children = (int)$b->children;
+            $infants = (int)($b->infants ?? 0);
+
+            $totalAdults += $adults;
+            $totalChildren += $children;
+            $totalInfants += $infants;
+            $totalGuests += ($adults + $children);
 
             $loc = strtolower($b->pickup_location . ' ' . ($b->special_requests ?? ''));
             if (str_contains($loc, 'marina') || str_contains($loc, 'jbr') || str_contains($loc, 'beach residence')) {
@@ -59,14 +65,15 @@ class AdminOperationsController extends Controller
         }
 
         // Vehicles estimation (Standard 4x4 Land Cruiser capacity is 6-7 guests)
-        $vehiclesNeeded = ceil($totalGuests / 6);
+        $vehiclesNeeded = $totalGuests > 0 ? (int)ceil($totalGuests / 6) : 0;
 
         $stats = [
             'total_bookings' => $bookings->count(),
             'total_guests' => $totalGuests,
             'total_adults' => $totalAdults,
             'total_children' => $totalChildren,
-            'vehicles_needed' => max(1, $vehiclesNeeded),
+            'total_infants' => $totalInfants,
+            'vehicles_needed' => $vehiclesNeeded,
             'confirmed_count' => $bookings->where('status', 'confirmed')->count(),
             'pending_count' => $bookings->where('status', 'pending')->count(),
         ];

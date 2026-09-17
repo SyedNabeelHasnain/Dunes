@@ -560,4 +560,209 @@ class BookingEngineTest extends TestCase
         $this->assertDatabaseMissing('request_logs', ['id' => $bulkLogA->id]);
         $this->assertDatabaseMissing('request_logs', ['id' => $bulkLogB->id]);
     }
+
+    /**
+     * Test dashboard KPIs reflect real-time database changes immediately without caching.
+     */
+    public function test_dashboard_kpis_reflect_realtime_data_without_cache(): void
+    {
+        $admin = User::create([
+            'name' => 'Admin Realtime',
+            'email' => 'admin_realtime@dunesdiscovery.com',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $b1 = Booking::create([
+            'reference' => 'DDT-RT-001',
+            'tour_name' => 'Desert Safari',
+            'tour_date' => now()->addDays(1)->toDateString(),
+            'status' => 'confirmed',
+            'payment_status' => 'paid',
+            'payment_amount' => 500.00,
+            'subtotal' => 500.00,
+            'total' => 500.00,
+            'adults' => 2,
+            'children' => 0,
+            'name' => 'Guest Realtime 1',
+            'email' => 'gr1@example.com',
+            'phone' => '+971501234567',
+        ]);
+
+        $response = $this->actingAs($admin)->getJson('/admin/api/kpis');
+        $response->assertStatus(200);
+        $response->assertJsonPath('stats.total', 1);
+        $response->assertJsonPath('stats.confirmed', 1);
+        $this->assertEquals(500.0, $response->json('stats.revenue'));
+
+        // Add a second booking and verify immediate real-time update without waiting for any cache
+        $b2 = Booking::create([
+            'reference' => 'DDT-RT-002',
+            'tour_name' => 'Morning Safari',
+            'tour_date' => now()->addDays(2)->toDateString(),
+            'status' => 'pending',
+            'payment_status' => 'unpaid',
+            'payment_amount' => 0.00,
+            'subtotal' => 300.00,
+            'total' => 300.00,
+            'adults' => 1,
+            'children' => 0,
+            'name' => 'Guest Realtime 2',
+            'email' => 'gr2@example.com',
+            'phone' => '+971507654321',
+        ]);
+
+        $response2 = $this->actingAs($admin)->getJson('/admin/api/kpis');
+        $response2->assertStatus(200);
+        $response2->assertJsonPath('stats.total', 2);
+        $response2->assertJsonPath('stats.pending', 1);
+        $this->assertEquals(500.0, $response2->json('stats.revenue')); // Unpaid booking adds 0 to collected revenue
+    }
+
+    /**
+     * Test that draft/abandoned bookings are strictly excluded from Total Bookings count.
+     */
+    public function test_dashboard_kpis_exclude_draft_bookings(): void
+    {
+        $admin = User::create([
+            'name' => 'Admin Drafts',
+            'email' => 'admin_drafts@dunesdiscovery.com',
+            'password' => bcrypt('password123'),
+        ]);
+
+        // Create 1 real confirmed booking
+        Booking::create([
+            'reference' => 'DDT-REAL-001',
+            'tour_name' => 'Evening Safari',
+            'tour_date' => now()->addDays(2)->toDateString(),
+            'status' => 'confirmed',
+            'payment_status' => 'paid',
+            'payment_amount' => 350.00,
+            'subtotal' => 350.00,
+            'total' => 350.00,
+            'adults' => 1,
+            'name' => 'Real Guest',
+            'email' => 'real@example.com',
+            'phone' => '+971509999999',
+        ]);
+
+        // Create 3 incomplete draft checkouts
+        for ($i = 1; $i <= 3; $i++) {
+            Booking::create([
+                'reference' => "DDT-DRAFT-00{$i}",
+                'tour_name' => 'Evening Safari',
+                'tour_date' => now()->addDays(2)->toDateString(),
+                'status' => 'draft',
+                'payment_status' => 'unpaid',
+                'payment_amount' => 0.00,
+                'subtotal' => 350.00,
+                'total' => 350.00,
+                'adults' => 1,
+                'name' => "Draft User {$i}",
+                'email' => "draft{$i}@example.com",
+                'phone' => '+971500000000',
+            ]);
+        }
+
+        $response = $this->actingAs($admin)->getJson('/admin/api/kpis');
+        $response->assertStatus(200);
+        // Total Bookings MUST be exactly 1 (excluding the 3 drafts)
+        $response->assertJsonPath('stats.total', 1);
+        $response->assertJsonPath('stats.drafts', 3);
+    }
+
+    /**
+     * Test collected revenue and AOV calculations match identically across Dashboard and Bookings Hub.
+     */
+    public function test_collected_revenue_matches_between_dashboard_and_bookings_hub(): void
+    {
+        $admin = User::create([
+            'name' => 'Admin Revenue',
+            'email' => 'admin_rev@dunesdiscovery.com',
+            'password' => bcrypt('password123'),
+        ]);
+
+        // Booking 1: Confirmed and fully paid (total 600, payment_amount 600)
+        Booking::create([
+            'reference' => 'DDT-PAID-001',
+            'tour_name' => 'VIP Desert Safari',
+            'tour_date' => now()->addDays(1)->toDateString(),
+            'status' => 'confirmed',
+            'payment_status' => 'paid',
+            'payment_amount' => 600.00,
+            'subtotal' => 600.00,
+            'total' => 600.00,
+            'adults' => 2,
+            'name' => 'Paid Guest',
+            'email' => 'paid@example.com',
+            'phone' => '+971501111111',
+        ]);
+
+        // Booking 2: Completed and partially paid (total 800, payment_amount 400)
+        Booking::create([
+            'reference' => 'DDT-PARTIAL-001',
+            'tour_name' => 'Dune Buggy Adventure',
+            'tour_date' => now()->addDays(2)->toDateString(),
+            'status' => 'completed',
+            'payment_status' => 'partial',
+            'payment_amount' => 400.00,
+            'subtotal' => 800.00,
+            'total' => 800.00,
+            'adults' => 2,
+            'name' => 'Partial Guest',
+            'email' => 'partial@example.com',
+            'phone' => '+971502222222',
+        ]);
+
+        // Booking 3: Confirmed but unpaid (total 500, payment_amount 0) - should NOT add to collected revenue
+        Booking::create([
+            'reference' => 'DDT-UNPAID-001',
+            'tour_name' => 'Quad Bike Safari',
+            'tour_date' => now()->addDays(3)->toDateString(),
+            'status' => 'confirmed',
+            'payment_status' => 'unpaid',
+            'payment_amount' => 0.00,
+            'subtotal' => 500.00,
+            'total' => 500.00,
+            'adults' => 1,
+            'name' => 'Unpaid Guest',
+            'email' => 'unpaid@example.com',
+            'phone' => '+971503333333',
+        ]);
+
+        $dashboardKpi = $this->actingAs($admin)->getJson('/admin/api/kpis');
+        $bookingKpi = $this->actingAs($admin)->getJson('/admin/api/bookings-stats');
+
+        $dashboardKpi->assertStatus(200);
+        $bookingKpi->assertStatus(200);
+
+        // Expected collected revenue = 600 + 400 = 1000.00
+        $this->assertEquals(1000.00, $dashboardKpi->json('stats.revenue'));
+        $this->assertEquals(1000.00, $bookingKpi->json('stats.revenue'));
+
+        // Both paid reservations = 2, AOV = 1000 / 2 = 500.00
+        $this->assertEquals(500.00, $dashboardKpi->json('stats.aov'));
+        $this->assertEquals(500.00, $bookingKpi->json('stats.aov'));
+    }
+
+    /**
+     * Test Operations Manifest correctly calculates 0 vehicles when no bookings exist.
+     */
+    public function test_operations_manifest_vehicles_needed_zero_when_no_bookings(): void
+    {
+        $admin = User::create([
+            'name' => 'Admin Operations',
+            'email' => 'admin_ops@dunesdiscovery.com',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $emptyDate = now()->addDays(30)->format('Y-m-d');
+        $response = $this->actingAs($admin)->get("/admin/operations?date={$emptyDate}");
+        $response->assertStatus(200);
+        // Vehicles needed must be 0, not 1
+        $response->assertViewHas('stats', function ($stats) {
+            return $stats['total_bookings'] === 0 
+                && $stats['total_guests'] === 0 
+                && $stats['vehicles_needed'] === 0;
+        });
+    }
 }

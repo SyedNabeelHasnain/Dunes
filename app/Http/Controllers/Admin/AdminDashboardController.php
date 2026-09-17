@@ -17,74 +17,133 @@ use Illuminate\Support\Facades\Log;
 class AdminDashboardController extends Controller
 {
     /**
-     * Display the Admin CMS Dashboard.
+     * Compute 100% fresh, real-time KPI metrics directly from database (Zero Caching).
+     */
+    public function computeRealtimeKpis(): array
+    {
+        // 1. Booking counts excluding draft checkout abandonments
+        $totalBookings = Booking::where('status', '!=', 'draft')->count();
+        $confirmedBookings = Booking::where('status', 'confirmed')->count();
+        $completedBookings = Booking::where('status', 'completed')->count();
+        $confirmedAndCompleted = $confirmedBookings + $completedBookings;
+        $pendingBookings = Booking::where('status', 'pending')->count();
+        $cancelledBookings = Booking::where('status', 'cancelled')->count();
+        $draftBookings = Booking::where('status', 'draft')->count();
+
+        // 2. Collected Revenue: only actual received payments from confirmed/completed reservations
+        $revenue = (float) Booking::whereIn('status', ['confirmed', 'completed'])
+            ->whereIn('payment_status', ['paid', 'partial'])
+            ->sum(DB::raw("CASE WHEN payment_amount > 0 THEN payment_amount ELSE (CASE WHEN payment_status = 'paid' THEN total ELSE 0 END) END"));
+
+        // 3. Average Order Value (AOV): Revenue divided by paid reservations
+        $paidCount = Booking::whereIn('status', ['confirmed', 'completed'])
+            ->whereIn('payment_status', ['paid', 'partial'])
+            ->count();
+        $avgOrderValue = $paidCount > 0 ? round($revenue / $paidCount, 2) : 0.0;
+
+        // 4. 30-Day Conversion Rate: Real human visitors to completed bookings (excl drafts)
+        $visitorsCount = RequestLog::where('request_timestamp', '>=', now()->subDays(30))
+            ->where('bot_indicator', 'Likely Human')
+            ->distinct('session_id')
+            ->count('session_id') ?: 1;
+
+        $recentBookingsCount = Booking::where('created_at', '>=', now()->subDays(30))
+            ->where('status', '!=', 'draft')
+            ->count();
+        $conversionRate = round(($recentBookingsCount / $visitorsCount) * 100, 2);
+
+        // 5. Customer Communications: Contact Inquiries & WhatsApp Leads
+        $newInquiries = Contact::where('status', 'new')->count();
+        $totalInquiries = Contact::count();
+        $totalWhatsappLeads = DB::table('whatsapp_inquiries')->count();
+
+        // 6. Audience & Email Marketing
+        $subscribersCount = Subscriber::where('status', 'subscribed')->count();
+        $campaignsCount = EmailCampaign::count();
+        $campaignsSent = EmailCampaign::where('status', 'sent')->count();
+
+        return [
+            'revenue' => (float)$revenue,
+            'total' => (int)$totalBookings,
+            'confirmed' => (int)$confirmedBookings,
+            'completed' => (int)$completedBookings,
+            'confirmed_and_completed' => (int)$confirmedAndCompleted,
+            'pending' => (int)$pendingBookings,
+            'cancelled' => (int)$cancelledBookings,
+            'drafts' => (int)$draftBookings,
+            'aov' => (float)$avgOrderValue,
+            'conversion_rate' => (float)$conversionRate,
+            'new_inquiries' => (int)$newInquiries,
+            'total_inquiries' => (int)$totalInquiries,
+            'whatsapp_leads' => (int)$totalWhatsappLeads,
+            'subscribers_count' => (int)$subscribersCount,
+            'campaigns_count' => (int)$campaignsCount,
+            'campaigns_sent' => (int)$campaignsSent,
+            'timestamp' => now()->toIso8601String(),
+        ];
+    }
+
+    /**
+     * Display the Admin CMS Dashboard with real-time fresh figures.
      */
     public function index()
     {
         try {
-            $stats = \Illuminate\Support\Facades\Cache::remember('admin_dashboard_kpis', 300, function() {
-                $revenue = Booking::whereIn('status', ['confirmed', 'completed'])
-                    ->whereIn('payment_status', ['paid', 'partial'])
-                    ->sum('payment_amount');
+            $stats = $this->computeRealtimeKpis();
 
-                $totalBookings = Booking::count();
-                $confirmedBookings = Booking::whereIn('status', ['confirmed', 'completed'])->count();
-                $pendingBookings = Booking::where('status', 'pending')->count();
-                $avgOrderValue = $confirmedBookings > 0 ? round($revenue / $confirmedBookings, 2) : 0;
+            // Recent bookings (latest 10 real bookings) - always real-time fresh
+            $recentBookings = Booking::where('status', '!=', 'draft')
+                ->orderBy('created_at', 'desc')
+                ->limit(10)
+                ->get();
 
-                // 30-day human visitors count for conversion rate calculation
-                $visitorsCount = RequestLog::where('request_timestamp', '>=', now()->subDays(30))
-                    ->where('bot_indicator', 'Likely Human')
-                    ->distinct('session_id')
-                    ->count('session_id') ?: 1;
-
-                $recentBookingsCount = Booking::where('created_at', '>=', now()->subDays(30))->count();
-                $conversionRate = round(($recentBookingsCount / $visitorsCount) * 100, 2);
-
-                $subscribersCount = Subscriber::where('status', 'subscribed')->count();
-                $campaignsCount = EmailCampaign::count();
-                $campaignsSent = EmailCampaign::where('status', 'sent')->count();
-
-                return [
-                    'revenue' => (float)$revenue,
-                    'total' => (int)$totalBookings,
-                    'confirmed' => (int)$confirmedBookings,
-                    'pending' => (int)$pendingBookings,
-                    'aov' => (float)$avgOrderValue,
-                    'conversion_rate' => (float)$conversionRate,
-                    'subscribers_count' => (int)$subscribersCount,
-                    'campaigns_count' => (int)$campaignsCount,
-                    'campaigns_sent' => (int)$campaignsSent,
-                ];
-            });
-
-            // Recent bookings (latest 10) - always real-time fresh
-            $recentBookings = Booking::orderBy('created_at', 'desc')->limit(10)->get();
-
-            // Top Tours (by booking counts) - cached for 300s
-            $topTours = \Illuminate\Support\Facades\Cache::remember('admin_dashboard_top_tours', 300, function() {
-                return Booking::whereIn('status', ['confirmed', 'completed'])
-                    ->select('tour_name', \DB::raw('COUNT(*) as count'), \DB::raw('SUM(total) as revenue'))
-                    ->groupBy('tour_name')
-                    ->orderBy('count', 'desc')
-                    ->limit(5)
-                    ->get();
-            });
+            // Top Tours (by booking counts) - real-time fresh without cache
+            $topTours = Booking::whereIn('status', ['confirmed', 'completed'])
+                ->select('tour_name', DB::raw('COUNT(*) as count'), DB::raw('SUM(total) as revenue'))
+                ->groupBy('tour_name')
+                ->orderBy('count', 'desc')
+                ->limit(5)
+                ->get();
 
             // Recent WhatsApp leads
-            $whatsappLeads = \DB::table('whatsapp_inquiries')
+            $whatsappLeads = DB::table('whatsapp_inquiries')
                 ->orderBy('created_at', 'desc')
                 ->limit(5)
                 ->get();
 
             return view('admin.dashboard', compact('stats', 'recentBookings', 'topTours', 'whatsappLeads'));
         } catch (\Throwable $e) {
-            \Log::error("Admin dashboard error: " . $e->getMessage());
-            $stats = ['revenue' => 0, 'total' => 0, 'confirmed' => 0, 'pending' => 0, 'aov' => 0, 'conversion_rate' => 0, 'subscribers_count' => 0, 'campaigns_count' => 0, 'campaigns_sent' => 0];
+            Log::error("Admin dashboard error: " . $e->getMessage());
+            $stats = [
+                'revenue' => 0, 'total' => 0, 'confirmed' => 0, 'completed' => 0, 'confirmed_and_completed' => 0,
+                'pending' => 0, 'cancelled' => 0, 'drafts' => 0, 'aov' => 0, 'conversion_rate' => 0,
+                'new_inquiries' => 0, 'total_inquiries' => 0, 'whatsapp_leads' => 0,
+                'subscribers_count' => 0, 'campaigns_count' => 0, 'campaigns_sent' => 0,
+                'timestamp' => now()->toIso8601String(),
+            ];
             $recentBookings = collect();
             $topTours = collect();
             $whatsappLeads = collect();
             return view('admin.dashboard', compact('stats', 'recentBookings', 'topTours', 'whatsappLeads'));
+        }
+    }
+
+    /**
+     * Real-time JSON endpoint for live KPI refresh.
+     */
+    public function liveKpis(): JsonResponse
+    {
+        try {
+            $stats = $this->computeRealtimeKpis();
+            return response()->json([
+                'success' => true,
+                'stats' => $stats,
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 

@@ -8,7 +8,11 @@
         <h2 class="h4 fw-800 text-dark mb-1">Bookings & Reservations</h2>
         <p class="text-muted small mb-0">Manage customer tour bookings, payment reconciliations, and instant WhatsApp support.</p>
     </div>
-    <div class="d-flex gap-2">
+    <div class="d-flex gap-2 align-items-center">
+        <button type="button" class="btn btn-white shadow-sm border rounded-pill px-3 py-2 fw-bold text-dark d-flex align-items-center gap-2" id="btnRefreshBookingsStats" title="Recount metrics live directly from database">
+            <i class="bi bi-arrow-repeat text-primary fs-6" id="bookingsSyncIcon"></i>
+            <span>Refresh Counts</span>
+        </button>
         <a href="{{ route('admin.bookings.export', request()->query()) }}" class="btn btn-outline-success rounded-pill px-4 fw-bold shadow-sm">
             <i class="bi bi-file-earmark-spreadsheet me-2"></i> Export CSV
         </a>
@@ -23,8 +27,8 @@
                 <span class="text-muted small fw-bold text-uppercase" style="font-size:0.75rem;">Total Bookings</span>
                 <span class="badge bg-primary-subtle text-primary rounded-circle p-2"><i class="bi bi-calendar-check-fill fs-5"></i></span>
             </div>
-            <h3 class="fw-800 text-dark mb-0">{{ number_format($stats['total'] ?? 0) }}</h3>
-            <span class="text-muted small" style="font-size: 0.75rem;">All tour reservations</span>
+            <h3 class="fw-800 text-dark mb-0 booking-kpi-val" id="bookingStatTotal">{{ number_format($stats['total'] ?? 0) }}</h3>
+            <span class="text-muted small" style="font-size: 0.75rem;">All active reservations</span>
         </div>
     </div>
     <div class="col-xl-3 col-sm-6">
@@ -33,17 +37,17 @@
                 <span class="text-muted small fw-bold text-uppercase" style="font-size:0.75rem;">Confirmed / Paid</span>
                 <span class="badge bg-success-subtle text-success rounded-circle p-2"><i class="bi bi-check-circle-fill fs-5"></i></span>
             </div>
-            <h3 class="fw-800 text-dark mb-0">{{ number_format($stats['confirmed'] ?? 0) }}</h3>
+            <h3 class="fw-800 text-dark mb-0 booking-kpi-val" id="bookingStatConfirmed">{{ number_format($stats['confirmed'] ?? 0) }}</h3>
             <span class="text-success small fw-bold" style="font-size: 0.75rem;"><i class="bi bi-shield-check me-1"></i>Active & Confirmed</span>
         </div>
     </div>
     <div class="col-xl-3 col-sm-6">
         <div class="card border-0 shadow-sm rounded-4 bg-white p-3 h-100">
             <div class="d-flex align-items-center justify-content-between mb-2">
-                <span class="text-muted small fw-bold text-uppercase" style="font-size:0.75rem;">Pending Inquiries</span>
+                <span class="text-muted small fw-bold text-uppercase" style="font-size:0.75rem;">Pending Bookings</span>
                 <span class="badge bg-warning-subtle text-warning rounded-circle p-2"><i class="bi bi-clock-history fs-5"></i></span>
             </div>
-            <h3 class="fw-800 text-dark mb-0">{{ number_format($stats['pending'] ?? 0) }}</h3>
+            <h3 class="fw-800 text-dark mb-0 booking-kpi-val" id="bookingStatPending">{{ number_format($stats['pending'] ?? 0) }}</h3>
             <span class="text-warning small fw-bold" style="font-size: 0.75rem;"><i class="bi bi-hourglass-split me-1"></i>Awaiting confirmation</span>
         </div>
     </div>
@@ -53,8 +57,8 @@
                 <span class="text-muted small fw-bold text-uppercase" style="font-size:0.75rem;">Collected Revenue</span>
                 <span class="badge bg-info-subtle text-info rounded-circle p-2"><i class="bi bi-cash-stack fs-5"></i></span>
             </div>
-            <h3 class="fw-800 text-primary mb-0">AED {{ number_format($stats['revenue'] ?? 0) }}</h3>
-            <span class="text-muted small" style="font-size: 0.75rem;">AOV: AED {{ number_format($stats['aov'] ?? 0) }}</span>
+            <h3 class="fw-800 text-primary mb-0 booking-kpi-val" id="bookingStatRevenue">AED {{ number_format($stats['revenue'] ?? 0) }}</h3>
+            <span class="text-muted small" style="font-size: 0.75rem;">AOV: <strong id="bookingStatAov">AED {{ number_format($stats['aov'] ?? 0) }}</strong></span>
         </div>
     </div>
 </div>
@@ -533,6 +537,67 @@ $(document).ready(function() {
                         const msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Error processing bulk action.';
                         Swal.fire('Failed', msg, 'error');
                     }
+                });
+            }
+        });
+    });
+
+    // Real-Time Bookings KPI Refresh with Shimmer Placeholders
+    $('#btnRefreshBookingsStats').on('click', function(e) {
+        e.preventDefault();
+        const $btn = $(this);
+        const $icon = $('#bookingsSyncIcon');
+
+        $btn.prop('disabled', true);
+        $icon.addClass('kpi-sync-spin');
+
+        $('.booking-kpi-val').each(function() {
+            $(this).data('cached-val', $(this).html());
+            $(this).html('<span class="counter-shimmer"></span>');
+        });
+
+        $.ajax({
+            url: "{{ route('admin.api.bookings.stats') }}",
+            type: "GET",
+            dataType: "json",
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache'
+            },
+            success: function(res) {
+                $icon.removeClass('kpi-sync-spin');
+                $btn.prop('disabled', false);
+
+                if (res && res.success && res.stats) {
+                    const s = res.stats;
+                    $('#bookingStatTotal').text(Number(s.total).toLocaleString());
+                    $('#bookingStatConfirmed').text(Number(s.confirmed).toLocaleString());
+                    $('#bookingStatPending').text(Number(s.pending).toLocaleString());
+                    $('#bookingStatRevenue').text('AED ' + Number(s.revenue).toLocaleString());
+                    $('#bookingStatAov').text('AED ' + Number(s.aov).toLocaleString());
+
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 2000,
+                        timerProgressBar: true
+                    });
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Bookings Metrics Recounted Live!'
+                    });
+                } else {
+                    $('.booking-kpi-val').each(function() {
+                        $(this).html($(this).data('cached-val'));
+                    });
+                }
+            },
+            error: function() {
+                $icon.removeClass('kpi-sync-spin');
+                $btn.prop('disabled', false);
+                $('.booking-kpi-val').each(function() {
+                    $(this).html($(this).data('cached-val'));
                 });
             }
         });
