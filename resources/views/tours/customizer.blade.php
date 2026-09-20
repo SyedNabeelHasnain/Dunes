@@ -678,6 +678,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateCalculation();
             }
         });
+
+        if (promoInputEl) {
+            promoInputEl.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    applyPromoBtn.click();
+                }
+            });
+        }
     }
 
     // Calculation Engine

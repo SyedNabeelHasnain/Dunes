@@ -281,8 +281,8 @@ class Coupon extends Model
             }
         }
 
-        // Automatic fallback for official first-time visitor 25% promo codes
-        if (in_array($normalized, ['DUNESWELCOME', 'FIRST25'])) {
+        // Automatic fallback for official first-time visitor 25% promo codes (including dynamic FIRST25-* codes)
+        if (in_array($normalized, ['DUNESWELCOME', 'FIRST25']) || str_starts_with($normalized, 'FIRST25-')) {
             try {
                 return static::firstOrCreate(
                     ['code' => $normalized],
@@ -296,7 +296,7 @@ class Coupon extends Model
                         'usage_limit_per_user' => 10,
                         'status' => 'active',
                         'valid_from' => now()->subDay(),
-                        'first_time_only' => $normalized === 'FIRST25',
+                        'first_time_only' => true,
                         'is_featured' => true,
                     ]
                 );
@@ -307,7 +307,7 @@ class Coupon extends Model
                     'discount_type' => 'percentage',
                     'discount_value' => 25.00,
                     'status' => 'active',
-                    'first_time_only' => $normalized === 'FIRST25',
+                    'first_time_only' => true,
                 ]);
             }
         }

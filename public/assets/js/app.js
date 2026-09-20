@@ -1471,7 +1471,8 @@ const App={
                 let h='';
                 data.tiers.forEach(t=>{
                     const save=t.old_price>t.price?Math.round(((t.old_price-t.price)/t.old_price)*100):0;
-                    h+=`<div class="tier-card${t.is_popular?' popular':''}" data-tier="${t.id}" data-price="${t.price}" data-name="${t.name}">
+                    const pType=(t.price_type||'per person').toLowerCase();
+                    h+=`<div class="tier-card${t.is_popular?' popular':''}" data-tier="${t.id}" data-price="${t.price}" data-name="${t.name}" data-price-type="${pType}">
                         ${t.is_popular?'<div class="tier-popular-badge">Popular</div>':''}
                         <div class="tier-card-check"><i class="bi bi-check-lg"></i></div>
                         <div class="tier-card-inner">
@@ -1583,14 +1584,18 @@ const App={
         const adults=parseInt(document.getElementById('bookingAdults')?.value)||1;
         const children=parseInt(document.getElementById('bookingChildren')?.value)||0;
         let price = this.selectedPrice || 0;
-        if (price <= 0) {
-            const selectedTierCard = document.querySelector('.tier-card.selected');
-            if (selectedTierCard && selectedTierCard.dataset.price) {
-                price = parseFloat(selectedTierCard.dataset.price) || 0;
-                this.selectedPrice = price;
-            }
+        const selectedTierCard = document.querySelector('.tier-card.selected');
+        if (price <= 0 && selectedTierCard && selectedTierCard.dataset.price) {
+            price = parseFloat(selectedTierCard.dataset.price) || 0;
+            this.selectedPrice = price;
         }
-        let total=(price * adults)+(price * 0.7 * children);
+        const priceType = (selectedTierCard?.dataset.priceType || 'per person').toLowerCase();
+        let total = 0;
+        if (['per buggy', 'per vehicle', 'per group', 'private'].includes(priceType)) {
+            total = price;
+        } else {
+            total = (price * adults) + (price * 0.70 * children);
+        }
         this.selectedAddons.forEach(a=>total+=a.price);
         return total;
     },
@@ -1598,8 +1603,15 @@ const App={
     updateTotal(){
         const adults=parseInt(document.getElementById('bookingAdults')?.value)||1;
         const children=parseInt(document.getElementById('bookingChildren')?.value)||0;
+        const selectedTierCard = document.querySelector('.tier-card.selected');
+        const priceType = (selectedTierCard?.dataset.priceType || 'per person').toLowerCase();
 
-        let baseTotal=(this.selectedPrice*adults)+(this.selectedPrice*0.7*children);
+        let baseTotal = 0;
+        if (['per buggy', 'per vehicle', 'per group', 'private'].includes(priceType)) {
+            baseTotal = this.selectedPrice;
+        } else {
+            baseTotal = (this.selectedPrice * adults) + (this.selectedPrice * 0.70 * children);
+        }
         this.selectedAddons.forEach(a=>baseTotal+=a.price);
 
         // Apply discount if active coupon is present
@@ -1620,7 +1632,7 @@ const App={
 
             const promoSavingsText = document.getElementById('promoSavingsText');
             if (promoSavingsText) {
-                promoSavingsText.textContent = `AED ${discount.toFixed(2)} saved (${c.discount_type === 'percentage' ? parseInt(c.discount_value) + '% OFF' : 'Discount Applied'})`;
+                promoSavingsText.textContent = `AED ${discount.toFixed(2)} saved (${c.discount_type === 'percentage' ? Math.round(c.discount_value) + '% OFF' : 'Discount Applied'})`;
             }
         }
 

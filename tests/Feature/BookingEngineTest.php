@@ -138,6 +138,171 @@ class BookingEngineTest extends TestCase
     }
 
     /**
+     * Test coupon validation API checks tour restrictions.
+     */
+    public function test_coupon_validation_api_checks_tour_restriction(): void
+    {
+        $tourA = Tour::create([
+            'name' => 'Desert Safari Luxury',
+            'slug' => 'desert-safari-luxury',
+            'status' => 'active',
+            'priority' => 1,
+        ]);
+        $tourB = Tour::create([
+            'name' => 'Dune Buggy Adventure',
+            'slug' => 'dune-buggy-adventure',
+            'status' => 'active',
+            'priority' => 2,
+        ]);
+
+        $coupon = Coupon::create([
+            'code' => 'LUXURYONLY',
+            'name' => 'Luxury Tour Only Promo',
+            'discount_type' => 'percentage',
+            'discount_value' => 15.00,
+            'tour_id' => $tourA->id,
+            'status' => 'active',
+        ]);
+
+        // Wrong tour -> 422 with tour mismatch message
+        $responseWrong = $this->postJson('/api/v1/coupon/validate', [
+            'code' => 'LUXURYONLY',
+            'subtotal' => 300.00,
+            'tour_id' => $tourB->id,
+            'adults' => 2,
+        ]);
+        $responseWrong->assertStatus(422)
+            ->assertJson([
+                'success' => false,
+            ]);
+        $this->assertStringContainsString('Desert Safari Luxury', $responseWrong->json('message'));
+
+        // Matching tour -> 200 with 15% discount applied
+        $responseMatch = $this->postJson('/api/v1/coupon/validate', [
+            'code' => 'LUXURYONLY',
+            'subtotal' => 300.00,
+            'tour_id' => $tourA->id,
+            'adults' => 2,
+        ]);
+        $responseMatch->assertStatus(200)
+            ->assertJson([
+                'success' => true,
+                'coupon' => [
+                    'code' => 'LUXURYONLY',
+                    'discount_amount' => 45.00,
+                    'new_total' => 255.00,
+                ]
+            ]);
+    }
+
+    /**
+     * Test coupon validation API checks minimum guests requirement.
+     */
+    public function test_coupon_validation_api_checks_min_guests(): void
+    {
+        Coupon::create([
+            'code' => 'GROUP3PLUS',
+            'name' => 'Group 3+ Guests Discount',
+            'discount_type' => 'percentage',
+            'discount_value' => 20.00,
+            'min_guests' => 3,
+            'status' => 'active',
+        ]);
+
+        // Less than 3 guests -> 422
+        $responseLess = $this->postJson('/api/v1/coupon/validate', [
+            'code' => 'GROUP3PLUS',
+            'subtotal' => 400.00,
+            'adults' => 1,
+            'children' => 1,
+        ]);
+        $responseLess->assertStatus(422)
+            ->assertJson([
+                'success' => false,
+            ]);
+        $this->assertStringContainsString('minimum of 3 guests', $responseLess->json('message'));
+
+        // 3 guests (2 adults + 1 child) -> 200 with discount
+        $responseEligible = $this->postJson('/api/v1/coupon/validate', [
+            'code' => 'GROUP3PLUS',
+            'subtotal' => 400.00,
+            'adults' => 2,
+            'children' => 1,
+        ]);
+        $responseEligible->assertStatus(200)
+            ->assertJson([
+                'success' => true,
+                'coupon' => [
+                    'code' => 'GROUP3PLUS',
+                    'discount_amount' => 80.00,
+                    'new_total' => 320.00,
+                ]
+            ]);
+    }
+
+    /**
+     * Test coupon validation API checks minimum spend requirement.
+     */
+    public function test_coupon_validation_api_checks_min_spend(): void
+    {
+        Coupon::create([
+            'code' => 'SPEND500',
+            'name' => 'Spend 500 Promo',
+            'discount_type' => 'fixed',
+            'discount_value' => 50.00,
+            'min_spend' => 500.00,
+            'status' => 'active',
+        ]);
+
+        // Under 500 -> 422
+        $responseUnder = $this->postJson('/api/v1/coupon/validate', [
+            'code' => 'SPEND500',
+            'subtotal' => 350.00,
+            'adults' => 1,
+        ]);
+        $responseUnder->assertStatus(422)
+            ->assertJson(['success' => false]);
+        $this->assertStringContainsString('Minimum booking value of AED 500.00 required', $responseUnder->json('message'));
+
+        // 500 or more -> 200 with 50 discount
+        $responseOver = $this->postJson('/api/v1/coupon/validate', [
+            'code' => 'SPEND500',
+            'subtotal' => 600.00,
+            'adults' => 1,
+        ]);
+        $responseOver->assertStatus(200)
+            ->assertJson([
+                'success' => true,
+                'coupon' => [
+                    'code' => 'SPEND500',
+                    'discount_amount' => 50.00,
+                    'new_total' => 550.00,
+                ]
+            ]);
+    }
+
+    /**
+     * Test coupon validation API supports dynamic FIRST25-* prefix.
+     */
+    public function test_coupon_validation_api_dynamic_first25_prefix(): void
+    {
+        $response = $this->postJson('/api/v1/coupon/validate', [
+            'code' => 'FIRST25-QA99X',
+            'subtotal' => 400.00,
+            'adults' => 2,
+        ]);
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => true,
+                'coupon' => [
+                    'code' => 'FIRST25-QA99X',
+                    'discount_amount' => 100.00,
+                    'new_total' => 300.00,
+                ]
+            ]);
+    }
+
+    /**
      * Test that fixed coupons strictly enforce max_discount caps.
      */
     public function test_fixed_coupon_enforces_max_discount_cap(): void

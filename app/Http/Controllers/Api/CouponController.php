@@ -38,7 +38,7 @@ class CouponController extends Controller
         $email = $request->input('email');
         $adults = (int)$request->input('adults', 1);
         $children = (int)$request->input('children', 0);
-        $totalGuests = max(1, $adults + $children);
+        $totalGuests = (int)$request->input('guests', max(1, $adults + $children));
         $tourDate = $request->input('date');
 
         // If client sent 0 subtotal but specified tour & tier, resolve price from database
@@ -48,7 +48,13 @@ class CouponController extends Controller
                 ->where('tier_id', $tierId)
                 ->first();
             if ($pricing && (float)$pricing->price > 0) {
-                $subtotal = (float)$pricing->price * $totalGuests;
+                $priceType = strtolower($pricing->price_type ?? 'per person');
+                if (in_array($priceType, ['per buggy', 'per vehicle', 'per group', 'private'])) {
+                    $subtotal = (float)$pricing->price;
+                } else {
+                    $childPrice = round((float)$pricing->price * 0.70, 2);
+                    $subtotal = ((float)$pricing->price * $adults) + ($childPrice * $children);
+                }
             }
         }
 
@@ -57,7 +63,7 @@ class CouponController extends Controller
         if (!$coupon) {
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid promo code. Please check and try again.'
+                'message' => 'Invalid promo code. Please check for typos and try again.'
             ], 422);
         }
 
@@ -109,6 +115,9 @@ class CouponController extends Controller
                 'original_total' => $subtotal,
                 'new_total' => $newTotal,
                 'savings_text' => $savingsText,
+                'formatted_discount' => 'AED ' . number_format($discountAmount, 2),
+                'formatted_new_total' => 'AED ' . number_format($newTotal, 2),
+                'formatted_original_total' => 'AED ' . number_format($subtotal, 2),
             ]
         ]);
     }

@@ -230,36 +230,45 @@
                                 ]) !!}
                             </div>
 
-                            <!-- Promo / Coupon Code Section -->
+                            <!-- Luxury Voucher & Promo Code Section -->
                             <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white p-3" id="promoCodeCard">
                                 <div class="d-flex align-items-center justify-content-between mb-2">
-                                    <label class="fw-800 small text-muted text-uppercase mb-0" for="bookingPromoCode">
-                                        <i class="bi bi-tag-fill text-primary me-1"></i> Have a Promo Code?
+                                    <label class="fw-800 small text-dark text-uppercase mb-0 d-flex align-items-center gap-1" for="bookingPromoCode" style="font-size: 0.78rem; letter-spacing: 0.5px;">
+                                        <i class="bi bi-ticket-perforated-fill text-primary"></i> Have a Promo Code or Voucher?
                                     </label>
-                                    <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1 small fw-bold d-none" id="promoAppliedBadge">
-                                        <i class="bi bi-check-circle-fill me-1"></i>Applied
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 small fw-bold d-none" id="promoAppliedBadge">
+                                        <i class="bi bi-check2-circle me-1"></i>Applied
                                     </span>
                                 </div>
-                                <div class="input-group rounded-4 overflow-hidden border" id="promoInputGroup">
-                                    <input type="text" class="form-control border-0 shadow-none fw-bold text-uppercase px-3 font-monospace" id="bookingPromoCode" name="coupon_code" placeholder="ENTER CODE (e.g. SUMMER2026)" style="height: 48px; letter-spacing: 1px;" autocomplete="off">
-                                    <button class="btn btn-dark px-4 fw-800" type="button" id="applyPromoBtn">Apply</button>
+                                <div class="input-group overflow-hidden" id="promoInputGroup">
+                                    <input type="text" class="form-control" id="bookingPromoCode" name="coupon_code" placeholder="Enter promo code (e.g. DUNESWELCOME)" autocomplete="off" spellcheck="false">
+                                    <button class="btn" type="button" id="applyPromoBtn">
+                                        <span>Apply</span>
+                                        <i class="bi bi-arrow-right-short fs-5"></i>
+                                    </button>
                                 </div>
                                 
-                                <div class="d-none mt-2 align-items-center justify-content-between p-3 rounded-4 bg-success-subtle text-success border border-success-subtle" id="promoSuccessBox">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width: 28px; height: 28px;">
+                                <div class="d-none mt-2 align-items-center justify-content-between" id="promoSuccessBox">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width: 32px; height: 32px;">
                                             <i class="bi bi-check-lg fw-bold"></i>
                                         </div>
                                         <div>
-                                            <strong class="d-block font-monospace fs-6" id="promoCodeLabel">CODE</strong>
-                                            <small class="fw-bold" id="promoSavingsText">Savings applied</small>
+                                            <div class="d-flex align-items-center gap-2 mb-0.5">
+                                                <span class="promo-badge-pill" id="promoCodeLabel">CODE</span>
+                                                <span class="badge bg-success text-white small fw-bold" id="promoDiscountBadge">Applied</span>
+                                            </div>
+                                            <div class="small fw-bold text-success" id="promoSavingsText">Savings applied</div>
                                         </div>
                                     </div>
-                                    <button type="button" class="btn btn-sm btn-link text-danger text-decoration-none fw-bold p-0" id="removePromoBtn">
-                                        <i class="bi bi-x-circle-fill me-1"></i>Remove
+                                    <button type="button" id="removePromoBtn" aria-label="Remove promo code">
+                                        <i class="bi bi-x-circle me-1"></i>Remove
                                     </button>
                                 </div>
-                                <div class="alert alert-danger p-2 small mt-2 d-none mb-0 rounded-3" id="promoErrorBox"></div>
+                                <div class="d-none mt-2" id="promoErrorBox">
+                                    <i class="bi bi-exclamation-circle-fill text-danger me-2 fs-6 flex-shrink-0"></i>
+                                    <span id="promoErrorMessage">Invalid promo code.</span>
+                                </div>
                             </div>
 
                             <div class="mb-4" id="paymentOptions" data-ziina-active="{{ $ziinaActive ? '1' : '0' }}" data-advance-percent="{{ $advancePercent }}">
@@ -327,7 +336,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const successBox = document.getElementById('promoSuccessBox');
     const inputGroup = document.getElementById('promoInputGroup');
     const errorBox = document.getElementById('promoErrorBox');
+    const errorMsg = document.getElementById('promoErrorMessage');
     const codeLabel = document.getElementById('promoCodeLabel');
+    const discountBadge = document.getElementById('promoDiscountBadge');
     const savingsLabel = document.getElementById('promoSavingsText');
     const appliedBadge = document.getElementById('promoAppliedBadge');
 
@@ -338,13 +349,18 @@ document.addEventListener('DOMContentLoaded', function() {
         promoInput.value = urlPromo.toUpperCase().trim();
     }
 
-    window.validateCurrentPromo = function() {
+    window.validateCurrentPromo = function(isSilent = false) {
         if (!promoInput) return;
-        const code = promoInput.value.trim().toUpperCase();
+        const code = (promoInput.value || '').trim().toUpperCase();
         if (!code) {
-            if (errorBox) {
-                errorBox.innerText = 'Please enter a promo code.';
+            if (!isSilent && errorBox) {
+                if (errorMsg) errorMsg.innerText = 'Please enter a promo or voucher code.';
                 errorBox.classList.remove('d-none');
+                errorBox.classList.add('d-flex');
+                if (inputGroup) {
+                    inputGroup.classList.add('has-error', 'shake-field');
+                    setTimeout(() => inputGroup.classList.remove('shake-field'), 500);
+                }
             }
             return;
         }
@@ -358,11 +374,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const adults = parseInt(document.getElementById('bookingAdults')?.value || '1', 10);
+        const children = parseInt(document.getElementById('bookingChildren')?.value || '0', 10);
+        const totalGuests = Math.max(1, adults + children);
 
         if (subtotal <= 0) {
             const selectedTierCard = document.querySelector('.tier-card.selected');
             if (selectedTierCard && selectedTierCard.dataset.price) {
-                subtotal = parseFloat(selectedTierCard.dataset.price) * adults;
+                const p = parseFloat(selectedTierCard.dataset.price) || 0;
+                const pType = (selectedTierCard.dataset.priceType || 'per person').toLowerCase();
+                if (['per buggy', 'per vehicle', 'per group', 'private'].includes(pType)) {
+                    subtotal = p;
+                } else {
+                    subtotal = (p * adults) + (p * 0.70 * children);
+                }
             }
         }
 
@@ -380,18 +404,25 @@ document.addEventListener('DOMContentLoaded', function() {
         const tierVal = document.getElementById('selectedTier')?.value || (window.App ? window.App.selectedTier : null);
         const tierId = tierVal ? parseInt(tierVal, 10) : null;
 
-        if (applyBtn) {
-            applyBtn.disabled = true;
-            applyBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span>';
+        if (!isSilent) {
+            if (applyBtn) {
+                applyBtn.disabled = true;
+                applyBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Checking...';
+            }
+            if (promoInput) promoInput.disabled = true;
+            if (errorBox) {
+                errorBox.classList.add('d-none');
+                errorBox.classList.remove('d-flex');
+            }
+            if (inputGroup) inputGroup.classList.remove('has-error', 'shake-field');
         }
-        if (errorBox) errorBox.classList.add('d-none');
 
         fetch('/api/v1/coupon/validate', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || window.CSRF_TOKEN || ''
             },
             body: JSON.stringify({
                 code: code,
@@ -400,94 +431,163 @@ document.addEventListener('DOMContentLoaded', function() {
                 tier_id: tierId,
                 email: email,
                 adults: adults,
+                children: children,
+                guests: totalGuests,
                 date: tourDate
             })
         })
         .then(res => res.json().then(data => ({ status: res.status, body: data })))
         .then(({ status, body }) => {
-            if (applyBtn) {
-                applyBtn.disabled = false;
-                applyBtn.innerText = 'Apply';
+            if (!isSilent) {
+                if (applyBtn) {
+                    applyBtn.disabled = false;
+                    applyBtn.innerHTML = '<span>Apply</span> <i class="bi bi-arrow-right-short fs-5"></i>';
+                }
+                if (promoInput) promoInput.disabled = false;
             }
 
             if (status === 200 && body.success && body.coupon) {
                 window.appliedPromoCoupon = body.coupon;
-                codeLabel.innerText = body.coupon.code;
-                if (body.coupon.savings_text) {
-                    savingsLabel.innerText = body.coupon.savings_text;
+                if (codeLabel) codeLabel.innerText = body.coupon.code;
+                if (discountBadge) {
+                    if (body.coupon.discount_type === 'percentage') {
+                        discountBadge.innerText = `${Math.round(body.coupon.discount_value)}% OFF`;
+                    } else if (body.coupon.discount_type === 'per_person') {
+                        discountBadge.innerText = `AED ${body.coupon.discount_value}/guest`;
+                    } else {
+                        discountBadge.innerText = 'Flat Discount';
+                    }
+                }
+                if (savingsLabel) {
+                    savingsLabel.innerText = body.coupon.savings_text || `AED ${body.coupon.discount_amount} saved`;
                 }
                 
-                inputGroup.classList.add('d-none');
-                successBox.classList.remove('d-none');
-                successBox.classList.add('d-flex');
+                if (inputGroup) {
+                    inputGroup.classList.add('d-none');
+                    inputGroup.classList.remove('has-error', 'shake-field');
+                }
+                if (successBox) {
+                    successBox.classList.remove('d-none');
+                    successBox.classList.add('d-flex');
+                }
                 if (appliedBadge) appliedBadge.classList.remove('d-none');
+                if (errorBox) {
+                    errorBox.classList.add('d-none');
+                    errorBox.classList.remove('d-flex');
+                }
 
                 if (window.App && typeof window.App.updateTotal === 'function') {
                     window.App.updateTotal();
                 } else if (window.DunesApp && typeof window.DunesApp.updateTotal === 'function') {
                     window.DunesApp.updateTotal();
-                } else {
-                    const originalTotal = parseFloat(body.coupon.original_total);
-                    const newTotal = parseFloat(body.coupon.new_total);
-                    const totalEl = document.getElementById('bookingTotal');
-                    const summaryTotalEl = document.getElementById('summaryTotal');
-
-                    if (totalEl) totalEl.innerText = `AED ${newTotal.toFixed(2)}`;
-                    if (summaryTotalEl) {
-                        summaryTotalEl.innerHTML = `<span class="text-decoration-line-through text-muted small me-2">AED ${originalTotal.toFixed(2)}</span> <span class="text-success">AED ${newTotal.toFixed(2)}</span>`;
-                    }
                 }
             } else {
-                window.appliedPromoCoupon = null;
-                if (errorBox) {
-                    errorBox.innerText = body.message || 'Invalid promo code.';
-                    errorBox.classList.remove('d-none');
+                if (isSilent) {
+                    // Coupon is no longer eligible under modified booking parameters
+                    const oldCode = window.appliedPromoCoupon ? window.appliedPromoCoupon.code : code;
+                    window.removeCurrentPromo(true);
+                    if (window.App && typeof window.App.toast === 'function') {
+                        window.App.toast(`Promo code ${oldCode} was removed: ${body.message || 'Not eligible for selected tour/package'}`, 'warning');
+                    }
+                } else {
+                    window.appliedPromoCoupon = null;
+                    if (errorBox) {
+                        if (errorMsg) errorMsg.innerText = body.message || 'Invalid promo code. Please check for typos and try again.';
+                        errorBox.classList.remove('d-none');
+                        errorBox.classList.add('d-flex');
+                    }
+                    if (inputGroup) {
+                        inputGroup.classList.add('has-error', 'shake-field');
+                        setTimeout(() => inputGroup.classList.remove('shake-field'), 500);
+                    }
                 }
             }
         })
         .catch(err => {
-            if (applyBtn) {
-                applyBtn.disabled = false;
-                applyBtn.innerText = 'Apply';
-            }
-            if (errorBox) {
-                errorBox.innerText = 'Unable to validate promo code. Please try again.';
-                errorBox.classList.remove('d-none');
+            if (!isSilent) {
+                if (applyBtn) {
+                    applyBtn.disabled = false;
+                    applyBtn.innerHTML = '<span>Apply</span> <i class="bi bi-arrow-right-short fs-5"></i>';
+                }
+                if (promoInput) promoInput.disabled = false;
+                if (errorBox) {
+                    if (errorMsg) errorMsg.innerText = 'Unable to validate promo code. Please check connection and try again.';
+                    errorBox.classList.remove('d-none');
+                    errorBox.classList.add('d-flex');
+                }
             }
         });
     };
 
-    window.removeCurrentPromo = function() {
+    window.removeCurrentPromo = function(isSilent = false) {
         window.appliedPromoCoupon = null;
         if (promoInput) promoInput.value = '';
-        if (inputGroup) inputGroup.classList.remove('d-none');
+        if (inputGroup) {
+            inputGroup.classList.remove('d-none', 'has-error', 'shake-field');
+        }
         if (successBox) {
             successBox.classList.add('d-none');
             successBox.classList.remove('d-flex');
         }
         if (appliedBadge) appliedBadge.classList.add('d-none');
-        if (errorBox) errorBox.classList.add('d-none');
+        if (errorBox) {
+            errorBox.classList.add('d-none');
+            errorBox.classList.remove('d-flex');
+        }
 
         if (window.App && typeof window.App.updateTotal === 'function') {
             window.App.updateTotal();
         } else if (window.DunesApp && typeof window.DunesApp.updateTotal === 'function') {
             window.DunesApp.updateTotal();
         }
+
+        if (!isSilent && window.App && typeof window.App.toast === 'function') {
+            window.App.toast('Promo code removed', 'success');
+        }
     };
 
-    if (applyBtn) applyBtn.addEventListener('click', window.validateCurrentPromo);
-    if (removeBtn) removeBtn.addEventListener('click', window.removeCurrentPromo);
+    window.revalidateAppliedPromo = function() {
+        if (window.appliedPromoCoupon && promoInput && promoInput.value.trim()) {
+            window.validateCurrentPromo(true);
+        }
+    };
+
+    if (applyBtn) applyBtn.addEventListener('click', () => window.validateCurrentPromo(false));
+    if (removeBtn) removeBtn.addEventListener('click', () => window.removeCurrentPromo(false));
     if (promoInput) {
         promoInput.addEventListener('input', function() {
-            if (errorBox) errorBox.classList.add('d-none');
+            if (errorBox) {
+                errorBox.classList.add('d-none');
+                errorBox.classList.remove('d-flex');
+            }
+            if (inputGroup) inputGroup.classList.remove('has-error', 'shake-field');
         });
         promoInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                window.validateCurrentPromo();
+                window.validateCurrentPromo(false);
             }
         });
     }
+
+    // Auto-revalidate promo if tour, package, date, or guests change
+    const tourSelect = document.getElementById('bookingTour');
+    const tierInput = document.getElementById('selectedTier');
+    const dateInput = document.getElementById('bookingDate');
+    const adultsInput = document.getElementById('bookingAdults');
+    const childrenInput = document.getElementById('bookingChildren');
+
+    if (tourSelect) tourSelect.addEventListener('change', window.revalidateAppliedPromo);
+    if (tierInput) tierInput.addEventListener('change', window.revalidateAppliedPromo);
+    if (dateInput) dateInput.addEventListener('change', window.revalidateAppliedPromo);
+    if (adultsInput) adultsInput.addEventListener('change', window.revalidateAppliedPromo);
+    if (childrenInput) childrenInput.addEventListener('change', window.revalidateAppliedPromo);
+
+    document.querySelectorAll('[data-action="plus"], [data-action="minus"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            setTimeout(window.revalidateAppliedPromo, 100);
+        });
+    });
 });
 </script>
 
