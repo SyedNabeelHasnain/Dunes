@@ -39,6 +39,8 @@
     $waPhone = $settings['site_whatsapp'] ?? '971502456056';
     $phone = $settings['site_phone'] ?? '+971 50 245 6056';
     $email = $settings['site_email'] ?? 'info@dunesdiscoverytourism.com';
+    $conciergePromoActive = isset($settings['concierge_promo_active']) && $settings['concierge_promo_active'] === '1';
+    $conciergePromoDiscount = $settings['concierge_promo_discount'] ?? '5';
     
     $cssFile = public_path('assets/css/app.min.css');
     $cacheVer = file_exists($cssFile) ? filemtime($cssFile) : ($settings['cache_version'] ?? time());
@@ -407,7 +409,9 @@
                                             <small class="text-white-50" style="font-size: 11px;">Find ideal tour in 30 seconds</small>
                                         </div>
                                     </div>
-                                    <span class="badge bg-warning text-dark rounded-pill px-2 py-1 fw-bold" style="font-size: 10px;">5% OFF</span>
+                                    @if($conciergePromoActive)
+                                    <span class="badge bg-warning text-dark rounded-pill px-2 py-1 fw-bold" style="font-size: 10px;">{{ $conciergePromoDiscount }}% OFF</span>
+                                    @endif
                                 </button>
                                 <a href="{{ route('tours.customizer') }}" class="btn btn-light w-100 rounded-pill py-2 px-3 d-flex align-items-center justify-content-between text-start border small fw-bold text-dark">
                                     <span class="d-flex align-items-center gap-2">
@@ -453,7 +457,9 @@
                             <button type="button" class="btn btn-outline-warning rounded-pill px-2.5 py-1.5 d-none d-xxl-inline-flex align-items-center gap-1.5 small shadow-none hover-shadow-sm transition-all text-nowrap" data-bs-toggle="modal" data-bs-target="#safariMatcherModal" style="font-size: 0.82rem; border-color: rgba(246, 144, 68, 0.45); color: #F69044;" aria-label="Safari Match Concierge">
                                 <i class="bi bi-compass text-warning"></i>
                                 <span class="fw-bold">Safari Concierge</span>
-                                <span class="badge bg-warning text-dark rounded-pill px-1.5 py-0.5" style="font-size: 9px;">5% OFF</span>
+                                @if($conciergePromoActive)
+                                <span class="badge bg-warning text-dark rounded-pill px-1.5 py-0.5" style="font-size: 9px;">{{ $conciergePromoDiscount }}% OFF</span>
+                                @endif
                             </button>
                             <button type="button" class="btn btn-light border rounded-circle shadow-sm d-none d-lg-inline-flex align-items-center justify-content-center flex-shrink-0" data-bs-toggle="modal" data-bs-target="#globalSearchModal" style="width: 38px; height: 38px; padding: 0;" title="Search Dubai tours" aria-label="Search Dubai tours">
                                 <i class="bi bi-search text-primary" style="font-size: 14px;"></i>

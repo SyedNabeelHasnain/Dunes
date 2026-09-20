@@ -1,3 +1,7 @@
+@php
+    $settingsService = app(\App\Services\SettingsService::class);
+    $conciergePromoActive = ($settingsService->get('concierge_promo_active', '0') === '1');
+@endphp
 @extends('layouts.app')
 
 @push('schema')
@@ -474,14 +478,14 @@
                         </div>
                     </div>
 
-                    <!-- Promo Code Input for MATCH5 / SAVE5 -->
+                    <!-- Promo Code Input (e.g. DUNESWELCOME) -->
                     <div class="mb-3">
                         <div class="input-group rounded-pill overflow-hidden border border-secondary border-opacity-25" style="background: rgba(255, 255, 255, 0.05);">
-                            <input type="text" class="form-control border-0 bg-transparent text-white font-monospace text-uppercase px-3 small" id="customizerPromoInput" placeholder="Promo code (e.g. MATCH5)" style="font-size: 0.8rem;">
+                            <input type="text" class="form-control border-0 bg-transparent text-white font-monospace text-uppercase px-3 small" id="customizerPromoInput" placeholder="Promo code (e.g. DUNESWELCOME)" style="font-size: 0.8rem;">
                             <button class="btn btn-outline-warning border-0 px-3 fw-bold small" type="button" id="customizerApplyPromoBtn">Apply</button>
                         </div>
                         <div class="small text-success fw-bold mt-1 d-none" id="customizerPromoNotice">
-                            <i class="bi bi-check-circle-fill me-1"></i> 5% Discount Applied!
+                            <i class="bi bi-check-circle-fill me-1"></i> Discount Applied!
                         </div>
                     </div>
 
@@ -653,16 +657,24 @@ document.addEventListener('DOMContentLoaded', function() {
     if (applyPromoBtn) {
         applyPromoBtn.addEventListener('click', () => {
             const code = (promoInputEl.value || '').trim().toUpperCase();
-            if (code === 'MATCH5' || code === 'SAVE5' || code === 'WELCOME5') {
+            const conciergeActive = {{ $conciergePromoActive ? 'true' : 'false' }};
+            if (code === 'DUNESWELCOME' || code === 'FIRST25' || code.startsWith('FIRST25-')) {
+                state.discountPercent = 25;
+                promoNoticeEl.classList.remove('d-none');
+                promoNoticeEl.className = 'small text-success fw-bold mt-1';
+                promoNoticeEl.innerText = `Promo ${code} applied (25% OFF)`;
+                updateCalculation();
+            } else if ((code === 'MATCH5' && conciergeActive) || code === 'SAVE5') {
                 state.discountPercent = 5;
                 promoNoticeEl.classList.remove('d-none');
+                promoNoticeEl.className = 'small text-success fw-bold mt-1';
                 promoNoticeEl.innerText = `Promo ${code} applied (5% OFF)`;
                 updateCalculation();
             } else {
                 state.discountPercent = 0;
                 promoNoticeEl.classList.remove('d-none');
                 promoNoticeEl.className = 'small text-danger fw-bold mt-1';
-                promoNoticeEl.innerText = 'Invalid promo code. Try MATCH5 or SAVE5';
+                promoNoticeEl.innerText = 'Invalid or inactive promo code.';
                 updateCalculation();
             }
         });

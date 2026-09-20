@@ -232,25 +232,39 @@ class Coupon extends Model
         }
 
         $normalized = strtoupper(trim($code));
+        $conciergeActive = false;
+        try {
+            $conciergeActive = \Illuminate\Support\Facades\DB::table('settings')
+                ->where('setting_key', 'concierge_promo_active')
+                ->value('setting_value') === '1';
+        } catch (\Throwable $e) {
+            $conciergeActive = false;
+        }
+
         $coupon = static::where('code', $normalized)->first();
+
         if ($coupon) {
+            if ($normalized === 'MATCH5' && !$conciergeActive) {
+                $coupon->status = 'inactive';
+            }
             return $coupon;
         }
 
         // Automatic fallback for system-defined gamified codes (MATCH5, SAVE5)
         if (in_array($normalized, ['MATCH5', 'SAVE5'])) {
+            $status = ($normalized === 'MATCH5') ? ($conciergeActive ? 'active' : 'inactive') : 'active';
             try {
                 return static::firstOrCreate(
                     ['code' => $normalized],
                     [
-                        'name' => $normalized === 'MATCH5' ? 'Safari Matcher AI 5% Discount' : 'Exit-Intent Cart Saver 5% Discount',
+                        'name' => $normalized === 'MATCH5' ? 'Safari Match Concierge 5% Discount' : 'Exit-Intent Cart Saver 5% Discount',
                         'description' => 'System discount code (5% off)',
                         'discount_type' => 'percentage',
                         'discount_value' => 5.00,
                         'min_spend' => 0.00,
                         'min_guests' => 1,
                         'usage_limit_per_user' => 10,
-                        'status' => 'active',
+                        'status' => $status,
                         'valid_from' => now()->subDay(),
                         'is_featured' => true,
                     ]
@@ -258,12 +272,43 @@ class Coupon extends Model
             } catch (\Throwable $e) {
                 $c = new static([
                     'code' => $normalized,
-                    'name' => $normalized === 'MATCH5' ? 'Safari Matcher AI 5% Discount' : 'Exit-Intent Cart Saver 5% Discount',
+                    'name' => $normalized === 'MATCH5' ? 'Safari Match Concierge 5% Discount' : 'Exit-Intent Cart Saver 5% Discount',
                     'discount_type' => 'percentage',
                     'discount_value' => 5.00,
-                    'status' => 'active',
+                    'status' => $status,
                 ]);
                 return $c;
+            }
+        }
+
+        // Automatic fallback for official first-time visitor 25% promo codes
+        if (in_array($normalized, ['DUNESWELCOME', 'FIRST25'])) {
+            try {
+                return static::firstOrCreate(
+                    ['code' => $normalized],
+                    [
+                        'name' => $normalized === 'DUNESWELCOME' ? 'First-Time Welcome 25% Promo (Top Banner)' : 'First-Time Guest 25% Promo',
+                        'description' => 'Official 25% welcome promo code for first-time visitors',
+                        'discount_type' => 'percentage',
+                        'discount_value' => 25.00,
+                        'min_spend' => 0.00,
+                        'min_guests' => 1,
+                        'usage_limit_per_user' => 10,
+                        'status' => 'active',
+                        'valid_from' => now()->subDay(),
+                        'first_time_only' => $normalized === 'FIRST25',
+                        'is_featured' => true,
+                    ]
+                );
+            } catch (\Throwable $e) {
+                return new static([
+                    'code' => $normalized,
+                    'name' => $normalized === 'DUNESWELCOME' ? 'First-Time Welcome 25% Promo (Top Banner)' : 'First-Time Guest 25% Promo',
+                    'discount_type' => 'percentage',
+                    'discount_value' => 25.00,
+                    'status' => 'active',
+                    'first_time_only' => $normalized === 'FIRST25',
+                ]);
             }
         }
 

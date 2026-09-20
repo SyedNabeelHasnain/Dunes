@@ -1,4 +1,10 @@
-<section class="py-5 bg-light position-relative overflow-hidden" id="safariMatcherSection">
+@php
+    $settingsService = app(\App\Services\SettingsService::class);
+    $conciergePromoActive = ($settingsService->get('concierge_promo_active', '0') === '1');
+    $conciergePromoDiscount = $settingsService->get('concierge_promo_discount', '5');
+    $conciergePromoCode = $settingsService->get('concierge_promo_code', 'MATCH5');
+@endphp
+<section class="py-5 bg-light position-relative overflow-hidden" id="safariMatcherSection" data-concierge-promo-active="{{ $conciergePromoActive ? '1' : '0' }}" data-concierge-promo-code="{{ $conciergePromoCode }}">
     <div class="container py-lg-4">
         <div class="row justify-content-center text-center mb-4">
             <div class="col-lg-8">
@@ -127,14 +133,16 @@
                         </div>
 
                         <div class="card bg-light border-0 rounded-4 p-3 p-md-4 mb-4">
+                            @if($conciergePromoActive)
                             <!-- Unlocked Reward Badge -->
                             <div class="p-2.5 rounded-3 mb-3 bg-warning-subtle text-dark border border-warning border-opacity-50 d-flex align-items-center justify-content-between flex-wrap gap-2">
                                 <div class="d-flex align-items-center gap-2">
                                     <span class="fs-5"><i class="bi bi-gift-fill text-primary"></i></span>
-                                    <span class="small fw-bold">5% Matcher Promo Unlocked: <span class="font-monospace text-primary fw-800">MATCH5</span></span>
+                                    <span class="small fw-bold">{{ $conciergePromoDiscount }}% Matcher Promo Unlocked: <span class="font-monospace text-primary fw-800">{{ $conciergePromoCode }}</span></span>
                                 </div>
                                 <span class="badge bg-dark text-warning rounded-pill px-2 py-1 small">Auto-Applies at Checkout</span>
                             </div>
+                            @endif
 
                             <div class="row align-items-center g-3">
                                 <div class="col-md-7">
@@ -152,7 +160,7 @@
                                     <div class="small text-muted text-uppercase fw-bold">Starting From</div>
                                     <div class="h2 fw-800 text-primary mb-2" id="quizMatchedPrice">--</div>
                                     <button type="button" class="btn btn-primary rounded-pill px-4 py-2 fw-800 text-white shadow-sm w-100" id="quizBookBtn">
-                                        <i class="bi bi-lightning-charge-fill me-1"></i> Book with 5% OFF
+                                        <i class="bi bi-calendar-check-fill me-1"></i> {{ $conciergePromoActive ? "Book with {$conciergePromoDiscount}% OFF" : "Book Recommended Tour" }}
                                     </button>
                                 </div>
                             </div>

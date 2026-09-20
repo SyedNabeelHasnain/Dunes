@@ -2442,10 +2442,15 @@ const App={
             bookBtn.addEventListener('click', () => {
                 if (matchedTour && matchedTour.id) {
                     this.openBooking(matchedTour.id);
+                    const isPromoActive = el.dataset.conciergePromoActive === '1';
                     const promoInput = document.getElementById('bookingPromoCode');
-                    if (promoInput) promoInput.value = 'MATCH5';
-                    if (typeof window.validateCurrentPromo === 'function') {
-                        setTimeout(() => window.validateCurrentPromo(), 400);
+                    if (isPromoActive && promoInput) {
+                        promoInput.value = el.dataset.conciergePromoCode || 'MATCH5';
+                        if (typeof window.validateCurrentPromo === 'function') {
+                            setTimeout(() => window.validateCurrentPromo(), 400);
+                        }
+                    } else if (!isPromoActive && promoInput && promoInput.value === 'MATCH5') {
+                        promoInput.value = '';
                     }
                 }
             });

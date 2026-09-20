@@ -87,6 +87,13 @@
 
 <section class="section py-5">
     <div class="container">
+@php
+    $settingsService = app(\App\Services\SettingsService::class);
+    $conciergePromoActive = ($settingsService->get('concierge_promo_active', '0') === '1');
+    $conciergePromoDiscount = $settingsService->get('concierge_promo_discount', '5');
+    $conciergePromoCode = $settingsService->get('concierge_promo_code', 'MATCH5');
+@endphp
+
         <!-- Safari Match Concierge Recommendation Banner -->
         <div class="card border-0 rounded-4 p-4 p-md-4 mb-4 shadow-sm position-relative overflow-hidden" style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); border: 1.5px solid rgba(246, 144, 68, 0.3) !important;">
             <div class="position-absolute top-0 end-0 translate-middle-y me-4 opacity-10 d-none d-md-block" style="font-size: 8rem; pointer-events: none; line-height: 1; color: #F69044;">
@@ -98,13 +105,19 @@
                         <span class="badge rounded-pill px-3 py-1 fw-bold" style="background: rgba(246, 144, 68, 0.2); border: 1px solid #F69044; color: #F69044; font-size: 0.75rem;">
                             <i class="bi bi-stars me-1"></i> Interactive Concierge
                         </span>
+                        @if($conciergePromoActive)
                         <span class="badge bg-warning text-dark rounded-pill px-2.5 py-1 fw-bold" style="font-size: 0.72rem;">
-                            <i class="bi bi-gift-fill me-1"></i> 5% OFF Match Bonus
+                            <i class="bi bi-gift-fill me-1"></i> {{ $conciergePromoDiscount }}% OFF Match Bonus
                         </span>
+                        @endif
                     </div>
                     <h3 class="fw-800 text-white mb-2 fs-4">Not sure which Dubai Safari to choose?</h3>
                     <p class="text-white-50 mb-0 small" style="max-width: 620px;">
-                        Answer 3 quick questions about your group style, timing, and must-have perks. Our <strong>Safari Match Concierge</strong> will recommend your ideal adventure and unlock an instant <strong>5% promo code (MATCH5)</strong>.
+                        @if($conciergePromoActive)
+                        Answer 3 quick questions about your group style, timing, and must-have perks. Our <strong>Safari Match Concierge</strong> will recommend your ideal adventure and unlock an instant <strong>{{ $conciergePromoDiscount }}% promo code ({{ $conciergePromoCode }})</strong>.
+                        @else
+                        Answer 3 quick questions about your group style, timing, and must-have perks. Our <strong>Safari Match Concierge</strong> will instantly recommend your ideal desert adventure tailored to your party.
+                        @endif
                     </p>
                 </div>
                 <div class="col-12 col-lg-4 text-lg-end">

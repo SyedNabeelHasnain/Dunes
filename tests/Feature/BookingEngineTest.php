@@ -95,6 +95,49 @@ class BookingEngineTest extends TestCase
     }
 
     /**
+     * Test that MATCH5 is deactivated when concierge_promo_active is 0, and activates when 1.
+     */
+    public function test_concierge_promo_status_toggle(): void
+    {
+        // Deactivated state
+        Setting::updateOrCreate(['setting_key' => 'concierge_promo_active'], ['setting_value' => '0']);
+        $coupon = Coupon::findByCode('MATCH5');
+        $this->assertNotNull($coupon);
+        $this->assertEquals('inactive', $coupon->status);
+        $checkInactive = $coupon->validateEligibility(200.00);
+        $this->assertFalse($checkInactive['valid']);
+        $this->assertStringContainsString('inactive', strtolower($checkInactive['message']));
+
+        // Activated state
+        Setting::updateOrCreate(['setting_key' => 'concierge_promo_active'], ['setting_value' => '1']);
+        Coupon::where('code', 'MATCH5')->update(['status' => 'active']);
+        $couponActive = Coupon::findByCode('MATCH5');
+        $this->assertEquals('active', $couponActive->status);
+        $checkActive = $couponActive->validateEligibility(200.00);
+        $this->assertTrue($checkActive['valid']);
+        $this->assertEquals(10.00, $checkActive['discount']);
+    }
+
+    /**
+     * Test 25% first-time welcome coupons (DUNESWELCOME and FIRST25).
+     */
+    public function test_welcome_25_percent_coupons(): void
+    {
+        $dunesWelcome = Coupon::findByCode('DUNESWELCOME');
+        $this->assertNotNull($dunesWelcome);
+        $this->assertEquals('active', $dunesWelcome->status);
+        $this->assertEquals(25.00, $dunesWelcome->discount_value);
+        $discount = $dunesWelcome->calculateDiscount(400.00);
+        $this->assertEquals(100.00, $discount);
+
+        $first25 = Coupon::findByCode('FIRST25');
+        $this->assertNotNull($first25);
+        $this->assertEquals('active', $first25->status);
+        $this->assertEquals(25.00, $first25->discount_value);
+        $this->assertTrue((bool)$first25->first_time_only);
+    }
+
+    /**
      * Test that fixed coupons strictly enforce max_discount caps.
      */
     public function test_fixed_coupon_enforces_max_discount_cap(): void

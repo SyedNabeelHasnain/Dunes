@@ -1,5 +1,12 @@
+@php
+    $settingsService = app(\App\Services\SettingsService::class);
+    $conciergePromoActive = ($settingsService->get('concierge_promo_active', '0') === '1');
+    $conciergePromoDiscount = $settingsService->get('concierge_promo_discount', '5');
+    $conciergePromoCode = $settingsService->get('concierge_promo_code', 'MATCH5');
+@endphp
+
 <!-- Safari Match Concierge Recommendation & Special Offer Modal -->
-<div class="modal fade" id="safariMatcherModal" tabindex="-1" aria-labelledby="safariMatcherModalLabel" aria-hidden="true">
+<div class="modal fade" id="safariMatcherModal" tabindex="-1" aria-labelledby="safariMatcherModalLabel" aria-hidden="true" data-concierge-promo-active="{{ $conciergePromoActive ? '1' : '0' }}" data-concierge-promo-code="{{ $conciergePromoCode }}">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
         <div class="modal-content border-0 shadow-lg" style="background: #0B1120; border: 1px solid rgba(246, 144, 68, 0.35) !important; border-radius: 26px; color: #ffffff; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85);">
             
@@ -279,7 +286,8 @@
                         </div>
                     </div>
 
-                    <!-- Gamified Reward Box: MATCH5 Discount Certificate -->
+                    @if($conciergePromoActive)
+                    <!-- Gamified Reward Box: Concierge Discount Certificate -->
                     <div class="p-3 rounded-4 mb-3 position-relative overflow-hidden" style="background: linear-gradient(135deg, rgba(246, 144, 68, 0.22), rgba(251, 191, 36, 0.12)); border: 1.5px dashed #F69044;">
                         <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
                             <div class="d-flex align-items-center gap-2">
@@ -287,24 +295,25 @@
                                     <i class="bi bi-gift-fill fs-5"></i>
                                 </div>
                                 <div>
-                                    <div class="fw-bold text-white small">Congratulations! 5% Matcher Promo Unlocked</div>
+                                    <div class="fw-bold text-white small">Congratulations! {{ $conciergePromoDiscount }}% Matcher Promo Unlocked</div>
                                     <div class="text-white-50" style="font-size: 0.78rem;">Automatically applied when you proceed to booking.</div>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center gap-2">
-                                <span class="font-monospace fw-bold fs-6 px-3 py-1 rounded-3 bg-dark text-warning border border-warning border-opacity-50">MATCH5</span>
-                                <button type="button" class="btn btn-sm btn-outline-warning rounded-pill px-2.5 py-1 small" id="matcherCopyCodeBtn" title="Copy promo code">
+                                <span class="font-monospace fw-bold fs-6 px-3 py-1 rounded-3 bg-dark text-warning border border-warning border-opacity-50">{{ $conciergePromoCode }}</span>
+                                <button type="button" class="btn btn-sm btn-outline-warning rounded-pill px-2.5 py-1 small" id="matcherCopyCodeBtn" title="Copy promo code" data-code="{{ $conciergePromoCode }}">
                                     <i class="bi bi-clipboard"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
+                    @endif
 
                     <!-- CTA Actions -->
                     <div class="row g-2">
                         <div class="col-12 col-md-7">
                             <button type="button" class="btn btn-desert-animated w-100 py-3 rounded-pill fw-bold fs-6 shadow-sm d-flex align-items-center justify-content-center gap-2" id="matcherBookNowBtn">
-                                <span>Book This Tour with 5% OFF</span>
+                                <span>{{ $conciergePromoActive ? "Book This Tour with {$conciergePromoDiscount}% OFF" : "Book Recommended Safari" }}</span>
                                 <i class="bi bi-arrow-right"></i>
                             </button>
                         </div>
@@ -571,7 +580,10 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             // Set WhatsApp link
-            const waText = encodeURIComponent(`Hi Dunes Discovery! Your Safari Match Concierge recommended "${bestTour.name}" for my party with code MATCH5. Could you please share availability and details?`);
+            const isPromoActive = matcherModalEl.dataset.conciergePromoActive === '1';
+            const promoCodeVal = matcherModalEl.dataset.conciergePromoCode || 'MATCH5';
+            const waCodeText = isPromoActive ? ` with code ${promoCodeVal}` : '';
+            const waText = encodeURIComponent(`Hi Dunes Discovery! Your Safari Match Concierge recommended "${bestTour.name}" for my party${waCodeText}. Could you please share availability and details?`);
             whatsAppBtn.href = `https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}?text=${waText}`;
 
         }, 600);
@@ -588,10 +600,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Copy MATCH5 Code
+    // Copy Concierge Promo Code
     if (copyCodeBtn) {
         copyCodeBtn.addEventListener('click', function() {
-            navigator.clipboard.writeText('MATCH5').then(() => {
+            const codeToCopy = copyCodeBtn.dataset.code || matcherModalEl.dataset.conciergePromoCode || 'MATCH5';
+            navigator.clipboard.writeText(codeToCopy).then(() => {
                 const orig = copyCodeBtn.innerHTML;
                 copyCodeBtn.innerHTML = '<i class="bi bi-check-lg text-success"></i>';
                 setTimeout(() => { copyCodeBtn.innerHTML = orig; }, 2000);
@@ -619,7 +632,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Book Now button: closes matcher, opens booking modal with MATCH5 & matched tour pre-selected!
+    // Book Now button: closes matcher, opens booking modal with matched tour pre-selected!
     if (bookNowBtn) {
         bookNowBtn.addEventListener('click', function() {
             const modal = bootstrap.Modal.getInstance(matcherModalEl);
@@ -643,15 +656,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
 
-                // Pre-load MATCH5 code
+                // Pre-load promo code ONLY if concierge promo is currently active
+                const isPromoActive = matcherModalEl.dataset.conciergePromoActive === '1';
                 const promoInput = document.getElementById('bookingPromoCode');
-                if (promoInput) {
-                    promoInput.value = 'MATCH5';
-                }
-
-                // Trigger promo validation
-                if (typeof window.validateCurrentPromo === 'function') {
-                    setTimeout(() => window.validateCurrentPromo(), 400);
+                if (isPromoActive && promoInput) {
+                    promoInput.value = matcherModalEl.dataset.conciergePromoCode || 'MATCH5';
+                    if (typeof window.validateCurrentPromo === 'function') {
+                        setTimeout(() => window.validateCurrentPromo(), 400);
+                    }
+                } else if (!isPromoActive && promoInput && promoInput.value === 'MATCH5') {
+                    promoInput.value = '';
                 }
             }, 350);
         });

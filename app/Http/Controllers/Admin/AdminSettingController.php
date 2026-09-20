@@ -58,19 +58,7 @@ class AdminSettingController extends Controller
      */
     public function marketing()
     {
-        $keys = [
-            'promo_top_banner_enabled', 'promo_top_banner_badge', 'promo_top_banner_text',
-            'promo_top_banner_code', 'promo_top_banner_discount',
-            'promo_welcome_modal_enabled', 'promo_welcome_modal_headline',
-            'promo_welcome_modal_subheadline', 'promo_welcome_modal_discount',
-            'promo_welcome_modal_timer_minutes', 'promo_welcome_modal_delay_seconds'
-        ];
-
-        $settings = Setting::whereIn('setting_key', $keys)
-            ->get()
-            ->pluck('setting_value', 'setting_key');
-
-        return view('admin.settings.marketing', compact('settings'));
+        return redirect()->route('admin.coupons.popup-settings');
     }
 
     /**

@@ -20,6 +20,16 @@
     </div>
 </div>
 
+<!-- Unified Section Navigation Tabs -->
+<div class="d-flex gap-2 mb-4 border-bottom pb-3">
+    <a href="{{ route('admin.coupons.index') }}" class="btn btn-primary rounded-pill px-3 py-1.5 fw-bold small shadow-sm">
+        <i class="bi bi-ticket-perforated me-1"></i> All Promo Codes
+    </a>
+    <a href="{{ route('admin.coupons.popup-settings') }}" class="btn btn-light rounded-pill px-3 py-1.5 fw-bold small border text-muted">
+        <i class="bi bi-megaphone me-1 text-warning"></i> Campaign Triggers & Banners (25% & Concierge)
+    </a>
+</div>
+
 <!-- 4 Key Performance Metric Cards -->
 <div class="row g-3 g-lg-4 mb-4">
     <div class="col-xl-3 col-sm-6">
@@ -149,6 +159,11 @@
                             </div>
                             @if($coupon->is_featured)
                                 <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill mt-1" style="font-size: 0.7rem;"><i class="bi bi-star-fill me-1"></i>Featured</span>
+                            @endif
+                            @if($coupon->code === 'MATCH5')
+                                <span class="badge bg-secondary-subtle text-secondary rounded-pill mt-1" style="font-size: 0.68rem;"><i class="bi bi-compass me-1"></i>Concierge Managed</span>
+                            @elseif($coupon->code === 'DUNESWELCOME' || $coupon->code === 'FIRST25')
+                                <span class="badge bg-primary-subtle text-primary rounded-pill mt-1" style="font-size: 0.68rem;"><i class="bi bi-gift-fill me-1"></i>25% First-Time Offer</span>
                             @endif
                         </td>
 

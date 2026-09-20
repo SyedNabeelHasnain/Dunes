@@ -71,8 +71,9 @@ class AdminCouponController extends Controller
 
         $tours = Tour::where('status', 'active')->orderBy('priority', 'asc')->get();
         $tiers = Tier::where('status', 'active')->orderBy('priority', 'asc')->get();
+        $settings = app(SettingsService::class);
 
-        return view('admin.coupons.index', compact('coupons', 'stats', 'tours', 'tiers', 'status', 'type', 'search'));
+        return view('admin.coupons.index', compact('coupons', 'stats', 'tours', 'tiers', 'status', 'type', 'search', 'settings'));
     }
 
     /**
@@ -330,14 +331,38 @@ class AdminCouponController extends Controller
             'top_promo_banner_active',
             'top_promo_banner_text',
             'top_promo_banner_code',
+            'top_promo_banner_badge',
+            'concierge_promo_active',
+            'concierge_promo_discount',
+            'concierge_promo_code',
         ];
 
         $data = $request->only($allowed);
 
         // Checkbox fields handling
-        $checkboxes = ['welcome_popup_active', 'welcome_popup_scroll_trigger', 'welcome_popup_exit_trigger', 'top_promo_banner_active'];
+        $checkboxes = ['welcome_popup_active', 'welcome_popup_scroll_trigger', 'welcome_popup_exit_trigger', 'top_promo_banner_active', 'concierge_promo_active'];
         foreach ($checkboxes as $cb) {
             $data[$cb] = $request->has($cb) ? '1' : '0';
+        }
+
+        // Synchronize canonical setting pairs across both marketing and coupon namespaces
+        $syncPairs = [
+            'welcome_popup_active' => 'promo_welcome_modal_enabled',
+            'welcome_popup_discount' => 'promo_welcome_modal_discount',
+            'welcome_popup_timer_mins' => 'promo_welcome_modal_timer_minutes',
+            'welcome_popup_delay_sec' => 'promo_welcome_modal_delay_seconds',
+            'welcome_popup_headline' => 'promo_welcome_modal_headline',
+            'welcome_popup_subheadline' => 'promo_welcome_modal_subheadline',
+            'top_promo_banner_active' => 'promo_top_banner_enabled',
+            'top_promo_banner_text' => 'promo_top_banner_text',
+            'top_promo_banner_code' => 'promo_top_banner_code',
+            'top_promo_banner_badge' => 'promo_top_banner_badge',
+        ];
+
+        foreach ($syncPairs as $primaryKey => $alternateKey) {
+            if (isset($data[$primaryKey])) {
+                $data[$alternateKey] = $data[$primaryKey];
+            }
         }
 
         foreach ($data as $key => $value) {
@@ -347,9 +372,30 @@ class AdminCouponController extends Controller
             );
         }
 
+        // Synchronize Safari Match Concierge coupon status and discount rate in database
+        $conciergeActive = ($data['concierge_promo_active'] ?? '0') === '1';
+        $conciergeDiscount = (float)($data['concierge_promo_discount'] ?? 5.00);
+        $conciergeCode = strtoupper(trim($data['concierge_promo_code'] ?? 'MATCH5')) ?: 'MATCH5';
+
+        try {
+            Coupon::updateOrCreate(
+                ['code' => $conciergeCode],
+                [
+                    'name' => 'Safari Match Concierge 5% Discount',
+                    'description' => 'Special discount unlocked via Safari Match Concierge interactive recommendation quiz.',
+                    'discount_type' => 'percentage',
+                    'discount_value' => $conciergeDiscount,
+                    'status' => $conciergeActive ? 'active' : 'inactive',
+                    'is_featured' => $conciergeActive,
+                ]
+            );
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Could not synchronize MATCH5 coupon status: " . $e->getMessage());
+        }
+
         Cache::forget('site_settings_cache');
         Cache::forget('site_home_cache');
 
-        return redirect()->route('admin.coupons.popup-settings')->with('success', 'Welcome offer popup and promo banner settings updated successfully!');
+        return redirect()->route('admin.coupons.popup-settings')->with('success', 'Promotion campaigns, welcome popup, and Concierge promo settings updated successfully!');
     }
 }
