@@ -34,7 +34,7 @@ Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 Route::get('/faq', [PageController::class, 'faq'])->name('faq');
 Route::get('/rate-card', [RateCardController::class, 'index'])->name('rate-card');
-Route::get('/pricing-guide', [RateCardController::class, 'index'])->name('pricing-guide');
+Route::redirect('/pricing-guide', '/rate-card', 301);
 // ── Legal, Privacy & Compliance Policies ──────────────────────────────────
 Route::get('/terms-condition', [LegalController::class, 'terms'])->name('terms');
 Route::get('/privacy-policy', [LegalController::class, 'privacy'])->name('privacy');

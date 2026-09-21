@@ -55,96 +55,31 @@ if (!function_exists('renderReviewCardMarkup')) {
 @push('preloads')
 <link rel="preload" as="image" href="{{ asset('images/desert-safari-poster.avif') }}" fetchpriority="high">
 
-<!-- Schema.org 2026 Connected Knowledge Graph: TravelAgency, LocalBusiness, WebSite, FAQPage, VideoObject -->
+<!-- Homepage-Specific Connected Schema Graph: VideoObject and FAQPage -->
 <script type="application/ld+json">
 {
   "@@context": "https://schema.org",
   "@@graph": [
     {
-      "@@type": ["TravelAgency", "LocalBusiness"],
-      "@@id": "{{ route('home') }}#organization",
-      "name": "{{ $settings['site_name'] ?? 'Dunes Discovery Tourism LLC' }}",
-      "alternateName": ["Dunes Discovery", "Dunes Discovery Tourism Dubai"],
-      "url": "{{ route('home') }}",
-      "logo": "{{ asset('images/logo.png') }}",
-      "image": "{{ asset('images/desert-safari-poster.avif') }}",
-      "description": "{{ $settings['site_description'] ?? 'Licensed Dubai Destination Management Company offering premium Desert Safaris, 1000cc Dune Buggy Rentals, Quad Biking, Dhow Cruise Dinners, and Abu Dhabi City Tours.' }}",
-      "telephone": "{{ $settings['contact_phone'] ?? '+971 50 245 6056' }}",
-      "email": "{{ $settings['contact_email'] ?? 'info@dunesdiscoverytourism.com' }}",
-      "priceRange": "AED 79 - AED 1500",
-      "currenciesAccepted": "AED, USD, EUR, GBP",
-      "paymentAccepted": "Cash, Credit Card, Debit Card, Ziina",
-      "address": {
-        "@@type": "PostalAddress",
-        "streetAddress": "{{ $settings['contact_address'] ?? 'Dubai Desert Safari Terminal, Al Aweer & Lahbab' }}",
-        "addressLocality": "Dubai",
-        "addressRegion": "Dubai",
-        "postalCode": "00000",
-        "addressCountry": "AE"
-      },
-      "geo": {
-        "@@type": "GeoCoordinates",
-        "latitude": "25.2048",
-        "longitude": "55.2708"
-      },
-      "openingHoursSpecification": {
-        "@@type": "OpeningHoursSpecification",
-        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-        "opens": "00:00",
-        "closes": "23:59"
-      },
-      "aggregateRating": {
-        "@@type": "AggregateRating",
-        "ratingValue": "4.9",
-        "reviewCount": "2847",
-        "bestRating": "5",
-        "worstRating": "1"
-      },
-      "hasMerchantReturnPolicy": {
-        "@@type": "MerchantReturnPolicy",
-        "applicableCountry": "AE",
-        "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
-        "merchantReturnDays": 1,
-        "returnMethod": "https://schema.org/ReturnInStore",
-        "returnFees": "https://schema.org/FreeReturn"
-      },
-      "sameAs": [
-        "{{ $settings['social_facebook'] ?? 'https://www.facebook.com/dunesdiscoverytourism' }}",
-        "{{ $settings['social_instagram'] ?? 'https://www.instagram.com/dunesdiscoverytourism' }}",
-        "{{ $settings['social_tripadvisor'] ?? 'https://www.tripadvisor.com' }}"
-      ]
-    },
-    {
-      "@@type": "WebSite",
-      "@@id": "{{ route('home') }}#website",
-      "url": "{{ route('home') }}",
-      "name": "Dunes Discovery Tourism",
-      "publisher": {
-        "@@id": "{{ route('home') }}#organization"
-      },
-      "potentialAction": {
-        "@@type": "SearchAction",
-        "target": "{{ route('tours.index') }}?category={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
-    },
-    {
       "@@type": "VideoObject",
-      "@@id": "{{ route('home') }}#video",
+      "@@id": "{{ url('/') }}#video",
       "name": "Dubai Desert Safari Experience - Dunes Discovery Tourism",
       "description": "Experience thrilling dune bashing across the Lahbab Red Dunes, sandboarding, 1000cc dune buggy rentals, and 5-star live BBQ dinner under the desert stars.",
       "thumbnailUrl": ["{{ asset('images/desert-safari-poster.avif') }}"],
       "uploadDate": "2026-01-01T00:00:00+04:00",
       "contentUrl": "{{ asset('images/desert-safar-dubai-tour-short-dune-discovery-tourism.mp4') }}",
       "publisher": {
-        "@@id": "{{ route('home') }}#organization"
+        "@@id": "{{ url('/') }}#organization"
       }
     }
     @if(isset($faqs) && $faqs->count() > 0)
     ,
     {
       "@@type": "FAQPage",
-      "@@id": "{{ route('home') }}#faq",
+      "@@id": "{{ $canonical }}#faq",
+      "isPartOf": {
+        "@@id": "{{ $canonical }}#webpage"
+      },
       "mainEntity": [
         @foreach($faqs as $fidx => $f)
         {

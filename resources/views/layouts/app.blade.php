@@ -42,7 +42,7 @@
     $pageDesc = $pageDesc ?? 'Book Dubai best desert safari tours from AED 99. Evening safari, city tours, dhow cruises with instant confirmation.';
     $pageKeys = $pageKeys ?? 'dubai desert safari,desert safari dubai,evening desert safari';
     $pageRobots = $pageRobots ?? 'index,follow';
-    $canonical = $canonical ?? request()->url();
+    $canonical = $canonical ?? (request()->is('/') ? rtrim(url('/'), '/') . '/' : request()->url());
     $ogImage = $ogImage ?? asset('images/desert-safari-poster.avif');
 @endphp
 <!DOCTYPE html>
@@ -203,14 +203,18 @@
         {
           "@@type": "TravelAgency",
           "@@id": "{{ url('/') }}#organization",
-          "name": "Dunes Discovery Tourism",
+          "name": "{{ $settings['site_name'] ?? 'Dunes Discovery Tourism LLC' }}",
           "legalName": "Dunes Discovery Tourism LLC",
+          "alternateName": ["Dunes Discovery", "Dunes Discovery Tourism", "Dunes Discovery Dubai"],
+          "description": "{{ $settings['site_description'] ?? 'Licensed Dubai Destination Management Company offering premium Desert Safaris, 1000cc Dune Buggy Rentals, Quad Biking, Dhow Cruise Dinners, and Abu Dhabi City Tours.' }}",
           "url": "{{ url('/') }}",
           "logo": "{{ asset('images/logo.png') }}",
           "image": "{{ asset('images/desert-safari-poster.avif') }}",
           "telephone": "{{ $phone }}",
           "email": "{{ $email }}",
-          "priceRange": "AED 99 - AED 1299",
+          "priceRange": "AED 79 - AED 1500",
+          "currenciesAccepted": "AED, USD, EUR, GBP",
+          "paymentAccepted": "Cash, Credit Card, Debit Card, Ziina",
           "identifier": {
             "@@type": "PropertyValue",
             "propertyID": "DET Tourism License",
@@ -248,13 +252,15 @@
               "sameAs": "https://www.wikidata.org/wiki/Q878"
             }
           ],
+          @if(request()->is('/'))
           "aggregateRating": {
             "@@type": "AggregateRating",
             "ratingValue": "4.9",
-            "reviewCount": "1247",
+            "reviewCount": "2847",
             "bestRating": "5",
             "worstRating": "1"
           },
+          @endif
           "address": {
             "@@type": "PostalAddress",
             "addressLocality": "Dubai",
@@ -294,7 +300,15 @@
             "https://www.tripadvisor.com"
           ],
           "termsOfService": "{{ route('terms') }}",
-          "privacyPolicy": "{{ route('privacy') }}"
+          "privacyPolicy": "{{ route('privacy') }}",
+          "hasMerchantReturnPolicy": {
+            "@@type": "MerchantReturnPolicy",
+            "applicableCountry": "AE",
+            "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+            "merchantReturnDays": 1,
+            "returnMethod": "https://schema.org/ReturnInStore",
+            "returnFees": "https://schema.org/FreeReturn"
+          }
         },
         {
           "@@type": "WebSite",

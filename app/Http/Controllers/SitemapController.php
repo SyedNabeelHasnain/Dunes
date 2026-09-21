@@ -145,8 +145,9 @@ class SitemapController extends Controller
         }
 
         foreach ($staticPages as $page => $meta) {
+            $loc = ($page === '' || $page === '/') ? (rtrim(url('/'), '/') . '/') : url($page);
             $xml .= "  <url>\n";
-            $xml .= "    <loc>" . url($page) . "</loc>\n";
+            $xml .= "    <loc>" . $loc . "</loc>\n";
             $xml .= "    <changefreq>{$meta['changefreq']}</changefreq>\n";
             $xml .= "    <priority>{$meta['priority']}</priority>\n";
             $xml .= "  </url>\n";

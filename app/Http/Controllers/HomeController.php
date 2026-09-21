@@ -94,7 +94,7 @@ class HomeController extends Controller
         $pageKeys = $settingsService->get('seo_home_keywords') ?: $defaultKeys;
         $ogImageSetting = $settingsService->get('seo_home_og_image');
         $ogImage = $ogImageSetting ? asset(ltrim($ogImageSetting, '/')) : asset('images/desert-safari-poster.avif');
-        $canonical = route('home');
+        $canonical = rtrim(route('home'), '/') . '/';
 
         return view('index', compact('categories', 'bestsellers', 'reviews', 'faqs', 'allActiveTours', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
     }

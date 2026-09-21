@@ -26,35 +26,6 @@
       "@@context": "https://schema.org",
       "@@graph": [
         {
-          "@@type": "TravelAgency",
-          "@@id": "{{ route('home') }}#organization",
-          "name": "Dunes Discovery Tourism LLC",
-          "url": "{{ route('home') }}",
-          "logo": "{{ asset('images/logo.png') }}",
-          "image": "{{ asset('images/desert-safari-poster.avif') }}",
-          "telephone": "{{ $phoneVal }}",
-          "email": "{{ $emailVal }}",
-          "priceRange": "AED 79 - AED 1500",
-          "address": {
-            "@@type": "PostalAddress",
-            "streetAddress": "Dubai Desert Safari Terminal, Al Aweer & Lahbab",
-            "addressLocality": "Dubai",
-            "addressRegion": "Dubai",
-            "postalCode": "00000",
-            "addressCountry": "AE"
-          },
-          "geo": {
-            "@@type": "GeoCoordinates",
-            "latitude": "25.2048",
-            "longitude": "55.2708"
-          },
-          "sameAs": [
-            "https://www.facebook.com/dunesdiscoverytourism",
-            "https://www.instagram.com/dunesdiscoverytourism",
-            "https://www.tripadvisor.com"
-          ]
-        },
-        {
           "@@type": ["Product", "TouristTrip"],
           "@@id": "{{ request()->url() }}#trip",
           "name": {!! json_encode($tour->name) !!},
@@ -65,10 +36,10 @@
           "sku": "DDT-TOUR-{{ $tour->id }}",
           "mpn": "DDT-{{ $tour->slug }}",
           "brand": {
-            "@@id": "{{ route('home') }}#organization"
+            "@@id": "{{ url('/') }}#organization"
           },
           "provider": {
-            "@@id": "{{ route('home') }}#organization"
+            "@@id": "{{ url('/') }}#organization"
           },
           "touristType": ["Adventure Tourism", "Family Friendly", "Couples", "Solo Travelers"],
           "about": [
@@ -142,7 +113,7 @@
             "itemCondition": "https://schema.org/NewCondition",
             "availability": "https://schema.org/InStock",
             "seller": {
-              "@@id": "{{ route('home') }}#organization"
+              "@@id": "{{ url('/') }}#organization"
             },
             "hasMerchantReturnPolicy": {
               "@@type": "MerchantReturnPolicy",
@@ -217,18 +188,6 @@
           ]
         }
         @endif
-        ,
-        {
-          "@@type": "WebPage",
-          "@@id": "{{ request()->url() }}#webpage",
-          "url": "{{ request()->url() }}",
-          "name": {!! json_encode($pageTitle) !!},
-          "description": {!! json_encode($pageDesc) !!},
-          "speakable": {
-            "@@type": "SpeakableSpecification",
-            "cssSelector": ["h1", ".tour-at-a-glance", "#tourDescriptionText"]
-          }
-        }
       ]
     }
     </script>
