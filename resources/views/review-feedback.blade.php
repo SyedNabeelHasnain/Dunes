@@ -32,7 +32,7 @@
 
                     <div class="mt-4 pt-3 border-top">
                         <small class="text-muted">
-                            Need immediate assistance? Speak directly with our guest relations team on <a href="https://wa.me/971501234567" target="_blank" class="text-success fw-bold text-decoration-none"><i class="bi bi-whatsapp"></i> WhatsApp</a>.
+                            Need immediate assistance? Speak directly with our guest relations team on <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $settings['site_whatsapp'] ?? '971502456056') }}" target="_blank" rel="noopener noreferrer" class="text-success fw-bold text-decoration-none"><i class="bi bi-whatsapp"></i> WhatsApp</a>.
                         </small>
                     </div>
 

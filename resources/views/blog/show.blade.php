@@ -249,7 +249,7 @@
                         <button data-action="open-booking" class="btn btn-white rounded-pill fw-bold w-100">
                             <i class="bi bi-calendar-check me-1"></i>Book Now
                         </button>
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',\App\Models\Setting::where('setting_key', 'site_whatsapp')->value('setting_value') ?? '971502456056') }}?text={{ urlencode('Hi! I read your blog about ' . $post->title . ' and would like to know more.') }}" class="btn btn-outline-light rounded-pill fw-bold w-100 mt-2 small" target="_blank" rel="noopener">
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode('Hi! I read your blog about ' . $post->title . ' and would like to know more.') }}" class="btn btn-outline-light rounded-pill fw-bold w-100 mt-2 small" target="_blank" rel="noopener noreferrer">
                             <i class="bi bi-whatsapp me-1"></i>Ask on WhatsApp
                         </a>
                     </div>

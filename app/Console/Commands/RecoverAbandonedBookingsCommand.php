@@ -84,6 +84,10 @@ class RecoverAbandonedBookingsCommand extends Command
 
                 \Illuminate\Support\Facades\Cache::put($cacheKey, now()->toIso8601String(), 86400 * 7);
 
+                $existingRequests = $booking->special_requests ?? '';
+                $updatedRequests = trim($existingRequests . "\n[RECOVERY_DISPATCHED " . now()->toIso8601String() . ']');
+                $booking->update(['special_requests' => $updatedRequests]);
+
                 $count++;
                 $this->info("Dispatched recovery invitation to: {$booking->email} (Ref: #{$booking->reference})");
             } catch (\Throwable $e) {

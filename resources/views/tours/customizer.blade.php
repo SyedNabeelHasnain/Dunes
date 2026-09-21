@@ -752,7 +752,7 @@ document.addEventListener('DOMContentLoaded', function() {
             `• Total: AED ${finalTotal}%0A%0A` +
             `Could you please check availability for this custom setup?`;
 
-        whatsAppBtn.href = `https://wa.me/{{ preg_replace('/[^0-9]/','',(string)(\App\Models\Setting::where('setting_key', 'site_whatsapp')->value('setting_value') ?? '971502456056')) }}?text=${waMessage}`;
+        whatsAppBtn.href = `https://wa.me/{{ preg_replace('/[^0-9]/','',(string)($settings['site_whatsapp'] ?? '971502456056')) }}?text=${waMessage}`;
     }
 
     // Book Now Handler: transfer custom spec to Booking Modal

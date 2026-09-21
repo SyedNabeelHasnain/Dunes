@@ -332,12 +332,12 @@
         <tr>
             <td style="vertical-align: top;">
                 <strong>DUNES DISCOVERY TOURISM LLC</strong><br>
-                Dubai, United Arab Emirates | Reg. Tourism License #892341<br>
-                Web: <span style="color: #F58F43;">dunesdiscoverytourism.com</span> | Email: info@dunesdiscoverytourism.com
+                Dubai, United Arab Emirates | Reg. Tourism License #{{ $settings['company_license_number'] ?? $settings['site_det_license'] ?? '1430583' }}<br>
+                Web: <span style="color: #F58F43;">dunesdiscoverytourism.com</span> | Email: {{ $settings['site_email'] ?? 'info@dunesdiscoverytourism.com' }}
             </td>
             <td style="text-align: right; vertical-align: top;">
                 <strong>24/7 Concierge Hotline & WhatsApp Support</strong><br>
-                <span style="font-size: 11px; font-weight: bold; color: #0f172a;">+971 50 123 4567</span><br>
+                <span style="font-size: 11px; font-weight: bold; color: #0f172a;">{{ $settings['site_phone'] ?? '+971 50 245 6056' }}</span><br>
                 Emergency Dispatch: Available 24 Hours Daily
             </td>
         </tr>

@@ -133,7 +133,7 @@
                 $cleanPhone = preg_replace('/[^0-9]/', '', $booking->phone);
                 $waMsg = 'Hello Dunes Discovery! Regarding my booking #' . $booking->reference . ' for ' . $booking->tour_name;
             @endphp
-            <a href="https://wa.me/971501234567?text={{ urlencode($waMsg) }}" target="_blank" rel="noopener noreferrer" class="btn btn-success rounded-pill shadow-sm px-3 fw-bold">
+            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode($waMsg) }}" target="_blank" rel="noopener noreferrer" class="btn btn-success rounded-pill shadow-sm px-3 fw-bold">
                 <i class="bi bi-whatsapp me-1"></i> Concierge
             </a>
         </div>
@@ -301,11 +301,11 @@
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 border-top pt-3 text-muted small" style="font-size: 0.78rem;">
                 <div>
                     <strong>DUNES DISCOVERY TOURISM LLC</strong> | Dubai, United Arab Emirates<br>
-                    License #892341 | Web: dunesdiscoverytourism.com
+                    License #{{ $settings['company_license_number'] ?? $settings['site_det_license'] ?? '1430583' }} | Web: dunesdiscoverytourism.com
                 </div>
                 <div class="text-md-end">
-                    <strong>24/7 Concierge Hotline:</strong> <a href="tel:+971501234567" class="text-decoration-none fw-bold text-dark">+971 50 123 4567</a><br>
-                    Support: info@dunesdiscoverytourism.com
+                    <strong>24/7 Concierge Hotline:</strong> <a href="tel:{{ preg_replace('/[^0-9+]/', '', $settings['site_phone'] ?? '+971502456056') }}" class="text-decoration-none fw-bold text-dark">{{ $settings['site_phone'] ?? '+971 50 245 6056' }}</a><br>
+                    Support: {{ $settings['site_email'] ?? 'info@dunesdiscoverytourism.com' }}
                 </div>
             </div>
         </div>

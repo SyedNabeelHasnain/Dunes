@@ -93,7 +93,7 @@
                         </button>
                     </div>
                     <div class="col-12 col-sm-5">
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',(string)(\App\Models\Setting::where('setting_key', 'site_whatsapp')->value('setting_value') ?? '971502456056')) }}?text={{ urlencode('Hi Dunes Discovery, I am looking to book a desert safari with the 5% discount code SAVE5. Could you recommend the best package for my group?') }}" class="btn btn-whatsapp-animated w-100 py-3 rounded-pill fw-bold fs-6 d-flex align-items-center justify-content-center gap-2" target="_blank" rel="noopener">
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',(string)($settings['site_whatsapp'] ?? '971502456056')) }}?text={{ urlencode('Hi Dunes Discovery, I am looking to book a desert safari with the 5% discount code SAVE5. Could you recommend the best package for my group?') }}" class="btn btn-whatsapp-animated w-100 py-3 rounded-pill fw-bold fs-6 d-flex align-items-center justify-content-center gap-2" target="_blank" rel="noopener noreferrer">
                             <i class="bi bi-whatsapp"></i>
                             <span>WhatsApp Us</span>
                         </a>

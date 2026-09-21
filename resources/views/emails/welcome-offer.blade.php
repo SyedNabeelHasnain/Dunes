@@ -44,7 +44,7 @@
 
     <!-- WhatsApp Instant Booking Helper -->
     @php
-        $whatsappNum = preg_replace('/[^0-9]/', '', app(\App\Services\SettingsService::class)->get('site_whatsapp', '971501234567'));
+        $whatsappNum = preg_replace('/[^0-9]/', '', app(\App\Services\SettingsService::class)->get('site_whatsapp', '971502456056'));
     @endphp
     <div style="text-align: center; margin-bottom: 25px;">
         <a href="https://wa.me/{{ $whatsappNum }}?text={{ urlencode('Hi Dunes Discovery! I received my 25% discount voucher ' . $code . ' and want to reserve a tour.') }}" style="display: inline-block; color: #16a34a; text-decoration: none; font-weight: 700; font-size: 13px;">

@@ -296,7 +296,7 @@
                                 <div class="legal-agreement-wrapper">
                                     <input class="form-check-input desert-checkbox border-primary" type="checkbox" id="bookingAgreement" required>
                                     <label class="legal-agreement-text" for="bookingAgreement">
-                                        I agree to the <a href="{{ route('terms') }}" target="_blank" class="legal-link">Terms & Conditions</a> and <a href="{{ route('privacy') }}" target="_blank" class="legal-link">Privacy Policy</a>.
+                                        I agree to the <a href="{{ route('terms') }}" target="_blank" rel="noopener noreferrer" class="legal-link">Terms & Conditions</a> and <a href="{{ route('privacy') }}" target="_blank" rel="noopener noreferrer" class="legal-link">Privacy Policy</a>.
                                     </label>
                                 </div>
                                 <div class="legal-agreement-wrapper mt-2">

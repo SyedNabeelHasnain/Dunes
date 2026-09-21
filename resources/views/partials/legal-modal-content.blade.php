@@ -69,7 +69,7 @@
     </div>
 
     <div class="pt-3 mt-4 border-top d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <a href="{{ url('/' . $page->slug) }}" target="_blank" class="small text-primary fw-bold text-decoration-none d-flex align-items-center gap-1">
+        <a href="{{ url('/' . $page->slug) }}" target="_blank" rel="noopener noreferrer" class="small text-primary fw-bold text-decoration-none d-flex align-items-center gap-1">
             <span>View Full Document</span>
             <i class="bi bi-box-arrow-up-right"></i>
         </a>

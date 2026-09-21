@@ -141,9 +141,9 @@
     <div class="container py-lg-4">
         <div class="row g-4 mb-5">
             @php
-                $phoneVal = \App\Models\Setting::where('setting_key', 'site_phone')->value('setting_value') ?? '+971 50 245 6056';
-                $emailVal = \App\Models\Setting::where('setting_key', 'site_email')->value('setting_value') ?? 'info@dunesdiscoverytourism.com';
-                $whatsappVal = \App\Models\Setting::where('setting_key', 'site_whatsapp')->value('setting_value') ?? '971502456056';
+                $phoneVal = $settings['site_phone'] ?? '+971 50 245 6056';
+                $emailVal = $settings['site_email'] ?? 'info@dunesdiscoverytourism.com';
+                $whatsappVal = $settings['site_whatsapp'] ?? '971502456056';
             @endphp
             <div class="col-12 col-md-4">
                 <a href="tel:{{ preg_replace('/[^0-9+]/','',$phoneVal) }}" class="text-decoration-none">
@@ -191,9 +191,6 @@
                             <input type="text" name="website_url" value="" tabindex="-1" autocomplete="off">
                         </div>
                         <input type="hidden" name="action" value="contact">
-                        
-                        <!-- OTP verification notification message -->
-                        <div class="alert alert-info d-none mb-4" id="contactOtpNotice"></div>
 
                         <div class="row g-4">
                             <div class="col-12 col-md-6">
@@ -259,24 +256,11 @@
                                 ]) !!}
                             </div>
 
-                            <!-- Dynamic OTP code fields if verification is needed -->
-                            <div class="col-12 d-none" id="contactOtpWrapper">
-                                <div class="fw-800 small text-muted text-uppercase mb-2">Email Verification Code</div>
-                                <div class="input-group shadow-sm rounded-4 overflow-hidden">
-                                    <input type="text" class="form-control border-0 shadow-none fw-bold text-center" id="contactOtpCode" placeholder="Enter 6-digit OTP" style="height: 60px; letter-spacing: 5px; font-size: 1.25rem;">
-                                    <button class="btn btn-primary px-4 fw-bold" type="button" id="contactVerifyOtpBtn">Verify</button>
-                                </div>
-                                <div class="d-flex justify-content-between mt-2 px-1">
-                                    <span class="small text-muted" id="contactOtpTimer"></span>
-                                    <a href="#" class="small text-decoration-none fw-bold" id="contactResendOtpBtn">Resend Code</a>
-                                </div>
-                            </div>
-
                             <div class="col-12">
                                 <div class="legal-agreement-wrapper">
                                     <input class="form-check-input desert-checkbox border-primary" type="checkbox" id="contactAgreement" required>
                                     <label class="legal-agreement-text" for="contactAgreement">
-                                        I agree to the <a href="{{ route('terms') }}" target="_blank" class="legal-link">Terms & Conditions</a> and <a href="{{ route('privacy') }}" target="_blank" class="legal-link">Privacy Policy</a>.
+                                        I agree to the <a href="{{ route('terms') }}" target="_blank" rel="noopener noreferrer" class="legal-link">Terms & Conditions</a> and <a href="{{ route('privacy') }}" target="_blank" rel="noopener noreferrer" class="legal-link">Privacy Policy</a>.
                                     </label>
                                 </div>
                             </div>

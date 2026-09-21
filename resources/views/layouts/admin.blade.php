@@ -14,13 +14,7 @@
     <link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
     @php
-        try {
-            $adminCacheVer = \Illuminate\Support\Facades\Cache::remember('cache_ver_admin', 86400, function() {
-                return \App\Models\Setting::where('setting_key', 'cache_version')->value('setting_value') ?? '1';
-            });
-        } catch (\Throwable $e) {
-            $adminCacheVer = time();
-        }
+        $adminCacheVer = $settings['cache_version'] ?? '1';
     @endphp
     <link href="{{ asset('assets/css/app.css') }}?v={{ $adminCacheVer }}" rel="stylesheet">
     

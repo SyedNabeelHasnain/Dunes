@@ -5,7 +5,7 @@
     "scripts": {
         "build": "vite build",
         "dev": "vite",
-        "minify:js": "terser public/assets/js/app.js -c -m -o public/assets/js/app.min.js"
+        "minify:js": "terser public/assets/js/app.js -c -m --format ascii_only=true -o public/assets/js/app.min.js"
     },
     "devDependencies": {
         "@tailwindcss/forms": "^0.5.2",

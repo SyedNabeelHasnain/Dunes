@@ -2,11 +2,11 @@
 
 @section('content')
 @php
-    $googleActive = \App\Models\Setting::where('setting_key', 'google_active')->value('setting_value') === '1';
-    $metaActive = \App\Models\Setting::where('setting_key', 'meta_active')->value('setting_value') === '1';
-    $metaPixelId = \App\Models\Setting::where('setting_key', 'meta_pixel_id')->value('setting_value');
-    $adsIdSetting = \App\Models\Setting::where('setting_key', 'google_ads_id')->value('setting_value');
-    $whatsappVal = \App\Models\Setting::where('setting_key', 'site_whatsapp')->value('setting_value') ?? '971502456056';
+    $googleActive = ($settings['google_active'] ?? '0') === '1';
+    $metaActive = ($settings['meta_active'] ?? '0') === '1';
+    $metaPixelId = $settings['meta_pixel_id'] ?? null;
+    $adsIdSetting = $settings['google_ads_id'] ?? null;
+    $whatsappVal = $settings['site_whatsapp'] ?? '971502456056';
 @endphp
 
 <!-- Google Ads Conversion Tag: Submit lead form (AW-17859624049/eR3SCLimtvobEPH4kMRC) -->
@@ -175,7 +175,7 @@ gtag('event', 'conversion_event_submit_lead_form', {
                         Your DTCM-certified digital voucher with real-time driver verification QR code is ready. You can present it directly from your phone or download an official PDF copy.
                     </p>
                     <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
-                        <a href="{{ route('booking.voucher', $booking->reference) }}" target="_blank" class="btn btn-desert-animated rounded-pill px-4 py-3 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-2">
+                        <a href="{{ route('booking.voucher', $booking->reference) }}" target="_blank" rel="noopener noreferrer" class="btn btn-desert-animated rounded-pill px-4 py-3 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-2">
                             <i class="bi bi-phone fs-5"></i> View Digital Boarding Pass
                         </a>
                         <a href="{{ route('booking.voucher.pdf', $booking->reference) }}" class="btn btn-outline-dark rounded-pill px-4 py-3 fw-bold d-inline-flex align-items-center justify-content-center gap-2">

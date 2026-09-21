@@ -1,14 +1,6 @@
 @php
-    try {
-        $settings = \Illuminate\Support\Facades\Cache::remember('site_settings_cache', 86400, function() {
-            return \App\Models\Setting::pluck('setting_value', 'setting_key')->all();
-        });
-    } catch (\Throwable $e) {
-        $settings = null;
-    }
-    if (!is_array($settings)) {
-        try { \Illuminate\Support\Facades\Cache::forget('site_settings_cache'); } catch (\Throwable $e) {}
-        try { $settings = \App\Models\Setting::pluck('setting_value', 'setting_key')->all(); } catch (\Throwable $e) { $settings = []; }
+    if (!isset($settings) || !is_array($settings)) {
+        $settings = [];
     }
 
     try {
@@ -674,7 +666,7 @@
                 <div class="review-popover-stars">
                     <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                 </div>
-                <a href="${data.url}" target="_blank" class="review-popover-btn">
+                <a href="${data.url}" target="_blank" rel="noopener noreferrer" class="review-popover-btn">
                     ${data.btnText} <i class="bi bi-arrow-right"></i>
                 </a>
             `;
@@ -727,7 +719,7 @@
     @include('partials.comparison-drawer')
     @include('partials.search-modal')
     @include('partials.safari-matcher-modal')
-    @if((\App\Models\Setting::where('setting_key', 'exit_intent_promo_active')->value('setting_value') ?? '0') === '1')
+    @if(($settings['exit_intent_promo_active'] ?? '0') === '1')
         @include('partials.exit-intent-modal')
     @endif
     @include('partials.custom-safari-modal')

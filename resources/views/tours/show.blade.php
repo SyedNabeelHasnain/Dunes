@@ -2,6 +2,8 @@
 
 @section('content')
 @php
+    $phoneVal = $settings['site_phone'] ?? '+971 50 245 6056';
+    $emailVal = $settings['site_email'] ?? 'info@dunesdiscoverytourism.com';
     $notAllowed = $tour->contentItems->where('type', 'not_allowed')->sortBy('priority');
     $minPrice = $tour->tiers->min('pivot.price') ?? 0;
     
@@ -30,8 +32,8 @@
           "url": "{{ route('home') }}",
           "logo": "{{ asset('images/logo.png') }}",
           "image": "{{ asset('images/desert-safari-poster.avif') }}",
-          "telephone": "{{ $phoneVal ?? '+971 50 245 6056' }}",
-          "email": "info@dunesdiscoverytourism.com",
+          "telephone": "{{ $phoneVal }}",
+          "email": "{{ $emailVal }}",
           "priceRange": "AED 79 - AED 1500",
           "address": {
             "@@type": "PostalAddress",
@@ -252,8 +254,8 @@ window.dataLayer.push({
 </script>
 
 <!-- Meta Pixel ViewContent Event -->
-@if(\App\Models\Setting::where('setting_key', 'meta_active')->value('setting_value') === '1')
-@php $metaPixelId = \App\Models\Setting::where('setting_key', 'meta_pixel_id')->value('setting_value'); @endphp
+@if(($settings['meta_active'] ?? '0') === '1')
+@php $metaPixelId = $settings['meta_pixel_id'] ?? null; @endphp
 <script>
 if(window.fbq){
     fbq('track', 'ViewContent', {
@@ -871,7 +873,7 @@ if(window.fbq){
                                 <button type="button" class="btn btn-outline-secondary rounded-pill py-2.5 fw-bold btn-toggle-compare transition-all" data-tour-id="{{ $tour->id }}" onclick="event.preventDefault(); window.DunesCompare && window.DunesCompare.toggle(this);">
                                     <i class="bi bi-shuffle me-2"></i><span class="compare-btn-text">Compare this Safari</span>
                                 </button>
-                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',\App\Models\Setting::where('setting_key', 'site_whatsapp')->value('setting_value') ?? '971502456056') }}?text={{ urlencode('Hi! I want to book ' . $tour->name) }}" class="btn btn-whatsapp-animated btn-lg rounded-pill py-3 fw-bold border-0 transition-all hover-translate-up" target="_blank" rel="noopener">
+                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode('Hi! I want to book ' . $tour->name) }}" class="btn btn-whatsapp-animated btn-lg rounded-pill py-3 fw-bold border-0 transition-all hover-translate-up" target="_blank" rel="noopener noreferrer">
                                     <i class="bi bi-whatsapp me-2"></i>Inquire via WhatsApp
                                 </a>
                             </div>
@@ -927,9 +929,6 @@ if(window.fbq){
                         <div class="card-body p-4 position-relative z-1">
                             <h3 class="h5 fw-bold text-light mb-3">Need Help?</h3>
                             <p class="small opacity-75 mb-4">Our travel experts are available 24/7 to help you with your booking.</p>
-                            @php
-                                $phoneVal = \App\Models\Setting::where('setting_key', 'site_phone')->value('setting_value') ?? '+971 50 245 6056';
-                            @endphp
                             <a href="tel:{{ preg_replace('/[^0-9+]/','',$phoneVal) }}" class="d-flex align-items-center gap-3 text-white text-decoration-none mb-3 group">
                                 <div class="bg-primary text-white rounded-circle p-2 group-hover-scale transition-all" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
                                     <i class="bi bi-telephone-fill"></i>
@@ -1051,7 +1050,7 @@ if(window.fbq){
                         <small class="text-muted d-block mb-1.5 fw-bold" style="font-size: 0.72rem; text-transform: uppercase;">Guest Photos</small>
                         <div class="d-flex gap-2">
                             @foreach(array_slice($rev->photos, 0, 3) as $photo)
-                            <a href="{{ asset($photo) }}" target="_blank" class="rounded-3 overflow-hidden d-inline-block shadow-sm" style="width: 60px; height: 60px; border: 1px solid rgba(0,0,0,0.08);">
+                            <a href="{{ asset($photo) }}" target="_blank" rel="noopener noreferrer" class="rounded-3 overflow-hidden d-inline-block shadow-sm" style="width: 60px; height: 60px; border: 1px solid rgba(0,0,0,0.08);">
                                 <img src="{{ asset($photo) }}" alt="Traveler photo" style="width: 100%; height: 100%; object-fit: cover;">
                             </a>
                             @endforeach

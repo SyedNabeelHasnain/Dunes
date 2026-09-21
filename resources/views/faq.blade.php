@@ -168,7 +168,7 @@
                     <h2 class="h3 fw-bold mb-3">Still Have Questions?</h2>
                     <p class="text-muted mb-4 mx-auto" style="max-width: 500px;">Our dedicated team is ready 24/7 to help you with any inquiries or custom tour arrangements.</p>
                     <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',\App\Models\Setting::where('setting_key', 'site_whatsapp')->value('setting_value') ?? '971502456056') }}?text={{ urlencode('Hi! I have a question about your tours.') }}" class="btn btn-whatsapp-animated btn-lg rounded-pill px-4 d-flex align-items-center justify-content-center gap-2" target="_blank" rel="noopener">
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode('Hi! I have a question about your tours.') }}" class="btn btn-whatsapp-animated btn-lg rounded-pill px-4 d-flex align-items-center justify-content-center gap-2" target="_blank" rel="noopener noreferrer">
                             <i class="bi bi-whatsapp"></i>
                             WhatsApp 24/7
                         </a>
