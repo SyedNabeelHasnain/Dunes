@@ -12,10 +12,11 @@
     if($inclusions->count() || $exclusions->count()) $tabs['inex'] = 'Inclusion & Exclusion';
     if($notAllowed->count()) $tabs['info'] = 'Important Information';
     if($faqs->count()) $tabs['faqs'] = 'FAQ';
+    $heroAvifUrl = asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image ?: 'evening-desert-safari-dubai-dune-discovery-tourism.avif'));
 @endphp
 
 @push('preloads')
-    <link rel="preload" as="image" href="{{ asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image ?: 'evening-desert-safari-dubai-dune-discovery-tourism.avif')) }}" type="image/avif">
+    <link rel="preload" as="image" href="{{ $heroAvifUrl }}" type="image/avif">
     
     <!-- 2026 Connected JSON-LD Schema Graph: TouristTrip, Product, Offer, TravelAgency, Itinerary, FAQPage -->
     <script type="application/ld+json">
@@ -57,7 +58,7 @@
           "name": {!! json_encode($tour->name) !!},
           "description": {!! json_encode(Str::limit(strip_tags($tour->short_desc ?: $tour->full_desc), 300)) !!},
           "image": [
-            {!! json_encode(asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image ?: 'evening-desert-safari-dubai-dune-discovery-tourism.avif'))) !!}
+            {!! json_encode($heroAvifUrl) !!}
           ],
           "sku": "DDT-TOUR-{{ $tour->id }}",
           "mpn": "DDT-{{ $tour->slug }}",
@@ -266,7 +267,7 @@ if(window.fbq){
 @endif
 
 <!-- Tour Hero Section -->
-<section class="tour-hero-modern position-relative d-flex align-items-end" style="min-height: 50vh; background: url('{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image)) }}') center/cover no-repeat; margin-top: calc(-1 * var(--header-h));">
+<section class="tour-hero-modern position-relative d-flex align-items-end" style="min-height: 50vh; background: url('{{ $heroAvifUrl }}') center/cover no-repeat; margin-top: calc(-1 * var(--header-h));">
     <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.85) 100%);"></div>
     <div class="container position-relative z-1 pb-5 text-white">
         <nav aria-label="breadcrumb" class="mb-4">

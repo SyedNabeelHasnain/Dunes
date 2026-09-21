@@ -973,4 +973,35 @@ class BookingEngineTest extends TestCase
                 && $stats['vehicles_needed'] === 0;
         });
     }
+
+    /**
+     * Test tour hero image preload matches hero background and does not point to images/blog/.
+     */
+    public function test_tour_hero_image_preload_matches_hero_background_and_not_blog(): void
+    {
+        $tour = Tour::create([
+            'name' => 'Morning Desert Safari Dubai',
+            'slug' => 'morning-desert-safari-dubai',
+            'short_desc' => 'Sunrise dune bashing adventure in Dubai.',
+            'hero_image' => 'desert-safari-dubai-morning-desert-safari.avif',
+            'status' => 'active',
+            'duration' => '4 Hours',
+            'rating' => 4.9,
+            'review_count' => 120,
+        ]);
+
+        $response = $this->get('/morning-desert-safari-dubai');
+        $response->assertStatus(200);
+
+        $expectedUrl = asset('images/desert-safari-dubai-morning-desert-safari.avif');
+        $wrongBlogUrl = asset('images/blog/desert-safari-dubai-morning-desert-safari.avif');
+
+        // Preload tag must point to images/ (NOT images/blog/)
+        $response->assertSee('<link rel="preload" as="image" href="' . $expectedUrl . '" type="image/avif">', false);
+        $response->assertDontSee($wrongBlogUrl, false);
+
+        // Hero background must use the exact same expectedUrl
+        $response->assertSee("background: url('" . $expectedUrl . "')", false);
+    }
 }
+
