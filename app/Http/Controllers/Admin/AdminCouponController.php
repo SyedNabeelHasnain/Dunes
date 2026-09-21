@@ -335,12 +335,15 @@ class AdminCouponController extends Controller
             'concierge_promo_active',
             'concierge_promo_discount',
             'concierge_promo_code',
+            'exit_intent_promo_active',
+            'exit_intent_promo_discount',
+            'exit_intent_promo_code',
         ];
 
         $data = $request->only($allowed);
 
         // Checkbox fields handling
-        $checkboxes = ['welcome_popup_active', 'welcome_popup_scroll_trigger', 'welcome_popup_exit_trigger', 'top_promo_banner_active', 'concierge_promo_active'];
+        $checkboxes = ['welcome_popup_active', 'welcome_popup_scroll_trigger', 'welcome_popup_exit_trigger', 'top_promo_banner_active', 'concierge_promo_active', 'exit_intent_promo_active'];
         foreach ($checkboxes as $cb) {
             $data[$cb] = $request->has($cb) ? '1' : '0';
         }
@@ -391,6 +394,27 @@ class AdminCouponController extends Controller
             );
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning("Could not synchronize MATCH5 coupon status: " . $e->getMessage());
+        }
+
+        // Synchronize Exit-Intent Cart Saver coupon status and discount rate in database
+        $exitIntentActive = ($data['exit_intent_promo_active'] ?? '0') === '1';
+        $exitIntentDiscount = (float)($data['exit_intent_promo_discount'] ?? 5.00);
+        $exitIntentCode = strtoupper(trim($data['exit_intent_promo_code'] ?? 'SAVE5')) ?: 'SAVE5';
+
+        try {
+            Coupon::updateOrCreate(
+                ['code' => $exitIntentCode],
+                [
+                    'name' => 'Exit-Intent Cart Saver 5% Discount',
+                    'description' => 'Special discount unlocked via Exit-Intent Cart Saver popup.',
+                    'discount_type' => 'percentage',
+                    'discount_value' => $exitIntentDiscount,
+                    'status' => $exitIntentActive ? 'active' : 'inactive',
+                    'is_featured' => $exitIntentActive,
+                ]
+            );
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Could not synchronize SAVE5 coupon status: " . $e->getMessage());
         }
 
         Cache::forget('site_settings_cache');

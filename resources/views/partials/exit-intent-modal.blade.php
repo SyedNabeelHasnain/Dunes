@@ -1,3 +1,11 @@
+@php
+    $settingsService = app(\App\Services\SettingsService::class);
+    $exitIntentPromoActive = ($settingsService->get('exit_intent_promo_active', '0')) === '1';
+    $exitIntentDiscount = (int)$settingsService->get('exit_intent_promo_discount', '5');
+    $exitIntentCode = $settingsService->get('exit_intent_promo_code', 'SAVE5');
+@endphp
+
+@if($exitIntentPromoActive)
 <!-- Smart Exit-Intent Cart Saver Modal -->
 <div class="modal fade" id="exitIntentModal" tabindex="-1" aria-labelledby="exitIntentModalLabel" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
@@ -27,7 +35,7 @@
                     Wait! Don't Leave Dubai Without Experiencing The Dunes
                 </h3>
                 <p class="text-white-50 small mb-4 mx-auto" style="max-width: 520px; font-size: 0.9rem; line-height: 1.6;">
-                    Before you go, take an instant <strong class="text-warning">5% OFF</strong> on all certified Dubai desert safari packages with 4x4 hotel pickup and 5-star live BBQ dinner.
+                    Before you go, take an instant <strong class="text-warning">{{ $exitIntentDiscount }}% OFF</strong> on all certified Dubai desert safari packages with 4x4 hotel pickup and 5-star live BBQ dinner.
                 </p>
 
                 <!-- Gamified Coupon Certificate Card -->
@@ -35,11 +43,11 @@
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
                         <div class="text-start">
                             <small class="text-white-50 d-block" style="font-size: 11px; text-transform: uppercase; font-weight: 700;">Instant Promo Code</small>
-                            <span class="font-monospace fw-800 fs-4 text-warning" id="exitIntentCodeDisplay">SAVE5</span>
+                            <span class="font-monospace fw-800 fs-4 text-warning" id="exitIntentCodeDisplay">{{ $exitIntentCode }}</span>
                         </div>
                         <div class="d-flex align-items-center gap-2">
                             <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1.5 fw-bold" style="font-size: 0.8rem;">
-                                5% Instant Savings
+                                {{ $exitIntentDiscount }}% Instant Savings
                             </span>
                             <button type="button" class="btn btn-sm btn-outline-warning rounded-pill px-3 py-1.5 fw-bold" id="exitIntentCopyBtn" title="Copy Code">
                                 <i class="bi bi-clipboard me-1"></i> Copy
@@ -119,8 +127,14 @@ document.addEventListener('DOMContentLoaded', function() {
     function triggerExitIntent() {
         if (exitIntentFired) return;
 
-        // Check if any other modal (booking, search, etc.) is already open
-        if (document.querySelector('.modal.show')) return;
+        // Check if any other modal (welcome offer, booking, search, etc.) is already open or was shown
+        if (document.querySelector('.modal.show') ||
+            document.body.classList.contains('modal-open') ||
+            document.getElementById('welcomeOfferModal')?.classList.contains('show') ||
+            document.getElementById('bookingModal')?.classList.contains('show') ||
+            sessionStorage.getItem('dunes_welcome_shown_session')) {
+            return;
+        }
 
         exitIntentFired = true;
         sessionStorage.setItem(STORAGE_KEY, '1');
@@ -150,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const copyBtn = document.getElementById('exitIntentCopyBtn');
     if (copyBtn) {
         copyBtn.addEventListener('click', function() {
-            navigator.clipboard.writeText('SAVE5').then(() => {
+            navigator.clipboard.writeText('{{ $exitIntentCode }}').then(() => {
                 const orig = copyBtn.innerHTML;
                 copyBtn.innerHTML = '<i class="bi bi-check-lg text-success"></i> Copied';
                 setTimeout(() => { copyBtn.innerHTML = orig; }, 2000);
@@ -158,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Claim 5% & Book Now button
+    // Claim Discount & Book Now button
     const claimBtn = document.getElementById('exitIntentClaimBtn');
     if (claimBtn) {
         claimBtn.addEventListener('click', function() {
@@ -176,7 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const promoInput = document.getElementById('bookingPromoCode');
                 if (promoInput) {
-                    promoInput.value = 'SAVE5';
+                    promoInput.value = '{{ $exitIntentCode }}';
                 }
 
                 if (typeof window.validateCurrentPromo === 'function') {
@@ -187,3 +201,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+@endif
+

@@ -201,6 +201,51 @@
                             </div>
                         </div>
                     </div>
+                <!-- Card 4: Exit-Intent Cart Saver Modal Controls (SAVE5) -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+                    <div class="card-header bg-white border-bottom py-3 px-4 d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-door-closed-fill text-danger fs-5"></i>
+                            <div>
+                                <h5 class="fw-bold mb-0 text-dark">Exit-Intent Cart Saver Modal (5% OFF)</h5>
+                                <small class="text-muted">Desktop exit-intent pop-up trigger with promo code SAVE5</small>
+                            </div>
+                        </div>
+                        <div class="form-check form-switch mb-0">
+                            <input class="form-check-input" type="checkbox" role="switch" id="exit_intent_promo_active" name="exit_intent_promo_active" value="1" {{ ($settings->get('exit_intent_promo_active', '0') == '1') ? 'checked' : '' }}>
+                            <label class="form-check-label fw-bold small text-muted" for="exit_intent_promo_active">Popup Active</label>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        @if($settings->get('exit_intent_promo_active', '0') == '1')
+                        <div class="alert alert-success d-flex align-items-center gap-2 rounded-3 py-2 px-3 mb-3 small">
+                            <i class="bi bi-check-circle-fill fs-5"></i>
+                            <div><strong>Exit-Intent Cart Saver is Live:</strong> The 5% exit-intent popup is active and will fire when visitors move cursor toward the browser tab/close area.</div>
+                        </div>
+                        @else
+                        <div class="alert alert-warning d-flex align-items-center gap-2 rounded-3 py-2 px-3 mb-3 small">
+                            <i class="bi bi-shield-lock-fill fs-5 text-warning"></i>
+                            <div><strong>Exit-Intent Cart Saver is Currently Deactivated:</strong> Only the 25% Welcome Offer modal is active for first-time visitors. No competing 5% popup will display on exit. Toggle the switch above whenever you wish to reactivate.</div>
+                        </div>
+                        @endif
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted text-uppercase mb-1" for="exit_intent_promo_discount">Exit-Intent Discount Rate (%)</label>
+                                <div class="input-group">
+                                    <input type="number" step="1" min="1" max="100" class="form-control fw-bold" id="exit_intent_promo_discount" name="exit_intent_promo_discount" value="{{ $settings->get('exit_intent_promo_discount', '5') }}" required>
+                                    <span class="input-group-text bg-light fw-bold text-primary">% OFF</span>
+                                </div>
+                                <small class="text-muted d-block mt-1">Percentage discount offered in exit popup.</small>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted text-uppercase mb-1" for="exit_intent_promo_code">Exit-Intent Promo Code</label>
+                                <input type="text" class="form-control fw-bold font-monospace text-uppercase" id="exit_intent_promo_code" name="exit_intent_promo_code" value="{{ $settings->get('exit_intent_promo_code', 'SAVE5') }}" required>
+                                <small class="text-muted d-block mt-1">Database coupon code linked to exit-intent offer.</small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="d-flex justify-content-end mb-4">
@@ -271,6 +316,23 @@
                                     <i class="bi bi-pause-circle-fill text-warning"></i> Pure Curation Mode (Promo Inactive)
                                 </div>
                                 <p class="small text-muted mb-0">The Concierge recommends tailored safaris without discount certificates or checkout code auto-injection.</p>
+                            </div>
+                        <!-- Exit-Intent Cart Saver Preview -->
+                        <div class="mb-3">
+                            <span class="text-muted small fw-bold text-uppercase d-block mb-2">Exit-Intent Cart Saver Mode:</span>
+                            @if($settings->get('exit_intent_promo_active', '0') == '1')
+                            <div class="p-3 rounded-4 bg-success-subtle border border-success border-opacity-25 text-dark">
+                                <div class="d-flex align-items-center gap-2 fw-bold text-success mb-1">
+                                    <i class="bi bi-check-circle-fill"></i> Popup Mode Active
+                                </div>
+                                <p class="small text-muted mb-0">Fires on cursor exit with <strong>{{ $settings->get('exit_intent_promo_discount', '5') }}% OFF ({{ $settings->get('exit_intent_promo_code', 'SAVE5') }})</strong>.</p>
+                            </div>
+                            @else
+                            <div class="p-3 rounded-4 bg-light border text-dark">
+                                <div class="d-flex align-items-center gap-2 fw-bold text-secondary mb-1">
+                                    <i class="bi bi-slash-circle-fill text-warning"></i> Deactivated (Protected)
+                                </div>
+                                <p class="small text-muted mb-0">Exit-intent popup is suppressed. Only the premier 25% Welcome Offer modal is presented.</p>
                             </div>
                             @endif
                         </div>

@@ -727,7 +727,9 @@
     @include('partials.comparison-drawer')
     @include('partials.search-modal')
     @include('partials.safari-matcher-modal')
-    @include('partials.exit-intent-modal')
+    @if((\App\Models\Setting::where('setting_key', 'exit_intent_promo_active')->value('setting_value') ?? '0') === '1')
+        @include('partials.exit-intent-modal')
+    @endif
     @include('partials.custom-safari-modal')
 
     <!-- Global Toast Container for App.toast notifications -->

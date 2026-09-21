@@ -1003,5 +1003,45 @@ class BookingEngineTest extends TestCase
         // Hero background must use the exact same expectedUrl
         $response->assertSee("background: url('" . $expectedUrl . "')", false);
     }
+
+    /**
+     * Test exit intent modal is suppressed by default and SAVE5 is deactivated in favor of 25% welcome offer.
+     */
+    public function test_exit_intent_modal_is_suppressed_by_default_and_save5_is_inactive(): void
+    {
+        // 1. By default, exit_intent_promo_active is 0
+        Setting::updateOrCreate(['setting_key' => 'exit_intent_promo_active'], ['setting_value' => '0']);
+        Cache::forget('site_settings_cache');
+
+        // Coupon SAVE5 should be inactive
+        $saveCoupon = Coupon::findByCode('SAVE5');
+        $this->assertNotNull($saveCoupon);
+        $this->assertEquals('inactive', $saveCoupon->status);
+
+        // API validation should reject SAVE5 as inactive
+        $response = $this->postJson('/api/v1/coupon/validate', ['code' => 'SAVE5', 'subtotal' => 300]);
+        $response->assertStatus(422);
+
+        // Homepage must NOT render #exitIntentModal
+        $home = $this->get('/');
+        $home->assertStatus(200);
+        $home->assertDontSee('id="exitIntentModal"', false);
+        $home->assertDontSee('Exclusive Departure Offer', false);
+
+        // Welcome offer 25% modal MUST still be present
+        $home->assertSee('id="welcomeOfferModal"', false);
+
+        // 2. When admin activates exit_intent_promo_active
+        Setting::updateOrCreate(['setting_key' => 'exit_intent_promo_active'], ['setting_value' => '1']);
+        Cache::forget('site_settings_cache');
+
+        $activeSaveCoupon = Coupon::findByCode('SAVE5');
+        $this->assertEquals('active', $activeSaveCoupon->status);
+
+        $activeResponse = $this->postJson('/api/v1/coupon/validate', ['code' => 'SAVE5', 'subtotal' => 300]);
+        $activeResponse->assertStatus(200);
+        $this->assertEquals(15.00, $activeResponse->json('coupon.discount_amount'));
+    }
 }
+
 

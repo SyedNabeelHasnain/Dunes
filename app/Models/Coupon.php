@@ -233,26 +233,36 @@ class Coupon extends Model
 
         $normalized = strtoupper(trim($code));
         $conciergeActive = false;
+        $exitIntentActive = false;
         try {
             $conciergeActive = \Illuminate\Support\Facades\DB::table('settings')
                 ->where('setting_key', 'concierge_promo_active')
                 ->value('setting_value') === '1';
+            $exitIntentActive = \Illuminate\Support\Facades\DB::table('settings')
+                ->where('setting_key', 'exit_intent_promo_active')
+                ->value('setting_value') === '1';
         } catch (\Throwable $e) {
             $conciergeActive = false;
+            $exitIntentActive = false;
         }
 
         $coupon = static::where('code', $normalized)->first();
 
         if ($coupon) {
-            if ($normalized === 'MATCH5' && !$conciergeActive) {
-                $coupon->status = 'inactive';
+            if ($normalized === 'MATCH5') {
+                $coupon->status = $conciergeActive ? 'active' : 'inactive';
+            }
+            if ($normalized === 'SAVE5') {
+                $coupon->status = $exitIntentActive ? 'active' : 'inactive';
             }
             return $coupon;
         }
 
         // Automatic fallback for system-defined gamified codes (MATCH5, SAVE5)
         if (in_array($normalized, ['MATCH5', 'SAVE5'])) {
-            $status = ($normalized === 'MATCH5') ? ($conciergeActive ? 'active' : 'inactive') : 'active';
+            $status = ($normalized === 'MATCH5') 
+                ? ($conciergeActive ? 'active' : 'inactive') 
+                : ($exitIntentActive ? 'active' : 'inactive');
             try {
                 return static::firstOrCreate(
                     ['code' => $normalized],
