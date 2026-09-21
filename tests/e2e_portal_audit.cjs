@@ -142,21 +142,21 @@ async function runTest(test) {
 async function runApiTests() {
   const apiResults = [];
 
-  // 1. Coupon MATCH5 test
+  // 1. Active 25% Welcome Coupon (DUNESWELCOME)
   try {
     const r = await fetch(`${BASE}/api/v1/coupon/validate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({ code: 'MATCH5', subtotal: 100 })
+      body: JSON.stringify({ code: 'DUNESWELCOME', subtotal: 200 })
     });
     const d = await r.json();
-    const pass = r.status === 200 && d.success === true && d.coupon && d.coupon.discount_amount === 5;
-    apiResults.push({ name: 'API: Coupon Validate MATCH5 (5% off 100 = AED 5)', pass, status: r.status, note: d.coupon ? d.coupon.savings_text : 'N/A' });
+    const pass = r.status === 200 && d.success === true && d.coupon && d.coupon.discount_amount === 50;
+    apiResults.push({ name: 'API: Coupon Validate DUNESWELCOME (25% off 200 = AED 50)', pass, status: r.status, note: d.coupon ? d.coupon.savings_text : 'N/A' });
   } catch (e) {
-    apiResults.push({ name: 'API: Coupon Validate MATCH5', pass: false, error: e.message });
+    apiResults.push({ name: 'API: Coupon Validate DUNESWELCOME', pass: false, error: e.message });
   }
 
-  // 2. Coupon SAVE5 test
+  // 2. Deactivated 5% Promo (SAVE5) - Must be rejected as inactive
   try {
     const r = await fetch(`${BASE}/api/v1/coupon/validate`, {
       method: 'POST',
@@ -164,8 +164,8 @@ async function runApiTests() {
       body: JSON.stringify({ code: 'SAVE5', subtotal: 200 })
     });
     const d = await r.json();
-    const pass = r.status === 200 && d.success === true && d.coupon && d.coupon.discount_amount === 10;
-    apiResults.push({ name: 'API: Coupon Validate SAVE5 (5% off 200 = AED 10)', pass, status: r.status, note: d.coupon ? d.coupon.savings_text : 'N/A' });
+    const pass = r.status === 422 && d.success === false;
+    apiResults.push({ name: 'API: Coupon Validate SAVE5 (Properly Rejected as Inactive: 422)', pass, status: r.status, note: d.message || 'Inactive' });
   } catch (e) {
     apiResults.push({ name: 'API: Coupon Validate SAVE5', pass: false, error: e.message });
   }
