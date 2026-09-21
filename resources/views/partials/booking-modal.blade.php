@@ -195,7 +195,7 @@
                                     'id' => 'bookingPhone',
                                     'name' => 'phone',
                                     'label' => 'Phone Number',
-                                    'placeholder' => '+971',
+                                    'placeholder' => '50 123 4567',
                                     'autocomplete' => 'tel',
                                     'required' => true,
                                     'wrapperClass' => 'form-floating phone-field',

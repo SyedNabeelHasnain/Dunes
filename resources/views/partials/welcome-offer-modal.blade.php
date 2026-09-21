@@ -96,10 +96,9 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <label class="form-label small fw-bold text-muted text-uppercase mb-1" for="welcomePhone">Phone / WhatsApp Number <span class="text-danger">*</span></label>
-                                        <div class="input-group shadow-sm rounded-4 overflow-hidden">
-                                            <span class="input-group-text bg-white border-0 ps-3 text-muted"><i class="bi bi-whatsapp text-success"></i></span>
-                                            <input type="tel" class="form-control border-0 shadow-none py-3 fw-bold ps-2" id="welcomePhone" name="phone" placeholder="e.g. +971 50 123 4567" required autocomplete="tel">
+                                        <label class="form-label small fw-bold text-muted text-uppercase mb-1" for="welcomePhone"><i class="bi bi-whatsapp text-success me-1"></i>Phone / WhatsApp Number <span class="text-danger">*</span></label>
+                                        <div class="welcome-phone-field shadow-sm rounded-4 bg-white position-relative">
+                                            <input type="tel" class="form-control border-0 shadow-none py-3 fw-bold" id="welcomePhone" name="phone" placeholder="50 123 4567" required autocomplete="tel">
                                         </div>
                                         <small class="text-muted d-block mt-1" style="font-size: 0.72rem;"><i class="bi bi-shield-check text-success me-1"></i>We'll send your voucher code via Email & WhatsApp.</small>
                                     </div>
@@ -326,6 +325,17 @@
                 const claimed = localStorage.getItem('dunes_welcome_claimed');
                 if (!claimed) {
                     localStorage.setItem('dunes_welcome_dismissed_until', Date.now() + (24 * 60 * 60 * 1000));
+                }
+            });
+
+            // Modal Shown Handler: Ensure phone input ITI is active and aligned
+            modalEl.addEventListener('shown.bs.modal', function() {
+                if (window.App && typeof window.App.initPhoneInputs === 'function') {
+                    window.App.initPhoneInputs();
+                }
+                const pInput = document.getElementById('welcomePhone');
+                if (pInput && pInput._iti && typeof pInput._iti.updateInputPadding === 'function') {
+                    pInput._iti.updateInputPadding();
                 }
             });
         }

@@ -225,8 +225,9 @@
                                     'id' => 'phone',
                                     'name' => 'phone',
                                     'label' => 'Phone Number',
-                                    'placeholder' => 'Phone Number',
+                                    'placeholder' => '50 123 4567',
                                     'autocomplete' => 'tel',
+                                    'wrapperClass' => 'form-floating phone-field',
                                     'inputClass' => 'form-control form-control-modern fw-bold',
                                     'inputAttrs' => ['data-form' => 'contact', 'data-field' => 'phone']
                                 ]) !!}

@@ -2432,6 +2432,41 @@ button:focus-visible {
 .phone-field .iti--separate-dial-code input{
     padding-left: 88px !important;
 }
+.welcome-phone-field {
+    border-radius: 1rem;
+}
+.welcome-phone-field .iti {
+    display: block;
+    width: 100%;
+}
+.welcome-phone-field .iti--separate-dial-code .iti__selected-country {
+    padding-left: 14px;
+    padding-right: 8px;
+    background-color: transparent;
+}
+.welcome-phone-field .iti--separate-dial-code .iti__selected-dial-code {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #1e293b;
+}
+.welcome-phone-field .iti--separate-dial-code input {
+    height: 52px;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    padding-left: 92px !important;
+    font-weight: 700;
+    font-size: 1rem;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent;
+    border-radius: 1rem !important;
+}
+.welcome-phone-field .iti__dropdown-content {
+    z-index: 1060 !important;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+    border: 1px solid #e2e8f0;
+}
 .tier-popular-badge {
     top: 6px;
     left: 6px;
