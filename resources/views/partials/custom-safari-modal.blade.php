@@ -1,61 +1,8 @@
 <!-- Build Your Own Safari Customizer Modal (Tailwind v4 + Alpine.js) -->
 <div id="customSafariModal"
-     x-data="{
-        base: { name: 'Standard Evening Red Dunes', price: 150, tourId: 1 },
-        transfer: { name: 'Shared 4x4 Land Cruiser', price: 0, type: 'flat' },
-        sports: { name: 'Scenic Only', price: 0, type: 'per_person' },
-        addons: [],
-        adults: 2,
-        
-        hasAddon(key) {
-            return this.addons.some(a => a.key === key);
-        },
-        toggleAddon(addon) {
-            if (this.hasAddon(addon.key)) {
-                this.addons = this.addons.filter(a => a.key !== addon.key);
-            } else {
-                this.addons.push(addon);
-            }
-        },
-        get total() {
-            let baseTotal = this.base.price * this.adults;
-            let transferTotal = (this.transfer.type === 'flat') ? this.transfer.price : (this.transfer.price * this.adults);
-            let sportsTotal = (this.sports.type === 'flat') ? this.sports.price : (this.sports.price * this.adults);
-            let addonsTotal = 0;
-            this.addons.forEach(a => {
-                addonsTotal += (a.type === 'flat') ? a.price : (a.price * this.adults);
-            });
-            return baseTotal + transferTotal + sportsTotal + addonsTotal;
-        },
-        get summaryAddons() {
-            return this.addons.length ? this.addons.map(a => a.name).join(', ') : 'None';
-        },
-        get waUrl() {
-            const msg = `Hi Dunes Discovery! I configured a custom safari: Base: ${encodeURIComponent(this.base.name)}, Vehicle: ${encodeURIComponent(this.transfer.name)}, Sports: ${encodeURIComponent(this.sports.name)}, Addons: ${encodeURIComponent(this.summaryAddons)}, Guests: ${this.adults} Adults, Total: AED ${this.total}. Can you check availability?`;
-            return `https://wa.me/{{ preg_replace('/[^0-9]/','',(string)($settings['site_whatsapp'] ?? '971502456056')) }}?text=${msg}`;
-        },
-        book() {
-            $store.modal.close();
-            setTimeout(() => {
-                $store.modal.open('booking', {
-                    tourId: this.base.tourId,
-                    adults: this.adults,
-                    requests: `[CUSTOM BUILDER SPEC]\nVehicle: ${this.transfer.name}\nMotorsports: ${this.sports.name}\nAddons: ${this.summaryAddons}\nEstimated Total: AED ${this.total}`
-                });
-                const tourSelect = document.getElementById('bookingTour');
-                if (tourSelect && this.base.tourId) {
-                    tourSelect.value = this.base.tourId;
-                    tourSelect.dispatchEvent(new Event('change'));
-                }
-                const adultsInput = document.getElementById('bookingAdults');
-                if (adultsInput) adultsInput.value = this.adults;
-                const reqInput = document.getElementById('bookingRequests');
-                if (reqInput) {
-                    reqInput.value = `[CUSTOM BUILDER SPEC]\nVehicle: ${this.transfer.name}\nMotorsports: ${this.sports.name}\nAddons: ${this.summaryAddons}\nEstimated Total: AED ${this.total}`;
-                }
-            }, 300);
-        }
-     }"
+     x-data="customSafariModal({
+        waPhone: '{{ preg_replace('/[^0-9]/','',(string)($settings['site_whatsapp'] ?? '971502456056')) }}'
+     })"
      x-show="$store.modal.active === 'custom-safari'"
      x-cloak
      class="fixed inset-0 z-50 overflow-y-auto"

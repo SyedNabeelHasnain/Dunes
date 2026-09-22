@@ -5,6 +5,9 @@
  */
 
 import Alpine from 'alpinejs';
+import collapse from '@alpinejs/collapse';
+
+Alpine.plugin(collapse);
 
 window.Alpine = Alpine;
 
@@ -3213,7 +3216,334 @@ window.bootstrap.Tooltip = class {
 
 
 // =============================================================================
-// 6. INITIALIZE ALPINE & APP ENGINE
+// 6. ALPINE.JS DATA COMPONENTS
+// =============================================================================
+
+/**
+ * 6.1 Safari Matcher Modal Component
+ */
+Alpine.data('safariMatcherModal', (config = {}) => ({
+    step: 1,
+    answers: { group: null, vibe: null, perk: null },
+    loading: false,
+    result: null,
+    reasons: [],
+    conciergePromoActive: !!config.conciergePromoActive,
+    conciergePromoCode: config.conciergePromoCode || '',
+    waPhone: config.waPhone || '971502456056',
+
+    selectOption(field, val) {
+        this.answers[field] = val;
+        if (this.step === 1) {
+            this.step = 2;
+        } else if (this.step === 2) {
+            this.step = 3;
+        } else if (this.step === 3) {
+            this.calculateResult();
+        }
+    },
+
+    calculateResult() {
+        this.loading = true;
+        this.step = 4;
+        
+        setTimeout(() => {
+            let catalog = [];
+            const compareScript = document.getElementById('dunesCompareTourData');
+            if (compareScript) {
+                try { catalog = JSON.parse(compareScript.textContent || '[]'); } catch(e) {}
+            }
+            if (!catalog || catalog.length === 0) {
+                catalog = [
+                    { id: '1', name: 'Standard Evening Desert Safari', slug: 'standard-evening-desert-safari', min_price: 120, rating: 4.9, duration: '6-7 Hours', thumb: '/images/desert-safari-poster.avif' },
+                    { id: '2', name: 'VIP Luxury Desert Safari with Table Service', slug: 'vip-desert-safari', min_price: 250, rating: 4.9, duration: '6-7 Hours', thumb: '/images/desert-safari-poster.avif' },
+                    { id: '3', name: 'Evening Desert Safari with Quad Biking', slug: 'quad-bike-desert-safari', min_price: 180, rating: 4.9, duration: '6-7 Hours', thumb: '/images/desert-safari-poster.avif' },
+                    { id: '4', name: 'Morning Desert Safari with Camel Ride', slug: 'morning-desert-safari', min_price: 130, rating: 4.8, duration: '4 Hours', thumb: '/images/desert-safari-poster.avif' },
+                    { id: '5', name: 'Overnight Desert Safari & Camping', slug: 'overnight-desert-safari', min_price: 350, rating: 4.9, duration: '18 Hours', thumb: '/images/desert-safari-poster.avif' },
+                    { id: '6', name: 'Dubai Marina Luxury Dhow Cruise Dinner', slug: 'marina-dhow-cruise', min_price: 150, rating: 4.8, duration: '3 Hours', thumb: '/images/desert-safari-poster.avif' }
+                ];
+            }
+            
+            let best = catalog[0];
+            let maxScore = -999;
+            
+            catalog.forEach(t => {
+                let score = 0;
+                const n = (t.name || '').toLowerCase();
+                const s = (t.slug || '').toLowerCase();
+                
+                if (this.answers.vibe === 'morning' && (s.includes('morning') || n.includes('morning'))) score += 50;
+                if (this.answers.vibe === 'overnight' && (s.includes('overnight') || n.includes('overnight'))) score += 50;
+                if (this.answers.vibe === 'cruise' && (s.includes('cruise') || s.includes('dhow') || n.includes('cruise'))) score += 60;
+                if (this.answers.vibe === 'evening' && !s.includes('morning') && !s.includes('overnight') && !s.includes('cruise')) score += 30;
+                
+                if (this.answers.perk === 'quad_buggy' && (s.includes('quad') || s.includes('buggy') || n.includes('quad') || n.includes('buggy'))) score += 45;
+                if (this.answers.perk === 'vip_service' && (s.includes('vip') || n.includes('vip') || s.includes('luxury'))) score += 45;
+                if (this.answers.perk === 'private_car' && (s.includes('private') || s.includes('vip'))) score += 35;
+                if (this.answers.perk === 'all_inclusive' && (s.includes('evening') || s.includes('standard') || s.includes('red-dunes'))) score += 30;
+                
+                if (this.answers.group === 'adventure' && (s.includes('quad') || s.includes('buggy') || s.includes('red-dunes'))) score += 30;
+                if (this.answers.group === 'luxury' && (s.includes('vip') || s.includes('private'))) score += 30;
+                if (this.answers.group === 'family' && (s.includes('standard') || s.includes('evening') || s.includes('morning'))) score += 25;
+                if (this.answers.group === 'budget') {
+                    if (t.min_price && t.min_price < 150) score += 25;
+                    if (t.is_bestseller) score += 15;
+                }
+                
+                if (score > maxScore) {
+                    maxScore = score;
+                    best = t;
+                }
+            });
+            
+            this.result = best;
+            
+            const bullets = [];
+            if (this.answers.group === 'family') bullets.push('Optimized for families: gentle pacing, spacious camp & child-friendly activities.');
+            else if (this.answers.group === 'adventure') bullets.push('Adrenaline-packed: extreme red dunes bashing & optional ATV self-drive.');
+            else if (this.answers.group === 'luxury') bullets.push('VIP experience: premium comfort, luxury 4x4 & priority table hospitality.');
+            else bullets.push("Best value: Dubai's highest-rated classic experience at guaranteed best rates.");
+
+            if (this.answers.vibe === 'morning') bullets.push('Crisp morning timing: cooler desert temperatures and sunrise dunes.');
+            else if (this.answers.vibe === 'overnight') bullets.push('Magical overnight stay: authentic Bedouin tent, stargazing & sunrise breakfast.');
+            else if (this.answers.vibe === 'cruise') bullets.push('Dubai Marina skyline: tranquil waters, live shows & 5-star international buffet.');
+            else bullets.push('Golden hour sunset: prime dune photography & evening cultural live performances.');
+
+            if (this.answers.perk === 'quad_buggy') bullets.push('Includes your desired high-power Quad / Buggy desert track session.');
+            else if (this.answers.perk === 'vip_service') bullets.push('Includes exclusive VIP table service with private dedicated waiter.');
+            else if (this.answers.perk === 'private_car') bullets.push('Available with private door-to-door Land Cruiser transfers.');
+            else bullets.push('All-inclusive: dune bashing, camel riding, sandboarding & 5-star live BBQ dinner.');
+
+            this.reasons = bullets;
+            this.loading = false;
+        }, 600);
+    },
+
+    resetQuiz() {
+        this.step = 1;
+        this.answers = { group: null, vibe: null, perk: null };
+        this.loading = false;
+        this.result = null;
+        this.reasons = [];
+    },
+
+    book() {
+        if (window.Alpine && Alpine.store('modal')) {
+            Alpine.store('modal').close();
+        }
+        setTimeout(() => {
+            if (window.Alpine && Alpine.store('modal')) {
+                Alpine.store('modal').open('booking', {
+                    tourId: this.result ? this.result.id : null,
+                    promo: this.conciergePromoActive ? this.conciergePromoCode : ''
+                });
+            }
+            if (this.result && this.result.id) {
+                const tourSelect = document.getElementById('bookingTour');
+                if (tourSelect) {
+                    tourSelect.value = this.result.id;
+                    tourSelect.dispatchEvent(new Event('change'));
+                }
+            }
+            if (this.conciergePromoActive) {
+                const promoInput = document.getElementById('bookingPromoCode');
+                if (promoInput) {
+                    promoInput.value = this.conciergePromoCode;
+                    if (typeof window.validateCurrentPromo === 'function') {
+                        setTimeout(() => window.validateCurrentPromo(), 400);
+                    }
+                }
+            }
+        }, 300);
+    },
+
+    get waUrl() {
+        if (!this.result) return '#';
+        const codeText = this.conciergePromoActive && this.conciergePromoCode ? ` with code ${this.conciergePromoCode}` : '';
+        const text = encodeURIComponent(`Hi Dunes Discovery! Your Safari Match Concierge recommended "${this.result.name}" for my party${codeText}. Could you please share availability and details?`);
+        return `https://wa.me/${this.waPhone}?text=${text}`;
+    }
+}));
+
+/**
+ * 6.2 Safari Matcher Inline Quiz Component
+ */
+Alpine.data('safariMatcherQuiz', (config = {}) => ({
+    step: 1,
+    answers: { type: null, time: null, style: null },
+    matchedTour: {
+        title: 'Evening Desert Safari Dubai',
+        category: 'Desert Safari',
+        duration: '6 Hours',
+        rating: '4.9 (1,200+ Reviews)',
+        desc: 'Our top-rated Dubai red dunes safari with 4x4 dune bashing, camel riding, sandboarding, 5-star live BBQ dinner buffet and 3 cultural shows.',
+        price: 'AED 150',
+        tourId: '1'
+    },
+    conciergePromoActive: !!config.conciergePromoActive,
+    conciergePromoCode: config.conciergePromoCode || '',
+
+    selectChoice(stepNum, val) {
+        if (stepNum === 1) {
+            this.answers.type = val;
+            this.step = 2;
+        } else if (stepNum === 2) {
+            this.answers.time = val;
+            this.step = 3;
+        } else if (stepNum === 3) {
+            this.answers.style = val;
+            this.calculateMatch();
+            this.step = 4;
+        }
+    },
+
+    calculateMatch() {
+        if (this.answers.type === 'quad_buggy') {
+            this.matchedTour = {
+                title: 'Can-Am Dune Buggy & Quad Safari',
+                category: 'Motorsports',
+                duration: '4-5 Hours',
+                rating: '4.9 (850+ Reviews)',
+                desc: 'Self-drive powerful 1000cc Can-Am Turbo or 400cc ATV quad bikes across open high red dunes with professional lead marshal.',
+                price: 'AED 350',
+                tourId: '3'
+            };
+        } else if (this.answers.type === 'water') {
+            this.matchedTour = {
+                title: 'Dubai Marina Luxury Dhow Cruise Dinner',
+                category: 'Cruises',
+                duration: '3 Hours',
+                rating: '4.8 (640+ Reviews)',
+                desc: 'Glide past illuminated skyscrapers of Dubai Marina and JBR on a glass-enclosed luxury catamaran with 5-star international buffet.',
+                price: 'AED 150',
+                tourId: '6'
+            };
+        } else if (this.answers.time === 'morning') {
+            this.matchedTour = {
+                title: 'Morning Desert Safari with Camel Trek',
+                category: 'Morning Safari',
+                duration: '4 Hours',
+                rating: '4.8 (720+ Reviews)',
+                desc: 'Enjoy crisp morning desert air, soft red sunrise dunes, thrilling dune bashing, sandboarding, and traditional camel riding.',
+                price: 'AED 130',
+                tourId: '4'
+            };
+        } else if (this.answers.time === 'overnight') {
+            this.matchedTour = {
+                title: 'Overnight Stargazing Safari & Camp',
+                category: 'Overnight Glamping',
+                duration: '18 Hours',
+                rating: '4.9 (410+ Reviews)',
+                desc: 'Full evening desert safari followed by private Bedouin tent stay, night campfire stargazing, and fresh cooked morning breakfast.',
+                price: 'AED 350',
+                tourId: '5'
+            };
+        } else if (this.answers.style === 'luxury') {
+            this.matchedTour = {
+                title: 'VIP Luxury Desert Safari with Table Service',
+                category: 'VIP Luxury',
+                duration: '6-7 Hours',
+                rating: '4.9 (980+ Reviews)',
+                desc: 'Private 4x4 Land Cruiser hotel pickup, VIP elevated stage-side table, dedicated private waiter service, and premium BBQ dinner.',
+                price: 'AED 250',
+                tourId: '2'
+            };
+        } else {
+            this.matchedTour = {
+                title: 'Premium Evening Desert Safari Dubai',
+                category: 'Desert Safari',
+                duration: '6-7 Hours',
+                rating: '4.9 (1,200+ Reviews)',
+                desc: "Dubai's flagship red dunes experience with extreme dune bashing, camel riding, sandboarding, 5-star live BBQ dinner and 3 cultural shows.",
+                price: 'AED 150',
+                tourId: '1'
+            };
+        }
+    },
+
+    resetQuiz() {
+        this.step = 1;
+        this.answers = { type: null, time: null, style: null };
+    },
+
+    bookMatched() {
+        if (window.Alpine && Alpine.store('modal')) {
+            Alpine.store('modal').open('booking', {
+                tourId: this.matchedTour.tourId,
+                promo: this.conciergePromoActive ? this.conciergePromoCode : ''
+            });
+        }
+    }
+}));
+
+/**
+ * 6.3 Custom Safari Modal Component
+ */
+Alpine.data('customSafariModal', (config = {}) => ({
+    base: { name: 'Standard Evening Red Dunes', price: 150, tourId: 1 },
+    transfer: { name: 'Shared 4x4 Land Cruiser', price: 0, type: 'flat' },
+    sports: { name: 'Scenic Only', price: 0, type: 'per_person' },
+    addons: [],
+    adults: 2,
+    waPhone: config.waPhone || '971502456056',
+
+    hasAddon(key) {
+        return this.addons.some(a => a.key === key);
+    },
+    toggleAddon(addon) {
+        if (this.hasAddon(addon.key)) {
+            this.addons = this.addons.filter(a => a.key !== addon.key);
+        } else {
+            this.addons.push(addon);
+        }
+    },
+    get total() {
+        let baseTotal = this.base.price * this.adults;
+        let transferTotal = (this.transfer.type === 'flat') ? this.transfer.price : (this.transfer.price * this.adults);
+        let sportsTotal = (this.sports.type === 'flat') ? this.sports.price : (this.sports.price * this.adults);
+        let addonsTotal = 0;
+        this.addons.forEach(a => {
+            addonsTotal += (a.type === 'flat') ? a.price : (a.price * this.adults);
+        });
+        return baseTotal + transferTotal + sportsTotal + addonsTotal;
+    },
+    get summaryAddons() {
+        return this.addons.length ? this.addons.map(a => a.name).join(', ') : 'None';
+    },
+    get waUrl() {
+        const msg = `Hi Dunes Discovery! I configured a custom safari: Base: ${encodeURIComponent(this.base.name)}, Vehicle: ${encodeURIComponent(this.transfer.name)}, Sports: ${encodeURIComponent(this.sports.name)}, Addons: ${encodeURIComponent(this.summaryAddons)}, Guests: ${this.adults} Adults, Total: AED ${this.total}. Can you check availability?`;
+        return `https://wa.me/${this.waPhone}?text=${msg}`;
+    },
+    book() {
+        if (window.Alpine && Alpine.store('modal')) {
+            Alpine.store('modal').close();
+        }
+        setTimeout(() => {
+            if (window.Alpine && Alpine.store('modal')) {
+                Alpine.store('modal').open('booking', {
+                    tourId: this.base.tourId,
+                    adults: this.adults,
+                    requests: `[CUSTOM BUILDER SPEC]\nVehicle: ${this.transfer.name}\nMotorsports: ${this.sports.name}\nAddons: ${this.summaryAddons}\nEstimated Total: AED ${this.total}`
+                });
+            }
+            const tourSelect = document.getElementById('bookingTour');
+            if (tourSelect && this.base.tourId) {
+                tourSelect.value = this.base.tourId;
+                tourSelect.dispatchEvent(new Event('change'));
+            }
+            const adultsInput = document.getElementById('bookingAdults');
+            if (adultsInput) adultsInput.value = this.adults;
+            const reqInput = document.getElementById('bookingRequests');
+            if (reqInput) {
+                reqInput.value = `[CUSTOM BUILDER SPEC]\nVehicle: ${this.transfer.name}\nMotorsports: ${this.sports.name}\nAddons: ${this.summaryAddons}\nEstimated Total: AED ${this.total}`;
+            }
+        }, 300);
+    }
+}));
+
+
+// =============================================================================
+// 7. INITIALIZE ALPINE & APP ENGINE
 // =============================================================================
 
 Alpine.start();

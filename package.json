@@ -18,5 +18,8 @@
         "tailwindcss": "^4.3.3",
         "terser": "^5.51.2",
         "vite": "^8.0.0"
+    },
+    "dependencies": {
+        "@alpinejs/collapse": "^3.17.4"
     }
 }
