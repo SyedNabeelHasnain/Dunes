@@ -1,24 +1,29 @@
 @extends('layouts.app')
 
 @section('content')
-<section class="section py-5" style="margin-top: 5vh;">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-7">
-                <div class="card border-0 shadow-sm rounded-4 p-4 p-lg-5 bg-white">
-                    <h2 class="fw-800 mb-2 text-danger">Payment Cancelled</h2>
-                    <p class="text-muted">Your payment was not completed. You can retry booking or contact our team for assistance.</p>
-                    @if($booking)
-                        <div class="p-3 bg-light rounded-4 mt-3 border">
-                            <div class="text-muted small fw-bold">Reference</div>
-                            <div class="fw-800 text-dark">#{{ $booking->reference }}</div>
-                        </div>
-                    @endif
-                    <div class="mt-4 d-flex gap-2">
-                        <a href="{{ route('tours.index') }}" class="btn btn-primary rounded-pill px-4 py-2 fw-bold">Browse Tours</a>
-                        <a href="{{ route('contact') }}" class="btn btn-outline-primary rounded-pill px-4 py-2 fw-bold">Contact Us</a>
-                    </div>
+<section class="py-16 min-h-[75vh] flex items-center bg-slate-50">
+    <div class="max-w-xl mx-auto px-4 w-full">
+        <div class="bg-white rounded-3xl shadow-xl border border-slate-100 p-8 sm:p-10 text-center">
+            <div class="w-16 h-16 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center text-3xl mx-auto mb-4">
+                <i class="bi bi-x-circle-fill"></i>
+            </div>
+            <h2 class="text-2xl font-black text-slate-900 mb-2">Payment Cancelled</h2>
+            <p class="text-slate-500 text-sm sm:text-base leading-relaxed mb-4">
+                Your payment was not completed. You can retry your reservation or contact our concierge team for immediate assistance.
+            </p>
+            @if($booking)
+                <div class="p-4 bg-slate-50 rounded-2xl mb-6 border border-slate-200 text-left">
+                    <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Reference</div>
+                    <div class="font-mono font-extrabold text-slate-900 text-base sm:text-lg">#{{ $booking->reference }}</div>
                 </div>
+            @endif
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                <a href="{{ route('tours.index') }}" class="btn-desert-animated font-bold rounded-full px-6 py-3 text-white text-sm shadow-sm inline-flex items-center justify-center gap-2">
+                    <i class="bi bi-compass-fill"></i> Browse Tours
+                </a>
+                <a href="{{ route('contact') }}" class="border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold rounded-full px-6 py-3 text-sm transition-colors inline-flex items-center justify-center gap-2">
+                    <i class="bi bi-envelope"></i> Contact Us
+                </a>
             </div>
         </div>
     </div>

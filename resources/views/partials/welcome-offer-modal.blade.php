@@ -11,134 +11,168 @@
 @endphp
 
 @if($popupActive)
-<!-- First-Time Visitor 25% Discount Voucher Modal -->
-<div class="modal fade" id="welcomeOfferModal" tabindex="-1" aria-labelledby="welcomeOfferLabel" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow-2xl rounded-5 overflow-hidden position-relative" style="background: #ffffff;">
+<!-- First-Time Visitor 25% Discount Voucher Modal (Tailwind v4 + Alpine.js) -->
+<div id="welcomeOfferModal" 
+     x-data="{}" 
+     x-show="$store.modal.active === 'welcome-offer'" 
+     x-cloak
+     class="fixed inset-0 z-50 overflow-y-auto" 
+     role="dialog" 
+     aria-modal="true"
+     @keydown.escape.window="$store.modal.close()">
+
+    <!-- Backdrop -->
+    <div x-show="$store.modal.active === 'welcome-offer'"
+         x-transition:enter="ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity"
+         @click="$store.modal.close()"></div>
+
+    <!-- Modal Dialog Panel -->
+    <div class="min-h-full flex items-center justify-center p-3 sm:p-4 text-center">
+        <div x-show="$store.modal.active === 'welcome-offer'"
+             x-transition:enter="ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="ease-in duration-150"
+             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+             x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+             class="w-full max-w-4xl transform overflow-hidden rounded-3xl bg-white text-left align-middle shadow-2xl transition-all border border-slate-100 relative"
+             @click.stop>
             
             <!-- Luxury Orange & Gold Ambient Glow Bar -->
-            <div style="height: 6px; background: linear-gradient(90deg, #F58F43 0%, #FFB067 50%, #d2a13b 100%);"></div>
+            <div class="h-1.5 w-full bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-500"></div>
 
             <!-- Close Button -->
-            <button type="button" class="btn-close position-absolute top-0 end-0 m-4 shadow-none z-3 p-2 bg-light rounded-circle" data-bs-dismiss="modal" aria-label="Close" id="closeWelcomeOfferBtn" style="font-size: 0.8rem;"></button>
+            <button type="button" 
+                    @click="$store.modal.close()" 
+                    class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer absolute top-4 right-4 z-10" 
+                    id="closeWelcomeOfferBtn" 
+                    aria-label="Close">
+                <i class="bi bi-x-lg text-xs"></i>
+            </button>
 
-            <div class="modal-body p-4 p-md-5">
-                <div class="row g-4 align-items-center">
+            <div class="p-6 sm:p-8">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
                     
                     <!-- Left Visual & Highlights Column -->
-                    <div class="col-lg-5 text-center text-lg-start">
-                        <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-primary-subtle text-primary fw-800 small text-uppercase mb-3" style="font-size: 0.75rem; letter-spacing: 0.5px;">
-                            <i class="bi bi-gift-fill"></i>
+                    <div class="lg:col-span-5 text-center lg:text-left">
+                        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 text-primary font-black text-[11px] uppercase tracking-wider mb-3">
+                            <i class="bi bi-gift-fill text-amber-500"></i>
                             <span>First-Time Guest Special</span>
                         </div>
 
-                        <h2 class="display-6 fw-800 text-dark lh-1 mb-3" style="letter-spacing: -0.5px;">
+                        <h2 class="text-2xl sm:text-3xl font-black text-slate-900 leading-tight mb-2 tracking-tight">
                             {{ $popupHeadline }}
                         </h2>
 
-                        <p class="text-muted small mb-4 lh-base">
+                        <p class="text-slate-500 text-xs sm:text-sm leading-relaxed mb-4">
                             {{ $popupSubheadline }}
                         </p>
 
                         <!-- Trust Pillars -->
-                        <div class="d-flex flex-column gap-2 mb-4 text-start">
-                            <div class="d-flex align-items-center gap-2 small fw-bold text-dark">
-                                <i class="bi bi-shield-check text-success fs-5"></i>
+                        <div class="space-y-2 mb-6 text-left">
+                            <div class="flex items-center gap-2 text-xs font-bold text-slate-800">
+                                <i class="bi bi-shield-check text-emerald-500 text-base"></i>
                                 <span>100% Free 24h Cancellation</span>
                             </div>
-                            <div class="d-flex align-items-center gap-2 small fw-bold text-dark">
-                                <i class="bi bi-patch-check-fill text-primary fs-5" style="color: #F58F43 !important;"></i>
+                            <div class="flex items-center gap-2 text-xs font-bold text-slate-800">
+                                <i class="bi bi-patch-check-fill text-primary text-base"></i>
                                 <span>DTCM Licensed Desert Marshals</span>
                             </div>
-                            <div class="d-flex align-items-center gap-2 small fw-bold text-dark">
-                                <i class="bi bi-stars text-warning fs-5"></i>
+                            <div class="flex items-center gap-2 text-xs font-bold text-slate-800">
+                                <i class="bi bi-stars text-amber-500 text-base"></i>
                                 <span>5-Star Halal Gourmet Dining</span>
                             </div>
-                            <div class="d-flex align-items-center gap-2 small fw-bold text-dark">
-                                <i class="bi bi-cash-coin text-info fs-5"></i>
+                            <div class="flex items-center gap-2 text-xs font-bold text-slate-800">
+                                <i class="bi bi-cash-coin text-sky-500 text-base"></i>
                                 <span>Zero-Deposit Cash on Pickup</span>
                             </div>
                         </div>
 
                         <!-- Session Countdown Box -->
-                        <div class="p-3 rounded-4 text-center border" style="background: #fff8f3; border-color: rgba(245, 143, 67, 0.25) !important;">
-                            <span class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.7rem; letter-spacing: 1px;">Session Offer Expires In</span>
-                            <div class="fw-800 fs-4 text-primary font-monospace" id="welcomeOfferCountdown" style="letter-spacing: 2px;">{{ sprintf('%02d', $popupTimerMins) }}:00</div>
+                        <div class="p-3.5 rounded-2xl text-center bg-orange-50/70 border border-orange-200/80">
+                            <span class="text-[10px] uppercase font-black text-slate-500 tracking-wider block mb-0.5">Session Offer Expires In</span>
+                            <div class="text-2xl font-black text-primary font-mono tracking-widest" id="welcomeOfferCountdown">{{ sprintf('%02d', $popupTimerMins) }}:00</div>
                         </div>
                     </div>
 
                     <!-- Right Form / Success Column -->
-                    <div class="col-lg-7">
-                        <div class="p-4 p-md-4 rounded-4 shadow-sm bg-light border border-light">
+                    <div class="lg:col-span-7">
+                        <div class="p-5 sm:p-6 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-xs">
                             
                             <!-- STATE 1: Lead Capture Form -->
                             <div id="welcomeOfferFormState">
-                                <div class="text-center mb-4">
-                                    <h4 class="fw-800 text-dark mb-1">Claim Your Voucher</h4>
-                                    <p class="text-muted small mb-0">Enter your email to receive your exclusive {{ (int)$popupDiscount }}% promo voucher instantly.</p>
+                                <div class="text-center mb-5">
+                                    <h4 class="font-extrabold text-slate-900 text-lg mb-1">Claim Your Voucher</h4>
+                                    <p class="text-slate-500 text-xs">Enter your details to receive your exclusive {{ (int)$popupDiscount }}% promo voucher instantly.</p>
                                 </div>
 
-                                <form id="welcomeOfferForm">
-                                    <div class="mb-3">
-                                        <label class="form-label small fw-bold text-muted text-uppercase mb-1" for="welcomeName">Full Name <span class="text-danger">*</span></label>
-                                        <div class="input-group shadow-sm rounded-4 overflow-hidden">
-                                            <span class="input-group-text bg-white border-0 ps-3 text-muted"><i class="bi bi-person-fill text-primary"></i></span>
-                                            <input type="text" class="form-control border-0 shadow-none py-3 fw-bold ps-2" id="welcomeName" name="name" placeholder="e.g. Sarah Connor" required autocomplete="name">
+                                <form id="welcomeOfferForm" class="space-y-3.5">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1" for="welcomeName">Full Name <span class="text-red-500">*</span></label>
+                                        <div class="relative rounded-xl shadow-2xs overflow-hidden border border-slate-200 bg-white focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+                                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-primary"><i class="bi bi-person-fill"></i></span>
+                                            <input type="text" class="w-full pl-10 pr-3 py-2.5 bg-transparent text-xs sm:text-sm font-semibold text-slate-800 border-0 focus:outline-none placeholder:text-slate-400" id="welcomeName" name="name" placeholder="e.g. Sarah Connor" required autocomplete="name">
                                         </div>
                                     </div>
 
-                                    <div class="mb-3">
-                                        <label class="form-label small fw-bold text-muted text-uppercase mb-1" for="welcomeEmail">Email Address <span class="text-danger">*</span></label>
-                                        <div class="input-group shadow-sm rounded-4 overflow-hidden">
-                                            <span class="input-group-text bg-white border-0 ps-3 text-muted"><i class="bi bi-envelope-fill text-primary"></i></span>
-                                            <input type="email" class="form-control border-0 shadow-none py-3 fw-bold ps-2" id="welcomeEmail" name="email" placeholder="name@example.com" required autocomplete="email">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1" for="welcomeEmail">Email Address <span class="text-red-500">*</span></label>
+                                        <div class="relative rounded-xl shadow-2xs overflow-hidden border border-slate-200 bg-white focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+                                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-primary"><i class="bi bi-envelope-fill"></i></span>
+                                            <input type="email" class="w-full pl-10 pr-3 py-2.5 bg-transparent text-xs sm:text-sm font-semibold text-slate-800 border-0 focus:outline-none placeholder:text-slate-400" id="welcomeEmail" name="email" placeholder="name@example.com" required autocomplete="email">
                                         </div>
                                     </div>
 
-                                    <div class="mb-3">
-                                        <label class="form-label small fw-bold text-muted text-uppercase mb-1" for="welcomePhone"><i class="bi bi-whatsapp text-success me-1"></i>Phone / WhatsApp Number <span class="text-danger">*</span></label>
-                                        <div class="welcome-phone-field shadow-sm rounded-4 bg-white position-relative">
-                                            <input type="tel" class="form-control border-0 shadow-none py-3 fw-bold" id="welcomePhone" name="phone" placeholder="50 123 4567" required autocomplete="tel">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1" for="welcomePhone"><i class="bi bi-whatsapp text-emerald-500 me-1"></i>Phone / WhatsApp Number <span class="text-red-500">*</span></label>
+                                        <div class="welcome-phone-field rounded-xl shadow-2xs bg-white border border-slate-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all relative">
+                                            <input type="tel" class="w-full py-2.5 px-3 bg-transparent text-xs sm:text-sm font-semibold text-slate-800 border-0 focus:outline-none placeholder:text-slate-400" id="welcomePhone" name="phone" placeholder="50 123 4567" required autocomplete="tel">
                                         </div>
-                                        <small class="text-muted d-block mt-1" style="font-size: 0.72rem;"><i class="bi bi-shield-check text-success me-1"></i>We'll send your voucher code via Email & WhatsApp.</small>
+                                        <small class="text-slate-400 block mt-1 text-[11px]"><i class="bi bi-shield-check text-emerald-500 me-1"></i>Voucher sent via Email & WhatsApp.</small>
                                     </div>
 
-                                    <div class="alert alert-danger p-2 small mt-2 d-none mb-3 rounded-3" id="welcomeOfferError"></div>
+                                    <div class="p-2.5 rounded-xl bg-red-50 text-red-700 text-xs border border-red-200 hidden" id="welcomeOfferError"></div>
 
-                                    <button type="submit" class="btn btn-primary rounded-pill w-100 py-3 fw-800 fs-6 shadow-lg d-flex align-items-center justify-content-center gap-2 mb-3" id="claimOfferSubmitBtn" style="background: linear-gradient(135deg, #F58F43 0%, #e07425 100%); border: none;">
+                                    <button type="submit" class="w-full py-3.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2" id="claimOfferSubmitBtn">
                                         <span>Claim My {{ (int)$popupDiscount }}% Discount</span>
                                         <i class="bi bi-arrow-right"></i>
                                     </button>
 
-                                    <div class="text-center text-muted small" style="font-size: 0.72rem;">
+                                    <div class="text-center text-slate-400 text-[11px]">
                                         <i class="bi bi-lock-fill me-1"></i> 100% Privacy. Single-use voucher valid for 24h.
                                     </div>
                                 </form>
                             </div>
 
                             <!-- STATE 2: Success & Instant 1-Click Booking -->
-                            <div id="welcomeOfferSuccessState" class="d-none text-center py-2">
-                                <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow-lg" style="width: 60px; height: 60px;">
-                                    <i class="bi bi-check-lg fs-2 fw-bold"></i>
+                            <div id="welcomeOfferSuccessState" class="hidden text-center py-2">
+                                <div class="w-14 h-14 rounded-full bg-emerald-500 text-white flex items-center justify-center mx-auto mb-3 shadow-lg shadow-emerald-500/20 text-2xl font-bold">
+                                    <i class="bi bi-check-lg"></i>
                                 </div>
-                                <h3 class="fw-800 text-dark mb-1">{{ (int)$popupDiscount }}% Discount Unlocked!</h3>
-                                <p class="text-muted small mb-4">Your personalized promo voucher is generated and ready to apply.</p>
+                                <h3 class="font-black text-slate-900 text-xl mb-1">{{ (int)$popupDiscount }}% Discount Unlocked!</h3>
+                                <p class="text-slate-500 text-xs mb-4">Your personalized promo voucher is generated and ready to apply.</p>
 
                                 <!-- Golden Ticket Display -->
-                                <div class="p-4 rounded-4 text-white mb-4 position-relative shadow-lg" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 2px dashed #F58F43;">
-                                    <span class="text-uppercase small fw-bold text-warning d-block mb-1" style="letter-spacing: 1.5px; font-size: 0.75rem;">Your Exclusive Promo Code</span>
-                                    <div class="fs-2 fw-800 font-monospace text-white my-2" id="generatedVoucherCode" style="letter-spacing: 3px;">FIRST25-XXXXX</div>
-                                    <button type="button" class="btn btn-sm btn-light rounded-pill px-3 py-1 fw-bold text-dark mt-1" id="copyVoucherBtn">
-                                        <i class="bi bi-clipboard me-1"></i> Copy Code
+                                <div class="p-4 rounded-2xl text-white mb-4 relative shadow-lg bg-gradient-to-br from-slate-900 to-slate-950 border-2 border-dashed border-orange-500">
+                                    <span class="text-[10px] uppercase font-bold text-amber-400 tracking-widest block mb-1">Your Exclusive Promo Code</span>
+                                    <div class="text-2xl sm:text-3xl font-black font-mono text-white my-2 tracking-widest" id="generatedVoucherCode">FIRST25-XXXXX</div>
+                                    <button type="button" class="px-3 py-1 rounded-full bg-white hover:bg-slate-100 text-slate-900 text-xs font-bold transition-colors cursor-pointer inline-flex items-center gap-1.5" id="copyVoucherBtn">
+                                        <i class="bi bi-clipboard"></i> <span>Copy Code</span>
                                     </button>
                                 </div>
 
-                                <button type="button" class="btn btn-primary rounded-pill w-100 py-3 fw-800 fs-6 shadow-lg d-flex align-items-center justify-content-center gap-2 mb-2" id="applyVoucherAndBookBtn" style="background: linear-gradient(135deg, #F58F43 0%, #e07425 100%); border: none;">
-                                    <i class="bi bi-cart-check-fill me-1"></i>
+                                <button type="button" class="w-full py-3.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 mb-2" id="applyVoucherAndBookBtn">
+                                    <i class="bi bi-cart-check-fill"></i>
                                     <span>Apply {{ (int)$popupDiscount }}% OFF & Book Safari Now</span>
                                 </button>
                                 
-                                <small class="text-muted d-block mt-2" style="font-size: 0.75rem;">
+                                <small class="text-slate-400 block mt-2 text-[11px]">
                                     A copy has also been sent to your email address.
                                 </small>
                             </div>
@@ -153,25 +187,15 @@
 @endif
 
 <!-- Floating Persistent Voucher Reminder Pill (Appears when claimed) -->
-<div id="welcomeFloatingPill" class="d-none position-fixed bottom-0 start-0 m-3 z-3 shadow-lg rounded-pill p-2 ps-3 pe-3 bg-dark text-white border border-secondary d-flex align-items-center gap-2" style="cursor: pointer; transition: all 0.3s ease; animation: slideInPill 0.4s ease forwards;">
-    <span class="badge bg-warning text-dark fw-800 rounded-pill px-2 py-1">{{ (int)$popupDiscount }}% OFF</span>
-    <span class="small fw-bold font-monospace text-white" id="floatingPillCode">FIRST25-OFF</span>
-    <span class="small text-muted font-monospace d-none d-sm-inline" id="floatingPillTimer">{{ sprintf('%02d', $popupTimerMins) }}:00</span>
-    <button type="button" class="btn btn-sm btn-primary rounded-pill px-2 py-1 fw-bold ms-1" style="background: #F58F43; border: none; font-size: 0.75rem;">
+<div id="welcomeFloatingPill" 
+     class="hidden fixed bottom-6 left-6 z-40 mb-safe items-center gap-2 p-2 px-3.5 rounded-full bg-slate-950/95 text-white border border-orange-500/50 shadow-2xl backdrop-blur-md cursor-pointer hover:scale-105 transition-all">
+    <span class="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-xs">{{ (int)$popupDiscount }}% OFF</span>
+    <span class="text-xs font-bold font-mono text-white" id="floatingPillCode">FIRST25-OFF</span>
+    <span class="text-xs text-slate-400 font-mono hidden sm:inline" id="floatingPillTimer">{{ sprintf('%02d', $popupTimerMins) }}:00</span>
+    <button type="button" class="px-2.5 py-1 rounded-full bg-primary hover:bg-primary-dark text-white font-bold text-xs transition-colors ms-1 cursor-pointer">
         Apply
     </button>
 </div>
-
-<style>
-@keyframes slideInPill {
-    from { transform: translateY(100px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
-#welcomeFloatingPill:hover {
-    transform: scale(1.04) translateY(-2px);
-    box-shadow: 0 10px 25px rgba(245, 143, 67, 0.4) !important;
-}
-</style>
 
 <script>
 (function() {
@@ -195,48 +219,19 @@
         const floatingCode = document.getElementById('floatingPillCode');
         const floatingTimer = document.getElementById('floatingPillTimer');
 
-        // Robust Modal Show Helper (works with Bootstrap or custom fallback)
         function showOfferModal() {
-            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                try {
-                    const bModal = bootstrap.Modal.getOrCreateInstance(modalEl);
-                    bModal.show();
-                    if (window.App && typeof window.App.initPhoneInputs === 'function') {
-                        setTimeout(() => window.App.initPhoneInputs(), 100);
-                    }
-                    return;
-                } catch(e) {}
-            }
-            
-            // Fallback if bootstrap is still loading
-            modalEl.classList.add('show');
-            modalEl.style.display = 'block';
-            document.body.classList.add('modal-open');
-            let backdrop = document.querySelector('.modal-backdrop');
-            if (!backdrop) {
-                backdrop = document.createElement('div');
-                backdrop.className = 'modal-backdrop fade show';
-                document.body.appendChild(backdrop);
+            if (window.Alpine && Alpine.store('modal')) {
+                Alpine.store('modal').open('welcome-offer');
+                if (window.App && typeof window.App.initPhoneInputs === 'function') {
+                    setTimeout(() => window.App.initPhoneInputs(), 100);
+                }
             }
         }
 
         function hideOfferModal() {
-            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                try {
-                    const bModal = bootstrap.Modal.getInstance(modalEl);
-                    if (bModal) bModal.hide();
-                } catch(e) {}
+            if (window.Alpine && Alpine.store('modal')) {
+                Alpine.store('modal').close();
             }
-            modalEl.classList.remove('show');
-            modalEl.style.display = 'none';
-            document.body.classList.remove('modal-open');
-            const backdrop = document.querySelector('.modal-backdrop');
-            if (backdrop) backdrop.remove();
-        }
-
-        const closeBtn = document.getElementById('closeWelcomeOfferBtn');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', hideOfferModal);
         }
 
         // Urgency Timer
@@ -292,12 +287,10 @@
         }
 
         if (modalEl) {
-            // Trigger 1: Delay Timer
             setTimeout(() => {
                 triggerModal();
             }, popupDelaySec * 1000);
 
-            // Trigger 2: Scroll Depth
             if (enableScroll) {
                 let scrollTriggered = false;
                 window.addEventListener('scroll', () => {
@@ -310,7 +303,6 @@
                 }, { passive: true });
             }
 
-            // Trigger 3: Desktop Exit Intent
             if (enableExit) {
                 let exitTriggered = false;
                 document.addEventListener('mouseleave', (e) => {
@@ -319,25 +311,6 @@
                     triggerModal();
                 });
             }
-
-            // Dismissal Handler
-            modalEl.addEventListener('hidden.bs.modal', function() {
-                const claimed = localStorage.getItem('dunes_welcome_claimed');
-                if (!claimed) {
-                    localStorage.setItem('dunes_welcome_dismissed_until', Date.now() + (24 * 60 * 60 * 1000));
-                }
-            });
-
-            // Modal Shown Handler: Ensure phone input ITI is active and aligned
-            modalEl.addEventListener('shown.bs.modal', function() {
-                if (window.App && typeof window.App.initPhoneInputs === 'function') {
-                    window.App.initPhoneInputs();
-                }
-                const pInput = document.getElementById('welcomePhone');
-                if (pInput && pInput._iti && typeof pInput._iti.updateInputPadding === 'function') {
-                    pInput._iti.updateInputPadding();
-                }
-            });
         }
 
         // Form Submission
@@ -354,14 +327,14 @@
                 if (!name || !email || !phone) {
                     if (errorBox) {
                         errorBox.innerText = 'Please provide your full name, email, and phone/WhatsApp number.';
-                        errorBox.classList.remove('d-none');
+                        errorBox.classList.remove('hidden');
                     }
                     return;
                 }
 
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Generating Voucher...';
-                if (errorBox) errorBox.classList.add('d-none');
+                submitBtn.innerHTML = '<span class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin me-2"></span> Generating Voucher...';
+                if (errorBox) errorBox.classList.add('hidden');
 
                 fetch('/api/v1/welcome-offer/claim', {
                     method: 'POST',
@@ -390,14 +363,14 @@
                         }
 
                         if (codeDisplay) codeDisplay.innerText = code;
-                        formState.classList.add('d-none');
-                        successState.classList.remove('d-none');
+                        formState.classList.add('hidden');
+                        successState.classList.remove('hidden');
 
                         showFloatingPill(code);
                     } else {
                         if (errorBox) {
                             errorBox.innerText = body.message || 'Unable to generate voucher. Please check your details and try again.';
-                            errorBox.classList.remove('d-none');
+                            errorBox.classList.remove('hidden');
                         }
                     }
                 })
@@ -406,7 +379,7 @@
                     submitBtn.innerHTML = '<span>Claim My Discount</span> <i class="bi bi-arrow-right"></i>';
                     if (errorBox) {
                         errorBox.innerText = 'Network error. Please try again.';
-                        errorBox.classList.remove('d-none');
+                        errorBox.classList.remove('hidden');
                     }
                 });
             });
@@ -419,19 +392,11 @@
                 const code = this.dataset.code || 'FIRST25';
                 navigator.clipboard.writeText(code).then(() => {
                     const orig = btn.innerHTML;
-                    btn.innerHTML = '<span class="text-success fw-bold">COPIED!</span> <i class="bi bi-check-lg text-success"></i>';
+                    btn.innerHTML = '<span class="text-emerald-400 font-bold">COPIED!</span> <i class="bi bi-check-lg text-emerald-400"></i>';
                     setTimeout(() => { btn.innerHTML = orig; }, 2000);
 
-                    // Open Booking Modal with Code Preloaded
-                    const bookingModalEl = document.getElementById('bookingModal');
-                    if (bookingModalEl && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                        const bModal = bootstrap.Modal.getOrCreateInstance(bookingModalEl);
-                        bModal.show();
-                        const promoInput = document.getElementById('bookingPromoCode');
-                        if (promoInput) promoInput.value = code;
-                        if (typeof window.validateCurrentPromo === 'function') {
-                            setTimeout(() => window.validateCurrentPromo(), 400);
-                        }
+                    if (window.Alpine && Alpine.store('modal')) {
+                        Alpine.store('modal').open('booking', { promo: code });
                     }
                 }).catch(() => {
                     showOfferModal();
@@ -444,7 +409,7 @@
             copyBtn.addEventListener('click', function() {
                 const code = codeDisplay.innerText.trim();
                 navigator.clipboard.writeText(code).then(() => {
-                    copyBtn.innerHTML = '<i class="bi bi-check-lg text-success me-1"></i> Copied!';
+                    copyBtn.innerHTML = '<i class="bi bi-check-lg text-emerald-500 me-1"></i> Copied!';
                     setTimeout(() => { copyBtn.innerHTML = '<i class="bi bi-clipboard me-1"></i> Copy Code'; }, 2000);
                 });
             });
@@ -458,12 +423,8 @@
                 hideOfferModal();
 
                 setTimeout(() => {
-                    const bookingModalEl = document.getElementById('bookingModal');
-                    if (bookingModalEl) {
-                        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                            const bModal = bootstrap.Modal.getOrCreateInstance(bookingModalEl);
-                            bModal.show();
-                        }
+                    if (window.Alpine && Alpine.store('modal')) {
+                        Alpine.store('modal').open('booking', { promo: code });
                         const promoInput = document.getElementById('bookingPromoCode');
                         if (promoInput) promoInput.value = code;
                         if (typeof window.validateCurrentPromo === 'function') {
@@ -477,17 +438,13 @@
         function showFloatingPill(code) {
             if (!floatingPill) return;
             if (floatingCode) floatingCode.innerText = code;
-            floatingPill.classList.remove('d-none');
-            floatingPill.classList.add('d-flex');
+            floatingPill.classList.remove('hidden');
+            floatingPill.classList.add('flex');
             startTimer();
 
             floatingPill.onclick = function() {
-                const bookingModalEl = document.getElementById('bookingModal');
-                if (bookingModalEl) {
-                    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                        const bModal = bootstrap.Modal.getOrCreateInstance(bookingModalEl);
-                        bModal.show();
-                    }
+                if (window.Alpine && Alpine.store('modal')) {
+                    Alpine.store('modal').open('booking', { promo: code });
                     const promoInput = document.getElementById('bookingPromoCode');
                     if (promoInput) promoInput.value = code;
                     if (typeof window.validateCurrentPromo === 'function') {
@@ -503,7 +460,6 @@
         }
     }
 
-    // Initialize on DOM or Window Load
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initWelcomeOffer);
     } else {

@@ -5,209 +5,8 @@
 
 @push('styles')
 <style>
-/* Page Scope Styling */
-.rc-page {
-    background-color: #F8FAFC !important;
-    min-height: 100vh;
-}
-
-.rc-hero {
-    background: linear-gradient(135deg, #0F172A 0%, #1E293B 60%, #334155 100%) !important;
-    border-radius: 24px !important;
-    position: relative;
-    overflow: hidden;
-    color: #FFFFFF !important;
-    border: 1px solid #334155 !important;
-    box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.4) !important;
-}
-.rc-hero::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: 45%;
-    background: radial-gradient(circle at 85% 50%, rgba(246, 144, 68, 0.25) 0%, transparent 70%);
-    pointer-events: none;
-}
-.rc-hero h1 {
-    color: #FFFFFF !important;
-}
-.rc-hero p {
-    color: #CBD5E1 !important;
-}
-
-.rc-pill {
-    background: rgba(255, 255, 255, 0.1) !important;
-    border: 1px solid rgba(255, 255, 255, 0.18) !important;
-    color: #FFFFFF !important;
-    padding: 6px 14px !important;
-    border-radius: 8px !important;
-    font-size: 13px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 6px !important;
-}
-
-.rc-pickup-banner {
-    background: linear-gradient(90deg, #FFF7ED 0%, #FFEDD5 100%) !important;
-    border: 2px solid #FDBA74 !important;
-    border-radius: 16px !important;
-    padding: 16px 24px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 16px !important;
-    box-shadow: 0 4px 15px rgba(246, 144, 68, 0.1) !important;
-}
-
-.rc-cat-header {
-    background: #FFFFFF !important;
-    border: 1px solid #E2E8F0 !important;
-    border-left: 6px solid #F69044 !important;
-    border-radius: 12px !important;
-    padding: 14px 22px !important;
-    margin-bottom: 20px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.02) !important;
-}
-.rc-cat-header h2 {
-    font-size: 19px !important;
-    font-weight: 800 !important;
-    color: #0F172A !important;
-    letter-spacing: -0.01em !important;
-    margin: 0 !important;
-    text-transform: uppercase !important;
-}
-
-/* 1 Tour Per Row Luxury Card */
-.rc-tour-card {
-    background: #FFFFFF !important;
-    border: 1px solid #E2E8F0 !important;
-    border-radius: 20px !important;
-    overflow: hidden !important;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04) !important;
-    margin-bottom: 24px !important;
-}
-.rc-tour-card:hover {
-    border-color: #CBD5E1 !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.08) !important;
-}
-
-.rc-img-wrap {
-    position: relative !important;
-    height: 100% !important;
-    min-height: 220px !important;
-    background: #0F172A !important;
-    overflow: hidden !important;
-}
-.rc-img-wrap img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    transition: transform 0.4s ease !important;
-}
-.rc-tour-card:hover .rc-img-wrap img {
-    transform: scale(1.04) !important;
-}
-
-.rc-tour-title {
-    font-size: 18px !important;
-    font-weight: 800 !important;
-    color: #0F172A !important;
-    line-height: 1.3 !important;
-    letter-spacing: -0.01em !important;
-}
-
-.rc-tour-desc {
-    font-size: 13px !important;
-    color: #475569 !important;
-    line-height: 1.55 !important;
-    margin-bottom: 14px !important;
-}
-
-.rc-inc-pill {
-    font-size: 11px !important;
-    background: #F1F5F9 !important;
-    color: #334155 !important;
-    padding: 4px 10px !important;
-    border-radius: 6px !important;
-    font-weight: 600 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 5px !important;
-    border: 1px solid #E2E8F0 !important;
-}
-.rc-inc-pill i {
-    color: #F69044 !important;
-}
-
-.rc-tier-box {
-    background: #F8FAFC !important;
-    border: 1px solid #E2E8F0 !important;
-    border-radius: 14px !important;
-    padding: 16px !important;
-    height: 100% !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-}
-
-.rc-tier-row {
-    padding: 8px 0 !important;
-    border-bottom: 1px dashed #CBD5E1 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-}
-.rc-tier-row:last-child {
-    border-bottom: none !important;
-    padding-bottom: 0 !important;
-}
-.rc-tier-row:first-child {
-    padding-top: 0 !important;
-}
-
-.rc-tier-name {
-    font-size: 13px !important;
-    font-weight: 700 !important;
-    color: #1E293B !important;
-}
-.rc-tier-sub {
-    font-size: 11px !important;
-    color: #64748B !important;
-}
-
-.rc-cur-price {
-    font-size: 16px !important;
-    font-weight: 800 !important;
-    color: #D95300 !important;
-}
-.rc-old-price {
-    font-size: 11.5px !important;
-    text-decoration: line-through !important;
-    color: #94A3B8 !important;
-    margin-right: 4px !important;
-}
-
-.rc-floating-bar {
-    position: sticky !important;
-    top: calc(var(--header-h, 72px) + 12px) !important;
-    z-index: 99 !important;
-    backdrop-filter: blur(12px) !important;
-    background: rgba(255, 255, 255, 0.95) !important;
-    border: 1px solid rgba(0,0,0,0.08) !important;
-    border-radius: 16px !important;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06) !important;
-}
-
-/* Print CSS */
 @media print {
-    #header, .footer, .btn-circle-whatsapp, .whatsapp-floating-btn, .rc-floating-bar, .modal, #tabBar, .toast-container, .visually-hidden-focusable, .rc-btn-action {
+    #header, footer, .whatsapp-floating-btn, .rc-floating-bar, [data-floating-pill], .modal, .toast-container, .rc-btn-action {
         display: none !important;
     }
     body, main, #main, .rc-page {
@@ -216,7 +15,7 @@
         margin: 0 !important;
         min-height: auto !important;
     }
-    .container {
+    .max-w-7xl {
         max-width: 100% !important;
         padding: 0 !important;
         margin: 0 !important;
@@ -241,250 +40,247 @@
 @endpush
 
 @section('content')
-<div class="rc-page py-4 py-lg-5" style="background-color: #F8FAFC !important;">
-    <div class="container">
+<div class="rc-page py-6 sm:py-10 bg-slate-50 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <!-- Top Floating Toolbar -->
-        <div class="rc-floating-bar p-3 mb-4 d-flex flex-wrap align-items-center justify-content-between gap-3" style="background: rgba(255, 255, 255, 0.95) !important; border-radius: 16px; border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
-            <div class="d-flex align-items-center gap-2">
-                <a href="{{ route('tours.index') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
-                    <i class="bi bi-arrow-left me-1"></i> Back to Tours
+        <div class="rc-floating-bar sticky top-20 z-30 p-3 sm:p-4 mb-6 flex flex-wrap items-center justify-between gap-3 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/80 shadow-md">
+            <div class="flex items-center gap-2.5">
+                <a href="{{ route('tours.index') }}" class="border border-slate-300 hover:border-primary text-slate-700 hover:text-primary rounded-full px-3.5 py-1.5 text-xs font-bold inline-flex items-center gap-1 transition-colors">
+                    <i class="bi bi-arrow-left"></i> Back to Tours
                 </a>
-                <span class="badge bg-success-subtle text-success fw-bold px-3 py-2 rounded-pill">
-                    ● Real-Time Database Verified
+                <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full px-3 py-1 text-xs font-bold inline-flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span> Verified Rates
                 </span>
             </div>
-            <div class="d-flex align-items-center gap-2">
-                <button type="button" class="btn btn-desert-animated btn-sm rounded-pill px-4 py-2 fw-bold" onclick="window.print()">
-                    <i class="bi bi-printer-fill me-1"></i> Print / Save as PDF
+            <div class="flex items-center gap-2">
+                <button type="button" class="btn-desert-animated rounded-full px-4 py-1.5 text-xs font-bold text-white shadow-sm inline-flex items-center gap-1.5 cursor-pointer" onclick="window.print()">
+                    <i class="bi bi-printer-fill"></i> Print / Save as PDF
                 </button>
-                <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}?text={{ urlencode('Hello Dunes Discovery Tourism, I am viewing your official rate card and would like to make an inquiry.') }}" target="_blank" rel="noopener" class="btn btn-whatsapp-animated btn-sm rounded-pill px-3 py-2 fw-bold">
-                    <i class="bi bi-whatsapp me-1"></i> WhatsApp Booking
+                <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}?text={{ urlencode('Hello Dunes Discovery Tourism, I am viewing your official rate card and would like to make an inquiry.') }}" target="_blank" rel="noopener" class="btn-whatsapp-animated rounded-full px-4 py-1.5 text-xs font-bold text-white inline-flex items-center gap-1.5 shadow-sm">
+                    <i class="bi bi-whatsapp"></i> WhatsApp Booking
                 </a>
             </div>
         </div>
 
-        <!-- Official Hero Banner (Explicit High Contrast) -->
-        <div class="rc-hero p-4 p-lg-5 mb-4" style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 60%, #334155 100%) !important; color: #FFFFFF !important; border-radius: 24px; border: 1px solid #334155; position: relative; overflow: hidden; box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.4);">
-            <div class="row align-items-center g-4 position-relative z-2">
-                <div class="col-lg-8">
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                        <img src="{{ asset('images/logo-white.png') }}" alt="Dunes Discovery Tourism" style="height: 44px; width: auto;">
-                        <span class="badge bg-warning text-dark fw-bold rounded-pill px-3 py-1 text-uppercase" style="font-size: 11px;">
-                            ⭐ Official 2026 Price Guide
+        <!-- Official Hero Banner -->
+        <div class="p-6 sm:p-10 mb-8 rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white border border-slate-700 shadow-xl relative overflow-hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center relative z-10">
+                <div class="lg:col-span-8">
+                    <div class="flex items-center gap-3 mb-3">
+                        <img src="{{ asset('images/logo-white.png') }}" alt="Dunes Discovery Tourism" class="h-10 w-auto">
+                        <span class="bg-amber-400 text-slate-950 font-bold rounded-full px-3 py-0.5 text-[11px] uppercase tracking-wider">
+                            Official 2026 Price Guide
                         </span>
                     </div>
-                    <h1 class="display-6 fw-bold mb-2" style="color: #FFFFFF !important; letter-spacing: -0.02em;">
-                        Dubai Desert Safaris & Tours <span style="color: #F69044 !important;">Rate Card</span>
+                    <h1 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight mb-2">
+                        Dubai Desert Safaris & Tours <span class="text-primary">Rate Card</span>
                     </h1>
-                    <p class="mb-3 fs-6" style="color: #CBD5E1 !important; max-width: 620px; line-height: 1.55;">
+                    <p class="text-slate-300 text-xs sm:text-sm max-w-xl leading-relaxed mb-4">
                         Official tour portfolio & pricing catalog by Dunes Discovery Tourism LLC. Direct operator rates with best price guarantee across all UAE excursions.
                     </p>
-                    <div class="d-flex flex-wrap gap-2 text-white small">
-                        <span class="rc-pill">
-                            <i class="bi bi-telephone-fill" style="color: #F69044;"></i> {{ $phone }}
+                    <div class="flex flex-wrap gap-2 text-white text-xs">
+                        <span class="bg-white/10 border border-white/20 rounded-lg px-3 py-1.5 inline-flex items-center gap-1.5">
+                            <i class="bi bi-telephone-fill text-primary"></i> {{ $phone }}
                         </span>
-                        <span class="rc-pill">
-                            <i class="bi bi-whatsapp" style="color: #25D366;"></i> WhatsApp: {{ $waPhone }}
+                        <span class="bg-white/10 border border-white/20 rounded-lg px-3 py-1.5 inline-flex items-center gap-1.5">
+                            <i class="bi bi-whatsapp text-emerald-400"></i> WhatsApp: {{ $waPhone }}
                         </span>
-                        <span class="rc-pill">
-                            <i class="bi bi-envelope-fill" style="color: #F69044;"></i> {{ $email }}
+                        <span class="bg-white/10 border border-white/20 rounded-lg px-3 py-1.5 inline-flex items-center gap-1.5">
+                            <i class="bi bi-envelope-fill text-primary"></i> {{ $email }}
                         </span>
-                        <span class="rc-pill">
-                            <i class="bi bi-globe" style="color: #F69044;"></i> dunesdiscoverytourism.com
+                        <span class="bg-white/10 border border-white/20 rounded-lg px-3 py-1.5 inline-flex items-center gap-1.5">
+                            <i class="bi bi-globe text-primary"></i> dunesdiscoverytourism.com
                         </span>
                     </div>
                 </div>
-                <div class="col-lg-4 text-lg-end d-none d-lg-block">
-                    <div class="p-3.5 rounded-4 border d-inline-block text-start" style="background: rgba(255,255,255,0.08) !important; border-color: rgba(255,255,255,0.15) !important; min-width: 220px; border-radius: 16px;">
-                        <div class="small mb-1" style="color: #CBD5E1 !important;">Customer Ratings & Trust</div>
-                        <div class="d-flex align-items-center gap-2 mb-1">
-                            <span class="fs-3 fw-bold text-white">4.9 / 5.0</span>
-                            <div class="text-warning">
+                <div class="lg:col-span-4 hidden lg:flex justify-end">
+                    <div class="p-5 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/15 text-left min-w-[220px]">
+                        <div class="text-slate-300 text-xs mb-1">Customer Ratings & Trust</div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-2xl font-black text-white">4.9 / 5.0</span>
+                            <div class="text-amber-400 text-xs flex gap-0.5">
                                 <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                             </div>
                         </div>
-                        <div class="small" style="color: #CBD5E1 !important;">TripAdvisor & Google Verified</div>
+                        <div class="text-slate-300 text-xs">TripAdvisor & Google Verified</div>
                     </div>
                 </div>
             </div>
+            <div class="absolute -right-16 -bottom-16 w-80 h-80 rounded-full bg-primary/20 blur-3xl pointer-events-none"></div>
         </div>
 
-        <!-- Marquee Key Value Banner: Free Doorstep Pickup -->
-        <div class="rc-pickup-banner mb-5" style="background: linear-gradient(90deg, #FFF7ED 0%, #FFEDD5 100%) !important; border: 2px solid #FDBA74 !important; border-radius: 16px; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; box-shadow: 0 4px 15px rgba(246, 144, 68, 0.1);">
-            <div class="d-flex align-items-center gap-3">
-                <div class="rounded-circle d-flex align-items-center justify-content-center bg-primary text-white shadow-sm" style="width: 46px; height: 46px; font-size: 22px; flex-shrink: 0; background-color: #F69044 !important;">
+        <!-- Free Doorstep Pickup Banner -->
+        <div class="mb-8 p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-orange-50 to-amber-50 border-2 border-orange-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center text-xl shrink-0 shadow-xs">
                     <i class="bi bi-car-front-fill"></i>
                 </div>
                 <div>
-                    <div class="fw-800 text-dark" style="font-size: 15px; letter-spacing: -0.01em; color: #0F172A !important;">
+                    <div class="font-extrabold text-slate-900 text-sm sm:text-base leading-snug">
                         COMPLIMENTARY 4X4 DOORSTEP HOTEL PICKUP & DROP-OFF INCLUDED
                     </div>
-                    <div class="text-secondary small" style="font-size: 13px; color: #475569 !important;">
+                    <div class="text-slate-600 text-xs sm:text-sm mt-0.5">
                         Enjoy seamless door-to-door transportation in clean, air-conditioned Toyota Land Cruisers from any hotel, residence, or cruise terminal across Dubai & Sharjah.
                     </div>
                 </div>
             </div>
-            <div class="d-none d-md-block text-end text-nowrap">
-                <span class="badge bg-dark text-white px-3.5 py-2 rounded-pill fw-bold" style="font-size: 11px;">
-                    <i class="bi bi-check-circle-fill text-success me-1"></i> Zero Hidden Fees
-                </span>
-            </div>
+            <span class="bg-slate-900 text-white rounded-full px-3.5 py-1.5 text-xs font-bold whitespace-nowrap shrink-0 inline-flex items-center gap-1">
+                <i class="bi bi-check-circle-fill text-emerald-400"></i> Zero Hidden Fees
+            </span>
         </div>
 
-        <!-- Tours Grouped by Category (Dynamic 1 Tour Per Row) -->
+        <!-- Tours Grouped by Category -->
         @foreach($categories as $cat)
             @if($cat->tours && $cat->tours->count() > 0)
-            <div class="mb-5">
-                <div class="rc-cat-header" style="background: #FFFFFF !important; border: 1px solid #E2E8F0 !important; border-left: 6px solid #F69044 !important; border-radius: 12px; padding: 14px 22px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
-                    <h2 style="font-size: 19px !important; font-weight: 800 !important; color: #0F172A !important; letter-spacing: -0.01em !important; margin: 0 !important; text-transform: uppercase !important;">
+            <div class="mb-10">
+                <div class="bg-white border border-slate-200 border-l-4 border-l-primary rounded-xl px-5 py-3.5 mb-5 flex items-center justify-between shadow-xs">
+                    <h2 class="text-base sm:text-lg font-extrabold text-slate-900 uppercase tracking-tight m-0">
                         {{ $cat->name }}
                     </h2>
-                    <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-1.5 fw-bold">
+                    <span class="bg-slate-100 text-slate-600 rounded-full px-3 py-1 text-xs font-bold">
                         {{ $cat->tours->count() }} Available {{ Str::plural('Experience', $cat->tours->count()) }}
                     </span>
                 </div>
 
+                <div class="space-y-6">
                 @foreach($cat->tours as $t)
-                <div class="rc-tour-card" style="background: #FFFFFF !important; border: 1px solid #E2E8F0 !important; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04); margin-bottom: 24px;">
-                    <div class="row g-0">
-                        <!-- Left: Image & Badge -->
-                        <div class="col-12 col-md-3">
-                            <div class="rc-img-wrap" style="position: relative; height: 100%; min-height: 220px; background: #0F172A; overflow: hidden;">
-                                @if(!empty($t->hero_image))
-                                    @php
-                                        $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->hero_image);
-                                    @endphp
-                                    <img src="{{ asset('images/' . $imgFile) }}" alt="{{ $t->name }}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
-                                @else
-                                    <img src="{{ asset('images/desert-safari-poster.avif') }}" alt="{{ $t->name }}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                <div class="rc-tour-card bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-shadow">
+                    <div class="grid grid-cols-1 md:grid-cols-12">
+                        <!-- Left: Image & Badge (3 cols) -->
+                        <div class="md:col-span-3 relative min-h-[180px] bg-slate-900">
+                            @php
+                                $imgFile = !empty($t->hero_image) ? preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->hero_image) : 'desert-safari-poster.avif';
+                            @endphp
+                            <img src="{{ asset('images/' . $imgFile) }}" alt="{{ $t->name }}" loading="lazy" class="w-full h-full object-cover">
+                            <div class="absolute top-2.5 left-2.5 flex flex-col gap-1.5">
+                                @if($t->is_bestseller)
+                                <span class="bg-amber-400 text-slate-950 font-bold rounded-full px-2.5 py-0.5 text-[10px] uppercase shadow-xs">
+                                    ⭐ Bestseller
+                                </span>
                                 @endif
-                                <div class="position-absolute top-0 start-0 m-2.5 d-flex flex-column gap-1.5">
-                                    @if($t->is_bestseller)
-                                    <span class="badge bg-warning text-dark fw-bold rounded-pill px-2.5 py-1 text-uppercase" style="font-size: 9.5px;">
-                                        ⭐ Bestseller
-                                    </span>
-                                    @endif
-                                    <span class="badge bg-dark bg-opacity-75 text-white fw-semibold rounded-pill px-2.5 py-1" style="font-size: 9.5px;">
-                                        ⏱ {{ $t->duration }}
-                                    </span>
-                                </div>
+                                <span class="bg-slate-900/80 text-white font-semibold rounded-full px-2.5 py-0.5 text-[10px]">
+                                    ⏱ {{ $t->duration }}
+                                </span>
                             </div>
                         </div>
 
-                        <!-- Middle: Tour Details & Inclusions -->
-                        <div class="col-12 col-md-5 p-3.5 p-lg-4 d-flex flex-column justify-content-between">
+                        <!-- Middle: Tour Details & Inclusions (5 cols) -->
+                        <div class="md:col-span-5 p-5 flex flex-col justify-between">
                             <div>
-                                <div class="d-flex align-items-center justify-content-between mb-1.5">
-                                    <h3 class="rc-tour-title mb-0" style="font-size: 18px !important; font-weight: 800 !important; color: #0F172A !important; line-height: 1.3 !important; letter-spacing: -0.01em !important;">
-                                        {{ $t->name }}
-                                    </h3>
-                                </div>
+                                <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-1 leading-snug">
+                                    {{ $t->name }}
+                                </h3>
                                 
-                                <div class="d-flex flex-wrap gap-3 small text-muted mb-2.5">
+                                <div class="flex flex-wrap gap-3 text-xs text-slate-500 mb-3">
                                     @if($t->pickup_time)
-                                    <span><i class="bi bi-clock-history me-1 text-primary" style="color: #F69044 !important;"></i>{{ $t->pickup_time }} - {{ $t->dropoff_time }}</span>
+                                    <span><i class="bi bi-clock-history mr-1 text-primary"></i>{{ $t->pickup_time }} - {{ $t->dropoff_time }}</span>
                                     @endif
-                                    <span><i class="bi bi-star-fill text-warning me-1"></i>{{ $t->rating ?? '4.9' }} ({{ $t->review_count ?? '500+' }} Reviews)</span>
+                                    <span><i class="bi bi-star-fill text-amber-400 mr-1"></i>{{ $t->rating ?? '4.9' }} ({{ $t->review_count ?? '500+' }} Reviews)</span>
                                 </div>
 
-                                <p class="rc-tour-desc" style="font-size: 13px !important; color: #475569 !important; line-height: 1.55 !important; margin-bottom: 14px !important;">
+                                <p class="text-slate-600 text-xs sm:text-sm leading-relaxed mb-4">
                                     {{ Str::limit($t->short_desc, 180) }}
                                 </p>
                             </div>
 
-                            <div>
-                                <div class="d-flex flex-wrap gap-1.5">
-                                    <span class="rc-inc-pill"><i class="bi bi-check-circle-fill" style="color: #F69044;"></i> Free 4x4 Pickup</span>
-                                    <span class="rc-inc-pill"><i class="bi bi-check-circle-fill" style="color: #F69044;"></i> Professional Guide</span>
-                                    <span class="rc-inc-pill"><i class="bi bi-check-circle-fill" style="color: #F69044;"></i> Refreshments</span>
-                                    @if(str_contains(strtolower($t->name), 'evening') || str_contains(strtolower($t->name), 'cruise'))
-                                    <span class="rc-inc-pill"><i class="bi bi-check-circle-fill" style="color: #F69044;"></i> Buffet Dinner</span>
-                                    <span class="rc-inc-pill"><i class="bi bi-check-circle-fill" style="color: #F69044;"></i> Live Shows</span>
-                                    @endif
-                                </div>
+                            <div class="flex flex-wrap gap-1.5">
+                                <span class="bg-slate-100 text-slate-700 rounded-md px-2 py-0.5 text-[11px] font-semibold inline-flex items-center gap-1 border border-slate-200">
+                                    <i class="bi bi-check-circle-fill text-primary"></i> Free 4x4 Pickup
+                                </span>
+                                <span class="bg-slate-100 text-slate-700 rounded-md px-2 py-0.5 text-[11px] font-semibold inline-flex items-center gap-1 border border-slate-200">
+                                    <i class="bi bi-check-circle-fill text-primary"></i> Professional Guide
+                                </span>
+                                <span class="bg-slate-100 text-slate-700 rounded-md px-2 py-0.5 text-[11px] font-semibold inline-flex items-center gap-1 border border-slate-200">
+                                    <i class="bi bi-check-circle-fill text-primary"></i> Refreshments
+                                </span>
+                                @if(str_contains(strtolower($t->name), 'evening') || str_contains(strtolower($t->name), 'cruise'))
+                                <span class="bg-slate-100 text-slate-700 rounded-md px-2 py-0.5 text-[11px] font-semibold inline-flex items-center gap-1 border border-slate-200">
+                                    <i class="bi bi-check-circle-fill text-primary"></i> Buffet Dinner
+                                </span>
+                                <span class="bg-slate-100 text-slate-700 rounded-md px-2 py-0.5 text-[11px] font-semibold inline-flex items-center gap-1 border border-slate-200">
+                                    <i class="bi bi-check-circle-fill text-primary"></i> Live Shows
+                                </span>
+                                @endif
                             </div>
                         </div>
 
-                        <!-- Right: Pricing & Package Tiers Matrix -->
-                        <div class="col-12 col-md-4 p-3.5 p-lg-4 border-start border-light bg-light bg-opacity-50">
-                            <div class="rc-tier-box" style="background: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-radius: 14px; padding: 16px; height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
-                                <div>
-                                    <div class="text-uppercase fw-bold text-secondary mb-2" style="font-size: 11px; letter-spacing: 0.5px; color: #64748B !important;">
-                                        Available Package Tiers
+                        <!-- Right: Pricing & Package Tiers Matrix (4 cols) -->
+                        <div class="md:col-span-4 p-5 border-t md:border-t-0 md:border-l border-slate-200 bg-slate-50 flex flex-col justify-between">
+                            <div>
+                                <div class="text-[11px] uppercase font-bold tracking-wider text-slate-400 mb-2">
+                                    Available Package Tiers
+                                </div>
+
+                                @if($t->tiers && $t->tiers->count() > 0)
+                                    <div class="space-y-2">
+                                    @foreach($t->tiers as $tier)
+                                    <div class="flex items-center justify-between py-1.5 border-b border-dashed border-slate-300 last:border-b-0 text-xs">
+                                        <div class="pr-2">
+                                            <div class="font-bold text-slate-800">{{ $tier->name }}</div>
+                                            @if($tier->description)
+                                            <span class="text-slate-400 text-[10px] block line-clamp-1">{{ Str::limit($tier->description, 35) }}</span>
+                                            @endif
+                                        </div>
+                                        <div class="text-right shrink-0">
+                                            @if(!empty($tier->pivot->old_price))
+                                            <span class="text-slate-400 line-through text-[11px] mr-1" data-aed="{{ $tier->pivot->old_price }}">AED {{ number_format($tier->pivot->old_price) }}</span>
+                                            @endif
+                                            <span class="font-black text-primary text-sm" data-aed="{{ $tier->pivot->price }}">AED {{ number_format($tier->pivot->price) }}</span>
+                                            <span class="text-slate-400 text-[9px] block">/ {{ $tier->pivot->price_type ?? 'person' }}</span>
+                                        </div>
                                     </div>
-
-                                    @if($t->tiers && $t->tiers->count() > 0)
-                                        @foreach($t->tiers as $tier)
-                                        <div class="rc-tier-row" style="padding: 8px 0 !important; border-bottom: 1px dashed #CBD5E1 !important; display: flex !important; align-items: center !important; justify-content: space-between !important;">
-                                            <div>
-                                                <div class="rc-tier-name" style="font-size: 13px !important; font-weight: 700 !important; color: #1E293B !important;">{{ $tier->name }}</div>
-                                                @if($tier->description)
-                                                <div class="rc-tier-sub" style="font-size: 11px !important; color: #64748B !important;">{{ Str::limit($tier->description, 35) }}</div>
-                                                @endif
-                                            </div>
-                                            <div class="text-end">
-                                                @if(!empty($tier->pivot->old_price))
-                                                <span class="rc-old-price" data-aed="{{ $tier->pivot->old_price }}" style="font-size: 11.5px !important; text-decoration: line-through !important; color: #94A3B8 !important; margin-right: 4px !important;">AED {{ number_format($tier->pivot->old_price) }}</span>
-                                                @endif
-                                                <span class="rc-cur-price" data-aed="{{ $tier->pivot->price }}" style="font-size: 16px !important; font-weight: 800 !important; color: #D95300 !important;">AED {{ number_format($tier->pivot->price) }}</span>
-                                                <div class="text-muted" style="font-size: 9.5px;">/ {{ $tier->pivot->price_type ?? 'person' }}</div>
-                                            </div>
+                                    @endforeach
+                                    </div>
+                                @else
+                                    <div class="flex items-center justify-between py-1.5 text-xs">
+                                        <div class="font-bold text-slate-800">Standard Experience</div>
+                                        <div class="text-right">
+                                            <span class="font-black text-primary text-sm" data-aed="{{ $t->price }}">AED {{ number_format($t->price) }}</span>
+                                            <span class="text-slate-400 text-[9px] block">/ person</span>
                                         </div>
-                                        @endforeach
-                                    @else
-                                        <div class="rc-tier-row" style="padding: 8px 0 !important; border-bottom: 1px dashed #CBD5E1 !important; display: flex !important; align-items: center !important; justify-content: space-between !important;">
-                                            <div>
-                                                <div class="rc-tier-name" style="font-size: 13px !important; font-weight: 700 !important; color: #1E293B !important;">Standard Experience</div>
-                                            </div>
-                                            <div class="text-end">
-                                                <span class="rc-cur-price" data-aed="{{ $t->price }}" style="font-size: 16px !important; font-weight: 800 !important; color: #D95300 !important;">AED {{ number_format($t->price) }}</span>
-                                                <div class="text-muted" style="font-size: 9.5px;">/ person</div>
-                                            </div>
-                                        </div>
-                                    @endif
-                                </div>
+                                    </div>
+                                @endif
+                            </div>
 
-                                <div class="pt-3 mt-2 border-top d-flex gap-2 rc-btn-action">
-                                    <a href="{{ route('tours.show', $t->slug) }}" class="btn btn-outline-dark btn-sm rounded-pill flex-grow-1 fw-bold" style="font-size: 11.5px;">
-                                        Details <i class="bi bi-arrow-right"></i>
-                                    </a>
-                                    <button type="button" class="btn btn-desert-animated btn-sm rounded-pill px-3 fw-bold" data-action="open-booking" data-tour="{{ $t->id }}" data-tour-id="{{ $t->id }}" style="font-size: 11.5px;">
-                                        Book Tour
-                                    </button>
-                                </div>
+                            <div class="pt-4 mt-3 border-t border-slate-200 flex gap-2 rc-btn-action">
+                                <a href="{{ route('tours.show', $t->slug) }}" class="flex-1 text-center border border-slate-300 hover:border-slate-800 text-slate-800 rounded-full py-2 text-xs font-bold transition-colors">
+                                    Details <i class="bi bi-arrow-right"></i>
+                                </a>
+                                <button type="button" class="btn-desert-animated rounded-full px-4 py-2 text-xs font-bold text-white shadow-xs cursor-pointer" data-action="open-booking" data-tour="{{ $t->id }}" @click="$store.modal.open('booking', { tourId: {{ $t->id }} })">
+                                    Book Tour
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
                 @endforeach
+                </div>
             </div>
             @endif
         @endforeach
 
         <!-- Add-Ons & Extras Section -->
         @if($globalAddons && $globalAddons->count() > 0)
-        <div class="mb-5">
-            <div class="rc-cat-header" style="background: #FFFFFF !important; border: 1px solid #E2E8F0 !important; border-left: 6px solid #F69044 !important; border-radius: 12px; padding: 14px 22px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
-                <h2 style="font-size: 19px !important; font-weight: 800 !important; color: #0F172A !important; letter-spacing: -0.01em !important; margin: 0 !important; text-transform: uppercase !important;">
+        <div class="mb-10">
+            <div class="bg-white border border-slate-200 border-l-4 border-l-primary rounded-xl px-5 py-3.5 mb-5 flex items-center justify-between shadow-xs">
+                <h2 class="text-base sm:text-lg font-extrabold text-slate-900 uppercase tracking-tight m-0">
                     Safari Add-Ons & Custom Upgrades
                 </h2>
             </div>
 
-            <div class="card p-4 border-0 rounded-4 shadow-sm bg-white" style="border-radius: 20px; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);">
-                <div class="row g-3">
+            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     @foreach($globalAddons as $addon)
-                    <div class="col-12 col-sm-6 col-md-4">
-                        <div class="p-3 rounded-3 bg-light border d-flex justify-content-between align-items-center" style="border-radius: 12px;">
-                            <div>
-                                <div class="fw-bold text-dark" style="font-size: 13px; color: #0F172A !important;">{{ $addon->name }}</div>
-                                @if($addon->description)
-                                <div class="text-muted" style="font-size: 11px; color: #64748B !important;">{{ Str::limit($addon->description, 45) }}</div>
-                                @endif
-                            </div>
-                            <div class="fw-800 fs-6 text-nowrap ms-2" style="color: #D95300 !important; font-weight: 800;" data-aed="{{ $addon->default_price ?: $addon->price ?: 0 }}">
-                                AED {{ number_format($addon->default_price ?: $addon->price ?: 0) }}
-                            </div>
+                    <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex justify-between items-center">
+                        <div class="pr-2">
+                            <div class="font-bold text-slate-900 text-xs">{{ $addon->name }}</div>
+                            @if($addon->description)
+                            <span class="text-slate-500 text-[10px] block line-clamp-1">{{ Str::limit($addon->description, 45) }}</span>
+                            @endif
+                        </div>
+                        <div class="font-black text-primary text-sm whitespace-nowrap" data-aed="{{ $addon->default_price ?: $addon->price ?: 0 }}">
+                            AED {{ number_format($addon->default_price ?: $addon->price ?: 0) }}
                         </div>
                     </div>
                     @endforeach
@@ -494,52 +290,42 @@
         @endif
 
         <!-- Why Choose Us & Guarantees -->
-        <div class="row g-3 mb-4">
-            <div class="col-12 col-md-3">
-                <div class="card p-3.5 text-center border-0 shadow-sm h-100 rounded-4 bg-white" style="border-radius: 16px; padding: 20px;">
-                    <i class="bi bi-shield-check fs-2 mb-2" style="color: #F69044;"></i>
-                    <h3 class="h6 fw-bold text-dark mb-1" style="color: #0F172A !important;">Best Price Guarantee</h3>
-                    <p class="text-muted mb-0 small" style="color: #64748B !important;">Direct operator pricing with zero middleman commissions.</p>
-                </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 text-center shadow-xs">
+                <i class="bi bi-shield-check text-2xl text-primary mb-2 block"></i>
+                <h3 class="font-bold text-slate-900 text-xs sm:text-sm mb-1">Best Price Guarantee</h3>
+                <p class="text-slate-500 text-xs mb-0">Direct operator pricing with zero middleman commissions.</p>
             </div>
-            <div class="col-12 col-md-3">
-                <div class="card p-3.5 text-center border-0 shadow-sm h-100 rounded-4 bg-white" style="border-radius: 16px; padding: 20px;">
-                    <i class="bi bi-arrow-counterclockwise fs-2 mb-2" style="color: #F69044;"></i>
-                    <h3 class="h6 fw-bold text-dark mb-1" style="color: #0F172A !important;">Free Cancellation</h3>
-                    <p class="text-muted mb-0 small" style="color: #64748B !important;">100% full refund up to 24 hours prior to tour departure.</p>
-                </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 text-center shadow-xs">
+                <i class="bi bi-arrow-counterclockwise text-2xl text-primary mb-2 block"></i>
+                <h3 class="font-bold text-slate-900 text-xs sm:text-sm mb-1">Free Cancellation</h3>
+                <p class="text-slate-500 text-xs mb-0">100% full refund up to 24 hours prior to tour departure.</p>
             </div>
-            <div class="col-12 col-md-3">
-                <div class="card p-3.5 text-center border-0 shadow-sm h-100 rounded-4 bg-white" style="border-radius: 16px; padding: 20px;">
-                    <i class="bi bi-car-front-fill fs-2 mb-2" style="color: #F69044;"></i>
-                    <h3 class="h6 fw-bold text-dark mb-1" style="color: #0F172A !important;">Doorstep 4x4 Pickup</h3>
-                    <p class="text-muted mb-0 small" style="color: #64748B !important;">Comfortable hotel pickup across all Dubai & Sharjah locations.</p>
-                </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 text-center shadow-xs">
+                <i class="bi bi-car-front-fill text-2xl text-primary mb-2 block"></i>
+                <h3 class="font-bold text-slate-900 text-xs sm:text-sm mb-1">Doorstep 4x4 Pickup</h3>
+                <p class="text-slate-500 text-xs mb-0">Comfortable hotel pickup across all Dubai & Sharjah locations.</p>
             </div>
-            <div class="col-12 col-md-3">
-                <div class="card p-3.5 text-center border-0 shadow-sm h-100 rounded-4 bg-white" style="border-radius: 16px; padding: 20px;">
-                    <i class="bi bi-whatsapp fs-2 mb-2" style="color: #25D366;"></i>
-                    <h3 class="h6 fw-bold text-dark mb-1" style="color: #0F172A !important;">Instant Support</h3>
-                    <p class="text-muted mb-0 small" style="color: #64748B !important;">Dedicated 24/7 safari concierge on WhatsApp & Phone.</p>
-                </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 text-center shadow-xs">
+                <i class="bi bi-whatsapp text-2xl text-emerald-500 mb-2 block"></i>
+                <h3 class="font-bold text-slate-900 text-xs sm:text-sm mb-1">Instant Support</h3>
+                <p class="text-slate-500 text-xs mb-0">Dedicated 24/7 safari concierge on WhatsApp & Phone.</p>
             </div>
         </div>
 
         <!-- Bottom VIP / Custom Booking Box -->
-        <div class="p-4 p-lg-5 rounded-4 bg-dark text-white text-center shadow position-relative overflow-hidden" style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%) !important; border-radius: 24px; border: 1px solid #334155;">
-            <div class="position-relative z-2">
-                <h2 class="display-6 fw-bold text-white mb-2" style="color: #FFFFFF !important;">Corporate Events & Custom VIP Camps</h2>
-                <p class="text-white-50 lead fs-6 mb-4 mx-auto" style="color: #CBD5E1 !important; max-width: 650px;">
-                    Planning a group excursion, private corporate desert party, or VIP luxury setup? Connect directly with our tour specialists for custom itineraries and group rates.
-                </p>
-                <div class="d-flex flex-wrap justify-content-center gap-3">
-                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}?text={{ urlencode('Hello Dunes Discovery Tourism, I would like to request a custom group / corporate tour quote.') }}" target="_blank" rel="noopener" class="btn btn-whatsapp-animated rounded-pill px-4 py-2.5 fw-bold">
-                        <i class="bi bi-whatsapp me-2 fs-5"></i> Chat on WhatsApp
-                    </a>
-                    <button type="button" class="btn btn-desert-animated rounded-pill px-4 py-2.5 fw-bold" onclick="window.print()">
-                        <i class="bi bi-printer-fill me-2"></i> Save / Print Rate Card
-                    </button>
-                </div>
+        <div class="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-slate-950 to-slate-900 text-white text-center shadow-xl border border-slate-700">
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">Corporate Events & Custom VIP Camps</h2>
+            <p class="text-slate-300 text-xs sm:text-sm max-w-xl mx-auto mb-6 leading-relaxed">
+                Planning a group excursion, private corporate desert party, or VIP luxury setup? Connect directly with our tour specialists for custom itineraries and group rates.
+            </p>
+            <div class="flex flex-wrap justify-center gap-3">
+                <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}?text={{ urlencode('Hello Dunes Discovery Tourism, I would like to request a custom group / corporate tour quote.') }}" target="_blank" rel="noopener" class="btn-whatsapp-animated rounded-full px-6 py-3 font-bold text-white text-xs sm:text-sm inline-flex items-center gap-2 shadow-sm">
+                    <i class="bi bi-whatsapp text-lg"></i> Chat on WhatsApp
+                </a>
+                <button type="button" class="btn-desert-animated rounded-full px-6 py-3 font-bold text-white text-xs sm:text-sm inline-flex items-center gap-2 shadow-sm cursor-pointer" onclick="window.print()">
+                    <i class="bi bi-printer-fill"></i> Save / Print Rate Card
+                </button>
             </div>
         </div>
 
@@ -557,5 +343,4 @@ window.addEventListener('load', function() {
 </script>
 @endpush
 @endif
-
 @endsection

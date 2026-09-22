@@ -158,13 +158,10 @@
     <link rel="apple-touch-icon" href="{{ asset('images/icon-192.png') }}">
     <link rel="manifest" href="{{ asset('manifest.json') }}">
 
-    <!-- Stylesheets -->
-    <link href="{{ asset('assets/vendor/bootstrap/5.3.2/css/bootstrap.min.css') }}" rel="stylesheet">
-    <link rel="preload" href="{{ asset('assets/vendor/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="{{ asset('assets/vendor/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css') }}"></noscript>
-    <link href="{{ asset('assets/css/app.min.css') }}?v={{ $cacheVer }}" rel="stylesheet">
-    <link rel="preload" href="{{ asset('assets/vendor/intl-tel-input/26.0.6/build/intlTelInput.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="{{ asset('assets/vendor/intl-tel-input/26.0.6/build/intlTelInput.css') }}"></noscript>
+    <!-- Stylesheets: Tailwind v4 Token System & Vendor Assets via Vite -->
+    <link rel="stylesheet" href="{{ asset('assets/vendor/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/vendor/intl-tel-input/26.0.6/build/intlTelInput.css') }}">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @stack('styles')
 
@@ -345,15 +342,12 @@
       ]
     }
     </script>
-    <style>
-        .footer a:hover, .hover-white:hover { color: #fff !important; transition: color 0.15s ease; }
-    </style>
     @stack('schema')
 </head>
-<body class="d-flex flex-column min-vh-100">
+<body class="flex flex-col min-h-screen bg-slate-50 text-slate-900 antialiased font-sans selection:bg-orange-500 selection:text-white" x-data="{}" :class="{ 'overflow-hidden': $store.mobileNav.open || $store.modal.active }">
 
     <!-- WCAG 2.2 SC 2.4.1 Skip to Main Content Link -->
-    <a href="#main" class="visually-hidden-focusable btn btn-primary position-absolute top-0 start-0 z-3 p-3 m-2 shadow">Skip to main content</a>
+    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2.5 focus:bg-primary focus:text-white focus:rounded-xl focus:shadow-lg focus:font-bold">Skip to main content</a>
 
     @if($googleActive && !empty($gtmId) && strpos($gtmId, 'G-') !== 0)
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ $gtmId }}" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -363,127 +357,205 @@
     @endif
 
     <!-- Header Navigation -->
-    <header id="header" class="fixed-top transition-all" style="z-index: 1045;">
+    <header id="header" class="fixed top-0 inset-x-0 transition-all z-40">
         @include('partials.top-banner')
-        <nav class="navbar navbar-expand-lg navbar-light glass-nav sticky-sm-top sticky-md-top sticky-lg-top">
-            <div class="container">
-                <a class="navbar-brand d-flex align-items-center p-0" href="{{ route('home') }}">
-                    <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery Tourism" width="160" height="103" class="img-fluid logo-img" fetchpriority="high" style="height: auto; max-height: 46px; object-fit: contain;">
-                </a>
-                
-                <!-- Mobile Review Badges & Buttons -->
-                <div class="d-flex align-items-center gap-2 d-lg-none">
-                    <div class="nav-review-circle" onclick="toggleReviewPopover(this, event)" id="taCircle" style="position: relative; cursor: pointer;">
-                        <img src="{{ asset('images/tripadvisor-color-logo.svg') }}" alt="TripAdvisor">
-                    </div>
-                    <div class="nav-review-circle" onclick="toggleReviewPopover(this, event)" id="googleCircle" style="position: relative; cursor: pointer;">
-                        <img src="{{ asset('images/Google-G.avif') }}" alt="Google">
-                    </div>
-                    <button type="button" class="btn-circle-desert-light" data-bs-toggle="modal" data-bs-target="#globalSearchModal" aria-label="Search Dubai Tours"><i class="bi bi-search"></i></button>
-                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" class="btn-circle-whatsapp" aria-label="WhatsApp" target="_blank" rel="noopener"><i class="bi bi-whatsapp"></i></a>
-                    <a href="#" class="btn-circle-desert-light" data-action="open-booking" aria-label="Book Now"><i class="bi bi-calendar-check"></i></a>
-                    <button class="navbar-toggler border-0 shadow-none p-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mainOffcanvas" aria-controls="mainOffcanvas" aria-label="Menu">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                </div>
+        <nav class="glass-nav border-b border-slate-200/80 shadow-xs">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16 sm:h-18">
+                    <!-- Brand Logo -->
+                    <a class="flex items-center flex-shrink-0" href="{{ route('home') }}">
+                        <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery Tourism" width="160" height="103" class="h-9 sm:h-10 w-auto object-contain" fetchpriority="high">
+                    </a>
 
-                <!-- Navigation Sidebar for Mobile & Desktop -->
-                <div class="offcanvas offcanvas-end border-0 rounded-start-4" tabindex="-1" id="mainOffcanvas" aria-labelledby="mainOffcanvasLabel" style="max-width: 75%;">
-                    <div class="offcanvas-header border-bottom py-3">
-                        <div class="offcanvas-title d-flex align-items-center" id="mainOffcanvasLabel">
-                            <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery" width="140" height="90" class="img-fluid" style="height: auto; max-height: 40px; object-fit: contain;">
-                        </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="d-lg-none">
-                                @include('partials.currency-switcher', ['switcherId' => 'mobileCurrencyDropdownBtn'])
-                            </div>
-                            <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                        </div>
-                    </div>
-                    <div class="offcanvas-body p-4 p-lg-0">
-                        <div class="d-lg-none mb-3">
-                            <form action="{{ route('tours.search') }}" method="GET" class="position-relative mb-2">
-                                <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-                                <input type="text" name="q" class="form-control rounded-pill ps-5 pe-4 py-2 bg-light border-0 small" placeholder="Search safaris, buggies, VIP..." required>
-                            </form>
-                            <div class="d-grid gap-2 mb-2">
-                                <button type="button" class="btn btn-dark w-100 rounded-pill py-2.5 px-3 d-flex align-items-center justify-content-between text-start border border-warning border-opacity-25 shadow-sm" data-bs-toggle="modal" data-bs-target="#safariMatcherModal" data-bs-dismiss="offcanvas" style="background: linear-gradient(135deg, #1E293B, #0F172A);">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="text-warning fs-5"><i class="bi bi-compass"></i></span>
-                                        <div>
-                                            <div class="fw-bold text-white small lh-1">Safari Match Concierge</div>
-                                            <small class="text-white-50" style="font-size: 11px;">Find ideal tour in 30 seconds</small>
-                                        </div>
-                                    </div>
-                                    @if($conciergePromoActive)
-                                    <span class="badge bg-warning text-dark rounded-pill px-2 py-1 fw-bold" style="font-size: 10px;">{{ $conciergePromoDiscount }}% OFF</span>
-                                    @endif
+                    <!-- Desktop Nav Links (Hidden on mobile/tablet) -->
+                    <ul class="hidden lg:flex items-center gap-1 xl:gap-2 text-sm font-semibold text-slate-700">
+                        <li>
+                            <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('home') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('home') }}">Home</a>
+                        </li>
+                        <li class="relative" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">
+                            <div class="inline-flex items-center rounded-xl {{ request()->routeIs('tours.*') ? 'bg-slate-900 text-white font-bold shadow-xs' : '' }}">
+                                <a class="px-3 py-2 rounded-l-xl transition-all {{ request()->routeIs('tours.*') ? 'text-white' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('tours.index') }}">Tours</a>
+                                <button type="button" @click="open = !open" :aria-expanded="open" class="px-1.5 py-2 rounded-r-xl transition-all hover:opacity-80 cursor-pointer" aria-label="Toggle Tours Submenu">
+                                    <i class="bi bi-chevron-down text-[10px] transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
                                 </button>
-                                <a href="{{ route('tours.customizer') }}" class="btn btn-light w-100 rounded-pill py-2 px-3 d-flex align-items-center justify-content-between text-start border small fw-bold text-dark">
-                                    <span class="d-flex align-items-center gap-2">
-                                        <i class="bi bi-sliders text-primary"></i> Build Your Own Safari
-                                    </span>
-                                    <i class="bi bi-chevron-right text-muted small"></i>
+                            </div>
+                            <!-- Tours Dropdown Menu -->
+                            <div x-show="open" 
+                                 x-transition:enter="transition ease-out duration-150"
+                                 x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                                 x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                 x-transition:leave="transition ease-in duration-100"
+                                 x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                                 x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+                                 class="absolute left-0 mt-2 w-72 rounded-2xl bg-white p-2 shadow-xl border border-slate-100 z-50 focus:outline-none"
+                                 style="display: none;">
+                                <a class="flex items-center gap-2 px-3 py-2.5 rounded-xl font-bold text-primary hover:bg-orange-50 transition-colors text-xs" href="{{ route('tours.customizer') }}">
+                                    <i class="bi bi-sliders text-amber-500"></i>
+                                    <span>Build Your Own Safari</span>
                                 </a>
-                            </div>
-                        </div>
-                        <ul class="navbar-nav mx-auto mb-4 mb-lg-0 gap-lg-1 gap-xl-2 text-nowrap flex-nowrap align-items-center">
-                            <li class="nav-item">
-                                <a class="nav-link px-3 px-lg-2 py-2 rounded-3 {{ request()->routeIs('home') ? 'active nav-active-pill' : '' }}" href="{{ route('home') }}">Home</a>
-                            </li>
-                            <li class="nav-item dropdown d-inline-flex flex-nowrap align-items-center">
-                                <div class="d-inline-flex flex-nowrap align-items-stretch rounded-3 position-relative {{ request()->routeIs('tours.*') ? 'nav-active-pill-wrapper' : '' }}">
-                                    <a class="nav-link px-2.5 py-2 text-nowrap rounded-start-3 {{ request()->routeIs('tours.*') ? 'active nav-active-pill' : '' }}" href="{{ route('tours.index') }}">Tours</a>
-                                    <a class="nav-link px-2 py-2 dropdown-toggle dropdown-toggle-split d-inline-flex align-items-center justify-content-center rounded-end-3 border-start border-primary border-opacity-10 {{ request()->routeIs('tours.*') ? 'active text-white' : '' }}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Toggle Tours Submenu">
-                                        <span class="visually-hidden">Toggle Dropdown</span>
+                                <div class="my-1 border-t border-slate-100"></div>
+                                <div class="max-h-72 overflow-y-auto space-y-0.5">
+                                    @foreach($allTours as $t)
+                                    <a class="block px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-primary transition-colors line-clamp-1" href="{{ route('tours.show', $t->slug) }}">
+                                        {{ $t->name }}
                                     </a>
-                                    <ul class="dropdown-menu border-0 shadow-lg rounded-4 overflow-hidden p-0 mt-2 dropdown-animated-border">
-                                        <li><a class="dropdown-item py-2.5 fw-bold text-primary" href="{{ route('tours.customizer') }}"><i class="bi bi-sliders me-1.5 text-warning"></i> Build Your Own Safari</a></li>
-                                        <li><hr class="dropdown-divider my-0"></li>
-                                        @foreach($allTours as $t)
-                                        <li><a class="dropdown-item rounded-0 py-2.5 position-relative animated-divider-item" href="{{ route('tours.show', $t->slug) }}">{{ $t->name }}</a></li>
-                                        @endforeach
-                                    </ul>
+                                    @endforeach
                                 </div>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link px-3 px-lg-2 py-2 rounded-3 {{ request()->routeIs('about') ? 'active nav-active-pill' : '' }}" href="{{ route('about') }}">About Us</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link px-3 px-lg-2 py-2 rounded-3 {{ request()->routeIs('blog.*') ? 'active nav-active-pill' : '' }}" href="{{ route('blog.index') }}">Blog</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link px-3 px-lg-2 py-2 rounded-3 {{ request()->routeIs('faq') ? 'active nav-active-pill' : '' }}" href="{{ route('faq') }}">FAQ</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link px-3 px-lg-2 py-2 rounded-3 {{ request()->routeIs('contact') ? 'active nav-active-pill' : '' }}" href="{{ route('contact') }}">Contact</a>
-                            </li>
-                        </ul>
-                        <div class="d-flex flex-column flex-lg-row gap-2 gap-xl-2.5 align-items-stretch align-items-lg-center flex-nowrap">
-                            <button type="button" class="btn btn-outline-warning rounded-pill px-2.5 py-1.5 d-none d-xxl-inline-flex align-items-center gap-1.5 small shadow-none hover-shadow-sm transition-all text-nowrap" data-bs-toggle="modal" data-bs-target="#safariMatcherModal" style="font-size: 0.82rem; border-color: rgba(246, 144, 68, 0.45); color: #F69044;" aria-label="Safari Match Concierge">
-                                <i class="bi bi-compass text-warning"></i>
-                                <span class="fw-bold">Safari Concierge</span>
-                                @if($conciergePromoActive)
-                                <span class="badge bg-warning text-dark rounded-pill px-1.5 py-0.5" style="font-size: 9px;">{{ $conciergePromoDiscount }}% OFF</span>
-                                @endif
-                            </button>
-                            <button type="button" class="btn btn-light border rounded-circle shadow-sm d-none d-lg-inline-flex align-items-center justify-content-center flex-shrink-0" data-bs-toggle="modal" data-bs-target="#globalSearchModal" style="width: 38px; height: 38px; padding: 0;" title="Search Dubai tours" aria-label="Search Dubai tours">
-                                <i class="bi bi-search text-primary" style="font-size: 14px;"></i>
-                            </button>
-                            <div class="d-none d-lg-block flex-shrink-0">
-                                @include('partials.currency-switcher', ['switcherId' => 'desktopCurrencyDropdownBtn'])
                             </div>
-                            <a class="btn btn-whatsapp-animated rounded-pill px-3 px-xl-3.5 py-2 fw-semibold d-inline-flex align-items-center justify-content-center gap-1.5 text-nowrap" href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" style="font-size: 13.5px;">
-                                <i class="bi bi-whatsapp fs-6"></i><span>WhatsApp</span>
-                            </a>
-                            <a class="btn btn-desert-animated rounded-pill px-3 px-xl-3.5 py-2 fw-bold shadow-primary d-inline-flex align-items-center justify-content-center gap-1.5 text-nowrap" href="#" data-action="open-booking" data-bs-dismiss="offcanvas" style="font-size: 13.5px;">
-                                <i class="bi bi-calendar-check fs-6"></i><span>Book Now</span>
-                            </a>
+                        </li>
+                        <li>
+                            <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('about') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('about') }}">About Us</a>
+                        </li>
+                        <li>
+                            <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('blog.*') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('blog.index') }}">Blog</a>
+                        </li>
+                        <li>
+                            <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('faq') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('faq') }}">FAQ</a>
+                        </li>
+                        <li>
+                            <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('contact') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('contact') }}">Contact</a>
+                        </li>
+                    </ul>
+
+                    <!-- Desktop Right Actions (Hidden on mobile/tablet) -->
+                    <div class="hidden lg:flex items-center gap-2 xl:gap-3">
+                        <button type="button" class="hidden 2xl:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-primary border border-primary/30 hover:border-primary hover:bg-orange-50/50 transition-all cursor-pointer shadow-2xs" @click="$store.modal.open('safari-matcher')" aria-label="Safari Match Concierge">
+                            <i class="bi bi-compass text-amber-500"></i>
+                            <span>Safari Concierge</span>
+                            @if($conciergePromoActive)
+                            <span class="px-1.5 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[9px] font-black">{{ $conciergePromoDiscount }}% OFF</span>
+                            @endif
+                        </button>
+                        <button type="button" class="w-9 h-9 rounded-full bg-white border border-slate-200/90 shadow-2xs flex items-center justify-center text-slate-600 hover:text-primary hover:border-primary/50 transition-all cursor-pointer" @click="$store.modal.open('search')" title="Search Dubai tours" aria-label="Search Dubai tours">
+                            <i class="bi bi-search text-xs"></i>
+                        </button>
+                        @include('partials.currency-switcher', ['switcherId' => 'desktopCurrencyDropdownBtn'])
+                        <a class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full font-bold text-xs bg-emerald-500 hover:bg-emerald-600 text-white shadow-xs hover:shadow-sm transition-all cursor-pointer" href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener">
+                            <i class="bi bi-whatsapp"></i><span>WhatsApp</span>
+                        </a>
+                        <a class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full font-extrabold text-xs text-white bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 shadow-sm hover:shadow-md transition-all cursor-pointer" href="#" data-action="open-booking">
+                            <i class="bi bi-calendar-check"></i><span>Book Now</span>
+                        </a>
+                    </div>
+
+                    <!-- Mobile App Bar Actions (Thumb-Friendly, uncluttered) -->
+                    <div class="flex items-center gap-1.5 sm:gap-2 lg:hidden">
+                        <!-- Review Circle Popover Triggers -->
+                        <div class="nav-review-circle w-8 h-8 rounded-full bg-white shadow-xs flex items-center justify-center cursor-pointer relative" onclick="toggleReviewPopover(this, event)" id="taCircle" title="TripAdvisor Reviews">
+                            <img src="{{ asset('images/tripadvisor-color-logo.svg') }}" alt="TripAdvisor" class="w-5 h-5 object-contain">
                         </div>
+                        <div class="nav-review-circle w-8 h-8 rounded-full bg-white shadow-xs flex items-center justify-center cursor-pointer relative" onclick="toggleReviewPopover(this, event)" id="googleCircle" title="Google Reviews">
+                            <img src="{{ asset('images/Google-G.avif') }}" alt="Google" class="w-5 h-5 object-contain">
+                        </div>
+
+                        <!-- Quick Search Button -->
+                        <button type="button" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer text-xs" @click="$store.modal.open('search')" aria-label="Search Dubai Tours">
+                            <i class="bi bi-search"></i>
+                        </button>
+
+                        <!-- WhatsApp Direct Button -->
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-100 flex items-center justify-center transition-colors cursor-pointer text-xs" aria-label="WhatsApp" target="_blank" rel="noopener">
+                            <i class="bi bi-whatsapp"></i>
+                        </a>
+
+                        <!-- Compact Book Now Button -->
+                        <a href="#" class="px-2.5 sm:px-3.5 py-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold text-[11px] sm:text-xs shadow-xs flex items-center gap-1 cursor-pointer" data-action="open-booking" aria-label="Book Now">
+                            <i class="bi bi-calendar-check"></i>
+                            <span class="hidden sm:inline">Book</span>
+                        </a>
+
+                        <!-- Hamburger Drawer Trigger -->
+                        <button class="p-1.5 sm:p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer focus:outline-none" type="button" @click="$store.mobileNav.toggle()" aria-label="Menu">
+                            <i class="bi bi-list text-xl sm:text-2xl"></i>
+                        </button>
                     </div>
                 </div>
             </div>
         </nav>
+
+        <!-- Alpine-Powered Mobile Offcanvas Drawer -->
+        <div x-show="$store.mobileNav.open" 
+             x-transition:enter="transition-opacity ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition-opacity ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 bg-black/60 z-50 backdrop-blur-xs lg:hidden"
+             @click="$store.mobileNav.close()"
+             style="display: none;"></div>
+
+        <div x-show="$store.mobileNav.open"
+             x-transition:enter="transition ease-out duration-300 transform"
+             x-transition:enter-start="translate-x-full"
+             x-transition:enter-end="translate-x-0"
+             x-transition:leave="transition ease-in duration-200 transform"
+             x-transition:leave-start="translate-x-0"
+             x-transition:leave-end="translate-x-full"
+             class="fixed inset-y-0 right-0 max-w-xs sm:max-w-sm w-full bg-white z-50 shadow-2xl p-5 flex flex-col justify-between overflow-y-auto lg:hidden"
+             style="display: none;"
+             id="mainOffcanvas">
+            <div>
+                <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+                    <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery" width="140" height="90" class="h-9 w-auto object-contain">
+                    <div class="flex items-center gap-2">
+                        @include('partials.currency-switcher', ['switcherId' => 'mobileCurrencyDropdownBtn'])
+                        <button type="button" class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer" @click="$store.mobileNav.close()" aria-label="Close">
+                            <i class="bi bi-x-lg text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Search Input in Drawer -->
+                <form action="{{ route('tours.search') }}" method="GET" class="relative mb-3">
+                    <i class="bi bi-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="text" name="q" class="w-full rounded-full pl-9 pr-4 py-2 bg-slate-100 text-slate-800 text-xs font-semibold border-0 focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="Search safaris, buggies, VIP..." required>
+                </form>
+
+                <!-- Interactive Features CTAs -->
+                <div class="space-y-2 mb-4">
+                    <button type="button" class="w-full rounded-2xl p-3 flex items-center justify-between text-left border border-amber-400/30 shadow-xs cursor-pointer" style="background: linear-gradient(135deg, #1E293B, #0F172A);" @click="$store.mobileNav.close(); $store.modal.open('safari-matcher');">
+                        <div class="flex items-center gap-2.5">
+                            <span class="text-amber-400 text-lg"><i class="bi bi-compass"></i></span>
+                            <div>
+                                <div class="font-bold text-white text-xs leading-none">Safari Match Concierge</div>
+                                <small class="text-white/60 text-[10px]">Find ideal tour in 30 seconds</small>
+                            </div>
+                        </div>
+                        @if($conciergePromoActive)
+                        <span class="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[9px]">{{ $conciergePromoDiscount }}% OFF</span>
+                        @endif
+                    </button>
+                    <a href="{{ route('tours.customizer') }}" class="w-full rounded-2xl p-2.5 flex items-center justify-between text-left border border-slate-200 bg-slate-50 hover:bg-orange-50 text-slate-800 font-bold text-xs transition-colors" @click="$store.mobileNav.close()">
+                        <span class="flex items-center gap-2">
+                            <i class="bi bi-sliders text-primary"></i>
+                            <span>Build Your Own Safari</span>
+                        </span>
+                        <i class="bi bi-chevron-right text-slate-400 text-[10px]"></i>
+                    </a>
+                </div>
+
+                <!-- Navigation Links List -->
+                <nav class="space-y-1">
+                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('home') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('home') }}" @click="$store.mobileNav.close()">Home</a>
+                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('tours.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('tours.index') }}" @click="$store.mobileNav.close()">All Tours</a>
+                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('about') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('about') }}" @click="$store.mobileNav.close()">About Us</a>
+                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('blog.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('blog.index') }}" @click="$store.mobileNav.close()">Travel Blog</a>
+                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('faq') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('faq') }}" @click="$store.mobileNav.close()">FAQ</a>
+                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('contact') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('contact') }}" @click="$store.mobileNav.close()">Contact</a>
+                </nav>
+            </div>
+
+            <!-- Drawer Bottom Direct Contact -->
+            <div class="pt-4 border-t border-slate-100 space-y-2">
+                <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="w-full py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors">
+                    <i class="bi bi-whatsapp"></i><span>Chat on WhatsApp</span>
+                </a>
+                <button type="button" class="w-full py-2.5 rounded-full bg-primary hover:bg-primary-dark text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer" @click="$store.mobileNav.close(); $store.modal.open('booking');">
+                    <i class="bi bi-calendar-check"></i><span>Book Online Now</span>
+                </button>
+            </div>
+        </div>
     </header>
 
     <script>
@@ -514,75 +586,92 @@
     @include('partials.newsletter-subscription')
 
     <!-- Footer Section -->
-    <footer class="footer bg-dark text-white pt-5 pb-4">
-        <div class="container">
-            <div class="row g-4 mb-5">
-                <div class="col-12 col-lg-3">
-                    <img src="{{ asset('images/logo-white.png') }}" alt="Dunes Discovery Tourism" width="160" height="46" class="mb-3" style="height: auto; width: 160px; object-fit: contain;">
-                    <p class="text-white-50 small pe-lg-2">Your trusted partner for unforgettable Dubai desert safari and city tour experiences since 2018. Licensed by Dubai Economy & Tourism (DET License: 1430583).</p>
-                    <div class="d-flex gap-3 mt-3">
-                        <a href="https://instagram.com/dunesdiscoverytourism" target="_blank" rel="noopener" class="btn btn-outline-light btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" aria-label="Follow Dunes Discovery Tourism on Instagram"><i class="bi bi-instagram"></i></a>
-                        <a href="https://facebook.com/dunesdiscoverytourism" target="_blank" rel="noopener" class="btn btn-outline-light btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" aria-label="Follow Dunes Discovery Tourism on Facebook"><i class="bi bi-facebook"></i></a>
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="btn btn-outline-light btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" aria-label="Chat with Dunes Discovery Tourism on WhatsApp"><i class="bi bi-whatsapp"></i></a>
+    <footer class="bg-slate-950 text-slate-300 pt-14 pb-8 border-t border-slate-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 mb-12">
+                <!-- Col 1: Brand & Bio -->
+                <div class="sm:col-span-2 lg:col-span-4">
+                    <img src="{{ asset('images/logo-white.png') }}" alt="Dunes Discovery Tourism" width="160" height="46" class="h-9 w-auto object-contain mb-4">
+                    <p class="text-slate-400 text-xs sm:text-sm leading-relaxed max-w-sm mb-4">
+                        Your trusted partner for unforgettable Dubai desert safari and city tour experiences since 2018. Licensed by Dubai Economy & Tourism (DET License: 1430583).
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <a href="https://instagram.com/dunesdiscoverytourism" target="_blank" rel="noopener" class="w-9 h-9 rounded-full border border-slate-700 bg-slate-900/60 hover:bg-slate-800 hover:border-slate-500 text-slate-300 hover:text-white flex items-center justify-center transition-colors text-sm" aria-label="Follow Dunes Discovery Tourism on Instagram">
+                            <i class="bi bi-instagram"></i>
+                        </a>
+                        <a href="https://facebook.com/dunesdiscoverytourism" target="_blank" rel="noopener" class="w-9 h-9 rounded-full border border-slate-700 bg-slate-900/60 hover:bg-slate-800 hover:border-slate-500 text-slate-300 hover:text-white flex items-center justify-center transition-colors text-sm" aria-label="Follow Dunes Discovery Tourism on Facebook">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="w-9 h-9 rounded-full border border-slate-700 bg-slate-900/60 hover:bg-emerald-600 hover:border-emerald-500 text-slate-300 hover:text-white flex items-center justify-center transition-colors text-sm" aria-label="Chat with Dunes Discovery Tourism on WhatsApp">
+                            <i class="bi bi-whatsapp"></i>
+                        </a>
                     </div>
                 </div>
-                <div class="col-6 col-lg-2">
-                    <h3 class="h6 fw-bold text-uppercase mb-3 text-warning">Desert Safaris</h3>
-                    <ul class="list-unstyled mb-0 d-grid gap-2">
-                        <li><a href="{{ route('tours.show', 'evening-desert-safari-dubai') }}" class="text-white-50 text-decoration-none small hover-white">Evening Safari</a></li>
-                        <li><a href="{{ route('tours.show', 'morning-desert-safari-dubai') }}" class="text-white-50 text-decoration-none small hover-white">Morning Safari</a></li>
-                        <li><a href="{{ route('tours.show', 'overnight-desert-safari-dubai') }}" class="text-white-50 text-decoration-none small hover-white">Overnight Safari</a></li>
-                        <li><a href="{{ route('tours.show', 'desert-safari-quad-biking-dubai') }}" class="text-white-50 text-decoration-none small hover-white">Quad Biking Safari</a></li>
-                        <li><a href="{{ route('tours.show', 'luxury-vip-desert-safari-dubai') }}" class="text-white-50 text-decoration-none small hover-white">VIP Desert Safari</a></li>
+
+                <!-- Col 2: Desert Safaris -->
+                <div class="col-span-1 lg:col-span-2">
+                    <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 mb-3.5">Desert Safaris</h3>
+                    <ul class="space-y-2 text-xs sm:text-sm">
+                        <li><a href="{{ route('tours.show', 'evening-desert-safari-dubai') }}" class="text-slate-400 hover:text-white transition-colors">Evening Safari</a></li>
+                        <li><a href="{{ route('tours.show', 'morning-desert-safari-dubai') }}" class="text-slate-400 hover:text-white transition-colors">Morning Safari</a></li>
+                        <li><a href="{{ route('tours.show', 'overnight-desert-safari-dubai') }}" class="text-slate-400 hover:text-white transition-colors">Overnight Safari</a></li>
+                        <li><a href="{{ route('tours.show', 'desert-safari-quad-biking-dubai') }}" class="text-slate-400 hover:text-white transition-colors">Quad Biking Safari</a></li>
+                        <li><a href="{{ route('tours.show', 'luxury-vip-desert-safari-dubai') }}" class="text-slate-400 hover:text-white transition-colors">VIP Desert Safari</a></li>
                     </ul>
                 </div>
-                <div class="col-6 col-lg-2">
-                    <h3 class="h6 fw-bold text-uppercase mb-3 text-warning">Tours & Cruises</h3>
-                    <ul class="list-unstyled mb-0 d-grid gap-2">
-                        <li><a href="{{ route('tours.show', 'dubai-city-tour') }}" class="text-white-50 text-decoration-none small hover-white">Dubai City Tour</a></li>
-                        <li><a href="{{ route('tours.show', 'abu-dhabi-city-tour-from-dubai') }}" class="text-white-50 text-decoration-none small hover-white">Abu Dhabi Tour</a></li>
-                        <li><a href="{{ route('tours.show', 'dhow-cruise-catamaran-cruise-dinner-dubai') }}" class="text-white-50 text-decoration-none small hover-white">Marina Cruise</a></li>
-                        <li><a href="{{ route('rate-card') }}" class="text-white-50 text-decoration-none small hover-white"><i class="bi bi-file-earmark-pdf text-warning me-1"></i>Rate Card (PDF)</a></li>
-                        <li><a href="{{ route('blog.index') }}" class="text-white-50 text-decoration-none small hover-white">Travel Guides & Blog</a></li>
+
+                <!-- Col 3: Tours & Cruises -->
+                <div class="col-span-1 lg:col-span-2">
+                    <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 mb-3.5">Tours & Cruises</h3>
+                    <ul class="space-y-2 text-xs sm:text-sm">
+                        <li><a href="{{ route('tours.show', 'dubai-city-tour') }}" class="text-slate-400 hover:text-white transition-colors">Dubai City Tour</a></li>
+                        <li><a href="{{ route('tours.show', 'abu-dhabi-city-tour-from-dubai') }}" class="text-slate-400 hover:text-white transition-colors">Abu Dhabi Tour</a></li>
+                        <li><a href="{{ route('tours.show', 'dhow-cruise-catamaran-cruise-dinner-dubai') }}" class="text-slate-400 hover:text-white transition-colors">Marina Cruise</a></li>
+                        <li><a href="{{ route('rate-card') }}" class="text-slate-400 hover:text-white transition-colors inline-flex items-center gap-1.5"><i class="bi bi-file-earmark-pdf text-amber-400"></i>Rate Card (PDF)</a></li>
+                        <li><a href="{{ route('blog.index') }}" class="text-slate-400 hover:text-white transition-colors">Travel Guides & Blog</a></li>
                     </ul>
                 </div>
-                <div class="col-6 col-lg-2">
-                    <h3 class="h6 fw-bold text-uppercase mb-3 text-warning">Trust & Policies</h3>
-                    <ul class="list-unstyled mb-0 d-grid gap-2">
-                        <li><a href="{{ route('terms') }}" class="text-white-50 text-decoration-none small hover-white">Terms & Conditions</a></li>
-                        <li><a href="{{ route('privacy') }}" class="text-white-50 text-decoration-none small hover-white">Privacy Policy</a></li>
-                        <li><a href="{{ route('cookies') }}" class="text-white-50 text-decoration-none small hover-white">Cookie Policy</a></li>
-                        <li><a href="{{ route('cancellation') }}" class="text-white-50 text-decoration-none small hover-white">Cancellation & Refund</a></li>
-                        <li><a href="{{ route('payment.security') }}" class="text-white-50 text-decoration-none small hover-white">Payment Security</a></li>
-                        <li><a href="{{ route('safety.waiver') }}" class="text-white-50 text-decoration-none small hover-white">Safety & Waiver</a></li>
-                        <li><a href="{{ route('ai.editorial') }}" class="text-white-50 text-decoration-none small hover-white">AI & Editorial Policy</a></li>
-                        <li><a href="{{ route('responsible.tourism') }}" class="text-white-50 text-decoration-none small hover-white">Responsible Tourism</a></li>
+
+                <!-- Col 4: Trust & Policies -->
+                <div class="col-span-1 lg:col-span-2">
+                    <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 mb-3.5">Trust & Policies</h3>
+                    <ul class="space-y-2 text-xs sm:text-sm">
+                        <li><a href="{{ route('terms') }}" class="text-slate-400 hover:text-white transition-colors">Terms & Conditions</a></li>
+                        <li><a href="{{ route('privacy') }}" class="text-slate-400 hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="{{ route('cookies') }}" class="text-slate-400 hover:text-white transition-colors">Cookie Policy</a></li>
+                        <li><a href="{{ route('cancellation') }}" class="text-slate-400 hover:text-white transition-colors">Cancellation & Refund</a></li>
+                        <li><a href="{{ route('payment.security') }}" class="text-slate-400 hover:text-white transition-colors">Payment Security</a></li>
+                        <li><a href="{{ route('safety.waiver') }}" class="text-slate-400 hover:text-white transition-colors">Safety & Waiver</a></li>
+                        <li><a href="{{ route('ai.editorial') }}" class="text-slate-400 hover:text-white transition-colors">AI & Editorial Policy</a></li>
+                        <li><a href="{{ route('responsible.tourism') }}" class="text-slate-400 hover:text-white transition-colors">Responsible Tourism</a></li>
                     </ul>
                 </div>
-                <div class="col-12 col-lg-3">
-                    <h3 class="h6 fw-bold text-uppercase mb-3 text-warning">Contact & Help</h3>
-                    <ul class="list-unstyled mb-0 d-grid gap-2">
-                        <li><a href="tel:{{ preg_replace('/[^0-9+]/','',$phone) }}" class="text-white-50 text-decoration-none small d-flex align-items-center gap-2 hover-white"><i class="bi bi-telephone text-primary"></i>{{ $phone }}</a></li>
-                        <li><a href="mailto:{{ $email }}" class="text-white-50 text-decoration-none small d-flex align-items-center gap-2 hover-white"><i class="bi bi-envelope text-primary"></i>{{ $email }}</a></li>
-                        <li><a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="text-white-50 text-decoration-none small d-flex align-items-center gap-2 hover-white"><i class="bi bi-whatsapp text-primary"></i>24/7 WhatsApp Chat</a></li>
-                        <li class="text-white-50 small d-flex align-items-center gap-2"><i class="bi bi-geo-alt text-primary"></i>{{ $settings['site_address'] ?? 'Dubai, United Arab Emirates' }}</li>
+
+                <!-- Col 5: Contact & Help -->
+                <div class="sm:col-span-2 lg:col-span-2">
+                    <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 mb-3.5">Contact & Help</h3>
+                    <ul class="space-y-2 text-xs sm:text-sm">
+                        <li><a href="tel:{{ preg_replace('/[^0-9+]/','',$phone) }}" class="text-slate-400 hover:text-white transition-colors inline-flex items-center gap-2"><i class="bi bi-telephone text-primary"></i><span>{{ $phone }}</span></a></li>
+                        <li><a href="mailto:{{ $email }}" class="text-slate-400 hover:text-white transition-colors inline-flex items-center gap-2"><i class="bi bi-envelope text-primary"></i><span class="break-all">{{ $email }}</span></a></li>
+                        <li><a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="text-slate-400 hover:text-white transition-colors inline-flex items-center gap-2"><i class="bi bi-whatsapp text-emerald-400"></i><span>24/7 WhatsApp</span></a></li>
+                        <li class="text-slate-400 inline-flex items-start gap-2"><i class="bi bi-geo-alt text-primary shrink-0 mt-0.5"></i><span>{{ $settings['site_address'] ?? 'Dubai, United Arab Emirates' }}</span></li>
                     </ul>
 
-                    <div class="d-flex flex-wrap gap-2 mt-3">
-                        <a href="{{ $settings['social_tripadvisor'] ?? 'https://www.tripadvisor.com/Attraction_Review-g295424-d29026644-Reviews-Dunes_Discovery-Dubai_Emirate_of_Dubai.html' }}" target="_blank" rel="noopener" class="footer-badge d-flex align-items-center text-decoration-none p-1 px-2 rounded-2 bg-black bg-opacity-40 border border-secondary border-opacity-25">
-                            <img src="{{ asset('images/tripadvisor-logo-circle-owl-icon-black-green.png') }}" alt="TripAdvisor" class="footer-badge-logo" style="width:20px; height:20px; margin-right:6px;">
-                            <div class="footer-badge-header">
-                                <span class="footer-badge-score text-white fw-bold small">4.9</span>
-                                <div class="footer-badge-stars text-warning small" style="font-size:9px;">
+                    <div class="flex flex-wrap gap-2 mt-4">
+                        <a href="{{ $settings['social_tripadvisor'] ?? 'https://www.tripadvisor.com/Attraction_Review-g295424-d29026644-Reviews-Dunes_Discovery-Dubai_Emirate_of_Dubai.html' }}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 p-1.5 px-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-colors">
+                            <img src="{{ asset('images/tripadvisor-logo-circle-owl-icon-black-green.png') }}" alt="TripAdvisor" class="w-5 h-5 object-contain">
+                            <div>
+                                <div class="text-white font-bold text-xs leading-none">4.9</div>
+                                <div class="text-amber-400 text-[9px] flex gap-0.5 mt-0.5">
                                     <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                                 </div>
                             </div>
                         </a>
-                        <a href="{{ $settings['social_google'] ?? 'https://search.google.com/local/writereview?placeid=ChIJbWsIEIVEdEER4uHEhb2dbcQ' }}" target="_blank" rel="noopener" class="footer-badge d-flex align-items-center text-decoration-none p-1 px-2 rounded-2 bg-black bg-opacity-40 border border-secondary border-opacity-25">
-                            <img src="https://www.gstatic.com/marketing-cms/assets/images/d5/dc/cfe9ce8b4425b410b49b7f2dd3f3/g.webp=s48-fcrop64=1,00000000ffffffff-rw" alt="Google" class="footer-badge-logo" style="width:20px; height:20px; margin-right:6px;">
-                            <div class="footer-badge-header">
-                                <span class="footer-badge-score text-white fw-bold small">5.0</span>
-                                <div class="footer-badge-stars text-warning small" style="font-size:9px;">
+                        <a href="{{ $settings['social_google'] ?? 'https://search.google.com/local/writereview?placeid=ChIJbWsIEIVEdEER4uHEhb2dbcQ' }}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 p-1.5 px-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-colors">
+                            <img src="https://www.gstatic.com/marketing-cms/assets/images/d5/dc/cfe9ce8b4425b410b49b7f2dd3f3/g.webp=s48-fcrop64=1,00000000ffffffff-rw" alt="Google" class="w-5 h-5 object-contain">
+                            <div>
+                                <div class="text-white font-bold text-xs leading-none">5.0</div>
+                                <div class="text-amber-400 text-[9px] flex gap-0.5 mt-0.5">
                                     <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                                 </div>
                             </div>
@@ -592,140 +681,41 @@
             </div>
             
             <!-- Bottom Bar with Legal Links and Payment Badges -->
-            <div class="border-top border-secondary border-opacity-50 pt-4">
-                <div class="d-flex flex-column flex-lg-row align-items-center justify-content-between gap-3 text-center text-lg-start">
+            <div class="border-t border-slate-800/80 pt-6">
+                <div class="flex flex-col lg:flex-row items-center justify-between gap-4 text-center lg:text-left">
                     <div>
-                        <p class="text-white-50 small mb-1">&copy; {{ date('Y') }} {{ $settings['site_name'] ?? 'Dunes Discovery Tourism L.L.C.' }} {{ $settings['site_copyright'] ?? 'All rights reserved.' }} Department of Economy & Tourism License #{{ $settings['company_license_number'] ?? '1430583' }}.</p>
-                        <div class="d-flex flex-wrap justify-content-center justify-content-lg-start gap-2 small">
-                            <a href="{{ route('terms') }}" class="text-white-50 text-decoration-none hover-white">Terms & Conditions</a>
-                            <span class="text-white-50">&bull;</span>
-                            <a href="{{ route('privacy') }}" class="text-white-50 text-decoration-none hover-white">Privacy Policy</a>
-                            <span class="text-white-50">&bull;</span>
-                            <a href="{{ route('cookies') }}" class="text-white-50 text-decoration-none hover-white">Cookie Policy</a>
-                            <span class="text-white-50">&bull;</span>
-                            <a href="{{ route('cancellation') }}" class="text-white-50 text-decoration-none hover-white">100% Refund Policy</a>
-                            <span class="text-white-50">&bull;</span>
-                            <a href="{{ route('payment.security') }}" class="text-white-50 text-decoration-none hover-white">Payment Security</a>
-                            <span class="text-white-50">&bull;</span>
-                            <a href="{{ route('safety.waiver') }}" class="text-white-50 text-decoration-none hover-white">Safety Waiver</a>
-                            <span class="text-white-50">&bull;</span>
-                            <a href="{{ route('ai.editorial') }}" class="text-white-50 text-decoration-none hover-white">AI Policy</a>
-                            <span class="text-white-50">&bull;</span>
-                            <a href="{{ route('responsible.tourism') }}" class="text-white-50 text-decoration-none hover-white">Sustainability</a>
+                        <p class="text-slate-500 text-xs mb-1">&copy; {{ date('Y') }} {{ $settings['site_name'] ?? 'Dunes Discovery Tourism L.L.C.' }} {{ $settings['site_copyright'] ?? 'All rights reserved.' }} Department of Economy & Tourism License #{{ $settings['company_license_number'] ?? '1430583' }}.</p>
+                        <div class="flex flex-wrap justify-center lg:justify-start items-center gap-x-2.5 gap-y-1 text-xs text-slate-400">
+                            <a href="{{ route('terms') }}" class="hover:text-white transition-colors">Terms & Conditions</a>
+                            <span class="text-slate-600">&bull;</span>
+                            <a href="{{ route('privacy') }}" class="hover:text-white transition-colors">Privacy Policy</a>
+                            <span class="text-slate-600">&bull;</span>
+                            <a href="{{ route('cookies') }}" class="hover:text-white transition-colors">Cookie Policy</a>
+                            <span class="text-slate-600">&bull;</span>
+                            <a href="{{ route('cancellation') }}" class="hover:text-white transition-colors">100% Refund Policy</a>
+                            <span class="text-slate-600">&bull;</span>
+                            <a href="{{ route('payment.security') }}" class="hover:text-white transition-colors">Payment Security</a>
+                            <span class="text-slate-600">&bull;</span>
+                            <a href="{{ route('safety.waiver') }}" class="hover:text-white transition-colors">Safety Waiver</a>
+                            <span class="text-slate-600">&bull;</span>
+                            <a href="{{ route('ai.editorial') }}" class="hover:text-white transition-colors">AI Policy</a>
+                            <span class="text-slate-600">&bull;</span>
+                            <a href="{{ route('responsible.tourism') }}" class="hover:text-white transition-colors">Sustainability</a>
                         </div>
                     </div>
-                    <div class="d-flex align-items-center justify-content-center gap-2 footer-trust-icons bg-black bg-opacity-30 px-3 py-2 rounded-pill border border-secondary border-opacity-25 flex-wrap">
-                        <span class="text-white-50 small me-1"><i class="bi bi-shield-lock-fill text-success me-1"></i>Secure Checkout:</span>
-                        <img src="{{ asset('images/visa-card.svg') }}" alt="Visa" width="32" height="20" style="height: 18px; width: auto; object-fit: contain;">
-                        <img src="{{ asset('images/mastercard.svg') }}" alt="Mastercard" width="28" height="20" style="height: 18px; width: auto; object-fit: contain;">
-                        <img src="{{ asset('images/americanexpress.svg') }}" alt="American Express" width="28" height="20" style="height: 18px; width: auto; object-fit: contain;">
-                        <img src="{{ asset('images/applepay.svg') }}" alt="Apple Pay" width="32" height="20" style="height: 18px; width: auto; object-fit: contain;">
-                        <img src="{{ asset('images/googlepay.svg') }}" alt="Google Pay" width="32" height="20" style="height: 18px; width: auto; object-fit: contain;">
-                        <img src="{{ asset('images/ziina-icon.png') }}" alt="Ziina Payment Gateway" width="18" height="18" style="filter: invert(1); opacity: 0.85;">
+                    <div class="inline-flex items-center gap-2 bg-slate-900 border border-slate-800 px-4 py-2 rounded-full flex-wrap justify-center">
+                        <span class="text-slate-400 text-xs inline-flex items-center gap-1"><i class="bi bi-shield-lock-fill text-emerald-400"></i>Secure Checkout:</span>
+                        <img src="{{ asset('images/visa-card.svg') }}" alt="Visa" width="32" height="20" class="h-4 w-auto object-contain">
+                        <img src="{{ asset('images/mastercard.svg') }}" alt="Mastercard" width="28" height="20" class="h-4 w-auto object-contain">
+                        <img src="{{ asset('images/americanexpress.svg') }}" alt="American Express" width="28" height="20" class="h-4 w-auto object-contain">
+                        <img src="{{ asset('images/applepay.svg') }}" alt="Apple Pay" width="32" height="20" class="h-4 w-auto object-contain">
+                        <img src="{{ asset('images/googlepay.svg') }}" alt="Google Pay" width="32" height="20" class="h-4 w-auto object-contain">
+                        <img src="{{ asset('images/ziina-icon.png') }}" alt="Ziina Payment Gateway" width="18" height="18" class="h-4 w-auto object-contain brightness-200">
                     </div>
                 </div>
             </div>
         </div>
     </footer>
-
-    <!-- Global TripAdvisor and Google Reviews Popover JS -->
-    <script>
-    const reviewData = {
-        'taCircle': {
-            title: 'TripAdvisor',
-            logo: 'https://static.tacdn.com/img2/brand_refresh_2025/logos/wordmark.svg',
-            score: '4.9',
-            url: 'https://www.tripadvisor.com/Attraction_Review-g295424-d29026644-Reviews-Dunes_Discovery-Dubai_Emirate_of_Dubai.html',
-            btnText: 'Read Reviews'
-        },
-        'googleCircle': {
-            title: 'Google Reviews',
-            logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/250px-Google_2015_logo.svg.png',
-            score: '5.0',
-            url: 'https://www.google.com/maps/search/?api=1&query=Google&query_place_id=ChIJbWsIEIVEdEER4uHEhb2dbcQ',
-            btnText: 'See Reviews'
-        }
-    };
-
-    function toggleReviewPopover(element, event) {
-        try {
-            event.stopPropagation();
-            event.preventDefault();
-
-            const existing = document.querySelector('.global-popover-overlay');
-            const currentTriggerId = existing ? existing.dataset.triggerId : null;
-
-            if (existing) {
-                existing.remove();
-            }
-
-            document.querySelectorAll('.nav-review-circle').forEach(el => el.classList.remove('active'));
-
-            if (currentTriggerId === element.id) {
-                return;
-            }
-
-            const data = reviewData[element.id];
-            if (!data) return;
-
-            const popover = document.createElement('div');
-            popover.className = 'global-popover-overlay';
-            popover.dataset.triggerId = element.id;
-
-            popover.innerHTML = `
-                <div class="review-popover-header">
-                    <img src="${data.logo}" alt="${data.title}" class="review-popover-logo">
-                </div>
-                <div class="review-popover-score">${data.score}</div>
-                <div class="review-popover-stars">
-                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                </div>
-                <a href="${data.url}" target="_blank" rel="noopener noreferrer" class="review-popover-btn">
-                    ${data.btnText} <i class="bi bi-arrow-right"></i>
-                </a>
-            `;
-
-            popover.style.position = 'fixed';
-            popover.style.zIndex = '2147483647';
-            popover.style.display = 'block';
-            popover.style.visibility = 'visible';
-            popover.style.opacity = '1';
-            popover.style.backgroundColor = 'white';
-            popover.style.transform = 'none';
-
-            const btnRect = element.getBoundingClientRect();
-            const popoverWidth = 220;
-            const margin = 10;
-
-            let left = btnRect.left + (btnRect.width / 2) - (popoverWidth / 2);
-
-            if (left < margin) left = margin;
-            else if (left + popoverWidth > window.innerWidth - margin) left = window.innerWidth - margin - popoverWidth;
-
-            const top = btnRect.bottom + 12;
-
-            popover.style.top = `${top}px`;
-            popover.style.left = `${left}px`;
-
-            const arrowX = (btnRect.left + btnRect.width / 2) - left;
-            popover.style.setProperty('--arrow-left', `${arrowX}px`);
-
-            document.body.appendChild(popover);
-            element.classList.add('active');
-
-        } catch (e) {
-            console.error('Popover Error:', e);
-        }
-    }
-
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.global-popover-overlay') && !e.target.closest('.nav-review-circle')) {
-            const existing = document.querySelector('.global-popover-overlay');
-            if (existing) existing.remove();
-            document.querySelectorAll('.nav-review-circle').forEach(el => el.classList.remove('active'));
-        }
-    });
-    </script>
 
     @include('partials.booking-modal')
     @include('partials.welcome-offer-modal')
@@ -739,7 +729,7 @@
     @include('partials.custom-safari-modal')
 
     <!-- Global Toast Container for App.toast notifications -->
-    <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1090;" aria-live="polite" aria-atomic="true"></div>
+    <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 p-3 pointer-events-none" aria-live="polite" aria-atomic="true"></div>
 
     <script>
         window.DunesRates = {
@@ -753,9 +743,7 @@
     </script>
 
     <!-- Scripts -->
-    <script src="{{ asset('assets/vendor/bootstrap/5.3.2/js/bootstrap.bundle.min.js') }}" defer></script>
     <script src="{{ asset('assets/vendor/intl-tel-input/26.0.6/build/intlTelInput.min.js') }}" defer></script>
-    <script src="{{ asset('assets/js/app.min.js') }}?v={{ file_exists(public_path('assets/js/app.min.js')) ? filemtime(public_path('assets/js/app.min.js')) : time() }}" defer></script>
 
     @stack('scripts')
 </body>

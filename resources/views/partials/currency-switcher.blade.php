@@ -7,49 +7,49 @@
     $rateInr = $settingsService->get('currency_rate_inr', '22.85');
     $dropdownId = $switcherId ?? 'currencyDropdownBtn';
 @endphp
-<div class="dropdown currency-switcher-dropdown d-inline-block">
-    <button class="btn btn-outline-light btn-sm rounded-pill px-3 py-1.5 fw-bold d-inline-flex align-items-center gap-1.5 border-opacity-25 shadow-sm text-dark bg-white" type="button" id="{{ $dropdownId }}" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 13px; border: 1px solid rgba(0,0,0,0.12); min-height: 38px;">
+<div class="relative inline-block text-left" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">
+    <button @click="open = !open" :aria-expanded="open" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-slate-800 bg-white border border-slate-200/90 shadow-sm hover:border-primary/50 transition-all cursor-pointer min-h-[38px]" type="button" id="{{ $dropdownId }}">
         <span class="current-currency-flag">&#x1F1E6;&#x1F1EA;</span>
-        <span class="current-currency-code fw-bold ms-1">AED</span>
-        <i class="bi bi-chevron-down ms-1 text-muted" style="font-size: 10px;"></i>
+        <span class="current-currency-code font-extrabold ml-1">AED</span>
+        <i class="bi bi-chevron-down text-[10px] text-slate-400 transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
     </button>
-    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4 p-2 mt-2" aria-labelledby="{{ $dropdownId }}" style="min-width: 175px; z-index: 1060;">
-        <li><h6 class="dropdown-header text-uppercase small fw-bold text-muted py-1" style="font-size: 11px; letter-spacing: 0.5px;">Display Currency</h6></li>
-        <li>
-            <button type="button" class="dropdown-item rounded-3 py-2 d-flex align-items-center justify-content-between currency-option active" data-currency="AED" data-flag="&#x1F1E6;&#x1F1EA;" data-symbol="AED" data-rate="1">
-                <span><span class="me-2">&#x1F1E6;&#x1F1EA;</span>AED <small class="text-muted">(د.إ)</small></span>
-                <i class="bi bi-check2 checkmark"></i>
+    <div x-show="open" 
+         x-transition:enter="transition ease-out duration-150"
+         x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-100"
+         x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+         x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+         class="absolute right-0 mt-2 w-48 rounded-2xl bg-white p-2 shadow-xl border border-slate-100 z-50 focus:outline-none"
+         style="display: none;">
+        <div class="px-2 py-1 text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
+            Display Currency
+        </div>
+        <div class="space-y-1 mt-1">
+            <button type="button" @click="open = false" class="w-full rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 hover:bg-orange-50 hover:text-primary flex items-center justify-between transition-colors currency-option active" data-currency="AED" data-flag="&#x1F1E6;&#x1F1EA;" data-symbol="AED" data-rate="1">
+                <span class="flex items-center gap-2"><span class="text-base">&#x1F1E6;&#x1F1EA;</span><span>AED <small class="text-slate-400">(د.إ)</small></span></span>
+                <i class="bi bi-check2 text-primary font-bold checkmark"></i>
             </button>
-        </li>
-        <li>
-            <button type="button" class="dropdown-item rounded-3 py-2 d-flex align-items-center justify-content-between currency-option" data-currency="USD" data-flag="&#x1F1FA;&#x1F1F8;" data-symbol="$" data-rate="{{ $rateUsd }}">
-                <span><span class="me-2">&#x1F1FA;&#x1F1F8;</span>USD <small class="text-muted">($)</small></span>
-                <i class="bi bi-check2 checkmark d-none"></i>
+            <button type="button" @click="open = false" class="w-full rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 hover:bg-orange-50 hover:text-primary flex items-center justify-between transition-colors currency-option" data-currency="USD" data-flag="&#x1F1FA;&#x1F1F8;" data-symbol="$" data-rate="{{ $rateUsd }}">
+                <span class="flex items-center gap-2"><span class="text-base">&#x1F1FA;&#x1F1F8;</span><span>USD <small class="text-slate-400">($)</small></span></span>
+                <i class="bi bi-check2 text-primary font-bold checkmark hidden"></i>
             </button>
-        </li>
-        <li>
-            <button type="button" class="dropdown-item rounded-3 py-2 d-flex align-items-center justify-content-between currency-option" data-currency="EUR" data-flag="&#x1F1EA;&#x1F1FA;" data-symbol="€" data-rate="{{ $rateEur }}">
-                <span><span class="me-2">&#x1F1EA;&#x1F1FA;</span>EUR <small class="text-muted">(€)</small></span>
-                <i class="bi bi-check2 checkmark d-none"></i>
+            <button type="button" @click="open = false" class="w-full rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 hover:bg-orange-50 hover:text-primary flex items-center justify-between transition-colors currency-option" data-currency="EUR" data-flag="&#x1F1EA;&#x1F1FA;" data-symbol="€" data-rate="{{ $rateEur }}">
+                <span class="flex items-center gap-2"><span class="text-base">&#x1F1EA;&#x1F1FA;</span><span>EUR <small class="text-slate-400">(€)</small></span></span>
+                <i class="bi bi-check2 text-primary font-bold checkmark hidden"></i>
             </button>
-        </li>
-        <li>
-            <button type="button" class="dropdown-item rounded-3 py-2 d-flex align-items-center justify-content-between currency-option" data-currency="GBP" data-flag="&#x1F1EC;&#x1F1E7;" data-symbol="£" data-rate="{{ $rateGbp }}">
-                <span><span class="me-2">&#x1F1EC;&#x1F1E7;</span>GBP <small class="text-muted">(£)</small></span>
-                <i class="bi bi-check2 checkmark d-none"></i>
+            <button type="button" @click="open = false" class="w-full rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 hover:bg-orange-50 hover:text-primary flex items-center justify-between transition-colors currency-option" data-currency="GBP" data-flag="&#x1F1EC;&#x1F1E7;" data-symbol="£" data-rate="{{ $rateGbp }}">
+                <span class="flex items-center gap-2"><span class="text-base">&#x1F1EC;&#x1F1E7;</span><span>GBP <small class="text-slate-400">(£)</small></span></span>
+                <i class="bi bi-check2 text-primary font-bold checkmark hidden"></i>
             </button>
-        </li>
-        <li>
-            <button type="button" class="dropdown-item rounded-3 py-2 d-flex align-items-center justify-content-between currency-option" data-currency="SAR" data-flag="&#x1F1F8;&#x1F1E6;" data-symbol="SAR" data-rate="{{ $rateSar }}">
-                <span><span class="me-2">&#x1F1F8;&#x1F1E6;</span>SAR <small class="text-muted">(﷼)</small></span>
-                <i class="bi bi-check2 checkmark d-none"></i>
+            <button type="button" @click="open = false" class="w-full rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 hover:bg-orange-50 hover:text-primary flex items-center justify-between transition-colors currency-option" data-currency="SAR" data-flag="&#x1F1F8;&#x1F1E6;" data-symbol="SAR" data-rate="{{ $rateSar }}">
+                <span class="flex items-center gap-2"><span class="text-base">&#x1F1F8;&#x1F1E6;</span><span>SAR <small class="text-slate-400">(﷼)</small></span></span>
+                <i class="bi bi-check2 text-primary font-bold checkmark hidden"></i>
             </button>
-        </li>
-        <li>
-            <button type="button" class="dropdown-item rounded-3 py-2 d-flex align-items-center justify-content-between currency-option" data-currency="INR" data-flag="&#x1F1EE;&#x1F1F3;" data-symbol="₹" data-rate="{{ $rateInr }}">
-                <span><span class="me-2">&#x1F1EE;&#x1F1F3;</span>INR <small class="text-muted">(₹)</small></span>
-                <i class="bi bi-check2 checkmark d-none"></i>
+            <button type="button" @click="open = false" class="w-full rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 hover:bg-orange-50 hover:text-primary flex items-center justify-between transition-colors currency-option" data-currency="INR" data-flag="&#x1F1EE;&#x1F1F3;" data-symbol="₹" data-rate="{{ $rateInr }}">
+                <span class="flex items-center gap-2"><span class="text-base">&#x1F1EE;&#x1F1F3;</span><span>INR <small class="text-slate-400">(₹)</small></span></span>
+                <i class="bi bi-check2 text-primary font-bold checkmark hidden"></i>
             </button>
-        </li>
-    </ul>
+        </div>
+    </div>
 </div>

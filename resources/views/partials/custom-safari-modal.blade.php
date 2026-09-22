@@ -1,231 +1,336 @@
-<!-- Build Your Own Safari Customizer Modal -->
-<div class="modal fade" id="customSafariModal" tabindex="-1" aria-labelledby="customSafariModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl modal-fullscreen-sm-down">
-        <div class="modal-content border-0 shadow-lg" style="background: #0B1120; border: 1.5px solid rgba(246, 144, 68, 0.4) !important; border-radius: 28px; color: #ffffff; overflow: hidden; box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.9);">
+<!-- Build Your Own Safari Customizer Modal (Tailwind v4 + Alpine.js) -->
+<div id="customSafariModal"
+     x-data="{
+        base: { name: 'Standard Evening Red Dunes', price: 150, tourId: 1 },
+        transfer: { name: 'Shared 4x4 Land Cruiser', price: 0, type: 'flat' },
+        sports: { name: 'Scenic Only', price: 0, type: 'per_person' },
+        addons: [],
+        adults: 2,
+        
+        hasAddon(key) {
+            return this.addons.some(a => a.key === key);
+        },
+        toggleAddon(addon) {
+            if (this.hasAddon(addon.key)) {
+                this.addons = this.addons.filter(a => a.key !== addon.key);
+            } else {
+                this.addons.push(addon);
+            }
+        },
+        get total() {
+            let baseTotal = this.base.price * this.adults;
+            let transferTotal = (this.transfer.type === 'flat') ? this.transfer.price : (this.transfer.price * this.adults);
+            let sportsTotal = (this.sports.type === 'flat') ? this.sports.price : (this.sports.price * this.adults);
+            let addonsTotal = 0;
+            this.addons.forEach(a => {
+                addonsTotal += (a.type === 'flat') ? a.price : (a.price * this.adults);
+            });
+            return baseTotal + transferTotal + sportsTotal + addonsTotal;
+        },
+        get summaryAddons() {
+            return this.addons.length ? this.addons.map(a => a.name).join(', ') : 'None';
+        },
+        get waUrl() {
+            const msg = `Hi Dunes Discovery! I configured a custom safari: Base: ${encodeURIComponent(this.base.name)}, Vehicle: ${encodeURIComponent(this.transfer.name)}, Sports: ${encodeURIComponent(this.sports.name)}, Addons: ${encodeURIComponent(this.summaryAddons)}, Guests: ${this.adults} Adults, Total: AED ${this.total}. Can you check availability?`;
+            return `https://wa.me/{{ preg_replace('/[^0-9]/','',(string)($settings['site_whatsapp'] ?? '971502456056')) }}?text=${msg}`;
+        },
+        book() {
+            $store.modal.close();
+            setTimeout(() => {
+                $store.modal.open('booking', {
+                    tourId: this.base.tourId,
+                    adults: this.adults,
+                    requests: `[CUSTOM BUILDER SPEC]\nVehicle: ${this.transfer.name}\nMotorsports: ${this.sports.name}\nAddons: ${this.summaryAddons}\nEstimated Total: AED ${this.total}`
+                });
+                const tourSelect = document.getElementById('bookingTour');
+                if (tourSelect && this.base.tourId) {
+                    tourSelect.value = this.base.tourId;
+                    tourSelect.dispatchEvent(new Event('change'));
+                }
+                const adultsInput = document.getElementById('bookingAdults');
+                if (adultsInput) adultsInput.value = this.adults;
+                const reqInput = document.getElementById('bookingRequests');
+                if (reqInput) {
+                    reqInput.value = `[CUSTOM BUILDER SPEC]\nVehicle: ${this.transfer.name}\nMotorsports: ${this.sports.name}\nAddons: ${this.summaryAddons}\nEstimated Total: AED ${this.total}`;
+                }
+            }, 300);
+        }
+     }"
+     x-show="$store.modal.active === 'custom-safari'"
+     x-cloak
+     class="fixed inset-0 z-50 overflow-y-auto"
+     role="dialog"
+     aria-modal="true"
+     @keydown.escape.window="$store.modal.close()">
+
+    <!-- Backdrop -->
+    <div x-show="$store.modal.active === 'custom-safari'"
+         x-transition:enter="ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity"
+         @click="$store.modal.close()"></div>
+
+    <!-- Modal Dialog Panel -->
+    <div class="min-h-full flex items-center justify-center p-2 sm:p-4 text-center">
+        <div x-show="$store.modal.active === 'custom-safari'"
+             x-transition:enter="ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="ease-in duration-150"
+             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+             x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+             class="w-full max-w-5xl transform overflow-hidden rounded-3xl bg-slate-950 text-left align-middle shadow-2xl transition-all border border-orange-500/40 text-white flex flex-col max-h-[92vh]"
+             @click.stop>
             
             <!-- Modal Header -->
-            <div class="modal-header border-bottom border-white border-opacity-10 py-3 px-4 position-relative z-2 bg-dark">
-                <div class="w-100 d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="d-flex align-items-center gap-2 mb-1">
-                            <span class="badge rounded-pill px-2.5 py-1 small" style="background: rgba(246, 144, 68, 0.2); border: 1px solid #F69044; color: #F69044; font-size: 11px;">
-                                <i class="bi bi-sliders me-1"></i> Interactive Customizer
-                            </span>
-                            <span class="badge bg-success bg-opacity-75 rounded-pill px-2 py-0.5 small text-white" style="font-size: 10px;">
-                                DET #1430583
-                            </span>
-                        </div>
-                        <h5 class="modal-title fw-800 text-white mb-0" id="customSafariModalLabel">
-                            Build Your Own Dubai Desert Safari
-                        </h5>
+            <div class="flex items-center justify-between p-4 sm:p-5 border-b border-slate-800 bg-slate-900/90 backdrop-blur-md shrink-0">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-primary/20 text-primary border border-primary/40 uppercase tracking-wider">
+                            <i class="bi bi-sliders"></i> Interactive Customizer
+                        </span>
+                        <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                            DET #1430583
+                        </span>
                     </div>
-                    <button type="button" class="btn btn-outline-light rounded-circle p-2 d-flex align-items-center justify-content-center shadow-none border-0" data-bs-dismiss="modal" aria-label="Close" style="background: rgba(255, 255, 255, 0.08); width: 38px; height: 38px;">
-                        <i class="bi bi-x-lg fs-6 text-white"></i>
-                    </button>
+                    <h5 class="text-base sm:text-lg font-black text-white" id="customSafariModalLabel">
+                        Build Your Own Dubai Desert Safari
+                    </h5>
                 </div>
+                <button type="button" 
+                        class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer" 
+                        @click="$store.modal.close()" 
+                        aria-label="Close">
+                    <i class="bi bi-x-lg text-xs"></i>
+                </button>
             </div>
 
-            <!-- Modal Body with Scrollable Area -->
-            <div class="modal-body p-4 position-relative z-1" style="max-height: calc(85vh - 120px); overflow-y: auto;">
-                <div class="row g-4">
+            <!-- Modal Body (Scrollable) -->
+            <div class="p-4 sm:p-6 overflow-y-auto flex-1">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                     
-                    <!-- Left: Customizer Options -->
-                    <div class="col-12 col-lg-7">
+                    <!-- Left: Customizer Options (7 cols) -->
+                    <div class="lg:col-span-7 space-y-6">
                         
                         <!-- Step 1: Base -->
-                        <div class="mb-4">
-                            <label class="fw-bold text-white small text-uppercase mb-2 d-block" style="letter-spacing: 0.5px;">
+                        <div>
+                            <label class="block text-xs font-black uppercase tracking-wider text-slate-300 mb-2.5">
                                 1. Select Base Experience
                             </label>
-                            <div class="row g-2">
-                                <div class="col-6">
-                                    <div class="modal-custom-card p-3 rounded-4 cursor-pointer transition-all h-100 selected" data-group="modal-base" data-name="Standard Evening Red Dunes" data-price="150" data-tour-id="1">
-                                        <div class="d-flex justify-content-between mb-1">
-                                            <span><i class="bi bi-sunset fs-5 text-warning"></i></span>
-                                            <span class="badge bg-warning text-dark fw-bold rounded-pill" style="font-size: 9px;">Popular</span>
-                                        </div>
-                                        <div class="fw-bold text-white small lh-1 mb-1">Standard Evening</div>
-                                        <div class="text-white-50" style="font-size: 11px;">Dune bashing & BBQ show</div>
-                                        <div class="fw-bold text-warning small mt-2" data-aed="150">AED 150/guest</div>
+                            <div class="grid grid-cols-2 gap-2.5">
+                                <!-- Base 1 -->
+                                <div @click="base = { name: 'Standard Evening Red Dunes', price: 150, tourId: 1 }" 
+                                     class="p-3 rounded-2xl cursor-pointer transition-all border text-left"
+                                     :class="base.name === 'Standard Evening Red Dunes' ? 'bg-orange-500/15 border-primary shadow-sm' : 'bg-slate-900/70 border-slate-800 hover:border-slate-700'">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <i class="bi bi-sunset text-lg text-amber-400"></i>
+                                        <span class="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[9px]">Popular</span>
                                     </div>
+                                    <div class="font-bold text-white text-xs mb-0.5">Standard Evening</div>
+                                    <div class="text-slate-400 text-[10px] leading-tight">Dune bashing & BBQ show</div>
+                                    <div class="font-extrabold text-amber-400 text-xs mt-2" data-aed="150">AED 150/guest</div>
                                 </div>
-                                <div class="col-6">
-                                    <div class="modal-custom-card p-3 rounded-4 cursor-pointer transition-all h-100" data-group="modal-base" data-name="VIP Luxury Evening Safari" data-price="250" data-tour-id="2">
-                                        <div class="d-flex justify-content-between mb-1">
-                                            <span><i class="bi bi-award fs-5 text-warning"></i></span>
-                                            <span class="badge bg-dark text-warning border border-warning rounded-pill" style="font-size: 9px;">VIP</span>
-                                        </div>
-                                        <div class="fw-bold text-white small lh-1 mb-1">VIP Luxury Safari</div>
-                                        <div class="text-white-50" style="font-size: 11px;">VIP table & waiter service</div>
-                                        <div class="fw-bold text-warning small mt-2" data-aed="250">AED 250/guest</div>
+
+                                <!-- Base 2 -->
+                                <div @click="base = { name: 'VIP Luxury Evening Safari', price: 250, tourId: 2 }" 
+                                     class="p-3 rounded-2xl cursor-pointer transition-all border text-left"
+                                     :class="base.name === 'VIP Luxury Evening Safari' ? 'bg-orange-500/15 border-primary shadow-sm' : 'bg-slate-900/70 border-slate-800 hover:border-slate-700'">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <i class="bi bi-award text-lg text-amber-400"></i>
+                                        <span class="px-2 py-0.5 rounded-full bg-slate-800 text-amber-400 border border-amber-400/40 font-black text-[9px]">VIP</span>
                                     </div>
+                                    <div class="font-bold text-white text-xs mb-0.5">VIP Luxury Safari</div>
+                                    <div class="text-slate-400 text-[10px] leading-tight">VIP table & waiter service</div>
+                                    <div class="font-extrabold text-amber-400 text-xs mt-2" data-aed="250">AED 250/guest</div>
                                 </div>
-                                <div class="col-6">
-                                    <div class="modal-custom-card p-3 rounded-4 cursor-pointer transition-all h-100" data-group="modal-base" data-name="Morning Desert Safari" data-price="120" data-tour-id="4">
-                                        <div class="d-flex justify-content-between mb-1">
-                                            <span><i class="bi bi-sunrise fs-5 text-warning"></i></span>
-                                            <span class="badge bg-info text-white rounded-pill" style="font-size: 9px;">Cooler</span>
-                                        </div>
-                                        <div class="fw-bold text-white small lh-1 mb-1">Morning Safari</div>
-                                        <div class="text-white-50" style="font-size: 11px;">Cool air & sunrise photos</div>
-                                        <div class="fw-bold text-warning small mt-2" data-aed="120">AED 120/guest</div>
+
+                                <!-- Base 3 -->
+                                <div @click="base = { name: 'Morning Desert Safari', price: 120, tourId: 4 }" 
+                                     class="p-3 rounded-2xl cursor-pointer transition-all border text-left"
+                                     :class="base.name === 'Morning Desert Safari' ? 'bg-orange-500/15 border-primary shadow-sm' : 'bg-slate-900/70 border-slate-800 hover:border-slate-700'">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <i class="bi bi-sunrise text-lg text-sky-400"></i>
+                                        <span class="px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 font-black text-[9px]">Cooler</span>
                                     </div>
+                                    <div class="font-bold text-white text-xs mb-0.5">Morning Safari</div>
+                                    <div class="text-slate-400 text-[10px] leading-tight">Cool air & sunrise photos</div>
+                                    <div class="font-extrabold text-amber-400 text-xs mt-2" data-aed="120">AED 120/guest</div>
                                 </div>
-                                <div class="col-6">
-                                    <div class="modal-custom-card p-3 rounded-4 cursor-pointer transition-all h-100" data-group="modal-base" data-name="Overnight Stargazing Safari" data-price="350" data-tour-id="5">
-                                        <div class="d-flex justify-content-between mb-1">
-                                            <span><i class="bi bi-moon-stars fs-5 text-warning"></i></span>
-                                            <span class="badge bg-success text-white rounded-pill" style="font-size: 9px;">Glamping</span>
-                                        </div>
-                                        <div class="fw-bold text-white small lh-1 mb-1">Overnight Safari</div>
-                                        <div class="text-white-50" style="font-size: 11px;">Bedouin tent & breakfast</div>
-                                        <div class="fw-bold text-warning small mt-2" data-aed="350">AED 350/guest</div>
+
+                                <!-- Base 4 -->
+                                <div @click="base = { name: 'Overnight Stargazing Safari', price: 350, tourId: 5 }" 
+                                     class="p-3 rounded-2xl cursor-pointer transition-all border text-left"
+                                     :class="base.name === 'Overnight Stargazing Safari' ? 'bg-orange-500/15 border-primary shadow-sm' : 'bg-slate-900/70 border-slate-800 hover:border-slate-700'">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <i class="bi bi-moon-stars text-lg text-emerald-400"></i>
+                                        <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-black text-[9px]">Glamping</span>
                                     </div>
+                                    <div class="font-bold text-white text-xs mb-0.5">Overnight Safari</div>
+                                    <div class="text-slate-400 text-[10px] leading-tight">Bedouin tent & breakfast</div>
+                                    <div class="font-extrabold text-amber-400 text-xs mt-2" data-aed="350">AED 350/guest</div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Step 2: Vehicle -->
-                        <div class="mb-4">
-                            <label class="fw-bold text-white small text-uppercase mb-2 d-block" style="letter-spacing: 0.5px;">
+                        <!-- Step 2: Transfer -->
+                        <div>
+                            <label class="block text-xs font-black uppercase tracking-wider text-slate-300 mb-2.5">
                                 2. Transfer Option
                             </label>
-                            <div class="row g-2">
-                                <div class="col-4">
-                                    <div class="modal-custom-card p-2.5 rounded-3 cursor-pointer transition-all h-100 selected" data-group="modal-transfer" data-name="Shared 4x4 Land Cruiser" data-price="0" data-type="flat">
-                                        <div class="fw-bold text-white small">Shared 4x4</div>
-                                        <div class="text-success fw-bold" style="font-size: 10px;">FREE</div>
-                                    </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <div @click="transfer = { name: 'Shared 4x4 Land Cruiser', price: 0, type: 'flat' }"
+                                     class="p-2.5 rounded-xl cursor-pointer transition-all border text-left"
+                                     :class="transfer.name === 'Shared 4x4 Land Cruiser' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/70 border-slate-800 hover:border-slate-700'">
+                                    <div class="font-bold text-white text-xs">Shared 4x4</div>
+                                    <div class="text-emerald-400 font-bold text-[10px] mt-1">FREE</div>
                                 </div>
-                                <div class="col-4">
-                                    <div class="modal-custom-card p-2.5 rounded-3 cursor-pointer transition-all h-100" data-group="modal-transfer" data-name="Private 7-Seater 4x4" data-price="350" data-type="flat">
-                                        <div class="fw-bold text-white small">Private 4x4</div>
-                                        <div class="text-warning fw-bold" style="font-size: 10px;" data-aed="350">+AED 350 flat</div>
-                                    </div>
+                                <div @click="transfer = { name: 'Private 7-Seater 4x4', price: 350, type: 'flat' }"
+                                     class="p-2.5 rounded-xl cursor-pointer transition-all border text-left"
+                                     :class="transfer.name === 'Private 7-Seater 4x4' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/70 border-slate-800 hover:border-slate-700'">
+                                    <div class="font-bold text-white text-xs">Private 4x4</div>
+                                    <div class="text-amber-400 font-bold text-[10px] mt-1" data-aed="350">+AED 350 flat</div>
                                 </div>
-                                <div class="col-4">
-                                    <div class="modal-custom-card p-2.5 rounded-3 cursor-pointer transition-all h-100" data-group="modal-transfer" data-name="VIP Range Rover" data-price="750" data-type="flat">
-                                        <div class="fw-bold text-white small">VIP SUV</div>
-                                        <div class="text-warning fw-bold" style="font-size: 10px;" data-aed="750">+AED 750 flat</div>
-                                    </div>
+                                <div @click="transfer = { name: 'VIP Range Rover', price: 750, type: 'flat' }"
+                                     class="p-2.5 rounded-xl cursor-pointer transition-all border text-left"
+                                     :class="transfer.name === 'VIP Range Rover' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/70 border-slate-800 hover:border-slate-700'">
+                                    <div class="font-bold text-white text-xs">VIP SUV</div>
+                                    <div class="text-amber-400 font-bold text-[10px] mt-1" data-aed="750">+AED 750 flat</div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Step 3: Sports -->
-                        <div class="mb-4">
-                            <label class="fw-bold text-white small text-uppercase mb-2 d-block" style="letter-spacing: 0.5px;">
+                        <div>
+                            <label class="block text-xs font-black uppercase tracking-wider text-slate-300 mb-2.5">
                                 3. Desert Motorsports
                             </label>
-                            <div class="row g-2">
-                                <div class="col-3">
-                                    <div class="modal-custom-card p-2 rounded-3 cursor-pointer transition-all h-100 selected" data-group="modal-sports" data-name="Scenic Only" data-price="0" data-type="per_person">
-                                        <div class="fw-bold text-white" style="font-size: 11px;">None</div>
-                                        <div class="text-success fw-bold" style="font-size: 9px;">INCLUDED</div>
-                                    </div>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                <div @click="sports = { name: 'Scenic Only', price: 0, type: 'per_person' }"
+                                     class="p-2 rounded-xl cursor-pointer transition-all border text-left"
+                                     :class="sports.name === 'Scenic Only' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/70 border-slate-800 hover:border-slate-700'">
+                                    <div class="font-bold text-white text-xs">None</div>
+                                    <div class="text-emerald-400 font-bold text-[9px] mt-1">INCLUDED</div>
                                 </div>
-                                <div class="col-3">
-                                    <div class="modal-custom-card p-2 rounded-3 cursor-pointer transition-all h-100" data-group="modal-sports" data-name="250cc Quad Biking" data-price="120" data-type="per_person">
-                                        <div class="fw-bold text-white" style="font-size: 11px;">250cc Quad</div>
-                                        <div class="text-warning fw-bold" style="font-size: 9px;" data-aed="120">+AED 120</div>
-                                    </div>
+                                <div @click="sports = { name: '250cc Quad Biking', price: 120, type: 'per_person' }"
+                                     class="p-2 rounded-xl cursor-pointer transition-all border text-left"
+                                     :class="sports.name === '250cc Quad Biking' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/70 border-slate-800 hover:border-slate-700'">
+                                    <div class="font-bold text-white text-xs">250cc Quad</div>
+                                    <div class="text-amber-400 font-bold text-[9px] mt-1" data-aed="120">+AED 120</div>
                                 </div>
-                                <div class="col-3">
-                                    <div class="modal-custom-card p-2 rounded-3 cursor-pointer transition-all h-100" data-group="modal-sports" data-name="400cc Quad Biking" data-price="220" data-type="per_person">
-                                        <div class="fw-bold text-white" style="font-size: 11px;">400cc Quad</div>
-                                        <div class="text-warning fw-bold" style="font-size: 9px;" data-aed="220">+AED 220</div>
-                                    </div>
+                                <div @click="sports = { name: '400cc Quad Biking', price: 220, type: 'per_person' }"
+                                     class="p-2 rounded-xl cursor-pointer transition-all border text-left"
+                                     :class="sports.name === '400cc Quad Biking' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/70 border-slate-800 hover:border-slate-700'">
+                                    <div class="font-bold text-white text-xs">400cc Quad</div>
+                                    <div class="text-amber-400 font-bold text-[9px] mt-1" data-aed="220">+AED 220</div>
                                 </div>
-                                <div class="col-3">
-                                    <div class="modal-custom-card p-2 rounded-3 cursor-pointer transition-all h-100" data-group="modal-sports" data-name="1000cc Can-Am Buggy" data-price="550" data-type="flat">
-                                        <div class="fw-bold text-white" style="font-size: 11px;">1000cc Buggy</div>
-                                        <div class="text-warning fw-bold" style="font-size: 9px;" data-aed="550">+AED 550</div>
-                                    </div>
+                                <div @click="sports = { name: '1000cc Can-Am Buggy', price: 550, type: 'flat' }"
+                                     class="p-2 rounded-xl cursor-pointer transition-all border text-left"
+                                     :class="sports.name === '1000cc Can-Am Buggy' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/70 border-slate-800 hover:border-slate-700'">
+                                    <div class="font-bold text-white text-xs">1000cc Buggy</div>
+                                    <div class="text-amber-400 font-bold text-[9px] mt-1" data-aed="550">+AED 550</div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Step 4: Addons -->
-                        <div class="mb-3">
-                            <label class="fw-bold text-white small text-uppercase mb-2 d-block" style="letter-spacing: 0.5px;">
+                        <div>
+                            <label class="block text-xs font-black uppercase tracking-wider text-slate-300 mb-2.5">
                                 4. Optional Camp Luxuries
                             </label>
-                            <div class="row g-2">
-                                <div class="col-6">
-                                    <div class="modal-addon-item p-2 rounded-3 border d-flex align-items-center justify-content-between cursor-pointer" data-addon="vip_table" data-name="VIP Table Service" data-price="60" data-type="per_person" style="background: rgba(30, 41, 59, 0.6); border-color: rgba(255, 255, 255, 0.1) !important;">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <input class="form-check-input m-0 modal-addon-check" type="checkbox">
-                                            <span class="text-white small" style="font-size: 11px;">VIP Table & Waiter</span>
-                                        </div>
-                                        <span class="text-warning small" style="font-size: 10px;" data-aed="60">+AED 60</span>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div @click="toggleAddon({ key: 'vip_table', name: 'VIP Table Service', price: 60, type: 'per_person' })"
+                                     class="p-2.5 rounded-xl cursor-pointer transition-all border flex items-center justify-between"
+                                     :class="hasAddon('vip_table') ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/70 border-slate-800 hover:border-slate-700'">
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" :checked="hasAddon('vip_table')" class="rounded border-slate-700 text-primary focus:ring-0 pointer-events-none">
+                                        <span class="text-white text-xs font-semibold">VIP Table</span>
                                     </div>
+                                    <span class="text-amber-400 text-[10px] font-bold" data-aed="60">+AED 60</span>
                                 </div>
-                                <div class="col-6">
-                                    <div class="modal-addon-item p-2 rounded-3 border d-flex align-items-center justify-content-between cursor-pointer" data-addon="shisha" data-name="Private Table Shisha" data-price="50" data-type="flat" style="background: rgba(30, 41, 59, 0.6); border-color: rgba(255, 255, 255, 0.1) !important;">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <input class="form-check-input m-0 modal-addon-check" type="checkbox">
-                                            <span class="text-white small" style="font-size: 11px;">Table Shisha</span>
-                                        </div>
-                                        <span class="text-warning small" style="font-size: 10px;" data-aed="50">+AED 50</span>
+                                <div @click="toggleAddon({ key: 'shisha', name: 'Private Table Shisha', price: 50, type: 'flat' })"
+                                     class="p-2.5 rounded-xl cursor-pointer transition-all border flex items-center justify-between"
+                                     :class="hasAddon('shisha') ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/70 border-slate-800 hover:border-slate-700'">
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" :checked="hasAddon('shisha')" class="rounded border-slate-700 text-primary focus:ring-0 pointer-events-none">
+                                        <span class="text-white text-xs font-semibold">Table Shisha</span>
                                     </div>
+                                    <span class="text-amber-400 text-[10px] font-bold" data-aed="50">+AED 50</span>
                                 </div>
                             </div>
                         </div>
 
                     </div>
 
-                    <!-- Right: Summary & Instant Checkout -->
-                    <div class="col-12 col-lg-5">
-                        <div class="card border-0 rounded-4 p-3 h-100" style="background: rgba(15, 23, 42, 0.85); border: 1.5px solid rgba(246, 144, 68, 0.3) !important;">
+                    <!-- Right: Summary & Instant Checkout (5 cols) -->
+                    <div class="lg:col-span-5">
+                        <div class="p-4 sm:p-5 rounded-2xl bg-slate-900/90 border border-slate-800 flex flex-col h-full justify-between shadow-xl">
                             
                             <!-- Guest Counter -->
-                            <div class="d-flex align-items-center justify-content-between p-2.5 rounded-3 mb-3" style="background: rgba(255, 255, 255, 0.05);">
-                                <div>
-                                    <div class="fw-bold text-white small">Guests (Adults)</div>
-                                    <small class="text-white-50" style="font-size: 10px;">Age 11+ years</small>
+                            <div>
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-950/60 border border-slate-800 mb-4">
+                                    <div>
+                                        <div class="font-bold text-white text-xs">Guests (Adults)</div>
+                                        <div class="text-slate-400 text-[10px]">Age 11+ years</div>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <button type="button" 
+                                                class="w-7 h-7 rounded-full border border-slate-700 hover:border-slate-500 bg-slate-800 text-white flex items-center justify-center text-xs font-bold transition-colors cursor-pointer"
+                                                @click="if (adults > 1) adults--">-</button>
+                                        <span class="font-black text-white text-sm w-4 text-center" x-text="adults">2</span>
+                                        <button type="button" 
+                                                class="w-7 h-7 rounded-full border border-amber-400/50 hover:bg-amber-400 hover:text-slate-950 bg-slate-800 text-amber-400 flex items-center justify-center text-xs font-bold transition-colors cursor-pointer"
+                                                @click="if (adults < 30) adults++">+</button>
+                                    </div>
                                 </div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-circle p-0 text-white" id="modalAdultsMinus" style="width: 28px; height: 28px;">-</button>
-                                    <span class="fw-bold fs-6 px-1" id="modalAdultsCount">2</span>
-                                    <button type="button" class="btn btn-sm btn-outline-warning rounded-circle p-0 text-warning" id="modalAdultsPlus" style="width: 28px; height: 28px;">+</button>
+
+                                <!-- Live Specs Breakdown -->
+                                <div class="space-y-2 mb-4 text-xs">
+                                    <div class="flex justify-between text-slate-400">
+                                        <span>Base:</span>
+                                        <strong class="text-white font-semibold text-right" x-text="base.name">Standard Evening</strong>
+                                    </div>
+                                    <div class="flex justify-between text-slate-400">
+                                        <span>Transfer:</span>
+                                        <strong class="text-white font-semibold text-right" x-text="transfer.name">Shared 4x4</strong>
+                                    </div>
+                                    <div class="flex justify-between text-slate-400">
+                                        <span>Sports:</span>
+                                        <strong class="text-white font-semibold text-right" x-text="sports.name">Scenic Only</strong>
+                                    </div>
+                                    <div class="flex justify-between text-slate-400">
+                                        <span>Addons:</span>
+                                        <strong class="text-white font-semibold text-right" x-text="summaryAddons">None</strong>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Live Specs Breakdown -->
-                            <div class="mb-3 small" style="font-size: 12px;">
-                                <div class="d-flex justify-content-between text-white-50 mb-1">
-                                    <span>Base:</span>
-                                    <strong class="text-white" id="modalSummaryBase">Standard Evening</strong>
+                            <!-- Total Display & CTAs -->
+                            <div class="pt-4 border-t border-slate-800 text-center">
+                                <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider mb-0.5">Live Estimated Total</span>
+                                <div class="text-3xl font-black text-amber-400 font-mono my-1" x-text="'AED ' + total">AED 300</div>
+                                <div class="text-emerald-400 font-semibold text-[10px] mb-4 flex items-center justify-center gap-1">
+                                    <i class="bi bi-shield-check"></i> Best Price Guarantee • Free Cancel 24h
                                 </div>
-                                <div class="d-flex justify-content-between text-white-50 mb-1">
-                                    <span>Transfer:</span>
-                                    <strong class="text-white" id="modalSummaryTransfer">Shared 4x4</strong>
-                                </div>
-                                <div class="d-flex justify-content-between text-white-50 mb-1">
-                                    <span>Sports:</span>
-                                    <strong class="text-white" id="modalSummarySports">Scenic Only</strong>
-                                </div>
-                                <div class="d-flex justify-content-between text-white-50 mb-1">
-                                    <span>Addons:</span>
-                                    <strong class="text-white" id="modalSummaryAddons">None</strong>
-                                </div>
-                            </div>
 
-                            <!-- Total Display -->
-                            <div class="pt-2 border-top border-white border-opacity-10 mb-3 text-center">
-                                <small class="text-white-50 d-block" style="font-size: 10px; text-transform: uppercase; font-weight: 700;">Live Estimated Total</small>
-                                <div class="display-6 fw-800 text-warning lh-1 my-1" id="modalCustomizerTotal" data-aed="300">AED 300</div>
-                                <small class="text-success fw-bold" style="font-size: 10px;"><i class="bi bi-shield-check me-1"></i>Best Price Guarantee • Free Cancel 24h</small>
-                            </div>
-
-                            <!-- CTAs -->
-                            <div class="d-grid gap-2 mt-auto">
-                                <button type="button" class="btn btn-desert-animated w-100 py-2.5 rounded-pill fw-bold small" id="modalCustomizerBookBtn">
-                                    <i class="bi bi-calendar-check-fill me-1"></i> Book Custom Safari
-                                </button>
-                                <a href="#" target="_blank" rel="noopener" class="btn btn-whatsapp-animated w-100 py-2 rounded-pill fw-bold small" id="modalCustomizerWaBtn">
-                                    <i class="bi bi-whatsapp me-1"></i> WhatsApp Inquire
-                                </a>
+                                <div class="space-y-2">
+                                    <button type="button" 
+                                            class="w-full py-3 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs sm:text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2" 
+                                            @click="book()">
+                                        <i class="bi bi-calendar-check-fill"></i>
+                                        <span>Book Custom Safari</span>
+                                    </button>
+                                    <a :href="waUrl" 
+                                       target="_blank" 
+                                       rel="noopener" 
+                                       class="w-full py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-xs transition-colors flex items-center justify-center gap-2">
+                                        <i class="bi bi-whatsapp"></i>
+                                        <span>WhatsApp Inquire</span>
+                                    </a>
+                                </div>
                             </div>
 
                         </div>
@@ -238,181 +343,10 @@
     </div>
 </div>
 
-<style>
-.modal-custom-card {
-    background: rgba(30, 41, 59, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-}
-.modal-custom-card:hover {
-    border-color: #F69044 !important;
-}
-.modal-custom-card.selected {
-    border-color: #F69044 !important;
-    background: rgba(246, 144, 68, 0.18) !important;
-}
-.modal-addon-item.selected {
-    border-color: #F69044 !important;
-    background: rgba(246, 144, 68, 0.18) !important;
-}
-</style>
-
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const modalEl = document.getElementById('customSafariModal');
-    if (!modalEl) return;
-
-    const modalState = {
-        base: { name: 'Standard Evening Red Dunes', price: 150, tourId: 1 },
-        transfer: { name: 'Shared 4x4 Land Cruiser', price: 0, type: 'flat' },
-        sports: { name: 'Scenic Only', price: 0, type: 'per_person' },
-        addons: [],
-        adults: 2
-    };
-
-    const adultsCountEl = document.getElementById('modalAdultsCount');
-    const summaryBaseEl = document.getElementById('modalSummaryBase');
-    const summaryTransferEl = document.getElementById('modalSummaryTransfer');
-    const summarySportsEl = document.getElementById('modalSummarySports');
-    const summaryAddonsEl = document.getElementById('modalSummaryAddons');
-    const totalEl = document.getElementById('modalCustomizerTotal');
-    const bookBtn = document.getElementById('modalCustomizerBookBtn');
-    const waBtn = document.getElementById('modalCustomizerWaBtn');
-
-    // Radio groups
-    ['modal-base', 'modal-transfer', 'modal-sports'].forEach(group => {
-        document.querySelectorAll(`.modal-custom-card[data-group="${group}"]`).forEach(card => {
-            card.addEventListener('click', function() {
-                document.querySelectorAll(`.modal-custom-card[data-group="${group}"]`).forEach(c => c.classList.remove('selected'));
-                this.classList.add('selected');
-
-                const key = group.replace('modal-', '');
-                modalState[key] = {
-                    name: this.getAttribute('data-name'),
-                    price: parseFloat(this.getAttribute('data-price') || 0),
-                    type: this.getAttribute('data-type') || 'per_person',
-                    tourId: this.getAttribute('data-tour-id') || null
-                };
-
-                updateModalCalc();
-            });
-        });
-    });
-
-    // Addons
-    document.querySelectorAll('.modal-addon-item').forEach(item => {
-        const chk = item.querySelector('.modal-addon-check');
-        item.addEventListener('click', function(e) {
-            if (e.target !== chk) chk.checked = !chk.checked;
-            toggleModalAddon(item, chk.checked);
-        });
-        if (chk) {
-            chk.addEventListener('change', function() {
-                toggleModalAddon(item, this.checked);
-            });
-        }
-    });
-
-    function toggleModalAddon(item, isChecked) {
-        const addonKey = item.getAttribute('data-addon');
-        const name = item.getAttribute('data-name');
-        const price = parseFloat(item.getAttribute('data-price') || 0);
-        const type = item.getAttribute('data-type') || 'per_person';
-
-        if (isChecked) {
-            item.classList.add('selected');
-            if (!modalState.addons.find(a => a.key === addonKey)) {
-                modalState.addons.push({ key: addonKey, name, price, type });
-            }
-        } else {
-            item.classList.remove('selected');
-            modalState.addons = modalState.addons.filter(a => a.key !== addonKey);
-        }
-
-        updateModalCalc();
+window.openSafariCustomizer = function() {
+    if (window.Alpine && Alpine.store('modal')) {
+        Alpine.store('modal').open('custom-safari');
     }
-
-    // Guest counter
-    document.getElementById('modalAdultsMinus').addEventListener('click', () => {
-        if (modalState.adults > 1) {
-            modalState.adults--;
-            adultsCountEl.innerText = modalState.adults;
-            updateModalCalc();
-        }
-    });
-    document.getElementById('modalAdultsPlus').addEventListener('click', () => {
-        if (modalState.adults < 30) {
-            modalState.adults++;
-            adultsCountEl.innerText = modalState.adults;
-            updateModalCalc();
-        }
-    });
-
-    function updateModalCalc() {
-        let baseTotal = modalState.base.price * modalState.adults;
-        let transferTotal = (modalState.transfer.type === 'flat') ? modalState.transfer.price : (modalState.transfer.price * modalState.adults);
-        let sportsTotal = (modalState.sports.type === 'flat') ? modalState.sports.price : (modalState.sports.price * modalState.adults);
-        let addonsTotal = 0;
-        modalState.addons.forEach(a => {
-            addonsTotal += (a.type === 'flat') ? a.price : (a.price * modalState.adults);
-        });
-
-        let grandTotal = baseTotal + transferTotal + sportsTotal + addonsTotal;
-
-        summaryBaseEl.innerText = modalState.base.name;
-        summaryTransferEl.innerText = modalState.transfer.name;
-        summarySportsEl.innerText = modalState.sports.name;
-        summaryAddonsEl.innerText = modalState.addons.length ? modalState.addons.map(a => a.name).join(', ') : 'None';
-
-        totalEl.setAttribute('data-aed', grandTotal);
-        totalEl.innerText = `AED ${grandTotal}`;
-
-        if (window.DunesApp && typeof window.DunesApp.updatePrices === 'function') {
-            window.DunesApp.updatePrices();
-        }
-
-        // WhatsApp
-        const waMsg = `Hi Dunes Discovery! I configured a custom safari: Base: ${encodeURIComponent(modalState.base.name)}, Vehicle: ${encodeURIComponent(modalState.transfer.name)}, Sports: ${encodeURIComponent(modalState.sports.name)}, Addons: ${encodeURIComponent(summaryAddonsEl.innerText)}, Guests: ${modalState.adults} Adults, Total: AED ${grandTotal}. Can you check availability?`;
-        waBtn.href = `https://wa.me/{{ preg_replace('/[^0-9]/','',(string)($settings['site_whatsapp'] ?? '971502456056')) }}?text=${waMsg}`;
-    }
-
-    if (bookBtn) {
-        bookBtn.addEventListener('click', function() {
-            const m = bootstrap.Modal.getInstance(modalEl);
-            if (m) m.hide();
-
-            setTimeout(() => {
-                const bookingModalEl = document.getElementById('bookingModal');
-                if (!bookingModalEl) return;
-
-                if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                    const bModal = bootstrap.Modal.getOrCreateInstance(bookingModalEl);
-                    bModal.show();
-                }
-
-                if (modalState.base.tourId) {
-                    const tourSelect = document.getElementById('bookingTour');
-                    if (tourSelect) {
-                        tourSelect.value = modalState.base.tourId;
-                        tourSelect.dispatchEvent(new Event('change'));
-                    }
-                }
-
-                const adultsInput = document.getElementById('bookingAdults');
-                if (adultsInput) adultsInput.value = modalState.adults;
-
-                const requestsInput = document.getElementById('bookingRequests');
-                if (requestsInput) {
-                    requestsInput.value = `[CUSTOM BUILDER SPEC]\nVehicle: ${modalState.transfer.name}\nMotorsports: ${modalState.sports.name}\nAddons: ${summaryAddonsEl.innerText}\nEstimated Total: AED ${totalEl.getAttribute('data-aed') || totalEl.innerText}`;
-                }
-            }, 350);
-        });
-    }
-
-    window.openSafariCustomizer = function() {
-        const m = bootstrap.Modal.getOrCreateInstance(modalEl);
-        m.show();
-    };
-
-    updateModalCalc();
-});
+};
 </script>

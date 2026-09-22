@@ -1,140 +1,144 @@
 @if(isset($tour) && $tour->tiers && $tour->tiers->count() > 1)
-<div class="card border-0 bg-white rounded-4 p-4 p-md-5 mb-5 shadow-sm border border-light" id="packageMatrixSection">
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+<div class="rounded-3xl bg-white p-5 sm:p-8 mb-8 shadow-sm border border-slate-200/80" id="packageMatrixSection">
+    <div class="flex justify-between items-center mb-6 flex-wrap gap-3">
         <div>
-            <div class="badge bg-soft-primary text-primary px-3 py-1.5 rounded-pill fw-bold mb-2">
-                <i class="bi bi-layers me-1"></i>Side-by-Side Comparison
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-orange-50 text-primary border border-orange-200/60 uppercase tracking-wider mb-2">
+                <i class="bi bi-layers"></i> Side-by-Side Comparison
             </div>
-            <h2 class="h3 fw-bold text-dark mb-1">Package Tier Feature Breakdown</h2>
-            <p class="text-muted small mb-0">Compare what is included in each package tier to pick the ideal safari experience for your party.</p>
+            <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mb-1">Package Tier Feature Breakdown</h2>
+            <p class="text-slate-500 text-xs sm:text-sm">Compare what is included in each package tier to pick the ideal safari experience for your party.</p>
         </div>
-        <div class="d-flex align-items-center gap-2">
-            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill small">
-                <i class="bi bi-shield-check text-success me-1"></i>Instant Confirmation
+        <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700">
+                <i class="bi bi-shield-check text-emerald-500"></i> Instant Confirmation
             </span>
         </div>
     </div>
 
-    <div class="table-responsive rounded-4 border overflow-hidden">
-        <table class="table table-hover align-middle mb-0 text-center" style="font-size: 14px;">
-            <thead class="bg-light">
+    <div class="overflow-x-auto rounded-2xl border border-slate-200">
+        <table class="w-full text-center text-sm border-collapse min-w-[620px]">
+            <thead class="bg-slate-50 border-b border-slate-200">
                 <tr>
-                    <th class="text-start py-3 px-4 text-muted fw-bold text-uppercase small" style="width: 28%; min-width: 180px;">Feature / Inclusion</th>
+                    <th class="text-left py-4 px-4 text-slate-500 font-bold uppercase text-xs w-[28%] min-w-[180px]">Feature / Inclusion</th>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
-                    <th class="py-3 px-3 {{ $tier->is_popular ? 'bg-soft-primary text-primary border-primary' : 'text-dark' }}" style="min-width: 140px;">
+                    <th class="py-4 px-3 min-w-[140px] {{ $tier->is_popular ? 'bg-orange-50/60 border-x border-orange-200' : '' }}">
                         @if($tier->is_popular)
-                        <span class="badge bg-primary text-white rounded-pill px-2.5 py-1 small mb-1" style="font-size: 10px;">MOST POPULAR</span>
+                        <span class="inline-block px-2 py-0.5 rounded-full bg-primary text-white text-[9px] font-black uppercase mb-1">MOST POPULAR</span>
                         @endif
-                        <div class="fw-bold fs-6">{{ $tier->name }}</div>
-                        <div class="fs-5 fw-800 text-primary mt-1" data-aed="{{ $tier->pivot?->price ?? 0 }}">AED {{ number_format($tier->pivot?->price ?? 0) }}</div>
-                        <small class="text-muted d-block fw-normal" style="font-size: 11px;">per person</small>
+                        <div class="font-extrabold text-slate-900 text-sm">{{ $tier->name }}</div>
+                        <div class="text-lg font-black text-primary font-mono mt-0.5" data-aed="{{ $tier->pivot?->price ?? 0 }}">AED {{ number_format($tier->pivot?->price ?? 0) }}</div>
+                        <small class="text-slate-400 block text-[10px] font-normal">per person</small>
                     </th>
                     @endforeach
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-slate-100 text-xs sm:text-sm">
                 <tr>
-                    <td class="text-start py-3 px-4 fw-semibold text-dark">
-                        <i class="bi bi-compass text-primary me-2"></i>Dune Bashing & Sandboarding
+                    <td class="text-left py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
+                        <i class="bi bi-compass text-primary"></i> Dune Bashing & Sandboarding
                     </td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
-                    <td class="py-3 px-3">
+                    <td class="py-3.5 px-3 {{ $tier->is_popular ? 'bg-orange-50/30 border-x border-orange-200/60' : '' }}">
                         @if(stripos($tier->name, 'vip') !== false)
-                            <span class="badge bg-success bg-opacity-10 text-success fw-bold px-2.5 py-1">35-45 Min (Red Dunes)</span>
+                            <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-bold text-xs">35-45 Min (Red Dunes)</span>
                         @elseif(stripos($tier->name, 'premium') !== false)
-                            <span class="badge bg-success bg-opacity-10 text-success fw-bold px-2.5 py-1">25-30 Min (High Dunes)</span>
+                            <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-bold text-xs">25-30 Min (High Dunes)</span>
                         @else
-                            <span class="badge bg-success bg-opacity-10 text-success fw-bold px-2.5 py-1">15-20 Min</span>
+                            <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-bold text-xs">15-20 Min</span>
                         @endif
                     </td>
                     @endforeach
                 </tr>
                 <tr>
-                    <td class="text-start py-3 px-4 fw-semibold text-dark">
-                        <i class="bi bi-house-door text-primary me-2"></i>Camp Seating & Service Style
+                    <td class="text-left py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
+                        <i class="bi bi-house-door text-primary"></i> Camp Seating & Service
                     </td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
-                    <td class="py-3 px-3">
+                    <td class="py-3.5 px-3 {{ $tier->is_popular ? 'bg-orange-50/30 border-x border-orange-200/60' : '' }}">
                         @if(stripos($tier->name, 'vip') !== false)
-                            <span class="fw-bold text-primary"><i class="bi bi-star-fill text-warning me-1"></i>AC VIP Majlis & Table Waiter</span>
+                            <span class="font-bold text-primary flex items-center justify-center gap-1"><i class="bi bi-star-fill text-amber-400"></i> AC VIP Majlis & Waiter</span>
                         @elseif(stripos($tier->name, 'premium') !== false)
-                            <span class="text-dark fw-semibold">Reserved Table Seating</span>
+                            <span class="text-slate-800 font-semibold">Reserved Table Seating</span>
                         @else
-                            <span class="text-muted">Standard Bedouin Carpet Seating</span>
+                            <span class="text-slate-500">Standard Carpet Seating</span>
                         @endif
                     </td>
                     @endforeach
                 </tr>
                 <tr>
-                    <td class="text-start py-3 px-4 fw-semibold text-dark">
-                        <i class="bi bi-fire text-primary me-2"></i>Live Desert Entertainment
+                    <td class="text-left py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
+                        <i class="bi bi-fire text-primary"></i> Live Desert Shows
                     </td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
-                    <td class="py-3 px-3 text-success">
-                        <i class="bi bi-check-circle-fill fs-5"></i>
-                        <small class="d-block text-muted" style="font-size: 11px;">Tanoura, Fire & Belly Dance</small>
+                    <td class="py-3.5 px-3 text-emerald-600 {{ $tier->is_popular ? 'bg-orange-50/30 border-x border-orange-200/60' : '' }}">
+                        <i class="bi bi-check-circle-fill text-base"></i>
+                        <small class="block text-slate-400 text-[10px]">Tanoura, Fire & Belly</small>
                     </td>
                     @endforeach
                 </tr>
                 <tr>
-                    <td class="text-start py-3 px-4 fw-semibold text-dark">
-                        <i class="bi bi-egg-fried text-primary me-2"></i>BBQ Buffet Dinner & Refreshments
+                    <td class="text-left py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
+                        <i class="bi bi-egg-fried text-primary"></i> BBQ Buffet Dinner
                     </td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
-                    <td class="py-3 px-3">
+                    <td class="py-3.5 px-3 {{ $tier->is_popular ? 'bg-orange-50/30 border-x border-orange-200/60' : '' }}">
                         @if(stripos($tier->name, 'vip') !== false)
-                            <span class="fw-bold text-dark">Served at Table + VIP Buffet</span>
+                            <span class="font-bold text-slate-900">Served at Table + VIP Buffet</span>
                         @else
-                            <span class="text-dark">Deluxe Open Buffet (Veg & Non-Veg)</span>
+                            <span class="text-slate-700">Deluxe Open Buffet (Veg & Non-Veg)</span>
                         @endif
                     </td>
                     @endforeach
                 </tr>
                 <tr>
-                    <td class="text-start py-3 px-4 fw-semibold text-dark">
-                        <i class="bi bi-truck text-primary me-2"></i>Pickup & Drop-off Vehicle
+                    <td class="text-left py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
+                        <i class="bi bi-truck text-primary"></i> Transfer Vehicle
                     </td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
-                    <td class="py-3 px-3">
+                    <td class="py-3.5 px-3 {{ $tier->is_popular ? 'bg-orange-50/30 border-x border-orange-200/60' : '' }}">
                         @if(stripos($tier->name, 'private') !== false || stripos($tier->name, 'vip') !== false)
-                            <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-2 py-1">Private 4x4 / Doorstep</span>
+                            <span class="px-2 py-0.5 rounded-full bg-orange-50 text-primary font-bold text-xs">Private 4x4 / Doorstep</span>
                         @else
-                            <span class="text-muted">Shared 4x4 Land Cruiser</span>
+                            <span class="text-slate-500">Shared 4x4 Land Cruiser</span>
                         @endif
                     </td>
                     @endforeach
                 </tr>
                 <tr>
-                    <td class="text-start py-3 px-4 fw-semibold text-dark">
-                        <i class="bi bi-speedometer2 text-primary me-2"></i>Quad Biking / Dune Buggy
+                    <td class="text-left py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
+                        <i class="bi bi-speedometer2 text-primary"></i> Quad Biking / Buggy
                     </td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
-                    <td class="py-3 px-3">
+                    <td class="py-3.5 px-3 {{ $tier->is_popular ? 'bg-orange-50/30 border-x border-orange-200/60' : '' }}">
                         @if(stripos($tier->name, 'quad') !== false || stripos($tier->name, 'buggy') !== false)
-                            <span class="badge bg-success text-white fw-bold px-2.5 py-1">INCLUDED</span>
+                            <span class="px-2.5 py-1 rounded-full bg-emerald-500 text-white font-bold text-xs">INCLUDED</span>
                         @else
-                            <span class="text-muted small">Available as Add-on</span>
+                            <span class="text-slate-400 text-xs">Available as Add-on</span>
                         @endif
                     </td>
                     @endforeach
                 </tr>
                 <tr>
-                    <td class="text-start py-3 px-4 fw-semibold text-dark">
-                        <i class="bi bi-heart text-primary me-2"></i>Camel Ride & Henna Painting
+                    <td class="text-left py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
+                        <i class="bi bi-heart text-primary"></i> Camel Ride & Henna
                     </td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
-                    <td class="py-3 px-3 text-success">
-                        <i class="bi bi-check-circle-fill fs-5"></i>
+                    <td class="py-3.5 px-3 text-emerald-600 {{ $tier->is_popular ? 'bg-orange-50/30 border-x border-orange-200/60' : '' }}">
+                        <i class="bi bi-check-circle-fill text-base"></i>
                     </td>
                     @endforeach
                 </tr>
             </tbody>
-            <tfoot class="bg-light">
+            <tfoot class="bg-slate-50 border-t border-slate-200">
                 <tr>
-                    <td class="text-start py-3 px-4 fw-bold text-muted small">Select Package:</td>
+                    <td class="text-left py-3.5 px-4 font-bold text-slate-500 text-xs">Select Package:</td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
-                    <td class="py-3 px-3">
-                        <button type="button" class="btn {{ $tier->is_popular ? 'btn-desert-animated' : 'btn-outline-primary' }} btn-sm rounded-pill px-3 py-2 fw-bold w-100 shadow-sm" data-action="open-booking" data-tour="{{ $tour->id }}" data-tier="{{ $tier->id }}">
+                    <td class="py-3.5 px-3 {{ $tier->is_popular ? 'bg-orange-50/60 border-x border-orange-200' : '' }}">
+                        <button type="button" 
+                                class="w-full py-2.5 px-3 rounded-full text-xs font-bold transition-all shadow-xs cursor-pointer {{ $tier->is_popular ? 'bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-sm' : 'border border-primary text-primary hover:bg-primary hover:text-white' }}" 
+                                data-action="open-booking" 
+                                data-tour="{{ $tour->id }}" 
+                                data-tier="{{ $tier->id }}">
                             Select {{ $tier->name }}
                         </button>
                     </td>

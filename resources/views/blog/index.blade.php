@@ -11,12 +11,12 @@
 <script type="application/ld+json">
 {
   "@@context": "https://schema.org",
-  "@@type": "BreadcrumbList",
+  "@type": "BreadcrumbList",
   "itemListElement": [
-    {"@@type":"ListItem","position":1,"name":"Home","item":"{{ route('home') }}"},
-    {"@@type":"ListItem","position":2,"name":"Blog","item":"{{ route('blog.index') }}"}
+    {"@type":"ListItem","position":1,"name":"Home","item":"{{ route('home') }}"},
+    {"@type":"ListItem","position":2,"name":"Blog","item":"{{ route('blog.index') }}"}
     @if ($cat)
-    ,{"@@type":"ListItem","position":3,"name":"{{ $cat->name }}","item":"{{ route('blog.index', ['category' => $cat->slug]) }}"}
+    ,{"@type":"ListItem","position":3,"name":"{{ $cat->name }}","item":"{{ route('blog.index', ['category' => $cat->slug]) }}"}
     @endif
   ]
 }
@@ -25,7 +25,7 @@
 <script type="application/ld+json">
 {
   "@@context": "https://schema.org",
-  "@@type": "CollectionPage",
+  "@type": "CollectionPage",
   "name": "{{ $cat ? $cat->name . ' Blog' : 'Dubai Travel Blog' }}",
   "description": "{{ $cat ? $cat->description : 'Expert guides and travel tips.' }}",
   "url": "{{ request()->fullUrl() }}"
@@ -33,33 +33,35 @@
 </script>
 
 <!-- Blog Hero -->
-<section class="bg-dark text-white py-5 position-relative overflow-hidden" style="background:linear-gradient(135deg,#1a0a00 0%,#3d1f00 50%,#1a0a00 100%) !important; margin-top: calc(-1 * var(--header-h));">
-    <div class="container position-relative z-1">
-        <nav aria-label="breadcrumb" class="mb-3">
-            <ol class="breadcrumb breadcrumb-dark mb-0 small">
-                <li class="breadcrumb-item"><a href="{{ route('home') }}" class="text-white-50 text-decoration-none">Home</a></li>
-                <li class="breadcrumb-item {{ !$cat ? 'active text-white' : '' }}">
+<section class="py-12 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white relative overflow-hidden" style="margin-top: calc(-1 * var(--header-h, 72px));">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-16">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="flex items-center gap-2 text-xs sm:text-sm text-white/70">
+                <li><a href="{{ route('home') }}" class="hover:text-white transition-colors">Home</a></li>
+                <li><span class="text-white/40">/</span></li>
+                <li class="{{ !$cat ? 'text-white font-semibold' : '' }}">
                     @if($cat)
-                        <a href="{{ route('blog.index') }}" class="text-white-50 text-decoration-none">Blog</a>
+                        <a href="{{ route('blog.index') }}" class="hover:text-white transition-colors">Blog</a>
                     @else
                         Blog
                     @endif
                 </li>
                 @if ($cat)
-                <li class="breadcrumb-item active text-white">{{ $cat->name }}</li>
+                <li><span class="text-white/40">/</span></li>
+                <li class="text-white font-semibold" aria-current="page">{{ $cat->name }}</li>
                 @endif
             </ol>
         </nav>
-        <h1 class="fw-800 display-6 mb-2 text-white" style="color: #ffffff !important;">
+        <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-3">
             @if ($cat)
                 {{ $cat->name }}
             @elseif ($search)
-                Search: <em class="text-warning">{{ $search }}</em>
+                Search: <em class="text-amber-400 not-italic">"{{ $search }}"</em>
             @else
                 Dubai Travel Blog
             @endif
         </h1>
-        <p class="text-white-50 mb-0 lead" style="max-width:600px;">
+        <p class="text-slate-300 text-sm sm:text-base max-w-2xl leading-relaxed">
             @if ($cat && $cat->description)
                 {{ $cat->description }}
             @elseif (!$search)
@@ -72,59 +74,65 @@
 </section>
 
 <!-- Category Filter + Search -->
-<section class="bg-white border-bottom py-3 sticky-top" style="top: var(--header-h, 72px); z-index: 100;">
-    <div class="container">
-        <div class="d-flex align-items-center gap-3 flex-wrap justify-content-between">
-            <div class="d-flex gap-2 flex-wrap align-items-center">
-                <a href="{{ route('blog.index') }}" class="btn btn-sm rounded-pill px-3 fw-bold {{ !$categorySlug && !$search ? 'btn-primary' : 'btn-outline-secondary' }}">All</a>
+<section class="bg-white border-b border-slate-200 py-3 sticky top-[var(--header-h,72px)] z-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex gap-2 overflow-x-auto no-scrollbar w-full sm:w-auto pb-1">
+                <a href="{{ route('blog.index') }}" class="rounded-full px-4 py-1.5 text-xs sm:text-sm font-bold whitespace-nowrap transition-colors {{ !$categorySlug && !$search ? 'bg-primary text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">All</a>
                 @foreach ($categories as $c)
-                <a href="{{ route('blog.index', ['category' => $c->slug]) }}" class="btn btn-sm rounded-pill px-3 fw-bold {{ $categorySlug === $c->slug ? 'btn-primary' : 'btn-outline-secondary' }}">{{ $c->name }}</a>
+                <a href="{{ route('blog.index', ['category' => $c->slug]) }}" class="rounded-full px-4 py-1.5 text-xs sm:text-sm font-bold whitespace-nowrap transition-colors {{ $categorySlug === $c->slug ? 'bg-primary text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">{{ $c->name }}</a>
                 @endforeach
             </div>
-            <form action="{{ route('blog.index') }}" method="get" class="d-flex gap-2">
+            <form action="{{ route('blog.index') }}" method="get" class="flex gap-2 w-full sm:w-auto">
                 @if ($categorySlug)
                     <input type="hidden" name="category" value="{{ $categorySlug }}">
                 @endif
-                <input type="search" name="search" class="form-control form-control-sm rounded-pill px-3" placeholder="Search articles..." value="{{ $search }}" style="min-width:200px;">
-                <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3" aria-label="Search articles"><i class="bi bi-search"></i></button>
+                <div class="relative w-full sm:w-64">
+                    <input type="search" name="search" class="w-full rounded-full pl-4 pr-10 py-1.5 bg-slate-100 border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/40" placeholder="Search articles..." value="{{ $search }}">
+                    <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors" aria-label="Search articles">
+                        <i class="bi bi-search text-xs"></i>
+                    </button>
+                </div>
             </form>
         </div>
     </div>
 </section>
 
-<div class="container py-5">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
     @if (!$categorySlug && !$search && $page === 1 && $featuredPost)
     <!-- Featured Posts Magazine Grid -->
-    <div class="mb-5">
-        <div class="d-flex align-items-center gap-2 mb-4">
-            <span class="badge bg-warning text-dark fw-bold px-3 py-2 rounded-pill"><i class="bi bi-star-fill me-1"></i> Featured Guides</span>
+    <div class="mb-12">
+        <div class="flex items-center gap-2 mb-6">
+            <span class="bg-amber-400 text-slate-950 font-bold px-3.5 py-1 rounded-full text-xs inline-flex items-center gap-1.5">
+                <i class="bi bi-star-fill"></i> Featured Guides
+            </span>
         </div>
-        <div class="row g-4 align-items-stretch">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
             @php
                 $featuredImg = $featuredPost->featured_image ? asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $featuredPost->featured_image)) : asset('images/desert-safari-poster.avif');
             @endphp
             <!-- Main Hero Featured Card -->
-            <div class="col-12 col-lg-7">
-                <a href="{{ route('blog.show', $featuredPost->slug) }}" class="text-decoration-none d-block h-100">
-                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 card-hover bg-white d-flex flex-column">
-                        <div class="position-relative" style="padding-bottom: 54%;">
-                            <img src="{{ $featuredImg }}" class="position-absolute w-100 h-100 object-fit-cover" alt="{{ $featuredPost->featured_image_alt ?: $featuredPost->title }}">
+            <div class="lg:col-span-7">
+                <a href="{{ route('blog.show', $featuredPost->slug) }}" class="block h-full group text-inherit">
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col h-full">
+                        <div class="relative overflow-hidden aspect-[16/9]">
+                            <img src="{{ $featuredImg }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $featuredPost->featured_image_alt ?: $featuredPost->title }}">
                             @if ($featuredPost->category)
-                            <span class="position-absolute top-0 start-0 m-3 badge bg-primary rounded-pill px-3 py-2 fw-bold shadow-sm">{{ $featuredPost->category?->name }}</span>
+                            <span class="absolute top-4 left-4 bg-primary text-white rounded-full px-3 py-1 text-xs font-bold shadow-md">{{ $featuredPost->category?->name }}</span>
                             @endif
                         </div>
-                        <div class="card-body p-4 d-flex flex-column justify-content-between flex-grow-1">
+                        <div class="p-6 flex flex-col justify-between flex-grow">
                             <div>
-                                <h2 class="h4 fw-800 text-dark mb-2 line-clamp-2">{{ $featuredPost->title }}</h2>
+                                <h2 class="text-xl sm:text-2xl font-bold text-slate-900 mb-2 line-clamp-2 group-hover:text-primary transition-colors">{{ $featuredPost->title }}</h2>
                                 @if ($featuredPost->excerpt)
-                                    <p class="text-muted small line-clamp-2 mb-3">{{ $featuredPost->excerpt }}</p>
+                                    <p class="text-slate-600 text-xs sm:text-sm line-clamp-2 mb-4 leading-relaxed">{{ $featuredPost->excerpt }}</p>
                                 @endif
                             </div>
-                            <div class="d-flex align-items-center gap-3 text-muted small pt-2 border-top">
-                                <span><i class="bi bi-person me-1 text-primary"></i>{{ $featuredPost->author_name ?: 'Dunes Discovery' }}</span>
-                                <span><i class="bi bi-clock me-1 text-primary"></i>{{ $featuredPost->read_time }} min read</span>
+                            <div class="flex items-center gap-4 text-slate-400 text-xs pt-3 border-t border-slate-100">
+                                <span><i class="bi bi-person text-primary mr-1"></i>{{ $featuredPost->author_name ?: 'Dunes Discovery' }}</span>
+                                <span><i class="bi bi-clock text-primary mr-1"></i>{{ $featuredPost->read_time }} min read</span>
                                 @if ($featuredPost->published_at)
-                                    <span><i class="bi bi-calendar3 me-1 text-primary"></i>{{ $featuredPost->published_at->format('M j, Y') }}</span>
+                                    <span><i class="bi bi-calendar3 text-primary mr-1"></i>{{ $featuredPost->published_at->format('M j, Y') }}</span>
                                 @endif
                             </div>
                         </div>
@@ -134,36 +142,32 @@
 
             <!-- Side Featured Stack (2 Cards) -->
             @if (isset($sideFeatured) && $sideFeatured->count() > 0)
-            <div class="col-12 col-lg-5 d-flex flex-column justify-content-between gap-3">
+            <div class="lg:col-span-5 flex flex-col justify-between gap-6">
                 @foreach ($sideFeatured as $sidePost)
                 @php
                     $sideImg = $sidePost->featured_image ? asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $sidePost->featured_image)) : asset('images/desert-safari-poster.avif');
                 @endphp
-                <a href="{{ route('blog.show', $sidePost->slug) }}" class="text-decoration-none d-block flex-grow-1">
-                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 card-hover bg-white">
-                        <div class="row g-0 h-100 align-items-stretch">
-                            <div class="col-6 col-sm-6 position-relative" style="min-height: 180px;">
-                                <img src="{{ $sideImg }}" class="position-absolute w-100 h-100 object-fit-cover" alt="{{ $sidePost->featured_image_alt ?: $sidePost->title }}">
-                                @if ($sidePost->category)
-                                <span class="position-absolute top-0 start-0 m-2 badge bg-primary rounded-pill px-2 py-1 fw-bold shadow-sm" style="font-size: .7rem;">{{ $sidePost->category?->name }}</span>
+                <a href="{{ route('blog.show', $sidePost->slug) }}" class="block flex-1 group text-inherit">
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-lg transition-all duration-300 border border-slate-100 flex flex-col sm:flex-row h-full">
+                        <div class="sm:w-5/12 relative aspect-[16/10] sm:aspect-auto">
+                            <img src="{{ $sideImg }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $sidePost->featured_image_alt ?: $sidePost->title }}">
+                            @if ($sidePost->category)
+                            <span class="absolute top-2 left-2 bg-primary text-white rounded-full px-2 py-0.5 text-[10px] font-bold shadow-sm">{{ $sidePost->category?->name }}</span>
+                            @endif
+                        </div>
+                        <div class="sm:w-7/12 p-4 flex flex-col justify-between flex-grow">
+                            <div>
+                                <h3 class="font-bold text-slate-900 text-sm mb-1 line-clamp-2 group-hover:text-primary transition-colors leading-snug">{{ $sidePost->title }}</h3>
+                                @if ($sidePost->excerpt)
+                                    <p class="text-slate-500 text-xs line-clamp-2 mb-2 leading-relaxed">{{ $sidePost->excerpt }}</p>
                                 @endif
                             </div>
-                            <div class="col-6 col-sm-6 d-flex flex-column">
-                                <div class="card-body p-3 d-flex flex-column justify-content-between h-100">
-                                    <div>
-                                        <h3 class="h6 fw-800 text-dark mb-1 line-clamp-2" style="font-size: .92rem; line-height: 1.35;">{{ $sidePost->title }}</h3>
-                                        @if ($sidePost->excerpt)
-                                            <p class="text-muted small line-clamp-3 mb-0" style="font-size: .78rem; line-height: 1.35;">{{ $sidePost->excerpt }}</p>
-                                        @endif
-                                    </div>
-                                    <div class="d-flex align-items-center gap-1 text-muted pt-2 border-top mt-2" style="font-size: .72rem;">
-                                        <span><i class="bi bi-person me-1 text-primary"></i>{{ Str::limit($sidePost->author_name ?: 'Dunes Discovery', 12) }}</span>
-                                        <span>• <i class="bi bi-clock me-1 text-primary"></i>{{ $sidePost->read_time }}m</span>
-                                        @if ($sidePost->published_at)
-                                            <span>• {{ $sidePost->published_at->format('M j') }}</span>
-                                        @endif
-                                    </div>
-                                </div>
+                            <div class="flex items-center gap-2 text-slate-400 text-[11px] pt-2 border-t border-slate-100">
+                                <span>{{ Str::limit($sidePost->author_name ?: 'Dunes Discovery', 12) }}</span>
+                                <span>• {{ $sidePost->read_time }}m</span>
+                                @if ($sidePost->published_at)
+                                    <span>• {{ $sidePost->published_at->format('M j') }}</span>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -173,22 +177,22 @@
             @endif
         </div>
     </div>
-    <hr class="my-5 opacity-10">
+    <hr class="my-10 border-slate-200">
     @endif
 
     <!-- Post Grid -->
     @if ($posts->count() === 0)
-    <div class="text-center py-5">
-        <i class="bi bi-search display-3 text-muted opacity-25"></i>
-        <h3 class="mt-4 fw-bold text-dark">No articles found</h3>
-        <p class="text-muted">Try a different search term or browse all categories.</p>
-        <a href="{{ route('blog.index') }}" class="btn btn-primary rounded-pill px-4 fw-bold">Browse All Articles</a>
+    <div class="text-center py-16">
+        <i class="bi bi-search text-5xl text-slate-300 block mb-4"></i>
+        <h3 class="text-xl font-bold text-slate-900 mb-1">No articles found</h3>
+        <p class="text-slate-500 text-sm mb-6">Try a different search term or browse all categories.</p>
+        <a href="{{ route('blog.index') }}" class="btn-desert-animated-dark text-white rounded-full px-6 py-2.5 text-xs font-bold inline-block shadow-md">Browse All Articles</a>
     </div>
     @else
 
     @if ($total > 0)
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-        <h2 class="h6 fw-bold text-uppercase text-muted mb-0">
+    <div class="flex justify-between items-center mb-6 flex-wrap gap-2">
+        <h2 class="text-xs uppercase font-extrabold tracking-wider text-slate-400">
             @if ($cat)
                 Articles in {{ $cat->name }}
             @elseif ($search)
@@ -196,64 +200,62 @@
             @else
                 Latest Articles
             @endif
-            <span class="badge bg-light text-muted border ms-2">{{ $total }}</span>
+            <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full text-xs font-bold ml-1.5">{{ $total }}</span>
         </h2>
-        <div class="text-muted small">Page {{ $page }} of {{ $totalPages }}</div>
+        <div class="text-slate-400 text-xs">Page {{ $page }} of {{ $totalPages }}</div>
     </div>
     @endif
 
-    <div class="row g-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @foreach ($posts as $post)
         @php
             $postImg = $post->featured_image ? asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $post->featured_image)) : asset('images/desert-safari-poster.avif');
         @endphp
-        <div class="col-12 col-md-6 col-xl-4">
-            <article class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 card-hover bg-white">
-                <a href="{{ route('blog.show', $post->slug) }}" class="text-decoration-none d-block position-relative" style="padding-bottom:60%;">
-                    <img src="{{ $postImg }}" class="position-absolute w-100 h-100 object-fit-cover" alt="{{ $post->featured_image_alt ?: $post->title }}" loading="lazy">
-                    @if ($post->category)
-                    <span class="position-absolute top-0 start-0 m-3 badge bg-primary rounded-pill px-2 py-1 small fw-bold">{{ $post->category?->name }}</span>
-                    @endif
-                </a>
-                <div class="card-body p-4 d-flex flex-column">
-                    <h3 class="h6 fw-800 mb-2">
-                        <a href="{{ route('blog.show', $post->slug) }}" class="text-dark text-decoration-none line-clamp-2">{{ $post->title }}</a>
-                    </h3>
-                    @if ($post->excerpt)
-                    <p class="text-muted small line-clamp-3 flex-grow-1 mb-3">{{ $post->excerpt }}</p>
-                    @endif
-                    <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top border-light small text-muted">
-                        <span><i class="bi bi-person-circle me-1"></i>{{ $post->author_name ?: 'Dunes Discovery' }}</span>
-                        <div class="d-flex gap-2">
-                            @if ($post->published_at)
-                                <span>{{ $post->published_at->format('M j') }}</span>
-                            @endif
-                            <span><i class="bi bi-clock me-1"></i>{{ $post->read_time }}m</span>
-                        </div>
+        <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col h-full group">
+            <a href="{{ route('blog.show', $post->slug) }}" class="block relative aspect-[16/10] overflow-hidden">
+                <img src="{{ $postImg }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $post->featured_image_alt ?: $post->title }}" loading="lazy">
+                @if ($post->category)
+                <span class="absolute top-3 left-3 bg-primary text-white rounded-full px-2.5 py-0.5 text-xs font-bold shadow-sm">{{ $post->category?->name }}</span>
+                @endif
+            </a>
+            <div class="p-5 flex flex-col flex-grow">
+                <h3 class="text-base font-bold text-slate-900 mb-2 line-clamp-2 group-hover:text-primary transition-colors leading-snug">
+                    <a href="{{ route('blog.show', $post->slug) }}">{{ $post->title }}</a>
+                </h3>
+                @if ($post->excerpt)
+                <p class="text-slate-600 text-xs sm:text-sm line-clamp-3 mb-4 flex-grow leading-relaxed">{{ $post->excerpt }}</p>
+                @endif
+                <div class="flex justify-between items-center mt-auto pt-3 border-t border-slate-100 text-xs text-slate-400">
+                    <span class="inline-flex items-center gap-1"><i class="bi bi-person-circle text-primary"></i>{{ $post->author_name ?: 'Dunes Discovery' }}</span>
+                    <div class="flex gap-2.5">
+                        @if ($post->published_at)
+                            <span>{{ $post->published_at->format('M j') }}</span>
+                        @endif
+                        <span><i class="bi bi-clock mr-1 text-primary"></i>{{ $post->read_time }}m</span>
                     </div>
                 </div>
-            </article>
-        </div>
+            </div>
+        </article>
         @endforeach
     </div>
 
     <!-- Pagination -->
     @if ($totalPages > 1)
-    <nav aria-label="Blog pagination" class="mt-5">
-        <ul class="pagination justify-content-center gap-1">
+    <nav aria-label="Blog pagination" class="mt-12 flex justify-center">
+        <ul class="flex items-center gap-1.5">
             @if ($page > 1)
-            <li class="page-item">
-                <a class="page-link rounded-3 border-0 fw-bold bg-light text-dark" href="{{ $posts->previousPageUrl() }}"><i class="bi bi-chevron-left"></i></a>
+            <li>
+                <a class="w-9 h-9 rounded-xl flex items-center justify-center font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors" href="{{ $posts->previousPageUrl() }}"><i class="bi bi-chevron-left"></i></a>
             </li>
             @endif
             @for ($p = max(1, $page-2); $p <= min($totalPages, $page+2); $p++)
-            <li class="page-item {{ $p === $page ? 'active' : '' }}">
-                <a class="page-link rounded-3 border-0 fw-bold {{ $p === $page ? 'btn-primary' : 'bg-light text-dark' }}" href="{{ $posts->url($p) }}">{{ $p }}</a>
+            <li>
+                <a class="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs transition-colors {{ $p === $page ? 'bg-primary text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700' }}" href="{{ $posts->url($p) }}">{{ $p }}</a>
             </li>
             @endfor
             @if ($page < $totalPages)
-            <li class="page-item">
-                <a class="page-link rounded-3 border-0 fw-bold bg-light text-dark" href="{{ $posts->nextPageUrl() }}"><i class="bi bi-chevron-right"></i></a>
+            <li>
+                <a class="w-9 h-9 rounded-xl flex items-center justify-center font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors" href="{{ $posts->nextPageUrl() }}"><i class="bi bi-chevron-right"></i></a>
             </li>
             @endif
         </ul>
@@ -262,19 +264,11 @@
 
     @endif
 
-    <!-- Newsletter / CTA Banner -->
-    <div class="rounded-4 p-5 text-center mt-5 position-relative overflow-hidden" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border: 1px solid rgba(246, 144, 68, 0.25); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);">
-        <h2 class="fw-800 text-white mb-2">Ready for Your Dubai Adventure?</h2>
-        <p class="text-white text-opacity-75 mb-4">Book a desert safari tour and make memories that last a lifetime.</p>
-        <button data-action="open-booking" class="btn btn-desert-animated rounded-pill px-5 py-3 fw-bold shadow-lg">Book a Tour Now</button>
+    <!-- CTA Banner -->
+    <div class="rounded-3xl p-8 sm:p-12 text-center mt-14 bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-primary/30 shadow-xl text-white">
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">Ready for Your Dubai Adventure?</h2>
+        <p class="text-slate-300 text-sm sm:text-base max-w-xl mx-auto mb-6">Book a desert safari tour and make memories that last a lifetime.</p>
+        <button data-action="open-booking" class="btn-desert-animated rounded-full px-8 py-3.5 font-bold text-white text-sm shadow-lg cursor-pointer" @click="$store.modal.open('booking')">Book a Tour Now</button>
     </div>
 </div>
-
-<style>
-.line-clamp-2 { display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden; }
-.line-clamp-3 { display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden; }
-.card-hover { transition: transform .2s, box-shadow .2s; }
-.card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,.1) !important; }
-.object-fit-cover { object-fit: cover; }
-</style>
 @endsection

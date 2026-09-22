@@ -102,7 +102,8 @@
                         </div>
                     </div>
 
-                    <textarea name="content_html" id="contentHtml" class="form-control font-monospace rounded-3 p-3 @error('content_html') is-invalid @enderror" rows="22" style="font-size: 0.82rem; line-height: 1.5; background: #0f172a; color: #38bdf8;" required>{{ old('content_html', $template->content_html ?: '<!DOCTYPE html>
+                    @php
+                        $defaultHtml = '<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
@@ -141,7 +142,9 @@ body { margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-sys
     </div>
 </div>
 </body>
-</html>') }}</textarea>
+</html>';
+                    @endphp
+                    <textarea name="content_html" id="contentHtml" class="form-control font-monospace rounded-3 p-3 @error('content_html') is-invalid @enderror" rows="22" style="font-size: 0.82rem; line-height: 1.5; background: #0f172a; color: #38bdf8;" required>{{ old('content_html', $template->content_html ?: $defaultHtml) }}</textarea>
                     @error('content_html')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror

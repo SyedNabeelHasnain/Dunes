@@ -317,6 +317,9 @@
                                 </div>
                                 <p class="small text-muted mb-0">The Concierge recommends tailored safaris without discount certificates or checkout code auto-injection.</p>
                             </div>
+                            @endif
+                        </div>
+
                         <!-- Exit-Intent Cart Saver Preview -->
                         <div class="mb-3">
                             <span class="text-muted small fw-bold text-uppercase d-block mb-2">Exit-Intent Cart Saver Mode:</span>

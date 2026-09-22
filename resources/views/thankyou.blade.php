@@ -71,151 +71,163 @@ gtag('event', 'conversion_event_submit_lead_form', {
     @endif
 @endif
 
-<section class="section py-5" style="margin-top: 5vh;">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
+<section class="py-12 bg-slate-50 min-h-[85vh] flex items-center">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 w-full">
 
-                <!-- Success Header Card -->
-                <div class="card card-modern border-0 shadow-sm rounded-4 p-4 p-lg-5 mb-4 text-center bg-white">
-                    <div class="mb-3">
-                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-success bg-opacity-10 p-4" style="width: 80px; height: 80px;">
-                            <i class="bi bi-check-lg text-success fs-1"></i>
-                        </div>
-                    </div>
-                    <h1 class="fw-800 mb-2">Thank You!</h1>
-                    <p class="text-muted lead mb-0">We are thrilled that you chose Dunes Discovery Tourism.<br>Your adventure awaits!</p>
+        <!-- Success Header Card -->
+        <div class="bg-white rounded-3xl shadow-xs border border-slate-200 p-6 sm:p-10 mb-6 text-center">
+            <div class="inline-flex items-center justify-center rounded-full bg-emerald-50 text-emerald-600 w-20 h-20 mb-4 text-3xl">
+                <i class="bi bi-check-lg"></i>
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-black text-slate-900 mb-2">Thank You!</h1>
+            <p class="text-slate-600 text-base sm:text-lg leading-relaxed">
+                We are thrilled that you chose Dunes Discovery Tourism.<br class="hidden sm:inline">Your adventure awaits!
+            </p>
+        </div>
+
+        <!-- Details Card -->
+        <div class="bg-white rounded-3xl shadow-xs border border-slate-200 p-6 sm:p-10 mb-6">
+            @if(!$booking)
+                <div class="text-center py-6">
+                    <h2 class="text-xl font-bold text-slate-900 mb-2">Booking Not Found</h2>
+                    <p class="text-slate-500 text-sm">We couldn't retrieve the booking details at this moment.</p>
                 </div>
-
-                <!-- Details Card -->
-                <div class="card card-modern border-0 shadow-sm rounded-4 p-4 p-lg-5 bg-white">
-                    @if(!$booking)
-                        <div class="text-center">
-                            <h2 class="fw-800 mb-3 text-dark">Booking Not Found</h2>
-                            <p class="text-muted mb-0">We couldn't retrieve the booking details at this moment.</p>
-                        </div>
-                    @else
-                        @php
-                            $title = 'Booking Received';
-                            $subtitle = 'We have received your booking request.';
-                            if($method === 'advance' && $paymentStatus === 'completed'){
-                                $title = 'Advance Payment Received';
-                                $subtitle = 'Your booking slot is held and confirmed for your selected date.';
-                            } elseif($method === 'full' && $paymentStatus === 'completed'){
-                                $title = 'Payment Successful';
-                                $subtitle = 'Your booking is confirmed.';
-                            } elseif($method !== 'cash' && $paymentStatus === 'pending'){
-                                $title = 'Payment Processing';
-                                $subtitle = 'We are verifying your payment status.';
-                            } elseif($method !== 'cash' && $paymentStatus === 'failed'){
-                                $title = 'Payment Failed';
-                                $subtitle = 'Your payment could not be completed.';
-                            } elseif($method === 'cash'){
-                                $title = 'Booking Received';
-                                $subtitle = 'Pay on pickup.';
-                            }
-                        @endphp
-                        <h2 class="fw-800 mb-2 text-dark">{{ $title }}</h2>
-                        <p class="text-muted">{{ $subtitle }}</p>
-                        <p class="fw-semibold text-primary">Dunes Discovery will contact you shortly to confirm the exact pickup time.</p>
-                        
-                        <div class="row g-3 mt-2">
-                            <div class="col-md-6">
-                                <div class="p-3 bg-light rounded-4 h-100 border">
-                                    <div class="text-muted small fw-bold">Reference</div>
-                                    <div class="fw-800 text-dark fs-5">#{{ $booking->reference }}</div>
-                                    <div class="text-muted small fw-bold mt-3">Tour</div>
-                                    <div class="fw-semibold text-dark">{{ $booking->tour_name }}</div>
-                                    <div class="text-muted small fw-bold mt-3">Date</div>
-                                    <div class="fw-semibold text-dark">{{ $booking->tour_date ? $booking->tour_date->format('M j, Y') : '' }}</div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="p-3 bg-light rounded-4 h-100 border">
-                                    <div class="text-muted small fw-bold">Payment Method</div>
-                                    <div class="fw-semibold text-capitalize text-dark">{{ $method }}</div>
-                                    @if($booking->coupon_code && $booking->discount_amount > 0)
-                                    <div class="text-muted small fw-bold mt-2">Original Subtotal</div>
-                                    <div class="fw-semibold text-muted text-decoration-line-through">AED {{ number_format($booking->original_total, 2) }}</div>
-                                    <div class="text-muted small fw-bold mt-2">Promo Discount ({{ $booking->coupon_code }})</div>
-                                    <div class="fw-bold text-success">-AED {{ number_format($booking->discount_amount, 2) }}</div>
-                                    @endif
-                                    <div class="text-muted small fw-bold mt-3">Total</div>
-                                    <div class="fw-800 text-primary fs-5">AED {{ number_format($booking->total, 2) }}</div>
-                                    <div class="text-muted small fw-bold mt-3">Paid</div>
-                                    <div class="fw-semibold text-success">AED {{ number_format($booking->payment_amount ?? 0, 2) }}</div>
-                                    <div class="text-muted small fw-bold mt-3">Balance Due</div>
-                                    <div class="fw-semibold text-danger">AED {{ number_format($booking->balance_due ?? 0, 2) }}</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        @if($method === 'full' && $paymentStatus === 'completed')
-                            <div class="mt-4 p-3 bg-white border rounded-4">
-                                <div class="fw-bold mb-2 text-dark">Invoice Summary</div>
-                                <div class="d-flex justify-content-between text-muted small"><span>Subtotal</span><span>AED {{ number_format($booking->subtotal, 2) }}</span></div>
-                                <div class="d-flex justify-content-between text-muted small"><span>Addons</span><span>AED {{ number_format($booking->addons_total, 2) }}</span></div>
-                                @if($booking->coupon_code && $booking->discount_amount > 0)
-                                <div class="d-flex justify-content-between text-success small"><span>Promo Code ({{ $booking->coupon_code }})</span><span>-AED {{ number_format($booking->discount_amount, 2) }}</span></div>
-                                @endif
-                                <div class="d-flex justify-content-between fw-bold mt-2 text-dark"><span>Total Paid</span><span>AED {{ number_format($booking->payment_amount, 2) }}</span></div>
-                            </div>
-                        @endif
-                    @endif
-                </div>
-
-                @if($booking)
-                <!-- Official E-Ticket Voucher Card -->
-                <div class="card card-modern border-0 shadow-sm rounded-4 p-4 p-lg-5 mt-4 bg-white text-center position-relative overflow-hidden" style="border-top: 4px solid #F58F43 !important;">
-                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-warning bg-opacity-10 text-primary p-3 mb-3 mx-auto" style="width: 64px; height: 64px;">
-                        <i class="bi bi-ticket-perforated-fill fs-2"></i>
-                    </div>
-                    <h3 class="fw-800 text-dark mb-2">Your Official E-Ticket & Boarding Pass</h3>
-                    <p class="text-muted mb-4 mx-auto" style="max-width: 540px;">
-                        Your DTCM-certified digital voucher with real-time driver verification QR code is ready. You can present it directly from your phone or download an official PDF copy.
+            @else
+                @php
+                    $title = 'Booking Received';
+                    $subtitle = 'We have received your booking request.';
+                    if($method === 'advance' && $paymentStatus === 'completed'){
+                        $title = 'Advance Payment Received';
+                        $subtitle = 'Your booking slot is held and confirmed for your selected date.';
+                    } elseif($method === 'full' && $paymentStatus === 'completed'){
+                        $title = 'Payment Successful';
+                        $subtitle = 'Your booking is confirmed.';
+                    } elseif($method !== 'cash' && $paymentStatus === 'pending'){
+                        $title = 'Payment Processing';
+                        $subtitle = 'We are verifying your payment status.';
+                    } elseif($method !== 'cash' && $paymentStatus === 'failed'){
+                        $title = 'Payment Failed';
+                        $subtitle = 'Your payment could not be completed.';
+                    } elseif($method === 'cash'){
+                        $title = 'Booking Received';
+                        $subtitle = 'Pay on pickup.';
+                    }
+                @endphp
+                <h2 class="text-2xl font-extrabold text-slate-900 mb-1">{{ $title }}</h2>
+                <p class="text-slate-500 text-sm mb-3">{{ $subtitle }}</p>
+                <div class="p-3.5 bg-amber-500/10 border border-amber-500/20 rounded-xl mb-6">
+                    <p class="font-semibold text-primary text-sm flex items-center gap-2 mb-0">
+                        <i class="bi bi-info-circle-fill shrink-0"></i>
+                        <span>Dunes Discovery will contact you shortly to confirm the exact pickup time.</span>
                     </p>
-                    <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
-                        <a href="{{ route('booking.voucher', $booking->reference) }}" target="_blank" rel="noopener noreferrer" class="btn btn-desert-animated rounded-pill px-4 py-3 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-2">
-                            <i class="bi bi-phone fs-5"></i> View Digital Boarding Pass
-                        </a>
-                        <a href="{{ route('booking.voucher.pdf', $booking->reference) }}" class="btn btn-outline-dark rounded-pill px-4 py-3 fw-bold d-inline-flex align-items-center justify-content-center gap-2">
-                            <i class="bi bi-file-earmark-pdf fs-5 text-danger"></i> Download PDF Voucher
-                        </a>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Left: Tour Details -->
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3.5">
+                        <div>
+                            <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Reference</div>
+                            <div class="font-extrabold text-slate-900 text-lg sm:text-xl font-mono">#{{ $booking->reference }}</div>
+                        </div>
+                        <div>
+                            <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Tour</div>
+                            <div class="font-semibold text-slate-800 text-sm sm:text-base">{{ $booking->tour_name }}</div>
+                        </div>
+                        <div>
+                            <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Date</div>
+                            <div class="font-semibold text-slate-800 text-sm sm:text-base">{{ $booking->tour_date ? $booking->tour_date->format('M j, Y') : '' }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Financial Summary -->
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                        <div>
+                            <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Payment Method</div>
+                            <div class="font-semibold capitalize text-slate-800 text-sm sm:text-base">{{ $method }}</div>
+                        </div>
+                        @if($booking->coupon_code && $booking->discount_amount > 0)
+                        <div>
+                            <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Original Subtotal</div>
+                            <div class="font-semibold text-slate-400 line-through text-sm">AED {{ number_format($booking->original_total, 2) }}</div>
+                            <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mt-1">Promo Discount ({{ $booking->coupon_code }})</div>
+                            <div class="font-bold text-emerald-600 text-sm">-AED {{ number_format($booking->discount_amount, 2) }}</div>
+                        </div>
+                        @endif
+                        <div class="pt-2 border-t border-slate-200">
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-500 font-medium">Total Package:</span>
+                                <span class="font-extrabold text-primary text-lg">AED {{ number_format($booking->total, 2) }}</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs text-slate-600 mt-1">
+                                <span>Paid Online:</span>
+                                <span class="font-semibold text-emerald-600">AED {{ number_format($booking->payment_amount ?? 0, 2) }}</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs text-slate-600 mt-1">
+                                <span>Balance Due:</span>
+                                <span class="font-semibold text-rose-600">AED {{ number_format($booking->balance_due ?? 0, 2) }}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+                @if($method === 'full' && $paymentStatus === 'completed')
+                    <div class="mt-6 p-4 bg-white border border-slate-200 rounded-2xl space-y-1.5 text-xs sm:text-sm">
+                        <div class="font-bold text-slate-900 text-sm mb-2">Invoice Summary</div>
+                        <div class="flex justify-between text-slate-500"><span>Subtotal</span><span>AED {{ number_format($booking->subtotal, 2) }}</span></div>
+                        <div class="flex justify-between text-slate-500"><span>Addons</span><span>AED {{ number_format($booking->addons_total, 2) }}</span></div>
+                        @if($booking->coupon_code && $booking->discount_amount > 0)
+                        <div class="flex justify-between text-emerald-600"><span>Promo Code ({{ $booking->coupon_code }})</span><span>-AED {{ number_format($booking->discount_amount, 2) }}</span></div>
+                        @endif
+                        <div class="flex justify-between font-bold pt-2 border-t border-slate-100 text-slate-900"><span>Total Paid</span><span>AED {{ number_format($booking->payment_amount, 2) }}</span></div>
+                    </div>
                 @endif
+            @endif
+        </div>
 
-                <!-- Action Links -->
-                <div class="card card-modern border-0 shadow-sm rounded-4 p-4 p-lg-5 mt-4 bg-white">
-                    <h4 class="fw-800 mb-4 text-center text-dark">What's Next?</h4>
-                    <div class="row g-2 justify-content-center">
-                        <div class="col-md-4">
-                            <a href="{{ route('home') }}" class="btn btn-desert-animated w-100 fw-bold rounded-pill py-3">
-                                <i class="bi bi-house-door-fill me-1"></i> Home
-                            </a>
-                        </div>
-                        <div class="col-md-4">
-                            <a href="{{ route('tours.index') }}" class="btn btn-desert-animated-dark w-100 fw-bold rounded-pill py-3">
-                                <i class="bi bi-compass-fill me-1"></i> Explore Tours
-                            </a>
-                        </div>
-                        <div class="col-md-4">
-                            @php
-                                $waLink = "https://wa.me/" . preg_replace('/[^0-9]/','',$whatsappVal);
-                                if($booking) {
-                                    $waMsg = "Hi Dunes Discovery Tourism, I have a question regarding my booking #".$booking->reference;
-                                    $waLink .= "?text=" . urlencode($waMsg);
-                                }
-                            @endphp
-                            <a href="{{ $waLink }}" target="_blank" rel="noopener" class="btn btn-whatsapp-animated w-100 fw-bold rounded-pill py-3">
-                                <i class="bi bi-whatsapp me-1"></i> WhatsApp Us
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
+        @if($booking)
+        <!-- Official E-Ticket Voucher Card -->
+        <div class="bg-white rounded-3xl shadow-xs border border-slate-200 border-t-4 border-t-primary p-6 sm:p-10 mb-6 text-center relative overflow-hidden">
+            <div class="inline-flex items-center justify-center rounded-full bg-amber-500/15 text-primary w-16 h-16 mb-4 mx-auto text-2xl">
+                <i class="bi bi-ticket-perforated-fill"></i>
+            </div>
+            <h3 class="text-xl sm:text-2xl font-black text-slate-900 mb-2">Your Official E-Ticket & Boarding Pass</h3>
+            <p class="text-slate-500 text-sm sm:text-base mb-6 max-w-xl mx-auto leading-relaxed">
+                Your DTCM-certified digital voucher with real-time driver verification QR code is ready. You can present it directly from your phone or download an official PDF copy.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-3">
+                <a href="{{ route('booking.voucher', $booking->reference) }}" target="_blank" rel="noopener noreferrer" class="btn-desert-animated font-bold rounded-full px-6 py-3.5 text-white shadow-md inline-flex items-center justify-center gap-2 text-sm sm:text-base">
+                    <i class="bi bi-phone text-lg"></i> View Digital Boarding Pass
+                </a>
+                <a href="{{ route('booking.voucher.pdf', $booking->reference) }}" class="border border-slate-800 hover:bg-slate-900 hover:text-white text-slate-800 font-bold rounded-full px-6 py-3.5 transition-colors inline-flex items-center justify-center gap-2 text-sm sm:text-base">
+                    <i class="bi bi-file-earmark-pdf text-rose-500 text-lg"></i> Download PDF Voucher
+                </a>
             </div>
         </div>
+        @endif
+
+        <!-- Action Links -->
+        <div class="bg-white rounded-3xl shadow-xs border border-slate-200 p-6 sm:p-10">
+            <h4 class="text-lg font-extrabold text-slate-900 mb-4 text-center">What's Next?</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <a href="{{ route('home') }}" class="btn-desert-animated w-full font-bold rounded-full py-3.5 text-white text-center inline-flex items-center justify-center gap-2 text-sm shadow-sm">
+                    <i class="bi bi-house-door-fill"></i> Home
+                </a>
+                <a href="{{ route('tours.index') }}" class="btn-desert-animated-dark w-full font-bold rounded-full py-3.5 text-white text-center inline-flex items-center justify-center gap-2 text-sm shadow-sm">
+                    <i class="bi bi-compass-fill"></i> Explore Tours
+                </a>
+                @php
+                    $waLink = "https://wa.me/" . preg_replace('/[^0-9]/','',$whatsappVal);
+                    if($booking) {
+                        $waMsg = "Hi Dunes Discovery Tourism, I have a question regarding my booking #".$booking->reference;
+                        $waLink .= "?text=" . urlencode($waMsg);
+                    }
+                @endphp
+                <a href="{{ $waLink }}" target="_blank" rel="noopener" class="btn-whatsapp-animated w-full font-bold rounded-full py-3.5 text-white text-center inline-flex items-center justify-center gap-2 text-sm shadow-sm">
+                    <i class="bi bi-whatsapp"></i> WhatsApp Us
+                </a>
+            </div>
+        </div>
+
     </div>
 </section>
 @endsection

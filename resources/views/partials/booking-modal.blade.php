@@ -13,25 +13,62 @@
     $ziinaActive = isset($settings['ziina_active']) ? ($settings['ziina_active'] === '1') : false;
     $advancePercent = (int)($settings['ziina_advance_percent'] ?? 10);
 @endphp
-<div class="modal fade" id="bookingModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
-        <div class="modal-content border-0 shadow-lg overflow-hidden" style="border-radius: 24px; display: flex; flex-direction: column; height: auto; max-height: none;">
 
-            <div class="modal-header border-bottom bg-white py-3 px-4 sticky-top z-3">
-                <div class="d-flex align-items-center gap-3 w-100">
-                    <button type="button" class="btn btn-light rounded-circle shadow-sm p-0 d-none" id="headerBackBtn" style="width: 40px; height: 40px;">
-                        <i class="bi bi-chevron-left"></i>
+<!-- Global Interactive Booking Modal (Tailwind v4 + Alpine.js) -->
+<div id="bookingModal" 
+     x-data="{}" 
+     x-show="$store.modal.active === 'booking'" 
+     x-cloak
+     class="fixed inset-0 z-50 overflow-y-auto" 
+     role="dialog" 
+     aria-modal="true"
+     @keydown.escape.window="$store.modal.close()">
+
+    <!-- Backdrop -->
+    <div x-show="$store.modal.active === 'booking'"
+         x-transition:enter="ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity"
+         @click="$store.modal.close()"></div>
+
+    <!-- Modal Dialog Panel (Bottom Sheet on Mobile, Centered Modal on Desktop) -->
+    <div class="min-h-full flex items-end sm:items-center justify-center p-0 sm:p-4 text-center">
+        <div x-show="$store.modal.active === 'booking'"
+             x-transition:enter="transform transition ease-out duration-300"
+             x-transition:enter-start="translate-y-full sm:translate-y-4 sm:scale-95 opacity-0"
+             x-transition:enter-end="translate-y-0 sm:scale-100 opacity-100"
+             x-transition:leave="transform transition ease-in duration-200"
+             x-transition:leave-start="translate-y-0 sm:scale-100 opacity-100"
+             x-transition:leave-end="translate-y-full sm:translate-y-4 sm:scale-95 opacity-0"
+             class="w-full sm:max-w-2xl lg:max-w-3xl rounded-t-3xl sm:rounded-3xl bg-white text-left align-middle shadow-2xl transition-all border border-slate-100 overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[88vh]"
+             @click.stop>
+
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between py-3.5 px-4 sm:px-6 border-b border-slate-100 bg-white sticky top-0 z-20 shrink-0">
+                <div class="flex items-center gap-3">
+                    <button type="button" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-colors cursor-pointer hidden" id="headerBackBtn">
+                        <i class="bi bi-chevron-left text-sm"></i>
                     </button>
-                    <div class="flex-grow-1">
-                        <h5 class="modal-title fw-800 h5 mb-0" id="bookingModalTitle">Book Your Adventure</h5>
-                        <div class="text-primary small fw-bold d-none" id="bookingModalSubtitle">Step 1 of 2</div>
+                    <div>
+                        <h5 class="text-base sm:text-lg font-black text-slate-900 leading-tight" id="bookingModalTitle">Book Your Adventure</h5>
+                        <div class="text-primary text-xs font-extrabold hidden" id="bookingModalSubtitle">Step 1 of 2</div>
                     </div>
-                    <button type="button" class="btn-close shadow-none bg-light rounded-circle p-2" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+                <button type="button" 
+                        class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer" 
+                        @click="$store.modal.close()" 
+                        aria-label="Close">
+                    <i class="bi bi-x-lg text-xs"></i>
+                </button>
             </div>
 
-            <div class="modal-body p-0 bg-light" style="flex: 1; overflow: hidden;">
-                <form id="bookingForm" autocomplete="off" class="h-100 d-flex flex-column needs-validation" style="min-height: 0;">
+            <!-- Modal Body & Form -->
+            <div class="flex-1 overflow-y-auto bg-slate-50 min-h-0">
+                <form id="bookingForm" autocomplete="off" class="h-full flex flex-col needs-validation">
                     @csrf
                     <!-- Honeypot anti-spam field -->
                     <div style="position:absolute;left:-9999px">
@@ -51,272 +88,248 @@
                     <input type="hidden" name="payment_method" id="paymentMethod" value="cash">
                     <input type="hidden" name="payment_amount" id="paymentAmount" value="0">
 
-                    <div class="booking-scroll-area p-4 flex-grow-1 overflow-y-auto">
+                    <div class="booking-scroll-area p-4 sm:p-6 flex-1">
 
-                        <!-- Step 1: Select Tour and Date -->
+                        <!-- Step 1: Select Tour, Package and Date -->
                         <div class="step-content active" data-step="1">
-                            <div class="mb-4" id="tourSelectWrapper">
-                                <div class="fw-800 small text-muted text-uppercase mb-2">Choose Tour</div>
-                                <div class="form-floating">
-                                    <select class="form-select border-0 shadow-sm rounded-4 fw-bold" id="bookingTour" name="tour_id" required style="height: 60px;" autocomplete="off">
+                            <div class="mb-5" id="tourSelectWrapper">
+                                <label class="block text-xs font-black uppercase tracking-wider text-slate-500 mb-2" for="bookingTour">Choose Tour</label>
+                                <div class="relative rounded-2xl bg-white shadow-2xs border border-slate-200 overflow-hidden focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+                                    <select class="w-full px-4 py-3.5 bg-transparent font-bold text-slate-900 text-sm focus:outline-none cursor-pointer" id="bookingTour" name="tour_id" required autocomplete="off">
                                         <option value="">Select a tour...</option>
                                         @foreach($modalTours as $t)
                                             <option value="{{ $t->id }}">{{ $t->name }}</option>
                                         @endforeach
                                     </select>
-                                    <label for="bookingTour">Select Tour</label>
                                 </div>
                             </div>
 
-                            <div class="mb-4">
-                                <div class="fw-800 small text-muted text-uppercase mb-2">Select Package</div>
+                            <div class="mb-5">
+                                <div class="text-xs font-black uppercase tracking-wider text-slate-500 mb-2">Select Package</div>
                                 <div class="tier-cards" id="tierCards">
-                                    <div class="text-center text-muted opacity-50">
-                                        <i class="bi bi-cursor-fill fs-1 mb-2 d-block"></i>
-                                        <small class="fw-bold">Select a tour above to view packages</small>
+                                    <div class="text-center py-6 text-slate-400">
+                                        <i class="bi bi-cursor-fill text-3xl mb-1 block"></i>
+                                        <small class="font-bold text-xs">Select a tour above to view packages</small>
                                     </div>
                                 </div>
                                 <input type="hidden" name="tier_id" id="selectedTier" required>
                             </div>
 
-                            <div class="mb-4">
-                                <div class="d-flex align-items-center justify-content-between mb-2 gap-2 flex-wrap">
-                                    <div class="fw-800 small text-muted text-uppercase mb-0">When</div>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <button type="button" class="btn btn-light btn-sm rounded-pill px-1 d-inline-flex align-items-center gap-2" id="calendarTrigger">
-                                            <i class="bi bi-calendar3"></i>
-                                            <span class="small fw-bold">Select from Calendar</span>
+                            <div class="mb-5">
+                                <div class="flex items-center justify-between mb-2 gap-2 flex-wrap">
+                                    <div class="text-xs font-black uppercase tracking-wider text-slate-500">When</div>
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer" id="calendarTrigger">
+                                            <i class="bi bi-calendar3 text-primary"></i>
+                                            <span>Select from Calendar</span>
                                         </button>
-                                        <div class="date-nav d-flex align-items-center">
-                                            <button type="button" class="btn btn-light btn-sm rounded-circle" id="datePrev" aria-label="Previous date" style="width: 36px; height: 36px;"><i class="bi bi-chevron-left"></i></button>
-                                            <button type="button" class="btn btn-light btn-sm rounded-circle ms-1" id="dateNext" aria-label="Next date" style="width: 36px; height: 36px;"><i class="bi bi-chevron-right"></i></button>
+                                        <div class="date-nav flex items-center gap-1">
+                                            <button type="button" class="w-8 h-8 rounded-full bg-white border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-700 shadow-2xs transition-colors cursor-pointer" id="datePrev" aria-label="Previous date"><i class="bi bi-chevron-left text-xs"></i></button>
+                                            <button type="button" class="w-8 h-8 rounded-full bg-white border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-700 shadow-2xs transition-colors cursor-pointer" id="dateNext" aria-label="Next date"><i class="bi bi-chevron-right text-xs"></i></button>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="date-cards-wrapper d-flex gap-2 overflow-x-auto pb-2" id="dateCardsWrapper"></div>
-                                <input type="date" class="form-control visually-hidden" name="date" id="bookingDate" required min="{{ $minDate }}" autocomplete="off">
+                                <div class="date-cards-wrapper flex gap-2.5 overflow-x-auto pb-2 scrollbar-none" id="dateCardsWrapper"></div>
+                                <input type="date" class="sr-only" name="date" id="bookingDate" required min="{{ $minDate }}" autocomplete="off">
                             </div>
 
-                            <div class="row g-3 mb-3 booking-guest-pickup-row align-items-stretch">
-                                <div class="col-12 col-sm-4 col-lg-3">
-                                    <label class="form-label fw-800 small text-muted text-uppercase mb-2" for="bookingAdults">Guests</label>
-                                    <div class="booking-field-container d-flex align-items-center justify-content-between bg-white shadow-sm rounded-4 p-0" style="min-height: 52px;">
-                                        <button type="button" class="btn btn-link text-primary shadow-none p-0 d-flex align-items-center justify-content-center" style="width: 44px; min-width: 44px; height: 100%; min-height: 44px;" data-action="minus" data-target="adults" aria-label="Decrease guest count">
-                                            <i class="bi bi-dash-circle-fill fs-5"></i>
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 mb-3">
+                                <div class="sm:col-span-4 lg:col-span-3">
+                                    <label class="block text-xs font-black uppercase tracking-wider text-slate-500 mb-2" for="bookingAdults">Guests</label>
+                                    <div class="flex items-center justify-between bg-white shadow-2xs rounded-2xl border border-slate-200 p-1 h-[52px]">
+                                        <button type="button" class="w-10 h-10 flex items-center justify-center text-primary hover:bg-orange-50 rounded-xl transition-colors cursor-pointer" data-action="minus" data-target="adults" aria-label="Decrease guest count">
+                                            <i class="bi bi-dash-circle-fill text-lg"></i>
                                         </button>
-                                        <div class="text-center lh-1 flex-grow-1 d-flex justify-content-center">
-                                            <input type="number" class="form-control border-0 bg-transparent text-center fw-800 shadow-none p-0 fs-5" name="adults" id="bookingAdults" value="1" min="1" max="50" readonly style="width: 3ch;" autocomplete="off">
-                                        </div>
-                                        <button type="button" class="btn btn-link text-primary shadow-none p-0 d-flex align-items-center justify-content-center" style="width: 44px; min-width: 44px; height: 100%; min-height: 44px;" data-action="plus" data-target="adults" aria-label="Increase guest count">
-                                            <i class="bi bi-plus-circle-fill fs-5"></i>
+                                        <input type="number" class="w-10 text-center font-black text-slate-900 border-0 bg-transparent p-0 text-base focus:outline-none" name="adults" id="bookingAdults" value="1" min="1" max="50" readonly autocomplete="off">
+                                        <button type="button" class="w-10 h-10 flex items-center justify-center text-primary hover:bg-orange-50 rounded-xl transition-colors cursor-pointer" data-action="plus" data-target="adults" aria-label="Increase guest count">
+                                            <i class="bi bi-plus-circle-fill text-lg"></i>
                                         </button>
                                     </div>
                                     <input type="hidden" name="children" id="bookingChildren" value="0">
                                 </div>
-                                <div class="col-12 col-sm-8 col-lg-9">
-                                    <label class="form-label fw-800 small text-muted text-uppercase mb-2" for="bookingLocation">Pickup</label>
-                                    <div class="position-relative booking-location-wrapper">
-                                        <div class="booking-field-container input-group shadow-sm rounded-4 overflow-hidden">
-                                            <span class="input-group-text bg-white border-0 ps-3 pe-2"><i class="bi bi-geo-alt-fill text-primary"></i></span>
-                                            <input type="text" class="form-control border-0 shadow-none fw-bold px-0" name="location" id="bookingLocation" required placeholder="Hotel/Area" style="height: 60px;" autocomplete="street-address">
-                                            <button class="btn btn-white border-start px-3" type="button" id="detectLocation" aria-label="Detect current location">
-                                                <i class="bi bi-crosshair"></i>
-                                            </button>
-                                        </div>
+                                <div class="sm:col-span-8 lg:col-span-9">
+                                    <label class="block text-xs font-black uppercase tracking-wider text-slate-500 mb-2" for="bookingLocation">Pickup Location</label>
+                                    <div class="relative rounded-2xl bg-white shadow-2xs border border-slate-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 overflow-hidden flex items-center h-[52px] transition-all">
+                                        <span class="pl-3.5 pr-2 text-primary"><i class="bi bi-geo-alt-fill text-base"></i></span>
+                                        <input type="text" class="flex-1 bg-transparent font-bold text-slate-900 text-sm border-0 focus:outline-none placeholder:text-slate-400" name="location" id="bookingLocation" required placeholder="Hotel / Residence in Dubai" autocomplete="street-address">
+                                        <button class="px-3.5 h-full text-slate-400 hover:text-primary hover:bg-slate-50 border-l border-slate-100 transition-colors cursor-pointer" type="button" id="detectLocation" aria-label="Detect current location">
+                                            <i class="bi bi-crosshair"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Step 2: Customer details, Addons, and Payment options -->
-                        <div class="step-content d-none" data-step="2">
-                            <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white">
-                                <div class="card-body p-3">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="bg-primary-subtle text-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                            <i class="bi bi-check-lg fw-bold"></i>
-                                        </div>
-                                        <div>
-                                            <small class="text-muted fw-bold d-block text-uppercase" style="font-size: 10px;">Selected Package</small>
-                                            <div class="fw-800 text-dark lh-1" id="summaryTourName">Loading...</div>
-                                            <div class="small text-muted mt-1" id="summaryTierName"></div>
-                                        </div>
-                                        <div class="ms-auto text-end">
-                                            <div class="fw-800 text-primary" id="summaryTotal">AED 0</div>
-                                            <a href="#" class="small text-decoration-none fw-bold" id="editStep1">Edit</a>
-                                        </div>
-                                    </div>
+                        <div class="step-content hidden" data-step="2">
+                            <!-- Package Summary Bar -->
+                            <div class="p-3.5 rounded-2xl bg-white shadow-2xs border border-slate-200 mb-4 flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-orange-50 text-primary flex items-center justify-center shrink-0">
+                                    <i class="bi bi-check-lg text-lg font-black"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <small class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Selected Experience</small>
+                                    <div class="font-extrabold text-slate-900 text-sm truncate" id="summaryTourName">Loading...</div>
+                                    <div class="text-xs text-slate-500" id="summaryTierName"></div>
+                                </div>
+                                <div class="text-right shrink-0">
+                                    <div class="font-black text-primary font-mono text-base" id="summaryTotal">AED 0</div>
+                                    <a href="#" class="text-xs font-bold text-slate-400 hover:text-primary transition-colors" id="editStep1">Edit</a>
                                 </div>
                             </div>
 
                             <!-- Dynamic Tour-Specific Addons Section -->
-                            <div class="mb-4" id="addonsSection" style="display:none">
-                                <div class="d-flex align-items-center justify-content-between mb-2">
-                                    <div class="fw-800 small text-muted text-uppercase d-flex align-items-center gap-1">
-                                        <i class="bi bi-stars text-warning"></i>
+                            <div class="mb-5" id="addonsSection" style="display:none">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="text-xs font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                                        <i class="bi bi-stars text-amber-500"></i>
                                         <span>Enhance Your Safari (Optional Add-ons)</span>
                                     </div>
-                                    <span class="badge bg-primary-subtle text-primary fw-bold rounded-pill px-2 py-1" style="font-size: 0.7rem;">1-Click Add</span>
+                                    <span class="px-2 py-0.5 rounded-full bg-orange-50 text-primary text-[10px] font-bold">1-Click Add</span>
                                 </div>
-                                <div class="addon-horizontal-wrapper" id="addonList"></div>
+                                <div class="addon-horizontal-wrapper flex gap-2 overflow-x-auto pb-2 scrollbar-none" id="addonList"></div>
                             </div>
 
                             <!-- OTP verification state banners -->
-                            <div class="alert alert-info d-none mb-3" id="otpNotice"></div>
+                            <div class="p-3 rounded-2xl bg-sky-50 border border-sky-200 text-sky-800 text-xs hidden mb-4" id="otpNotice"></div>
 
-                            <div class="mb-3">
-                                <div class="fw-800 small text-muted text-uppercase mb-2">Contact Info</div>
-                                {!! renderFloatingInput([
-                                    'type' => 'text',
-                                    'id' => 'bookingName',
-                                    'name' => 'name',
-                                    'label' => 'Full Name',
-                                    'placeholder' => 'John Doe',
-                                    'autocomplete' => 'name',
-                                    'required' => true,
-                                    'wrapperClass' => 'form-floating mb-3',
-                                    'inputClass' => 'form-control border-0 shadow-sm rounded-4 fw-bold',
-                                    'inputAttrs' => ['data-form' => 'booking', 'data-field' => 'name']
-                                ]) !!}
-                                {!! renderFloatingInput([
-                                    'type' => 'email',
-                                    'id' => 'bookingEmail',
-                                    'name' => 'email',
-                                    'label' => 'Email Address',
-                                    'placeholder' => 'name@example.com',
-                                    'autocomplete' => 'email',
-                                    'required' => true,
-                                    'wrapperClass' => 'form-floating mb-3',
-                                    'inputClass' => 'form-control border-0 shadow-sm rounded-4 fw-bold',
-                                    'inputAttrs' => ['data-form' => 'booking', 'data-field' => 'email']
-                                ]) !!}
-                                {!! renderFloatingInput([
-                                    'type' => 'tel',
-                                    'id' => 'bookingPhone',
-                                    'name' => 'phone',
-                                    'label' => 'Phone Number',
-                                    'placeholder' => '50 123 4567',
-                                    'autocomplete' => 'tel',
-                                    'required' => true,
-                                    'wrapperClass' => 'form-floating phone-field',
-                                    'inputClass' => 'form-control border-0 shadow-sm rounded-4 fw-bold',
-                                    'inputAttrs' => ['data-form' => 'booking', 'data-field' => 'phone']
-                                ]) !!}
-                            </div>
-
-                            <!-- OTP Verification Fields (Loaded dynamically via JS if needed) -->
-                            <div class="mb-3 d-none" id="otpFieldsWrapper">
-                                <div class="fw-800 small text-muted text-uppercase mb-2">Email Verification Code</div>
-                                <div class="input-group shadow-sm rounded-4 overflow-hidden">
-                                    <input type="text" class="form-control border-0 shadow-none fw-bold text-center" id="bookingOtpCode" placeholder="Enter 6-digit OTP" style="height: 60px; letter-spacing: 5px; font-size: 1.25rem;">
-                                    <button class="btn btn-primary px-4 fw-bold" type="button" id="verifyOtpBtn">Verify</button>
+                            <!-- Contact Info -->
+                            <div class="mb-5 space-y-3">
+                                <div class="text-xs font-black uppercase tracking-wider text-slate-500 mb-2">Contact Info</div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1" for="bookingName">Full Name</label>
+                                    <input type="text" class="w-full px-4 py-3 rounded-2xl bg-white border border-slate-200 text-sm font-semibold text-slate-900 shadow-2xs focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-slate-400" id="bookingName" name="name" placeholder="John Doe" autocomplete="name" required data-form="booking" data-field="name">
                                 </div>
-                                <div class="d-flex justify-content-between mt-2 px-1">
-                                    <span class="small text-muted" id="otpTimer"></span>
-                                    <a href="#" class="small text-decoration-none fw-bold" id="resendOtpBtn">Resend Code</a>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1" for="bookingEmail">Email Address</label>
+                                    <input type="email" class="w-full px-4 py-3 rounded-2xl bg-white border border-slate-200 text-sm font-semibold text-slate-900 shadow-2xs focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-slate-400" id="bookingEmail" name="email" placeholder="name@example.com" autocomplete="email" required data-form="booking" data-field="email">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1" for="bookingPhone">Phone Number</label>
+                                    <div class="welcome-phone-field rounded-2xl bg-white border border-slate-200 shadow-2xs focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+                                        <input type="tel" class="w-full py-3 px-4 bg-transparent text-sm font-semibold text-slate-900 border-0 focus:outline-none placeholder:text-slate-400" id="bookingPhone" name="phone" placeholder="50 123 4567" autocomplete="tel" required data-form="booking" data-field="phone">
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="mb-4">
-                                <div class="fw-800 small text-muted text-uppercase mb-2">Notes</div>
-                                {!! renderFloatingTextarea([
-                                    'id' => 'bookingRequests',
-                                    'name' => 'requests',
-                                    'label' => 'Any special requirements?',
-                                    'placeholder' => 'Special requests',
-                                    'autocomplete' => 'off',
-                                    'inputClass' => 'form-control border-0 shadow-sm rounded-4 fw-bold',
-                                    'inputAttrs' => ['style' => 'height: 100px', 'data-form' => 'booking', 'data-field' => 'requests']
-                                ]) !!}
+                            <!-- OTP Verification Fields -->
+                            <div class="mb-5 hidden" id="otpFieldsWrapper">
+                                <div class="text-xs font-black uppercase tracking-wider text-slate-500 mb-2">Email Verification Code</div>
+                                <div class="flex rounded-2xl shadow-2xs border border-slate-200 bg-white overflow-hidden">
+                                    <input type="text" class="flex-1 px-4 py-3 bg-transparent text-center font-black font-mono tracking-widest text-lg text-slate-900 border-0 focus:outline-none" id="bookingOtpCode" placeholder="Enter 6-digit OTP">
+                                    <button class="px-5 bg-primary hover:bg-primary-dark text-white font-bold text-xs transition-colors cursor-pointer" type="button" id="verifyOtpBtn">Verify</button>
+                                </div>
+                                <div class="flex justify-between mt-2 px-1 text-xs">
+                                    <span class="text-slate-400" id="otpTimer"></span>
+                                    <a href="#" class="font-bold text-primary hover:underline" id="resendOtpBtn">Resend Code</a>
+                                </div>
+                            </div>
+
+                            <!-- Special Requests -->
+                            <div class="mb-5">
+                                <label class="block text-xs font-black uppercase tracking-wider text-slate-500 mb-2" for="bookingRequests">Special Requests / Dietary Notes</label>
+                                <textarea class="w-full p-3.5 rounded-2xl bg-white border border-slate-200 text-xs sm:text-sm font-medium text-slate-900 shadow-2xs focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-slate-400" id="bookingRequests" name="requests" rows="3" placeholder="Any dietary requirements, hotel room numbers, baby seat needs..." autocomplete="off" data-form="booking" data-field="requests"></textarea>
                             </div>
 
                             <!-- Luxury Voucher & Promo Code Section -->
-                            <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white p-3" id="promoCodeCard">
-                                <div class="d-flex align-items-center justify-content-between mb-2">
-                                    <label class="fw-800 small text-dark text-uppercase mb-0 d-flex align-items-center gap-1" for="bookingPromoCode" style="font-size: 0.78rem; letter-spacing: 0.5px;">
+                            <div class="p-4 rounded-2xl bg-white shadow-2xs border border-slate-200 mb-5" id="promoCodeCard">
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5" for="bookingPromoCode">
                                         <i class="bi bi-ticket-perforated-fill text-primary"></i> Have a Promo Code or Voucher?
                                     </label>
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 small fw-bold d-none" id="promoAppliedBadge">
-                                        <i class="bi bi-check2-circle me-1"></i>Applied
+                                    <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold hidden" id="promoAppliedBadge">
+                                        <i class="bi bi-check2-circle"></i> Applied
                                     </span>
                                 </div>
-                                <div class="input-group overflow-hidden" id="promoInputGroup">
-                                    <input type="text" class="form-control" id="bookingPromoCode" name="coupon_code" placeholder="Enter promo code (e.g. DUNESWELCOME)" autocomplete="off" spellcheck="false">
-                                    <button class="btn" type="button" id="applyPromoBtn">
+                                <div class="flex rounded-xl border border-slate-200 bg-white overflow-hidden focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all" id="promoInputGroup">
+                                    <input type="text" class="flex-1 px-3.5 py-2.5 bg-transparent text-xs sm:text-sm font-semibold text-slate-800 border-0 focus:outline-none placeholder:text-slate-400 uppercase" id="bookingPromoCode" name="coupon_code" placeholder="Enter promo code (e.g. DUNESWELCOME)" autocomplete="off" spellcheck="false">
+                                    <button class="px-4 bg-primary hover:bg-primary-dark text-white font-bold text-xs transition-colors cursor-pointer flex items-center gap-1" type="button" id="applyPromoBtn">
                                         <span>Apply</span>
-                                        <i class="bi bi-arrow-right-short fs-5"></i>
+                                        <i class="bi bi-arrow-right-short"></i>
                                     </button>
                                 </div>
                                 
-                                <div class="d-none mt-2 align-items-center justify-content-between" id="promoSuccessBox">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width: 32px; height: 32px;">
-                                            <i class="bi bi-check-lg fw-bold"></i>
+                                <div class="hidden mt-2 items-center justify-between" id="promoSuccessBox">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0 text-sm">
+                                            <i class="bi bi-check-lg"></i>
                                         </div>
                                         <div>
-                                            <div class="d-flex align-items-center gap-2 mb-0.5">
-                                                <span class="promo-badge-pill" id="promoCodeLabel">CODE</span>
-                                                <span class="badge bg-success text-white small fw-bold" id="promoDiscountBadge">Applied</span>
+                                            <div class="flex items-center gap-2">
+                                                <span class="px-2 py-0.5 rounded-md bg-slate-900 text-amber-400 font-mono font-bold text-xs" id="promoCodeLabel">CODE</span>
+                                                <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold text-[10px]" id="promoDiscountBadge">Applied</span>
                                             </div>
-                                            <div class="small fw-bold text-success" id="promoSavingsText">Savings applied</div>
+                                            <div class="text-xs font-bold text-emerald-600 mt-0.5" id="promoSavingsText">Savings applied</div>
                                         </div>
                                     </div>
-                                    <button type="button" id="removePromoBtn" aria-label="Remove promo code">
+                                    <button type="button" class="text-xs text-red-500 hover:text-red-700 font-semibold cursor-pointer" id="removePromoBtn" aria-label="Remove promo code">
                                         <i class="bi bi-x-circle me-1"></i>Remove
                                     </button>
                                 </div>
-                                <div class="d-none mt-2" id="promoErrorBox">
-                                    <i class="bi bi-exclamation-circle-fill text-danger me-2 fs-6 flex-shrink-0"></i>
+                                <div class="hidden mt-2 text-xs text-red-600 items-center gap-1.5" id="promoErrorBox">
+                                    <i class="bi bi-exclamation-circle-fill shrink-0"></i>
                                     <span id="promoErrorMessage">Invalid promo code.</span>
                                 </div>
                             </div>
 
-                            <div class="mb-4" id="paymentOptions" data-ziina-active="{{ $ziinaActive ? '1' : '0' }}" data-advance-percent="{{ $advancePercent }}">
-                                <div class="fw-800 small text-muted text-uppercase mb-2">Payment Options</div>
-                                <div class="payment-options">
-                                    <div class="payment-option selected" data-value="cash">
-                                        <div class="payment-option-title">Cash</div>
-                                        <div class="payment-option-sub">Pay on pickup</div>
+                            <!-- Payment Options -->
+                            <div class="mb-5" id="paymentOptions" data-ziina-active="{{ $ziinaActive ? '1' : '0' }}" data-advance-percent="{{ $advancePercent }}">
+                                <div class="text-xs font-black uppercase tracking-wider text-slate-500 mb-2">Payment Options</div>
+                                <div class="payment-options grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                    <div class="payment-option selected p-3 rounded-2xl border-2 border-primary bg-orange-50/40 cursor-pointer text-left transition-all" data-value="cash">
+                                        <div class="payment-option-title font-bold text-slate-900 text-xs sm:text-sm">Cash</div>
+                                        <div class="payment-option-sub text-slate-500 text-[11px]">Pay on pickup</div>
                                     </div>
                                     @if($ziinaActive)
-                                    <div class="payment-option" data-value="advance">
-                                        <div class="payment-option-title">Advance</div>
-                                        <div class="payment-option-sub">Hold slot ({{ $advancePercent }}%)</div>
+                                    <div class="payment-option p-3 rounded-2xl border border-slate-200 bg-white hover:border-primary/50 cursor-pointer text-left transition-all" data-value="advance">
+                                        <div class="payment-option-title font-bold text-slate-900 text-xs sm:text-sm">Advance</div>
+                                        <div class="payment-option-sub text-slate-500 text-[11px]">Hold slot ({{ $advancePercent }}%)</div>
                                     </div>
-                                    <div class="payment-option" data-value="full">
-                                        <div class="payment-option-title">Full</div>
-                                        <div class="payment-option-sub">Instant confirmation</div>
+                                    <div class="payment-option p-3 rounded-2xl border border-slate-200 bg-white hover:border-primary/50 cursor-pointer text-left transition-all" data-value="full">
+                                        <div class="payment-option-title font-bold text-slate-900 text-xs sm:text-sm">Full</div>
+                                        <div class="payment-option-sub text-slate-500 text-[11px]">Instant confirmation</div>
                                     </div>
                                     @endif
                                 </div>
-                                <div class="alert alert-danger mt-3 d-none" id="bookingError"></div>
+                                <div class="p-3 rounded-xl bg-red-50 text-red-700 text-xs border border-red-200 mt-3 hidden" id="bookingError"></div>
                             </div>
 
-                            <div class="mb-3">
-                                <div class="legal-agreement-wrapper">
-                                    <input class="form-check-input desert-checkbox border-primary" type="checkbox" id="bookingAgreement" required>
-                                    <label class="legal-agreement-text" for="bookingAgreement">
-                                        I agree to the <a href="{{ route('terms') }}" target="_blank" rel="noopener noreferrer" class="legal-link">Terms & Conditions</a> and <a href="{{ route('privacy') }}" target="_blank" rel="noopener noreferrer" class="legal-link">Privacy Policy</a>.
-                                    </label>
-                                </div>
-                                <div class="legal-agreement-wrapper mt-2">
-                                    <input class="form-check-input desert-checkbox border-primary" type="checkbox" id="bookingNewsletter" name="subscribe_newsletter" value="1" checked>
-                                    <label class="legal-agreement-text text-muted small" for="bookingNewsletter">
-                                        Keep me updated with exclusive desert safari deals, seasonal discounts & travel guides.
-                                    </label>
-                                </div>
+                            <!-- Legal Agreement -->
+                            <div class="space-y-2 mb-2">
+                                <label class="flex items-start gap-2.5 text-xs text-slate-600 cursor-pointer">
+                                    <input class="mt-0.5 rounded border-slate-300 text-primary focus:ring-primary/20" type="checkbox" id="bookingAgreement" required>
+                                    <span>
+                                        I agree to the <a href="{{ route('terms') }}" target="_blank" rel="noopener noreferrer" class="text-primary font-bold hover:underline">Terms & Conditions</a> and <a href="{{ route('privacy') }}" target="_blank" rel="noopener noreferrer" class="text-primary font-bold hover:underline">Privacy Policy</a>.
+                                    </span>
+                                </label>
+                                <label class="flex items-start gap-2.5 text-xs text-slate-500 cursor-pointer">
+                                    <input class="mt-0.5 rounded border-slate-300 text-primary focus:ring-primary/20" type="checkbox" id="bookingNewsletter" name="subscribe_newsletter" value="1" checked>
+                                    <span>Keep me updated with exclusive desert safari deals, seasonal discounts & travel guides.</span>
+                                </label>
                             </div>
                         </div>
                     </div>
 
-                    <div class="modal-footer border-top bg-white p-3 z-3" style="position: sticky; bottom: 0; padding-bottom: max(1rem, env(safe-area-inset-bottom)) !important;">
-                        <div class="d-flex align-items-center justify-content-between w-100">
-                            <div class="d-flex align-items-center">
-                                <div class="fw-800 text-primary mb-0 booking-total-value" id="bookingTotal">AED 0.00</div>
+                    <!-- Modal Sticky Footer with Live Total & Action Buttons -->
+                    <div class="border-t border-slate-200/80 bg-white py-3.5 px-4 sm:px-6 sticky bottom-0 z-20 pb-safe shrink-0 shadow-lg">
+                        <div class="flex items-center justify-between w-full">
+                            <div class="text-left">
+                                <small class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Total Amount</small>
+                                <div class="font-black text-primary font-mono text-xl sm:text-2xl leading-none" id="bookingTotal">AED 0.00</div>
                             </div>
-                            <div class="d-flex align-items-center ms-auto" id="continueBtnWrapper">
-                                <button type="button" class="btn btn-desert-animated rounded-pill px-4 px-sm-5 py-2.5 py-sm-3 fw-800 shadow-lg d-inline-flex align-items-center justify-content-center gap-2" id="nextStep"> Continue <i class="bi bi-arrow-right"></i> </button>
-                                <button type="submit" class="btn btn-whatsapp-animated rounded-pill px-4 px-sm-5 py-2.5 py-sm-3 fw-800 shadow-lg d-none align-items-center justify-content-center gap-2" id="submitBooking"> Confirm <i class="bi bi-check-lg"></i> </button>
+                            <div class="flex items-center gap-2 ml-auto" id="continueBtnWrapper">
+                                <button type="button" 
+                                        class="px-5 sm:px-7 py-3 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all cursor-pointer inline-flex items-center gap-2" 
+                                        id="nextStep">
+                                    <span>Continue</span>
+                                    <i class="bi bi-arrow-right"></i>
+                                </button>
+                                <button type="submit" 
+                                        class="px-5 sm:px-7 py-3 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all cursor-pointer hidden items-center gap-2" 
+                                        id="submitBooking">
+                                    <span>Confirm Booking</span>
+                                    <i class="bi bi-check-lg"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -342,7 +355,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const savingsLabel = document.getElementById('promoSavingsText');
     const appliedBadge = document.getElementById('promoAppliedBadge');
 
-    // Auto-apply promo from URL (?promo=CODE or ?coupon=CODE)
     const urlParams = new URLSearchParams(window.location.search);
     const urlPromo = urlParams.get('promo') || urlParams.get('coupon');
     if (urlPromo && promoInput) {
@@ -355,17 +367,16 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!code) {
             if (!isSilent && errorBox) {
                 if (errorMsg) errorMsg.innerText = 'Please enter a promo or voucher code.';
-                errorBox.classList.remove('d-none');
-                errorBox.classList.add('d-flex');
+                errorBox.classList.remove('hidden');
+                errorBox.classList.add('flex');
                 if (inputGroup) {
-                    inputGroup.classList.add('has-error', 'shake-field');
+                    inputGroup.classList.add('border-red-400', 'shake-field');
                     setTimeout(() => inputGroup.classList.remove('shake-field'), 500);
                 }
             }
             return;
         }
 
-        // Fetch current subtotal
         let subtotal = 0;
         if (window.App && typeof window.App.calculateBaseTotal === 'function') {
             subtotal = window.App.calculateBaseTotal();
@@ -407,14 +418,14 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!isSilent) {
             if (applyBtn) {
                 applyBtn.disabled = true;
-                applyBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Checking...';
+                applyBtn.innerHTML = '<span class="inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin me-1"></span> Checking...';
             }
             if (promoInput) promoInput.disabled = true;
             if (errorBox) {
-                errorBox.classList.add('d-none');
-                errorBox.classList.remove('d-flex');
+                errorBox.classList.add('hidden');
+                errorBox.classList.remove('flex');
             }
-            if (inputGroup) inputGroup.classList.remove('has-error', 'shake-field');
+            if (inputGroup) inputGroup.classList.remove('border-red-400', 'shake-field');
         }
 
         fetch('/api/v1/coupon/validate', {
@@ -441,7 +452,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!isSilent) {
                 if (applyBtn) {
                     applyBtn.disabled = false;
-                    applyBtn.innerHTML = '<span>Apply</span> <i class="bi bi-arrow-right-short fs-5"></i>';
+                    applyBtn.innerHTML = '<span>Apply</span> <i class="bi bi-arrow-right-short text-base"></i>';
                 }
                 if (promoInput) promoInput.disabled = false;
             }
@@ -463,17 +474,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 if (inputGroup) {
-                    inputGroup.classList.add('d-none');
-                    inputGroup.classList.remove('has-error', 'shake-field');
+                    inputGroup.classList.add('hidden');
+                    inputGroup.classList.remove('border-red-400', 'shake-field');
                 }
                 if (successBox) {
-                    successBox.classList.remove('d-none');
-                    successBox.classList.add('d-flex');
+                    successBox.classList.remove('hidden');
+                    successBox.classList.add('flex');
                 }
-                if (appliedBadge) appliedBadge.classList.remove('d-none');
+                if (appliedBadge) appliedBadge.classList.remove('hidden');
                 if (errorBox) {
-                    errorBox.classList.add('d-none');
-                    errorBox.classList.remove('d-flex');
+                    errorBox.classList.add('hidden');
+                    errorBox.classList.remove('flex');
                 }
 
                 if (window.App && typeof window.App.updateTotal === 'function') {
@@ -483,7 +494,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             } else {
                 if (isSilent) {
-                    // Coupon is no longer eligible under modified booking parameters
                     const oldCode = window.appliedPromoCoupon ? window.appliedPromoCoupon.code : code;
                     window.removeCurrentPromo(true);
                     if (window.App && typeof window.App.toast === 'function') {
@@ -493,27 +503,27 @@ document.addEventListener('DOMContentLoaded', function() {
                     window.appliedPromoCoupon = null;
                     if (errorBox) {
                         if (errorMsg) errorMsg.innerText = body.message || 'Invalid promo code. Please check for typos and try again.';
-                        errorBox.classList.remove('d-none');
-                        errorBox.classList.add('d-flex');
+                        errorBox.classList.remove('hidden');
+                        errorBox.classList.add('flex');
                     }
                     if (inputGroup) {
-                        inputGroup.classList.add('has-error', 'shake-field');
+                        inputGroup.classList.add('border-red-400', 'shake-field');
                         setTimeout(() => inputGroup.classList.remove('shake-field'), 500);
                     }
                 }
             }
         })
-        .catch(err => {
+        .catch(() => {
             if (!isSilent) {
                 if (applyBtn) {
                     applyBtn.disabled = false;
-                    applyBtn.innerHTML = '<span>Apply</span> <i class="bi bi-arrow-right-short fs-5"></i>';
+                    applyBtn.innerHTML = '<span>Apply</span> <i class="bi bi-arrow-right-short text-base"></i>';
                 }
                 if (promoInput) promoInput.disabled = false;
                 if (errorBox) {
                     if (errorMsg) errorMsg.innerText = 'Unable to validate promo code. Please check connection and try again.';
-                    errorBox.classList.remove('d-none');
-                    errorBox.classList.add('d-flex');
+                    errorBox.classList.remove('hidden');
+                    errorBox.classList.add('flex');
                 }
             }
         });
@@ -523,16 +533,16 @@ document.addEventListener('DOMContentLoaded', function() {
         window.appliedPromoCoupon = null;
         if (promoInput) promoInput.value = '';
         if (inputGroup) {
-            inputGroup.classList.remove('d-none', 'has-error', 'shake-field');
+            inputGroup.classList.remove('hidden', 'border-red-400', 'shake-field');
         }
         if (successBox) {
-            successBox.classList.add('d-none');
-            successBox.classList.remove('d-flex');
+            successBox.classList.add('hidden');
+            successBox.classList.remove('flex');
         }
-        if (appliedBadge) appliedBadge.classList.add('d-none');
+        if (appliedBadge) appliedBadge.classList.add('hidden');
         if (errorBox) {
-            errorBox.classList.add('d-none');
-            errorBox.classList.remove('d-flex');
+            errorBox.classList.add('hidden');
+            errorBox.classList.remove('flex');
         }
 
         if (window.App && typeof window.App.updateTotal === 'function') {
@@ -557,10 +567,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (promoInput) {
         promoInput.addEventListener('input', function() {
             if (errorBox) {
-                errorBox.classList.add('d-none');
-                errorBox.classList.remove('d-flex');
+                errorBox.classList.add('hidden');
+                errorBox.classList.remove('flex');
             }
-            if (inputGroup) inputGroup.classList.remove('has-error', 'shake-field');
+            if (inputGroup) inputGroup.classList.remove('border-red-400', 'shake-field');
         });
         promoInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
@@ -570,7 +580,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Auto-revalidate promo if tour, package, date, or guests change
     const tourSelect = document.getElementById('bookingTour');
     const tierInput = document.getElementById('selectedTier');
     const dateInput = document.getElementById('bookingDate');
@@ -590,4 +599,3 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-

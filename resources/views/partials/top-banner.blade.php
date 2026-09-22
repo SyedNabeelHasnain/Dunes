@@ -9,15 +9,17 @@
 
 @if($topBannerActive)
 <!-- Top Sticky Announcement Bar -->
-<div id="dunesTopPromoBanner" class="py-2 px-3 text-white text-center position-relative z-3 shadow-sm d-flex align-items-center justify-content-center flex-wrap gap-2" style="background: linear-gradient(90deg, #111827 0%, #1f2937 50%, #0f172a 100%); border-bottom: 2px solid #F58F43; font-size: 0.85rem;">
+<div id="dunesTopPromoBanner" class="py-2 px-3 text-white text-center relative z-30 shadow-sm flex items-center justify-center flex-wrap gap-2 text-xs sm:text-sm" style="background: linear-gradient(90deg, #111827 0%, #1f2937 50%, #0f172a 100%); border-bottom: 2px solid #F69044;">
     @if(!empty($topBannerBadge))
-    <span class="badge bg-warning text-dark fw-800 rounded-pill px-2.5 py-1 text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">{{ $topBannerBadge }}</span>
+    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold uppercase bg-amber-400 text-slate-950 tracking-wider">{{ $topBannerBadge }}</span>
     @endif
-    <span class="fw-bold"><i class="bi bi-tag-fill text-warning me-1"></i>{{ $topBannerText }}</span>
-    <button type="button" class="btn btn-warning btn-sm rounded-pill px-3 py-0 fw-800 text-dark d-inline-flex align-items-center gap-1 shadow-sm top-banner-copy-btn" data-code="{{ $topBannerCode }}" style="font-size: 0.75rem; height: 26px;">
-        <span>CODE: <strong class="font-monospace">{{ $topBannerCode }}</strong></span>
+    <span class="font-bold flex items-center gap-1.5"><i class="bi bi-tag-fill text-amber-400"></i><span>{{ $topBannerText }}</span></span>
+    <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-amber-400 hover:bg-amber-300 text-slate-950 shadow-sm transition-all top-banner-copy-btn cursor-pointer" data-code="{{ $topBannerCode }}">
+        <span>CODE: <strong class="font-mono font-black">{{ $topBannerCode }}</strong></span>
         <i class="bi bi-clipboard"></i>
     </button>
-    <button type="button" class="btn-close btn-close-white ms-2 shadow-none position-absolute end-0 me-3" style="font-size: 0.65rem;" aria-label="Dismiss announcement" onclick="document.getElementById('dunesTopPromoBanner').style.display='none'; if(window.syncHeaderHeight) window.syncHeaderHeight();"></button>
+    <button type="button" class="text-white/60 hover:text-white transition-colors absolute right-3 top-1/2 -translate-y-1/2 p-1 text-xs cursor-pointer" aria-label="Dismiss announcement" onclick="document.getElementById('dunesTopPromoBanner').style.display='none'; if(window.syncHeaderHeight) window.syncHeaderHeight();">
+        <i class="bi bi-x-lg"></i>
+    </button>
 </div>
 @endif

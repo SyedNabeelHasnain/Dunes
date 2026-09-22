@@ -2,26 +2,27 @@
 
 @section('content')
 <!-- Page Header Section -->
-<section class="page-header py-4 bg-dark text-white position-relative overflow-hidden" style="margin-top: calc(-1 * var(--header-h));">
-    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: radial-gradient(circle at 15% 20%, rgba(246, 144, 68, 0.15) 0%, transparent 60%);"></div>
-    <div class="container position-relative z-1 pt-3">
+<section class="py-10 bg-slate-950 text-white relative overflow-hidden" style="margin-top: calc(-1 * var(--header-h, 72px));">
+    <div class="absolute inset-0 w-full h-full bg-[radial-gradient(ellipse_at_15%_20%,rgba(246,144,68,0.2)_0%,transparent_60%)]"></div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-16">
         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-3">
-                <li class="breadcrumb-item"><a href="{{ route('home') }}" class="text-white text-opacity-75 text-decoration-none">Home</a></li>
-                <li class="breadcrumb-item active text-white" aria-current="page">Tours</li>
+            <ol class="flex items-center gap-2 text-xs sm:text-sm text-white/70 mb-4">
+                <li><a href="{{ route('home') }}" class="hover:text-white transition-colors">Home</a></li>
+                <li><span class="text-white/40">/</span></li>
+                <li class="text-white font-semibold" aria-current="page">Tours</li>
             </ol>
         </nav>
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
             <div>
-                <div class="d-flex flex-wrap gap-2 mb-2">
-                    <span class="badge glass rounded-pill px-3 py-1.5">
-                        <i class="bi bi-star-fill text-warning me-1"></i>Rated 4.9/5 by 2,847+ Travelers
+                <div class="flex flex-wrap gap-2 mb-3">
+                    <span class="glass rounded-full px-3.5 py-1 text-xs inline-flex items-center gap-1.5">
+                        <i class="bi bi-star-fill text-amber-400"></i>Rated 4.9/5 by 2,847+ Travelers
                     </span>
-                    <span class="badge bg-success bg-opacity-75 rounded-pill px-3 py-1.5 text-white">
-                        <i class="bi bi-patch-check-fill me-1"></i>DTCM Licensed Operator
+                    <span class="bg-emerald-600/90 rounded-full px-3.5 py-1 text-xs font-semibold text-white inline-flex items-center gap-1.5">
+                        <i class="bi bi-patch-check-fill text-emerald-200"></i>DTCM Licensed Operator
                     </span>
                 </div>
-                <h1 class="display-4 fw-bold text-white mb-2">
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-2">
                     @if(request('q'))
                         Search: "{{ request('q') }}"
                     @elseif($selectedCategorySlug)
@@ -30,11 +31,11 @@
                         Explore Dubai Safari Tours & Experiences
                     @endif
                 </h1>
-                <p class="lead text-white text-opacity-75 mb-0">Discover top-rated desert adventures, high-power dune buggies, skyline dhow cruises & city tours.</p>
+                <p class="text-sm sm:text-base text-white/80 max-w-2xl leading-relaxed">Discover top-rated desert adventures, high-power dune buggies, skyline dhow cruises & city tours.</p>
             </div>
-            <div class="d-none d-lg-block text-end">
-                <span class="badge bg-soft-primary text-primary px-3 py-2 rounded-pill fw-bold fs-6">
-                    <i class="bi bi-shield-check me-1"></i>Best Price Guarantee
+            <div class="hidden lg:block shrink-0">
+                <span class="bg-primary/20 text-primary border border-primary/40 px-4 py-2 rounded-full font-bold text-sm inline-flex items-center gap-1.5">
+                    <i class="bi bi-shield-check"></i>Best Price Guarantee
                 </span>
             </div>
         </div>
@@ -42,51 +43,43 @@
 </section>
 
 <!-- Regulatory E-E-A-T & Trust Bar -->
-<section class="bg-light py-3 border-bottom shadow-sm">
-    <div class="container">
-        <div class="row g-3 text-center align-items-center">
-            <div class="col-6 col-md-3">
-                <div class="d-flex align-items-center justify-content-center gap-2">
-                    <i class="bi bi-patch-check-fill text-primary fs-5"></i>
-                    <div class="text-start">
-                        <div class="fw-bold text-dark small lh-1">DTCM Licensed Operator</div>
-                        <small class="text-muted" style="font-size: 11px;">Dubai Tourism Authority</small>
-                    </div>
+<section class="bg-slate-50 py-3.5 border-b border-slate-200 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+            <div class="flex items-center gap-2.5">
+                <i class="bi bi-patch-check-fill text-primary text-xl shrink-0"></i>
+                <div>
+                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">DTCM Licensed Operator</div>
+                    <div class="text-slate-500 text-[11px]">Dubai Tourism Authority</div>
                 </div>
             </div>
-            <div class="col-6 col-md-3">
-                <div class="d-flex align-items-center justify-content-center gap-2">
-                    <i class="bi bi-arrow-repeat text-success fs-5"></i>
-                    <div class="text-start">
-                        <div class="fw-bold text-dark small lh-1">100% Free Cancellation</div>
-                        <small class="text-muted" style="font-size: 11px;">Full refund 24h prior</small>
-                    </div>
+            <div class="flex items-center gap-2.5">
+                <i class="bi bi-arrow-repeat text-emerald-600 text-xl shrink-0"></i>
+                <div>
+                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">100% Free Cancellation</div>
+                    <div class="text-slate-500 text-[11px]">Full refund 24h prior</div>
                 </div>
             </div>
-            <div class="col-6 col-md-3">
-                <div class="d-flex align-items-center justify-content-center gap-2">
-                    <i class="bi bi-award-fill text-warning fs-5"></i>
-                    <div class="text-start">
-                        <div class="fw-bold text-dark small lh-1">100% Halal Food</div>
-                        <small class="text-muted" style="font-size: 11px;">Veg, Non-Veg & Jain</small>
-                    </div>
+            <div class="flex items-center gap-2.5">
+                <i class="bi bi-award-fill text-amber-500 text-xl shrink-0"></i>
+                <div>
+                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">100% Halal Food</div>
+                    <div class="text-slate-500 text-[11px]">Veg, Non-Veg & Jain</div>
                 </div>
             </div>
-            <div class="col-6 col-md-3">
-                <div class="d-flex align-items-center justify-content-center gap-2">
-                    <i class="bi bi-shield-lock-fill text-info fs-5"></i>
-                    <div class="text-start">
-                        <div class="fw-bold text-dark small lh-1">Instant Confirmation</div>
-                        <small class="text-muted" style="font-size: 11px;">Card / Cash on Pickup</small>
-                    </div>
+            <div class="flex items-center gap-2.5">
+                <i class="bi bi-shield-lock-fill text-cyan-600 text-xl shrink-0"></i>
+                <div>
+                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">Instant Confirmation</div>
+                    <div class="text-slate-500 text-[11px]">Card / Cash on Pickup</div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<section class="section py-5">
-    <div class="container">
+<section class="py-10 sm:py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 @php
     $settingsService = app(\App\Services\SettingsService::class);
     $conciergePromoActive = ($settingsService->get('concierge_promo_active', '0') === '1');
@@ -95,24 +88,21 @@
 @endphp
 
         <!-- Safari Match Concierge Recommendation Banner -->
-        <div class="card border-0 rounded-4 p-4 p-md-4 mb-4 shadow-sm position-relative overflow-hidden" style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); border: 1.5px solid rgba(246, 144, 68, 0.3) !important;">
-            <div class="position-absolute top-0 end-0 translate-middle-y me-4 opacity-10 d-none d-md-block" style="font-size: 8rem; pointer-events: none; line-height: 1; color: #F69044;">
-                <i class="bi bi-compass"></i>
-            </div>
-            <div class="row align-items-center position-relative z-1 g-3">
-                <div class="col-12 col-lg-8">
-                    <div class="d-flex align-items-center gap-2 mb-2">
-                        <span class="badge rounded-pill px-3 py-1 fw-bold" style="background: rgba(246, 144, 68, 0.2); border: 1px solid #F69044; color: #F69044; font-size: 0.75rem;">
-                            <i class="bi bi-stars me-1"></i> Interactive Concierge
+        <div class="rounded-2xl p-6 sm:p-8 mb-8 shadow-sm relative overflow-hidden bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-primary/30">
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-6 relative z-10">
+                <div class="text-center lg:text-left">
+                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2 mb-2">
+                        <span class="rounded-full px-3 py-1 font-bold text-xs bg-primary/20 border border-primary/40 text-primary inline-flex items-center gap-1">
+                            <i class="bi bi-stars"></i> Interactive Concierge
                         </span>
                         @if($conciergePromoActive)
-                        <span class="badge bg-warning text-dark rounded-pill px-2.5 py-1 fw-bold" style="font-size: 0.72rem;">
-                            <i class="bi bi-gift-fill me-1"></i> {{ $conciergePromoDiscount }}% OFF Match Bonus
+                        <span class="bg-amber-400 text-slate-950 rounded-full px-2.5 py-0.5 text-xs font-bold inline-flex items-center gap-1">
+                            <i class="bi bi-gift-fill"></i> {{ $conciergePromoDiscount }}% OFF Match Bonus
                         </span>
                         @endif
                     </div>
-                    <h3 class="fw-800 text-white mb-2 fs-4">Not sure which Dubai Safari to choose?</h3>
-                    <p class="text-white-50 mb-0 small" style="max-width: 620px;">
+                    <h3 class="font-extrabold text-white text-xl sm:text-2xl mb-1.5">Not sure which Dubai Safari to choose?</h3>
+                    <p class="text-slate-300 text-xs sm:text-sm max-w-2xl leading-relaxed">
                         @if($conciergePromoActive)
                         Answer 3 quick questions about your group style, timing, and must-have perks. Our <strong>Safari Match Concierge</strong> will recommend your ideal adventure and unlock an instant <strong>{{ $conciergePromoDiscount }}% promo code ({{ $conciergePromoCode }})</strong>.
                         @else
@@ -120,9 +110,9 @@
                         @endif
                     </p>
                 </div>
-                <div class="col-12 col-lg-4 text-lg-end">
-                    <button type="button" class="btn btn-desert-animated rounded-pill px-4 py-3 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-2" data-bs-toggle="modal" data-bs-target="#safariMatcherModal">
-                        <i class="bi bi-compass fs-5"></i>
+                <div class="shrink-0 w-full sm:w-auto text-center lg:text-right">
+                    <button type="button" class="w-full sm:w-auto btn-desert-animated rounded-full px-6 py-3 font-bold text-white text-sm shadow-md inline-flex items-center justify-center gap-2 cursor-pointer" @click="$store.modal.open('safari-matcher')" data-bs-toggle="modal" data-bs-target="#safariMatcherModal">
+                        <i class="bi bi-compass text-base"></i>
                         <span>Launch Safari Concierge</span>
                     </button>
                 </div>
@@ -130,17 +120,17 @@
         </div>
 
         <!-- Interactive Search & Category Filter Controls -->
-        <div class="card border-0 bg-light rounded-4 p-3 p-md-4 mb-5 shadow-sm">
-            <div class="row g-3 align-items-center">
-                <div class="col-12 col-lg-4">
-                    <div class="position-relative">
-                        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-                        <input type="text" id="tourSearchInput" class="form-control rounded-pill ps-5 py-2.5 bg-white border-0 shadow-none" placeholder="Search safaris, buggies, cruises..." oninput="handleTourSearch(this.value)">
+        <div class="bg-slate-50 rounded-2xl p-4 sm:p-5 mb-8 border border-slate-200/80 shadow-xs">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+                <div class="lg:col-span-4">
+                    <div class="relative">
+                        <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="tourSearchInput" class="w-full rounded-full pl-11 pr-4 py-2.5 bg-white border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs" placeholder="Search safaris, buggies, cruises..." oninput="handleTourSearch(this.value)">
                     </div>
                 </div>
-                <div class="col-12 col-lg-8">
-                    <div class="d-flex gap-2 overflow-x-auto pb-1 flex-nowrap w-100" style="scrollbar-width: none; -webkit-overflow-scrolling: touch;">
-                        <button onclick="filterTours('')" data-category="" class="btn filter-btn {{ !$selectedCategorySlug ? 'btn-desert-animated-dark' : 'btn-white border' }} rounded-pill px-3 py-2 fw-semibold d-flex align-items-center gap-2 transition-all small flex-shrink-0 text-nowrap">
+                <div class="lg:col-span-8">
+                    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                        <button onclick="filterTours('')" data-category="" class="filter-btn {{ !$selectedCategorySlug ? 'bg-slate-900 text-white shadow-xs' : 'bg-white text-slate-700 border border-slate-200 hover:border-slate-300' }} rounded-full px-4 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer transition-colors">
                             <i class="bi bi-grid-fill"></i> All ({{ $tours->count() }})
                         </button>
                         @foreach($categories as $cat)
@@ -154,7 +144,7 @@
                                 ];
                                 $icon = $iconMap[$cat->slug] ?? 'bi-compass-fill';
                             @endphp
-                            <button onclick="filterTours('{{ $cat->slug }}')" data-category="{{ $cat->slug }}" class="btn filter-btn {{ $selectedCategorySlug === $cat->slug ? 'btn-desert-animated-dark' : 'btn-white border' }} rounded-pill px-3 py-2 fw-semibold d-flex align-items-center gap-2 transition-all small flex-shrink-0 text-nowrap">
+                            <button onclick="filterTours('{{ $cat->slug }}')" data-category="{{ $cat->slug }}" class="filter-btn {{ $selectedCategorySlug === $cat->slug ? 'bg-slate-900 text-white shadow-xs' : 'bg-white text-slate-700 border border-slate-200 hover:border-slate-300' }} rounded-full px-4 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer transition-colors">
                                 <i class="bi {{ $icon }}"></i> {{ $cat->name }} ({{ $catCount }})
                             </button>
                         @endforeach
@@ -164,71 +154,71 @@
         </div>
 
         @if($tours->count() > 0)
-        <div class="row g-4" id="tours-grid">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="tours-grid">
             @foreach($tours as $t)
                 @php
                     $minPrice = $t->tiers->min('pivot.price') ?? 0;
                     $tourCat = $categories->firstWhere('id', $t->category_id);
                     $tourCatSlug = $tourCat ? $tourCat->slug : '';
                 @endphp
-                <div class="col-12 col-md-6 col-lg-4 tour-item" data-category="{{ $tourCatSlug }}" data-name="{{ strtolower($t->name) }}">
-                    <article class="card card-modern h-100 border-0 shadow-sm transition-all hover-shadow-md rounded-4 overflow-hidden bg-white">
-                        <a href="{{ route('tours.show', $t->slug) }}" class="text-decoration-none text-dark d-flex flex-column h-100">
-                            <div class="card-img-wrapper position-relative overflow-hidden" style="aspect-ratio: 16/10;">
-                                <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" class="card-img-top w-100 h-100" alt="{{ $t->name }} Dubai" loading="lazy" style="object-fit: cover;">
+                <div class="tour-item flex flex-col h-full" data-category="{{ $tourCatSlug }}" data-name="{{ strtolower($t->name) }}">
+                    <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col h-full group">
+                        <a href="{{ route('tours.show', $t->slug) }}" class="flex flex-col h-full text-inherit">
+                            <div class="relative overflow-hidden aspect-[16/10]">
+                                <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai" loading="lazy">
                                 @if($t->is_bestseller)
-                                <span class="badge bg-primary position-absolute top-0 start-0 m-3 rounded-pill shadow-sm">
-                                    <i class="bi bi-fire me-1"></i>Best Seller
+                                <span class="absolute top-3 left-3 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-md inline-flex items-center gap-1">
+                                    <i class="bi bi-fire text-amber-300"></i>Best Seller
                                 </span>
                                 @endif
-                                <div class="position-absolute bottom-0 start-0 w-100 p-3" style="background: linear-gradient(0deg, rgba(0,0,0,0.6) 0%, transparent 100%);">
-                                    <span class="badge glass text-white fw-semibold">
-                                        <i class="bi bi-tag-fill me-1"></i>{{ $tourCat ? $tourCat->name : 'Tours' }}
+                                <div class="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
+                                    <span class="glass text-white text-xs font-semibold px-2.5 py-1 rounded-full inline-flex items-center gap-1">
+                                        <i class="bi bi-tag-fill text-primary"></i>{{ $tourCat ? $tourCat->name : 'Tours' }}
                                     </span>
                                 </div>
                             </div>
-                            <div class="card-body p-4 d-flex flex-column flex-grow-1">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <div class="text-muted small">
-                                        <i class="bi bi-clock me-1 text-primary"></i>{{ $t->duration }}
+                            <div class="p-5 flex flex-col flex-grow">
+                                <div class="flex justify-between items-center text-xs mb-2">
+                                    <div class="text-slate-500 inline-flex items-center gap-1">
+                                        <i class="bi bi-clock text-primary"></i>{{ $t->duration }}
                                     </div>
-                                    <div class="text-warning small fw-bold">
-                                        <i class="bi bi-star-fill me-1"></i>{{ $t->rating ?: '4.9' }}
+                                    <div class="text-amber-500 font-bold inline-flex items-center gap-1">
+                                        <i class="bi bi-star-fill"></i>{{ $t->rating ?: '4.9' }}
                                     </div>
                                 </div>
-                                <h2 class="h5 fw-bold mb-2 line-clamp-2 text-dark">{{ $t->name }}</h2>
+                                <h2 class="text-base font-bold text-slate-900 mb-2 line-clamp-2 group-hover:text-primary transition-colors leading-snug">{{ $t->name }}</h2>
                                 @php $bookingsToday = (int)(($t->id * 3 + (int)date('j')) % 5 + 3); @endphp
-                                <div class="d-flex align-items-center gap-1.5 text-danger small fw-bold mb-2" style="font-size: 11px;">
-                                    <i class="bi bi-fire text-danger"></i>
+                                <div class="inline-flex items-center gap-1.5 text-red-600 text-xs font-bold mb-3">
+                                    <i class="bi bi-fire text-red-500"></i>
                                     <span>{{ $bookingsToday }} booked in last 6 hours</span>
                                 </div>
                                 
-                                <div class="d-flex flex-wrap gap-1 mb-3">
-                                    <span class="badge bg-light text-muted border small" style="font-size: 10px;">
-                                        <i class="bi bi-check2 text-success me-1"></i>4x4 Pickup
+                                <div class="flex flex-wrap gap-1.5 mb-4">
+                                    <span class="bg-slate-50 text-slate-600 border border-slate-200 text-[10px] font-medium px-2 py-0.5 rounded-full inline-flex items-center gap-1">
+                                        <i class="bi bi-check2 text-emerald-600"></i>4x4 Pickup
                                     </span>
-                                    <span class="badge bg-light text-muted border small" style="font-size: 10px;">
-                                        <i class="bi bi-check2 text-success me-1"></i>Halal Live BBQ
+                                    <span class="bg-slate-50 text-slate-600 border border-slate-200 text-[10px] font-medium px-2 py-0.5 rounded-full inline-flex items-center gap-1">
+                                        <i class="bi bi-check2 text-emerald-600"></i>Halal Live BBQ
                                     </span>
-                                    <span class="badge bg-light text-muted border small" style="font-size: 10px;">
-                                        <i class="bi bi-check2 text-success me-1"></i>Free Cancel 24h
+                                    <span class="bg-slate-50 text-slate-600 border border-slate-200 text-[10px] font-medium px-2 py-0.5 rounded-full inline-flex items-center gap-1">
+                                        <i class="bi bi-check2 text-emerald-600"></i>Free Cancel 24h
                                     </span>
                                 </div>
 
-                                <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top border-light">
+                                <div class="flex justify-between items-end mt-auto pt-3 border-t border-slate-100">
                                     <div>
-                                        <small class="text-muted d-block" style="font-size: 10px; text-transform: uppercase; font-weight: 700;">Starting from</small>
-                                        <span class="h5 fw-bold text-primary mb-0" data-aed="{{ $minPrice }}">AED {{ number_format($minPrice) }}</span>
+                                        <span class="block text-[10px] uppercase font-bold text-slate-400">Starting from</span>
+                                        <span class="text-lg font-black text-primary" data-aed="{{ $minPrice }}">AED {{ number_format($minPrice) }}</span>
                                     </div>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-2.5 py-1 text-nowrap btn-toggle-compare small" style="font-size: 0.78rem;" data-tour-id="{{ $t->id }}" onclick="event.preventDefault(); event.stopPropagation(); window.DunesCompare && window.DunesCompare.toggle(this);">
-                                            <i class="bi bi-shuffle me-1"></i> <span class="compare-btn-text">Compare</span>
+                                    <div class="flex items-center gap-1.5">
+                                        <button type="button" class="border border-slate-300 hover:border-primary text-slate-600 hover:text-primary text-xs font-semibold rounded-full px-2.5 py-1 transition-colors btn-toggle-compare inline-flex items-center gap-1 cursor-pointer" data-tour-id="{{ $t->id }}" onclick="event.preventDefault(); event.stopPropagation(); window.DunesCompare && window.DunesCompare.toggle(this);">
+                                            <i class="bi bi-shuffle"></i> <span class="compare-btn-text">Compare</span>
                                         </button>
-                                        <span role="button" tabindex="0" class="btn-circle-whatsapp fab-whatsapp" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp" onclick="event.preventDefault(); event.stopPropagation(); if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp('{{ addslashes($t->name) }}'); }" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();if(window.App&&typeof window.App.openWhatsApp==='function'){window.App.openWhatsApp('{{ addslashes($t->name) }}');}}">
-                                            <i class="bi bi-whatsapp"></i>
+                                        <span role="button" tabindex="0" class="btn-circle-whatsapp fab-whatsapp w-8 h-8 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center cursor-pointer shadow-xs transition-transform hover:scale-105" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp" onclick="event.preventDefault(); event.stopPropagation(); if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp('{{ addslashes($t->name) }}'); }" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();if(window.App&&typeof window.App.openWhatsApp==='function'){window.App.openWhatsApp('{{ addslashes($t->name) }}');}}">
+                                            <i class="bi bi-whatsapp text-sm"></i>
                                         </span>
-                                        <div class="btn-circle-desert d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-arrow-right"></i>
+                                        <div class="w-8 h-8 rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white flex items-center justify-center transition-colors">
+                                            <i class="bi bi-arrow-right text-sm"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -239,62 +229,60 @@
             @endforeach
         </div>
 
-        <div id="no-tours-message" class="text-center py-5" style="display: none;">
-            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-4" style="width: 100px; height: 100px;">
-                <i class="bi bi-search fs-1 text-muted"></i>
+        <div id="no-tours-message" class="text-center py-12" style="display: none;">
+            <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl text-slate-400">
+                <i class="bi bi-search"></i>
             </div>
-            <h2 class="h3 fw-bold mb-3">No Tours Found</h2>
-            <p class="text-muted mb-4">We couldn't find any tours matching your criteria.</p>
-            <button onclick="resetFilters()" class="btn btn-desert-animated-dark rounded-pill px-5 py-3">View All Tours</button>
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">No Tours Found</h2>
+            <p class="text-slate-500 mb-6 text-sm">We couldn't find any tours matching your criteria.</p>
+            <button onclick="resetFilters()" class="btn-desert-animated-dark font-bold text-white text-sm rounded-full px-6 py-3 cursor-pointer shadow-md">View All Tours</button>
         </div>
         @else
-        <div class="text-center py-5">
-            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-4" style="width: 100px; height: 100px;">
-                <i class="bi bi-search fs-1 text-muted"></i>
+        <div class="text-center py-12">
+            <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl text-slate-400">
+                <i class="bi bi-search"></i>
             </div>
-            <h2 class="h3 fw-bold mb-3">No Tours Found</h2>
-            <p class="text-muted mb-4">We couldn't find any tours matching your search query. Try exploring all our amazing experiences!</p>
-            <a href="{{ route('tours.index') }}" class="btn btn-desert-animated-dark rounded-pill px-5 py-3">View All Tours</a>
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">No Tours Found</h2>
+            <p class="text-slate-500 mb-6 text-sm">We couldn't find any tours matching your search query. Try exploring all our amazing experiences!</p>
+            <a href="{{ route('tours.index') }}" class="btn-desert-animated-dark font-bold text-white text-sm rounded-full px-6 py-3 inline-block shadow-md">View All Tours</a>
         </div>
         @endif
     </div>
 </section>
 
 <!-- GEO & AI Direct-Answer Catalog Buyer's Guide -->
-<section class="section py-5 bg-light border-top">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="display-5 fw-bold mb-3">Dubai Tour Selection <span class="text-primary">Guide & FAQ</span></h2>
-            <p class="text-muted lead mx-auto" style="max-width: 650px;">Expert tips to help you choose the best desert safari or city adventure for your group.</p>
+<section class="py-12 sm:py-16 bg-slate-50 border-t border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10 sm:mb-12">
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">
+                Dubai Tour Selection <span class="text-primary">Guide & FAQ</span>
+            </h2>
+            <p class="text-slate-600 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
+                Expert tips to help you choose the best desert safari or city adventure for your group.
+            </p>
         </div>
 
-        <div class="row g-4 mb-4">
-            <div class="col-md-4">
-                <div class="card h-100 p-4 border-0 rounded-4 shadow-sm bg-white">
-                    <div class="d-flex align-items-center gap-2 mb-2">
-                        <i class="bi bi-sun-fill text-warning fs-4"></i>
-                        <h3 class="h6 fw-bold text-dark mb-0">Best for First-Timers</h3>
-                    </div>
-                    <p class="text-muted small mb-0">The <strong>Evening Desert Safari</strong> offers the complete Dubai experience: dune bashing in Lahbab Red Dunes, camel ride, sandboarding, 5-star live BBQ dinner, and live shows.</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow">
+                <div class="flex items-center gap-2.5 mb-2.5">
+                    <i class="bi bi-sun-fill text-amber-500 text-xl"></i>
+                    <h3 class="text-base font-bold text-slate-900">Best for First-Timers</h3>
                 </div>
+                <p class="text-slate-600 text-sm leading-relaxed">The <strong>Evening Desert Safari</strong> offers the complete Dubai experience: dune bashing in Lahbab Red Dunes, camel ride, sandboarding, 5-star live BBQ dinner, and live shows.</p>
             </div>
-            <div class="col-md-4">
-                <div class="card h-100 p-4 border-0 rounded-4 shadow-sm bg-white">
-                    <div class="d-flex align-items-center gap-2 mb-2">
-                        <i class="bi bi-speedometer2 text-primary fs-4"></i>
-                        <h3 class="h6 fw-bold text-dark mb-0">Best for Thrill-Seekers</h3>
-                    </div>
-                    <p class="text-muted small mb-0">Choose our <strong>1000cc Dune Buggy (Can-Am / Polaris)</strong> or <strong>Quad Biking ATV tours</strong> for self-drive high-speed excitement across open dunes with full safety gear included.</p>
+            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow">
+                <div class="flex items-center gap-2.5 mb-2.5">
+                    <i class="bi bi-speedometer2 text-primary text-xl"></i>
+                    <h3 class="text-base font-bold text-slate-900">Best for Thrill-Seekers</h3>
                 </div>
+                <p class="text-slate-600 text-sm leading-relaxed">Choose our <strong>1000cc Dune Buggy (Can-Am / Polaris)</strong> or <strong>Quad Biking ATV tours</strong> for self-drive high-speed excitement across open dunes with full safety gear included.</p>
             </div>
-            <div class="col-md-4">
-                <div class="card h-100 p-4 border-0 rounded-4 shadow-sm bg-white">
-                    <div class="d-flex align-items-center gap-2 mb-2">
-                        <i class="bi bi-star-fill text-warning fs-4"></i>
-                        <h3 class="h6 fw-bold text-dark mb-0">Best for Luxury & VIPs</h3>
-                    </div>
-                    <p class="text-muted small mb-0">Book the <strong>VIP Chalet Desert Safari</strong> or <strong>Marina Catamaran Dinner Cruise</strong> featuring private air-conditioned seating, dedicated waiter service, and gourmet cuisine.</p>
+            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow">
+                <div class="flex items-center gap-2.5 mb-2.5">
+                    <i class="bi bi-star-fill text-amber-500 text-xl"></i>
+                    <h3 class="text-base font-bold text-slate-900">Best for Luxury & VIPs</h3>
                 </div>
+                <p class="text-slate-600 text-sm leading-relaxed">Book the <strong>VIP Chalet Desert Safari</strong> or <strong>Marina Catamaran Dinner Cruise</strong> featuring private air-conditioned seating, dedicated waiter service, and gourmet cuisine.</p>
             </div>
         </div>
     </div>
@@ -317,7 +305,7 @@ function applyTourFilters() {
         const matchesSearch = !currentSearch || itemName.includes(currentSearch.toLowerCase());
 
         if (matchesCat && matchesSearch) {
-            item.style.display = 'block';
+            item.style.display = 'flex';
             hasVisible = true;
         } else {
             item.style.display = 'none';
@@ -334,11 +322,11 @@ function filterTours(category) {
     currentCategory = category;
     document.querySelectorAll('.filter-btn').forEach(btn => {
         if (btn.dataset.category === category) {
-            btn.classList.remove('btn-white', 'border');
-            btn.classList.add('btn-desert-animated-dark');
+            btn.classList.remove('bg-white', 'text-slate-700', 'border', 'border-slate-200');
+            btn.classList.add('bg-slate-900', 'text-white', 'shadow-xs');
         } else {
-            btn.classList.remove('btn-desert-animated-dark');
-            btn.classList.add('btn-white', 'border');
+            btn.classList.remove('bg-slate-900', 'text-white', 'shadow-xs');
+            btn.classList.add('bg-white', 'text-slate-700', 'border', 'border-slate-200');
         }
     });
 
@@ -378,24 +366,24 @@ window.addEventListener('popstate', () => {
 <script type="application/ld+json">
 {
   "@@context": "https://schema.org",
-  "@@graph": [
+  "@graph": [
     {
-      "@@type": "CollectionPage",
-      "@@id": "{{ route('tours.index') }}#webpage",
+      "@type": "CollectionPage",
+      "@id": "{{ route('tours.index') }}#webpage",
       "url": "{{ route('tours.index') }}",
       "name": "Dubai Desert Safari Tours & City Experiences | Dunes Discovery",
       "description": "Browse and book the best Dubai desert safari tours, dune buggy rentals, quad biking, and dhow cruise dinners with Dunes Discovery Tourism.",
       "breadcrumb": {
-        "@@type": "BreadcrumbList",
+        "@type": "BreadcrumbList",
         "itemListElement": [
           {
-            "@@type": "ListItem",
+            "@type": "ListItem",
             "position": 1,
             "name": "Home",
             "item": "{{ route('home') }}"
           },
           {
-            "@@type": "ListItem",
+            "@type": "ListItem",
             "position": 2,
             "name": "Tours",
             "item": "{{ route('tours.index') }}"
@@ -403,12 +391,12 @@ window.addEventListener('popstate', () => {
         ]
       },
       "mainEntity": {
-        "@@type": "ItemList",
+        "@type": "ItemList",
         "numberOfItems": {{ $tours->count() }},
         "itemListElement": [
           @foreach($tours as $idx => $t)
           {
-            "@@type": "ListItem",
+            "@type": "ListItem",
             "position": {{ $idx + 1 }},
             "name": {!! json_encode($t->name) !!},
             "url": "{{ route('tours.show', $t->slug) }}"

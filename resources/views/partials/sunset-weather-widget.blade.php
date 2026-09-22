@@ -1,10 +1,11 @@
-<div class="d-inline-flex align-items-center gap-2 bg-dark bg-opacity-75 text-white backdrop-blur rounded-pill px-3 py-1 mb-3 border border-white border-opacity-10 shadow-sm" style="backdrop-filter: blur(10px); font-size: 0.82rem;">
-    <span class="d-flex align-items-center gap-1 text-warning fw-bold">
+<div class="inline-flex items-center gap-2 bg-slate-950/80 text-white backdrop-blur-md rounded-full px-3.5 py-1.5 mb-3 border border-white/10 shadow-sm text-xs">
+    <span class="flex items-center gap-1.5 text-amber-400 font-bold">
         <i class="bi bi-sunset-fill"></i>
         <span id="sunsetCountdownLabel">Sunset in Dubai: 6:38 PM</span>
     </span>
-    <span class="text-white-50">•</span>
-    <span class="text-light" id="desertWeatherLabel">
-        <i class="bi bi-thermometer-half text-danger"></i> 32°C • Clear Safari Skies
+    <span class="text-slate-500">•</span>
+    <span class="text-slate-200 flex items-center gap-1" id="desertWeatherLabel">
+        <i class="bi bi-thermometer-half text-rose-400"></i>
+        <span>32°C • Clear Safari Skies</span>
     </span>
 </div>

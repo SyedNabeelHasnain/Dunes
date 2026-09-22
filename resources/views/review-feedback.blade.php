@@ -3,41 +3,38 @@
 @section('title', 'Your Feedback - Dunes Discovery Tourism')
 
 @section('content')
-<section class="py-5" style="background: linear-gradient(180deg, #F8FAFC 0%, #FFFFFF 100%); min-height: 75vh;">
-    <div class="container py-4">
-        <div class="row justify-content-center">
-            <div class="col-lg-6 col-md-8">
-                <div class="card border-0 shadow-lg rounded-5 overflow-hidden p-4 p-md-5 bg-white text-center">
-                    
-                    <div class="bg-warning-subtle text-warning rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 70px; height: 70px; font-size: 2rem;">
-                        <i class="bi bi-chat-heart"></i>
-                    </div>
-
-                    <h2 class="h3 fw-800 text-dark mb-2">We value your honesty</h2>
-                    <p class="text-muted small mb-4">
-                        Dear {{ $booking->name }}, our goal is to deliver exceptional 5-star desert safari adventures. Please let us know what we could have done better on your {{ $booking->tour_name }}.
-                    </p>
-
-                    <form action="{{ route('review.feedback', $booking->reference) }}" method="POST" class="text-start">
-                        @csrf
-                        <div class="mb-4">
-                            <label class="form-label small fw-bold text-muted text-uppercase mb-2">Your Detailed Feedback</label>
-                            <textarea name="feedback" rows="4" class="form-control rounded-4 border p-3 shadow-none" placeholder="Tell our operations team what we can improve (driver, food, camp, timing)..." required></textarea>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary w-100 rounded-pill py-3 fw-800 text-white shadow-sm">
-                            Submit Private Feedback
-                        </button>
-                    </form>
-
-                    <div class="mt-4 pt-3 border-top">
-                        <small class="text-muted">
-                            Need immediate assistance? Speak directly with our guest relations team on <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $settings['site_whatsapp'] ?? '971502456056') }}" target="_blank" rel="noopener noreferrer" class="text-success fw-bold text-decoration-none"><i class="bi bi-whatsapp"></i> WhatsApp</a>.
-                        </small>
-                    </div>
-
-                </div>
+<section class="py-16 bg-gradient-to-b from-slate-50 to-white min-h-[75vh] flex items-center">
+    <div class="max-w-xl mx-auto px-4 w-full">
+        <div class="bg-white rounded-3xl shadow-xl border border-slate-100 p-8 sm:p-10 text-center">
+            
+            <div class="w-16 h-16 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center text-3xl mx-auto mb-4">
+                <i class="bi bi-chat-heart"></i>
             </div>
+
+            <h2 class="text-2xl font-black text-slate-900 mb-2">We value your honesty</h2>
+            <p class="text-slate-500 text-sm leading-relaxed mb-6">
+                Dear <strong class="text-slate-700">{{ $booking->name }}</strong>, our goal is to deliver exceptional 5-star desert safari adventures. Please let us know what we could have done better on your {{ $booking->tour_name }}.
+            </p>
+
+            <form action="{{ route('review.feedback', $booking->reference) }}" method="POST" class="text-left">
+                @csrf
+                <div class="mb-5">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Your Detailed Feedback</label>
+                    <textarea name="feedback" rows="4" class="w-full rounded-2xl border border-slate-200 p-4 text-slate-800 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-colors leading-relaxed" placeholder="Tell our operations team what we can improve (driver, food, camp, timing)..." required></textarea>
+                </div>
+
+                <button type="submit" class="btn-desert-animated w-full rounded-full py-3.5 font-extrabold text-white shadow-lg text-sm sm:text-base cursor-pointer">
+                    Submit Private Feedback
+                </button>
+            </form>
+
+            <div class="mt-6 pt-4 border-t border-slate-100 text-xs text-slate-500">
+                Need immediate assistance? Speak directly with our guest relations team on 
+                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $settings['site_whatsapp'] ?? '971502456056') }}" target="_blank" rel="noopener noreferrer" class="text-emerald-600 font-bold hover:underline inline-flex items-center gap-1">
+                    <i class="bi bi-whatsapp"></i> WhatsApp
+                </a>.
+            </div>
+
         </div>
     </div>
 </section>

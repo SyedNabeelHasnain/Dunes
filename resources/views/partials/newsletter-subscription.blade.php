@@ -5,80 +5,73 @@
 @endphp
 
 @if($newsletterEnabled)
-<section class="newsletter-section py-5 position-relative overflow-hidden" id="newsletterBlock" style="background: linear-gradient(180deg, #0b1325 0%, #060a13 100%); border-top: 1px solid rgba(255, 255, 255, 0.08);">
-    <div class="container position-relative z-2">
-        <div class="row justify-content-center">
-            <div class="col-12 col-lg-10 col-xl-8 text-center">
-                <!-- Eyebrow Badge -->
-                <div class="d-inline-flex align-items-center gap-2 px-3 py-1.5 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-15 text-warning extra-small fw-bold text-uppercase mb-3 shadow-sm">
-                    <i class="bi bi-envelope-paper-heart"></i> VIP Travel Club & Special Offers
+<section class="py-12 sm:py-16 relative overflow-hidden bg-slate-950 border-t border-white/10" id="newsletterBlock">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 relative z-10 text-center">
+        <!-- Eyebrow Badge -->
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-amber-400 text-xs font-bold uppercase tracking-wider mb-4 shadow-sm">
+            <i class="bi bi-envelope-paper-heart"></i>
+            <span>VIP Travel Club & Special Offers</span>
+        </div>
+
+        <!-- Section Heading -->
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mb-3 tracking-tight">
+            Receive Exclusive <span class="bg-gradient-to-r from-orange-400 to-amber-300 bg-clip-text text-transparent">Desert Safari Offers</span> & Guides
+        </h2>
+        <p class="text-slate-400 text-sm sm:text-base max-w-2xl mx-auto mb-8 leading-relaxed">
+            Subscribe to {{ $siteName }} for verified member discounts, seasonal adventure rates, and insider Dubai desert travel guides delivered directly to your inbox.
+        </p>
+
+        <!-- Subscription Card / Form -->
+        <div class="rounded-3xl p-4 sm:p-6 text-left bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl">
+            <form id="publicNewsletterForm" class="space-y-3" novalidate>
+                @csrf
+                <!-- Anti-Bot Honeypot -->
+                <div style="display: none !important;" aria-hidden="true">
+                    <input type="text" name="website_url" tabindex="-1" autocomplete="off">
                 </div>
 
-                <!-- Section Heading -->
-                <h2 class="display-6 fw-800 text-white mb-3">
-                    Receive Exclusive <span class="text-gradient-primary">Desert Safari Offers</span> & Guides
-                </h2>
-                <p class="text-white-50 lead fs-6 mb-4 px-md-4">
-                    Subscribe to {{ $siteName }} for verified member discounts, seasonal adventure rates, and insider Dubai desert travel guides delivered directly to your inbox.
-                </p>
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+                    <!-- Name Input -->
+                    <div class="md:col-span-4 relative">
+                        <i class="bi bi-person absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                        <input type="text" name="name" id="newsletterName" class="w-full rounded-full pl-11 pr-4 py-3 bg-white text-slate-800 text-sm font-semibold border-0 shadow-sm focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="Your Name (Optional)" maxlength="100">
+                    </div>
 
-                <!-- Subscription Card / Form -->
-                <div class="card border-0 rounded-4 shadow-lg p-3 p-md-4 text-start" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1) !important; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);">
-                    <form id="publicNewsletterForm" class="row g-3 align-items-center" novalidate>
-                        @csrf
-                        <!-- Anti-Bot Honeypot -->
-                        <div style="display: none !important;" aria-hidden="true">
-                            <input type="text" name="website_url" tabindex="-1" autocomplete="off">
-                        </div>
+                    <!-- Email Input -->
+                    <div class="md:col-span-5 relative">
+                        <i class="bi bi-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                        <input type="email" name="email" id="newsletterEmail" class="w-full rounded-full pl-11 pr-4 py-3 bg-white text-slate-800 text-sm font-semibold border-0 shadow-sm focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="Enter your email address *" required maxlength="255">
+                    </div>
 
-                        <!-- Name Input -->
-                        <div class="col-12 col-md-4">
-                            <div class="position-relative">
-                                <i class="bi bi-person position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-                                <input type="text" name="name" id="newsletterName" class="form-control rounded-pill ps-5 py-2.5 bg-white border border-light shadow-sm fw-semibold" placeholder="Your Name (Optional)" maxlength="100">
-                            </div>
-                        </div>
-
-                        <!-- Email Input -->
-                        <div class="col-12 col-md-5">
-                            <div class="position-relative">
-                                <i class="bi bi-envelope position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-                                <input type="email" name="email" id="newsletterEmail" class="form-control rounded-pill ps-5 py-2.5 bg-white border border-light shadow-sm fw-semibold" placeholder="Enter your email address *" required maxlength="255">
-                            </div>
-                        </div>
-
-                        <!-- Submit Button -->
-                        <div class="col-12 col-md-3">
-                            <button type="submit" id="btnNewsletterSubmit" class="btn btn-desert-animated w-100 rounded-pill py-2.5 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
-                                <span>Join Club</span>
-                                <i class="bi bi-arrow-right"></i>
-                            </button>
-                        </div>
-
-                        <!-- Consent & Privacy Disclaimer -->
-                        <div class="col-12 mt-2">
-                            <div class="form-check d-flex align-items-center gap-2">
-                                <input class="form-check-input mt-0 flex-shrink-0" type="checkbox" name="consent" id="newsletterConsent" required checked>
-                                <label class="form-check-label text-white-50 extra-small" for="newsletterConsent">
-                                    I agree to receive personalized newsletters and travel offers. Unsubscribe easily at any time.
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Status Alert Box -->
-                        <div class="col-12 d-none" id="newsletterStatusBox">
-                            <div class="alert mb-0 rounded-3 py-2 px-3 small d-flex align-items-center gap-2" id="newsletterAlert"></div>
-                        </div>
-                    </form>
+                    <!-- Submit Button -->
+                    <div class="md:col-span-3">
+                        <button type="submit" id="btnNewsletterSubmit" class="w-full rounded-full py-3 px-4 font-bold text-white bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 shadow-md flex items-center justify-center gap-2 text-sm transition-all cursor-pointer">
+                            <span>Join Club</span>
+                            <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Trust Badges -->
-                <div class="d-flex flex-wrap align-items-center justify-content-center gap-4 mt-4 text-white-50 extra-small">
-                    <div><i class="bi bi-shield-check text-success me-1"></i> Zero spam guarantee</div>
-                    <div><i class="bi bi-lock-fill text-warning me-1"></i> 100% Privacy protected</div>
-                    <div><i class="bi bi-check2-circle text-muted me-1"></i> Instant one-click unsubscribe</div>
+                <!-- Consent & Privacy Disclaimer -->
+                <div class="flex items-center gap-2 pt-2">
+                    <input class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer" type="checkbox" name="consent" id="newsletterConsent" required checked>
+                    <label class="text-xs text-slate-400 cursor-pointer" for="newsletterConsent">
+                        I agree to receive personalized newsletters and travel offers. Unsubscribe easily at any time.
+                    </label>
                 </div>
-            </div>
+
+                <!-- Status Alert Box -->
+                <div class="hidden" id="newsletterStatusBox">
+                    <div class="rounded-xl py-2 px-3 text-xs flex items-center gap-2" id="newsletterAlert"></div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Trust Badges -->
+        <div class="flex flex-wrap items-center justify-center gap-6 mt-6 text-xs text-slate-400">
+            <div class="flex items-center gap-1.5"><i class="bi bi-shield-check text-emerald-400"></i><span>Zero spam guarantee</span></div>
+            <div class="flex items-center gap-1.5"><i class="bi bi-lock-fill text-amber-400"></i><span>100% Privacy protected</span></div>
+            <div class="flex items-center gap-1.5"><i class="bi bi-check2-circle text-slate-400"></i><span>Instant one-click unsubscribe</span></div>
         </div>
     </div>
 </section>
