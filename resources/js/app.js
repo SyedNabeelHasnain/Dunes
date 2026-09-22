@@ -3226,7 +3226,15 @@ Alpine.data('safariMatcherModal', (config = {}) => ({
     step: 1,
     answers: { group: null, vibe: null, perk: null },
     loading: false,
-    result: null,
+    result: {
+        id: '1',
+        name: 'Standard Evening Desert Safari',
+        slug: 'standard-evening-desert-safari',
+        min_price: 120,
+        rating: 4.9,
+        duration: '6-7 Hours',
+        thumb: '/images/desert-safari-poster.avif'
+    },
     reasons: [],
     conciergePromoActive: !!config.conciergePromoActive,
     conciergePromoCode: config.conciergePromoCode || '',
@@ -3323,7 +3331,15 @@ Alpine.data('safariMatcherModal', (config = {}) => ({
         this.step = 1;
         this.answers = { group: null, vibe: null, perk: null };
         this.loading = false;
-        this.result = null;
+        this.result = {
+            id: '1',
+            name: 'Standard Evening Desert Safari',
+            slug: 'standard-evening-desert-safari',
+            min_price: 120,
+            rating: 4.9,
+            duration: '6-7 Hours',
+            thumb: '/images/desert-safari-poster.avif'
+        };
         this.reasons = [];
     },
 

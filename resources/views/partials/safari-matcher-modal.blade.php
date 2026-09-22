@@ -264,21 +264,21 @@
                     <div class="p-4 rounded-2xl bg-slate-900 border border-orange-500/30 mb-4">
                         <div class="flex flex-col sm:flex-row items-center gap-4">
                             <div class="w-full sm:w-32 h-24 rounded-xl overflow-hidden shrink-0 relative bg-slate-800">
-                                <img :src="result.thumb" :alt="result.name" class="w-full h-full object-cover">
+                                <img :src="result ? result.thumb : '/images/desert-safari-poster.avif'" :alt="result ? result.name : 'Dunes Discovery Tour'" class="w-full h-full object-cover">
                                 <span class="absolute top-1 left-1 px-1.5 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[9px]">Top Match</span>
                             </div>
                             <div class="flex-1 min-w-0 text-left">
                                 <div class="flex items-start justify-between gap-2">
-                                    <h5 class="font-extrabold text-white text-base truncate" x-text="result.name">Evening Desert Safari</h5>
+                                    <h5 class="font-extrabold text-white text-base truncate" x-text="result ? result.name : ''">Evening Desert Safari</h5>
                                     <div class="text-right shrink-0">
-                                        <div class="text-lg font-black text-amber-400 font-mono" x-text="'AED ' + (result.min_price || 120)">AED 150</div>
+                                        <div class="text-lg font-black text-amber-400 font-mono" x-text="'AED ' + ((result && result.min_price) ? result.min_price : 120)">AED 150</div>
                                         <small class="text-slate-400 text-[10px]">per person</small>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-3 text-slate-400 text-xs my-1">
                                     <span class="flex items-center gap-1"><i class="bi bi-star-fill text-amber-400"></i>4.9/5 (1,200+ Reviews)</span>
                                     <span>•</span>
-                                    <span class="flex items-center gap-1"><i class="bi bi-clock"></i><span x-text="result.duration || '6-7 Hours'"></span></span>
+                                    <span class="flex items-center gap-1"><i class="bi bi-clock"></i><span x-text="(result && result.duration) ? result.duration : '6-7 Hours'"></span></span>
                                 </div>
                                 <div class="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 mt-2">
                                     <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1">Why This Matches You:</span>
