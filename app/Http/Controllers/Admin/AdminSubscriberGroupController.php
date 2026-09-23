@@ -19,7 +19,7 @@ class AdminSubscriberGroupController extends Controller
             'subscribers',
             'subscribers as active_subscribers_count' => function ($q) {
                 $q->where('status', 'subscribed');
-            }
+            },
         ])->get();
 
         return view('admin.subscriber-groups.index', compact('groups'));

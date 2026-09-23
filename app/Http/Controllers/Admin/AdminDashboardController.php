@@ -4,11 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\BookingPayment;
 use App\Models\Contact;
 use App\Models\EmailCampaign;
 use App\Models\RequestLog;
 use App\Models\Subscriber;
-use App\Models\Tour;
+use App\Services\ZiinaPaymentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -63,22 +64,22 @@ class AdminDashboardController extends Controller
         $campaignsSent = EmailCampaign::where('status', 'sent')->count();
 
         return [
-            'revenue' => (float)$revenue,
-            'total' => (int)$totalBookings,
-            'confirmed' => (int)$confirmedBookings,
-            'completed' => (int)$completedBookings,
-            'confirmed_and_completed' => (int)$confirmedAndCompleted,
-            'pending' => (int)$pendingBookings,
-            'cancelled' => (int)$cancelledBookings,
-            'drafts' => (int)$draftBookings,
-            'aov' => (float)$avgOrderValue,
-            'conversion_rate' => (float)$conversionRate,
-            'new_inquiries' => (int)$newInquiries,
-            'total_inquiries' => (int)$totalInquiries,
-            'whatsapp_leads' => (int)$totalWhatsappLeads,
-            'subscribers_count' => (int)$subscribersCount,
-            'campaigns_count' => (int)$campaignsCount,
-            'campaigns_sent' => (int)$campaignsSent,
+            'revenue' => (float) $revenue,
+            'total' => (int) $totalBookings,
+            'confirmed' => (int) $confirmedBookings,
+            'completed' => (int) $completedBookings,
+            'confirmed_and_completed' => (int) $confirmedAndCompleted,
+            'pending' => (int) $pendingBookings,
+            'cancelled' => (int) $cancelledBookings,
+            'drafts' => (int) $draftBookings,
+            'aov' => (float) $avgOrderValue,
+            'conversion_rate' => (float) $conversionRate,
+            'new_inquiries' => (int) $newInquiries,
+            'total_inquiries' => (int) $totalInquiries,
+            'whatsapp_leads' => (int) $totalWhatsappLeads,
+            'subscribers_count' => (int) $subscribersCount,
+            'campaigns_count' => (int) $campaignsCount,
+            'campaigns_sent' => (int) $campaignsSent,
             'timestamp' => now()->toIso8601String(),
         ];
     }
@@ -113,7 +114,7 @@ class AdminDashboardController extends Controller
 
             return view('admin.dashboard', compact('stats', 'recentBookings', 'topTours', 'whatsappLeads'));
         } catch (\Throwable $e) {
-            Log::error("Admin dashboard error: " . $e->getMessage());
+            Log::error('Admin dashboard error: '.$e->getMessage());
             $stats = [
                 'revenue' => 0, 'total' => 0, 'confirmed' => 0, 'completed' => 0, 'confirmed_and_completed' => 0,
                 'pending' => 0, 'cancelled' => 0, 'drafts' => 0, 'aov' => 0, 'conversion_rate' => 0,
@@ -124,6 +125,7 @@ class AdminDashboardController extends Controller
             $recentBookings = collect();
             $topTours = collect();
             $whatsappLeads = collect();
+
             return view('admin.dashboard', compact('stats', 'recentBookings', 'topTours', 'whatsappLeads'));
         }
     }
@@ -135,6 +137,7 @@ class AdminDashboardController extends Controller
     {
         try {
             $stats = $this->computeRealtimeKpis();
+
             return response()->json([
                 'success' => true,
                 'stats' => $stats,
@@ -142,7 +145,7 @@ class AdminDashboardController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -153,7 +156,7 @@ class AdminDashboardController extends Controller
     public function analytics(Request $request)
     {
         try {
-            $days = (int)$request->input('days', 30);
+            $days = (int) $request->input('days', 30);
             $startDate = now()->subDays($days)->startOfDay();
 
             // 1. Core Traffic Stats
@@ -274,7 +277,7 @@ class AdminDashboardController extends Controller
                 'devices', 'browsers', 'logs'
             ));
         } catch (\Throwable $e) {
-            return response("ANALYTICS ERROR: " . $e->getMessage() . "\n" . $e->getTraceAsString(), 500)
+            return response('ANALYTICS ERROR: '.$e->getMessage()."\n".$e->getTraceAsString(), 500)
                 ->header('Content-Type', 'text/plain');
         }
     }
@@ -301,7 +304,7 @@ class AdminDashboardController extends Controller
 
         return response()->json([
             'count' => $count,
-            'visitors' => $visitors
+            'visitors' => $visitors,
         ]);
     }
 
@@ -327,11 +330,11 @@ class AdminDashboardController extends Controller
             $query->whereDate('created_at', '<=', $toDate);
         }
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('subject', 'like', "%{$search}%")
-                  ->orWhere('message', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('subject', 'like', "%{$search}%")
+                    ->orWhere('message', 'like', "%{$search}%");
             });
         }
 
@@ -360,7 +363,7 @@ class AdminDashboardController extends Controller
             $count = Contact::whereDate('created_at', $date)->count();
             $trendData[] = [
                 'date' => $label,
-                'count' => $count
+                'count' => $count,
             ];
         }
 
@@ -389,7 +392,7 @@ class AdminDashboardController extends Controller
     public function viewInquiry(int $id)
     {
         $inquiry = Contact::findOrFail($id);
-        
+
         // Mark as read/viewed if pending
         if ($inquiry->status === 'new') {
             $inquiry->update(['status' => 'read']);
@@ -421,13 +424,13 @@ class AdminDashboardController extends Controller
         $email = trim(strtolower($request->input('email')));
         $phone = trim($request->input('phone'));
         $description = trim($request->input('description'));
-        $amount = (float)$request->input('amount');
+        $amount = (float) $request->input('amount');
 
-        $ziina = app(\App\Services\ZiinaPaymentService::class);
+        $ziina = app(ZiinaPaymentService::class);
 
         $successUrl = route('booking.thankyou', ['pi' => '{PAYMENT_INTENT_ID}']);
         $cancelUrl = route('booking.cancel', ['pi' => '{PAYMENT_INTENT_ID}']);
-        $fullDescription = $description ?: 'Quick Payment for ' . $name;
+        $fullDescription = $description ?: 'Quick Payment for '.$name;
 
         $intent = $ziina->createPaymentIntent($amount, 'AED', $successUrl, $cancelUrl, $fullDescription);
 
@@ -435,7 +438,7 @@ class AdminDashboardController extends Controller
             return response()->json(['success' => false, 'message' => $intent['error']], 400);
         }
 
-        \App\Models\BookingPayment::create([
+        BookingPayment::create([
             'booking_id' => null,
             'payment_intent_id' => $intent['id'],
             'amount' => $amount,
@@ -446,7 +449,7 @@ class AdminDashboardController extends Controller
             'customer_name' => $name,
             'customer_email' => $email,
             'customer_phone' => $phone,
-            'description' => $description
+            'description' => $description,
         ]);
 
         return response()->json([
@@ -457,8 +460,8 @@ class AdminDashboardController extends Controller
                 'amount' => $amount,
                 'created_at' => now()->format('Y-m-d H:i:s'),
                 'status' => $intent['status'] ?? 'pending',
-                'notes' => $description
-            ]
+                'notes' => $description,
+            ],
         ]);
     }
 
@@ -468,7 +471,7 @@ class AdminDashboardController extends Controller
     public function updateInquiryStatus(Request $request, int $id)
     {
         $request->validate([
-            'status' => 'required|string|in:new,read,replied'
+            'status' => 'required|string|in:new,read,replied',
         ]);
 
         $inquiry = Contact::findOrFail($id);
@@ -491,23 +494,23 @@ class AdminDashboardController extends Controller
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => true,
-                    'message' => "Inquiry from {$name} and all associated records permanently purged."
+                    'message' => "Inquiry from {$name} and all associated records permanently purged.",
                 ]);
             }
 
             return redirect()->route('admin.inquiries.index')
                 ->with('success', "Inquiry from {$name} and all associated records permanently purged.");
         } catch (\Throwable $e) {
-            Log::error("Failed to delete contact inquiry #{$id}: " . $e->getMessage());
+            Log::error("Failed to delete contact inquiry #{$id}: ".$e->getMessage());
 
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Failed to delete inquiry: ' . $e->getMessage()
+                    'message' => 'Failed to delete inquiry: '.$e->getMessage(),
                 ], 500);
             }
 
-            return redirect()->back()->with('error', 'Failed to delete inquiry: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to delete inquiry: '.$e->getMessage());
         }
     }
 
@@ -540,7 +543,7 @@ class AdminDashboardController extends Controller
      */
     public function exportInquiriesCsv(Request $request)
     {
-        $fileName = 'dunes-inquiries-export-' . date('Y-m-d-His') . '.csv';
+        $fileName = 'dunes-inquiries-export-'.date('Y-m-d-His').'.csv';
         $query = Contact::orderBy('created_at', 'desc');
 
         if ($request->filled('status')) {
@@ -548,12 +551,12 @@ class AdminDashboardController extends Controller
         }
         if ($request->filled('search')) {
             $s = $request->search;
-            $query->where(function($q) use ($s) {
+            $query->where(function ($q) use ($s) {
                 $q->where('name', 'like', "%{$s}%")
-                  ->orWhere('email', 'like', "%{$s}%")
-                  ->orWhere('phone', 'like', "%{$s}%")
-                  ->orWhere('subject', 'like', "%{$s}%")
-                  ->orWhere('message', 'like', "%{$s}%");
+                    ->orWhere('email', 'like', "%{$s}%")
+                    ->orWhere('phone', 'like', "%{$s}%")
+                    ->orWhere('subject', 'like', "%{$s}%")
+                    ->orWhere('message', 'like', "%{$s}%");
             });
         }
         if ($request->filled('from_date')) {
@@ -564,32 +567,35 @@ class AdminDashboardController extends Controller
         }
 
         $headers = [
-            "Content-type" => "text/csv; charset=UTF-8",
-            "Content-Disposition" => "attachment; filename={$fileName}",
-            "Pragma" => "no-cache",
-            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
-            "Expires" => "0"
+            'Content-type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename={$fileName}",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
         ];
 
         $columns = ['ID', 'Date', 'Name', 'Email', 'Phone', 'Subject', 'Message', 'Status', 'IP Address'];
 
-        $sanitize = function(array $row): array {
-            return array_map(function($val) {
-                if ($val === null) return '';
+        $sanitize = function (array $row): array {
+            return array_map(function ($val) {
+                if ($val === null) {
+                    return '';
+                }
                 $str = (string) $val;
                 if (isset($str[0]) && in_array($str[0], ['=', '+', '-', '@', "\t", "\r"], true)) {
-                    return "'" . $str;
+                    return "'".$str;
                 }
+
                 return $str;
             }, $row);
         };
 
-        $callback = function() use ($query, $columns, $sanitize) {
+        $callback = function () use ($query, $columns, $sanitize) {
             $file = fopen('php://output', 'w');
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM for UTF-8
             fputcsv($file, $columns);
 
-            $query->chunk(100, function($inquiries) use ($file, $sanitize) {
+            $query->chunk(100, function ($inquiries) use ($file, $sanitize) {
                 foreach ($inquiries as $inq) {
                     fputcsv($file, $sanitize([
                         $inq->id,
@@ -600,7 +606,7 @@ class AdminDashboardController extends Controller
                         $inq->subject,
                         $inq->message,
                         $inq->status,
-                        $inq->ip_address
+                        $inq->ip_address,
                     ]));
                 }
             });
@@ -638,7 +644,7 @@ class AdminDashboardController extends Controller
 
                 return response()->json([
                     'success' => true,
-                    'message' => "{$count} inquiry(s) and all associated analytics permanently purged."
+                    'message' => "{$count} inquiry(s) and all associated analytics permanently purged.",
                 ]);
             }
 
@@ -647,15 +653,15 @@ class AdminDashboardController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => "{$count} inquiry(s) marked as " . ucfirst($newStatus) . " successfully."
+                'message' => "{$count} inquiry(s) marked as ".ucfirst($newStatus).' successfully.',
             ]);
         } catch (\Throwable $e) {
-            \Log::error("Bulk action failed on inquiries: " . $e->getMessage());
+            \Log::error('Bulk action failed on inquiries: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to process bulk action: ' . $e->getMessage()
+                'message' => 'Failed to process bulk action: '.$e->getMessage(),
             ], 500);
         }
     }
 }
-

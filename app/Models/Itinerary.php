@@ -12,7 +12,7 @@ class Itinerary extends Model
     protected $fillable = ['tour_id', 'time', 'title', 'description', 'icon', 'duration', 'priority'];
 
     protected $casts = [
-        'priority' => 'integer'
+        'priority' => 'integer',
     ];
 
     public function tour()

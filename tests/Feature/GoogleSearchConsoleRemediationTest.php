@@ -79,7 +79,7 @@ class GoogleSearchConsoleRemediationTest extends TestCase
             'review_count' => 120,
         ]);
 
-        $response = $this->get('/' . $tour->slug);
+        $response = $this->get('/'.$tour->slug);
         $response->assertStatus(200);
 
         $content = $response->getContent();

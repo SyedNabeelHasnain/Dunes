@@ -37,7 +37,7 @@ class UpdateExchangeRatesCommand extends Command
         curl_setopt($ch, CURLOPT_TIMEOUT, 12);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'User-Agent: DunesDiscoveryTourism-RateEngine/2.0'
+            'User-Agent: DunesDiscoveryTourism-RateEngine/2.0',
         ]);
 
         $response = curl_exec($ch);
@@ -46,36 +46,38 @@ class UpdateExchangeRatesCommand extends Command
         curl_close($ch);
 
         if ($httpCode !== 200 || empty($response)) {
-            $msg = "Currency sync API request failed (HTTP {$httpCode}): " . ($curlError ?: 'Empty response');
+            $msg = "Currency sync API request failed (HTTP {$httpCode}): ".($curlError ?: 'Empty response');
             $this->error($msg);
             Log::warning($msg);
+
             return Command::FAILURE;
         }
 
         $data = json_decode($response, true);
 
-        if (!isset($data['result']) || $data['result'] !== 'success' || empty($data['rates'])) {
-            $msg = "Currency sync API returned malformed or non-success payload.";
+        if (! isset($data['result']) || $data['result'] !== 'success' || empty($data['rates'])) {
+            $msg = 'Currency sync API returned malformed or non-success payload.';
             $this->error($msg);
             Log::warning($msg);
+
             return Command::FAILURE;
         }
 
         $rates = $data['rates'];
 
         $supportedCurrencies = [
-            'usd' => isset($rates['USD']) ? round((float)$rates['USD'], 4) : 0.2723,
-            'eur' => isset($rates['EUR']) ? round((float)$rates['EUR'], 4) : 0.2510,
-            'gbp' => isset($rates['GBP']) ? round((float)$rates['GBP'], 4) : 0.2150,
-            'sar' => isset($rates['SAR']) ? round((float)$rates['SAR'], 4) : 1.0210,
-            'inr' => isset($rates['INR']) ? round((float)$rates['INR'], 2) : 22.85,
+            'usd' => isset($rates['USD']) ? round((float) $rates['USD'], 4) : 0.2723,
+            'eur' => isset($rates['EUR']) ? round((float) $rates['EUR'], 4) : 0.2510,
+            'gbp' => isset($rates['GBP']) ? round((float) $rates['GBP'], 4) : 0.2150,
+            'sar' => isset($rates['SAR']) ? round((float) $rates['SAR'], 4) : 1.0210,
+            'inr' => isset($rates['INR']) ? round((float) $rates['INR'], 2) : 22.85,
         ];
 
         try {
             foreach ($supportedCurrencies as $cur => $rate) {
                 Setting::updateOrCreate(
-                    ['setting_key' => 'currency_rate_' . $cur],
-                    ['setting_value' => (string)$rate]
+                    ['setting_key' => 'currency_rate_'.$cur],
+                    ['setting_value' => (string) $rate]
                 );
                 $this->line("  ✓ {$cur} Rate: {$rate}");
             }
@@ -89,12 +91,13 @@ class UpdateExchangeRatesCommand extends Command
             Cache::forget('site_settings_cache');
 
             $this->info("Currency rates synchronized successfully at {$now}.");
-            Log::info("Currency rates synchronized successfully via Open Exchange Rates.");
+            Log::info('Currency rates synchronized successfully via Open Exchange Rates.');
 
             return Command::SUCCESS;
         } catch (\Throwable $e) {
-            $this->error("Database update failed: " . $e->getMessage());
-            Log::error("Currency rate database update failed: " . $e->getMessage());
+            $this->error('Database update failed: '.$e->getMessage());
+            Log::error('Currency rate database update failed: '.$e->getMessage());
+
             return Command::FAILURE;
         }
     }

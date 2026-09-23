@@ -14,11 +14,11 @@ class BookingPayment extends Model
     protected $fillable = [
         'booking_id', 'payment_intent_id', 'amount', 'currency', 'status',
         'payment_url', 'notes', 'customer_name', 'customer_email',
-        'customer_phone', 'description'
+        'customer_phone', 'description',
     ];
 
     protected $casts = [
-        'amount' => 'float'
+        'amount' => 'float',
     ];
 
     public function booking()

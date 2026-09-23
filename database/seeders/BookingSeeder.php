@@ -4,8 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Booking;
 use App\Models\BookingPayment;
-use App\Models\VerifiedEmail;
 use App\Models\EmailOtp;
+use App\Models\VerifiedEmail;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -46,31 +46,31 @@ class BookingSeeder extends Seeder
                     ['id' => $b['id']],
                     [
                         'reference' => $b['reference'],
-                        'tour_id' => $b['tour_id'] ? (int)$b['tour_id'] : null,
-                        'tier_id' => $b['tier_id'] ? (int)$b['tier_id'] : null,
+                        'tour_id' => $b['tour_id'] ? (int) $b['tour_id'] : null,
+                        'tier_id' => $b['tier_id'] ? (int) $b['tier_id'] : null,
                         'tour_name' => $b['tour_name'],
                         'tier_name' => $b['tier_name'],
                         'tour_date' => $b['tour_date'] ? date('Y-m-d', strtotime($b['tour_date'])) : null,
-                        'adults' => (int)($b['adults'] ?? 1),
-                        'children' => (int)($b['children'] ?? 0),
+                        'adults' => (int) ($b['adults'] ?? 1),
+                        'children' => (int) ($b['children'] ?? 0),
                         'name' => $b['name'],
                         'email' => $b['email'],
                         'phone' => $b['phone'],
                         'pickup_location' => $b['pickup_location'],
                         'special_requests' => $b['special_requests'],
-                        'subtotal' => (float)$b['subtotal'],
-                        'addons_total' => (float)($b['addons_total'] ?? 0.00),
-                        'total' => (float)$b['total'],
+                        'subtotal' => (float) $b['subtotal'],
+                        'addons_total' => (float) ($b['addons_total'] ?? 0.00),
+                        'total' => (float) $b['total'],
                         'currency' => $b['currency'] ?: 'AED',
                         'status' => $b['status'] ?: 'pending',
                         'payment_method' => $b['payment_method'] ?: 'cash',
                         'payment_status' => $b['payment_status'] ?: 'unpaid',
-                        'payment_amount' => (float)($b['payment_amount'] ?? 0.00),
-                        'balance_due' => (float)($b['balance_due'] ?? 0.00),
+                        'payment_amount' => (float) ($b['payment_amount'] ?? 0.00),
+                        'balance_due' => (float) ($b['balance_due'] ?? 0.00),
                         'ziina_payment_intent_id' => $b['ziina_payment_intent_id'],
                         'ziina_status' => $b['ziina_status'],
                         'ziina_redirect_url' => $b['ziina_redirect_url'],
-                        'request_log_id' => $b['request_log_id'] ? (int)$b['request_log_id'] : null,
+                        'request_log_id' => $b['request_log_id'] ? (int) $b['request_log_id'] : null,
                         'ip_address' => $b['ip_address'],
                         'ip_location' => $b['ip_location'],
                         'gps_lat' => $b['gps_lat'],
@@ -86,7 +86,7 @@ class BookingSeeder extends Seeder
                         'utm_campaign' => $b['utm_campaign'],
                         'utm_term' => $b['utm_term'],
                         'utm_content' => $b['utm_content'],
-                        'is_verified' => (bool)($b['is_verified'] ?? false),
+                        'is_verified' => (bool) ($b['is_verified'] ?? false),
                     ]
                 );
             }
@@ -100,9 +100,9 @@ class BookingSeeder extends Seeder
                 BookingPayment::updateOrCreate(
                     ['id' => $p['id']],
                     [
-                        'booking_id' => $p['booking_id'] ? (int)$p['booking_id'] : null,
+                        'booking_id' => $p['booking_id'] ? (int) $p['booking_id'] : null,
                         'payment_intent_id' => $p['payment_intent_id'],
-                        'amount' => (float)$p['amount'],
+                        'amount' => (float) $p['amount'],
                         'currency' => $p['currency'] ?: 'AED',
                         'status' => $p['status'],
                         'payment_url' => $p['payment_url'],
@@ -123,7 +123,7 @@ class BookingSeeder extends Seeder
             $chunks = array_chunk($inquiries, 500);
             foreach ($chunks as $chunk) {
                 foreach ($chunk as &$inq) {
-                    $inq['request_log_id'] = $inq['request_log_id'] ? (int)$inq['request_log_id'] : null;
+                    $inq['request_log_id'] = $inq['request_log_id'] ? (int) $inq['request_log_id'] : null;
                     $inq['created_at'] = $inq['created_at'] ? date('Y-m-d H:i:s', strtotime($inq['created_at'])) : now();
                 }
                 DB::table('whatsapp_inquiries')->insert($chunk);

@@ -12,7 +12,7 @@ class LegalSection extends Model
     protected $fillable = ['page_id', 'heading', 'heading_ar', 'subheading', 'subheading_ar', 'priority'];
 
     protected $casts = [
-        'priority' => 'integer'
+        'priority' => 'integer',
     ];
 
     public function page()

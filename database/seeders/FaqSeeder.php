@@ -15,7 +15,7 @@ class FaqSeeder extends Seeder
     public function run(): void
     {
         $faqsPath = database_path('seeders/data/faqs.json');
-        if (!File::exists($faqsPath)) {
+        if (! File::exists($faqsPath)) {
             return;
         }
 
@@ -27,7 +27,7 @@ class FaqSeeder extends Seeder
                     'question' => $f['question'],
                     'answer' => $f['answer'],
                     'category' => $f['category'] ?: 'general',
-                    'priority' => (int)$f['priority'],
+                    'priority' => (int) $f['priority'],
                     'status' => $f['status'] ?: 'active',
                 ]
             );
@@ -43,7 +43,7 @@ class FaqSeeder extends Seeder
                     [
                         'faq_id' => $a['faq_id'],
                         'entity_type' => $a['entity_type'] ?: 'general',
-                        'entity_id' => $a['entity_id'] ? (int)$a['entity_id'] : null,
+                        'entity_id' => $a['entity_id'] ? (int) $a['entity_id'] : null,
                     ]
                 );
             }

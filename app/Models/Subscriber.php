@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
 class Subscriber extends Model
@@ -43,7 +43,7 @@ class Subscriber extends Model
 
         static::creating(function ($subscriber) {
             if (empty($subscriber->unsubscribe_token)) {
-                $subscriber->unsubscribe_token = Str::random(40) . time();
+                $subscriber->unsubscribe_token = Str::random(40).time();
             }
             if (empty($subscriber->subscribed_at) && $subscriber->status === 'subscribed') {
                 $subscriber->subscribed_at = now();
@@ -72,8 +72,9 @@ class Subscriber extends Model
      */
     public function getFullNameAttribute(): string
     {
-        $name = trim(($this->first_name ?? '') . ' ' . ($this->last_name ?? ''));
-        return !empty($name) ? $name : ($this->email ? explode('@', $this->email)[0] : 'Subscriber');
+        $name = trim(($this->first_name ?? '').' '.($this->last_name ?? ''));
+
+        return ! empty($name) ? $name : ($this->email ? explode('@', $this->email)[0] : 'Subscriber');
     }
 
     /**
@@ -99,6 +100,6 @@ class Subscriber extends Model
      */
     public function getUnsubscribeUrlAttribute(): string
     {
-        return url('/unsubscribe/' . $this->unsubscribe_token);
+        return url('/unsubscribe/'.$this->unsubscribe_token);
     }
 }

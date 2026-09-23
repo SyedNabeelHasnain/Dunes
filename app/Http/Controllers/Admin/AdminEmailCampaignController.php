@@ -10,6 +10,7 @@ use App\Models\Subscriber;
 use App\Models\SubscriberGroup;
 use App\Services\EmailMarketingService;
 use App\Services\SettingsService;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,6 +18,7 @@ use Illuminate\Http\Request;
 class AdminEmailCampaignController extends Controller
 {
     protected EmailMarketingService $emailService;
+
     protected SettingsService $settings;
 
     public function __construct(EmailMarketingService $emailService, SettingsService $settings)
@@ -57,7 +59,7 @@ class AdminEmailCampaignController extends Controller
         $groups = SubscriberGroup::withCount([
             'subscribers as active_count' => function ($q) {
                 $q->where('status', 'subscribed');
-            }
+            },
         ])->get();
         $totalActiveSubscribers = Subscriber::where('status', 'subscribed')->count();
 
@@ -94,9 +96,9 @@ class AdminEmailCampaignController extends Controller
         $status = 'draft';
         $scheduledAt = null;
 
-        if ($validated['action'] === 'schedule' && !empty($validated['scheduled_at'])) {
+        if ($validated['action'] === 'schedule' && ! empty($validated['scheduled_at'])) {
             $status = 'scheduled';
-            $scheduledAt = \Carbon\Carbon::parse($validated['scheduled_at']);
+            $scheduledAt = Carbon::parse($validated['scheduled_at']);
         }
 
         $campaign = EmailCampaign::create([
@@ -126,7 +128,7 @@ class AdminEmailCampaignController extends Controller
 
         if ($validated['action'] === 'schedule') {
             return redirect()->route('admin.campaigns.show', $campaign->id)
-                ->with('success', "Campaign '{$campaign->title}' scheduled for broadcast on " . ($scheduledAt ? $scheduledAt->format('M d, Y h:i A') : 'scheduled time') . ".");
+                ->with('success', "Campaign '{$campaign->title}' scheduled for broadcast on ".($scheduledAt ? $scheduledAt->format('M d, Y h:i A') : 'scheduled time').'.');
         }
 
         return redirect()->route('admin.campaigns.show', $campaign->id)
@@ -152,8 +154,8 @@ class AdminEmailCampaignController extends Controller
             $s = trim($request->search);
             $logsQuery->whereHas('subscriber', function ($q) use ($s) {
                 $q->where('email', 'like', "%{$s}%")
-                  ->orWhere('first_name', 'like', "%{$s}%")
-                  ->orWhere('last_name', 'like', "%{$s}%");
+                    ->orWhere('first_name', 'like', "%{$s}%")
+                    ->orWhere('last_name', 'like', "%{$s}%");
             });
         }
 

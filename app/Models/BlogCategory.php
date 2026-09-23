@@ -12,7 +12,7 @@ class BlogCategory extends Model
     protected $fillable = ['name', 'slug', 'description', 'meta_title', 'meta_desc', 'og_image', 'priority', 'status'];
 
     protected $casts = [
-        'priority' => 'integer'
+        'priority' => 'integer',
     ];
 
     public function posts()

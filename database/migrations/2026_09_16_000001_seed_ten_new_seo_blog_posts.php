@@ -1,11 +1,11 @@
 <?php
 
+use App\Models\BlogCategory;
+use App\Models\BlogPost;
+use App\Models\BlogPostFaq;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use App\Models\BlogPost;
-use App\Models\BlogCategory;
-use App\Models\BlogPostFaq;
 
 return new class extends Migration
 {
@@ -15,12 +15,12 @@ return new class extends Migration
     public function up(): void
     {
         $postsPath = database_path('seeders/data/blog_posts.json');
-        if (!File::exists($postsPath)) {
+        if (! File::exists($postsPath)) {
             return;
         }
 
         $posts = json_decode(File::get($postsPath), true);
-        if (!is_array($posts)) {
+        if (! is_array($posts)) {
             return;
         }
 
@@ -37,16 +37,16 @@ return new class extends Migration
             'best-dubai-combo-tour-packages-save-money',
             'bedouin-culture-dubai-camel-trekking-falconry-henna-guide',
             'abu-dhabi-shore-excursion-from-dubai-cruise-port-guide',
-            'dubai-marina-dhow-cruise-deck-selection-timings-secrets'
+            'dubai-marina-dhow-cruise-deck-selection-timings-secrets',
         ];
 
         foreach ($posts as $p) {
-            if (!in_array($p['slug'], $targetSlugs)) {
+            if (! in_array($p['slug'], $targetSlugs)) {
                 continue;
             }
 
-            $targetCatId = !empty($p['category_id']) 
-                ? (BlogCategory::where('id', $p['category_id'])->value('id') ?? $defaultCatId) 
+            $targetCatId = ! empty($p['category_id'])
+                ? (BlogCategory::where('id', $p['category_id'])->value('id') ?? $defaultCatId)
                 : $defaultCatId;
 
             $post = BlogPost::updateOrCreate(
@@ -65,11 +65,11 @@ return new class extends Migration
                     'featured_image' => $p['featured_image'] ?? null,
                     'featured_image_alt' => $p['featured_image_alt'] ?? null,
                     'featured_image_caption' => $p['featured_image_caption'] ?? null,
-                    'read_time' => (int)($p['read_time'] ?? 6),
+                    'read_time' => (int) ($p['read_time'] ?? 6),
                     'status' => $p['status'] ?? 'published',
-                    'is_featured' => (bool)($p['is_featured'] ?? false),
-                    'priority' => (int)($p['priority'] ?? 99),
-                    'published_at' => !empty($p['published_at']) ? date('Y-m-d H:i:s', strtotime($p['published_at'])) : now(),
+                    'is_featured' => (bool) ($p['is_featured'] ?? false),
+                    'priority' => (int) ($p['priority'] ?? 99),
+                    'published_at' => ! empty($p['published_at']) ? date('Y-m-d H:i:s', strtotime($p['published_at'])) : now(),
                     'meta_title' => $p['meta_title'] ?? null,
                     'meta_desc' => $p['meta_desc'] ?? null,
                     'meta_keywords' => $p['meta_keywords'] ?? null,
@@ -95,7 +95,7 @@ return new class extends Migration
                             if (DB::table('blog_tags')->where('id', $tr['tag_id'])->exists()) {
                                 DB::table('blog_post_tags')->insertOrIgnore([
                                     'post_id' => $post->id,
-                                    'tag_id' => $tr['tag_id']
+                                    'tag_id' => $tr['tag_id'],
                                 ]);
                             }
                         }
@@ -113,11 +113,11 @@ return new class extends Migration
                             BlogPostFaq::updateOrCreate(
                                 [
                                     'post_id' => $post->id,
-                                    'question' => $faqData['question']
+                                    'question' => $faqData['question'],
                                 ],
                                 [
                                     'answer' => $faqData['answer'],
-                                    'priority' => (int)($faqData['priority'] ?? 99)
+                                    'priority' => (int) ($faqData['priority'] ?? 99),
                                 ]
                             );
                         }
@@ -142,7 +142,7 @@ return new class extends Migration
             'best-dubai-combo-tour-packages-save-money',
             'bedouin-culture-dubai-camel-trekking-falconry-henna-guide',
             'abu-dhabi-shore-excursion-from-dubai-cruise-port-guide',
-            'dubai-marina-dhow-cruise-deck-selection-timings-secrets'
+            'dubai-marina-dhow-cruise-deck-selection-timings-secrets',
         ];
 
         BlogPost::whereIn('slug', $targetSlugs)->delete();

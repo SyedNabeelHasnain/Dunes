@@ -15,6 +15,7 @@ class AdminPasswordResetMail extends Mailable
     use Queueable, SerializesModels;
 
     public User $user;
+
     public string $resetUrl;
 
     /**
@@ -46,7 +47,7 @@ class AdminPasswordResetMail extends Mailable
             htmlString: "
                 <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #ffffff;'>
                     <h2 style='color: #00476d; margin-top: 0;'>Reset Your Password</h2>
-                    <p style='color: #333333; font-size: 15px;'>Hello <strong>" . htmlspecialchars($this->user->name ?? 'Admin') . "</strong>,</p>
+                    <p style='color: #333333; font-size: 15px;'>Hello <strong>".htmlspecialchars($this->user->name ?? 'Admin')."</strong>,</p>
                     <p style='color: #555555; font-size: 14px; line-height: 1.6;'>You are receiving this email because we received a password reset request for your account.</p>
                     <div style='text-align: center; margin: 30px 0;'>
                         <a href='{$this->resetUrl}' style='background-color: #f69044; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 50px; font-weight: bold; display: inline-block;'>Reset Password</a>

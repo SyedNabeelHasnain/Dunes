@@ -226,7 +226,7 @@
                     </p>
                 </div>
             </div>
-            <button type="button" class="btn-desert-animated-dark font-bold text-white text-xs rounded-full px-5 py-2.5 whitespace-nowrap shrink-0 shadow-sm cursor-pointer" @click="$store.modal.open('safari-matcher')" data-bs-toggle="modal" data-bs-target="#safariMatcherModal">
+            <button type="button" class="btn-desert-animated-dark font-bold text-white text-xs rounded-full px-5 py-2.5 whitespace-nowrap shrink-0 shadow-sm cursor-pointer" @click="$store.modal.open('safari-matcher')">
                 <i class="bi bi-stars text-amber-400 me-1"></i> Match My Safari (5% OFF)
             </button>
         </div>

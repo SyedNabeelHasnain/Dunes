@@ -13,9 +13,13 @@ class WelcomeOfferMail extends Mailable
     use Queueable, SerializesModels;
 
     public string $code;
+
     public float $discount;
+
     public string $name;
+
     public string $bookingUrl;
+
     public string $brandColor = '#F58F43';
 
     /**
@@ -26,7 +30,7 @@ class WelcomeOfferMail extends Mailable
         $this->code = $code;
         $this->discount = $discount;
         $this->name = $name ?: 'Valued Traveler';
-        $this->bookingUrl = url('/') . '?promo=' . urlencode($code);
+        $this->bookingUrl = url('/').'?promo='.urlencode($code);
     }
 
     /**

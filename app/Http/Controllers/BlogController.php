@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\BlogCategory;
-use App\Models\BlogTag;
 use App\Models\BlogPost;
+use App\Models\BlogTag;
+use App\Services\SettingsService;
 use Illuminate\Http\Request;
 
 class BlogController extends Controller
@@ -40,15 +41,15 @@ class BlogController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('content', 'like', "%{$search}%")
-                  ->orWhere('excerpt', 'like', "%{$search}%");
+                    ->orWhere('content', 'like', "%{$search}%")
+                    ->orWhere('excerpt', 'like', "%{$search}%");
             });
         }
 
         $posts = $query->paginate(9)->withQueryString();
         $categories = BlogCategory::where('status', 'active')->orderBy('priority', 'asc')->get();
         $popularTags = BlogTag::withCount('posts')->orderBy('posts_count', 'desc')->limit(12)->get();
-        
+
         $featuredPosts = BlogPost::where('status', 'published')
             ->where('is_featured', true)
             ->with('category')
@@ -70,14 +71,14 @@ class BlogController extends Controller
         $featuredPost = $featuredPosts->first();
         $sideFeatured = $featuredPosts->slice(1, 2);
 
-        $settingsService = app(\App\Services\SettingsService::class);
+        $settingsService = app(SettingsService::class);
         $currentYear = date('Y');
         $defaultTitle = "Dubai Desert Safari & Travel Blog ({$currentYear}) | Expert Insights | Dunes Discovery";
-        $defaultDesc = "Read insider travel tips, desert safari packing guides, buggy safety advice, and Dubai itinerary recommendations by Dunes Discovery Tourism.";
-        $defaultKeys = "dubai travel blog, desert safari guide, dubai desert tips, travel advice dubai";
+        $defaultDesc = 'Read insider travel tips, desert safari packing guides, buggy safety advice, and Dubai itinerary recommendations by Dunes Discovery Tourism.';
+        $defaultKeys = 'dubai travel blog, desert safari guide, dubai desert tips, travel advice dubai';
 
-        $pageTitle = $categorySlug 
-            ? ucwords(str_replace('-', ' ', $categorySlug)) . " Guides ({$currentYear}) | Dunes Discovery Blog" 
+        $pageTitle = $categorySlug
+            ? ucwords(str_replace('-', ' ', $categorySlug))." Guides ({$currentYear}) | Dunes Discovery Blog"
             : ($settingsService->get('seo_blog_title') ?: $defaultTitle);
         $pageDesc = $settingsService->get('seo_blog_description') ?: $defaultDesc;
         $pageKeys = $settingsService->get('seo_blog_keywords') ?: $defaultKeys;
@@ -97,8 +98,7 @@ class BlogController extends Controller
             ->with(['category', 'tags', 'faqs'])
             ->first();
 
-
-        if (!$post) {
+        if (! $post) {
             abort(404);
         }
 
@@ -125,4 +125,3 @@ class BlogController extends Controller
         return view('blog.show', compact('post', 'relatedPosts'));
     }
 }
-

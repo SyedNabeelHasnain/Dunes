@@ -12,7 +12,7 @@ class Faq extends Model
     protected $fillable = ['question', 'answer', 'category', 'priority', 'status'];
 
     protected $casts = [
-        'priority' => 'integer'
+        'priority' => 'integer',
     ];
 
     public function assignments()

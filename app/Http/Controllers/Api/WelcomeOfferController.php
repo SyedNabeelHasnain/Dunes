@@ -11,6 +11,7 @@ use App\Services\SettingsService;
 use App\Services\VisitorTrackerService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -18,7 +19,9 @@ use Illuminate\Support\Str;
 class WelcomeOfferController extends Controller
 {
     protected VisitorTrackerService $tracker;
+
     protected MetaCapiService $metaCapi;
+
     protected SettingsService $settings;
 
     public function __construct(VisitorTrackerService $tracker, MetaCapiService $metaCapi, SettingsService $settings)
@@ -47,7 +50,7 @@ class WelcomeOfferController extends Controller
         $existing = Coupon::where('code', 'like', 'FIRST25-%')
             ->where('name', 'like', "%({$email})%")
             ->where('status', 'active')
-            ->where(function($q) {
+            ->where(function ($q) {
                 $q->whereNull('valid_until')->orWhere('valid_until', '>=', now());
             })
             ->where('created_at', '>=', now()->subHours(24))
@@ -57,12 +60,12 @@ class WelcomeOfferController extends Controller
             $coupon = $existing;
         } else {
             // Generate unique voucher code
-            $code = 'FIRST25-' . strtoupper(Str::random(5));
+            $code = 'FIRST25-'.strtoupper(Str::random(5));
 
             $coupon = Coupon::create([
                 'code' => $code,
-                'name' => 'First-Time 25% Welcome Offer (' . $email . ')',
-                'description' => 'Claimed via welcome offer popup modal by ' . $name . ' (' . $phone . ') on ' . now()->format('Y-m-d H:i'),
+                'name' => 'First-Time 25% Welcome Offer ('.$email.')',
+                'description' => 'Claimed via welcome offer popup modal by '.$name.' ('.$phone.') on '.now()->format('Y-m-d H:i'),
                 'discount_type' => 'percentage',
                 'discount_value' => 25.00,
                 'min_spend' => 0.00,
@@ -97,7 +100,7 @@ class WelcomeOfferController extends Controller
                 'name' => $name,
                 'email' => $email,
                 'phone' => $phone,
-                'subject' => 'First-Time 25% Voucher Claimed (' . $coupon->code . ')',
+                'subject' => 'First-Time 25% Voucher Claimed ('.$coupon->code.')',
                 'message' => "Customer {$name} claimed 25% first-time visitor voucher {$coupon->code}.\nPhone/WhatsApp: {$phone}\nEmail: {$email}\nExpires in 24 hours.",
                 'status' => 'new',
                 'ip_address' => $ctx['client_ip'],
@@ -109,22 +112,22 @@ class WelcomeOfferController extends Controller
                 $contact->update(['request_log_id' => $logId]);
             }
         } catch (\Throwable $e) {
-            Log::error("Failed to log welcome offer lead to contacts: " . $e->getMessage());
+            Log::error('Failed to log welcome offer lead to contacts: '.$e->getMessage());
         }
 
         // Record Lead in WhatsApp Inquiries Hub for 1-Click Retargeting
         try {
-            \Illuminate\Support\Facades\DB::table('whatsapp_inquiries')->insert([
+            DB::table('whatsapp_inquiries')->insert([
                 'name' => $name,
                 'phone' => $phone,
-                'tour_name' => '25% Welcome Offer (' . $coupon->code . ')',
+                'tour_name' => '25% Welcome Offer ('.$coupon->code.')',
                 'page_url' => $request->header('referer') ?: url('/'),
                 'message_text' => "Customer claimed 25% discount voucher {$coupon->code}. Phone: {$phone}, Email: {$email}.",
                 'request_log_id' => $logId,
                 'created_at' => now(),
             ]);
         } catch (\Throwable $e) {
-            Log::error("Failed to log welcome offer lead to whatsapp_inquiries: " . $e->getMessage());
+            Log::error('Failed to log welcome offer lead to whatsapp_inquiries: '.$e->getMessage());
         }
 
         // Send Email Voucher to Customer
@@ -134,13 +137,13 @@ class WelcomeOfferController extends Controller
                 (new WelcomeOfferMail($coupon->code, 25.00, $name))->from($fromEmail, 'Dunes Discovery Tourism')
             );
         } catch (\Throwable $e) {
-            Log::error("Failed to dispatch welcome offer email to {$email}: " . $e->getMessage());
+            Log::error("Failed to dispatch welcome offer email to {$email}: ".$e->getMessage());
         }
 
         // Trigger Meta Conversions API Lead Event
         try {
             $this->metaCapi->dispatchEvent('Lead', [
-                'event_id' => 'LEAD-WELCOME-' . strtoupper(substr(md5($email), 0, 10)),
+                'event_id' => 'LEAD-WELCOME-'.strtoupper(substr(md5($email), 0, 10)),
                 'email' => $email,
                 'phone' => $phone,
                 'custom_data' => [
@@ -149,10 +152,10 @@ class WelcomeOfferController extends Controller
                     'coupon' => $coupon->code,
                     'value' => 0.00,
                     'currency' => 'AED',
-                ]
+                ],
             ]);
         } catch (\Throwable $e) {
-            Log::error("Meta CAPI Lead event error: " . $e->getMessage());
+            Log::error('Meta CAPI Lead event error: '.$e->getMessage());
         }
 
         return response()->json([
@@ -165,7 +168,7 @@ class WelcomeOfferController extends Controller
                 'savings_text' => '25% OFF Today',
                 'valid_until' => $coupon->valid_until ? $coupon->valid_until->toIso8601String() : null,
                 'timer_seconds' => 900, // 15 minutes session urgency
-            ]
+            ],
         ]);
     }
 }

@@ -14,7 +14,7 @@ class Tour extends Model
         'pickup_time', 'dropoff_time', 'min_age', 'group_size', 'languages',
         'hero_image', 'thumb_image', 'og_image', 'video_url', 'rating',
         'review_count', 'is_bestseller', 'is_featured', 'status', 'priority',
-        'meta_title', 'meta_desc', 'meta_keywords'
+        'meta_title', 'meta_desc', 'meta_keywords',
     ];
 
     protected $casts = [
@@ -23,7 +23,7 @@ class Tour extends Model
         'rating' => 'float',
         'review_count' => 'integer',
         'min_age' => 'integer',
-        'priority' => 'integer'
+        'priority' => 'integer',
     ];
 
     public function category()

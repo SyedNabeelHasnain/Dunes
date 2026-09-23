@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Cache;
 class AdminMailSettingController extends Controller
 {
     protected SettingsService $settingsService;
+
     protected EmailMarketingService $emailService;
 
     public function __construct(SettingsService $settingsService, EmailMarketingService $emailService)
@@ -28,6 +29,7 @@ class AdminMailSettingController extends Controller
     public function index()
     {
         $settings = $this->settingsService->all()->all();
+
         return view('admin.settings.mail', compact('settings'));
     }
 
@@ -54,21 +56,21 @@ class AdminMailSettingController extends Controller
         $keys = [
             'smtp_driver', 'smtp_host', 'smtp_port', 'smtp_encryption',
             'smtp_username', 'smtp_from_address', 'smtp_from_name',
-            'smtp_reply_to', 'newsletter_batch_size', 'newsletter_batch_delay'
+            'smtp_reply_to', 'newsletter_batch_size', 'newsletter_batch_delay',
         ];
 
         foreach ($keys as $k) {
             Setting::updateOrCreate(
                 ['setting_key' => $k],
-                ['setting_value' => (string)($validated[$k] ?? '')]
+                ['setting_value' => (string) ($validated[$k] ?? '')]
             );
         }
 
         // Only update password if provided
-        if (!empty($validated['smtp_password'])) {
+        if (! empty($validated['smtp_password'])) {
             Setting::updateOrCreate(
                 ['setting_key' => 'smtp_password'],
-                ['setting_value' => (string)$validated['smtp_password']]
+                ['setting_value' => (string) $validated['smtp_password']]
             );
         }
 
@@ -100,8 +102,8 @@ class AdminMailSettingController extends Controller
             <h2 style='color: #F58F43;'>SMTP Connection Test Successful!</h2>
             <p>Hello,</p>
             <p>This is a live diagnostic confirmation that your mail configuration on <strong>{$siteName}</strong> is properly configured and successfully communicating with your mail server.</p>
-            <p style='font-size: 13px; color: #64748b;'>Timestamp: " . now()->toRfc2822String() . "</p>
-        </div>";
+            <p style='font-size: 13px; color: #64748b;'>Timestamp: ".now()->toRfc2822String().'</p>
+        </div>';
 
         $res = $this->emailService->sendTestEmail($recipient, "SMTP Diagnostic Test - {$siteName}", $htmlContent);
 

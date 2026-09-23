@@ -252,7 +252,6 @@ function toggleAddonPrice(id) {
 
     if (isChecked) {
         priceGroup.classList.remove('hidden');
-        priceGroup.classList.remove('d-none');
         priceInput.removeAttribute('disabled');
         priceInput.setAttribute('required', 'true');
     } else {

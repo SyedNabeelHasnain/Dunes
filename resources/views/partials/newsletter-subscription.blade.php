@@ -110,8 +110,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         submitBtn.disabled = true;
         const originalBtnHtml = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Subscribing...';
-        statusBox.classList.add('d-none');
+        submitBtn.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Subscribing...';
+        statusBox.classList.add('hidden');
 
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
@@ -155,9 +155,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function showAlert(msg, type) {
-        statusBox.classList.remove('d-none');
-        alertBox.className = `alert alert-${type} mb-0 rounded-3 py-2 px-3 small d-flex align-items-center gap-2`;
-        alertBox.innerHTML = `<i class="bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'} fs-6"></i> <span>${msg}</span>`;
+        statusBox.classList.remove('hidden');
+        if (type === 'success') {
+            alertBox.className = 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-xl py-2.5 px-3.5 text-xs flex items-center gap-2';
+            alertBox.innerHTML = `<i class="bi bi-check-circle-fill text-emerald-400 text-sm"></i> <span>${msg}</span>`;
+        } else {
+            alertBox.className = 'bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-xl py-2.5 px-3.5 text-xs flex items-center gap-2';
+            alertBox.innerHTML = `<i class="bi bi-exclamation-triangle-fill text-rose-400 text-sm"></i> <span>${msg}</span>`;
+        }
     }
 });
 </script>

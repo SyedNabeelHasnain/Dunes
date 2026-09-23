@@ -21,7 +21,7 @@ class Booking extends Model
         'ziina_redirect_url', 'request_log_id', 'ip_address', 'ip_location',
         'gps_lat', 'gps_lng', 'gps_address', 'device_type', 'browser',
         'platform', 'user_agent', 'referrer', 'utm_source', 'utm_medium',
-        'utm_campaign', 'utm_term', 'utm_content', 'is_verified'
+        'utm_campaign', 'utm_term', 'utm_content', 'is_verified',
     ];
 
     protected $casts = [
@@ -37,7 +37,7 @@ class Booking extends Model
         'total' => 'float',
         'payment_amount' => 'float',
         'balance_due' => 'float',
-        'is_verified' => 'boolean'
+        'is_verified' => 'boolean',
     ];
 
     /**
@@ -53,7 +53,7 @@ class Booking extends Model
      */
     public function getDiscountAttribute(): float
     {
-        return (float)($this->discount_amount ?? 0);
+        return (float) ($this->discount_amount ?? 0);
     }
 
     /**

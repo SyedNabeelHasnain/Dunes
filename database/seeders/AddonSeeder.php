@@ -14,7 +14,7 @@ class AddonSeeder extends Seeder
     public function run(): void
     {
         $path = database_path('seeders/data/addons.json');
-        if (!File::exists($path)) {
+        if (! File::exists($path)) {
             return;
         }
 
@@ -27,9 +27,9 @@ class AddonSeeder extends Seeder
                     'name' => $a['name'],
                     'description' => $a['description'],
                     'icon' => $a['icon'],
-                    'default_price' => (float)$a['default_price'],
+                    'default_price' => (float) $a['default_price'],
                     'status' => $a['status'] ?: 'active',
-                    'priority' => (int)$a['priority'],
+                    'priority' => (int) $a['priority'],
                 ]
             );
         }

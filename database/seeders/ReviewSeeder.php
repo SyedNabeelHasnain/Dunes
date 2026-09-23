@@ -14,7 +14,7 @@ class ReviewSeeder extends Seeder
     public function run(): void
     {
         $path = database_path('seeders/data/reviews.json');
-        if (!File::exists($path)) {
+        if (! File::exists($path)) {
             return;
         }
 
@@ -30,11 +30,11 @@ class ReviewSeeder extends Seeder
                     'reviewer_name' => $r['reviewer_name'],
                     'reviewer_avatar_url' => $r['reviewer_avatar_url'],
                     'reviewer_profile_url' => $r['reviewer_profile_url'],
-                    'rating' => (float)$r['rating'],
+                    'rating' => (float) $r['rating'],
                     'review_title' => $r['review_title'],
                     'review_text' => $r['review_text'],
                     'status' => $r['status'] ?: 'approved',
-                    'is_featured' => (bool)$r['is_featured'],
+                    'is_featured' => (bool) $r['is_featured'],
                     'imported_at' => $r['imported_at'] ? date('Y-m-d H:i:s', strtotime($r['imported_at'])) : now(),
                 ]
             );

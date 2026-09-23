@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Review;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AdminReviewController extends Controller
 {
@@ -21,7 +22,7 @@ class AdminReviewController extends Controller
         $query = Review::query();
 
         if ($rating) {
-            $query->where('rating', (float)$rating);
+            $query->where('rating', (float) $rating);
         }
         if ($status) {
             $query->where('status', $status);
@@ -30,10 +31,10 @@ class AdminReviewController extends Controller
             $query->where('source', $source);
         }
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('reviewer_name', 'like', "%{$search}%")
-                  ->orWhere('review_title', 'like', "%{$search}%")
-                  ->orWhere('review_text', 'like', "%{$search}%");
+                    ->orWhere('review_title', 'like', "%{$search}%")
+                    ->orWhere('review_text', 'like', "%{$search}%");
             });
         }
 
@@ -41,7 +42,7 @@ class AdminReviewController extends Controller
 
         // 1. Review Key Performance Statistics
         $totalReviews = Review::count();
-        $avgRating = $totalReviews > 0 ? round((float)Review::avg('rating'), 1) : 5.0;
+        $avgRating = $totalReviews > 0 ? round((float) Review::avg('rating'), 1) : 5.0;
         $approvedCount = Review::where('status', 'approved')->count();
         $pendingCount = Review::where('status', 'pending')->count();
         $fiveStarCount = Review::where('rating', '>=', 5)->count();
@@ -65,7 +66,7 @@ class AdminReviewController extends Controller
         ];
 
         // 3. Review Source Breakdown
-        $sourceBreakdown = Review::select('source', \Illuminate\Support\Facades\DB::raw('count(*) as count'))
+        $sourceBreakdown = Review::select('source', DB::raw('count(*) as count'))
             ->groupBy('source')
             ->get();
 
@@ -95,7 +96,7 @@ class AdminReviewController extends Controller
 
         Review::create([
             'reviewer_name' => $request->reviewer_name,
-            'rating' => (float)$request->rating,
+            'rating' => (float) $request->rating,
             'review_text' => $request->review_text,
             'review_title' => $request->review_title,
             'status' => $request->status,
@@ -124,7 +125,7 @@ class AdminReviewController extends Controller
 
         $review->update([
             'reviewer_name' => $request->reviewer_name,
-            'rating' => (float)$request->rating,
+            'rating' => (float) $request->rating,
             'review_text' => $request->review_text,
             'review_title' => $request->review_title,
             'status' => $request->status,
@@ -142,6 +143,7 @@ class AdminReviewController extends Controller
     {
         $review = Review::findOrFail($id);
         $review->delete();
+
         return redirect()->route('admin.reviews.index')->with('success', 'Review deleted successfully.');
     }
 
@@ -157,7 +159,7 @@ class AdminReviewController extends Controller
         return response()->json([
             'success' => true,
             'status' => $review->status,
-            'message' => 'Review status updated to ' . ucfirst($review->status) . '.'
+            'message' => 'Review status updated to '.ucfirst($review->status).'.',
         ]);
     }
 }

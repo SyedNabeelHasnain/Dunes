@@ -15,7 +15,7 @@ class ContentItemSeeder extends Seeder
     public function run(): void
     {
         $itemsPath = database_path('seeders/data/content_items.json');
-        if (!File::exists($itemsPath)) {
+        if (! File::exists($itemsPath)) {
             return;
         }
 
@@ -28,7 +28,7 @@ class ContentItemSeeder extends Seeder
                     'icon' => $item['icon'],
                     'title' => $item['title'],
                     'description' => $item['description'],
-                    'priority' => (int)$item['priority'],
+                    'priority' => (int) $item['priority'],
                 ]
             );
         }
@@ -40,11 +40,11 @@ class ContentItemSeeder extends Seeder
             foreach ($tourContent as $tc) {
                 DB::table('tour_content')->updateOrInsert(
                     [
-                        'id' => $tc['id']
+                        'id' => $tc['id'],
                     ],
                     [
                         'tour_id' => $tc['tour_id'],
-                        'tier_id' => $tc['tier_id'] ? (int)$tc['tier_id'] : null,
+                        'tier_id' => $tc['tier_id'] ? (int) $tc['tier_id'] : null,
                         'content_id' => $tc['content_id'],
                     ]
                 );

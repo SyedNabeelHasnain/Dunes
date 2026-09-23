@@ -12,7 +12,7 @@ class LegalItem extends Model
     protected $fillable = ['section_id', 'content', 'content_ar', 'priority'];
 
     protected $casts = [
-        'priority' => 'integer'
+        'priority' => 'integer',
     ];
 
     public function section()

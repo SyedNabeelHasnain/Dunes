@@ -33,9 +33,6 @@
     $email = $settings['site_email'] ?? 'info@dunesdiscoverytourism.com';
     $conciergePromoActive = isset($settings['concierge_promo_active']) && $settings['concierge_promo_active'] === '1';
     $conciergePromoDiscount = $settings['concierge_promo_discount'] ?? '5';
-    
-    $cssFile = public_path('assets/css/app.min.css');
-    $cacheVer = file_exists($cssFile) ? filemtime($cssFile) : ($settings['cache_version'] ?? time());
 
     $currentYear = date('Y');
     $pageTitle = $pageTitle ?? "Dunes Discovery Tourism | Dubai Desert Safari Tours ({$currentYear})";

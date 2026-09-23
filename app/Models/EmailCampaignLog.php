@@ -41,7 +41,7 @@ class EmailCampaignLog extends Model
 
         static::creating(function ($log) {
             if (empty($log->tracking_token)) {
-                $log->tracking_token = Str::random(40) . time();
+                $log->tracking_token = Str::random(40).time();
             }
         });
     }

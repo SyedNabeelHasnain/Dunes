@@ -3,23 +3,27 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\BookingNotification;
+use App\Mail\PaymentLinkMail;
 use App\Models\Booking;
 use App\Models\BookingAddon;
 use App\Models\BookingPayment;
 use App\Models\Coupon;
 use App\Models\CouponUsage;
-use App\Models\Review;
 use App\Models\RequestLog;
+use App\Models\Review;
+use App\Models\Setting;
+use App\Services\SettingsService;
+use App\Services\ZiinaPaymentService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
-use App\Mail\BookingNotification;
-use App\Mail\PaymentLinkMail;
-use App\Services\SettingsService;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class AdminBookingController extends Controller
 {
@@ -46,12 +50,12 @@ class AdminBookingController extends Controller
             $query->where('payment_status', $paymentStatus);
         }
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('reference', 'like', "%{$search}%")
-                  ->orWhere('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%")
-                  ->orWhere('tour_name', 'like', "%{$search}%");
+                    ->orWhere('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('tour_name', 'like', "%{$search}%");
             });
         }
         if ($fromDate) {
@@ -69,7 +73,7 @@ class AdminBookingController extends Controller
             ->whereIn('payment_status', ['paid', 'partial'])
             ->count();
         $avgOrderValue = $paidCount > 0 ? round($revenue / $paidCount, 2) : 0;
-        $addonsRevenue = (float)Booking::whereIn('status', ['confirmed', 'completed'])->sum('addons_total');
+        $addonsRevenue = (float) Booking::whereIn('status', ['confirmed', 'completed'])->sum('addons_total');
 
         $stats = [
             'total' => Booking::where('status', '!=', 'draft')->count(),
@@ -88,7 +92,7 @@ class AdminBookingController extends Controller
             $date = now()->subDays($i)->format('Y-m-d');
             $label = now()->subDays($i)->format('M j');
             $count = Booking::whereDate('created_at', $date)->where('status', '!=', 'draft')->count();
-            $dayRev = (float)Booking::whereDate('created_at', $date)->whereIn('status', ['confirmed', 'completed'])->sum('payment_amount');
+            $dayRev = (float) Booking::whereDate('created_at', $date)->whereIn('status', ['confirmed', 'completed'])->sum('payment_amount');
             $trendData[] = [
                 'date' => $label,
                 'count' => $count,
@@ -106,6 +110,7 @@ class AdminBookingController extends Controller
         ];
 
         $bookings = $query->orderBy('created_at', 'desc')->get();
+
         return view('admin.bookings.index', compact('bookings', 'status', 'search', 'paymentStatus', 'fromDate', 'toDate', 'stats', 'trendData', 'statusDistribution'));
     }
 
@@ -114,7 +119,7 @@ class AdminBookingController extends Controller
      */
     public function exportCsv(Request $request)
     {
-        $fileName = 'dunes-bookings-export-' . date('Y-m-d-His') . '.csv';
+        $fileName = 'dunes-bookings-export-'.date('Y-m-d-His').'.csv';
         $query = Booking::with(['tour', 'tier'])->orderBy('created_at', 'desc');
 
         if ($request->filled('status')) {
@@ -125,46 +130,49 @@ class AdminBookingController extends Controller
         }
         if ($request->filled('search')) {
             $s = $request->search;
-            $query->where(function($q) use ($s) {
+            $query->where(function ($q) use ($s) {
                 $q->where('reference', 'like', "%{$s}%")
-                  ->orWhere('name', 'like', "%{$s}%")
-                  ->orWhere('email', 'like', "%{$s}%")
-                  ->orWhere('phone', 'like', "%{$s}%");
+                    ->orWhere('name', 'like', "%{$s}%")
+                    ->orWhere('email', 'like', "%{$s}%")
+                    ->orWhere('phone', 'like', "%{$s}%");
             });
         }
 
         $headers = [
-            "Content-type" => "text/csv; charset=UTF-8",
-            "Content-Disposition" => "attachment; filename={$fileName}",
-            "Pragma" => "no-cache",
-            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
-            "Expires" => "0"
+            'Content-type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename={$fileName}",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
         ];
 
         $columns = [
             'Reference', 'Created At', 'Customer Name', 'Email', 'Phone',
             'Tour Name', 'Package Tier', 'Tour Date', 'Pickup Time', 'Adults',
             'Children', 'Infants', 'Pickup Location', 'Total (AED)', 'Paid (AED)',
-            'Balance Due (AED)', 'Payment Method', 'Payment Status', 'Booking Status'
+            'Balance Due (AED)', 'Payment Method', 'Payment Status', 'Booking Status',
         ];
 
-        $sanitize = function(array $row): array {
-            return array_map(function($val) {
-                if ($val === null) return '';
+        $sanitize = function (array $row): array {
+            return array_map(function ($val) {
+                if ($val === null) {
+                    return '';
+                }
                 $str = (string) $val;
                 if (isset($str[0]) && in_array($str[0], ['=', '+', '-', '@', "\t", "\r"], true)) {
-                    return "'" . $str;
+                    return "'".$str;
                 }
+
                 return $str;
             }, $row);
         };
 
-        $callback = function() use ($query, $columns, $sanitize) {
+        $callback = function () use ($query, $columns, $sanitize) {
             $file = fopen('php://output', 'w');
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
             fputcsv($file, $columns);
 
-            $query->chunk(100, function($rows) use ($file, $sanitize) {
+            $query->chunk(100, function ($rows) use ($file, $sanitize) {
                 foreach ($rows as $b) {
                     fputcsv($file, $sanitize([
                         $b->reference,
@@ -185,7 +193,7 @@ class AdminBookingController extends Controller
                         $b->balance_due,
                         $b->payment_method,
                         $b->payment_status,
-                        $b->status
+                        $b->status,
                     ]));
                 }
             });
@@ -201,7 +209,7 @@ class AdminBookingController extends Controller
     public function show(string $id)
     {
         $booking = Booking::with(['tour', 'tier', 'addons', 'payments'])->findOrFail($id);
-        
+
         $log = null;
         if ($booking->request_log_id) {
             $log = RequestLog::find($booking->request_log_id);
@@ -224,17 +232,17 @@ class AdminBookingController extends Controller
         ]);
 
         $paymentStatus = $request->input('payment_status');
-        $balanceDue = (float)$request->input('balance_due');
-        $paymentAmount = (float)$booking->payment_amount;
+        $balanceDue = (float) $request->input('balance_due');
+        $paymentAmount = (float) $booking->payment_amount;
 
         if ($paymentStatus === 'paid') {
             $balanceDue = 0.00;
-            $paymentAmount = (float)$booking->total;
+            $paymentAmount = (float) $booking->total;
         } elseif ($paymentStatus === 'unpaid') {
-            $balanceDue = (float)$booking->total;
+            $balanceDue = (float) $booking->total;
             $paymentAmount = 0.00;
         } else {
-            $paymentAmount = max(0, (float)$booking->total - $balanceDue);
+            $paymentAmount = max(0, (float) $booking->total - $balanceDue);
         }
 
         $oldStatus = $booking->status;
@@ -252,7 +260,7 @@ class AdminBookingController extends Controller
             try {
                 $settings = app(SettingsService::class);
                 $fromEmail = $settings->getFromEmail();
-                
+
                 if ($booking->status === 'confirmed') {
                     Mail::to($booking->email)->send(
                         (new BookingNotification('booking_confirmed', $booking))->from($fromEmail, 'Dunes Discovery Tourism')
@@ -263,7 +271,7 @@ class AdminBookingController extends Controller
                     );
                 }
             } catch (\Throwable $e) {
-                \Log::error("Failed to send booking status change email: " . $e->getMessage());
+                \Log::error('Failed to send booking status change email: '.$e->getMessage());
             }
         }
 
@@ -284,27 +292,27 @@ class AdminBookingController extends Controller
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => true,
-                    'message' => "Booking #{$reference} and all associated records permanently purged."
+                    'message' => "Booking #{$reference} and all associated records permanently purged.",
                 ]);
             }
 
             return redirect()->route('admin.bookings.index')
                 ->with('success', "Booking #{$reference} and all associated records permanently purged.");
         } catch (\Throwable $e) {
-            Log::error("Failed to permanently delete booking #{$reference}: " . $e->getMessage(), [
+            Log::error("Failed to permanently delete booking #{$reference}: ".$e->getMessage(), [
                 'booking_id' => $id,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Failed to delete booking: ' . $e->getMessage()
+                    'message' => 'Failed to delete booking: '.$e->getMessage(),
                 ], 500);
             }
 
             return redirect()->back()
-                ->with('error', 'Failed to delete booking: ' . $e->getMessage());
+                ->with('error', 'Failed to delete booking: '.$e->getMessage());
         }
     }
 
@@ -345,7 +353,7 @@ class AdminBookingController extends Controller
             // 4. Delete Reviews directly linked to this booking & cleanup storage photos
             $reviews = Review::where('booking_id', $bookingId)->get();
             foreach ($reviews as $review) {
-                if (!empty($review->photos) && is_array($review->photos)) {
+                if (! empty($review->photos) && is_array($review->photos)) {
                     foreach ($review->photos as $photo) {
                         if (is_string($photo) && str_starts_with($photo, '/storage/')) {
                             $relativePath = str_replace('/storage/', '', $photo);
@@ -383,25 +391,25 @@ class AdminBookingController extends Controller
     public function createPaymentLink(Request $request, string $id)
     {
         $booking = Booking::findOrFail($id);
-        
+
         $request->validate([
             'amount' => 'required|numeric|min:1',
             'notes' => 'nullable|string|max:255',
             'send_method' => 'required|string|in:none,whatsapp,email',
         ]);
 
-        $amount = (float)$request->input('amount');
+        $amount = (float) $request->input('amount');
         $notes = trim($request->input('notes', ''));
         $sendMethod = $request->input('send_method');
 
-        $ziina = app(\App\Services\ZiinaPaymentService::class);
+        $ziina = app(ZiinaPaymentService::class);
 
         $successUrl = route('booking.thankyou', ['pi' => '{PAYMENT_INTENT_ID}']);
         $cancelUrl = route('booking.cancel', ['pi' => '{PAYMENT_INTENT_ID}']);
-        
-        $description = 'Booking ' . $booking->reference;
-        if (!empty($notes)) {
-            $description .= ' ' . $notes;
+
+        $description = 'Booking '.$booking->reference;
+        if (! empty($notes)) {
+            $description .= ' '.$notes;
         }
 
         $intent = $ziina->createPaymentIntent($amount, 'AED', $successUrl, $cancelUrl, $description);
@@ -414,27 +422,27 @@ class AdminBookingController extends Controller
             return response()->json(['success' => false, 'message' => 'Payment link could not be generated.'], 400);
         }
 
-        $payment = \App\Models\BookingPayment::create([
+        $payment = BookingPayment::create([
             'booking_id' => $booking->id,
             'payment_intent_id' => $intent['id'],
             'amount' => $amount,
             'currency' => 'AED',
             'status' => $intent['status'] ?? 'pending',
             'payment_url' => $intent['redirect_url'],
-            'notes' => $notes
+            'notes' => $notes,
         ]);
 
         $message = 'Payment link created successfully.';
 
         if ($sendMethod === 'whatsapp') {
-            $defaultCountry = \App\Models\Setting::where('setting_key', 'whatsapp_default_country')->value('setting_value') ?? '971';
+            $defaultCountry = Setting::where('setting_key', 'whatsapp_default_country')->value('setting_value') ?? '971';
             $phone = preg_replace('/[^0-9]/', '', $booking->phone);
             if (substr($phone, 0, strlen($defaultCountry)) !== $defaultCountry) {
-                $phone = $defaultCountry . ltrim($phone, '0');
+                $phone = $defaultCountry.ltrim($phone, '0');
             }
             $text = "Hello {$booking->name}, please use this link to complete your payment for booking #{$booking->reference}: {$intent['redirect_url']}";
             $whatsappUrl = 'https://wa.me/'.$phone.'?text='.urlencode($text);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Link created. Redirecting to WhatsApp...',
@@ -444,8 +452,8 @@ class AdminBookingController extends Controller
                     'amount' => number_format($amount),
                     'status' => $payment->status,
                     'link' => $payment->payment_url,
-                    'notes' => $notes
-                ]
+                    'notes' => $notes,
+                ],
             ]);
         } elseif ($sendMethod === 'email') {
             try {
@@ -455,7 +463,7 @@ class AdminBookingController extends Controller
                 );
                 $message = 'Payment link created and email sent successfully.';
             } catch (\Throwable $e) {
-                \Log::error("Failed to send payment link email: " . $e->getMessage());
+                \Log::error('Failed to send payment link email: '.$e->getMessage());
                 $message = 'Payment link created but email sending failed.';
             }
         }
@@ -468,8 +476,8 @@ class AdminBookingController extends Controller
                 'amount' => number_format($amount),
                 'status' => $payment->status,
                 'link' => $payment->payment_url,
-                'notes' => $notes
-            ]
+                'notes' => $notes,
+            ],
         ]);
     }
 
@@ -479,23 +487,25 @@ class AdminBookingController extends Controller
     public function resendPaymentEmail(Request $request, string $id)
     {
         $booking = Booking::findOrFail($id);
-        
+
         $request->validate([
             'link' => 'required|url',
             'amount' => 'required|numeric',
         ]);
 
         $link = $request->input('link');
-        $amount = (float)$request->input('amount');
+        $amount = (float) $request->input('amount');
 
         try {
             $fromEmail = app(SettingsService::class)->getFromEmail();
             Mail::to($booking->email)->send(
                 (new PaymentLinkMail($booking, $amount, $link, ''))->from($fromEmail, 'Dunes Discovery Tourism')
             );
+
             return response()->json(['success' => true, 'message' => 'Email sent successfully.']);
         } catch (\Throwable $e) {
-            \Log::error("Failed to resend payment email: " . $e->getMessage());
+            \Log::error('Failed to resend payment email: '.$e->getMessage());
+
             return response()->json(['success' => false, 'message' => 'Failed to send email.'], 500);
         }
     }
@@ -526,25 +536,27 @@ class AdminBookingController extends Controller
                 });
 
                 Cache::forget('admin_dashboard_kpis');
+
                 return response()->json([
                     'success' => true,
-                    'message' => "{$count} booking(s) and all associated records permanently purged."
+                    'message' => "{$count} booking(s) and all associated records permanently purged.",
                 ]);
             }
 
             $newStatus = str_replace('status_', '', $action);
             $count = Booking::whereIn('id', $ids)->update(['status' => $newStatus]);
-            \Illuminate\Support\Facades\Cache::forget('admin_dashboard_kpis');
+            Cache::forget('admin_dashboard_kpis');
 
             return response()->json([
                 'success' => true,
-                'message' => "{$count} booking(s) updated to " . ucfirst($newStatus) . " successfully."
+                'message' => "{$count} booking(s) updated to ".ucfirst($newStatus).' successfully.',
             ]);
         } catch (\Throwable $e) {
-            \Log::error("Bulk action failed on bookings: " . $e->getMessage());
+            \Log::error('Bulk action failed on bookings: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to process bulk action: ' . $e->getMessage()
+                'message' => 'Failed to process bulk action: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -558,21 +570,21 @@ class AdminBookingController extends Controller
 
         $verificationUrl = route('booking.voucher', $booking->reference);
         try {
-            $qrSvg = (string) \SimpleSoftwareIO\QrCode\Facades\QrCode::size(150)->margin(1)->generate($verificationUrl);
-            $qrCodeUrl = 'data:image/svg+xml;base64,' . base64_encode($qrSvg);
+            $qrSvg = (string) QrCode::size(150)->margin(1)->generate($verificationUrl);
+            $qrCodeUrl = 'data:image/svg+xml;base64,'.base64_encode($qrSvg);
         } catch (\Throwable $e) {
-            $qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=4&data=' . urlencode($verificationUrl);
+            $qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=4&data='.urlencode($verificationUrl);
         }
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('booking.ticket-pdf', compact('booking', 'qrCodeUrl'))
+        $pdf = Pdf::loadView('booking.ticket-pdf', compact('booking', 'qrCodeUrl'))
             ->setPaper('a4', 'portrait')
             ->setOption([
                 'isRemoteEnabled' => true,
                 'dpi' => 120,
-                'defaultFont' => 'sans-serif'
+                'defaultFont' => 'sans-serif',
             ]);
 
-        return $pdf->download('Dunes-Voucher-' . $booking->reference . '.pdf');
+        return $pdf->download('Dunes-Voucher-'.$booking->reference.'.pdf');
     }
 
     /**
@@ -588,7 +600,7 @@ class AdminBookingController extends Controller
             ->whereIn('payment_status', ['paid', 'partial'])
             ->count();
         $avgOrderValue = $paidCount > 0 ? round($revenue / $paidCount, 2) : 0;
-        $addonsRevenue = (float)Booking::whereIn('status', ['confirmed', 'completed'])->sum('addons_total');
+        $addonsRevenue = (float) Booking::whereIn('status', ['confirmed', 'completed'])->sum('addons_total');
 
         $stats = [
             'total' => Booking::where('status', '!=', 'draft')->count(),
@@ -609,4 +621,3 @@ class AdminBookingController extends Controller
         ]);
     }
 }
-

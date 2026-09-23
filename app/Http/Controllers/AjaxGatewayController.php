@@ -2,21 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Tour;
+use App\Http\Controllers\Api\ApiController;
+use App\Http\Controllers\Api\EmailVerificationController;
 use App\Models\Booking;
 use App\Models\LegalPage;
-use Illuminate\Support\Facades\Cache;
-use App\Http\Controllers\Api\ApiController;
-use App\Http\Controllers\BookingController;
-use App\Http\Controllers\PageController;
-use App\Http\Controllers\Api\EmailVerificationController;
+use App\Models\Tour;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class AjaxGatewayController extends Controller
 {
     protected $apiController;
+
     protected $bookingController;
+
     protected $pageController;
+
     protected $emailVerificationController;
 
     public function __construct(
@@ -37,9 +38,9 @@ class AjaxGatewayController extends Controller
 
         switch ($action) {
             case 'getTiers':
-                $tourId = (int)$request->input('tour_id');
+                $tourId = (int) $request->input('tour_id');
                 $tour = Tour::find($tourId);
-                if (!$tour) {
+                if (! $tour) {
                     return response()->json(['error' => 'Invalid tour'], 400);
                 }
 
@@ -67,31 +68,32 @@ class AjaxGatewayController extends Controller
                             'name' => $addon->name,
                             'description' => $addon->description,
                             'icon' => $addon->icon ?: 'plus-circle',
-                            'price' => (float)$addon->pivot->price,
+                            'price' => (float) $addon->pivot->price,
                         ];
                     });
 
                 return response()->json([
                     'tiers' => $tiers,
-                    'addons' => $addons
+                    'addons' => $addons,
                 ]);
 
             case 'get_legal_content':
                 $type = $request->input('type');
-                if (!$type) {
+                if (! $type) {
                     return response()->json(['success' => false, 'message' => 'Missing content type']);
                 }
 
                 $page = LegalPage::where('slug', $type)->first();
-                if (!$page) {
+                if (! $page) {
                     return response()->json(['success' => false, 'message' => 'Content not found']);
                 }
 
-                $sections = $page->sections()->orderBy('priority', 'asc')->with(['items' => function($q) {
+                $sections = $page->sections()->orderBy('priority', 'asc')->with(['items' => function ($q) {
                     $q->orderBy('priority', 'asc');
                 }])->get();
 
                 $html = view('partials.legal-modal-content', compact('page', 'sections'))->render();
+
                 return response()->json(['success' => true, 'html' => $html]);
 
             case 'geoip':
@@ -122,7 +124,7 @@ class AjaxGatewayController extends Controller
 
             case 'subscribe_newsletter':
             case 'subscribe':
-                return app(\App\Http\Controllers\SubscriberController::class)->subscribe($request);
+                return app(SubscriberController::class)->subscribe($request);
 
             default:
                 return response()->json(['error' => 'Invalid action'], 400);
@@ -151,9 +153,9 @@ class AjaxGatewayController extends Controller
                         $tourSlug = $b->tour ? $b->tour->slug : 'tours';
                         $heroImage = ($b->tour && $b->tour->hero_image) ? $b->tour->hero_image : 'evening-desert-safari-dubai-hero.avif';
 
-                        $nameParts = preg_split('/\s+/', trim((string)($b->name ?: 'Guest')));
+                        $nameParts = preg_split('/\s+/', trim((string) ($b->name ?: 'Guest')));
                         $firstName = $nameParts[0] ?: 'Guest';
-                        $initial = isset($nameParts[1]) && !empty($nameParts[1]) ? strtoupper(substr($nameParts[1], 0, 1)) . '.' : '';
+                        $initial = isset($nameParts[1]) && ! empty($nameParts[1]) ? strtoupper(substr($nameParts[1], 0, 1)).'.' : '';
                         $displayName = $initial ? "{$firstName} {$initial}" : $firstName;
 
                         $diffMins = max(6, $b->created_at ? $b->created_at->diffInMinutes() : 18);
@@ -161,10 +163,10 @@ class AjaxGatewayController extends Controller
                             $timeAgo = "{$diffMins} minutes ago";
                         } elseif ($diffMins < 1440) {
                             $hrs = floor($diffMins / 60);
-                            $timeAgo = "{$hrs} " . ($hrs == 1 ? 'hour' : 'hours') . " ago";
+                            $timeAgo = "{$hrs} ".($hrs == 1 ? 'hour' : 'hours').' ago';
                         } else {
                             $days = min(3, floor($diffMins / 1440));
-                            $timeAgo = "{$days} " . ($days == 1 ? 'day' : 'days') . " ago";
+                            $timeAgo = "{$days} ".($days == 1 ? 'day' : 'days').' ago';
                         }
 
                         $cleanImage = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $heroImage);
@@ -172,10 +174,10 @@ class AjaxGatewayController extends Controller
                         $list[] = [
                             'name' => $displayName,
                             'tour' => $tourName,
-                            'url' => url('/' . $tourSlug),
-                            'image' => asset('images/' . $cleanImage),
+                            'url' => url('/'.$tourSlug),
+                            'image' => asset('images/'.$cleanImage),
                             'time_ago' => $timeAgo,
-                            'location' => 'Dubai'
+                            'location' => 'Dubai',
                         ];
                     }
                 } catch (\Throwable $e) {
@@ -196,10 +198,10 @@ class AjaxGatewayController extends Controller
                         $list[] = [
                             'name' => $f['name'],
                             'tour' => $f['tour'],
-                            'url' => url('/' . $f['slug']),
-                            'image' => asset('images/' . $f['img']),
+                            'url' => url('/'.$f['slug']),
+                            'image' => asset('images/'.$f['img']),
                             'time_ago' => $f['time'],
-                            'location' => 'Dubai'
+                            'location' => 'Dubai',
                         ];
                     }
                 }
@@ -209,7 +211,7 @@ class AjaxGatewayController extends Controller
 
             return response()->json([
                 'success' => true,
-                'items' => $proofs
+                'items' => $proofs,
             ]);
         } catch (\Throwable $e) {
             return response()->json([
@@ -221,9 +223,9 @@ class AjaxGatewayController extends Controller
                         'url' => url('/tours'),
                         'image' => asset('images/evening-desert-safari-dubai-hero.avif'),
                         'time_ago' => '14 minutes ago',
-                        'location' => 'Dubai'
-                    ]
-                ]
+                        'location' => 'Dubai',
+                    ],
+                ],
             ]);
         }
     }

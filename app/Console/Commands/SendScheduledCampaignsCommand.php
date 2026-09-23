@@ -39,6 +39,7 @@ class SendScheduledCampaignsCommand extends Command
 
         if ($campaigns->isEmpty()) {
             $this->info('No pending scheduled campaigns to dispatch.');
+
             return Command::SUCCESS;
         }
 
@@ -54,12 +55,13 @@ class SendScheduledCampaignsCommand extends Command
                 $dispatched++;
                 $this->info("Campaign #{$campaign->id} dispatched successfully to {$res['sent']} recipient(s).");
             } catch (\Throwable $e) {
-                Log::error("Failed to dispatch scheduled campaign #{$campaign->id}: " . $e->getMessage());
-                $this->error("Error dispatching campaign #{$campaign->id}: " . $e->getMessage());
+                Log::error("Failed to dispatch scheduled campaign #{$campaign->id}: ".$e->getMessage());
+                $this->error("Error dispatching campaign #{$campaign->id}: ".$e->getMessage());
             }
         }
 
         $this->info("Finished processing. Total scheduled campaigns dispatched: {$dispatched}.");
+
         return Command::SUCCESS;
     }
 }

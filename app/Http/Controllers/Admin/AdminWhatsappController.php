@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Setting;
-use App\Models\WhatsappInquiry;
 use App\Models\RequestLog;
+use App\Models\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -48,11 +48,11 @@ class AdminWhatsappController extends Controller
             $query->where('request_logs.device_type', $deviceType);
         }
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('whatsapp_inquiries.name', 'like', "%{$search}%")
-                  ->orWhere('whatsapp_inquiries.phone', 'like', "%{$search}%")
-                  ->orWhere('whatsapp_inquiries.tour_name', 'like', "%{$search}%")
-                  ->orWhere('whatsapp_inquiries.message_text', 'like', "%{$search}%");
+                    ->orWhere('whatsapp_inquiries.phone', 'like', "%{$search}%")
+                    ->orWhere('whatsapp_inquiries.tour_name', 'like', "%{$search}%")
+                    ->orWhere('whatsapp_inquiries.message_text', 'like', "%{$search}%");
             });
         }
 
@@ -62,7 +62,7 @@ class AdminWhatsappController extends Controller
         $totalLeads = DB::table('whatsapp_inquiries')->count();
         $todayLeads = DB::table('whatsapp_inquiries')->whereDate('created_at', today())->count();
         $monthLeads = DB::table('whatsapp_inquiries')->where('created_at', '>=', now()->startOfMonth())->count();
-        
+
         $mobileCount = DB::table('whatsapp_inquiries')
             ->leftJoin('request_logs', 'whatsapp_inquiries.request_log_id', '=', 'request_logs.id')
             ->where('request_logs.device_type', 'mobile')
@@ -84,7 +84,7 @@ class AdminWhatsappController extends Controller
             $count = DB::table('whatsapp_inquiries')->whereDate('created_at', $date)->count();
             $trendData[] = [
                 'date' => $label,
-                'count' => $count
+                'count' => $count,
             ];
         }
 
@@ -157,11 +157,11 @@ class AdminWhatsappController extends Controller
         foreach ($settings as $key => $value) {
             Setting::updateOrCreate(
                 ['setting_key' => $key],
-                ['setting_value' => $value !== null ? trim((string)$value) : '']
+                ['setting_value' => $value !== null ? trim((string) $value) : '']
             );
         }
 
-        \Illuminate\Support\Facades\Cache::forget('site_settings_cache');
+        Cache::forget('site_settings_cache');
 
         return redirect()->route('admin.whatsapp.settings')->with('success', 'WhatsApp settings updated successfully.');
     }
@@ -171,7 +171,7 @@ class AdminWhatsappController extends Controller
      */
     public function exportCsv()
     {
-        $fileName = 'dunes-whatsapp-leads-' . date('Y-m-d-His') . '.csv';
+        $fileName = 'dunes-whatsapp-leads-'.date('Y-m-d-His').'.csv';
         $leads = DB::table('whatsapp_inquiries')
             ->leftJoin('request_logs', 'whatsapp_inquiries.request_log_id', '=', 'request_logs.id')
             ->select(
@@ -187,30 +187,33 @@ class AdminWhatsappController extends Controller
             ->get();
 
         $headers = [
-            "Content-type" => "text/csv; charset=UTF-8",
-            "Content-Disposition" => "attachment; filename={$fileName}",
-            "Pragma" => "no-cache",
-            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
-            "Expires" => "0"
+            'Content-type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename={$fileName}",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
         ];
 
         $columns = [
             'ID', 'Timestamp', 'Customer Name', 'Phone Number', 'Tour / Activity',
-            'Source Page URL', 'Prefill Message', 'Client IP', 'Location', 'Device Type', 'OS / Browser'
+            'Source Page URL', 'Prefill Message', 'Client IP', 'Location', 'Device Type', 'OS / Browser',
         ];
 
-        $sanitize = function(array $row): array {
-            return array_map(function($val) {
-                if ($val === null) return '';
+        $sanitize = function (array $row): array {
+            return array_map(function ($val) {
+                if ($val === null) {
+                    return '';
+                }
                 $str = (string) $val;
                 if (isset($str[0]) && in_array($str[0], ['=', '+', '-', '@', "\t", "\r"], true)) {
-                    return "'" . $str;
+                    return "'".$str;
                 }
+
                 return $str;
             }, $row);
         };
 
-        $callback = function() use ($leads, $columns, $sanitize) {
+        $callback = function () use ($leads, $columns, $sanitize) {
             $file = fopen('php://output', 'w');
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
             fputcsv($file, $columns);
@@ -225,9 +228,9 @@ class AdminWhatsappController extends Controller
                     $lead->page_url ?: '',
                     $lead->message_text ?: '',
                     $lead->client_ip ?: '',
-                    ($lead->city ?: 'Unknown') . ', ' . ($lead->country ?: ''),
+                    ($lead->city ?: 'Unknown').', '.($lead->country ?: ''),
                     $lead->device_type ?: 'Desktop',
-                    ($lead->os_name ?: '') . ' / ' . ($lead->browser_name ?: '')
+                    ($lead->os_name ?: '').' / '.($lead->browser_name ?: ''),
                 ]));
             }
             fclose($file);
@@ -243,31 +246,33 @@ class AdminWhatsappController extends Controller
     {
         try {
             $lead = DB::table('whatsapp_inquiries')->where('id', $id)->first();
-            if (!$lead) {
+            if (! $lead) {
                 if ($request->ajax() || $request->wantsJson()) {
                     return response()->json(['success' => false, 'message' => 'WhatsApp lead not found.'], 404);
                 }
+
                 return redirect()->route('admin.whatsapp.leads')->with('error', 'WhatsApp lead not found.');
             }
 
             $leadName = $lead->name ?: 'Lead';
-            $this->purgeLeadData($id, $lead->request_log_id ? (int)$lead->request_log_id : null);
+            $this->purgeLeadData($id, $lead->request_log_id ? (int) $lead->request_log_id : null);
 
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => true,
-                    'message' => "WhatsApp lead ({$leadName}) and all associated records permanently purged."
+                    'message' => "WhatsApp lead ({$leadName}) and all associated records permanently purged.",
                 ]);
             }
 
             return redirect()->route('admin.whatsapp.leads')
                 ->with('success', "WhatsApp lead ({$leadName}) and all associated records permanently purged.");
         } catch (\Throwable $e) {
-            Log::error("Failed to delete WhatsApp lead #{$id}: " . $e->getMessage());
+            Log::error("Failed to delete WhatsApp lead #{$id}: ".$e->getMessage());
             if ($request->ajax() || $request->wantsJson()) {
-                return response()->json(['success' => false, 'message' => 'Failed to delete lead: ' . $e->getMessage()], 500);
+                return response()->json(['success' => false, 'message' => 'Failed to delete lead: '.$e->getMessage()], 500);
             }
-            return redirect()->back()->with('error', 'Failed to delete lead: ' . $e->getMessage());
+
+            return redirect()->back()->with('error', 'Failed to delete lead: '.$e->getMessage());
         }
     }
 
@@ -312,23 +317,24 @@ class AdminWhatsappController extends Controller
                 DB::transaction(function () use ($ids, &$count) {
                     $leads = DB::table('whatsapp_inquiries')->whereIn('id', $ids)->get();
                     foreach ($leads as $lead) {
-                        $this->purgeLeadData($lead->id, $lead->request_log_id ? (int)$lead->request_log_id : null);
+                        $this->purgeLeadData($lead->id, $lead->request_log_id ? (int) $lead->request_log_id : null);
                         $count++;
                     }
                 });
 
                 return response()->json([
                     'success' => true,
-                    'message' => "{$count} lead(s) and all associated analytics permanently purged."
+                    'message' => "{$count} lead(s) and all associated analytics permanently purged.",
                 ]);
             }
 
             return response()->json(['success' => false, 'message' => 'Invalid action.'], 400);
         } catch (\Throwable $e) {
-            Log::error("Bulk action failed on WhatsApp inquiries: " . $e->getMessage());
+            Log::error('Bulk action failed on WhatsApp inquiries: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to process bulk action: ' . $e->getMessage()
+                'message' => 'Failed to process bulk action: '.$e->getMessage(),
             ], 500);
         }
     }

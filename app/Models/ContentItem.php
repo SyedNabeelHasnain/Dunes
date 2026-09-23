@@ -12,7 +12,7 @@ class ContentItem extends Model
     protected $fillable = ['type', 'icon', 'title', 'description', 'priority'];
 
     protected $casts = [
-        'priority' => 'integer'
+        'priority' => 'integer',
     ];
 
     public function tours()

@@ -111,7 +111,7 @@
                     </p>
                 </div>
                 <div class="shrink-0 w-full sm:w-auto text-center lg:text-right">
-                    <button type="button" class="w-full sm:w-auto btn-desert-animated rounded-full px-6 py-3 font-bold text-white text-sm shadow-md inline-flex items-center justify-center gap-2 cursor-pointer" @click="$store.modal.open('safari-matcher')" data-bs-toggle="modal" data-bs-target="#safariMatcherModal">
+                    <button type="button" class="w-full sm:w-auto btn-desert-animated rounded-full px-6 py-3 font-bold text-white text-sm shadow-md inline-flex items-center justify-center gap-2 cursor-pointer" @click="$store.modal.open('safari-matcher')">
                         <i class="bi bi-compass text-base"></i>
                         <span>Launch Safari Concierge</span>
                     </button>

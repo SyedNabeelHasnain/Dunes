@@ -12,6 +12,6 @@ class WhatsappInquiry extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'request_log_id', 'name', 'phone', 'tour_name', 'page_url', 'message_text'
+        'request_log_id', 'name', 'phone', 'tour_name', 'page_url', 'message_text',
     ];
 }

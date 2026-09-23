@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Tier;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
 class TierSeeder extends Seeder
@@ -14,13 +14,13 @@ class TierSeeder extends Seeder
     public function run(): void
     {
         $path = database_path('seeders/data/tiers.json');
-        if (!File::exists($path)) {
+        if (! File::exists($path)) {
             return;
         }
 
         $tiers = json_decode(File::get($path), true);
         foreach ($tiers as $t) {
-            \Illuminate\Support\Facades\DB::table('tiers')->insertOrIgnore([
+            DB::table('tiers')->insertOrIgnore([
                 'id' => $t['id'],
                 'slug' => $t['slug'],
                 'name' => $t['name'],
@@ -29,8 +29,8 @@ class TierSeeder extends Seeder
                 'icon' => $t['icon'],
                 'badge' => $t['badge'],
                 'color' => $t['color'],
-                'is_popular' => (bool)$t['is_popular'],
-                'priority' => (int)$t['priority'],
+                'is_popular' => (bool) $t['is_popular'],
+                'priority' => (int) $t['priority'],
                 'status' => $t['status'] ?: 'active',
                 'created_at' => now(),
                 'updated_at' => now(),

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
 use App\Models\Tour;
+use App\Services\LocationLandingService;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 
@@ -14,8 +15,8 @@ class SitemapController extends Controller
      */
     public function index(): Response
     {
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        $xml .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+        $xml .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
 
         $latestTour = Tour::where('status', 'active')->latest('updated_at')->first();
         $latestBlog = BlogPost::where('status', 'published')->latest('updated_at')->first();
@@ -51,26 +52,27 @@ class SitemapController extends Controller
         $content = Cache::remember('sitemap_tours_xml', 3600, function () {
             $tours = Tour::where('status', 'active')->select('slug', 'name', 'hero_image', 'updated_at')->get();
 
-            $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-            $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' . "\n";
+            $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+            $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">'."\n";
 
             foreach ($tours as $tour) {
                 $xml .= "  <url>\n";
-                $xml .= "    <loc>" . url('/' . $tour->slug) . "</loc>\n";
-                $xml .= "    <lastmod>" . ($tour->updated_at ? $tour->updated_at->toAtomString() : now()->toAtomString()) . "</lastmod>\n";
+                $xml .= '    <loc>'.url('/'.$tour->slug)."</loc>\n";
+                $xml .= '    <lastmod>'.($tour->updated_at ? $tour->updated_at->toAtomString() : now()->toAtomString())."</lastmod>\n";
                 $xml .= "    <changefreq>daily</changefreq>\n";
                 $xml .= "    <priority>0.9</priority>\n";
-                if (!empty($tour->hero_image)) {
+                if (! empty($tour->hero_image)) {
                     $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image);
                     $xml .= "    <image:image>\n";
-                    $xml .= "      <image:loc>" . asset('images/' . $imgFile) . "</image:loc>\n";
-                    $xml .= "      <image:title>" . htmlspecialchars($tour->name) . "</image:title>\n";
+                    $xml .= '      <image:loc>'.asset('images/'.$imgFile)."</image:loc>\n";
+                    $xml .= '      <image:title>'.htmlspecialchars($tour->name)."</image:title>\n";
                     $xml .= "    </image:image>\n";
                 }
                 $xml .= "  </url>\n";
             }
 
             $xml .= '</urlset>';
+
             return $xml;
         });
 
@@ -85,26 +87,27 @@ class SitemapController extends Controller
         $content = Cache::remember('sitemap_blogs_xml', 3600, function () {
             $blogs = BlogPost::where('status', 'published')->select('slug', 'title', 'featured_image', 'updated_at')->get();
 
-            $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-            $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' . "\n";
+            $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+            $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">'."\n";
 
             foreach ($blogs as $blog) {
                 $xml .= "  <url>\n";
-                $xml .= "    <loc>" . url('/blog/' . $blog->slug) . "</loc>\n";
-                $xml .= "    <lastmod>" . ($blog->updated_at ? $blog->updated_at->toAtomString() : now()->toAtomString()) . "</lastmod>\n";
+                $xml .= '    <loc>'.url('/blog/'.$blog->slug)."</loc>\n";
+                $xml .= '    <lastmod>'.($blog->updated_at ? $blog->updated_at->toAtomString() : now()->toAtomString())."</lastmod>\n";
                 $xml .= "    <changefreq>weekly</changefreq>\n";
                 $xml .= "    <priority>0.8</priority>\n";
-                if (!empty($blog->featured_image)) {
+                if (! empty($blog->featured_image)) {
                     $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $blog->featured_image);
                     $xml .= "    <image:image>\n";
-                    $xml .= "      <image:loc>" . asset('images/blog/' . $imgFile) . "</image:loc>\n";
-                    $xml .= "      <image:title>" . htmlspecialchars($blog->title) . "</image:title>\n";
+                    $xml .= '      <image:loc>'.asset('images/blog/'.$imgFile)."</image:loc>\n";
+                    $xml .= '      <image:title>'.htmlspecialchars($blog->title)."</image:title>\n";
                     $xml .= "    </image:image>\n";
                 }
                 $xml .= "  </url>\n";
             }
 
             $xml .= '</urlset>';
+
             return $xml;
         });
 
@@ -116,8 +119,8 @@ class SitemapController extends Controller
      */
     public function pages(): Response
     {
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
 
         $staticPages = [
             '' => ['changefreq' => 'weekly', 'priority' => '1.0'],
@@ -140,14 +143,14 @@ class SitemapController extends Controller
         ];
 
         // Pillar 2: Programmatic Geo-Location Pickup Pages
-        foreach (\App\Services\LocationLandingService::getLocations() as $loc) {
-            $staticPages['/' . $loc['slug']] = ['changefreq' => 'weekly', 'priority' => '0.9'];
+        foreach (LocationLandingService::getLocations() as $loc) {
+            $staticPages['/'.$loc['slug']] = ['changefreq' => 'weekly', 'priority' => '0.9'];
         }
 
         foreach ($staticPages as $page => $meta) {
-            $loc = ($page === '' || $page === '/') ? (rtrim(url('/'), '/') . '/') : url($page);
+            $loc = ($page === '' || $page === '/') ? (rtrim(url('/'), '/').'/') : url($page);
             $xml .= "  <url>\n";
-            $xml .= "    <loc>" . $loc . "</loc>\n";
+            $xml .= '    <loc>'.$loc."</loc>\n";
             $xml .= "    <changefreq>{$meta['changefreq']}</changefreq>\n";
             $xml .= "    <priority>{$meta['priority']}</priority>\n";
             $xml .= "  </url>\n";
@@ -170,17 +173,17 @@ class SitemapController extends Controller
             $tours = Tour::where('status', 'active')->whereNotNull('hero_image')->get();
             $blogs = BlogPost::where('status', 'published')->whereNotNull('featured_image')->get();
 
-            $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-            $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' . "\n";
+            $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+            $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">'."\n";
 
             foreach ($tours as $tour) {
                 $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image);
                 $xml .= "  <url>\n";
-                $xml .= "    <loc>" . url('/' . $tour->slug) . "</loc>\n";
+                $xml .= '    <loc>'.url('/'.$tour->slug)."</loc>\n";
                 $xml .= "    <image:image>\n";
-                $xml .= "      <image:loc>" . asset('images/' . $imgFile) . "</image:loc>\n";
-                $xml .= "      <image:title>" . htmlspecialchars($tour->name) . " - Dubai Desert Safari</image:title>\n";
-                $xml .= "      <image:caption>" . htmlspecialchars($tour->short_desc ?: $tour->name) . "</image:caption>\n";
+                $xml .= '      <image:loc>'.asset('images/'.$imgFile)."</image:loc>\n";
+                $xml .= '      <image:title>'.htmlspecialchars($tour->name)." - Dubai Desert Safari</image:title>\n";
+                $xml .= '      <image:caption>'.htmlspecialchars($tour->short_desc ?: $tour->name)."</image:caption>\n";
                 $xml .= "    </image:image>\n";
                 $xml .= "  </url>\n";
             }
@@ -188,26 +191,27 @@ class SitemapController extends Controller
             foreach ($blogs as $blog) {
                 $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $blog->featured_image);
                 $xml .= "  <url>\n";
-                $xml .= "    <loc>" . url('/blog/' . $blog->slug) . "</loc>\n";
+                $xml .= '    <loc>'.url('/blog/'.$blog->slug)."</loc>\n";
                 $xml .= "    <image:image>\n";
-                $xml .= "      <image:loc>" . asset('images/blog/' . $imgFile) . "</image:loc>\n";
-                $xml .= "      <image:title>" . htmlspecialchars($blog->title) . "</image:title>\n";
+                $xml .= '      <image:loc>'.asset('images/blog/'.$imgFile)."</image:loc>\n";
+                $xml .= '      <image:title>'.htmlspecialchars($blog->title)."</image:title>\n";
                 $xml .= "    </image:image>\n";
                 $xml .= "  </url>\n";
             }
 
-            foreach (\App\Services\LocationLandingService::getLocations() as $loc) {
+            foreach (LocationLandingService::getLocations() as $loc) {
                 $xml .= "  <url>\n";
-                $xml .= "    <loc>" . url('/' . $loc['slug']) . "</loc>\n";
+                $xml .= '    <loc>'.url('/'.$loc['slug'])."</loc>\n";
                 $xml .= "    <image:image>\n";
-                $xml .= "      <image:loc>" . asset('images/desert-safari-poster.avif') . "</image:loc>\n";
-                $xml .= "      <image:title>" . htmlspecialchars($loc['headline']) . "</image:title>\n";
-                $xml .= "      <image:caption>" . htmlspecialchars($loc['subheadline']) . "</image:caption>\n";
+                $xml .= '      <image:loc>'.asset('images/desert-safari-poster.avif')."</image:loc>\n";
+                $xml .= '      <image:title>'.htmlspecialchars($loc['headline'])."</image:title>\n";
+                $xml .= '      <image:caption>'.htmlspecialchars($loc['subheadline'])."</image:caption>\n";
                 $xml .= "    </image:image>\n";
                 $xml .= "  </url>\n";
             }
 
             $xml .= '</urlset>';
+
             return $xml;
         });
 

@@ -17,6 +17,7 @@ class AdminBlogController extends Controller
     public function index()
     {
         $posts = BlogPost::with('category')->orderBy('created_at', 'desc')->get();
+
         return view('admin.blogs.index', compact('posts'));
     }
 
@@ -27,6 +28,7 @@ class AdminBlogController extends Controller
     {
         $categories = BlogCategory::where('status', 'active')->orderBy('priority', 'asc')->get();
         $tags = BlogTag::all();
+
         return view('admin.blogs.create', compact('categories', 'tags'));
     }
 
@@ -79,6 +81,7 @@ class AdminBlogController extends Controller
         $post = BlogPost::with('tags')->findOrFail($id);
         $categories = BlogCategory::where('status', 'active')->orderBy('priority', 'asc')->get();
         $tags = BlogTag::all();
+
         return view('admin.blogs.edit', compact('post', 'categories', 'tags'));
     }
 
@@ -132,6 +135,7 @@ class AdminBlogController extends Controller
     {
         $post = BlogPost::findOrFail($id);
         $post->delete();
+
         return redirect()->route('admin.blogs.index')->with('success', 'Blog post deleted successfully.');
     }
 
@@ -150,7 +154,7 @@ class AdminBlogController extends Controller
         return response()->json([
             'success' => true,
             'status' => $post->status,
-            'message' => 'Article status updated to ' . ucfirst($post->status) . '.'
+            'message' => 'Article status updated to '.ucfirst($post->status).'.',
         ]);
     }
 }

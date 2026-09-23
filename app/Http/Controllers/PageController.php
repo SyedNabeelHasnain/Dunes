@@ -2,19 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ContactAcknowledgement;
+use App\Mail\ContactNotification;
+use App\Mail\WhatsappLeadNotification;
+use App\Models\Booking;
 use App\Models\Contact;
 use App\Models\Faq;
 use App\Models\FaqAssignment;
+use App\Models\Review;
+use App\Models\VerifiedEmail;
 use App\Models\WhatsappInquiry;
+use App\Services\SettingsService;
 use App\Services\VisitorTrackerService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
-use App\Mail\ContactNotification;
-use App\Mail\ContactAcknowledgement;
-use App\Mail\WhatsappLeadNotification;
-use App\Services\SettingsService;
+use Illuminate\Support\Facades\Mail;
 
 class PageController extends Controller
 {
@@ -34,7 +37,7 @@ class PageController extends Controller
         $currentYear = date('Y');
         $defaultTitle = "About Dunes Discovery Tourism ({$currentYear}) | Leading Dubai Desert Safari Operator";
         $defaultDesc = "Learn about Dunes Discovery Tourism LLC, Dubai's premier DTCM-licensed desert safari & adventure operator since 2018. Over 25+ luxury 4x4 Land Cruisers, 5-star live BBQ camps, and 10,000+ happy travelers.";
-        $defaultKeys = "about dunes discovery tourism, dubai desert safari operator, licensed tourism company dubai, luxury desert safaris";
+        $defaultKeys = 'about dunes discovery tourism, dubai desert safari operator, licensed tourism company dubai, luxury desert safaris';
 
         $pageTitle = $settings->get('seo_about_title') ?: $defaultTitle;
         $pageDesc = $settings->get('seo_about_description') ?: $defaultDesc;
@@ -56,8 +59,8 @@ class PageController extends Controller
         $settings = app(SettingsService::class);
         $currentYear = date('Y');
         $defaultTitle = "Contact Dunes Discovery Tourism ({$currentYear}) | 24/7 Dubai Support & Booking";
-        $defaultDesc = "Get in touch with Dunes Discovery Tourism Dubai. 24/7 WhatsApp assistance (+971 50 245 6056), instant bookings, custom group tours, and corporate desert safaris.";
-        $defaultKeys = "contact dunes discovery, dubai desert safari contact, book desert safari whatsapp, tourism office dubai";
+        $defaultDesc = 'Get in touch with Dunes Discovery Tourism Dubai. 24/7 WhatsApp assistance (+971 50 245 6056), instant bookings, custom group tours, and corporate desert safaris.';
+        $defaultKeys = 'contact dunes discovery, dubai desert safari contact, book desert safari whatsapp, tourism office dubai';
 
         $pageTitle = $settings->get('seo_contact_title') ?: $defaultTitle;
         $pageDesc = $settings->get('seo_contact_description') ?: $defaultDesc;
@@ -76,7 +79,7 @@ class PageController extends Controller
     {
         $generalFaqIds = FaqAssignment::where('entity_type', 'general')
             ->pluck('faq_id');
-            
+
         $faqs = Faq::whereIn('id', $generalFaqIds)
             ->where('status', 'active')
             ->orderBy('priority', 'asc')
@@ -85,8 +88,8 @@ class PageController extends Controller
         $settings = app(SettingsService::class);
         $currentYear = date('Y');
         $defaultTitle = "Dubai Desert Safari FAQs ({$currentYear}) | Complete Traveler Guide | Dunes Discovery";
-        $defaultDesc = "Find instant answers to all questions about Dubai desert safaris, what to wear, dune bashing safety, child booster seats, 100% Halal live BBQ dining, and free 24h cancellations.";
-        $defaultKeys = "dubai desert safari faq, desert safari questions, what to wear desert safari dubai, halal bbq desert safari";
+        $defaultDesc = 'Find instant answers to all questions about Dubai desert safaris, what to wear, dune bashing safety, child booster seats, 100% Halal live BBQ dining, and free 24h cancellations.';
+        $defaultKeys = 'dubai desert safari faq, desert safari questions, what to wear desert safari dubai, halal bbq desert safari';
 
         $pageTitle = $settings->get('seo_faq_title') ?: $defaultTitle;
         $pageDesc = $settings->get('seo_faq_description') ?: $defaultDesc;
@@ -118,10 +121,10 @@ class PageController extends Controller
         $messageText = trim($request->input('message'));
 
         // Check if email is verified
-        $sessionVerified = session()->has('email_verified_' . md5($email));
-        $isVerified = $sessionVerified || 
-            \App\Models\VerifiedEmail::where('email', $email)->exists() ||
-            \App\Models\Booking::where('email', $email)->where('is_verified', true)->exists() ||
+        $sessionVerified = session()->has('email_verified_'.md5($email));
+        $isVerified = $sessionVerified ||
+            VerifiedEmail::where('email', $email)->exists() ||
+            Booking::where('email', $email)->where('is_verified', true)->exists() ||
             Contact::where('email', $email)->where('is_verified', true)->exists();
 
         // Collect request context
@@ -136,7 +139,7 @@ class PageController extends Controller
             'gps_heading' => $request->input('gps_heading'),
             'gps_speed' => $request->input('gps_speed'),
         ];
-        
+
         $ctx = $this->tracker->collectRequestContext('contact', $gpsPost);
 
         try {
@@ -168,27 +171,32 @@ class PageController extends Controller
 
                 // Admin notification
                 $adminMail = (new ContactNotification($name, $email, $phone, $subject, $messageText))->from($fromEmail, 'Dunes Discovery Tourism');
-                if (!empty($ccEmails)) $adminMail->cc($ccEmails);
-                if (!empty($bccEmails)) $adminMail->bcc($bccEmails);
+                if (! empty($ccEmails)) {
+                    $adminMail->cc($ccEmails);
+                }
+                if (! empty($bccEmails)) {
+                    $adminMail->bcc($bccEmails);
+                }
                 Mail::to($adminEmail)->send($adminMail);
 
                 // User acknowledgement
                 Mail::to($email)->send((new ContactAcknowledgement($name))->from($fromEmail, 'Dunes Discovery Tourism'));
             } catch (\Throwable $e) {
-                Log::error("Failed to send contact emails: " . $e->getMessage());
+                Log::error('Failed to send contact emails: '.$e->getMessage());
             }
 
             return response()->json([
                 'success' => true,
                 'message' => 'Thank you! Your message has been sent successfully.',
-                'verified' => $isVerified
+                'verified' => $isVerified,
             ]);
 
         } catch (\Throwable $e) {
-            Log::error("Failed to process contact submission: " . $e->getMessage());
+            Log::error('Failed to process contact submission: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while sending your message. Please try again later.'
+                'message' => 'An error occurred while sending your message. Please try again later.',
             ], 500);
         }
     }
@@ -239,17 +247,18 @@ class PageController extends Controller
                     (new WhatsappLeadNotification($name, $phone, $tourName, $pageUrl, $messageText))->from($adminEmail, 'Dunes Discovery Tourism')
                 );
             } catch (\Throwable $e) {
-                Log::error("Failed to send WhatsApp lead email: " . $e->getMessage());
+                Log::error('Failed to send WhatsApp lead email: '.$e->getMessage());
             }
 
             return response()->json([
                 'success' => true,
                 'message' => 'WhatsApp click logged successfully',
-                'inquiry_id' => $inquiry->id
+                'inquiry_id' => $inquiry->id,
             ]);
 
         } catch (\Throwable $e) {
-            Log::error("Failed to log WhatsApp click: " . $e->getMessage());
+            Log::error('Failed to log WhatsApp click: '.$e->getMessage());
+
             return response()->json(['success' => false, 'message' => 'An error occurred while logging WhatsApp inquiry.'], 500);
         }
     }
@@ -259,16 +268,16 @@ class PageController extends Controller
      */
     public function reviewRate(Request $request, string $ref)
     {
-        $booking = \App\Models\Booking::where('reference', $ref)->with('tour')->first();
-        if (!$booking) {
-            $booking = new \App\Models\Booking([
+        $booking = Booking::where('reference', $ref)->with('tour')->first();
+        if (! $booking) {
+            $booking = new Booking([
                 'tour_name' => 'Dubai Desert Safari Experience',
             ]);
             $booking->id = null;
             $booking->reference = strtoupper($ref);
             $booking->name = 'Valued Guest';
         }
-        $score = (int)$request->input('score', 5);
+        $score = (int) $request->input('score', 5);
         if ($score < 1 || $score > 5) {
             $score = 5;
         }
@@ -281,8 +290,8 @@ class PageController extends Controller
             return redirect()->away($googleReviewUrl);
         }
 
-        $pageTitle = "Review Your Safari Adventure | Dunes Discovery Tourism";
-        $pageDesc = "Share your verified guest review, rate your desert safari captain, and upload your tour photos.";
+        $pageTitle = 'Review Your Safari Adventure | Dunes Discovery Tourism';
+        $pageDesc = 'Share your verified guest review, rate your desert safari captain, and upload your tour photos.';
 
         return view('pages.submit-review', compact('booking', 'score', 'googleReviewUrl', 'pageTitle', 'pageDesc'));
     }
@@ -292,8 +301,8 @@ class PageController extends Controller
      */
     public function submitReview(Request $request, string $ref)
     {
-        $booking = \App\Models\Booking::where('reference', $ref)->first();
-        $isGuestMode = !$booking;
+        $booking = Booking::where('reference', $ref)->first();
+        $isGuestMode = ! $booking;
 
         $rules = [
             'rating' => 'required|numeric|min:1|max:5',
@@ -310,28 +319,28 @@ class PageController extends Controller
         $reviewerName = $booking ? $booking->name : trim($request->input('guest_name', 'Guest Traveler'));
         $bookingId = $booking ? $booking->id : null;
 
-        $rating = (float)$request->input('rating');
+        $rating = (float) $request->input('rating');
         $storedPhotos = [];
 
         if ($request->hasFile('photos')) {
             $uploadDir = public_path('uploads/reviews');
-            if (!file_exists($uploadDir)) {
+            if (! file_exists($uploadDir)) {
                 @mkdir($uploadDir, 0755, true);
             }
 
             foreach ($request->file('photos') as $photoFile) {
                 if ($photoFile->isValid()) {
                     $ext = $photoFile->getClientOriginalExtension() ?: 'jpg';
-                    $filename = 'rev_' . uniqid() . '_' . time() . '.' . $ext;
+                    $filename = 'rev_'.uniqid().'_'.time().'.'.$ext;
                     $photoFile->move($uploadDir, $filename);
-                    $storedPhotos[] = 'uploads/reviews/' . $filename;
+                    $storedPhotos[] = 'uploads/reviews/'.$filename;
                 }
             }
         }
 
-        $sourceReviewId = $booking ? $booking->reference : ('GUEST-' . strtoupper($ref) . '-' . substr(md5($reviewerName . ($storedPhotos[0] ?? time())), 0, 8));
+        $sourceReviewId = $booking ? $booking->reference : ('GUEST-'.strtoupper($ref).'-'.substr(md5($reviewerName.($storedPhotos[0] ?? time())), 0, 8));
 
-        $review = \App\Models\Review::updateOrCreate(
+        $review = Review::updateOrCreate(
             [
                 'source' => 'direct_ugc',
                 'source_review_id' => $sourceReviewId,
@@ -373,13 +382,13 @@ class PageController extends Controller
      */
     public function submitFeedback(Request $request, string $ref)
     {
-        $booking = \App\Models\Booking::where('reference', $ref)->firstOrFail();
+        $booking = Booking::where('reference', $ref)->firstOrFail();
         $feedback = trim($request->input('feedback', ''));
 
-        if (!empty($feedback)) {
+        if (! empty($feedback)) {
             $notes = $booking->special_requests ?: '';
             $booking->update([
-                'special_requests' => trim($notes . "\n[GUEST FEEDBACK: " . $feedback . "]")
+                'special_requests' => trim($notes."\n[GUEST FEEDBACK: ".$feedback.']'),
             ]);
         }
 

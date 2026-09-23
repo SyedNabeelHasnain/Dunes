@@ -26,6 +26,7 @@ class AdminEmailTemplateController extends Controller
     public function index()
     {
         $templates = EmailTemplate::withCount('campaigns')->latest()->get();
+
         return view('admin.email-templates.index', compact('templates'));
     }
 
@@ -34,7 +35,7 @@ class AdminEmailTemplateController extends Controller
      */
     public function create()
     {
-        return view('admin.email-templates.edit', ['template' => new EmailTemplate()]);
+        return view('admin.email-templates.edit', ['template' => new EmailTemplate]);
     }
 
     /**
@@ -52,7 +53,7 @@ class AdminEmailTemplateController extends Controller
 
         $template = EmailTemplate::create([
             'name' => trim($validated['name']),
-            'slug' => Str::slug($validated['name']) . '-' . Str::random(4),
+            'slug' => Str::slug($validated['name']).'-'.Str::random(4),
             'subject' => trim($validated['subject']),
             'preview_text' => $validated['preview_text'] ?? null,
             'content_html' => $validated['content_html'],
@@ -70,6 +71,7 @@ class AdminEmailTemplateController extends Controller
     public function edit(int $id)
     {
         $template = EmailTemplate::findOrFail($id);
+
         return view('admin.email-templates.edit', compact('template'));
     }
 

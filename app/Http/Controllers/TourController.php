@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Faq;
 use App\Models\FaqAssignment;
+use App\Models\Review;
 use App\Models\Tour;
+use App\Services\SettingsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -18,27 +20,28 @@ class TourController extends Controller
     {
         if ($request->filled('q') || $request->filled('search')) {
             $searchTerm = trim((string) ($request->input('q') ?? $request->input('search')));
+
             return redirect()->route('tours.search', ['q' => $searchTerm]);
         }
 
         $selectedCategorySlug = $request->input('category');
         $categories = Category::orderBy('priority', 'asc')->get();
         $query = Tour::where('status', 'active')->with(['tiers', 'category']);
-        
+
         if ($selectedCategorySlug) {
             $category = Category::where('slug', $selectedCategorySlug)->first();
             if ($category) {
                 $query->where('category_id', $category->id);
             }
         }
-        
+
         $tours = $query->orderBy('priority', 'asc')->get();
-        
-        $settingsService = app(\App\Services\SettingsService::class);
+
+        $settingsService = app(SettingsService::class);
         $currentYear = date('Y');
         $defaultTitle = "Top Dubai Desert Safari & City Tours ({$currentYear}) | Best Deals | Dunes Discovery";
-        $defaultDesc = "Explore top-rated Dubai desert safaris, 1000cc dune buggy rentals, dhow cruise dinners, and luxury Abu Dhabi city tours. Instant confirmation & 24h free cancellation.";
-        $defaultKeys = "dubai desert safari tours, dune buggy dubai, quad biking dubai, dhow cruise dubai, abu dhabi city tour";
+        $defaultDesc = 'Explore top-rated Dubai desert safaris, 1000cc dune buggy rentals, dhow cruise dinners, and luxury Abu Dhabi city tours. Instant confirmation & 24h free cancellation.';
+        $defaultKeys = 'dubai desert safari tours, dune buggy dubai, quad biking dubai, dhow cruise dubai, abu dhabi city tour';
 
         $pageTitle = $settingsService->get('seo_tours_title') ?: $defaultTitle;
         $pageDesc = $settingsService->get('seo_tours_description') ?: $defaultDesc;
@@ -46,7 +49,7 @@ class TourController extends Controller
         $ogImageSetting = $settingsService->get('seo_tours_og_image');
         $ogImage = $ogImageSetting ? asset(ltrim($ogImageSetting, '/')) : asset('images/desert-safari-poster.avif');
         $canonical = route('tours.index');
-        
+
         return view('tours.index', compact('categories', 'tours', 'selectedCategorySlug', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
     }
 
@@ -63,13 +66,13 @@ class TourController extends Controller
         $query = Tour::where('slug', $slug)
             ->with(['itineraries', 'tiers', 'addons', 'contentItems', 'category']);
 
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             $query->where('status', 'active');
         }
 
         $tour = $query->first();
 
-        if (!$tour) {
+        if (! $tour) {
             abort(404);
         }
 
@@ -82,7 +85,7 @@ class TourController extends Controller
         $faqIds = FaqAssignment::where('entity_type', 'tour')
             ->where('entity_id', $tour->id)
             ->pluck('faq_id');
-            
+
         $faqs = Faq::whereIn('id', $faqIds)
             ->where('status', 'active')
             ->orderBy('priority', 'asc')
@@ -92,7 +95,7 @@ class TourController extends Controller
         if ($faqs->isEmpty()) {
             $generalFaqIds = FaqAssignment::where('entity_type', 'general')
                 ->pluck('faq_id');
-                
+
             $faqs = Faq::whereIn('id', $generalFaqIds)
                 ->where('status', 'active')
                 ->orderBy('priority', 'asc')
@@ -119,28 +122,28 @@ class TourController extends Controller
                 ->orderBy('priority', 'asc')
                 ->limit(3 - $relatedTours->count())
                 ->get();
-                
+
             $relatedTours = $relatedTours->concat($extraTours);
         }
 
         // Dynamic High-CTR SEO Metadata
         $minPrice = $tour->tiers->min('pivot.price') ?? 0;
         $currentYear = date('Y');
-        
-        $priceText = $minPrice > 0 ? "From AED " . number_format($minPrice) : "Best Rates";
+
+        $priceText = $minPrice > 0 ? 'From AED '.number_format($minPrice) : 'Best Rates';
         $pageTitle = $tour->meta_title ?: "{$tour->name} Dubai {$currentYear}: {$priceText} | Dunes Discovery";
-        
+
         $defaultDesc = "Book {$tour->name} in Dubai. Luxury 4x4 Land Cruiser transfers, live BBQ dining, thrilling dune bashing, and 24/7 WhatsApp assistance. Instant confirmation {$priceText}.";
         $pageDesc = $tour->meta_desc ?: (strlen($tour->short_desc ?? '') > 50 ? strip_tags($tour->short_desc) : $defaultDesc);
-        
+
         $pageKeys = $tour->meta_keywords ?: strtolower("{$tour->name}, {$tour->name} dubai, book {$tour->name}, desert safari dubai, dubai tours {$currentYear}");
-        $canonical = url('/' . $tour->slug);
-        
+        $canonical = url('/'.$tour->slug);
+
         $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image ?: 'evening-desert-safari-dubai-dune-discovery-tourism.avif');
-        $ogImage = asset('images/' . $imgFile);
+        $ogImage = asset('images/'.$imgFile);
 
         // Top verified reviews for Schema.org review rich snippets
-        $approvedReviews = \App\Models\Review::where('status', 'approved')
+        $approvedReviews = Review::where('status', 'approved')
             ->where('rating', '>=', 4.5)
             ->latest('published_date')
             ->take(5)
@@ -204,7 +207,7 @@ class TourController extends Controller
         $currentYear = date('Y');
 
         // 4. Exact-Query SERP Snippets (Triggers Google Query Bolding + Higher CTR)
-        $priceText = "from AED " . number_format($minPrice);
+        $priceText = 'from AED '.number_format($minPrice);
         $pageTitle = "{$displayQuery} Dubai ({$currentYear} Deals {$priceText}) | Dunes Discovery";
         $pageDesc = "Looking for {$displayQuery}? Compare verified Dubai desert safari packages with 4x4 hotel pickup, 5-star live BBQ dinner, and instant confirmation. DET Licensed #1430583.";
         $pageKeys = strtolower("{$cleanQuery}, {$cleanQuery} dubai, best {$cleanQuery} dubai, desert safari dubai, dunes discovery");
@@ -215,13 +218,13 @@ class TourController extends Controller
         $ogImage = asset('images/desert-safari-poster.avif');
         if ($tours->isNotEmpty() && $tours->first()->hero_image) {
             $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tours->first()->hero_image);
-            $ogImage = asset('images/' . $imgFile);
+            $ogImage = asset('images/'.$imgFile);
         }
 
         // 5. Generative Engine Optimization (GEO) Direct-Answer Synthesis
         $aiOverview = $this->generateGeoDirectAnswer($cleanQuery, $intent, $minPrice, $tours->count());
         if ($isFallback) {
-            $aiOverview['title'] = "Recommended Dubai Desert Safaris (Bestsellers)";
+            $aiOverview['title'] = 'Recommended Dubai Desert Safaris (Bestsellers)';
             $aiOverview['summary'] = "While no specific package directly matches \"{$displayQuery}\", here are Dubai's highest-rated desert safari adventures. Each package includes 4x4 hotel transfers, red dune bashing in Lahbab, 5-star halal live BBQ dinner, and live entertainment shows.";
         }
 
@@ -265,7 +268,7 @@ class TourController extends Controller
                     'License Required' => 'No (Age 16+)',
                     'Location' => 'Lahbab Red Dunes',
                     'Safety Gear' => 'Helmets & Goggles Included',
-                ]
+                ],
             ];
         }
 
@@ -283,7 +286,7 @@ class TourController extends Controller
                     'Seater Capacity' => '1, 2, or 4 Passengers',
                     'License Required' => 'No (Age 16+)',
                     'Terrain' => 'High Lahbab Desert Dunes',
-                ]
+                ],
             ];
         }
 
@@ -301,7 +304,7 @@ class TourController extends Controller
                     'Camp Seating' => 'Reserved VIP Lounge Area',
                     'Dinner Service' => 'Live Table Waiter Service',
                     'Entertainment' => 'Front-Row Fire & Tanoura Shows',
-                ]
+                ],
             ];
         }
 
@@ -319,7 +322,7 @@ class TourController extends Controller
                     'Dune Bashing' => '45 Minutes (Lahbab)',
                     'Activities' => 'Sandboarding & Camel Rides',
                     'Ideal For' => 'Early Risers & Quick Layovers',
-                ]
+                ],
             ];
         }
 
@@ -337,7 +340,7 @@ class TourController extends Controller
                     'Accommodation' => 'Private Bedouin Tents & Mattresses',
                     'Meals Included' => '5-Star BBQ Dinner + Fresh Breakfast',
                     'Experience' => 'Night Stargazing & Sunrise Views',
-                ]
+                ],
             ];
         }
 
@@ -355,7 +358,7 @@ class TourController extends Controller
                     'Dining' => '5-Star International Buffet',
                     'Atmosphere' => 'Open-Air Upper Deck & AC Lower Deck',
                     'Entertainment' => 'Traditional Live Tanoura Dance',
-                ]
+                ],
             ];
         }
 
@@ -372,7 +375,7 @@ class TourController extends Controller
                 'Pickup & Dropoff' => 'Door-to-Door 4x4 Hotel Transfers',
                 'Dining' => '5-Star Live BBQ Buffet (100% Halal)',
                 'License' => 'DET Licensed Operator #1430583',
-            ]
+            ],
         ];
     }
 
@@ -384,7 +387,7 @@ class TourController extends Controller
         $qLower = strtolower($query);
         $stopWords = ['in', 'the', 'a', 'an', 'to', 'for', 'of', 'and', 'dubai', 'tour', 'tours', 'best', 'deals', 'packages'];
         $tokens = array_filter(explode(' ', $qLower), function ($t) use ($stopWords) {
-            return strlen($t) > 1 && !in_array($t, $stopWords);
+            return strlen($t) > 1 && ! in_array($t, $stopWords);
         });
 
         $scored = [];
@@ -392,7 +395,7 @@ class TourController extends Controller
         foreach ($allTours as $tour) {
             $score = 0;
             $tName = strtolower($tour->name);
-            $tDesc = strtolower(($tour->short_desc ?? '') . ' ' . ($tour->full_desc ?? ''));
+            $tDesc = strtolower(($tour->short_desc ?? '').' '.($tour->full_desc ?? ''));
             $tKeys = strtolower($tour->meta_keywords ?? '');
             $catSlug = strtolower($tour->category ? $tour->category->slug : '');
             $catName = strtolower($tour->category ? $tour->category->name : '');
@@ -436,7 +439,7 @@ class TourController extends Controller
                 str_contains($catName, $qLower)
             );
 
-            if (!$hasTermMatch) {
+            if (! $hasTermMatch) {
                 foreach ($tokens as $token) {
                     if (str_contains($tName, $token) || str_contains($tKeys, $token) || str_contains($catSlug, $token) || str_contains($catName, $token) || str_contains($tierNames, $token) || str_contains($tDesc, $token)) {
                         $hasTermMatch = true;
@@ -485,6 +488,7 @@ class TourController extends Controller
             if ($a['score'] === $b['score']) {
                 return $a['tour']->priority <=> $b['tour']->priority;
             }
+
             return $b['score'] <=> $a['score'];
         });
 
@@ -497,15 +501,16 @@ class TourController extends Controller
     protected function generateGeoDirectAnswer(string $query, array $intent, float $minPrice, int $resultCount): array
     {
         $formattedPrice = number_format($minPrice);
+
         return [
             'title' => $intent['ai_title'],
             'summary' => $intent['summary'],
             'quick_stats' => array_merge($intent['specs'], [
                 'Starting Price' => "From AED {$formattedPrice}",
                 'Verified Packages' => "{$resultCount} Available",
-                'Operator License' => 'DET #1430583 (Govt. Approved)'
+                'Operator License' => 'DET #1430583 (Govt. Approved)',
             ]),
-            'verified_note' => "All tours operated by Dunes Discovery Tourism LLC are licensed by the Dubai Department of Economy and Tourism (DET License #1430583) and include 24-hour free cancellation and instant confirmation."
+            'verified_note' => 'All tours operated by Dunes Discovery Tourism LLC are licensed by the Dubai Department of Economy and Tourism (DET License #1430583) and include 24-hour free cancellation and instant confirmation.',
         ];
     }
 
@@ -517,9 +522,9 @@ class TourController extends Controller
         $allTours = Tour::where('status', 'active')->with(['tiers', 'category'])->orderBy('priority', 'asc')->get();
         $categories = Category::orderBy('priority', 'asc')->get();
 
-        $pageTitle = "Build Your Own Dubai Desert Safari (Customizer 2026) | Dunes Discovery";
-        $pageDesc = "Customize your bespoke Dubai desert safari experience. Configure private Land Cruisers, 1000cc Can-Am buggies, 400cc quad bikes, and VIP waiter table service with live real-time pricing.";
-        $pageKeys = "custom desert safari dubai, build your own safari dubai, bespoke desert safari, private land cruiser safari, vip desert safari customizer";
+        $pageTitle = 'Build Your Own Dubai Desert Safari (Customizer 2026) | Dunes Discovery';
+        $pageDesc = 'Customize your bespoke Dubai desert safari experience. Configure private Land Cruisers, 1000cc Can-Am buggies, 400cc quad bikes, and VIP waiter table service with live real-time pricing.';
+        $pageKeys = 'custom desert safari dubai, build your own safari dubai, bespoke desert safari, private land cruiser safari, vip desert safari customizer';
         $canonical = route('tours.customizer');
         $ogImage = asset('images/desert-safari-poster.avif');
 

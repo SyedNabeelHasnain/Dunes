@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Services\SettingsService;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,9 +23,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        \Illuminate\Support\Facades\View::composer('*', function ($view) {
+        View::composer('*', function ($view) {
             try {
-                $settings = app(\App\Services\SettingsService::class)->all();
+                $settings = app(SettingsService::class)->all();
                 $view->with('settings', $settings);
             } catch (\Throwable $e) {
                 $view->with('settings', collect());

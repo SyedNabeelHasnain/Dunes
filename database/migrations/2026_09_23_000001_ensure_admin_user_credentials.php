@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('users')) {
+        if (! Schema::hasTable('users')) {
             return;
         }
 
@@ -40,7 +40,7 @@ return new class extends Migration
 
         // 2. Secondary domain admin (so admin@dunesdiscoverytourism.com also authenticates)
         $domainAdmin = User::where('email', 'admin@dunesdiscoverytourism.com')->first();
-        if (!$domainAdmin) {
+        if (! $domainAdmin) {
             User::create([
                 'name' => 'Admin Concierge',
                 'email' => 'admin@dunesdiscoverytourism.com',

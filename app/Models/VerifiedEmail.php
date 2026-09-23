@@ -14,6 +14,6 @@ class VerifiedEmail extends Model
     protected $fillable = ['email', 'verified_at'];
 
     protected $casts = [
-        'verified_at' => 'datetime'
+        'verified_at' => 'datetime',
     ];
 }

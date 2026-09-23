@@ -18,7 +18,6 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class AdminPortalTest extends TestCase
@@ -26,6 +25,7 @@ class AdminPortalTest extends TestCase
     use RefreshDatabase;
 
     protected User $adminUser;
+
     protected User $secondaryAdmin;
 
     protected function setUp(): void

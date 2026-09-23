@@ -1,11 +1,11 @@
 <?php
 
+use App\Models\LegalPage;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use App\Models\LegalPage;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -17,13 +17,13 @@ return new class extends Migration
         // 1. Add Arabic columns if they do not exist
         if (Schema::hasTable('legal_pages')) {
             Schema::table('legal_pages', function (Blueprint $table) {
-                if (!Schema::hasColumn('legal_pages', 'title_ar')) {
+                if (! Schema::hasColumn('legal_pages', 'title_ar')) {
                     $table->string('title_ar', 255)->nullable()->after('title');
                 }
-                if (!Schema::hasColumn('legal_pages', 'subtitle_ar')) {
+                if (! Schema::hasColumn('legal_pages', 'subtitle_ar')) {
                     $table->string('subtitle_ar', 255)->nullable()->after('subtitle');
                 }
-                if (!Schema::hasColumn('legal_pages', 'description_ar')) {
+                if (! Schema::hasColumn('legal_pages', 'description_ar')) {
                     $table->text('description_ar')->nullable()->after('description');
                 }
             });
@@ -31,10 +31,10 @@ return new class extends Migration
 
         if (Schema::hasTable('legal_sections')) {
             Schema::table('legal_sections', function (Blueprint $table) {
-                if (!Schema::hasColumn('legal_sections', 'heading_ar')) {
+                if (! Schema::hasColumn('legal_sections', 'heading_ar')) {
                     $table->string('heading_ar', 255)->nullable()->after('heading');
                 }
-                if (!Schema::hasColumn('legal_sections', 'subheading_ar')) {
+                if (! Schema::hasColumn('legal_sections', 'subheading_ar')) {
                     $table->string('subheading_ar', 255)->nullable()->after('subheading');
                 }
             });
@@ -42,7 +42,7 @@ return new class extends Migration
 
         if (Schema::hasTable('legal_items')) {
             Schema::table('legal_items', function (Blueprint $table) {
-                if (!Schema::hasColumn('legal_items', 'content_ar')) {
+                if (! Schema::hasColumn('legal_items', 'content_ar')) {
                     $table->text('content_ar')->nullable()->after('content');
                 }
             });
@@ -84,7 +84,7 @@ return new class extends Migration
                             'heading_ar' => $s['heading_ar'] ?? null,
                             'subheading' => $s['subheading'] ?? null,
                             'subheading_ar' => $s['subheading_ar'] ?? null,
-                            'priority' => (int)$s['priority'],
+                            'priority' => (int) $s['priority'],
                             'updated_at' => now(),
                         ]
                     );
@@ -104,7 +104,7 @@ return new class extends Migration
                             'section_id' => $item['section_id'],
                             'content' => $item['content'],
                             'content_ar' => $item['content_ar'] ?? null,
-                            'priority' => (int)$item['priority'],
+                            'priority' => (int) $item['priority'],
                             'updated_at' => now(),
                         ]
                     );

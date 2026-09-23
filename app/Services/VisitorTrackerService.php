@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\RequestLog;
-use App\Models\Setting;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -26,7 +25,7 @@ class VisitorTrackerService
         }
 
         $salt = app(SettingsService::class)->get('tracking_ip_salt', 'dunes-discovery-tracking-salt');
-        $hash = ($ip !== '0.0.0.0') ? hash('sha256', $salt . $ip) : 'Not Available';
+        $hash = ($ip !== '0.0.0.0') ? hash('sha256', $salt.$ip) : 'Not Available';
 
         return [
             'client_ip' => $ip,
@@ -57,7 +56,7 @@ class VisitorTrackerService
                     }
                 }
             } catch (\Exception $e) {
-                Log::warning("IP-API Lookup failed for IP: {$ip}, trying fallback: " . $e->getMessage());
+                Log::warning("IP-API Lookup failed for IP: {$ip}, trying fallback: ".$e->getMessage());
             }
 
             // Fallback to FreeGeoIP
@@ -65,6 +64,7 @@ class VisitorTrackerService
                 $response = Http::timeout(2)->get("https://reallyfreegeoip.org/json/{$ip}");
                 if ($response->successful()) {
                     $data = $response->json();
+
                     return [
                         'country' => $data['country_name'] ?? null,
                         'regionName' => $data['region_name'] ?? null,
@@ -78,7 +78,7 @@ class VisitorTrackerService
                     ];
                 }
             } catch (\Exception $e) {
-                Log::error("GeoIP Fallback failed for IP: {$ip}: " . $e->getMessage());
+                Log::error("GeoIP Fallback failed for IP: {$ip}: ".$e->getMessage());
             }
 
             return null;
@@ -91,7 +91,7 @@ class VisitorTrackerService
     public function parseUserAgent(?string $ua = null): array
     {
         $ua = $ua ?: (request()->userAgent() ?: '');
-        
+
         $device = 'Desktop';
         if (preg_match('/Mobile|Android|iPhone|iPad/i', $ua)) {
             $device = preg_match('/iPad|Tablet/i', $ua) ? 'Tablet' : 'Mobile';
@@ -186,14 +186,14 @@ class VisitorTrackerService
         $gpsLng = $submitData['gps_lng'] ?? 'Not Available';
         $gpsAccuracy = $submitData['gps_accuracy'] ?? 'Not Available';
         $gpsTimestamp = $submitData['gps_timestamp'] ?? 'Not Available';
-        $gpsSource = (!empty($submitData['gps_consent']) && $submitData['gps_consent'] === 'Yes') ? 'GPS (User Consented)' : 'Not Available';
+        $gpsSource = (! empty($submitData['gps_consent']) && $submitData['gps_consent'] === 'Yes') ? 'GPS (User Consented)' : 'Not Available';
 
         $loc = [
             'country' => $ipMeta['country'] ?? 'Not Available',
             'region' => $ipMeta['regionName'] ?? ($ipMeta['region'] ?? 'Not Available'),
             'city' => $ipMeta['city'] ?? 'Not Available',
-            'latitude' => $gpsLat !== 'Not Available' ? (string)$gpsLat : (!empty($ipMeta['lat']) ? (string)$ipMeta['lat'] : 'Not Available'),
-            'longitude' => $gpsLng !== 'Not Available' ? (string)$gpsLng : (!empty($ipMeta['lon']) ? (string)$ipMeta['lon'] : 'Not Available'),
+            'latitude' => $gpsLat !== 'Not Available' ? (string) $gpsLat : (! empty($ipMeta['lat']) ? (string) $ipMeta['lat'] : 'Not Available'),
+            'longitude' => $gpsLng !== 'Not Available' ? (string) $gpsLng : (! empty($ipMeta['lon']) ? (string) $ipMeta['lon'] : 'Not Available'),
             'timezone' => $ipMeta['timezone'] ?? 'Not Available',
             'isp' => $ipMeta['isp'] ?? 'Not Available',
             'organization' => $ipMeta['org'] ?? 'Not Available',
@@ -212,7 +212,7 @@ class VisitorTrackerService
         ];
 
         if ($loc['latitude'] !== 'Not Available' && $loc['longitude'] !== 'Not Available') {
-            $loc['google_maps_link'] = 'https://www.google.com/maps?q=' . $loc['latitude'] . ',' . $loc['longitude'];
+            $loc['google_maps_link'] = 'https://www.google.com/maps?q='.$loc['latitude'].','.$loc['longitude'];
         } else {
             $loc['google_maps_link'] = 'Not Available';
         }
@@ -229,30 +229,34 @@ class VisitorTrackerService
 
         // GCLID Google Ads tracking
         $gclid = request()->input('gclid') ?? session('google_ads_gclid');
-        if (!empty($gclid)) {
+        if (! empty($gclid)) {
             session(['google_ads_gclid' => $gclid]);
-            if (empty($utmSource)) $utmSource = 'Google Ads';
-            if (empty($utmMedium)) $utmMedium = 'CPC';
-            
+            if (empty($utmSource)) {
+                $utmSource = 'Google Ads';
+            }
+            if (empty($utmMedium)) {
+                $utmMedium = 'CPC';
+            }
+
             $campaignId = request()->input('gad_campaignid');
-            if (!$campaignId && is_numeric($utmCampaign)) {
+            if (! $campaignId && is_numeric($utmCampaign)) {
                 $campaignId = $utmCampaign;
             }
-            if ((string)$campaignId === '23467597613') {
+            if ((string) $campaignId === '23467597613') {
                 $utmCampaign = 'Desert Safari Dubai - 15 Jan 2026';
             } elseif ($campaignId && empty($utmCampaign)) {
-                $utmCampaign = 'Campaign ' . $campaignId;
+                $utmCampaign = 'Campaign '.$campaignId;
             }
         }
 
         // Referrer parsing fallbacks
-        if (empty($utmSource) && $referrer !== 'Not Available' && !empty($referrer)) {
+        if (empty($utmSource) && $referrer !== 'Not Available' && ! empty($referrer)) {
             $refHost = parse_url($referrer, PHP_URL_HOST);
             $currentHost = request()->getHost();
             $cleanRef = preg_replace('/^www\./', '', $refHost ?: '');
             $cleanCurr = preg_replace('/^www\./', '', $currentHost ?: '');
 
-            if ($refHost && !str_contains($cleanRef, $cleanCurr)) {
+            if ($refHost && ! str_contains($cleanRef, $cleanCurr)) {
                 if (str_contains($refHost, 'syndicatedsearch.goog')) {
                     $utmSource = 'Google Ads';
                     $utmMedium = 'CPC';
@@ -281,26 +285,26 @@ class VisitorTrackerService
         }
 
         // Session tracking
-        if (!session()->has('tracking_session_start')) {
+        if (! session()->has('tracking_session_start')) {
             session([
                 'tracking_session_start' => microtime(true),
                 'tracking_pages' => 0,
-                'tracking_landing' => request()->getRequestUri() ?: '/'
+                'tracking_landing' => request()->getRequestUri() ?: '/',
             ]);
         }
 
-        $pagesCount = (int)session('tracking_pages', 0) + 1;
+        $pagesCount = (int) session('tracking_pages', 0) + 1;
         session(['tracking_pages' => $pagesCount]);
 
         $now = microtime(true);
-        $durationSec = (int)max(0, $now - (float)session('tracking_session_start'));
+        $durationSec = (int) max(0, $now - (float) session('tracking_session_start'));
 
         $formLoadTs = null;
         $formDuration = 0;
         if (session()->has("form_load.{$formName}")) {
-            $load = (float)session("form_load.{$formName}");
-            $formDuration = (int)max(0, $now - $load);
-            $formLoadTs = date('Y-m-d H:i:s', (int)$load);
+            $load = (float) session("form_load.{$formName}");
+            $formDuration = (int) max(0, $now - $load);
+            $formLoadTs = date('Y-m-d H:i:s', (int) $load);
         }
 
         $isRepeat = session()->has('tracking_seen') ? 'Yes' : 'No';
@@ -329,12 +333,12 @@ class VisitorTrackerService
             'utm_content' => $utmContent ?: 'Not Available',
             'landing_page' => session('tracking_landing', '/'),
             'session_id' => session()->getId() ?: 'Not Available',
-            'session_start_time' => date('Y-m-d H:i:s', (int)session('tracking_session_start')),
-            'session_end_time' => date('Y-m-d H:i:s', (int)$now),
+            'session_start_time' => date('Y-m-d H:i:s', (int) session('tracking_session_start')),
+            'session_end_time' => date('Y-m-d H:i:s', (int) $now),
             'session_duration_seconds' => $durationSec,
             'pages_viewed_count' => $pagesCount,
             'form_load_timestamp' => $formLoadTs,
-            'form_submit_timestamp' => date('Y-m-d H:i:s', (int)$now),
+            'form_submit_timestamp' => date('Y-m-d H:i:s', (int) $now),
             'form_completion_seconds' => $formDuration,
             'repeat_visit_flag' => $isRepeat,
         ], $loc, $uaData);
@@ -388,9 +392,10 @@ class VisitorTrackerService
 
             return $log->id;
         } catch (\Exception $e) {
-            Log::error("Failed to write request log context: " . $e->getMessage(), [
-                'ctx' => $ctx
+            Log::error('Failed to write request log context: '.$e->getMessage(), [
+                'ctx' => $ctx,
             ]);
+
             return null;
         }
     }

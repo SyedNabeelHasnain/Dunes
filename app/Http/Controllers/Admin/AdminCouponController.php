@@ -5,20 +5,19 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Coupon;
 use App\Models\CouponUsage;
-use App\Models\Tour;
-use App\Models\Tier;
 use App\Models\Setting;
+use App\Models\Tier;
+use App\Models\Tour;
 use App\Services\SettingsService;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class AdminCouponController extends Controller
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     /**
      * Display a listing of coupons with statistics.
@@ -39,10 +38,10 @@ class AdminCouponController extends Controller
                 $query->where('discount_type', $type);
             }
             if ($search) {
-                $query->where(function($q) use ($search) {
+                $query->where(function ($q) use ($search) {
                     $q->where('code', 'like', "%{$search}%")
-                      ->orWhere('name', 'like', "%{$search}%")
-                      ->orWhere('description', 'like', "%{$search}%");
+                        ->orWhere('name', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
                 });
             }
 
@@ -51,10 +50,10 @@ class AdminCouponController extends Controller
             // 4 KPI Statistics
             $totalActive = Coupon::where('status', 'active')->count();
             $totalRedemptions = CouponUsage::count();
-            $totalDiscountGiven = (float)CouponUsage::sum('discount_amount');
-            $totalRevenueViaPromos = (float)CouponUsage::sum('order_final_total');
+            $totalDiscountGiven = (float) CouponUsage::sum('discount_amount');
+            $totalRevenueViaPromos = (float) CouponUsage::sum('order_final_total');
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error("Error loading coupons in index: " . $e->getMessage());
+            Log::error('Error loading coupons in index: '.$e->getMessage());
             $coupons = collect([]);
             $totalActive = 0;
             $totalRedemptions = 0;
@@ -83,6 +82,7 @@ class AdminCouponController extends Controller
     {
         $tours = Tour::where('status', 'active')->orderBy('priority', 'asc')->get();
         $tiers = Tier::where('status', 'active')->orderBy('priority', 'asc')->get();
+
         return view('admin.coupons.create', compact('tours', 'tiers'));
     }
 
@@ -132,6 +132,7 @@ class AdminCouponController extends Controller
         $coupon = Coupon::findOrFail($id);
         $tours = Tour::where('status', 'active')->orderBy('priority', 'asc')->get();
         $tiers = Tier::where('status', 'active')->orderBy('priority', 'asc')->get();
+
         return view('admin.coupons.edit', compact('coupon', 'tours', 'tiers'));
     }
 
@@ -143,7 +144,7 @@ class AdminCouponController extends Controller
         $coupon = Coupon::findOrFail($id);
 
         $request->validate([
-            'code' => 'required|string|max:50|unique:coupons,code,' . $coupon->id,
+            'code' => 'required|string|max:50|unique:coupons,code,'.$coupon->id,
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'discount_type' => 'required|in:percentage,fixed,per_person',
@@ -199,7 +200,7 @@ class AdminCouponController extends Controller
         return response()->json([
             'success' => true,
             'status' => $coupon->status,
-            'message' => "Coupon {$coupon->code} status changed to " . ucfirst($coupon->status)
+            'message' => "Coupon {$coupon->code} status changed to ".ucfirst($coupon->status),
         ]);
     }
 
@@ -209,11 +210,11 @@ class AdminCouponController extends Controller
     public function duplicate(int $id)
     {
         $coupon = Coupon::findOrFail($id);
-        
-        $newCode = $coupon->code . '_COPY_' . strtoupper(Str::random(3));
+
+        $newCode = $coupon->code.'_COPY_'.strtoupper(Str::random(3));
         $newCoupon = $coupon->replicate();
         $newCoupon->code = $newCode;
-        $newCoupon->name = $coupon->name . ' (Copy)';
+        $newCoupon->name = $coupon->name.' (Copy)';
         $newCoupon->used_count = 0;
         $newCoupon->status = 'inactive';
         $newCoupon->save();
@@ -236,7 +237,7 @@ class AdminCouponController extends Controller
         return response()->json([
             'success' => true,
             'coupon' => $coupon,
-            'usages' => $usages
+            'usages' => $usages,
         ]);
     }
 
@@ -245,31 +246,34 @@ class AdminCouponController extends Controller
      */
     public function exportCsv(Request $request)
     {
-        $fileName = 'dunes-coupons-export-' . date('Y-m-d-His') . '.csv';
+        $fileName = 'dunes-coupons-export-'.date('Y-m-d-His').'.csv';
         $coupons = Coupon::with(['tour', 'tier'])->withCount('usages')->orderBy('created_at', 'desc')->get();
 
         $headers = [
-            "Content-type" => "text/csv; charset=UTF-8",
-            "Content-Disposition" => "attachment; filename={$fileName}",
-            "Pragma" => "no-cache",
-            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
-            "Expires" => "0"
+            'Content-type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename={$fileName}",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
         ];
 
         $columns = ['ID', 'Code', 'Name', 'Type', 'Value', 'Min Spend', 'Max Discount', 'Min Guests', 'Usage Limit', 'Redemptions', 'Valid From', 'Valid Until', 'Applicable Tour', 'Applicable Tier', 'First Time Only', 'Status', 'Created Date'];
 
-        $sanitize = function(array $row): array {
-            return array_map(function($val) {
-                if ($val === null) return '';
+        $sanitize = function (array $row): array {
+            return array_map(function ($val) {
+                if ($val === null) {
+                    return '';
+                }
                 $str = (string) $val;
                 if (isset($str[0]) && in_array($str[0], ['=', '+', '-', '@', "\t", "\r"], true)) {
-                    return "'" . $str;
+                    return "'".$str;
                 }
+
                 return $str;
             }, $row);
         };
 
-        $callback = function() use ($coupons, $columns, $sanitize) {
+        $callback = function () use ($coupons, $columns, $sanitize) {
             $file = fopen('php://output', 'w');
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // UTF-8 BOM
             fputcsv($file, $columns);
@@ -280,9 +284,9 @@ class AdminCouponController extends Controller
                     $c->code,
                     $c->name,
                     ucfirst($c->discount_type),
-                    $c->discount_type === 'percentage' ? $c->discount_value . '%' : 'AED ' . number_format($c->discount_value, 2),
-                    'AED ' . number_format($c->min_spend, 2),
-                    $c->max_discount ? 'AED ' . number_format($c->max_discount, 2) : 'No Cap',
+                    $c->discount_type === 'percentage' ? $c->discount_value.'%' : 'AED '.number_format($c->discount_value, 2),
+                    'AED '.number_format($c->min_spend, 2),
+                    $c->max_discount ? 'AED '.number_format($c->max_discount, 2) : 'No Cap',
                     $c->min_guests,
                     $c->usage_limit ?: 'Unlimited',
                     $c->used_count,
@@ -371,13 +375,13 @@ class AdminCouponController extends Controller
         foreach ($data as $key => $value) {
             Setting::updateOrCreate(
                 ['setting_key' => $key],
-                ['setting_value' => $value !== null ? trim((string)$value) : '']
+                ['setting_value' => $value !== null ? trim((string) $value) : '']
             );
         }
 
         // Synchronize Safari Match Concierge coupon status and discount rate in database
         $conciergeActive = ($data['concierge_promo_active'] ?? '0') === '1';
-        $conciergeDiscount = (float)($data['concierge_promo_discount'] ?? 5.00);
+        $conciergeDiscount = (float) ($data['concierge_promo_discount'] ?? 5.00);
         $conciergeCode = strtoupper(trim($data['concierge_promo_code'] ?? 'MATCH5')) ?: 'MATCH5';
 
         try {
@@ -393,12 +397,12 @@ class AdminCouponController extends Controller
                 ]
             );
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning("Could not synchronize MATCH5 coupon status: " . $e->getMessage());
+            Log::warning('Could not synchronize MATCH5 coupon status: '.$e->getMessage());
         }
 
         // Synchronize Exit-Intent Cart Saver coupon status and discount rate in database
         $exitIntentActive = ($data['exit_intent_promo_active'] ?? '0') === '1';
-        $exitIntentDiscount = (float)($data['exit_intent_promo_discount'] ?? 5.00);
+        $exitIntentDiscount = (float) ($data['exit_intent_promo_discount'] ?? 5.00);
         $exitIntentCode = strtoupper(trim($data['exit_intent_promo_code'] ?? 'SAVE5')) ?: 'SAVE5';
 
         try {
@@ -414,7 +418,7 @@ class AdminCouponController extends Controller
                 ]
             );
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning("Could not synchronize SAVE5 coupon status: " . $e->getMessage());
+            Log::warning('Could not synchronize SAVE5 coupon status: '.$e->getMessage());
         }
 
         Cache::forget('site_settings_cache');

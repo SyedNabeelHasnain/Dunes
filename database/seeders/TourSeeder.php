@@ -16,7 +16,7 @@ class TourSeeder extends Seeder
     public function run(): void
     {
         $toursPath = database_path('seeders/data/tours.json');
-        if (!File::exists($toursPath)) {
+        if (! File::exists($toursPath)) {
             return;
         }
 
@@ -39,19 +39,19 @@ class TourSeeder extends Seeder
                     'duration' => $t['duration'],
                     'pickup_time' => $t['pickup_time'],
                     'dropoff_time' => $t['dropoff_time'],
-                    'min_age' => (int)($t['min_age'] ?? 3),
+                    'min_age' => (int) ($t['min_age'] ?? 3),
                     'group_size' => $t['group_size'],
                     'languages' => $t['languages'] ?: 'English, Arabic',
                     'hero_image' => $t['hero_image'],
                     'thumb_image' => $t['thumb_image'],
                     'og_image' => $t['og_image'],
                     'video_url' => $t['video_url'],
-                    'rating' => (float)($t['rating'] ?? 4.8),
-                    'review_count' => (int)($t['review_count'] ?? 0),
-                    'is_bestseller' => (bool)$t['is_bestseller'],
-                    'is_featured' => (bool)$t['is_featured'],
+                    'rating' => (float) ($t['rating'] ?? 4.8),
+                    'review_count' => (int) ($t['review_count'] ?? 0),
+                    'is_bestseller' => (bool) $t['is_bestseller'],
+                    'is_featured' => (bool) $t['is_featured'],
                     'status' => $t['status'] ?: 'active',
-                    'priority' => (int)$t['priority'],
+                    'priority' => (int) $t['priority'],
                     'meta_title' => $t['meta_title'],
                     'meta_desc' => $t['meta_desc'],
                     'meta_keywords' => $t['meta_keywords'],
@@ -70,8 +70,8 @@ class TourSeeder extends Seeder
                 DB::table('tour_tiers')->insertOrIgnore([
                     'tour_id' => $actualTourId,
                     'tier_id' => $tt['tier_id'],
-                    'price' => (float)$tt['price'],
-                    'old_price' => $tt['old_price'] ? (float)$tt['old_price'] : null,
+                    'price' => (float) $tt['price'],
+                    'old_price' => $tt['old_price'] ? (float) $tt['old_price'] : null,
                     'price_type' => $tt['price_type'] ?: 'per person',
                 ]);
             }
@@ -86,7 +86,7 @@ class TourSeeder extends Seeder
                 DB::table('tour_addons')->insertOrIgnore([
                     'tour_id' => $actualTourId,
                     'addon_id' => $ta['addon_id'],
-                    'price' => (float)$ta['price'],
+                    'price' => (float) $ta['price'],
                 ]);
             }
         }

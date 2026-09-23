@@ -777,7 +777,7 @@ if(window.fbq){
 
                         <!-- CTA Actions -->
                         <div class="space-y-2.5">
-                            <button class="w-full btn-desert-animated text-base font-bold rounded-full py-3.5 text-white shadow-lg cursor-pointer" @click.prevent="$store.modal.open('booking', { tourId: {{ $tour->id }} })" data-bs-toggle="modal" data-bs-target="#bookingModal">
+                            <button class="w-full btn-desert-animated text-base font-bold rounded-full py-3.5 text-white shadow-lg cursor-pointer" @click.prevent="$store.modal.open('booking', { tourId: {{ $tour->id }} })">
                                 <i class="bi bi-calendar-check-fill me-2"></i>Book Online Now
                             </button>
                             <button type="button" class="w-full border border-slate-300 hover:border-primary text-slate-700 hover:text-primary text-sm font-bold rounded-full py-2.5 transition-colors btn-toggle-compare cursor-pointer flex items-center justify-center gap-2" data-tour-id="{{ $tour->id }}" onclick="event.preventDefault(); window.DunesCompare && window.DunesCompare.toggle(this);">
@@ -1046,7 +1046,7 @@ if(window.fbq){
         <button type="button" class="border border-slate-300 text-slate-700 text-xs font-bold rounded-full px-3.5 py-2.5 btn-toggle-compare whitespace-nowrap cursor-pointer inline-flex items-center gap-1" data-tour-id="{{ $tour->id }}" onclick="event.preventDefault(); window.DunesCompare && window.DunesCompare.toggle(this);">
             <i class="bi bi-shuffle"></i><span class="compare-btn-text">Compare</span>
         </button>
-        <button class="btn-desert-animated text-xs sm:text-sm font-bold text-white rounded-full px-5 py-2.5 shadow-md whitespace-nowrap cursor-pointer inline-flex items-center gap-1" data-action="open-booking" data-tour="{{ $tour->id }}" @click.prevent="$store.modal.open('booking', { tourId: {{ $tour->id }} })" data-bs-toggle="modal" data-bs-target="#bookingModal">
+        <button class="btn-desert-animated text-xs sm:text-sm font-bold text-white rounded-full px-5 py-2.5 shadow-md whitespace-nowrap cursor-pointer inline-flex items-center gap-1" data-action="open-booking" data-tour="{{ $tour->id }}" @click.prevent="$store.modal.open('booking', { tourId: {{ $tour->id }} })">
             <i class="bi bi-calendar-check-fill"></i>Book Now
         </button>
     </div>

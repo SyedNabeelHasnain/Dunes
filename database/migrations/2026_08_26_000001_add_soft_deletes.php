@@ -10,7 +10,7 @@ return new class extends Migration
     {
         if (Schema::hasTable('bookings')) {
             Schema::table('bookings', function (Blueprint $table) {
-                if (!Schema::hasColumn('bookings', 'deleted_at')) {
+                if (! Schema::hasColumn('bookings', 'deleted_at')) {
                     $table->softDeletes();
                 }
             });
@@ -18,10 +18,10 @@ return new class extends Migration
 
         if (Schema::hasTable('contacts')) {
             Schema::table('contacts', function (Blueprint $table) {
-                if (!Schema::hasColumn('contacts', 'updated_at')) {
+                if (! Schema::hasColumn('contacts', 'updated_at')) {
                     $table->timestamp('updated_at')->nullable()->after('created_at');
                 }
-                if (!Schema::hasColumn('contacts', 'deleted_at')) {
+                if (! Schema::hasColumn('contacts', 'deleted_at')) {
                     $table->softDeletes();
                 }
             });
@@ -29,7 +29,7 @@ return new class extends Migration
 
         if (Schema::hasTable('booking_payments')) {
             Schema::table('booking_payments', function (Blueprint $table) {
-                if (!Schema::hasColumn('booking_payments', 'deleted_at')) {
+                if (! Schema::hasColumn('booking_payments', 'deleted_at')) {
                     $table->softDeletes();
                 }
             });

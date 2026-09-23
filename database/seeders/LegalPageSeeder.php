@@ -47,7 +47,7 @@ class LegalPageSeeder extends Seeder
                         'heading_ar' => $s['heading_ar'] ?? null,
                         'subheading' => $s['subheading'] ?? null,
                         'subheading_ar' => $s['subheading_ar'] ?? null,
-                        'priority' => (int)$s['priority'],
+                        'priority' => (int) $s['priority'],
                     ]
                 );
             }
@@ -64,7 +64,7 @@ class LegalPageSeeder extends Seeder
                         'section_id' => $item['section_id'],
                         'content' => $item['content'],
                         'content_ar' => $item['content_ar'] ?? null,
-                        'priority' => (int)$item['priority'],
+                        'priority' => (int) $item['priority'],
                     ]
                 );
             }

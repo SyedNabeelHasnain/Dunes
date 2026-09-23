@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\Setting;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -22,7 +21,8 @@ class ZiinaPaymentService
     public function getAdvancePercent(): int
     {
         $percent = app(SettingsService::class)->get('ziina_advance_percent', '10');
-        return is_numeric($percent) ? (int)$percent : 10;
+
+        return is_numeric($percent) ? (int) $percent : 10;
     }
 
     /**
@@ -52,7 +52,7 @@ class ZiinaPaymentService
         }
 
         // Amount must be in fils (1 AED = 100 fils)
-        $amountFils = (int)round($amount * 100);
+        $amountFils = (int) round($amount * 100);
 
         $payload = [
             'amount' => $amountFils,
@@ -62,13 +62,13 @@ class ZiinaPaymentService
         ];
 
         // Clean & truncate message for Ziina API constraints (max 50 chars, alphanumeric/spaces/hyphen)
-        if (!empty($message)) {
+        if (! empty($message)) {
             $cleanMessage = trim(preg_replace('/[^a-zA-Z0-9 \-_.]/', ' ', $message));
             $cleanMessage = preg_replace('/\s+/', ' ', $cleanMessage);
             if (mb_strlen($cleanMessage) > 50) {
                 $cleanMessage = mb_substr($cleanMessage, 0, 50);
             }
-            if (!empty($cleanMessage)) {
+            if (! empty($cleanMessage)) {
                 $payload['message'] = $cleanMessage;
             }
         }
@@ -87,7 +87,7 @@ class ZiinaPaymentService
                 Log::error('Ziina Create Payment Intent API Failed', [
                     'status' => $response->status(),
                     'body' => $response->body(),
-                    'payload' => $payload
+                    'payload' => $payload,
                 ]);
 
                 $data = $response->json();
@@ -97,12 +97,12 @@ class ZiinaPaymentService
                 } elseif (isset($data['error']) && is_string($data['error'])) {
                     $errorMsg = $data['error'];
                 } elseif (isset($data['errors']) && is_array($data['errors'])) {
-                    $errorMsg = implode(', ', array_map(fn($e) => is_array($e) ? implode(' ', $e) : $e, $data['errors']));
+                    $errorMsg = implode(', ', array_map(fn ($e) => is_array($e) ? implode(' ', $e) : $e, $data['errors']));
                 }
 
                 return [
                     'error' => $errorMsg,
-                    'details' => $data
+                    'details' => $data,
                 ];
             }
 
@@ -111,10 +111,10 @@ class ZiinaPaymentService
         } catch (\Exception $e) {
             Log::error('Ziina Create Payment Intent Exception', [
                 'message' => $e->getMessage(),
-                'payload' => $payload
+                'payload' => $payload,
             ]);
 
-            return ['error' => 'Connection failed: ' . $e->getMessage()];
+            return ['error' => 'Connection failed: '.$e->getMessage()];
         }
     }
 
@@ -138,13 +138,14 @@ class ZiinaPaymentService
                 Log::error('Ziina Fetch Payment Intent API Failed', [
                     'status' => $response->status(),
                     'body' => $response->body(),
-                    'intent_id' => $intentId
+                    'intent_id' => $intentId,
                 ]);
 
                 $data = $response->json();
+
                 return [
                     'error' => $data['message'] ?? 'Ziina error',
-                    'details' => $data
+                    'details' => $data,
                 ];
             }
 
@@ -153,10 +154,10 @@ class ZiinaPaymentService
         } catch (\Exception $e) {
             Log::error('Ziina Fetch Payment Intent Exception', [
                 'message' => $e->getMessage(),
-                'intent_id' => $intentId
+                'intent_id' => $intentId,
             ]);
 
-            return ['error' => 'Connection failed: ' . $e->getMessage()];
+            return ['error' => 'Connection failed: '.$e->getMessage()];
         }
     }
 }

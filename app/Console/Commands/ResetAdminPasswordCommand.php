@@ -34,6 +34,7 @@ class ResetAdminPasswordCommand extends Command
 
         if (empty($login) || empty($password)) {
             $this->error('Both login and password are required.');
+
             return self::FAILURE;
         }
 

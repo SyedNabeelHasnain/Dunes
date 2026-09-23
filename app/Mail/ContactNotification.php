@@ -3,8 +3,8 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -14,9 +14,13 @@ class ContactNotification extends Mailable
     use Queueable, SerializesModels;
 
     public string $name;
+
     public string $email;
+
     public string $phone;
+
     public string $subjectText;
+
     public string $messageText;
 
     /**
@@ -49,7 +53,7 @@ class ContactNotification extends Mailable
         return new Content(
             view: 'emails.contact-admin',
             with: [
-                'subject' => $this->subjectText
+                'subject' => $this->subjectText,
             ]
         );
     }
@@ -57,7 +61,7 @@ class ContactNotification extends Mailable
     /**
      * Get the attachments for the message.
      *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
+     * @return array<int, Attachment>
      */
     public function attachments(): array
     {

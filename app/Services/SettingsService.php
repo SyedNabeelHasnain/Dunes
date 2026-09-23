@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Cache;
 class SettingsService
 {
     protected ?Collection $settings = null;
-    
+
     public function all(): Collection
     {
         if ($this->settings === null) {
@@ -34,47 +34,51 @@ class SettingsService
                 $this->settings = collect();
             }
         }
+
         return $this->settings;
     }
-    
+
     public function get(string $key, ?string $default = null): ?string
     {
         try {
             $val = $this->all()->get($key, $default);
-            return $val !== null ? (string)$val : $default;
+
+            return $val !== null ? (string) $val : $default;
         } catch (\Throwable $e) {
             return $default;
         }
     }
-    
+
     public function getFromEmail(): string
     {
         return $this->get('site_email', 'info@dunesdiscoverytourism.com') ?: 'info@dunesdiscoverytourism.com';
     }
-    
+
     public function getAdminEmail(): string
     {
         return $this->get('admin_email', 'admin@dunesdiscoverytourism.com') ?: 'admin@dunesdiscoverytourism.com';
     }
-    
+
     public function getCcEmails(): array
     {
         $cc = $this->get('admin_email_cc', '');
-        return !empty($cc) ? array_filter(array_map('trim', explode(',', $cc))) : [];
+
+        return ! empty($cc) ? array_filter(array_map('trim', explode(',', $cc))) : [];
     }
-    
+
     public function getBccEmails(): array
     {
         $bcc = $this->get('admin_email_bcc', '');
-        return !empty($bcc) ? array_filter(array_map('trim', explode(',', $bcc))) : [];
+
+        return ! empty($bcc) ? array_filter(array_map('trim', explode(',', $bcc))) : [];
     }
-    
+
     public function clearCache(): void
     {
         try {
             Cache::forget('site_settings_cache');
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+        }
         $this->settings = null;
     }
 }
-

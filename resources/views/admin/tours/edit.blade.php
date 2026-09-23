@@ -592,7 +592,7 @@ $('#tourContentForm').on('submit', function(e) {
 
 // Itinerary Builder Scripts
 function showEditItineraryForm(id) {
-    $(`#it_edit_form_${id}`).removeClass('hidden').removeClass('d-none');
+    $(`#it_edit_form_${id}`).removeClass('hidden');
 }
 function hideEditItineraryForm(id) {
     $(`#it_edit_form_${id}`).addClass('hidden');
@@ -682,7 +682,6 @@ function toggleAddonPrice(id) {
 
     if (isChecked) {
         priceGroup.classList.remove('hidden');
-        priceGroup.classList.remove('d-none');
         priceInput.removeAttribute('disabled');
         priceInput.setAttribute('required', 'true');
     } else {

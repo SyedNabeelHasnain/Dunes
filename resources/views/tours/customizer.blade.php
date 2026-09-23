@@ -92,7 +92,7 @@
                 </p>
             </div>
             <div class="hidden lg:block shrink-0">
-                <button type="button" class="border border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-slate-950 rounded-full px-4 py-2 text-xs font-bold transition-colors cursor-pointer inline-flex items-center gap-1.5" @click="$store.modal.open('safari-matcher')" data-bs-toggle="modal" data-bs-target="#safariMatcherModal">
+                <button type="button" class="border border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-slate-950 rounded-full px-4 py-2 text-xs font-bold transition-colors cursor-pointer inline-flex items-center gap-1.5" @click="$store.modal.open('safari-matcher')">
                     <i class="bi bi-compass"></i> Try Safari Match Concierge
                 </button>
             </div>
@@ -689,12 +689,6 @@ document.addEventListener('DOMContentLoaded', function() {
         bookNowBtn.addEventListener('click', function() {
             if (window.Alpine && window.Alpine.store('modal')) {
                 window.Alpine.store('modal').open('booking', { tourId: state.base.tourId });
-            } else {
-                const bookingModalEl = document.getElementById('bookingModal');
-                if (bookingModalEl && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                    const bModal = bootstrap.Modal.getOrCreateInstance(bookingModalEl);
-                    bModal.show();
-                }
             }
 
             // Set Tour ID in select

@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\EmailCampaign;
 use App\Models\EmailCampaignLog;
 use App\Models\Subscriber;
-use App\Services\SettingsService;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -34,25 +33,25 @@ class EmailMarketingService
         $fromAddress = $this->settings->get('smtp_from_address', config('mail.from.address'));
         $fromName = $this->settings->get('smtp_from_name', config('mail.from.name', $this->settings->get('site_name', 'Dunes Discovery Tourism')));
 
-        if (!empty($driver)) {
+        if (! empty($driver)) {
             Config::set('mail.default', $driver);
         }
 
-        if ($driver === 'smtp' && !empty($host)) {
+        if ($driver === 'smtp' && ! empty($host)) {
             Config::set('mail.mailers.smtp.host', $host);
             Config::set('mail.mailers.smtp.port', $port);
             Config::set('mail.mailers.smtp.encryption', $encryption === 'none' ? null : $encryption);
             Config::set('mail.mailers.smtp.scheme', $encryption === 'ssl' ? 'smtps' : null);
 
-            if (!empty($username)) {
+            if (! empty($username)) {
                 Config::set('mail.mailers.smtp.username', $username);
             }
-            if (!empty($password)) {
+            if (! empty($password)) {
                 Config::set('mail.mailers.smtp.password', $password);
             }
         }
 
-        if (!empty($fromAddress)) {
+        if (! empty($fromAddress)) {
             Config::set('mail.from.address', $fromAddress);
             Config::set('mail.from.name', $fromName);
         }
@@ -70,9 +69,9 @@ class EmailMarketingService
         $companyAddress = $this->settings->get('site_address', 'Dubai Desert Safari Terminal, Al Aweer & Lahbab, Dubai, UAE');
         $currentYear = date('Y');
 
-        $firstName = !empty($subscriber->first_name) ? $subscriber->first_name : (!empty($subscriber->full_name) ? explode(' ', $subscriber->full_name)[0] : 'Friend');
-        $lastName = !empty($subscriber->last_name) ? $subscriber->last_name : '';
-        $fullName = !empty($subscriber->full_name) ? $subscriber->full_name : $firstName;
+        $firstName = ! empty($subscriber->first_name) ? $subscriber->first_name : (! empty($subscriber->full_name) ? explode(' ', $subscriber->full_name)[0] : 'Friend');
+        $lastName = ! empty($subscriber->last_name) ? $subscriber->last_name : '';
+        $fullName = ! empty($subscriber->full_name) ? $subscriber->full_name : $firstName;
 
         $unsubUrl = $subscriber->unsubscribe_url;
 
@@ -101,9 +100,9 @@ class EmailMarketingService
         $html = $this->parseTags($rawHtml, $subscriber, $log);
 
         // If tracking log exists, rewrite non-unsubscribe links for click tracking
-        if ($log && !empty($log->tracking_token)) {
+        if ($log && ! empty($log->tracking_token)) {
             $token = $log->tracking_token;
-            $clickBase = url('/email/track/click/' . $token);
+            $clickBase = url('/email/track/click/'.$token);
 
             $html = preg_replace_callback('/<a\s+([^>]*?)href=["\']([^"\']+)["\']([^>]*?)>/i', function ($matches) use ($clickBase, $subscriber) {
                 $before = $matches[1];
@@ -122,31 +121,32 @@ class EmailMarketingService
                     return $matches[0];
                 }
 
-                $trackedUrl = $clickBase . '?url=' . urlencode($url);
-                return '<a ' . $before . 'href="' . $trackedUrl . '"' . $after . '>';
+                $trackedUrl = $clickBase.'?url='.urlencode($url);
+
+                return '<a '.$before.'href="'.$trackedUrl.'"'.$after.'>';
             }, $html);
 
             // Inject 1x1 GIF tracking pixel
-            $openPixelUrl = url('/email/track/open/' . $token . '.gif');
-            $trackingPixel = '<img src="' . $openPixelUrl . '" width="1" height="1" style="display:none!important;max-height:0;max-width:0;opacity:0;overflow:hidden;border:0;outline:none;" alt="" />';
+            $openPixelUrl = url('/email/track/open/'.$token.'.gif');
+            $trackingPixel = '<img src="'.$openPixelUrl.'" width="1" height="1" style="display:none!important;max-height:0;max-width:0;opacity:0;overflow:hidden;border:0;outline:none;" alt="" />';
 
             if (stripos($html, '</body>') !== false) {
-                $html = str_ireplace('</body>', $trackingPixel . '</body>', $html);
+                $html = str_ireplace('</body>', $trackingPixel.'</body>', $html);
             } else {
                 $html .= $trackingPixel;
             }
         }
 
         // CAN-SPAM & GDPR Compliance: Guarantee unsubscribe link exists in every email
-        if (!str_contains($html, $subscriber->unsubscribe_url)) {
+        if (! str_contains($html, $subscriber->unsubscribe_url)) {
             $siteName = htmlspecialchars($this->settings->get('site_name', 'Dunes Discovery Tourism'), ENT_QUOTES, 'UTF-8');
             $unsubFooter = '<div style="margin-top: 36px; padding-top: 20px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #94a3b8; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, Helvetica, Arial, sans-serif; line-height: 1.5;">'
-                . 'You are receiving this communication because you are subscribed to updates from ' . $siteName . '.<br>'
-                . '<a href="' . $subscriber->unsubscribe_url . '" style="color: #64748b; text-decoration: underline; font-weight: 500;">Unsubscribe from future marketing emails</a>'
-                . '</div>';
+                .'You are receiving this communication because you are subscribed to updates from '.$siteName.'.<br>'
+                .'<a href="'.$subscriber->unsubscribe_url.'" style="color: #64748b; text-decoration: underline; font-weight: 500;">Unsubscribe from future marketing emails</a>'
+                .'</div>';
 
             if (stripos($html, '</body>') !== false) {
-                $html = str_ireplace('</body>', $unsubFooter . '</body>', $html);
+                $html = str_ireplace('</body>', $unsubFooter.'</body>', $html);
             } else {
                 $html .= $unsubFooter;
             }
@@ -181,6 +181,7 @@ class EmailMarketingService
 
         if ($totalSubscribers === 0) {
             $campaign->update(['status' => 'sent']);
+
             return ['success' => true, 'sent' => 0, 'failed' => 0, 'total' => 0];
         }
 
@@ -200,7 +201,7 @@ class EmailMarketingService
                         'subscriber_id' => $sub->id,
                     ],
                     [
-                        'tracking_token' => Str::random(40) . time() . Str::random(8),
+                        'tracking_token' => Str::random(40).time().Str::random(8),
                         'status' => 'pending',
                     ]
                 );
@@ -208,14 +209,14 @@ class EmailMarketingService
                 try {
                     $parsedSubject = $this->parseTags($campaign->subject, $sub, $log);
                     $parsedHtml = $this->renderHtml($campaign->content_html, $sub, $log);
-                    $parsedPlain = !empty($campaign->content_plain) ? $this->parseTags($campaign->content_plain, $sub, $log) : strip_tags($parsedHtml);
+                    $parsedPlain = ! empty($campaign->content_plain) ? $this->parseTags($campaign->content_plain, $sub, $log) : strip_tags($parsedHtml);
 
                     Mail::html($parsedHtml, function ($message) use ($sub, $parsedSubject, $fromAddress, $fromName, $replyTo) {
                         $message->to($sub->email, $sub->full_name)
                             ->subject($parsedSubject)
                             ->from($fromAddress, $fromName);
 
-                        if (!empty($replyTo)) {
+                        if (! empty($replyTo)) {
                             $message->replyTo($replyTo);
                         }
                     });
@@ -229,7 +230,7 @@ class EmailMarketingService
                     $sentCount++;
                 } catch (\Throwable $e) {
                     $failedCount++;
-                    Log::error("Campaign [{$campaign->id}] failed for subscriber [{$sub->email}]: " . $e->getMessage());
+                    Log::error("Campaign [{$campaign->id}] failed for subscriber [{$sub->email}]: ".$e->getMessage());
 
                     $isBounce = str_contains(strtolower($e->getMessage()), 'bounce') ||
                                 str_contains(strtolower($e->getMessage()), 'mailbox unavailable') ||
@@ -287,7 +288,7 @@ class EmailMarketingService
             'unsubscribe_token' => 'sample-test-token',
         ]);
 
-        $renderedSubject = '[TEST] ' . $this->parseTags($subject, $dummySubscriber);
+        $renderedSubject = '[TEST] '.$this->parseTags($subject, $dummySubscriber);
         $renderedHtml = $this->renderHtml($htmlContent, $dummySubscriber);
 
         try {
@@ -302,10 +303,11 @@ class EmailMarketingService
                 'message' => "Test email dispatched successfully to {$recipientEmail}!",
             ];
         } catch (\Throwable $e) {
-            Log::error("Test email dispatch failed: " . $e->getMessage());
+            Log::error('Test email dispatch failed: '.$e->getMessage());
+
             return [
                 'success' => false,
-                'message' => "Dispatch failed: " . $e->getMessage(),
+                'message' => 'Dispatch failed: '.$e->getMessage(),
             ];
         }
     }

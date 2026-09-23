@@ -1,6 +1,6 @@
 <?php
 
-if (!function_exists('buildHtmlAttrs')) {
+if (! function_exists('buildHtmlAttrs')) {
     function buildHtmlAttrs(array $attrs = []): string
     {
         $parts = [];
@@ -8,18 +8,19 @@ if (!function_exists('buildHtmlAttrs')) {
             if ($value === null || $value === false) {
                 continue;
             }
-            $k = htmlspecialchars((string)$key, ENT_QUOTES, 'UTF-8');
+            $k = htmlspecialchars((string) $key, ENT_QUOTES, 'UTF-8');
             if ($value === true) {
                 $parts[] = $k;
             } else {
-                $parts[] = $k . '="' . htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8') . '"';
+                $parts[] = $k.'="'.htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8').'"';
             }
         }
-        return $parts ? ' ' . implode(' ', $parts) : '';
+
+        return $parts ? ' '.implode(' ', $parts) : '';
     }
 }
 
-if (!function_exists('renderFloatingInput')) {
+if (! function_exists('renderFloatingInput')) {
     function renderFloatingInput(array $opts = []): string
     {
         $type = $opts['type'] ?? 'text';
@@ -28,10 +29,10 @@ if (!function_exists('renderFloatingInput')) {
         $label = $opts['label'] ?? '';
         $placeholder = $opts['placeholder'] ?? '';
         $autocomplete = $opts['autocomplete'] ?? '';
-        $required = !empty($opts['required']);
-        $wrapperClass = $opts['wrapperClass'] ?? 'form-floating';
-        $inputClass = $opts['inputClass'] ?? 'form-control';
-        $labelClass = $opts['labelClass'] ?? '';
+        $required = ! empty($opts['required']);
+        $wrapperClass = $opts['wrapperClass'] ?? 'relative rounded-xl';
+        $inputClass = $opts['inputClass'] ?? 'w-full rounded-xl border border-slate-200 px-3.5 pt-5 pb-2 text-xs font-semibold text-slate-800 outline-hidden focus:border-primary';
+        $labelClass = $opts['labelClass'] ?? 'absolute text-[10px] uppercase font-bold text-slate-400 left-3.5 top-1.5 transition-all pointer-events-none';
         $wrapperAttrs = $opts['wrapperAttrs'] ?? [];
         $inputAttrs = $opts['inputAttrs'] ?? [];
         $labelAttrs = $opts['labelAttrs'] ?? [];
@@ -56,11 +57,11 @@ if (!function_exists('renderFloatingInput')) {
         }
         $labelAttrs['for'] = $id;
 
-        return '<div' . buildHtmlAttrs($wrapperAttrs) . '><input' . buildHtmlAttrs($inputAttrs) . '><label' . buildHtmlAttrs($labelAttrs) . '>' . htmlspecialchars($label, ENT_QUOTES, 'UTF-8') . '</label></div>';
+        return '<div'.buildHtmlAttrs($wrapperAttrs).'><input'.buildHtmlAttrs($inputAttrs).'><label'.buildHtmlAttrs($labelAttrs).'>'.htmlspecialchars($label, ENT_QUOTES, 'UTF-8').'</label></div>';
     }
 }
 
-if (!function_exists('renderFloatingTextarea')) {
+if (! function_exists('renderFloatingTextarea')) {
     function renderFloatingTextarea(array $opts = []): string
     {
         $id = $opts['id'] ?? '';
@@ -68,10 +69,10 @@ if (!function_exists('renderFloatingTextarea')) {
         $label = $opts['label'] ?? '';
         $placeholder = $opts['placeholder'] ?? '';
         $autocomplete = $opts['autocomplete'] ?? '';
-        $required = !empty($opts['required']);
-        $wrapperClass = $opts['wrapperClass'] ?? 'form-floating';
-        $inputClass = $opts['inputClass'] ?? 'form-control';
-        $labelClass = $opts['labelClass'] ?? '';
+        $required = ! empty($opts['required']);
+        $wrapperClass = $opts['wrapperClass'] ?? 'relative rounded-xl';
+        $inputClass = $opts['inputClass'] ?? 'w-full rounded-xl border border-slate-200 px-3.5 pt-5 pb-2 text-xs font-semibold text-slate-800 outline-hidden focus:border-primary';
+        $labelClass = $opts['labelClass'] ?? 'absolute text-[10px] uppercase font-bold text-slate-400 left-3.5 top-1.5 transition-all pointer-events-none';
         $wrapperAttrs = $opts['wrapperAttrs'] ?? [];
         $inputAttrs = $opts['inputAttrs'] ?? [];
         $labelAttrs = $opts['labelAttrs'] ?? [];
@@ -95,21 +96,22 @@ if (!function_exists('renderFloatingTextarea')) {
         }
         $labelAttrs['for'] = $id;
 
-        return '<div' . buildHtmlAttrs($wrapperAttrs) . '><textarea' . buildHtmlAttrs($inputAttrs) . '></textarea><label' . buildHtmlAttrs($labelAttrs) . '>' . htmlspecialchars($label, ENT_QUOTES, 'UTF-8') . '</label></div>';
+        return '<div'.buildHtmlAttrs($wrapperAttrs).'><textarea'.buildHtmlAttrs($inputAttrs).'></textarea><label'.buildHtmlAttrs($labelAttrs).'>'.htmlspecialchars($label, ENT_QUOTES, 'UTF-8').'</label></div>';
     }
 }
 
-if (!function_exists('formatPhone')) {
+if (! function_exists('formatPhone')) {
     function formatPhone(string $phone): string
     {
-        return 'tel:' . preg_replace('/[^0-9+]/', '', $phone);
+        return 'tel:'.preg_replace('/[^0-9+]/', '', $phone);
     }
 }
 
-if (!function_exists('formatWhatsApp')) {
+if (! function_exists('formatWhatsApp')) {
     function formatWhatsApp(string $number, string $message = ''): string
     {
         $number = preg_replace('/[^0-9]/', '', $number);
-        return "https://wa.me/{$number}" . ($message ? '?text=' . urlencode($message) : '');
+
+        return "https://wa.me/{$number}".($message ? '?text='.urlencode($message) : '');
     }
 }

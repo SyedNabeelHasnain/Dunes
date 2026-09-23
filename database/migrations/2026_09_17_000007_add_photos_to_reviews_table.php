@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('reviews', function (Blueprint $table) {
-            if (!Schema::hasColumn('reviews', 'photos')) {
+            if (! Schema::hasColumn('reviews', 'photos')) {
                 $table->json('photos')->nullable()->after('review_text');
             }
-            if (!Schema::hasColumn('reviews', 'booking_id')) {
+            if (! Schema::hasColumn('reviews', 'booking_id')) {
                 $table->unsignedInteger('booking_id')->nullable()->after('source_review_id')->index();
             }
         });

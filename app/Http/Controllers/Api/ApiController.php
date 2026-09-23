@@ -24,17 +24,17 @@ class ApiController extends Controller
         $ip = $ipInfo['client_ip'];
         $details = $this->tracker->ipLookup($ip);
 
-        if (!$details) {
+        if (! $details) {
             return response()->json([
                 'status' => 'fail',
                 'message' => 'Unable to resolve IP location',
-                'ip' => $ip
+                'ip' => $ip,
             ], 404);
         }
 
         return response()->json(array_merge([
             'status' => 'success',
-            'ip' => $ip
+            'ip' => $ip,
         ], $details));
     }
 }

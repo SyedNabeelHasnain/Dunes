@@ -7,6 +7,7 @@ use App\Models\Setting;
 use App\Services\SettingsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class AdminSettingController extends Controller
@@ -20,7 +21,7 @@ class AdminSettingController extends Controller
             'site_name', 'site_phone', 'site_whatsapp', 'site_email', 'site_support_email',
             'site_address', 'company_license_number', 'google_maps_embed_url',
             'social_tripadvisor', 'social_google', 'social_facebook', 'social_instagram',
-            'social_youtube', 'social_tiktok', 'footer_about', 'site_copyright'
+            'social_youtube', 'social_tiktok', 'footer_about', 'site_copyright',
         ];
 
         $settings = Setting::whereIn('setting_key', $keys)
@@ -173,12 +174,12 @@ class AdminSettingController extends Controller
         foreach ($settings as $key => $value) {
             Setting::updateOrCreate(
                 ['setting_key' => $key],
-                ['setting_value' => $value !== null ? trim((string)$value) : '']
+                ['setting_value' => $value !== null ? trim((string) $value) : '']
             );
         }
 
-        \Illuminate\Support\Facades\Cache::forget('site_settings_cache');
-        \Illuminate\Support\Facades\Cache::forget('site_home_cache');
+        Cache::forget('site_settings_cache');
+        Cache::forget('site_home_cache');
 
         return back()->with('success', 'Settings updated successfully.');
     }
@@ -197,16 +198,16 @@ class AdminSettingController extends Controller
             @opcache_reset();
         }
 
-        \Illuminate\Support\Facades\Cache::forget('site_settings_cache');
-        \Illuminate\Support\Facades\Cache::forget('site_tours_header_cache');
-        \Illuminate\Support\Facades\Cache::forget('site_home_cache');
-        \Illuminate\Support\Facades\Cache::forget('admin_dashboard_kpis');
-        \Illuminate\Support\Facades\Cache::forget('admin_dashboard_top_tours');
+        Cache::forget('site_settings_cache');
+        Cache::forget('site_tours_header_cache');
+        Cache::forget('site_home_cache');
+        Cache::forget('admin_dashboard_kpis');
+        Cache::forget('admin_dashboard_top_tours');
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'All system, route, configuration, and view caches purged successfully.'
+                'message' => 'All system, route, configuration, and view caches purged successfully.',
             ]);
         }
 
@@ -225,18 +226,18 @@ class AdminSettingController extends Controller
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => true,
-                    'message' => 'Database migrations executed successfully: ' . $output
+                    'message' => 'Database migrations executed successfully: '.$output,
                 ]);
             }
 
-            return back()->with('success', 'Database migrations executed successfully: ' . $output);
+            return back()->with('success', 'Database migrations executed successfully: '.$output);
         } catch (\Throwable $e) {
-            Log::error('Admin migration execution error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('Admin migration execution error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'An error occurred while running migrations. Details have been logged.'
+                    'message' => 'An error occurred while running migrations. Details have been logged.',
                 ], 500);
             }
 
@@ -265,13 +266,14 @@ class AdminSettingController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Foreign exchange rates synchronized successfully with Open Exchange Rates API.',
-                'rates' => $rates
+                'rates' => $rates,
             ]);
         } catch (\Throwable $e) {
-            Log::error('Currency sync error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('Currency sync error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to synchronize currency rates. Please verify connection.'
+                'message' => 'Failed to synchronize currency rates. Please verify connection.',
             ], 500);
         }
     }

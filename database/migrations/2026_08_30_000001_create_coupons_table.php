@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         // 1. Create coupons table
-        if (!Schema::hasTable('coupons')) {
+        if (! Schema::hasTable('coupons')) {
             Schema::create('coupons', function (Blueprint $table) {
                 $table->increments('id');
                 $table->string('code', 50)->unique()->index();
@@ -41,7 +41,7 @@ return new class extends Migration
         }
 
         // 2. Create coupon_usages table
-        if (!Schema::hasTable('coupon_usages')) {
+        if (! Schema::hasTable('coupon_usages')) {
             Schema::create('coupon_usages', function (Blueprint $table) {
                 $table->increments('id');
                 $table->unsignedInteger('coupon_id')->index();
@@ -61,22 +61,22 @@ return new class extends Migration
         // 3. Add coupon columns to bookings table
         if (Schema::hasTable('bookings')) {
             Schema::table('bookings', function (Blueprint $table) {
-                if (!Schema::hasColumn('bookings', 'coupon_id')) {
+                if (! Schema::hasColumn('bookings', 'coupon_id')) {
                     $table->unsignedInteger('coupon_id')->nullable()->index()->after('special_requests');
                 }
-                if (!Schema::hasColumn('bookings', 'coupon_code')) {
+                if (! Schema::hasColumn('bookings', 'coupon_code')) {
                     $table->string('coupon_code', 50)->nullable()->index()->after('coupon_id');
                 }
-                if (!Schema::hasColumn('bookings', 'discount_type')) {
+                if (! Schema::hasColumn('bookings', 'discount_type')) {
                     $table->string('discount_type', 20)->nullable()->after('coupon_code');
                 }
-                if (!Schema::hasColumn('bookings', 'discount_rate')) {
+                if (! Schema::hasColumn('bookings', 'discount_rate')) {
                     $table->decimal('discount_rate', 10, 2)->default(0.00)->after('discount_type');
                 }
-                if (!Schema::hasColumn('bookings', 'discount_amount')) {
+                if (! Schema::hasColumn('bookings', 'discount_amount')) {
                     $table->decimal('discount_amount', 10, 2)->default(0.00)->after('discount_rate');
                 }
-                if (!Schema::hasColumn('bookings', 'original_total')) {
+                if (! Schema::hasColumn('bookings', 'original_total')) {
                     $table->decimal('original_total', 10, 2)->default(0.00)->after('discount_amount');
                 }
             });
@@ -91,8 +91,10 @@ return new class extends Migration
         if (Schema::hasTable('bookings')) {
             Schema::table('bookings', function (Blueprint $table) {
                 $cols = ['coupon_id', 'coupon_code', 'discount_type', 'discount_rate', 'discount_amount', 'original_total'];
-                $existing = array_filter($cols, function($c) { return Schema::hasColumn('bookings', $c); });
-                if (!empty($existing)) {
+                $existing = array_filter($cols, function ($c) {
+                    return Schema::hasColumn('bookings', $c);
+                });
+                if (! empty($existing)) {
                     $table->dropColumn($existing);
                 }
             });

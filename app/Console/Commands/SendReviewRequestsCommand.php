@@ -6,8 +6,8 @@ use App\Mail\ReviewRequestMail;
 use App\Models\Booking;
 use App\Services\SettingsService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class SendReviewRequestsCommand extends Command
 {
@@ -56,18 +56,19 @@ class SendReviewRequestsCommand extends Command
 
                 $notes = $booking->special_requests ?: '';
                 $booking->update([
-                    'special_requests' => trim($notes . "\n[REVIEW_REQUESTED: " . now()->toIso8601String() . "]")
+                    'special_requests' => trim($notes."\n[REVIEW_REQUESTED: ".now()->toIso8601String().']'),
                 ]);
 
                 $count++;
                 $this->info("Dispatched review invitation to: {$booking->email} (Ref: #{$booking->reference})");
             } catch (\Throwable $e) {
-                Log::error("Failed to send post-tour review email to {$booking->email}: " . $e->getMessage());
-                $this->error("Failed to send review email to {$booking->email}: " . $e->getMessage());
+                Log::error("Failed to send post-tour review email to {$booking->email}: ".$e->getMessage());
+                $this->error("Failed to send review email to {$booking->email}: ".$e->getMessage());
             }
         }
 
         $this->info("Successfully dispatched {$count} post-tour review requests.");
+
         return Command::SUCCESS;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Services\SettingsService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
@@ -40,12 +41,12 @@ class ResetPasswordNotification extends Notification
             'email' => $notifiable->getEmailForPasswordReset(),
         ], false));
 
-        $fromEmail = app(\App\Services\SettingsService::class)->getFromEmail();
+        $fromEmail = app(SettingsService::class)->getFromEmail();
 
         return (new MailMessage)
             ->from($fromEmail, 'Dunes Discovery Tourism')
             ->subject('Reset Your Password - Dunes Discovery Tourism')
-            ->greeting('Hello ' . ($notifiable->name ?? 'User') . ',')
+            ->greeting('Hello '.($notifiable->name ?? 'User').',')
             ->line('You are receiving this email because we received a password reset request for your account.')
             ->action('Reset Password', $url)
             ->line('This password reset link will expire in 60 minutes.')

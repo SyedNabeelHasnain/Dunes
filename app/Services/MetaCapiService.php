@@ -3,8 +3,6 @@
 namespace App\Services;
 
 use App\Jobs\SendMetaCapiEvent;
-use App\Models\Setting;
-use Illuminate\Support\Facades\Log;
 
 class MetaCapiService
 {
@@ -14,6 +12,7 @@ class MetaCapiService
     public function isActive(): bool
     {
         $settings = app(SettingsService::class);
+
         return $settings->get('meta_active') === '1' && $settings->get('meta_capi_enabled') === '1';
     }
 
@@ -22,14 +21,14 @@ class MetaCapiService
      */
     public function dispatchEvent(string $eventName, array $data = []): void
     {
-        if (!$this->isActive()) {
+        if (! $this->isActive()) {
             return;
         }
 
         // Capture request context in front-end context before queue execution
         $clientIp = request()->ip();
         $userAgent = request()->userAgent();
-        
+
         $cookies = [
             'fbp' => request()->cookie('_fbp'),
             'fbc' => request()->cookie('_fbc'),

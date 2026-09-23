@@ -16,14 +16,14 @@ class BlogPost extends Model
         'read_time', 'status', 'is_featured', 'priority', 'published_at',
         'meta_title', 'meta_desc', 'meta_keywords', 'focus_keyword',
         'canonical_url', 'robots', 'og_title', 'og_desc', 'og_image',
-        'og_type', 'schema_type', 'ai_summary'
+        'og_type', 'schema_type', 'ai_summary',
     ];
 
     protected $casts = [
         'read_time' => 'integer',
         'is_featured' => 'boolean',
         'priority' => 'integer',
-        'published_at' => 'datetime'
+        'published_at' => 'datetime',
     ];
 
     public function category()

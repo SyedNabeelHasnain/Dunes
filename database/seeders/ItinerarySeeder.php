@@ -14,7 +14,7 @@ class ItinerarySeeder extends Seeder
     public function run(): void
     {
         $path = database_path('seeders/data/itinerary.json');
-        if (!File::exists($path)) {
+        if (! File::exists($path)) {
             return;
         }
 
@@ -29,7 +29,7 @@ class ItinerarySeeder extends Seeder
                     'description' => $it['description'],
                     'icon' => $it['icon'],
                     'duration' => $it['duration'],
-                    'priority' => (int)$it['priority'],
+                    'priority' => (int) $it['priority'],
                 ]
             );
         }

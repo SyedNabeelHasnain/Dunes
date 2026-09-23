@@ -11,12 +11,12 @@ class Tier extends Model
 
     protected $fillable = [
         'slug', 'name', 'display_name', 'description', 'icon', 'badge', 'color',
-        'is_popular', 'priority', 'status'
+        'is_popular', 'priority', 'status',
     ];
 
     protected $casts = [
         'is_popular' => 'boolean',
-        'priority' => 'integer'
+        'priority' => 'integer',
     ];
 
     public function tours()

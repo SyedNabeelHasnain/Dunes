@@ -15,6 +15,7 @@ class AdminBlogCategoryController extends Controller
     public function index()
     {
         $categories = BlogCategory::orderBy('priority', 'asc')->get();
+
         return view('admin.blog-categories.index', compact('categories'));
     }
 
@@ -48,7 +49,7 @@ class AdminBlogCategoryController extends Controller
         $category = BlogCategory::findOrFail($id);
 
         $request->validate([
-            'name' => 'required|string|max:255|unique:blog_categories,name,' . $id,
+            'name' => 'required|string|max:255|unique:blog_categories,name,'.$id,
             'priority' => 'required|integer',
             'status' => 'required|string|in:active,inactive',
         ]);
@@ -71,6 +72,7 @@ class AdminBlogCategoryController extends Controller
     {
         $category = BlogCategory::findOrFail($id);
         $category->delete();
+
         return redirect()->route('admin.blog-categories.index')->with('success', 'Category deleted successfully.');
     }
 }

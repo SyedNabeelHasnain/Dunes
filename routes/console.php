@@ -22,5 +22,3 @@ Schedule::command('currency:sync-rates')->dailyAt('02:00');
 
 // Dispatch scheduled email marketing campaigns (every 5 minutes)
 Schedule::command('campaigns:send-scheduled')->everyFiveMinutes();
-
-

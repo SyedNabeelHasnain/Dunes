@@ -1,8 +1,9 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -21,7 +22,7 @@ return new class extends Migration
                 'description' => 'Default subscriber audience opted-in via website footer, popups, and blog forms.',
                 'is_system' => true,
                 'created_at' => $now,
-                'updated_at' => $now
+                'updated_at' => $now,
             ],
             [
                 'name' => 'Booked Guests',
@@ -29,7 +30,7 @@ return new class extends Migration
                 'description' => 'Travelers who have completed a booking reservation with marketing consent.',
                 'is_system' => true,
                 'created_at' => $now,
-                'updated_at' => $now
+                'updated_at' => $now,
             ],
             [
                 'name' => 'VIP Travelers',
@@ -37,7 +38,7 @@ return new class extends Migration
                 'description' => 'High-value guests and private charter patrons eligible for bespoke premium alerts.',
                 'is_system' => false,
                 'created_at' => $now,
-                'updated_at' => $now
+                'updated_at' => $now,
             ],
             [
                 'name' => 'Inquiries & Leads',
@@ -45,8 +46,8 @@ return new class extends Migration
                 'description' => 'Prospective customers who contacted support or WhatsApp concierge.',
                 'is_system' => false,
                 'created_at' => $now,
-                'updated_at' => $now
-            ]
+                'updated_at' => $now,
+            ],
         ];
 
         foreach ($groups as $g) {
@@ -57,14 +58,14 @@ return new class extends Migration
         }
 
         // 2. Base Responsive Email Boilerplate Structure
-        $makeHtml = function(string $headerBadge, string $headline, string $contentBody, ?string $ctaText = null, ?string $ctaUrl = null) {
+        $makeHtml = function (string $headerBadge, string $headline, string $contentBody, ?string $ctaText = null, ?string $ctaUrl = null) {
             $ctaBlock = '';
             if ($ctaText && $ctaUrl) {
                 $ctaBlock = '
                 <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 32px 0;">
                     <tr>
                         <td align="center">
-                            <a href="' . $ctaUrl . '" target="_blank" style="display: inline-block; padding: 16px 36px; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; font-size: 15px; font-weight: 700; color: #ffffff; text-decoration: none; background: linear-gradient(135deg, #F58F43, #D97706); border-radius: 50px; box-shadow: 0 4px 14px rgba(245, 143, 67, 0.35); text-transform: uppercase; letter-spacing: 0.5px;">' . $ctaText . '</a>
+                            <a href="'.$ctaUrl.'" target="_blank" style="display: inline-block; padding: 16px 36px; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; font-size: 15px; font-weight: 700; color: #ffffff; text-decoration: none; background: linear-gradient(135deg, #F58F43, #D97706); border-radius: 50px; box-shadow: 0 4px 14px rgba(245, 143, 67, 0.35); text-transform: uppercase; letter-spacing: 0.5px;">'.$ctaText.'</a>
                         </td>
                     </tr>
                 </table>';
@@ -107,7 +108,7 @@ return new class extends Migration
                                 </h1>
                             </a>
                             <div style="display: inline-block; margin-top: 14px; padding: 4px 14px; background: rgba(245, 143, 67, 0.18); border: 1px solid rgba(245, 143, 67, 0.4); border-radius: 50px; font-size: 11px; font-weight: 700; color: #F58F43; text-transform: uppercase; letter-spacing: 1px;">
-                                ' . $headerBadge . '
+                                '.$headerBadge.'
                             </div>
                         </td>
                     </tr>
@@ -115,12 +116,12 @@ return new class extends Migration
                     <tr>
                         <td class="content-padding" style="padding: 40px 36px;">
                             <h2 class="h1-title" style="margin: 0 0 16px 0; font-size: 26px; font-weight: 800; color: #0F172A; line-height: 1.3;">
-                                ' . $headline . '
+                                '.$headline.'
                             </h2>
                             <div style="font-size: 15px; line-height: 1.65; color: #475569;">
-                                ' . $contentBody . '
+                                '.$contentBody.'
                             </div>
-                            ' . $ctaBlock . '
+                            '.$ctaBlock.'
                             <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #f1f5f9; font-size: 13px; color: #64748b;">
                                 <p style="margin: 0 0 6px 0;">Warm regards,<br><strong style="color: #0f172a;">The Concierge Team</strong><br>{{site_name}}</p>
                                 <p style="margin: 0;">WhatsApp 24/7: <a href="https://wa.me/{{site_whatsapp}}" style="color: #F58F43; text-decoration: none; font-weight: 600;">+{{site_whatsapp}}</a></p>
@@ -172,7 +173,7 @@ return new class extends Migration
                 'content_plain' => "Welcome to {{site_name}}, {{first_name}}!\n\nUse promo code FIRST25 to save 25% on your booking: {{site_url}}?promo=FIRST25\n\nUnsubscribe: {{unsubscribe_url}}",
                 'is_system' => true,
                 'created_at' => $now,
-                'updated_at' => $now
+                'updated_at' => $now,
             ],
             [
                 'name' => 'Monthly Travel & Safari Digest',
@@ -195,7 +196,7 @@ return new class extends Migration
                 'content_plain' => "Hello {{first_name}},\n\nCheck out the latest seasonal safari updates at {{site_url}}/tours\n\nUnsubscribe: {{unsubscribe_url}}",
                 'is_system' => true,
                 'created_at' => $now,
-                'updated_at' => $now
+                'updated_at' => $now,
             ],
             [
                 'name' => 'Flash Sale & Limited-Time Alert',
@@ -217,7 +218,7 @@ return new class extends Migration
                 'content_plain' => "Hi {{first_name}},\n\n48-Hour Flash Sale is live now at {{site_url}}\n\nUnsubscribe: {{unsubscribe_url}}",
                 'is_system' => true,
                 'created_at' => $now,
-                'updated_at' => $now
+                'updated_at' => $now,
             ],
             [
                 'name' => 'Operational & Service Advisory',
@@ -237,8 +238,8 @@ return new class extends Migration
                 'content_plain' => "Dear {{first_name}},\n\nPlease review this important travel advisory at {{site_url}}/contact\n\nUnsubscribe: {{unsubscribe_url}}",
                 'is_system' => true,
                 'created_at' => $now,
-                'updated_at' => $now
-            ]
+                'updated_at' => $now,
+            ],
         ];
 
         foreach ($templates as $t) {
@@ -249,8 +250,8 @@ return new class extends Migration
         }
 
         // 4. Seed Dynamic SMTP & Newsletter Settings
-        if (!\Illuminate\Support\Facades\Schema::hasColumn('settings', 'description')) {
-            \Illuminate\Support\Facades\Schema::table('settings', function (\Illuminate\Database\Schema\Blueprint $table) {
+        if (! Schema::hasColumn('settings', 'description')) {
+            Schema::table('settings', function (Blueprint $table) {
                 $table->text('description')->nullable();
             });
         }
@@ -267,7 +268,7 @@ return new class extends Migration
             ['setting_key' => 'smtp_reply_to', 'setting_value' => 'info@dunesdiscoverytourism.com', 'description' => 'Default Mail Reply-To Email Address'],
             ['setting_key' => 'newsletter_enabled', 'setting_value' => '1', 'description' => 'Global Newsletter & Email Marketing Active Toggle (1/0)'],
             ['setting_key' => 'newsletter_batch_size', 'setting_value' => '50', 'description' => 'Number of emails sent per campaign dispatch batch'],
-            ['setting_key' => 'newsletter_batch_delay', 'setting_value' => '1', 'description' => 'Seconds delay between campaign email batches to respect host rate limits']
+            ['setting_key' => 'newsletter_batch_delay', 'setting_value' => '1', 'description' => 'Seconds delay between campaign email batches to respect host rate limits'],
         ];
 
         foreach ($settings as $s) {
@@ -288,7 +289,7 @@ return new class extends Migration
         DB::table('settings')->whereIn('setting_key', [
             'smtp_driver', 'smtp_host', 'smtp_port', 'smtp_encryption',
             'smtp_username', 'smtp_password', 'smtp_from_address', 'smtp_from_name',
-            'smtp_reply_to', 'newsletter_enabled', 'newsletter_batch_size', 'newsletter_batch_delay'
+            'smtp_reply_to', 'newsletter_enabled', 'newsletter_batch_size', 'newsletter_batch_delay',
         ])->delete();
     }
 };

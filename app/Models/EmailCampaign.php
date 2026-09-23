@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class EmailCampaign extends Model
 {
@@ -81,25 +81,37 @@ class EmailCampaign extends Model
      */
     public function getOpenRateAttribute(): float
     {
-        if ($this->sent_count <= 0) return 0.0;
+        if ($this->sent_count <= 0) {
+            return 0.0;
+        }
+
         return round(($this->unique_opens / $this->sent_count) * 100, 1);
     }
 
     public function getClickRateAttribute(): float
     {
-        if ($this->sent_count <= 0) return 0.0;
+        if ($this->sent_count <= 0) {
+            return 0.0;
+        }
+
         return round(($this->unique_clicks / $this->sent_count) * 100, 1);
     }
 
     public function getBounceRateAttribute(): float
     {
-        if ($this->sent_count <= 0) return 0.0;
+        if ($this->sent_count <= 0) {
+            return 0.0;
+        }
+
         return round(($this->bounced_count / $this->sent_count) * 100, 1);
     }
 
     public function getUnsubscribeRateAttribute(): float
     {
-        if ($this->sent_count <= 0) return 0.0;
+        if ($this->sent_count <= 0) {
+            return 0.0;
+        }
+
         return round(($this->unsubscribed_count / $this->sent_count) * 100, 1);
     }
 }

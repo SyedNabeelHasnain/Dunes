@@ -14,7 +14,7 @@ class BlogPostFaq extends Model
     protected $fillable = ['post_id', 'question', 'answer', 'priority'];
 
     protected $casts = [
-        'priority' => 'integer'
+        'priority' => 'integer',
     ];
 
     public function post()

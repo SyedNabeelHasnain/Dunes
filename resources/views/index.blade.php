@@ -122,11 +122,11 @@ if (!function_exists('renderReviewCardMarkup')) {
         </p>
 
         <div class="flex flex-col sm:flex-row gap-3 justify-center items-center mb-10">
-            <a href="#" class="btn-desert-animated text-base sm:text-lg font-bold rounded-full px-8 py-3.5 shadow-xl text-white inline-flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto" @click.prevent="$store.modal.open('booking')" data-bs-toggle="modal" data-bs-target="#bookingModal">
+            <a href="#" class="btn-desert-animated text-base sm:text-lg font-bold rounded-full px-8 py-3.5 shadow-xl text-white inline-flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto" @click.prevent="$store.modal.open('booking')">
                 <i class="bi bi-calendar-check text-lg"></i>
                 <span>Book Online Now</span>
             </a>
-            <button type="button" class="inline-flex items-center justify-center gap-2 text-base font-bold rounded-full px-6 py-3.5 border border-primary/60 text-primary bg-slate-900/60 backdrop-blur-md hover:bg-slate-900/80 transition-all cursor-pointer w-full sm:w-auto" @click="$store.modal.open('safari-matcher')" data-bs-toggle="modal" data-bs-target="#safariMatcherModal">
+            <button type="button" class="inline-flex items-center justify-center gap-2 text-base font-bold rounded-full px-6 py-3.5 border border-primary/60 text-primary bg-slate-900/60 backdrop-blur-md hover:bg-slate-900/80 transition-all cursor-pointer w-full sm:w-auto" @click="$store.modal.open('safari-matcher')">
                 <i class="bi bi-compass text-amber-400 text-lg"></i>
                 <span>Safari Match Concierge</span>
                 <span class="bg-amber-400 text-slate-950 font-bold rounded-full px-2 py-0.5 text-[10px]">5% OFF</span>
@@ -310,7 +310,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                     <p class="text-slate-300 text-sm">Take our 30-second interactive matching quiz or customize your own private 4x4, buggy, and VIP dinner setup.</p>
                 </div>
                 <div class="flex flex-col sm:flex-row gap-3 shrink-0 w-full sm:w-auto">
-                    <button type="button" class="btn-desert-animated text-sm font-bold rounded-full px-5 py-3 text-white inline-flex items-center justify-center gap-2 cursor-pointer shadow-md" @click="$store.modal.open('safari-matcher')" data-bs-toggle="modal" data-bs-target="#safariMatcherModal">
+                    <button type="button" class="btn-desert-animated text-sm font-bold rounded-full px-5 py-3 text-white inline-flex items-center justify-center gap-2 cursor-pointer shadow-md" @click="$store.modal.open('safari-matcher')">
                         <i class="bi bi-compass"></i> Safari Match Concierge
                     </button>
                     <a href="{{ route('tours.customizer') }}" class="border border-white/40 hover:border-white text-white text-sm font-bold rounded-full px-5 py-3 inline-flex items-center justify-center gap-2 transition-colors">
@@ -608,7 +608,7 @@ if (!function_exists('renderReviewCardMarkup')) {
             Reserve your safari experience in 60 seconds with instant booking confirmation. Free cancellation up to 24 hours prior with full refund.
         </p>
         <div class="flex flex-wrap justify-center gap-4">
-            <a href="#" class="btn-desert-animated text-base sm:text-lg font-bold rounded-full px-8 py-3.5 shadow-xl inline-flex items-center gap-2 cursor-pointer" @click.prevent="$store.modal.open('booking')" data-bs-toggle="modal" data-bs-target="#bookingModal">
+            <a href="#" class="btn-desert-animated text-base sm:text-lg font-bold rounded-full px-8 py-3.5 shadow-xl inline-flex items-center gap-2 cursor-pointer" @click.prevent="$store.modal.open('booking')">
                 <i class="bi bi-calendar-check text-lg"></i>
                 <span>Book Your Tour Now</span>
             </a>

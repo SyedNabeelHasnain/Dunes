@@ -3,24 +3,27 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Mail\BookingNotification;
 use App\Mail\BookingAdminNotification;
+use App\Mail\BookingNotification;
 use App\Models\Booking;
 use App\Models\BookingPayment;
 use App\Models\Coupon;
 use App\Models\CouponUsage;
-use App\Services\ZiinaPaymentService;
-use App\Services\SettingsService;
 use App\Services\MetaCapiService;
+use App\Services\SettingsService;
+use App\Services\ZiinaPaymentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class ZiinaWebhookController extends Controller
 {
     protected ZiinaPaymentService $ziina;
+
     protected SettingsService $settings;
+
     protected MetaCapiService $metaCapi;
 
     public function __construct(ZiinaPaymentService $ziina, SettingsService $settings, MetaCapiService $metaCapi)
@@ -43,26 +46,29 @@ class ZiinaWebhookController extends Controller
 
         if (empty($secret)) {
             Log::error('Ziina Webhook: Webhook secret is not configured on server.');
+
             return response()->json(['error' => 'Webhook secret not configured'], 401);
         }
 
         if (empty($signature)) {
             Log::warning('Ziina Webhook: Missing signature header', ['ip' => $request->ip()]);
+
             return response()->json(['error' => 'Missing signature header'], 401);
         }
 
         $expectedSignature = hash_hmac('sha256', $rawPayload, $secret);
-        if (!hash_equals($expectedSignature, $signature)) {
+        if (! hash_equals($expectedSignature, $signature)) {
             Log::warning('Ziina Webhook: Signature mismatch', [
                 'ip' => $request->ip(),
-                'received_sig' => $signature
+                'received_sig' => $signature,
             ]);
+
             return response()->json(['error' => 'Invalid signature'], 401);
         }
 
         // 2. Parse Payload
         $payload = json_decode($rawPayload, true);
-        if (!is_array($payload)) {
+        if (! is_array($payload)) {
             $payload = $request->all();
         }
 
@@ -73,6 +79,7 @@ class ZiinaWebhookController extends Controller
 
         if (empty($intentId)) {
             Log::warning('Ziina Webhook: Missing payment intent ID in payload', ['payload' => $payload]);
+
             return response()->json(['error' => 'Missing payment intent ID'], 400);
         }
 
@@ -81,8 +88,9 @@ class ZiinaWebhookController extends Controller
         if (isset($intent['error'])) {
             Log::error('Ziina Webhook: Failed to verify intent with Ziina API', [
                 'intent_id' => $intentId,
-                'error' => $intent['error']
+                'error' => $intent['error'],
             ]);
+
             return response()->json(['error' => 'Could not verify intent status with Ziina'], 502);
         }
 
@@ -92,17 +100,19 @@ class ZiinaWebhookController extends Controller
         $booking = Booking::where('ziina_payment_intent_id', $intentId)->first();
         $paymentRecord = BookingPayment::where('payment_intent_id', $intentId)->first();
 
-        if (!$booking && $paymentRecord && $paymentRecord->booking) {
+        if (! $booking && $paymentRecord && $paymentRecord->booking) {
             $booking = $paymentRecord->booking;
         }
 
-        if (!$booking) {
+        if (! $booking) {
             if ($paymentRecord && $status === 'completed') {
                 $paymentRecord->update(['status' => 'completed']);
                 Log::info('Ziina Webhook: Standalone payment marked completed', ['intent_id' => $intentId, 'payment_id' => $paymentRecord->id]);
+
                 return response()->json(['message' => 'Standalone payment processed successfully'], 200);
             }
             Log::warning('Ziina Webhook: No booking found for payment intent', ['intent_id' => $intentId]);
+
             return response()->json(['message' => 'Booking not found, event acknowledged'], 200);
         }
 
@@ -112,7 +122,7 @@ class ZiinaWebhookController extends Controller
             $newPaymentStatus = 'paid';
             $shouldNotify = false;
 
-            \Illuminate\Support\Facades\DB::transaction(function () use (
+            DB::transaction(function () use (
                 $booking, $paymentRecord, $intent, &$totalPaid, &$newPaymentStatus, &$shouldNotify
             ) {
                 $lockedBooking = Booking::where('id', $booking->id)->lockForUpdate()->first();
@@ -130,10 +140,10 @@ class ZiinaWebhookController extends Controller
                     ->sum('amount');
 
                 if ($totalPaid <= 0 && isset($intent['amount'])) {
-                    $totalPaid = (float)($intent['amount'] / 100);
+                    $totalPaid = (float) ($intent['amount'] / 100);
                 }
 
-                $remBalance = max(0, (float)$lockedBooking->total - (float)$totalPaid);
+                $remBalance = max(0, (float) $lockedBooking->total - (float) $totalPaid);
                 $method = $lockedBooking->payment_method;
                 $newPaymentStatus = ($remBalance <= 0) ? 'paid' : (($method === 'advance' || $totalPaid > 0) ? 'partial' : 'paid');
 
@@ -146,7 +156,7 @@ class ZiinaWebhookController extends Controller
                 ]);
 
                 // Record coupon usage and trigger notification only if this is the first completion event
-                if (!$wasCompleted) {
+                if (! $wasCompleted) {
                     $shouldNotify = true;
                     $this->recordCouponUsage($lockedBooking);
                 }
@@ -159,35 +169,35 @@ class ZiinaWebhookController extends Controller
 
                 try {
                     $custom = [
-                        'value' => (float)$booking->total,
+                        'value' => (float) $booking->total,
                         'currency' => 'AED',
-                        'content_ids' => ['TOUR-' . $booking->tour_id],
+                        'content_ids' => ['TOUR-'.$booking->tour_id],
                         'content_type' => 'product',
-                        'contents' => [['id' => 'TOUR-' . $booking->tour_id, 'quantity' => 1]],
+                        'contents' => [['id' => 'TOUR-'.$booking->tour_id, 'quantity' => 1]],
                         'coupon' => $booking->coupon_code,
-                        'discount_amount' => (float)$booking->discount_amount,
+                        'discount_amount' => (float) $booking->discount_amount,
                     ];
                     $this->metaCapi->dispatchEvent('Purchase', [
-                        'event_id' => 'BOOK-' . $booking->reference,
+                        'event_id' => 'BOOK-'.$booking->reference,
                         'email' => $booking->email,
                         'phone' => $booking->phone,
-                        'custom_data' => $custom
+                        'custom_data' => $custom,
                     ]);
                 } catch (\Throwable $e) {
-                    Log::error('Ziina Webhook: Meta CAPI dispatch error: ' . $e->getMessage());
+                    Log::error('Ziina Webhook: Meta CAPI dispatch error: '.$e->getMessage());
                 }
             }
 
             return response()->json([
                 'success' => true,
                 'message' => 'Payment completed and booking confirmed',
-                'reference' => $booking->reference
+                'reference' => $booking->reference,
             ]);
         }
 
         // 6. Process Failed or Cancelled Status
         if (in_array($status, ['failed', 'cancelled'])) {
-            if (!in_array($booking->status, ['confirmed', 'completed']) && !in_array($booking->payment_status, ['paid', 'partial'])) {
+            if (! in_array($booking->status, ['confirmed', 'completed']) && ! in_array($booking->payment_status, ['paid', 'partial'])) {
                 if ($booking->coupon_id) {
                     try {
                         $usage = CouponUsage::where('booking_id', $booking->id)->first();
@@ -199,13 +209,13 @@ class ZiinaWebhookController extends Controller
                             $usage->delete();
                         }
                     } catch (\Throwable $e) {
-                        Log::error("Ziina Webhook: Failed to release coupon on cancellation: " . $e->getMessage());
+                        Log::error('Ziina Webhook: Failed to release coupon on cancellation: '.$e->getMessage());
                     }
                 }
 
                 $booking->update([
                     'payment_status' => $status,
-                    'ziina_status' => $status
+                    'ziina_status' => $status,
                 ]);
 
                 if ($paymentRecord) {
@@ -216,7 +226,7 @@ class ZiinaWebhookController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => "Booking payment marked as {$status}",
-                'reference' => $booking->reference
+                'reference' => $booking->reference,
             ]);
         }
 
@@ -229,7 +239,7 @@ class ZiinaWebhookController extends Controller
         return response()->json([
             'success' => true,
             'message' => "Status {$status} recorded",
-            'reference' => $booking->reference
+            'reference' => $booking->reference,
         ]);
     }
 
@@ -238,13 +248,13 @@ class ZiinaWebhookController extends Controller
      */
     protected function recordCouponUsage(Booking $booking): void
     {
-        if (!$booking->coupon_id || (float)$booking->discount_amount <= 0) {
+        if (! $booking->coupon_id || (float) $booking->discount_amount <= 0) {
             return;
         }
 
         try {
             $alreadyRecorded = CouponUsage::where('booking_id', $booking->id)->exists();
-            if (!$alreadyRecorded) {
+            if (! $alreadyRecorded) {
                 CouponUsage::create([
                     'coupon_id' => $booking->coupon_id,
                     'booking_id' => $booking->id,
@@ -252,9 +262,9 @@ class ZiinaWebhookController extends Controller
                     'customer_name' => $booking->name,
                     'customer_email' => strtolower($booking->email),
                     'customer_phone' => $booking->phone,
-                    'discount_amount' => (float)$booking->discount_amount,
-                    'order_subtotal' => (float)$booking->original_total,
-                    'order_final_total' => (float)$booking->total,
+                    'discount_amount' => (float) $booking->discount_amount,
+                    'order_subtotal' => (float) $booking->original_total,
+                    'order_final_total' => (float) $booking->total,
                     'used_at' => now(),
                 ]);
 
@@ -264,7 +274,7 @@ class ZiinaWebhookController extends Controller
                 }
             }
         } catch (\Throwable $e) {
-            Log::error("Ziina Webhook: Failed to record coupon usage for {$booking->reference}: " . $e->getMessage());
+            Log::error("Ziina Webhook: Failed to record coupon usage for {$booking->reference}: ".$e->getMessage());
         }
     }
 
@@ -284,20 +294,24 @@ class ZiinaWebhookController extends Controller
                 Mail::to($booking->email)
                     ->send((new BookingNotification($type, $booking))->from($fromEmail, 'Dunes Discovery Tourism'));
             } catch (\Throwable $e) {
-                Log::error("Ziina Webhook: Failed to send customer booking email for {$booking->reference}: " . $e->getMessage());
+                Log::error("Ziina Webhook: Failed to send customer booking email for {$booking->reference}: ".$e->getMessage());
             }
 
             // Send to admin
             try {
                 $adminMail = (new BookingAdminNotification($booking))->from($fromEmail, 'Dunes Discovery Tourism');
-                if (!empty($ccEmails)) $adminMail->cc($ccEmails);
-                if (!empty($bccEmails)) $adminMail->bcc($bccEmails);
+                if (! empty($ccEmails)) {
+                    $adminMail->cc($ccEmails);
+                }
+                if (! empty($bccEmails)) {
+                    $adminMail->bcc($bccEmails);
+                }
                 Mail::to($adminEmail)->send($adminMail);
             } catch (\Throwable $e) {
-                Log::error("Ziina Webhook: Failed to send admin booking email for {$booking->reference}: " . $e->getMessage());
+                Log::error("Ziina Webhook: Failed to send admin booking email for {$booking->reference}: ".$e->getMessage());
             }
         } catch (\Throwable $e) {
-            Log::error("Ziina Webhook: Failed to prepare booking email for {$booking->reference}: " . $e->getMessage());
+            Log::error("Ziina Webhook: Failed to prepare booking email for {$booking->reference}: ".$e->getMessage());
         }
     }
 }

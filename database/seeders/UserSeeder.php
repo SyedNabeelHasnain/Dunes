@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $path = database_path('seeders/data/users.json');
-        if (!File::exists($path)) {
+        if (! File::exists($path)) {
             // Default fallback admin user if JSON is missing
             User::updateOrCreate(
                 ['email' => 'admin@dunesdiscovery.com'],
@@ -23,6 +23,7 @@ class UserSeeder extends Seeder
                     'password' => bcrypt('admin123'),
                 ]
             );
+
             return;
         }
 
@@ -30,7 +31,7 @@ class UserSeeder extends Seeder
         foreach ($users as $u) {
             $pass = $u['password'];
             if (str_starts_with($pass, '$2a$')) {
-                $pass = '$2y$' . substr($pass, 4);
+                $pass = '$2y$'.substr($pass, 4);
             }
 
             User::updateOrCreate(

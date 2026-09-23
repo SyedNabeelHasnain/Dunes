@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\LegalItem;
 use App\Models\LegalPage;
 use App\Models\LegalSection;
-use App\Models\LegalItem;
 use Illuminate\Http\Request;
 
 class AdminLegalController extends Controller
@@ -16,6 +16,7 @@ class AdminLegalController extends Controller
     public function index()
     {
         $pages = LegalPage::withCount('sections')->orderBy('id', 'asc')->get();
+
         return view('admin.legal.index', compact('pages'));
     }
 
@@ -25,6 +26,7 @@ class AdminLegalController extends Controller
     public function edit(int $id)
     {
         $page = LegalPage::with(['sections.items'])->findOrFail($id);
+
         return view('admin.legal.edit', compact('page'));
     }
 

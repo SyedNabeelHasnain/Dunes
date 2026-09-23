@@ -29,7 +29,7 @@ class SubscriberController extends Controller
     public function subscribe(Request $request): JsonResponse
     {
         // 1. Anti-Bot Honeypot Protection
-        if (!empty($request->input('website_url'))) {
+        if (! empty($request->input('website_url'))) {
             return response()->json([
                 'success' => true,
                 'message' => 'Thank you for subscribing!',
@@ -49,18 +49,18 @@ class SubscriberController extends Controller
 
         $email = strtolower(trim($validated['email']));
 
-        $fullName = !empty($validated['name']) ? trim($validated['name']) : null;
+        $fullName = ! empty($validated['name']) ? trim($validated['name']) : null;
         if ($fullName) {
             $parts = preg_split('/\s+/', $fullName, 2);
             $firstName = $parts[0] ?? null;
             $lastName = $parts[1] ?? null;
         } else {
-            $firstName = !empty($validated['first_name']) ? trim($validated['first_name']) : null;
-            $lastName = !empty($validated['last_name']) ? trim($validated['last_name']) : null;
+            $firstName = ! empty($validated['first_name']) ? trim($validated['first_name']) : null;
+            $lastName = ! empty($validated['last_name']) ? trim($validated['last_name']) : null;
         }
 
-        $phone = !empty($validated['phone']) ? trim($validated['phone']) : null;
-        $source = !empty($validated['source']) ? trim($validated['source']) : 'footer';
+        $phone = ! empty($validated['phone']) ? trim($validated['phone']) : null;
+        $source = ! empty($validated['source']) ? trim($validated['source']) : 'footer';
 
         $subscriber = Subscriber::where('email', $email)->first();
 
@@ -100,7 +100,7 @@ class SubscriberController extends Controller
 
         // Auto-assign to default General Newsletter group
         $defaultGroup = SubscriberGroup::where('slug', 'general-newsletter')->first();
-        if ($defaultGroup && !$subscriber->groups()->where('subscriber_groups.id', $defaultGroup->id)->exists()) {
+        if ($defaultGroup && ! $subscriber->groups()->where('subscriber_groups.id', $defaultGroup->id)->exists()) {
             $subscriber->groups()->attach($defaultGroup->id);
         }
 
@@ -117,7 +117,7 @@ class SubscriberController extends Controller
     {
         $subscriber = Subscriber::where('unsubscribe_token', $token)->first();
 
-        if (!$subscriber) {
+        if (! $subscriber) {
             return response()->view('subscribers.unsubscribe', [
                 'subscriber' => null,
                 'message' => 'Invalid or expired unsubscribe link.',
@@ -138,7 +138,7 @@ class SubscriberController extends Controller
     {
         $subscriber = Subscriber::where('unsubscribe_token', $token)->first();
 
-        if (!$subscriber) {
+        if (! $subscriber) {
             return response()->view('subscribers.unsubscribe', [
                 'subscriber' => null,
                 'message' => 'Invalid or expired unsubscribe link.',
@@ -147,7 +147,7 @@ class SubscriberController extends Controller
 
         $reason = $request->input('reason', 'User requested opt-out');
         if ($request->filled('other_reason')) {
-            $reason .= ': ' . trim($request->input('other_reason'));
+            $reason .= ': '.trim($request->input('other_reason'));
         }
 
         if ($subscriber->status !== 'unsubscribed') {
@@ -182,7 +182,7 @@ class SubscriberController extends Controller
         // 43-byte transparent 1x1 GIF binary
         $pixel = base64_decode('R0lGODlhAQABAJAAAP8AAAAAACH5BAUQAAAALAAAAAABAAEAAAICBAEAOw==');
 
-        if (!empty($token)) {
+        if (! empty($token)) {
             try {
                 $log = EmailCampaignLog::where('tracking_token', $token)->first();
                 if ($log) {
@@ -204,7 +204,7 @@ class SubscriberController extends Controller
                     }
                 }
             } catch (\Throwable $e) {
-                Log::error("Track open failed for token [{$token}]: " . $e->getMessage());
+                Log::error("Track open failed for token [{$token}]: ".$e->getMessage());
             }
         }
 
@@ -224,11 +224,11 @@ class SubscriberController extends Controller
         $targetUrl = $request->query('url', url('/'));
 
         // Basic URL validation
-        if (!filter_var($targetUrl, FILTER_VALIDATE_URL)) {
+        if (! filter_var($targetUrl, FILTER_VALIDATE_URL)) {
             $targetUrl = url('/');
         }
 
-        if (!empty($token)) {
+        if (! empty($token)) {
             try {
                 $log = EmailCampaignLog::where('tracking_token', $token)->first();
                 if ($log) {
@@ -258,7 +258,7 @@ class SubscriberController extends Controller
                     ]);
                 }
             } catch (\Throwable $e) {
-                Log::error("Track click failed for token [{$token}]: " . $e->getMessage());
+                Log::error("Track click failed for token [{$token}]: ".$e->getMessage());
             }
         }
 

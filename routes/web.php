@@ -1,32 +1,38 @@
 <?php
 
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\TourController;
-use App\Http\Controllers\BlogController;
-use App\Http\Controllers\PageController;
-use App\Http\Controllers\LegalController;
-use App\Http\Controllers\BookingController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\RateCardController;
-use App\Http\Controllers\Admin\AdminDashboardController;
-use App\Http\Controllers\Admin\AdminTourController;
-use App\Http\Controllers\Admin\AdminBookingController;
-use App\Http\Controllers\Admin\AdminBlogController;
 use App\Http\Controllers\Admin\AdminBlogCategoryController;
+use App\Http\Controllers\Admin\AdminBlogController;
+use App\Http\Controllers\Admin\AdminBookingController;
+use App\Http\Controllers\Admin\AdminCouponController;
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminEmailCampaignController;
+use App\Http\Controllers\Admin\AdminEmailTemplateController;
 use App\Http\Controllers\Admin\AdminFaqController;
+use App\Http\Controllers\Admin\AdminLegalController;
+use App\Http\Controllers\Admin\AdminMailSettingController;
+use App\Http\Controllers\Admin\AdminOperationsController;
 use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\AdminSettingController;
-use App\Http\Controllers\Admin\AdminWhatsappController;
-use App\Http\Controllers\Admin\AdminLegalController;
-use App\Http\Controllers\Admin\AdminCouponController;
-use App\Http\Controllers\SubscriberController;
 use App\Http\Controllers\Admin\AdminSubscriberController;
 use App\Http\Controllers\Admin\AdminSubscriberGroupController;
-use App\Http\Controllers\Admin\AdminEmailTemplateController;
-use App\Http\Controllers\Admin\AdminEmailCampaignController;
-use App\Http\Controllers\Admin\AdminMailSettingController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\AdminTourController;
+use App\Http\Controllers\Admin\AdminWhatsappController;
 use App\Http\Controllers\AjaxGatewayController;
+use App\Http\Controllers\BlogController;
+use App\Http\Controllers\BookingController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LegalController;
+use App\Http\Controllers\LlmsController;
+use App\Http\Controllers\LocationLandingController;
+use App\Http\Controllers\PageController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RateCardController;
+use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\SubscriberController;
+use App\Http\Controllers\TourController;
+use App\Http\Controllers\VoucherController;
+use App\Http\Middleware\AdminNoCacheMiddleware;
+use Illuminate\Support\Facades\Route;
 
 // ── Front-Facing Pages ────────────────────────────────────────────────────────
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -71,7 +77,7 @@ Route::get('/search', [TourController::class, 'search'])->name('tours.search');
 Route::get('/build-your-own-safari', [TourController::class, 'customizer'])->name('tours.customizer');
 Route::redirect('/custom-safari', '/build-your-own-safari', 301);
 Route::get('/tours/{slug}', function ($slug) {
-    return redirect('/' . $slug, 301);
+    return redirect('/'.$slug, 301);
 });
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
@@ -79,15 +85,15 @@ Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 Route::get('/thankyou', [BookingController::class, 'thankyou'])->name('booking.thankyou');
 Route::get('/payment-cancel', [BookingController::class, 'paymentCancel'])->name('booking.cancel');
 Route::post('/booking/draft', [BookingController::class, 'saveDraft'])->name('booking.draft');
-Route::get('/booking/{reference}/voucher', [\App\Http\Controllers\VoucherController::class, 'show'])->name('booking.voucher');
-Route::get('/booking/{reference}/ticket-pdf', [\App\Http\Controllers\VoucherController::class, 'downloadPdf'])->name('booking.ticket.pdf');
-Route::get('/booking/{reference}/voucher-pdf', [\App\Http\Controllers\VoucherController::class, 'downloadPdf'])->name('booking.voucher.pdf');
+Route::get('/booking/{reference}/voucher', [VoucherController::class, 'show'])->name('booking.voucher');
+Route::get('/booking/{reference}/ticket-pdf', [VoucherController::class, 'downloadPdf'])->name('booking.ticket.pdf');
+Route::get('/booking/{reference}/voucher-pdf', [VoucherController::class, 'downloadPdf'])->name('booking.voucher.pdf');
 Route::get('/review/{ref}', [PageController::class, 'reviewRate'])->name('review.rate');
 Route::post('/review/{ref}', [PageController::class, 'submitReview'])->name('review.submit');
 Route::post('/review/{ref}/feedback', [PageController::class, 'submitFeedback'])->name('review.feedback');
 
 // ── Admin CMS Panel (Guarded by auth & strict no-cache headers) ──────────────
-Route::middleware(['auth', \App\Http\Middleware\AdminNoCacheMiddleware::class])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard.alias');
     Route::get('/analytics', [AdminDashboardController::class, 'analytics'])->name('analytics.index');
@@ -95,7 +101,7 @@ Route::middleware(['auth', \App\Http\Middleware\AdminNoCacheMiddleware::class])-
     Route::get('/api/kpis', [AdminDashboardController::class, 'liveKpis'])->name('api.kpis');
     Route::get('/api/bookings-stats', [AdminBookingController::class, 'liveStats'])->name('api.bookings.stats');
     Route::post('/quick-payment', [AdminDashboardController::class, 'createQuickPayment'])->name('quick-payment');
-    
+
     // Tours, Tiers, Addons, and Pricing
     Route::resource('tours', AdminTourController::class)->except(['show']);
     Route::post('/tours/{id}/toggle-status', [AdminTourController::class, 'toggleStatus'])->name('tours.toggle-status');
@@ -118,7 +124,7 @@ Route::middleware(['auth', \App\Http\Middleware\AdminNoCacheMiddleware::class])-
 
     Route::get('/pricing', [AdminTourController::class, 'pricing'])->name('pricing.index');
     Route::post('/pricing/update', [AdminTourController::class, 'updatePricing'])->name('pricing.update');
-    
+
     // Bookings & WhatsApp Leads
     Route::get('/bookings/export/csv', [AdminBookingController::class, 'exportCsv'])->name('bookings.export');
     Route::post('/bookings/bulk-action', [AdminBookingController::class, 'bulkAction'])->name('bookings.bulk');
@@ -126,11 +132,11 @@ Route::middleware(['auth', \App\Http\Middleware\AdminNoCacheMiddleware::class])-
     Route::post('/bookings/{id}/payment-link', [AdminBookingController::class, 'createPaymentLink'])->name('bookings.payment-link');
     Route::post('/bookings/{id}/resend-payment', [AdminBookingController::class, 'resendPaymentEmail'])->name('bookings.resend-payment');
     Route::get('/bookings/{id}/ticket', [AdminBookingController::class, 'downloadTicket'])->name('bookings.ticket');
-    
+
     // Daily Tour Operations & Driver Dispatch Manifest
-    Route::get('/operations', [\App\Http\Controllers\Admin\AdminOperationsController::class, 'index'])->name('operations.index');
-    Route::post('/operations/{id}/assign-driver', [\App\Http\Controllers\Admin\AdminOperationsController::class, 'assignDriver'])->name('operations.assign-driver');
-    Route::get('/operations/export/csv', [\App\Http\Controllers\Admin\AdminOperationsController::class, 'exportManifest'])->name('operations.export');
+    Route::get('/operations', [AdminOperationsController::class, 'index'])->name('operations.index');
+    Route::post('/operations/{id}/assign-driver', [AdminOperationsController::class, 'assignDriver'])->name('operations.assign-driver');
+    Route::get('/operations/export/csv', [AdminOperationsController::class, 'exportManifest'])->name('operations.export');
 
     Route::get('/whatsapp-leads/export/csv', [AdminWhatsappController::class, 'exportCsv'])->name('whatsapp.export');
     Route::post('/whatsapp-leads/bulk-action', [AdminWhatsappController::class, 'bulkAction'])->name('whatsapp.bulk');
@@ -140,7 +146,7 @@ Route::middleware(['auth', \App\Http\Middleware\AdminNoCacheMiddleware::class])-
     Route::get('/whatsapp/leads', [AdminWhatsappController::class, 'index'])->name('whatsapp.leads.alias');
     Route::get('/whatsapp-settings', [AdminWhatsappController::class, 'settings'])->name('whatsapp.settings');
     Route::post('/whatsapp-settings/update', [AdminWhatsappController::class, 'updateSettings'])->name('whatsapp.settings.update');
-    
+
     // FAQs, Reviews, and Inquiries
     Route::resource('faqs', AdminFaqController::class)->except(['create', 'show', 'edit']);
     Route::post('/faqs/{id}/toggle-status', [AdminFaqController::class, 'toggleStatus'])->name('faqs.toggle-status');
@@ -152,7 +158,7 @@ Route::middleware(['auth', \App\Http\Middleware\AdminNoCacheMiddleware::class])-
     Route::get('/inquiries/{id}', [AdminDashboardController::class, 'viewInquiry'])->name('inquiries.show');
     Route::post('/inquiries/{id}/status', [AdminDashboardController::class, 'updateInquiryStatus'])->name('inquiries.status');
     Route::delete('/inquiries/{id}', [AdminDashboardController::class, 'deleteInquiry'])->name('inquiries.destroy');
-    
+
     // Blog CMS
     Route::resource('blogs', AdminBlogController::class)->except(['show']);
     Route::post('/blogs/{id}/toggle-status', [AdminBlogController::class, 'toggleStatus'])->name('blogs.toggle-status');
@@ -169,7 +175,9 @@ Route::middleware(['auth', \App\Http\Middleware\AdminNoCacheMiddleware::class])-
 
     // Legal Pages Manager
     Route::get('/legal-pages', [AdminLegalController::class, 'index'])->name('legal.index');
-    Route::get('/legal', function() { return redirect()->route('admin.legal.index'); })->name('legal.alias');
+    Route::get('/legal', function () {
+        return redirect()->route('admin.legal.index');
+    })->name('legal.alias');
     Route::get('/legal-pages/{id}/edit', [AdminLegalController::class, 'edit'])->name('legal.edit');
     Route::post('/legal-pages/{id}/update', [AdminLegalController::class, 'update'])->name('legal.update');
     Route::post('/legal-pages/{id}/section/add', [AdminLegalController::class, 'addSection'])->name('legal.section.add');
@@ -236,23 +244,22 @@ Route::get('/unsubscribe/{token}', [SubscriberController::class, 'unsubscribe'])
 Route::post('/unsubscribe/{token}', [SubscriberController::class, 'processUnsubscribe'])->name('unsubscribe.submit');
 
 // ── Dynamic XML Sitemap & Sitemap Index ──────────────────────────────────────
-Route::get('/sitemap_index.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap.index');
-Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'unified'])->name('sitemap');
-Route::get('/sitemap-tours.xml', [\App\Http\Controllers\SitemapController::class, 'tours'])->name('sitemap.tours');
-Route::get('/sitemap-blogs.xml', [\App\Http\Controllers\SitemapController::class, 'blogs'])->name('sitemap.blogs');
-Route::get('/sitemap-pages.xml', [\App\Http\Controllers\SitemapController::class, 'pages'])->name('sitemap.pages');
-Route::get('/sitemap-images.xml', [\App\Http\Controllers\SitemapController::class, 'images'])->name('sitemap.images');
+Route::get('/sitemap_index.xml', [SitemapController::class, 'index'])->name('sitemap.index');
+Route::get('/sitemap.xml', [SitemapController::class, 'unified'])->name('sitemap');
+Route::get('/sitemap-tours.xml', [SitemapController::class, 'tours'])->name('sitemap.tours');
+Route::get('/sitemap-blogs.xml', [SitemapController::class, 'blogs'])->name('sitemap.blogs');
+Route::get('/sitemap-pages.xml', [SitemapController::class, 'pages'])->name('sitemap.pages');
+Route::get('/sitemap-images.xml', [SitemapController::class, 'images'])->name('sitemap.images');
 
 // ── AI Search Engine & LLM Markdown Endpoints (GEO Optimization) ─────────────
-Route::get('/llms.txt', [\App\Http\Controllers\LlmsController::class, 'index'])->name('llms.txt');
-Route::get('/llms-full.txt', [\App\Http\Controllers\LlmsController::class, 'full'])->name('llms.full');
+Route::get('/llms.txt', [LlmsController::class, 'index'])->name('llms.txt');
+Route::get('/llms-full.txt', [LlmsController::class, 'full'])->name('llms.full');
 
 // ── Explicit High-Value Tour Routes ─────────────────────────────────────────
 Route::get('/dune-buggy-rental-dubai', [TourController::class, 'showBuggy'])->name('tours.buggy');
 
 // ── Programmatic Geo-Location Pickup Routes (Pillar 2 SEO) ───────────────────
-Route::get('/desert-safari-from-{location}', [\App\Http\Controllers\LocationLandingController::class, 'show'])->name('tours.location');
-
+Route::get('/desert-safari-from-{location}', [LocationLandingController::class, 'show'])->name('tours.location');
 
 // ── SEO 301 Permanent Redirects for Legacy / Shorthand Tour Slugs ───────────
 Route::redirect('/dubai-marina-dhow-cruise', '/dhow-cruise-catamaran-cruise-dinner-dubai', 301);

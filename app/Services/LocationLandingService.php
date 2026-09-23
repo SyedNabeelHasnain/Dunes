@@ -25,26 +25,26 @@ class LocationLandingService
                 'geo' => ['lat' => 25.0772, 'lng' => 55.1330],
                 'landmarks' => [
                     'Dubai Marina Mall', 'The Walk JBR', 'Address Beach Resort', 'Rixos Premium Dubai',
-                    'Grosvenor House', 'Bluewaters Island & Ain Dubai', 'Habtoor Grand Resort'
+                    'Grosvenor House', 'Bluewaters Island & Ain Dubai', 'Habtoor Grand Resort',
                 ],
                 'faqs' => [
                     [
                         'q' => 'Do you pick up from Airbnb apartments or private towers in Dubai Marina?',
-                        'a' => 'Yes! We provide direct door-to-door pickup from all residential towers, hotels, and holiday homes in Dubai Marina and JBR. Your safari captain will contact you via WhatsApp with live vehicle updates.'
+                        'a' => 'Yes! We provide direct door-to-door pickup from all residential towers, hotels, and holiday homes in Dubai Marina and JBR. Your safari captain will contact you via WhatsApp with live vehicle updates.',
                     ],
                     [
                         'q' => 'What is the pickup timing for Dubai Marina guests?',
-                        'a' => 'For the Evening Desert Safari, pickup from Dubai Marina takes place between 02:30 PM and 03:00 PM, returning you comfortably by 09:30 PM to 10:00 PM.'
+                        'a' => 'For the Evening Desert Safari, pickup from Dubai Marina takes place between 02:30 PM and 03:00 PM, returning you comfortably by 09:30 PM to 10:00 PM.',
                     ],
                     [
                         'q' => 'Is there any additional surcharge for pickup from Bluewaters Island or JBR?',
-                        'a' => 'No additional surcharge. Complimentary 4x4 hotel and residence pickup is 100% included in all 4x4 Land Cruiser and VIP safari packages.'
+                        'a' => 'No additional surcharge. Complimentary 4x4 hotel and residence pickup is 100% included in all 4x4 Land Cruiser and VIP safari packages.',
                     ],
                     [
                         'q' => 'Can we bring luggage if we are checking out from our Marina hotel?',
-                        'a' => 'Yes. All our Land Cruiser 300 series vehicles have spacious trunks to safely lock and store luggage during the desert safari adventure.'
-                    ]
-                ]
+                        'a' => 'Yes. All our Land Cruiser 300 series vehicles have spacious trunks to safely lock and store luggage during the desert safari adventure.',
+                    ],
+                ],
             ],
 
             'downtown-dubai' => [
@@ -62,26 +62,26 @@ class LocationLandingService
                 'geo' => ['lat' => 25.1972, 'lng' => 55.2744],
                 'landmarks' => [
                     'Burj Khalifa & Dubai Mall', 'Address Downtown', 'Armani Hotel Dubai', 'Palace Downtown',
-                    'JW Marriott Marquis Business Bay', 'The Ritz-Carlton DIFC', 'SLS Dubai'
+                    'JW Marriott Marquis Business Bay', 'The Ritz-Carlton DIFC', 'SLS Dubai',
                 ],
                 'faqs' => [
                     [
                         'q' => 'Can you pick up from hotels near Burj Khalifa and Dubai Mall?',
-                        'a' => 'Absolutely. We pick up directly from the lobby of all Downtown Dubai hotels, including Armani Hotel, Address Downtown, Palace Downtown, and surrounding towers.'
+                        'a' => 'Absolutely. We pick up directly from the lobby of all Downtown Dubai hotels, including Armani Hotel, Address Downtown, Palace Downtown, and surrounding towers.',
                     ],
                     [
                         'q' => 'How long is the drive from Downtown Dubai to Lahbab Red Dunes?',
-                        'a' => 'From Downtown, the drive is only about 40 minutes along the smooth Al Ain / Ras Al Khor highway, ensuring a swift and scenic trip to the red dunes.'
+                        'a' => 'From Downtown, the drive is only about 40 minutes along the smooth Al Ain / Ras Al Khor highway, ensuring a swift and scenic trip to the red dunes.',
                     ],
                     [
                         'q' => 'Are Business Bay and DIFC offices or hotels eligible for doorstep pickup?',
-                        'a' => 'Yes, our 4x4 safari fleet covers all streets and towers across Business Bay, DIFC, and Financial Centre with zero extra pickup fees.'
+                        'a' => 'Yes, our 4x4 safari fleet covers all streets and towers across Business Bay, DIFC, and Financial Centre with zero extra pickup fees.',
                     ],
                     [
                         'q' => 'Can we be dropped off at Dubai Mall or a Downtown restaurant after the tour?',
-                        'a' => 'Yes! Simply inform your safari captain when boarding, and we will happily drop you off at Dubai Mall, Souk Al Bahar, or your chosen Downtown dining venue.'
-                    ]
-                ]
+                        'a' => 'Yes! Simply inform your safari captain when boarding, and we will happily drop you off at Dubai Mall, Souk Al Bahar, or your chosen Downtown dining venue.',
+                    ],
+                ],
             ],
 
             'palm-jumeirah' => [
@@ -99,26 +99,26 @@ class LocationLandingService
                 'geo' => ['lat' => 25.1124, 'lng' => 55.1390],
                 'landmarks' => [
                     'Atlantis The Palm', 'Atlantis The Royal', 'FIVE Palm Jumeirah', 'W Dubai - The Palm',
-                    'Anantara The Palm Resort', 'Waldorf Astoria Palm Jumeirah', 'One&Only The Palm'
+                    'Anantara The Palm Resort', 'Waldorf Astoria Palm Jumeirah', 'One&Only The Palm',
                 ],
                 'faqs' => [
                     [
                         'q' => 'Do you pick up from private villas on Palm Jumeirah Fronds?',
-                        'a' => 'Yes, our private 4x4 Land Cruisers provide direct gate pickup from all residential Fronds (A to P) as well as the Palm Crescent luxury resorts.'
+                        'a' => 'Yes, our private 4x4 Land Cruisers provide direct gate pickup from all residential Fronds (A to P) as well as the Palm Crescent luxury resorts.',
                     ],
                     [
                         'q' => 'Is pickup available from Atlantis The Royal and Atlantis The Palm?',
-                        'a' => 'Yes, we provide daily pickup from both Atlantis The Royal and Atlantis The Palm main reception lobbies.'
+                        'a' => 'Yes, we provide daily pickup from both Atlantis The Royal and Atlantis The Palm main reception lobbies.',
                     ],
                     [
                         'q' => 'Is private car hire recommended for Palm Jumeirah families?',
-                        'a' => 'Yes, our Private Land Cruiser option gives your family an exclusive vehicle with customized departure times and maximum comfort.'
+                        'a' => 'Yes, our Private Land Cruiser option gives your family an exclusive vehicle with customized departure times and maximum comfort.',
                     ],
                     [
                         'q' => 'What happens if we want to combine the safari with Dune Buggy driving?',
-                        'a' => 'You can select the Can-Am or Polaris Dune Buggy add-on during checkout, and your buggy ride will be seamlessly integrated into your safari itinerary.'
-                    ]
-                ]
+                        'a' => 'You can select the Can-Am or Polaris Dune Buggy add-on during checkout, and your buggy ride will be seamlessly integrated into your safari itinerary.',
+                    ],
+                ],
             ],
 
             'deira-bur-dubai' => [
@@ -136,26 +136,26 @@ class LocationLandingService
                 'geo' => ['lat' => 25.2697, 'lng' => 55.3095],
                 'landmarks' => [
                     'City Centre Deira', 'Al Seef Heritage District', 'Gold Souk & Spice Souk',
-                    'Hyatt Regency Dubai Creek', 'Grand Hyatt Dubai', 'Al Rigga Metro Station area'
+                    'Hyatt Regency Dubai Creek', 'Grand Hyatt Dubai', 'Al Rigga Metro Station area',
                 ],
                 'faqs' => [
                     [
                         'q' => 'Can airport layover passengers be picked up from DXB Airport hotels?',
-                        'a' => 'Yes! We pick up from all hotels around Dubai International Airport (Terminal 1, 2, 3), Holiday Inn Express, Le Meridien, and Premier Inn.'
+                        'a' => 'Yes! We pick up from all hotels around Dubai International Airport (Terminal 1, 2, 3), Holiday Inn Express, Le Meridien, and Premier Inn.',
                     ],
                     [
                         'q' => 'Are bus pickup meeting points available in Deira for budget travelers?',
-                        'a' => 'Yes, in addition to direct 4x4 hotel pickup, our AED 99 Standard Package offers centralized meeting points near major Deira metro stations.'
+                        'a' => 'Yes, in addition to direct 4x4 hotel pickup, our AED 99 Standard Package offers centralized meeting points near major Deira metro stations.',
                     ],
                     [
                         'q' => 'How far is the desert from Deira and Bur Dubai?',
-                        'a' => 'The scenic Lahbab high red dunes are approximately 40 minutes away, making it a very quick and smooth journey.'
+                        'a' => 'The scenic Lahbab high red dunes are approximately 40 minutes away, making it a very quick and smooth journey.',
                     ],
                     [
                         'q' => 'Are vegetarian and Jain food options provided at the camp for Indian travelers?',
-                        'a' => 'Yes, our 5-star live buffet features extensive vegetarian curry, lentils, naan bread, salads, and specially prepared Jain dishes upon request.'
-                    ]
-                ]
+                        'a' => 'Yes, our 5-star live buffet features extensive vegetarian curry, lentils, naan bread, salads, and specially prepared Jain dishes upon request.',
+                    ],
+                ],
             ],
 
             'al-barsha' => [
@@ -173,26 +173,26 @@ class LocationLandingService
                 'geo' => ['lat' => 25.1112, 'lng' => 55.2005],
                 'landmarks' => [
                     'Mall of the Emirates & Ski Dubai', 'Kempinski Hotel Mall of the Emirates', 'Sheraton Mall of the Emirates',
-                    'Grand Millennium Dubai Barsha Heights', 'Novotel Suites Dubai Mall of the Emirates'
+                    'Grand Millennium Dubai Barsha Heights', 'Novotel Suites Dubai Mall of the Emirates',
                 ],
                 'faqs' => [
                     [
                         'q' => 'Do you pick up from hotels near Mall of the Emirates?',
-                        'a' => 'Yes, we provide direct door-to-door 4x4 pickup from all hotels around Mall of the Emirates, Al Barsha 1, and Barsha Heights.'
+                        'a' => 'Yes, we provide direct door-to-door 4x4 pickup from all hotels around Mall of the Emirates, Al Barsha 1, and Barsha Heights.',
                     ],
                     [
                         'q' => 'Is Al Barsha well located for desert safari departures?',
-                        'a' => 'Yes, Al Barsha has immediate access to Umm Suqeim Road and the E44 Al Khail / Al Ain highways, reaching the red dunes in just 40 minutes.'
+                        'a' => 'Yes, Al Barsha has immediate access to Umm Suqeim Road and the E44 Al Khail / Al Ain highways, reaching the red dunes in just 40 minutes.',
                     ],
                     [
                         'q' => 'Can we book on the same day if staying in Al Barsha?',
-                        'a' => 'Yes! If you book before 01:30 PM, same-day pickup from Al Barsha is guaranteed. Instant booking confirmation is sent via WhatsApp.'
+                        'a' => 'Yes! If you book before 01:30 PM, same-day pickup from Al Barsha is guaranteed. Instant booking confirmation is sent via WhatsApp.',
                     ],
                     [
                         'q' => 'Is camel riding and sandboarding included in the package?',
-                        'a' => 'Yes, all standard and VIP safari packages from Al Barsha include dune bashing, camel riding, sandboarding, live shows, and dinner.'
-                    ]
-                ]
+                        'a' => 'Yes, all standard and VIP safari packages from Al Barsha include dune bashing, camel riding, sandboarding, live shows, and dinner.',
+                    ],
+                ],
             ],
 
             'sharjah' => [
@@ -210,27 +210,27 @@ class LocationLandingService
                 'geo' => ['lat' => 25.3463, 'lng' => 55.4209],
                 'landmarks' => [
                     'Al Majaz Waterfront', 'Sharjah Corniche', 'Sheraton Sharjah Beach Resort',
-                    'Radisson Blu Resort Sharjah', 'Ajman Hotel (Kempinski)', 'Sahara Centre Sharjah'
+                    'Radisson Blu Resort Sharjah', 'Ajman Hotel (Kempinski)', 'Sahara Centre Sharjah',
                 ],
                 'faqs' => [
                     [
                         'q' => 'Do you provide daily desert safari pickup from Sharjah hotels?',
-                        'a' => 'Yes! We have dedicated 4x4 vehicles operating daily in Sharjah and Ajman, picking up directly from hotel lobbies and residences.'
+                        'a' => 'Yes! We have dedicated 4x4 vehicles operating daily in Sharjah and Ajman, picking up directly from hotel lobbies and residences.',
                     ],
                     [
                         'q' => 'Which highway route is used from Sharjah to the desert?',
-                        'a' => 'We travel via the wide Emirates Road (E611) directly to Lahbab Desert, bypassing downtown city traffic for a fast and comfortable ride.'
+                        'a' => 'We travel via the wide Emirates Road (E611) directly to Lahbab Desert, bypassing downtown city traffic for a fast and comfortable ride.',
                     ],
                     [
                         'q' => 'Can we book a private vehicle for our family from Sharjah?',
-                        'a' => 'Yes, our Private Land Cruiser package (up to 6 guests) is very popular with Sharjah families, offering private door-to-door service.'
+                        'a' => 'Yes, our Private Land Cruiser package (up to 6 guests) is very popular with Sharjah families, offering private door-to-door service.',
                     ],
                     [
                         'q' => 'What is the return time to Sharjah after the safari?',
-                        'a' => 'You will be dropped back at your Sharjah or Ajman hotel between 10:00 PM and 10:30 PM after the live entertainment shows conclude.'
-                    ]
-                ]
-            ]
+                        'a' => 'You will be dropped back at your Sharjah or Ajman hotel between 10:00 PM and 10:30 PM after the live entertainment shows conclude.',
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -245,7 +245,7 @@ class LocationLandingService
         }
 
         foreach ($locations as $loc) {
-            if ($loc['slug'] === $slugOrKey || $loc['key'] === $slugOrKey || $loc['slug'] === 'desert-safari-from-' . $slugOrKey) {
+            if ($loc['slug'] === $slugOrKey || $loc['key'] === $slugOrKey || $loc['slug'] === 'desert-safari-from-'.$slugOrKey) {
                 return $loc;
             }
         }

@@ -9,7 +9,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class AdminSubscriberController extends Controller
 {
@@ -36,9 +35,9 @@ class AdminSubscriberController extends Controller
             $s = trim($request->search);
             $query->where(function ($q) use ($s) {
                 $q->where('email', 'like', "%{$s}%")
-                  ->orWhere('first_name', 'like', "%{$s}%")
-                  ->orWhere('last_name', 'like', "%{$s}%")
-                  ->orWhere('phone', 'like', "%{$s}%");
+                    ->orWhere('first_name', 'like', "%{$s}%")
+                    ->orWhere('last_name', 'like', "%{$s}%")
+                    ->orWhere('phone', 'like', "%{$s}%");
             });
         }
 
@@ -80,7 +79,7 @@ class AdminSubscriberController extends Controller
             'subscribed_at' => $validated['status'] === 'subscribed' ? now() : null,
         ]);
 
-        if (!empty($validated['groups'])) {
+        if (! empty($validated['groups'])) {
             $subscriber->groups()->sync($validated['groups']);
         }
 
@@ -164,7 +163,7 @@ class AdminSubscriberController extends Controller
      */
     public function exportCsv(Request $request)
     {
-        $fileName = 'dunes-subscribers-' . date('Y-m-d-His') . '.csv';
+        $fileName = 'dunes-subscribers-'.date('Y-m-d-His').'.csv';
         $query = Subscriber::with('groups')->latest();
 
         if ($request->filled('status')) {
@@ -175,32 +174,35 @@ class AdminSubscriberController extends Controller
         }
 
         $headers = [
-            "Content-type" => "text/csv; charset=UTF-8",
-            "Content-Disposition" => "attachment; filename={$fileName}",
-            "Pragma" => "no-cache",
-            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
-            "Expires" => "0"
+            'Content-type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename={$fileName}",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
         ];
 
         $columns = ['ID', 'Email', 'First Name', 'Last Name', 'Phone', 'Status', 'Source', 'Groups', 'Country', 'City', 'Subscribed At', 'Unsubscribed At', 'Reason'];
 
-        $sanitize = function(array $row): array {
-            return array_map(function($val) {
-                if ($val === null) return '';
+        $sanitize = function (array $row): array {
+            return array_map(function ($val) {
+                if ($val === null) {
+                    return '';
+                }
                 $str = (string) $val;
                 if (isset($str[0]) && in_array($str[0], ['=', '+', '-', '@', "\t", "\r"], true)) {
-                    return "'" . $str;
+                    return "'".$str;
                 }
+
                 return $str;
             }, $row);
         };
 
-        $callback = function() use ($query, $columns, $sanitize) {
+        $callback = function () use ($query, $columns, $sanitize) {
             $file = fopen('php://output', 'w');
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // UTF-8 BOM
             fputcsv($file, $columns);
 
-            $query->chunk(100, function($rows) use ($file, $sanitize) {
+            $query->chunk(100, function ($rows) use ($file, $sanitize) {
                 foreach ($rows as $s) {
                     $groupNames = $s->groups->pluck('name')->implode(', ');
                     fputcsv($file, $sanitize([
@@ -241,13 +243,14 @@ class AdminSubscriberController extends Controller
         $groupId = $request->input('group_id');
         $handle = fopen($file->getPathname(), 'r');
 
-        if (!$handle) {
+        if (! $handle) {
             return back()->with('error', 'Could not open CSV file.');
         }
 
         $header = fgetcsv($handle);
-        if (!$header) {
+        if (! $header) {
             fclose($handle);
+
             return back()->with('error', 'Empty CSV file.');
         }
 
@@ -259,15 +262,22 @@ class AdminSubscriberController extends Controller
         $emailIndex = array_search('email', $header);
         if ($emailIndex === false) {
             fclose($handle);
+
             return back()->with('error', 'CSV must contain an "email" header column.');
         }
 
         $firstNameIndex = array_search('first_name', $header);
-        if ($firstNameIndex === false) $firstNameIndex = array_search('firstname', $header);
-        if ($firstNameIndex === false) $firstNameIndex = array_search('name', $header);
+        if ($firstNameIndex === false) {
+            $firstNameIndex = array_search('firstname', $header);
+        }
+        if ($firstNameIndex === false) {
+            $firstNameIndex = array_search('name', $header);
+        }
 
         $lastNameIndex = array_search('last_name', $header);
-        if ($lastNameIndex === false) $lastNameIndex = array_search('lastname', $header);
+        if ($lastNameIndex === false) {
+            $lastNameIndex = array_search('lastname', $header);
+        }
 
         $phoneIndex = array_search('phone', $header);
 
@@ -277,9 +287,13 @@ class AdminSubscriberController extends Controller
         DB::beginTransaction();
         try {
             while (($row = fgetcsv($handle)) !== false) {
-                if (!isset($row[$emailIndex])) continue;
+                if (! isset($row[$emailIndex])) {
+                    continue;
+                }
                 $email = strtolower(trim($row[$emailIndex]));
-                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) continue;
+                if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    continue;
+                }
 
                 $firstName = ($firstNameIndex !== false && isset($row[$firstNameIndex])) ? trim($row[$firstNameIndex]) : null;
                 $lastName = ($lastNameIndex !== false && isset($row[$lastNameIndex])) ? trim($row[$lastNameIndex]) : null;
@@ -306,7 +320,7 @@ class AdminSubscriberController extends Controller
                     $imported++;
                 }
 
-                if ($groupId && !$sub->groups()->where('group_id', $groupId)->exists()) {
+                if ($groupId && ! $sub->groups()->where('group_id', $groupId)->exists()) {
                     $sub->groups()->attach($groupId);
                 }
             }
@@ -314,10 +328,12 @@ class AdminSubscriberController extends Controller
         } catch (\Throwable $e) {
             DB::rollBack();
             fclose($handle);
-            return back()->with('error', 'Import error: ' . $e->getMessage());
+
+            return back()->with('error', 'Import error: '.$e->getMessage());
         }
 
         fclose($handle);
+
         return redirect()->route('admin.subscribers.index')
             ->with('success', "Import completed: {$imported} new subscribers added, {$updated} existing records updated.");
     }
@@ -352,7 +368,7 @@ class AdminSubscriberController extends Controller
                 'unsubscribed_at' => null,
             ]);
             $msg = "{$count} subscribers marked active.";
-        } elseif ($action === 'assign_group' && !empty($validated['target_group_id'])) {
+        } elseif ($action === 'assign_group' && ! empty($validated['target_group_id'])) {
             $group = SubscriberGroup::findOrFail($validated['target_group_id']);
             foreach ($ids as $subId) {
                 DB::table('subscriber_group_pivot')->updateOrInsert(

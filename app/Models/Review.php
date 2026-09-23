@@ -13,7 +13,7 @@ class Review extends Model
         'source', 'source_review_id', 'booking_id', 'review_url', 'published_date',
         'reviewer_name', 'reviewer_avatar_url', 'reviewer_profile_url',
         'rating', 'review_title', 'review_text', 'photos', 'status', 'is_featured',
-        'imported_at'
+        'imported_at',
     ];
 
     protected $casts = [
@@ -21,7 +21,7 @@ class Review extends Model
         'rating' => 'float',
         'is_featured' => 'boolean',
         'imported_at' => 'datetime',
-        'photos' => 'array'
+        'photos' => 'array',
     ];
 
     public function booking()

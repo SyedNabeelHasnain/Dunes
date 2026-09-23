@@ -14,6 +14,6 @@ class EmailOtp extends Model
     protected $fillable = ['email', 'otp', 'expires_at'];
 
     protected $casts = [
-        'expires_at' => 'datetime'
+        'expires_at' => 'datetime',
     ];
 }

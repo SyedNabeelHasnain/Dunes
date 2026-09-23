@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Middleware\SecurityHeaders;
+use App\Http\Middleware\TrackVisitor;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -14,8 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
-            \App\Http\Middleware\TrackVisitor::class,
-            \App\Http\Middleware\SecurityHeaders::class,
+            TrackVisitor::class,
+            SecurityHeaders::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -23,11 +26,11 @@ return Application::configure(basePath: dirname(__DIR__))
             fn (Request $request) => $request->is('api/*') || $request->is('ajax.php') || $request->ajax(),
         );
 
-        $exceptions->render(function (\Illuminate\Contracts\Encryption\DecryptException $e, Request $request) {
+        $exceptions->render(function (DecryptException $e, Request $request) {
             if ($request->is('api/*') || $request->is('ajax.php') || $request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Session expired. Please refresh the page.'
+                    'message' => 'Session expired. Please refresh the page.',
                 ], 200);
             }
 

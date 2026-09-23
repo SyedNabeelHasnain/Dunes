@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -21,7 +21,7 @@ return new class extends Migration
             'site_address' => 'Al Fahidi, Bur Dubai, Dubai, United Arab Emirates',
             'company_license_number' => '1430583',
             'google_maps_embed_url' => 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14439.467468694034!2d55.2707828!3d25.2048493!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f434910086b6d%3A0xc4db9db186e4e1e2!2sDunes%20Discovery%20Tourism%20LLC!5e0!3m2!1sen!2sae!4v1700000000000!5m2!1sen!2sae',
-            
+
             // Social Media & Reviews
             'social_tripadvisor' => 'https://www.tripadvisor.com/UserReviewEdit-g295424-d29026644-Dunes_Discovery-Dubai_Emirate_of_Dubai.html',
             'social_google' => 'https://search.google.com/local/writereview?placeid=ChIJbWsIEIVEdEER4uHEhb2dbcQ',
@@ -101,7 +101,7 @@ return new class extends Migration
         $now = now();
         foreach ($settings as $key => $val) {
             $exists = DB::table('settings')->where('setting_key', $key)->exists();
-            if (!$exists) {
+            if (! $exists) {
                 DB::table('settings')->insert([
                     'setting_key' => $key,
                     'setting_value' => $val,
@@ -112,7 +112,8 @@ return new class extends Migration
 
         try {
             Cache::forget('site_settings_cache');
-        } catch (\Throwable $e) {}
+        } catch (Throwable $e) {
+        }
     }
 
     /**

@@ -13,7 +13,7 @@ class Addon extends Model
 
     protected $casts = [
         'default_price' => 'float',
-        'priority' => 'integer'
+        'priority' => 'integer',
     ];
 
     public function getPriceAttribute()

@@ -14,7 +14,7 @@ class SettingSeeder extends Seeder
     public function run(): void
     {
         $path = database_path('seeders/data/settings.json');
-        if (!File::exists($path)) {
+        if (! File::exists($path)) {
             return;
         }
 

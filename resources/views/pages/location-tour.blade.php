@@ -644,21 +644,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     locInput.dispatchEvent(new Event('input', { bubbles: true }));
                     locInput.dispatchEvent(new Event('change', { bubbles: true }));
                 }
-            } else {
-                var modalEl = document.getElementById('bookingModal');
-                if (modalEl && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                    var m = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-                    m.show();
-                    var tourSel = document.getElementById('bookingTour');
-                    if (tourSel && tourId) {
-                        tourSel.value = tourId;
-                        tourSel.dispatchEvent(new Event('change', { bubbles: true }));
-                    }
-                    var locInput = document.getElementById('bookingLocation');
-                    if (locInput && locName) {
-                        locInput.value = locName;
-                    }
-                }
             }
         });
     });

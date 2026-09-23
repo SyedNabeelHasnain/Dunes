@@ -15,7 +15,7 @@ return new class extends Migration
             ->where('payment_status', 'unpaid')
             ->update([
                 'payment_amount' => 0.00,
-                'balance_due' => DB::raw('total')
+                'balance_due' => DB::raw('total'),
             ]);
     }
 

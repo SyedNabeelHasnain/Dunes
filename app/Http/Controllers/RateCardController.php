@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Tour;
-use App\Models\Category;
 use App\Models\Addon;
+use App\Models\Category;
+use App\Models\Tour;
 use App\Services\SettingsService;
 use Illuminate\Http\Request;
 
@@ -22,8 +22,8 @@ class RateCardController extends Controller
 
         $currentYear = date('Y');
         $defaultTitle = "Official Rate Card & Pricing Guide {$currentYear} | Dunes Discovery Tourism";
-        $defaultDesc = "View transparent, all-inclusive rates for all Dubai Desert Safari packages, VIP majlis upgrades, buggy rentals, and private transport options.";
-        $defaultKeys = "desert safari prices dubai, safari rate card 2026, dubai buggy prices, vip safari rates";
+        $defaultDesc = 'View transparent, all-inclusive rates for all Dubai Desert Safari packages, VIP majlis upgrades, buggy rentals, and private transport options.';
+        $defaultKeys = 'desert safari prices dubai, safari rate card 2026, dubai buggy prices, vip safari rates';
 
         $pageTitle = $settingsService->get('seo_rate_card_title') ?: $defaultTitle;
         $pageDesc = $settingsService->get('seo_rate_card_description') ?: $defaultDesc;
@@ -37,7 +37,7 @@ class RateCardController extends Controller
             ->orderBy('priority', 'asc')
             ->get();
 
-        $categories = Category::with(['tours' => function($q) {
+        $categories = Category::with(['tours' => function ($q) {
             $q->where('status', 'active')->with(['tiers', 'addons'])->orderBy('priority', 'asc');
         }])->get();
 

@@ -17,6 +17,7 @@ class AdminFaqController extends Controller
     {
         $faqs = Faq::with('assignments')->orderBy('priority', 'asc')->get();
         $tours = Tour::where('status', 'active')->get();
+
         return view('admin.faqs.index', compact('faqs', 'tours'));
     }
 
@@ -42,7 +43,7 @@ class AdminFaqController extends Controller
             'status' => $request->status,
         ]);
 
-        $entityId = $request->assignment_type === 'general' ? null : (int)$request->tour_id;
+        $entityId = $request->assignment_type === 'general' ? null : (int) $request->tour_id;
 
         FaqAssignment::create([
             'faq_id' => $faq->id,
@@ -77,7 +78,7 @@ class AdminFaqController extends Controller
             'status' => $request->status,
         ]);
 
-        $entityId = $request->assignment_type === 'general' ? null : (int)$request->tour_id;
+        $entityId = $request->assignment_type === 'general' ? null : (int) $request->tour_id;
 
         FaqAssignment::where('faq_id', $faq->id)->delete();
         FaqAssignment::create([
@@ -97,6 +98,7 @@ class AdminFaqController extends Controller
         $faq = Faq::findOrFail($id);
         FaqAssignment::where('faq_id', $faq->id)->delete();
         $faq->delete();
+
         return redirect()->route('admin.faqs.index')->with('success', 'FAQ deleted successfully.');
     }
 
@@ -112,7 +114,7 @@ class AdminFaqController extends Controller
         return response()->json([
             'success' => true,
             'status' => $faq->status,
-            'message' => 'FAQ status updated to ' . ucfirst($faq->status) . '.'
+            'message' => 'FAQ status updated to '.ucfirst($faq->status).'.',
         ]);
     }
 }

@@ -6,8 +6,9 @@ use App\Mail\AbandonedBookingRecoveryMail;
 use App\Models\Booking;
 use App\Services\SettingsService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class RecoverAbandonedBookingsCommand extends Command
 {
@@ -56,13 +57,13 @@ class RecoverAbandonedBookingsCommand extends Command
 
         $count = 0;
         foreach ($bookings as $booking) {
-            if (!filter_var($booking->email, FILTER_VALIDATE_EMAIL)) {
+            if (! filter_var($booking->email, FILTER_VALIDATE_EMAIL)) {
                 continue;
             }
 
             // Prevent duplicate recovery emails (check cache and tag)
-            $cacheKey = 'abandoned_recovery_sent_' . $booking->id;
-            if (\Illuminate\Support\Facades\Cache::has($cacheKey) || 
+            $cacheKey = 'abandoned_recovery_sent_'.$booking->id;
+            if (Cache::has($cacheKey) ||
                 ($booking->special_requests && str_contains($booking->special_requests, '[RECOVERY_DISPATCHED]'))) {
                 continue;
             }
@@ -82,21 +83,22 @@ class RecoverAbandonedBookingsCommand extends Command
                     (new AbandonedBookingRecoveryMail($booking))->from($fromEmail, 'Dunes Discovery Tourism')
                 );
 
-                \Illuminate\Support\Facades\Cache::put($cacheKey, now()->toIso8601String(), 86400 * 7);
+                Cache::put($cacheKey, now()->toIso8601String(), 86400 * 7);
 
                 $existingRequests = $booking->special_requests ?? '';
-                $updatedRequests = trim($existingRequests . "\n[RECOVERY_DISPATCHED " . now()->toIso8601String() . ']');
+                $updatedRequests = trim($existingRequests."\n[RECOVERY_DISPATCHED ".now()->toIso8601String().']');
                 $booking->update(['special_requests' => $updatedRequests]);
 
                 $count++;
                 $this->info("Dispatched recovery invitation to: {$booking->email} (Ref: #{$booking->reference})");
             } catch (\Throwable $e) {
-                Log::error("Failed to send abandoned checkout email to {$booking->email}: " . $e->getMessage());
-                $this->error("Failed to send recovery email to {$booking->email}: " . $e->getMessage());
+                Log::error("Failed to send abandoned checkout email to {$booking->email}: ".$e->getMessage());
+                $this->error("Failed to send recovery email to {$booking->email}: ".$e->getMessage());
             }
         }
 
         $this->info("Successfully dispatched {$count} abandoned booking recovery emails.");
+
         return Command::SUCCESS;
     }
 }

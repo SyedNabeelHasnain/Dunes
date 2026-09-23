@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Review;
 use App\Models\Tour;
 use App\Services\LocationLandingService;
-use Illuminate\Http\Request;
 
 class LocationLandingController extends Controller
 {
@@ -16,7 +15,7 @@ class LocationLandingController extends Controller
     {
         $locationData = LocationLandingService::find($location);
 
-        if (!$locationData) {
+        if (! $locationData) {
             abort(404);
         }
 
@@ -24,9 +23,9 @@ class LocationLandingController extends Controller
             $safariTours = Tour::where('status', 'active')
                 ->where(function ($q) {
                     $q->where('slug', 'like', '%safari%')
-                      ->orWhere('slug', 'like', '%buggy%')
-                      ->orWhere('name', 'like', '%Safari%')
-                      ->orWhere('name', 'like', '%Desert%');
+                        ->orWhere('slug', 'like', '%buggy%')
+                        ->orWhere('name', 'like', '%Safari%')
+                        ->orWhere('name', 'like', '%Desert%');
                 })
                 ->with(['tiers', 'category'])
                 ->orderBy('is_bestseller', 'desc')
@@ -58,7 +57,7 @@ class LocationLandingController extends Controller
 
         $pageTitle = $locationData['meta_title'];
         $pageDesc = $locationData['meta_desc'];
-        $canonical = url('/' . $locationData['slug']);
+        $canonical = url('/'.$locationData['slug']);
         $ogImage = asset('images/desert-safari-poster.avif');
 
         return view('pages.location-tour', compact(

@@ -15,7 +15,7 @@ class BookingAddon extends Model
 
     protected $casts = [
         'quantity' => 'integer',
-        'price' => 'float'
+        'price' => 'float',
     ];
 
     public function booking()

@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Setting;
+use App\Services\SettingsService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -16,10 +17,15 @@ class SendMetaCapiEvent implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $eventName;
+
     protected $data;
+
     protected $clientIp;
+
     protected $userAgent;
+
     protected $cookies;
+
     protected $eventSourceUrl;
 
     /**
@@ -40,7 +46,7 @@ class SendMetaCapiEvent implements ShouldQueue
      */
     public function handle(): void
     {
-        $settings = app(\App\Services\SettingsService::class);
+        $settings = app(SettingsService::class);
         $pixelId = trim($settings->get('meta_pixel_id', ''));
         $token = trim($settings->get('meta_capi_token', '') ?: $settings->get('meta_access_token', ''));
 
@@ -49,39 +55,39 @@ class SendMetaCapiEvent implements ShouldQueue
         }
 
         $endpoint = "https://graph.facebook.com/v25.0/{$pixelId}/events";
-        
+
         $userData = [];
-        
+
         // Add cookies (_fbp, _fbc)
-        if (!empty($this->cookies['fbp'])) {
+        if (! empty($this->cookies['fbp'])) {
             $userData['fbp'] = $this->cookies['fbp'];
         }
-        if (!empty($this->cookies['fbc'])) {
+        if (! empty($this->cookies['fbc'])) {
             $userData['fbc'] = $this->cookies['fbc'];
         }
 
         // Add hashed email if present
-        if (!empty($this->data['email'])) {
+        if (! empty($this->data['email'])) {
             $userData['em'] = [hash('sha256', strtolower(trim($this->data['email'])))];
         }
 
         // Add hashed phone if present
-        if (!empty($this->data['phone'])) {
+        if (! empty($this->data['phone'])) {
             $phoneDigits = preg_replace('/[^0-9]/', '', $this->data['phone']);
-            if (!empty($phoneDigits)) {
+            if (! empty($phoneDigits)) {
                 $userData['ph'] = [hash('sha256', $phoneDigits)];
             }
         }
 
         // IP and User Agent settings check
         $sendIpUaSetting = Setting::where('setting_key', 'meta_send_ip_ua')->first();
-        $sendIpUa = !$sendIpUaSetting || $sendIpUaSetting->setting_value === '1';
+        $sendIpUa = ! $sendIpUaSetting || $sendIpUaSetting->setting_value === '1';
 
         if ($sendIpUa) {
-            if (!empty($this->clientIp)) {
+            if (! empty($this->clientIp)) {
                 $userData['client_ip_address'] = $this->clientIp;
             }
-            if (!empty($this->userAgent)) {
+            if (! empty($this->userAgent)) {
                 $userData['client_user_agent'] = $this->userAgent;
             }
         }
@@ -98,34 +104,34 @@ class SendMetaCapiEvent implements ShouldQueue
             'custom_data' => $customData,
         ];
 
-        if (!empty($this->data['event_id'])) {
+        if (! empty($this->data['event_id'])) {
             $eventPayload['event_id'] = $this->data['event_id'];
         }
 
         $payload = [
-            'data' => [$eventPayload]
+            'data' => [$eventPayload],
         ];
 
         // Test event code config
         $testCodeSetting = Setting::where('setting_key', 'meta_test_event_code')->first();
         $testCode = $testCodeSetting ? trim($testCodeSetting->setting_value) : '';
-        if (!empty($testCode)) {
+        if (! empty($testCode)) {
             $payload['test_event_code'] = $testCode;
         }
 
         try {
             $response = Http::timeout(15)
-                ->post("{$endpoint}?access_token=" . rawurlencode($token), $payload);
+                ->post("{$endpoint}?access_token=".rawurlencode($token), $payload);
 
             if ($response->failed()) {
                 Log::error("Meta CAPI Error ({$this->eventName})", [
                     'status' => $response->status(),
-                    'body' => $response->json()
+                    'body' => $response->json(),
                 ]);
             }
         } catch (\Exception $e) {
             Log::error("Meta CAPI Job Exception ({$this->eventName})", [
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ]);
         }
     }

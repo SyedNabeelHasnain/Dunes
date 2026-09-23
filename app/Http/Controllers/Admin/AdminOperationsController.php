@@ -39,16 +39,16 @@ class AdminOperationsController extends Controller
         $totalInfants = 0;
 
         foreach ($bookings as $b) {
-            $adults = (int)$b->adults;
-            $children = (int)$b->children;
-            $infants = (int)($b->infants ?? 0);
+            $adults = (int) $b->adults;
+            $children = (int) $b->children;
+            $infants = (int) ($b->infants ?? 0);
 
             $totalAdults += $adults;
             $totalChildren += $children;
             $totalInfants += $infants;
             $totalGuests += ($adults + $children);
 
-            $loc = strtolower($b->pickup_location . ' ' . ($b->special_requests ?? ''));
+            $loc = strtolower($b->pickup_location.' '.($b->special_requests ?? ''));
             if (str_contains($loc, 'marina') || str_contains($loc, 'jbr') || str_contains($loc, 'beach residence')) {
                 $zones['Dubai Marina & JBR'][] = $b;
             } elseif (str_contains($loc, 'downtown') || str_contains($loc, 'burj') || str_contains($loc, 'business bay') || str_contains($loc, 'dubai mall')) {
@@ -65,7 +65,7 @@ class AdminOperationsController extends Controller
         }
 
         // Vehicles estimation (Standard 4x4 Land Cruiser capacity is 6-7 guests)
-        $vehiclesNeeded = $totalGuests > 0 ? (int)ceil($totalGuests / 6) : 0;
+        $vehiclesNeeded = $totalGuests > 0 ? (int) ceil($totalGuests / 6) : 0;
 
         $stats = [
             'total_bookings' => $bookings->count(),
@@ -98,17 +98,17 @@ class AdminOperationsController extends Controller
 
         $pickupTime = $request->input('pickup_time');
         $driverInfo = array_filter([
-            $pickupTime ? 'Pickup: ' . $pickupTime : null,
-            $request->input('driver_name') ? 'Driver: ' . $request->input('driver_name') : null,
-            $request->input('driver_phone') ? 'Phone: ' . $request->input('driver_phone') : null,
-            $request->input('vehicle_plate') ? 'Plate: ' . $request->input('vehicle_plate') : null,
-            $request->input('driver_notes') ? 'Notes: ' . $request->input('driver_notes') : null,
+            $pickupTime ? 'Pickup: '.$pickupTime : null,
+            $request->input('driver_name') ? 'Driver: '.$request->input('driver_name') : null,
+            $request->input('driver_phone') ? 'Phone: '.$request->input('driver_phone') : null,
+            $request->input('vehicle_plate') ? 'Plate: '.$request->input('vehicle_plate') : null,
+            $request->input('driver_notes') ? 'Notes: '.$request->input('driver_notes') : null,
         ]);
 
-        if (!empty($driverInfo)) {
+        if (! empty($driverInfo)) {
             $notes = $booking->special_requests ?: '';
             $cleanNotes = preg_replace('/\[DISPATCH:.*?\]/s', '', $notes);
-            $booking->special_requests = trim($cleanNotes . "\n[DISPATCH: " . implode(' | ', $driverInfo) . "]");
+            $booking->special_requests = trim($cleanNotes."\n[DISPATCH: ".implode(' | ', $driverInfo).']');
         }
 
         $booking->save();
@@ -134,16 +134,19 @@ class AdminOperationsController extends Controller
 
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="dunes-dispatch-manifest-' . $selectedDate . '.csv"',
+            'Content-Disposition' => 'attachment; filename="dunes-dispatch-manifest-'.$selectedDate.'.csv"',
         ];
 
         $sanitize = function (array $row): array {
             return array_map(function ($val) {
-                if ($val === null) return '';
+                if ($val === null) {
+                    return '';
+                }
                 $str = (string) $val;
                 if (isset($str[0]) && in_array($str[0], ['=', '+', '-', '@', "\t", "\r"], true)) {
-                    return "'" . $str;
+                    return "'".$str;
                 }
+
                 return $str;
             }, $row);
         };
@@ -155,7 +158,7 @@ class AdminOperationsController extends Controller
                 'Date', 'Reference', 'Customer Name', 'Phone', 'Email',
                 'Pickup Location', 'Pickup Time', 'Tour Name', 'Tier',
                 'Adults', 'Children', 'Total Guests', 'Addons', 'Total (AED)',
-                'Payment Status', 'Booking Status'
+                'Payment Status', 'Booking Status',
             ]);
 
             foreach ($bookings as $b) {
@@ -176,7 +179,7 @@ class AdminOperationsController extends Controller
                     $addonsStr ?: 'None',
                     $b->total,
                     $b->payment_status,
-                    $b->status
+                    $b->status,
                 ]));
             }
 

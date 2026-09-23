@@ -2,22 +2,21 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
-use App\Models\Tour;
-use App\Models\TourTier;
-use App\Models\Coupon;
-use App\Models\CouponUsage;
 use App\Models\Booking;
 use App\Models\BookingAddon;
 use App\Models\BookingPayment;
-use App\Models\Review;
-use App\Models\RequestLog;
-use App\Models\WhatsappInquiry;
 use App\Models\Contact;
-use App\Models\User;
+use App\Models\Coupon;
+use App\Models\CouponUsage;
+use App\Models\RequestLog;
+use App\Models\Review;
 use App\Models\Setting;
-use Illuminate\Support\Facades\Cache;
+use App\Models\Tour;
+use App\Models\User;
+use App\Models\WhatsappInquiry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
+use Tests\TestCase;
 
 class BookingEngineTest extends TestCase
 {
@@ -34,7 +33,7 @@ class BookingEngineTest extends TestCase
         Setting::updateOrCreate(['setting_key' => 'ziina_webhook_secret'], ['setting_value' => 'test_webhook_secret_key_123']);
         Setting::updateOrCreate(['setting_key' => 'site_phone'], ['setting_value' => '+971 50 245 6056']);
         Setting::updateOrCreate(['setting_key' => 'currency_rates'], ['setting_value' => json_encode(['AED' => 1, 'USD' => 0.2723, 'EUR' => 0.251, 'GBP' => 0.215, 'SAR' => 1.021, 'INR' => 22.85])]);
-        
+
         Cache::forget('site_settings_cache');
     }
 
@@ -134,7 +133,7 @@ class BookingEngineTest extends TestCase
         $this->assertNotNull($first25);
         $this->assertEquals('active', $first25->status);
         $this->assertEquals(25.00, $first25->discount_value);
-        $this->assertTrue((bool)$first25->first_time_only);
+        $this->assertTrue((bool) $first25->first_time_only);
     }
 
     /**
@@ -191,7 +190,7 @@ class BookingEngineTest extends TestCase
                     'code' => 'LUXURYONLY',
                     'discount_amount' => 45.00,
                     'new_total' => 255.00,
-                ]
+                ],
             ]);
     }
 
@@ -236,7 +235,7 @@ class BookingEngineTest extends TestCase
                     'code' => 'GROUP3PLUS',
                     'discount_amount' => 80.00,
                     'new_total' => 320.00,
-                ]
+                ],
             ]);
     }
 
@@ -277,7 +276,7 @@ class BookingEngineTest extends TestCase
                     'code' => 'SPEND500',
                     'discount_amount' => 50.00,
                     'new_total' => 550.00,
-                ]
+                ],
             ]);
     }
 
@@ -298,7 +297,7 @@ class BookingEngineTest extends TestCase
                     'code' => 'FIRST25-QA99X',
                     'discount_amount' => 100.00,
                     'new_total' => 300.00,
-                ]
+                ],
             ]);
     }
 
@@ -363,7 +362,7 @@ class BookingEngineTest extends TestCase
             [],
             [
                 'HTTP_X_ZIINA_SIGNATURE' => 'invalid_signature_hash',
-                'CONTENT_TYPE' => 'application/json'
+                'CONTENT_TYPE' => 'application/json',
             ],
             $payload
         );
@@ -379,7 +378,7 @@ class BookingEngineTest extends TestCase
             [],
             [
                 'HTTP_X_ZIINA_SIGNATURE' => $validSignature,
-                'CONTENT_TYPE' => 'application/json'
+                'CONTENT_TYPE' => 'application/json',
             ],
             $payload
         );
@@ -968,8 +967,8 @@ class BookingEngineTest extends TestCase
         $response->assertStatus(200);
         // Vehicles needed must be 0, not 1
         $response->assertViewHas('stats', function ($stats) {
-            return $stats['total_bookings'] === 0 
-                && $stats['total_guests'] === 0 
+            return $stats['total_bookings'] === 0
+                && $stats['total_guests'] === 0
                 && $stats['vehicles_needed'] === 0;
         });
     }
@@ -997,11 +996,11 @@ class BookingEngineTest extends TestCase
         $wrongBlogUrl = asset('images/blog/desert-safari-dubai-morning-desert-safari.avif');
 
         // Preload tag must point to images/ (NOT images/blog/)
-        $response->assertSee('<link rel="preload" as="image" href="' . $expectedUrl . '" type="image/avif">', false);
+        $response->assertSee('<link rel="preload" as="image" href="'.$expectedUrl.'" type="image/avif">', false);
         $response->assertDontSee($wrongBlogUrl, false);
 
         // Hero background must use the exact same expectedUrl
-        $response->assertSee("background: url('" . $expectedUrl . "')", false);
+        $response->assertSee("background: url('".$expectedUrl."')", false);
     }
 
     /**
@@ -1043,5 +1042,3 @@ class BookingEngineTest extends TestCase
         $this->assertEquals(15.00, $activeResponse->json('coupon.discount_amount'));
     }
 }
-
-

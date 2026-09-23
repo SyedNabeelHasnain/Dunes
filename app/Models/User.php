@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Notifications\ResetPasswordNotification;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -29,6 +30,7 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
     /**
      * Send the password reset notification.
      *
@@ -37,6 +39,6 @@ class User extends Authenticatable
      */
     public function sendPasswordResetNotification($token)
     {
-        $this->notify(new \App\Notifications\ResetPasswordNotification($token));
+        $this->notify(new ResetPasswordNotification($token));
     }
 }

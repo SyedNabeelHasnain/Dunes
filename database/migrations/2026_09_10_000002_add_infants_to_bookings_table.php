@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('bookings') && !Schema::hasColumn('bookings', 'infants')) {
+        if (Schema::hasTable('bookings') && ! Schema::hasColumn('bookings', 'infants')) {
             Schema::table('bookings', function (Blueprint $table) {
                 $table->integer('infants')->default(0)->after('children');
             });

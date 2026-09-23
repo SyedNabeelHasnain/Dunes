@@ -186,7 +186,6 @@
                                     'placeholder' => 'Full Name',
                                     'autocomplete' => 'name',
                                     'required' => true,
-                                    'inputClass' => 'form-control form-control-modern font-semibold',
                                     'inputAttrs' => ['data-form' => 'contact', 'data-field' => 'name']
                                 ]) !!}
                             </div>
@@ -199,7 +198,6 @@
                                     'placeholder' => 'Email Address',
                                     'autocomplete' => 'email',
                                     'required' => true,
-                                    'inputClass' => 'form-control form-control-modern font-semibold',
                                     'inputAttrs' => ['data-form' => 'contact', 'data-field' => 'email']
                                 ]) !!}
                             </div>
@@ -211,8 +209,7 @@
                                     'label' => 'Phone Number',
                                     'placeholder' => '50 123 4567',
                                     'autocomplete' => 'tel',
-                                    'wrapperClass' => 'form-floating phone-field',
-                                    'inputClass' => 'form-control form-control-modern font-semibold',
+                                    'wrapperClass' => 'relative rounded-xl phone-field',
                                     'inputAttrs' => ['data-form' => 'contact', 'data-field' => 'phone']
                                 ]) !!}
                             </div>
@@ -224,7 +221,6 @@
                                     'label' => 'Subject',
                                     'placeholder' => 'Subject',
                                     'autocomplete' => 'off',
-                                    'inputClass' => 'form-control form-control-modern font-semibold',
                                     'inputAttrs' => ['data-form' => 'contact', 'data-field' => 'subject']
                                 ]) !!}
                             </div>
@@ -238,7 +234,6 @@
                                 'placeholder' => 'Your Message',
                                 'autocomplete' => 'off',
                                 'required' => true,
-                                'inputClass' => 'form-control form-control-modern font-semibold',
                                 'inputAttrs' => ['style' => 'height: 140px', 'data-form' => 'contact', 'data-field' => 'message']
                             ]) !!}
                         </div>

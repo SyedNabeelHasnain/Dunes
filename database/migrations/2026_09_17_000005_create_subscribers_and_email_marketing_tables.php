@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         // 1. Subscribers Table
-        if (!Schema::hasTable('subscribers')) {
+        if (! Schema::hasTable('subscribers')) {
             Schema::create('subscribers', function (Blueprint $table) {
                 $table->id();
                 $table->string('email', 255)->unique();
@@ -39,7 +39,7 @@ return new class extends Migration
         }
 
         // 2. Subscriber Groups Table
-        if (!Schema::hasTable('subscriber_groups')) {
+        if (! Schema::hasTable('subscriber_groups')) {
             Schema::create('subscriber_groups', function (Blueprint $table) {
                 $table->id();
                 $table->string('name', 150);
@@ -51,7 +51,7 @@ return new class extends Migration
         }
 
         // 3. Subscriber Group Pivot Table
-        if (!Schema::hasTable('subscriber_group_pivot')) {
+        if (! Schema::hasTable('subscriber_group_pivot')) {
             Schema::create('subscriber_group_pivot', function (Blueprint $table) {
                 $table->foreignId('subscriber_id')->constrained('subscribers')->onDelete('cascade');
                 $table->foreignId('group_id')->constrained('subscriber_groups')->onDelete('cascade');
@@ -60,7 +60,7 @@ return new class extends Migration
         }
 
         // 4. Email Templates Table
-        if (!Schema::hasTable('email_templates')) {
+        if (! Schema::hasTable('email_templates')) {
             Schema::create('email_templates', function (Blueprint $table) {
                 $table->id();
                 $table->string('name', 150);
@@ -76,7 +76,7 @@ return new class extends Migration
         }
 
         // 5. Email Campaigns Table
-        if (!Schema::hasTable('email_campaigns')) {
+        if (! Schema::hasTable('email_campaigns')) {
             Schema::create('email_campaigns', function (Blueprint $table) {
                 $table->id();
                 $table->string('title', 200);
@@ -110,7 +110,7 @@ return new class extends Migration
         }
 
         // 6. Email Campaign Logs Table
-        if (!Schema::hasTable('email_campaign_logs')) {
+        if (! Schema::hasTable('email_campaign_logs')) {
             Schema::create('email_campaign_logs', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('campaign_id')->constrained('email_campaigns')->onDelete('cascade');
@@ -133,7 +133,7 @@ return new class extends Migration
         }
 
         // 7. Email Campaign Clicks Table
-        if (!Schema::hasTable('email_campaign_clicks')) {
+        if (! Schema::hasTable('email_campaign_clicks')) {
             Schema::create('email_campaign_clicks', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('campaign_log_id')->constrained('email_campaign_logs')->onDelete('cascade');

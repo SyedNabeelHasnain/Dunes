@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\BlogCategory;
-use App\Models\BlogTag;
 use App\Models\BlogPost;
 use App\Models\BlogPostFaq;
+use App\Models\BlogTag;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -31,7 +31,7 @@ class BlogSeeder extends Seeder
                         'meta_title' => $cat['meta_title'] ?? null,
                         'meta_desc' => $cat['meta_desc'] ?? null,
                         'og_image' => $cat['og_image'] ?? null,
-                        'priority' => (int)($cat['priority'] ?? 99),
+                        'priority' => (int) ($cat['priority'] ?? 99),
                         'status' => $cat['status'] ?? 'active',
                     ]
                 );
@@ -61,7 +61,7 @@ class BlogSeeder extends Seeder
             $defaultCatId = BlogCategory::value('id');
 
             foreach ($posts as $p) {
-                $targetCatId = !empty($p['category_id']) ? (BlogCategory::where('id', $p['category_id'])->value('id') ?? $defaultCatId) : $defaultCatId;
+                $targetCatId = ! empty($p['category_id']) ? (BlogCategory::where('id', $p['category_id'])->value('id') ?? $defaultCatId) : $defaultCatId;
 
                 BlogPost::updateOrCreate(
                     ['slug' => $p['slug']],
@@ -79,11 +79,11 @@ class BlogSeeder extends Seeder
                         'featured_image' => $p['featured_image'] ?? null,
                         'featured_image_alt' => $p['featured_image_alt'] ?? null,
                         'featured_image_caption' => $p['featured_image_caption'] ?? null,
-                        'read_time' => (int)($p['read_time'] ?? 5),
+                        'read_time' => (int) ($p['read_time'] ?? 5),
                         'status' => $p['status'] ?? 'published',
-                        'is_featured' => (bool)($p['is_featured'] ?? false),
-                        'priority' => (int)($p['priority'] ?? 99),
-                        'published_at' => !empty($p['published_at']) ? date('Y-m-d H:i:s', strtotime($p['published_at'])) : now(),
+                        'is_featured' => (bool) ($p['is_featured'] ?? false),
+                        'priority' => (int) ($p['priority'] ?? 99),
+                        'published_at' => ! empty($p['published_at']) ? date('Y-m-d H:i:s', strtotime($p['published_at'])) : now(),
                         'meta_title' => $p['meta_title'] ?? null,
                         'meta_desc' => $p['meta_desc'] ?? null,
                         'meta_keywords' => $p['meta_keywords'] ?? null,
@@ -123,7 +123,7 @@ class BlogSeeder extends Seeder
                         'post_id' => $pf['post_id'],
                         'question' => $pf['question'],
                         'answer' => $pf['answer'],
-                        'priority' => (int)($pf['priority'] ?? 99),
+                        'priority' => (int) ($pf['priority'] ?? 99),
                     ]
                 );
             }

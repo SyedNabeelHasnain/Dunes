@@ -26,7 +26,7 @@ class RequestLog extends Model
         'form_submit_timestamp', 'form_completion_seconds', 'repeat_visit_flag',
         'google_maps_link', 'gps_consent_flag', 'gps_latitude', 'gps_longitude',
         'gps_accuracy', 'gps_altitude', 'gps_heading', 'gps_speed',
-        'gps_timestamp', 'gps_source'
+        'gps_timestamp', 'gps_source',
     ];
 
     protected $casts = [
@@ -37,6 +37,6 @@ class RequestLog extends Model
         'form_submit_timestamp' => 'datetime',
         'session_duration_seconds' => 'integer',
         'pages_viewed_count' => 'integer',
-        'form_completion_seconds' => 'integer'
+        'form_completion_seconds' => 'integer',
     ];
 }
