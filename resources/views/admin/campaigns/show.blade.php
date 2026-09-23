@@ -3,51 +3,53 @@
 @section('page_title', 'Campaign Analytics: ' . $campaign->title)
 
 @section('content')
-<div class="container-fluid py-4">
-    <!-- Header -->
-    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+<div class="space-y-6" x-data>
+    <!-- Top Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <div class="d-flex align-items-center gap-2 mb-1">
-                <a href="{{ route('admin.campaigns.index') }}" class="btn btn-outline-secondary btn-sm rounded-circle p-1" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;">
+            <div class="flex items-center gap-3">
+                <a href="{{ route('admin.campaigns.index') }}" class="w-9 h-9 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 flex items-center justify-center transition shadow-2xs">
                     <i class="bi bi-arrow-left"></i>
                 </a>
-                <h4 class="fw-800 text-dark mb-0">{{ $campaign->title }}</h4>
-                @if($campaign->status === 'sent')
-                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 small fw-bold ms-2">
-                        <i class="bi bi-check2-all me-1"></i> Completed
-                    </span>
-                @elseif($campaign->status === 'sending')
-                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2.5 py-1 small fw-bold ms-2">
-                        <i class="bi bi-arrow-repeat spin me-1"></i> Sending...
-                    </span>
-                @elseif($campaign->status === 'scheduled')
-                    <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2.5 py-1 small fw-bold ms-2">
-                        <i class="bi bi-clock-history me-1"></i> Scheduled
-                    </span>
-                @elseif($campaign->status === 'draft')
-                    <span class="badge bg-secondary-subtle text-dark border rounded-pill px-2.5 py-1 small fw-bold ms-2">
-                        <i class="bi bi-pencil-square me-1"></i> Draft
-                    </span>
-                @endif
+                <h1 class="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                    {{ $campaign->title }}
+                    @if($campaign->status === 'sent')
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <i class="bi bi-check2-all text-[11px]"></i> Completed
+                        </span>
+                    @elseif($campaign->status === 'sending')
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 animate-pulse">
+                            <i class="bi bi-arrow-repeat spin text-[11px]"></i> Sending...
+                        </span>
+                    @elseif($campaign->status === 'scheduled')
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200">
+                            <i class="bi bi-clock-history text-[11px]"></i> Scheduled
+                        </span>
+                    @elseif($campaign->status === 'draft')
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                            <i class="bi bi-pencil-square text-[11px]"></i> Draft
+                        </span>
+                    @endif
+                </h1>
             </div>
-            <div class="text-muted small ps-4 ms-2">
-                <strong>Subject:</strong> {{ $campaign->subject }}
+            <div class="text-xs text-slate-500 mt-1 pl-12">
+                <strong class="text-slate-700">Subject:</strong> {{ $campaign->subject }}
                 @if($campaign->sent_at)
-                    • Dispatched on {{ $campaign->sent_at->format('M d, Y h:i A') }}
+                    &bull; Dispatched on {{ $campaign->sent_at->format('M d, Y h:i A') }}
                 @elseif($campaign->scheduled_at)
-                    • Scheduled for {{ $campaign->scheduled_at->format('M d, Y h:i A') }}
+                    &bull; Scheduled for {{ $campaign->scheduled_at->format('M d, Y h:i A') }}
                 @endif
             </div>
         </div>
 
-        <div class="d-flex flex-wrap gap-2">
-            <button type="button" class="btn btn-outline-info rounded-pill px-3 py-2 btn-sm fw-bold shadow-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#testEmailModal">
+        <div class="flex flex-wrap items-center gap-2">
+            <button type="button" @click="$dispatch('open-test-email')" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-sky-200 hover:bg-sky-50 text-sky-700 text-xs font-bold transition cursor-pointer">
                 <i class="bi bi-send-check"></i> Send Test Copy
             </button>
             @if(in_array($campaign->status, ['draft', 'scheduled']))
-                <form action="{{ route('admin.campaigns.send', $campaign->id) }}" method="POST" class="d-inline" id="sendNowForm">
+                <form action="{{ route('admin.campaigns.send', $campaign->id) }}" method="POST" class="inline" id="sendNowForm">
                     @csrf
-                    <button type="button" class="btn btn-success rounded-pill px-4 py-2 btn-sm fw-bold shadow-sm d-flex align-items-center gap-2" id="btnSendNow">
+                    <button type="button" class="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition cursor-pointer" id="btnSendNow">
                         <i class="bi bi-send-fill"></i> Send Broadcast Now
                     </button>
                 </form>
@@ -55,206 +57,200 @@
         </div>
     </div>
 
-    <!-- Analytics Metric Cards -->
-    <div class="row g-3 mb-4">
-        <div class="col-6 col-md-4 col-xl-2">
-            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
-                <div class="text-muted extra-small text-uppercase fw-bold mb-1">Audience</div>
-                <h4 class="fw-800 text-dark mb-0">{{ number_format($campaign->total_recipients ?: $campaign->sent_count) }}</h4>
-                <div class="text-muted extra-small mt-1 text-truncate">
-                    {{ $campaign->target_type === 'all' ? 'All Active' : ($campaign->group ? $campaign->group->name : 'Segment') }}
-                </div>
+    <!-- 6 Analytics Metric Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Audience</div>
+            <div class="text-2xl font-black text-slate-900">{{ number_format($campaign->total_recipients ?: $campaign->sent_count) }}</div>
+            <div class="text-[11px] text-slate-500 mt-1 truncate">
+                {{ $campaign->target_type === 'all' ? 'All Active' : ($campaign->group ? $campaign->group->name : 'Segment') }}
             </div>
         </div>
-        <div class="col-6 col-md-4 col-xl-2">
-            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
-                <div class="text-muted extra-small text-uppercase fw-bold mb-1">Delivered</div>
-                <h4 class="fw-800 text-primary mb-0">{{ number_format($campaign->sent_count) }}</h4>
-                <div class="text-muted extra-small mt-1">
-                    {{ $campaign->total_recipients > 0 ? round(($campaign->sent_count / $campaign->total_recipients) * 100, 1) : 100 }}% delivery
-                </div>
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Delivered</div>
+            <div class="text-2xl font-black text-primary">{{ number_format($campaign->sent_count) }}</div>
+            <div class="text-[11px] text-slate-500 mt-1">
+                {{ $campaign->total_recipients > 0 ? round(($campaign->sent_count / $campaign->total_recipients) * 100, 1) : 100 }}% delivery
             </div>
         </div>
-        <div class="col-6 col-md-4 col-xl-2">
-            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
-                <div class="text-muted extra-small text-uppercase fw-bold mb-1">Opens (Unique)</div>
-                <h4 class="fw-800 text-info mb-0">{{ number_format($campaign->opened_count) }}</h4>
-                <div class="text-info extra-small fw-bold mt-1">
-                    {{ $campaign->open_rate }}% open rate
-                </div>
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Opens (Unique)</div>
+            <div class="text-2xl font-black text-sky-600">{{ number_format($campaign->opened_count) }}</div>
+            <div class="text-[11px] text-sky-600 font-bold mt-1">
+                {{ $campaign->open_rate }}% open rate
             </div>
         </div>
-        <div class="col-6 col-md-4 col-xl-2">
-            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
-                <div class="text-muted extra-small text-uppercase fw-bold mb-1">Link Clicks</div>
-                <h4 class="fw-800 text-warning mb-0">{{ number_format($campaign->clicked_count) }}</h4>
-                <div class="text-warning extra-small fw-bold mt-1">
-                    {{ $campaign->click_rate }}% click rate
-                </div>
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Link Clicks</div>
+            <div class="text-2xl font-black text-amber-500">{{ number_format($campaign->clicked_count) }}</div>
+            <div class="text-[11px] text-amber-600 font-bold mt-1">
+                {{ $campaign->click_rate }}% click rate
             </div>
         </div>
-        <div class="col-6 col-md-4 col-xl-2">
-            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
-                <div class="text-muted extra-small text-uppercase fw-bold mb-1">Bounces</div>
-                <h4 class="fw-800 text-danger mb-0">{{ number_format($campaign->bounced_count) }}</h4>
-                <div class="text-muted extra-small mt-1">
-                    {{ $campaign->bounce_rate }}% bounce rate
-                </div>
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Bounces</div>
+            <div class="text-2xl font-black text-rose-600">{{ number_format($campaign->bounced_count) }}</div>
+            <div class="text-[11px] text-slate-500 mt-1">
+                {{ $campaign->bounce_rate }}% bounce rate
             </div>
         </div>
-        <div class="col-6 col-md-4 col-xl-2">
-            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
-                <div class="text-muted extra-small text-uppercase fw-bold mb-1">Unsubscribed</div>
-                <h4 class="fw-800 text-secondary mb-0">{{ number_format($campaign->unsubscribed_count) }}</h4>
-                <div class="text-muted extra-small mt-1">
-                    {{ $campaign->unsubscribe_rate }}% opt-out
-                </div>
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Unsubscribed</div>
+            <div class="text-2xl font-black text-slate-600">{{ number_format($campaign->unsubscribed_count) }}</div>
+            <div class="text-[11px] text-slate-500 mt-1">
+                {{ $campaign->unsubscribe_rate }}% opt-out
             </div>
         </div>
     </div>
 
     <!-- Engagement Rates Progress Bars -->
-    <div class="card border-0 shadow-sm rounded-4 bg-white p-4 mb-4">
-        <h6 class="fw-800 text-dark mb-3">
-            <i class="bi bi-graph-up-arrow text-primary me-2"></i>Engagement Performance Benchmarks
-        </h6>
-        <div class="row g-4">
-            <div class="col-12 col-md-6">
-                <div class="d-flex align-items-center justify-content-between mb-1.5">
-                    <span class="small fw-bold text-dark"><i class="bi bi-envelope-open text-info me-1"></i> Unique Open Rate</span>
-                    <span class="small fw-800 text-info">{{ $campaign->open_rate }}%</span>
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5">
+        <h2 class="text-xs font-black uppercase text-slate-700 tracking-wider flex items-center gap-1.5 mb-4">
+            <i class="bi bi-graph-up-arrow text-primary"></i> Engagement Performance Benchmarks
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                        <i class="bi bi-envelope-open text-sky-500"></i> Unique Open Rate
+                    </span>
+                    <span class="text-xs font-black text-sky-600">{{ $campaign->open_rate }}%</span>
                 </div>
-                <div class="progress rounded-pill" style="height: 10px;">
-                    <div class="progress-bar bg-info" role="progressbar" style="width: {{ $campaign->open_rate }}%;" aria-valuenow="{{ $campaign->open_rate }}" aria-valuemin="0" aria-valuemax="100"></div>
+                <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                    <div class="bg-sky-500 h-2.5 rounded-full" style="width: {{ $campaign->open_rate }}%;"></div>
                 </div>
-                <div class="text-muted extra-small mt-1">Industry travel average: ~22% - 28%</div>
+                <div class="text-[11px] text-slate-400 mt-1">Industry travel average: ~22% - 28%</div>
             </div>
 
-            <div class="col-12 col-md-6">
-                <div class="d-flex align-items-center justify-content-between mb-1.5">
-                    <span class="small fw-bold text-dark"><i class="bi bi-cursor text-warning me-1"></i> Click-to-Open Rate</span>
-                    <span class="small fw-800 text-warning">{{ $campaign->click_rate }}%</span>
+            <div>
+                <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                        <i class="bi bi-cursor text-amber-500"></i> Click-to-Open Rate
+                    </span>
+                    <span class="text-xs font-black text-amber-500">{{ $campaign->click_rate }}%</span>
                 </div>
-                <div class="progress rounded-pill" style="height: 10px;">
-                    <div class="progress-bar bg-warning" role="progressbar" style="width: {{ $campaign->click_rate }}%;" aria-valuenow="{{ $campaign->click_rate }}" aria-valuemin="0" aria-valuemax="100"></div>
+                <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                    <div class="bg-amber-400 h-2.5 rounded-full" style="width: {{ $campaign->click_rate }}%;"></div>
                 </div>
-                <div class="text-muted extra-small mt-1">Industry travel average: ~2.5% - 4.5%</div>
+                <div class="text-[11px] text-slate-400 mt-1">Industry travel average: ~2.5% - 4.5%</div>
             </div>
         </div>
     </div>
 
     <!-- Recipient Logs Filter Bar -->
-    <div class="card border-0 shadow-sm rounded-4 mb-3 bg-white">
-        <div class="card-body p-3 p-md-4">
-            <form action="{{ route('admin.campaigns.show', $campaign->id) }}" method="GET" class="row g-3 align-items-center">
-                <div class="col-12 col-md-6">
-                    <div class="position-relative">
-                        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-                        <input type="text" name="search" class="form-control rounded-pill ps-5 bg-light border-0" placeholder="Search recipient email, name..." value="{{ request('search') }}">
-                    </div>
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5">
+        <form action="{{ route('admin.campaigns.show', $campaign->id) }}" method="GET" class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+            <div class="sm:col-span-6">
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" name="search" class="w-full rounded-xl border border-slate-200 pl-10 pr-3.5 py-2 text-xs text-slate-800 placeholder-slate-400 outline-hidden focus:border-primary transition" placeholder="Search recipient email, name..." value="{{ request('search') }}">
                 </div>
-                <div class="col-6 col-md-3">
-                    <select name="log_status" class="form-select rounded-pill bg-light border-0">
-                        <option value="">All Delivery Statuses</option>
-                        <option value="sent" {{ request('log_status') === 'sent' ? 'selected' : '' }}>Sent</option>
-                        <option value="opened" {{ request('log_status') === 'opened' ? 'selected' : '' }}>Opened</option>
-                        <option value="clicked" {{ request('log_status') === 'clicked' ? 'selected' : '' }}>Clicked</option>
-                        <option value="bounced" {{ request('log_status') === 'bounced' ? 'selected' : '' }}>Bounced</option>
-                        <option value="failed" {{ request('log_status') === 'failed' ? 'selected' : '' }}>Failed</option>
-                    </select>
-                </div>
-                <div class="col-6 col-md-3 d-flex gap-2">
-                    <button type="submit" class="btn btn-dark rounded-pill px-4 fw-bold flex-grow-1">Filter</button>
-                    @if(request()->hasAny(['search', 'log_status']))
-                        <a href="{{ route('admin.campaigns.show', $campaign->id) }}" class="btn btn-light rounded-pill px-3">
-                            <i class="bi bi-x-lg"></i>
-                        </a>
-                    @endif
-                </div>
-            </form>
-        </div>
+            </div>
+            <div class="sm:col-span-4">
+                <select name="log_status" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden bg-white focus:border-primary">
+                    <option value="">All Delivery Statuses</option>
+                    <option value="sent" {{ request('log_status') === 'sent' ? 'selected' : '' }}>Sent</option>
+                    <option value="opened" {{ request('log_status') === 'opened' ? 'selected' : '' }}>Opened</option>
+                    <option value="clicked" {{ request('log_status') === 'clicked' ? 'selected' : '' }}>Clicked</option>
+                    <option value="bounced" {{ request('log_status') === 'bounced' ? 'selected' : '' }}>Bounced</option>
+                    <option value="failed" {{ request('log_status') === 'failed' ? 'selected' : '' }}>Failed</option>
+                </select>
+            </div>
+            <div class="sm:col-span-2 flex items-center gap-1.5">
+                <button type="submit" class="flex-1 inline-flex items-center justify-center px-4 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold shadow-xs transition cursor-pointer">
+                    Filter
+                </button>
+                @if(request()->hasAny(['search', 'log_status']))
+                    <a href="{{ route('admin.campaigns.show', $campaign->id) }}" class="inline-flex items-center justify-center px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-bold transition">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                @endif
+            </div>
+        </form>
     </div>
 
     <!-- Recipient Logs Table -->
-    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
-        <div class="table-responsive">
-            <table class="table align-middle table-hover mb-0">
-                <thead class="bg-light">
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm text-slate-700">
+                <thead class="bg-slate-50/80 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
                     <tr>
-                        <th class="ps-4 text-muted extra-small text-uppercase fw-800">Recipient</th>
-                        <th class="text-muted extra-small text-uppercase fw-800">Status</th>
-                        <th class="text-muted extra-small text-uppercase fw-800">Opened</th>
-                        <th class="text-muted extra-small text-uppercase fw-800">Clicked Links</th>
-                        <th class="text-muted extra-small text-uppercase fw-800">Dispatched At</th>
-                        <th class="text-end pe-4 text-muted extra-small text-uppercase fw-800">Diagnostic Details</th>
+                        <th class="py-3 px-4">Recipient</th>
+                        <th class="py-3 px-4">Status</th>
+                        <th class="py-3 px-4">Opened</th>
+                        <th class="py-3 px-4">Clicked Links</th>
+                        <th class="py-3 px-4">Dispatched At</th>
+                        <th class="py-3 px-4 text-right pe-4">Diagnostic Details</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-slate-100 bg-white">
                     @forelse($logs as $log)
-                    <tr>
-                        <td class="ps-4 py-3">
-                            <div class="fw-bold text-dark">{{ $log->subscriber ? $log->subscriber->full_name : 'Guest' }}</div>
-                            <div class="text-muted small font-monospace">{{ $log->subscriber ? $log->subscriber->email : 'N/A' }}</div>
+                    <tr class="hover:bg-slate-50/60 transition-colors">
+                        <td class="py-3 px-4">
+                            <div class="font-bold text-slate-900 text-xs">{{ $log->subscriber ? $log->subscriber->full_name : 'Guest' }}</div>
+                            <div class="text-[11px] text-slate-400 font-mono">{{ $log->subscriber ? $log->subscriber->email : 'N/A' }}</div>
                         </td>
-                        <td>
+                        <td class="py-3 px-4">
                             @if($log->status === 'clicked')
-                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2.5 py-1 small fw-bold">
-                                    <i class="bi bi-cursor me-1"></i> Clicked
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                    <i class="bi bi-cursor text-[11px]"></i> Clicked
                                 </span>
                             @elseif($log->status === 'opened')
-                                <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2.5 py-1 small fw-bold">
-                                    <i class="bi bi-envelope-open me-1"></i> Opened
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200">
+                                    <i class="bi bi-envelope-open text-[11px]"></i> Opened
                                 </span>
                             @elseif($log->status === 'sent')
-                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 small fw-bold">
-                                    <i class="bi bi-check2 me-1"></i> Delivered
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <i class="bi bi-check2 text-[11px]"></i> Delivered
                                 </span>
                             @elseif($log->status === 'bounced')
-                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1 small fw-bold">
-                                    <i class="bi bi-exclamation-octagon me-1"></i> Bounced
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                    <i class="bi bi-exclamation-octagon text-[11px]"></i> Bounced
                                 </span>
                             @elseif($log->status === 'failed')
-                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1 small fw-bold">
-                                    <i class="bi bi-x-circle me-1"></i> Failed
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                    <i class="bi bi-x-circle text-[11px]"></i> Failed
                                 </span>
                             @else
-                                <span class="badge bg-light text-secondary border rounded-pill px-2.5 py-1 small fw-bold">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 capitalize">
                                     {{ ucfirst($log->status) }}
                                 </span>
                             @endif
                         </td>
-                        <td>
+                        <td class="py-3 px-4">
                             @if($log->opened_at)
-                                <span class="text-info fw-bold small">
-                                    <i class="bi bi-check2 me-1"></i> {{ $log->opened_at->format('M d, h:i A') }}
-                                </span>
-                                <div class="text-muted extra-small">{{ $log->opened_at->diffForHumans($log->sent_at, true) }} after send</div>
+                                <div class="text-xs font-bold text-sky-600 flex items-center gap-1">
+                                    <i class="bi bi-check2"></i> {{ $log->opened_at->format('M d, h:i A') }}
+                                </div>
+                                <div class="text-[10px] text-slate-400">{{ $log->opened_at->diffForHumans($log->sent_at, true) }} after send</div>
                             @else
-                                <span class="text-muted extra-small fst-italic">Not opened yet</span>
+                                <span class="text-xs text-slate-400 italic">Not opened yet</span>
                             @endif
                         </td>
-                        <td>
+                        <td class="py-3 px-4">
                             @if($log->clicks && $log->clicks->count() > 0)
-                                <span class="badge bg-warning rounded-pill px-2.5 py-1 text-dark fw-bold">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
                                     {{ $log->clicks->count() }} click(s)
                                 </span>
-                                <div class="text-muted extra-small text-truncate" style="max-width: 180px;" title="{{ $log->clicks->first()->target_url ?? $log->clicks->first()->url }}">
+                                <div class="text-[11px] text-slate-400 truncate max-w-xs mt-0.5" title="{{ $log->clicks->first()->target_url ?? $log->clicks->first()->url }}">
                                     {{ $log->clicks->first()->target_url ?? $log->clicks->first()->url }}
                                 </div>
                             @else
-                                <span class="text-muted extra-small fst-italic">No clicks</span>
+                                <span class="text-xs text-slate-400 italic">No clicks</span>
                             @endif
                         </td>
-                        <td class="text-muted small">
+                        <td class="py-3 px-4 text-xs text-slate-500">
                             {{ $log->sent_at ? $log->sent_at->format('M d, h:i:s A') : 'Pending' }}
                         </td>
-                        <td class="text-end pe-4">
+                        <td class="py-3 px-4 text-right pe-4">
                             @if($log->error_message)
-                                <span class="badge bg-danger-subtle text-danger small text-truncate" style="max-width: 220px;" title="{{ $log->error_message }}">
-                                    <i class="bi bi-bug me-1"></i> {{ $log->error_message }}
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200 truncate max-w-xs" title="{{ $log->error_message }}">
+                                    <i class="bi bi-bug"></i> {{ $log->error_message }}
                                 </span>
                             @else
-                                <span class="badge bg-light text-muted border font-monospace extra-small">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-md font-mono text-[10px] bg-slate-100 text-slate-500 border border-slate-200">
                                     #{{ substr($log->tracking_token, 0, 10) }}...
                                 </span>
                             @endif
@@ -262,10 +258,10 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center py-5">
-                            <i class="bi bi-inbox text-muted display-4 mb-3 d-block opacity-50"></i>
-                            <h6 class="fw-bold text-dark">No Recipient Logs Found</h6>
-                            <p class="text-muted small">Logs will appear once the campaign is dispatched to your subscribers.</p>
+                        <td colspan="6" class="text-center py-12 text-slate-400 text-xs">
+                            <i class="bi bi-inbox text-4xl block mb-2 opacity-50"></i>
+                            <h3 class="font-bold text-slate-700 mb-1">No Recipient Logs Found</h3>
+                            <span class="text-slate-400">Logs will appear once the campaign is dispatched to your subscribers.</span>
                         </td>
                     </tr>
                     @endforelse
@@ -274,40 +270,41 @@
         </div>
 
         @if($logs->hasPages())
-        <div class="card-footer bg-white border-top p-3 d-flex justify-content-center">
+        <div class="p-4 border-t border-slate-100 bg-white">
             {{ $logs->links() }}
         </div>
         @endif
     </div>
 </div>
 
-<!-- Test Email Modal -->
-<div class="modal fade" id="testEmailModal" tabindex="-1" aria-labelledby="testEmailModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-            <div class="modal-header border-0 bg-light p-4 pb-3">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="rounded-3 bg-info bg-opacity-10 text-info p-2">
-                        <i class="bi bi-send-check-fill fs-5"></i>
+<!-- Modal: Test Email (Alpine.js) -->
+<div x-data="{ open: false }" @open-test-email.window="open = true" x-show="open" x-cloak class="relative z-50">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" @click="open = false"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20 flex items-center justify-center">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-md w-full p-6 space-y-4" @click.stop>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2">
+                    <div class="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-200">
+                        <i class="bi bi-send-check-fill text-base"></i>
                     </div>
                     <div>
-                        <h5 class="modal-title fw-800 text-dark mb-0" id="testEmailModalLabel">Send Test Copy</h5>
-                        <div class="text-muted extra-small">Dispatch a live preview of this campaign to your inbox</div>
+                        <h3 class="text-base font-black text-slate-900">Send Test Copy</h3>
+                        <div class="text-[11px] text-slate-400">Dispatch a live preview of this campaign to your inbox</div>
                     </div>
                 </div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" @click="open = false" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="bi bi-x-lg"></i></button>
             </div>
-            <div class="modal-body p-4 pt-2">
-                <div class="mb-3">
-                    <label class="form-label fw-bold small text-dark">Recipient Email Address:</label>
-                    <input type="email" id="testRecipientEmail" class="form-control rounded-3 py-2" placeholder="yourname@domain.com" value="{{ auth()->user()->email ?? '' }}">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Recipient Email Address:</label>
+                    <input type="email" id="testRecipientEmail" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary" placeholder="yourname@domain.com" value="{{ auth()->user()->email ?? '' }}">
                 </div>
-                <div id="testResultBox" class="alert d-none rounded-3 small"></div>
+                <div id="testResultBox" class="hidden p-3 rounded-xl text-xs"></div>
             </div>
-            <div class="modal-footer border-0 bg-light p-3 px-4">
-                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-info text-white rounded-pill px-4 fw-bold" id="btnSendTest" onclick="sendDiagnosticTestEmail()">
-                    <i class="bi bi-send me-1"></i> Send Test
+            <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                <button type="button" @click="open = false" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold cursor-pointer">Close</button>
+                <button type="button" class="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-xs transition cursor-pointer" id="btnSendTest" onclick="sendDiagnosticTestEmail()">
+                    <i class="bi bi-send"></i> Send Test
                 </button>
             </div>
         </div>
@@ -329,8 +326,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     text: 'Are you sure you want to broadcast this campaign to all recipients now? Batches will dispatch immediately.',
                     icon: 'question',
                     showCancelButton: true,
-                    confirmButtonColor: '#198754',
-                    cancelButtonColor: '#6c757d',
+                    confirmButtonColor: '#10b981',
+                    cancelButtonColor: '#64748b',
                     confirmButtonText: 'Yes, Send Broadcast!'
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -353,15 +350,15 @@ async function sendDiagnosticTestEmail() {
 
     const email = emailInput.value.trim();
     if (!email) {
-        resultBox.className = 'alert alert-danger rounded-3 small';
+        resultBox.className = 'p-3 rounded-xl text-xs bg-rose-50 text-rose-700 border border-rose-200';
         resultBox.textContent = 'Please enter a valid email address.';
-        resultBox.classList.remove('d-none');
+        resultBox.classList.remove('hidden');
         return;
     }
 
     sendBtn.disabled = true;
-    sendBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Sending...';
-    resultBox.classList.add('d-none');
+    sendBtn.innerHTML = '<span class="inline-block animate-spin mr-1">⌛</span> Sending...';
+    resultBox.classList.add('hidden');
 
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
@@ -377,20 +374,20 @@ async function sendDiagnosticTestEmail() {
 
         const data = await response.json();
         if (data.success) {
-            resultBox.className = 'alert alert-success rounded-3 small';
+            resultBox.className = 'p-3 rounded-xl text-xs bg-emerald-50 text-emerald-700 border border-emerald-200';
             resultBox.textContent = data.message || 'Diagnostic copy sent successfully! Check your inbox.';
         } else {
-            resultBox.className = 'alert alert-danger rounded-3 small';
+            resultBox.className = 'p-3 rounded-xl text-xs bg-rose-50 text-rose-700 border border-rose-200';
             resultBox.textContent = data.message || 'Failed to dispatch test email. Check your SMTP settings.';
         }
-        resultBox.classList.remove('d-none');
+        resultBox.classList.remove('hidden');
     } catch (err) {
-        resultBox.className = 'alert alert-danger rounded-3 small';
+        resultBox.className = 'p-3 rounded-xl text-xs bg-rose-50 text-rose-700 border border-rose-200';
         resultBox.textContent = 'Network error while attempting test dispatch.';
-        resultBox.classList.remove('d-none');
+        resultBox.classList.remove('hidden');
     } finally {
         sendBtn.disabled = false;
-        sendBtn.innerHTML = '<i class="bi bi-send me-1"></i> Send Test';
+        sendBtn.innerHTML = '<i class="bi bi-send mr-1"></i> Send Test';
     }
 }
 </script>

@@ -3,29 +3,29 @@
 @section('page_title', 'Create Marketing Campaign')
 
 @section('content')
-<div class="container-fluid py-4">
-    <!-- Header -->
-    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
-        <div>
-            <div class="d-flex align-items-center gap-2 mb-1">
-                <a href="{{ route('admin.campaigns.index') }}" class="btn btn-outline-secondary btn-sm rounded-circle p-1" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;">
-                    <i class="bi bi-arrow-left"></i>
-                </a>
-                <h4 class="fw-800 text-dark mb-0">Launch Email Marketing Campaign</h4>
+<div class="space-y-6" x-data>
+    <!-- Top Action Bar -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <a href="{{ route('admin.campaigns.index') }}" class="w-9 h-9 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 flex items-center justify-center transition shadow-2xs">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <div>
+                <h1 class="text-xl font-black text-slate-900 tracking-tight">Launch Email Marketing Campaign</h1>
+                <p class="text-xs text-slate-500 mt-0.5">Configure campaign audience, template, sender branding, and dispatches.</p>
             </div>
-            <div class="text-muted small ps-4 ms-2">Configure campaign audience, template, sender branding, and dispatches.</div>
         </div>
-        <div class="d-flex gap-2">
-            <button type="button" class="btn btn-outline-info rounded-pill px-3 py-2 btn-sm fw-bold shadow-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#testEmailModal">
+        <div class="flex flex-wrap items-center gap-2">
+            <button type="button" @click="$dispatch('open-test-email')" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-sky-200 hover:bg-sky-50 text-sky-700 text-xs font-bold transition cursor-pointer">
                 <i class="bi bi-send-check"></i> Send Test Email
             </button>
-            <button type="button" class="btn btn-outline-warning text-dark rounded-pill px-3 py-2 btn-sm fw-bold shadow-sm d-flex align-items-center gap-1.5" data-bs-toggle="modal" data-bs-target="#scheduleModal">
-                <i class="bi bi-clock-history text-warning"></i> Schedule
+            <button type="button" @click="$dispatch('open-schedule-modal')" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-amber-200 hover:bg-amber-50 text-amber-700 text-xs font-bold transition cursor-pointer">
+                <i class="bi bi-clock-history"></i> Schedule
             </button>
-            <button type="button" class="btn btn-outline-secondary rounded-pill px-4 py-2 btn-sm fw-bold" onclick="submitCampaignForm('save_draft')">
-                <i class="bi bi-save me-1"></i> Save Draft
+            <button type="button" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold transition cursor-pointer" onclick="submitCampaignForm('save_draft')">
+                <i class="bi bi-save"></i> Save Draft
             </button>
-            <button type="button" class="btn btn-primary rounded-pill px-4 py-2 btn-sm fw-bold shadow-sm d-flex align-items-center gap-2" onclick="confirmDispatch()">
+            <button type="button" class="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold shadow-xs transition cursor-pointer" onclick="confirmDispatch()">
                 <i class="bi bi-send-fill"></i> Send Campaign Now
             </button>
         </div>
@@ -37,118 +37,114 @@
         <input type="hidden" name="action" id="campaignAction" value="save_draft">
         <input type="hidden" name="scheduled_at" id="campaignScheduledAt" value="">
 
-        <div class="row g-4">
-            <!-- Left Column: Settings & Content -->
-            <div class="col-12 col-xl-7">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <!-- Left Column: Settings & Content (Col 7) -->
+            <div class="lg:col-span-7 space-y-6">
                 <!-- Step 1: Audience Targeting -->
-                <div class="card border-0 shadow-sm rounded-4 bg-white p-4 mb-4">
-                    <h5 class="fw-800 text-dark mb-3">
-                        <i class="bi bi-people-fill text-primary me-2"></i>1. Select Target Audience
-                    </h5>
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5 space-y-4">
+                    <h2 class="text-base font-black text-slate-900 flex items-center gap-2 pb-3 border-b border-slate-100">
+                        <i class="bi bi-people-fill text-primary"></i> 1. Select Target Audience
+                    </h2>
 
-                    <div class="row g-3">
-                        <div class="col-12 col-md-6">
-                            <label class="form-check card p-3 rounded-4 border-2 border-primary bg-primary bg-opacity-10 cursor-pointer h-100 target-card" id="targetAllCard">
-                                <div class="d-flex align-items-center gap-3">
-                                    <input class="form-check-input flex-shrink-0" type="radio" name="target_type" id="targetAll" value="all" checked onchange="handleTargetChange()">
-                                    <div>
-                                        <div class="fw-800 text-dark">All Active Subscribers</div>
-                                        <div class="text-muted extra-small">Broadcast to every active, unsubscribed recipient</div>
-                                        <div class="mt-2">
-                                            <span class="badge bg-primary rounded-pill px-2.5 py-1">
-                                                {{ number_format($totalActiveSubscribers) }} Recipients
-                                            </span>
-                                        </div>
-                                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <label class="p-4 rounded-2xl border-2 border-primary bg-primary/5 cursor-pointer flex items-start gap-3 transition target-card" id="targetAllCard">
+                            <input class="rounded-full text-primary focus:ring-primary w-4 h-4 mt-0.5" type="radio" name="target_type" id="targetAll" value="all" checked onchange="handleTargetChange()">
+                            <div>
+                                <div class="font-black text-slate-900 text-xs">All Active Subscribers</div>
+                                <div class="text-[11px] text-slate-500 mt-0.5">Broadcast to every active, unsubscribed recipient</div>
+                                <div class="mt-2.5">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary text-white">
+                                        {{ number_format($totalActiveSubscribers) }} Recipients
+                                    </span>
                                 </div>
-                            </label>
-                        </div>
+                            </div>
+                        </label>
 
-                        <div class="col-12 col-md-6">
-                            <label class="form-check card p-3 rounded-4 border-2 border-light bg-light cursor-pointer h-100 target-card" id="targetGroupCard">
-                                <div class="d-flex align-items-center gap-3">
-                                    <input class="form-check-input flex-shrink-0" type="radio" name="target_type" id="targetGroup" value="group" onchange="handleTargetChange()">
-                                    <div>
-                                        <div class="fw-800 text-dark">Specific Segment Group</div>
-                                        <div class="text-muted extra-small">Target a specific tagged customer or inquiry list</div>
-                                        <div class="mt-2">
-                                            <span class="badge bg-secondary rounded-pill px-2.5 py-1">
-                                                {{ $groups->count() }} Available Groups
-                                            </span>
-                                        </div>
-                                    </div>
+                        <label class="p-4 rounded-2xl border-2 border-slate-200 bg-slate-50/50 hover:bg-slate-50 cursor-pointer flex items-start gap-3 transition target-card" id="targetGroupCard">
+                            <input class="rounded-full text-primary focus:ring-primary w-4 h-4 mt-0.5" type="radio" name="target_type" id="targetGroup" value="group" onchange="handleTargetChange()">
+                            <div>
+                                <div class="font-black text-slate-900 text-xs">Specific Segment Group</div>
+                                <div class="text-[11px] text-slate-500 mt-0.5">Target a specific tagged customer or inquiry list</div>
+                                <div class="mt-2.5">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-200 text-slate-700">
+                                        {{ $groups->count() }} Available Groups
+                                    </span>
                                 </div>
-                            </label>
-                        </div>
+                            </div>
+                        </label>
+                    </div>
 
-                        <div class="col-12 d-none" id="groupSelectorWrapper">
-                            <label class="form-label fw-bold small text-dark">Select Audience Group <span class="text-danger">*</span></label>
-                            <select name="group_id" id="groupSelect" class="form-select rounded-3 py-2">
-                                <option value="">Choose a group...</option>
-                                @foreach($groups as $grp)
-                                    <option value="{{ $grp->id }}" data-count="{{ $grp->active_count }}">
-                                        {{ $grp->name }} ({{ number_format($grp->active_count) }} active subscribers)
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                    <div class="hidden pt-2" id="groupSelectorWrapper">
+                        <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Select Audience Group *</label>
+                        <select name="group_id" id="groupSelect" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden bg-white focus:border-primary">
+                            <option value="">Choose a group...</option>
+                            @foreach($groups as $grp)
+                                <option value="{{ $grp->id }}" data-count="{{ $grp->active_count }}">
+                                    {{ $grp->name }} ({{ number_format($grp->active_count) }} active subscribers)
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
 
                 <!-- Step 2: Campaign Identity & Subject -->
-                <div class="card border-0 shadow-sm rounded-4 bg-white p-4 mb-4">
-                    <h5 class="fw-800 text-dark mb-3">
-                        <i class="bi bi-envelope-paper-fill text-primary me-2"></i>2. Campaign Headers & Subject
-                    </h5>
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5 space-y-4">
+                    <h2 class="text-base font-black text-slate-900 flex items-center gap-2 pb-3 border-b border-slate-100">
+                        <i class="bi bi-envelope-paper-fill text-primary"></i> 2. Campaign Headers & Subject
+                    </h2>
 
-                    <div class="row g-3">
-                        <div class="col-12">
-                            <label class="form-label fw-bold small text-dark">Campaign Internal Title <span class="text-danger">*</span></label>
-                            <input type="text" name="title" class="form-control rounded-3 py-2 @error('title') is-invalid @enderror" placeholder="e.g. October 2026 VIP Sunset Desert Safari Promo" value="{{ old('title') }}" required>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Campaign Internal Title *</label>
+                            <input type="text" name="title" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary @error('title') border-rose-300 ring-rose-200 @enderror" placeholder="e.g. October 2026 VIP Sunset Desert Safari Promo" value="{{ old('title') }}" required>
                             @error('title')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="text-xs text-rose-500 mt-1">{{ $message }}</div>
                             @enderror
                         </div>
 
-                        <div class="col-12 col-md-8">
-                            <label class="form-label fw-bold small text-dark">Email Subject Line <span class="text-danger">*</span></label>
-                            <input type="text" name="subject" id="campaignSubject" class="form-control rounded-3 py-2 @error('subject') is-invalid @enderror" placeholder="e.g. Special Dubai Experience for @{{first_name}}!" value="{{ old('subject') }}" required>
-                            @error('subject')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
+                            <div class="sm:col-span-8">
+                                <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Email Subject Line *</label>
+                                <input type="text" name="subject" id="campaignSubject" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary @error('subject') border-rose-300 ring-rose-200 @enderror" placeholder="e.g. Special Dubai Experience for @{{first_name}}!" value="{{ old('subject') }}" required>
+                                @error('subject')
+                                    <div class="text-xs text-rose-500 mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="sm:col-span-4">
+                                <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Preheader Teaser</label>
+                                <input type="text" name="preview_text" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary" placeholder="Inbox summary snippet..." value="{{ old('preview_text') }}">
+                            </div>
                         </div>
 
-                        <div class="col-12 col-md-4">
-                            <label class="form-label fw-bold small text-dark">Preheader Teaser</label>
-                            <input type="text" name="preview_text" class="form-control rounded-3 py-2" placeholder="Inbox summary snippet..." value="{{ old('preview_text') }}">
-                        </div>
+                        <!-- Sender Branding -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-100">
+                            <div>
+                                <label class="block text-[11px] font-bold uppercase text-slate-400 tracking-wider mb-1.5">From Name</label>
+                                <input type="text" name="from_name" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs text-slate-800 outline-hidden focus:border-primary" value="{{ old('from_name', $defaultFromName) }}">
+                            </div>
 
-                        <!-- Sender Branding (Collapsible or visible) -->
-                        <div class="col-12 col-md-4">
-                            <label class="form-label fw-bold extra-small text-muted text-uppercase">From Name</label>
-                            <input type="text" name="from_name" class="form-control rounded-3 py-2 small" value="{{ old('from_name', $defaultFromName) }}">
-                        </div>
+                            <div>
+                                <label class="block text-[11px] font-bold uppercase text-slate-400 tracking-wider mb-1.5">From Email</label>
+                                <input type="email" name="from_email" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs text-slate-800 outline-hidden focus:border-primary" value="{{ old('from_email', $defaultFromAddress) }}">
+                            </div>
 
-                        <div class="col-12 col-md-4">
-                            <label class="form-label fw-bold extra-small text-muted text-uppercase">From Email</label>
-                            <input type="email" name="from_email" class="form-control rounded-3 py-2 small" value="{{ old('from_email', $defaultFromAddress) }}">
-                        </div>
-
-                        <div class="col-12 col-md-4">
-                            <label class="form-label fw-bold extra-small text-muted text-uppercase">Reply-To Email</label>
-                            <input type="email" name="reply_to" class="form-control rounded-3 py-2 small" value="{{ old('reply_to', $defaultReplyTo) }}">
+                            <div>
+                                <label class="block text-[11px] font-bold uppercase text-slate-400 tracking-wider mb-1.5">Reply-To Email</label>
+                                <input type="email" name="reply_to" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs text-slate-800 outline-hidden focus:border-primary" value="{{ old('reply_to', $defaultReplyTo) }}">
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Step 3: Template & HTML Content -->
-                <div class="card border-0 shadow-sm rounded-4 bg-white p-4 mb-4">
-                    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
-                        <h5 class="fw-800 text-dark mb-0">
-                            <i class="bi bi-file-earmark-code-fill text-primary me-2"></i>3. Design & Content
-                        </h5>
-                        <div class="d-flex align-items-center gap-2">
-                            <select class="form-select form-select-sm rounded-pill py-1 px-3 border-primary" id="templatePicker" onchange="loadSelectedTemplate()">
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5 space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-3">
+                        <h2 class="text-base font-black text-slate-900 flex items-center gap-2">
+                            <i class="bi bi-file-earmark-code-fill text-primary"></i> 3. Design & Content
+                        </h2>
+                        <div class="flex items-center gap-2">
+                            <select class="rounded-xl border border-primary/40 px-3 py-1.5 text-xs text-slate-800 outline-hidden bg-white focus:border-primary" id="templatePicker" onchange="loadSelectedTemplate()">
                                 <option value="">Load from Template Library...</option>
                                 @foreach($templates as $tmpl)
                                     <option value="{{ $tmpl->id }}" {{ request('template_id') == $tmpl->id ? 'selected' : '' }} data-subject="{{ $tmpl->subject }}" data-preview="{{ $tmpl->preview_text }}">
@@ -161,15 +157,15 @@
                     </div>
 
                     <!-- Merge Tags Helper -->
-                    <div class="mb-3 p-2 bg-light rounded-3 d-flex flex-wrap gap-1.5 align-items-center border">
-                        <span class="extra-small fw-bold text-muted me-1">Insert Tag:</span>
-                        <button type="button" class="btn btn-xs btn-white border rounded-pill px-2 py-0.5 font-monospace extra-small tag-pill" data-tag="@{{first_name}}">@{{first_name}}</button>
-                        <button type="button" class="btn btn-xs btn-white border rounded-pill px-2 py-0.5 font-monospace extra-small tag-pill" data-tag="@{{last_name}}">@{{last_name}}</button>
-                        <button type="button" class="btn btn-xs btn-white border rounded-pill px-2 py-0.5 font-monospace extra-small tag-pill" data-tag="@{{subscriber_name}}">@{{subscriber_name}}</button>
-                        <button type="button" class="btn btn-xs btn-white border rounded-pill px-2 py-0.5 font-monospace extra-small tag-pill" data-tag="@{{email}}">@{{email}}</button>
-                        <button type="button" class="btn btn-xs btn-white border rounded-pill px-2 py-0.5 font-monospace extra-small tag-pill" data-tag="@{{unsubscribe_url}}">@{{unsubscribe_url}}</button>
-                        <button type="button" class="btn btn-xs btn-white border rounded-pill px-2 py-0.5 font-monospace extra-small tag-pill" data-tag="@{{site_name}}">@{{site_name}}</button>
-                        <button type="button" class="btn btn-xs btn-white border rounded-pill px-2 py-0.5 font-monospace extra-small tag-pill" data-tag="@{{current_year}}">@{{current_year}}</button>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex flex-wrap items-center gap-1.5">
+                        <span class="text-[11px] font-bold uppercase text-slate-500 mr-1">Insert Tag:</span>
+                        <button type="button" class="px-2 py-0.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 font-mono text-[11px] border border-slate-200 transition cursor-pointer tag-pill" data-tag="@{{first_name}}">@{{first_name}}</button>
+                        <button type="button" class="px-2 py-0.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 font-mono text-[11px] border border-slate-200 transition cursor-pointer tag-pill" data-tag="@{{last_name}}">@{{last_name}}</button>
+                        <button type="button" class="px-2 py-0.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 font-mono text-[11px] border border-slate-200 transition cursor-pointer tag-pill" data-tag="@{{subscriber_name}}">@{{subscriber_name}}</button>
+                        <button type="button" class="px-2 py-0.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 font-mono text-[11px] border border-slate-200 transition cursor-pointer tag-pill" data-tag="@{{email}}">@{{email}}</button>
+                        <button type="button" class="px-2 py-0.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 font-mono text-[11px] border border-slate-200 transition cursor-pointer tag-pill" data-tag="@{{unsubscribe_url}}">@{{unsubscribe_url}}</button>
+                        <button type="button" class="px-2 py-0.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 font-mono text-[11px] border border-slate-200 transition cursor-pointer tag-pill" data-tag="@{{site_name}}">@{{site_name}}</button>
+                        <button type="button" class="px-2 py-0.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 font-mono text-[11px] border border-slate-200 transition cursor-pointer tag-pill" data-tag="@{{current_year}}">@{{current_year}}</button>
                     </div>
 
                     <!-- Hidden container storing templates json for instantaneous loading -->
@@ -177,36 +173,36 @@
                         {!! json_encode($templates->keyBy('id')) !!}
                     </script>
 
-                    <textarea name="content_html" id="campaignHtml" class="form-control font-monospace rounded-3 p-3 @error('content_html') is-invalid @enderror" rows="22" style="font-size: 0.82rem; line-height: 1.5; background: #0f172a; color: #38bdf8;" required>{{ old('content_html', $templates->first() ? $templates->first()->content_html : '') }}</textarea>
+                    <textarea name="content_html" id="campaignHtml" class="w-full font-mono rounded-xl p-4 text-xs bg-slate-950 text-sky-300 border border-slate-800 outline-hidden focus:ring-1 focus:ring-primary @error('content_html') border-rose-500 @enderror" rows="22" style="line-height: 1.6;" required>{{ old('content_html', $templates->first() ? $templates->first()->content_html : '') }}</textarea>
                     @error('content_html')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                        <div class="text-xs text-rose-500 mt-1">{{ $message }}</div>
                     @enderror
                 </div>
             </div>
 
-            <!-- Right Column: Live Responsive Preview -->
-            <div class="col-12 col-xl-5">
-                <div class="card border-0 shadow-sm rounded-4 bg-white p-3 sticky-top" style="top: 85px; z-index: 10;">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <h6 class="fw-800 text-dark mb-0">
-                            <i class="bi bi-eye-fill text-primary me-2"></i>Live Device Preview
-                        </h6>
-                        <div class="btn-group btn-group-sm bg-light rounded-pill p-0.5 border" role="group">
-                            <button type="button" class="btn btn-sm btn-primary rounded-pill px-3" id="previewDesktopBtn">
-                                <i class="bi bi-display me-1"></i> Desktop
+            <!-- Right Column: Live Responsive Preview (Col 5) -->
+            <div class="lg:col-span-5 sticky top-24 space-y-4">
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 space-y-3">
+                    <div class="flex items-center justify-between gap-2 pb-2 border-b border-slate-100">
+                        <h3 class="text-xs font-black uppercase text-slate-700 tracking-wider flex items-center gap-1.5">
+                            <i class="bi bi-eye-fill text-primary"></i> Live Device Preview
+                        </h3>
+                        <div class="inline-flex items-center bg-slate-100 rounded-xl p-0.5 border border-slate-200 text-xs">
+                            <button type="button" class="px-2.5 py-1 rounded-lg font-bold bg-primary text-white shadow-2xs transition cursor-pointer" id="previewDesktopBtn">
+                                <i class="bi bi-display mr-1"></i> Desktop
                             </button>
-                            <button type="button" class="btn btn-sm text-secondary rounded-pill px-3" id="previewMobileBtn">
-                                <i class="bi bi-phone me-1"></i> Mobile
+                            <button type="button" class="px-2.5 py-1 rounded-lg font-bold text-slate-600 hover:text-slate-900 transition cursor-pointer" id="previewMobileBtn">
+                                <i class="bi bi-phone mr-1"></i> Mobile
                             </button>
                         </div>
                     </div>
 
-                    <div id="previewWrapper" class="rounded-3 border overflow-hidden bg-light d-flex justify-content-center align-items-center transition-all" style="min-height: 580px;">
-                        <iframe id="campaignPreviewIframe" class="w-100 bg-white border-0 shadow-sm transition-all" style="height: 580px; width: 100%;" sandbox="allow-same-origin"></iframe>
+                    <div id="previewWrapper" class="rounded-xl border border-slate-200 overflow-hidden bg-slate-100 flex justify-center items-center transition-all p-2" style="min-height: 580px;">
+                        <iframe id="campaignPreviewIframe" class="w-full bg-white rounded-lg border border-slate-200 shadow-sm transition-all" style="height: 580px; width: 100%;" sandbox="allow-same-origin"></iframe>
                     </div>
 
-                    <div class="alert alert-info border-0 rounded-4 mt-3 mb-0 p-3 small d-flex gap-2">
-                        <i class="bi bi-info-circle-fill text-info fs-5 flex-shrink-0"></i>
+                    <div class="p-3 bg-sky-50 rounded-xl border border-sky-200 flex items-start gap-2.5 text-xs text-sky-800">
+                        <i class="bi bi-info-circle-fill text-sky-500 text-base shrink-0 mt-0.5"></i>
                         <div>
                             <strong>Automatic Tracking:</strong> Tracking pixels for email opens and link click redirects are automatically injected upon dispatch.
                         </div>
@@ -217,66 +213,68 @@
     </form>
 </div>
 
-<!-- Diagnostic Test Email Modal -->
-<div class="modal fade" id="testEmailModal" tabindex="-1" aria-labelledby="testEmailModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-            <div class="modal-header border-0 bg-light p-4 pb-3">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="rounded-3 bg-info bg-opacity-10 text-info p-2">
-                        <i class="bi bi-send-check-fill fs-5"></i>
+<!-- Modal: Diagnostic Test Email (Alpine.js) -->
+<div x-data="{ open: false }" @open-test-email.window="open = true" x-show="open" x-cloak class="relative z-50">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" @click="open = false"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20 flex items-center justify-center">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-md w-full p-6 space-y-4" @click.stop>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2">
+                    <div class="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-200">
+                        <i class="bi bi-send-check-fill text-base"></i>
                     </div>
                     <div>
-                        <h5 class="modal-title fw-800 text-dark mb-0" id="testEmailModalLabel">Send Test Email</h5>
-                        <div class="text-muted extra-small">Verify template rendering in your personal inbox</div>
+                        <h3 class="text-base font-black text-slate-900">Send Test Email</h3>
+                        <div class="text-[11px] text-slate-400">Verify template rendering in your personal inbox</div>
                     </div>
                 </div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" @click="open = false" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="bi bi-x-lg"></i></button>
             </div>
-            <div class="modal-body p-4 pt-2">
-                <div class="mb-3">
-                    <label class="form-label fw-bold small text-dark">Send Diagnostic Copy To:</label>
-                    <input type="email" id="testRecipientEmail" class="form-control rounded-3 py-2" placeholder="yourname@domain.com" value="{{ auth()->user()->email ?? '' }}">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Send Diagnostic Copy To:</label>
+                    <input type="email" id="testRecipientEmail" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary" placeholder="yourname@domain.com" value="{{ auth()->user()->email ?? '' }}">
                 </div>
-                <div id="testResultBox" class="alert d-none rounded-3 small"></div>
+                <div id="testResultBox" class="hidden p-3 rounded-xl text-xs"></div>
             </div>
-            <div class="modal-footer border-0 bg-light p-3 px-4">
-                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-info text-white rounded-pill px-4 fw-bold" id="btnSendTest" onclick="sendDiagnosticTestEmail()">
-                    <i class="bi bi-send me-1"></i> Send Test
+            <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                <button type="button" @click="open = false" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold cursor-pointer">Close</button>
+                <button type="button" class="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-xs transition cursor-pointer" id="btnSendTest" onclick="sendDiagnosticTestEmail()">
+                    <i class="bi bi-send"></i> Send Test
                 </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Schedule Broadcast Modal -->
-<div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-            <div class="modal-header border-0 bg-light p-4 pb-3">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="rounded-3 bg-warning bg-opacity-10 text-warning p-2">
-                        <i class="bi bi-clock-history fs-5"></i>
+<!-- Modal: Schedule Broadcast (Alpine.js) -->
+<div x-data="{ open: false }" @open-schedule-modal.window="open = true" x-show="open" x-cloak class="relative z-50">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" @click="open = false"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20 flex items-center justify-center">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-md w-full p-6 space-y-4" @click.stop>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2">
+                    <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-200">
+                        <i class="bi bi-clock-history text-base"></i>
                     </div>
                     <div>
-                        <h5 class="modal-title fw-800 text-dark mb-0" id="scheduleModalLabel">Schedule Email Broadcast</h5>
-                        <div class="text-muted extra-small">Automate campaign delivery at a future date and time</div>
+                        <h3 class="text-base font-black text-slate-900">Schedule Email Broadcast</h3>
+                        <div class="text-[11px] text-slate-400">Automate campaign delivery at a future date and time</div>
                     </div>
                 </div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" @click="open = false" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="bi bi-x-lg"></i></button>
             </div>
-            <div class="modal-body p-4 pt-2">
-                <div class="mb-3">
-                    <label class="form-label fw-bold small text-dark">Broadcast Date & Time (Dubai Local Time / UTC+4):</label>
-                    <input type="datetime-local" id="scheduleDatetimeInput" class="form-control rounded-3 py-2" min="{{ now()->addMinutes(5)->format('Y-m-d\TH:i') }}" value="{{ now()->addHours(2)->format('Y-m-d\TH:i') }}">
-                    <div class="form-text extra-small text-muted mt-1">The system scheduler scans and broadcasts automatically every 5 minutes.</div>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Broadcast Date & Time (Dubai Local Time / UTC+4):</label>
+                    <input type="datetime-local" id="scheduleDatetimeInput" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary" min="{{ now()->addMinutes(5)->format('Y-m-d\TH:i') }}" value="{{ now()->addHours(2)->format('Y-m-d\TH:i') }}">
+                    <div class="text-slate-400 text-[11px] mt-1">The system scheduler scans and broadcasts automatically every 5 minutes.</div>
                 </div>
             </div>
-            <div class="modal-footer border-0 bg-light p-3 px-4">
-                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-warning text-dark rounded-pill px-4 fw-bold" onclick="confirmSchedule()">
-                    <i class="bi bi-calendar-check me-1"></i> Confirm Schedule
+            <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                <button type="button" @click="open = false" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold cursor-pointer">Cancel</button>
+                <button type="button" class="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-xs transition cursor-pointer" onclick="confirmSchedule()">
+                    <i class="bi bi-calendar-check"></i> Confirm Schedule
                 </button>
             </div>
         </div>
@@ -299,17 +297,17 @@ function handleTargetChange() {
     const groupCard = document.getElementById('targetGroupCard');
 
     if (isGroup) {
-        groupWrapper.classList.remove('d-none');
-        groupCard.classList.remove('border-light', 'bg-light');
-        groupCard.classList.add('border-primary', 'bg-primary', 'bg-opacity-10');
-        allCard.classList.remove('border-primary', 'bg-primary', 'bg-opacity-10');
-        allCard.classList.add('border-light', 'bg-light');
+        groupWrapper.classList.remove('hidden');
+        groupCard.classList.remove('border-slate-200', 'bg-slate-50/50');
+        groupCard.classList.add('border-primary', 'bg-primary/5');
+        allCard.classList.remove('border-primary', 'bg-primary/5');
+        allCard.classList.add('border-slate-200', 'bg-slate-50/50');
     } else {
-        groupWrapper.classList.add('d-none');
-        allCard.classList.remove('border-light', 'bg-light');
-        allCard.classList.add('border-primary', 'bg-primary', 'bg-opacity-10');
-        groupCard.classList.remove('border-primary', 'bg-primary', 'bg-opacity-10');
-        groupCard.classList.add('border-light', 'bg-light');
+        groupWrapper.classList.add('hidden');
+        allCard.classList.remove('border-slate-200', 'bg-slate-50/50');
+        allCard.classList.add('border-primary', 'bg-primary/5');
+        groupCard.classList.remove('border-primary', 'bg-primary/5');
+        groupCard.classList.add('border-slate-200', 'bg-slate-50/50');
     }
 }
 
@@ -384,8 +382,8 @@ function confirmDispatch() {
             text: `Are you ready to send "${title}"? Dispatches will start immediately and throttle through batches.`,
             icon: 'question',
             showCancelButton: true,
-            confirmButtonColor: '#198754',
-            cancelButtonColor: '#6c757d',
+            confirmButtonColor: '#10b981',
+            cancelButtonColor: '#64748b',
             confirmButtonText: 'Yes, Send Immediately!'
         }).then((result) => {
             if (result.isConfirmed) {
@@ -433,10 +431,6 @@ function confirmSchedule() {
     }
 
     document.getElementById('campaignScheduledAt').value = val;
-    const modalEl = document.getElementById('scheduleModal');
-    const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-    modal.hide();
-
     submitCampaignForm('schedule');
 }
 
@@ -447,15 +441,15 @@ async function sendDiagnosticTestEmail() {
 
     const email = emailInput.value.trim();
     if (!email) {
-        resultBox.className = 'alert alert-danger rounded-3 small';
+        resultBox.className = 'p-3 rounded-xl text-xs bg-rose-50 text-rose-700 border border-rose-200';
         resultBox.textContent = 'Please enter a valid email address.';
-        resultBox.classList.remove('d-none');
+        resultBox.classList.remove('hidden');
         return;
     }
 
     sendBtn.disabled = true;
-    sendBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Sending...';
-    resultBox.classList.add('d-none');
+    sendBtn.innerHTML = '<span class="inline-block animate-spin mr-1">⌛</span> Sending...';
+    resultBox.classList.add('hidden');
 
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
@@ -471,20 +465,20 @@ async function sendDiagnosticTestEmail() {
 
         const data = await response.json();
         if (data.success) {
-            resultBox.className = 'alert alert-success rounded-3 small';
+            resultBox.className = 'p-3 rounded-xl text-xs bg-emerald-50 text-emerald-700 border border-emerald-200';
             resultBox.textContent = data.message || 'Diagnostic test email sent successfully! Check your inbox.';
         } else {
-            resultBox.className = 'alert alert-danger rounded-3 small';
+            resultBox.className = 'p-3 rounded-xl text-xs bg-rose-50 text-rose-700 border border-rose-200';
             resultBox.textContent = data.message || 'Failed to dispatch test email. Check your SMTP server settings.';
         }
-        resultBox.classList.remove('d-none');
+        resultBox.classList.remove('hidden');
     } catch (err) {
-        resultBox.className = 'alert alert-danger rounded-3 small';
+        resultBox.className = 'p-3 rounded-xl text-xs bg-rose-50 text-rose-700 border border-rose-200';
         resultBox.textContent = 'Network error while attempting test dispatch.';
-        resultBox.classList.remove('d-none');
+        resultBox.classList.remove('hidden');
     } finally {
         sendBtn.disabled = false;
-        sendBtn.innerHTML = '<i class="bi bi-send me-1"></i> Send Test';
+        sendBtn.innerHTML = '<i class="bi bi-send mr-1"></i> Send Test';
     }
 }
 
@@ -512,22 +506,24 @@ document.addEventListener('DOMContentLoaded', function() {
         debounceTimer = setTimeout(updateLivePreview, 400);
     });
 
-    desktopBtn.addEventListener('click', function() {
-        previewWrapper.style.maxWidth = '100%';
-        iframe.style.width = '100%';
-        desktopBtn.classList.remove('text-secondary');
-        desktopBtn.classList.add('btn-primary');
-        mobileBtn.classList.remove('btn-primary');
-        mobileBtn.classList.add('text-secondary');
-    });
+    if (desktopBtn && mobileBtn) {
+        desktopBtn.addEventListener('click', function() {
+            previewWrapper.style.maxWidth = '100%';
+            iframe.style.width = '100%';
+            desktopBtn.classList.remove('text-slate-600');
+            desktopBtn.classList.add('bg-primary', 'text-white', 'shadow-2xs');
+            mobileBtn.classList.remove('bg-primary', 'text-white', 'shadow-2xs');
+            mobileBtn.classList.add('text-slate-600');
+        });
 
-    mobileBtn.addEventListener('click', function() {
-        iframe.style.width = '375px';
-        mobileBtn.classList.remove('text-secondary');
-        mobileBtn.classList.add('btn-primary');
-        desktopBtn.classList.remove('btn-primary');
-        desktopBtn.classList.add('text-secondary');
-    });
+        mobileBtn.addEventListener('click', function() {
+            iframe.style.width = '375px';
+            mobileBtn.classList.remove('text-slate-600');
+            mobileBtn.classList.add('bg-primary', 'text-white', 'shadow-2xs');
+            desktopBtn.classList.remove('bg-primary', 'text-white', 'shadow-2xs');
+            desktopBtn.classList.add('text-slate-600');
+        });
+    }
 
     // Initial render
     setTimeout(updateLivePreview, 300);

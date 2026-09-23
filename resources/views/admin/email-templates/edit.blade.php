@@ -3,26 +3,26 @@
 @section('page_title', $template->exists ? 'Edit Email Template: ' . $template->name : 'Create Email Template')
 
 @section('content')
-<div class="container-fluid py-4">
-    <!-- Header -->
-    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
-        <div>
-            <div class="d-flex align-items-center gap-2 mb-1">
-                <a href="{{ route('admin.email-templates.index') }}" class="btn btn-outline-secondary btn-sm rounded-circle p-1" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;">
-                    <i class="bi bi-arrow-left"></i>
-                </a>
-                <h4 class="fw-800 text-dark mb-0">
+<div class="space-y-6">
+    <!-- Top Action Bar -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <a href="{{ route('admin.email-templates.index') }}" class="w-9 h-9 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 flex items-center justify-center transition shadow-2xs">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <div>
+                <h1 class="text-xl font-black text-slate-900 tracking-tight">
                     {{ $template->exists ? 'Edit Template: ' . $template->name : 'Create Responsive Email Template' }}
-                </h4>
+                </h1>
+                <p class="text-xs text-slate-500 mt-0.5">HTML email layout with responsive styles and dynamic subscriber interpolation tags.</p>
             </div>
-            <div class="text-muted small ps-4 ms-2">HTML email layout with responsive styles and dynamic subscriber interpolation tags.</div>
         </div>
-        <div class="d-flex gap-2">
-            <a href="{{ route('admin.email-templates.index') }}" class="btn btn-outline-secondary rounded-pill px-3 py-2 btn-sm fw-bold">
+        <div class="flex items-center gap-2">
+            <a href="{{ route('admin.email-templates.index') }}" class="inline-flex items-center px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold transition">
                 Cancel
             </a>
-            <button type="button" class="btn btn-primary rounded-pill px-4 py-2 btn-sm fw-bold shadow-sm" onclick="document.getElementById('templateForm').submit();">
-                <i class="bi bi-check-lg me-1"></i> {{ $template->exists ? 'Save Changes' : 'Create Template' }}
+            <button type="button" class="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold shadow-xs transition cursor-pointer" onclick="document.getElementById('templateForm').submit();">
+                <i class="bi bi-check-lg"></i> {{ $template->exists ? 'Save Changes' : 'Create Template' }}
             </button>
         </div>
     </div>
@@ -34,72 +34,73 @@
             @method('PUT')
         @endif
 
-        <div class="row g-4">
-            <!-- Left Column: Form & Code Editor -->
-            <div class="col-12 col-xl-7">
-                <div class="card border-0 shadow-sm rounded-4 bg-white p-4 mb-4">
-                    <h5 class="fw-800 text-dark mb-3">
-                        <i class="bi bi-sliders2 text-primary me-2"></i>Template Details
-                    </h5>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <!-- Left Column: Form & Code Editor (Col 7) -->
+            <div class="lg:col-span-7 space-y-6">
+                <!-- Details Card -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5 space-y-4">
+                    <h2 class="text-base font-black text-slate-900 flex items-center gap-2 pb-3 border-b border-slate-100">
+                        <i class="bi bi-sliders2 text-primary"></i> Template Details
+                    </h2>
 
-                    <div class="row g-3">
-                        <div class="col-12">
-                            <label class="form-label fw-bold small text-dark">Template Name <span class="text-danger">*</span></label>
-                            <input type="text" name="name" id="templateName" class="form-control rounded-3 py-2 @error('name') is-invalid @enderror" placeholder="e.g. VIP Seasonal Offer, Monthly Digest" value="{{ old('name', $template->name) }}" required>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Template Name *</label>
+                            <input type="text" name="name" id="templateName" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary @error('name') border-rose-300 ring-rose-200 @enderror" placeholder="e.g. VIP Seasonal Offer, Monthly Digest" value="{{ old('name', $template->name) }}" required>
                             @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="text-xs text-rose-500 mt-1">{{ $message }}</div>
                             @enderror
                         </div>
 
-                        <div class="col-12 col-md-6">
-                            <label class="form-label fw-bold small text-dark">Default Subject Line <span class="text-danger">*</span></label>
-                            <input type="text" name="subject" id="templateSubject" class="form-control rounded-3 py-2 @error('subject') is-invalid @enderror" placeholder="e.g. Special Dubai Desert Invitation for @{{first_name}}" value="{{ old('subject', $template->subject) }}" required>
-                            @error('subject')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Default Subject Line *</label>
+                                <input type="text" name="subject" id="templateSubject" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary @error('subject') border-rose-300 ring-rose-200 @enderror" placeholder="e.g. Special Dubai Desert Invitation for @{{first_name}}" value="{{ old('subject', $template->subject) }}" required>
+                                @error('subject')
+                                    <div class="text-xs text-rose-500 mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
 
-                        <div class="col-12 col-md-6">
-                            <label class="form-label fw-bold small text-dark">Preheader / Preview Text</label>
-                            <input type="text" name="preview_text" class="form-control rounded-3 py-2 @error('preview_text') is-invalid @enderror" placeholder="Short teaser seen in email clients..." value="{{ old('preview_text', $template->preview_text) }}">
-                            @error('preview_text')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Preheader / Preview Text</label>
+                                <input type="text" name="preview_text" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary @error('preview_text') border-rose-300 ring-rose-200 @enderror" placeholder="Short teaser seen in email clients..." value="{{ old('preview_text', $template->preview_text) }}">
+                                @error('preview_text')
+                                    <div class="text-xs text-rose-500 mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Personalization Tags Helper Card -->
-                <div class="card border-0 shadow-sm rounded-4 bg-white p-4 mb-4">
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <h6 class="fw-800 text-dark mb-0">
-                            <i class="bi bi-braces-asterisk text-primary me-2"></i>Personalization & Merge Tags
-                        </h6>
-                        <span class="text-muted extra-small">Click any tag pill to insert into editor</span>
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5">
+                    <div class="flex items-center justify-between gap-2 mb-3">
+                        <h3 class="text-xs font-black uppercase text-slate-700 tracking-wider flex items-center gap-1.5">
+                            <i class="bi bi-braces-asterisk text-primary"></i> Personalization & Merge Tags
+                        </h3>
+                        <span class="text-[11px] text-slate-400">Click any tag pill to insert into editor</span>
                     </div>
-                    <div class="d-flex flex-wrap gap-2 pt-2">
-                        <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 font-monospace tag-pill" data-tag="@{{first_name}}">@{{first_name}}</button>
-                        <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 font-monospace tag-pill" data-tag="@{{last_name}}">@{{last_name}}</button>
-                        <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 font-monospace tag-pill" data-tag="@{{subscriber_name}}">@{{subscriber_name}}</button>
-                        <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 font-monospace tag-pill" data-tag="@{{email}}">@{{email}}</button>
-                        <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 font-monospace tag-pill" data-tag="@{{unsubscribe_url}}">@{{unsubscribe_url}}</button>
-                        <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 font-monospace tag-pill" data-tag="@{{site_name}}">@{{site_name}}</button>
-                        <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 font-monospace tag-pill" data-tag="@{{site_url}}">@{{site_url}}</button>
-                        <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 font-monospace tag-pill" data-tag="@{{current_year}}">@{{current_year}}</button>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-xs font-semibold border border-slate-200 transition cursor-pointer tag-pill" data-tag="@{{first_name}}">@{{first_name}}</button>
+                        <button type="button" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-xs font-semibold border border-slate-200 transition cursor-pointer tag-pill" data-tag="@{{last_name}}">@{{last_name}}</button>
+                        <button type="button" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-xs font-semibold border border-slate-200 transition cursor-pointer tag-pill" data-tag="@{{subscriber_name}}">@{{subscriber_name}}</button>
+                        <button type="button" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-xs font-semibold border border-slate-200 transition cursor-pointer tag-pill" data-tag="@{{email}}">@{{email}}</button>
+                        <button type="button" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-xs font-semibold border border-slate-200 transition cursor-pointer tag-pill" data-tag="@{{unsubscribe_url}}">@{{unsubscribe_url}}</button>
+                        <button type="button" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-xs font-semibold border border-slate-200 transition cursor-pointer tag-pill" data-tag="@{{site_name}}">@{{site_name}}</button>
+                        <button type="button" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-xs font-semibold border border-slate-200 transition cursor-pointer tag-pill" data-tag="@{{site_url}}">@{{site_url}}</button>
+                        <button type="button" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-xs font-semibold border border-slate-200 transition cursor-pointer tag-pill" data-tag="@{{current_year}}">@{{current_year}}</button>
                     </div>
                 </div>
 
                 <!-- HTML Content Editor -->
-                <div class="card border-0 shadow-sm rounded-4 bg-white p-4 mb-4">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <h6 class="fw-800 text-dark mb-0">
-                            <i class="bi bi-code-slash text-primary me-2"></i>HTML Email Content <span class="text-danger">*</span>
-                        </h6>
-                        <div class="d-flex align-items-center gap-2">
-                            <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1" id="refreshPreviewBtn">
-                                <i class="bi bi-arrow-repeat me-1"></i> Update Preview
-                            </button>
-                        </div>
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5 space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <h3 class="text-xs font-black uppercase text-slate-700 tracking-wider flex items-center gap-1.5">
+                            <i class="bi bi-code-slash text-primary"></i> HTML Email Content <span class="text-rose-500">*</span>
+                        </h3>
+                        <button type="button" class="inline-flex items-center gap-1 px-3 py-1 rounded-lg border border-primary/30 hover:bg-primary/5 text-primary text-xs font-bold transition cursor-pointer" id="refreshPreviewBtn">
+                            <i class="bi bi-arrow-repeat"></i> Update Preview
+                        </button>
                     </div>
 
                     @php
@@ -144,41 +145,41 @@ body { margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-sys
 </body>
 </html>';
                     @endphp
-                    <textarea name="content_html" id="contentHtml" class="form-control font-monospace rounded-3 p-3 @error('content_html') is-invalid @enderror" rows="22" style="font-size: 0.82rem; line-height: 1.5; background: #0f172a; color: #38bdf8;" required>{{ old('content_html', $template->content_html ?: $defaultHtml) }}</textarea>
+                    <textarea name="content_html" id="contentHtml" class="w-full font-mono rounded-xl p-4 text-xs bg-slate-950 text-sky-300 border border-slate-800 outline-hidden focus:ring-1 focus:ring-primary @error('content_html') border-rose-500 @enderror" rows="22" style="line-height: 1.6;" required>{{ old('content_html', $template->content_html ?: $defaultHtml) }}</textarea>
                     @error('content_html')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                        <div class="text-xs text-rose-500 mt-1">{{ $message }}</div>
                     @enderror
 
-                    <div class="mt-4">
-                        <label class="form-label fw-bold small text-dark">Plain Text Fallback (Optional)</label>
-                        <textarea name="content_plain" class="form-control font-monospace rounded-3 p-2.5 text-muted" rows="4" placeholder="Plain text version for text-only email clients...">{{ old('content_plain', $template->content_plain) }}</textarea>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Plain Text Fallback (Optional)</label>
+                        <textarea name="content_plain" class="w-full font-mono rounded-xl border border-slate-200 p-3 text-xs text-slate-700 outline-hidden focus:border-primary bg-slate-50/50" rows="4" placeholder="Plain text version for text-only email clients...">{{ old('content_plain', $template->content_plain) }}</textarea>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column: Sticky Live Preview -->
-            <div class="col-12 col-xl-5">
-                <div class="card border-0 shadow-sm rounded-4 bg-white p-3 sticky-top" style="top: 85px; z-index: 10;">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <h6 class="fw-800 text-dark mb-0">
-                            <i class="bi bi-eye-fill text-primary me-2"></i>Live Device Preview
-                        </h6>
-                        <div class="btn-group btn-group-sm bg-light rounded-pill p-0.5 border" role="group">
-                            <button type="button" class="btn btn-sm btn-primary rounded-pill px-3" id="deviceDesktopBtn">
-                                <i class="bi bi-display me-1"></i> Desktop
+            <!-- Right Column: Sticky Live Preview (Col 5) -->
+            <div class="lg:col-span-5 sticky top-24">
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 space-y-3">
+                    <div class="flex items-center justify-between gap-2 pb-2 border-b border-slate-100">
+                        <h3 class="text-xs font-black uppercase text-slate-700 tracking-wider flex items-center gap-1.5">
+                            <i class="bi bi-eye-fill text-primary"></i> Live Device Preview
+                        </h3>
+                        <div class="inline-flex items-center bg-slate-100 rounded-xl p-0.5 border border-slate-200 text-xs">
+                            <button type="button" class="px-2.5 py-1 rounded-lg font-bold bg-primary text-white shadow-2xs transition cursor-pointer" id="deviceDesktopBtn">
+                                <i class="bi bi-display mr-1"></i> Desktop
                             </button>
-                            <button type="button" class="btn btn-sm text-secondary rounded-pill px-3" id="deviceMobileBtn">
-                                <i class="bi bi-phone me-1"></i> Mobile (375px)
+                            <button type="button" class="px-2.5 py-1 rounded-lg font-bold text-slate-600 hover:text-slate-900 transition cursor-pointer" id="deviceMobileBtn">
+                                <i class="bi bi-phone mr-1"></i> Mobile
                             </button>
                         </div>
                     </div>
 
                     <!-- Sandbox Iframe Container -->
-                    <div id="livePreviewContainer" class="rounded-3 border overflow-hidden bg-light d-flex justify-content-center align-items-center transition-all" style="min-height: 600px;">
-                        <iframe id="livePreviewIframe" class="w-100 bg-white border-0 shadow-sm transition-all" style="height: 600px; width: 100%;" sandbox="allow-same-origin"></iframe>
+                    <div id="livePreviewContainer" class="rounded-xl border border-slate-200 overflow-hidden bg-slate-100 flex justify-center items-center transition-all p-2" style="min-height: 600px;">
+                        <iframe id="livePreviewIframe" class="w-full bg-white rounded-lg border border-slate-200 shadow-sm transition-all" style="height: 600px; width: 100%;" sandbox="allow-same-origin"></iframe>
                     </div>
-                    <div class="text-muted extra-small text-center mt-2">
-                        Preview interpolates sample subscriber: <span class="fw-bold text-dark">Alex Turner (alex.turner@example.com)</span>
+                    <div class="text-slate-400 text-[11px] text-center">
+                        Preview interpolates sample: <span class="font-bold text-slate-700">Alex Turner (alex.turner@example.com)</span>
                     </div>
                 </div>
             </div>
@@ -246,25 +247,28 @@ document.addEventListener('DOMContentLoaded', function() {
         debounceTimer = setTimeout(updateLivePreview, 400);
     });
 
-    refreshBtn.addEventListener('click', updateLivePreview);
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', updateLivePreview);
+    }
 
     // Device toggling
-    desktopBtn.addEventListener('click', function() {
-        container.style.maxWidth = '100%';
-        iframe.style.width = '100%';
-        desktopBtn.classList.remove('text-secondary');
-        desktopBtn.classList.add('btn-primary');
-        mobileBtn.classList.remove('btn-primary');
-        mobileBtn.classList.add('text-secondary');
-    });
+    if (desktopBtn && mobileBtn) {
+        desktopBtn.addEventListener('click', function() {
+            iframe.style.width = '100%';
+            desktopBtn.classList.remove('text-slate-600');
+            desktopBtn.classList.add('bg-primary', 'text-white', 'shadow-2xs');
+            mobileBtn.classList.remove('bg-primary', 'text-white', 'shadow-2xs');
+            mobileBtn.classList.add('text-slate-600');
+        });
 
-    mobileBtn.addEventListener('click', function() {
-        iframe.style.width = '375px';
-        mobileBtn.classList.remove('text-secondary');
-        mobileBtn.classList.add('btn-primary');
-        desktopBtn.classList.remove('btn-primary');
-        desktopBtn.classList.add('text-secondary');
-    });
+        mobileBtn.addEventListener('click', function() {
+            iframe.style.width = '375px';
+            mobileBtn.classList.remove('text-slate-600');
+            mobileBtn.classList.add('bg-primary', 'text-white', 'shadow-2xs');
+            desktopBtn.classList.remove('bg-primary', 'text-white', 'shadow-2xs');
+            desktopBtn.classList.add('text-slate-600');
+        });
+    }
 
     // Initial render
     setTimeout(updateLivePreview, 300);

@@ -3,139 +3,138 @@
 @section('page_title', 'Email Templates Gallery')
 
 @section('content')
-<div class="container-fluid py-4">
-    <!-- Header -->
-    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+<div class="space-y-6" x-data="{ openPreview: false, previewDevice: 'desktop', previewTitle: '', previewUrl: '' }">
+    <!-- Top Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <h4 class="fw-800 text-dark mb-1">
-                <i class="bi bi-envelope-paper-heart-fill text-primary me-2"></i>Email Templates Gallery
-            </h4>
-            <div class="text-muted small">Design and customize mobile-responsive HTML email templates with dynamic personalization tags.</div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                <i class="bi bi-envelope-paper-heart-fill text-primary"></i> Email Templates Gallery
+            </h1>
+            <p class="text-xs text-slate-500 mt-0.5">Design and customize mobile-responsive HTML email templates with dynamic personalization tags.</p>
         </div>
-        <div class="d-flex flex-wrap gap-2">
-            <a href="{{ route('admin.campaigns.create') }}" class="btn btn-outline-primary rounded-pill px-3 py-2 btn-sm fw-bold shadow-sm d-flex align-items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
+            <a href="{{ route('admin.campaigns.create') }}" class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-primary/30 hover:bg-primary/5 text-primary font-bold text-xs shadow-2xs transition">
                 <i class="bi bi-send-plus"></i> New Campaign
             </a>
-            <a href="{{ route('admin.email-templates.create') }}" class="btn btn-primary rounded-pill px-4 py-2 btn-sm fw-bold shadow-sm d-flex align-items-center gap-2">
+            <a href="{{ route('admin.email-templates.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-xs shadow-xs transition">
                 <i class="bi bi-plus-lg"></i> Create Template
             </a>
         </div>
     </div>
 
     <!-- Templates Grid -->
-    <div class="row g-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         @forelse($templates as $template)
-        <div class="col-12 col-md-6 col-xl-4">
-            <div class="card border-0 shadow-sm rounded-4 h-100 bg-white d-flex flex-column overflow-hidden position-relative">
-                <div class="card-header bg-light border-0 p-3 px-4 d-flex align-items-center justify-content-between">
-                    <div class="d-flex align-items-center gap-2">
-                        @if($template->is_system)
-                            <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2.5 py-1 small fw-bold">
-                                <i class="bi bi-shield-check me-1"></i> System Default
-                            </span>
-                        @else
-                            <span class="badge bg-secondary-subtle text-dark border rounded-pill px-2.5 py-1 small fw-bold">
-                                <i class="bi bi-palette me-1"></i> Custom Layout
-                            </span>
-                        @endif
-                    </div>
-                    <span class="text-muted extra-small">
-                        <i class="bi bi-megaphone me-1"></i> {{ $template->campaigns_count }} campaign(s)
-                    </span>
-                </div>
-
-                <div class="card-body p-4 flex-grow-1">
-                    <h5 class="fw-800 text-dark mb-1 text-truncate" title="{{ $template->name }}">{{ $template->name }}</h5>
-                    <div class="text-muted small mb-3 text-truncate">
-                        <strong>Subject:</strong> {{ $template->subject }}
-                    </div>
-                    
-                    @if($template->preview_text)
-                    <div class="p-2.5 px-3 bg-light rounded-3 text-muted extra-small mb-3 text-truncate border">
-                        <i class="bi bi-eye text-primary me-1"></i> {{ $template->preview_text }}
-                    </div>
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between overflow-hidden">
+            <div class="bg-slate-50/80 border-b border-slate-200/80 p-3.5 px-5 flex items-center justify-between gap-2">
+                <div>
+                    @if($template->is_system)
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200">
+                            <i class="bi bi-shield-check text-[11px]"></i> System Default
+                        </span>
+                    @else
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                            <i class="bi bi-palette text-[11px]"></i> Custom Layout
+                        </span>
                     @endif
+                </div>
+                <span class="text-xs text-slate-400 flex items-center gap-1">
+                    <i class="bi bi-megaphone"></i> {{ $template->campaigns_count }} campaign(s)
+                </span>
+            </div>
 
-                    <!-- Visual Mini Thumbnail Frame -->
-                    <div class="border rounded-3 overflow-hidden bg-light position-relative mb-3" style="height: 160px;">
-                        <iframe src="{{ route('admin.email-templates.preview', $template->id) }}" class="w-100 h-100 border-0 pointer-events-none" style="transform: scale(0.65); transform-origin: top left; width: 154%; height: 154%; pointer-events: none;" loading="lazy"></iframe>
-                        <div class="position-absolute inset-0 bg-transparent" style="cursor: pointer;" onclick="openTemplatePreview({{ $template->id }}, '{{ addslashes($template->name) }}')"></div>
-                    </div>
+            <div class="p-5 flex-1">
+                <h2 class="font-black text-slate-900 text-sm truncate mb-1" title="{{ $template->name }}">{{ $template->name }}</h2>
+                <div class="text-xs text-slate-500 truncate mb-3">
+                    <strong class="text-slate-700">Subject:</strong> {{ $template->subject }}
+                </div>
+                
+                @if($template->preview_text)
+                <div class="p-2.5 px-3 bg-slate-50 rounded-xl text-slate-500 text-xs mb-3 truncate border border-slate-200">
+                    <i class="bi bi-eye text-primary mr-1"></i> {{ $template->preview_text }}
+                </div>
+                @endif
 
-                    <div class="d-flex align-items-center justify-content-between text-muted extra-small">
-                        <span><i class="bi bi-clock-history me-1"></i> Updated {{ $template->updated_at->diffForHumans() }}</span>
-                        <span class="font-monospace text-secondary">#{{ $template->slug }}</span>
-                    </div>
+                <!-- Visual Mini Thumbnail Frame -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50 relative mb-4 h-40">
+                    <iframe src="{{ route('admin.email-templates.preview', $template->id) }}" class="w-full h-full border-0 pointer-events-none" style="transform: scale(0.65); transform-origin: top left; width: 154%; height: 154%; pointer-events: none;" loading="lazy"></iframe>
+                    <div class="absolute inset-0 bg-transparent cursor-pointer" @click="previewTitle = '{{ addslashes($template->name) }}'; previewUrl = '{{ route('admin.email-templates.preview', $template->id) }}'; openPreview = true;"></div>
                 </div>
 
-                <div class="card-footer bg-white border-top p-3 px-4 d-flex align-items-center justify-content-between gap-2">
-                    <button type="button" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold" onclick="openTemplatePreview({{ $template->id }}, '{{ addslashes($template->name) }}')">
-                        <i class="bi bi-eye"></i> Preview
-                    </button>
-                    <div class="d-flex align-items-center gap-1">
-                        <a href="{{ route('admin.campaigns.create', ['template_id' => $template->id]) }}" class="btn btn-outline-primary btn-sm rounded-pill px-2.5" title="Start Campaign with this template">
-                            <i class="bi bi-send-plus"></i>
-                        </a>
-                        <a href="{{ route('admin.email-templates.edit', $template->id) }}" class="btn btn-outline-secondary btn-sm rounded-pill px-2.5" title="Edit Template">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                        @if(!$template->is_system)
-                        <form action="{{ route('admin.email-templates.destroy', $template->id) }}" method="POST" class="d-inline delete-template-form">
-                            @csrf
-                            @method('DELETE')
-                            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-2.5 btn-delete-template" data-name="{{ $template->name }}" title="Delete Template">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </form>
-                        @endif
-                    </div>
+                <div class="flex items-center justify-between text-xs text-slate-400">
+                    <span><i class="bi bi-clock-history mr-1"></i> Updated {{ $template->updated_at->diffForHumans() }}</span>
+                    <span class="font-mono text-slate-500">#{{ $template->slug }}</span>
+                </div>
+            </div>
+
+            <div class="border-t border-slate-100 p-3 px-5 flex items-center justify-between gap-2 bg-slate-50/40">
+                <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-bold transition cursor-pointer" @click="previewTitle = '{{ addslashes($template->name) }}'; previewUrl = '{{ route('admin.email-templates.preview', $template->id) }}'; openPreview = true;">
+                    <i class="bi bi-eye text-slate-500"></i> Preview
+                </button>
+                <div class="flex items-center gap-1">
+                    <a href="{{ route('admin.campaigns.create', ['template_id' => $template->id]) }}" class="w-8 h-8 rounded-xl border border-slate-200 hover:border-primary hover:text-primary flex items-center justify-center text-slate-600 bg-white transition shadow-2xs" title="Start Campaign with this template">
+                        <i class="bi bi-send-plus text-xs"></i>
+                    </a>
+                    <a href="{{ route('admin.email-templates.edit', $template->id) }}" class="w-8 h-8 rounded-xl border border-slate-200 hover:border-primary hover:text-primary flex items-center justify-center text-slate-600 bg-white transition shadow-2xs" title="Edit Template">
+                        <i class="bi bi-pencil text-xs"></i>
+                    </a>
+                    @if(!$template->is_system)
+                    <form action="{{ route('admin.email-templates.destroy', $template->id) }}" method="POST" class="inline delete-template-form">
+                        @csrf
+                        @method('DELETE')
+                        <button type="button" class="w-8 h-8 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 flex items-center justify-center bg-white transition shadow-2xs btn-delete-template cursor-pointer" data-name="{{ $template->name }}" title="Delete Template">
+                            <i class="bi bi-trash text-xs"></i>
+                        </button>
+                    </form>
+                    @endif
                 </div>
             </div>
         </div>
         @empty
-        <div class="col-12">
-            <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white">
-                <i class="bi bi-envelope-paper text-muted display-4 mb-3 opacity-50"></i>
-                <h5 class="fw-bold text-dark">No Email Templates Found</h5>
-                <p class="text-muted small mb-4">Start by creating your first responsive email marketing template.</p>
+        <div class="col-span-full">
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-12 text-center shadow-xs">
+                <i class="bi bi-envelope-paper text-4xl text-slate-300 block mb-3"></i>
+                <h3 class="text-base font-bold text-slate-800 mb-1">No Email Templates Found</h3>
+                <p class="text-xs text-slate-400 mb-5">Start by creating your first responsive email marketing template.</p>
                 <div>
-                    <a href="{{ route('admin.email-templates.create') }}" class="btn btn-primary rounded-pill px-4 py-2 fw-bold">
-                        <i class="bi bi-plus-lg me-1"></i> Create Template
+                    <a href="{{ route('admin.email-templates.create') }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold shadow-xs transition">
+                        <i class="bi bi-plus-lg"></i> Create Template
                     </a>
                 </div>
             </div>
         </div>
         @endforelse
     </div>
-</div>
 
-<!-- Template Live Preview Modal -->
-<div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-            <div class="modal-header border-0 bg-dark text-white p-3 px-4 d-flex align-items-center justify-content-between">
-                <div class="d-flex align-items-center gap-3">
-                    <i class="bi bi-envelope-check text-primary fs-4"></i>
-                    <div>
-                        <h6 class="modal-title fw-800 text-white mb-0" id="previewModalLabel">Template Preview</h6>
-                        <span class="extra-small text-white-50">Live rendered with dynamic tags populated</span>
+    <!-- Template Live Preview Modal (Alpine.js) -->
+    <div x-show="openPreview" x-cloak class="relative z-50">
+        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" @click="openPreview = false"></div>
+        <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-10 flex items-center justify-center">
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-5xl w-full overflow-hidden flex flex-col" @click.stop>
+                <div class="bg-slate-900 text-white p-4 px-6 flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <i class="bi bi-envelope-check text-primary text-xl"></i>
+                        <div>
+                            <h3 class="text-sm font-black text-white" x-text="'Preview: ' + previewTitle">Template Preview</h3>
+                            <span class="text-[11px] text-slate-400">Live rendered with dynamic tags populated</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="inline-flex items-center bg-slate-800 rounded-xl p-1 border border-slate-700 text-xs">
+                            <button type="button" @click="previewDevice = 'desktop'" :class="previewDevice === 'desktop' ? 'bg-primary text-white' : 'text-slate-400 hover:text-white'" class="px-3 py-1 rounded-lg font-bold transition cursor-pointer">
+                                <i class="bi bi-display mr-1"></i> Desktop
+                            </button>
+                            <button type="button" @click="previewDevice = 'mobile'" :class="previewDevice === 'mobile' ? 'bg-primary text-white' : 'text-slate-400 hover:text-white'" class="px-3 py-1 rounded-lg font-bold transition cursor-pointer">
+                                <i class="bi bi-phone mr-1"></i> Mobile
+                            </button>
+                        </div>
+                        <button type="button" @click="openPreview = false" class="text-slate-400 hover:text-white cursor-pointer"><i class="bi bi-x-lg"></i></button>
                     </div>
                 </div>
-                <div class="d-flex align-items-center gap-2">
-                    <div class="btn-group btn-group-sm bg-black rounded-pill p-0.5 border border-secondary" role="group">
-                        <button type="button" class="btn btn-sm btn-primary rounded-pill px-3" id="previewDesktopBtn" onclick="setPreviewDevice('desktop')">
-                            <i class="bi bi-display me-1"></i> Desktop
-                        </button>
-                        <button type="button" class="btn btn-sm text-white rounded-pill px-3" id="previewMobileBtn" onclick="setPreviewDevice('mobile')">
-                            <i class="bi bi-phone me-1"></i> Mobile
-                        </button>
+                <div class="p-4 sm:p-6 bg-slate-100 flex justify-center items-center" style="min-height: 540px;">
+                    <div class="w-full transition-all duration-300" :style="previewDevice === 'mobile' ? 'max-width: 420px;' : 'max-width: 100%;'">
+                        <iframe :src="previewUrl" class="w-full rounded-2xl shadow-md border border-slate-200 bg-white" style="height: 650px;" loading="lazy"></iframe>
                     </div>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-            </div>
-            <div class="modal-body p-0 bg-secondary bg-opacity-10 d-flex justify-content-center align-items-center" style="min-height: 540px;">
-                <div id="previewContainer" class="w-100 transition-all p-2 p-md-4" style="max-width: 100%; transition: max-width 0.3s ease;">
-                    <iframe id="previewIframe" src="about:blank" class="w-100 rounded-3 shadow border bg-white" style="height: 650px;" loading="lazy"></iframe>
                 </div>
             </div>
         </div>
@@ -144,36 +143,6 @@
 
 @push('scripts')
 <script>
-const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
-const previewIframe = document.getElementById('previewIframe');
-const previewLabel = document.getElementById('previewModalLabel');
-const previewContainer = document.getElementById('previewContainer');
-const previewDesktopBtn = document.getElementById('previewDesktopBtn');
-const previewMobileBtn = document.getElementById('previewMobileBtn');
-
-function openTemplatePreview(templateId, templateName) {
-    previewLabel.textContent = `Preview: ${templateName}`;
-    previewIframe.src = `/admin/email-templates/${templateId}/preview`;
-    setPreviewDevice('desktop');
-    previewModal.show();
-}
-
-function setPreviewDevice(device) {
-    if (device === 'mobile') {
-        previewContainer.style.maxWidth = '420px';
-        previewMobileBtn.classList.remove('text-white');
-        previewMobileBtn.classList.add('btn-primary');
-        previewDesktopBtn.classList.remove('btn-primary');
-        previewDesktopBtn.classList.add('text-white');
-    } else {
-        previewContainer.style.maxWidth = '100%';
-        previewDesktopBtn.classList.remove('text-white');
-        previewDesktopBtn.classList.add('btn-primary');
-        previewMobileBtn.classList.remove('btn-primary');
-        previewMobileBtn.classList.add('text-white');
-    }
-}
-
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.btn-delete-template').forEach(btn => {
         btn.addEventListener('click', function(e) {

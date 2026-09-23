@@ -3,231 +3,205 @@
 @section('page_title', 'Email Marketing Campaigns')
 
 @section('content')
-<div class="container-fluid py-4">
-    <!-- Header -->
-    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+<div class="space-y-6">
+    <!-- Top Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <h4 class="fw-800 text-dark mb-1">
-                <i class="bi bi-megaphone-fill text-primary me-2"></i>Email Marketing Campaigns
-            </h4>
-            <div class="text-muted small">Broadcast newsletters, flash promotions, and booking alerts with live engagement tracking.</div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                <i class="bi bi-megaphone-fill text-primary"></i> Email Marketing Campaigns
+            </h1>
+            <p class="text-xs text-slate-500 mt-0.5">Broadcast newsletters, flash promotions, and booking alerts with live engagement tracking.</p>
         </div>
-        <div class="d-flex flex-wrap gap-2">
-            <a href="{{ route('admin.email-templates.index') }}" class="btn btn-outline-secondary rounded-pill px-3 py-2 btn-sm fw-bold shadow-sm d-flex align-items-center gap-2">
-                <i class="bi bi-palette"></i> Templates Gallery
+        <div class="flex flex-wrap items-center gap-2">
+            <a href="{{ route('admin.email-templates.index') }}" class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition">
+                <i class="bi bi-palette text-slate-500"></i> Templates Gallery
             </a>
-            <a href="{{ route('admin.subscribers.index') }}" class="btn btn-outline-secondary rounded-pill px-3 py-2 btn-sm fw-bold shadow-sm d-flex align-items-center gap-2">
-                <i class="bi bi-people"></i> Subscribers
+            <a href="{{ route('admin.subscribers.index') }}" class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition">
+                <i class="bi bi-people text-slate-500"></i> Subscribers
             </a>
-            <a href="{{ route('admin.campaigns.create') }}" class="btn btn-primary rounded-pill px-4 py-2 btn-sm fw-bold shadow-sm d-flex align-items-center gap-2">
+            <a href="{{ route('admin.campaigns.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-xs shadow-xs transition">
                 <i class="bi bi-plus-lg"></i> New Campaign
             </a>
         </div>
     </div>
 
-    <!-- Metric Stat Cards -->
-    <div class="row g-3 mb-4">
-        <div class="col-6 col-md-3">
-            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="rounded-3 bg-primary bg-opacity-10 text-primary p-3 fs-4">
-                        <i class="bi bi-broadcast"></i>
-                    </div>
-                    <div>
-                        <div class="text-muted extra-small text-uppercase fw-bold">Total Campaigns</div>
-                        <h4 class="fw-800 text-dark mb-0">{{ number_format($stats['total_campaigns']) }}</h4>
-                    </div>
+    <!-- 4 Metric Stat Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 border border-primary/20">
+                <i class="bi bi-broadcast text-xl"></i>
+            </div>
+            <div>
+                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Campaigns</div>
+                <div class="text-2xl font-black text-slate-900">{{ number_format($stats['total_campaigns']) }}</div>
+            </div>
+        </div>
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-200">
+                <i class="bi bi-send-check text-xl"></i>
+            </div>
+            <div>
+                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Emails Sent</div>
+                <div class="text-2xl font-black text-emerald-600">{{ number_format($stats['total_sent']) }}</div>
+            </div>
+        </div>
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0 border border-sky-200">
+                <i class="bi bi-envelope-open text-xl"></i>
+            </div>
+            <div>
+                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Opens</div>
+                <div class="text-2xl font-black text-sky-600">{{ number_format($stats['total_opened']) }}</div>
+                <div class="text-[11px] text-slate-400 mt-0.5">
+                    {{ $stats['total_sent'] > 0 ? round(($stats['total_opened'] / $stats['total_sent']) * 100, 1) : 0 }}% avg open
                 </div>
             </div>
         </div>
-        <div class="col-6 col-md-3">
-            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="rounded-3 bg-success bg-opacity-10 text-success p-3 fs-4">
-                        <i class="bi bi-send-check"></i>
-                    </div>
-                    <div>
-                        <div class="text-muted extra-small text-uppercase fw-bold">Emails Sent</div>
-                        <h4 class="fw-800 text-success mb-0">{{ number_format($stats['total_sent']) }}</h4>
-                    </div>
-                </div>
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center shrink-0 border border-amber-200">
+                <i class="bi bi-cursor text-xl"></i>
             </div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="rounded-3 bg-info bg-opacity-10 text-info p-3 fs-4">
-                        <i class="bi bi-envelope-open"></i>
-                    </div>
-                    <div>
-                        <div class="text-muted extra-small text-uppercase fw-bold">Total Opens</div>
-                        <h4 class="fw-800 text-info mb-0">{{ number_format($stats['total_opened']) }}</h4>
-                        <span class="text-muted extra-small">
-                            {{ $stats['total_sent'] > 0 ? round(($stats['total_opened'] / $stats['total_sent']) * 100, 1) : 0 }}% avg open
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="rounded-3 bg-warning bg-opacity-10 text-warning p-3 fs-4">
-                        <i class="bi bi-cursor"></i>
-                    </div>
-                    <div>
-                        <div class="text-muted extra-small text-uppercase fw-bold">Total Clicks</div>
-                        <h4 class="fw-800 text-warning mb-0">{{ number_format($stats['total_clicked']) }}</h4>
-                        <span class="text-muted extra-small">
-                            {{ $stats['total_opened'] > 0 ? round(($stats['total_clicked'] / $stats['total_opened']) * 100, 1) : 0 }}% click-to-open
-                        </span>
-                    </div>
+            <div>
+                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Clicks</div>
+                <div class="text-2xl font-black text-amber-500">{{ number_format($stats['total_clicked']) }}</div>
+                <div class="text-[11px] text-slate-400 mt-0.5">
+                    {{ $stats['total_opened'] > 0 ? round(($stats['total_clicked'] / $stats['total_opened']) * 100, 1) : 0 }}% click-to-open
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Status Tabs & Filter -->
-    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
-        <ul class="nav nav-pills bg-white p-1 rounded-pill shadow-sm border" id="campaignStatusTabs">
-            <li class="nav-item">
-                <a class="nav-link rounded-pill px-3 py-1.5 fw-bold {{ !request('status') ? 'active' : '' }}" href="{{ route('admin.campaigns.index') }}">
-                    All
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link rounded-pill px-3 py-1.5 fw-bold {{ request('status') === 'sent' ? 'active' : '' }}" href="{{ route('admin.campaigns.index', ['status' => 'sent']) }}">
-                    Sent
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link rounded-pill px-3 py-1.5 fw-bold {{ request('status') === 'draft' ? 'active' : '' }}" href="{{ route('admin.campaigns.index', ['status' => 'draft']) }}">
-                    Drafts
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link rounded-pill px-3 py-1.5 fw-bold {{ request('status') === 'sending' ? 'active' : '' }}" href="{{ route('admin.campaigns.index', ['status' => 'sending']) }}">
-                    Sending
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link rounded-pill px-3 py-1.5 fw-bold {{ request('status') === 'scheduled' ? 'active' : '' }}" href="{{ route('admin.campaigns.index', ['status' => 'scheduled']) }}">
-                    Scheduled
-                </a>
-            </li>
-        </ul>
+    <!-- Status Tabs -->
+    <div class="flex items-center justify-between flex-wrap gap-3">
+        <div class="inline-flex p-1 bg-white rounded-2xl border border-slate-200/80 shadow-2xs gap-1">
+            <a class="px-3.5 py-1.5 rounded-xl font-bold text-xs transition {{ !request('status') ? 'bg-primary text-white shadow-xs' : 'text-slate-600 hover:text-slate-900' }}" href="{{ route('admin.campaigns.index') }}">
+                All
+            </a>
+            <a class="px-3.5 py-1.5 rounded-xl font-bold text-xs transition {{ request('status') === 'sent' ? 'bg-primary text-white shadow-xs' : 'text-slate-600 hover:text-slate-900' }}" href="{{ route('admin.campaigns.index', ['status' => 'sent']) }}">
+                Sent
+            </a>
+            <a class="px-3.5 py-1.5 rounded-xl font-bold text-xs transition {{ request('status') === 'draft' ? 'bg-primary text-white shadow-xs' : 'text-slate-600 hover:text-slate-900' }}" href="{{ route('admin.campaigns.index', ['status' => 'draft']) }}">
+                Drafts
+            </a>
+            <a class="px-3.5 py-1.5 rounded-xl font-bold text-xs transition {{ request('status') === 'sending' ? 'bg-primary text-white shadow-xs' : 'text-slate-600 hover:text-slate-900' }}" href="{{ route('admin.campaigns.index', ['status' => 'sending']) }}">
+                Sending
+            </a>
+            <a class="px-3.5 py-1.5 rounded-xl font-bold text-xs transition {{ request('status') === 'scheduled' ? 'bg-primary text-white shadow-xs' : 'text-slate-600 hover:text-slate-900' }}" href="{{ route('admin.campaigns.index', ['status' => 'scheduled']) }}">
+                Scheduled
+            </a>
+        </div>
     </div>
 
     <!-- Campaigns List Card -->
-    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
-        <div class="table-responsive">
-            <table class="table align-middle table-hover mb-0">
-                <thead class="bg-light">
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm text-slate-700">
+                <thead class="bg-slate-50/80 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
                     <tr>
-                        <th class="ps-4 text-muted extra-small text-uppercase fw-800">Campaign & Subject</th>
-                        <th class="text-muted extra-small text-uppercase fw-800">Target Audience</th>
-                        <th class="text-muted extra-small text-uppercase fw-800">Status</th>
-                        <th class="text-muted extra-small text-uppercase fw-800" style="min-width: 140px;">Open Rate</th>
-                        <th class="text-muted extra-small text-uppercase fw-800" style="min-width: 140px;">Click Rate</th>
-                        <th class="text-center text-muted extra-small text-uppercase fw-800">Sent / Dispatched</th>
-                        <th class="text-end pe-4 text-muted extra-small text-uppercase fw-800">Actions</th>
+                        <th class="py-3 px-4">Campaign & Subject</th>
+                        <th class="py-3 px-4">Target Audience</th>
+                        <th class="py-3 px-4">Status</th>
+                        <th class="py-3 px-4" style="min-width: 140px;">Open Rate</th>
+                        <th class="py-3 px-4" style="min-width: 140px;">Click Rate</th>
+                        <th class="py-3 px-4 text-center">Sent / Dispatched</th>
+                        <th class="py-3 px-4 text-right pe-4">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-slate-100 bg-white">
                     @forelse($campaigns as $campaign)
-                    <tr>
-                        <td class="ps-4 py-3">
+                    <tr class="hover:bg-slate-50/60 transition-colors">
+                        <td class="py-3 px-4">
                             <div>
-                                <a href="{{ route('admin.campaigns.show', $campaign->id) }}" class="fw-800 text-dark text-decoration-none hover-primary">
+                                <a href="{{ route('admin.campaigns.show', $campaign->id) }}" class="font-black text-slate-900 text-xs hover:text-primary transition">
                                     {{ $campaign->title }}
                                 </a>
-                                <div class="text-muted small text-truncate" style="max-width: 320px;">
-                                    <strong>Subject:</strong> {{ $campaign->subject }}
+                                <div class="text-slate-400 text-xs truncate max-w-xs mt-0.5">
+                                    <strong class="text-slate-600">Subject:</strong> {{ $campaign->subject }}
                                 </div>
                             </div>
                         </td>
-                        <td>
+                        <td class="py-3 px-4">
                             @if($campaign->target_type === 'all')
-                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1 small fw-bold">
-                                    <i class="bi bi-people-fill me-1"></i> All Active Subscribers
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
+                                    <i class="bi bi-people-fill text-[11px]"></i> All Active Subscribers
                                 </span>
                             @else
-                                <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2.5 py-1 small fw-bold">
-                                    <i class="bi bi-diagram-3-fill me-1"></i> {{ $campaign->group ? $campaign->group->name : 'Audience Segment' }}
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200">
+                                    <i class="bi bi-diagram-3-fill text-[11px]"></i> {{ $campaign->group ? $campaign->group->name : 'Audience Segment' }}
                                 </span>
                             @endif
                         </td>
-                        <td>
+                        <td class="py-3 px-4">
                             @if($campaign->status === 'sent')
-                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 small fw-bold">
-                                    <i class="bi bi-check2-all me-1"></i> Completed
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <i class="bi bi-check2-all text-[11px]"></i> Completed
                                 </span>
                             @elseif($campaign->status === 'sending')
-                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2.5 py-1 small fw-bold">
-                                    <i class="bi bi-arrow-repeat spin me-1"></i> Sending...
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 animate-pulse">
+                                    <i class="bi bi-arrow-repeat spin text-[11px]"></i> Sending...
                                 </span>
                             @elseif($campaign->status === 'scheduled')
-                                <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2.5 py-1 small fw-bold" title="{{ $campaign->scheduled_at ? $campaign->scheduled_at->format('M d, Y h:i A') : '' }}">
-                                    <i class="bi bi-clock-history me-1"></i> Scheduled
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200" title="{{ $campaign->scheduled_at ? $campaign->scheduled_at->format('M d, Y h:i A') : '' }}">
+                                    <i class="bi bi-clock-history text-[11px]"></i> Scheduled
                                 </span>
                             @elseif($campaign->status === 'draft')
-                                <span class="badge bg-secondary-subtle text-dark border rounded-pill px-2.5 py-1 small fw-bold">
-                                    <i class="bi bi-pencil-square me-1"></i> Draft
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                                    <i class="bi bi-pencil-square text-[11px]"></i> Draft
                                 </span>
                             @else
-                                <span class="badge bg-light text-secondary border rounded-pill px-2.5 py-1 small fw-bold">
-                                    {{ ucfirst($campaign->status) }}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 capitalize">
+                                    {{ $campaign->status }}
                                 </span>
                             @endif
                         </td>
-                        <td>
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="progress flex-grow-1 rounded-pill" style="height: 6px;">
-                                    <div class="progress-bar bg-info" role="progressbar" style="width: {{ $campaign->open_rate }}%;" aria-valuenow="{{ $campaign->open_rate }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        <td class="py-3 px-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                    <div class="bg-sky-500 h-1.5 rounded-full" style="width: {{ $campaign->open_rate }}%;"></div>
                                 </div>
-                                <span class="fw-bold extra-small text-dark">{{ $campaign->open_rate }}%</span>
+                                <span class="font-bold text-xs text-slate-800">{{ $campaign->open_rate }}%</span>
                             </div>
-                            <div class="text-muted extra-small">
+                            <div class="text-slate-400 text-[11px] mt-0.5">
                                 {{ number_format($campaign->opened_count) }} / {{ number_format($campaign->sent_count) }}
                             </div>
                         </td>
-                        <td>
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="progress flex-grow-1 rounded-pill" style="height: 6px;">
-                                    <div class="progress-bar bg-warning" role="progressbar" style="width: {{ $campaign->click_rate }}%;" aria-valuenow="{{ $campaign->click_rate }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        <td class="py-3 px-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                    <div class="bg-amber-400 h-1.5 rounded-full" style="width: {{ $campaign->click_rate }}%;"></div>
                                 </div>
-                                <span class="fw-bold extra-small text-dark">{{ $campaign->click_rate }}%</span>
+                                <span class="font-bold text-xs text-slate-800">{{ $campaign->click_rate }}%</span>
                             </div>
-                            <div class="text-muted extra-small">
+                            <div class="text-slate-400 text-[11px] mt-0.5">
                                 {{ number_format($campaign->clicked_count) }} clicks
                             </div>
                         </td>
-                        <td class="text-center text-muted small">
+                        <td class="py-3 px-4 text-center text-xs text-slate-500">
                             @if($campaign->sent_at)
-                                <div>{{ $campaign->sent_at->format('M d, Y') }}</div>
-                                <div class="extra-small text-muted">{{ $campaign->sent_at->format('h:i A') }}</div>
+                                <div class="font-medium text-slate-800">{{ $campaign->sent_at->format('M d, Y') }}</div>
+                                <div class="text-[10px] text-slate-400">{{ $campaign->sent_at->format('h:i A') }}</div>
                             @else
-                                <span class="text-muted fst-italic">Not dispatched</span>
+                                <span class="text-slate-400 italic">Not dispatched</span>
                             @endif
                         </td>
-                        <td class="text-end pe-4">
-                            <div class="d-inline-flex gap-1">
-                                <a href="{{ route('admin.campaigns.show', $campaign->id) }}" class="btn btn-sm btn-outline-primary rounded-pill px-2.5 py-1" title="View Analytics & Recipients">
-                                    <i class="bi bi-graph-up"></i>
+                        <td class="py-3 px-4 text-right pe-4">
+                            <div class="inline-flex items-center justify-end gap-1.5">
+                                <a href="{{ route('admin.campaigns.show', $campaign->id) }}" class="w-8 h-8 rounded-xl border border-slate-200 hover:border-primary hover:text-primary flex items-center justify-center text-slate-600 bg-white transition shadow-2xs" title="View Analytics & Recipients">
+                                    <i class="bi bi-graph-up text-xs"></i>
                                 </a>
                                 @if($campaign->status === 'draft')
-                                <form action="{{ route('admin.campaigns.send', $campaign->id) }}" method="POST" class="d-inline send-campaign-form">
+                                <form action="{{ route('admin.campaigns.send', $campaign->id) }}" method="POST" class="inline send-campaign-form">
                                     @csrf
-                                    <button type="button" class="btn btn-sm btn-outline-success rounded-pill px-2.5 py-1 btn-send-campaign" data-title="{{ $campaign->title }}" title="Send Now">
-                                        <i class="bi bi-send"></i>
+                                    <button type="button" class="w-8 h-8 rounded-xl border border-emerald-200 text-emerald-600 hover:bg-emerald-50 flex items-center justify-center bg-white transition shadow-2xs btn-send-campaign cursor-pointer" data-title="{{ $campaign->title }}" title="Send Now">
+                                        <i class="bi bi-send text-xs"></i>
                                     </button>
                                 </form>
                                 @endif
-                                <form action="{{ route('admin.campaigns.destroy', $campaign->id) }}" method="POST" class="d-inline delete-campaign-form">
+                                <form action="{{ route('admin.campaigns.destroy', $campaign->id) }}" method="POST" class="inline delete-campaign-form">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-2.5 py-1 btn-delete-campaign" data-title="{{ $campaign->title }}" title="Delete Campaign">
-                                        <i class="bi bi-trash"></i>
+                                    <button type="button" class="w-8 h-8 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 flex items-center justify-center bg-white transition shadow-2xs btn-delete-campaign cursor-pointer" data-title="{{ $campaign->title }}" title="Delete Campaign">
+                                        <i class="bi bi-trash text-xs"></i>
                                     </button>
                                 </form>
                             </div>
@@ -235,12 +209,12 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="text-center py-5">
-                            <i class="bi bi-megaphone text-muted display-4 mb-3 d-block opacity-50"></i>
-                            <h6 class="fw-bold text-dark">No Campaigns Found</h6>
-                            <p class="text-muted small mb-3">Launch your first marketing campaign to engage with your subscribers.</p>
-                            <a href="{{ route('admin.campaigns.create') }}" class="btn btn-primary rounded-pill px-4 py-2 fw-bold btn-sm">
-                                <i class="bi bi-plus-lg me-1"></i> Create Campaign
+                        <td colspan="7" class="text-center py-12 text-slate-400 text-xs">
+                            <i class="bi bi-megaphone text-4xl block mb-2 opacity-50"></i>
+                            <h3 class="font-bold text-slate-700 mb-1">No Campaigns Found</h3>
+                            <p class="text-slate-400 mb-4">Launch your first marketing campaign to engage with your subscribers.</p>
+                            <a href="{{ route('admin.campaigns.create') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-xs shadow-xs transition">
+                                <i class="bi bi-plus-lg"></i> Create Campaign
                             </a>
                         </td>
                     </tr>
@@ -250,7 +224,7 @@
         </div>
 
         @if($campaigns->hasPages())
-        <div class="card-footer bg-white border-top p-3 d-flex justify-content-center">
+        <div class="p-4 border-t border-slate-100 bg-white">
             {{ $campaigns->links() }}
         </div>
         @endif
@@ -272,8 +246,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     text: `Are you ready to send "${title}" to its target audience? Dispatches are processed in batches.`,
                     icon: 'question',
                     showCancelButton: true,
-                    confirmButtonColor: '#198754',
-                    cancelButtonColor: '#6c757d',
+                    confirmButtonColor: '#10b981',
+                    cancelButtonColor: '#64748b',
                     confirmButtonText: 'Yes, Send Now!'
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -300,8 +274,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     text: `Are you sure you want to delete "${title}"? All campaign recipient logs and click statistics will be removed.`,
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#dc3545',
-                    cancelButtonColor: '#6c757d',
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#64748b',
                     confirmButtonText: 'Yes, delete it!'
                 }).then((result) => {
                     if (result.isConfirmed) {

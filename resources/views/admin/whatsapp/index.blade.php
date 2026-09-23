@@ -3,196 +3,218 @@
 @section('page_title', 'WhatsApp Leads & Analytics')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-    <div>
-        <h2 class="h4 fw-800 text-dark mb-1">WhatsApp Leads Hub & Analytics</h2>
-        <p class="text-muted small mb-0">Track real-time chat click leads, customer phone numbers, tour preferences, and visitor telemetry.</p>
+<div class="space-y-6" x-data>
+    <!-- Top Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                <i class="bi bi-whatsapp text-emerald-500"></i> WhatsApp Leads Hub & Analytics
+            </h1>
+            <p class="text-xs text-slate-500 mt-0.5">Track real-time chat click leads, customer phone numbers, tour preferences, and visitor telemetry.</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+            <a href="{{ route('admin.whatsapp.export', request()->query()) }}" class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-emerald-200 hover:bg-emerald-50 text-emerald-700 font-bold text-xs shadow-2xs transition">
+                <i class="bi bi-file-earmark-spreadsheet"></i> Export CSV
+            </a>
+            <a href="{{ route('admin.whatsapp.settings') }}" class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition">
+                <i class="bi bi-gear-fill text-primary"></i> Settings
+            </a>
+        </div>
     </div>
-    <div class="d-flex gap-2">
-        <a href="{{ route('admin.whatsapp.export', request()->query()) }}" class="btn btn-outline-success rounded-pill px-4 fw-bold shadow-sm">
-            <i class="bi bi-file-earmark-spreadsheet me-2"></i> Export CSV
-        </a>
-        <a href="{{ route('admin.whatsapp.settings') }}" class="btn btn-light border rounded-pill px-3 fw-bold shadow-sm">
-            <i class="bi bi-gear-fill me-1 text-primary"></i> Settings
-        </a>
-    </div>
-</div>
 
-<!-- 4 Key Performance Metric Cards -->
-<div class="row g-3 g-lg-4 mb-4">
-    <div class="col-xl-3 col-sm-6">
-        <div class="card card-modern h-100 p-3 bg-white border-0 shadow-sm rounded-4">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-muted small fw-bold text-uppercase" style="font-size:0.75rem;">Total WhatsApp Leads</span>
-                <span class="badge bg-success-subtle text-success rounded-circle p-2"><i class="bi bi-whatsapp fs-5"></i></span>
+    <!-- 4 Key Performance Metric Cards -->
+    <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total WhatsApp Leads</span>
+                <span class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200">
+                    <i class="bi bi-whatsapp text-lg"></i>
+                </span>
             </div>
-            <h3 class="fw-800 text-dark mb-0">{{ number_format($stats['total'] ?? 0) }}</h3>
-            <span class="text-muted small" style="font-size: 0.75rem;">All-time chat click inquiries</span>
-        </div>
-    </div>
-    <div class="col-xl-3 col-sm-6">
-        <div class="card card-modern h-100 p-3 bg-white border-0 shadow-sm rounded-4">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-muted small fw-bold text-uppercase" style="font-size:0.75rem;">Today's Leads</span>
-                <span class="badge bg-primary-subtle text-primary rounded-circle p-2"><i class="bi bi-calendar2-day-fill fs-5"></i></span>
+            <div>
+                <div class="text-2xl font-black text-slate-900">{{ number_format($stats['total'] ?? 0) }}</div>
+                <div class="text-xs text-slate-400 mt-1">All-time chat click inquiries</div>
             </div>
-            <h3 class="fw-800 text-dark mb-0">{{ number_format($stats['today'] ?? 0) }}</h3>
-            <span class="text-success small fw-bold" style="font-size: 0.75rem;"><i class="bi bi-lightning-fill me-1"></i>Active today</span>
         </div>
-    </div>
-    <div class="col-xl-3 col-sm-6">
-        <div class="card card-modern h-100 p-3 bg-white border-0 shadow-sm rounded-4">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-muted small fw-bold text-uppercase" style="font-size:0.75rem;">This Month</span>
-                <span class="badge bg-info-subtle text-info rounded-circle p-2"><i class="bi bi-graph-up fs-5"></i></span>
-            </div>
-            <h3 class="fw-800 text-dark mb-0">{{ number_format($stats['this_month'] ?? 0) }}</h3>
-            <span class="text-muted small" style="font-size: 0.75rem;">Current month acquisition</span>
-        </div>
-    </div>
-    <div class="col-xl-3 col-sm-6">
-        <div class="card card-modern h-100 p-3 bg-white border-0 shadow-sm rounded-4">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-muted small fw-bold text-uppercase" style="font-size:0.75rem;">Mobile Traffic %</span>
-                <span class="badge bg-warning-subtle text-warning rounded-circle p-2"><i class="bi bi-phone-fill fs-5"></i></span>
-            </div>
-            <h3 class="fw-800 text-dark mb-0">{{ $stats['mobile_pct'] ?? 0 }}%</h3>
-            <span class="text-muted small" style="font-size: 0.75rem;">Mobile vs desktop users</span>
-        </div>
-    </div>
-</div>
 
-<!-- 2 Interactive Analytics Charts -->
-<div class="row g-4 mb-4">
-    <div class="col-lg-8">
-        <div class="card card-modern bg-white border-0 shadow-sm rounded-4 p-4 h-100">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    <h6 class="fw-800 text-dark mb-1"><i class="bi bi-graph-up-arrow text-success me-2"></i>14-Day WhatsApp Leads Trend</h6>
-                    <span class="text-muted small">Daily volume of customer WhatsApp inquiries</span>
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Today's Leads</span>
+                <span class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
+                    <i class="bi bi-calendar2-day-fill text-lg"></i>
+                </span>
+            </div>
+            <div>
+                <div class="text-2xl font-black text-slate-900">{{ number_format($stats['today'] ?? 0) }}</div>
+                <div class="text-xs font-bold text-emerald-600 mt-1 flex items-center gap-1">
+                    <i class="bi bi-lightning-fill"></i> Active today
                 </div>
             </div>
-            <div style="height: 220px;">
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">This Month</span>
+                <span class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-200">
+                    <i class="bi bi-graph-up text-lg"></i>
+                </span>
+            </div>
+            <div>
+                <div class="text-2xl font-black text-slate-900">{{ number_format($stats['this_month'] ?? 0) }}</div>
+                <div class="text-xs text-slate-400 mt-1">Current month acquisition</div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Mobile Traffic %</span>
+                <span class="w-10 h-10 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center border border-amber-200">
+                    <i class="bi bi-phone-fill text-lg"></i>
+                </span>
+            </div>
+            <div>
+                <div class="text-2xl font-black text-slate-900">{{ $stats['mobile_pct'] ?? 0 }}%</div>
+                <div class="text-xs text-slate-400 mt-1">Mobile vs desktop users</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2 Interactive Analytics Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-8 bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                        <i class="bi bi-graph-up-arrow text-emerald-500"></i> 14-Day WhatsApp Leads Trend
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Daily volume of customer WhatsApp inquiries</p>
+                </div>
+            </div>
+            <div class="h-56 relative">
                 <canvas id="leadsTrendChart"></canvas>
             </div>
         </div>
-    </div>
-    <div class="col-lg-4">
-        <div class="card card-modern bg-white border-0 shadow-sm rounded-4 p-4 h-100">
-            <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="lg:col-span-4 bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs">
+            <div class="flex items-center justify-between mb-4">
                 <div>
-                    <h6 class="fw-800 text-dark mb-1"><i class="bi bi-pie-chart-fill text-primary me-2"></i>Tour Interest</h6>
-                    <span class="text-muted small">Top inquired experiences</span>
+                    <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                        <i class="bi bi-pie-chart-fill text-primary"></i> Tour Interest
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Top inquired experiences</p>
                 </div>
             </div>
-            <div style="height: 220px; position: relative;">
+            <div class="h-56 relative">
                 <canvas id="tourBreakdownChart"></canvas>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Multi-Parameter Filter Toolbar -->
-<div class="card card-modern border-0 shadow-sm rounded-4 p-3 bg-white mb-4">
-    <form method="GET" action="{{ route('admin.whatsapp.leads') }}">
-        <div class="row g-2 align-items-end">
-            <div class="col-lg-3 col-md-6">
-                <label for="leadSearch" class="form-label small fw-bold text-dark mb-1">Search Leads</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
-                    <input type="text" name="search" id="leadSearch" class="form-control border-start-0" placeholder="Name, Phone, Tour..." value="{{ request('search') }}">
+    <!-- Multi-Parameter Filter Toolbar -->
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5">
+        <form method="GET" action="{{ route('admin.whatsapp.leads') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end">
+            <div class="lg:col-span-3">
+                <label for="leadSearch" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Search Leads</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" name="search" id="leadSearch" class="w-full rounded-xl border border-slate-200 pl-10 pr-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden focus:border-primary transition" placeholder="Name, Phone, Tour..." value="{{ request('search') }}">
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6">
-                <label for="tourFilter" class="form-label small fw-bold text-dark mb-1">Tour Package</label>
-                <select name="tour_name" id="tourFilter" class="form-select">
+            <div class="lg:col-span-3">
+                <label for="tourFilter" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Tour Package</label>
+                <select name="tour_name" id="tourFilter" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden bg-white focus:border-primary">
                     <option value="">All Tours</option>
                     @foreach($availableTours as $tName)
                         <option value="{{ $tName }}" {{ request('tour_name') === $tName ? 'selected' : '' }}>{{ $tName }}</option>
                     @endforeach
                 </select>
             </div>
-            <div class="col-lg-2 col-md-4">
-                <label for="deviceFilter" class="form-label small fw-bold text-dark mb-1">Device Type</label>
-                <select name="device_type" id="deviceFilter" class="form-select">
+            <div class="lg:col-span-2">
+                <label for="deviceFilter" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Device Type</label>
+                <select name="device_type" id="deviceFilter" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden bg-white focus:border-primary">
                     <option value="">All Devices</option>
                     <option value="mobile" {{ request('device_type') === 'mobile' ? 'selected' : '' }}>Mobile</option>
                     <option value="desktop" {{ request('device_type') === 'desktop' ? 'selected' : '' }}>Desktop</option>
                     <option value="tablet" {{ request('device_type') === 'tablet' ? 'selected' : '' }}>Tablet</option>
                 </select>
             </div>
-            <div class="col-lg-2 col-md-4">
-                <label for="fromDate" class="form-label small fw-bold text-dark mb-1">From Date</label>
-                <input type="date" name="from_date" id="fromDate" class="form-control" value="{{ request('from_date') }}">
+            <div class="lg:col-span-2">
+                <label for="fromDate" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">From Date</label>
+                <input type="date" name="from_date" id="fromDate" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary" value="{{ request('from_date') }}">
             </div>
-            <div class="col-lg-2 col-md-4 d-flex gap-2">
-                <button type="submit" class="btn btn-primary w-100 fw-bold" title="Apply Filter"><i class="bi bi-funnel-fill me-1"></i> Filter</button>
-                <a href="{{ route('admin.whatsapp.leads') }}" class="btn btn-light border" title="Reset Filters"><i class="bi bi-arrow-counterclockwise"></i></a>
+            <div class="lg:col-span-2 flex items-center gap-2">
+                <button type="submit" class="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-xs shadow-xs transition cursor-pointer">
+                    <i class="bi bi-funnel-fill"></i> Filter
+                </button>
+                <a href="{{ route('admin.whatsapp.leads') }}" class="inline-flex items-center justify-center px-3.5 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-bold transition" title="Reset Filters">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                </a>
             </div>
-        </div>
-    </form>
-</div>
+        </form>
+    </div>
 
-<div class="card card-modern border-0 shadow-sm rounded-4 overflow-hidden bg-white p-3 mb-4">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table align-middle mb-0 table-hover datatable" id="whatsappLeadsTable">
-                <thead class="table-light small text-uppercase fw-bold text-muted">
+    <!-- WhatsApp Leads Table Card -->
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden p-5">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm text-slate-700 datatable" id="whatsappLeadsTable">
+                <thead class="bg-slate-50/80 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
                     <tr>
-                        <th class="ps-4 no-sort no-export" style="width: 36px;">
-                            <input type="checkbox" class="form-check-input whatsapp-select-all" title="Select All">
+                        <th class="py-3 px-4 no-sort no-export w-10">
+                            <input type="checkbox" class="rounded border-slate-300 text-primary focus:ring-primary w-4 h-4 whatsapp-select-all" title="Select All">
                         </th>
-                        <th>Date & Time</th>
-                        <th>Customer</th>
-                        <th>Interest Context</th>
-                        <th>Message Snippet</th>
-                        <th>Location</th>
-                        <th>Device</th>
-                        <th class="pe-4 text-end no-sort">Action</th>
+                        <th class="py-3 px-4">Date & Time</th>
+                        <th class="py-3 px-4">Customer</th>
+                        <th class="py-3 px-4">Interest Context</th>
+                        <th class="py-3 px-4">Message Snippet</th>
+                        <th class="py-3 px-4">Location</th>
+                        <th class="py-3 px-4">Device</th>
+                        <th class="py-3 px-4 text-right no-sort pe-4">Action</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-slate-100 bg-white">
                     @forelse($leads as $lead)
-                    <tr>
-                        <td class="ps-4 no-export">
-                            <input type="checkbox" class="form-check-input whatsapp-row-select" value="{{ $lead->id }}">
+                    <tr class="hover:bg-slate-50/60 transition-colors">
+                        <td class="py-3 px-4 no-export">
+                            <input type="checkbox" class="rounded border-slate-300 text-primary focus:ring-primary w-4 h-4 whatsapp-row-select" value="{{ $lead->id }}">
                         </td>
-                        <td data-order="{{ \Carbon\Carbon::parse($lead->created_at)->timestamp }}">
-                            <div class="small fw-bold text-dark">
+                        <td class="py-3 px-4" data-order="{{ \Carbon\Carbon::parse($lead->created_at)->timestamp }}">
+                            <div class="text-xs font-bold text-slate-900">
                                 {{ \Carbon\Carbon::parse($lead->created_at)->format('M j, Y') }}
                             </div>
-                            <div class="text-muted small" style="font-size: 0.72rem;">
+                            <div class="text-[11px] text-slate-400">
                                 {{ \Carbon\Carbon::parse($lead->created_at)->format('g:ia') }}
                             </div>
                         </td>
-                        <td>
-                            <div class="fw-bold text-dark">{{ $lead->name ?: 'Visitor' }}</div>
-                            <div class="text-success small fw-bold font-monospace" style="font-size: 0.75rem;">
+                        <td class="py-3 px-4">
+                            <div class="font-bold text-slate-900 text-xs">{{ $lead->name ?: 'Visitor' }}</div>
+                            <div class="text-emerald-600 font-mono font-bold text-xs mt-0.5">
                                 {{ $lead->phone }}
                             </div>
                         </td>
-                        <td>
-                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill fw-bold small">
+                        <td class="py-3 px-4">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
                                 {{ $lead->tour_name ?: 'General Inquiry' }}
                             </span>
                         </td>
-                        <td class="text-muted small" style="max-width: 220px;">
-                            {{ Str::limit($lead->message_text, 65) }}
-                        </td>
-                        <td>
-                            <div class="small text-dark fw-semibold">
-                                <i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ $lead->city ?: 'Unknown' }}, {{ $lead->country ?: '' }}
+                        <td class="py-3 px-4">
+                            <div class="text-slate-500 text-xs truncate max-w-xs" title="{{ $lead->message_text }}">
+                                {{ Str::limit($lead->message_text, 65) }}
                             </div>
                         </td>
-                        <td>
-                            <div class="small text-muted text-capitalize">
-                                <span class="badge bg-light text-dark border">{{ $lead->device_type ?: 'Desktop' }}</span>
+                        <td class="py-3 px-4">
+                            <div class="text-xs font-semibold text-slate-700 flex items-center gap-1">
+                                <i class="bi bi-geo-alt-fill text-rose-500"></i> {{ $lead->city ?: 'Unknown' }}, {{ $lead->country ?: '' }}
                             </div>
                         </td>
-                        <td class="pe-4 text-end">
-                            <div class="d-flex justify-content-end gap-2">
-                                <button class="btn btn-sm btn-outline-primary rounded-circle d-flex align-items-center justify-content-center view-lead-btn" 
-                                        style="width: 34px; height: 34px;" 
+                        <td class="py-3 px-4">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 capitalize">
+                                {{ $lead->device_type ?: 'Desktop' }}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-right pe-4">
+                            <div class="inline-flex items-center justify-end gap-1.5">
+                                <button class="w-8 h-8 rounded-xl border border-slate-200 hover:border-primary hover:text-primary flex items-center justify-center text-slate-600 bg-white transition shadow-2xs view-lead-btn cursor-pointer" 
                                         title="View Full Lead Details"
                                         data-id="{{ $lead->id }}"
                                         data-name="{{ $lead->name }}"
@@ -203,21 +225,20 @@
                                         data-ip="{{ $lead->client_ip ?? $lead->ip_address ?? 'Not Available' }}"
                                         data-location="{{ ($lead->city ?? 'Unknown') . ', ' . ($lead->country ?? '') }}"
                                         data-device="{{ ucfirst($lead->device_type ?? '-') }} ({{ $lead->os_name ?? '-' }} / {{ $lead->browser_name ?? '-' }})">
-                                    <i class="bi bi-search"></i>
+                                    <i class="bi bi-search text-xs"></i>
                                 </button>
-                                <button type="button" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center btn-delete-lead" 
-                                        style="width: 34px; height: 34px;" 
+                                <button type="button" class="w-8 h-8 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 flex items-center justify-center bg-white transition shadow-2xs btn-delete-lead cursor-pointer" 
                                         title="Permanently Delete WhatsApp Lead & All Footprints"
                                         onclick="promptPermanentDeleteLead({{ $lead->id }}, '{{ addslashes($lead->name ?: 'Visitor') }}', '{{ addslashes($lead->phone ?: '') }}')">
-                                    <i class="bi bi-trash3"></i>
+                                    <i class="bi bi-trash3 text-xs"></i>
                                 </button>
                             </div>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="text-center py-5 text-muted">
-                            <i class="bi bi-whatsapp fs-1 d-block mb-2 text-muted opacity-50"></i>
+                        <td colspan="8" class="text-center py-12 text-slate-400 text-xs">
+                            <i class="bi bi-whatsapp text-4xl block mb-2 opacity-50"></i>
                             No WhatsApp leads found matching your criteria.
                         </td>
                     </tr>
@@ -226,92 +247,99 @@
             </table>
         </div>
     </div>
-</div>
 
-<!-- Floating Batch Bulk Action Toolbar -->
-<div id="whatsappBulkBar" class="bulk-action-bar">
-    <div class="d-flex align-items-center gap-2">
-        <span class="badge bg-success rounded-pill px-2 py-1"><span id="whatsappSelectedCount">0</span></span>
-        <span class="fw-semibold small text-white">leads selected</span>
+    <!-- Floating Batch Bulk Action Toolbar -->
+    <div id="whatsappBulkBar" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-slate-900/90 backdrop-blur-md text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-4 transition-all duration-300 border border-slate-700">
+        <div class="flex items-center gap-2">
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-500 text-white" id="whatsappSelectedCount">0</span>
+            <span class="text-xs font-semibold text-white">leads selected</span>
+        </div>
+        <div class="w-px h-5 bg-slate-700"></div>
+        <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition cursor-pointer" id="whatsappBulkDelete">
+            <i class="bi bi-trash3"></i> Delete Selected
+        </button>
+        <button type="button" class="text-slate-400 hover:text-white transition cursor-pointer text-xs" id="whatsappBulkClear" title="Deselect all">
+            <i class="bi bi-x-lg"></i>
+        </button>
     </div>
-    <div class="vr bg-secondary opacity-50" style="height: 20px;"></div>
-    <button type="button" class="btn btn-sm btn-danger rounded-pill px-3" id="whatsappBulkDelete">
-        <i class="bi bi-trash3 me-1"></i> Delete Selected
-    </button>
-    <button type="button" class="btn btn-sm btn-link text-white-50 p-0 ms-1 text-decoration-none" id="whatsappBulkClear" title="Deselect all">
-        <i class="bi bi-x-lg"></i>
-    </button>
 </div>
 
-<!-- View Details Modal -->
-<div class="modal fade" id="leadDetailsModal" tabindex="-1" aria-labelledby="leadDetailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content rounded-4 shadow border-0 bg-white">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-800 text-dark" id="leadDetailsModalLabel">WhatsApp Lead Telemetry & Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4">
-                <div class="row g-4">
-                    <!-- Client Details -->
-                    <div class="col-md-6">
-                        <div class="p-3 bg-light rounded-4 h-100 border">
-                            <h6 class="text-success fw-800 text-uppercase small mb-3"><i class="bi bi-person-fill me-1"></i> Customer Identity</h6>
-                            <div class="mb-3">
-                                <label class="text-muted small fw-bold d-block">Customer Name</label>
-                                <span class="fw-bold text-dark fs-5" id="modalCustomerName">-</span>
-                            </div>
-                            <div class="mb-3">
-                                <label class="text-muted small fw-bold d-block">Phone Number</label>
-                                <strong class="fs-6 text-success font-monospace" id="modalCustomerPhone">-</strong>
-                            </div>
-                            <div class="mb-3">
-                                <label class="text-muted small fw-bold d-block">Interest Context</label>
-                                <span class="badge bg-primary text-white" id="modalTourName">-</span>
-                            </div>
-                            <div>
-                                <label class="text-muted small fw-bold d-block">Source Page</label>
-                                <a href="#" target="_blank" class="small text-primary text-decoration-none text-truncate d-block" id="modalPageUrl">-</a>
-                            </div>
-                        </div>
+<!-- Modal: View Details (Alpine.js) -->
+<div x-data="{ open: false }" @open-lead-modal.window="open = true" x-show="open" x-cloak class="relative z-50">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" @click="open = false"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-16 flex items-center justify-center">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-2xl w-full p-6 space-y-4" @click.stop>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200">
+                        <i class="bi bi-whatsapp text-base"></i>
                     </div>
-
-                    <!-- Telemetry -->
-                    <div class="col-md-6">
-                        <div class="p-3 bg-light rounded-4 h-100 border">
-                            <h6 class="text-primary fw-800 text-uppercase small mb-3"><i class="bi bi-geo-alt-fill me-1"></i> Visitor Telemetry</h6>
-                            <div class="mb-3">
-                                <label class="text-muted small fw-bold d-block">Client IP Address</label>
-                                <strong class="text-dark font-monospace small" id="modalClientIp">-</strong>
-                            </div>
-                            <div class="mb-3">
-                                <label class="text-muted small fw-bold d-block">Estimated Location</label>
-                                <strong class="text-dark" id="modalLocation">-</strong>
-                            </div>
-                            <div>
-                                <label class="text-muted small fw-bold d-block">Device Environment</label>
-                                <strong class="text-dark small" id="modalDevice">-</strong>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Message text -->
-                    <div class="col-12">
-                        <div class="p-3 bg-light rounded-4 border">
-                            <label class="text-muted small fw-bold d-block mb-2">Prefilled Customer Message</label>
-                            <p class="mb-0 text-dark small p-3 bg-white border rounded-3" id="modalMessageText" style="white-space: pre-wrap; line-height: 1.6;">-</p>
-                        </div>
+                    <div>
+                        <h3 class="text-base font-black text-slate-900">WhatsApp Lead Telemetry & Details</h3>
+                        <div class="text-[11px] text-slate-400">Captured click-to-chat inquiry footprint</div>
                     </div>
                 </div>
+                <button type="button" @click="open = false" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="bi bi-x-lg"></i></button>
             </div>
-            <div class="modal-footer border-0 pt-0 d-flex justify-content-between">
-                <button type="button" class="btn btn-outline-danger rounded-pill px-3" id="modalDeleteLeadBtn">
-                    <i class="bi bi-trash3 me-1"></i> Delete Lead
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Client Details -->
+                <div class="p-4 bg-slate-50/70 rounded-2xl border border-slate-200/80 space-y-3">
+                    <h4 class="text-xs font-black uppercase text-emerald-600 tracking-wider flex items-center gap-1.5">
+                        <i class="bi bi-person-fill"></i> Customer Identity
+                    </h4>
+                    <div>
+                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Customer Name</div>
+                        <div class="text-sm font-black text-slate-900" id="modalCustomerName">-</div>
+                    </div>
+                    <div>
+                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Phone Number</div>
+                        <div class="text-xs font-mono font-bold text-emerald-600" id="modalCustomerPhone">-</div>
+                    </div>
+                    <div>
+                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Interest Context</div>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-primary text-white mt-0.5" id="modalTourName">-</span>
+                    </div>
+                    <div>
+                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Source Page</div>
+                        <a href="#" target="_blank" rel="noopener" class="text-xs text-primary hover:underline truncate block" id="modalPageUrl">-</a>
+                    </div>
+                </div>
+
+                <!-- Telemetry -->
+                <div class="p-4 bg-slate-50/70 rounded-2xl border border-slate-200/80 space-y-3">
+                    <h4 class="text-xs font-black uppercase text-primary tracking-wider flex items-center gap-1.5">
+                        <i class="bi bi-geo-alt-fill"></i> Visitor Telemetry
+                    </h4>
+                    <div>
+                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Client IP Address</div>
+                        <div class="text-xs font-mono font-bold text-slate-800" id="modalClientIp">-</div>
+                    </div>
+                    <div>
+                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Estimated Location</div>
+                        <div class="text-xs font-bold text-slate-800" id="modalLocation">-</div>
+                    </div>
+                    <div>
+                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Device Environment</div>
+                        <div class="text-xs font-medium text-slate-700" id="modalDevice">-</div>
+                    </div>
+                </div>
+
+                <!-- Message text -->
+                <div class="sm:col-span-2 p-4 bg-slate-50/70 rounded-2xl border border-slate-200/80 space-y-1.5">
+                    <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Prefilled Customer Message</div>
+                    <p class="text-xs text-slate-800 p-3 bg-white border border-slate-200 rounded-xl leading-relaxed whitespace-pre-wrap" id="modalMessageText">-</p>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+                <button type="button" class="inline-flex items-center gap-1 px-3.5 py-2 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-bold transition cursor-pointer" id="modalDeleteLeadBtn">
+                    <i class="bi bi-trash3"></i> Delete Lead
                 </button>
-                <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Close</button>
-                    <a href="#" id="modalDirectChatBtn" target="_blank" class="btn btn-success rounded-pill px-4 fw-bold">
-                        <i class="bi bi-whatsapp me-1"></i> Open Chat on WhatsApp
+                <div class="flex items-center gap-2">
+                    <button type="button" @click="open = false" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold cursor-pointer">Close</button>
+                    <a href="#" id="modalDirectChatBtn" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition">
+                        <i class="bi bi-whatsapp"></i> Open Chat on WhatsApp
                     </a>
                 </div>
             </div>
@@ -333,12 +361,12 @@ $(document).ready(function() {
                 datasets: [{
                     label: 'WhatsApp Leads',
                     data: trendData.map(d => d.count),
-                    borderColor: '#25D366',
-                    backgroundColor: 'rgba(37, 211, 102, 0.1)',
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
                     borderWidth: 3,
                     fill: true,
                     tension: 0.35,
-                    pointBackgroundColor: '#25D366',
+                    pointBackgroundColor: '#10b981',
                     pointRadius: 4
                 }]
             },
@@ -349,8 +377,8 @@ $(document).ready(function() {
                     legend: { display: false }
                 },
                 scales: {
-                    x: { grid: { color: '#f5f5f5' } },
-                    y: { beginAtZero: true, grid: { color: '#f5f5f5' }, ticks: { stepSize: 1 } }
+                    x: { grid: { color: '#f1f5f9' } },
+                    y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { stepSize: 1 } }
                 }
             }
         });
@@ -366,7 +394,7 @@ $(document).ready(function() {
                 labels: tourData.map(t => t.tour_label.length > 20 ? t.tour_label.substring(0, 20) + '...' : t.tour_label),
                 datasets: [{
                     data: tourData.map(t => t.count),
-                    backgroundColor: ['#F58F43', '#25D366', '#3b82f6', '#8b5cf6', '#ec4899'],
+                    backgroundColor: ['#F58F43', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899'],
                     borderWidth: 2
                 }]
             },
@@ -412,11 +440,11 @@ $(document).ready(function() {
 
         const id = btn.data('id');
         $('#modalDeleteLeadBtn').off('click').on('click', function() {
-            $('#leadDetailsModal').modal('hide');
+            window.dispatchEvent(new CustomEvent('close-lead-modal'));
             promptPermanentDeleteLead(id, name, phone);
         });
 
-        $('#leadDetailsModal').modal('show');
+        window.dispatchEvent(new CustomEvent('open-lead-modal'));
     });
 
     // WhatsApp Batch Bulk Selection & Processing
@@ -429,9 +457,9 @@ $(document).ready(function() {
         const count = checkedBoxes.length;
         $waCountBadge.text(count);
         if (count > 0) {
-            $waBulkBar.addClass('active');
+            $waBulkBar.removeClass('hidden');
         } else {
-            $waBulkBar.removeClass('active');
+            $waBulkBar.addClass('hidden');
         }
     }
 
@@ -463,19 +491,19 @@ $(document).ready(function() {
         Swal.fire({
             title: 'CAUTION: Permanent Bulk Deletion',
             html: `
-                <div class="text-start small text-secondary">
-                    <div class="alert alert-danger py-2 px-3 mb-3 border-danger border-opacity-25 bg-danger bg-opacity-10 text-danger fw-semibold">
-                        <i class="bi bi-exclamation-triangle-fill me-1"></i>
-                        <strong>IRREVERSIBLE BULK ACTION:</strong> You are about to permanently purge <strong class="text-dark">${selectedIds.length}</strong> selected WhatsApp lead inquiry record(s) from the database.
+                <div class="text-left text-xs text-slate-600 leading-relaxed">
+                    <div class="p-3 mb-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 font-semibold">
+                        <i class="bi bi-exclamation-triangle-fill mr-1"></i>
+                        <strong>IRREVERSIBLE BULK ACTION:</strong> You are about to permanently purge <strong class="text-slate-900">${selectedIds.length}</strong> selected WhatsApp lead inquiry record(s) from the database.
                     </div>
-                    <p class="mb-2 text-dark">This will permanently delete all associated customer messages, client IP telemetry, and request log analytics. No orphaned footprints will remain.</p>
-                    <p class="mb-0 text-muted">Are you sure you want to proceed to the final confirmation?</p>
+                    <p class="mb-2 text-slate-800">This will permanently delete all associated customer messages, client IP telemetry, and request log analytics. No orphaned footprints will remain.</p>
+                    <p class="mb-0 text-slate-500">Are you sure you want to proceed to the final confirmation?</p>
                 </div>
             `,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#dc3545',
-            cancelButtonColor: '#6c757d',
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#64748b',
             confirmButtonText: 'Proceed to Final Confirmation <i class="bi bi-arrow-right ms-1"></i>',
             cancelButtonText: 'Cancel (Keep Leads)',
             focusCancel: true
@@ -486,8 +514,8 @@ $(document).ready(function() {
             Swal.fire({
                 title: 'Confirm Bulk Deletion',
                 html: `
-                    <div class="text-start small">
-                        <p class="text-dark mb-2">To confirm permanent deletion of <strong>${selectedIds.length}</strong> WhatsApp leads and all analytics footprints, type <strong>DELETE</strong> in capital letters below:</p>
+                    <div class="text-left text-xs">
+                        <p class="text-slate-800 mb-2">To confirm permanent deletion of <strong>${selectedIds.length}</strong> WhatsApp leads and all analytics footprints, type <strong>DELETE</strong> in capital letters below:</p>
                     </div>
                 `,
                 input: 'text',
@@ -498,9 +526,9 @@ $(document).ready(function() {
                 },
                 icon: 'error',
                 showCancelButton: true,
-                confirmButtonColor: '#b02a37',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: '<i class="bi bi-trash3-fill me-1"></i> PURGE ALL SELECTED',
+                confirmButtonColor: '#b91c1c',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: '<i class="bi bi-trash3-fill mr-1"></i> PURGE ALL SELECTED',
                 cancelButtonText: 'Abort',
                 focusCancel: true,
                 showLoaderOnConfirm: true,
@@ -556,27 +584,27 @@ window.promptPermanentDeleteLead = function(id, name, phone) {
     Swal.fire({
         title: 'CAUTION: Permanent Lead Deletion',
         html: `
-            <div class="text-start small text-secondary">
-                <div class="alert alert-danger py-2 px-3 mb-3 border-danger border-opacity-25 bg-danger bg-opacity-10 text-danger fw-semibold">
-                    <i class="bi bi-exclamation-triangle-fill me-1"></i>
-                    <strong>IRREVERSIBLE ACTION:</strong> You are about to permanently eradicate WhatsApp lead inquiry <strong class="text-dark">#${id} (${name})</strong> from the database.
+            <div class="text-left text-xs text-slate-600 leading-relaxed">
+                <div class="p-3 mb-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 font-semibold">
+                    <i class="bi bi-exclamation-triangle-fill mr-1"></i>
+                    <strong>IRREVERSIBLE ACTION:</strong> You are about to permanently eradicate WhatsApp lead inquiry <strong class="text-slate-900">#${id} (${name})</strong> from the database.
                 </div>
-                <div class="card bg-light border-0 p-2.5 mb-3">
-                    <div class="fw-bold text-dark mb-1 small text-uppercase" style="font-size: 11px;">The following records will be permanently purged:</div>
-                    <ul class="mb-0 ps-3 text-muted" style="font-size: 12px; line-height: 1.6;">
+                <div class="p-3 mb-3 bg-slate-50 border border-slate-200 rounded-xl">
+                    <div class="font-bold text-slate-700 mb-1 text-[11px] uppercase">The following records will be permanently purged:</div>
+                    <ul class="list-disc pl-4 text-slate-500 text-xs space-y-1">
                         <li>WhatsApp Lead Record & Contact Information (${phone || 'No Phone'})</li>
                         <li>Prefilled inquiry message & campaign source URL</li>
                         <li>Visitor Analytics, Telemetry & Request Logs (${id})</li>
                         <li>Client IP & Geolocation Audit Trail</li>
                     </ul>
                 </div>
-                <p class="mb-0 text-muted">Are you sure you want to proceed to the final verification?</p>
+                <p class="mb-0 text-slate-500">Are you sure you want to proceed to the final verification?</p>
             </div>
         `,
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#dc3545',
-        cancelButtonColor: '#6c757d',
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
         confirmButtonText: 'Proceed to Final Confirmation <i class="bi bi-arrow-right ms-1"></i>',
         cancelButtonText: 'Cancel (Keep Lead)',
         focusCancel: true
@@ -587,10 +615,10 @@ window.promptPermanentDeleteLead = function(id, name, phone) {
         Swal.fire({
             title: 'Double Confirmation Required',
             html: `
-                <div class="text-start small">
-                    <p class="text-dark mb-2">To prevent accidental deletion, please type the verification value below to authorize permanent destruction:</p>
+                <div class="text-left text-xs">
+                    <p class="text-slate-800 mb-2">To prevent accidental deletion, please type the verification value below to authorize permanent destruction:</p>
                     <div class="text-center my-3">
-                        <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 fs-6 font-monospace py-2 px-3">
+                        <span class="inline-block px-3 py-1.5 rounded-lg bg-rose-50 text-rose-600 border border-rose-200 font-mono text-sm font-bold">
                             ${verifyTarget}
                         </span>
                     </div>
@@ -606,9 +634,9 @@ window.promptPermanentDeleteLead = function(id, name, phone) {
             },
             icon: 'error',
             showCancelButton: true,
-            confirmButtonColor: '#b02a37',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: '<i class="bi bi-trash3-fill me-1"></i> PERMANENTLY PURGE EVERYTHING',
+            confirmButtonColor: '#b91c1c',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: '<i class="bi bi-trash3-fill mr-1"></i> PERMANENTLY PURGE EVERYTHING',
             cancelButtonText: 'Abort',
             focusCancel: true,
             showLoaderOnConfirm: true,
