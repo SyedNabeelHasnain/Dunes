@@ -3,62 +3,72 @@
 @section('page_title', 'Blog Categories')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="h4 fw-800 text-dark mb-0">Blog Categories</h2>
-    <button class="btn btn-primary rounded-pill px-4 fw-800" data-bs-toggle="modal" data-bs-target="#createCategoryModal">
-        <i class="bi bi-plus-lg me-2"></i> Add New Category
-    </button>
-</div>
+<div class="space-y-6" x-data>
+    <!-- Top Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Blog Categories</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Organize and structure travel articles and destination guides.</p>
+        </div>
+        <button type="button" @click="$dispatch('open-add-category')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-xs shadow-xs transition-all cursor-pointer">
+            <i class="bi bi-plus-lg"></i> Add New Category
+        </button>
+    </div>
 
-<!-- Categories Table -->
-<div class="card card-modern border-0 shadow-sm rounded-4 overflow-hidden bg-white mb-4 p-3">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table align-middle mb-0 table-hover datatable" id="categoriesTable">
-                <thead class="table-light small text-uppercase fw-bold text-muted">
+    <!-- Categories Table Card -->
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden p-5">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm text-slate-700 datatable" id="categoriesTable">
+                <thead class="bg-slate-50/80 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
                     <tr>
-                        <th class="ps-4">Category Name</th>
-                        <th>Slug</th>
-                        <th>Description</th>
-                        <th class="text-center">Priority</th>
-                        <th class="text-center">Status</th>
-                        <th class="pe-4 text-end no-sort">Actions</th>
+                        <th class="py-3 px-4">Category Name</th>
+                        <th class="py-3 px-4">Slug</th>
+                        <th class="py-3 px-4">Description</th>
+                        <th class="py-3 px-4 text-center">Priority</th>
+                        <th class="py-3 px-4 text-center">Status</th>
+                        <th class="py-3 px-4 text-right no-sort pe-4">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-slate-100 bg-white">
                     @forelse($categories as $cat)
-                    <tr>
-                        <td class="ps-4">
-                            <div class="fw-bold text-dark fs-6">{{ $cat->name }}</div>
+                    <tr class="hover:bg-slate-50/60 transition-colors">
+                        <td class="py-3 px-4">
+                            <div class="font-bold text-slate-900 text-xs">{{ $cat->name }}</div>
                         </td>
-                        <td><code class="text-primary font-monospace">{{ $cat->slug }}</code></td>
-                        <td><span class="text-muted small">{{ $cat->description ?: '-' }}</span></td>
-                        <td class="fw-bold text-dark text-center">{{ $cat->priority }}</td>
-                        <td class="text-center">
+                        <td class="py-3 px-4">
+                            <code class="text-xs font-mono text-primary bg-primary/5 px-2 py-0.5 rounded-md border border-primary/15">{{ $cat->slug }}</code>
+                        </td>
+                        <td class="py-3 px-4">
+                            <span class="text-slate-500 text-xs">{{ $cat->description ?: '-' }}</span>
+                        </td>
+                        <td class="py-3 px-4 text-center font-bold text-slate-600 text-xs">
+                            {{ $cat->priority }}
+                        </td>
+                        <td class="py-3 px-4 text-center">
                             @if($cat->status === 'active')
-                                <span class="badge bg-success text-capitalize px-3 py-1 rounded-pill">Active</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 capitalize">Active</span>
                             @else
-                                <span class="badge bg-secondary text-capitalize px-3 py-1 rounded-pill">Inactive</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 capitalize">Inactive</span>
                             @endif
                         </td>
-                        <td class="pe-4 text-end">
-                            <div class="d-flex justify-content-end gap-2">
+                        <td class="py-3 px-4 text-right pe-4">
+                            <div class="inline-flex items-center justify-end gap-1.5">
                                 <button type="button" 
-                                        class="btn btn-sm btn-outline-primary rounded-circle d-flex align-items-center justify-content-center edit-cat-btn" 
-                                        style="width: 34px; height: 34px;" 
+                                        class="w-8 h-8 rounded-xl border border-slate-200 hover:border-primary hover:text-primary flex items-center justify-center text-slate-600 bg-white transition shadow-2xs edit-cat-btn cursor-pointer" 
                                         title="Edit Category"
                                         data-id="{{ $cat->id }}"
                                         data-name="{{ $cat->name }}"
                                         data-desc="{{ $cat->description }}"
                                         data-priority="{{ $cat->priority }}"
-                                        data-status="{{ $cat->status }}">
-                                    <i class="bi bi-pencil-fill"></i>
+                                        data-status="{{ $cat->status }}"
+                                        data-action="{{ route('admin.blog-categories.update', $cat->id) }}">
+                                    <i class="bi bi-pencil-fill text-xs"></i>
                                 </button>
-                                <form action="{{ route('admin.blog-categories.destroy', $cat->id) }}" method="POST" class="d-inline delete-form" data-confirm="Are you sure you want to delete this category?">
+                                <form action="{{ route('admin.blog-categories.destroy', $cat->id) }}" method="POST" class="inline delete-form" data-confirm="Are you sure you want to delete this category?">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="Delete Category">
-                                        <i class="bi bi-trash3-fill"></i>
+                                    <button type="submit" class="w-8 h-8 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 flex items-center justify-center bg-white transition shadow-2xs cursor-pointer" title="Delete Category">
+                                        <i class="bi bi-trash3-fill text-xs"></i>
                                     </button>
                                 </form>
                             </div>
@@ -66,7 +76,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center py-5 text-muted">No categories defined.</td>
+                        <td colspan="6" class="text-center py-10 text-slate-400 text-xs">No categories defined.</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -75,87 +85,89 @@
     </div>
 </div>
 
-<!-- Create Category Modal -->
-<div class="modal fade" id="createCategoryModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow bg-white">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-800 text-dark">Add Blog Category</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- Modal: Create Category (Alpine.js) -->
+<div x-data="{ open: false }" @open-add-category.window="open = true" x-show="open" x-cloak class="relative z-50">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" @click="open = false"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20 flex items-center justify-center">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full p-6 space-y-4" @click.stop>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <h3 class="text-base font-black text-slate-900 flex items-center gap-2">
+                    <i class="bi bi-folder-plus text-primary"></i> Add Blog Category
+                </h3>
+                <button type="button" @click="open = false" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="bi bi-x-lg"></i></button>
             </div>
-            <div class="modal-body p-4">
-                <form action="{{ route('admin.blog-categories.store') }}" method="POST">
-                    @csrf
-                    <div class="mb-3">
-                        <label for="c_name" class="form-label fw-bold text-dark">Category Name</label>
-                        <input type="text" name="name" id="c_name" class="form-control" required placeholder="e.g. Travel Guides">
+            <form action="{{ route('admin.blog-categories.store') }}" method="POST" class="space-y-4">
+                @csrf
+                <div>
+                    <label for="c_name" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Category Name *</label>
+                    <input type="text" name="name" id="c_name" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary" required placeholder="e.g. Travel Guides">
+                </div>
+                <div>
+                    <label for="c_desc" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Description</label>
+                    <input type="text" name="description" id="c_desc" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary" placeholder="Short description of category content">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="c_priority" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Priority *</label>
+                        <input type="number" name="priority" id="c_priority" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden focus:border-primary" value="99" required>
                     </div>
-                    <div class="mb-3">
-                        <label for="c_desc" class="form-label fw-bold text-dark">Description</label>
-                        <input type="text" name="description" id="c_desc" class="form-control" placeholder="Short description of category content">
+                    <div>
+                        <label for="c_status" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Status *</label>
+                        <select name="status" id="c_status" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden bg-white">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
                     </div>
-                    <div class="row g-2 mb-4">
-                        <div class="col-6">
-                            <label for="c_priority" class="form-label fw-bold text-dark small">Priority</label>
-                            <input type="number" name="priority" id="c_priority" class="form-control form-control-sm" value="99" required>
-                        </div>
-                        <div class="col-6">
-                            <label for="c_status" class="form-label fw-bold text-dark small">Status</label>
-                            <select name="status" id="c_status" class="form-select form-select-sm" required>
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="text-end">
-                        <button type="button" class="btn btn-secondary rounded-pill px-4 me-1" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary rounded-pill px-4">Create Category</button>
-                    </div>
-                </form>
-            </div>
+                </div>
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button type="button" @click="open = false" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold cursor-pointer">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold shadow-xs transition cursor-pointer">Create Category</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
-<!-- Edit Category Modal -->
-<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow bg-white">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-800 text-dark">Edit Blog Category</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- Modal: Edit Category (Alpine.js) -->
+<div x-data="{ open: false }" @open-edit-category.window="open = true" x-show="open" x-cloak class="relative z-50">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" @click="open = false"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20 flex items-center justify-center">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full p-6 space-y-4" @click.stop>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <h3 class="text-base font-black text-slate-900 flex items-center gap-2">
+                    <i class="bi bi-pencil-square text-primary"></i> Edit Blog Category
+                </h3>
+                <button type="button" @click="open = false" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="bi bi-x-lg"></i></button>
             </div>
-            <div class="modal-body p-4">
-                <form id="editCategoryForm" method="POST">
-                    @csrf
-                    @method('PUT')
-                    <div class="mb-3">
-                        <label for="e_name" class="form-label fw-bold text-dark">Category Name</label>
-                        <input type="text" name="name" id="e_name" class="form-control" required>
+            <form id="editCategoryForm" method="POST" class="space-y-4">
+                @csrf
+                @method('PUT')
+                <div>
+                    <label for="e_name" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Category Name *</label>
+                    <input type="text" name="name" id="e_name" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary" required>
+                </div>
+                <div>
+                    <label for="e_desc" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Description</label>
+                    <input type="text" name="description" id="e_desc" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="e_priority" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Priority *</label>
+                        <input type="number" name="priority" id="e_priority" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden focus:border-primary" required>
                     </div>
-                    <div class="mb-3">
-                        <label for="e_desc" class="form-label fw-bold text-dark">Description</label>
-                        <input type="text" name="description" id="e_desc" class="form-control">
+                    <div>
+                        <label for="e_status" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Status *</label>
+                        <select name="status" id="e_status" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden bg-white">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
                     </div>
-                    <div class="row g-2 mb-4">
-                        <div class="col-6">
-                            <label for="e_priority" class="form-label fw-bold text-dark small">Priority</label>
-                            <input type="number" name="priority" id="e_priority" class="form-control form-control-sm" required>
-                        </div>
-                        <div class="col-6">
-                            <label for="e_status" class="form-label fw-bold text-dark small">Status</label>
-                            <select name="status" id="e_status" class="form-select form-select-sm" required>
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="text-end">
-                        <button type="button" class="btn btn-secondary rounded-pill px-4 me-1" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary rounded-pill px-4">Update Category</button>
-                    </div>
-                </form>
-            </div>
+                </div>
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button type="button" @click="open = false" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold cursor-pointer">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold shadow-xs transition cursor-pointer">Update Category</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -169,6 +181,7 @@ $(document).ready(function() {
         const desc = $(this).data('desc');
         const priority = $(this).data('priority');
         const status = $(this).data('status');
+        const action = $(this).data('action') || `/admin/blog-categories/${id}`;
 
         $('#e_name').val(name);
         $('#e_desc').val(desc);
@@ -176,11 +189,10 @@ $(document).ready(function() {
         $('#e_status').val(status);
 
         // Update form action
-        $('#editCategoryForm').attr('action', `/admin/blog-categories/${id}`);
+        $('#editCategoryForm').attr('action', action);
 
-        // Open modal
-        const myModal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
-        myModal.show();
+        // Open Alpine modal
+        window.dispatchEvent(new CustomEvent('open-edit-category'));
     });
 });
 </script>

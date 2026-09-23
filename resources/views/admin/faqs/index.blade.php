@@ -3,67 +3,72 @@
 @section('page_title', 'FAQs')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="h4 fw-800 text-dark mb-0">Frequently Asked Questions</h2>
-    <button class="btn btn-primary rounded-pill px-4 fw-800" data-bs-toggle="modal" data-bs-target="#createFaqModal">
-        <i class="bi bi-plus-lg me-2"></i> Log New FAQ
-    </button>
-</div>
+<div class="space-y-6" x-data>
+    <!-- Top Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Frequently Asked Questions</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Manage customer inquiries, general service guidelines, and tour-specific FAQ answers.</p>
+        </div>
+        <button type="button" @click="$dispatch('open-add-faq')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-xs shadow-xs transition-all cursor-pointer">
+            <i class="bi bi-plus-lg"></i> Log New FAQ
+        </button>
+    </div>
 
-<!-- FAQs Table Card -->
-<div class="card card-modern border shadow-sm rounded-4 overflow-hidden bg-white mb-4">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table align-middle mb-0 table-hover datatable" id="faqsTable">
-                <thead class="table-light small text-uppercase fw-bold text-muted">
+    <!-- FAQs Table Card -->
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden p-5">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm text-slate-700 datatable" id="faqsTable">
+                <thead class="bg-slate-50/80 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
                     <tr>
-                        <th class="ps-4">Question</th>
-                        <th>Answer Snippet</th>
-                        <th>Assignment</th>
-                        <th class="text-center">Status</th>
-                        <th class="text-center">Priority</th>
-                        <th class="pe-4 text-end no-sort">Actions</th>
+                        <th class="py-3 px-4">Question</th>
+                        <th class="py-3 px-4">Answer Snippet</th>
+                        <th class="py-3 px-4">Assignment</th>
+                        <th class="py-3 px-4 text-center">Status</th>
+                        <th class="py-3 px-4 text-center">Priority</th>
+                        <th class="py-3 px-4 text-right no-sort pe-4">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-slate-100 bg-white">
                     @forelse($faqs as $faq)
                     @php
                         $assignment = $faq->assignments->first();
                         $assignmentType = $assignment ? $assignment->entity_type : 'general';
                         $entityId = $assignment ? $assignment->entity_id : null;
                     @endphp
-                    <tr>
-                        <td class="ps-4">
-                            <div class="fw-bold text-dark fs-6">{{ $faq->question }}</div>
+                    <tr class="hover:bg-slate-50/60 transition-colors">
+                        <td class="py-3 px-4">
+                            <div class="font-bold text-slate-900 text-xs">{{ $faq->question }}</div>
                         </td>
-                        <td>
-                            <div class="text-muted small text-truncate" style="max-width: 320px;">{{ $faq->answer }}</div>
+                        <td class="py-3 px-4">
+                            <div class="text-slate-500 text-xs truncate max-w-sm">{{ $faq->answer }}</div>
                         </td>
-                        <td>
+                        <td class="py-3 px-4">
                             @if($assignmentType === 'general')
-                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 rounded-pill fw-bold small">General FAQ</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">General FAQ</span>
                             @else
                                 @php
                                     $tourName = $tours->firstWhere('id', $entityId)->name ?? 'Deleted Tour';
                                 @endphp
-                                <span class="badge bg-info-subtle text-info border border-info-subtle px-3 py-1 rounded-pill fw-bold small" title="{{ $tourName }}">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200" title="{{ $tourName }}">
                                     Tour: {{ Str::limit($tourName, 25) }}
                                 </span>
                             @endif
                         </td>
-                        <td class="text-center">
+                        <td class="py-3 px-4 text-center">
                             @if($faq->status === 'active')
-                                <span class="badge bg-success text-capitalize px-3 py-1 rounded-pill badge-interactive ajax-toggle-status" data-url="{{ route('admin.faqs.toggle-status', $faq->id) }}" title="Click to toggle status">Active</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 capitalize badge-interactive ajax-toggle-status cursor-pointer" data-url="{{ route('admin.faqs.toggle-status', $faq->id) }}" title="Click to toggle status">Active</span>
                             @else
-                                <span class="badge bg-secondary text-capitalize px-3 py-1 rounded-pill badge-interactive ajax-toggle-status" data-url="{{ route('admin.faqs.toggle-status', $faq->id) }}" title="Click to toggle status">Inactive</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 capitalize badge-interactive ajax-toggle-status cursor-pointer" data-url="{{ route('admin.faqs.toggle-status', $faq->id) }}" title="Click to toggle status">Inactive</span>
                             @endif
                         </td>
-                        <td class="fw-bold text-dark text-center">{{ $faq->priority }}</td>
-                        <td class="pe-4 text-end">
-                            <div class="d-flex justify-content-end gap-2">
+                        <td class="py-3 px-4 text-center font-bold text-slate-600 text-xs">
+                            {{ $faq->priority }}
+                        </td>
+                        <td class="py-3 px-4 text-right pe-4">
+                            <div class="inline-flex items-center justify-end gap-1.5">
                                 <button type="button" 
-                                        class="btn btn-sm btn-outline-primary rounded-circle d-flex align-items-center justify-content-center edit-faq-btn" 
-                                        style="width: 34px; height: 34px;" 
+                                        class="w-8 h-8 rounded-xl border border-slate-200 hover:border-primary hover:text-primary flex items-center justify-center text-slate-600 bg-white transition shadow-2xs edit-faq-btn cursor-pointer" 
                                         title="Edit FAQ"
                                         data-id="{{ $faq->id }}"
                                         data-question="{{ $faq->question }}"
@@ -71,14 +76,15 @@
                                         data-priority="{{ $faq->priority }}"
                                         data-status="{{ $faq->status }}"
                                         data-type="{{ $assignmentType }}"
-                                        data-tour-id="{{ $entityId }}">
-                                    <i class="bi bi-pencil-fill"></i>
+                                        data-tour-id="{{ $entityId }}"
+                                        data-action="{{ route('admin.faqs.update', $faq->id) }}">
+                                    <i class="bi bi-pencil-fill text-xs"></i>
                                 </button>
-                                <form action="{{ route('admin.faqs.destroy', $faq->id) }}" method="POST" class="d-inline delete-form" data-confirm="Are you sure you want to delete this FAQ?">
+                                <form action="{{ route('admin.faqs.destroy', $faq->id) }}" method="POST" class="inline delete-form" data-confirm="Are you sure you want to delete this FAQ?">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Delete FAQ">
-                                        <i class="bi bi-trash3-fill"></i>
+                                    <button type="submit" class="w-8 h-8 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 flex items-center justify-center bg-white transition shadow-2xs cursor-pointer" title="Delete FAQ">
+                                        <i class="bi bi-trash3-fill text-xs"></i>
                                     </button>
                                 </form>
                             </div>
@@ -86,7 +92,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center py-4 text-muted">No FAQs loaded yet.</td>
+                        <td colspan="6" class="text-center py-10 text-slate-400 text-xs">No FAQs loaded yet.</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -95,136 +101,129 @@
     </div>
 </div>
 
-<!-- Create FAQ Modal -->
-<div class="modal fade" id="createFaqModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow bg-white">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-800 text-dark">Log New FAQ</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- Modal: Create FAQ (Alpine.js) -->
+<div x-data="{ open: false, isTour: false }" @open-add-faq.window="open = true" x-show="open" x-cloak class="relative z-50">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" @click="open = false"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20 flex items-center justify-center">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full p-6 space-y-4" @click.stop>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <h3 class="text-base font-black text-slate-900 flex items-center gap-2">
+                    <i class="bi bi-question-circle text-primary"></i> Log New FAQ
+                </h3>
+                <button type="button" @click="open = false" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="bi bi-x-lg"></i></button>
             </div>
-            <div class="modal-body p-4">
-                <form action="{{ route('admin.faqs.store') }}" method="POST">
-                    @csrf
-                    <div class="mb-3">
-                        <label for="c_question" class="form-label fw-bold text-dark">Question</label>
-                        <input type="text" name="question" id="c_question" class="form-control" required placeholder="e.g. What is the dress code?">
+            <form action="{{ route('admin.faqs.store') }}" method="POST" class="space-y-4">
+                @csrf
+                <div>
+                    <label for="c_question" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Question *</label>
+                    <input type="text" name="question" id="c_question" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary" required placeholder="e.g. What is the dress code?">
+                </div>
+                <div>
+                    <label for="c_answer" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Answer *</label>
+                    <textarea name="answer" id="c_answer" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary" rows="4" required placeholder="Describe the answer details here..."></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="c_assignment_type" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Assignment Scope</label>
+                        <select name="assignment_type" id="c_assignment_type" @change="isTour = ($event.target.value === 'tour')" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden bg-white">
+                            <option value="general">General (Global FAQ)</option>
+                            <option value="tour">Tour-Specific FAQ</option>
+                        </select>
                     </div>
-                    <div class="mb-3">
-                        <label for="c_answer" class="form-label fw-bold text-dark">Answer</label>
-                        <textarea name="answer" id="c_answer" class="form-control" rows="4" required placeholder="Describe the answer details here..."></textarea>
+                    <div x-show="isTour" x-cloak>
+                        <label for="c_tour_id" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Target Tour</label>
+                        <select name="tour_id" id="c_tour_id" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden bg-white">
+                            @foreach($tours as $t)
+                                <option value="{{ $t->id }}">{{ $t->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
-                    <div class="row g-2 mb-3">
-                        <div class="col-6">
-                            <label for="c_assignment_type" class="form-label fw-bold text-dark small">Assignment Scope</label>
-                            <select name="assignment_type" id="c_assignment_type" class="form-select form-select-sm" onchange="toggleTourSelector('c')">
-                                <option value="general">General (Global FAQ)</option>
-                                <option value="tour">Tour-Specific FAQ</option>
-                            </select>
-                        </div>
-                        <div class="col-6 d-none" id="c_tour_selector_group">
-                            <label for="c_tour_id" class="form-label fw-bold text-dark small">Select Target Tour</label>
-                            <select name="tour_id" id="c_tour_id" class="form-select form-select-sm">
-                                @foreach($tours as $t)
-                                    <option value="{{ $t->id }}">{{ $t->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="c_priority" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Priority *</label>
+                        <input type="number" name="priority" id="c_priority" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden focus:border-primary" value="99" required>
                     </div>
-                    <div class="row g-2 mb-4">
-                        <div class="col-6">
-                            <label for="c_priority" class="form-label fw-bold text-dark small">Priority</label>
-                            <input type="number" name="priority" id="c_priority" class="form-control form-control-sm" value="99" required>
-                        </div>
-                        <div class="col-6">
-                            <label for="c_status" class="form-label fw-bold text-dark small">Status</label>
-                            <select name="status" id="c_status" class="form-select form-select-sm" required>
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
+                    <div>
+                        <label for="c_status" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Status *</label>
+                        <select name="status" id="c_status" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden bg-white">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
                     </div>
-                    <div class="text-end">
-                        <button type="button" class="btn btn-secondary rounded-pill px-4 me-1" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary rounded-pill px-4">Create FAQ</button>
-                    </div>
-                </form>
-            </div>
+                </div>
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button type="button" @click="open = false" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold cursor-pointer">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold shadow-xs transition cursor-pointer">Create FAQ</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
-<!-- Edit FAQ Modal -->
-<div class="modal fade" id="editFaqModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow bg-white">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-800 text-dark">Modify FAQ Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- Modal: Edit FAQ (Alpine.js) -->
+<div x-data="{ open: false, isTour: false }" @open-edit-faq.window="open = true; isTour = ($('#e_assignment_type').val() === 'tour')" x-show="open" x-cloak class="relative z-50">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" @click="open = false"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20 flex items-center justify-center">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full p-6 space-y-4" @click.stop>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <h3 class="text-base font-black text-slate-900 flex items-center gap-2">
+                    <i class="bi bi-pencil-square text-primary"></i> Modify FAQ Details
+                </h3>
+                <button type="button" @click="open = false" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="bi bi-x-lg"></i></button>
             </div>
-            <div class="modal-body p-4">
-                <form id="editFaqForm" method="POST">
-                    @csrf
-                    @method('PUT')
-                    <div class="mb-3">
-                        <label for="e_question" class="form-label fw-bold text-dark">Question</label>
-                        <input type="text" name="question" id="e_question" class="form-control" required>
+            <form id="editFaqForm" method="POST" class="space-y-4">
+                @csrf
+                @method('PUT')
+                <div>
+                    <label for="e_question" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Question *</label>
+                    <input type="text" name="question" id="e_question" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary" required>
+                </div>
+                <div>
+                    <label for="e_answer" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Answer *</label>
+                    <textarea name="answer" id="e_answer" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary" rows="4" required></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="e_assignment_type" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Assignment Scope</label>
+                        <select name="assignment_type" id="e_assignment_type" @change="isTour = ($event.target.value === 'tour')" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden bg-white">
+                            <option value="general">General (Global FAQ)</option>
+                            <option value="tour">Tour-Specific FAQ</option>
+                        </select>
                     </div>
-                    <div class="mb-3">
-                        <label for="e_answer" class="form-label fw-bold text-dark">Answer</label>
-                        <textarea name="answer" id="e_answer" class="form-control" rows="4" required></textarea>
+                    <div x-show="isTour" x-cloak>
+                        <label for="e_tour_id" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Target Tour</label>
+                        <select name="tour_id" id="e_tour_id" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden bg-white">
+                            @foreach($tours as $t)
+                                <option value="{{ $t->id }}">{{ $t->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
-                    <div class="row g-2 mb-3">
-                        <div class="col-6">
-                            <label for="e_assignment_type" class="form-label fw-bold text-dark small">Assignment Scope</label>
-                            <select name="assignment_type" id="e_assignment_type" class="form-select form-select-sm" onchange="toggleTourSelector('e')">
-                                <option value="general">General (Global FAQ)</option>
-                                <option value="tour">Tour-Specific FAQ</option>
-                            </select>
-                        </div>
-                        <div class="col-6" id="e_tour_selector_group">
-                            <label for="e_tour_id" class="form-label fw-bold text-dark small">Select Target Tour</label>
-                            <select name="tour_id" id="e_tour_id" class="form-select form-select-sm">
-                                @foreach($tours as $t)
-                                    <option value="{{ $t->id }}">{{ $t->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="e_priority" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Priority *</label>
+                        <input type="number" name="priority" id="e_priority" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden focus:border-primary" required>
                     </div>
-                    <div class="row g-2 mb-4">
-                        <div class="col-6">
-                            <label for="e_priority" class="form-label fw-bold text-dark small">Priority</label>
-                            <input type="number" name="priority" id="e_priority" class="form-control form-control-sm" required>
-                        </div>
-                        <div class="col-6">
-                            <label for="e_status" class="form-label fw-bold text-dark small">Status</label>
-                            <select name="status" id="e_status" class="form-select form-select-sm" required>
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
+                    <div>
+                        <label for="e_status" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Status *</label>
+                        <select name="status" id="e_status" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden bg-white">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
                     </div>
-                    <div class="text-end">
-                        <button type="button" class="btn btn-secondary rounded-pill px-4 me-1" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary rounded-pill px-4">Update FAQ</button>
-                    </div>
-                </form>
-            </div>
+                </div>
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button type="button" @click="open = false" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold cursor-pointer">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold shadow-xs transition cursor-pointer">Update FAQ</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
 @push('scripts')
 <script>
-function toggleTourSelector(prefix) {
-    const type = $(`#${prefix}_assignment_type`).val();
-    if(type === 'tour') {
-        $(`#${prefix}_tour_selector_group`).removeClass('d-none');
-    } else {
-        $(`#${prefix}_tour_selector_group`).addClass('d-none');
-    }
-}
-
 $(document).ready(function() {
     $('.edit-faq-btn').on('click', function() {
         const id = $(this).data('id');
@@ -234,6 +233,7 @@ $(document).ready(function() {
         const status = $(this).data('status');
         const type = $(this).data('type');
         const tourId = $(this).data('tour-id');
+        const action = $(this).data('action') || `/admin/faqs/${id}`;
 
         $('#e_question').val(question);
         $('#e_answer').val(answer);
@@ -242,19 +242,16 @@ $(document).ready(function() {
         $('#e_assignment_type').val(type);
         
         if (type === 'tour') {
-            $('#e_tour_selector_group').removeClass('d-none');
             $('#e_tour_id').val(tourId);
         } else {
-            $('#e_tour_selector_group').addClass('d-none');
             $('#e_tour_id').val('');
         }
 
         // Set action url
-        $('#editFaqForm').attr('action', `/admin/faqs/${id}`);
+        $('#editFaqForm').attr('action', action);
 
-        // Show modal
-        const myModal = new bootstrap.Modal(document.getElementById('editFaqModal'));
-        myModal.show();
+        // Open Alpine modal
+        window.dispatchEvent(new CustomEvent('open-edit-faq'));
     });
 });
 </script>
