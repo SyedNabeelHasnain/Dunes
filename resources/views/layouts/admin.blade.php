@@ -1,1012 +1,566 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Admin CMS | Dunes Discovery Tourism</title>
+    <title>@yield('page_title', 'Dashboard') | Admin CMS | Dunes Discovery Tourism</title>
     
-    <!-- CSS Stylesheets -->
-    <link href="{{ asset('assets/vendor/bootstrap/5.3.2/css/bootstrap.min.css') }}" rel="stylesheet">
-    <link rel="preload" href="{{ asset('assets/vendor/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
-    @php
-        $adminCacheVer = $settings['cache_version'] ?? '1';
-    @endphp
-    <link href="{{ asset('assets/css/app.css') }}?v={{ $adminCacheVer }}" rel="stylesheet">
-    
-    <style>
-        /* Quill WYSIWYG Editor Styling */
-        .ql-toolbar.ql-snow {
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-            border-color: #dee2e6 !important;
-            background: #f8fafc;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .ql-container.ql-snow {
-            border-bottom-left-radius: 10px;
-            border-bottom-right-radius: 10px;
-            border-color: #dee2e6 !important;
-            font-family: inherit;
-            font-size: 0.95rem;
-            min-height: 220px;
-        }
-        .ql-editor {
-            min-height: 200px;
-            line-height: 1.6;
-        }
-        /* DataTables Buttons Styling */
-        .dt-buttons .btn {
-            font-size: 0.78rem;
-            font-weight: 600;
-            padding: 0.35rem 0.75rem;
-            border-radius: 50px !important;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            transition: all 0.2s ease;
-        }
-        .dt-buttons .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        /* Floating Batch Bulk Action Toolbar */
-        .bulk-action-bar {
-            position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%) translateY(120%);
-            z-index: 1050;
-            background: #1e293b;
-            color: #ffffff;
-            border-radius: 50px;
-            padding: 10px 24px;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .bulk-action-bar.show {
-            transform: translateX(-50%) translateY(0);
-        }
-        /* Global SVG & Pagination Safeguards */
-        svg {
-            max-width: 100%;
-        }
-        .pagination svg, nav svg, nav[role="navigation"] svg {
-            width: 1.25rem !important;
-            height: 1.25rem !important;
-            max-width: 1.25rem !important;
-            max-height: 1.25rem !important;
-            display: inline-block !important;
-            vertical-align: middle !important;
-        }
-        nav[role="navigation"] {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-        .loader-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.8); z-index: 9999; display: none;
-            justify-content: center; align-items: center; flex-direction: column;
-        }
-        .spinner {
-            width: 50px; height: 50px; border: 5px solid #f3f3f3;
-            border-top: 5px solid var(--bs-primary); border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 1rem;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    <!-- Vector Icons Suite & Quill WYSIWYG CSS -->
+    <link rel="stylesheet" href="{{ asset('assets/vendor/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css">
 
-        /* Real-Time Insightful Counter & Loader States */
-        @keyframes kpiShimmer {
-            0% { opacity: 0.35; transform: scale(0.98); }
-            50% { opacity: 0.85; transform: scale(1); }
-            100% { opacity: 0.35; transform: scale(0.98); }
-        }
-        .counter-shimmer {
-            display: inline-block;
-            min-width: 48px;
-            height: 1.2em;
-            background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
-            background-size: 200% 100%;
-            border-radius: 6px;
-            animation: kpiShimmer 1.2s ease-in-out infinite;
-            vertical-align: middle;
-        }
-        .kpi-sync-spin {
-            animation: spin 0.8s linear infinite !important;
-        }
-        .live-pulse-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: #10b981;
-            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-            animation: livePulse 2s infinite;
-        }
-        @keyframes livePulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-        }
+    <!-- Admin Tailwind CSS v4 & Alpine.js Enterprise Portal Engine via Vite -->
+    @vite(['resources/css/admin.css', 'resources/js/admin.js'])
 
-        .popover-primary {
-            --bs-popover-border-color: var(--bs-primary);
-            --bs-popover-header-bg: var(--bs-primary);
-            --bs-popover-header-color: var(--bs-white);
-            --bs-popover-body-padding-x: 0;
-            --bs-popover-body-padding-y: 0;
-        }
-        .popover-primary .popover-header {
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 0.5px;
-        }
-        .popover-body-content {
-            max-height: 250px;
-            overflow-y: auto;
-            min-width: 250px;
-        }
-
-        /* Ensure Admin Sidebar is a fixed flex column with permanently pinned footer */
-        .admin-sidebar {
-            display: flex !important;
-            flex-direction: column !important;
-            height: 100vh !important;
-            position: fixed !important;
-            top: 0;
-            left: 0;
-            z-index: 1040;
-        }
-        .sidebar-brand {
-            flex-shrink: 0 !important;
-        }
-        .sidebar-scroll {
-            flex: 1 1 auto !important;
-            height: auto !important;
-            overflow-y: auto !important;
-            scrollbar-width: thin;
-        }
-        .sidebar-footer {
-            flex-shrink: 0 !important;
-            background: #08172c !important;
-            border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
-            padding: 12px 16px !important;
-        }
-
-        /* DataTables Sorting & Clean Table Styling */
-        table.dataTable thead th,
-        table.table thead th {
-            position: relative;
-            cursor: pointer;
-            user-select: none;
-            transition: background-color 0.15s ease, color 0.15s ease;
-            white-space: nowrap;
-        }
-        table.dataTable thead th:not(.no-sort):hover,
-        table.table thead th:not(.no-sort):hover {
-            background-color: rgba(245, 143, 67, 0.08) !important;
-            color: #F58F43 !important;
-        }
-        table.dataTable thead th.no-sort,
-        table.table thead th.no-sort {
-            cursor: default !important;
-        }
-        /* Prominent High-Contrast Sort Arrows */
-        table.dataTable thead th.sorting::after {
-            content: " \21C5" !important;
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            opacity: 0.4;
-            font-size: 0.9rem;
-            font-weight: 700;
-        }
-        table.dataTable thead th.sorting_asc::after {
-            content: " \25B2" !important;
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            opacity: 1;
-            color: #F58F43 !important;
-            font-size: 0.85rem;
-            font-weight: 700;
-        }
-        table.dataTable thead th.sorting_desc::after {
-            content: " \25BC" !important;
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            opacity: 1;
-            color: #F58F43 !important;
-            font-size: 0.85rem;
-            font-weight: 700;
-        }
-        table.dataTable thead th.no-sort::after,
-        table.dataTable thead th.no-sort::before {
-            display: none !important;
-            content: "" !important;
-        }
-
-        .dataTables_wrapper .dataTables_filter input {
-            border-radius: 50rem;
-            padding: 0.4rem 1.25rem;
-            border: 1px solid #dee2e6;
-            outline: none;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.04);
-            font-size: 0.875rem;
-        }
-        .dataTables_wrapper .dataTables_filter input:focus {
-            border-color: #F58F43;
-            box-shadow: 0 0 0 0.25rem rgba(245, 143, 67, 0.25);
-        }
-        .dataTables_wrapper .dataTables_length select {
-            border-radius: 50rem;
-            padding: 0.35rem 2rem 0.35rem 0.85rem;
-            border: 1px solid #dee2e6;
-            font-size: 0.875rem;
-        }
-        .dataTables_wrapper .dataTables_paginate .page-link {
-            border-radius: 50rem;
-            margin: 0 2px;
-            font-size: 0.875rem;
-            color: #0f2239;
-        }
-        .dataTables_wrapper .dataTables_paginate .page-item.active .page-link {
-            background-color: #F58F43;
-            border-color: #F58F43;
-            color: #ffffff;
-        }
-
-        /* Interactive Command Palette */
-        .cmd-item {
-            cursor: pointer;
-            transition: all 0.15s ease-in-out;
-            text-decoration: none;
-        }
-        .cmd-item:hover, .cmd-item.active {
-            background-color: #f8f9fa;
-            border-color: #F58F43 !important;
-            transform: translateX(4px);
-        }
-
-        /* Clickable Ajax Status Badges */
-        .badge-interactive {
-            cursor: pointer;
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
-        }
-        .badge-interactive:hover {
-            transform: scale(1.06);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-        }
-
-        /* Mobile Sidebar Overlay */
-        .sidebar-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.5);
-            backdrop-filter: blur(2px);
-            z-index: 1039;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.25s ease;
-        }
-        .sidebar-overlay.show {
-            opacity: 1;
-            pointer-events: auto;
-        }
-    </style>
     @stack('styles')
 </head>
-<body>
+<body class="bg-slate-50 font-sans text-slate-800 antialiased min-h-screen flex flex-col" x-data>
 
-    <!-- Loader Processing Overlay -->
-    <div class="loader-overlay" id="appLoader">
-        <div class="spinner mb-3"></div>
-        <div class="fw-bold text-primary">Processing...</div>
+    <!-- Global Processing Loader Overlay -->
+    <div id="appLoader" class="fixed inset-0 z-50 bg-white/80 backdrop-blur-xs hidden flex-col items-center justify-center">
+        <div class="w-12 h-12 border-4 border-slate-200 border-t-primary rounded-full animate-spin mb-3"></div>
+        <div class="font-bold text-primary text-sm tracking-wide">Processing...</div>
     </div>
 
-    <!-- Mobile Sidebar Overlay -->
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="document.getElementById('sidebar').classList.remove('show'); this.classList.remove('show')"></div>
+    <!-- Mobile Sidebar Drawer Backdrop -->
+    <div x-show="$store.admin.mobileSidebarOpen" 
+         x-transition:enter="transition-opacity ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition-opacity ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         @click="$store.admin.closeMobileSidebar()" 
+         class="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-xs lg:hidden"
+         style="display: none;"></div>
 
-    <!-- Sidebar navigation -->
-    <aside class="admin-sidebar shadow-lg" id="sidebar">
-        <div class="sidebar-brand d-flex align-items-center justify-content-between">
-            <div class="brand-text">
-                <h4 class="text-white fw-800 mb-0">DUNES<span class="text-primary">CMS</span></h4>
-            </div>
-            <button class="btn btn-link text-white p-0 d-none d-lg-block" id="sidebarToggleDesktop">
-                <i class="bi bi-list fs-4"></i>
+    <!-- Mobile Slide-over Sidebar Drawer -->
+    <aside x-show="$store.admin.mobileSidebarOpen"
+           x-transition:enter="transition-transform ease-out duration-300"
+           x-transition:enter-start="-translate-x-full"
+           x-transition:enter-end="translate-x-0"
+           x-transition:leave="transition-transform ease-in duration-200"
+           x-transition:leave-start="translate-x-0"
+           x-transition:leave-end="-translate-x-full"
+           class="fixed top-0 bottom-0 left-0 z-50 w-72 bg-slate-950 text-slate-200 shadow-2xl flex flex-col lg:hidden"
+           style="display: none;">
+        <!-- Brand Header -->
+        <div class="h-16 px-4 flex items-center justify-between border-b border-slate-800/80 shrink-0">
+            <h4 class="text-white font-extrabold tracking-tight text-lg mb-0">DUNES<span class="text-primary">CMS</span></h4>
+            <button type="button" @click="$store.admin.closeMobileSidebar()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+                <i class="bi bi-x-lg text-lg"></i>
             </button>
         </div>
-        <div class="sidebar-scroll">
-            <a href="{{ route('admin.dashboard') }}" class="sidebar-link {{ request()->routeIs('admin.dashboard*') ? 'active' : '' }}">
-                <i class="bi bi-grid-1x2-fill"></i> <span>Dashboard</span>
+        <!-- Scrollable Navigation Links -->
+        <div class="flex-1 overflow-y-auto p-3 space-y-1 sidebar-scroll text-sm">
+            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.dashboard*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-grid-1x2-fill text-base"></i> <span>Dashboard</span>
             </a>
-            <a href="{{ route('admin.analytics.index') }}" class="sidebar-link {{ request()->routeIs('admin.analytics*') ? 'active' : '' }}">
-                <i class="bi bi-graph-up-arrow"></i> <span>Analytics</span>
+            <a href="{{ route('admin.analytics.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.analytics*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-graph-up-arrow text-base"></i> <span>Analytics</span>
             </a>
-            <a href="{{ route('admin.bookings.index') }}" class="sidebar-link {{ request()->routeIs('admin.bookings*') ? 'active' : '' }}">
-                <i class="bi bi-calendar2-check-fill"></i> <span>Bookings</span>
+            <a href="{{ route('admin.bookings.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.bookings*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-calendar2-check-fill text-base"></i> <span>Bookings</span>
             </a>
-            <a href="{{ route('admin.operations.index') }}" class="sidebar-link {{ request()->routeIs('admin.operations*') ? 'active' : '' }}">
-                <i class="bi bi-truck-flatbed text-warning"></i> <span>Daily Operations</span>
+            <a href="{{ route('admin.operations.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.operations*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-truck-flatbed text-amber-400 text-base"></i> <span>Daily Operations</span>
             </a>
-            <a href="{{ route('admin.inquiries.index') }}" class="sidebar-link {{ request()->routeIs('admin.inquiries*') ? 'active' : '' }}">
-                <i class="bi bi-envelope-paper-fill"></i> <span>Inquiries</span>
+            <a href="{{ route('admin.inquiries.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.inquiries*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-envelope-paper-fill text-base"></i> <span>Inquiries</span>
             </a>
-            <a href="{{ route('admin.whatsapp.leads') }}" class="sidebar-link {{ request()->routeIs('admin.whatsapp.leads') ? 'active' : '' }}">
-                <i class="bi bi-whatsapp"></i> <span>WhatsApp Leads</span>
-            </a>
-
-            <div class="sidebar-heading">Tour Management</div>
-            <a href="{{ route('admin.tours.index') }}" class="sidebar-link {{ request()->routeIs('admin.tours*') ? 'active' : '' }}">
-                <i class="bi bi-compass-fill"></i> <span>Tours Inventory</span>
-            </a>
-            <a href="{{ route('admin.addons.index') }}" class="sidebar-link {{ request()->routeIs('admin.addons*') ? 'active' : '' }}">
-                <i class="bi bi-puzzle-fill"></i> <span>Tour Add-ons</span>
-            </a>
-            <a href="{{ route('admin.tiers.index') }}" class="sidebar-link {{ request()->routeIs('admin.tiers*') ? 'active' : '' }}">
-                <i class="bi bi-layers-fill"></i> <span>Pricing Tiers</span>
-            </a>
-            <a href="{{ route('admin.pricing.index') }}" class="sidebar-link {{ request()->routeIs('admin.pricing*') ? 'active' : '' }}">
-                <i class="bi bi-cash-stack"></i> <span>Pricing Matrix</span>
+            <a href="{{ route('admin.whatsapp.leads') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.whatsapp.leads') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-whatsapp text-emerald-400 text-base"></i> <span>WhatsApp Leads</span>
             </a>
 
-            <div class="sidebar-heading">Marketing & Content</div>
-            <a href="{{ route('admin.coupons.index') }}" class="sidebar-link {{ request()->routeIs('admin.coupons.index') || request()->routeIs('admin.coupons.create') || request()->routeIs('admin.coupons.edit') ? 'active' : '' }}">
-                <i class="bi bi-ticket-perforated-fill"></i> <span>Coupons & Promos</span>
+            <div class="pt-4 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">Tour Management</div>
+            <a href="{{ route('admin.tours.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.tours*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-compass-fill text-base"></i> <span>Tours Inventory</span>
             </a>
-            <a href="{{ route('admin.coupons.popup-settings') }}" class="sidebar-link {{ request()->routeIs('admin.coupons.popup-settings*') ? 'active' : '' }}">
-                <i class="bi bi-gift-fill text-warning"></i> <span>Welcome Offer & Banner</span>
+            <a href="{{ route('admin.addons.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.addons*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-puzzle-fill text-base"></i> <span>Tour Add-ons</span>
             </a>
-            <a href="{{ route('admin.blogs.index') }}" class="sidebar-link {{ request()->routeIs('admin.blogs*') ? 'active' : '' }}">
-                <i class="bi bi-journal-richtext"></i> <span>Blog Articles</span>
+            <a href="{{ route('admin.tiers.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.tiers*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-layers-fill text-base"></i> <span>Pricing Tiers</span>
             </a>
-            <a href="{{ route('admin.reviews.index') }}" class="sidebar-link {{ request()->routeIs('admin.reviews*') ? 'active' : '' }}">
-                <i class="bi bi-star-half"></i> <span>Customer Reviews</span>
-            </a>
-            <a href="{{ route('admin.faqs.index') }}" class="sidebar-link {{ request()->routeIs('admin.faqs*') ? 'active' : '' }}">
-                <i class="bi bi-question-circle-fill"></i> <span>FAQs</span>
-            </a>
-            <a href="{{ route('admin.legal.index') }}" class="sidebar-link {{ request()->routeIs('admin.legal*') ? 'active' : '' }}">
-                <i class="bi bi-shield-check"></i> <span>Legal Policies</span>
+            <a href="{{ route('admin.pricing.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.pricing*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-cash-stack text-base"></i> <span>Pricing Matrix</span>
             </a>
 
-            <div class="sidebar-heading">Email Marketing</div>
-            <a href="{{ route('admin.subscribers.index') }}" class="sidebar-link {{ request()->routeIs('admin.subscribers*') ? 'active' : '' }}">
-                <i class="bi bi-people-fill text-primary"></i> <span>Subscribers & Lists</span>
+            <div class="pt-4 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">Marketing & Content</div>
+            <a href="{{ route('admin.coupons.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.coupons.index') || request()->routeIs('admin.coupons.create') || request()->routeIs('admin.coupons.edit') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-ticket-perforated-fill text-base"></i> <span>Coupons & Promos</span>
             </a>
-            <a href="{{ route('admin.subscriber-groups.index') }}" class="sidebar-link {{ request()->routeIs('admin.subscriber-groups*') ? 'active' : '' }}">
-                <i class="bi bi-diagram-3-fill text-info"></i> <span>Subscriber Groups</span>
+            <a href="{{ route('admin.coupons.popup-settings') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.coupons.popup-settings*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-gift-fill text-amber-400 text-base"></i> <span>Welcome Offer & Banner</span>
             </a>
-            <a href="{{ route('admin.email-templates.index') }}" class="sidebar-link {{ request()->routeIs('admin.email-templates*') ? 'active' : '' }}">
-                <i class="bi bi-envelope-paper-heart-fill text-danger"></i> <span>Email Templates</span>
+            <a href="{{ route('admin.blogs.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.blogs*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-journal-richtext text-base"></i> <span>Blog Articles</span>
             </a>
-            <a href="{{ route('admin.campaigns.index') }}" class="sidebar-link {{ request()->routeIs('admin.campaigns*') ? 'active' : '' }}">
-                <i class="bi bi-megaphone-fill text-warning"></i> <span>Campaigns & Analytics</span>
+            <a href="{{ route('admin.reviews.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.reviews*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-star-half text-base"></i> <span>Customer Reviews</span>
             </a>
-
-            <div class="sidebar-heading">Portal Settings & SEO</div>
-            <a href="{{ route('admin.settings.general') }}" class="sidebar-link {{ request()->routeIs('admin.settings.general*') ? 'active' : '' }}">
-                <i class="bi bi-sliders text-warning"></i> <span>General Identity</span>
+            <a href="{{ route('admin.faqs.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.faqs*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-question-circle-fill text-base"></i> <span>FAQs</span>
             </a>
-            <a href="{{ route('admin.settings.seo') }}" class="sidebar-link {{ request()->routeIs('admin.settings.seo*') ? 'active' : '' }}">
-                <i class="bi bi-search text-primary"></i> <span>SEO & Metadata</span>
-            </a>
-            <a href="{{ route('admin.settings.marketing') }}" class="sidebar-link {{ request()->routeIs('admin.settings.marketing*') ? 'active' : '' }}">
-                <i class="bi bi-megaphone text-danger"></i> <span>Marketing & Promos</span>
-            </a>
-            <a href="{{ route('admin.settings.mail') }}" class="sidebar-link {{ request()->routeIs('admin.settings.mail*') ? 'active' : '' }}">
-                <i class="bi bi-envelope-gear text-primary"></i> <span>SMTP & Mailer</span>
-            </a>
-            <a href="{{ route('admin.settings.google') }}" class="sidebar-link {{ request()->routeIs('admin.settings.google*') ? 'active' : '' }}">
-                <i class="bi bi-google text-danger"></i> <span>Google Integrations</span>
-            </a>
-            <a href="{{ route('admin.settings.meta') }}" class="sidebar-link {{ request()->routeIs('admin.settings.meta*') ? 'active' : '' }}">
-                <i class="bi bi-meta text-primary"></i> <span>Meta / Facebook</span>
-            </a>
-            <a href="{{ route('admin.whatsapp.settings') }}" class="sidebar-link {{ request()->routeIs('admin.whatsapp.settings*') ? 'active' : '' }}">
-                <i class="bi bi-gear-wide-connected text-success"></i> <span>WhatsApp Setup</span>
-            </a>
-            <a href="{{ route('admin.settings.currency') }}" class="sidebar-link {{ request()->routeIs('admin.settings.currency*') ? 'active' : '' }}">
-                <i class="bi bi-currency-exchange text-info"></i> <span>Currency & Rates</span>
-            </a>
-            <a href="javascript:void(0);" class="sidebar-link clear-cache-trigger">
-                <i class="bi bi-arrow-repeat text-warning"></i> <span>Purge Cache</span>
+            <a href="{{ route('admin.legal.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.legal*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-shield-check text-base"></i> <span>Legal Policies</span>
             </a>
 
-            <div class="sidebar-heading">External Tools</div>
-            <a href="{{ url('/rate-card') }}" target="_blank" class="sidebar-link">
-                <i class="bi bi-file-earmark-pdf-fill text-warning"></i> <span>Live Rate Card</span>
+            <div class="pt-4 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">Email Marketing</div>
+            <a href="{{ route('admin.subscribers.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.subscribers*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-people-fill text-sky-400 text-base"></i> <span>Subscribers & Lists</span>
             </a>
-            <a href="{{ url('/') }}" target="_blank" class="sidebar-link">
-                <i class="bi bi-box-arrow-up-right text-info"></i> <span>Visit Website</span>
+            <a href="{{ route('admin.subscriber-groups.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.subscriber-groups*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-diagram-3-fill text-cyan-400 text-base"></i> <span>Subscriber Groups</span>
+            </a>
+            <a href="{{ route('admin.email-templates.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.email-templates*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-envelope-paper-heart-fill text-rose-400 text-base"></i> <span>Email Templates</span>
+            </a>
+            <a href="{{ route('admin.campaigns.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.campaigns*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-megaphone-fill text-amber-400 text-base"></i> <span>Campaigns & Analytics</span>
+            </a>
+
+            <div class="pt-4 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">Portal Settings & SEO</div>
+            <a href="{{ route('admin.settings.general') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.general*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-sliders text-amber-400 text-base"></i> <span>General Identity</span>
+            </a>
+            <a href="{{ route('admin.settings.seo') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.seo*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-search text-sky-400 text-base"></i> <span>SEO & Metadata</span>
+            </a>
+            <a href="{{ route('admin.settings.marketing') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.marketing*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-megaphone text-rose-400 text-base"></i> <span>Marketing & Promos</span>
+            </a>
+            <a href="{{ route('admin.settings.mail') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.mail*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-envelope-gear text-sky-400 text-base"></i> <span>SMTP & Mailer</span>
+            </a>
+            <a href="{{ route('admin.settings.google') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.google*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-google text-rose-400 text-base"></i> <span>Google Integrations</span>
+            </a>
+            <a href="{{ route('admin.settings.meta') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.meta*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-meta text-sky-400 text-base"></i> <span>Meta / Facebook</span>
+            </a>
+            <a href="{{ route('admin.whatsapp.settings') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.whatsapp.settings*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-gear-wide-connected text-emerald-400 text-base"></i> <span>WhatsApp Setup</span>
+            </a>
+            <a href="{{ route('admin.settings.currency') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.currency*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-currency-exchange text-cyan-400 text-base"></i> <span>Currency & Rates</span>
+            </a>
+            <button type="button" class="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-slate-400 hover:bg-slate-900 hover:text-white transition clear-cache-trigger">
+                <i class="bi bi-arrow-repeat text-amber-400 text-base"></i> <span>Purge Cache</span>
+            </button>
+
+            <div class="pt-4 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">External Tools</div>
+            <a href="{{ url('/rate-card') }}" target="_blank" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-slate-400 hover:bg-slate-900 hover:text-white transition">
+                <i class="bi bi-file-earmark-pdf-fill text-amber-400 text-base"></i> <span>Live Rate Card</span>
+            </a>
+            <a href="{{ url('/') }}" target="_blank" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-slate-400 hover:bg-slate-900 hover:text-white transition">
+                <i class="bi bi-box-arrow-up-right text-cyan-400 text-base"></i> <span>Visit Website</span>
             </a>
         </div>
-
-        <div class="sidebar-footer">
-            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                @csrf
-            </form>
-            <div class="d-flex flex-column gap-2">
-                <button type="button" class="btn btn-outline-light btn-sm rounded-pill w-100 d-flex align-items-center justify-content-center gap-2 clear-cache-trigger" style="font-size: 0.8rem; padding: 6px 12px; border-color: rgba(255,255,255,0.18);">
-                    <i class="bi bi-arrow-repeat text-warning"></i> <span>Purge Caches</span>
-                </button>
-                <a href="#" class="btn btn-danger btn-sm rounded-pill w-100 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm" style="font-size: 0.8rem; padding: 6px 12px;" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i class="bi bi-power"></i> <span>Sign Out</span>
-                </a>
-            </div>
+        <!-- Mobile Sidebar Footer -->
+        <div class="p-3 border-t border-slate-800 bg-slate-900/60 shrink-0 space-y-2">
+            <button type="button" class="w-full flex items-center justify-center gap-2 py-2 px-3 border border-slate-700/80 hover:bg-slate-800 text-slate-300 rounded-full text-xs font-semibold transition clear-cache-trigger">
+                <i class="bi bi-arrow-repeat text-amber-400"></i> <span>Purge Caches</span>
+            </button>
+            <a href="#" class="w-full flex items-center justify-center gap-2 py-2 px-3 bg-rose-600 hover:bg-rose-700 text-white rounded-full text-xs font-bold shadow-sm transition" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                <i class="bi bi-power"></i> <span>Sign Out</span>
+            </a>
         </div>
     </aside>
 
-    <!-- Main Content Area -->
-    <div class="admin-main-content">
-        <nav class="top-navbar d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-            <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-white shadow-sm d-lg-none rounded-3 border-0" id="sidebarToggleMobile" onclick="document.getElementById('sidebar').classList.toggle('show'); document.getElementById('sidebarOverlay').classList.toggle('show')">
-                    <i class="bi bi-list fs-4"></i>
+    <!-- Desktop Collapsible Sidebar -->
+    <aside :class="$store.admin.sidebarCollapsed ? 'w-20' : 'w-64'"
+           class="hidden lg:flex fixed top-0 bottom-0 left-0 z-30 bg-slate-950 text-slate-200 shadow-xl transition-all duration-300 ease-in-out flex-col">
+        <!-- Brand Header -->
+        <div class="h-16 px-4 flex items-center justify-between border-b border-slate-800/80 shrink-0">
+            <div x-show="!$store.admin.sidebarCollapsed" class="transition-opacity duration-200">
+                <h4 class="text-white font-extrabold tracking-tight text-lg mb-0 whitespace-nowrap">DUNES<span class="text-primary">CMS</span></h4>
+            </div>
+            <button type="button" @click="$store.admin.toggleSidebar()" class="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-900 transition mx-auto" :title="$store.admin.sidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'">
+                <i class="bi bi-list text-xl"></i>
+            </button>
+        </div>
+        <!-- Scrollable Navigation -->
+        <div class="flex-1 overflow-y-auto py-3 px-2 space-y-1 sidebar-scroll text-sm">
+            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.dashboard*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Dashboard' : ''">
+                <i class="bi bi-grid-1x2-fill text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Dashboard</span>
+            </a>
+            <a href="{{ route('admin.analytics.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.analytics*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Analytics' : ''">
+                <i class="bi bi-graph-up-arrow text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Analytics</span>
+            </a>
+            <a href="{{ route('admin.bookings.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.bookings*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Bookings' : ''">
+                <i class="bi bi-calendar2-check-fill text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Bookings</span>
+            </a>
+            <a href="{{ route('admin.operations.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.operations*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Daily Operations' : ''">
+                <i class="bi bi-truck-flatbed text-amber-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Daily Operations</span>
+            </a>
+            <a href="{{ route('admin.inquiries.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.inquiries*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Inquiries' : ''">
+                <i class="bi bi-envelope-paper-fill text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Inquiries</span>
+            </a>
+            <a href="{{ route('admin.whatsapp.leads') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.whatsapp.leads') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'WhatsApp Leads' : ''">
+                <i class="bi bi-whatsapp text-emerald-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">WhatsApp Leads</span>
+            </a>
+
+            <div x-show="!$store.admin.sidebarCollapsed" class="pt-4 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Tour Management</div>
+            <a href="{{ route('admin.tours.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.tours*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Tours Inventory' : ''">
+                <i class="bi bi-compass-fill text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Tours Inventory</span>
+            </a>
+            <a href="{{ route('admin.addons.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.addons*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Tour Add-ons' : ''">
+                <i class="bi bi-puzzle-fill text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Tour Add-ons</span>
+            </a>
+            <a href="{{ route('admin.tiers.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.tiers*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Pricing Tiers' : ''">
+                <i class="bi bi-layers-fill text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Pricing Tiers</span>
+            </a>
+            <a href="{{ route('admin.pricing.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.pricing*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Pricing Matrix' : ''">
+                <i class="bi bi-cash-stack text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Pricing Matrix</span>
+            </a>
+
+            <div x-show="!$store.admin.sidebarCollapsed" class="pt-4 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Marketing & Content</div>
+            <a href="{{ route('admin.coupons.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.coupons.index') || request()->routeIs('admin.coupons.create') || request()->routeIs('admin.coupons.edit') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Coupons & Promos' : ''">
+                <i class="bi bi-ticket-perforated-fill text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Coupons & Promos</span>
+            </a>
+            <a href="{{ route('admin.coupons.popup-settings') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.coupons.popup-settings*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Welcome Offer & Banner' : ''">
+                <i class="bi bi-gift-fill text-amber-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Welcome Offer</span>
+            </a>
+            <a href="{{ route('admin.blogs.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.blogs*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Blog Articles' : ''">
+                <i class="bi bi-journal-richtext text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Blog Articles</span>
+            </a>
+            <a href="{{ route('admin.reviews.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.reviews*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Customer Reviews' : ''">
+                <i class="bi bi-star-half text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Customer Reviews</span>
+            </a>
+            <a href="{{ route('admin.faqs.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.faqs*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'FAQs' : ''">
+                <i class="bi bi-question-circle-fill text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">FAQs</span>
+            </a>
+            <a href="{{ route('admin.legal.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.legal*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Legal Policies' : ''">
+                <i class="bi bi-shield-check text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Legal Policies</span>
+            </a>
+
+            <div x-show="!$store.admin.sidebarCollapsed" class="pt-4 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Email Marketing</div>
+            <a href="{{ route('admin.subscribers.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.subscribers*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Subscribers' : ''">
+                <i class="bi bi-people-fill text-sky-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Subscribers</span>
+            </a>
+            <a href="{{ route('admin.subscriber-groups.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.subscriber-groups*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Subscriber Groups' : ''">
+                <i class="bi bi-diagram-3-fill text-cyan-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Subscriber Groups</span>
+            </a>
+            <a href="{{ route('admin.email-templates.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.email-templates*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Email Templates' : ''">
+                <i class="bi bi-envelope-paper-heart-fill text-rose-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Email Templates</span>
+            </a>
+            <a href="{{ route('admin.campaigns.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.campaigns*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Campaigns' : ''">
+                <i class="bi bi-megaphone-fill text-amber-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Campaigns</span>
+            </a>
+
+            <div x-show="!$store.admin.sidebarCollapsed" class="pt-4 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Portal Settings & SEO</div>
+            <a href="{{ route('admin.settings.general') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.general*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'General Settings' : ''">
+                <i class="bi bi-sliders text-amber-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">General Identity</span>
+            </a>
+            <a href="{{ route('admin.settings.seo') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.seo*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'SEO & Metadata' : ''">
+                <i class="bi bi-search text-sky-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">SEO & Metadata</span>
+            </a>
+            <a href="{{ route('admin.settings.marketing') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.marketing*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Marketing' : ''">
+                <i class="bi bi-megaphone text-rose-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Marketing</span>
+            </a>
+            <a href="{{ route('admin.settings.mail') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.mail*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'SMTP Mailer' : ''">
+                <i class="bi bi-envelope-gear text-sky-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">SMTP & Mailer</span>
+            </a>
+            <a href="{{ route('admin.settings.google') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.google*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Google Integrations' : ''">
+                <i class="bi bi-google text-rose-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Google Setup</span>
+            </a>
+            <a href="{{ route('admin.settings.meta') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.meta*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Meta / Facebook' : ''">
+                <i class="bi bi-meta text-sky-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Meta / Facebook</span>
+            </a>
+            <a href="{{ route('admin.whatsapp.settings') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.whatsapp.settings*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'WhatsApp Setup' : ''">
+                <i class="bi bi-gear-wide-connected text-emerald-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">WhatsApp Setup</span>
+            </a>
+            <a href="{{ route('admin.settings.currency') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.currency*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Currency & Rates' : ''">
+                <i class="bi bi-currency-exchange text-cyan-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Currency & Rates</span>
+            </a>
+            <button type="button" class="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-slate-400 hover:bg-slate-900 hover:text-white transition clear-cache-trigger" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Purge Cache' : ''">
+                <i class="bi bi-arrow-repeat text-amber-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Purge Cache</span>
+            </button>
+
+            <div x-show="!$store.admin.sidebarCollapsed" class="pt-4 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">External Links</div>
+            <a href="{{ url('/rate-card') }}" target="_blank" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-slate-400 hover:bg-slate-900 hover:text-white transition" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Live Rate Card' : ''">
+                <i class="bi bi-file-earmark-pdf-fill text-amber-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Rate Card</span>
+            </a>
+            <a href="{{ url('/') }}" target="_blank" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-slate-400 hover:bg-slate-900 hover:text-white transition" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Live Website' : ''">
+                <i class="bi bi-box-arrow-up-right text-cyan-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">View Website</span>
+            </a>
+        </div>
+        <!-- Desktop Sidebar Footer -->
+        <div class="p-3 border-t border-slate-800 bg-slate-900/60 shrink-0 space-y-2">
+            <button type="button" class="w-full flex items-center justify-center gap-2 py-2 px-3 border border-slate-700/80 hover:bg-slate-800 text-slate-300 rounded-full text-xs font-semibold transition clear-cache-trigger" :title="$store.admin.sidebarCollapsed ? 'Purge Cache' : ''">
+                <i class="bi bi-arrow-repeat text-amber-400"></i> <span x-show="!$store.admin.sidebarCollapsed">Purge Caches</span>
+            </button>
+            <a href="#" class="w-full flex items-center justify-center gap-2 py-2 px-3 bg-rose-600 hover:bg-rose-700 text-white rounded-full text-xs font-bold shadow-sm transition" :title="$store.admin.sidebarCollapsed ? 'Sign Out' : ''" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                <i class="bi bi-power"></i> <span x-show="!$store.admin.sidebarCollapsed">Sign Out</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Pinned Logout Form -->
+    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+        @csrf
+    </form>
+
+    <!-- Main Content Area Wrapper -->
+    <div :class="$store.admin.sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'" class="min-h-screen transition-all duration-300 ease-in-out flex flex-col flex-1">
+        <!-- Top Navbar -->
+        <header class="sticky top-0 z-20 bg-white/90 backdrop-blur-md border-b border-slate-200 px-4 md:px-6 py-3 shrink-0 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <button type="button" @click="$store.admin.toggleMobileSidebar()" class="lg:hidden p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition" title="Toggle Navigation Menu">
+                    <i class="bi bi-list text-xl"></i>
                 </button>
-                <h1 class="h5 fw-800 mb-0 text-capitalize text-dark">@yield('page_title', 'Dashboard')</h1>
+                <h1 class="text-lg md:text-xl font-extrabold text-slate-900 capitalize tracking-tight mb-0">@yield('page_title', 'Dashboard')</h1>
             </div>
 
-            <!-- Top Actions: Command Palette, Purge Cache, Online Visitors, & User Profile -->
-            <div class="d-flex align-items-center gap-2">
-                <!-- Command Palette Shortcut Button -->
-                <button type="button" class="btn btn-white shadow-sm border-0 d-flex align-items-center gap-2 px-3 py-2 rounded-pill text-muted small fw-bold" data-bs-toggle="modal" data-bs-target="#commandPaletteModal">
+            <!-- Top Actions Toolbar -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Jump to Command Palette Button -->
+                <button type="button" @click="$store.admin.openCommandPalette()" class="hidden sm:inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200/80 text-xs font-semibold text-slate-600 shadow-2xs transition">
                     <i class="bi bi-search text-primary"></i>
-                    <span class="d-none d-sm-inline">Jump to...</span>
-                    <kbd class="bg-light border text-dark px-2 py-0.5 rounded shadow-none" style="font-size: 0.7rem;">Ctrl K</kbd>
+                    <span>Jump to...</span>
+                    <kbd class="px-1.5 py-0.5 rounded bg-white border border-slate-200 text-[10px] text-slate-500 font-mono shadow-2xs">Ctrl K</kbd>
                 </button>
 
-                <!-- 1-Click Purge System Cache Button -->
-                <button type="button" class="btn btn-white shadow-sm border-0 d-flex align-items-center gap-2 px-3 py-2 rounded-pill text-muted small fw-bold clear-cache-trigger" title="Purge application views, routes, and config caches">
-                    <i class="bi bi-arrow-repeat text-warning"></i>
-                    <span class="d-none d-md-inline">Purge Cache</span>
+                <!-- Purge Cache Button -->
+                <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200/80 text-xs font-semibold text-slate-600 shadow-2xs transition clear-cache-trigger" title="Purge application views, routes, and config caches">
+                    <i class="bi bi-arrow-repeat text-amber-500"></i>
+                    <span class="hidden md:inline">Purge Cache</span>
                 </button>
 
-                <!-- Active Online Visitors Widget -->
-                <button type="button" class="btn btn-white shadow-sm border-0 fw-bold text-primary d-flex align-items-center gap-2 rounded-pill px-3 py-2"
-                        id="activeVisitorsWidget"
-                        data-bs-container="body"
-                        data-bs-toggle="popover"
-                        data-bs-custom-class="popover-primary"
-                        data-bs-html="true"
-                        data-bs-trigger="focus"
-                        data-bs-placement="bottom"
-                        title="Active Visitors (5m)"
-                        data-bs-content="<div class='popover-body-content p-3'><small class='text-muted'>Loading visitors...</small></div>">
-                    <span class="position-relative d-flex">
-                        <i class="bi bi-people-fill fs-5"></i>
-                        <span class="position-absolute top-0 start-100 translate-middle p-1 bg-success border border-light rounded-circle">
-                            <span class="visually-hidden">Online</span>
+                <!-- Active Online Visitors Widget Popover -->
+                <div class="relative" x-data="{ open: false }">
+                    <button type="button" @click="open = !open" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white hover:bg-slate-50 border border-slate-200 shadow-xs text-xs font-bold text-primary transition" title="Active human visitors in last 5 minutes">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                         </span>
-                    </span>
-                    <span id="activeVisitorsCount">0 Online</span>
-                </button>
+                        <span id="activeVisitorsCount" x-text="$store.admin.activeVisitorsCount">0 Online</span>
+                    </button>
+                    <!-- Visitors Popover Dropdown -->
+                    <div x-show="open" @click.outside="open = false" x-transition class="absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-slate-200 p-3 z-30 text-xs" style="display: none;">
+                        <div class="font-bold text-slate-800 pb-2 border-b border-slate-100 flex items-center justify-between">
+                            <span>Live Visitors (Last 5m)</span>
+                            <span class="text-primary font-mono text-[11px]" x-text="$store.admin.activeVisitorsCount"></span>
+                        </div>
+                        <div class="max-h-60 overflow-y-auto divide-y divide-slate-100 pt-1" id="activeVisitorsList">
+                            <template x-if="$store.admin.activeVisitorsList && $store.admin.activeVisitorsList.length > 0">
+                                <div>
+                                    <template x-for="(v, index) in $store.admin.activeVisitorsList" :key="index">
+                                        <div class="py-2 space-y-0.5">
+                                            <div class="flex items-center justify-between font-mono text-[11px]">
+                                                <span class="font-semibold text-slate-800" x-text="v.client_ip"></span>
+                                                <span class="text-slate-400" x-text="new Date(v.request_timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})"></span>
+                                            </div>
+                                            <div class="text-primary truncate font-medium" x-text="(v.city || 'Unknown') + ', ' + (v.country || '')"></div>
+                                            <div class="text-slate-500 truncate" x-text="v.request_uri"></div>
+                                            <div class="text-[10px] text-slate-400" x-text="v.device_type + ' (' + v.browser_name + ')'"></div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                            <template x-if="!$store.admin.activeVisitorsList || $store.admin.activeVisitorsList.length === 0">
+                                <div class="text-center text-slate-400 py-3">No active human visitors detected</div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
 
-                <!-- User Profile & Sign Out Dropdown -->
-                <div class="dropdown">
-                    <button class="btn btn-white shadow-sm border-0 d-flex align-items-center gap-2 px-3 py-2 rounded-pill" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 28px; height: 28px; font-size: 0.8rem;">
+                <!-- Admin User Profile Dropdown -->
+                <div class="relative" x-data="{ open: false }">
+                    <button type="button" @click="open = !open" class="flex items-center gap-2 p-1 md:px-3 md:py-1.5 rounded-full bg-white hover:bg-slate-50 border border-slate-200 shadow-xs transition">
+                        <div class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs shadow-2xs">
                             {{ strtoupper(substr(Auth::user()->name ?? 'A', 0, 1)) }}
                         </div>
-                        <span class="d-none d-md-inline small fw-bold text-dark">{{ Auth::user()->name ?? 'Admin' }}</span>
-                        <i class="bi bi-chevron-down small text-muted"></i>
+                        <span class="hidden md:inline text-xs font-bold text-slate-800">{{ Auth::user()->name ?? 'Admin' }}</span>
+                        <i class="bi bi-chevron-down text-[10px] text-slate-400 hidden md:inline"></i>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-2 mt-2" style="min-width: 220px;">
-                        <li class="px-3 py-2 border-bottom mb-1">
-                            <div class="fw-bold small text-dark">{{ Auth::user()->name ?? 'Administrator' }}</div>
-                            <div class="text-muted small" style="font-size: 0.75rem;">{{ Auth::user()->email ?? 'admin@dunesdiscoverytourism.com' }}</div>
-                        </li>
-                        <li>
-                            <a class="dropdown-item rounded-3 py-2 small fw-semibold" href="{{ url('/') }}" target="_blank">
-                                <i class="bi bi-box-arrow-up-right me-2 text-info"></i> View Live Website
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item rounded-3 py-2 small fw-semibold clear-cache-trigger" href="javascript:void(0);">
-                                <i class="bi bi-arrow-repeat me-2 text-warning"></i> Purge All Caches
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider my-1"></li>
-                        <li>
-                            <a class="dropdown-item rounded-3 py-2 small fw-bold text-danger" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                <i class="bi bi-power me-2"></i> Sign Out
-                            </a>
-                        </li>
-                    </ul>
+                    <!-- User Dropdown Menu -->
+                    <div x-show="open" @click.outside="open = false" x-transition class="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2 z-30 text-xs" style="display: none;">
+                        <div class="px-3 py-2 border-b border-slate-100 mb-1">
+                            <div class="font-bold text-slate-900 text-sm">{{ Auth::user()->name ?? 'Administrator' }}</div>
+                            <div class="text-slate-400 truncate">{{ Auth::user()->email ?? 'admin@dunesdiscoverytourism.com' }}</div>
+                        </div>
+                        <a href="{{ route('admin.profile.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-50 font-medium transition">
+                            <i class="bi bi-person-gear text-slate-400"></i> My Profile & Security
+                        </a>
+                        <a href="{{ url('/') }}" target="_blank" class="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-50 font-medium transition">
+                            <i class="bi bi-box-arrow-up-right text-cyan-500"></i> View Live Website
+                        </a>
+                        <button type="button" class="w-full text-left flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-50 font-medium transition clear-cache-trigger">
+                            <i class="bi bi-arrow-repeat text-amber-500"></i> Purge All Caches
+                        </button>
+                        <div class="border-t border-slate-100 my-1"></div>
+                        <a href="#" class="flex items-center gap-2 px-3 py-2 rounded-xl text-rose-600 hover:bg-rose-50 font-bold transition" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                            <i class="bi bi-power"></i> Sign Out
+                        </a>
+                    </div>
                 </div>
             </div>
-        </nav>
+        </header>
 
         <!-- Page Yielded Content -->
-        @yield('content')
+        <main class="flex-1 p-4 md:p-6 lg:p-8">
+            @yield('content')
+        </main>
     </div>
 
-    <!-- Spotlight Command Palette Modal (Ctrl + K) -->
-    <div class="modal fade" id="commandPaletteModal" tabindex="-1" aria-labelledby="commandPaletteLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content rounded-4 shadow-lg border-0 bg-white overflow-hidden">
-                <div class="modal-header border-bottom p-3 bg-light">
-                    <div class="input-group input-group-lg border-0 bg-transparent">
-                        <span class="input-group-text bg-transparent border-0"><i class="bi bi-search text-primary fs-4"></i></span>
-                        <input type="text" class="form-control bg-transparent border-0 shadow-none fs-5 fw-bold" id="cmdInput" placeholder="Search pages, actions, tours, or bookings... (Esc to close)" autofocus>
-                    </div>
-                </div>
-                <div class="modal-body p-3" style="max-height: 420px; overflow-y: auto;">
-                    <!-- Quick Actions -->
-                    <div class="mb-3 cmd-section" data-section="actions">
-                        <span class="text-uppercase text-muted fw-bold small px-2" style="font-size: 0.72rem; letter-spacing: 0.5px;">Quick Actions</span>
-                        <div class="row g-2 mt-1">
-                            <div class="col-md-6 cmd-entry" data-keywords="add tour create new tour">
-                                <a href="{{ route('admin.tours.create') }}" class="d-flex align-items-center p-2 rounded-3 border bg-light text-dark cmd-item">
-                                    <i class="bi bi-plus-circle-fill text-primary fs-5 me-2"></i>
-                                    <div><strong class="d-block small">Add New Tour</strong><span class="text-muted" style="font-size: 0.75rem;">Create a new desert safari or activity</span></div>
-                                </a>
-                            </div>
-                            <div class="col-md-6 cmd-entry" data-keywords="add addon create add-on upgrade">
-                                <a href="{{ route('admin.addons.index') }}" class="d-flex align-items-center p-2 rounded-3 border bg-light text-dark cmd-item">
-                                    <i class="bi bi-puzzle-fill text-warning fs-5 me-2"></i>
-                                    <div><strong class="d-block small">Manage Tour Add-ons</strong><span class="text-muted" style="font-size: 0.75rem;">Quad biking, VIP seating, buggy</span></div>
-                                </a>
-                            </div>
-                            <div class="col-md-6 cmd-entry" data-keywords="write blog new article post">
-                                <a href="{{ route('admin.blogs.create') }}" class="d-flex align-items-center p-2 rounded-3 border bg-light text-dark cmd-item">
-                                    <i class="bi bi-journal-plus text-success fs-5 me-2"></i>
-                                    <div><strong class="d-block small">Write Blog Post</strong><span class="text-muted" style="font-size: 0.75rem;">Publish travel guides and tips</span></div>
-                                </a>
-                            </div>
-                            <div class="col-md-6 cmd-entry" data-keywords="coupon promo discount voucher code create">
-                                <a href="{{ route('admin.coupons.create') }}" class="d-flex align-items-center p-2 rounded-3 border bg-light text-dark cmd-item">
-                                    <i class="bi bi-ticket-perforated-fill text-danger fs-5 me-2"></i>
-                                    <div><strong class="d-block small">Create Promo Code</strong><span class="text-muted" style="font-size: 0.75rem;">Add discounts and promotional campaigns</span></div>
-                                </a>
-                            </div>
-                            <div class="col-md-6 cmd-entry" data-keywords="export bookings csv download excel">
-                                <a href="{{ route('admin.bookings.export') }}" class="d-flex align-items-center p-2 rounded-3 border bg-light text-dark cmd-item">
-                                    <i class="bi bi-file-earmark-spreadsheet-fill text-success fs-5 me-2"></i>
-                                    <div><strong class="d-block small">Export Bookings (CSV)</strong><span class="text-muted" style="font-size: 0.75rem;">Download customer reservations spreadsheet</span></div>
-                                </a>
-                            </div>
-                            <div class="col-md-6 cmd-entry" data-keywords="campaign broadcast newsletter email send create marketing">
-                                <a href="{{ route('admin.campaigns.create') }}" class="d-flex align-items-center p-2 rounded-3 border bg-light text-dark cmd-item">
-                                    <i class="bi bi-megaphone-fill text-warning fs-5 me-2"></i>
-                                    <div><strong class="d-block small">Create Email Campaign</strong><span class="text-muted" style="font-size: 0.75rem;">Broadcast newsletter or promotional offer</span></div>
-                                </a>
-                            </div>
-                            <div class="col-md-6 cmd-entry" data-keywords="add subscriber new audience import csv email list">
-                                <a href="{{ route('admin.subscribers.index') }}" class="d-flex align-items-center p-2 rounded-3 border bg-light text-dark cmd-item">
-                                    <i class="bi bi-person-plus-fill text-primary fs-5 me-2"></i>
-                                    <div><strong class="d-block small">Manage Subscribers</strong><span class="text-muted" style="font-size: 0.75rem;">View, import, or export email audience</span></div>
-                                </a>
-                            </div>
-                            <div class="col-md-6 cmd-entry" data-keywords="clear cache purge system views routes config">
-                                <a href="javascript:void(0);" class="d-flex align-items-center p-2 rounded-3 border bg-light text-dark cmd-item clear-cache-trigger">
-                                    <i class="bi bi-arrow-repeat text-warning fs-5 me-2"></i>
-                                    <div><strong class="d-block small">Purge System Cache</strong><span class="text-muted" style="font-size: 0.75rem;">Flush views, routes, and config caches</span></div>
-                                </a>
-                            </div>
-                            <div class="col-md-6 cmd-entry" data-keywords="sign out logout exit disconnect">
-                                <a href="#" class="d-flex align-items-center p-2 rounded-3 border bg-light text-danger cmd-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                    <i class="bi bi-power text-danger fs-5 me-2"></i>
-                                    <div><strong class="d-block small text-danger">Sign Out</strong><span class="text-muted" style="font-size: 0.75rem;">End current administrator session</span></div>
-                                </a>
-                            </div>
+    <!-- Spotlight Command Palette Modal (Ctrl + K / Cmd + K) -->
+    <div x-show="$store.admin.commandPaletteOpen"
+         x-transition:enter="transition-opacity ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition-opacity ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-50 flex items-start justify-center p-4 pt-16 md:pt-24 bg-slate-900/60 backdrop-blur-xs"
+         style="display: none;">
+        <div @click.outside="$store.admin.closeCommandPalette()"
+             x-transition:enter="transition-all ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition-all ease-in duration-150"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95"
+             class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[80vh]">
+            <!-- Header Search Input -->
+            <div class="p-3 bg-slate-50 border-b border-slate-200 flex items-center gap-3">
+                <i class="bi bi-search text-primary text-lg ms-2"></i>
+                <input type="text" id="cmdInput" placeholder="Search actions, tours, bookings, or pages... (Esc to close)" class="w-full bg-transparent border-0 outline-none text-slate-800 text-base font-semibold placeholder:text-slate-400 placeholder:font-normal focus:ring-0">
+                <button type="button" @click="$store.admin.closeCommandPalette()" class="p-1 text-slate-400 hover:text-slate-600 rounded-lg">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <!-- Search Results Scrollable Body -->
+            <div class="p-4 overflow-y-auto space-y-4 flex-1">
+                <!-- Quick Actions Section -->
+                <div class="cmd-section" data-section="actions">
+                    <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2 px-1">Quick Actions</div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <div class="cmd-entry" data-keywords="add tour create new tour">
+                            <a href="{{ route('admin.tours.create') }}" class="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group">
+                                <i class="bi bi-plus-circle-fill text-primary text-xl"></i>
+                                <div>
+                                    <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Add New Tour</strong>
+                                    <span class="text-[11px] text-slate-500">Create a new safari or excursion</span>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="cmd-entry" data-keywords="add addon create add-on upgrade">
+                            <a href="{{ route('admin.addons.index') }}" class="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group">
+                                <i class="bi bi-puzzle-fill text-amber-500 text-xl"></i>
+                                <div>
+                                    <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Manage Tour Add-ons</strong>
+                                    <span class="text-[11px] text-slate-500">Quad biking, VIP seating, buggy</span>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="cmd-entry" data-keywords="write blog new article post">
+                            <a href="{{ route('admin.blogs.create') }}" class="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group">
+                                <i class="bi bi-journal-plus text-emerald-500 text-xl"></i>
+                                <div>
+                                    <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Write Blog Post</strong>
+                                    <span class="text-[11px] text-slate-500">Publish desert guides and tips</span>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="cmd-entry" data-keywords="coupon promo discount voucher code create">
+                            <a href="{{ route('admin.coupons.create') }}" class="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group">
+                                <i class="bi bi-ticket-perforated-fill text-rose-500 text-xl"></i>
+                                <div>
+                                    <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Create Promo Code</strong>
+                                    <span class="text-[11px] text-slate-500">Discounts and voucher campaigns</span>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="cmd-entry" data-keywords="export bookings csv download excel">
+                            <a href="{{ route('admin.bookings.export') }}" class="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group">
+                                <i class="bi bi-file-earmark-spreadsheet-fill text-emerald-600 text-xl"></i>
+                                <div>
+                                    <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Export Bookings (CSV)</strong>
+                                    <span class="text-[11px] text-slate-500">Download customer spreadsheet</span>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="cmd-entry" data-keywords="clear cache purge system views routes config">
+                            <a href="javascript:void(0);" class="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition clear-cache-trigger group">
+                                <i class="bi bi-arrow-repeat text-amber-500 text-xl"></i>
+                                <div>
+                                    <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Purge System Cache</strong>
+                                    <span class="text-[11px] text-slate-500">Flush views, routes, config</span>
+                                </div>
+                            </a>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Navigation Shortcuts -->
-                    <div class="cmd-section" data-section="navigation">
-                        <span class="text-uppercase text-muted fw-bold small px-2" style="font-size: 0.72rem; letter-spacing: 0.5px;">Navigation Shortcuts</span>
-                        <div class="list-group list-group-flush mt-1">
-                            <a href="{{ route('admin.dashboard') }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between rounded-3 border-0 py-2 cmd-entry cmd-item" data-keywords="dashboard overview revenue kpi stats">
-                                <span><i class="bi bi-grid-1x2-fill text-primary me-2"></i> Dashboard Overview</span>
-                                <span class="badge bg-light text-muted border">Nav</span>
-                            </a>
-                            <a href="{{ route('admin.campaigns.index') }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between rounded-3 border-0 py-2 cmd-entry cmd-item" data-keywords="campaigns email marketing newsletters broadcasts analytics stats clicks opens">
-                                <span><i class="bi bi-megaphone-fill text-warning me-2"></i> Email Campaigns & Analytics</span>
-                                <span class="badge bg-light text-muted border">Nav</span>
-                            </a>
-                            <a href="{{ route('admin.subscribers.index') }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between rounded-3 border-0 py-2 cmd-entry cmd-item" data-keywords="subscribers audience mailing lists contacts emails">
-                                <span><i class="bi bi-people-fill text-primary me-2"></i> Subscribers & Audience Lists</span>
-                                <span class="badge bg-light text-muted border">Nav</span>
-                            </a>
-                            <a href="{{ route('admin.subscriber-groups.index') }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between rounded-3 border-0 py-2 cmd-entry cmd-item" data-keywords="groups segments audience tagging customers leads">
-                                <span><i class="bi bi-diagram-3-fill text-info me-2"></i> Audience Groups & Segments</span>
-                                <span class="badge bg-light text-muted border">Nav</span>
-                            </a>
-                            <a href="{{ route('admin.email-templates.index') }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between rounded-3 border-0 py-2 cmd-entry cmd-item" data-keywords="templates email html designs builder layout gallery">
-                                <span><i class="bi bi-envelope-paper-heart-fill text-danger me-2"></i> Email Templates Gallery</span>
-                                <span class="badge bg-light text-muted border">Nav</span>
-                            </a>
-                            <a href="{{ route('admin.settings.mail') }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between rounded-3 border-0 py-2 cmd-entry cmd-item" data-keywords="smtp mail server host port credentials settings email tester">
-                                <span><i class="bi bi-envelope-gear text-primary me-2"></i> SMTP & Mailer Settings</span>
-                                <span class="badge bg-light text-muted border">Nav</span>
-                            </a>
-                            <a href="{{ route('admin.analytics.index') }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between rounded-3 border-0 py-2 cmd-entry cmd-item" data-keywords="analytics traffic visitors acquisition referrers sources campaigns utm">
-                                <span><i class="bi bi-graph-up-arrow text-primary me-2"></i> Traffic & Acquisition Analytics</span>
-                                <span class="badge bg-light text-muted border">Nav</span>
-                            </a>
-                            <a href="{{ route('admin.bookings.index') }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between rounded-3 border-0 py-2 cmd-entry cmd-item" data-keywords="bookings orders customers reservations payments">
-                                <span><i class="bi bi-calendar2-check-fill text-primary me-2"></i> Bookings & Reservations</span>
-                                <span class="badge bg-light text-muted border">Nav</span>
-                            </a>
-                            <a href="{{ route('admin.whatsapp.leads') }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between rounded-3 border-0 py-2 cmd-entry cmd-item" data-keywords="whatsapp leads inquiries click chat support">
-                                <span><i class="bi bi-whatsapp text-success me-2"></i> WhatsApp Click Leads</span>
-                                <span class="badge bg-light text-muted border">Nav</span>
-                            </a>
-                            <a href="{{ route('admin.tours.index') }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between rounded-3 border-0 py-2 cmd-entry cmd-item" data-keywords="tours inventory safari quad buggy glamping">
-                                <span><i class="bi bi-compass-fill text-primary me-2"></i> Tours Inventory</span>
-                                <span class="badge bg-light text-muted border">Nav</span>
-                            </a>
-                            <a href="{{ route('admin.pricing.index') }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between rounded-3 border-0 py-2 cmd-entry cmd-item" data-keywords="pricing matrix rates aed tiers standard vip glamping">
-                                <span><i class="bi bi-cash-stack text-info me-2"></i> Pricing Matrix</span>
-                                <span class="badge bg-light text-muted border">Nav</span>
-                            </a>
-                            <a href="{{ route('admin.reviews.index') }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between rounded-3 border-0 py-2 cmd-entry cmd-item" data-keywords="reviews ratings customer feedback stars">
-                                <span><i class="bi bi-star-half text-warning me-2"></i> Customer Reviews</span>
-                                <span class="badge bg-light text-muted border">Nav</span>
-                            </a>
-                            <a href="{{ route('admin.faqs.index') }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between rounded-3 border-0 py-2 cmd-entry cmd-item" data-keywords="faqs questions answers help">
-                                <span><i class="bi bi-question-circle-fill text-primary me-2"></i> Frequently Asked Questions</span>
-                                <span class="badge bg-light text-muted border">Nav</span>
-                            </a>
-                            <a href="{{ route('admin.settings.google') }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between rounded-3 border-0 py-2 cmd-entry cmd-item" data-keywords="google tag ads conversion tracking analytics gtm aw-17859624049">
-                                <span><i class="bi bi-google text-danger me-2"></i> Google Ads & Tag Integrations</span>
-                                <span class="badge bg-light text-muted border">Nav</span>
-                            </a>
-                        </div>
+                <!-- Navigation Shortcuts Section -->
+                <div class="cmd-section" data-section="navigation">
+                    <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2 px-1">Navigation Shortcuts</div>
+                    <div class="space-y-1">
+                        <a href="{{ route('admin.dashboard') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-keywords="dashboard overview revenue kpi stats">
+                            <span class="flex items-center gap-2"><i class="bi bi-grid-1x2-fill text-primary"></i> Dashboard Overview</span>
+                            <span class="text-[10px] text-slate-400 font-mono">/admin/dashboard</span>
+                        </a>
+                        <a href="{{ route('admin.bookings.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-keywords="bookings orders customers reservations payments">
+                            <span class="flex items-center gap-2"><i class="bi bi-calendar2-check-fill text-primary"></i> Bookings & Reservations</span>
+                            <span class="text-[10px] text-slate-400 font-mono">/admin/bookings</span>
+                        </a>
+                        <a href="{{ route('admin.operations.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-keywords="operations dispatch manifest drivers pickup logistics">
+                            <span class="flex items-center gap-2"><i class="bi bi-truck-flatbed text-amber-500"></i> Daily Operations Manifest</span>
+                            <span class="text-[10px] text-slate-400 font-mono">/admin/operations</span>
+                        </a>
+                        <a href="{{ route('admin.tours.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-keywords="tours inventory safari quad buggy glamping">
+                            <span class="flex items-center gap-2"><i class="bi bi-compass-fill text-primary"></i> Tours Inventory</span>
+                            <span class="text-[10px] text-slate-400 font-mono">/admin/tours</span>
+                        </a>
+                        <a href="{{ route('admin.campaigns.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-keywords="campaigns email marketing newsletters broadcasts analytics stats clicks opens">
+                            <span class="flex items-center gap-2"><i class="bi bi-megaphone-fill text-amber-500"></i> Email Campaigns</span>
+                            <span class="text-[10px] text-slate-400 font-mono">/admin/campaigns</span>
+                        </a>
+                        <a href="{{ route('admin.analytics.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-keywords="analytics traffic visitors acquisition referrers sources campaigns utm">
+                            <span class="flex items-center gap-2"><i class="bi bi-graph-up-arrow text-primary"></i> Analytics Dashboard</span>
+                            <span class="text-[10px] text-slate-400 font-mono">/admin/analytics</span>
+                        </a>
+                        <a href="{{ route('admin.settings.general') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-keywords="settings identity logo contact general">
+                            <span class="flex items-center gap-2"><i class="bi bi-sliders text-amber-500"></i> Portal Settings</span>
+                            <span class="text-[10px] text-slate-400 font-mono">/admin/settings/general</span>
+                        </a>
                     </div>
                 </div>
-                <div class="modal-footer border-top bg-light p-2 ps-3 pe-3 d-flex justify-content-between">
-                    <span class="text-muted small"><kbd class="bg-white border text-dark px-1">↑</kbd> <kbd class="bg-white border text-dark px-1">↓</kbd> to navigate, <kbd class="bg-white border text-dark px-1">Enter</kbd> to select</span>
-                    <span class="badge bg-white text-muted border">Spotlight</span>
-                </div>
+            </div>
+            <!-- Modal Footer -->
+            <div class="p-3 bg-slate-50 border-t border-slate-200 text-xs text-slate-500 flex items-center justify-between">
+                <span>Use <kbd class="px-1.5 py-0.5 rounded bg-white border border-slate-200 text-[10px] font-mono">Esc</kbd> to close</span>
+                <span class="font-bold text-primary">DUNES SPOTLIGHT</span>
             </div>
         </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- Essential Scripts & Plugins -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" crossorigin="anonymous"></script>
-    <script src="{{ asset('assets/vendor/bootstrap/5.3.2/js/bootstrap.bundle.min.js') }}"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js" crossorigin="anonymous"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.all.min.js" crossorigin="anonymous"></script>
 
     <script>
-    $(document).ready(function() {
-        // Universal SweetAlert2 confirmation for forms with delete-form or data-confirm
-        $(document).on('submit', 'form.delete-form, form[data-confirm]', function(e) {
-            const form = this;
-            if (form.dataset.confirmed === 'true') return true;
-            e.preventDefault();
-            const message = form.dataset.confirm || $(form).find('[type="submit"]').attr('title') || 'Are you sure you want to delete this record? This action cannot be undone.';
-            Swal.fire({
-                title: 'Are you sure?',
-                text: message,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, delete',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    form.dataset.confirmed = 'true';
-                    form.submit();
-                }
-            });
-        });
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize real-time online visitors poller
+        window.initVisitorsPoller("{{ route('admin.active-visitors') }}");
+        
+        // Initialize cache purge AJAX handler
+        window.initCachePurgeHandler("{{ route('admin.clear-cache') }}", "{{ csrf_token() }}");
 
-        // Toggle Sidebar collapsed state on desktop
-        $('#sidebarToggleDesktop').on('click', function() {
-            $('#sidebar').toggleClass('collapsed');
-            $('.admin-main-content').toggleClass('collapsed');
-            localStorage.setItem('sidebarState', $('#sidebar').hasClass('collapsed') ? 'collapsed' : 'expanded');
-        });
-
-        if (localStorage.getItem('sidebarState') === 'collapsed' && $(window).width() >= 992) {
-            $('#sidebar').addClass('collapsed');
-            $('.admin-main-content').addClass('collapsed');
-        }
-
-        // Suppress DataTables alert popups in UI
-        if ($.fn.dataTable) {
-            $.fn.dataTable.ext.errMode = 'none';
-        }
-
-        // Initialize Universal DataTables with column sorting & native export suite across all admin tables
-        $('.table:not(.no-datatable), .datatable').each(function() {
-            var $table = $(this);
-            if ($table.find('tbody tr').length > 0 && $table.find('tbody td[colspan]').length === 0) {
-                if (!$.fn.DataTable.isDataTable($table)) {
-                    $table.DataTable({
-                        pageLength: 25,
-                        ordering: true,
-                        responsive: true,
-                        order: [], // Preserve natural server-side sort order
-                        columnDefs: [
-                            { orderable: false, targets: 'no-sort' }
-                        ],
-                        buttons: [
-                            {
-                                extend: 'excelHtml5',
-                                text: '<i class="bi bi-file-earmark-excel me-1 text-success"></i>Excel',
-                                className: 'btn btn-sm btn-white border shadow-sm rounded-pill px-3 me-1',
-                                exportOptions: {
-                                    columns: ':visible:not(.no-export):not(.no-sort)',
-                                    format: {
-                                        body: function(data, row, column, node) {
-                                            if (typeof data !== 'string') return data;
-                                            var cleaned = data.replace(/<br\s*[\/]?>/gi, ' ').replace(/<\/p>/gi, ' ').replace(/<\/div>/gi, ' ').replace(/<[^>]*>/g, '').trim();
-                                            if (/^[=+\-@\t\r]/.test(cleaned)) {
-                                                cleaned = "'" + cleaned;
-                                            }
-                                            return cleaned;
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                extend: 'pdfHtml5',
-                                text: '<i class="bi bi-file-earmark-pdf me-1 text-danger"></i>PDF',
-                                className: 'btn btn-sm btn-white border shadow-sm rounded-pill px-3 me-1',
-                                exportOptions: {
-                                    columns: ':visible:not(.no-export):not(.no-sort)',
-                                    format: {
-                                        body: function(data, row, column, node) {
-                                            return typeof data === 'string' ? data.replace(/<br\s*[\/]?>/gi, '\n').replace(/<\/p>/gi, '\n').replace(/<\/div>/gi, '\n').replace(/<[^>]*>/g, '').trim() : data;
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                extend: 'csvHtml5',
-                                text: '<i class="bi bi-file-earmark-text me-1 text-primary"></i>CSV',
-                                className: 'btn btn-sm btn-white border shadow-sm rounded-pill px-3 me-1',
-                                exportOptions: {
-                                    columns: ':visible:not(.no-export):not(.no-sort)',
-                                    format: {
-                                        body: function(data, row, column, node) {
-                                            if (typeof data !== 'string') return data;
-                                            var cleaned = data.replace(/<br\s*[\/]?>/gi, ' ').replace(/<\/p>/gi, ' ').replace(/<\/div>/gi, ' ').replace(/<[^>]*>/g, '').trim();
-                                            if (/^[=+\-@\t\r]/.test(cleaned)) {
-                                                cleaned = "'" + cleaned;
-                                            }
-                                            return cleaned;
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                extend: 'print',
-                                text: '<i class="bi bi-printer me-1 text-dark"></i>Print',
-                                className: 'btn btn-sm btn-white border shadow-sm rounded-pill px-3 me-1',
-                                exportOptions: { columns: ':visible:not(.no-export):not(.no-sort)' }
-                            },
-                            {
-                                extend: 'colvis',
-                                text: '<i class="bi bi-columns-gap me-1 text-muted"></i>Columns',
-                                className: 'btn btn-sm btn-white border shadow-sm rounded-pill px-3'
-                            }
-                        ],
-                        language: {
-                            search: "",
-                            searchPlaceholder: "Quick search table records...",
-                            lengthMenu: "Show _MENU_ entries",
-                            info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                            paginate: {
-                                previous: '<i class="bi bi-chevron-left"></i>',
-                                next: '<i class="bi bi-chevron-right"></i>'
-                            }
-                        },
-                        dom: "<'row mb-3 mt-2 align-items-center'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-4 text-md-center mb-2 mb-md-0'B><'col-sm-12 col-md-4'f>>" +
-                             "<'row'<'col-sm-12'tr>>" +
-                             "<'row mt-3 align-items-center'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>"
-                    });
-                }
-            }
-        });
-
-        // Universal Quill WYSIWYG Editor Auto-initializer
-        document.querySelectorAll('textarea.wysiwyg-editor').forEach(function(textarea) {
-            if (textarea.dataset.quillInitialized === 'true') return;
-            textarea.dataset.quillInitialized = 'true';
-
-            const wrapper = document.createElement('div');
-            wrapper.className = 'quill-editor-container mb-3 bg-white rounded-3 shadow-sm';
-            textarea.parentNode.insertBefore(wrapper, textarea);
-            textarea.style.display = 'none';
-
-            const quill = new Quill(wrapper, {
-                theme: 'snow',
-                placeholder: textarea.getAttribute('placeholder') || 'Compose rich content...',
-                modules: {
-                    toolbar: [
-                        [{ 'header': [2, 3, 4, false] }],
-                        ['bold', 'italic', 'underline', 'strike'],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        ['blockquote', 'code-block'],
-                        ['link', 'clean']
-                    ]
-                }
-            });
-
-            if (textarea.value) {
-                quill.clipboard.dangerouslyPasteHTML(textarea.value);
-            }
-
-            quill.on('text-change', function() {
-                textarea.value = quill.root.innerHTML === '<p><br></p>' ? '' : quill.root.innerHTML;
-            });
-
-            const form = textarea.closest('form');
-            if (form) {
-                form.addEventListener('submit', function() {
-                    textarea.value = quill.root.innerHTML === '<p><br></p>' ? '' : quill.root.innerHTML;
-                });
-            }
-        });
-
-        // 1-Click Interactive AJAX Status Toggles for Tours, FAQs, Reviews, and Blogs
-        $(document).on('click', '.ajax-toggle-status', function(e) {
-            e.preventDefault();
-            const $btn = $(this);
-            const toggleUrl = $btn.data('url');
-            if (!toggleUrl) return;
-
-            $btn.addClass('opacity-50');
-
-            $.ajax({
-                url: toggleUrl,
-                type: 'POST',
-                data: {
-                    _token: '{{ csrf_token() }}'
-                },
-                success: function(res) {
-                    $btn.removeClass('opacity-50');
-                    if (res.success) {
-                        const newStatus = res.status;
-                        $btn.text(newStatus.charAt(0).toUpperCase() + newStatus.slice(1));
-                        
-                        // Update badge colors dynamically
-                        $btn.removeClass('bg-success bg-secondary bg-warning bg-danger text-white');
-                        if (newStatus === 'active' || newStatus === 'approved' || newStatus === 'published') {
-                            $btn.addClass('bg-success text-white');
-                        } else if (newStatus === 'pending') {
-                            $btn.addClass('bg-warning text-white');
-                        } else {
-                            $btn.addClass('bg-secondary text-white');
-                        }
-
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Updated',
-                            text: res.message || 'Status updated successfully.',
-                            timer: 2000,
-                            toast: true,
-                            position: 'top-end',
-                            showConfirmButton: false
-                        });
-                    }
-                },
-                error: function() {
-                    $btn.removeClass('opacity-50');
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Failed to update status. Please try again.',
-                        timer: 2500,
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false
-                    });
-                }
-            });
-        });
-
-        // Command Palette (Ctrl+K or Cmd+K)
-        $(document).on('keydown', function(e) {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-                e.preventDefault();
-                $('#commandPaletteModal').modal('show');
-            }
-        });
-
-        $('#commandPaletteModal').on('shown.bs.modal', function () {
-            $('#cmdInput').val('').focus();
-            $('.cmd-entry').show();
-        });
-
-        $('#cmdInput').on('input', function() {
-            const query = $(this).val().toLowerCase().trim();
-            if (!query) {
-                $('.cmd-entry').show();
-                $('.cmd-section').show();
-                return;
-            }
-
-            $('.cmd-entry').each(function() {
-                const text = $(this).text().toLowerCase();
-                const keywords = ($(this).data('keywords') || '').toLowerCase();
-                if (text.includes(query) || keywords.includes(query)) {
-                    $(this).show();
-                } else {
-                    $(this).hide();
-                }
-            });
-
-            $('.cmd-section').each(function() {
-                const visibleEntries = $(this).find('.cmd-entry:visible').length;
-                $(this).toggle(visibleEntries > 0);
-            });
-        });
-
-        // 1-Click Universal AJAX Clear Cache Handler
-        $(document).on('click', '.clear-cache-trigger', function(e) {
-            e.preventDefault();
-            Swal.fire({
-                title: 'Purging Caches...',
-                text: 'Flushing application views, routes, and config caches.',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            $.ajax({
-                url: "{{ route('admin.clear-cache') }}",
-                type: 'POST',
-                data: {
-                    _token: '{{ csrf_token() }}'
-                },
-                success: function(res) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Cache Purged',
-                        text: res.message || 'System caches cleared successfully.',
-                        timer: 2500,
-                        showConfirmButton: false,
-                        toast: true,
-                        position: 'top-end'
-                    });
-                },
-                error: function() {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Failed to purge cache. Please try again.',
-                        confirmButtonColor: '#F58F43'
-                    });
-                }
-            });
-        });
-
+        // Flash message toasts via SweetAlert2
         @if(session('success'))
             Swal.fire({
                 icon: 'success',
@@ -1036,7 +590,7 @@
                 icon: 'error',
                 title: 'Error',
                 text: "{{ session('error') }}",
-                confirmButtonColor: '#F58F43'
+                confirmButtonColor: '#F69044'
             });
         @endif
 
@@ -1045,88 +599,10 @@
                 icon: 'error',
                 title: 'Validation Error',
                 html: '<ul style="text-align:left; font-size:13px;">@foreach($errors->all() as $err)<li>{{ $err }}</li>@endforeach</ul>',
-                confirmButtonColor: '#F58F43'
+                confirmButtonColor: '#F69044'
             });
         @endif
-
-        // Hide sidebar on clicking outside (mobile)
-        $(document).on('click', function(e) {
-            if ($(window).width() < 992) {
-                if (!$(e.target).closest('#sidebar, #sidebarToggleMobile, #sidebarToggleDesktop').length) {
-                    $('#sidebar').removeClass('show');
-                    $('#sidebarOverlay').removeClass('show');
-                }
-            }
-        });
-
-        // Active visitors popover and polling
-        const widget = document.getElementById('activeVisitorsWidget');
-        const countSpan = document.getElementById('activeVisitorsCount');
-        let popoverInstance = widget ? new bootstrap.Popover(widget) : null;
-        let lastVisitorsPayload = '';
-
-        function updateActiveVisitors() {
-            if (document.hidden || !widget || !countSpan) return;
-
-            fetch("{{ route('admin.active-visitors') }}")
-                .then(res => res.json())
-                .then(data => {
-                    const currentPayload = JSON.stringify(data);
-                    if (currentPayload === lastVisitorsPayload) return;
-                    lastVisitorsPayload = currentPayload;
-
-                    countSpan.textContent = `${data.count} Online`;
-                    
-                    let html = '<div class="popover-body-content p-3" style="max-height:220px; overflow-y:auto; font-size:12px; min-width:260px;">';
-                    if (data.visitors && data.visitors.length > 0) {
-                        data.visitors.forEach(v => {
-                            const date = new Date(v.request_timestamp);
-                            const timeStr = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                            html += `
-                                <div class="mb-3 border-bottom pb-2">
-                                    <div class="d-flex justify-content-between">
-                                        <strong>${v.client_ip}</strong>
-                                        <span class="text-muted">${timeStr}</span>
-                                    </div>
-                                    <div class="text-primary text-truncate">${v.city || 'Unknown'}, ${v.country || ''}</div>
-                                    <div class="text-muted text-truncate">${v.request_uri}</div>
-                                    <div class="small opacity-75">${v.device_type} (${v.browser_name} / ${v.os_name})</div>
-                                </div>
-                            `;
-                        });
-                    } else {
-                        html += '<div class="text-center text-muted py-2">No active human visitors in last 5m</div>';
-                    }
-                    html += '</div>';
-
-                    // Update Popover content dynamically
-                    widget.setAttribute('data-bs-content', html);
-                    
-                    // Re-init popover to update content
-                    if (popoverInstance) {
-                        popoverInstance.dispose();
-                    }
-                    popoverInstance = new bootstrap.Popover(widget);
-                })
-                .catch(err => console.error("Failed to fetch active visitors", err));
-        }
-
-        // Run immediately and poll every 15s
-        updateActiveVisitors();
-        setInterval(updateActiveVisitors, 15000);
-
-        // Resume immediately when admin tab becomes visible
-        document.addEventListener('visibilitychange', function() {
-            if (!document.hidden) {
-                updateActiveVisitors();
-            }
-        });
     });
-
-    // Global Loader Controls
-    const loader = document.getElementById('appLoader');
-    function showLoader() { loader.style.display = 'flex'; }
-    function hideLoader() { loader.style.display = 'none'; }
     </script>
 
     @stack('scripts')

@@ -1,0 +1,351 @@
+@import "tailwindcss";
+
+@theme {
+  /* ==========================================================================
+     Dunes Admin CMS Design Tokens - Tailwind CSS v4 Architecture
+     ========================================================================== */
+
+  /* Primary Brand Tokens */
+  --color-primary: #F69044;
+  --color-primary-dark: #d57a32;
+  --color-primary-light: #fff4eb;
+  --color-primary-accessible: #c45e14;
+  --color-secondary: #00476d;
+  --color-secondary-dark: #1a3240;
+  --color-accent: #F9E51E;
+  --color-accent-amber: #FBBF24;
+
+  /* Semantic Colors */
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+  --color-info: #0EA5E9;
+
+  /* Neutral Slate Shades */
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+  --color-slate-950: #020617;
+}
+
+/* ==========================================================================
+   CSS Custom Variables for Admin Layout
+   ========================================================================== */
+:root {
+  --admin-sidebar-width: 260px;
+  --admin-sidebar-collapsed-width: 80px;
+  --primary: #F69044;
+  --primary-dark: #d57a32;
+  --primary-light: #fff4eb;
+}
+
+/* ==========================================================================
+   Animations & Keyframes
+   ========================================================================== */
+@keyframes spinSlow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes livePulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+@keyframes kpiShimmer {
+  0% { opacity: 0.35; transform: scale(0.98); }
+  50% { opacity: 0.85; transform: scale(1); }
+  100% { opacity: 0.35; transform: scale(0.98); }
+}
+
+.live-pulse-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background-color: #10b981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: livePulse 2s infinite;
+}
+
+.counter-shimmer {
+  display: inline-block;
+  min-width: 48px;
+  height: 1.2em;
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  border-radius: 6px;
+  animation: kpiShimmer 1.2s ease-in-out infinite;
+  vertical-align: middle;
+}
+
+.kpi-sync-spin {
+  animation: spinSlow 0.8s linear infinite !important;
+}
+
+/* ==========================================================================
+   Scrollbars
+   ========================================================================== */
+.sidebar-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+.sidebar-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+/* ==========================================================================
+   Interactive Status Badges
+   ========================================================================== */
+.badge-interactive {
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.badge-interactive:hover {
+  transform: scale(1.05);
+}
+
+/* ==========================================================================
+   DataTables Native Tailwind CSS Integration
+   ========================================================================== */
+.dataTables_wrapper {
+  position: relative;
+  clear: both;
+}
+
+/* DataTables Top Toolbar: Length & Search & Export Buttons */
+.dataTables_wrapper .dataTables_length {
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+  color: #475569;
+}
+.dataTables_wrapper .dataTables_length select {
+  border-radius: 9999px;
+  border: 1px solid #cbd5e1;
+  padding: 0.35rem 2rem 0.35rem 0.85rem;
+  margin: 0 0.5rem;
+  font-size: 0.875rem;
+  background-color: #ffffff;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.dataTables_wrapper .dataTables_length select:focus {
+  border-color: #F69044;
+  box-shadow: 0 0 0 3px rgba(246, 144, 68, 0.2);
+}
+
+.dataTables_wrapper .dataTables_filter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-size: 0.875rem;
+  color: #475569;
+}
+.dataTables_wrapper .dataTables_filter input {
+  border-radius: 9999px;
+  border: 1px solid #cbd5e1;
+  padding: 0.4rem 1.25rem;
+  font-size: 0.875rem;
+  background-color: #ffffff;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  min-width: 220px;
+}
+.dataTables_wrapper .dataTables_filter input:focus {
+  border-color: #F69044;
+  box-shadow: 0 0 0 3px rgba(246, 144, 68, 0.2);
+}
+
+/* DataTables Export Buttons (B) */
+.dataTables_wrapper .dt-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+}
+.dataTables_wrapper .dt-buttons .btn,
+.dataTables_wrapper .dt-buttons button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.4rem 0.85rem;
+  border-radius: 9999px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.dataTables_wrapper .dt-buttons .btn:hover,
+.dataTables_wrapper .dt-buttons button:hover {
+  background-color: #f8fafc;
+  border-color: #F69044;
+  color: #d57a32;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* DataTables Column Sorting Arrows */
+table.dataTable thead th,
+table.dataTable thead td {
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+table.dataTable thead th:not(.no-sort):hover {
+  background-color: #fff7ed !important;
+  color: #F69044 !important;
+}
+table.dataTable thead th.sorting::after {
+  content: " \21C5" !important;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.35;
+  font-size: 0.85rem;
+}
+table.dataTable thead th.sorting_asc::after {
+  content: " \25B2" !important;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 1;
+  color: #F69044 !important;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+table.dataTable thead th.sorting_desc::after {
+  content: " \25BC" !important;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 1;
+  color: #F69044 !important;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+table.dataTable thead th.no-sort::after,
+table.dataTable thead th.no-sort::before {
+  display: none !important;
+  content: "" !important;
+}
+
+/* DataTables Footer: Info & Pagination */
+.dataTables_wrapper .dataTables_info {
+  font-size: 0.875rem;
+  color: #64748b;
+  padding-top: 0.75rem;
+}
+.dataTables_wrapper .dataTables_paginate {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  padding-top: 0.75rem;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #334155 !important;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none !important;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background-color: #fff7ed !important;
+  border-color: #F69044 !important;
+  color: #d57a32 !important;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+  background-color: #F69044 !important;
+  border-color: #F69044 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 4px 0 rgba(246, 144, 68, 0.3);
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  color: #94a3b8 !important;
+}
+
+/* ==========================================================================
+   Quill WYSIWYG Editor Container
+   ========================================================================== */
+.quill-editor-container .ql-toolbar.ql-snow {
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
+  border-color: #e2e8f0 !important;
+  background-color: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+.quill-editor-container .ql-container.ql-snow {
+  border-bottom-left-radius: 0.75rem;
+  border-bottom-right-radius: 0.75rem;
+  border-color: #e2e8f0 !important;
+  font-family: inherit;
+  font-size: 0.95rem;
+  min-height: 220px;
+}
+.quill-editor-container .ql-editor {
+  min-height: 200px;
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   Floating Bulk Action Toolbar
+   ========================================================================== */
+.bulk-action-bar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(120%);
+  z-index: 1050;
+  background-color: #0f172a;
+  color: #ffffff;
+  border-radius: 9999px;
+  padding: 10px 24px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.bulk-action-bar.show {
+  transform: translateX(-50%) translateY(0);
+}

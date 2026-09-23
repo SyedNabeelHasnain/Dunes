@@ -4,145 +4,145 @@
 
 @section('content')
 <!-- Top Executive Header with Real-Time Database Sync & Live Refresh Trigger -->
-<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
     <div>
-        <div class="d-flex align-items-center gap-2 mb-1">
-            <h2 class="h4 fw-800 text-dark mb-0">Executive Dashboard</h2>
-            <span class="badge bg-success-subtle text-success border border-success border-opacity-25 rounded-pill px-2.5 py-1 small fw-bold d-inline-flex align-items-center gap-1.5">
+        <div class="flex items-center gap-2 mb-1">
+            <h2 class="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight">Executive Dashboard</h2>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                 <span class="live-pulse-dot"></span> Live Real-Time Database Sync
             </span>
         </div>
-        <p class="text-muted small mb-0">Direct live counts from database transactions. Zero caching, instant precision.</p>
+        <p class="text-xs md:text-sm text-slate-500 mb-0">Direct live counts from database transactions. Zero caching, instant precision.</p>
     </div>
-    <div class="d-flex align-items-center gap-2">
-        <span class="text-muted extra-small text-uppercase fw-semibold d-none d-sm-inline" id="kpiSyncStatus" style="font-size: 0.72rem;">Live as of {{ now()->format('g:i:s A') }}</span>
-        <button type="button" class="btn btn-white shadow-sm border rounded-pill px-3 py-2 fw-bold text-dark d-flex align-items-center gap-2" id="btnRefreshDashboardKpis" title="Recount all metrics live directly from database">
-            <i class="bi bi-arrow-repeat text-primary fs-6" id="kpiSyncIcon"></i>
+    <div class="flex items-center gap-3">
+        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider hidden sm:inline" id="kpiSyncStatus">Live as of {{ now()->format('g:i:s A') }}</span>
+        <button type="button" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-slate-50 border border-slate-200 shadow-xs text-xs font-bold text-slate-800 transition cursor-pointer" id="btnRefreshDashboardKpis" title="Recount all metrics live directly from database">
+            <i class="bi bi-arrow-repeat text-primary text-sm" id="kpiSyncIcon"></i>
             <span>Refresh Metrics</span>
         </button>
     </div>
 </div>
 
 <!-- 6 Core Business Performance KPI Cards Row -->
-<div class="row g-3 g-lg-4 mb-4">
-    <div class="col-xl-2 col-md-4 col-6">
-        <div class="card-modern h-100 p-3 bg-white border-0 shadow-sm rounded-4">
-            <div class="stat-card-icon bg-primary-subtle text-primary mb-2 d-flex align-items-center justify-content-center rounded-circle" style="width:40px; height:40px; font-size:18px;">
+<div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 lg:gap-4 mb-6">
+    <div class="p-4 bg-white rounded-2xl shadow-xs border border-slate-200/80 flex flex-col justify-between">
+        <div>
+            <div class="w-10 h-10 rounded-xl bg-orange-50 text-primary flex items-center justify-center text-lg mb-2">
                 <i class="bi bi-calendar-event-fill"></i>
             </div>
-            <div class="text-muted small fw-bold text-uppercase mb-1" style="font-size:0.72rem;">Total Bookings</div>
-            <h3 class="fw-800 mb-0 text-dark kpi-number" id="kpiTotalBookings">{{ number_format($stats['total']) }}</h3>
-            <span class="text-muted small" style="font-size: 0.7rem;">Active reservations</span>
+            <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Total Bookings</div>
+            <h3 class="text-xl lg:text-2xl font-black text-slate-900 mb-1 kpi-number" id="kpiTotalBookings">{{ number_format($stats['total']) }}</h3>
         </div>
+        <span class="text-[11px] text-slate-500">Active reservations</span>
     </div>
-    <div class="col-xl-2 col-md-4 col-6">
-        <div class="card-modern h-100 p-3 bg-white border-0 shadow-sm rounded-4">
-            <div class="stat-card-icon bg-success-subtle text-success mb-2 d-flex align-items-center justify-content-center rounded-circle" style="width:40px; height:40px; font-size:18px;">
+
+    <div class="p-4 bg-white rounded-2xl shadow-xs border border-slate-200/80 flex flex-col justify-between">
+        <div>
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg mb-2">
                 <i class="bi bi-check-circle-fill"></i>
             </div>
-            <div class="text-muted small fw-bold text-uppercase mb-1" style="font-size:0.72rem;">Confirmed & Done</div>
-            <h3 class="fw-800 mb-0 text-dark kpi-number" id="kpiConfirmedBookings">{{ number_format($stats['confirmed_and_completed'] ?? ($stats['confirmed'] + ($stats['completed'] ?? 0))) }}</h3>
-            <span class="text-success small fw-bold" style="font-size: 0.7rem;"><span id="kpiConfirmedCount">{{ $stats['confirmed'] }}</span> Confirmed, <span id="kpiCompletedCount">{{ $stats['completed'] ?? 0 }}</span> Done</span>
+            <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Confirmed & Done</div>
+            <h3 class="text-xl lg:text-2xl font-black text-slate-900 mb-1 kpi-number" id="kpiConfirmedBookings">{{ number_format($stats['confirmed_and_completed'] ?? ($stats['confirmed'] + ($stats['completed'] ?? 0))) }}</h3>
         </div>
+        <span class="text-[11px] text-emerald-600 font-bold"><span id="kpiConfirmedCount">{{ $stats['confirmed'] }}</span> Confirmed, <span id="kpiCompletedCount">{{ $stats['completed'] ?? 0 }}</span> Done</span>
     </div>
-    <div class="col-xl-2 col-md-4 col-6">
-        <div class="card-modern h-100 p-3 bg-white border-0 shadow-sm rounded-4">
-            <div class="stat-card-icon bg-warning-subtle text-warning mb-2 d-flex align-items-center justify-content-center rounded-circle" style="width:40px; height:40px; font-size:18px;">
+
+    <div class="p-4 bg-white rounded-2xl shadow-xs border border-slate-200/80 flex flex-col justify-between">
+        <div>
+            <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg mb-2">
                 <i class="bi bi-clock-history"></i>
             </div>
-            <div class="text-muted small fw-bold text-uppercase mb-1" style="font-size:0.72rem;">Pending Bookings</div>
-            <h3 class="fw-800 mb-0 text-dark kpi-number" id="kpiPendingBookings">{{ number_format($stats['pending']) }}</h3>
-            <span class="text-warning small fw-bold" style="font-size: 0.7rem;"><i class="bi bi-hourglass-split me-1"></i>Awaiting review</span>
+            <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Pending Bookings</div>
+            <h3 class="text-xl lg:text-2xl font-black text-slate-900 mb-1 kpi-number" id="kpiPendingBookings">{{ number_format($stats['pending']) }}</h3>
         </div>
+        <span class="text-[11px] text-amber-600 font-bold"><i class="bi bi-hourglass-split me-1"></i>Awaiting review</span>
     </div>
-    <div class="col-xl-2 col-md-4 col-6">
-        <div class="card-modern h-100 p-3 bg-white border-0 shadow-sm rounded-4">
-            <div class="stat-card-icon bg-info-subtle text-info mb-2 d-flex align-items-center justify-content-center rounded-circle" style="width:40px; height:40px; font-size:18px;">
+
+    <div class="p-4 bg-white rounded-2xl shadow-xs border border-slate-200/80 flex flex-col justify-between">
+        <div>
+            <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center text-lg mb-2">
                 <i class="bi bi-cash-stack"></i>
             </div>
-            <div class="text-muted small fw-bold text-uppercase mb-1" style="font-size:0.72rem;">Collected Revenue</div>
-            <h4 class="fw-800 mb-0 text-primary kpi-number" id="kpiRevenue">AED {{ number_format($stats['revenue']) }}</h4>
-            <span class="text-muted small" style="font-size: 0.7rem;">Verified payments</span>
+            <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Collected Revenue</div>
+            <h4 class="text-lg lg:text-xl font-black text-primary mb-1 kpi-number" id="kpiRevenue">AED {{ number_format($stats['revenue']) }}</h4>
         </div>
+        <span class="text-[11px] text-slate-500">Verified payments</span>
     </div>
-    <div class="col-xl-2 col-md-4 col-6">
-        <div class="card-modern h-100 p-3 bg-white border-0 shadow-sm rounded-4">
-            <div class="stat-card-icon bg-secondary-subtle text-dark mb-2 d-flex align-items-center justify-content-center rounded-circle" style="width:40px; height:40px; font-size:18px;">
+
+    <div class="p-4 bg-white rounded-2xl shadow-xs border border-slate-200/80 flex flex-col justify-between">
+        <div>
+            <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center text-lg mb-2">
                 <i class="bi bi-bag-check-fill"></i>
             </div>
-            <div class="text-muted small fw-bold text-uppercase mb-1" style="font-size:0.72rem;">Avg Order Value</div>
-            <h4 class="fw-800 mb-0 text-dark kpi-number" id="kpiAov">AED {{ number_format($stats['aov'] ?? 0) }}</h4>
-            <span class="text-muted small" style="font-size: 0.7rem;">Per paid booking</span>
+            <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Avg Order Value</div>
+            <h4 class="text-lg lg:text-xl font-black text-slate-900 mb-1 kpi-number" id="kpiAov">AED {{ number_format($stats['aov'] ?? 0) }}</h4>
         </div>
+        <span class="text-[11px] text-slate-500">Per paid booking</span>
     </div>
-    <div class="col-xl-2 col-md-4 col-6">
-        <div class="card-modern h-100 p-3 bg-white border-0 shadow-sm rounded-4">
-            <div class="stat-card-icon bg-danger-subtle text-danger mb-2 d-flex align-items-center justify-content-center rounded-circle" style="width:40px; height:40px; font-size:18px;">
+
+    <div class="p-4 bg-white rounded-2xl shadow-xs border border-slate-200/80 flex flex-col justify-between">
+        <div>
+            <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-lg mb-2">
                 <i class="bi bi-percent"></i>
             </div>
-            <div class="text-muted small fw-bold text-uppercase mb-1" style="font-size:0.72rem;">30d Conversion</div>
-            <h3 class="fw-800 mb-0 text-dark kpi-number" id="kpiConversion">{{ $stats['conversion_rate'] ?? 0 }}%</h3>
-            <span class="text-muted small" style="font-size: 0.7rem;">Visitors to bookings</span>
+            <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">30d Conversion</div>
+            <h3 class="text-xl lg:text-2xl font-black text-slate-900 mb-1 kpi-number" id="kpiConversion">{{ $stats['conversion_rate'] ?? 0 }}%</h3>
         </div>
+        <span class="text-[11px] text-slate-500">Visitors to bookings</span>
     </div>
 </div>
 
 <!-- Real-Time Customer Communications & Leads Hub Summary -->
-<div class="card card-modern border-0 shadow-sm rounded-4 p-3 bg-white mb-4">
-    <div class="row g-3 align-items-center">
-        <div class="col-lg-3 col-sm-6 border-end-lg">
-            <div class="d-flex align-items-center gap-3">
-                <div class="icon-box bg-danger-subtle text-danger rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 42px; height: 42px; font-size: 18px;">
-                    <i class="bi bi-envelope-exclamation-fill"></i>
-                </div>
-                <div>
-                    <div class="text-muted extra-small text-uppercase fw-bold">Action Needed Inquiries</div>
-                    <div class="d-flex align-items-baseline gap-2">
-                        <span class="fw-800 text-danger fs-5 kpi-number" id="kpiNewInquiries">{{ number_format($stats['new_inquiries'] ?? 0) }}</span>
-                        <a href="{{ route('admin.inquiries.index') }}" class="small text-decoration-none fw-semibold">View Inquiries <i class="bi bi-chevron-right"></i></a>
-                    </div>
+<div class="p-4 bg-white rounded-2xl shadow-xs border border-slate-200/80 mb-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+        <div class="flex items-center gap-3 pt-2 sm:pt-0 sm:px-2">
+            <div class="w-11 h-11 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-lg shrink-0">
+                <i class="bi bi-envelope-exclamation-fill"></i>
+            </div>
+            <div>
+                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Action Needed Inquiries</div>
+                <div class="flex items-baseline gap-2 mt-0.5">
+                    <span class="text-lg font-black text-rose-600 kpi-number" id="kpiNewInquiries">{{ number_format($stats['new_inquiries'] ?? 0) }}</span>
+                    <a href="{{ route('admin.inquiries.index') }}" class="text-xs font-semibold text-primary hover:underline flex items-center gap-1">View Inquiries <i class="bi bi-chevron-right text-[10px]"></i></a>
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-sm-6 border-end-lg">
-            <div class="d-flex align-items-center gap-3">
-                <div class="icon-box bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 42px; height: 42px; font-size: 18px;">
-                    <i class="bi bi-whatsapp"></i>
-                </div>
-                <div>
-                    <div class="text-muted extra-small text-uppercase fw-bold">WhatsApp Leads Captured</div>
-                    <div class="d-flex align-items-baseline gap-2">
-                        <span class="fw-800 text-success fs-5 kpi-number" id="kpiWhatsappLeads">{{ number_format($stats['whatsapp_leads'] ?? 0) }}</span>
-                        <a href="{{ route('admin.whatsapp.leads') }}" class="small text-decoration-none fw-semibold">View Leads <i class="bi bi-chevron-right"></i></a>
-                    </div>
+
+        <div class="flex items-center gap-3 pt-3 sm:pt-0 sm:px-4">
+            <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg shrink-0">
+                <i class="bi bi-whatsapp"></i>
+            </div>
+            <div>
+                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-500">WhatsApp Leads Captured</div>
+                <div class="flex items-baseline gap-2 mt-0.5">
+                    <span class="text-lg font-black text-emerald-600 kpi-number" id="kpiWhatsappLeads">{{ number_format($stats['whatsapp_leads'] ?? 0) }}</span>
+                    <a href="{{ route('admin.whatsapp.leads') }}" class="text-xs font-semibold text-primary hover:underline flex items-center gap-1">View Leads <i class="bi bi-chevron-right text-[10px]"></i></a>
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-sm-6 border-end-lg">
-            <div class="d-flex align-items-center gap-3">
-                <div class="icon-box bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 42px; height: 42px; font-size: 18px;">
-                    <i class="bi bi-inbox-fill"></i>
-                </div>
-                <div>
-                    <div class="text-muted extra-small text-uppercase fw-bold">Total Contact Messages</div>
-                    <div class="d-flex align-items-baseline gap-2">
-                        <span class="fw-800 text-dark fs-5 kpi-number" id="kpiTotalInquiries">{{ number_format($stats['total_inquiries'] ?? 0) }}</span>
-                        <span class="text-muted extra-small">Website submissions</span>
-                    </div>
+
+        <div class="flex items-center gap-3 pt-3 sm:pt-0 sm:px-4">
+            <div class="w-11 h-11 rounded-xl bg-orange-50 text-primary flex items-center justify-center text-lg shrink-0">
+                <i class="bi bi-inbox-fill"></i>
+            </div>
+            <div>
+                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Total Contact Messages</div>
+                <div class="flex items-baseline gap-2 mt-0.5">
+                    <span class="text-lg font-black text-slate-900 kpi-number" id="kpiTotalInquiries">{{ number_format($stats['total_inquiries'] ?? 0) }}</span>
+                    <span class="text-[11px] text-slate-400">Website submissions</span>
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-sm-6">
-            <div class="d-flex align-items-center gap-3">
-                <div class="icon-box bg-warning-subtle text-warning rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 42px; height: 42px; font-size: 18px;">
-                    <i class="bi bi-file-earmark-diff-fill"></i>
-                </div>
-                <div>
-                    <div class="text-muted extra-small text-uppercase fw-bold">Incomplete Drafts</div>
-                    <div class="d-flex align-items-baseline gap-2">
-                        <span class="fw-800 text-muted fs-5 kpi-number" id="kpiDrafts">{{ number_format($stats['drafts'] ?? 0) }}</span>
-                        <span class="text-muted extra-small">Unfinished checkouts</span>
-                    </div>
+
+        <div class="flex items-center gap-3 pt-3 sm:pt-0 sm:px-4">
+            <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg shrink-0">
+                <i class="bi bi-file-earmark-diff-fill"></i>
+            </div>
+            <div>
+                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Incomplete Drafts</div>
+                <div class="flex items-baseline gap-2 mt-0.5">
+                    <span class="text-lg font-black text-slate-500 kpi-number" id="kpiDrafts">{{ number_format($stats['drafts'] ?? 0) }}</span>
+                    <span class="text-[11px] text-slate-400">Unfinished checkouts</span>
                 </div>
             </div>
         </div>
@@ -150,209 +150,203 @@
 </div>
 
 <!-- Top Grossing Tours & Quick Action Row -->
-<div class="row g-4 mb-4">
-    <div class="col-lg-8">
-        <div class="card card-modern h-100 bg-white border-0 shadow-sm rounded-4 p-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    <h6 class="fw-800 text-dark mb-1"><i class="bi bi-trophy-fill text-warning me-2"></i>Top Performing Tours</h6>
-                    <span class="text-muted small">Top grossing experiences by revenue & booking volume</span>
-                </div>
-                <a href="{{ route('admin.tours.index') }}" class="btn btn-sm btn-light border rounded-pill px-3 fw-bold small">Manage Inventory</a>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+    <div class="lg:col-span-8 bg-white rounded-2xl shadow-xs border border-slate-200/80 p-5">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+            <div>
+                <h6 class="font-extrabold text-slate-900 text-sm md:text-base flex items-center gap-2 mb-0.5">
+                    <i class="bi bi-trophy-fill text-amber-500"></i> Top Performing Tours
+                </h6>
+                <span class="text-xs text-slate-500">Top grossing experiences by revenue & booking volume</span>
             </div>
-            <div style="height: 220px;">
-                <canvas id="topToursChart"></canvas>
-            </div>
+            <a href="{{ route('admin.tours.index') }}" class="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 text-xs font-bold text-slate-700 transition">
+                Manage Inventory
+            </a>
+        </div>
+        <div class="h-60">
+            <canvas id="topToursChart"></canvas>
         </div>
     </div>
-    <div class="col-lg-4">
-        <!-- Quick Payment Link Card -->
-        <div class="card card-modern border-0 shadow-sm bg-primary text-white rounded-4 overflow-hidden h-100">
-            <div class="card-header border-bottom border-white border-opacity-10 bg-transparent py-3 ps-4 pe-4">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="icon-box bg-white text-primary rounded-circle d-flex align-items-center justify-content-center mb-0" style="width: 36px; height: 36px; font-size: 16px;">
-                        <i class="bi bi-lightning-charge-fill"></i>
+
+    <!-- Quick Payment Link Card -->
+    <div class="lg:col-span-4 bg-gradient-to-br from-primary to-orange-600 text-white rounded-2xl shadow-xs overflow-hidden flex flex-col">
+        <div class="px-5 py-4 border-b border-white/15 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-white text-primary flex items-center justify-center font-bold text-lg">
+                <i class="bi bi-lightning-charge-fill"></i>
+            </div>
+            <div>
+                <h6 class="font-extrabold text-white text-sm mb-0">Instant Payment Link</h6>
+                <div class="text-[11px] text-white/80">Generate checkout link on the fly</div>
+            </div>
+        </div>
+        <div class="p-5 flex-1 flex flex-col justify-between">
+            <form id="quickPaymentForm" class="space-y-3">
+                @csrf
+                <div>
+                    <input type="text" name="name" class="w-full bg-white/95 text-slate-900 text-xs font-semibold px-3 py-2 rounded-xl border-0 placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-white outline-none" placeholder="Customer Full Name" required>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <input type="email" name="email" class="w-full bg-white/95 text-slate-900 text-xs font-semibold px-3 py-2 rounded-xl border-0 placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-white outline-none" placeholder="Email" required>
                     </div>
                     <div>
-                        <h6 class="fw-800 mb-0 text-white">Instant Payment Link</h6>
-                        <div class="small text-white opacity-75" style="font-size: 0.75rem;">Generate Ziina checkout link on the fly</div>
+                        <input type="tel" name="phone" class="w-full bg-white/95 text-slate-900 text-xs font-semibold px-3 py-2 rounded-xl border-0 placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-white outline-none" placeholder="Phone (+971...)" required>
                     </div>
                 </div>
-            </div>
-            <div class="card-body p-4">
-                <form id="quickPaymentForm">
-                    @csrf
-                    <div class="mb-2">
-                        <input type="text" name="name" class="form-control form-control-sm border-0" placeholder="Customer Full Name" required style="border-radius:8px;">
-                    </div>
-                    <div class="row g-2 mb-2">
-                        <div class="col-6">
-                            <input type="email" name="email" class="form-control form-control-sm border-0" placeholder="Email" required style="border-radius:8px;">
-                        </div>
-                        <div class="col-6">
-                            <input type="tel" name="phone" class="form-control form-control-sm border-0" placeholder="Phone (+971...)" required style="border-radius:8px;">
-                        </div>
-                    </div>
-                    <div class="mb-2">
-                        <input type="text" name="description" class="form-control form-control-sm border-0" placeholder="Activity / Service Description" required style="border-radius:8px;">
-                    </div>
-                    <div class="mb-3">
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text bg-white border-0 text-dark fw-bold" style="border-radius:8px 0 0 8px;">AED</span>
-                            <input type="number" name="amount" step="0.01" class="form-control border-0" placeholder="0.00" required style="border-radius:0 8px 8px 0;">
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-dark w-100 fw-bold rounded-pill py-2 shadow-sm border-0">Generate & Share Link <i class="bi bi-arrow-right ms-1"></i></button>
-                </form>
-            </div>
+                <div>
+                    <input type="text" name="description" class="w-full bg-white/95 text-slate-900 text-xs font-semibold px-3 py-2 rounded-xl border-0 placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-white outline-none" placeholder="Activity / Service Description" required>
+                </div>
+                <div class="flex rounded-xl overflow-hidden bg-white/95">
+                    <span class="inline-flex items-center px-3 bg-white/80 text-xs font-bold text-slate-800 border-r border-slate-200">AED</span>
+                    <input type="number" name="amount" step="0.01" class="w-full bg-transparent text-slate-900 text-xs font-semibold px-3 py-2 border-0 placeholder:text-slate-400 focus:ring-0 outline-none" placeholder="0.00" required>
+                </div>
+                <button type="submit" class="w-full py-2.5 px-4 bg-slate-950 hover:bg-slate-900 text-white rounded-xl text-xs font-bold shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer">
+                    <span>Generate & Share Link</span> <i class="bi bi-arrow-right"></i>
+                </button>
+            </form>
         </div>
     </div>
 </div>
 
 <!-- Email Marketing & Audience Performance Card -->
-<div class="card card-modern border-0 shadow-sm rounded-4 bg-white mb-4 p-4">
-    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
-        <div class="d-flex align-items-center gap-3">
-            <div class="icon-box bg-warning-subtle text-warning rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px; font-size: 22px;">
+<div class="p-5 bg-white rounded-2xl shadow-xs border border-slate-200/80 mb-6">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl shrink-0">
                 <i class="bi bi-megaphone-fill"></i>
             </div>
             <div>
-                <div class="d-flex align-items-center gap-2">
-                    <h6 class="fw-800 text-dark mb-0">Email Marketing & Audience Hub</h6>
-                    <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-0.5 small fw-bold">Live</span>
+                <div class="flex items-center gap-2">
+                    <h6 class="font-extrabold text-slate-900 text-sm md:text-base mb-0">Email Marketing & Audience Hub</h6>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Live</span>
                 </div>
-                <div class="text-muted small">Manage subscriber lists, automated campaigns, and deliverability performance.</div>
+                <div class="text-xs text-slate-500">Manage subscriber lists, automated campaigns, and deliverability performance.</div>
             </div>
         </div>
-        <div class="d-flex align-items-center gap-2 flex-wrap">
-            <a href="{{ route('admin.campaigns.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-sm d-flex align-items-center gap-1.5">
+        <div class="flex items-center gap-2 flex-wrap">
+            <a href="{{ route('admin.campaigns.create') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary hover:bg-primary-dark text-white text-xs font-bold shadow-xs transition">
                 <i class="bi bi-send-fill"></i> Create Campaign
             </a>
-            <a href="{{ route('admin.subscribers.index') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold d-flex align-items-center gap-1.5">
-                <i class="bi bi-people-fill"></i> Audience Lists
+            <a href="{{ route('admin.subscribers.index') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 text-xs font-bold text-slate-700 transition">
+                <i class="bi bi-people-fill text-sky-500"></i> Audience Lists
             </a>
-            <a href="{{ route('admin.email-templates.index') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold d-flex align-items-center gap-1.5">
-                <i class="bi bi-palette-fill"></i> Templates
+            <a href="{{ route('admin.email-templates.index') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 text-xs font-bold text-slate-700 transition">
+                <i class="bi bi-palette-fill text-rose-500"></i> Templates
             </a>
-            <a href="{{ route('admin.settings.mail') }}" class="btn btn-light border btn-sm rounded-pill px-3 fw-bold text-muted" title="Mailer Settings">
+            <a href="{{ route('admin.settings.mail') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 text-xs font-bold text-slate-500 transition" title="Mailer Settings">
                 <i class="bi bi-gear-fill"></i> SMTP
             </a>
         </div>
     </div>
-    <div class="row g-3 mt-2 pt-2 border-top">
-        <div class="col-6 col-md-3">
-            <div class="p-2 rounded-3 bg-light d-flex align-items-center gap-2.5">
-                <i class="bi bi-people text-primary fs-4 ms-1"></i>
-                <div>
-                    <div class="text-muted extra-small text-uppercase fw-bold">Active Subscribers</div>
-                    <div class="fw-800 text-dark fs-6">{{ number_format($stats['subscribers_count'] ?? 0) }}</div>
-                </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4 pt-4 border-t border-slate-100">
+        <div class="p-3 rounded-xl bg-slate-50 flex items-center gap-3">
+            <i class="bi bi-people text-primary text-2xl"></i>
+            <div>
+                <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Active Subscribers</div>
+                <div class="text-base font-black text-slate-900">{{ number_format($stats['subscribers_count'] ?? 0) }}</div>
             </div>
         </div>
-        <div class="col-6 col-md-3">
-            <div class="p-2 rounded-3 bg-light d-flex align-items-center gap-2.5">
-                <i class="bi bi-broadcast text-warning fs-4 ms-1"></i>
-                <div>
-                    <div class="text-muted extra-small text-uppercase fw-bold">Total Campaigns</div>
-                    <div class="fw-800 text-dark fs-6">{{ number_format($stats['campaigns_count'] ?? 0) }}</div>
-                </div>
+        <div class="p-3 rounded-xl bg-slate-50 flex items-center gap-3">
+            <i class="bi bi-broadcast text-amber-500 text-2xl"></i>
+            <div>
+                <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Campaigns</div>
+                <div class="text-base font-black text-slate-900">{{ number_format($stats['campaigns_count'] ?? 0) }}</div>
             </div>
         </div>
-        <div class="col-6 col-md-3">
-            <div class="p-2 rounded-3 bg-light d-flex align-items-center gap-2.5">
-                <i class="bi bi-check2-circle text-success fs-4 ms-1"></i>
-                <div>
-                    <div class="text-muted extra-small text-uppercase fw-bold">Dispatched Broadcasts</div>
-                    <div class="fw-800 text-success fs-6">{{ number_format($stats['campaigns_sent'] ?? 0) }}</div>
-                </div>
+        <div class="p-3 rounded-xl bg-slate-50 flex items-center gap-3">
+            <i class="bi bi-check2-circle text-emerald-600 text-2xl"></i>
+            <div>
+                <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Dispatched Broadcasts</div>
+                <div class="text-base font-black text-emerald-600">{{ number_format($stats['campaigns_sent'] ?? 0) }}</div>
             </div>
         </div>
-        <div class="col-6 col-md-3">
-            <div class="p-2 rounded-3 bg-light d-flex align-items-center justify-content-between">
-                <div>
-                    <div class="text-muted extra-small text-uppercase fw-bold">Campaign Delivery</div>
-                    <div class="text-success fw-bold small"><i class="bi bi-shield-check me-1"></i> Ready & Armed</div>
-                </div>
-                <a href="{{ route('admin.campaigns.index') }}" class="btn btn-xs btn-outline-primary rounded-pill px-2 py-1 text-decoration-none extra-small fw-bold">
-                    View Hub <i class="bi bi-arrow-right"></i>
-                </a>
+        <div class="p-3 rounded-xl bg-slate-50 flex items-center justify-between">
+            <div>
+                <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Campaign Delivery</div>
+                <div class="text-xs text-emerald-600 font-bold flex items-center gap-1"><i class="bi bi-shield-check"></i> Ready & Armed</div>
             </div>
+            <a href="{{ route('admin.campaigns.index') }}" class="px-2 py-1 rounded-full bg-white border border-slate-200 text-[10px] font-bold text-primary hover:bg-slate-50 transition">
+                View <i class="bi bi-arrow-right"></i>
+            </a>
         </div>
     </div>
 </div>
 
 <!-- Recent Bookings Table -->
-<div class="card card-modern border-0 shadow-sm rounded-4 overflow-hidden bg-white mb-4 p-3">
-    <div class="card-header bg-white py-2 border-0 d-flex justify-content-between align-items-center ps-2 pe-2 mb-2">
+<div class="bg-white rounded-2xl shadow-xs border border-slate-200/80 p-5 mb-6">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
         <div>
-            <h6 class="fw-800 mb-0 text-dark"><i class="bi bi-activity text-primary me-2"></i>Recent Booking Inquiries & Reservations</h6>
-            <span class="text-muted small">Latest reservations processed by the system</span>
+            <h6 class="font-extrabold text-slate-900 text-sm md:text-base flex items-center gap-2 mb-0.5">
+                <i class="bi bi-activity text-primary"></i> Recent Booking Inquiries & Reservations
+            </h6>
+            <span class="text-xs text-slate-500">Latest reservations processed by the system</span>
         </div>
-        <a href="{{ route('admin.bookings.index') }}" class="btn btn-primary btn-sm rounded-pill px-4 fw-bold shadow-sm">View All Bookings</a>
+        <a href="{{ route('admin.bookings.index') }}" class="px-4 py-2 rounded-full bg-primary hover:bg-primary-dark text-white text-xs font-bold shadow-xs transition">
+            View All Bookings
+        </a>
     </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table align-middle mb-0 table-hover datatable" id="recentBookingsTable">
-                <thead class="table-light small text-uppercase fw-bold text-muted">
-                    <tr>
-                        <th class="ps-4">Booking Ref</th>
-                        <th>Customer</th>
-                        <th>Tour / Activity</th>
-                        <th>Total</th>
-                        <th class="text-center">Status</th>
-                        <th class="pe-4 text-end no-sort">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($recentBookings as $b)
-                    <tr>
-                        <td class="ps-4">
-                            <a href="{{ route('admin.bookings.show', $b->id) }}" class="fw-800 text-decoration-none text-dark">#{{ $b->reference }}</a>
-                            <div class="text-muted small" style="font-size: 0.72rem;">{{ $b->created_at ? $b->created_at->format('M j, g:ia') : '' }}</div>
-                        </td>
-                        <td>
-                            <div class="fw-bold text-dark">{{ $b->name }}</div>
-                            <div class="text-muted small font-monospace">{{ $b->phone }}</div>
-                        </td>
-                        <td>
-                            <div class="fw-bold text-dark">{{ $b->tour_name }}</div>
-                            <div class="text-muted small">{{ $b->tour_date ? $b->tour_date->format('M j, Y') : 'Open Date' }}</div>
-                        </td>
-                        <td class="fw-800 text-primary">AED {{ number_format($b->total) }}</td>
-                        <td class="text-center">
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse table datatable" id="recentBookingsTable">
+            <thead>
+                <tr class="border-b border-slate-200 bg-slate-50/80 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                    <th class="py-3 px-4">Booking Ref</th>
+                    <th class="py-3 px-4">Customer</th>
+                    <th class="py-3 px-4">Tour / Activity</th>
+                    <th class="py-3 px-4">Total</th>
+                    <th class="py-3 px-4 text-center">Status</th>
+                    <th class="py-3 px-4 text-right no-sort">Action</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-xs">
+                @forelse($recentBookings as $b)
+                <tr class="hover:bg-slate-50/80 transition">
+                    <td class="py-3.5 px-4">
+                        <a href="{{ route('admin.bookings.show', $b->id) }}" class="font-black text-slate-900 hover:text-primary transition">#{{ $b->reference }}</a>
+                        <div class="text-[11px] text-slate-400">{{ $b->created_at ? $b->created_at->format('M j, g:ia') : '' }}</div>
+                    </td>
+                    <td class="py-3.5 px-4">
+                        <div class="font-bold text-slate-900">{{ $b->name }}</div>
+                        <div class="text-[11px] text-slate-500 font-mono">{{ $b->phone }}</div>
+                    </td>
+                    <td class="py-3.5 px-4">
+                        <div class="font-bold text-slate-800">{{ $b->tour_name }}</div>
+                        <div class="text-[11px] text-slate-400">{{ $b->tour_date ? $b->tour_date->format('M j, Y') : 'Open Date' }}</div>
+                    </td>
+                    <td class="py-3.5 px-4 font-black text-primary">AED {{ number_format($b->total) }}</td>
+                    <td class="py-3.5 px-4 text-center">
+                        @php
+                            $badgeClass = [
+                                'pending' => 'bg-amber-100 text-amber-800',
+                                'confirmed' => 'bg-emerald-100 text-emerald-800',
+                                'completed' => 'bg-sky-100 text-sky-800',
+                                'cancelled' => 'bg-rose-100 text-rose-800'
+                            ][$b->status] ?? 'bg-slate-100 text-slate-800';
+                        @endphp
+                        <span class="inline-block px-3 py-1 rounded-full text-[11px] font-bold capitalize {{ $badgeClass }}">{{ $b->status }}</span>
+                    </td>
+                    <td class="py-3.5 px-4 text-right">
+                        <div class="inline-flex items-center gap-1.5">
+                            <a href="{{ route('admin.bookings.show', $b->id) }}" class="w-8 h-8 rounded-full border border-slate-200 hover:border-primary hover:text-primary flex items-center justify-center text-slate-500 transition" title="View Details">
+                                <i class="bi bi-eye-fill"></i>
+                            </a>
                             @php
-                                $badgeColor = [
-                                    'pending' => 'warning',
-                                    'confirmed' => 'success',
-                                    'completed' => 'info',
-                                    'cancelled' => 'danger'
-                                ][$b->status] ?? 'secondary';
+                                $waVal = preg_replace('/[^0-9]/', '', $b->phone);
+                                $waMsg = 'Hi ' . $b->name . '! This is Dunes Discovery regarding your booking #' . $b->reference;
                             @endphp
-                            <span class="badge bg-{{ $badgeColor }} text-capitalize px-3 py-1 rounded-pill">{{ $b->status }}</span>
-                        </td>
-                        <td class="pe-4 text-end">
-                            <div class="d-flex justify-content-end gap-2">
-                                <a href="{{ route('admin.bookings.show', $b->id) }}" class="btn btn-sm btn-outline-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="View Details">
-                                    <i class="bi bi-eye-fill"></i>
-                                </a>
-                                @php
-                                    $waVal = preg_replace('/[^0-9]/', '', $b->phone);
-                                    $waMsg = 'Hi ' . $b->name . '! This is Dunes Discovery regarding your booking #' . $b->reference;
-                                @endphp
-                                <a href="https://wa.me/{{ $waVal }}?text={{ urlencode($waMsg) }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-success rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="WhatsApp Customer">
-                                    <i class="bi bi-whatsapp"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="6" class="text-center py-5 text-muted">No recent bookings found.</td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+                            <a href="https://wa.me/{{ $waVal }}?text={{ urlencode($waMsg) }}" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-full border border-emerald-200 hover:bg-emerald-50 text-emerald-600 flex items-center justify-center transition" title="WhatsApp Customer">
+                                <i class="bi bi-whatsapp"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="6" class="py-8 text-center text-slate-400">No recent bookings found.</td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
 </div>
 
@@ -373,7 +367,7 @@ $(document).ready(function() {
                 datasets: [{
                     label: 'Revenue (AED)',
                     data: revenues,
-                    backgroundColor: '#F58F43',
+                    backgroundColor: '#F69044',
                     borderRadius: 8,
                     barPercentage: 0.55
                 }]
@@ -393,7 +387,7 @@ $(document).ready(function() {
                     }
                 },
                 scales: {
-                    x: { grid: { color: '#f5f5f5' }, beginAtZero: true },
+                    x: { grid: { color: '#f1f5f9' }, beginAtZero: true },
                     y: { grid: { display: false }, ticks: { font: { size: 11, weight: 'bold' } } }
                 }
             }
@@ -421,7 +415,7 @@ $(document).ready(function() {
                         showCancelButton: true,
                         confirmButtonText: '<i class="bi bi-clipboard me-1"></i> Copy Link',
                         cancelButtonText: '<i class="bi bi-whatsapp me-1"></i> WhatsApp Customer',
-                        confirmButtonColor: '#F58F43',
+                        confirmButtonColor: '#F69044',
                         cancelButtonColor: '#25D366'
                     }).then((result) => {
                         if (result.isConfirmed) {
@@ -442,7 +436,8 @@ $(document).ready(function() {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
-                    text: msg
+                    text: msg,
+                    confirmButtonColor: '#F69044'
                 });
             }
         });
@@ -457,7 +452,7 @@ $(document).ready(function() {
 
         $btn.prop('disabled', true);
         $icon.addClass('kpi-sync-spin');
-        $status.html('<span class="text-primary fw-bold"><i class="bi bi-hourglass-split me-1"></i>Counting live from database...</span>');
+        $status.html('<span class="text-primary font-bold"><i class="bi bi-hourglass-split me-1"></i>Counting live from database...</span>');
 
         // Render shimmer loaders as placeholders on all counter cards
         $('.kpi-number').each(function() {
@@ -495,9 +490,8 @@ $(document).ready(function() {
                     $('#kpiTotalInquiries').text(Number(s.total_inquiries).toLocaleString());
                     $('#kpiDrafts').text(Number(s.drafts).toLocaleString());
 
-                    $status.html(`Live as of <span class="fw-bold text-success">${nowTime}</span>`);
+                    $status.html(`Live as of <span class="font-bold text-emerald-600">${nowTime}</span>`);
 
-                    // Brief toast notification
                     const Toast = Swal.mixin({
                         toast: true,
                         position: 'top-end',
@@ -516,13 +510,13 @@ $(document).ready(function() {
                     $status.text('Recount failed.');
                 }
             },
-            error: function(xhr) {
+            error: function() {
                 $icon.removeClass('kpi-sync-spin');
                 $btn.prop('disabled', false);
                 $('.kpi-number').each(function() {
                     $(this).html($(this).data('cached-html'));
                 });
-                $status.html('<span class="text-danger">Sync error</span>');
+                $status.html('<span class="text-rose-600">Sync error</span>');
             }
         });
     });
