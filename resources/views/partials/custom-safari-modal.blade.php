@@ -265,7 +265,7 @@
 
                                 <div class="space-y-2">
                                     <button type="button" 
-                                            class="w-full py-3 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs sm:text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2" 
+                                            class="w-full py-3 rounded-full bg-gradient-to-r from-[#b45309] to-[#c45e14] hover:from-[#9a4408] hover:to-[#b45309] text-white font-extrabold text-xs sm:text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2" 
                                             @click="book()">
                                         <i class="bi bi-calendar-check-fill"></i>
                                         <span>Book Custom Safari</span>

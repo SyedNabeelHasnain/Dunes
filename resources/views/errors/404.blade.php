@@ -24,7 +24,7 @@
                 <i class="bi bi-grid-fill"></i> Explore Desert Tours
             </a>
         </div>
-        <div class="mt-6 pt-4 border-t border-slate-100 text-slate-500 text-xs">
+        <div class="mt-6 pt-4 border-t border-slate-200 text-slate-500 text-xs">
             Need immediate assistance? <a href="https://wa.me/971502456056?text=Hi%20Dunes%20Team%2C%20I%20need%20help%20finding%20a%20tour" target="_blank" rel="noopener" class="text-primary font-bold hover:underline inline-flex items-center gap-1"><i class="bi bi-whatsapp"></i> Chat on WhatsApp</a>
         </div>
     </div>

@@ -29,7 +29,7 @@
              x-transition:leave="ease-in duration-150"
              x-transition:leave-start="opacity-100 scale-100 translate-y-0"
              x-transition:leave-end="opacity-0 scale-95 translate-y-4"
-             class="w-full max-w-2xl transform overflow-hidden rounded-3xl bg-white text-left align-middle shadow-2xl transition-all border border-slate-100"
+             class="w-full max-w-2xl transform overflow-hidden rounded-3xl bg-white text-left align-middle shadow-2xl transition-all border border-slate-200"
              @click.stop>
             
             <!-- Header -->
@@ -38,9 +38,9 @@
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary">
                         <i class="bi bi-search"></i> Search Dubai Safaris
                     </span>
-                    <span class="hidden sm:inline-block text-xs text-slate-400">DET Licensed #1430583</span>
+                    <span class="hidden sm:inline-block text-xs text-slate-500">DET Licensed #1430583</span>
                 </div>
-                <button type="button" @click="$store.modal.close()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer" aria-label="Close">
+                <button type="button" @click="$store.modal.close()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-700 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer" aria-label="Close">
                     <i class="bi bi-x-lg text-xs"></i>
                 </button>
             </div>
@@ -49,9 +49,9 @@
             <div class="p-4 sm:p-6">
                 <form action="{{ route('tours.search') }}" method="GET" id="globalSearchForm">
                     <div class="relative mb-6">
-                        <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg sm:text-xl"></i>
+                        <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-lg sm:text-xl"></i>
                         <input type="text" name="q" id="globalSearchModalInput" 
-                               class="w-full pl-12 pr-28 py-3.5 sm:py-4 rounded-2xl bg-slate-50 border-2 border-slate-200 focus:border-primary focus:bg-white text-sm sm:text-base font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none transition-all" 
+                               class="w-full pl-12 pr-28 py-3.5 sm:py-4 rounded-2xl bg-slate-50 border-2 border-slate-200 focus:border-primary focus:bg-white text-sm sm:text-base font-semibold text-slate-800 placeholder:text-slate-500 focus:outline-none transition-all" 
                                placeholder="Search safaris, buggies, VIP dining, 4x4..." 
                                autocomplete="off" 
                                required
@@ -64,10 +64,10 @@
 
                 <div class="trending-searches-wrapper">
                     <div class="flex items-center justify-between mb-3">
-                        <span class="text-[11px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                        <span class="text-[11px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
                             <i class="bi bi-fire text-amber-500"></i> Popular Searches
                         </span>
-                        <span class="hidden sm:inline-block text-[11px] text-slate-400">Press <kbd class="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 font-mono text-[10px]">Ctrl+K</kbd> anytime</span>
+                        <span class="hidden sm:inline-block text-[11px] text-slate-500">Press <kbd class="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 font-mono text-[10px]">Ctrl+K</kbd> anytime</span>
                     </div>
                     <div class="flex flex-wrap gap-2">
                         <a href="{{ route('tours.search', ['q' => 'Evening Desert Safari']) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-100 hover:bg-orange-50 hover:text-primary text-slate-700 transition-colors border border-slate-200/80">
@@ -99,7 +99,7 @@
             </div>
 
             <!-- Footer -->
-            <div class="flex items-center justify-between p-4 px-6 bg-slate-50 border-t border-slate-100 text-xs">
+            <div class="flex items-center justify-between p-4 px-6 bg-slate-50 border-t border-slate-200 text-xs">
                 <span class="text-slate-500 flex items-center gap-1">
                     <i class="bi bi-patch-check-fill text-emerald-500"></i> 100% Free 24h Cancellation
                 </span>

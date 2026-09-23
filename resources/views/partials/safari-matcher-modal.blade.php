@@ -314,7 +314,7 @@
                     <!-- CTAs -->
                     <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
                         <button type="button" 
-                                class="sm:col-span-7 w-full py-3.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2" 
+                                class="sm:col-span-7 w-full py-3.5 rounded-full bg-gradient-to-r from-[#b45309] to-[#c45e14] hover:from-[#9a4408] hover:to-[#b45309] text-white font-extrabold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2" 
                                 @click="book()">
                             <span>{{ $conciergePromoActive ? "Book with {$conciergePromoDiscount}% OFF" : "Book Recommended Safari" }}</span>
                             <i class="bi bi-arrow-right"></i>

@@ -92,7 +92,7 @@
             <span id="compareCountLabel" x-text="$store.compare.items ? $store.compare.items.length : 0">0</span>/3 Selected
         </div>
         <button type="button" 
-                class="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs shadow-sm hover:shadow-md transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5" 
+                class="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#b45309] to-[#c45e14] hover:from-[#9a4408] hover:to-[#b45309] text-white font-extrabold text-xs shadow-sm hover:shadow-md transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5" 
                 id="openCompareDrawerBtn" 
                 @click="$store.modal.open('compare')">
             <i class="bi bi-shuffle"></i>
@@ -180,7 +180,7 @@
                     Click the <strong class="text-white">+ Compare</strong> button on any safari card, or click below to analyze our Top 3 most popular Dubai experiences side-by-side:
                 </p>
                 <button type="button" 
-                        class="px-5 py-2.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs sm:text-sm shadow-md transition-all cursor-pointer inline-flex items-center gap-2" 
+                        class="px-5 py-2.5 rounded-full bg-gradient-to-r from-[#b45309] to-[#c45e14] hover:from-[#9a4408] hover:to-[#b45309] text-white font-extrabold text-xs sm:text-sm shadow-md transition-all cursor-pointer inline-flex items-center gap-2" 
                         @click="$store.compare.loadBestsellers()">
                     <i class="bi bi-stars"></i>
                     <span>Compare Top 3 Bestsellers</span>

@@ -387,13 +387,13 @@
                                  x-transition:leave="transition ease-in duration-100"
                                  x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                                  x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
-                                 class="absolute left-0 mt-2 w-72 rounded-2xl bg-white p-2 shadow-xl border border-slate-100 z-50 focus:outline-none"
+                                 class="absolute left-0 mt-2 w-72 rounded-2xl bg-white p-2 shadow-xl border border-slate-200 z-50 focus:outline-none"
                                  style="display: none;">
                                 <a class="flex items-center gap-2 px-3 py-2.5 rounded-xl font-bold text-primary hover:bg-orange-50 transition-colors text-xs" href="{{ route('tours.customizer') }}">
                                     <i class="bi bi-sliders text-amber-500"></i>
                                     <span>Build Your Own Safari</span>
                                 </a>
-                                <div class="my-1 border-t border-slate-100"></div>
+                                <div class="my-1 border-t border-slate-200"></div>
                                 <div class="max-h-72 overflow-y-auto space-y-0.5">
                                     @foreach($allTours as $t)
                                     <a class="block px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-primary transition-colors line-clamp-1" href="{{ route('tours.show', $t->slug) }}">
@@ -433,7 +433,7 @@
                         <a class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full font-bold text-xs bg-emerald-500 hover:bg-emerald-600 text-white shadow-xs hover:shadow-sm transition-all cursor-pointer" href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener">
                             <i class="bi bi-whatsapp"></i><span>WhatsApp</span>
                         </a>
-                        <a class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full font-extrabold text-xs text-white bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 shadow-sm hover:shadow-md transition-all cursor-pointer" href="#" data-action="open-booking">
+                        <a class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full font-extrabold text-xs text-white bg-gradient-to-r from-[#b45309] to-[#c45e14] hover:from-[#9a4408] hover:to-[#b45309] shadow-sm hover:shadow-md transition-all cursor-pointer" href="#" data-action="open-booking">
                             <i class="bi bi-calendar-check"></i><span>Book Now</span>
                         </a>
                     </div>
@@ -459,7 +459,7 @@
                         </a>
 
                         <!-- Compact Book Now Button -->
-                        <a href="#" class="px-2.5 sm:px-3.5 py-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold text-[11px] sm:text-xs shadow-xs flex items-center gap-1 cursor-pointer" data-action="open-booking" aria-label="Book Now">
+                        <a href="#" class="px-2.5 sm:px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#b45309] to-[#c45e14] text-white font-extrabold text-[11px] sm:text-xs shadow-xs flex items-center gap-1 cursor-pointer" data-action="open-booking" aria-label="Book Now">
                             <i class="bi bi-calendar-check"></i>
                             <span class="hidden sm:inline">Book</span>
                         </a>
@@ -496,7 +496,7 @@
              style="display: none;"
              id="mainOffcanvas">
             <div>
-                <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+                <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-4">
                     <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery" width="140" height="90" class="h-9 w-auto object-contain">
                     <div class="flex items-center gap-2">
                         @include('partials.currency-switcher', ['switcherId' => 'mobileCurrencyDropdownBtn'])
@@ -547,7 +547,7 @@
             </div>
 
             <!-- Drawer Bottom Direct Contact -->
-            <div class="pt-4 border-t border-slate-100 space-y-2">
+            <div class="pt-4 border-t border-slate-200 space-y-2">
                 <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="w-full py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors">
                     <i class="bi bi-whatsapp"></i><span>Chat on WhatsApp</span>
                 </a>
@@ -684,22 +684,22 @@
             <div class="border-t border-slate-800/80 pt-6">
                 <div class="flex flex-col lg:flex-row items-center justify-between gap-4 text-center lg:text-left">
                     <div>
-                        <p class="text-slate-500 text-xs mb-1">&copy; {{ date('Y') }} {{ $settings['site_name'] ?? 'Dunes Discovery Tourism L.L.C.' }} {{ $settings['site_copyright'] ?? 'All rights reserved.' }} Department of Economy & Tourism License #{{ $settings['company_license_number'] ?? '1430583' }}.</p>
+                        <p class="text-slate-400 text-xs mb-1">&copy; {{ date('Y') }} {{ $settings['site_name'] ?? 'Dunes Discovery Tourism L.L.C.' }} {{ $settings['site_copyright'] ?? 'All rights reserved.' }} Department of Economy & Tourism License #{{ $settings['company_license_number'] ?? '1430583' }}.</p>
                         <div class="flex flex-wrap justify-center lg:justify-start items-center gap-x-2.5 gap-y-1 text-xs text-slate-400">
                             <a href="{{ route('terms') }}" class="hover:text-white transition-colors">Terms & Conditions</a>
-                            <span class="text-slate-600">&bull;</span>
+                            <span class="text-slate-500">&bull;</span>
                             <a href="{{ route('privacy') }}" class="hover:text-white transition-colors">Privacy Policy</a>
-                            <span class="text-slate-600">&bull;</span>
+                            <span class="text-slate-500">&bull;</span>
                             <a href="{{ route('cookies') }}" class="hover:text-white transition-colors">Cookie Policy</a>
-                            <span class="text-slate-600">&bull;</span>
+                            <span class="text-slate-500">&bull;</span>
                             <a href="{{ route('cancellation') }}" class="hover:text-white transition-colors">100% Refund Policy</a>
-                            <span class="text-slate-600">&bull;</span>
+                            <span class="text-slate-500">&bull;</span>
                             <a href="{{ route('payment.security') }}" class="hover:text-white transition-colors">Payment Security</a>
-                            <span class="text-slate-600">&bull;</span>
+                            <span class="text-slate-500">&bull;</span>
                             <a href="{{ route('safety.waiver') }}" class="hover:text-white transition-colors">Safety Waiver</a>
-                            <span class="text-slate-600">&bull;</span>
+                            <span class="text-slate-500">&bull;</span>
                             <a href="{{ route('ai.editorial') }}" class="hover:text-white transition-colors">AI Policy</a>
-                            <span class="text-slate-600">&bull;</span>
+                            <span class="text-slate-500">&bull;</span>
                             <a href="{{ route('responsible.tourism') }}" class="hover:text-white transition-colors">Sustainability</a>
                         </div>
                     </div>

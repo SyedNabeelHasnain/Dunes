@@ -150,7 +150,7 @@
                 </div>
                 <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight mb-1.5" id="legalPageHeaderTitle">{{ $page->title }}</h1>
                 <p class="text-white/75 text-sm sm:text-base" id="legalPageHeaderSubtitle">
-                    {{ $page->subtitle ?: 'Dunes Discovery Tourism L.L.C • Dubai, United Arab Emirates' }}
+                    {{ $page->subtitle ?: 'Dunes Discovery Tourism L.L.C â€¢ Dubai, United Arab Emirates' }}
                 </p>
             </div>
 
@@ -165,7 +165,7 @@
                 <input type="radio" class="sr-only peer/ar" name="legalLang" id="langAr" autocomplete="off" onchange="switchLegalLanguage('ar')">
                 <label class="cursor-pointer text-white/80 hover:text-white rounded-full px-3.5 py-1.5 text-xs font-medium flex items-center gap-1.5 transition-all peer-checked/ar:bg-primary peer-checked/ar:text-white peer-checked/ar:font-bold peer-checked/ar:shadow-md" for="langAr">
                     <span class="bg-amber-400 text-slate-950 rounded-full px-1.5 py-0.5 text-[10px] font-bold">AR</span>
-                    <span>العربية</span>
+                    <span>Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©</span>
                 </label>
             </div>
         </div>
@@ -203,7 +203,7 @@
             <!-- Table of Contents / Quick Jump (Desktop) -->
             <div class="hidden lg:block lg:col-span-3 legal-toc-col">
                 <div class="legal-toc-list bg-white rounded-2xl shadow-xs border border-slate-200 p-4">
-                    <div class="flex items-center gap-2 pb-3 mb-3 border-b border-slate-100">
+                    <div class="flex items-center gap-2 pb-3 mb-3 border-b border-slate-200">
                         <i class="bi bi-list-nested text-primary"></i>
                         <span class="font-bold text-slate-900 text-xs uppercase tracking-wider">Document Sections</span>
                     </div>
@@ -238,7 +238,7 @@
                                                 <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 border-l-4 border-primary pl-3">
                                                     {{ $section->heading }}
                                                 </h2>
-                                                <a href="#sec-{{ $section->id }}" class="text-slate-400 hover:text-primary transition-colors text-xs pt-1" title="Direct Link to Clause">
+                                                <a href="#sec-{{ $section->id }}" class="text-slate-500 hover:text-primary transition-colors text-xs pt-1" title="Direct Link to Clause">
                                                     <i class="bi bi-link-45deg text-lg"></i>
                                                 </a>
                                             </div>
@@ -259,12 +259,12 @@
                                             @endif
                                         </div>
                                         @if(!$loop->last)
-                                            <hr class="my-6 border-slate-100">
+                                            <hr class="my-6 border-slate-200">
                                         @endif
                                     @endforeach
                                 </div>
                             @else
-                                <div class="text-center py-12 text-slate-400">
+                                <div class="text-center py-12 text-slate-500">
                                     <i class="bi bi-hourglass-split text-4xl mb-3 block text-primary"></i>
                                     <p class="text-sm">Legal document updates in progress.</p>
                                 </div>
@@ -287,7 +287,7 @@
                                                 <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 border-r-4 border-primary pr-3">
                                                     {{ $section->heading_ar ?: $section->heading }}
                                                 </h2>
-                                                <a href="#sec-ar-{{ $section->id }}" class="text-slate-400 hover:text-primary transition-colors text-xs pt-1" title="رابط مباشر للبند">
+                                                <a href="#sec-ar-{{ $section->id }}" class="text-slate-500 hover:text-primary transition-colors text-xs pt-1" title="Ø±Ø§Ø¨Ø· Ù…Ø¨Ø§Ø´Ø± Ù„Ù„Ø¨Ù†Ø¯">
                                                     <i class="bi bi-link-45deg text-lg"></i>
                                                 </a>
                                             </div>
@@ -308,14 +308,14 @@
                                             @endif
                                         </div>
                                         @if(!$loop->last)
-                                            <hr class="my-6 border-slate-100">
+                                            <hr class="my-6 border-slate-200">
                                         @endif
                                     @endforeach
                                 </div>
                             @else
-                                <div class="text-center py-12 text-slate-400">
+                                <div class="text-center py-12 text-slate-500">
                                     <i class="bi bi-hourglass-split text-4xl mb-3 block text-primary"></i>
-                                    <p class="text-sm">جاري تحديث المحتوى القانوني.</p>
+                                    <p class="text-sm">Ø¬Ø§Ø±ÙŠ ØªØ­Ø¯ÙŠØ« Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ø§Ù„Ù‚Ø§Ù†ÙˆÙ†ÙŠ.</p>
                                 </div>
                             @endif
                         </div>
@@ -346,7 +346,7 @@
 
                 <!-- Trust Badges & Policy Sitemap Links -->
                 <div class="legal-policy-suite mt-6 p-4 bg-white rounded-2xl border border-slate-200 text-center">
-                    <div class="text-xs text-slate-400 mb-3 font-bold uppercase tracking-wider">Comprehensive Policy Suite</div>
+                    <div class="text-xs text-slate-500 mb-3 font-bold uppercase tracking-wider">Comprehensive Policy Suite</div>
                     <div class="flex flex-wrap justify-center gap-2">
                         <a href="{{ route('terms') }}" class="text-xs rounded-full px-3.5 py-1.5 border transition-colors {{ $page->slug === 'terms-condition' ? 'bg-primary text-white border-primary font-bold shadow-xs' : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-primary/50' }}">Terms & Conditions</a>
                         <a href="{{ route('privacy') }}" class="text-xs rounded-full px-3.5 py-1.5 border transition-colors {{ $page->slug === 'privacy-policy' ? 'bg-primary text-white border-primary font-bold shadow-xs' : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-primary/50' }}">Privacy Policy</a>
@@ -380,10 +380,10 @@ function switchLegalLanguage(lang) {
         if (arBox) arBox.classList.remove('hidden');
         
         if (titleEl) titleEl.textContent = "{{ $page->title_ar ?: $page->title }}";
-        if (subEl) subEl.textContent = "{{ $page->subtitle_ar ?: ($page->subtitle ?: 'شركة ديونز ديسكفري للسياحة ذ.م.م • دبي، الإمارات العربية المتحدة') }}";
+        if (subEl) subEl.textContent = "{{ $page->subtitle_ar ?: ($page->subtitle ?: 'Ø´Ø±ÙƒØ© Ø¯ÙŠÙˆÙ†Ø² Ø¯ÙŠØ³ÙƒÙØ±ÙŠ Ù„Ù„Ø³ÙŠØ§Ø­Ø© Ø°.Ù….Ù… â€¢ Ø¯Ø¨ÙŠØŒ Ø§Ù„Ø¥Ù…Ø§Ø±Ø§Øª Ø§Ù„Ø¹Ø±Ø¨ÙŠØ© Ø§Ù„Ù…ØªØ­Ø¯Ø©') }}";
         
-        if (helpTitle) helpTitle.textContent = "هل لديك أي استفسار حول سياساتنا أو التراخيص الرسمية؟";
-        if (helpDesc) helpDesc.textContent = "فريق الامتثال القانوني وخدمة العملاء في دبي متاح على مدار الساعة للرد على استفساراتكم أو تنسيق الحجوزات المؤسسية.";
+        if (helpTitle) helpTitle.textContent = "Ù‡Ù„ Ù„Ø¯ÙŠÙƒ Ø£ÙŠ Ø§Ø³ØªÙØ³Ø§Ø± Ø­ÙˆÙ„ Ø³ÙŠØ§Ø³Ø§ØªÙ†Ø§ Ø£Ùˆ Ø§Ù„ØªØ±Ø§Ø®ÙŠØµ Ø§Ù„Ø±Ø³Ù…ÙŠØ©ØŸ";
+        if (helpDesc) helpDesc.textContent = "ÙØ±ÙŠÙ‚ Ø§Ù„Ø§Ù…ØªØ«Ø§Ù„ Ø§Ù„Ù‚Ø§Ù†ÙˆÙ†ÙŠ ÙˆØ®Ø¯Ù…Ø© Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡ ÙÙŠ Ø¯Ø¨ÙŠ Ù…ØªØ§Ø­ Ø¹Ù„Ù‰ Ù…Ø¯Ø§Ø± Ø§Ù„Ø³Ø§Ø¹Ø© Ù„Ù„Ø±Ø¯ Ø¹Ù„Ù‰ Ø§Ø³ØªÙØ³Ø§Ø±Ø§ØªÙƒÙ… Ø£Ùˆ ØªÙ†Ø³ÙŠÙ‚ Ø§Ù„Ø­Ø¬ÙˆØ²Ø§Øª Ø§Ù„Ù…Ø¤Ø³Ø³ÙŠØ©.";
 
         tocLinks.forEach(link => {
             const arText = link.getAttribute('data-ar');
@@ -396,7 +396,7 @@ function switchLegalLanguage(lang) {
         if (enBox) enBox.classList.remove('hidden');
         
         if (titleEl) titleEl.textContent = "{{ $page->title }}";
-        if (subEl) subEl.textContent = "{{ $page->subtitle ?: 'Dunes Discovery Tourism L.L.C • Dubai, United Arab Emirates' }}";
+        if (subEl) subEl.textContent = "{{ $page->subtitle ?: 'Dunes Discovery Tourism L.L.C â€¢ Dubai, United Arab Emirates' }}";
 
         if (helpTitle) helpTitle.textContent = "Questions About Our Policies or Compliance?";
         if (helpDesc) helpDesc.textContent = "Our legal compliance desk and customer concierge team in Dubai are available 24/7 to assist with any policy questions, corporate travel agreements, or booking amendments.";

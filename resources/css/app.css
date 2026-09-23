@@ -404,6 +404,280 @@
 }
 
 /* ==========================================================================
+   Component: Desert CTA Buttons (Primary Action Buttons)
+   Ported from legacy public/assets/css/app.css for Vite pipeline.
+   ========================================================================== */
+.btn-desert-animated {
+  position: relative;
+  background: linear-gradient(135deg, #b45309, #c45e14);
+  color: white;
+  font-weight: 600;
+  z-index: 1;
+  overflow: visible;
+  transition: all 0.3s ease;
+  border: none;
+  box-shadow: 0 10px 20px -10px rgba(246, 144, 68, 0.5);
+}
+
+.btn-desert-animated i,
+.btn-desert-animated span {
+  position: relative;
+  z-index: 2;
+}
+
+.btn-desert-animated i {
+  transition: color 0.3s ease;
+}
+
+.btn-desert-animated::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 50rem;
+  padding: 2px;
+  background: linear-gradient(90deg, #FF8C00, #FFD700, #FF4500, #FFD700, #FF8C00);
+  background-size: 300% 300%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  will-change: background-position;
+  animation: desertBorderFlow 8s ease-in-out infinite;
+  filter: drop-shadow(0 0 2px rgba(255, 140, 0, 0.5));
+}
+
+.btn-desert-animated:hover {
+  color: white;
+  background: linear-gradient(135deg, #9a4408 0%, #b45309 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px -10px rgba(255, 69, 0, 0.6);
+}
+
+.btn-desert-animated:hover::before {
+  opacity: 0;
+}
+
+/* Dark variant CTA button */
+.btn-desert-animated-dark {
+  position: relative;
+  background: #020617;
+  color: #FFB074;
+  font-weight: 600;
+  z-index: 1;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: none;
+  box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.5);
+}
+
+.btn-desert-animated-dark i,
+.btn-desert-animated-dark span {
+  position: relative;
+  z-index: 2;
+}
+
+.btn-desert-animated-dark::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 50rem;
+  padding: 2px;
+  background: linear-gradient(90deg, #FF8C00, #FFD700, #FF4500, #FFD700, #FF8C00);
+  background-size: 300% 300%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  will-change: background-position;
+  animation: desertBorderFlow 8s linear infinite;
+  filter: drop-shadow(0 0 2px rgba(255, 140, 0, 0.5));
+}
+
+.btn-desert-animated-dark:hover {
+  color: #FFB074;
+  background: #000;
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px -10px rgba(255, 140, 0, 0.3);
+}
+
+.btn-desert-animated-dark:hover::before {
+  opacity: 0;
+}
+
+/* ==========================================================================
+   Component: WhatsApp CTA Button
+   ========================================================================== */
+.btn-whatsapp-animated {
+  position: relative;
+  background: #047857;
+  color: white;
+  font-weight: 600;
+  z-index: 1;
+  overflow: visible;
+  transition: all 0.3s ease;
+  border: none;
+  box-shadow: 0 10px 20px -10px rgba(5, 150, 105, 0.5);
+}
+
+.btn-whatsapp-animated i,
+.btn-whatsapp-animated span {
+  position: relative;
+  z-index: 2;
+}
+
+.btn-whatsapp-animated::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 50rem;
+  padding: 2px;
+  background: linear-gradient(90deg, #25D366, #128C7E, #25D366, #128C7E, #25D366);
+  background-size: 300% 300%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  will-change: background-position;
+  animation: desertBorderFlow 4s linear infinite;
+  filter: drop-shadow(0 0 2px rgba(37, 211, 102, 0.5));
+}
+
+.btn-whatsapp-animated:hover {
+  color: white;
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px -10px rgba(37, 211, 102, 0.6);
+}
+
+.btn-whatsapp-animated:hover::before {
+  opacity: 0;
+}
+
+/* Shared disabled state for all animated buttons */
+.btn-desert-animated:disabled,
+.btn-whatsapp-animated:disabled,
+.btn-desert-animated-dark:disabled {
+  opacity: 0.65;
+  pointer-events: none;
+  box-shadow: none;
+  filter: grayscale(100%);
+}
+
+.btn-desert-animated:disabled::before,
+.btn-whatsapp-animated:disabled::before,
+.btn-desert-animated-dark:disabled::before {
+  animation: none;
+  opacity: 0.5;
+}
+
+/* ==========================================================================
+   Component: WhatsApp Circle Button (Sidebar/Sticky)
+   ========================================================================== */
+.btn-circle-whatsapp {
+  width: 39px;
+  height: 39px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  position: relative;
+  z-index: 1;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+/* ==========================================================================
+   Component: CTA Section (Bottom dark call-to-action banner)
+   ========================================================================== */
+.cta-section {
+  background: linear-gradient(180deg, #0F172A 0%, #0B1325 100%);
+  position: relative;
+  z-index: 1;
+  padding: 5rem 0;
+  overflow: hidden;
+  border-top: 1px solid rgba(246, 144, 68, 0.2);
+}
+
+.cta-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 100%;
+  background: radial-gradient(ellipse at 50% 0%, rgba(246, 144, 68, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ==========================================================================
+   Component: Card Animated Gradient Borders (Tour, Review, Modern Cards)
+   ========================================================================== */
+.tour-card,
+.review-card,
+.card-modern {
+  position: relative;
+  z-index: 1;
+}
+
+.tour-card::before,
+.review-card::before,
+.card-modern::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(90deg, #ff8c00, gold, #ff4500, gold, #ff8c00);
+  background-size: 300% 300%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  will-change: background-position;
+  animation: desertBorderFlow 8s linear infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Review card base styles */
+.review-card {
+  width: 280px;
+  min-width: 280px;
+  background: white;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  border: 1px solid #e2e8f0;
+}
+
+.review-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
+}
+
+/* ==========================================================================
+   Component: Text Gradient Primary
+   ========================================================================== */
+.text-gradient-primary {
+  background: linear-gradient(135deg, var(--color-primary), #FFB074);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ==========================================================================
    Custom Utilities: Print Stylesheet for Rate Cards & Vouchers
    ========================================================================== */
 @media print {
@@ -487,4 +761,16 @@
     margin: 1.2cm;
     size: A4 portrait;
   }
+}
+
+/* ==========================================================================
+   WCAG AA Text Contrast Overrides
+   Unlayered CSS overrides Tailwind's @layer utilities in the CSS cascade.
+   - text-primary (#F69044) on white = 2.33:1 → FAILS WCAG AA 4.5:1
+   - text-primary-accessible (#c45e14) on white = 4.6:1 → PASSES WCAG AA
+   Does NOT affect bg-primary, border-primary, ring-primary, or any hover/
+   focus/group-hover variants which use different selector names.
+   ========================================================================== */
+.text-primary {
+  color: var(--color-primary-accessible);
 }

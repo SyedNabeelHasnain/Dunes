@@ -41,7 +41,7 @@
              x-transition:leave="ease-in duration-150"
              x-transition:leave-start="opacity-100 scale-100 translate-y-0"
              x-transition:leave-end="opacity-0 scale-95 translate-y-4"
-             class="w-full max-w-4xl transform overflow-hidden rounded-3xl bg-white text-left align-middle shadow-2xl transition-all border border-slate-100 relative"
+             class="w-full max-w-4xl transform overflow-hidden rounded-3xl bg-white text-left align-middle shadow-2xl transition-all border border-slate-200 relative"
              @click.stop>
             
             <!-- Luxury Orange & Gold Ambient Glow Bar -->
@@ -50,7 +50,7 @@
             <!-- Close Button -->
             <button type="button" 
                     @click="$store.modal.close()" 
-                    class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer absolute top-4 right-4 z-10" 
+                    class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-700 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer absolute top-4 right-4 z-10" 
                     id="closeWelcomeOfferBtn" 
                     aria-label="Close">
                 <i class="bi bi-x-lg text-xs"></i>
@@ -134,17 +134,17 @@
                                         <div class="welcome-phone-field rounded-xl shadow-2xs bg-white border border-slate-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all relative">
                                             <input type="tel" class="w-full py-2.5 px-3 bg-transparent text-xs sm:text-sm font-semibold text-slate-800 border-0 focus:outline-none placeholder:text-slate-400" id="welcomePhone" name="phone" placeholder="50 123 4567" required autocomplete="tel">
                                         </div>
-                                        <small class="text-slate-400 block mt-1 text-[11px]"><i class="bi bi-shield-check text-emerald-500 me-1"></i>Voucher sent via Email & WhatsApp.</small>
+                                        <small class="text-slate-500 block mt-1 text-[11px]"><i class="bi bi-shield-check text-emerald-500 me-1"></i>Voucher sent via Email & WhatsApp.</small>
                                     </div>
 
                                     <div class="p-2.5 rounded-xl bg-red-50 text-red-700 text-xs border border-red-200 hidden" id="welcomeOfferError"></div>
 
-                                    <button type="submit" class="w-full py-3.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2" id="claimOfferSubmitBtn">
+                                    <button type="submit" class="w-full py-3.5 rounded-full bg-gradient-to-r from-[#b45309] to-[#c45e14] hover:from-[#9a4408] hover:to-[#b45309] text-white font-extrabold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2" id="claimOfferSubmitBtn">
                                         <span>Claim My {{ (int)$popupDiscount }}% Discount</span>
                                         <i class="bi bi-arrow-right"></i>
                                     </button>
 
-                                    <div class="text-center text-slate-400 text-[11px]">
+                                    <div class="text-center text-slate-500 text-[11px]">
                                         <i class="bi bi-lock-fill me-1"></i> 100% Privacy. Single-use voucher valid for 24h.
                                     </div>
                                 </form>
@@ -167,12 +167,12 @@
                                     </button>
                                 </div>
 
-                                <button type="button" class="w-full py-3.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 mb-2" id="applyVoucherAndBookBtn">
+                                <button type="button" class="w-full py-3.5 rounded-full bg-gradient-to-r from-[#b45309] to-[#c45e14] hover:from-[#9a4408] hover:to-[#b45309] text-white font-extrabold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 mb-2" id="applyVoucherAndBookBtn">
                                     <i class="bi bi-cart-check-fill"></i>
                                     <span>Apply {{ (int)$popupDiscount }}% OFF & Book Safari Now</span>
                                 </button>
                                 
-                                <small class="text-slate-400 block mt-2 text-[11px]">
+                                <small class="text-slate-500 block mt-2 text-[11px]">
                                     A copy has also been sent to your email address.
                                 </small>
                             </div>

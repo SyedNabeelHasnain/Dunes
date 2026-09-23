@@ -5,7 +5,7 @@
 
 @section('content')
 <div class="max-w-xl mx-auto px-4 py-16 sm:py-24 min-h-[75vh] flex items-center">
-    <div class="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden w-full">
+    <div class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden w-full">
         <!-- Card Header -->
         <div class="bg-slate-900 text-white p-6 sm:p-8 text-center">
             <div class="inline-flex items-center justify-center bg-primary/20 text-primary rounded-full w-14 h-14 mb-3 text-2xl">

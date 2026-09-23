@@ -44,11 +44,11 @@
              x-transition:leave="transform transition ease-in duration-200"
              x-transition:leave-start="translate-y-0 sm:scale-100 opacity-100"
              x-transition:leave-end="translate-y-full sm:translate-y-4 sm:scale-95 opacity-0"
-             class="w-full sm:max-w-2xl lg:max-w-3xl rounded-t-3xl sm:rounded-3xl bg-white text-left align-middle shadow-2xl transition-all border border-slate-100 overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[88vh]"
+             class="w-full sm:max-w-2xl lg:max-w-3xl rounded-t-3xl sm:rounded-3xl bg-white text-left align-middle shadow-2xl transition-all border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[88vh]"
              @click.stop>
 
             <!-- Modal Header -->
-            <div class="flex items-center justify-between py-3.5 px-4 sm:px-6 border-b border-slate-100 bg-white sticky top-0 z-20 shrink-0">
+            <div class="flex items-center justify-between py-3.5 px-4 sm:px-6 border-b border-slate-200 bg-white sticky top-0 z-20 shrink-0">
                 <div class="flex items-center gap-3">
                     <button type="button" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-colors cursor-pointer hidden" id="headerBackBtn">
                         <i class="bi bi-chevron-left text-sm"></i>
@@ -59,7 +59,7 @@
                     </div>
                 </div>
                 <button type="button" 
-                        class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer" 
+                        class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-700 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer" 
                         @click="$store.modal.close()" 
                         aria-label="Close">
                     <i class="bi bi-x-lg text-xs"></i>
@@ -107,7 +107,7 @@
                             <div class="mb-5">
                                 <div class="text-xs font-black uppercase tracking-wider text-slate-500 mb-2">Select Package</div>
                                 <div class="tier-cards" id="tierCards">
-                                    <div class="text-center py-6 text-slate-400">
+                                    <div class="text-center py-6 text-slate-500">
                                         <i class="bi bi-cursor-fill text-3xl mb-1 block"></i>
                                         <small class="font-bold text-xs">Select a tour above to view packages</small>
                                     </div>
@@ -152,7 +152,7 @@
                                     <div class="relative rounded-2xl bg-white shadow-2xs border border-slate-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 overflow-hidden flex items-center h-[52px] transition-all">
                                         <span class="pl-3.5 pr-2 text-primary"><i class="bi bi-geo-alt-fill text-base"></i></span>
                                         <input type="text" class="flex-1 bg-transparent font-bold text-slate-900 text-sm border-0 focus:outline-none placeholder:text-slate-400" name="location" id="bookingLocation" required placeholder="Hotel / Residence in Dubai" autocomplete="street-address">
-                                        <button class="px-3.5 h-full text-slate-400 hover:text-primary hover:bg-slate-50 border-l border-slate-100 transition-colors cursor-pointer" type="button" id="detectLocation" aria-label="Detect current location">
+                                        <button class="px-3.5 h-full text-slate-500 hover:text-primary hover:bg-slate-50 border-l border-slate-200 transition-colors cursor-pointer" type="button" id="detectLocation" aria-label="Detect current location">
                                             <i class="bi bi-crosshair"></i>
                                         </button>
                                     </div>
@@ -168,13 +168,13 @@
                                     <i class="bi bi-check-lg text-lg font-black"></i>
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <small class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Selected Experience</small>
+                                    <small class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Selected Experience</small>
                                     <div class="font-extrabold text-slate-900 text-sm truncate" id="summaryTourName">Loading...</div>
                                     <div class="text-xs text-slate-500" id="summaryTierName"></div>
                                 </div>
                                 <div class="text-right shrink-0">
                                     <div class="font-black text-primary font-mono text-base" id="summaryTotal">AED 0</div>
-                                    <a href="#" class="text-xs font-bold text-slate-400 hover:text-primary transition-colors" id="editStep1">Edit</a>
+                                    <a href="#" class="text-xs font-bold text-slate-500 hover:text-primary transition-colors" id="editStep1">Edit</a>
                                 </div>
                             </div>
 
@@ -220,7 +220,7 @@
                                     <button class="px-5 bg-primary hover:bg-primary-dark text-white font-bold text-xs transition-colors cursor-pointer" type="button" id="verifyOtpBtn">Verify</button>
                                 </div>
                                 <div class="flex justify-between mt-2 px-1 text-xs">
-                                    <span class="text-slate-400" id="otpTimer"></span>
+                                    <span class="text-slate-500" id="otpTimer"></span>
                                     <a href="#" class="font-bold text-primary hover:underline" id="resendOtpBtn">Resend Code</a>
                                 </div>
                             </div>
@@ -314,12 +314,12 @@
                     <div class="border-t border-slate-200/80 bg-white py-3.5 px-4 sm:px-6 sticky bottom-0 z-20 pb-safe shrink-0 shadow-lg">
                         <div class="flex items-center justify-between w-full">
                             <div class="text-left">
-                                <small class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Total Amount</small>
+                                <small class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Total Amount</small>
                                 <div class="font-black text-primary font-mono text-xl sm:text-2xl leading-none" id="bookingTotal">AED 0.00</div>
                             </div>
                             <div class="flex items-center gap-2 ml-auto" id="continueBtnWrapper">
                                 <button type="button" 
-                                        class="px-5 sm:px-7 py-3 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all cursor-pointer inline-flex items-center gap-2" 
+                                        class="px-5 sm:px-7 py-3 rounded-full bg-gradient-to-r from-[#b45309] to-[#c45e14] hover:from-[#9a4408] hover:to-[#b45309] text-white font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all cursor-pointer inline-flex items-center gap-2" 
                                         id="nextStep">
                                     <span>Continue</span>
                                     <i class="bi bi-arrow-right"></i>

@@ -29,12 +29,12 @@
             <div class="rounded-3xl bg-white shadow-xl border border-slate-200/80 p-5 sm:p-8">
                 
                 <!-- Progress Header -->
-                <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6" x-show="step <= 3">
+                <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-6" x-show="step <= 3">
                     <div class="flex items-center gap-2.5">
                         <span class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center font-black text-xs" x-text="step">1</span>
                         <span class="font-bold text-slate-800 text-xs sm:text-sm" x-text="step === 1 ? 'Choose Experience Type' : (step === 2 ? 'Choose Time of Day' : 'Choose Group Style & Pace')">Choose Experience Type</span>
                     </div>
-                    <span class="text-slate-400 font-mono text-xs font-bold" x-text="'Step ' + step + ' of 3'">Step 1 of 3</span>
+                    <span class="text-slate-500 font-mono text-xs font-bold" x-text="'Step ' + step + ' of 3'">Step 1 of 3</span>
                 </div>
 
                 <!-- Step 1: Category -->
@@ -71,12 +71,12 @@
                         <div @click="selectChoice(2, 'morning')" class="p-4 rounded-2xl border border-slate-200 hover:border-primary hover:bg-orange-50/50 cursor-pointer transition-all text-center group">
                             <i class="bi bi-sunrise text-3xl text-amber-500 mb-2 block group-hover:scale-110 transition-transform"></i>
                             <h6 class="font-bold text-slate-900 text-sm mb-1">Morning Experience</h6>
-                            <p class="text-slate-500 text-xs leading-relaxed">8:00 AM - 12:00 PM • Crisp breeze & cool weather</p>
+                            <p class="text-slate-500 text-xs leading-relaxed">8:00 AM - 12:00 PM â€¢ Crisp breeze & cool weather</p>
                         </div>
                         <div @click="selectChoice(2, 'evening')" class="p-4 rounded-2xl border border-slate-200 hover:border-primary hover:bg-orange-50/50 cursor-pointer transition-all text-center group">
                             <i class="bi bi-sunset text-3xl text-amber-500 mb-2 block group-hover:scale-110 transition-transform"></i>
                             <h6 class="font-bold text-slate-900 text-sm mb-1">Evening & Sunset</h6>
-                            <p class="text-slate-500 text-xs leading-relaxed">3:00 PM - 9:30 PM • Sunset, 5-Star Buffet & Shows</p>
+                            <p class="text-slate-500 text-xs leading-relaxed">3:00 PM - 9:30 PM â€¢ Sunset, 5-Star Buffet & Shows</p>
                         </div>
                         <div @click="selectChoice(2, 'overnight')" class="p-4 rounded-2xl border border-slate-200 hover:border-primary hover:bg-orange-50/50 cursor-pointer transition-all text-center group">
                             <i class="bi bi-moon-stars text-3xl text-amber-500 mb-2 block group-hover:scale-110 transition-transform"></i>
@@ -118,7 +118,7 @@
                         <div class="flex items-center justify-center gap-3 text-xs text-slate-500 mb-2">
                             <span class="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-semibold" x-text="matchedTour.category">Desert Safari</span>
                             <span class="flex items-center gap-1"><i class="bi bi-clock"></i><span x-text="matchedTour.duration"></span></span>
-                            <span>•</span>
+                            <span>â€¢</span>
                             <span class="flex items-center gap-1"><i class="bi bi-star-fill text-amber-400"></i><span x-text="matchedTour.rating"></span></span>
                         </div>
                         <p class="text-slate-500 text-xs sm:text-sm max-w-lg mx-auto" x-text="matchedTour.desc"></p>
@@ -151,14 +151,14 @@
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <i class="bi bi-check2 text-emerald-500 font-bold"></i>
-                                    <span>No hidden charges • Instant WhatsApp support</span>
+                                    <span>No hidden charges â€¢ Instant WhatsApp support</span>
                                 </div>
                             </div>
                             <div class="sm:col-span-5 text-center sm:text-right border-t sm:border-t-0 sm:border-l border-slate-200 pt-4 sm:pt-0 sm:pl-4">
-                                <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Starting From</div>
+                                <div class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Starting From</div>
                                 <div class="text-3xl font-black text-primary font-mono my-1" x-text="matchedTour.price">AED 150</div>
                                 <button type="button" 
-                                        class="w-full py-3 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs sm:text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2" 
+                                        class="w-full py-3 rounded-full bg-gradient-to-r from-[#b45309] to-[#c45e14] hover:from-[#9a4408] hover:to-[#b45309] text-white font-extrabold text-xs sm:text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2" 
                                         @click="bookMatched()">
                                     <i class="bi bi-calendar-check-fill"></i>
                                     <span>{{ $conciergePromoActive ? "Book with {$conciergePromoDiscount}% OFF" : "Book Recommended Tour" }}</span>
@@ -169,7 +169,7 @@
 
                     <div class="text-center">
                         <button type="button" 
-                                class="text-xs text-slate-400 hover:text-slate-700 transition-colors inline-flex items-center gap-1.5 cursor-pointer" 
+                                class="text-xs text-slate-500 hover:text-slate-700 transition-colors inline-flex items-center gap-1.5 cursor-pointer" 
                                 @click="resetQuiz()">
                             <i class="bi bi-arrow-counterclockwise"></i>
                             <span>Retake Matcher Quiz</span>

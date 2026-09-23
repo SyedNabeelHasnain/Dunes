@@ -160,7 +160,7 @@
                             <p class="text-slate-500 text-xs mb-3 leading-relaxed">
                                 Dune bashing, sunset photo stop, camel ride, sandboarding, 5-star live BBQ dinner & 3 cultural shows.
                             </p>
-                            <div class="font-black text-primary text-base" data-aed="150">AED 150 <span class="text-slate-400 font-normal text-xs">/ guest</span></div>
+                            <div class="font-black text-primary text-base" data-aed="150">AED 150 <span class="text-slate-500 font-normal text-xs">/ guest</span></div>
                         </div>
 
                         <div class="custom-card p-4 rounded-2xl cursor-pointer transition-all bg-white border-2 border-slate-200 hover:border-primary/50 shadow-xs" data-group="base" data-name="VIP Luxury Evening Safari" data-price="250" data-tour-id="2">
@@ -172,7 +172,7 @@
                             <p class="text-slate-500 text-xs mb-3 leading-relaxed">
                                 Extreme Lahbab dune bashing, reserved elevated VIP table with private dedicated waiter & table service.
                             </p>
-                            <div class="font-black text-primary text-base" data-aed="250">AED 250 <span class="text-slate-400 font-normal text-xs">/ guest</span></div>
+                            <div class="font-black text-primary text-base" data-aed="250">AED 250 <span class="text-slate-500 font-normal text-xs">/ guest</span></div>
                         </div>
 
                         <div class="custom-card p-4 rounded-2xl cursor-pointer transition-all bg-white border-2 border-slate-200 hover:border-primary/50 shadow-xs" data-group="base" data-name="Morning Desert Safari" data-price="120" data-tour-id="4">
@@ -184,7 +184,7 @@
                             <p class="text-slate-500 text-xs mb-3 leading-relaxed">
                                 Crisp morning air, 40-min high dune drive, sunrise photos, camel ride & sandboarding. Back by 12:30 PM.
                             </p>
-                            <div class="font-black text-primary text-base" data-aed="120">AED 120 <span class="text-slate-400 font-normal text-xs">/ guest</span></div>
+                            <div class="font-black text-primary text-base" data-aed="120">AED 120 <span class="text-slate-500 font-normal text-xs">/ guest</span></div>
                         </div>
 
                         <div class="custom-card p-4 rounded-2xl cursor-pointer transition-all bg-white border-2 border-slate-200 hover:border-primary/50 shadow-xs" data-group="base" data-name="Overnight Stargazing Safari" data-price="350" data-tour-id="5">
@@ -196,7 +196,7 @@
                             <p class="text-slate-500 text-xs mb-3 leading-relaxed">
                                 Full evening safari + private overnight Bedouin tent, campfire stargazing & freshly cooked sunrise breakfast.
                             </p>
-                            <div class="font-black text-primary text-base" data-aed="350">AED 350 <span class="text-slate-400 font-normal text-xs">/ guest</span></div>
+                            <div class="font-black text-primary text-base" data-aed="350">AED 350 <span class="text-slate-500 font-normal text-xs">/ guest</span></div>
                         </div>
                     </div>
                 </div>
@@ -223,7 +223,7 @@
                             <p class="text-slate-500 text-xs mb-3 leading-relaxed">
                                 Exclusive Land Cruiser strictly for your party. Flexible pickup timing & customized dune drive intensity.
                             </p>
-                            <div class="font-black text-primary text-sm" data-aed="350">+AED 350 <span class="text-slate-400 font-normal text-xs">/ vehicle</span></div>
+                            <div class="font-black text-primary text-sm" data-aed="350">+AED 350 <span class="text-slate-500 font-normal text-xs">/ vehicle</span></div>
                         </div>
 
                         <div class="custom-card p-4 rounded-2xl cursor-pointer transition-all bg-white border-2 border-slate-200 hover:border-primary/50 shadow-xs" data-group="transfer" data-name="VIP Luxury SUV / Range Rover" data-price="750" data-type="flat">
@@ -232,7 +232,7 @@
                             <p class="text-slate-500 text-xs mb-3 leading-relaxed">
                                 Ultra-luxury VIP SUV pickup with premium chilled amenities, cold towels, and first-class chauffeur.
                             </p>
-                            <div class="font-black text-primary text-sm" data-aed="750">+AED 750 <span class="text-slate-400 font-normal text-xs">/ vehicle</span></div>
+                            <div class="font-black text-primary text-sm" data-aed="750">+AED 750 <span class="text-slate-500 font-normal text-xs">/ vehicle</span></div>
                         </div>
                     </div>
                 </div>
@@ -259,7 +259,7 @@
                             <p class="text-slate-500 text-xs mb-3 leading-relaxed">
                                 Dedicated desert quad track session with helmet, goggles & guide assistance.
                             </p>
-                            <div class="font-black text-primary text-sm" data-aed="120">+AED 120 <span class="text-slate-400 font-normal text-xs">/ guest</span></div>
+                            <div class="font-black text-primary text-sm" data-aed="120">+AED 120 <span class="text-slate-500 font-normal text-xs">/ guest</span></div>
                         </div>
 
                         <div class="custom-card p-4 rounded-2xl cursor-pointer transition-all bg-white border-2 border-slate-200 hover:border-primary/50 shadow-xs" data-group="sports" data-name="60-Min 400cc Quad Biking" data-price="220" data-type="per_person">
@@ -268,7 +268,7 @@
                             <p class="text-slate-500 text-xs mb-3 leading-relaxed">
                                 Open red dunes exploration with high-power Yamaha 400cc automatic ATV.
                             </p>
-                            <div class="font-black text-primary text-sm" data-aed="220">+AED 220 <span class="text-slate-400 font-normal text-xs">/ guest</span></div>
+                            <div class="font-black text-primary text-sm" data-aed="220">+AED 220 <span class="text-slate-500 font-normal text-xs">/ guest</span></div>
                         </div>
 
                         <div class="custom-card p-4 rounded-2xl cursor-pointer transition-all bg-white border-2 border-slate-200 hover:border-primary/50 shadow-xs" data-group="sports" data-name="1000cc Can-Am Buggy (2-Seater)" data-price="550" data-type="flat">
@@ -277,7 +277,7 @@
                             <p class="text-slate-500 text-xs mb-3 leading-relaxed">
                                 2-Seater Can-Am Maverick Turbo buggy with roll cage & 4-point racing harness.
                             </p>
-                            <div class="font-black text-primary text-sm" data-aed="550">+AED 550 <span class="text-slate-400 font-normal text-xs">/ vehicle</span></div>
+                            <div class="font-black text-primary text-sm" data-aed="550">+AED 550 <span class="text-slate-500 font-normal text-xs">/ vehicle</span></div>
                         </div>
                     </div>
                 </div>

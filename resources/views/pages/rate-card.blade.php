@@ -208,7 +208,7 @@
                         <!-- Right: Pricing & Package Tiers Matrix (4 cols) -->
                         <div class="md:col-span-4 p-5 border-t md:border-t-0 md:border-l border-slate-200 bg-slate-50 flex flex-col justify-between">
                             <div>
-                                <div class="text-[11px] uppercase font-bold tracking-wider text-slate-400 mb-2">
+                                <div class="text-[11px] uppercase font-bold tracking-wider text-slate-500 mb-2">
                                     Available Package Tiers
                                 </div>
 
@@ -219,15 +219,15 @@
                                         <div class="pr-2">
                                             <div class="font-bold text-slate-800">{{ $tier->name }}</div>
                                             @if($tier->description)
-                                            <span class="text-slate-400 text-[10px] block line-clamp-1">{{ Str::limit($tier->description, 35) }}</span>
+                                            <span class="text-slate-500 text-[10px] block line-clamp-1">{{ Str::limit($tier->description, 35) }}</span>
                                             @endif
                                         </div>
                                         <div class="text-right shrink-0">
                                             @if(!empty($tier->pivot->old_price))
-                                            <span class="text-slate-400 line-through text-[11px] mr-1" data-aed="{{ $tier->pivot->old_price }}">AED {{ number_format($tier->pivot->old_price) }}</span>
+                                            <span class="text-slate-500 line-through text-[11px] mr-1" data-aed="{{ $tier->pivot->old_price }}">AED {{ number_format($tier->pivot->old_price) }}</span>
                                             @endif
                                             <span class="font-black text-primary text-sm" data-aed="{{ $tier->pivot->price }}">AED {{ number_format($tier->pivot->price) }}</span>
-                                            <span class="text-slate-400 text-[9px] block">/ {{ $tier->pivot->price_type ?? 'person' }}</span>
+                                            <span class="text-slate-500 text-[9px] block">/ {{ $tier->pivot->price_type ?? 'person' }}</span>
                                         </div>
                                     </div>
                                     @endforeach
@@ -237,7 +237,7 @@
                                         <div class="font-bold text-slate-800">Standard Experience</div>
                                         <div class="text-right">
                                             <span class="font-black text-primary text-sm" data-aed="{{ $t->price }}">AED {{ number_format($t->price) }}</span>
-                                            <span class="text-slate-400 text-[9px] block">/ person</span>
+                                            <span class="text-slate-500 text-[9px] block">/ person</span>
                                         </div>
                                     </div>
                                 @endif

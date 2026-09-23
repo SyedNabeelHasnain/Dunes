@@ -153,7 +153,7 @@
             <form action="{{ route('tours.search') }}" method="GET" class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
                 <div class="lg:col-span-5">
                     <div class="relative">
-                        <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
                         <input type="text" name="q" value="{{ $cleanQuery }}" class="w-full rounded-full pl-11 pr-24 py-2.5 bg-white border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs" placeholder="Search safaris, quad biking, dune buggy..." required>
                         <button type="submit" class="btn-desert-animated rounded-full absolute right-1.5 top-1/2 -translate-y-1/2 px-4 py-1 text-xs font-bold text-white shadow-xs cursor-pointer">
                             Update
@@ -197,7 +197,7 @@
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
                 @foreach($aiOverview['quick_stats'] as $label => $stat)
                 <div class="bg-white rounded-xl p-3 border border-slate-200/80 shadow-xs">
-                    <div class="text-slate-400 text-[11px] font-medium mb-0.5">{{ $label }}</div>
+                    <div class="text-slate-500 text-[11px] font-medium mb-0.5">{{ $label }}</div>
                     <div class="font-bold text-slate-900 text-xs sm:text-sm">{{ $stat }}</div>
                 </div>
                 @endforeach
@@ -241,7 +241,7 @@
                     $tourCatSlug = $tourCat ? $tourCat->slug : '';
                 @endphp
                 <div class="tour-item flex flex-col h-full" data-category="{{ $tourCatSlug }}" data-name="{{ strtolower($t->name) }}">
-                    <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col h-full group">
+                    <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-200 flex flex-col h-full group">
                         <a href="{{ route('tours.show', $t->slug) }}" class="flex flex-col h-full text-inherit">
                             <div class="relative overflow-hidden aspect-[16/10]">
                                 <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai" loading="lazy">
@@ -255,7 +255,7 @@
                                 </span>
                                 @endif
                                 <div class="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
-                                    <span class="glass text-white text-xs font-semibold px-2.5 py-1 rounded-full inline-flex items-center gap-1">
+                                    <span class="glass text-slate-900 text-xs font-semibold px-2.5 py-1 rounded-full inline-flex items-center gap-1">
                                         <i class="bi bi-tag-fill text-primary"></i>{{ $tourCat ? $tourCat->name : 'Tours' }}
                                     </span>
                                 </div>
@@ -288,9 +288,9 @@
                                     </span>
                                 </div>
 
-                                <div class="flex justify-between items-end mt-auto pt-3 border-t border-slate-100">
+                                <div class="flex justify-between items-end mt-auto pt-3 border-t border-slate-200">
                                     <div>
-                                        <span class="block text-[10px] uppercase font-bold text-slate-400">Starting from</span>
+                                        <span class="block text-[10px] uppercase font-bold text-slate-500">Starting from</span>
                                         <span class="text-lg font-black text-primary" data-aed="{{ $minPrice }}">AED {{ number_format($minPrice) }}</span>
                                     </div>
                                     <div class="flex items-center gap-1.5">
@@ -329,10 +329,10 @@
                         class="w-full text-left px-5 sm:px-6 py-4 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
                         @click="activeSearchFaq = (activeSearchFaq === 1 ? null : 1)">
                     <span class="text-sm sm:text-base">Are hotel pickups and drop-offs included in all safaris?</span>
-                    <i class="bi bi-chevron-down transition-transform duration-300 text-slate-400 shrink-0"
+                    <i class="bi bi-chevron-down transition-transform duration-300 text-slate-500 shrink-0"
                        :class="activeSearchFaq === 1 ? 'rotate-180 text-primary' : ''"></i>
                 </button>
-                <div x-show="activeSearchFaq === 1" x-collapse x-cloak class="px-5 sm:px-6 pb-5 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-3">
+                <div x-show="activeSearchFaq === 1" x-collapse x-cloak class="px-5 sm:px-6 pb-5 text-slate-600 text-sm leading-relaxed border-t border-slate-200 pt-3">
                     Yes. All 4x4 packages include direct, door-to-door hotel pickup and drop-off from Dubai, Sharjah, and major hotel districts in air-conditioned 4x4 Land Cruisers. Standard bus meeting point options are also available for budget travelers.
                 </div>
             </div>
@@ -342,10 +342,10 @@
                         class="w-full text-left px-5 sm:px-6 py-4 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
                         @click="activeSearchFaq = (activeSearchFaq === 2 ? null : 2)">
                     <span class="text-sm sm:text-base">Do I need an international driver's license for Dune Buggies or Quad Bikes?</span>
-                    <i class="bi bi-chevron-down transition-transform duration-300 text-slate-400 shrink-0"
+                    <i class="bi bi-chevron-down transition-transform duration-300 text-slate-500 shrink-0"
                        :class="activeSearchFaq === 2 ? 'rotate-180 text-primary' : ''"></i>
                 </button>
-                <div x-show="activeSearchFaq === 2" x-collapse x-cloak class="px-5 sm:px-6 pb-5 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-3">
+                <div x-show="activeSearchFaq === 2" x-collapse x-cloak class="px-5 sm:px-6 pb-5 text-slate-600 text-sm leading-relaxed border-t border-slate-200 pt-3">
                     No driving license is required. Dune buggy and quad biking tours take place on designated off-road tracks and high red dunes in Lahbab under professional guide supervision. All riders are equipped with helmets, goggles, and full safety briefings.
                 </div>
             </div>
@@ -355,10 +355,10 @@
                         class="w-full text-left px-5 sm:px-6 py-4 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
                         @click="activeSearchFaq = (activeSearchFaq === 3 ? null : 3)">
                     <span class="text-sm sm:text-base">What is your cancellation policy?</span>
-                    <i class="bi bi-chevron-down transition-transform duration-300 text-slate-400 shrink-0"
+                    <i class="bi bi-chevron-down transition-transform duration-300 text-slate-500 shrink-0"
                        :class="activeSearchFaq === 3 ? 'rotate-180 text-primary' : ''"></i>
                 </button>
-                <div x-show="activeSearchFaq === 3" x-collapse x-cloak class="px-5 sm:px-6 pb-5 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-3">
+                <div x-show="activeSearchFaq === 3" x-collapse x-cloak class="px-5 sm:px-6 pb-5 text-slate-600 text-sm leading-relaxed border-t border-slate-200 pt-3">
                     We offer 100% free cancellation with a full refund up to 24 hours prior to your scheduled tour pickup time. You can cancel or reschedule easily via WhatsApp or email with zero penalty fees.
                 </div>
             </div>
@@ -368,10 +368,10 @@
                         class="w-full text-left px-5 sm:px-6 py-4 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
                         @click="activeSearchFaq = (activeSearchFaq === 4 ? null : 4)">
                     <span class="text-sm sm:text-base">Is Dunes Discovery an officially licensed tour operator in Dubai?</span>
-                    <i class="bi bi-chevron-down transition-transform duration-300 text-slate-400 shrink-0"
+                    <i class="bi bi-chevron-down transition-transform duration-300 text-slate-500 shrink-0"
                        :class="activeSearchFaq === 4 ? 'rotate-180 text-primary' : ''"></i>
                 </button>
-                <div x-show="activeSearchFaq === 4" x-collapse x-cloak class="px-5 sm:px-6 pb-5 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-3">
+                <div x-show="activeSearchFaq === 4" x-collapse x-cloak class="px-5 sm:px-6 pb-5 text-slate-600 text-sm leading-relaxed border-t border-slate-200 pt-3">
                     Yes. Dunes Discovery Tourism LLC is fully certified and licensed by the Dubai Department of Economy and Tourism (DET License #1430583). All drivers hold professional safari licenses, and all vehicles undergo stringent DTCM safety inspections.
                 </div>
             </div>

@@ -27,12 +27,12 @@
                         @endif
                         <div class="font-extrabold text-slate-900 text-sm">{{ $tier->name }}</div>
                         <div class="text-lg font-black text-primary font-mono mt-0.5" data-aed="{{ $tier->pivot?->price ?? 0 }}">AED {{ number_format($tier->pivot?->price ?? 0) }}</div>
-                        <small class="text-slate-400 block text-[10px] font-normal">per person</small>
+                        <small class="text-slate-500 block text-[10px] font-normal">per person</small>
                     </th>
                     @endforeach
                 </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100 text-xs sm:text-sm">
+            <tbody class="divide-y divide-slate-200 text-xs sm:text-sm">
                 <tr>
                     <td class="text-left py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
                         <i class="bi bi-compass text-primary"></i> Dune Bashing & Sandboarding
@@ -72,7 +72,7 @@
                     @foreach($tour->tiers->sortBy('priority') as $tier)
                     <td class="py-3.5 px-3 text-emerald-600 {{ $tier->is_popular ? 'bg-orange-50/30 border-x border-orange-200/60' : '' }}">
                         <i class="bi bi-check-circle-fill text-base"></i>
-                        <small class="block text-slate-400 text-[10px]">Tanoura, Fire & Belly</small>
+                        <small class="block text-slate-500 text-[10px]">Tanoura, Fire & Belly</small>
                     </td>
                     @endforeach
                 </tr>
@@ -113,7 +113,7 @@
                         @if(stripos($tier->name, 'quad') !== false || stripos($tier->name, 'buggy') !== false)
                             <span class="px-2.5 py-1 rounded-full bg-emerald-500 text-white font-bold text-xs">INCLUDED</span>
                         @else
-                            <span class="text-slate-400 text-xs">Available as Add-on</span>
+                            <span class="text-slate-500 text-xs">Available as Add-on</span>
                         @endif
                     </td>
                     @endforeach
@@ -135,7 +135,7 @@
                     @foreach($tour->tiers->sortBy('priority') as $tier)
                     <td class="py-3.5 px-3 {{ $tier->is_popular ? 'bg-orange-50/60 border-x border-orange-200' : '' }}">
                         <button type="button" 
-                                class="w-full py-2.5 px-3 rounded-full text-xs font-bold transition-all shadow-xs cursor-pointer {{ $tier->is_popular ? 'bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-sm' : 'border border-primary text-primary hover:bg-primary hover:text-white' }}" 
+                                class="w-full py-2.5 px-3 rounded-full text-xs font-bold transition-all shadow-xs cursor-pointer {{ $tier->is_popular ? 'bg-gradient-to-r from-[#b45309] to-[#c45e14] hover:from-[#9a4408] hover:to-[#b45309] text-white shadow-sm' : 'border border-primary text-primary hover:bg-primary hover:text-white' }}" 
                                 data-action="open-booking" 
                                 data-tour="{{ $tour->id }}" 
                                 data-tier="{{ $tier->id }}">

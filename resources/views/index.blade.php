@@ -35,7 +35,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                     <img src="' . htmlspecialchars($avatar) . '" alt="' . htmlspecialchars($r->reviewer_name) . '" class="w-10 h-10 rounded-full object-cover shrink-0" referrerpolicy="no-referrer" loading="lazy" onerror="this.onerror=null;this.src=\'' . $fallbackAvatar . '\'">
                     <div class="min-w-0">
                         <div class="font-bold text-slate-900 text-sm truncate">' . htmlspecialchars($r->reviewer_name) . '</div>
-                        <div class="text-slate-400 text-xs">' . ($r->published_date ? $r->published_date->format('M Y') : '') . '</div>
+                        <div class="text-slate-500 text-xs">' . ($r->published_date ? $r->published_date->format('M Y') : '') . '</div>
                     </div>
                 </div>
                 <div class="flex gap-0.5 text-xs shrink-0">' . $stars . '</div>
@@ -43,7 +43,7 @@ if (!function_exists('renderReviewCardMarkup')) {
             ' . ($r->review_title ? '<h3 class="text-sm font-bold mb-1.5 text-slate-900 line-clamp-1">' . htmlspecialchars($r->review_title) . '</h3>' : '') . '
             <p class="text-slate-600 text-sm mb-2 flex-grow line-clamp-3 leading-relaxed">"' . htmlspecialchars($r->review_text) . '"</p>
             ' . $photosHtml . '
-            <div class="flex justify-between items-center mt-auto pt-3 border-t border-slate-100">
+            <div class="flex justify-between items-center mt-auto pt-3 border-t border-slate-200">
                 ' . $sourceBadge . '
                 <a href="' . htmlspecialchars($url) . '" ' . ($isUgc ? '' : 'target="_blank" rel="noopener"') . ' class="text-xs font-semibold text-slate-700 hover:text-primary border border-slate-300 hover:border-primary rounded-full px-3 py-1 transition-colors">' . ($isUgc ? 'Review' : 'View') . '</a>
             </div>
@@ -246,7 +246,7 @@ if (!function_exists('renderReviewCardMarkup')) {
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="group bg-slate-50 hover:bg-white rounded-2xl p-6 border border-slate-100 hover:border-primary/30 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col h-full hover:-translate-y-1">
+            <div class="group bg-slate-50 hover:bg-white rounded-2xl p-6 border border-slate-200 hover:border-primary/30 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col h-full hover:-translate-y-1">
                 <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 text-2xl group-hover:scale-110 transition-transform">
                     <i class="bi bi-sunset-fill"></i>
                 </div>
@@ -258,7 +258,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                 </a>
             </div>
 
-            <div class="group bg-slate-50 hover:bg-white rounded-2xl p-6 border border-slate-100 hover:border-primary/30 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col h-full hover:-translate-y-1">
+            <div class="group bg-slate-50 hover:bg-white rounded-2xl p-6 border border-slate-200 hover:border-primary/30 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col h-full hover:-translate-y-1">
                 <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 text-2xl group-hover:scale-110 transition-transform">
                     <i class="bi bi-speedometer2"></i>
                 </div>
@@ -270,7 +270,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                 </a>
             </div>
 
-            <div class="group bg-slate-50 hover:bg-white rounded-2xl p-6 border border-slate-100 hover:border-primary/30 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col h-full hover:-translate-y-1">
+            <div class="group bg-slate-50 hover:bg-white rounded-2xl p-6 border border-slate-200 hover:border-primary/30 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col h-full hover:-translate-y-1">
                 <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 text-2xl group-hover:scale-110 transition-transform">
                     <i class="bi bi-water"></i>
                 </div>
@@ -282,7 +282,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                 </a>
             </div>
 
-            <div class="group bg-slate-50 hover:bg-white rounded-2xl p-6 border border-slate-100 hover:border-primary/30 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col h-full hover:-translate-y-1">
+            <div class="group bg-slate-50 hover:bg-white rounded-2xl p-6 border border-slate-200 hover:border-primary/30 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col h-full hover:-translate-y-1">
                 <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 text-2xl group-hover:scale-110 transition-transform">
                     <i class="bi bi-building"></i>
                 </div>
@@ -295,7 +295,7 @@ if (!function_exists('renderReviewCardMarkup')) {
             </div>
         </div>
 
-        <div class="mt-8 p-6 sm:p-8 rounded-2xl shadow-sm bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-primary/30">
+        <div class="mt-8 p-6 sm:p-8 rounded-2xl shadow-sm bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-primary/30">
             <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
                 <div class="text-center lg:text-left">
                     <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2 mb-2">
@@ -340,7 +340,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                     $minPrice = $t->tiers->min('pivot.price') ?? 0;
                     $category = $categories->firstWhere('id', $t->category_id);
                 @endphp
-                <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col h-full group">
+                <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-200 flex flex-col h-full group">
                     <a href="{{ route('tours.show', $t->slug) }}" class="flex flex-col h-full text-inherit">
                         <div class="relative overflow-hidden aspect-[16/10]">
                             <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }}" loading="lazy">
@@ -350,7 +350,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                             </span>
                             @endif
                             <div class="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
-                                <span class="glass text-white text-xs font-semibold px-2.5 py-1 rounded-full inline-flex items-center gap-1">
+                                <span class="glass text-slate-900 text-xs font-semibold px-2.5 py-1 rounded-full inline-flex items-center gap-1">
                                     <i class="bi bi-tag-fill text-primary"></i>{{ $category ? $category->name : 'Tours' }}
                                 </span>
                             </div>
@@ -370,9 +370,9 @@ if (!function_exists('renderReviewCardMarkup')) {
                                 <i class="bi bi-fire text-red-500"></i>
                                 <span>{{ $homeBookings }} booked in last 6 hours</span>
                             </div>
-                            <div class="flex justify-between items-end mt-auto pt-3 border-t border-slate-100">
+                            <div class="flex justify-between items-end mt-auto pt-3 border-t border-slate-200">
                                 <div>
-                                    <span class="block text-[10px] uppercase font-bold text-slate-400">Starting from</span>
+                                    <span class="block text-[10px] uppercase font-bold text-slate-500">Starting from</span>
                                     <span class="text-lg font-black text-primary" data-aed="{{ $minPrice }}">AED {{ number_format($minPrice) }}</span>
                                 </div>
                                 <div class="flex items-center gap-1.5">
@@ -455,21 +455,21 @@ if (!function_exists('renderReviewCardMarkup')) {
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-slate-50 hover:bg-white rounded-2xl p-6 sm:p-8 text-center border border-slate-100 hover:border-primary/20 shadow-xs hover:shadow-lg transition-all duration-300">
+            <div class="bg-slate-50 hover:bg-white rounded-2xl p-6 sm:p-8 text-center border border-slate-200 hover:border-primary/20 shadow-xs hover:shadow-lg transition-all duration-300">
                 <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl">
                     <i class="bi bi-shield-check"></i>
                 </div>
                 <h3 class="text-lg sm:text-xl font-bold text-slate-900 mb-2">Best Price Guarantee</h3>
                 <p class="text-slate-600 text-sm leading-relaxed">We match any competitor price. No hidden fees, what you see is what you pay.</p>
             </div>
-            <div class="bg-slate-50 hover:bg-white rounded-2xl p-6 sm:p-8 text-center border border-slate-100 hover:border-primary/20 shadow-xs hover:shadow-lg transition-all duration-300">
+            <div class="bg-slate-50 hover:bg-white rounded-2xl p-6 sm:p-8 text-center border border-slate-200 hover:border-primary/20 shadow-xs hover:shadow-lg transition-all duration-300">
                 <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl">
                     <i class="bi bi-lightning-charge"></i>
                 </div>
                 <h3 class="text-lg sm:text-xl font-bold text-slate-900 mb-2">Instant Confirmation</h3>
                 <p class="text-slate-600 text-sm leading-relaxed">Receive immediate booking confirmation via email and WhatsApp.</p>
             </div>
-            <div class="bg-slate-50 hover:bg-white rounded-2xl p-6 sm:p-8 text-center border border-slate-100 hover:border-primary/20 shadow-xs hover:shadow-lg transition-all duration-300">
+            <div class="bg-slate-50 hover:bg-white rounded-2xl p-6 sm:p-8 text-center border border-slate-200 hover:border-primary/20 shadow-xs hover:shadow-lg transition-all duration-300">
                 <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl">
                     <i class="bi bi-calendar-x"></i>
                 </div>
@@ -573,7 +573,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                         class="w-full text-left px-5 sm:px-6 py-4.5 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
                         @click="activeFaq = (activeFaq === {{ $index }} ? null : {{ $index }})">
                     <span class="text-sm sm:text-base">{{ $f->question }}</span>
-                    <i class="bi bi-chevron-down transition-transform duration-300 text-slate-400 shrink-0"
+                    <i class="bi bi-chevron-down transition-transform duration-300 text-slate-500 shrink-0"
                        :class="activeFaq === {{ $index }} ? 'rotate-180 text-primary' : ''"></i>
                 </button>
                 <div x-show="activeFaq === {{ $index }}" 
@@ -599,7 +599,7 @@ if (!function_exists('renderReviewCardMarkup')) {
 <section class="cta-section py-16 sm:py-20 relative text-white overflow-hidden">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
         <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-xs border border-white/20 text-amber-300 text-xs font-bold uppercase tracking-wider mb-4 shadow-xs">
-            <i class="bi bi-shield-check"></i> Licensed Dubai Tour Operator • DTCM Permit #1430583
+            <i class="bi bi-shield-check"></i> Licensed Dubai Tour Operator â€¢ DTCM Permit #1430583
         </div>
         <h2 class="text-3xl sm:text-5xl font-extrabold mb-4 text-white tracking-tight">
             Ready for Your <span class="text-gradient-primary">Dubai Desert Adventure</span>?

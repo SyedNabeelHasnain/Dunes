@@ -67,7 +67,7 @@
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
             <div>
                 <div class="flex flex-wrap gap-2 mb-3">
-                    <span class="glass rounded-full px-3.5 py-1 text-xs inline-flex items-center gap-1.5">
+                    <span class="glass text-slate-900 font-semibold rounded-full px-3.5 py-1 text-xs inline-flex items-center gap-1.5">
                         <i class="bi bi-calendar3 text-primary"></i>Trusted Since 2018
                     </span>
                     <span class="bg-emerald-600/90 rounded-full px-3.5 py-1 text-xs font-semibold text-white inline-flex items-center gap-1.5">

@@ -109,7 +109,7 @@
                 <!-- Selected Experience (Col 7) -->
                 <div class="md:col-span-7 bg-slate-50 rounded-2xl p-5 border border-slate-200 flex flex-col justify-between">
                     <div>
-                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block mb-1">Selected Experience</span>
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block mb-1">Selected Experience</span>
                         <div class="text-lg font-bold text-primary mb-2.5 leading-snug">{{ $booking->tour_name }}</div>
                         <div class="flex gap-2 flex-wrap items-center mb-3">
                             <span class="bg-amber-500/15 text-primary border border-primary/25 text-xs font-bold px-3 py-1 rounded-full">
@@ -133,7 +133,7 @@
                 <!-- Lead Passenger (Col 5) -->
                 <div class="md:col-span-5 bg-slate-50 rounded-2xl p-5 border border-slate-200 flex flex-col justify-between">
                     <div>
-                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block mb-1">Lead Passenger</span>
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block mb-1">Lead Passenger</span>
                         <div class="text-base font-bold text-slate-900 mb-1.5">{{ $booking->name }}</div>
                         <div class="text-xs text-slate-600 font-mono mb-1"><i class="bi bi-telephone-fill text-emerald-600 me-1.5"></i>{{ $booking->phone }}</div>
                         <div class="text-xs text-slate-600 mb-2"><i class="bi bi-envelope-fill text-primary me-1.5"></i>{{ $booking->email }}</div>
@@ -148,24 +148,24 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Schedule -->
                 <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-3">
-                    <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">Schedule & Pickup</span>
+                    <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block">Schedule & Pickup</span>
                     <div>
-                        <span class="text-[11px] text-slate-400 block">Tour Date</span>
+                        <span class="text-[11px] text-slate-500 block">Tour Date</span>
                         <strong class="text-slate-900 text-sm block">{{ $booking->tour_date ? $booking->tour_date->format('l, F j, Y') : 'Open Date' }}</strong>
                     </div>
                     <div>
-                        <span class="text-[11px] text-slate-400 block">Pickup Window</span>
+                        <span class="text-[11px] text-slate-500 block">Pickup Window</span>
                         <strong class="text-slate-900 text-sm block">{{ $booking->pickup_time ?: '2:30 PM - 3:15 PM' }}</strong>
                     </div>
                     <div>
-                        <span class="text-[11px] text-slate-400 block">Location</span>
+                        <span class="text-[11px] text-slate-500 block">Location</span>
                         <span class="text-slate-700 text-xs font-semibold block leading-tight">{{ $booking->pickup_location ?: 'Hotel / Residence in Dubai' }}</span>
                     </div>
                 </div>
 
                 <!-- Financials -->
                 <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-2 text-xs">
-                    <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block mb-1">Financial Summary</span>
+                    <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block mb-1">Financial Summary</span>
                     @if($booking->coupon_code && (float)$booking->discount_amount > 0)
                     <div class="flex justify-between items-center text-slate-500">
                         <span>Original Total:</span>
@@ -189,7 +189,7 @@
                         <span>Amount Paid:</span>
                         <span>AED {{ number_format($booking->payment_amount ?: ($booking->payment_status === 'paid' ? $booking->total : 0), 2) }}</span>
                     </div>
-                    <div class="pt-2 border-t border-slate-100 flex justify-between items-center">
+                    <div class="pt-2 border-t border-slate-200 flex justify-between items-center">
                         <span class="font-bold text-rose-600">Balance Due:</span>
                         <span class="font-black text-sm text-rose-600">
                             @if($booking->payment_status === 'paid')
@@ -199,18 +199,18 @@
                             @endif
                         </span>
                     </div>
-                    <div class="text-slate-400 text-[11px] text-center pt-2 border-t border-slate-100">
+                    <div class="text-slate-500 text-[11px] text-center pt-2 border-t border-slate-200">
                         Method: <strong class="text-slate-700 capitalize">{{ $booking->payment_method ?: 'Cash on Pickup / Online' }}</strong>
                     </div>
                 </div>
 
                 <!-- Digital QR -->
                 <div class="bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl p-5 text-center flex flex-col items-center justify-center">
-                    <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block mb-2">Digital E-Ticket QR</span>
+                    <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block mb-2">Digital E-Ticket QR</span>
                     @if(!empty($qrCodeUrl))
                         <img src="{{ $qrCodeUrl }}" width="115" height="115" class="rounded-xl shadow-xs bg-white p-1.5" alt="Verification QR">
                     @else
-                        <div class="w-24 h-24 border border-slate-300 rounded-xl bg-white text-slate-400 text-xs flex items-center justify-center font-mono">QR CODE</div>
+                        <div class="w-24 h-24 border border-slate-300 rounded-xl bg-white text-slate-500 text-xs flex items-center justify-center font-mono">QR CODE</div>
                     @endif
                     <span class="text-slate-500 text-[10px] mt-2 leading-tight">Scan with driver to verify reservation instantly</span>
                 </div>
@@ -218,7 +218,7 @@
 
             @if($booking->notes)
             <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs">
-                <span class="font-bold uppercase tracking-wider text-slate-400 block mb-1 text-[10px]">Special Guest Requests</span>
+                <span class="font-bold uppercase tracking-wider text-slate-500 block mb-1 text-[10px]">Special Guest Requests</span>
                 <p class="text-slate-800 mb-0 leading-relaxed">{{ $booking->notes }}</p>
             </div>
             @endif

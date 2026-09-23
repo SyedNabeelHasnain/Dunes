@@ -45,7 +45,7 @@
 
                     <!-- Submit Button -->
                     <div class="md:col-span-3">
-                        <button type="submit" id="btnNewsletterSubmit" class="w-full rounded-full py-3 px-4 font-bold text-white bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 shadow-md flex items-center justify-center gap-2 text-sm transition-all cursor-pointer">
+                        <button type="submit" id="btnNewsletterSubmit" class="w-full rounded-full py-3 px-4 font-bold text-white bg-gradient-to-r from-[#b45309] to-[#c45e14] hover:from-[#9a4408] hover:to-[#b45309] shadow-md flex items-center justify-center gap-2 text-sm transition-all cursor-pointer">
                             <span>Join Club</span>
                             <i class="bi bi-arrow-right"></i>
                         </button>

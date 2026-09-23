@@ -88,7 +88,7 @@
 @endphp
 
         <!-- Safari Match Concierge Recommendation Banner -->
-        <div class="rounded-2xl p-6 sm:p-8 mb-8 shadow-sm relative overflow-hidden bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-primary/30">
+        <div class="rounded-2xl p-6 sm:p-8 mb-8 shadow-sm relative overflow-hidden bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-primary/30">
             <div class="flex flex-col lg:flex-row items-center justify-between gap-6 relative z-10">
                 <div class="text-center lg:text-left">
                     <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2 mb-2">
@@ -124,7 +124,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
                 <div class="lg:col-span-4">
                     <div class="relative">
-                        <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
                         <input type="text" id="tourSearchInput" class="w-full rounded-full pl-11 pr-4 py-2.5 bg-white border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs" placeholder="Search safaris, buggies, cruises..." oninput="handleTourSearch(this.value)">
                     </div>
                 </div>
@@ -162,7 +162,7 @@
                     $tourCatSlug = $tourCat ? $tourCat->slug : '';
                 @endphp
                 <div class="tour-item flex flex-col h-full" data-category="{{ $tourCatSlug }}" data-name="{{ strtolower($t->name) }}">
-                    <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col h-full group">
+                    <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-200 flex flex-col h-full group">
                         <a href="{{ route('tours.show', $t->slug) }}" class="flex flex-col h-full text-inherit">
                             <div class="relative overflow-hidden aspect-[16/10]">
                                 <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai" loading="lazy">
@@ -172,7 +172,7 @@
                                 </span>
                                 @endif
                                 <div class="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
-                                    <span class="glass text-white text-xs font-semibold px-2.5 py-1 rounded-full inline-flex items-center gap-1">
+                                    <span class="glass text-slate-900 text-xs font-semibold px-2.5 py-1 rounded-full inline-flex items-center gap-1">
                                         <i class="bi bi-tag-fill text-primary"></i>{{ $tourCat ? $tourCat->name : 'Tours' }}
                                     </span>
                                 </div>
@@ -205,9 +205,9 @@
                                     </span>
                                 </div>
 
-                                <div class="flex justify-between items-end mt-auto pt-3 border-t border-slate-100">
+                                <div class="flex justify-between items-end mt-auto pt-3 border-t border-slate-200">
                                     <div>
-                                        <span class="block text-[10px] uppercase font-bold text-slate-400">Starting from</span>
+                                        <span class="block text-[10px] uppercase font-bold text-slate-500">Starting from</span>
                                         <span class="text-lg font-black text-primary" data-aed="{{ $minPrice }}">AED {{ number_format($minPrice) }}</span>
                                     </div>
                                     <div class="flex items-center gap-1.5">
@@ -230,7 +230,7 @@
         </div>
 
         <div id="no-tours-message" class="text-center py-12" style="display: none;">
-            <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl text-slate-400">
+            <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl text-slate-500">
                 <i class="bi bi-search"></i>
             </div>
             <h2 class="text-2xl font-bold text-slate-900 mb-2">No Tours Found</h2>
@@ -239,7 +239,7 @@
         </div>
         @else
         <div class="text-center py-12">
-            <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl text-slate-400">
+            <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl text-slate-500">
                 <i class="bi bi-search"></i>
             </div>
             <h2 class="text-2xl font-bold text-slate-900 mb-2">No Tours Found</h2>

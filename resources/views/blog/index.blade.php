@@ -89,7 +89,7 @@
                 @endif
                 <div class="relative w-full sm:w-64">
                     <input type="search" name="search" class="w-full rounded-full pl-4 pr-10 py-1.5 bg-slate-100 border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/40" placeholder="Search articles..." value="{{ $search }}">
-                    <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors" aria-label="Search articles">
+                    <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-primary transition-colors" aria-label="Search articles">
                         <i class="bi bi-search text-xs"></i>
                     </button>
                 </div>
@@ -114,7 +114,7 @@
             <!-- Main Hero Featured Card -->
             <div class="lg:col-span-7">
                 <a href="{{ route('blog.show', $featuredPost->slug) }}" class="block h-full group text-inherit">
-                    <div class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col h-full">
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-200 flex flex-col h-full">
                         <div class="relative overflow-hidden aspect-[16/9]">
                             <img src="{{ $featuredImg }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $featuredPost->featured_image_alt ?: $featuredPost->title }}">
                             @if ($featuredPost->category)
@@ -128,7 +128,7 @@
                                     <p class="text-slate-600 text-xs sm:text-sm line-clamp-2 mb-4 leading-relaxed">{{ $featuredPost->excerpt }}</p>
                                 @endif
                             </div>
-                            <div class="flex items-center gap-4 text-slate-400 text-xs pt-3 border-t border-slate-100">
+                            <div class="flex items-center gap-4 text-slate-500 text-xs pt-3 border-t border-slate-200">
                                 <span><i class="bi bi-person text-primary mr-1"></i>{{ $featuredPost->author_name ?: 'Dunes Discovery' }}</span>
                                 <span><i class="bi bi-clock text-primary mr-1"></i>{{ $featuredPost->read_time }} min read</span>
                                 @if ($featuredPost->published_at)
@@ -148,7 +148,7 @@
                     $sideImg = $sidePost->featured_image ? asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $sidePost->featured_image)) : asset('images/desert-safari-poster.avif');
                 @endphp
                 <a href="{{ route('blog.show', $sidePost->slug) }}" class="block flex-1 group text-inherit">
-                    <div class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-lg transition-all duration-300 border border-slate-100 flex flex-col sm:flex-row h-full">
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-lg transition-all duration-300 border border-slate-200 flex flex-col sm:flex-row h-full">
                         <div class="sm:w-5/12 relative aspect-[16/10] sm:aspect-auto">
                             <img src="{{ $sideImg }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $sidePost->featured_image_alt ?: $sidePost->title }}">
                             @if ($sidePost->category)
@@ -162,11 +162,11 @@
                                     <p class="text-slate-500 text-xs line-clamp-2 mb-2 leading-relaxed">{{ $sidePost->excerpt }}</p>
                                 @endif
                             </div>
-                            <div class="flex items-center gap-2 text-slate-400 text-[11px] pt-2 border-t border-slate-100">
+                            <div class="flex items-center gap-2 text-slate-500 text-[11px] pt-2 border-t border-slate-200">
                                 <span>{{ Str::limit($sidePost->author_name ?: 'Dunes Discovery', 12) }}</span>
-                                <span>• {{ $sidePost->read_time }}m</span>
+                                <span>â€¢ {{ $sidePost->read_time }}m</span>
                                 @if ($sidePost->published_at)
-                                    <span>• {{ $sidePost->published_at->format('M j') }}</span>
+                                    <span>â€¢ {{ $sidePost->published_at->format('M j') }}</span>
                                 @endif
                             </div>
                         </div>
@@ -192,7 +192,7 @@
 
     @if ($total > 0)
     <div class="flex justify-between items-center mb-6 flex-wrap gap-2">
-        <h2 class="text-xs uppercase font-extrabold tracking-wider text-slate-400">
+        <h2 class="text-xs uppercase font-extrabold tracking-wider text-slate-500">
             @if ($cat)
                 Articles in {{ $cat->name }}
             @elseif ($search)
@@ -202,7 +202,7 @@
             @endif
             <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full text-xs font-bold ml-1.5">{{ $total }}</span>
         </h2>
-        <div class="text-slate-400 text-xs">Page {{ $page }} of {{ $totalPages }}</div>
+        <div class="text-slate-500 text-xs">Page {{ $page }} of {{ $totalPages }}</div>
     </div>
     @endif
 
@@ -211,7 +211,7 @@
         @php
             $postImg = $post->featured_image ? asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $post->featured_image)) : asset('images/desert-safari-poster.avif');
         @endphp
-        <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col h-full group">
+        <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-200 flex flex-col h-full group">
             <a href="{{ route('blog.show', $post->slug) }}" class="block relative aspect-[16/10] overflow-hidden">
                 <img src="{{ $postImg }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $post->featured_image_alt ?: $post->title }}" loading="lazy">
                 @if ($post->category)
@@ -225,7 +225,7 @@
                 @if ($post->excerpt)
                 <p class="text-slate-600 text-xs sm:text-sm line-clamp-3 mb-4 flex-grow leading-relaxed">{{ $post->excerpt }}</p>
                 @endif
-                <div class="flex justify-between items-center mt-auto pt-3 border-t border-slate-100 text-xs text-slate-400">
+                <div class="flex justify-between items-center mt-auto pt-3 border-t border-slate-200 text-xs text-slate-500">
                     <span class="inline-flex items-center gap-1"><i class="bi bi-person-circle text-primary"></i>{{ $post->author_name ?: 'Dunes Discovery' }}</span>
                     <div class="flex gap-2.5">
                         @if ($post->published_at)
@@ -265,7 +265,7 @@
     @endif
 
     <!-- CTA Banner -->
-    <div class="rounded-3xl p-8 sm:p-12 text-center mt-14 bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-primary/30 shadow-xl text-white">
+    <div class="rounded-3xl p-8 sm:p-12 text-center mt-14 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-primary/30 shadow-xl text-white">
         <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">Ready for Your Dubai Adventure?</h2>
         <p class="text-slate-300 text-sm sm:text-base max-w-xl mx-auto mb-6">Book a desert safari tour and make memories that last a lifetime.</p>
         <button data-action="open-booking" class="btn-desert-animated rounded-full px-8 py-3.5 font-bold text-white text-sm shadow-lg cursor-pointer" @click="$store.modal.open('booking')">Book a Tour Now</button>

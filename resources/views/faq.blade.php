@@ -61,7 +61,7 @@
         </nav>
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
             <div>
-                <span class="glass rounded-full px-3.5 py-1 text-xs inline-flex items-center gap-1.5 mb-2">
+                <span class="glass text-slate-900 font-semibold rounded-full px-3.5 py-1 text-xs inline-flex items-center gap-1.5 mb-2">
                     <i class="bi bi-patch-question-fill text-primary"></i>Help Center & Direct Answers
                 </span>
                 <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-2">Frequently Asked Questions</h1>
@@ -118,7 +118,7 @@
         <div class="mb-10">
             <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200/80 shadow-xs">
                 <div class="relative">
-                    <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
                     <input type="text" id="faqSearchInput" class="w-full rounded-full pl-11 pr-4 py-3 bg-white border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs" placeholder="Search questions (e.g., cancel, clothing, quad, pickup, timing)..." oninput="handleFaqSearch(this.value)">
                 </div>
             </div>
@@ -134,10 +134,10 @@
                         <i class="bi bi-question-circle-fill text-primary shrink-0"></i>
                         <span>{{ $f->question }}</span>
                     </span>
-                    <i class="bi bi-chevron-down transition-transform duration-300 text-slate-400 shrink-0"
+                    <i class="bi bi-chevron-down transition-transform duration-300 text-slate-500 shrink-0"
                        :class="openFaq === {{ $i }} ? 'rotate-180 text-primary' : ''"></i>
                 </button>
-                <div x-show="openFaq === {{ $i }}" x-collapse x-cloak class="px-5 sm:px-6 pb-5 text-slate-600 text-xs sm:text-sm leading-relaxed border-t border-slate-100 pt-3.5">
+                <div x-show="openFaq === {{ $i }}" x-collapse x-cloak class="px-5 sm:px-6 pb-5 text-slate-600 text-xs sm:text-sm leading-relaxed border-t border-slate-200 pt-3.5">
                     {{ $f->answer }}
                 </div>
             </div>
@@ -145,7 +145,7 @@
         </div>
 
         <div id="noFaqResults" class="text-center py-12 hidden">
-            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl text-slate-400">
+            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl text-slate-500">
                 <i class="bi bi-search"></i>
             </div>
             <h3 class="text-base font-bold text-slate-900 mb-1">No matching questions found</h3>

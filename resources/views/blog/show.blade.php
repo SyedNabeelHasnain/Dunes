@@ -172,7 +172,7 @@
                 <div class="flex flex-wrap gap-2 mb-6">
                     @foreach ($post->tags as $tag)
                     <a href="{{ route('blog.index', ['search' => $tag->name]) }}" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-1 rounded-full transition-colors inline-flex items-center gap-1">
-                        <i class="bi bi-tag text-slate-400"></i>{{ $tag->name }}
+                        <i class="bi bi-tag text-slate-500"></i>{{ $tag->name }}
                     </a>
                     @endforeach
                 </div>
@@ -184,7 +184,7 @@
                 </div>
 
                 @if ($post->featured_image_caption)
-                <p class="text-slate-400 text-xs text-center mt-3 italic">{{ $post->featured_image_caption }}</p>
+                <p class="text-slate-500 text-xs text-center mt-3 italic">{{ $post->featured_image_caption }}</p>
                 @endif
 
                 <!-- FAQs Accordion with Alpine.js -->
@@ -201,10 +201,10 @@
                                     class="w-full text-left px-5 py-4 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
                                     @click="openFaq = (openFaq === {{ $fi }} ? null : {{ $fi }})">
                                 <span class="text-sm sm:text-base">{{ $faq->question }}</span>
-                                <i class="bi bi-chevron-down transition-transform duration-300 text-slate-400 shrink-0"
+                                <i class="bi bi-chevron-down transition-transform duration-300 text-slate-500 shrink-0"
                                    :class="openFaq === {{ $fi }} ? 'rotate-180 text-primary' : ''"></i>
                             </button>
-                            <div x-show="openFaq === {{ $fi }}" x-collapse x-cloak class="px-5 pb-5 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-3">
+                            <div x-show="openFaq === {{ $fi }}" x-collapse x-cloak class="px-5 pb-5 text-slate-600 text-sm leading-relaxed border-t border-slate-200 pt-3">
                                 {!! nl2br(e($faq->answer)) !!}
                             </div>
                         </div>
@@ -228,7 +228,7 @@
 
                 <!-- Social Share Widget -->
                 <div class="mt-10 pt-6 border-t border-slate-200 flex items-center gap-2 sm:gap-3 flex-wrap text-xs">
-                    <span class="font-bold text-slate-400 uppercase tracking-wider text-[11px] mr-2">Share:</span>
+                    <span class="font-bold text-slate-500 uppercase tracking-wider text-[11px] mr-2">Share:</span>
                     <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($canonical) }}" target="_blank" rel="noopener noreferrer" class="border border-slate-200 hover:border-primary text-slate-700 hover:text-primary rounded-full px-3.5 py-1.5 transition-colors inline-flex items-center gap-1 font-semibold">
                         <i class="bi bi-facebook text-blue-600"></i>Facebook
                     </a>
@@ -263,7 +263,7 @@
                     @php $cats = \App\Models\BlogCategory::where('status', 'active')->orderBy('priority', 'asc')->get(); @endphp
                     @if ($cats->count() > 0)
                     <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-                        <div class="p-4 border-b border-slate-100">
+                        <div class="p-4 border-b border-slate-200">
                             <h3 class="font-bold text-sm text-slate-900 flex items-center gap-1.5">
                                 <i class="bi bi-tags text-primary"></i>Categories
                             </h3>
@@ -283,19 +283,19 @@
                     <!-- Related posts widget -->
                     @if ($relatedPosts->count() > 0)
                     <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-                        <div class="p-4 border-b border-slate-100">
+                        <div class="p-4 border-b border-slate-200">
                             <h3 class="font-bold text-sm text-slate-900 flex items-center gap-1.5">
                                 <i class="bi bi-newspaper text-primary"></i>Related Articles
                             </h3>
                         </div>
-                        <div class="divide-y divide-slate-100">
+                        <div class="divide-y divide-slate-200">
                             @foreach ($relatedPosts as $rp)
                             @php $rpImg = $rp->featured_image ? asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $rp->featured_image)) : asset('images/desert-safari-poster.avif'); @endphp
                             <a href="{{ route('blog.show', $rp->slug) }}" class="flex gap-3 p-4 hover:bg-slate-50 transition-colors group">
                                 <img src="{{ $rpImg }}" class="w-13 h-13 object-cover rounded-xl shrink-0" loading="lazy" alt="{{ $rp->title }}">
                                 <div>
                                     <div class="font-bold text-slate-900 text-xs line-clamp-2 group-hover:text-primary transition-colors leading-snug">{{ $rp->title }}</div>
-                                    <span class="text-slate-400 text-[11px] mt-1 block"><i class="bi bi-clock mr-1 text-primary"></i>{{ $rp->read_time }} min</span>
+                                    <span class="text-slate-500 text-[11px] mt-1 block"><i class="bi bi-clock mr-1 text-primary"></i>{{ $rp->read_time }} min</span>
                                 </div>
                             </a>
                             @endforeach
@@ -316,7 +316,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             @foreach ($relatedPosts as $rp)
             @php $rpImg = $rp->featured_image ? asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $rp->featured_image)) : asset('images/desert-safari-poster.avif'); @endphp
-            <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-lg transition-all duration-300 border border-slate-100 flex flex-col h-full group">
+            <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-lg transition-all duration-300 border border-slate-200 flex flex-col h-full group">
                 <a href="{{ route('blog.show', $rp->slug) }}" class="block relative aspect-[16/10] overflow-hidden">
                     <img src="{{ $rpImg }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $rp->featured_image_alt ?: $rp->title }}" loading="lazy">
                     @if ($rp->category)
@@ -330,7 +330,7 @@
                     @if ($rp->excerpt)
                         <p class="text-slate-500 text-xs line-clamp-2 mb-3 leading-relaxed">{{ $rp->excerpt }}</p>
                     @endif
-                    <div class="text-[11px] text-slate-400 mt-auto pt-2 border-t border-slate-100">
+                    <div class="text-[11px] text-slate-500 mt-auto pt-2 border-t border-slate-200">
                         <i class="bi bi-clock mr-1 text-primary"></i>{{ $rp->read_time }} min read
                     </div>
                 </div>
@@ -342,7 +342,7 @@
 @endif
 
 <!-- Bottom CTA -->
-<section class="py-12 sm:py-16 bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 text-white border-t border-primary/30">
+<section class="py-12 sm:py-16 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white border-t border-primary/30">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">Ready for Your Dubai Adventure?</h2>
         <p class="text-slate-300 text-sm sm:text-base mb-6">Join thousands of satisfied guests who have experienced Dubai with Dunes Discovery Tourism.</p>
