@@ -3,396 +3,422 @@
 @section('page_title', 'Analytics & Traffic Intelligence')
 
 @section('content')
-<div class="mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
-    <div>
-        <h4 class="fw-800 text-dark mb-1">Traffic & Acquisition Intelligence</h4>
-        <p class="text-muted small mb-0">Real-time visitor telemetry, traffic channels, referring websites, and UTM campaign attribution.</p>
-    </div>
-    
-    <div class="d-flex align-items-center gap-2">
-        <form method="GET" action="{{ route('admin.analytics.index') }}" class="d-flex align-items-center gap-2">
-            <label for="days" class="small fw-bold text-dark text-nowrap">Timeframe:</label>
-            <select name="days" id="days" class="form-select form-select-sm rounded-pill border shadow-sm px-3 fw-bold" onchange="this.form.submit()" style="width: 150px;">
+<div class="space-y-6">
+    <!-- Top Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                <i class="bi bi-activity text-primary"></i> Traffic & Acquisition Intelligence
+            </h1>
+            <p class="text-xs text-slate-500 mt-0.5">Real-time visitor telemetry, traffic channels, referring websites, and UTM campaign attribution.</p>
+        </div>
+        
+        <form method="GET" action="{{ route('admin.analytics.index') }}" class="flex items-center gap-2">
+            <label for="days" class="text-xs font-bold text-slate-700 whitespace-nowrap">Timeframe:</label>
+            <select name="days" id="days" class="rounded-xl border border-slate-200 px-3.5 py-1.5 text-xs font-bold text-slate-800 outline-hidden bg-white shadow-2xs focus:border-primary" onchange="this.form.submit()">
                 <option value="7" {{ $days == 7 ? 'selected' : '' }}>Last 7 Days</option>
                 <option value="30" {{ $days == 30 ? 'selected' : '' }}>Last 30 Days</option>
                 <option value="90" {{ $days == 90 ? 'selected' : '' }}>Last 90 Days</option>
             </select>
         </form>
     </div>
-</div>
 
-<!-- 4 Key Stat Cards -->
-<div class="row g-3 mb-4">
-    <div class="col-xl-3 col-sm-6">
-        <div class="card border-0 shadow-sm rounded-4 bg-white p-4 h-100">
-            <div class="d-flex align-items-center justify-content-between mb-3">
-                <span class="text-muted small fw-bold text-uppercase">Total Pageviews</span>
-                <span class="badge bg-primary-subtle text-primary rounded-circle p-2"><i class="bi bi-eye-fill fs-5"></i></span>
+    <!-- 4 Key Stat Cards -->
+    <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Pageviews</span>
+                <span class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
+                    <i class="bi bi-eye-fill text-lg"></i>
+                </span>
             </div>
-            <h3 class="fw-800 text-dark mb-1">{{ number_format($totalPageviews) }}</h3>
-            <span class="text-muted small">Total HTTP requests</span>
-        </div>
-    </div>
-    <div class="col-xl-3 col-sm-6">
-        <div class="card border-0 shadow-sm rounded-4 bg-white p-4 h-100">
-            <div class="d-flex align-items-center justify-content-between mb-3">
-                <span class="text-muted small fw-bold text-uppercase">Human Pageviews</span>
-                <span class="badge bg-success-subtle text-success rounded-circle p-2"><i class="bi bi-person-check-fill fs-5"></i></span>
+            <div>
+                <div class="text-2xl font-black text-slate-900">{{ number_format($totalPageviews) }}</div>
+                <div class="text-xs text-slate-400 mt-1">Total HTTP requests</div>
             </div>
-            <h3 class="fw-800 text-dark mb-1">{{ number_format($humanPageviews) }}</h3>
-            <span class="text-muted small">Excludes bots & automated crawlers</span>
         </div>
-    </div>
-    <div class="col-xl-3 col-sm-6">
-        <div class="card border-0 shadow-sm rounded-4 bg-white p-4 h-100">
-            <div class="d-flex align-items-center justify-content-between mb-3">
-                <span class="text-muted small fw-bold text-uppercase">Unique Sessions</span>
-                <span class="badge bg-info-subtle text-info rounded-circle p-2"><i class="bi bi-people-fill fs-5"></i></span>
-            </div>
-            <h3 class="fw-800 text-dark mb-1">{{ number_format($uniqueVisitors) }}</h3>
-            <span class="text-muted small">Distinct user sessions</span>
-        </div>
-    </div>
-    <div class="col-xl-3 col-sm-6">
-        <div class="card border-0 shadow-sm rounded-4 bg-white p-4 h-100">
-            <div class="d-flex align-items-center justify-content-between mb-3">
-                <span class="text-muted small fw-bold text-uppercase">Unique Human IPs</span>
-                <span class="badge bg-warning-subtle text-warning rounded-circle p-2"><i class="bi bi-globe fs-5"></i></span>
-            </div>
-            <h3 class="fw-800 text-dark mb-1">{{ number_format($uniqueIPs) }}</h3>
-            <span class="text-muted small">Distinct IP addresses</span>
-        </div>
-    </div>
-</div>
 
-<!-- Visual Analytics Charts Row -->
-<div class="row g-4 mb-4">
-    <div class="col-lg-8">
-        <div class="card border-0 shadow-sm rounded-4 bg-white p-4 h-100">
-            <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Human Pageviews</span>
+                <span class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200">
+                    <i class="bi bi-person-check-fill text-lg"></i>
+                </span>
+            </div>
+            <div>
+                <div class="text-2xl font-black text-emerald-600">{{ number_format($humanPageviews) }}</div>
+                <div class="text-xs text-slate-400 mt-1">Excludes bots & automated crawlers</div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Unique Sessions</span>
+                <span class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-200">
+                    <i class="bi bi-people-fill text-lg"></i>
+                </span>
+            </div>
+            <div>
+                <div class="text-2xl font-black text-slate-900">{{ number_format($uniqueVisitors) }}</div>
+                <div class="text-xs text-slate-400 mt-1">Distinct user sessions</div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Unique Human IPs</span>
+                <span class="w-10 h-10 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center border border-amber-200">
+                    <i class="bi bi-globe text-lg"></i>
+                </span>
+            </div>
+            <div>
+                <div class="text-2xl font-black text-slate-900">{{ number_format($uniqueIPs) }}</div>
+                <div class="text-xs text-slate-400 mt-1">Distinct IP addresses</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Visual Analytics Charts Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-8 bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs">
+            <div class="flex items-center justify-between mb-4">
                 <div>
-                    <h6 class="fw-800 text-dark mb-1"><i class="bi bi-graph-up text-primary me-2"></i>Daily Traffic Trend</h6>
-                    <span class="text-muted small">Pageviews & Human Visits progression over the last {{ $days }} days</span>
+                    <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                        <i class="bi bi-graph-up text-primary"></i> Daily Traffic Trend
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Pageviews & Human Visits progression over the last {{ $days }} days</p>
                 </div>
-                <span class="badge bg-light text-dark border px-3 py-1 rounded-pill small">Daily Telemetry</span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200">Daily Telemetry</span>
             </div>
-            <div style="height: 280px;">
+            <div class="h-72 relative">
                 <canvas id="trafficTrendChart"></canvas>
             </div>
         </div>
-    </div>
-    <div class="col-lg-4">
-        <div class="card border-0 shadow-sm rounded-4 bg-white p-4 h-100">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h6 class="fw-800 text-dark mb-0"><i class="bi bi-pie-chart-fill text-warning me-2"></i>Traffic Sources</h6>
-                <span class="badge bg-light text-muted border">Channels</span>
+        <div class="lg:col-span-4 bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                        <i class="bi bi-pie-chart-fill text-amber-500"></i> Traffic Sources
+                    </h2>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">Channels</span>
+                </div>
+                <div class="h-56 relative">
+                    <canvas id="trafficSourcesChart"></canvas>
+                </div>
             </div>
-            <div style="height: 220px; position: relative;">
-                <canvas id="trafficSourcesChart"></canvas>
-            </div>
-            <div class="mt-3 small text-muted text-center">
+            <div class="text-slate-400 text-xs text-center mt-3 pt-3 border-t border-slate-100">
                 Attribution grouped by Google Ads, Organic Search, Social, WhatsApp & Direct.
             </div>
         </div>
     </div>
-</div>
 
-<!-- Traffic Acquisition & Referrers Row -->
-<div class="row g-4 mb-4">
-    <!-- Traffic Sources Breakdown -->
-    <div class="col-lg-6">
-        <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden h-100">
-            <div class="card-header bg-white py-3 border-bottom ps-4 pe-4 d-flex justify-content-between align-items-center">
+    <!-- Traffic Acquisition & Referrers Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Traffic Sources Breakdown -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden flex flex-col justify-between">
+            <div class="bg-slate-50/80 border-b border-slate-200/80 py-3.5 px-5 flex items-center justify-between">
                 <div>
-                    <h6 class="fw-800 mb-0 text-dark"><i class="bi bi-compass text-primary me-2"></i>Acquisition Channels & Traffic Sources</h6>
-                    <span class="text-muted small">Origin channels of visiting traffic</span>
+                    <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                        <i class="bi bi-compass text-primary"></i> Acquisition Channels
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Origin channels of visiting traffic</p>
                 </div>
-                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3">{{ $trafficSources->count() }} Channels</span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
+                    {{ $trafficSources->count() }} Channels
+                </span>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table align-middle mb-0 no-datatable">
-                        <thead class="table-light small text-uppercase fw-bold text-muted">
-                            <tr>
-                                <th class="ps-4">Channel / Source</th>
-                                <th class="text-center">Pageviews</th>
-                                <th class="text-center">Unique Visitors</th>
-                                <th class="text-end pe-4">Traffic Share</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @php $totalChannelViews = $trafficSources->sum('views') ?: 1; @endphp
-                            @forelse($trafficSources as $src)
-                            @php
-                                $percent = round(($src->views / $totalChannelViews) * 100, 1);
-                                $iconClass = match($src->channel) {
-                                    'Google Ads' => 'bi-google text-danger',
-                                    'Google Organic' => 'bi-search text-success',
-                                    'Facebook' => 'bi-facebook text-primary',
-                                    'Instagram' => 'bi-instagram text-danger',
-                                    'WhatsApp' => 'bi-whatsapp text-success',
-                                    'Bing Organic' => 'bi-browser-edge text-info',
-                                    'TikTok' => 'bi-tiktok text-dark',
-                                    'Direct / Bookmark' => 'bi-bookmark-star-fill text-warning',
-                                    default => 'bi-box-arrow-up-right text-muted'
-                                };
-                            @endphp
-                            <tr>
-                                <td class="ps-4">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <i class="bi {{ $iconClass }} fs-5"></i>
-                                        <strong class="text-dark">{{ $src->channel }}</strong>
+            <div class="overflow-x-auto flex-1">
+                <table class="w-full text-left border-collapse text-sm text-slate-700">
+                    <thead class="bg-slate-50/50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
+                        <tr>
+                            <th class="py-3 px-4">Channel / Source</th>
+                            <th class="py-3 px-4 text-center">Pageviews</th>
+                            <th class="py-3 px-4 text-center">Unique Visitors</th>
+                            <th class="py-3 px-4 text-right pe-4">Traffic Share</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 bg-white">
+                        @php $totalChannelViews = $trafficSources->sum('views') ?: 1; @endphp
+                        @forelse($trafficSources as $src)
+                        @php
+                            $percent = round(($src->views / $totalChannelViews) * 100, 1);
+                            $iconClass = match($src->channel) {
+                                'Google Ads' => 'bi-google text-rose-500',
+                                'Google Organic' => 'bi-search text-emerald-600',
+                                'Facebook' => 'bi-facebook text-blue-600',
+                                'Instagram' => 'bi-instagram text-rose-500',
+                                'WhatsApp' => 'bi-whatsapp text-emerald-500',
+                                'Bing Organic' => 'bi-browser-edge text-sky-500',
+                                'TikTok' => 'bi-tiktok text-slate-900',
+                                'Direct / Bookmark' => 'bi-bookmark-star-fill text-amber-500',
+                                default => 'bi-box-arrow-up-right text-slate-400'
+                            };
+                        @endphp
+                        <tr class="hover:bg-slate-50/60 transition-colors">
+                            <td class="py-3 px-4">
+                                <div class="flex items-center gap-2">
+                                    <i class="bi {{ $iconClass }} text-base"></i>
+                                    <span class="font-bold text-slate-900 text-xs">{{ $src->channel }}</span>
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 text-center font-bold text-slate-900 text-xs">{{ number_format($src->views) }}</td>
+                            <td class="py-3 px-4 text-center text-slate-500 text-xs">{{ number_format($src->visitors) }}</td>
+                            <td class="py-3 px-4 text-right pe-4">
+                                <div class="flex items-center justify-end gap-2">
+                                    <div class="w-16 bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                        <div class="bg-primary h-1.5 rounded-full" style="width: {{ $percent }}%"></div>
                                     </div>
-                                </td>
-                                <td class="text-center fw-bold text-dark">{{ number_format($src->views) }}</td>
-                                <td class="text-center text-muted fw-medium">{{ number_format($src->visitors) }}</td>
-                                <td class="text-end pe-4">
-                                    <div class="d-flex align-items-center justify-content-end gap-2">
-                                        <div class="progress flex-grow-1" style="height: 6px; max-width: 60px;">
-                                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ $percent }}%"></div>
-                                        </div>
-                                        <span class="small fw-bold text-muted" style="min-width: 42px;">{{ $percent }}%</span>
-                                    </div>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="4" class="text-center py-4 text-muted">No traffic channel telemetry available.</td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                                    <span class="text-xs font-bold text-slate-600 w-10 text-right">{{ $percent }}%</span>
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="4" class="text-center py-6 text-slate-400 text-xs">No traffic channel telemetry available.</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Top Referring Domains -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden flex flex-col justify-between">
+            <div class="bg-slate-50/80 border-b border-slate-200/80 py-3.5 px-5 flex items-center justify-between">
+                <div>
+                    <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                        <i class="bi bi-link-45deg text-emerald-600"></i> Referring Websites
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5">External sites sending traffic to Dunes</p>
                 </div>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                    {{ $topReferrers->count() }} Referrers
+                </span>
+            </div>
+            <div class="overflow-x-auto flex-1">
+                <table class="w-full text-left border-collapse text-sm text-slate-700">
+                    <thead class="bg-slate-50/50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
+                        <tr>
+                            <th class="py-3 px-4">Referrer URL</th>
+                            <th class="py-3 px-4 text-center">Views</th>
+                            <th class="py-3 px-4 text-right pe-4">Unique Visitors</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 bg-white">
+                        @forelse($topReferrers as $ref)
+                        <tr class="hover:bg-slate-50/60 transition-colors">
+                            <td class="py-3 px-4">
+                                <a href="{{ $ref->referrer }}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline font-mono font-bold text-xs truncate inline-block max-w-xs" title="{{ $ref->referrer }}">
+                                    {{ $ref->referrer }} <i class="bi bi-box-arrow-up-right text-[10px] ml-1"></i>
+                                </a>
+                            </td>
+                            <td class="py-3 px-4 text-center">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
+                                    {{ number_format($ref->views) }}
+                                </span>
+                            </td>
+                            <td class="py-3 px-4 text-right pe-4 text-xs font-bold text-slate-600">
+                                {{ number_format($ref->visitors) }}
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="3" class="text-center py-6 text-slate-400 text-xs">No external referring URLs recorded for this timeframe.</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
-    <!-- Top Referring Domains -->
-    <div class="col-lg-6">
-        <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden h-100">
-            <div class="card-header bg-white py-3 border-bottom ps-4 pe-4 d-flex justify-content-between align-items-center">
-                <div>
-                    <h6 class="fw-800 mb-0 text-dark"><i class="bi bi-link-45deg text-success me-2"></i>Top Referring Websites & Referrers</h6>
-                    <span class="text-muted small">External sites sending traffic to Dunes</span>
-                </div>
-                <span class="badge bg-light text-muted border">{{ $topReferrers->count() }} Referrers</span>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table align-middle mb-0 no-datatable">
-                        <thead class="table-light small text-uppercase fw-bold text-muted">
-                            <tr>
-                                <th class="ps-4">Referrer URL</th>
-                                <th class="text-center">Views</th>
-                                <th class="text-end pe-4">Unique Visitors</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($topReferrers as $ref)
-                            <tr>
-                                <td class="ps-4">
-                                    <a href="{{ $ref->referrer }}" target="_blank" rel="noopener noreferrer" class="text-primary fw-bold font-monospace small text-truncate d-inline-block" style="max-width: 280px;" title="{{ $ref->referrer }}">
-                                        {{ $ref->referrer }} <i class="bi bi-box-arrow-up-right small ms-1"></i>
-                                    </a>
-                                </td>
-                                <td class="text-center">
-                                    <span class="badge bg-primary rounded-pill px-3">{{ number_format($ref->views) }}</span>
-                                </td>
-                                <td class="text-end pe-4 fw-bold text-muted">
-                                    {{ number_format($ref->visitors) }}
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="3" class="text-center py-4 text-muted">No external referring URLs recorded for this timeframe.</td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- UTM Campaigns & Top Pages Row -->
-<div class="row g-4 mb-4">
-    <!-- UTM Campaigns Table -->
+    <!-- UTM Campaigns Table (If any) -->
     @if($campaigns->count() > 0)
-    <div class="col-12">
-        <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden mb-4">
-            <div class="card-header bg-white py-3 border-bottom ps-4 pe-4 d-flex justify-content-between align-items-center">
-                <h6 class="fw-800 mb-0 text-dark"><i class="bi bi-megaphone-fill text-danger me-2"></i>Active UTM Marketing Campaigns</h6>
-                <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3">{{ $campaigns->count() }} Campaigns</span>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table align-middle mb-0 no-datatable">
-                        <thead class="table-light small text-uppercase fw-bold text-muted">
-                            <tr>
-                                <th class="ps-4">Campaign Name</th>
-                                <th>Source</th>
-                                <th>Medium</th>
-                                <th class="text-center">Pageviews</th>
-                                <th class="text-end pe-4">Unique Visitors</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($campaigns as $camp)
-                            <tr>
-                                <td class="ps-4 fw-bold text-dark">{{ $camp->utm_campaign }}</td>
-                                <td><span class="badge bg-light text-dark border">{{ $camp->utm_source }}</span></td>
-                                <td><span class="badge bg-light text-muted border">{{ $camp->utm_medium }}</span></td>
-                                <td class="text-center fw-800 text-primary">{{ number_format($camp->views) }}</td>
-                                <td class="text-end pe-4 fw-bold text-muted">{{ number_format($camp->visitors) }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+        <div class="bg-slate-50/80 border-b border-slate-200/80 py-3.5 px-5 flex items-center justify-between">
+            <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <i class="bi bi-megaphone-fill text-rose-500"></i> Active UTM Marketing Campaigns
+            </h2>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                {{ $campaigns->count() }} Campaigns
+            </span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm text-slate-700">
+                <thead class="bg-slate-50/50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
+                    <tr>
+                        <th class="py-3 px-4">Campaign Name</th>
+                        <th class="py-3 px-4">Source</th>
+                        <th class="py-3 px-4">Medium</th>
+                        <th class="py-3 px-4 text-center">Pageviews</th>
+                        <th class="py-3 px-4 text-right pe-4">Unique Visitors</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 bg-white">
+                    @foreach($campaigns as $camp)
+                    <tr class="hover:bg-slate-50/60 transition-colors">
+                        <td class="py-3 px-4 font-bold text-slate-900 text-xs">{{ $camp->utm_campaign }}</td>
+                        <td class="py-3 px-4"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200">{{ $camp->utm_source }}</span></td>
+                        <td class="py-3 px-4"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200">{{ $camp->utm_medium }}</span></td>
+                        <td class="py-3 px-4 text-center font-black text-primary text-xs">{{ number_format($camp->views) }}</td>
+                        <td class="py-3 px-4 text-right pe-4 font-bold text-slate-600 text-xs">{{ number_format($camp->visitors) }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
     @endif
 
-    <!-- Top Pages Table -->
-    <div class="col-lg-7">
-        <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden h-100">
-            <div class="card-header bg-white py-3 border-bottom ps-4 pe-4 d-flex justify-content-between align-items-center">
-                <h6 class="fw-800 mb-0 text-dark"><i class="bi bi-file-earmark-text text-primary me-2"></i>Top Most Visited Pages</h6>
-                <span class="badge bg-light text-muted border">Human Traffic</span>
+    <!-- Top Pages & Geographies / Devices -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <!-- Top Pages Table (Col 7) -->
+        <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+            <div class="bg-slate-50/80 border-b border-slate-200/80 py-3.5 px-5 flex items-center justify-between">
+                <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <i class="bi bi-file-earmark-text text-primary"></i> Top Most Visited Pages
+                </h2>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600 border border-slate-200">Human Traffic</span>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table align-middle mb-0 no-datatable">
-                        <thead class="table-light small text-uppercase fw-bold text-muted">
-                            <tr>
-                                <th class="ps-4">Page URI</th>
-                                <th class="text-center">Views</th>
-                                <th class="text-end pe-4">Unique Visitors</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($topPages as $page)
-                            <tr>
-                                <td class="ps-4">
-                                    <span class="fw-bold text-dark font-monospace small text-break">{{ $page->request_uri }}</span>
-                                </td>
-                                <td class="text-center">
-                                    <span class="badge bg-primary rounded-pill px-3">{{ number_format($page->views) }}</span>
-                                </td>
-                                <td class="text-end pe-4 fw-bold text-muted">
-                                    {{ number_format($page->visitors) }}
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="3" class="text-center py-4 text-muted">No pageview data recorded for this timeframe.</td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Top Countries & Devices -->
-    <div class="col-lg-5">
-        <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden mb-4">
-            <div class="card-header bg-white py-3 border-bottom ps-4 pe-4">
-                <h6 class="fw-800 mb-0 text-dark"><i class="bi bi-globe-americas text-info me-2"></i>Top Visitor Geographies</h6>
-            </div>
-            <div class="card-body p-4">
-                @forelse($topCountries as $c)
-                <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
-                    <span class="fw-bold text-dark small"><i class="bi bi-geo-alt-fill text-danger me-2"></i>{{ $c->country }}</span>
-                    <span class="badge bg-light text-dark border rounded-pill px-3">{{ number_format($c->count) }} views</span>
-                </div>
-                @empty
-                <p class="text-muted small mb-0 text-center">No location telemetry available.</p>
-                @endforelse
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm text-slate-700">
+                    <thead class="bg-slate-50/50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
+                        <tr>
+                            <th class="py-3 px-4">Page URI</th>
+                            <th class="py-3 px-4 text-center">Views</th>
+                            <th class="py-3 px-4 text-right pe-4">Unique Visitors</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 bg-white">
+                        @forelse($topPages as $page)
+                        <tr class="hover:bg-slate-50/60 transition-colors">
+                            <td class="py-3 px-4">
+                                <span class="font-bold text-slate-900 font-mono text-xs break-all">{{ $page->request_uri }}</span>
+                            </td>
+                            <td class="py-3 px-4 text-center">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
+                                    {{ number_format($page->views) }}
+                                </span>
+                            </td>
+                            <td class="py-3 px-4 text-right pe-4 font-bold text-slate-600 text-xs">
+                                {{ number_format($page->visitors) }}
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="3" class="text-center py-6 text-slate-400 text-xs">No pageview data recorded for this timeframe.</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
-            <div class="card-header bg-white py-3 border-bottom ps-4 pe-4">
-                <h6 class="fw-800 mb-0 text-dark"><i class="bi bi-display text-primary me-2"></i>Device Breakdown</h6>
-            </div>
-            <div class="card-body p-4">
-                <div class="row g-2 text-center">
-                    @foreach($devices as $dev)
-                    <div class="col-4">
-                        <div class="p-3 bg-light rounded-3 border">
-                            <i class="bi {{ $dev->device_type === 'Mobile' ? 'bi-phone text-success' : ($dev->device_type === 'Tablet' ? 'bi-tablet text-warning' : 'bi-laptop text-primary') }} fs-4 d-block mb-1"></i>
-                            <strong class="d-block text-dark small">{{ $dev->device_type ?: 'Desktop' }}</strong>
-                            <span class="text-muted small">{{ number_format($dev->count) }}</span>
-                        </div>
+        <!-- Top Countries & Devices (Col 5) -->
+        <div class="lg:col-span-5 space-y-6">
+            <!-- Top Countries -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                <div class="bg-slate-50/80 border-b border-slate-200/80 py-3.5 px-5">
+                    <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                        <i class="bi bi-globe-americas text-sky-600"></i> Top Visitor Geographies
+                    </h2>
+                </div>
+                <div class="p-5 space-y-3">
+                    @forelse($topCountries as $c)
+                    <div class="flex items-center justify-between pb-2.5 border-b border-slate-100 last:border-0 last:pb-0">
+                        <span class="font-bold text-slate-800 text-xs flex items-center gap-2">
+                            <i class="bi bi-geo-alt-fill text-rose-500"></i> {{ $c->country }}
+                        </span>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                            {{ number_format($c->count) }} views
+                        </span>
                     </div>
-                    @endforeach
+                    @empty
+                    <p class="text-slate-400 text-xs text-center py-2">No location telemetry available.</p>
+                    @endforelse
+                </div>
+            </div>
+
+            <!-- Device Breakdown -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                <div class="bg-slate-50/80 border-b border-slate-200/80 py-3.5 px-5">
+                    <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                        <i class="bi bi-display text-primary"></i> Device Breakdown
+                    </h2>
+                </div>
+                <div class="p-5">
+                    <div class="grid grid-cols-3 gap-3 text-center">
+                        @foreach($devices as $dev)
+                        <div class="p-3 bg-slate-50/70 rounded-xl border border-slate-200/80">
+                            <i class="bi {{ $dev->device_type === 'Mobile' ? 'bi-phone text-emerald-500' : ($dev->device_type === 'Tablet' ? 'bi-tablet text-amber-500' : 'bi-laptop text-primary') }} text-2xl block mb-1"></i>
+                            <strong class="block text-slate-800 text-xs">{{ $dev->device_type ?: 'Desktop' }}</strong>
+                            <span class="text-slate-400 text-[11px]">{{ number_format($dev->count) }}</span>
+                        </div>
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Detailed Request Logs Table -->
-<div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden mb-4">
-    <div class="card-header bg-white py-3 border-bottom ps-4 pe-4 d-flex justify-content-between align-items-center">
-        <div>
-            <h6 class="fw-800 mb-0 text-dark"><i class="bi bi-activity text-danger me-2"></i>Live Request Logs Telemetry</h6>
-            <span class="text-muted small">Real-time HTTP requests captured by Dunes VisitorTracker engine.</span>
+    <!-- Detailed Request Logs Table -->
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+        <div class="bg-slate-50/80 border-b border-slate-200/80 py-3.5 px-5 flex items-center justify-between">
+            <div>
+                <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <i class="bi bi-activity text-rose-500"></i> Live Request Logs Telemetry
+                </h2>
+                <p class="text-xs text-slate-400 mt-0.5">Real-time HTTP requests captured by Dunes VisitorTracker engine.</p>
+            </div>
         </div>
-    </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table align-middle mb-0 no-datatable">
-                <thead class="table-light small text-uppercase fw-bold text-muted">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm text-slate-700">
+                <thead class="bg-slate-50/50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
                     <tr>
-                        <th class="ps-4">Timestamp</th>
-                        <th>IP & Location</th>
-                        <th>Request URI</th>
-                        <th>Device / OS / Browser</th>
-                        <th class="text-end pe-4">Indicator</th>
+                        <th class="py-3 px-4">Timestamp</th>
+                        <th class="py-3 px-4">IP & Location</th>
+                        <th class="py-3 px-4">Request URI</th>
+                        <th class="py-3 px-4">Device / OS / Browser</th>
+                        <th class="py-3 px-4 text-right pe-4">Indicator</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-slate-100 bg-white">
                     @forelse($logs as $log)
-                    <tr>
-                        <td class="ps-4 text-nowrap">
-                            <span class="fw-bold text-dark small d-block">{{ \Carbon\Carbon::parse($log->request_timestamp)->format('M d, Y') }}</span>
-                            <span class="text-muted small">{{ \Carbon\Carbon::parse($log->request_timestamp)->format('H:i:s') }}</span>
+                    <tr class="hover:bg-slate-50/60 transition-colors">
+                        <td class="py-3 px-4 whitespace-nowrap">
+                            <div class="font-bold text-slate-900 text-xs">{{ \Carbon\Carbon::parse($log->request_timestamp)->format('M d, Y') }}</div>
+                            <div class="text-[11px] text-slate-400">{{ \Carbon\Carbon::parse($log->request_timestamp)->format('H:i:s') }}</div>
                         </td>
-                        <td>
-                            <strong class="text-dark font-monospace small d-block">{{ $log->client_ip }}</strong>
-                            <span class="text-muted small">{{ ($log->city ?: 'Unknown') . ', ' . ($log->country ?: '') }}</span>
+                        <td class="py-3 px-4">
+                            <div class="font-mono font-bold text-slate-800 text-xs">{{ $log->client_ip }}</div>
+                            <div class="text-[11px] text-slate-400">{{ ($log->city ?: 'Unknown') . ', ' . ($log->country ?: '') }}</div>
                         </td>
-                        <td class="font-monospace small text-primary text-break">
+                        <td class="py-3 px-4 font-mono text-xs text-primary break-all">
                             {{ $log->request_uri }}
                         </td>
-                        <td class="small text-muted">
-                            <span class="badge bg-light text-dark border me-1">{{ $log->device_type ?: 'Desktop' }}</span>
+                        <td class="py-3 px-4 text-xs text-slate-600">
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 mr-1">{{ $log->device_type ?: 'Desktop' }}</span>
                             {{ $log->os_name }} / {{ $log->browser_name }}
                         </td>
-                        <td class="text-end pe-4">
+                        <td class="py-3 px-4 text-right pe-4">
                             @if($log->bot_indicator === 'Likely Human')
-                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3">Human</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Human</span>
                             @else
-                                <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-3">Bot/System</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200">Bot/System</span>
                             @endif
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="text-center py-4 text-muted">No request logs found.</td>
+                        <td colspan="5" class="text-center py-6 text-slate-400 text-xs">No request logs found.</td>
                     </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
-    </div>
-    <div class="card-footer bg-white border-top p-3 ps-4 pe-4">
-        {{ $logs->appends(['days' => $days])->links('pagination::bootstrap-5') }}
+        <div class="p-4 border-t border-slate-100 bg-white">
+            {{ $logs->appends(['days' => $days])->links() }}
+        </div>
     </div>
 </div>
 
@@ -426,7 +452,7 @@ $(document).ready(function() {
                     {
                         label: 'Unique Sessions',
                         data: humanSessions,
-                        borderColor: '#20c997',
+                        borderColor: '#10b981',
                         backgroundColor: 'transparent',
                         borderDash: [5, 5],
                         borderWidth: 2,
@@ -436,7 +462,7 @@ $(document).ready(function() {
                     {
                         label: 'Total Requests',
                         data: totalViews,
-                        borderColor: '#adb5bd',
+                        borderColor: '#94a3b8',
                         backgroundColor: 'transparent',
                         borderWidth: 1.5,
                         tension: 0.35,
@@ -453,7 +479,7 @@ $(document).ready(function() {
                 },
                 scales: {
                     x: { grid: { display: false }, ticks: { font: { size: 10 } } },
-                    y: { grid: { color: '#f0f0f0' }, beginAtZero: true }
+                    y: { grid: { color: '#f1f5f9' }, beginAtZero: true }
                 }
             }
         });
@@ -466,7 +492,7 @@ $(document).ready(function() {
         const sourceLabels = sourcesData.map(s => s.channel);
         const sourceViews = sourcesData.map(s => s.views);
 
-        const colors = ['#F58F43', '#198754', '#0d6efd', '#d63384', '#20c997', '#ffc107', '#6c757d', '#0dcaf0'];
+        const colors = ['#F58F43', '#10b981', '#3b82f6', '#ec4899', '#14b8a6', '#f59e0b', '#64748b', '#06b6d4'];
 
         new Chart(sourcesCtx, {
             type: 'doughnut',
@@ -493,4 +519,3 @@ $(document).ready(function() {
 </script>
 @endpush
 @endsection
-

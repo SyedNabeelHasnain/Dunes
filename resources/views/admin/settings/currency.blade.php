@@ -3,48 +3,49 @@
 @section('page_title', 'Multi-Currency & Exchange Rates')
 
 @section('content')
-<div class="card card-modern border shadow-sm rounded-4 bg-white overflow-hidden mb-5">
-    <div class="card-header bg-white py-3 border-bottom ps-4 pe-4">
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-            <div class="d-flex align-items-center gap-3">
-                <div class="bg-light text-primary rounded-circle border d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; font-size: 1.3rem;">
+<div class="rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden mb-8">
+    <div class="px-6 py-4 border-b border-slate-100 bg-white">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full border border-slate-200 bg-slate-50 text-primary flex items-center justify-center text-xl shrink-0">
                     <i class="bi bi-currency-exchange"></i>
                 </div>
                 <div>
-                    <h5 class="fw-800 mb-0 text-dark">Multi-Currency & Foreign Exchange Rates</h5>
-                    <div class="text-muted small">Manage real-time currency conversion rates for global guests (Base: 1 AED).</div>
+                    <h5 class="text-base font-extrabold text-slate-900 leading-tight">Multi-Currency & Foreign Exchange Rates</h5>
+                    <div class="text-xs text-slate-500 mt-0.5">Manage real-time currency conversion rates for global guests (Base: 1 AED).</div>
                 </div>
             </div>
             <div>
-                <button type="button" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm d-inline-flex align-items-center gap-2" id="btnSyncRates">
-                    <i class="bi bi-arrow-repeat" id="syncIcon"></i>
+                <button type="button" id="btnSyncRates" class="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-[#e07b32] transition">
+                    <i class="bi bi-arrow-repeat text-sm" id="syncIcon"></i>
                     <span id="syncText">Sync Live Rates Now</span>
                 </button>
             </div>
         </div>
     </div>
-    <div class="card-body p-4 ps-4 pe-4">
+
+    <div class="p-6">
         <div id="syncAlert"></div>
 
         <!-- Sync Info Banner -->
-        <div class="p-4 bg-light rounded-4 border mb-4">
-            <div class="row align-items-center g-3">
-                <div class="col-lg-8">
-                    <div class="d-flex align-items-center gap-2 mb-1">
-                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 fw-bold">
-                            <i class="bi bi-broadcast me-1"></i> Live Exchange Feed Active
+        <div class="p-5 bg-slate-50/70 rounded-2xl border border-slate-200/80 mb-6">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div class="max-w-2xl">
+                    <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <i class="bi bi-broadcast text-[10px]"></i> Live Exchange Feed Active
                         </span>
-                        <span class="text-muted small">&bull;</span>
-                        <span class="text-muted small">Source: <strong>Open Exchange Rates API</strong></span>
+                        <span class="text-slate-300">&bull;</span>
+                        <span class="text-xs text-slate-600">Source: <strong class="text-slate-800">Open Exchange Rates API</strong></span>
                     </div>
-                    <p class="text-dark mb-0 small">
-                        Automated sync scheduled daily at <strong>02:00 AM (UAE Time)</strong>. Rates are cached and instantly reflected across all booking tours, add-ons, and pricing cards for international visitors.
+                    <p class="text-xs text-slate-600 leading-relaxed mb-0">
+                        Automated sync scheduled daily at <strong class="text-slate-800">02:00 AM (UAE Time)</strong>. Rates are cached and instantly reflected across all booking tours, add-ons, and pricing cards for international visitors.
                     </p>
                 </div>
-                <div class="col-lg-4 text-lg-end">
-                    <div class="text-muted small">Last Synchronized:</div>
-                    <div class="fw-bold text-dark fs-6" id="lastSyncedDisplay">
-                        <i class="bi bi-clock-history me-1 text-primary"></i>{{ $rates['synced_at'] }}
+                <div class="lg:text-right shrink-0">
+                    <div class="text-[11px] font-semibold text-slate-500">Last Synchronized:</div>
+                    <div class="text-sm font-extrabold text-slate-800 mt-0.5" id="lastSyncedDisplay">
+                        <i class="bi bi-clock-history mr-1 text-primary"></i>{{ $rates['synced_at'] }}
                     </div>
                 </div>
             </div>
@@ -54,152 +55,150 @@
         <form action="{{ route('admin.settings.update') }}" method="POST" id="currencyRatesForm">
             @csrf
 
-            <div class="row g-4 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
                 <!-- USD -->
-                <div class="col-md-6 col-xl-4">
-                    <div class="p-4 bg-light rounded-4 border h-100">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="fs-4">🇺🇸</span>
+                <div class="p-5 bg-slate-50/70 rounded-2xl border border-slate-200/80 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2.5">
+                                <span class="text-2xl">🇺🇸</span>
                                 <div>
-                                    <h6 class="fw-bold mb-0 text-dark">US Dollar (USD)</h6>
-                                    <span class="text-muted small">Symbol: $</span>
+                                    <h6 class="text-xs font-bold text-slate-900 leading-tight">US Dollar (USD)</h6>
+                                    <span class="text-[11px] text-slate-500">Symbol: $</span>
                                 </div>
                             </div>
-                            <span class="badge bg-white text-dark border rounded-pill px-2 py-1 small fw-bold">1 AED =</span>
+                            <span class="rounded-full border border-slate-200 bg-white px-2.5 py-0.5 text-[11px] font-bold text-slate-600">1 AED =</span>
                         </div>
-                        <div class="input-group mb-2">
-                            <span class="input-group-text bg-white fw-bold">$</span>
-                            <input type="number" step="0.0001" name="currency_rate_usd" id="rate_usd" class="form-control fw-bold fs-6" value="{{ $rates['usd'] }}" required>
+                        <div class="relative flex rounded-xl shadow-2xs mb-2">
+                            <span class="inline-flex items-center px-3.5 rounded-l-xl border border-r-0 border-slate-200 bg-white text-xs font-bold text-slate-600">$</span>
+                            <input type="number" step="0.0001" name="currency_rate_usd" id="rate_usd" class="w-full rounded-r-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-bold text-slate-800 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $rates['usd'] }}" required>
                         </div>
-                        <div class="text-muted small">Standard peg: approx 0.2723 (1 USD &approx; 3.6725 AED)</div>
                     </div>
+                    <div class="text-[11px] text-slate-500 mt-1">Standard peg: approx 0.2723 (1 USD &approx; 3.6725 AED)</div>
                 </div>
 
                 <!-- EUR -->
-                <div class="col-md-6 col-xl-4">
-                    <div class="p-4 bg-light rounded-4 border h-100">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="fs-4">🇪🇺</span>
+                <div class="p-5 bg-slate-50/70 rounded-2xl border border-slate-200/80 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2.5">
+                                <span class="text-2xl">🇪🇺</span>
                                 <div>
-                                    <h6 class="fw-bold mb-0 text-dark">Euro (EUR)</h6>
-                                    <span class="text-muted small">Symbol: €</span>
+                                    <h6 class="text-xs font-bold text-slate-900 leading-tight">Euro (EUR)</h6>
+                                    <span class="text-[11px] text-slate-500">Symbol: €</span>
                                 </div>
                             </div>
-                            <span class="badge bg-white text-dark border rounded-pill px-2 py-1 small fw-bold">1 AED =</span>
+                            <span class="rounded-full border border-slate-200 bg-white px-2.5 py-0.5 text-[11px] font-bold text-slate-600">1 AED =</span>
                         </div>
-                        <div class="input-group mb-2">
-                            <span class="input-group-text bg-white fw-bold">€</span>
-                            <input type="number" step="0.0001" name="currency_rate_eur" id="rate_eur" class="form-control fw-bold fs-6" value="{{ $rates['eur'] }}" required>
+                        <div class="relative flex rounded-xl shadow-2xs mb-2">
+                            <span class="inline-flex items-center px-3.5 rounded-l-xl border border-r-0 border-slate-200 bg-white text-xs font-bold text-slate-600">€</span>
+                            <input type="number" step="0.0001" name="currency_rate_eur" id="rate_eur" class="w-full rounded-r-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-bold text-slate-800 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $rates['eur'] }}" required>
                         </div>
-                        <div class="text-muted small">Floating rate against AED (e.g. 0.2341 - 0.2550)</div>
                     </div>
+                    <div class="text-[11px] text-slate-500 mt-1">Floating rate against AED (e.g. 0.2341 - 0.2550)</div>
                 </div>
 
                 <!-- GBP -->
-                <div class="col-md-6 col-xl-4">
-                    <div class="p-4 bg-light rounded-4 border h-100">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="fs-4">🇬🇧</span>
+                <div class="p-5 bg-slate-50/70 rounded-2xl border border-slate-200/80 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2.5">
+                                <span class="text-2xl">🇬🇧</span>
                                 <div>
-                                    <h6 class="fw-bold mb-0 text-dark">British Pound (GBP)</h6>
-                                    <span class="text-muted small">Symbol: £</span>
+                                    <h6 class="text-xs font-bold text-slate-900 leading-tight">British Pound (GBP)</h6>
+                                    <span class="text-[11px] text-slate-500">Symbol: £</span>
                                 </div>
                             </div>
-                            <span class="badge bg-white text-dark border rounded-pill px-2 py-1 small fw-bold">1 AED =</span>
+                            <span class="rounded-full border border-slate-200 bg-white px-2.5 py-0.5 text-[11px] font-bold text-slate-600">1 AED =</span>
                         </div>
-                        <div class="input-group mb-2">
-                            <span class="input-group-text bg-white fw-bold">£</span>
-                            <input type="number" step="0.0001" name="currency_rate_gbp" id="rate_gbp" class="form-control fw-bold fs-6" value="{{ $rates['gbp'] }}" required>
+                        <div class="relative flex rounded-xl shadow-2xs mb-2">
+                            <span class="inline-flex items-center px-3.5 rounded-l-xl border border-r-0 border-slate-200 bg-white text-xs font-bold text-slate-600">£</span>
+                            <input type="number" step="0.0001" name="currency_rate_gbp" id="rate_gbp" class="w-full rounded-r-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-bold text-slate-800 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $rates['gbp'] }}" required>
                         </div>
-                        <div class="text-muted small">Floating rate against AED (e.g. 0.2010 - 0.2200)</div>
                     </div>
+                    <div class="text-[11px] text-slate-500 mt-1">Floating rate against AED (e.g. 0.2010 - 0.2200)</div>
                 </div>
 
                 <!-- SAR -->
-                <div class="col-md-6 col-xl-4">
-                    <div class="p-4 bg-light rounded-4 border h-100">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="fs-4">🇸🇦</span>
+                <div class="p-5 bg-slate-50/70 rounded-2xl border border-slate-200/80 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2.5">
+                                <span class="text-2xl">🇸🇦</span>
                                 <div>
-                                    <h6 class="fw-bold mb-0 text-dark">Saudi Riyal (SAR)</h6>
-                                    <span class="text-muted small">Symbol: SAR (﷼)</span>
+                                    <h6 class="text-xs font-bold text-slate-900 leading-tight">Saudi Riyal (SAR)</h6>
+                                    <span class="text-[11px] text-slate-500">Symbol: SAR (﷼)</span>
                                 </div>
                             </div>
-                            <span class="badge bg-white text-dark border rounded-pill px-2 py-1 small fw-bold">1 AED =</span>
+                            <span class="rounded-full border border-slate-200 bg-white px-2.5 py-0.5 text-[11px] font-bold text-slate-600">1 AED =</span>
                         </div>
-                        <div class="input-group mb-2">
-                            <span class="input-group-text bg-white fw-bold">SAR</span>
-                            <input type="number" step="0.0001" name="currency_rate_sar" id="rate_sar" class="form-control fw-bold fs-6" value="{{ $rates['sar'] }}" required>
+                        <div class="relative flex rounded-xl shadow-2xs mb-2">
+                            <span class="inline-flex items-center px-3.5 rounded-l-xl border border-r-0 border-slate-200 bg-white text-xs font-bold text-slate-600">SAR</span>
+                            <input type="number" step="0.0001" name="currency_rate_sar" id="rate_sar" class="w-full rounded-r-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-bold text-slate-800 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $rates['sar'] }}" required>
                         </div>
-                        <div class="text-muted small">GCC peg: approx 1.0210 (1 AED &approx; 1.0210 SAR)</div>
                     </div>
+                    <div class="text-[11px] text-slate-500 mt-1">GCC peg: approx 1.0210 (1 AED &approx; 1.0210 SAR)</div>
                 </div>
 
                 <!-- INR -->
-                <div class="col-md-6 col-xl-4">
-                    <div class="p-4 bg-light rounded-4 border h-100">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="fs-4">🇮🇳</span>
+                <div class="p-5 bg-slate-50/70 rounded-2xl border border-slate-200/80 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2.5">
+                                <span class="text-2xl">🇮🇳</span>
                                 <div>
-                                    <h6 class="fw-bold mb-0 text-dark">Indian Rupee (INR)</h6>
-                                    <span class="text-muted small">Symbol: ₹</span>
+                                    <h6 class="text-xs font-bold text-slate-900 leading-tight">Indian Rupee (INR)</h6>
+                                    <span class="text-[11px] text-slate-500">Symbol: ₹</span>
                                 </div>
                             </div>
-                            <span class="badge bg-white text-dark border rounded-pill px-2 py-1 small fw-bold">1 AED =</span>
+                            <span class="rounded-full border border-slate-200 bg-white px-2.5 py-0.5 text-[11px] font-bold text-slate-600">1 AED =</span>
                         </div>
-                        <div class="input-group mb-2">
-                            <span class="input-group-text bg-white fw-bold">₹</span>
-                            <input type="number" step="0.01" name="currency_rate_inr" id="rate_inr" class="form-control fw-bold fs-6" value="{{ $rates['inr'] }}" required>
+                        <div class="relative flex rounded-xl shadow-2xs mb-2">
+                            <span class="inline-flex items-center px-3.5 rounded-l-xl border border-r-0 border-slate-200 bg-white text-xs font-bold text-slate-600">₹</span>
+                            <input type="number" step="0.01" name="currency_rate_inr" id="rate_inr" class="w-full rounded-r-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-bold text-slate-800 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $rates['inr'] }}" required>
                         </div>
-                        <div class="text-muted small">Floating rate against AED (e.g. 22.85 - 25.90)</div>
                     </div>
+                    <div class="text-[11px] text-slate-500 mt-1">Floating rate against AED (e.g. 22.85 - 25.90)</div>
                 </div>
 
                 <!-- Live Conversion Calculator Card -->
-                <div class="col-md-6 col-xl-4">
-                    <div class="p-4 bg-primary-subtle rounded-4 border border-primary-subtle h-100 d-flex flex-column justify-content-between">
-                        <div>
-                            <h6 class="text-primary fw-800 text-uppercase small mb-2">
-                                <i class="bi bi-calculator me-1"></i> Quick Conversion Matrix (100 AED)
-                            </h6>
-                            <div class="d-flex flex-column gap-1 small mt-3" id="quickMatrix">
-                                <div class="d-flex justify-content-between">
-                                    <span>🇺🇸 USD:</span>
-                                    <strong id="calc_usd">$27.23</strong>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <span>🇪🇺 EUR:</span>
-                                    <strong id="calc_eur">€25.10</strong>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <span>🇬🇧 GBP:</span>
-                                    <strong id="calc_gbp">£21.50</strong>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <span>🇸🇦 SAR:</span>
-                                    <strong id="calc_sar">102.10 SAR</strong>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <span>🇮🇳 INR:</span>
-                                    <strong id="calc_inr">₹2,285</strong>
-                                </div>
+                <div class="p-5 bg-amber-500/5 rounded-2xl border border-primary/20 flex flex-col justify-between">
+                    <div>
+                        <h6 class="text-xs font-black uppercase tracking-wider text-primary mb-3 flex items-center gap-1.5">
+                            <i class="bi bi-calculator"></i> Quick Conversion Matrix (100 AED)
+                        </h6>
+                        <div class="flex flex-col gap-2 text-xs mt-3" id="quickMatrix">
+                            <div class="flex justify-between items-center py-1 border-b border-slate-200/60">
+                                <span class="text-slate-600 font-medium">🇺🇸 USD:</span>
+                                <strong id="calc_usd" class="font-extrabold text-slate-900">$27.23</strong>
+                            </div>
+                            <div class="flex justify-between items-center py-1 border-b border-slate-200/60">
+                                <span class="text-slate-600 font-medium">🇪🇺 EUR:</span>
+                                <strong id="calc_eur" class="font-extrabold text-slate-900">€25.10</strong>
+                            </div>
+                            <div class="flex justify-between items-center py-1 border-b border-slate-200/60">
+                                <span class="text-slate-600 font-medium">🇬🇧 GBP:</span>
+                                <strong id="calc_gbp" class="font-extrabold text-slate-900">£21.50</strong>
+                            </div>
+                            <div class="flex justify-between items-center py-1 border-b border-slate-200/60">
+                                <span class="text-slate-600 font-medium">🇸🇦 SAR:</span>
+                                <strong id="calc_sar" class="font-extrabold text-slate-900">102.10 SAR</strong>
+                            </div>
+                            <div class="flex justify-between items-center py-1">
+                                <span class="text-slate-600 font-medium">🇮🇳 INR:</span>
+                                <strong id="calc_inr" class="font-extrabold text-slate-900">₹2,285</strong>
                             </div>
                         </div>
-                        <div class="mt-3 pt-2 border-top border-primary-subtle text-muted small">
-                            Updates dynamically as rate inputs change.
-                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-primary/10 text-[11px] text-slate-500">
+                        Updates dynamically as rate inputs change.
                     </div>
                 </div>
             </div>
 
-            <div class="text-end">
-                <button type="submit" class="btn btn-primary rounded-pill px-5 py-2.5 fw-bold shadow-sm">
-                    <i class="bi bi-save me-2"></i>Save Exchange Rates
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+                <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-[#e07b32] transition">
+                    <i class="bi bi-save"></i> Save Exchange Rates
                 </button>
             </div>
         </form>
@@ -270,15 +269,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     inputInr.value = data.rates.inr;
 
                     if (data.rates.synced_at) {
-                        lastSyncedDisplay.innerHTML = '<i class="bi bi-clock-history me-1 text-primary"></i>' + data.rates.synced_at;
+                        lastSyncedDisplay.innerHTML = '<i class="bi bi-clock-history mr-1 text-primary"></i>' + data.rates.synced_at;
                     }
 
                     updateMatrix();
 
                     syncAlert.innerHTML = `
-                        <div class="alert alert-success alert-dismissible fade show rounded-4 mb-4 border-0 shadow-sm" role="alert">
-                            <i class="bi bi-check-circle-fill me-2"></i> ${data.message}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <div class="flex items-center justify-between p-4 mb-5 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 text-xs shadow-xs">
+                            <div class="flex items-center gap-2">
+                                <i class="bi bi-check-circle-fill text-emerald-600 text-sm"></i>
+                                <span>${data.message}</span>
+                            </div>
+                            <button type="button" class="text-emerald-600 hover:text-emerald-800 p-1" onclick="this.closest('.flex').remove()"><i class="bi bi-x-lg"></i></button>
                         </div>
                     `;
                 } else {
@@ -291,9 +293,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 syncText.textContent = 'Sync Live Rates Now';
 
                 syncAlert.innerHTML = `
-                    <div class="alert alert-danger alert-dismissible fade show rounded-4 mb-4 border-0 shadow-sm" role="alert">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i> ${err.message || 'Sync failed. Please try again.'}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <div class="flex items-center justify-between p-4 mb-5 rounded-xl border border-rose-200 bg-rose-50 text-rose-800 text-xs shadow-xs">
+                        <div class="flex items-center gap-2">
+                            <i class="bi bi-exclamation-triangle-fill text-rose-600 text-sm"></i>
+                            <span>${err.message || 'Sync failed. Please try again.'}</span>
+                        </div>
+                        <button type="button" class="text-rose-600 hover:text-rose-800 p-1" onclick="this.closest('.flex').remove()"><i class="bi bi-x-lg"></i></button>
                     </div>
                 `;
             });
