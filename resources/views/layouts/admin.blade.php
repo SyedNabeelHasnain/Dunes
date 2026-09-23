@@ -382,7 +382,7 @@
                             <div class="font-bold text-slate-900 text-sm">{{ Auth::user()->name ?? 'Administrator' }}</div>
                             <div class="text-slate-400 truncate">{{ Auth::user()->email ?? 'admin@dunesdiscoverytourism.com' }}</div>
                         </div>
-                        <a href="{{ route('admin.profile.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-50 font-medium transition">
+                        <a href="{{ route('admin.profile') }}" class="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-50 font-medium transition">
                             <i class="bi bi-person-gear text-slate-400"></i> My Profile & Security
                         </a>
                         <a href="{{ url('/') }}" target="_blank" class="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-50 font-medium transition">
