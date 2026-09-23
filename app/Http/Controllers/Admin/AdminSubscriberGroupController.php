@@ -86,4 +86,28 @@ class AdminSubscriberGroupController extends Controller
         return redirect()->route('admin.subscriber-groups.index')
             ->with('success', "Group '{$name}' deleted successfully.");
     }
+
+    /**
+     * Redirect create request to index modal.
+     */
+    public function create(): RedirectResponse
+    {
+        return redirect()->route('admin.subscriber-groups.index');
+    }
+
+    /**
+     * Show subscribers belonging to this group.
+     */
+    public function show(int $id): RedirectResponse
+    {
+        return redirect()->route('admin.subscribers.index', ['group_id' => $id]);
+    }
+
+    /**
+     * Redirect edit request to index modal.
+     */
+    public function edit(int $id): RedirectResponse
+    {
+        return redirect()->route('admin.subscriber-groups.index');
+    }
 }

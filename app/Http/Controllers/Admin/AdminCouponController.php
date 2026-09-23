@@ -308,7 +308,7 @@ class AdminCouponController extends Controller
     public function popupSettings()
     {
         $settingsService = app(SettingsService::class);
-        $settings = $settingsService->all();
+        $settings = $settingsService->all()->all();
         $coupons = Coupon::where('status', 'active')->orderBy('created_at', 'desc')->get();
 
         return view('admin.coupons.popup-settings', compact('settings', 'coupons'));

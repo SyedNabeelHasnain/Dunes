@@ -56,7 +56,7 @@
                             </div>
                         </div>
                         <div class="form-check form-switch mb-0">
-                            <input class="form-check-input" type="checkbox" role="switch" id="welcome_popup_active" name="welcome_popup_active" value="1" {{ ($settings->get('welcome_popup_active', '1') == '1') ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" role="switch" id="welcome_popup_active" name="welcome_popup_active" value="1" {{ (($settings['welcome_popup_active'] ?? '1') == '1') ? 'checked' : '' }}>
                             <label class="form-check-label fw-bold small text-muted" for="welcome_popup_active">Popup Active</label>
                         </div>
                     </div>
@@ -65,7 +65,7 @@
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase mb-1" for="welcome_popup_discount">Discount Rate (%)</label>
                                 <div class="input-group">
-                                    <input type="number" step="1" min="1" max="100" class="form-control fw-bold" id="welcome_popup_discount" name="welcome_popup_discount" value="{{ $settings->get('welcome_popup_discount', '25') }}" required>
+                                    <input type="number" step="1" min="1" max="100" class="form-control fw-bold" id="welcome_popup_discount" name="welcome_popup_discount" value="{{ ($settings['welcome_popup_discount'] ?? '25') }}" required>
                                     <span class="input-group-text bg-light fw-bold text-primary">% OFF</span>
                                 </div>
                                 <small class="text-muted d-block mt-1">Percentage discount applied to first booking.</small>
@@ -74,7 +74,7 @@
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase mb-1" for="welcome_popup_timer_mins">Session Urgency Timer</label>
                                 <div class="input-group">
-                                    <input type="number" step="1" min="1" max="120" class="form-control fw-bold" id="welcome_popup_timer_mins" name="welcome_popup_timer_mins" value="{{ $settings->get('welcome_popup_timer_mins', '15') }}" required>
+                                    <input type="number" step="1" min="1" max="120" class="form-control fw-bold" id="welcome_popup_timer_mins" name="welcome_popup_timer_mins" value="{{ ($settings['welcome_popup_timer_mins'] ?? '15') }}" required>
                                     <span class="input-group-text bg-light fw-bold">Minutes</span>
                                 </div>
                                 <small class="text-muted d-block mt-1">Urgency countdown ticker duration.</small>
@@ -83,7 +83,7 @@
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase mb-1" for="welcome_popup_delay_sec">Trigger Delay</label>
                                 <div class="input-group">
-                                    <input type="number" step="1" min="1" max="60" class="form-control fw-bold" id="welcome_popup_delay_sec" name="welcome_popup_delay_sec" value="{{ $settings->get('welcome_popup_delay_sec', '5') }}" required>
+                                    <input type="number" step="1" min="1" max="60" class="form-control fw-bold" id="welcome_popup_delay_sec" name="welcome_popup_delay_sec" value="{{ ($settings['welcome_popup_delay_sec'] ?? '5') }}" required>
                                     <span class="input-group-text bg-light fw-bold">Seconds</span>
                                 </div>
                                 <small class="text-muted d-block mt-1">Time on page before popup displays automatically.</small>
@@ -93,13 +93,13 @@
                                 <label class="form-label small fw-bold text-muted text-uppercase mb-2">Smart Triggers</label>
                                 <div class="d-flex flex-column gap-2">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="welcome_popup_exit_trigger" name="welcome_popup_exit_trigger" value="1" {{ ($settings->get('welcome_popup_exit_trigger', '1') == '1') ? 'checked' : '' }}>
+                                        <input class="form-check-input" type="checkbox" id="welcome_popup_exit_trigger" name="welcome_popup_exit_trigger" value="1" {{ (($settings['welcome_popup_exit_trigger'] ?? '1') == '1') ? 'checked' : '' }}>
                                         <label class="form-check-label small fw-bold text-dark" for="welcome_popup_exit_trigger">
                                             Desktop Exit-Intent (When cursor moves to close tab)
                                         </label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="welcome_popup_scroll_trigger" name="welcome_popup_scroll_trigger" value="1" {{ ($settings->get('welcome_popup_scroll_trigger', '1') == '1') ? 'checked' : '' }}>
+                                        <input class="form-check-input" type="checkbox" id="welcome_popup_scroll_trigger" name="welcome_popup_scroll_trigger" value="1" {{ (($settings['welcome_popup_scroll_trigger'] ?? '1') == '1') ? 'checked' : '' }}>
                                         <label class="form-check-label small fw-bold text-dark" for="welcome_popup_scroll_trigger">
                                             Scroll Depth (When visitor scrolls 35% of page)
                                         </label>
@@ -109,12 +109,12 @@
 
                             <div class="col-12">
                                 <label class="form-label small fw-bold text-muted text-uppercase mb-1" for="welcome_popup_headline">Modal Headline</label>
-                                <input type="text" class="form-control fw-bold" id="welcome_popup_headline" name="welcome_popup_headline" value="{{ $settings->get('welcome_popup_headline', 'Unlock Exclusive 25% OFF') }}">
+                                <input type="text" class="form-control fw-bold" id="welcome_popup_headline" name="welcome_popup_headline" value="{{ ($settings['welcome_popup_headline'] ?? 'Unlock Exclusive 25% OFF') }}">
                             </div>
 
                             <div class="col-12">
                                 <label class="form-label small fw-bold text-muted text-uppercase mb-1" for="welcome_popup_subheadline">Modal Subheadline</label>
-                                <textarea class="form-control" rows="2" id="welcome_popup_subheadline" name="welcome_popup_subheadline">{{ $settings->get('welcome_popup_subheadline', 'Book your unforgettable Dubai Desert Safari today with our premier welcome discount.') }}</textarea>
+                                <textarea class="form-control" rows="2" id="welcome_popup_subheadline" name="welcome_popup_subheadline">{{ ($settings['welcome_popup_subheadline'] ?? 'Book your unforgettable Dubai Desert Safari today with our premier welcome discount.') }}</textarea>
                             </div>
                         </div>
                     </div>
@@ -131,7 +131,7 @@
                             </div>
                         </div>
                         <div class="form-check form-switch mb-0">
-                            <input class="form-check-input" type="checkbox" role="switch" id="top_promo_banner_active" name="top_promo_banner_active" value="1" {{ ($settings->get('top_promo_banner_active', '1') == '1') ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" role="switch" id="top_promo_banner_active" name="top_promo_banner_active" value="1" {{ (($settings['top_promo_banner_active'] ?? '1') == '1') ? 'checked' : '' }}>
                             <label class="form-check-label fw-bold small text-muted" for="top_promo_banner_active">Banner Active</label>
                         </div>
                     </div>
@@ -139,17 +139,17 @@
                         <div class="row g-3">
                             <div class="col-12">
                                 <label class="form-label small fw-bold text-muted text-uppercase mb-1" for="top_promo_banner_text">Banner Announcement Text</label>
-                                <input type="text" class="form-control fw-bold" id="top_promo_banner_text" name="top_promo_banner_text" value="{{ $settings->get('top_promo_banner_text', 'Special Online Exclusive: Get 25% OFF on all Desert Safari Tours! • 100% Free 24h Cancellation') }}">
+                                <input type="text" class="form-control fw-bold" id="top_promo_banner_text" name="top_promo_banner_text" value="{{ ($settings['top_promo_banner_text'] ?? 'Special Online Exclusive: Get 25% OFF on all Desert Safari Tours! • 100% Free 24h Cancellation') }}">
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase mb-1" for="top_promo_banner_badge">Badge Pill Text</label>
-                                <input type="text" class="form-control fw-bold" id="top_promo_banner_badge" name="top_promo_banner_badge" value="{{ $settings->get('top_promo_banner_badge', 'Limited Time Offer') }}">
+                                <input type="text" class="form-control fw-bold" id="top_promo_banner_badge" name="top_promo_banner_badge" value="{{ ($settings['top_promo_banner_badge'] ?? 'Limited Time Offer') }}">
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase mb-1" for="top_promo_banner_code">Featured Promo Code to Display</label>
-                                <input type="text" class="form-control fw-bold font-monospace text-uppercase" id="top_promo_banner_code" name="top_promo_banner_code" value="{{ $settings->get('top_promo_banner_code', 'DUNESWELCOME') }}">
+                                <input type="text" class="form-control fw-bold font-monospace text-uppercase" id="top_promo_banner_code" name="top_promo_banner_code" value="{{ ($settings['top_promo_banner_code'] ?? 'DUNESWELCOME') }}">
                                 <small class="text-muted d-block mt-1">Visitors can 1-click copy this code from top banner.</small>
                             </div>
                         </div>
@@ -167,12 +167,12 @@
                             </div>
                         </div>
                         <div class="form-check form-switch mb-0">
-                            <input class="form-check-input" type="checkbox" role="switch" id="concierge_promo_active" name="concierge_promo_active" value="1" {{ ($settings->get('concierge_promo_active', '0') == '1') ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" role="switch" id="concierge_promo_active" name="concierge_promo_active" value="1" {{ (($settings['concierge_promo_active'] ?? '0') == '1') ? 'checked' : '' }}>
                             <label class="form-check-label fw-bold small text-muted" for="concierge_promo_active">Promo Active</label>
                         </div>
                     </div>
                     <div class="card-body p-4">
-                        @if($settings->get('concierge_promo_active', '0') == '1')
+                        @if(($settings['concierge_promo_active'] ?? '0') == '1')
                         <div class="alert alert-success d-flex align-items-center gap-2 rounded-3 py-2 px-3 mb-3 small">
                             <i class="bi bi-check-circle-fill fs-5"></i>
                             <div><strong>Concierge Promo is Live:</strong> The 5% reward badge is shown across navbars, quiz completion screens, and automatically preloads code MATCH5 into the booking checkout.</div>
@@ -188,7 +188,7 @@
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase mb-1" for="concierge_promo_discount">Concierge Discount Rate (%)</label>
                                 <div class="input-group">
-                                    <input type="number" step="1" min="1" max="100" class="form-control fw-bold" id="concierge_promo_discount" name="concierge_promo_discount" value="{{ $settings->get('concierge_promo_discount', '5') }}" required>
+                                    <input type="number" step="1" min="1" max="100" class="form-control fw-bold" id="concierge_promo_discount" name="concierge_promo_discount" value="{{ ($settings['concierge_promo_discount'] ?? '5') }}" required>
                                     <span class="input-group-text bg-light fw-bold text-primary">% OFF</span>
                                 </div>
                                 <small class="text-muted d-block mt-1">Percentage discount granted upon quiz completion.</small>
@@ -196,7 +196,7 @@
 
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase mb-1" for="concierge_promo_code">Concierge Promo Code</label>
-                                <input type="text" class="form-control fw-bold font-monospace text-uppercase" id="concierge_promo_code" name="concierge_promo_code" value="{{ $settings->get('concierge_promo_code', 'MATCH5') }}" required>
+                                <input type="text" class="form-control fw-bold font-monospace text-uppercase" id="concierge_promo_code" name="concierge_promo_code" value="{{ ($settings['concierge_promo_code'] ?? 'MATCH5') }}" required>
                                 <small class="text-muted d-block mt-1">Database coupon code linked to this concierge incentive.</small>
                             </div>
                         </div>
@@ -212,12 +212,12 @@
                             </div>
                         </div>
                         <div class="form-check form-switch mb-0">
-                            <input class="form-check-input" type="checkbox" role="switch" id="exit_intent_promo_active" name="exit_intent_promo_active" value="1" {{ ($settings->get('exit_intent_promo_active', '0') == '1') ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" role="switch" id="exit_intent_promo_active" name="exit_intent_promo_active" value="1" {{ (($settings['exit_intent_promo_active'] ?? '0') == '1') ? 'checked' : '' }}>
                             <label class="form-check-label fw-bold small text-muted" for="exit_intent_promo_active">Popup Active</label>
                         </div>
                     </div>
                     <div class="card-body p-4">
-                        @if($settings->get('exit_intent_promo_active', '0') == '1')
+                        @if(($settings['exit_intent_promo_active'] ?? '0') == '1')
                         <div class="alert alert-success d-flex align-items-center gap-2 rounded-3 py-2 px-3 mb-3 small">
                             <i class="bi bi-check-circle-fill fs-5"></i>
                             <div><strong>Exit-Intent Cart Saver is Live:</strong> The 5% exit-intent popup is active and will fire when visitors move cursor toward the browser tab/close area.</div>
@@ -233,7 +233,7 @@
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase mb-1" for="exit_intent_promo_discount">Exit-Intent Discount Rate (%)</label>
                                 <div class="input-group">
-                                    <input type="number" step="1" min="1" max="100" class="form-control fw-bold" id="exit_intent_promo_discount" name="exit_intent_promo_discount" value="{{ $settings->get('exit_intent_promo_discount', '5') }}" required>
+                                    <input type="number" step="1" min="1" max="100" class="form-control fw-bold" id="exit_intent_promo_discount" name="exit_intent_promo_discount" value="{{ ($settings['exit_intent_promo_discount'] ?? '5') }}" required>
                                     <span class="input-group-text bg-light fw-bold text-primary">% OFF</span>
                                 </div>
                                 <small class="text-muted d-block mt-1">Percentage discount offered in exit popup.</small>
@@ -241,7 +241,7 @@
 
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase mb-1" for="exit_intent_promo_code">Exit-Intent Promo Code</label>
-                                <input type="text" class="form-control fw-bold font-monospace text-uppercase" id="exit_intent_promo_code" name="exit_intent_promo_code" value="{{ $settings->get('exit_intent_promo_code', 'SAVE5') }}" required>
+                                <input type="text" class="form-control fw-bold font-monospace text-uppercase" id="exit_intent_promo_code" name="exit_intent_promo_code" value="{{ ($settings['exit_intent_promo_code'] ?? 'SAVE5') }}" required>
                                 <small class="text-muted d-block mt-1">Database coupon code linked to exit-intent offer.</small>
                             </div>
                         </div>
@@ -267,9 +267,9 @@
                         <div class="mb-4">
                             <span class="text-muted small fw-bold text-uppercase d-block mb-2">Top Banner (25% OFF):</span>
                             <div class="p-2 rounded-3 text-white text-center small fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm" style="background: linear-gradient(90deg, #111827 0%, #1f2937 50%, #0f172a 100%); border-bottom: 2px solid #F58F43; font-size: 0.8rem;">
-                                <span class="badge bg-warning text-dark font-monospace px-2 py-0.5" style="font-size: 0.68rem;">{{ $settings->get('top_promo_banner_badge', 'Limited Time Offer') }}</span>
+                                <span class="badge bg-warning text-dark font-monospace px-2 py-0.5" style="font-size: 0.68rem;">{{ ($settings['top_promo_banner_badge'] ?? 'Limited Time Offer') }}</span>
                                 <span><i class="bi bi-tag-fill text-warning me-1"></i> Get 25% OFF</span>
-                                <span class="badge bg-warning text-dark font-monospace px-2 py-1">{{ $settings->get('top_promo_banner_code', 'DUNESWELCOME') }}</span>
+                                <span class="badge bg-warning text-dark font-monospace px-2 py-1">{{ ($settings['top_promo_banner_code'] ?? 'DUNESWELCOME') }}</span>
                             </div>
                         </div>
 
@@ -283,8 +283,8 @@
                                     <i class="bi bi-gift-fill"></i> First-Time Guest Special
                                 </div>
 
-                                <h5 class="fw-800 text-dark lh-sm mb-2">{{ $settings->get('welcome_popup_headline', 'Unlock Exclusive 25% OFF') }}</h5>
-                                <p class="text-muted lh-sm mb-3" style="font-size: 0.8rem;">{{ $settings->get('welcome_popup_subheadline', 'Book your unforgettable Dubai Desert Safari today with our premier welcome discount.') }}</p>
+                                <h5 class="fw-800 text-dark lh-sm mb-2">{{ ($settings['welcome_popup_headline'] ?? 'Unlock Exclusive 25% OFF') }}</h5>
+                                <p class="text-muted lh-sm mb-3" style="font-size: 0.8rem;">{{ ($settings['welcome_popup_subheadline'] ?? 'Book your unforgettable Dubai Desert Safari today with our premier welcome discount.') }}</p>
 
                                 <div class="p-2 rounded-3 bg-light text-center border mb-3">
                                     <span class="text-muted fw-bold d-block" style="font-size: 0.65rem;">SESSION OFFER EXPIRES IN</span>
@@ -303,12 +303,12 @@
                         <!-- Concierge Mode Preview -->
                         <div class="mb-3">
                             <span class="text-muted small fw-bold text-uppercase d-block mb-2">Safari Match Concierge Mode:</span>
-                            @if($settings->get('concierge_promo_active', '0') == '1')
+                            @if(($settings['concierge_promo_active'] ?? '0') == '1')
                             <div class="p-3 rounded-4 bg-success-subtle border border-success border-opacity-25 text-dark">
                                 <div class="d-flex align-items-center gap-2 fw-bold text-success mb-1">
                                     <i class="bi bi-check-circle-fill"></i> Promo Mode Active
                                 </div>
-                                <p class="small text-muted mb-0">Navbars and quiz completion screens advertise and auto-inject <strong>{{ $settings->get('concierge_promo_discount', '5') }}% OFF ({{ $settings->get('concierge_promo_code', 'MATCH5') }})</strong>.</p>
+                                <p class="small text-muted mb-0">Navbars and quiz completion screens advertise and auto-inject <strong>{{ ($settings['concierge_promo_discount'] ?? '5') }}% OFF ({{ ($settings['concierge_promo_code'] ?? 'MATCH5') }})</strong>.</p>
                             </div>
                             @else
                             <div class="p-3 rounded-4 bg-light border text-dark">
@@ -323,12 +323,12 @@
                         <!-- Exit-Intent Cart Saver Preview -->
                         <div class="mb-3">
                             <span class="text-muted small fw-bold text-uppercase d-block mb-2">Exit-Intent Cart Saver Mode:</span>
-                            @if($settings->get('exit_intent_promo_active', '0') == '1')
+                            @if(($settings['exit_intent_promo_active'] ?? '0') == '1')
                             <div class="p-3 rounded-4 bg-success-subtle border border-success border-opacity-25 text-dark">
                                 <div class="d-flex align-items-center gap-2 fw-bold text-success mb-1">
                                     <i class="bi bi-check-circle-fill"></i> Popup Mode Active
                                 </div>
-                                <p class="small text-muted mb-0">Fires on cursor exit with <strong>{{ $settings->get('exit_intent_promo_discount', '5') }}% OFF ({{ $settings->get('exit_intent_promo_code', 'SAVE5') }})</strong>.</p>
+                                <p class="small text-muted mb-0">Fires on cursor exit with <strong>{{ ($settings['exit_intent_promo_discount'] ?? '5') }}% OFF ({{ ($settings['exit_intent_promo_code'] ?? 'SAVE5') }})</strong>.</p>
                             </div>
                             @else
                             <div class="p-3 rounded-4 bg-light border text-dark">

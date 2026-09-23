@@ -333,14 +333,14 @@ function updateLivePreview() {
 
     let rawHtml = editor.value;
     const dummyTags = {
-        '{{subscriber_name}}': 'Alex Turner',
-        '{{first_name}}': 'Alex',
-        '{{last_name}}': 'Turner',
-        '{{email}}': 'alex.turner@example.com',
-        '{{unsubscribe_url}}': '#unsubscribe-sample',
-        '{{site_name}}': '{{ addslashes($defaultFromName) }}',
-        '{{site_url}}': window.location.origin,
-        '{{current_year}}': new Date().getFullYear().toString()
+        '@{{subscriber_name}}': 'Alex Turner',
+        '@{{first_name}}': 'Alex',
+        '@{{last_name}}': 'Turner',
+        '@{{email}}': 'alex.turner@example.com',
+        '@{{unsubscribe_url}}': '#unsubscribe-sample',
+        '@{{site_name}}': '{{ addslashes($defaultFromName) }}',
+        '@{{site_url}}': window.location.origin,
+        '@{{current_year}}': new Date().getFullYear().toString()
     };
 
     for (const [tag, val] of Object.entries(dummyTags)) {

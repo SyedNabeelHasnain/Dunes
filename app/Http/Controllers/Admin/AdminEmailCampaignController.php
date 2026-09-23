@@ -211,4 +211,12 @@ class AdminEmailCampaignController extends Controller
         return redirect()->route('admin.campaigns.index')
             ->with('success', "Campaign '{$title}' deleted successfully.");
     }
+
+    /**
+     * Redirect edit requests to campaign show/analytics view.
+     */
+    public function edit(int $id): RedirectResponse
+    {
+        return redirect()->route('admin.campaigns.show', $id);
+    }
 }

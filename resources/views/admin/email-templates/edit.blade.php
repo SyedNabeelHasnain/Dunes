@@ -203,14 +203,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Sample tags interpolation for preview
         const dummyTags = {
-            '{{subscriber_name}}': 'Alex Turner',
-            '{{first_name}}': 'Alex',
-            '{{last_name}}': 'Turner',
-            '{{email}}': 'alex.turner@example.com',
-            '{{unsubscribe_url}}': '#unsubscribe-sample',
-            '{{site_name}}': 'Dunes Discovery Tourism',
-            '{{site_url}}': window.location.origin,
-            '{{current_year}}': new Date().getFullYear().toString()
+            '@{{subscriber_name}}': 'Alex Turner',
+            '@{{first_name}}': 'Alex',
+            '@{{last_name}}': 'Turner',
+            '@{{email}}': 'alex.turner@example.com',
+            '@{{unsubscribe_url}}': '#unsubscribe-sample',
+            '@{{site_name}}': 'Dunes Discovery Tourism',
+            '@{{site_url}}': window.location.origin,
+            '@{{current_year}}': new Date().getFullYear().toString()
         };
 
         for (const [tag, val] of Object.entries(dummyTags)) {

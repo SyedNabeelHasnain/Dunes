@@ -370,4 +370,28 @@ class AdminSubscriberController extends Controller
 
         return redirect()->route('admin.subscribers.index')->with('success', $msg);
     }
+
+    /**
+     * Redirect create request to index modal.
+     */
+    public function create(): RedirectResponse
+    {
+        return redirect()->route('admin.subscribers.index');
+    }
+
+    /**
+     * Redirect show request to index filter.
+     */
+    public function show(int $id): RedirectResponse
+    {
+        return redirect()->route('admin.subscribers.index');
+    }
+
+    /**
+     * Redirect edit request to index modal.
+     */
+    public function edit(int $id): RedirectResponse
+    {
+        return redirect()->route('admin.subscribers.index');
+    }
 }
