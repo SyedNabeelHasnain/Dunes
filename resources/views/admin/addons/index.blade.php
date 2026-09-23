@@ -3,108 +3,111 @@
 @section('page_title', 'Tour Addons')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-    <div>
-        <h2 class="h4 fw-800 text-dark mb-1">Tour Addons Catalog</h2>
-        <p class="text-muted small mb-0">Manage global add-on upgrades, pricing, and adoption across all desert safaris and tours.</p>
+<div class="space-y-6" x-data>
+    <!-- Top Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Tour Addons Catalog</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Manage global add-on upgrades, pricing, and adoption across all desert safaris and tours.</p>
+        </div>
+        <button type="button" @click="$dispatch('open-add-addon')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-xs shadow-xs transition-all cursor-pointer">
+            <i class="bi bi-plus-lg"></i> Add New Addon
+        </button>
     </div>
-    <button type="button" class="btn btn-primary rounded-pill px-4 fw-800 shadow-sm" data-bs-toggle="modal" data-bs-target="#addAddonModal">
-        <i class="bi bi-plus-lg me-2"></i> Add New Addon
-    </button>
-</div>
 
-<!-- 3 Summary KPI Cards -->
-<div class="row g-3 g-lg-4 mb-4">
-    <div class="col-md-4">
-        <div class="card card-modern h-100 p-3 bg-white border-0 shadow-sm rounded-4">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-muted small fw-bold text-uppercase" style="font-size:0.75rem;">Addons in Catalog</span>
-                <span class="badge bg-primary-subtle text-primary rounded-circle p-2"><i class="bi bi-puzzle-fill fs-5"></i></span>
+    <!-- 3 Summary KPI Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Addons in Catalog</span>
+                <span class="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                    <i class="bi bi-puzzle-fill text-sm"></i>
+                </span>
             </div>
-            <h3 class="fw-800 text-dark mb-0">{{ number_format(count($addons)) }}</h3>
-            <span class="text-muted small" style="font-size: 0.75rem;">Active tour enhancements</span>
+            <div class="text-2xl font-black text-slate-900">{{ number_format(count($addons)) }}</div>
+            <span class="text-[11px] text-slate-400 mt-1 block">Active tour enhancements</span>
         </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card card-modern h-100 p-3 bg-white border-0 shadow-sm rounded-4">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-muted small fw-bold text-uppercase" style="font-size:0.75rem;">Total Add-ons Booked</span>
-                <span class="badge bg-success-subtle text-success rounded-circle p-2"><i class="bi bi-cart-check-fill fs-5"></i></span>
-            </div>
-            <h3 class="fw-800 text-success mb-0">{{ number_format($totalAddonsBooked) }} <small class="fs-6 fw-normal text-muted">Units</small></h3>
-            <span class="text-muted small" style="font-size: 0.75rem;">Across all customer reservations</span>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card card-modern h-100 p-3 bg-white border-0 shadow-sm rounded-4">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-muted small fw-bold text-uppercase" style="font-size:0.75rem;">Add-on Revenue Earned</span>
-                <span class="badge bg-info-subtle text-info rounded-circle p-2"><i class="bi bi-cash-stack fs-5"></i></span>
-            </div>
-            <h3 class="fw-800 text-primary mb-0">AED {{ number_format($totalAddonsRevenue) }}</h3>
-            <span class="text-muted small" style="font-size: 0.75rem;">Incremental upsell revenue</span>
-        </div>
-    </div>
-</div>
 
-<div class="card card-modern border-0 shadow-sm rounded-4 overflow-hidden bg-white">
-    <div class="card-body p-4">
-        <div class="table-responsive">
-            <table class="table align-middle mb-0 table-hover datatable" id="addonsTable">
-                <thead class="table-light small text-uppercase fw-bold text-muted">
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Add-ons Booked</span>
+                <span class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <i class="bi bi-cart-check-fill text-sm"></i>
+                </span>
+            </div>
+            <div class="text-2xl font-black text-emerald-600">{{ number_format($totalAddonsBooked) }} <span class="text-xs font-semibold text-slate-400">Units</span></div>
+            <span class="text-[11px] text-slate-400 mt-1 block">Across all customer reservations</span>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Add-on Revenue Earned</span>
+                <span class="w-8 h-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+                    <i class="bi bi-cash-stack text-sm"></i>
+                </span>
+            </div>
+            <div class="text-2xl font-black text-primary">AED {{ number_format($totalAddonsRevenue) }}</div>
+            <span class="text-[11px] text-slate-400 mt-1 block">Incremental upsell revenue</span>
+        </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden p-5">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm text-slate-700 datatable" id="addonsTable">
+                <thead class="bg-slate-50/80 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
                     <tr>
-                        <th class="ps-3">Addon Identity</th>
-                        <th>Default Price</th>
-                        <th>Tour Adoption</th>
-                        <th>Times Booked</th>
-                        <th>Revenue Earned</th>
-                        <th>Status</th>
-                        <th>Priority</th>
-                        <th class="text-end pe-3 no-sort">Actions</th>
+                        <th class="py-3 px-4">Addon Identity</th>
+                        <th class="py-3 px-4">Default Price</th>
+                        <th class="py-3 px-4">Tour Adoption</th>
+                        <th class="py-3 px-4">Times Booked</th>
+                        <th class="py-3 px-4">Revenue Earned</th>
+                        <th class="py-3 px-4">Status</th>
+                        <th class="py-3 px-4">Priority</th>
+                        <th class="py-3 px-4 text-right no-sort pe-4">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-slate-100 bg-white">
                     @forelse($addons as $addon)
-                    <tr>
-                        <td class="ps-3">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="bg-primary-subtle text-primary d-flex align-items-center justify-content-center rounded-circle border border-primary-subtle" style="width: 42px; height: 42px; font-size: 1.1rem; flex-shrink: 0;">
-                                    <i class="bi bi-{{ $addon->icon ?: 'plus-lg' }}"></i>
+                    <tr class="hover:bg-slate-50/60 transition-colors">
+                        <td class="py-3 px-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 border border-primary/20">
+                                    <i class="bi bi-{{ $addon->icon ?: 'plus-lg' }} text-base"></i>
                                 </div>
                                 <div>
-                                    <div class="fw-bold text-dark fs-6">{{ $addon->name }}</div>
-                                    <div class="text-muted small text-truncate" style="max-width: 280px;">{{ $addon->description }}</div>
+                                    <div class="text-xs font-bold text-slate-900">{{ $addon->name }}</div>
+                                    <div class="text-[11px] text-slate-400 truncate max-w-xs">{{ $addon->description }}</div>
                                 </div>
                             </div>
                         </td>
-                        <td class="fw-800 text-dark">AED {{ number_format($addon->default_price, 2) }}</td>
-                        <td>
-                            <span class="badge bg-light text-dark border rounded-pill px-3 py-1 fw-bold">
-                                <i class="bi bi-link-45deg me-1"></i>{{ $addon->tours_count ?? $addon->tours->count() }} Tours
+                        <td class="py-3 px-4 font-bold text-slate-900">AED {{ number_format($addon->default_price, 2) }}</td>
+                        <td class="py-3 px-4">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                                <i class="bi bi-link-45deg"></i> {{ $addon->tours_count ?? $addon->tours->count() }} Tours
                             </span>
                         </td>
-                        <td>
-                            <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1 fw-bold">
+                        <td class="py-3 px-4">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                 {{ number_format($addon->times_booked ?? 0) }} Sold ({{ $addon->attachment_rate ?? 0 }}%)
                             </span>
                         </td>
-                        <td class="fw-800 text-primary">
+                        <td class="py-3 px-4 font-black text-primary">
                             AED {{ number_format($addon->total_revenue ?? 0) }}
                         </td>
-                        <td>
+                        <td class="py-3 px-4">
                             @if($addon->status === 'active')
-                                <span class="badge bg-success text-capitalize px-3 py-1 rounded-pill">Active</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 capitalize">Active</span>
                             @else
-                                <span class="badge bg-secondary text-capitalize px-3 py-1 rounded-pill">Inactive</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 capitalize">Inactive</span>
                             @endif
                         </td>
-                        <td class="fw-bold text-muted">
+                        <td class="py-3 px-4 font-bold text-slate-500">
                             {{ $addon->priority }}
                         </td>
-                        <td class="text-end pe-3">
-                            <div class="d-flex justify-content-end gap-2">
-                                <button type="button" class="btn btn-sm btn-outline-primary rounded-circle d-flex align-items-center justify-content-center edit-addon-btn" 
-                                    style="width: 34px; height: 34px;"
+                        <td class="py-3 px-4 text-right pe-4">
+                            <div class="inline-flex items-center justify-end gap-1.5">
+                                <button type="button" class="w-8 h-8 rounded-xl border border-slate-200 hover:border-primary hover:text-primary flex items-center justify-center text-slate-600 bg-white transition shadow-2xs edit-addon-btn cursor-pointer" 
                                     title="Edit Addon"
                                     data-id="{{ $addon->id }}"
                                     data-name="{{ $addon->name }}"
@@ -115,15 +118,14 @@
                                     data-status="{{ $addon->status }}"
                                     data-priority="{{ $addon->priority }}"
                                     data-action="{{ route('admin.addons.update', $addon->id) }}">
-                                    <i class="bi bi-pencil-fill"></i>
+                                    <i class="bi bi-pencil-fill text-xs"></i>
                                 </button>
-                                <form action="{{ route('admin.addons.destroy', $addon->id) }}" method="POST" class="d-inline delete-form" data-confirm="Are you sure you want to delete this addon? It will be detached from all linked tours.">
+                                <form action="{{ route('admin.addons.destroy', $addon->id) }}" method="POST" class="inline delete-form" data-confirm="Are you sure you want to delete this addon? It will be detached from all linked tours.">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" 
-                                        style="width: 34px; height: 34px;" 
+                                    <button type="submit" class="w-8 h-8 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 flex items-center justify-center bg-white transition shadow-2xs" 
                                         title="Delete Addon">
-                                        <i class="bi bi-trash3-fill"></i>
+                                        <i class="bi bi-trash3-fill text-xs"></i>
                                     </button>
                                 </form>
                             </div>
@@ -131,7 +133,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="text-center py-4 text-muted">No addons found in catalog.</td>
+                        <td colspan="8" class="text-center py-10 text-slate-400">No addons found in catalog.</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -140,118 +142,124 @@
     </div>
 </div>
 
-<!-- Modal: Add New Addon -->
-<div class="modal fade" id="addAddonModal" tabindex="-1" aria-labelledby="addAddonModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow">
-            <form action="{{ route('admin.addons.store') }}" method="POST">
+<!-- Modal: Add New Addon (Alpine.js) -->
+<div x-data="{ open: false }" @open-add-addon.window="open = true" x-show="open" x-cloak class="relative z-50">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" @click="open = false"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20 flex items-center justify-center">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full p-6 space-y-4" @click.stop>
+            <form action="{{ route('admin.addons.store') }}" method="POST" class="space-y-4">
                 @csrf
-                <div class="modal-header border-bottom p-4">
-                    <h5 class="modal-title fw-800 text-dark" id="addAddonModalLabel"><i class="bi bi-plus-circle text-primary me-2"></i>Add New Tour Addon</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <h3 class="text-base font-black text-slate-900 flex items-center gap-2">
+                        <i class="bi bi-plus-circle text-primary"></i> Add New Tour Addon
+                    </h3>
+                    <button type="button" @click="open = false" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="bi bi-x-lg"></i></button>
                 </div>
-                <div class="modal-body p-4">
-                    <div class="mb-3">
-                        <label for="addonName" class="form-label small fw-bold text-dark">Addon Name <span class="text-danger">*</span></label>
-                        <input type="text" name="name" id="addonName" class="form-control rounded-3" placeholder="e.g. Quad Biking (30 Mins)" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="addonSlug" class="form-label small fw-bold text-dark">Slug (Optional - auto-generated if empty)</label>
-                        <input type="text" name="slug" id="addonSlug" class="form-control rounded-3" placeholder="e.g. quad-biking-30-mins">
-                    </div>
-                    <div class="row g-3 mb-3">
-                        <div class="col-6">
-                            <label for="addonPrice" class="form-label small fw-bold text-dark">Default Price (AED) <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light text-dark fw-bold">AED</span>
-                                <input type="number" step="0.01" min="0" name="default_price" id="addonPrice" class="form-control" placeholder="150.00" required>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <label for="addonIcon" class="form-label small fw-bold text-dark">Bootstrap Icon Class</label>
-                            <input type="text" name="icon" id="addonIcon" class="form-control rounded-3" placeholder="e.g. plus-lg, bicycle, star-fill" value="plus-lg">
+
+                <div>
+                    <label for="addonName" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Addon Name *</label>
+                    <input type="text" name="name" id="addonName" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary" placeholder="e.g. Quad Biking (30 Mins)" required>
+                </div>
+                <div>
+                    <label for="addonSlug" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Slug (Optional - auto-generated if empty)</label>
+                    <input type="text" name="slug" id="addonSlug" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary" placeholder="e.g. quad-biking-30-mins">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="addonPrice" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Default Price (AED) *</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-xs font-bold text-slate-400">AED</span>
+                            <input type="number" step="0.01" min="0" name="default_price" id="addonPrice" class="w-full rounded-xl border border-slate-200 pl-11 pr-3 py-2 text-xs text-slate-800 outline-hidden focus:border-primary" placeholder="150.00" required>
                         </div>
                     </div>
-                    <div class="row g-3 mb-3">
-                        <div class="col-6">
-                            <label for="addonStatus" class="form-label small fw-bold text-dark">Status</label>
-                            <select name="status" id="addonStatus" class="form-select rounded-3">
-                                <option value="active" selected>Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
-                        <div class="col-6">
-                            <label for="addonPriority" class="form-label small fw-bold text-dark">Priority Order</label>
-                            <input type="number" name="priority" id="addonPriority" class="form-control rounded-3" value="1" required>
-                        </div>
-                    </div>
-                    <div class="mb-0">
-                        <label for="addonDesc" class="form-label small fw-bold text-dark">Description</label>
-                        <textarea name="description" id="addonDesc" rows="3" class="form-control rounded-3" placeholder="Short description of this add-on upgrade..."></textarea>
+                    <div>
+                        <label for="addonIcon" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Icon Class</label>
+                        <input type="text" name="icon" id="addonIcon" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden focus:border-primary" placeholder="e.g. plus-lg, bicycle" value="plus-lg">
                     </div>
                 </div>
-                <div class="modal-footer border-top p-3 px-4">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Save Addon</button>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="addonStatus" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Status</label>
+                        <select name="status" id="addonStatus" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden bg-white">
+                            <option value="active" selected>Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="addonPriority" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Priority Order</label>
+                        <input type="number" name="priority" id="addonPriority" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden focus:border-primary" value="1" required>
+                    </div>
+                </div>
+                <div>
+                    <label for="addonDesc" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Description</label>
+                    <textarea name="description" id="addonDesc" rows="3" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden focus:border-primary" placeholder="Short description of this add-on upgrade..."></textarea>
+                </div>
+                
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button type="button" @click="open = false" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold shadow-xs transition">Save Addon</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- Modal: Edit Addon -->
-<div class="modal fade" id="editAddonModal" tabindex="-1" aria-labelledby="editAddonModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow">
-            <form id="editAddonForm" method="POST">
+<!-- Modal: Edit Addon (Alpine.js) -->
+<div x-data="{ open: false }" @open-edit-addon.window="open = true" x-show="open" x-cloak class="relative z-50">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" @click="open = false"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20 flex items-center justify-center">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full p-6 space-y-4" @click.stop>
+            <form id="editAddonForm" method="POST" class="space-y-4">
                 @csrf
-                <div class="modal-header border-bottom p-4">
-                    <h5 class="modal-title fw-800 text-dark" id="editAddonModalLabel"><i class="bi bi-pencil-square text-primary me-2"></i>Edit Tour Addon</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <h3 class="text-base font-black text-slate-900 flex items-center gap-2">
+                        <i class="bi bi-pencil-square text-primary"></i> Edit Tour Addon
+                    </h3>
+                    <button type="button" @click="open = false" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="bi bi-x-lg"></i></button>
                 </div>
-                <div class="modal-body p-4">
-                    <div class="mb-3">
-                        <label for="editAddonName" class="form-label small fw-bold text-dark">Addon Name <span class="text-danger">*</span></label>
-                        <input type="text" name="name" id="editAddonName" class="form-control rounded-3" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editAddonSlug" class="form-label small fw-bold text-dark">Slug <span class="text-danger">*</span></label>
-                        <input type="text" name="slug" id="editAddonSlug" class="form-control rounded-3" required>
-                    </div>
-                    <div class="row g-3 mb-3">
-                        <div class="col-6">
-                            <label for="editAddonPrice" class="form-label small fw-bold text-dark">Default Price (AED) <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light text-dark fw-bold">AED</span>
-                                <input type="number" step="0.01" min="0" name="default_price" id="editAddonPrice" class="form-control" required>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <label for="editAddonIcon" class="form-label small fw-bold text-dark">Bootstrap Icon Class</label>
-                            <input type="text" name="icon" id="editAddonIcon" class="form-control rounded-3">
+
+                <div>
+                    <label for="editAddonName" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Addon Name *</label>
+                    <input type="text" name="name" id="editAddonName" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary" required>
+                </div>
+                <div>
+                    <label for="editAddonSlug" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Slug *</label>
+                    <input type="text" name="slug" id="editAddonSlug" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary" required>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="editAddonPrice" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Default Price (AED) *</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-xs font-bold text-slate-400">AED</span>
+                            <input type="number" step="0.01" min="0" name="default_price" id="editAddonPrice" class="w-full rounded-xl border border-slate-200 pl-11 pr-3 py-2 text-xs text-slate-800 outline-hidden focus:border-primary" required>
                         </div>
                     </div>
-                    <div class="row g-3 mb-3">
-                        <div class="col-6">
-                            <label for="editAddonStatus" class="form-label small fw-bold text-dark">Status</label>
-                            <select name="status" id="editAddonStatus" class="form-select rounded-3">
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
-                        <div class="col-6">
-                            <label for="editAddonPriority" class="form-label small fw-bold text-dark">Priority Order</label>
-                            <input type="number" name="priority" id="editAddonPriority" class="form-control rounded-3" required>
-                        </div>
-                    </div>
-                    <div class="mb-0">
-                        <label for="editAddonDesc" class="form-label small fw-bold text-dark">Description</label>
-                        <textarea name="description" id="editAddonDesc" rows="3" class="form-control rounded-3"></textarea>
+                    <div>
+                        <label for="editAddonIcon" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Icon Class</label>
+                        <input type="text" name="icon" id="editAddonIcon" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden focus:border-primary">
                     </div>
                 </div>
-                <div class="modal-footer border-top p-3 px-4">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Update Addon</button>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="editAddonStatus" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Status</label>
+                        <select name="status" id="editAddonStatus" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden bg-white">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="editAddonPriority" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Priority Order</label>
+                        <input type="number" name="priority" id="editAddonPriority" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden focus:border-primary" required>
+                    </div>
+                </div>
+                <div>
+                    <label for="editAddonDesc" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Description</label>
+                    <textarea name="description" id="editAddonDesc" rows="3" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden focus:border-primary"></textarea>
+                </div>
+                
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button type="button" @click="open = false" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold shadow-xs transition">Update Addon</button>
                 </div>
             </form>
         </div>
@@ -272,8 +280,7 @@ $(document).ready(function() {
         $('#editAddonDesc').val(btn.data('description'));
         $('#editAddonForm').attr('action', btn.data('action'));
         
-        const modal = new bootstrap.Modal(document.getElementById('editAddonModal'));
-        modal.show();
+        window.dispatchEvent(new CustomEvent('open-edit-addon'));
     });
 });
 </script>

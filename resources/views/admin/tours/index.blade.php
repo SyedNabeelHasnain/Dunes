@@ -3,68 +3,76 @@
 @section('page_title', 'Tours Inventory')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-    <div>
-        <h2 class="h4 fw-800 text-dark mb-1">Tours & Experiences Inventory</h2>
-        <p class="text-muted small mb-0">Manage desert safari packages, activity durations, best-seller highlights, and live visibility.</p>
+<div class="space-y-6">
+    <!-- Top Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Tours & Experiences Inventory</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Manage desert safari packages, activity durations, best-seller highlights, and live visibility.</p>
+        </div>
+        <a href="{{ route('admin.tours.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-xs shadow-xs transition-all">
+            <i class="bi bi-plus-lg"></i> Add New Tour
+        </a>
     </div>
-    <a href="{{ route('admin.tours.create') }}" class="btn btn-primary rounded-pill px-4 fw-800 shadow-sm"><i class="bi bi-plus-lg me-2"></i> Add New Tour</a>
-</div>
 
-<div class="card card-modern border-0 shadow-sm rounded-4 overflow-hidden bg-white p-3">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table align-middle mb-0 table-hover datatable" id="toursTable">
-                <thead class="table-light small text-uppercase fw-bold text-muted">
+    <!-- Tours Table Card -->
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden p-5">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm text-slate-700 datatable" id="toursTable">
+                <thead class="bg-slate-50/80 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
                     <tr>
-                        <th class="ps-4">Tour Name & Slug</th>
-                        <th>Category</th>
-                        <th>Duration</th>
-                        <th class="text-center">Status (Click to toggle)</th>
-                        <th class="pe-4 text-end no-sort">Actions</th>
+                        <th class="py-3 px-4">Tour Name & Slug</th>
+                        <th class="py-3 px-4">Category</th>
+                        <th class="py-3 px-4">Duration</th>
+                        <th class="py-3 px-4 text-center">Status (Click to toggle)</th>
+                        <th class="py-3 px-4 text-right no-sort pe-4">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-slate-100 bg-white">
                     @forelse($tours as $t)
-                    <tr>
-                        <td class="ps-4">
-                            <div class="fw-bold text-dark fs-6">{{ $t->name }}</div>
-                            <div class="text-muted small font-monospace">/{{ $t->slug }}</div>
+                    <tr class="hover:bg-slate-50/60 transition-colors">
+                        <td class="py-3 px-4">
+                            <div class="text-xs font-bold text-slate-900">{{ $t->name }}</div>
+                            <div class="text-[11px] text-slate-400 font-mono mt-0.5">/{{ $t->slug }}</div>
                         </td>
-                        <td>
-                            <span class="badge bg-light text-dark border fw-bold small text-uppercase">
+                        <td class="py-3 px-4">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200 uppercase">
                                 {{ $t->category ? str_replace('-', ' ', $t->category->name) : 'General' }}
                             </span>
                         </td>
-                        <td>
-                            <div class="small fw-medium text-dark"><i class="bi bi-clock me-1 text-muted"></i>{{ $t->duration ?: 'Flexible' }}</div>
+                        <td class="py-3 px-4">
+                            <div class="text-xs font-medium text-slate-700 flex items-center gap-1.5">
+                                <i class="bi bi-clock text-slate-400"></i> {{ $t->duration ?: 'Flexible' }}
+                            </div>
                         </td>
-                        <td class="text-center">
-                            <div class="d-flex gap-2 align-items-center justify-content-center">
+                        <td class="py-3 px-4 text-center">
+                            <div class="inline-flex items-center justify-center gap-2">
                                 @if($t->status === 'active')
-                                    <span class="badge bg-success text-capitalize px-3 py-1 rounded-pill badge-interactive ajax-toggle-status" data-url="{{ route('admin.tours.toggle-status', $t->id) }}" title="Click to toggle status">Active</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-pointer hover:scale-105 transition-transform ajax-toggle-status" data-url="{{ route('admin.tours.toggle-status', $t->id) }}" title="Click to toggle status">Active</span>
                                 @else
-                                    <span class="badge bg-secondary text-capitalize px-3 py-1 rounded-pill badge-interactive ajax-toggle-status" data-url="{{ route('admin.tours.toggle-status', $t->id) }}" title="Click to toggle status">Hidden</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 cursor-pointer hover:scale-105 transition-transform ajax-toggle-status" data-url="{{ route('admin.tours.toggle-status', $t->id) }}" title="Click to toggle status">Hidden</span>
                                 @endif
                                 
                                 @if($t->is_bestseller)
-                                    <span class="badge bg-warning text-white px-2 py-1 rounded-pill" title="Featured Best Seller"><i class="bi bi-fire me-1"></i>Best</span>
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-200" title="Featured Best Seller">
+                                        <i class="bi bi-fire text-amber-500"></i> Best
+                                    </span>
                                 @endif
                             </div>
                         </td>
-                        <td class="pe-4 text-end">
-                            <div class="d-flex justify-content-end gap-2">
-                                <a href="{{ route('admin.tours.edit', $t->id) }}" class="btn btn-sm btn-outline-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="Edit Tour Details">
-                                    <i class="bi bi-pencil-fill"></i>
+                        <td class="py-3 px-4 text-right pe-4">
+                            <div class="inline-flex items-center justify-end gap-1.5">
+                                <a href="{{ route('admin.tours.edit', $t->id) }}" class="w-8 h-8 rounded-xl border border-slate-200 hover:border-primary hover:text-primary flex items-center justify-center text-slate-600 bg-white transition shadow-2xs" title="Edit Tour Details">
+                                    <i class="bi bi-pencil-fill text-xs"></i>
                                 </a>
-                                <a href="{{ route('tours.show', $t->slug) }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-info rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="Live Preview">
-                                    <i class="bi bi-box-arrow-up-right"></i>
+                                <a href="{{ route('tours.show', $t->slug) }}" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl border border-sky-200 text-sky-600 hover:bg-sky-50 flex items-center justify-center bg-white transition shadow-2xs" title="Live Preview">
+                                    <i class="bi bi-box-arrow-up-right text-xs"></i>
                                 </a>
-                                <form action="{{ route('admin.tours.destroy', $t->id) }}" method="POST" class="d-inline delete-form" data-confirm="Are you sure you want to delete this tour and all its associations?">
+                                <form action="{{ route('admin.tours.destroy', $t->id) }}" method="POST" class="inline delete-form" data-confirm="Are you sure you want to delete this tour and all its associations?">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="Delete Tour">
-                                        <i class="bi bi-trash3-fill"></i>
+                                    <button type="submit" class="w-8 h-8 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 flex items-center justify-center bg-white transition shadow-2xs" title="Delete Tour">
+                                        <i class="bi bi-trash3-fill text-xs"></i>
                                     </button>
                                 </form>
                             </div>
@@ -72,7 +80,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="text-center py-5 text-muted">No tours found in inventory.</td>
+                        <td colspan="5" class="text-center py-10 text-slate-400">No tours found in inventory.</td>
                     </tr>
                     @endforelse
                 </tbody>

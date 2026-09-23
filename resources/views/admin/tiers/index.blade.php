@@ -3,71 +3,74 @@
 @section('page_title', 'Pricing Tiers')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-    <div>
-        <h2 class="h4 fw-800 text-dark mb-1">Pricing Tiers Hierarchy</h2>
-        <p class="text-muted small mb-0">Configure package tiers (Standard, VIP, Glamping, Premium) and their global feature descriptions.</p>
+<div class="space-y-6" x-data>
+    <!-- Top Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Pricing Tiers Hierarchy</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Configure package tiers (Standard, VIP, Glamping, Premium) and their global feature descriptions.</p>
+        </div>
+        <button type="button" @click="$dispatch('open-add-tier')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-xs shadow-xs transition-all cursor-pointer">
+            <i class="bi bi-plus-lg"></i> Add New Tier
+        </button>
     </div>
-    <button type="button" class="btn btn-primary rounded-pill px-4 fw-800 shadow-sm" data-bs-toggle="modal" data-bs-target="#addTierModal">
-        <i class="bi bi-plus-lg me-2"></i> Add New Tier
-    </button>
-</div>
 
-<div class="card card-modern border-0 shadow-sm rounded-4 overflow-hidden bg-white">
-    <div class="card-body p-4">
-        <div class="table-responsive">
-            <table class="table align-middle mb-0 table-hover datatable" id="tiersTable">
-                <thead class="table-light small text-uppercase fw-bold text-muted">
+    <!-- Tiers Table Card -->
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden p-5">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm text-slate-700 datatable" id="tiersTable">
+                <thead class="bg-slate-50/80 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
                     <tr>
-                        <th class="ps-3">Tier Identity</th>
-                        <th>Internal Name</th>
-                        <th>Slug</th>
-                        <th>Tour Adoption</th>
-                        <th>Status</th>
-                        <th>Priority</th>
-                        <th class="text-end pe-3 no-sort">Actions</th>
+                        <th class="py-3 px-4">Tier Identity</th>
+                        <th class="py-3 px-4">Internal Name</th>
+                        <th class="py-3 px-4">Slug</th>
+                        <th class="py-3 px-4">Tour Adoption</th>
+                        <th class="py-3 px-4">Status</th>
+                        <th class="py-3 px-4">Priority</th>
+                        <th class="py-3 px-4 text-right no-sort pe-4">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-slate-100 bg-white">
                     @forelse($tiers as $tier)
-                    <tr>
-                        <td class="ps-3">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="bg-primary-subtle text-primary d-flex align-items-center justify-content-center rounded-circle border border-primary-subtle" style="width: 42px; height: 42px; font-size: 1.1rem; flex-shrink: 0;">
-                                    <i class="bi bi-{{ $tier->icon ?: 'star-fill' }}"></i>
+                    <tr class="hover:bg-slate-50/60 transition-colors">
+                        <td class="py-3 px-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 border border-primary/20">
+                                    <i class="bi bi-{{ $tier->icon ?: 'star-fill' }} text-base"></i>
                                 </div>
                                 <div>
-                                    <div class="fw-bold text-dark fs-6 d-flex align-items-center gap-2">
+                                    <div class="text-xs font-bold text-slate-900 flex items-center gap-2">
                                         {{ $tier->display_name }}
                                         @if($tier->is_popular)
-                                            <span class="badge bg-warning text-white rounded-pill px-2 py-0 small" style="font-size:0.65rem;"><i class="bi bi-fire me-1"></i>Popular</span>
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-200">
+                                                <i class="bi bi-fire text-amber-500"></i> Popular
+                                            </span>
                                         @endif
                                     </div>
-                                    <div class="text-muted small text-truncate" style="max-width: 280px;">{{ $tier->description }}</div>
+                                    <div class="text-[11px] text-slate-400 truncate max-w-xs">{{ $tier->description }}</div>
                                 </div>
                             </div>
                         </td>
-                        <td class="fw-medium text-dark">{{ $tier->name }}</td>
-                        <td><code class="text-primary bg-light px-2 py-1 rounded">{{ $tier->slug }}</code></td>
-                        <td>
-                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1 fw-bold">
-                                <i class="bi bi-link-45deg me-1"></i>{{ $tier->tours_count ?? $tier->tours->count() }} Tours
+                        <td class="py-3 px-4 text-xs font-medium text-slate-800">{{ $tier->name }}</td>
+                        <td class="py-3 px-4"><code class="text-xs font-mono text-primary bg-primary/5 px-2 py-0.5 rounded-md border border-primary/15">{{ $tier->slug }}</code></td>
+                        <td class="py-3 px-4">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
+                                <i class="bi bi-link-45deg"></i> {{ $tier->tours_count ?? $tier->tours->count() }} Tours
                             </span>
                         </td>
-                        <td>
+                        <td class="py-3 px-4">
                             @if($tier->status === 'active')
-                                <span class="badge bg-success text-capitalize px-3 py-1 rounded-pill">Active</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 capitalize">Active</span>
                             @else
-                                <span class="badge bg-secondary text-capitalize px-3 py-1 rounded-pill">Inactive</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 capitalize">Inactive</span>
                             @endif
                         </td>
-                        <td class="fw-bold text-muted">
+                        <td class="py-3 px-4 font-bold text-slate-500">
                             {{ $tier->priority }}
                         </td>
-                        <td class="text-end pe-3">
-                            <div class="d-flex justify-content-end gap-2">
-                                <button type="button" class="btn btn-sm btn-outline-primary rounded-circle d-flex align-items-center justify-content-center edit-tier-btn" 
-                                    style="width: 34px; height: 34px;"
+                        <td class="py-3 px-4 text-right pe-4">
+                            <div class="inline-flex items-center justify-end gap-1.5">
+                                <button type="button" class="w-8 h-8 rounded-xl border border-slate-200 hover:border-primary hover:text-primary flex items-center justify-center text-slate-600 bg-white transition shadow-2xs edit-tier-btn cursor-pointer" 
                                     title="Edit Tier"
                                     data-id="{{ $tier->id }}"
                                     data-name="{{ $tier->name }}"
@@ -79,15 +82,14 @@
                                     data-status="{{ $tier->status }}"
                                     data-priority="{{ $tier->priority }}"
                                     data-action="{{ route('admin.tiers.update', $tier->id) }}">
-                                    <i class="bi bi-pencil-fill"></i>
+                                    <i class="bi bi-pencil-fill text-xs"></i>
                                 </button>
-                                <form action="{{ route('admin.tiers.destroy', $tier->id) }}" method="POST" class="d-inline delete-form" data-confirm="Are you sure you want to delete this pricing tier? It will be detached from all linked tours.">
+                                <form action="{{ route('admin.tiers.destroy', $tier->id) }}" method="POST" class="inline delete-form" data-confirm="Are you sure you want to delete this pricing tier? It will be detached from all linked tours.">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" 
-                                        style="width: 34px; height: 34px;" 
+                                    <button type="submit" class="w-8 h-8 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 flex items-center justify-center bg-white transition shadow-2xs" 
                                         title="Delete Tier">
-                                        <i class="bi bi-trash3-fill"></i>
+                                        <i class="bi bi-trash3-fill text-xs"></i>
                                     </button>
                                 </form>
                             </div>
@@ -95,7 +97,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="text-center py-4 text-muted">No pricing tiers defined.</td>
+                        <td colspan="7" class="text-center py-10 text-slate-400">No pricing tiers defined.</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -104,124 +106,138 @@
     </div>
 </div>
 
-<!-- Modal: Add New Tier -->
-<div class="modal fade" id="addTierModal" tabindex="-1" aria-labelledby="addTierModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow">
-            <form action="{{ route('admin.tiers.store') }}" method="POST">
+<!-- Modal: Add New Tier (Alpine.js) -->
+<div x-data="{ open: false }" @open-add-tier.window="open = true" x-show="open" x-cloak class="relative z-50">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" @click="open = false"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20 flex items-center justify-center">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full p-6 space-y-4" @click.stop>
+            <form action="{{ route('admin.tiers.store') }}" method="POST" class="space-y-4">
                 @csrf
-                <div class="modal-header border-bottom p-4">
-                    <h5 class="modal-title fw-800 text-dark" id="addTierModalLabel"><i class="bi bi-plus-circle text-primary me-2"></i>Add New Pricing Tier</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <h3 class="text-base font-black text-slate-900 flex items-center gap-2">
+                        <i class="bi bi-plus-circle text-primary"></i> Add New Pricing Tier
+                    </h3>
+                    <button type="button" @click="open = false" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="bi bi-x-lg"></i></button>
                 </div>
-                <div class="modal-body p-4">
-                    <div class="row g-3 mb-3">
-                        <div class="col-6">
-                            <label for="tierDisplayName" class="form-label small fw-bold text-dark">Display Name <span class="text-danger">*</span></label>
-                            <input type="text" name="display_name" id="tierDisplayName" class="form-control rounded-3" placeholder="e.g. VIP Royal Dining" required>
-                        </div>
-                        <div class="col-6">
-                            <label for="tierName" class="form-label small fw-bold text-dark">Internal Name <span class="text-danger">*</span></label>
-                            <input type="text" name="name" id="tierName" class="form-control rounded-3" placeholder="e.g. VIP Royal" required>
-                        </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="tierDisplayName" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Display Name *</label>
+                        <input type="text" name="display_name" id="tierDisplayName" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary" placeholder="e.g. VIP Royal Dining" required>
                     </div>
-                    <div class="row g-3 mb-3">
-                        <div class="col-6">
-                            <label for="tierSlug" class="form-label small fw-bold text-dark">Slug (Optional)</label>
-                            <input type="text" name="slug" id="tierSlug" class="form-control rounded-3" placeholder="e.g. vip-royal">
-                        </div>
-                        <div class="col-6">
-                            <label for="tierIcon" class="form-label small fw-bold text-dark">Icon Class</label>
-                            <input type="text" name="icon" id="tierIcon" class="form-control rounded-3" placeholder="e.g. star-fill, trophy, gem" value="star-fill">
-                        </div>
-                    </div>
-                    <div class="row g-3 mb-3">
-                        <div class="col-6">
-                            <label for="tierStatus" class="form-label small fw-bold text-dark">Status</label>
-                            <select name="status" id="tierStatus" class="form-select rounded-3">
-                                <option value="active" selected>Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
-                        <div class="col-6">
-                            <label for="tierPriority" class="form-label small fw-bold text-dark">Priority Order</label>
-                            <input type="number" name="priority" id="tierPriority" class="form-control rounded-3" value="1" required>
-                        </div>
-                    </div>
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" name="is_popular" value="1" id="addTierPopular">
-                        <label class="form-check-label small fw-bold text-dark" for="addTierPopular">Mark as "Popular / Best Value" Badge</label>
-                    </div>
-                    <div class="mb-0">
-                        <label for="tierDesc" class="form-label small fw-bold text-dark">Description</label>
-                        <textarea name="description" id="tierDesc" rows="3" class="form-control rounded-3" placeholder="Key inclusions or features of this tier..."></textarea>
+                    <div>
+                        <label for="tierName" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Internal Name *</label>
+                        <input type="text" name="name" id="tierName" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary" placeholder="e.g. VIP Royal" required>
                     </div>
                 </div>
-                <div class="modal-footer border-top p-3 px-4">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Save Tier</button>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="tierSlug" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Slug (Optional)</label>
+                        <input type="text" name="slug" id="tierSlug" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary" placeholder="e.g. vip-royal">
+                    </div>
+                    <div>
+                        <label for="tierIcon" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Icon Class</label>
+                        <input type="text" name="icon" id="tierIcon" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary" placeholder="e.g. star-fill, trophy" value="star-fill">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="tierStatus" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Status</label>
+                        <select name="status" id="tierStatus" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden bg-white">
+                            <option value="active" selected>Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="tierPriority" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Priority Order</label>
+                        <input type="number" name="priority" id="tierPriority" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden focus:border-primary" value="1" required>
+                    </div>
+                </div>
+
+                <label class="flex items-center gap-3 cursor-pointer p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                    <input class="rounded border-slate-300 text-primary focus:ring-primary w-4 h-4" type="checkbox" name="is_popular" value="1" id="addTierPopular">
+                    <span class="text-xs font-bold text-slate-800">Mark as "Popular / Best Value" Badge</span>
+                </label>
+
+                <div>
+                    <label for="tierDesc" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Description</label>
+                    <textarea name="description" id="tierDesc" rows="3" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden focus:border-primary" placeholder="Key inclusions or features of this tier..."></textarea>
+                </div>
+                
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button type="button" @click="open = false" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold shadow-xs transition">Save Tier</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- Modal: Edit Tier -->
-<div class="modal fade" id="editTierModal" tabindex="-1" aria-labelledby="editTierModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow">
-            <form id="editTierForm" method="POST">
+<!-- Modal: Edit Tier (Alpine.js) -->
+<div x-data="{ open: false }" @open-edit-tier.window="open = true" x-show="open" x-cloak class="relative z-50">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" @click="open = false"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20 flex items-center justify-center">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full p-6 space-y-4" @click.stop>
+            <form id="editTierForm" method="POST" class="space-y-4">
                 @csrf
-                <div class="modal-header border-bottom p-4">
-                    <h5 class="modal-title fw-800 text-dark" id="editTierModalLabel"><i class="bi bi-pencil-square text-primary me-2"></i>Edit Pricing Tier</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <h3 class="text-base font-black text-slate-900 flex items-center gap-2">
+                        <i class="bi bi-pencil-square text-primary"></i> Edit Pricing Tier
+                    </h3>
+                    <button type="button" @click="open = false" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="bi bi-x-lg"></i></button>
                 </div>
-                <div class="modal-body p-4">
-                    <div class="row g-3 mb-3">
-                        <div class="col-6">
-                            <label for="editTierDisplayName" class="form-label small fw-bold text-dark">Display Name <span class="text-danger">*</span></label>
-                            <input type="text" name="display_name" id="editTierDisplayName" class="form-control rounded-3" required>
-                        </div>
-                        <div class="col-6">
-                            <label for="editTierName" class="form-label small fw-bold text-dark">Internal Name <span class="text-danger">*</span></label>
-                            <input type="text" name="name" id="editTierName" class="form-control rounded-3" required>
-                        </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="editTierDisplayName" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Display Name *</label>
+                        <input type="text" name="display_name" id="editTierDisplayName" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary" required>
                     </div>
-                    <div class="row g-3 mb-3">
-                        <div class="col-6">
-                            <label for="editTierSlug" class="form-label small fw-bold text-dark">Slug <span class="text-danger">*</span></label>
-                            <input type="text" name="slug" id="editTierSlug" class="form-control rounded-3" required>
-                        </div>
-                        <div class="col-6">
-                            <label for="editTierIcon" class="form-label small fw-bold text-dark">Icon Class</label>
-                            <input type="text" name="icon" id="editTierIcon" class="form-control rounded-3">
-                        </div>
-                    </div>
-                    <div class="row g-3 mb-3">
-                        <div class="col-6">
-                            <label for="editTierStatus" class="form-label small fw-bold text-dark">Status</label>
-                            <select name="status" id="editTierStatus" class="form-select rounded-3">
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
-                        <div class="col-6">
-                            <label for="editTierPriority" class="form-label small fw-bold text-dark">Priority Order</label>
-                            <input type="number" name="priority" id="editTierPriority" class="form-control rounded-3" required>
-                        </div>
-                    </div>
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" name="is_popular" value="1" id="editTierPopular">
-                        <label class="form-check-label small fw-bold text-dark" for="editTierPopular">Mark as "Popular / Best Value" Badge</label>
-                    </div>
-                    <div class="mb-0">
-                        <label for="editTierDesc" class="form-label small fw-bold text-dark">Description</label>
-                        <textarea name="description" id="editTierDesc" rows="3" class="form-control rounded-3"></textarea>
+                    <div>
+                        <label for="editTierName" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Internal Name *</label>
+                        <input type="text" name="name" id="editTierName" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary" required>
                     </div>
                 </div>
-                <div class="modal-footer border-top p-3 px-4">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Update Tier</button>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="editTierSlug" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Slug *</label>
+                        <input type="text" name="slug" id="editTierSlug" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary" required>
+                    </div>
+                    <div>
+                        <label for="editTierIcon" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Icon Class</label>
+                        <input type="text" name="icon" id="editTierIcon" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="editTierStatus" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Status</label>
+                        <select name="status" id="editTierStatus" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden bg-white">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="editTierPriority" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Priority Order</label>
+                        <input type="number" name="priority" id="editTierPriority" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden focus:border-primary" required>
+                    </div>
+                </div>
+
+                <label class="flex items-center gap-3 cursor-pointer p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                    <input class="rounded border-slate-300 text-primary focus:ring-primary w-4 h-4" type="checkbox" name="is_popular" value="1" id="editTierPopular">
+                    <span class="text-xs font-bold text-slate-800">Mark as "Popular / Best Value" Badge</span>
+                </label>
+
+                <div>
+                    <label for="editTierDesc" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Description</label>
+                    <textarea name="description" id="editTierDesc" rows="3" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden focus:border-primary"></textarea>
+                </div>
+                
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button type="button" @click="open = false" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold shadow-xs transition">Update Tier</button>
                 </div>
             </form>
         </div>
@@ -243,8 +259,7 @@ $(document).ready(function() {
         $('#editTierPopular').prop('checked', btn.data('popular') == '1');
         $('#editTierForm').attr('action', btn.data('action'));
         
-        const modal = new bootstrap.Modal(document.getElementById('editTierModal'));
-        modal.show();
+        window.dispatchEvent(new CustomEvent('open-edit-tier'));
     });
 });
 </script>
