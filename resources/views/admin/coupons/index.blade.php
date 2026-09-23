@@ -3,141 +3,147 @@
 @section('page_title', 'Coupons & Promo Codes')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-    <div>
-        <h2 class="h4 fw-800 text-dark mb-1">Coupons & Promo Codes Management</h2>
-        <p class="text-muted small mb-0">Create promotional codes, set discount limits, track customer redemptions, and drive tour conversions.</p>
+<div class="space-y-6">
+    <!-- Top Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Coupons & Promo Codes Management</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Create promotional codes, set discount limits, track customer redemptions, and drive tour conversions.</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <a href="{{ route('admin.coupons.export') }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold shadow-2xs transition-all">
+                <i class="bi bi-file-earmark-arrow-down text-emerald-600 text-sm"></i>
+                <span>Export CSV</span>
+            </a>
+            <a href="{{ route('admin.coupons.create') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-xs shadow-xs transition-all">
+                <i class="bi bi-plus-lg"></i>
+                <span>Create Promo Code</span>
+            </a>
+        </div>
     </div>
-    <div class="d-flex gap-2 align-items-center">
-        <a href="{{ route('admin.coupons.export') }}" class="btn btn-white shadow-sm border-0 rounded-pill px-3 py-2 fw-bold text-dark d-flex align-items-center gap-2">
-            <i class="bi bi-file-earmark-arrow-down text-success fs-5"></i>
-            <span>Export CSV</span>
+
+    <!-- Unified Section Navigation Tabs -->
+    <div class="flex items-center gap-2 border-b border-slate-200 pb-3">
+        <a href="{{ route('admin.coupons.index') }}" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-primary text-white shadow-xs">
+            <i class="bi bi-ticket-perforated"></i> All Promo Codes
         </a>
-        <a href="{{ route('admin.coupons.create') }}" class="btn btn-primary shadow-sm border-0 rounded-pill px-4 py-2 fw-800 text-white d-flex align-items-center gap-2">
-            <i class="bi bi-plus-lg"></i>
-            <span>Create Promo Code</span>
+        <a href="{{ route('admin.coupons.popup-settings') }}" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800 transition">
+            <i class="bi bi-megaphone text-amber-500"></i> Campaign Triggers & Banners (25% & Concierge)
         </a>
     </div>
-</div>
 
-<!-- Unified Section Navigation Tabs -->
-<div class="d-flex gap-2 mb-4 border-bottom pb-3">
-    <a href="{{ route('admin.coupons.index') }}" class="btn btn-primary rounded-pill px-3 py-1.5 fw-bold small shadow-sm">
-        <i class="bi bi-ticket-perforated me-1"></i> All Promo Codes
-    </a>
-    <a href="{{ route('admin.coupons.popup-settings') }}" class="btn btn-light rounded-pill px-3 py-1.5 fw-bold small border text-muted">
-        <i class="bi bi-megaphone me-1 text-warning"></i> Campaign Triggers & Banners (25% & Concierge)
-    </a>
-</div>
+    <!-- 4 Key Performance Metric Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Active Promos</span>
+                <span class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <i class="bi bi-ticket-perforated-fill text-sm"></i>
+                </span>
+            </div>
+            <div class="text-2xl font-black text-slate-900">{{ number_format($stats['total_active'] ?? 0) }}</div>
+            <span class="text-[11px] text-slate-400 mt-1 block">Live and redeemable codes</span>
+        </div>
 
-<!-- 4 Key Performance Metric Cards -->
-<div class="row g-3 g-lg-4 mb-4">
-    <div class="col-xl-3 col-sm-6">
-        <div class="card card-modern h-100 p-3 bg-white border-0 shadow-sm rounded-4">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-muted small fw-bold text-uppercase" style="font-size:0.75rem;">Active Promos</span>
-                <span class="badge bg-success-subtle text-success rounded-circle p-2"><i class="bi bi-ticket-perforated-fill fs-5"></i></span>
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Redemptions</span>
+                <span class="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                    <i class="bi bi-person-check-fill text-sm"></i>
+                </span>
             </div>
-            <h3 class="fw-800 text-dark mb-0">{{ number_format($stats['total_active'] ?? 0) }}</h3>
-            <span class="text-muted small" style="font-size: 0.75rem;">Live and redeemable codes</span>
+            <div class="text-2xl font-black text-primary">{{ number_format($stats['total_redemptions'] ?? 0) }}</div>
+            <span class="text-[11px] font-bold text-primary mt-1 flex items-center gap-1">
+                <i class="bi bi-graph-up-arrow"></i> Guest checkouts
+            </span>
         </div>
-    </div>
-    <div class="col-xl-3 col-sm-6">
-        <div class="card card-modern h-100 p-3 bg-white border-0 shadow-sm rounded-4">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-muted small fw-bold text-uppercase" style="font-size:0.75rem;">Total Redemptions</span>
-                <span class="badge bg-primary-subtle text-primary rounded-circle p-2"><i class="bi bi-person-check-fill fs-5"></i></span>
-            </div>
-            <h3 class="fw-800 text-primary mb-0">{{ number_format($stats['total_redemptions'] ?? 0) }}</h3>
-            <span class="text-primary small fw-bold" style="font-size: 0.75rem;"><i class="bi bi-graph-up-arrow me-1"></i>Guest checkouts</span>
-        </div>
-    </div>
-    <div class="col-xl-3 col-sm-6">
-        <div class="card card-modern h-100 p-3 bg-white border-0 shadow-sm rounded-4">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-muted small fw-bold text-uppercase" style="font-size:0.75rem;">Discounts Granted</span>
-                <span class="badge bg-warning-subtle text-warning rounded-circle p-2"><i class="bi bi-piggy-bank-fill fs-5"></i></span>
-            </div>
-            <h3 class="fw-800 text-dark mb-0">AED {{ number_format($stats['total_discount_given'] ?? 0) }}</h3>
-            <span class="text-muted small" style="font-size: 0.75rem;">Total guest savings</span>
-        </div>
-    </div>
-    <div class="col-xl-3 col-sm-6">
-        <div class="card card-modern h-100 p-3 bg-white border-0 shadow-sm rounded-4">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-muted small fw-bold text-uppercase" style="font-size:0.75rem;">Promo Revenue</span>
-                <span class="badge bg-info-subtle text-info rounded-circle p-2"><i class="bi bi-cash-stack fs-5"></i></span>
-            </div>
-            <h3 class="fw-800 text-success mb-0">AED {{ number_format($stats['total_promo_revenue'] ?? 0) }}</h3>
-            <span class="text-muted small" style="font-size: 0.75rem;">Bookings generated via promos</span>
-        </div>
-    </div>
-</div>
 
-<!-- Coupons Table Card -->
-<style>
-.table-responsive {
-    min-height: 260px;
-    padding-bottom: 70px;
-    overflow-y: visible !important;
-}
-.dropdown-menu {
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
-}
-</style>
-<div class="card card-modern bg-white border-0 shadow-sm rounded-4 mb-4">
-    <div class="card-body p-4">
-        
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Discounts Granted</span>
+                <span class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                    <i class="bi bi-piggy-bank-fill text-sm"></i>
+                </span>
+            </div>
+            <div class="text-2xl font-black text-slate-900">AED {{ number_format($stats['total_discount_given'] ?? 0) }}</div>
+            <span class="text-[11px] text-slate-400 mt-1 block">Total guest savings</span>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Promo Revenue</span>
+                <span class="w-8 h-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+                    <i class="bi bi-cash-stack text-sm"></i>
+                </span>
+            </div>
+            <div class="text-2xl font-black text-emerald-600">AED {{ number_format($stats['total_promo_revenue'] ?? 0) }}</div>
+            <span class="text-[11px] text-slate-400 mt-1 block">Bookings generated via promos</span>
+        </div>
+    </div>
+
+    <!-- Table Card & Filters -->
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5 space-y-5">
         <!-- Filter Controls -->
-        <form method="GET" action="{{ route('admin.coupons.index') }}" class="row g-3 align-items-end mb-4">
-            <div class="col-md-4">
-                <label class="form-label small fw-bold text-muted text-uppercase mb-1">Search Promo</label>
-                <div class="input-group rounded-pill overflow-hidden border">
-                    <span class="input-group-text bg-white border-0 ps-3"><i class="bi bi-search text-muted"></i></span>
-                    <input type="text" name="search" class="form-control border-0 shadow-none ps-0" placeholder="Code, title, description..." value="{{ $search }}">
+        <form method="GET" action="{{ route('admin.coupons.index') }}">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end">
+                <div class="lg:col-span-5 sm:col-span-2">
+                    <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Search Promo</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                            <i class="bi bi-search text-xs"></i>
+                        </div>
+                        <input type="text" name="search" class="w-full rounded-xl border border-slate-200 pl-9 pr-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" placeholder="Code, title, description..." value="{{ $search }}">
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <label class="form-label small fw-bold text-muted text-uppercase mb-1">Discount Type</label>
-                <select name="type" class="form-select rounded-pill border shadow-none" onchange="this.form.submit()">
-                    <option value="">All Types</option>
-                    <option value="percentage" {{ $type === 'percentage' ? 'selected' : '' }}>Percentage (% OFF)</option>
-                    <option value="fixed" {{ $type === 'fixed' ? 'selected' : '' }}>Flat Amount (AED)</option>
-                    <option value="per_person" {{ $type === 'per_person' ? 'selected' : '' }}>Per Person (AED)</option>
-                </select>
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <label class="form-label small fw-bold text-muted text-uppercase mb-1">Status</label>
-                <select name="status" class="form-select rounded-pill border shadow-none" onchange="this.form.submit()">
-                    <option value="">All Statuses</option>
-                    <option value="active" {{ $status === 'active' ? 'selected' : '' }}>Active</option>
-                    <option value="inactive" {{ $status === 'inactive' ? 'selected' : '' }}>Inactive</option>
-                </select>
-            </div>
-            <div class="col-md-2 d-flex gap-2">
-                <button type="submit" class="btn btn-dark rounded-pill px-3 py-2 w-100 fw-bold">Filter</button>
-                @if($search || $type || $status)
-                    <a href="{{ route('admin.coupons.index') }}" class="btn btn-light rounded-pill px-3 py-2 fw-bold" title="Reset Filters"><i class="bi bi-arrow-counterclockwise"></i></a>
-                @endif
+
+                <div class="lg:col-span-3">
+                    <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Discount Type</label>
+                    <select name="type" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden bg-white" onchange="this.form.submit()">
+                        <option value="">All Types</option>
+                        <option value="percentage" {{ $type === 'percentage' ? 'selected' : '' }}>Percentage (% OFF)</option>
+                        <option value="fixed" {{ $type === 'fixed' ? 'selected' : '' }}>Flat Amount (AED)</option>
+                        <option value="per_person" {{ $type === 'per_person' ? 'selected' : '' }}>Per Person (AED)</option>
+                    </select>
+                </div>
+
+                <div class="lg:col-span-2">
+                    <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Status</label>
+                    <select name="status" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden bg-white" onchange="this.form.submit()">
+                        <option value="">All Statuses</option>
+                        <option value="active" {{ $status === 'active' ? 'selected' : '' }}>Active</option>
+                        <option value="inactive" {{ $status === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                    </select>
+                </div>
+
+                <div class="lg:col-span-2 flex items-center gap-2">
+                    <button type="submit" class="flex-1 inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition shadow-xs">
+                        Filter
+                    </button>
+                    @if($search || $type || $status)
+                        <a href="{{ route('admin.coupons.index') }}" class="inline-flex items-center justify-center p-2.5 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 text-xs font-bold shadow-2xs transition" title="Reset Filters">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                        </a>
+                    @endif
+                </div>
             </div>
         </form>
 
         <!-- Table View -->
-        <div class="table-responsive">
-            <table class="table align-middle table-hover mb-0" id="couponsTable">
-                <thead class="bg-light text-muted small text-uppercase">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm text-slate-700" id="couponsTable">
+                <thead class="bg-slate-50/80 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
                     <tr>
-                        <th class="border-0 ps-3">Promo Code</th>
-                        <th class="border-0">Promotion Name</th>
-                        <th class="border-0">Discount</th>
-                        <th class="border-0">Rules & Scope</th>
-                        <th class="border-0 text-center">Redemptions</th>
-                        <th class="border-0 text-center">Validity Window</th>
-                        <th class="border-0 text-center">Status</th>
-                        <th class="border-0 text-end pe-3 no-sort">Actions</th>
+                        <th class="py-3 px-4">Promo Code</th>
+                        <th class="py-3 px-4">Promotion Name</th>
+                        <th class="py-3 px-4">Discount</th>
+                        <th class="py-3 px-4">Rules & Scope</th>
+                        <th class="py-3 px-4 text-center">Redemptions</th>
+                        <th class="py-3 px-4 text-center">Validity Window</th>
+                        <th class="py-3 px-4 text-center">Status</th>
+                        <th class="py-3 px-4 text-right no-sort pe-4">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-slate-100 bg-white">
                     @forelse($coupons as $coupon)
                     @php
                         $now = now();
@@ -146,161 +152,178 @@
                         $limitReached = $coupon->usage_limit !== null && $coupon->used_count >= $coupon->usage_limit;
                         $pctUsed = $coupon->usage_limit ? round(($coupon->used_count / $coupon->usage_limit) * 100) : 0;
                     @endphp
-                    <tr>
+                    <tr class="hover:bg-slate-50/60 transition-colors">
                         <!-- Code with 1-click copy -->
-                        <td class="ps-3">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="badge bg-dark text-white px-3 py-2 rounded-pill font-monospace fw-bold fs-6" style="letter-spacing: 1px;">
+                        <td class="py-3.5 px-4">
+                            <div class="flex items-center gap-1.5">
+                                <span class="px-2.5 py-1 rounded-lg bg-slate-900 text-white font-mono font-bold text-xs tracking-wider">
                                     {{ $coupon->code }}
                                 </span>
-                                <button type="button" class="btn btn-sm btn-light rounded-circle p-1 text-muted copy-code-btn" data-code="{{ $coupon->code }}" title="Copy Code">
-                                    <i class="bi bi-clipboard"></i>
+                                <button type="button" class="w-7 h-7 rounded-lg border border-slate-200 hover:border-slate-300 text-slate-500 flex items-center justify-center bg-white transition copy-code-btn cursor-pointer" data-code="{{ $coupon->code }}" title="Copy Code">
+                                    <i class="bi bi-clipboard text-xs"></i>
                                 </button>
                             </div>
-                            @if($coupon->is_featured)
-                                <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill mt-1" style="font-size: 0.7rem;"><i class="bi bi-star-fill me-1"></i>Featured</span>
-                            @endif
-                            @if($coupon->code === 'MATCH5')
-                                <span class="badge bg-secondary-subtle text-secondary rounded-pill mt-1" style="font-size: 0.68rem;"><i class="bi bi-compass me-1"></i>Concierge Managed</span>
-                            @elseif($coupon->code === 'DUNESWELCOME' || $coupon->code === 'FIRST25')
-                                <span class="badge bg-primary-subtle text-primary rounded-pill mt-1" style="font-size: 0.68rem;"><i class="bi bi-gift-fill me-1"></i>25% First-Time Offer</span>
-                            @endif
+                            <div class="flex flex-wrap gap-1 mt-1">
+                                @if($coupon->is_featured)
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-200">
+                                        <i class="bi bi-star-fill text-amber-500"></i> Featured
+                                    </span>
+                                @endif
+                                @if($coupon->code === 'MATCH5')
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                                        <i class="bi bi-compass"></i> Concierge
+                                    </span>
+                                @elseif($coupon->code === 'DUNESWELCOME' || $coupon->code === 'FIRST25')
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary border border-primary/20">
+                                        <i class="bi bi-gift-fill"></i> 25% Welcome
+                                    </span>
+                                @endif
+                            </div>
                         </td>
 
                         <!-- Name & Applicability -->
-                        <td>
-                            <div class="fw-bold text-dark">{{ $coupon->name }}</div>
-                            <div class="small text-muted">
+                        <td class="py-3.5 px-4">
+                            <div class="text-xs font-bold text-slate-900">{{ $coupon->name }}</div>
+                            <div class="flex flex-wrap gap-1 mt-1">
                                 @if($coupon->tour)
-                                    <span class="badge bg-info-subtle text-info rounded-pill"><i class="bi bi-compass me-1"></i>{{ Str::limit($coupon->tour->name, 25) }}</span>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
+                                        <i class="bi bi-compass me-1"></i>{{ Str::limit($coupon->tour->name, 25) }}
+                                    </span>
                                 @else
-                                    <span class="badge bg-light text-secondary border rounded-pill"><i class="bi bi-globe me-1"></i>Sitewide (All Tours)</span>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                                        <i class="bi bi-globe me-1"></i>Sitewide
+                                    </span>
                                 @endif
                                 @if($coupon->tier)
-                                    <span class="badge bg-primary-subtle text-primary rounded-pill">{{ $coupon->tier->display_name }}</span>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-primary/10 text-primary border border-primary/20">
+                                        {{ $coupon->tier->display_name }}
+                                    </span>
                                 @endif
                             </div>
                         </td>
 
                         <!-- Discount Value & Type -->
-                        <td>
+                        <td class="py-3.5 px-4">
                             @if($coupon->discount_type === 'percentage')
-                                <div class="fw-800 text-success fs-5">{{ (float)$coupon->discount_value }}% OFF</div>
+                                <div class="text-sm font-black text-emerald-600">{{ (float)$coupon->discount_value }}% OFF</div>
                                 @if($coupon->max_discount)
-                                    <small class="text-muted d-block" style="font-size:0.75rem;">Cap: AED {{ number_format($coupon->max_discount) }}</small>
+                                    <div class="text-[10px] text-slate-400 mt-0.5">Cap: AED {{ number_format($coupon->max_discount) }}</div>
                                 @endif
                             @elseif($coupon->discount_type === 'per_person')
-                                <div class="fw-800 text-primary fs-5">AED {{ number_format($coupon->discount_value) }} <span class="small fs-6 fw-normal text-muted">/ guest</span></div>
+                                <div class="text-sm font-black text-primary">AED {{ number_format($coupon->discount_value) }} <span class="text-[10px] text-slate-400 font-normal">/ guest</span></div>
                                 @if($coupon->max_discount)
-                                    <small class="text-muted d-block" style="font-size:0.75rem;">Cap: AED {{ number_format($coupon->max_discount) }}</small>
+                                    <div class="text-[10px] text-slate-400 mt-0.5">Cap: AED {{ number_format($coupon->max_discount) }}</div>
                                 @endif
                             @else
-                                <div class="fw-800 text-dark fs-5">AED {{ number_format($coupon->discount_value) }} <span class="small fs-6 fw-normal text-muted">Flat</span></div>
+                                <div class="text-sm font-black text-slate-900">AED {{ number_format($coupon->discount_value) }} <span class="text-[10px] text-slate-400 font-normal">Flat</span></div>
                             @endif
                         </td>
 
                         <!-- Rules -->
-                        <td>
-                            <div class="small">
+                        <td class="py-3.5 px-4 text-xs text-slate-600">
+                            <div class="space-y-0.5">
                                 @if($coupon->min_spend > 0)
-                                    <div class="text-muted"><i class="bi bi-cart me-1"></i>Min Spend: <strong>AED {{ number_format($coupon->min_spend) }}</strong></div>
+                                    <div class="flex items-center gap-1"><i class="bi bi-cart text-slate-400"></i> Min: <strong>AED {{ number_format($coupon->min_spend) }}</strong></div>
                                 @endif
                                 @if($coupon->min_guests > 1)
-                                    <div class="text-muted"><i class="bi bi-people me-1"></i>Min Guests: <strong>{{ $coupon->min_guests }}+</strong></div>
+                                    <div class="flex items-center gap-1"><i class="bi bi-people text-slate-400"></i> Min: <strong>{{ $coupon->min_guests }}+</strong> guests</div>
                                 @endif
                                 @if($coupon->first_time_only)
-                                    <div class="text-danger fw-bold"><i class="bi bi-person-plus me-1"></i>First-time guests only</div>
+                                    <div class="text-rose-600 font-bold flex items-center gap-1"><i class="bi bi-person-plus"></i> First-time only</div>
                                 @endif
                                 @if(!$coupon->min_spend && $coupon->min_guests <= 1 && !$coupon->first_time_only)
-                                    <span class="text-muted">No restrictions</span>
+                                    <span class="text-slate-400 italic">No restrictions</span>
                                 @endif
                             </div>
                         </td>
 
                         <!-- Usage Progress & Redemptions -->
-                        <td class="text-center">
-                            <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 fw-bold view-usages-btn" data-id="{{ $coupon->id }}" data-code="{{ $coupon->code }}">
-                                <i class="bi bi-eye me-1 text-primary"></i> {{ $coupon->used_count }} {{ $coupon->usage_limit ? "/ {$coupon->usage_limit}" : '' }}
+                        <td class="py-3.5 px-4 text-center">
+                            <button type="button" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 transition view-usages-btn cursor-pointer" data-id="{{ $coupon->id }}" data-code="{{ $coupon->code }}">
+                                <i class="bi bi-eye text-primary"></i> {{ $coupon->used_count }} {{ $coupon->usage_limit ? "/ {$coupon->usage_limit}" : '' }}
                             </button>
                             @if($coupon->usage_limit)
-                                <div class="progress mt-1 mx-auto" style="height: 4px; width: 80px;">
-                                    <div class="progress-bar {{ $limitReached ? 'bg-danger' : 'bg-primary' }}" style="width: {{ min(100, $pctUsed) }}%"></div>
+                                <div class="w-16 h-1.5 bg-slate-100 rounded-full mt-1.5 mx-auto overflow-hidden">
+                                    <div class="h-full rounded-full {{ $limitReached ? 'bg-rose-500' : 'bg-primary' }}" style="width: {{ min(100, $pctUsed) }}%"></div>
                                 </div>
                             @endif
                         </td>
 
                         <!-- Validity Window -->
-                        <td class="text-center">
+                        <td class="py-3.5 px-4 text-center">
                             @if($isExpired)
-                                <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-1"><i class="bi bi-clock-history me-1"></i>Expired</span>
-                                <small class="text-muted d-block mt-1" style="font-size:0.7rem;">{{ $coupon->valid_until->format('M j, Y') }}</small>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                    <i class="bi bi-clock-history me-1"></i> Expired
+                                </span>
+                                <div class="text-[10px] text-slate-400 mt-0.5">{{ $coupon->valid_until->format('M j, Y') }}</div>
                             @elseif($isScheduled)
-                                <span class="badge bg-info-subtle text-info rounded-pill px-3 py-1"><i class="bi bi-calendar-event me-1"></i>Starts {{ $coupon->valid_from->format('M j') }}</span>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200">
+                                    <i class="bi bi-calendar-event me-1"></i> Starts {{ $coupon->valid_from->format('M j') }}
+                                </span>
                             @elseif($coupon->valid_until)
-                                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1"><i class="bi bi-check-circle me-1"></i>Until {{ $coupon->valid_until->format('M j, Y') }}</span>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <i class="bi bi-check-circle me-1"></i> Until {{ $coupon->valid_until->format('M j') }}
+                                </span>
                             @else
-                                <span class="badge bg-light text-secondary border rounded-pill px-3 py-1">No Expiry</span>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200">No Expiry</span>
                             @endif
                         </td>
 
                         <!-- Status Switch -->
-                        <td class="text-center">
-                            <div class="form-check form-switch d-inline-block">
-                                <input class="form-check-input status-toggle-switch" type="checkbox" role="switch" data-id="{{ $coupon->id }}" {{ $coupon->status === 'active' && !$isExpired && !$limitReached ? 'checked' : '' }} {{ $isExpired || $limitReached ? 'disabled' : '' }}>
-                            </div>
+                        <td class="py-3.5 px-4 text-center">
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer status-toggle-switch" data-id="{{ $coupon->id }}" {{ $coupon->status === 'active' && !$isExpired && !$limitReached ? 'checked' : '' }} {{ $isExpired || $limitReached ? 'disabled' : '' }}>
+                                <div class="w-9 h-5 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500 peer-disabled:opacity-40"></div>
+                            </label>
                         </td>
 
                         <!-- Action Buttons -->
-                        <td class="text-end pe-3">
-                            <div class="d-flex align-items-center justify-content-end gap-1">
-                                <a href="{{ route('admin.coupons.edit', $coupon->id) }}" class="btn btn-sm btn-light border rounded-circle p-2 text-primary" title="Edit Promo" style="width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;">
-                                    <i class="bi bi-pencil-fill" style="font-size: 0.8rem;"></i>
+                        <td class="py-3.5 px-4 text-right pe-4">
+                            <div class="inline-flex items-center justify-end gap-1.5" x-data="{ menuOpen: false }">
+                                <a href="{{ route('admin.coupons.edit', $coupon->id) }}" class="w-8 h-8 rounded-xl border border-slate-200 hover:border-primary hover:text-primary flex items-center justify-center text-slate-600 bg-white transition shadow-2xs" title="Edit Promo">
+                                    <i class="bi bi-pencil-fill text-xs"></i>
                                 </a>
-                                <div class="dropdown d-inline-block">
-                                    <button class="btn btn-sm btn-light border-0 rounded-circle p-2 shadow-none" type="button" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false" title="More Actions" style="width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;">
-                                        <i class="bi bi-three-dots-vertical"></i>
+                                
+                                <div class="relative">
+                                    <button type="button" @click="menuOpen = !menuOpen" class="w-8 h-8 rounded-xl border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-600 bg-white transition shadow-2xs cursor-pointer" title="More Actions">
+                                        <i class="bi bi-three-dots-vertical text-xs"></i>
                                     </button>
-                                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4 p-2" style="z-index: 1065; min-width: 200px;">
-                                        <li>
-                                            <a class="dropdown-item rounded-3 py-2 fw-bold" href="{{ route('admin.coupons.edit', $coupon->id) }}">
-                                                <i class="bi bi-pencil me-2 text-primary"></i> Edit Promo
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <form action="{{ route('admin.coupons.duplicate', $coupon->id) }}" method="POST">
-                                                @csrf
-                                                <button type="submit" class="dropdown-item rounded-3 py-2 fw-bold">
-                                                    <i class="bi bi-copy me-2 text-info"></i> Duplicate Promo
-                                                </button>
-                                            </form>
-                                        </li>
-                                        <li>
-                                            <button type="button" class="dropdown-item rounded-3 py-2 fw-bold view-usages-btn" data-id="{{ $coupon->id }}" data-code="{{ $coupon->code }}">
-                                                <i class="bi bi-receipt me-2 text-success"></i> View Redemptions ({{ $coupon->used_count }})
+
+                                    <div x-show="menuOpen" @click.away="menuOpen = false" x-transition x-cloak class="absolute right-0 mt-1.5 w-48 bg-white rounded-2xl border border-slate-200 shadow-xl py-1.5 z-20 text-left">
+                                        <a href="{{ route('admin.coupons.edit', $coupon->id) }}" class="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-primary transition">
+                                            <i class="bi bi-pencil text-primary"></i> Edit Promo
+                                        </a>
+                                        <form action="{{ route('admin.coupons.duplicate', $coupon->id) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="w-full flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-sky-600 transition text-left cursor-pointer">
+                                                <i class="bi bi-copy text-sky-600"></i> Duplicate Promo
                                             </button>
-                                        </li>
-                                        <li><hr class="dropdown-divider my-1"></li>
-                                        <li>
-                                            <form action="{{ route('admin.coupons.destroy', $coupon->id) }}" method="POST" class="delete-coupon-form">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="button" class="dropdown-item rounded-3 py-2 fw-bold text-danger delete-coupon-btn" data-code="{{ $coupon->code }}">
-                                                    <i class="bi bi-trash me-2"></i> Archive Promo
-                                                </button>
-                                            </form>
-                                        </li>
-                                    </ul>
+                                        </form>
+                                        <button type="button" class="w-full flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-emerald-600 transition text-left view-usages-btn cursor-pointer" data-id="{{ $coupon->id }}" data-code="{{ $coupon->code }}">
+                                            <i class="bi bi-receipt text-emerald-600"></i> View Redemptions ({{ $coupon->used_count }})
+                                        </button>
+                                        <div class="my-1 border-t border-slate-100"></div>
+                                        <form action="{{ route('admin.coupons.destroy', $coupon->id) }}" method="POST" class="delete-coupon-form">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" class="w-full flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition text-left delete-coupon-btn cursor-pointer" data-code="{{ $coupon->code }}">
+                                                <i class="bi bi-trash"></i> Archive Promo
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="text-center py-5">
-                            <div class="text-muted opacity-50 mb-3"><i class="bi bi-ticket-perforated fs-1"></i></div>
-                            <h5 class="fw-bold text-dark">No Promo Codes Found</h5>
-                            <p class="text-muted small mb-3">Create high-converting coupons to boost bookings and reward returning travelers.</p>
-                            <a href="{{ route('admin.coupons.create') }}" class="btn btn-primary rounded-pill px-4 fw-bold">Create First Promo</a>
+                        <td colspan="8" class="text-center py-12">
+                            <div class="text-slate-300 mb-2"><i class="bi bi-ticket-perforated text-4xl"></i></div>
+                            <h3 class="text-base font-bold text-slate-900">No Promo Codes Found</h3>
+                            <p class="text-xs text-slate-400 mb-3">Create high-converting coupons to boost bookings and reward returning travelers.</p>
+                            <a href="{{ route('admin.coupons.create') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold shadow-xs transition">
+                                <i class="bi bi-plus-lg"></i> Create First Promo
+                            </a>
                         </td>
                     </tr>
                     @endforelse
@@ -310,21 +333,23 @@
     </div>
 </div>
 
-<!-- Redemptions Audit Modal -->
-<div class="modal fade" id="couponUsagesModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-            <div class="modal-header border-bottom bg-light py-3 px-4">
+<!-- Redemptions Audit Modal (Alpine.js) -->
+<div x-data="{ open: false }" @open-usages-modal.window="open = true" x-show="open" x-cloak class="relative z-50">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" @click="open = false"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20 flex items-center justify-center">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-2xl w-full p-6 space-y-4" @click.stop>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div>
-                    <h5 class="modal-title fw-800 text-dark mb-0" id="modalCouponTitle">Coupon Redemptions</h5>
-                    <small class="text-muted" id="modalCouponSubtitle">Customer usage audit trail</small>
+                    <h3 class="text-base font-black text-slate-900" id="modalCouponTitle">Coupon Redemptions</h3>
+                    <p class="text-xs text-slate-400" id="modalCouponSubtitle">Customer usage audit trail</p>
                 </div>
-                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"></button>
+                <button type="button" @click="open = false" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="bi bi-x-lg"></i></button>
             </div>
-            <div class="modal-body p-4" id="modalCouponBody">
-                <div class="text-center py-4">
-                    <div class="spinner-border text-primary" role="status"></div>
-                    <div class="mt-2 text-muted small fw-bold">Loading redemption logs...</div>
+            
+            <div id="modalCouponBody" class="max-h-96 overflow-y-auto">
+                <div class="text-center py-6">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent"></div>
+                    <div class="mt-2 text-xs text-slate-500 font-bold">Loading redemption logs...</div>
                 </div>
             </div>
         </div>
@@ -341,8 +366,8 @@ $(document).ready(function() {
         if (navigator.clipboard) {
             navigator.clipboard.writeText(code).then(() => {
                 const $icon = $(btn).find('i');
-                $icon.attr('class', 'bi bi-check-lg text-success');
-                setTimeout(() => { $icon.attr('class', 'bi bi-clipboard'); }, 1500);
+                $icon.attr('class', 'bi bi-check-lg text-emerald-600 text-xs');
+                setTimeout(() => { $icon.attr('class', 'bi bi-clipboard text-xs'); }, 1500);
             });
         }
     });
@@ -382,53 +407,51 @@ $(document).ready(function() {
         });
     });
 
-    // Usages Audit Modal (Delegated for DataTables)
-    const usagesModalElem = document.getElementById('couponUsagesModal');
-    const usagesModal = usagesModalElem ? new bootstrap.Modal(usagesModalElem) : null;
+    // Usages Audit Modal
     $(document).on('click', '.view-usages-btn', function() {
         const couponId = $(this).data('id');
         const code = $(this).data('code');
         document.getElementById('modalCouponTitle').innerText = `Redemptions for ${code}`;
         document.getElementById('modalCouponBody').innerHTML = `
-            <div class="text-center py-4">
-                <div class="spinner-border text-primary" role="status"></div>
-                <div class="mt-2 text-muted small fw-bold">Loading redemption logs...</div>
+            <div class="text-center py-6">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent"></div>
+                <div class="mt-2 text-xs text-slate-500 font-bold">Loading redemption logs...</div>
             </div>
         `;
-        if (usagesModal) usagesModal.show();
+        window.dispatchEvent(new CustomEvent('open-usages-modal'));
 
         fetch(`/admin/coupons/${couponId}/usages`)
             .then(res => res.json())
             .then(data => {
                 if (data.success && data.usages.length > 0) {
                     let html = `
-                        <div class="table-responsive">
-                            <table class="table align-middle table-sm small mb-0">
-                                <thead class="bg-light text-muted text-uppercase">
+                        <div class="overflow-x-auto rounded-xl border border-slate-200">
+                            <table class="w-full text-left text-xs text-slate-700">
+                                <thead class="bg-slate-50 text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
                                     <tr>
-                                        <th>Date</th>
-                                        <th>Customer</th>
-                                        <th>Booking Ref</th>
-                                        <th class="text-end">Discount</th>
-                                        <th class="text-end">Order Total</th>
+                                        <th class="py-2.5 px-3">Date</th>
+                                        <th class="py-2.5 px-3">Customer</th>
+                                        <th class="py-2.5 px-3">Booking Ref</th>
+                                        <th class="py-2.5 px-3 text-right">Discount</th>
+                                        <th class="py-2.5 px-3 text-right">Order Total</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody class="divide-y divide-slate-100 bg-white">
                     `;
                     data.usages.forEach(u => {
                         const dateStr = new Date(u.used_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
                         html += `
-                            <tr>
-                                <td>${dateStr}</td>
-                                <td>
-                                    <div class="fw-bold text-dark">${u.customer_name || 'Guest'}</div>
-                                    <div class="text-muted">${u.customer_email}</div>
+                            <tr class="hover:bg-slate-50/60">
+                                <td class="py-2.5 px-3 text-slate-500">${dateStr}</td>
+                                <td class="py-2.5 px-3">
+                                    <div class="font-bold text-slate-900">${u.customer_name || 'Guest'}</div>
+                                    <div class="text-[11px] text-slate-400">${u.customer_email}</div>
                                 </td>
-                                <td>
-                                    <span class="badge bg-light text-dark border">${u.booking_reference || ('#' + u.booking_id)}</span>
+                                <td class="py-2.5 px-3">
+                                    <span class="inline-flex px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-mono text-[11px] font-bold">${u.booking_reference || ('#' + u.booking_id)}</span>
                                 </td>
-                                <td class="text-end fw-bold text-success">-AED ${parseFloat(u.discount_amount).toFixed(2)}</td>
-                                <td class="text-end fw-800 text-dark">AED ${parseFloat(u.order_final_total).toFixed(2)}</td>
+                                <td class="py-2.5 px-3 text-right font-bold text-emerald-600">-AED ${parseFloat(u.discount_amount).toFixed(2)}</td>
+                                <td class="py-2.5 px-3 text-right font-black text-slate-900">AED ${parseFloat(u.order_final_total).toFixed(2)}</td>
                             </tr>
                         `;
                     });
@@ -436,16 +459,16 @@ $(document).ready(function() {
                     document.getElementById('modalCouponBody').innerHTML = html;
                 } else {
                     document.getElementById('modalCouponBody').innerHTML = `
-                        <div class="text-center py-4 text-muted">
-                            <i class="bi bi-inbox fs-2 mb-2 d-block opacity-50"></i>
-                            <div class="fw-bold">No redemptions yet</div>
-                            <small>This promo code has not been redeemed by any customers so far.</small>
+                        <div class="text-center py-6 text-slate-400">
+                            <i class="bi bi-inbox text-3xl mb-2 block opacity-50"></i>
+                            <div class="font-bold text-slate-700 text-xs">No redemptions yet</div>
+                            <small class="text-slate-400">This promo code has not been redeemed by any customers so far.</small>
                         </div>
                     `;
                 }
             })
             .catch(() => {
-                document.getElementById('modalCouponBody').innerHTML = `<div class="alert alert-danger mb-0">Failed to load redemptions log.</div>`;
+                document.getElementById('modalCouponBody').innerHTML = `<div class="p-4 rounded-xl bg-rose-50 text-rose-700 text-xs">Failed to load redemptions log.</div>`;
             });
     });
 
@@ -460,8 +483,8 @@ $(document).ready(function() {
             text: "This promo code will be deactivated and archived from the active promotions list.",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#dc3545',
-            cancelButtonColor: '#6c757d',
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#64748b',
             confirmButtonText: 'Yes, Archive It'
         }).then((result) => {
             if (result.isConfirmed && form) {
