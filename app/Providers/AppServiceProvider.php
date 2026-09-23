@@ -23,10 +23,10 @@ class AppServiceProvider extends ServiceProvider
     {
         \Illuminate\Support\Facades\View::composer('*', function ($view) {
             try {
-                $settings = app(\App\Services\SettingsService::class)->all()->all();
+                $settings = app(\App\Services\SettingsService::class)->all();
                 $view->with('settings', $settings);
             } catch (\Throwable $e) {
-                $view->with('settings', []);
+                $view->with('settings', collect());
             }
         });
     }

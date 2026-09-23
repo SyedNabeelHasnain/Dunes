@@ -28,12 +28,17 @@ class UserSeeder extends Seeder
 
         $users = json_decode(File::get($path), true);
         foreach ($users as $u) {
+            $pass = $u['password'];
+            if (str_starts_with($pass, '$2a$')) {
+                $pass = '$2y$' . substr($pass, 4);
+            }
+
             User::updateOrCreate(
                 ['id' => $u['id']],
                 [
                     'name' => ucfirst($u['username']),
                     'email' => $u['email'],
-                    'password' => $u['password'],
+                    'password' => $pass,
                 ]
             );
         }
