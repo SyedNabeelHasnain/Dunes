@@ -408,5 +408,36 @@ class GoogleSearchConsoleRemediationTest extends TestCase
         $this->assertStringContainsString('"@type": "FAQPage"', $content);
         $this->assertStringContainsString('Is \"dune bashing\" safe for kids?', $content);
     }
+
+    /**
+     * Test 19: RFC 9116 Security Policy (.well-known/security.txt)
+     */
+    public function test_security_txt_is_accessible_and_rfc_9116_compliant(): void
+    {
+        $path = public_path('.well-known/security.txt');
+        $this->assertFileExists($path);
+
+        $content = file_get_contents($path);
+        $this->assertStringContainsString('Contact: mailto:security@dunesdiscoverytourism.com', $content);
+        $this->assertStringContainsString('Canonical: https://dunesdiscoverytourism.com/.well-known/security.txt', $content);
+        $this->assertStringContainsString('Expires:', $content);
+    }
+
+    /**
+     * Test 20: AI LLM GEO Markdown Endpoints
+     */
+    public function test_llms_txt_and_full_txt_render_markdown(): void
+    {
+        $respIndex = $this->get('/llms.txt');
+        $respIndex->assertStatus(200);
+        $respIndex->assertHeader('Content-Type', 'text/markdown; charset=utf-8');
+        $this->assertStringContainsString('Dunes Discovery Tourism', $respIndex->getContent());
+
+        $respFull = $this->get('/llms-full.txt');
+        $respFull->assertStatus(200);
+        $respFull->assertHeader('Content-Type', 'text/markdown; charset=utf-8');
+        $this->assertStringContainsString('Dunes Discovery Tourism', $respFull->getContent());
+    }
 }
+
 

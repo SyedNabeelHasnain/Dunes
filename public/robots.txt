@@ -29,3 +29,8 @@ User-agent: Diffbot
 Allow: /
 
 Sitemap: https://dunesdiscoverytourism.com/sitemap_index.xml
+
+# Generative Engine Optimization (GEO) & LLM Documentation
+# https://llmstxt.org/
+# https://dunesdiscoverytourism.com/llms.txt
+# https://dunesdiscoverytourism.com/llms-full.txt
