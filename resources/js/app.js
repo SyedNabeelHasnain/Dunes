@@ -268,8 +268,8 @@ Alpine.store('modal', {
 
         const isOffcanvas = el.classList.contains('offcanvas');
 
-        // Render Backdrop
-        this.ensureBackdrop(isOffcanvas);
+        // Cleanup any orphaned backdrops from previous modals
+        this.removeBackdrops();
 
         // Display Element
         if (isOffcanvas) {
@@ -306,12 +306,12 @@ Alpine.store('modal', {
                             titleEl.textContent = tourSel.options[tourSel.selectedIndex].text;
                         }
                     }
-                    if (wrapper) wrapper.classList.add('d-none');
+                    if (wrapper) wrapper.classList.add('hidden', 'd-none');
                 } else {
                     window.App.preselectedTourId = null;
                     window.App.preselectedTierId = null;
                     if (titleEl) titleEl.textContent = 'Book Your Adventure';
-                    if (wrapper) wrapper.classList.remove('d-none');
+                    if (wrapper) wrapper.classList.remove('hidden', 'd-none');
                 }
                 window.App.updateStep?.();
             }
@@ -1588,7 +1588,7 @@ const App = {
         const validateStep1 = (shakeIfInvalid = false) => {
             if (!next) return false;
             const tourWrapper = document.getElementById('tourSelectWrapper');
-            const tourIsRequired = !tourWrapper || !tourWrapper.classList.contains('d-none');
+            const tourIsRequired = !tourWrapper || (!tourWrapper.classList.contains('hidden') && !tourWrapper.classList.contains('d-none'));
             const tour = tourSelect ? tourSelect.value : '';
             const tier = tierInput ? tierInput.value : '';
             const date = dateInput ? dateInput.value : '';
@@ -2232,10 +2232,10 @@ const App = {
         document.querySelectorAll('.step-content').forEach(s => {
             const stepNum = parseInt(s.dataset.step);
             if (stepNum === this.currentStep) {
-                s.classList.remove('d-none');
+                s.classList.remove('hidden', 'd-none');
                 s.classList.add('active');
             } else {
-                s.classList.add('d-none');
+                s.classList.add('hidden', 'd-none');
                 s.classList.remove('active');
             }
         });
@@ -2243,12 +2243,16 @@ const App = {
         const subtitle = document.getElementById('bookingModalSubtitle');
         if (subtitle) {
             subtitle.textContent = `Step ${this.currentStep} of 2`;
-            subtitle.classList.remove('d-none');
+            subtitle.classList.remove('hidden', 'd-none');
         }
 
         const backBtn = document.getElementById('headerBackBtn');
         if (backBtn) {
-            backBtn.classList.toggle('d-none', this.currentStep <= 1);
+            if (this.currentStep <= 1) {
+                backBtn.classList.add('hidden', 'd-none');
+            } else {
+                backBtn.classList.remove('hidden', 'd-none');
+            }
         }
 
         const nextBtn = document.getElementById('nextStep');
@@ -2256,20 +2260,20 @@ const App = {
 
         if (nextBtn) {
             if (this.currentStep < 2) {
-                nextBtn.classList.remove('d-none');
-                nextBtn.classList.add('d-inline-flex');
+                nextBtn.classList.remove('hidden', 'd-none');
+                nextBtn.classList.add('inline-flex', 'd-inline-flex');
             } else {
-                nextBtn.classList.add('d-none');
-                nextBtn.classList.remove('d-inline-flex');
+                nextBtn.classList.add('hidden', 'd-none');
+                nextBtn.classList.remove('inline-flex', 'd-inline-flex');
             }
         }
         if (submitBtn) {
             if (this.currentStep === 2) {
-                submitBtn.classList.remove('d-none');
-                submitBtn.classList.add('d-inline-flex');
+                submitBtn.classList.remove('hidden', 'd-none');
+                submitBtn.classList.add('inline-flex', 'd-inline-flex');
             } else {
-                submitBtn.classList.add('d-none');
-                submitBtn.classList.remove('d-inline-flex');
+                submitBtn.classList.add('hidden', 'd-none');
+                submitBtn.classList.remove('inline-flex', 'd-inline-flex');
             }
         }
 
@@ -2333,7 +2337,7 @@ const App = {
         const titleEl = document.getElementById('bookingModalTitle');
         const wrapper = document.getElementById('tourSelectWrapper');
         if (titleEl) titleEl.textContent = 'Book Your Adventure';
-        if (wrapper) wrapper.classList.remove('d-none');
+        if (wrapper) wrapper.classList.remove('hidden', 'd-none');
 
         this.updateStep();
 
@@ -3344,33 +3348,31 @@ Alpine.data('safariMatcherModal', (config = {}) => ({
     },
 
     book() {
+        const targetTourId = this.result ? this.result.id : null;
+        const promoCode = this.conciergePromoActive ? this.conciergePromoCode : '';
+
         if (window.Alpine && Alpine.store('modal')) {
-            Alpine.store('modal').close();
+            Alpine.store('modal').open('booking', {
+                tourId: targetTourId,
+                promo: promoCode
+            });
         }
-        setTimeout(() => {
-            if (window.Alpine && Alpine.store('modal')) {
-                Alpine.store('modal').open('booking', {
-                    tourId: this.result ? this.result.id : null,
-                    promo: this.conciergePromoActive ? this.conciergePromoCode : ''
-                });
+        if (targetTourId) {
+            const tourSelect = document.getElementById('bookingTour');
+            if (tourSelect) {
+                tourSelect.value = targetTourId;
+                tourSelect.dispatchEvent(new Event('change'));
             }
-            if (this.result && this.result.id) {
-                const tourSelect = document.getElementById('bookingTour');
-                if (tourSelect) {
-                    tourSelect.value = this.result.id;
-                    tourSelect.dispatchEvent(new Event('change'));
+        }
+        if (promoCode) {
+            const promoInput = document.getElementById('bookingPromoCode');
+            if (promoInput) {
+                promoInput.value = promoCode;
+                if (typeof window.validateCurrentPromo === 'function') {
+                    setTimeout(() => window.validateCurrentPromo(), 300);
                 }
             }
-            if (this.conciergePromoActive) {
-                const promoInput = document.getElementById('bookingPromoCode');
-                if (promoInput) {
-                    promoInput.value = this.conciergePromoCode;
-                    if (typeof window.validateCurrentPromo === 'function') {
-                        setTimeout(() => window.validateCurrentPromo(), 400);
-                    }
-                }
-            }
-        }, 300);
+        }
     },
 
     get waUrl() {

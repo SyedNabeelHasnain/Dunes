@@ -10,6 +10,9 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css">
 
+    <!-- Prevent Alpine.js modal/drawer flashing during page hydration -->
+    <style>[x-cloak] { display: none !important; }</style>
+
     <!-- Admin Tailwind CSS v4 & Alpine.js Enterprise Portal Engine via Vite -->
     @vite(['resources/css/admin.css', 'resources/js/admin.js'])
 

@@ -70,6 +70,18 @@
 }
 
 /* ==========================================================================
+   Alpine.js Cloak Directive & Dynamic Utilities
+   ========================================================================== */
+[x-cloak] {
+  display: none !important;
+}
+
+.d-none { display: none !important; }
+.d-block { display: block !important; }
+.d-inline-flex { display: inline-flex !important; }
+.d-flex { display: flex !important; }
+
+/* ==========================================================================
    CSS Custom Properties (Backward Compatibility & Global Root Variables)
    ========================================================================== */
 :root {
@@ -682,6 +694,222 @@
 
 .global-popover-overlay .review-popover-btn:hover {
   background: #e07424;
+}
+
+/* ==========================================================================
+   Pre-Footer CTA Section Dark Background
+   ========================================================================== */
+.cta-section {
+  background: radial-gradient(circle at 50% 0%, #1e293b 0%, #020617 100%) !important;
+  color: #ffffff !important;
+}
+
+/* ==========================================================================
+   Booking Modal Dynamic Components: Date Cards, Tier Cards, Addons
+   ========================================================================== */
+.date-card {
+  flex: 0 0 auto;
+  width: 72px;
+  padding: 8px 4px;
+  text-align: center;
+  border: 1px solid var(--color-slate-200, #e2e8f0);
+  border-radius: 1rem;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+.date-card:hover {
+  border-color: var(--color-primary, #F69044);
+  background: #fff4eb;
+  transform: translateY(-1px);
+}
+.date-card.selected {
+  border-color: var(--color-primary, #F69044) !important;
+  background: var(--color-primary, #F69044) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(246, 144, 68, 0.25);
+}
+.date-card .day {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #64748b;
+  margin-bottom: 2px;
+}
+.date-card.selected .day {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+.date-card .date {
+  font-size: 1.25rem;
+  font-weight: 900;
+  line-height: 1.1;
+  color: #0f172a;
+}
+.date-card.selected .date {
+  color: #ffffff !important;
+}
+.date-card .month {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+.date-card.selected .month {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Tier Selection Cards */
+.tier-card {
+  position: relative;
+  border: 2px solid var(--color-slate-200, #e2e8f0);
+  border-radius: 1rem;
+  padding: 1rem;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 0.75rem;
+}
+.tier-card:hover {
+  border-color: rgba(246, 144, 68, 0.5);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+.tier-card.selected {
+  border-color: var(--color-primary, #F69044) !important;
+  background: #fff9f5;
+  box-shadow: 0 0 0 1px var(--color-primary, #F69044), 0 4px 14px rgba(246, 144, 68, 0.15);
+}
+.tier-card.popular {
+  border-color: rgba(246, 144, 68, 0.4);
+}
+.tier-popular-badge {
+  position: absolute;
+  top: -10px;
+  right: 16px;
+  background: linear-gradient(135deg, #f97316, #eab308);
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  box-shadow: 0 2px 6px rgba(249, 115, 22, 0.3);
+}
+.tier-card-check {
+  display: none;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-primary, #F69044);
+  color: #ffffff;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+}
+.tier-card.selected .tier-card-check {
+  display: flex;
+}
+.tier-card-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.tier-card-info h4 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 0.25rem 0;
+}
+.tier-card.selected .tier-card-info h4 {
+  color: #c45e14;
+}
+.tier-card-info p {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.35;
+}
+.tier-card-price {
+  text-align: right;
+  flex-shrink: 0;
+}
+.tier-card-price .old {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  text-decoration: line-through;
+}
+.tier-card-price .current {
+  font-size: 1.15rem;
+  font-weight: 900;
+  font-family: monospace;
+  color: var(--color-primary, #F69044);
+}
+.tier-placeholder {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: #94a3b8;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 1rem;
+  font-size: 0.85rem;
+}
+
+/* Horizontal Addon Cards */
+.addon-card-horizontal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-slate-200, #e2e8f0);
+  border-radius: 1rem;
+  padding: 0.85rem;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 170px;
+  max-width: 200px;
+}
+.addon-card-horizontal:hover {
+  border-color: rgba(246, 144, 68, 0.4);
+}
+.addon-card-horizontal.selected {
+  border-color: var(--color-primary, #F69044);
+  background: #fff9f5;
+  box-shadow: 0 0 0 1px var(--color-primary, #F69044);
+}
+.addon-card-horizontal input[type="checkbox"] {
+  display: none;
+}
+.addon-check-abs {
+  display: none;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #10b981;
+  color: #ffffff;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+}
+.addon-card-horizontal.selected .addon-check-abs {
+  display: flex;
+}
+
+/* Form Validation Field Animations */
+.shake-field {
+  animation: fieldShakeStrong 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+.missing-field-highlight {
+  box-shadow: 0 0 0 2px #ef4444 !important;
+  border-color: #ef4444 !important;
 }
 
 /* ==========================================================================

@@ -3,6 +3,7 @@
      x-data="{}"
      x-show="$store.modal.active === 'search'"
      x-cloak
+     style="display: none;"
      class="fixed inset-0 z-50 overflow-y-auto"
      aria-labelledby="globalSearchModalLabel" 
      role="dialog" 

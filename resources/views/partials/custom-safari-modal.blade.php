@@ -5,6 +5,7 @@
      })"
      x-show="$store.modal.active === 'custom-safari'"
      x-cloak
+     style="display: none;"
      class="fixed inset-0 z-50 overflow-y-auto"
      role="dialog"
      aria-modal="true"

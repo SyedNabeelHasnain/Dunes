@@ -19,6 +19,7 @@
      x-data="{}" 
      x-show="$store.modal.active === 'booking'" 
      x-cloak
+     style="display: none;"
      class="fixed inset-0 z-50 overflow-y-auto" 
      role="dialog" 
      aria-modal="true"

@@ -83,8 +83,9 @@
 <!-- Floating Comparison Bar (Sticky Bottom Pill) -->
 <div id="compareFloatingBar" 
      x-data="{}" 
-     x-show="$store.compare.items && $store.compare.items.length > 0"
+     x-show="$store.compare.items && $store.compare.items.length > 0" 
      x-cloak
+     style="display: none;"
      class="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 mb-safe max-w-[94%] w-auto transition-all">
     <div class="flex items-center gap-3 px-4 py-2.5 rounded-full shadow-2xl bg-slate-950/95 border border-primary backdrop-blur-md">
         <div class="flex items-center -space-x-2" id="compareThumbBubbles"></div>
@@ -113,6 +114,7 @@
      x-data="{}"
      x-show="$store.modal.active === 'compare'"
      x-cloak
+     style="display: none;"
      class="fixed inset-0 z-50 overflow-hidden"
      role="dialog"
      aria-modal="true"

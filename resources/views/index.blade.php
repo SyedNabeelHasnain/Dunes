@@ -100,17 +100,17 @@ if (!function_exists('renderReviewCardMarkup')) {
 @endpush
 
 <!-- Modern Hero Section -->
-<section class="hero-modern relative min-h-[90vh] flex items-center justify-center overflow-hidden">
+<section class="hero-modern relative min-h-[92vh] flex items-center justify-center overflow-hidden pt-28 sm:pt-36 pb-16 sm:pb-20">
     <video class="hero-video absolute inset-0 w-full h-full object-cover -z-10" autoplay loop muted playsinline id="heroVideo" poster="{{ asset('images/desert-safari-poster.avif') }}" fetchpriority="high" aria-hidden="true">
         <track kind="captions" src="" label="English" srclang="en">
     </video>
-    <div class="absolute inset-0 w-full h-full bg-gradient-to-b from-black/50 via-black/60 to-black/85 -z-10"></div>
+    <div class="absolute inset-0 w-full h-full bg-gradient-to-b from-slate-950/75 via-slate-950/65 to-slate-950/90 -z-10"></div>
 
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center text-white py-16 -mt-8">
-        <div class="flex justify-center mb-3">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center text-white py-6 sm:py-10">
+        <div class="flex justify-center mb-2">
             @include('partials.sunset-weather-widget')
         </div>
-        <div class="inline-flex items-center gap-2 rounded-full glass px-4 py-1.5 mb-5 text-sm">
+        <div class="inline-flex items-center gap-2 rounded-full bg-slate-900/85 border border-white/20 text-white backdrop-blur-md px-4 py-1.5 mb-5 text-xs sm:text-sm shadow-lg">
             <i class="bi bi-star-fill text-amber-400"></i>
             <span class="font-semibold text-white">Rated 4.9/5 by 2,847+ Travelers</span>
         </div>
@@ -596,15 +596,19 @@ if (!function_exists('renderReviewCardMarkup')) {
 </section>
 
 <!-- CTA booking banner -->
-<section class="cta-section py-16 sm:py-20 relative text-white overflow-hidden">
+<section class="cta-section py-16 sm:py-24 relative bg-slate-950 text-white overflow-hidden border-t border-slate-800">
+    <!-- Ambient Desert Glow Effects -->
+    <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-b from-orange-500/20 via-amber-500/10 to-transparent blur-3xl pointer-events-none -z-0"></div>
+    <div class="absolute -bottom-24 right-10 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none -z-0"></div>
+
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-xs border border-white/20 text-amber-300 text-xs font-bold uppercase tracking-wider mb-4 shadow-xs">
-            <i class="bi bi-shield-check"></i> Licensed Dubai Tour Operator • DTCM Permit #1430583
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-amber-400/30 text-amber-300 text-xs font-bold uppercase tracking-wider mb-5 shadow-lg">
+            <i class="bi bi-patch-check-fill text-amber-400"></i> Licensed Dubai Tour Operator • DTCM Permit #1430583
         </div>
-        <h2 class="text-3xl sm:text-5xl font-extrabold mb-4 text-white tracking-tight">
-            Ready for Your <span class="text-gradient-primary">Dubai Desert Adventure</span>?
+        <h2 class="text-3xl sm:text-5xl font-black mb-4 text-white tracking-tight leading-tight">
+            Ready for Your <span class="bg-gradient-to-r from-orange-400 via-amber-300 to-yellow-400 bg-clip-text text-transparent">Dubai Desert Adventure</span>?
         </h2>
-        <p class="text-base sm:text-lg mb-8 text-white/80 max-w-2xl mx-auto leading-relaxed">
+        <p class="text-base sm:text-lg mb-8 text-slate-300 max-w-2xl mx-auto leading-relaxed font-normal">
             Reserve your safari experience in 60 seconds with instant booking confirmation. Free cancellation up to 24 hours prior with full refund.
         </p>
         <div class="flex flex-wrap justify-center gap-4">
@@ -613,12 +617,12 @@ if (!function_exists('renderReviewCardMarkup')) {
                 <span>Book Your Tour Now</span>
             </button>
             @php $waNumClean = preg_replace('/[^0-9]/', '', $settings['whatsapp_phone'] ?? '971502456056'); @endphp
-            <a href="https://wa.me/{{ $waNumClean }}?text={{ urlencode('Hi Dunes Discovery Tourism! I would like to inquire about booking a desert safari.') }}" target="_blank" rel="noopener" class="border border-white/30 hover:border-white bg-slate-900/40 hover:bg-slate-900/60 backdrop-blur-xs text-white text-base font-bold rounded-full px-6 py-3.5 inline-flex items-center gap-2 shadow-sm transition-all">
+            <a href="https://wa.me/{{ $waNumClean }}?text={{ urlencode('Hi Dunes Discovery Tourism! I would like to inquire about booking a desert safari.') }}" target="_blank" rel="noopener" class="border border-slate-700 hover:border-white bg-slate-900/80 hover:bg-slate-900 text-white text-base font-bold rounded-full px-6 py-3.5 inline-flex items-center gap-2 shadow-md transition-all">
                 <i class="bi bi-whatsapp text-emerald-400 text-lg"></i>
                 <span>WhatsApp Us</span>
             </a>
         </div>
-        <div class="flex flex-wrap justify-center items-center gap-4 sm:gap-8 mt-8 text-white/80 text-xs sm:text-sm font-medium">
+        <div class="flex flex-wrap justify-center items-center gap-4 sm:gap-8 mt-10 text-slate-300 text-xs sm:text-sm font-medium">
             <div class="inline-flex items-center gap-1.5"><i class="bi bi-check-circle-fill text-amber-400"></i> Free 24h Cancellation</div>
             <div class="inline-flex items-center gap-1.5"><i class="bi bi-check-circle-fill text-amber-400"></i> Luxury 4x4 Land Cruiser Transfers</div>
             <div class="inline-flex items-center gap-1.5"><i class="bi bi-check-circle-fill text-amber-400"></i> Pay Online or Cash on Pickup</div>
