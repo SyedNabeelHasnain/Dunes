@@ -435,7 +435,7 @@ if(window.fbq){
                     <div x-show="currentTab === 'highlights'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             @foreach($highlights as $h)
-                            <div class="flex gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-primary/30 transition-all">
+                            <div class="flex gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200 hover:border-primary/50 shadow-2xs transition-all">
                                 <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shrink-0 text-sm">
                                     <i class="bi bi-check2 font-bold"></i>
                                 </div>
@@ -619,18 +619,18 @@ if(window.fbq){
                             $tOldPrice = $tier->pivot?->old_price ?? 0;
                             $saveAmt = ($tOldPrice > 0 && $tOldPrice > $tPrice) ? ($tOldPrice - $tPrice) : 0;
                         @endphp
-                        <div class="bg-white rounded-2xl p-5 border-2 flex flex-col h-full relative transition-all duration-300 hover:shadow-lg {{ $tier->is_popular ? 'border-primary shadow-md' : 'border-slate-200' }}">
+                        <div class="bg-white rounded-2xl p-5 border-2 flex flex-col h-full relative transition-all duration-300 hover:shadow-lg {{ $tier->is_popular ? 'border-primary shadow-md' : 'border-slate-300 shadow-xs' }}">
                             @if($tier->is_popular)
                             <div class="absolute -top-3 left-1/2 -translate-x-1/2">
                                 <span class="bg-primary text-white rounded-full px-3 py-0.5 text-[10px] font-extrabold uppercase tracking-wider shadow-sm">Most Popular</span>
                             </div>
                             @endif
-                            <div class="text-center pt-2 pb-3 mb-3 border-b border-slate-100">
+                            <div class="text-center pt-2 pb-3 mb-3 border-b border-slate-200">
                                 <h3 class="text-base font-bold text-slate-900 mb-1.5">{{ $tier->name }}</h3>
                                 <div class="flex items-baseline justify-center gap-2">
                                     <span class="text-2xl font-black text-primary" data-aed="{{ $tPrice }}">AED {{ number_format($tPrice) }}</span>
                                     @if($saveAmt)
-                                    <span class="text-xs text-slate-400 line-through" data-aed="{{ $tOldPrice }}">AED {{ number_format($tOldPrice) }}</span>
+                                    <span class="text-xs text-slate-500 line-through" data-aed="{{ $tOldPrice }}">AED {{ number_format($tOldPrice) }}</span>
                                     @endif
                                 </div>
                                 <span class="text-[11px] text-slate-500 block mt-0.5">Per Person (All Inclusive)</span>
@@ -704,9 +704,9 @@ if(window.fbq){
             <div class="lg:col-span-4">
                 <div class="sticky top-24 space-y-6">
                     <!-- Booking Card -->
-                    <div class="bg-white rounded-2xl p-6 shadow-xl border border-slate-100">
-                        <div class="text-center pb-4 mb-4 border-b border-slate-100">
-                            <span class="text-[11px] uppercase font-bold text-slate-400 tracking-wider">Starting from</span>
+                    <div class="bg-white rounded-2xl p-6 shadow-xl border border-slate-200">
+                        <div class="text-center pb-4 mb-4 border-b border-slate-200">
+                            <span class="text-[11px] uppercase font-bold text-slate-500 tracking-wider">Starting from</span>
                             <div class="text-3xl font-black text-primary mt-0.5" data-aed="{{ $minPrice }}">AED {{ number_format($minPrice) }}</div>
                         </div>
 
@@ -795,7 +795,7 @@ if(window.fbq){
                         </div>
 
                         <!-- Trust Callouts -->
-                        <div class="grid grid-cols-3 gap-2 mt-5 pt-4 text-center border-t border-slate-100">
+                        <div class="grid grid-cols-3 gap-2 mt-5 pt-4 text-center border-t border-slate-200">
                             <div class="bg-slate-50 p-2 rounded-xl">
                                 <i class="bi bi-lightning-charge-fill text-primary block mb-0.5 text-sm"></i>
                                 <span class="block font-bold text-slate-800 text-[10px]">Instant Voucher</span>
@@ -811,14 +811,14 @@ if(window.fbq){
                         </div>
 
                         <div class="grid grid-cols-2 gap-3 mt-4 text-center">
-                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200">
                                 <i class="bi bi-clock-history text-primary block mb-1 text-lg"></i>
-                                <span class="text-slate-400 block text-[9px] uppercase font-bold tracking-wider">DURATION</span>
+                                <span class="text-slate-500 block text-[9px] uppercase font-bold tracking-wider">DURATION</span>
                                 <span class="font-bold text-xs text-slate-900">{{ $tour->duration }}</span>
                             </div>
-                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200">
                                 <i class="bi bi-translate text-primary block mb-1 text-lg"></i>
-                                <span class="text-slate-400 block text-[9px] uppercase font-bold tracking-wider">LANGUAGES</span>
+                                <span class="text-slate-500 block text-[9px] uppercase font-bold tracking-wider">LANGUAGES</span>
                                 <span class="font-bold text-xs text-slate-900 truncate block">{{ $tour->languages }}</span>
                             </div>
                         </div>
@@ -941,8 +941,8 @@ if(window.fbq){
 
                 @if(!empty($rev->photos) && is_array($rev->photos) && count($rev->photos) > 0)
                 <!-- Guest Uploaded Photo Strip -->
-                <div class="mb-4 pt-3 border-t border-slate-100">
-                    <span class="text-slate-400 block mb-2 text-[10px] uppercase font-bold tracking-wider">Guest Photos</span>
+                <div class="mb-4 pt-3 border-t border-slate-200">
+                    <span class="text-slate-500 block mb-2 text-[10px] uppercase font-bold tracking-wider">Guest Photos</span>
                     <div class="flex gap-2">
                         @foreach(array_slice($rev->photos, 0, 3) as $photo)
                         <a href="{{ asset($photo) }}" target="_blank" rel="noopener noreferrer" class="w-14 h-14 rounded-xl overflow-hidden shadow-xs border border-slate-200 shrink-0">
@@ -953,7 +953,7 @@ if(window.fbq){
                 </div>
                 @endif
 
-                <div class="flex justify-between items-center mt-auto pt-3 border-t border-slate-100 text-[11px] text-slate-400">
+                <div class="flex justify-between items-center mt-auto pt-3 border-t border-slate-200 text-[11px] text-slate-500">
                     <span><i class="bi bi-calendar3 me-1"></i>{{ $rev->published_date ? \Carbon\Carbon::parse($rev->published_date)->format('M d, Y') : 'Recent Guest' }}</span>
                     <span class="bg-slate-100 text-slate-600 rounded-full px-2.5 py-0.5 font-medium">{{ ucfirst($rev->source ?: 'direct_ugc') }}</span>
                 </div>
@@ -988,7 +988,7 @@ if(window.fbq){
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             @foreach($relatedTours as $t)
             @php $minPriceRel = $t->tiers->min('pivot.price') ?? 0; @endphp
-            <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col h-full group">
+            <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-200 hover:border-slate-300 flex flex-col h-full group">
                 <a href="{{ route('tours.show', $t->slug) }}" class="flex flex-col h-full text-inherit">
                     <div class="relative overflow-hidden aspect-[16/10]">
                         <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }}" loading="lazy">
@@ -1013,9 +1013,9 @@ if(window.fbq){
                             </div>
                         </div>
                         <h3 class="text-base font-bold text-slate-900 mb-3 line-clamp-2 group-hover:text-primary transition-colors leading-snug">{{ $t->name }}</h3>
-                        <div class="flex justify-between items-end mt-auto pt-3 border-t border-slate-100">
+                        <div class="flex justify-between items-end mt-auto pt-3 border-t border-slate-200">
                             <div>
-                                <span class="block text-[10px] uppercase font-bold text-slate-400">Starting from</span>
+                                <span class="block text-[10px] uppercase font-bold text-slate-500">Starting from</span>
                                 <span class="text-lg font-black text-primary" data-aed="{{ $minPriceRel }}">AED {{ number_format($minPriceRel) }}</span>
                             </div>
                             <div class="flex items-center gap-1.5">

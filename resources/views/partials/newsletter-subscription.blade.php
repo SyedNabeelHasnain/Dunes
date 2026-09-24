@@ -5,7 +5,7 @@
 @endphp
 
 @if($newsletterEnabled)
-<section class="py-12 sm:py-16 relative overflow-hidden bg-slate-950 border-t border-white/10" id="newsletterBlock">
+<section class="py-12 sm:py-16 relative overflow-hidden bg-slate-950 border-t border-white/20" id="newsletterBlock">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 relative z-10 text-center">
         <!-- Eyebrow Badge -->
         <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-amber-400 text-xs font-bold uppercase tracking-wider mb-4 shadow-sm">
@@ -17,12 +17,12 @@
         <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mb-3 tracking-tight">
             Receive Exclusive <span class="bg-gradient-to-r from-orange-400 to-amber-300 bg-clip-text text-transparent">Desert Safari Offers</span> & Guides
         </h2>
-        <p class="text-slate-400 text-sm sm:text-base max-w-2xl mx-auto mb-8 leading-relaxed">
+        <p class="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto mb-8 leading-relaxed">
             Subscribe to {{ $siteName }} for verified member discounts, seasonal adventure rates, and insider Dubai desert travel guides delivered directly to your inbox.
         </p>
 
         <!-- Subscription Card / Form -->
-        <div class="rounded-3xl p-4 sm:p-6 text-left bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl">
+        <div class="rounded-3xl p-4 sm:p-6 text-left bg-white/5 border border-white/20 backdrop-blur-xl shadow-2xl">
             <form id="publicNewsletterForm" class="space-y-3" novalidate>
                 @csrf
                 <!-- Anti-Bot Honeypot -->
@@ -55,7 +55,7 @@
                 <!-- Consent & Privacy Disclaimer -->
                 <div class="flex items-center gap-2 pt-2">
                     <input class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer" type="checkbox" name="consent" id="newsletterConsent" required checked>
-                    <label class="text-xs text-slate-400 cursor-pointer" for="newsletterConsent">
+                    <label class="text-xs text-slate-300 cursor-pointer" for="newsletterConsent">
                         I agree to receive personalized newsletters and travel offers. Unsubscribe easily at any time.
                     </label>
                 </div>
@@ -68,10 +68,10 @@
         </div>
 
         <!-- Trust Badges -->
-        <div class="flex flex-wrap items-center justify-center gap-6 mt-6 text-xs text-slate-400">
+        <div class="flex flex-wrap items-center justify-center gap-6 mt-6 text-xs text-slate-300">
             <div class="flex items-center gap-1.5"><i class="bi bi-shield-check text-emerald-400"></i><span>Zero spam guarantee</span></div>
             <div class="flex items-center gap-1.5"><i class="bi bi-lock-fill text-amber-400"></i><span>100% Privacy protected</span></div>
-            <div class="flex items-center gap-1.5"><i class="bi bi-check2-circle text-slate-400"></i><span>Instant one-click unsubscribe</span></div>
+            <div class="flex items-center gap-1.5"><i class="bi bi-check2-circle text-slate-300"></i><span>Instant one-click unsubscribe</span></div>
         </div>
     </div>
 </section>

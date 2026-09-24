@@ -384,13 +384,13 @@
                                  x-transition:leave="transition ease-in duration-100"
                                  x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                                  x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
-                                 class="absolute left-0 mt-2 w-72 rounded-2xl bg-white p-2 shadow-xl border border-slate-100 z-50 focus:outline-none"
+                                 class="absolute left-0 mt-2 w-72 rounded-2xl bg-white p-2 shadow-xl border border-slate-200 z-50 focus:outline-none"
                                  style="display: none;">
                                 <a class="flex items-center gap-2 px-3 py-2.5 rounded-xl font-bold text-primary hover:bg-orange-50 transition-colors text-xs" href="{{ route('tours.customizer') }}">
                                     <i class="bi bi-sliders text-amber-500"></i>
                                     <span>Build Your Own Safari</span>
                                 </a>
-                                <div class="my-1 border-t border-slate-100"></div>
+                                <div class="my-1 border-t border-slate-200"></div>
                                 <div class="max-h-72 overflow-y-auto space-y-0.5">
                                     @foreach($allTours as $t)
                                     <a class="block px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-primary transition-colors line-clamp-1" href="{{ route('tours.show', $t->slug) }}">
@@ -493,7 +493,7 @@
              style="display: none;"
              id="mainOffcanvas">
             <div>
-                <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+                <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-4">
                     <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery" width="140" height="90" class="h-9 w-auto object-contain">
                     <div class="flex items-center gap-2">
                         @include('partials.currency-switcher', ['switcherId' => 'mobileCurrencyDropdownBtn'])
@@ -505,7 +505,7 @@
 
                 <!-- Search Input in Drawer -->
                 <form action="{{ route('tours.search') }}" method="GET" class="relative mb-3">
-                    <i class="bi bi-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <i class="bi bi-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
                     <input type="text" name="q" class="w-full rounded-full pl-9 pr-4 py-2 bg-slate-100 text-slate-800 text-xs font-semibold border-0 focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="Search safaris, buggies, VIP..." required>
                 </form>
 
@@ -528,7 +528,7 @@
                             <i class="bi bi-sliders text-primary"></i>
                             <span>Build Your Own Safari</span>
                         </span>
-                        <i class="bi bi-chevron-right text-slate-400 text-[10px]"></i>
+                        <i class="bi bi-chevron-right text-slate-500 text-[10px]"></i>
                     </a>
                 </div>
 
@@ -544,7 +544,7 @@
             </div>
 
             <!-- Drawer Bottom Direct Contact -->
-            <div class="pt-4 border-t border-slate-100 space-y-2">
+            <div class="pt-4 border-t border-slate-200 space-y-2">
                 <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="w-full py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors">
                     <i class="bi bi-whatsapp"></i><span>Chat on WhatsApp</span>
                 </a>
@@ -589,7 +589,7 @@
                 <!-- Col 1: Brand & Bio -->
                 <div class="sm:col-span-2 lg:col-span-4">
                     <img src="{{ asset('images/logo-white.png') }}" alt="Dunes Discovery Tourism" width="160" height="46" class="h-9 w-auto object-contain mb-4">
-                    <p class="text-slate-400 text-xs sm:text-sm leading-relaxed max-w-sm mb-4">
+                    <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-sm mb-4">
                         Your trusted partner for unforgettable Dubai desert safari and city tour experiences since 2018. Licensed by Dubai Economy & Tourism (DET License: 1430583).
                     </p>
                     <div class="flex items-center gap-3">
@@ -609,11 +609,11 @@
                 <div class="col-span-1 lg:col-span-2">
                     <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 mb-3.5">Desert Safaris</h3>
                     <ul class="space-y-2 text-xs sm:text-sm">
-                        <li><a href="{{ route('tours.show', 'evening-desert-safari-dubai') }}" class="text-slate-400 hover:text-white transition-colors">Evening Safari</a></li>
-                        <li><a href="{{ route('tours.show', 'morning-desert-safari-dubai') }}" class="text-slate-400 hover:text-white transition-colors">Morning Safari</a></li>
-                        <li><a href="{{ route('tours.show', 'overnight-desert-safari-dubai') }}" class="text-slate-400 hover:text-white transition-colors">Overnight Safari</a></li>
-                        <li><a href="{{ route('tours.show', 'desert-safari-quad-biking-dubai') }}" class="text-slate-400 hover:text-white transition-colors">Quad Biking Safari</a></li>
-                        <li><a href="{{ route('tours.show', 'luxury-vip-desert-safari-dubai') }}" class="text-slate-400 hover:text-white transition-colors">VIP Desert Safari</a></li>
+                        <li><a href="{{ route('tours.show', 'evening-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">Evening Safari</a></li>
+                        <li><a href="{{ route('tours.show', 'morning-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">Morning Safari</a></li>
+                        <li><a href="{{ route('tours.show', 'overnight-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">Overnight Safari</a></li>
+                        <li><a href="{{ route('tours.show', 'desert-safari-quad-biking-dubai') }}" class="text-slate-300 hover:text-white transition-colors">Quad Biking Safari</a></li>
+                        <li><a href="{{ route('tours.show', 'luxury-vip-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">VIP Desert Safari</a></li>
                     </ul>
                 </div>
 
@@ -621,11 +621,11 @@
                 <div class="col-span-1 lg:col-span-2">
                     <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 mb-3.5">Tours & Cruises</h3>
                     <ul class="space-y-2 text-xs sm:text-sm">
-                        <li><a href="{{ route('tours.show', 'dubai-city-tour') }}" class="text-slate-400 hover:text-white transition-colors">Dubai City Tour</a></li>
-                        <li><a href="{{ route('tours.show', 'abu-dhabi-city-tour-from-dubai') }}" class="text-slate-400 hover:text-white transition-colors">Abu Dhabi Tour</a></li>
-                        <li><a href="{{ route('tours.show', 'dhow-cruise-catamaran-cruise-dinner-dubai') }}" class="text-slate-400 hover:text-white transition-colors">Marina Cruise</a></li>
-                        <li><a href="{{ route('rate-card') }}" class="text-slate-400 hover:text-white transition-colors inline-flex items-center gap-1.5"><i class="bi bi-file-earmark-pdf text-amber-400"></i>Rate Card (PDF)</a></li>
-                        <li><a href="{{ route('blog.index') }}" class="text-slate-400 hover:text-white transition-colors">Travel Guides & Blog</a></li>
+                        <li><a href="{{ route('tours.show', 'dubai-city-tour') }}" class="text-slate-300 hover:text-white transition-colors">Dubai City Tour</a></li>
+                        <li><a href="{{ route('tours.show', 'abu-dhabi-city-tour-from-dubai') }}" class="text-slate-300 hover:text-white transition-colors">Abu Dhabi Tour</a></li>
+                        <li><a href="{{ route('tours.show', 'dhow-cruise-catamaran-cruise-dinner-dubai') }}" class="text-slate-300 hover:text-white transition-colors">Marina Cruise</a></li>
+                        <li><a href="{{ route('rate-card') }}" class="text-slate-300 hover:text-white transition-colors inline-flex items-center gap-1.5"><i class="bi bi-file-earmark-pdf text-amber-400"></i>Rate Card (PDF)</a></li>
+                        <li><a href="{{ route('blog.index') }}" class="text-slate-300 hover:text-white transition-colors">Travel Guides & Blog</a></li>
                     </ul>
                 </div>
 
@@ -633,14 +633,14 @@
                 <div class="col-span-1 lg:col-span-2">
                     <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 mb-3.5">Trust & Policies</h3>
                     <ul class="space-y-2 text-xs sm:text-sm">
-                        <li><a href="{{ route('terms') }}" class="text-slate-400 hover:text-white transition-colors">Terms & Conditions</a></li>
-                        <li><a href="{{ route('privacy') }}" class="text-slate-400 hover:text-white transition-colors">Privacy Policy</a></li>
-                        <li><a href="{{ route('cookies') }}" class="text-slate-400 hover:text-white transition-colors">Cookie Policy</a></li>
-                        <li><a href="{{ route('cancellation') }}" class="text-slate-400 hover:text-white transition-colors">Cancellation & Refund</a></li>
-                        <li><a href="{{ route('payment.security') }}" class="text-slate-400 hover:text-white transition-colors">Payment Security</a></li>
-                        <li><a href="{{ route('safety.waiver') }}" class="text-slate-400 hover:text-white transition-colors">Safety & Waiver</a></li>
-                        <li><a href="{{ route('ai.editorial') }}" class="text-slate-400 hover:text-white transition-colors">AI & Editorial Policy</a></li>
-                        <li><a href="{{ route('responsible.tourism') }}" class="text-slate-400 hover:text-white transition-colors">Responsible Tourism</a></li>
+                        <li><a href="{{ route('terms') }}" class="text-slate-300 hover:text-white transition-colors">Terms & Conditions</a></li>
+                        <li><a href="{{ route('privacy') }}" class="text-slate-300 hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="{{ route('cookies') }}" class="text-slate-300 hover:text-white transition-colors">Cookie Policy</a></li>
+                        <li><a href="{{ route('cancellation') }}" class="text-slate-300 hover:text-white transition-colors">Cancellation & Refund</a></li>
+                        <li><a href="{{ route('payment.security') }}" class="text-slate-300 hover:text-white transition-colors">Payment Security</a></li>
+                        <li><a href="{{ route('safety.waiver') }}" class="text-slate-300 hover:text-white transition-colors">Safety & Waiver</a></li>
+                        <li><a href="{{ route('ai.editorial') }}" class="text-slate-300 hover:text-white transition-colors">AI & Editorial Policy</a></li>
+                        <li><a href="{{ route('responsible.tourism') }}" class="text-slate-300 hover:text-white transition-colors">Responsible Tourism</a></li>
                     </ul>
                 </div>
 
@@ -648,10 +648,10 @@
                 <div class="sm:col-span-2 lg:col-span-2">
                     <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 mb-3.5">Contact & Help</h3>
                     <ul class="space-y-2 text-xs sm:text-sm">
-                        <li><a href="tel:{{ preg_replace('/[^0-9+]/','',$phone) }}" class="text-slate-400 hover:text-white transition-colors inline-flex items-center gap-2"><i class="bi bi-telephone text-primary"></i><span>{{ $phone }}</span></a></li>
-                        <li><a href="mailto:{{ $email }}" class="text-slate-400 hover:text-white transition-colors inline-flex items-center gap-2"><i class="bi bi-envelope text-primary"></i><span class="break-all">{{ $email }}</span></a></li>
-                        <li><a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="text-slate-400 hover:text-white transition-colors inline-flex items-center gap-2"><i class="bi bi-whatsapp text-emerald-400"></i><span>24/7 WhatsApp</span></a></li>
-                        <li class="text-slate-400 inline-flex items-start gap-2"><i class="bi bi-geo-alt text-primary shrink-0 mt-0.5"></i><span>{{ $settings['site_address'] ?? 'Dubai, United Arab Emirates' }}</span></li>
+                        <li><a href="tel:{{ preg_replace('/[^0-9+]/','',$phone) }}" class="text-slate-300 hover:text-white transition-colors inline-flex items-center gap-2"><i class="bi bi-telephone text-primary"></i><span>{{ $phone }}</span></a></li>
+                        <li><a href="mailto:{{ $email }}" class="text-slate-300 hover:text-white transition-colors inline-flex items-center gap-2"><i class="bi bi-envelope text-primary"></i><span class="break-all">{{ $email }}</span></a></li>
+                        <li><a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="text-slate-300 hover:text-white transition-colors inline-flex items-center gap-2"><i class="bi bi-whatsapp text-emerald-400"></i><span>24/7 WhatsApp</span></a></li>
+                        <li class="text-slate-300 inline-flex items-start gap-2"><i class="bi bi-geo-alt text-primary shrink-0 mt-0.5"></i><span>{{ $settings['site_address'] ?? 'Dubai, United Arab Emirates' }}</span></li>
                     </ul>
 
                     <div class="flex flex-wrap gap-2 mt-4">
@@ -681,27 +681,27 @@
             <div class="border-t border-slate-800/80 pt-6">
                 <div class="flex flex-col lg:flex-row items-center justify-between gap-4 text-center lg:text-left">
                     <div>
-                        <p class="text-slate-500 text-xs mb-1">&copy; {{ date('Y') }} {{ $settings['site_name'] ?? 'Dunes Discovery Tourism L.L.C.' }} {{ $settings['site_copyright'] ?? 'All rights reserved.' }} Department of Economy & Tourism License #{{ $settings['company_license_number'] ?? '1430583' }}.</p>
-                        <div class="flex flex-wrap justify-center lg:justify-start items-center gap-x-2.5 gap-y-1 text-xs text-slate-400">
+                        <p class="text-slate-400 text-xs mb-1">&copy; {{ date('Y') }} {{ $settings['site_name'] ?? 'Dunes Discovery Tourism L.L.C.' }} {{ $settings['site_copyright'] ?? 'All rights reserved.' }} Department of Economy & Tourism License #{{ $settings['company_license_number'] ?? '1430583' }}.</p>
+                        <div class="flex flex-wrap justify-center lg:justify-start items-center gap-x-2.5 gap-y-1 text-xs text-slate-300">
                             <a href="{{ route('terms') }}" class="hover:text-white transition-colors">Terms & Conditions</a>
-                            <span class="text-slate-600">&bull;</span>
+                            <span class="text-slate-500">&bull;</span>
                             <a href="{{ route('privacy') }}" class="hover:text-white transition-colors">Privacy Policy</a>
-                            <span class="text-slate-600">&bull;</span>
+                            <span class="text-slate-500">&bull;</span>
                             <a href="{{ route('cookies') }}" class="hover:text-white transition-colors">Cookie Policy</a>
-                            <span class="text-slate-600">&bull;</span>
+                            <span class="text-slate-500">&bull;</span>
                             <a href="{{ route('cancellation') }}" class="hover:text-white transition-colors">100% Refund Policy</a>
-                            <span class="text-slate-600">&bull;</span>
+                            <span class="text-slate-500">&bull;</span>
                             <a href="{{ route('payment.security') }}" class="hover:text-white transition-colors">Payment Security</a>
-                            <span class="text-slate-600">&bull;</span>
+                            <span class="text-slate-500">&bull;</span>
                             <a href="{{ route('safety.waiver') }}" class="hover:text-white transition-colors">Safety Waiver</a>
-                            <span class="text-slate-600">&bull;</span>
+                            <span class="text-slate-500">&bull;</span>
                             <a href="{{ route('ai.editorial') }}" class="hover:text-white transition-colors">AI Policy</a>
-                            <span class="text-slate-600">&bull;</span>
+                            <span class="text-slate-500">&bull;</span>
                             <a href="{{ route('responsible.tourism') }}" class="hover:text-white transition-colors">Sustainability</a>
                         </div>
                     </div>
                     <div class="inline-flex items-center gap-2 bg-slate-900 border border-slate-800 px-4 py-2 rounded-full flex-wrap justify-center">
-                        <span class="text-slate-400 text-xs inline-flex items-center gap-1"><i class="bi bi-shield-lock-fill text-emerald-400"></i>Secure Checkout:</span>
+                        <span class="text-slate-300 text-xs inline-flex items-center gap-1"><i class="bi bi-shield-lock-fill text-emerald-400"></i>Secure Checkout:</span>
                         <img src="{{ asset('images/visa-card.svg') }}" alt="Visa" width="32" height="20" class="h-4 w-auto object-contain">
                         <img src="{{ asset('images/mastercard.svg') }}" alt="Mastercard" width="28" height="20" class="h-4 w-auto object-contain">
                         <img src="{{ asset('images/americanexpress.svg') }}" alt="American Express" width="28" height="20" class="h-4 w-auto object-contain">

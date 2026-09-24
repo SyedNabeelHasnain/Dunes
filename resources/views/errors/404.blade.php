@@ -7,7 +7,7 @@
 
 @section('content')
 <div class="min-h-[85vh] flex items-center justify-center py-12 px-4" style="background: linear-gradient(135deg, #FFF9F5 0%, #FFF0E6 100%);">
-    <div class="max-w-md w-full bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl border border-orange-100 p-8 sm:p-10 text-center">
+    <div class="max-w-md w-full bg-white/95 backdrop-blur-xl rounded-3xl shadow-xl border border-slate-200 p-8 sm:p-10 text-center">
         <div class="mb-4 text-primary">
             <i class="bi bi-compass-fill text-6xl inline-block" style="filter: drop-shadow(0 10px 15px rgba(246, 144, 68, 0.25));"></i>
         </div>
@@ -24,7 +24,7 @@
                 <i class="bi bi-grid-fill"></i> Explore Desert Tours
             </a>
         </div>
-        <div class="mt-6 pt-4 border-t border-slate-100 text-slate-500 text-xs">
+        <div class="mt-6 pt-4 border-t border-slate-200 text-slate-500 text-xs">
             Need immediate assistance? <a href="https://wa.me/971502456056?text=Hi%20Dunes%20Team%2C%20I%20need%20help%20finding%20a%20tour" target="_blank" rel="noopener" class="text-primary font-bold hover:underline inline-flex items-center gap-1"><i class="bi bi-whatsapp"></i> Chat on WhatsApp</a>
         </div>
     </div>

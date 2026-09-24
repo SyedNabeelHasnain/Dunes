@@ -35,7 +35,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                     <img src="' . htmlspecialchars($avatar) . '" alt="' . htmlspecialchars($r->reviewer_name) . '" class="w-10 h-10 rounded-full object-cover shrink-0" referrerpolicy="no-referrer" loading="lazy" onerror="this.onerror=null;this.src=\'' . $fallbackAvatar . '\'">
                     <div class="min-w-0">
                         <div class="font-bold text-slate-900 text-sm truncate">' . htmlspecialchars($r->reviewer_name) . '</div>
-                        <div class="text-slate-400 text-xs">' . ($r->published_date ? $r->published_date->format('M Y') : '') . '</div>
+                        <div class="text-slate-500 text-xs">' . ($r->published_date ? $r->published_date->format('M Y') : '') . '</div>
                     </div>
                 </div>
                 <div class="flex gap-0.5 text-xs shrink-0">' . $stars . '</div>
@@ -43,9 +43,9 @@ if (!function_exists('renderReviewCardMarkup')) {
             ' . ($r->review_title ? '<h3 class="text-sm font-bold mb-1.5 text-slate-900 line-clamp-1">' . htmlspecialchars($r->review_title) . '</h3>' : '') . '
             <p class="text-slate-600 text-sm mb-2 flex-grow line-clamp-3 leading-relaxed">"' . htmlspecialchars($r->review_text) . '"</p>
             ' . $photosHtml . '
-            <div class="flex justify-between items-center mt-auto pt-3 border-t border-slate-100">
+            <div class="flex justify-between items-center mt-auto pt-3 border-t border-slate-200">
                 ' . $sourceBadge . '
-                <a href="' . htmlspecialchars($url) . '" ' . ($isUgc ? '' : 'target="_blank" rel="noopener"') . ' class="text-xs font-semibold text-slate-700 hover:text-primary border border-slate-300 hover:border-primary rounded-full px-3 py-1 transition-colors">' . ($isUgc ? 'Review' : 'View') . '</a>
+                <a href="' . htmlspecialchars($url) . '" ' . ($isUgc ? '' : 'target="_blank" rel="noopener"') . ' class="text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-primary hover:text-white border border-slate-300 hover:border-primary rounded-full px-3 py-1 transition-colors shadow-2xs">' . ($isUgc ? 'Review' : 'View') . '</a>
             </div>
         </div>';
     }
@@ -202,32 +202,32 @@ if (!function_exists('renderReviewCardMarkup')) {
             <div class="p-2">
                 <i class="bi bi-trophy text-primary text-2xl mb-1.5 block"></i>
                 <div class="text-xl font-bold text-white mb-0.5">#1</div>
-                <div class="text-slate-400 text-xs">Desert Safari</div>
+                <div class="text-slate-300 text-xs">Desert Safari</div>
             </div>
             <div class="p-2">
                 <i class="bi bi-shield-check text-primary text-2xl mb-1.5 block"></i>
                 <div class="text-xl font-bold text-white mb-0.5">100%</div>
-                <div class="text-slate-400 text-xs">Secure Pay</div>
+                <div class="text-slate-300 text-xs">Secure Pay</div>
             </div>
             <div class="p-2">
                 <i class="bi bi-clock-history text-primary text-2xl mb-1.5 block"></i>
                 <div class="text-xl font-bold text-white mb-0.5">Fast</div>
-                <div class="text-slate-400 text-xs">Booking</div>
+                <div class="text-slate-300 text-xs">Booking</div>
             </div>
             <div class="p-2">
                 <i class="bi bi-truck text-primary text-2xl mb-1.5 block"></i>
                 <div class="text-xl font-bold text-white mb-0.5">25+</div>
-                <div class="text-slate-400 text-xs">Vehicles</div>
+                <div class="text-slate-300 text-xs">Vehicles</div>
             </div>
             <div class="p-2">
                 <i class="bi bi-geo-alt text-primary text-2xl mb-1.5 block"></i>
                 <div class="text-xl font-bold text-white mb-0.5">Local</div>
-                <div class="text-slate-400 text-xs">Expert Guides</div>
+                <div class="text-slate-300 text-xs">Expert Guides</div>
             </div>
             <div class="p-2">
                 <i class="bi bi-star text-primary text-2xl mb-1.5 block"></i>
                 <div class="text-xl font-bold text-white mb-0.5">Best</div>
-                <div class="text-slate-400 text-xs">Price Promise</div>
+                <div class="text-slate-300 text-xs">Price Promise</div>
             </div>
         </div>
     </div>
@@ -246,7 +246,7 @@ if (!function_exists('renderReviewCardMarkup')) {
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="group bg-slate-50 hover:bg-white rounded-2xl p-6 border border-slate-100 hover:border-primary/30 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col h-full hover:-translate-y-1">
+            <div class="group bg-slate-50 hover:bg-white rounded-2xl p-6 border border-slate-200 hover:border-primary/50 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col h-full hover:-translate-y-1">
                 <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 text-2xl group-hover:scale-110 transition-transform">
                     <i class="bi bi-sunset-fill"></i>
                 </div>
@@ -258,7 +258,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                 </a>
             </div>
 
-            <div class="group bg-slate-50 hover:bg-white rounded-2xl p-6 border border-slate-100 hover:border-primary/30 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col h-full hover:-translate-y-1">
+            <div class="group bg-slate-50 hover:bg-white rounded-2xl p-6 border border-slate-200 hover:border-primary/50 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col h-full hover:-translate-y-1">
                 <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 text-2xl group-hover:scale-110 transition-transform">
                     <i class="bi bi-speedometer2"></i>
                 </div>
@@ -270,7 +270,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                 </a>
             </div>
 
-            <div class="group bg-slate-50 hover:bg-white rounded-2xl p-6 border border-slate-100 hover:border-primary/30 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col h-full hover:-translate-y-1">
+            <div class="group bg-slate-50 hover:bg-white rounded-2xl p-6 border border-slate-200 hover:border-primary/50 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col h-full hover:-translate-y-1">
                 <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 text-2xl group-hover:scale-110 transition-transform">
                     <i class="bi bi-water"></i>
                 </div>
@@ -282,7 +282,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                 </a>
             </div>
 
-            <div class="group bg-slate-50 hover:bg-white rounded-2xl p-6 border border-slate-100 hover:border-primary/30 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col h-full hover:-translate-y-1">
+            <div class="group bg-slate-50 hover:bg-white rounded-2xl p-6 border border-slate-200 hover:border-primary/50 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col h-full hover:-translate-y-1">
                 <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 text-2xl group-hover:scale-110 transition-transform">
                     <i class="bi bi-building"></i>
                 </div>
@@ -340,7 +340,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                     $minPrice = $t->tiers->min('pivot.price') ?? 0;
                     $category = $categories->firstWhere('id', $t->category_id);
                 @endphp
-                <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col h-full group">
+                <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-200 hover:border-slate-300 flex flex-col h-full group">
                     <a href="{{ route('tours.show', $t->slug) }}" class="flex flex-col h-full text-inherit">
                         <div class="relative overflow-hidden aspect-[16/10]">
                             <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }}" loading="lazy">
@@ -370,13 +370,13 @@ if (!function_exists('renderReviewCardMarkup')) {
                                 <i class="bi bi-fire text-red-500"></i>
                                 <span>{{ $homeBookings }} booked in last 6 hours</span>
                             </div>
-                            <div class="flex justify-between items-end mt-auto pt-3 border-t border-slate-100">
+                            <div class="flex justify-between items-end mt-auto pt-3 border-t border-slate-200">
                                 <div>
-                                    <span class="block text-[10px] uppercase font-bold text-slate-400">Starting from</span>
+                                    <span class="block text-[10px] uppercase font-bold text-slate-500">Starting from</span>
                                     <span class="text-lg font-black text-primary" data-aed="{{ $minPrice }}">AED {{ number_format($minPrice) }}</span>
                                 </div>
                                 <div class="flex items-center gap-1.5">
-                                    <button type="button" class="border border-slate-300 hover:border-primary text-slate-600 hover:text-primary text-xs font-semibold rounded-full px-2.5 py-1 transition-colors btn-toggle-compare inline-flex items-center gap-1 cursor-pointer" data-tour-id="{{ $t->id }}" onclick="event.preventDefault(); event.stopPropagation(); window.DunesCompare && window.DunesCompare.toggle(this);">
+                                    <button type="button" class="border border-slate-300 hover:border-primary text-slate-700 bg-white hover:text-primary text-xs font-semibold rounded-full px-2.5 py-1 transition-colors btn-toggle-compare inline-flex items-center gap-1 cursor-pointer" data-tour-id="{{ $t->id }}" onclick="event.preventDefault(); event.stopPropagation(); window.DunesCompare && window.DunesCompare.toggle(this);">
                                         <i class="bi bi-shuffle"></i> <span class="compare-btn-text">Compare</span>
                                     </button>
                                     <span role="button" tabindex="0" class="btn-circle-whatsapp fab-whatsapp w-8 h-8 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center cursor-pointer shadow-xs transition-transform hover:scale-105" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp" onclick="event.preventDefault(); event.stopPropagation(); if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp('{{ addslashes($t->name) }}'); }" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();if(window.App&&typeof window.App.openWhatsApp==='function'){window.App.openWhatsApp('{{ addslashes($t->name) }}');}}">
@@ -455,21 +455,21 @@ if (!function_exists('renderReviewCardMarkup')) {
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-slate-50 hover:bg-white rounded-2xl p-6 sm:p-8 text-center border border-slate-100 hover:border-primary/20 shadow-xs hover:shadow-lg transition-all duration-300">
+            <div class="bg-slate-50 hover:bg-white rounded-2xl p-6 sm:p-8 text-center border border-slate-200 hover:border-primary/40 shadow-xs hover:shadow-lg transition-all duration-300">
                 <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl">
                     <i class="bi bi-shield-check"></i>
                 </div>
                 <h3 class="text-lg sm:text-xl font-bold text-slate-900 mb-2">Best Price Guarantee</h3>
                 <p class="text-slate-600 text-sm leading-relaxed">We match any competitor price. No hidden fees, what you see is what you pay.</p>
             </div>
-            <div class="bg-slate-50 hover:bg-white rounded-2xl p-6 sm:p-8 text-center border border-slate-100 hover:border-primary/20 shadow-xs hover:shadow-lg transition-all duration-300">
+            <div class="bg-slate-50 hover:bg-white rounded-2xl p-6 sm:p-8 text-center border border-slate-200 hover:border-primary/40 shadow-xs hover:shadow-lg transition-all duration-300">
                 <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl">
                     <i class="bi bi-lightning-charge"></i>
                 </div>
                 <h3 class="text-lg sm:text-xl font-bold text-slate-900 mb-2">Instant Confirmation</h3>
                 <p class="text-slate-600 text-sm leading-relaxed">Receive immediate booking confirmation via email and WhatsApp.</p>
             </div>
-            <div class="bg-slate-50 hover:bg-white rounded-2xl p-6 sm:p-8 text-center border border-slate-100 hover:border-primary/20 shadow-xs hover:shadow-lg transition-all duration-300">
+            <div class="bg-slate-50 hover:bg-white rounded-2xl p-6 sm:p-8 text-center border border-slate-200 hover:border-primary/40 shadow-xs hover:shadow-lg transition-all duration-300">
                 <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl">
                     <i class="bi bi-calendar-x"></i>
                 </div>
@@ -568,18 +568,18 @@ if (!function_exists('renderReviewCardMarkup')) {
 
         <div x-data="{ activeFaq: null }" class="max-w-3xl mx-auto space-y-3">
             @foreach($faqs as $index => $f)
-            <div class="bg-slate-50 hover:bg-slate-50/80 rounded-2xl border border-slate-200/80 overflow-hidden transition-all duration-200">
+            <div class="bg-slate-50 hover:bg-slate-50/80 rounded-2xl border border-slate-200 overflow-hidden transition-all duration-200">
                 <button type="button" 
                         class="w-full text-left px-5 sm:px-6 py-4.5 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
                         @click="activeFaq = (activeFaq === {{ $index }} ? null : {{ $index }})">
                     <span class="text-sm sm:text-base">{{ $f->question }}</span>
-                    <i class="bi bi-chevron-down transition-transform duration-300 text-slate-400 shrink-0"
+                    <i class="bi bi-chevron-down transition-transform duration-300 text-slate-500 shrink-0"
                        :class="activeFaq === {{ $index }} ? 'rotate-180 text-primary' : ''"></i>
                 </button>
                 <div x-show="activeFaq === {{ $index }}" 
                      x-collapse 
                      x-cloak 
-                     class="px-5 sm:px-6 pb-5 text-slate-600 text-sm leading-relaxed border-t border-slate-200/60 pt-3">
+                     class="px-5 sm:px-6 pb-5 text-slate-600 text-sm leading-relaxed border-t border-slate-200 pt-3">
                     {{ $f->answer }}
                 </div>
             </div>

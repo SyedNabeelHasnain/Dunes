@@ -148,7 +148,7 @@
                 </span>
                 <div>
                     <h5 class="font-extrabold text-sm sm:text-base text-white leading-tight">Compare Safari Experiences</h5>
-                    <p class="text-slate-400 text-xs hidden sm:block">Side-by-side comparison of vehicles, dune bashing, dinner & entertainment</p>
+                    <p class="text-slate-300 text-xs hidden sm:block">Side-by-side comparison of vehicles, dune bashing, dinner & entertainment</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
@@ -160,7 +160,7 @@
                     <span>Compare Top 3</span>
                 </button>
                 <button type="button" 
-                        class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer" 
+                        class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-colors cursor-pointer" 
                         @click="$store.modal.close()" 
                         aria-label="Close">
                     <i class="bi bi-x-lg text-xs"></i>
@@ -172,11 +172,11 @@
         <div class="p-3 sm:p-6 overflow-y-auto flex-1">
             <!-- Empty State -->
             <div id="compareEmptyState" class="text-center py-12" x-show="!$store.compare.items || $store.compare.items.length === 0">
-                <div class="w-16 h-16 rounded-full bg-slate-900 border border-slate-800 text-slate-400 flex items-center justify-center mx-auto mb-4 text-2xl">
+                <div class="w-16 h-16 rounded-full bg-slate-900 border border-slate-800 text-slate-300 flex items-center justify-center mx-auto mb-4 text-2xl">
                     <i class="bi bi-compass"></i>
                 </div>
                 <h5 class="text-base sm:text-lg font-bold text-white mb-2">No Safaris Selected for Comparison</h5>
-                <p class="text-slate-400 text-xs sm:text-sm max-w-md mx-auto mb-6">
+                <p class="text-slate-300 text-xs sm:text-sm max-w-md mx-auto mb-6">
                     Click the <strong class="text-white">+ Compare</strong> button on any safari card, or click below to analyze our Top 3 most popular Dubai experiences side-by-side:
                 </p>
                 <button type="button" 
@@ -191,37 +191,37 @@
             <div id="compareTableWrapper" class="overflow-x-auto" x-show="$store.compare.items && $store.compare.items.length > 0">
                 <table class="w-full text-left text-sm border-collapse min-w-[640px]" id="compareTable">
                     <thead>
-                        <tr id="compareRowHeader" class="border-b border-slate-800">
-                            <th class="w-44 min-w-[176px] pb-4 text-xs font-bold uppercase tracking-wider text-slate-400">Feature</th>
+                        <tr id="compareRowHeader" class="border-b border-slate-700">
+                            <th class="w-44 min-w-[176px] pb-4 text-xs font-bold uppercase tracking-wider text-slate-300">Feature</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-800/60 text-xs sm:text-sm">
+                    <tbody class="divide-y divide-slate-700/80 text-xs sm:text-sm">
                         <tr id="compareRowPrice">
-                            <td class="py-3 font-semibold text-slate-400 flex items-center gap-2"><i class="bi bi-cash-stack text-amber-400"></i>Starting Price</td>
+                            <td class="py-3 font-semibold text-slate-300 flex items-center gap-2"><i class="bi bi-cash-stack text-amber-400"></i>Starting Price</td>
                         </tr>
                         <tr id="compareRowDuration">
-                            <td class="py-3 font-semibold text-slate-400 flex items-center gap-2"><i class="bi bi-clock-history text-amber-400"></i>Duration</td>
+                            <td class="py-3 font-semibold text-slate-300 flex items-center gap-2"><i class="bi bi-clock-history text-amber-400"></i>Duration</td>
                         </tr>
                         <tr id="compareRowVehicle">
-                            <td class="py-3 font-semibold text-slate-400 flex items-center gap-2"><i class="bi bi-truck text-amber-400"></i>Vehicle & Transfer</td>
+                            <td class="py-3 font-semibold text-slate-300 flex items-center gap-2"><i class="bi bi-truck text-amber-400"></i>Vehicle & Transfer</td>
                         </tr>
                         <tr id="compareRowDuneBashing">
-                            <td class="py-3 font-semibold text-slate-400 flex items-center gap-2"><i class="bi bi-speedometer2 text-amber-400"></i>Dune Bashing</td>
+                            <td class="py-3 font-semibold text-slate-300 flex items-center gap-2"><i class="bi bi-speedometer2 text-amber-400"></i>Dune Bashing</td>
                         </tr>
                         <tr id="compareRowDining">
-                            <td class="py-3 font-semibold text-slate-400 flex items-center gap-2"><i class="bi bi-cup-hot-fill text-amber-400"></i>Camp & Dinner</td>
+                            <td class="py-3 font-semibold text-slate-300 flex items-center gap-2"><i class="bi bi-cup-hot-fill text-amber-400"></i>Camp & Dinner</td>
                         </tr>
                         <tr id="compareRowShows">
-                            <td class="py-3 font-semibold text-slate-400 flex items-center gap-2"><i class="bi bi-fire text-amber-400"></i>Live Shows</td>
+                            <td class="py-3 font-semibold text-slate-300 flex items-center gap-2"><i class="bi bi-fire text-amber-400"></i>Live Shows</td>
                         </tr>
                         <tr id="compareRowInclusions">
-                            <td class="py-3 font-semibold text-slate-400 flex items-center gap-2"><i class="bi bi-gift-fill text-amber-400"></i>Inclusions</td>
+                            <td class="py-3 font-semibold text-slate-300 flex items-center gap-2"><i class="bi bi-gift-fill text-amber-400"></i>Inclusions</td>
                         </tr>
                         <tr id="compareRowCancellation">
-                            <td class="py-3 font-semibold text-slate-400 flex items-center gap-2"><i class="bi bi-shield-check text-emerald-400"></i>Cancellation</td>
+                            <td class="py-3 font-semibold text-slate-300 flex items-center gap-2"><i class="bi bi-shield-check text-emerald-400"></i>Cancellation</td>
                         </tr>
                         <tr id="compareRowAction">
-                            <td class="py-3 font-semibold text-slate-400">Book Experience</td>
+                            <td class="py-3 font-semibold text-slate-300">Book Experience</td>
                         </tr>
                     </tbody>
                 </table>

@@ -6,7 +6,7 @@
      style="display: none;">
     <div class="p-3 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-slate-200/90 flex items-center gap-3 relative">
         <button type="button" 
-                class="absolute top-2 right-2.5 w-6 h-6 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer text-base leading-none" 
+                class="absolute top-2 right-2.5 w-6 h-6 rounded-full text-slate-500 hover:text-slate-800 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer text-base leading-none" 
                 id="socialProofCloseBtn" 
                 aria-label="Dismiss">&times;</button>
         
@@ -20,12 +20,12 @@
         <div class="flex-1 min-w-0 pr-4">
             <div class="flex items-center gap-1 mb-0.5">
                 <span class="font-bold text-slate-900 text-xs truncate max-w-[130px]" id="spCustomerName">Michael R.</span>
-                <span class="text-slate-400 text-[11px]">booked</span>
+                <span class="text-slate-500 text-[11px]">booked</span>
             </div>
             <a href="{{ route('tours.index') }}" id="spTourLink" class="block font-bold text-xs text-primary hover:text-primary-dark transition-colors truncate">
                 Premium Evening Desert Safari
             </a>
-            <div class="flex items-center gap-1.5 text-slate-400 text-[10px] mt-0.5">
+            <div class="flex items-center gap-1.5 text-slate-500 text-[10px] mt-0.5">
                 <span id="spTimeAgo" class="flex items-center gap-1"><i class="bi bi-clock"></i>12m ago</span>
                 <span>&bull;</span>
                 <span class="text-emerald-600 font-semibold flex items-center gap-0.5"><i class="bi bi-shield-check"></i> Verified</span>

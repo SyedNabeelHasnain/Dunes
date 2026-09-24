@@ -130,7 +130,7 @@
                 </div>
                 <div class="lg:col-span-8">
                     <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-                        <button onclick="filterTours('')" data-category="" class="filter-btn {{ !$selectedCategorySlug ? 'bg-slate-900 text-white shadow-xs' : 'bg-white text-slate-700 border border-slate-200 hover:border-slate-300' }} rounded-full px-4 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer transition-colors">
+                        <button onclick="filterTours('')" data-category="" class="filter-btn {{ !$selectedCategorySlug ? 'bg-slate-900 text-white shadow-xs' : 'bg-white text-slate-700 border border-slate-300 hover:border-primary' }} rounded-full px-4 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer transition-colors">
                             <i class="bi bi-grid-fill"></i> All ({{ $tours->count() }})
                         </button>
                         @foreach($categories as $cat)
@@ -162,7 +162,7 @@
                     $tourCatSlug = $tourCat ? $tourCat->slug : '';
                 @endphp
                 <div class="tour-item flex flex-col h-full" data-category="{{ $tourCatSlug }}" data-name="{{ strtolower($t->name) }}">
-                    <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col h-full group">
+                    <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-200 hover:border-slate-300 flex flex-col h-full group">
                         <a href="{{ route('tours.show', $t->slug) }}" class="flex flex-col h-full text-inherit">
                             <div class="relative overflow-hidden aspect-[16/10]">
                                 <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai" loading="lazy">
@@ -205,13 +205,13 @@
                                     </span>
                                 </div>
 
-                                <div class="flex justify-between items-end mt-auto pt-3 border-t border-slate-100">
+                                <div class="flex justify-between items-end mt-auto pt-3 border-t border-slate-200">
                                     <div>
-                                        <span class="block text-[10px] uppercase font-bold text-slate-400">Starting from</span>
+                                        <span class="block text-[10px] uppercase font-bold text-slate-500">Starting from</span>
                                         <span class="text-lg font-black text-primary" data-aed="{{ $minPrice }}">AED {{ number_format($minPrice) }}</span>
                                     </div>
                                     <div class="flex items-center gap-1.5">
-                                        <button type="button" class="border border-slate-300 hover:border-primary text-slate-600 hover:text-primary text-xs font-semibold rounded-full px-2.5 py-1 transition-colors btn-toggle-compare inline-flex items-center gap-1 cursor-pointer" data-tour-id="{{ $t->id }}" onclick="event.preventDefault(); event.stopPropagation(); window.DunesCompare && window.DunesCompare.toggle(this);">
+                                        <button type="button" class="border border-slate-300 hover:border-primary text-slate-700 bg-white hover:text-primary text-xs font-semibold rounded-full px-2.5 py-1 transition-colors btn-toggle-compare inline-flex items-center gap-1 cursor-pointer" data-tour-id="{{ $t->id }}" onclick="event.preventDefault(); event.stopPropagation(); window.DunesCompare && window.DunesCompare.toggle(this);">
                                             <i class="bi bi-shuffle"></i> <span class="compare-btn-text">Compare</span>
                                         </button>
                                         <span role="button" tabindex="0" class="btn-circle-whatsapp fab-whatsapp w-8 h-8 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center cursor-pointer shadow-xs transition-transform hover:scale-105" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp" onclick="event.preventDefault(); event.stopPropagation(); if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp('{{ addslashes($t->name) }}'); }" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();if(window.App&&typeof window.App.openWhatsApp==='function'){window.App.openWhatsApp('{{ addslashes($t->name) }}');}}">
@@ -230,7 +230,7 @@
         </div>
 
         <div id="no-tours-message" class="text-center py-12" style="display: none;">
-            <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl text-slate-400">
+            <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl text-slate-500">
                 <i class="bi bi-search"></i>
             </div>
             <h2 class="text-2xl font-bold text-slate-900 mb-2">No Tours Found</h2>
@@ -239,7 +239,7 @@
         </div>
         @else
         <div class="text-center py-12">
-            <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl text-slate-400">
+            <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl text-slate-500">
                 <i class="bi bi-search"></i>
             </div>
             <h2 class="text-2xl font-bold text-slate-900 mb-2">No Tours Found</h2>

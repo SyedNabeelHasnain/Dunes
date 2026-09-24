@@ -44,11 +44,11 @@
              x-transition:leave="transform transition ease-in duration-200"
              x-transition:leave-start="translate-y-0 sm:scale-100 opacity-100"
              x-transition:leave-end="translate-y-full sm:translate-y-4 sm:scale-95 opacity-0"
-             class="w-full sm:max-w-2xl lg:max-w-3xl rounded-t-3xl sm:rounded-3xl bg-white text-left align-middle shadow-2xl transition-all border border-slate-100 overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[88vh]"
+             class="w-full sm:max-w-2xl lg:max-w-3xl rounded-t-3xl sm:rounded-3xl bg-white text-left align-middle shadow-2xl transition-all border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[88vh]"
              @click.stop>
 
             <!-- Modal Header -->
-            <div class="flex items-center justify-between py-3.5 px-4 sm:px-6 border-b border-slate-100 bg-white sticky top-0 z-20 shrink-0">
+            <div class="flex items-center justify-between py-3.5 px-4 sm:px-6 border-b border-slate-200 bg-white sticky top-0 z-20 shrink-0">
                 <div class="flex items-center gap-3">
                     <button type="button" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-colors cursor-pointer hidden" id="headerBackBtn">
                         <i class="bi bi-chevron-left text-sm"></i>
@@ -59,7 +59,7 @@
                     </div>
                 </div>
                 <button type="button" 
-                        class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer" 
+                        class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-800 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer" 
                         @click="$store.modal.close()" 
                         aria-label="Close">
                     <i class="bi bi-x-lg text-xs"></i>
@@ -314,7 +314,7 @@
                     <div class="border-t border-slate-200/80 bg-white py-3.5 px-4 sm:px-6 sticky bottom-0 z-20 pb-safe shrink-0 shadow-lg">
                         <div class="flex items-center justify-between w-full">
                             <div class="text-left">
-                                <small class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Total Amount</small>
+                                <small class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Total Amount</small>
                                 <div class="font-black text-primary font-mono text-xl sm:text-2xl leading-none" id="bookingTotal">AED 0.00</div>
                             </div>
                             <div class="flex items-center gap-2 ml-auto" id="continueBtnWrapper">

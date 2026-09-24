@@ -49,7 +49,7 @@
                     </h5>
                 </div>
                 <button type="button" 
-                        class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer" 
+                        class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-colors cursor-pointer" 
                         @click="$store.modal.close()" 
                         aria-label="Close">
                     <i class="bi bi-x-lg text-xs"></i>
@@ -72,52 +72,52 @@
                                 <!-- Base 1 -->
                                 <div @click="base = { name: 'Standard Evening Red Dunes', price: 150, tourId: 1 }" 
                                      class="p-3 rounded-2xl cursor-pointer transition-all border text-left"
-                                     :class="base.name === 'Standard Evening Red Dunes' ? 'bg-orange-500/15 border-primary shadow-sm' : 'bg-slate-900/70 border-slate-800 hover:border-slate-700'">
+                                     :class="base.name === 'Standard Evening Red Dunes' ? 'bg-orange-500/15 border-primary shadow-sm' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="flex items-center justify-between mb-1.5">
                                         <i class="bi bi-sunset text-lg text-amber-400"></i>
                                         <span class="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[9px]">Popular</span>
                                     </div>
                                     <div class="font-bold text-white text-xs mb-0.5">Standard Evening</div>
-                                    <div class="text-slate-400 text-[10px] leading-tight">Dune bashing & BBQ show</div>
+                                    <div class="text-slate-300 text-[10px] leading-tight">Dune bashing & BBQ show</div>
                                     <div class="font-extrabold text-amber-400 text-xs mt-2" data-aed="150">AED 150/guest</div>
                                 </div>
 
                                 <!-- Base 2 -->
                                 <div @click="base = { name: 'VIP Luxury Evening Safari', price: 250, tourId: 2 }" 
                                      class="p-3 rounded-2xl cursor-pointer transition-all border text-left"
-                                     :class="base.name === 'VIP Luxury Evening Safari' ? 'bg-orange-500/15 border-primary shadow-sm' : 'bg-slate-900/70 border-slate-800 hover:border-slate-700'">
+                                     :class="base.name === 'VIP Luxury Evening Safari' ? 'bg-orange-500/15 border-primary shadow-sm' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="flex items-center justify-between mb-1.5">
                                         <i class="bi bi-award text-lg text-amber-400"></i>
                                         <span class="px-2 py-0.5 rounded-full bg-slate-800 text-amber-400 border border-amber-400/40 font-black text-[9px]">VIP</span>
                                     </div>
                                     <div class="font-bold text-white text-xs mb-0.5">VIP Luxury Safari</div>
-                                    <div class="text-slate-400 text-[10px] leading-tight">VIP table & waiter service</div>
+                                    <div class="text-slate-300 text-[10px] leading-tight">VIP table & waiter service</div>
                                     <div class="font-extrabold text-amber-400 text-xs mt-2" data-aed="250">AED 250/guest</div>
                                 </div>
 
                                 <!-- Base 3 -->
                                 <div @click="base = { name: 'Morning Desert Safari', price: 120, tourId: 4 }" 
                                      class="p-3 rounded-2xl cursor-pointer transition-all border text-left"
-                                     :class="base.name === 'Morning Desert Safari' ? 'bg-orange-500/15 border-primary shadow-sm' : 'bg-slate-900/70 border-slate-800 hover:border-slate-700'">
+                                     :class="base.name === 'Morning Desert Safari' ? 'bg-orange-500/15 border-primary shadow-sm' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="flex items-center justify-between mb-1.5">
                                         <i class="bi bi-sunrise text-lg text-sky-400"></i>
                                         <span class="px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 font-black text-[9px]">Cooler</span>
                                     </div>
                                     <div class="font-bold text-white text-xs mb-0.5">Morning Safari</div>
-                                    <div class="text-slate-400 text-[10px] leading-tight">Cool air & sunrise photos</div>
+                                    <div class="text-slate-300 text-[10px] leading-tight">Cool air & sunrise photos</div>
                                     <div class="font-extrabold text-amber-400 text-xs mt-2" data-aed="120">AED 120/guest</div>
                                 </div>
 
                                 <!-- Base 4 -->
                                 <div @click="base = { name: 'Overnight Stargazing Safari', price: 350, tourId: 5 }" 
                                      class="p-3 rounded-2xl cursor-pointer transition-all border text-left"
-                                     :class="base.name === 'Overnight Stargazing Safari' ? 'bg-orange-500/15 border-primary shadow-sm' : 'bg-slate-900/70 border-slate-800 hover:border-slate-700'">
+                                     :class="base.name === 'Overnight Stargazing Safari' ? 'bg-orange-500/15 border-primary shadow-sm' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="flex items-center justify-between mb-1.5">
                                         <i class="bi bi-moon-stars text-lg text-emerald-400"></i>
                                         <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-black text-[9px]">Glamping</span>
                                     </div>
                                     <div class="font-bold text-white text-xs mb-0.5">Overnight Safari</div>
-                                    <div class="text-slate-400 text-[10px] leading-tight">Bedouin tent & breakfast</div>
+                                    <div class="text-slate-300 text-[10px] leading-tight">Bedouin tent & breakfast</div>
                                     <div class="font-extrabold text-amber-400 text-xs mt-2" data-aed="350">AED 350/guest</div>
                                 </div>
                             </div>
@@ -131,19 +131,19 @@
                             <div class="grid grid-cols-3 gap-2">
                                 <div @click="transfer = { name: 'Shared 4x4 Land Cruiser', price: 0, type: 'flat' }"
                                      class="p-2.5 rounded-xl cursor-pointer transition-all border text-left"
-                                     :class="transfer.name === 'Shared 4x4 Land Cruiser' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/70 border-slate-800 hover:border-slate-700'">
+                                     :class="transfer.name === 'Shared 4x4 Land Cruiser' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="font-bold text-white text-xs">Shared 4x4</div>
                                     <div class="text-emerald-400 font-bold text-[10px] mt-1">FREE</div>
                                 </div>
                                 <div @click="transfer = { name: 'Private 7-Seater 4x4', price: 350, type: 'flat' }"
                                      class="p-2.5 rounded-xl cursor-pointer transition-all border text-left"
-                                     :class="transfer.name === 'Private 7-Seater 4x4' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/70 border-slate-800 hover:border-slate-700'">
+                                     :class="transfer.name === 'Private 7-Seater 4x4' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="font-bold text-white text-xs">Private 4x4</div>
                                     <div class="text-amber-400 font-bold text-[10px] mt-1" data-aed="350">+AED 350 flat</div>
                                 </div>
                                 <div @click="transfer = { name: 'VIP Range Rover', price: 750, type: 'flat' }"
                                      class="p-2.5 rounded-xl cursor-pointer transition-all border text-left"
-                                     :class="transfer.name === 'VIP Range Rover' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/70 border-slate-800 hover:border-slate-700'">
+                                     :class="transfer.name === 'VIP Range Rover' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="font-bold text-white text-xs">VIP SUV</div>
                                     <div class="text-amber-400 font-bold text-[10px] mt-1" data-aed="750">+AED 750 flat</div>
                                 </div>
@@ -158,25 +158,25 @@
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
                                 <div @click="sports = { name: 'Scenic Only', price: 0, type: 'per_person' }"
                                      class="p-2 rounded-xl cursor-pointer transition-all border text-left"
-                                     :class="sports.name === 'Scenic Only' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/70 border-slate-800 hover:border-slate-700'">
+                                     :class="sports.name === 'Scenic Only' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="font-bold text-white text-xs">None</div>
                                     <div class="text-emerald-400 font-bold text-[9px] mt-1">INCLUDED</div>
                                 </div>
                                 <div @click="sports = { name: '250cc Quad Biking', price: 120, type: 'per_person' }"
                                      class="p-2 rounded-xl cursor-pointer transition-all border text-left"
-                                     :class="sports.name === '250cc Quad Biking' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/70 border-slate-800 hover:border-slate-700'">
+                                     :class="sports.name === '250cc Quad Biking' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="font-bold text-white text-xs">250cc Quad</div>
                                     <div class="text-amber-400 font-bold text-[9px] mt-1" data-aed="120">+AED 120</div>
                                 </div>
                                 <div @click="sports = { name: '400cc Quad Biking', price: 220, type: 'per_person' }"
                                      class="p-2 rounded-xl cursor-pointer transition-all border text-left"
-                                     :class="sports.name === '400cc Quad Biking' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/70 border-slate-800 hover:border-slate-700'">
+                                     :class="sports.name === '400cc Quad Biking' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="font-bold text-white text-xs">400cc Quad</div>
                                     <div class="text-amber-400 font-bold text-[9px] mt-1" data-aed="220">+AED 220</div>
                                 </div>
                                 <div @click="sports = { name: '1000cc Can-Am Buggy', price: 550, type: 'flat' }"
                                      class="p-2 rounded-xl cursor-pointer transition-all border text-left"
-                                     :class="sports.name === '1000cc Can-Am Buggy' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/70 border-slate-800 hover:border-slate-700'">
+                                     :class="sports.name === '1000cc Can-Am Buggy' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="font-bold text-white text-xs">1000cc Buggy</div>
                                     <div class="text-amber-400 font-bold text-[9px] mt-1" data-aed="550">+AED 550</div>
                                 </div>
@@ -191,7 +191,7 @@
                             <div class="grid grid-cols-2 gap-2">
                                 <div @click="toggleAddon({ key: 'vip_table', name: 'VIP Table Service', price: 60, type: 'per_person' })"
                                      class="p-2.5 rounded-xl cursor-pointer transition-all border flex items-center justify-between"
-                                     :class="hasAddon('vip_table') ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/70 border-slate-800 hover:border-slate-700'">
+                                     :class="hasAddon('vip_table') ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="flex items-center gap-2">
                                         <input type="checkbox" :checked="hasAddon('vip_table')" class="rounded border-slate-700 text-primary focus:ring-0 pointer-events-none">
                                         <span class="text-white text-xs font-semibold">VIP Table</span>
@@ -200,7 +200,7 @@
                                 </div>
                                 <div @click="toggleAddon({ key: 'shisha', name: 'Private Table Shisha', price: 50, type: 'flat' })"
                                      class="p-2.5 rounded-xl cursor-pointer transition-all border flex items-center justify-between"
-                                     :class="hasAddon('shisha') ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/70 border-slate-800 hover:border-slate-700'">
+                                     :class="hasAddon('shisha') ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="flex items-center gap-2">
                                         <input type="checkbox" :checked="hasAddon('shisha')" class="rounded border-slate-700 text-primary focus:ring-0 pointer-events-none">
                                         <span class="text-white text-xs font-semibold">Table Shisha</span>
@@ -214,14 +214,14 @@
 
                     <!-- Right: Summary & Instant Checkout (5 cols) -->
                     <div class="lg:col-span-5">
-                        <div class="p-4 sm:p-5 rounded-2xl bg-slate-900/90 border border-slate-800 flex flex-col h-full justify-between shadow-xl">
+                        <div class="p-4 sm:p-5 rounded-2xl bg-slate-900/95 border border-slate-700/80 flex flex-col h-full justify-between shadow-xl">
                             
                             <!-- Guest Counter -->
                             <div>
-                                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-950/60 border border-slate-800 mb-4">
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-950/80 border border-slate-700/80 mb-4">
                                     <div>
                                         <div class="font-bold text-white text-xs">Guests (Adults)</div>
-                                        <div class="text-slate-400 text-[10px]">Age 11+ years</div>
+                                        <div class="text-slate-300 text-[10px]">Age 11+ years</div>
                                     </div>
                                     <div class="flex items-center gap-3">
                                         <button type="button" 
@@ -236,19 +236,19 @@
 
                                 <!-- Live Specs Breakdown -->
                                 <div class="space-y-2 mb-4 text-xs">
-                                    <div class="flex justify-between text-slate-400">
+                                    <div class="flex justify-between text-slate-300">
                                         <span>Base:</span>
                                         <strong class="text-white font-semibold text-right" x-text="base.name">Standard Evening</strong>
                                     </div>
-                                    <div class="flex justify-between text-slate-400">
+                                    <div class="flex justify-between text-slate-300">
                                         <span>Transfer:</span>
                                         <strong class="text-white font-semibold text-right" x-text="transfer.name">Shared 4x4</strong>
                                     </div>
-                                    <div class="flex justify-between text-slate-400">
+                                    <div class="flex justify-between text-slate-300">
                                         <span>Sports:</span>
                                         <strong class="text-white font-semibold text-right" x-text="sports.name">Scenic Only</strong>
                                     </div>
-                                    <div class="flex justify-between text-slate-400">
+                                    <div class="flex justify-between text-slate-300">
                                         <span>Addons:</span>
                                         <strong class="text-white font-semibold text-right" x-text="summaryAddons">None</strong>
                                     </div>
@@ -256,8 +256,8 @@
                             </div>
 
                             <!-- Total Display & CTAs -->
-                            <div class="pt-4 border-t border-slate-800 text-center">
-                                <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider mb-0.5">Live Estimated Total</span>
+                            <div class="pt-4 border-t border-slate-700/80 text-center">
+                                <span class="text-[10px] uppercase font-bold text-slate-300 block tracking-wider mb-0.5">Live Estimated Total</span>
                                 <div class="text-3xl font-black text-amber-400 font-mono my-1" x-text="'AED ' + total">AED 300</div>
                                 <div class="text-emerald-400 font-semibold text-[10px] mb-4 flex items-center justify-center gap-1">
                                     <i class="bi bi-shield-check"></i> Best Price Guarantee • Free Cancel 24h

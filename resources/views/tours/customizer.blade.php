@@ -387,7 +387,7 @@
                             <span class="text-xl text-amber-400"><i class="bi bi-receipt"></i></span>
                             <div>
                                 <h5 class="font-bold text-white text-base">Custom Safari Spec</h5>
-                                <span class="text-slate-400 text-xs">Live Calculation</span>
+                                <span class="text-slate-300 text-xs">Live Calculation</span>
                             </div>
                         </div>
                         <span class="bg-emerald-500/20 text-emerald-400 rounded-full px-2.5 py-0.5 text-[10px] font-bold">
@@ -398,34 +398,34 @@
                     <!-- Itemized Specs List -->
                     <div class="space-y-2 mb-4 text-xs">
                         <div class="flex justify-between">
-                            <span class="text-slate-400">Base Safari:</span>
+                            <span class="text-slate-300">Base Safari:</span>
                             <span class="font-bold text-white text-right" id="summaryBaseName">Standard Evening</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-slate-400">Transfer:</span>
+                            <span class="text-slate-300">Transfer:</span>
                             <span class="font-bold text-white text-right" id="summaryTransferName">Shared 4x4</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-slate-400">Motorsports:</span>
+                            <span class="text-slate-300">Motorsports:</span>
                             <span class="font-bold text-white text-right" id="summarySportsName">Scenic Only</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-slate-400">Addons:</span>
+                            <span class="text-slate-300">Addons:</span>
                             <span class="font-bold text-white text-right" id="summaryAddonsName">None</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-slate-400">Party Size:</span>
+                            <span class="text-slate-300">Party Size:</span>
                             <span class="font-bold text-white text-right" id="summaryGuests">2 Adults</span>
                         </div>
                     </div>
 
                     <!-- Price Subtotal -->
-                    <div class="pt-4 border-t border-white/10 mb-4">
+                    <div class="pt-4 border-t border-white/20 mb-4">
                         <div class="flex justify-between items-baseline mb-1">
-                            <span class="text-slate-400 text-xs">Estimated Total:</span>
+                            <span class="text-slate-300 text-xs">Estimated Total:</span>
                             <div class="text-right">
                                 <span class="text-3xl font-black text-amber-400" id="customizerTotalDisplay" data-aed="300">AED 300</span>
-                                <span class="text-slate-400 block text-[10px] mt-0.5">inclusive of all taxes & DTCM fees</span>
+                                <span class="text-slate-300 block text-[10px] mt-0.5">inclusive of all taxes & DTCM fees</span>
                             </div>
                         </div>
                     </div>

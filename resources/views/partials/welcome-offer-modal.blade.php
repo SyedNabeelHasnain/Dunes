@@ -41,7 +41,7 @@
              x-transition:leave="ease-in duration-150"
              x-transition:leave-start="opacity-100 scale-100 translate-y-0"
              x-transition:leave-end="opacity-0 scale-95 translate-y-4"
-             class="w-full max-w-4xl transform overflow-hidden rounded-3xl bg-white text-left align-middle shadow-2xl transition-all border border-slate-100 relative"
+             class="w-full max-w-4xl transform overflow-hidden rounded-3xl bg-white text-left align-middle shadow-2xl transition-all border border-slate-200 relative"
              @click.stop>
             
             <!-- Luxury Orange & Gold Ambient Glow Bar -->
@@ -50,7 +50,7 @@
             <!-- Close Button -->
             <button type="button" 
                     @click="$store.modal.close()" 
-                    class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer absolute top-4 right-4 z-10" 
+                    class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-800 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer absolute top-4 right-4 z-10" 
                     id="closeWelcomeOfferBtn" 
                     aria-label="Close">
                 <i class="bi bi-x-lg text-xs"></i>
@@ -134,7 +134,7 @@
                                         <div class="welcome-phone-field rounded-xl shadow-2xs bg-white border border-slate-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all relative">
                                             <input type="tel" class="w-full py-2.5 px-3 bg-transparent text-xs sm:text-sm font-semibold text-slate-800 border-0 focus:outline-none placeholder:text-slate-400" id="welcomePhone" name="phone" placeholder="50 123 4567" required autocomplete="tel">
                                         </div>
-                                        <small class="text-slate-400 block mt-1 text-[11px]"><i class="bi bi-shield-check text-emerald-500 me-1"></i>Voucher sent via Email & WhatsApp.</small>
+                                        <small class="text-slate-500 block mt-1 text-[11px]"><i class="bi bi-shield-check text-emerald-500 me-1"></i>Voucher sent via Email & WhatsApp.</small>
                                     </div>
 
                                     <div class="p-2.5 rounded-xl bg-red-50 text-red-700 text-xs border border-red-200 hidden" id="welcomeOfferError"></div>
@@ -144,7 +144,7 @@
                                         <i class="bi bi-arrow-right"></i>
                                     </button>
 
-                                    <div class="text-center text-slate-400 text-[11px]">
+                                    <div class="text-center text-slate-500 text-[11px]">
                                         <i class="bi bi-lock-fill me-1"></i> 100% Privacy. Single-use voucher valid for 24h.
                                     </div>
                                 </form>
@@ -172,7 +172,7 @@
                                     <span>Apply {{ (int)$popupDiscount }}% OFF & Book Safari Now</span>
                                 </button>
                                 
-                                <small class="text-slate-400 block mt-2 text-[11px]">
+                                <small class="text-slate-500 block mt-2 text-[11px]">
                                     A copy has also been sent to your email address.
                                 </small>
                             </div>
@@ -191,7 +191,7 @@
      class="hidden fixed bottom-6 left-6 z-40 mb-safe items-center gap-2 p-2 px-3.5 rounded-full bg-slate-950/95 text-white border border-orange-500/50 shadow-2xl backdrop-blur-md cursor-pointer hover:scale-105 transition-all">
     <span class="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-xs">{{ (int)$popupDiscount }}% OFF</span>
     <span class="text-xs font-bold font-mono text-white" id="floatingPillCode">FIRST25-OFF</span>
-    <span class="text-xs text-slate-400 font-mono hidden sm:inline" id="floatingPillTimer">{{ sprintf('%02d', $popupTimerMins) }}:00</span>
+    <span class="text-xs text-slate-300 font-mono hidden sm:inline" id="floatingPillTimer">{{ sprintf('%02d', $popupTimerMins) }}:00</span>
     <button type="button" class="px-2.5 py-1 rounded-full bg-primary hover:bg-primary-dark text-white font-bold text-xs transition-colors ms-1 cursor-pointer">
         Apply
     </button>

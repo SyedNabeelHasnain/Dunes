@@ -126,15 +126,15 @@ gtag('event', 'conversion_event_submit_lead_form', {
                     <!-- Left: Tour Details -->
                     <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3.5">
                         <div>
-                            <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Reference</div>
+                            <div class="text-slate-500 text-xs font-bold uppercase tracking-wider">Reference</div>
                             <div class="font-extrabold text-slate-900 text-lg sm:text-xl font-mono">#{{ $booking->reference }}</div>
                         </div>
                         <div>
-                            <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Tour</div>
+                            <div class="text-slate-500 text-xs font-bold uppercase tracking-wider">Tour</div>
                             <div class="font-semibold text-slate-800 text-sm sm:text-base">{{ $booking->tour_name }}</div>
                         </div>
                         <div>
-                            <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Date</div>
+                            <div class="text-slate-500 text-xs font-bold uppercase tracking-wider">Date</div>
                             <div class="font-semibold text-slate-800 text-sm sm:text-base">{{ $booking->tour_date ? $booking->tour_date->format('M j, Y') : '' }}</div>
                         </div>
                     </div>
@@ -142,14 +142,14 @@ gtag('event', 'conversion_event_submit_lead_form', {
                     <!-- Right: Financial Summary -->
                     <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
                         <div>
-                            <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Payment Method</div>
+                            <div class="text-slate-500 text-xs font-bold uppercase tracking-wider">Payment Method</div>
                             <div class="font-semibold capitalize text-slate-800 text-sm sm:text-base">{{ $method }}</div>
                         </div>
                         @if($booking->coupon_code && $booking->discount_amount > 0)
                         <div>
-                            <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Original Subtotal</div>
-                            <div class="font-semibold text-slate-400 line-through text-sm">AED {{ number_format($booking->original_total, 2) }}</div>
-                            <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mt-1">Promo Discount ({{ $booking->coupon_code }})</div>
+                            <div class="text-slate-500 text-xs font-bold uppercase tracking-wider">Original Subtotal</div>
+                            <div class="font-semibold text-slate-500 line-through text-sm">AED {{ number_format($booking->original_total, 2) }}</div>
+                            <div class="text-slate-500 text-xs font-bold uppercase tracking-wider mt-1">Promo Discount ({{ $booking->coupon_code }})</div>
                             <div class="font-bold text-emerald-600 text-sm">-AED {{ number_format($booking->discount_amount, 2) }}</div>
                         </div>
                         @endif
@@ -178,7 +178,7 @@ gtag('event', 'conversion_event_submit_lead_form', {
                         @if($booking->coupon_code && $booking->discount_amount > 0)
                         <div class="flex justify-between text-emerald-600"><span>Promo Code ({{ $booking->coupon_code }})</span><span>-AED {{ number_format($booking->discount_amount, 2) }}</span></div>
                         @endif
-                        <div class="flex justify-between font-bold pt-2 border-t border-slate-100 text-slate-900"><span>Total Paid</span><span>AED {{ number_format($booking->payment_amount, 2) }}</span></div>
+                        <div class="flex justify-between font-bold pt-2 border-t border-slate-200 text-slate-900"><span>Total Paid</span><span>AED {{ number_format($booking->payment_amount, 2) }}</span></div>
                     </div>
                 @endif
             @endif

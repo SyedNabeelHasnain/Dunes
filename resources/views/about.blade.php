@@ -224,32 +224,32 @@
             <div class="p-2">
                 <i class="bi bi-trophy text-primary text-2xl mb-1.5 block"></i>
                 <div class="text-xl font-bold text-white mb-0.5">#1</div>
-                <div class="text-slate-400 text-xs">Desert Safari</div>
+                <div class="text-slate-300 text-xs">Desert Safari</div>
             </div>
             <div class="p-2">
                 <i class="bi bi-shield-check text-primary text-2xl mb-1.5 block"></i>
                 <div class="text-xl font-bold text-white mb-0.5">100%</div>
-                <div class="text-slate-400 text-xs">Secure Pay</div>
+                <div class="text-slate-300 text-xs">Secure Pay</div>
             </div>
             <div class="p-2">
                 <i class="bi bi-clock-history text-primary text-2xl mb-1.5 block"></i>
                 <div class="text-xl font-bold text-white mb-0.5">Fast</div>
-                <div class="text-slate-400 text-xs">Booking</div>
+                <div class="text-slate-300 text-xs">Booking</div>
             </div>
             <div class="p-2">
                 <i class="bi bi-truck text-primary text-2xl mb-1.5 block"></i>
                 <div class="text-xl font-bold text-white mb-0.5">25+</div>
-                <div class="text-slate-400 text-xs">Vehicles</div>
+                <div class="text-slate-300 text-xs">Vehicles</div>
             </div>
             <div class="p-2">
                 <i class="bi bi-geo-alt text-primary text-2xl mb-1.5 block"></i>
                 <div class="text-xl font-bold text-white mb-0.5">Local</div>
-                <div class="text-slate-400 text-xs">Expert Guides</div>
+                <div class="text-slate-300 text-xs">Expert Guides</div>
             </div>
             <div class="p-2">
                 <i class="bi bi-star text-primary text-2xl mb-1.5 block"></i>
                 <div class="text-xl font-bold text-white mb-0.5">Best</div>
-                <div class="text-slate-400 text-xs">Price Promise</div>
+                <div class="text-slate-300 text-xs">Price Promise</div>
             </div>
         </div>
     </div>

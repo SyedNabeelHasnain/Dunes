@@ -116,17 +116,17 @@
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Live Instant Search Bar for FAQs -->
         <div class="mb-10">
-            <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200/80 shadow-xs">
+            <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 shadow-xs">
                 <div class="relative">
-                    <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                    <input type="text" id="faqSearchInput" class="w-full rounded-full pl-11 pr-4 py-3 bg-white border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs" placeholder="Search questions (e.g., cancel, clothing, quad, pickup, timing)..." oninput="handleFaqSearch(this.value)">
+                    <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                    <input type="text" id="faqSearchInput" class="w-full rounded-full pl-11 pr-4 py-3 bg-white border border-slate-200 text-sm text-slate-800 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs" placeholder="Search questions (e.g., cancel, clothing, quad, pickup, timing)..." oninput="handleFaqSearch(this.value)">
                 </div>
             </div>
         </div>
 
         <div x-data="{ openFaq: 0 }" class="space-y-3.5">
             @foreach($faqs as $i => $f)
-            <div class="faq-item bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden transition-all duration-200" data-question="{{ strtolower($f->question) }}" data-answer="{{ strtolower($f->answer) }}">
+            <div class="faq-item bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden transition-all duration-200" data-question="{{ strtolower($f->question) }}" data-answer="{{ strtolower($f->answer) }}">
                 <button type="button" 
                         class="w-full text-left px-5 sm:px-6 py-4.5 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
                         @click="openFaq = (openFaq === {{ $i }} ? null : {{ $i }})">
@@ -134,10 +134,10 @@
                         <i class="bi bi-question-circle-fill text-primary shrink-0"></i>
                         <span>{{ $f->question }}</span>
                     </span>
-                    <i class="bi bi-chevron-down transition-transform duration-300 text-slate-400 shrink-0"
+                    <i class="bi bi-chevron-down transition-transform duration-300 text-slate-500 shrink-0"
                        :class="openFaq === {{ $i }} ? 'rotate-180 text-primary' : ''"></i>
                 </button>
-                <div x-show="openFaq === {{ $i }}" x-collapse x-cloak class="px-5 sm:px-6 pb-5 text-slate-600 text-xs sm:text-sm leading-relaxed border-t border-slate-100 pt-3.5">
+                <div x-show="openFaq === {{ $i }}" x-collapse x-cloak class="px-5 sm:px-6 pb-5 text-slate-600 text-xs sm:text-sm leading-relaxed border-t border-slate-200 pt-3.5">
                     {{ $f->answer }}
                 </div>
             </div>
@@ -145,14 +145,14 @@
         </div>
 
         <div id="noFaqResults" class="text-center py-12 hidden">
-            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl text-slate-400">
+            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl text-slate-500">
                 <i class="bi bi-search"></i>
             </div>
             <h3 class="text-base font-bold text-slate-900 mb-1">No matching questions found</h3>
             <p class="text-slate-500 text-xs">Can't find what you're looking for? Reach out directly via WhatsApp for instant answers.</p>
         </div>
 
-        <div class="mt-14 p-8 sm:p-12 text-center bg-slate-50 rounded-3xl border border-slate-200/80">
+        <div class="mt-14 p-8 sm:p-12 text-center bg-slate-50 rounded-3xl border border-slate-200">
             <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl text-primary shadow-xs">
                 <i class="bi bi-chat-dots-fill"></i>
             </div>

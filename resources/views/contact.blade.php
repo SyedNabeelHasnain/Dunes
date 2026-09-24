@@ -139,7 +139,7 @@
         @endphp
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <a href="tel:{{ preg_replace('/[^0-9+]/','',$phoneVal) }}" class="bg-slate-50 hover:bg-white rounded-2xl p-6 text-center border border-slate-200/80 hover:border-primary/40 shadow-xs hover:shadow-lg transition-all duration-300 group">
+            <a href="tel:{{ preg_replace('/[^0-9+]/','',$phoneVal) }}" class="bg-slate-50 hover:bg-white rounded-2xl p-6 text-center border border-slate-200 hover:border-primary/40 shadow-xs hover:shadow-lg transition-all duration-300 group">
                 <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-xl mx-auto mb-3 group-hover:scale-110 transition-transform">
                     <i class="bi bi-telephone"></i>
                 </div>
@@ -147,7 +147,7 @@
                 <div class="text-slate-600 text-sm">{{ $phoneVal }}</div>
             </a>
             
-            <a href="mailto:{{ $emailVal }}" class="bg-slate-50 hover:bg-white rounded-2xl p-6 text-center border border-slate-200/80 hover:border-primary/40 shadow-xs hover:shadow-lg transition-all duration-300 group">
+            <a href="mailto:{{ $emailVal }}" class="bg-slate-50 hover:bg-white rounded-2xl p-6 text-center border border-slate-200 hover:border-primary/40 shadow-xs hover:shadow-lg transition-all duration-300 group">
                 <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-xl mx-auto mb-3 group-hover:scale-110 transition-transform">
                     <i class="bi bi-envelope"></i>
                 </div>
@@ -155,7 +155,7 @@
                 <div class="text-slate-600 text-sm">{{ $emailVal }}</div>
             </a>
             
-            <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$whatsappVal) }}" target="_blank" rel="noopener" class="bg-slate-50 hover:bg-white rounded-2xl p-6 text-center border border-slate-200/80 hover:border-primary/40 shadow-xs hover:shadow-lg transition-all duration-300 group">
+            <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$whatsappVal) }}" target="_blank" rel="noopener" class="bg-slate-50 hover:bg-white rounded-2xl p-6 text-center border border-slate-200 hover:border-primary/40 shadow-xs hover:shadow-lg transition-all duration-300 group">
                 <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl mx-auto mb-3 group-hover:scale-110 transition-transform">
                     <i class="bi bi-whatsapp"></i>
                 </div>
@@ -166,7 +166,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
             <div class="lg:col-span-7">
-                <div class="bg-white rounded-2xl p-6 sm:p-10 border border-slate-200/80 shadow-md">
+                <div class="bg-white rounded-2xl p-6 sm:p-10 border border-slate-200 shadow-md">
                     <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-6">Send Us a Message</h2>
                     <form id="contactForm" autocomplete="off" class="needs-validation space-y-5" novalidate>
                         @csrf
@@ -268,7 +268,7 @@
             </div>
             
             <div class="lg:col-span-5 flex flex-col">
-                <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200/80 flex-grow h-full min-h-[350px]">
+                <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200 flex-grow h-full min-h-[350px]">
                     <iframe src="{{ $settings['google_maps_embed_url'] ?? 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14439.467468694034!2d55.2707828!3d25.2048493!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f434910086b6d%3A0xc4db9db186e4e1e2!2sDunes%20Discovery%20Tourism%20LLC!5e0!3m2!1sen!2sae!4v1700000000000!5m2!1sen!2sae' }}" class="w-full h-full border-0 min-h-[400px]" allowfullscreen loading="lazy"></iframe>
                 </div>
             </div>

@@ -45,7 +45,7 @@
                     <i class="bi bi-gift-fill text-amber-400"></i> Exclusive Departure Offer
                 </span>
                 <button type="button" 
-                        class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer" 
+                        class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-colors cursor-pointer" 
                         @click="$store.modal.close()" 
                         aria-label="Close" 
                         id="exitIntentCloseBtn">
@@ -62,14 +62,14 @@
             <h3 class="text-xl sm:text-2xl font-black text-white mb-2 leading-snug" id="exitIntentModalLabel">
                 Wait! Don't Leave Dubai Without Experiencing The Dunes
             </h3>
-            <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-6 max-w-md mx-auto">
+            <p class="text-slate-300 text-xs sm:text-sm leading-relaxed mb-6 max-w-md mx-auto">
                 Before you go, take an instant <strong class="text-amber-400">{{ $exitIntentDiscount }}% OFF</strong> on all certified Dubai desert safari packages with 4x4 hotel pickup and 5-star live BBQ dinner.
             </p>
 
             <!-- Gamified Coupon Certificate Card -->
             <div class="rounded-2xl p-4 mb-6 bg-gradient-to-r from-orange-500/15 to-amber-500/10 border-2 border-dashed border-orange-500/40 flex items-center justify-between flex-wrap gap-2 text-left">
                 <div>
-                    <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Instant Promo Code</span>
+                    <span class="text-[10px] uppercase font-bold text-slate-300 block tracking-wider">Instant Promo Code</span>
                     <span class="font-mono font-black text-2xl text-amber-400 tracking-wider" id="exitIntentCodeDisplay">{{ $exitIntentCode }}</span>
                 </div>
                 <div class="flex items-center gap-2">
@@ -87,7 +87,7 @@
             </div>
 
             <!-- Trust Guarantees -->
-            <div class="grid grid-cols-2 gap-2.5 text-left mb-6 text-xs text-slate-400">
+            <div class="grid grid-cols-2 gap-2.5 text-left mb-6 text-xs text-slate-300">
                 <div class="flex items-center gap-2">
                     <i class="bi bi-patch-check-fill text-primary"></i>
                     <span>DET Licensed #1430583</span>
@@ -125,7 +125,7 @@
 
             <div class="mt-4">
                 <button type="button" 
-                        class="text-xs text-slate-500 hover:text-slate-300 transition-colors cursor-pointer" 
+                        class="text-xs text-slate-400 hover:text-slate-200 transition-colors cursor-pointer" 
                         @click="$store.modal.close()" 
                         id="exitIntentDismissLink">
                     No thanks, I'll pay full price later

@@ -190,21 +190,302 @@
 .glass {
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
 }
 
 .glass-dark {
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(15, 23, 42, 0.85);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
 }
 
 .glass-nav {
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   background: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+/* ==========================================================================
+   Frontend UI Components & Interactive Buttons (WCAG AA High Contrast)
+   ========================================================================== */
+
+/* Primary Animated Brand CTA Button (Vibrant Desert Sunset Gradient) */
+.btn-desert-animated {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%);
+  color: #ffffff !important;
+  font-weight: 700;
+  border: 1.5px solid rgba(249, 115, 22, 0.65);
+  box-shadow: 0 4px 14px -2px rgba(234, 88, 12, 0.35), 0 2px 6px -1px rgba(234, 88, 12, 0.2);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-desert-animated i,
+.btn-desert-animated span {
+  position: relative;
+  z-index: 2;
+  color: inherit;
+}
+
+.btn-desert-animated::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(90deg, #ff8c00, #fbbf24, #ea580c, #fbbf24, #ff8c00);
+  background-size: 300% 300%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: desertBorderFlow 8s linear infinite;
+  pointer-events: none;
+  opacity: 0.85;
+  transition: opacity 0.25s ease;
+}
+
+.btn-desert-animated:hover {
+  background: linear-gradient(135deg, #ea580c 0%, #c2410c 50%, #9a3412 100%);
+  color: #ffffff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px -4px rgba(234, 88, 12, 0.45), 0 4px 10px -2px rgba(234, 88, 12, 0.3);
+  border-color: #ea580c;
+}
+
+.btn-desert-animated:hover::before {
+  opacity: 1;
+}
+
+.btn-desert-animated:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-desert-animated:disabled,
+.btn-desert-animated[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Secondary High-Contrast Dark Animated CTA Button */
+.btn-desert-animated-dark {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #0f172a;
+  color: #ffffff !important;
+  font-weight: 700;
+  border: 1.5px solid rgba(246, 144, 68, 0.55);
+  box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.25);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-desert-animated-dark i,
+.btn-desert-animated-dark span {
+  position: relative;
+  z-index: 2;
+  color: inherit;
+}
+
+.btn-desert-animated-dark::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(90deg, #f97316, #fbbf24, #ea580c, #fbbf24, #f97316);
+  background-size: 300% 300%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: desertBorderFlow 8s linear infinite;
+  pointer-events: none;
+  opacity: 0.7;
+  transition: opacity 0.25s ease;
+}
+
+.btn-desert-animated-dark:hover {
+  background: #020617;
+  color: #fbbf24 !important;
+  border-color: #f59e0b;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -4px rgba(245, 158, 11, 0.25);
+}
+
+.btn-desert-animated-dark:hover::before {
+  opacity: 1;
+}
+
+.btn-desert-animated-dark:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* WhatsApp Animated Floating & Inline Action Button */
+.btn-whatsapp-animated {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  color: #ffffff !important;
+  font-weight: 700;
+  border: 1px solid rgba(37, 211, 102, 0.5);
+  box-shadow: 0 4px 14px -2px rgba(37, 211, 102, 0.35);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-whatsapp-animated i,
+.btn-whatsapp-animated span {
+  position: relative;
+  z-index: 2;
+  color: inherit;
+}
+
+.btn-whatsapp-animated::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(90deg, #25D366, #A7F3D0, #10B981, #A7F3D0, #25D366);
+  background-size: 300% 300%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: desertBorderFlow 8s linear infinite;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.btn-whatsapp-animated:hover {
+  background: linear-gradient(135deg, #128C7E 0%, #075E54 100%);
+  color: #ffffff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -4px rgba(18, 140, 126, 0.45);
+}
+
+.btn-whatsapp-animated:hover::before {
+  opacity: 1;
+}
+
+.btn-whatsapp-animated:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Tour Card Circle WhatsApp Button */
+.btn-circle-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px -1px rgba(37, 211, 102, 0.35);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+}
+
+.btn-circle-whatsapp:hover {
+  background: linear-gradient(135deg, #128C7E 0%, #075E54 100%);
+  color: #ffffff !important;
+  transform: scale(1.08);
+  box-shadow: 0 4px 14px -1px rgba(37, 211, 102, 0.5);
+}
+
+/* Guest Review Marquee Cards (Crisp White Card Surface + Clear Borders) */
+.review-card {
+  width: 320px;
+  min-width: 320px;
+  max-width: 320px;
+  background: #ffffff;
+  border-radius: 1.25rem;
+  padding: 1.25rem;
+  border: 1.5px solid #cbd5e1;
+  box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.review-card:hover {
+  transform: translateY(-3px);
+  border-color: #f97316;
+  box-shadow: 0 12px 20px -4px rgba(246, 144, 68, 0.18), 0 4px 6px -2px rgba(15, 23, 42, 0.05);
+}
+
+/* Compare Safari Toggle Button (Active & Outline States) */
+.btn-toggle-compare {
+  background-color: #ffffff;
+  color: #334155;
+  border-color: #cbd5e1;
+  transition: all 0.2s ease;
+}
+
+.btn-toggle-compare:hover {
+  border-color: #f97316;
+  color: #ea580c;
+  background-color: #fff7ed;
+}
+
+.btn-toggle-compare.active,
+.btn-toggle-compare.btn-warning {
+  background-color: #fbbf24 !important;
+  color: #0f172a !important;
+  border-color: #d97706 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 8px -1px rgba(217, 119, 6, 0.35) !important;
+}
+
+/* White High-Contrast Hero & CTA Button */
+.btn-cta-white {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border: 2px solid #ffffff !important;
+  font-weight: 800 !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25) !important;
+  transition: all 0.3s ease !important;
+  text-decoration: none !important;
+}
+
+.btn-cta-white:hover,
+.btn-cta-white:focus {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+  border-color: #0f172a !important;
+  transform: translateY(-3px) !important;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35) !important;
+}
+
+.btn-cta-white i {
+  color: #ea580c !important;
+  transition: color 0.3s ease;
+}
+
+.btn-cta-white:hover i {
+  color: #fbbf24 !important;
 }
 
 /* ==========================================================================
