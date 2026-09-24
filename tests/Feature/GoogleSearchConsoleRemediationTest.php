@@ -421,6 +421,16 @@ class GoogleSearchConsoleRemediationTest extends TestCase
         $this->assertStringContainsString('Contact: mailto:security@dunesdiscoverytourism.com', $content);
         $this->assertStringContainsString('Canonical: https://dunesdiscoverytourism.com/.well-known/security.txt', $content);
         $this->assertStringContainsString('Expires:', $content);
+
+        // HTTP Endpoint Test
+        $response = $this->get('/.well-known/security.txt');
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'text/plain; charset=utf-8');
+
+        // Shorthand 301 Redirect Test
+        $redirect = $this->get('/security.txt');
+        $redirect->assertStatus(301);
+        $redirect->assertRedirect('/.well-known/security.txt');
     }
 
     /**
@@ -439,5 +449,3 @@ class GoogleSearchConsoleRemediationTest extends TestCase
         $this->assertStringContainsString('Dunes Discovery Tourism', $respFull->getContent());
     }
 }
-
-

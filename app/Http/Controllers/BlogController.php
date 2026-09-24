@@ -7,6 +7,7 @@ use App\Models\BlogPost;
 use App\Models\BlogTag;
 use App\Services\SettingsService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class BlogController extends Controller
 {
@@ -126,7 +127,7 @@ class BlogController extends Controller
         $canonical = $post->canonical_url ?: route('blog.show', $post->slug);
         $ogImage = $post->og_image ?: $featImgPath;
         $pageTitle = $post->meta_title ?: $post->title.' | Dunes Discovery';
-        $pageDesc = $post->meta_desc ?: ($post->excerpt ?: \Illuminate\Support\Str::limit(strip_tags($post->content), 155));
+        $pageDesc = $post->meta_desc ?: ($post->excerpt ?: Str::limit(strip_tags($post->content), 155));
         $pageKeys = $post->meta_keywords ?: 'dubai, desert safari, travel';
         $ogType = 'article';
         $pageRobots = $post->robots ?: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';

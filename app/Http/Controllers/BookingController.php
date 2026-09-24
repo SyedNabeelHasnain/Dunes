@@ -576,6 +576,7 @@ class BookingController extends Controller
         }
 
         $pageRobots = 'noindex, nofollow';
+
         return view('thankyou', compact('booking', 'paymentStatus', 'method', 'pageRobots'));
     }
 
@@ -627,6 +628,7 @@ class BookingController extends Controller
         }
 
         $pageRobots = 'noindex, nofollow';
+
         return view('payment-cancel', compact('booking', 'pageRobots'));
     }
 

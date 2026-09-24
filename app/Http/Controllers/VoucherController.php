@@ -26,6 +26,7 @@ class VoucherController extends Controller
         }
 
         $pageRobots = 'noindex, nofollow';
+
         return view('booking.voucher', compact('booking', 'qrCodeUrl', 'pageRobots'));
     }
 

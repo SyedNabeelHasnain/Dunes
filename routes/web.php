@@ -255,6 +255,15 @@ Route::get('/sitemap-images.xml', [SitemapController::class, 'images'])->name('s
 Route::get('/llms.txt', [LlmsController::class, 'index'])->name('llms.txt');
 Route::get('/llms-full.txt', [LlmsController::class, 'full'])->name('llms.full');
 
+// ── RFC 9116 Vulnerability Disclosure & Security Policy ──────────────────────
+Route::get('/.well-known/security.txt', function () {
+    return response()->file(public_path('.well-known/security.txt'), [
+        'Content-Type' => 'text/plain; charset=utf-8',
+        'Cache-Control' => 'public, max-age=604800',
+    ]);
+})->name('security.txt');
+Route::redirect('/security.txt', '/.well-known/security.txt', 301);
+
 // ── Explicit High-Value Tour Routes ─────────────────────────────────────────
 Route::get('/dune-buggy-rental-dubai', [TourController::class, 'showBuggy'])->name('tours.buggy');
 
