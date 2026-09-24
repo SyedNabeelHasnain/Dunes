@@ -136,5 +136,18 @@ class VisualQAExportTest extends TestCase
         $this->assertStringContainsString('id="addonsSection"', $html);
         $this->assertStringContainsString('1-Click Add</span>', $html);
         $this->assertStringContainsString('class="addon-horizontal-wrapper flex gap-3 overflow-x-auto pb-3 pt-1 scrollbar-none" id="addonList"', $html);
+
+        // 5. Pickup Location wrapper and input autocomplete readiness (unclipped dropdown)
+        $this->assertStringContainsString('booking-location-wrapper relative', $html);
+        $this->assertStringContainsString('name="location" id="bookingLocation"', $html);
+
+        // 6. Ensure Footer is nested inside the form and inside the modal card (no stray closing div)
+        $formStartPos = strpos($html, '<form id="bookingForm"');
+        $footerPos = strpos($html, '<div class="border-t border-slate-200/90 bg-white py-4 px-5 sm:px-7 shrink-0 shadow-xs z-10">');
+        $formEndPos = strpos($html, '</form>', $footerPos);
+        $this->assertNotFalse($formStartPos);
+        $this->assertNotFalse($footerPos);
+        $this->assertNotFalse($formEndPos);
+        $this->assertTrue($footerPos > $formStartPos && $footerPos < $formEndPos, 'Footer must be nested inside <form id="bookingForm">');
     }
 }

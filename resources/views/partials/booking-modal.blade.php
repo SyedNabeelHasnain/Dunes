@@ -148,12 +148,12 @@
                                     </div>
                                     <input type="hidden" name="children" id="bookingChildren" value="0">
                                 </div>
-                                <div class="sm:col-span-8 lg:col-span-9">
+                                <div class="sm:col-span-8 lg:col-span-9 booking-location-wrapper relative">
                                     <label class="block text-xs font-black uppercase tracking-wider text-slate-800 mb-2" for="bookingLocation">Pickup Location</label>
-                                    <div class="relative rounded-2xl bg-white shadow-2xs border border-slate-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 overflow-hidden flex items-center h-[52px] transition-all">
-                                        <span class="pl-3.5 pr-2 text-primary"><i class="bi bi-geo-alt-fill text-base"></i></span>
-                                        <input type="text" class="flex-1 bg-transparent font-bold text-slate-900 text-sm border-0 focus:outline-none placeholder:text-slate-400" name="location" id="bookingLocation" required placeholder="Hotel / Residence in Dubai" autocomplete="street-address">
-                                        <button class="px-3.5 h-full text-slate-400 hover:text-primary hover:bg-slate-50 border-l border-slate-100 transition-colors cursor-pointer" type="button" id="detectLocation" aria-label="Detect current location">
+                                    <div class="relative rounded-2xl bg-white shadow-2xs border border-slate-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 flex items-center h-[52px] transition-all">
+                                        <span class="pl-3.5 pr-2 text-primary shrink-0"><i class="bi bi-geo-alt-fill text-base"></i></span>
+                                        <input type="text" class="flex-1 bg-transparent font-bold text-slate-900 text-sm border-0 focus:outline-none placeholder:text-slate-400 min-w-0" name="location" id="bookingLocation" required placeholder="Hotel / Residence in Dubai" autocomplete="off">
+                                        <button class="px-3.5 h-full text-slate-400 hover:text-primary hover:bg-slate-50 border-l border-slate-100 transition-colors cursor-pointer rounded-r-2xl shrink-0" type="button" id="detectLocation" aria-label="Detect current location" title="Detect Current Location">
                                             <i class="bi bi-crosshair"></i>
                                         </button>
                                     </div>
@@ -302,7 +302,7 @@
                                     <span>
                                         I agree to the <a href="{{ route('terms') }}" target="_blank" rel="noopener noreferrer" class="text-primary font-bold hover:underline">Terms & Conditions</a> and <a href="{{ route('privacy') }}" target="_blank" rel="noopener noreferrer" class="text-primary font-bold hover:underline">Privacy Policy</a>.
                                     </span>
-                                </label>
+                                								</label>
                                 <label class="flex items-start gap-2.5 text-xs text-slate-500 cursor-pointer">
                                     <input class="mt-0.5 rounded border-slate-300 text-primary focus:ring-primary/20" type="checkbox" id="bookingNewsletter" name="subscribe_newsletter" value="1" checked>
                                     <span>Keep me updated with exclusive desert safari deals, seasonal discounts & travel guides.</span>
@@ -310,7 +310,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
 
                 <!-- Modal Static Fixed Footer with Live Total & Action Buttons -->
                 <div class="border-t border-slate-200/90 bg-white py-4 px-5 sm:px-7 shrink-0 shadow-xs z-10">

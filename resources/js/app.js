@@ -1755,31 +1755,42 @@ const App = {
 
         if (initGooglePlaces()) return;
 
-        // 2. OpenStreetMap / Photon Fallback
+        // 2. OpenStreetMap / Photon Fallback & Comprehensive Dubai Pickups
         const popularLocations = [
             { name: 'Dubai Marina', detail: 'Dubai Marina & JBR area, Dubai' },
             { name: 'Downtown Dubai', detail: 'Burj Khalifa, Dubai Mall & Downtown area' },
-            { name: 'Palm Jumeirah', detail: 'Palm Jumeirah Island & Resorts, Dubai' },
+            { name: 'Palm Jumeirah', detail: 'Palm Jumeirah Island & Luxury Resorts, Dubai' },
             { name: 'Business Bay', detail: 'Business Bay & Canal area, Dubai' },
-            { name: 'Deira Dubai', detail: 'Deira Old Town & Gold Souk area, Dubai' },
-            { name: 'Bur Dubai', detail: 'Bur Dubai & Al Fahidi Historic District' },
-            { name: 'Jumeirah Beach Residence (JBR)', detail: 'JBR Beach & Walk, Dubai' },
-            { name: 'Al Barsha', detail: 'Al Barsha & Mall of the Emirates area' },
-            { name: 'Jumeirah Lake Towers (JLT)', detail: 'JLT & Cluster towers area, Dubai' },
-            { name: 'Atlantis The Palm', detail: 'Crescent Rd, Palm Jumeirah, Dubai' },
+            { name: 'Jumeirah Beach Residence (JBR)', detail: 'The Walk, JBR Beach, Dubai' },
+            { name: 'Al Barsha', detail: 'Mall of the Emirates & Al Barsha, Dubai' },
+            { name: 'Jumeirah Lake Towers (JLT)', detail: 'JLT Clusters & Lakes, Dubai' },
+            { name: 'Deira Dubai', detail: 'Deira Gold Souk & Creek area, Dubai' },
+            { name: 'Bur Dubai', detail: 'Al Fahidi & Meena Bazaar area, Dubai' },
+            { name: 'Atlantis, The Palm & The Royal', detail: 'Crescent Rd, Palm Jumeirah, Dubai' },
+            { name: 'Burj Al Arab & Madinat Jumeirah', detail: 'Jumeirah Beach Rd, Dubai' },
             { name: 'Dubai International Airport (DXB)', detail: 'Terminals 1, 2 & 3, Dubai' },
-            { name: 'Abu Dhabi City Center', detail: 'Corniche & Abu Dhabi Hotels' }
+            { name: 'Dubai Hills Estate', detail: 'Dubai Hills Mall & Boulevard, Dubai' },
+            { name: 'Dubai Creek Harbour', detail: 'Ras Al Khor, Dubai' },
+            { name: 'Bluewaters Island', detail: 'Ain Dubai, Bluewaters, Dubai' },
+            { name: 'City Walk & Al Wasl', detail: 'Al Safa & City Walk area, Dubai' },
+            { name: 'Jumeirah Village Circle (JVC)', detail: 'JVC & Al Barsha South, Dubai' },
+            { name: 'Al Rigga & Deira City Centre', detail: 'Port Saeed, Deira, Dubai' },
+            { name: 'Abu Dhabi City Center', detail: 'Corniche & Abu Dhabi Hotels' },
+            { name: 'Yas Island, Abu Dhabi', detail: 'Yas Hotels & Theme Parks, Abu Dhabi' }
         ];
 
-        let wrapper = locationInput.closest('.booking-location-wrapper') || locationInput.parentElement;
+        const wrapper = locationInput.closest('.booking-location-wrapper') || locationInput.parentElement;
         if (getComputedStyle(wrapper).position === 'static') {
             wrapper.style.position = 'relative';
         }
 
-        const dropdown = document.createElement('div');
-        dropdown.className = 'osm-autocomplete-dropdown shadow-lg rounded-3 border-0';
-        dropdown.style.cssText = 'position:absolute; top:100%; left:0; right:0; z-index:1060; background:#ffffff; display:none; max-height:280px; overflow-y:auto; margin-top:6px; box-shadow:0 10px 30px rgba(0,0,0,0.15); border-radius:12px; border:1px solid rgba(246,144,68,0.25);';
-        wrapper.appendChild(dropdown);
+        let dropdown = wrapper.querySelector('.osm-autocomplete-dropdown');
+        if (!dropdown) {
+            dropdown = document.createElement('div');
+            dropdown.className = 'osm-autocomplete-dropdown shadow-2xl rounded-2xl border border-slate-200/90 bg-white overflow-hidden';
+            dropdown.style.cssText = 'position:absolute; top:calc(100% + 6px); left:0; right:0; z-index:60; background:#ffffff; display:none; max-height:260px; overflow-y:auto; box-shadow:0 20px 40px -15px rgba(0,0,0,0.18); border-radius:16px; border:1px solid #e2e8f0;';
+            wrapper.appendChild(dropdown);
+        }
 
         let debounceTimer = null;
 
@@ -1792,25 +1803,26 @@ const App = {
 
             items.forEach(item => {
                 const el = document.createElement('div');
-                el.className = 'osm-autocomplete-item p-3 text-start d-flex align-items-center gap-3 border-bottom border-light';
-                el.style.cssText = 'cursor:pointer; transition:all 0.15s ease; background:#ffffff;';
+                el.className = 'osm-autocomplete-item px-3.5 py-2.5 text-left flex items-center gap-3 border-b border-slate-100 last:border-b-0 hover:bg-orange-50/70 transition-colors cursor-pointer select-none';
                 el.innerHTML = `
-                    <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width:34px; height:34px; background:#fff4eb; color:#F69044;">
-                        <i class="bi bi-geo-alt-fill" style="font-size:0.9rem;"></i>
+                    <div class="w-7 h-7 rounded-full bg-orange-100/80 text-primary flex items-center justify-center shrink-0 text-xs shadow-2xs">
+                        <i class="bi bi-geo-alt-fill text-xs"></i>
                     </div>
-                    <div class="overflow-hidden">
-                        <div class="fw-bold text-dark text-truncate" style="font-size:0.9rem;">${item.name}</div>
-                        <div class="text-muted text-truncate" style="font-size:0.78rem;">${item.detail || 'Dubai, United Arab Emirates'}</div>
+                    <div class="min-w-0 flex-1">
+                        <div class="font-extrabold text-slate-900 text-xs truncate leading-tight">${item.name}</div>
+                        <div class="text-[11px] font-medium text-slate-500 truncate mt-0.5">${item.detail || 'Dubai, United Arab Emirates'}</div>
                     </div>
+                    <i class="bi bi-arrow-up-left text-slate-300 text-xs shrink-0"></i>
                 `;
-                el.addEventListener('mouseenter', () => { el.style.background = '#fff4eb'; });
-                el.addEventListener('mouseleave', () => { el.style.background = '#ffffff'; });
                 el.addEventListener('mousedown', (e) => {
                     e.preventDefault();
                     locationInput.value = item.name + (item.detail ? ', ' + item.detail : '');
                     locationInput.dispatchEvent(new Event('input', { bubbles: true }));
                     locationInput.dispatchEvent(new Event('change', { bubbles: true }));
                     dropdown.style.display = 'none';
+                    if (typeof this.validateStep1 === 'function') {
+                        this.validateStep1(false);
+                    }
                 });
                 dropdown.appendChild(el);
             });
@@ -1820,35 +1832,60 @@ const App = {
 
         const showPopular = () => renderResults(popularLocations);
 
-        const searchPhoton = async (query) => {
+        const searchLocations = async (query) => {
+            const q = query.trim().toLowerCase();
+            // 1. Instant local filter
+            const localMatches = popularLocations.filter(p => 
+                p.name.toLowerCase().includes(q) || 
+                p.detail.toLowerCase().includes(q)
+            );
+
+            if (localMatches.length > 0) {
+                renderResults(localMatches);
+            }
+
+            // 2. Fetch from Photon with lang=en for granular street/hotel addresses
             try {
-                const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&lat=25.2048&lon=55.2708&limit=6`;
+                const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&lat=25.2048&lon=55.2708&limit=8&lang=en`;
                 const res = await fetch(url);
-                if (!res.ok) return showPopular();
-                const data = await res.json();
-                if (data && data.features && data.features.length > 0) {
-                    const results = data.features.map(f => {
-                        const props = f.properties || {};
-                        const name = props.name || props.street || query;
-                        const parts = [props.district, props.city, props.country].filter(Boolean);
-                        return {
-                            name: name,
-                            detail: parts.join(', ') || 'United Arab Emirates'
-                        };
-                    });
-                    renderResults(results);
-                } else {
-                    const filtered = popularLocations.filter(p => p.name.toLowerCase().includes(query.toLowerCase()) || p.detail.toLowerCase().includes(query.toLowerCase()));
-                    renderResults(filtered.length ? filtered : [{ name: query, detail: 'Dubai, UAE' }]);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.features && data.features.length > 0) {
+                        const photonResults = data.features.map(f => {
+                            const props = f.properties || {};
+                            const name = props['name:en'] || props.name || props.street || query;
+                            const parts = [props.district, props.city, props.country].filter(Boolean);
+                            return {
+                                name: name,
+                                detail: parts.join(', ') || 'United Arab Emirates'
+                            };
+                        });
+
+                        const seen = new Set();
+                        const merged = [];
+                        [...localMatches, ...photonResults].forEach(item => {
+                            const key = item.name.toLowerCase().trim();
+                            if (!seen.has(key)) {
+                                seen.add(key);
+                                merged.push(item);
+                            }
+                        });
+                        if (merged.length > 0) {
+                            renderResults(merged.slice(0, 8));
+                            return;
+                        }
+                    }
                 }
-            } catch (e) {
-                showPopular();
+            } catch (e) {}
+
+            if (localMatches.length === 0) {
+                renderResults([{ name: query, detail: 'Dubai, UAE' }, ...popularLocations.slice(0, 4)]);
             }
         };
 
         locationInput.addEventListener('focus', () => {
             if (!locationInput.value.trim()) showPopular();
-            else searchPhoton(locationInput.value.trim());
+            else searchLocations(locationInput.value.trim());
         });
 
         locationInput.addEventListener('input', () => {
@@ -1858,7 +1895,7 @@ const App = {
                 showPopular();
                 return;
             }
-            debounceTimer = setTimeout(() => searchPhoton(val), 200);
+            debounceTimer = setTimeout(() => searchLocations(val), 150);
         });
 
         document.addEventListener('click', (e) => {
@@ -2437,17 +2474,28 @@ const App = {
 
     async ipLocation(inp) {
         try {
-            const res = await fetch('/ajax.php?action=geoip');
-            const t = await res.text();
-            const d = JSON.parse(t.replace(/^\uFEFF+/, '').trim());
-            const locCity = d.city || d.region;
-            if (locCity) {
-                inp.value = [d.city, d.region].filter(Boolean).join(', ');
-                this.toast('Approximate location detected', 'success');
-                return;
+            const res = await fetch('/api/v1/geoip');
+            if (res.ok) {
+                const d = await res.json();
+                const locCity = d.city || d.region;
+                if (locCity) {
+                    inp.value = [d.city, d.region].filter(Boolean).join(', ');
+                    inp.dispatchEvent(new Event('input', { bubbles: true }));
+                    inp.dispatchEvent(new Event('change', { bubbles: true }));
+                    if (typeof this.validateStep1 === 'function') {
+                        this.validateStep1(false);
+                    }
+                    this.toast('Approximate location detected', 'success');
+                    return;
+                }
             }
         } catch (e) {}
         inp.value = 'Dubai, UAE';
+        inp.dispatchEvent(new Event('input', { bubbles: true }));
+        inp.dispatchEvent(new Event('change', { bubbles: true }));
+        if (typeof this.validateStep1 === 'function') {
+            this.validateStep1(false);
+        }
     },
 
     initForms() {

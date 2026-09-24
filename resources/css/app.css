@@ -919,6 +919,25 @@
   border-color: #ef4444 !important;
 }
 
+/* Location Autocomplete Dropdown */
+.osm-autocomplete-dropdown {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(203, 213, 225, 0.8) transparent;
+}
+.osm-autocomplete-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+.osm-autocomplete-dropdown::-webkit-scrollbar-track {
+  background: transparent;
+}
+.osm-autocomplete-dropdown::-webkit-scrollbar-thumb {
+  background-color: rgba(203, 213, 225, 0.8);
+  border-radius: 9999px;
+}
+.osm-autocomplete-item:hover {
+  background-color: #fff7ed !important;
+}
+
 /* ==========================================================================
    Custom Utilities: Print Stylesheet for Rate Cards & Vouchers
    ========================================================================== */
