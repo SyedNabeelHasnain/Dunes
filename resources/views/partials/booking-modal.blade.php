@@ -95,13 +95,16 @@
                     <div class="step-content active" data-step="1">
                             <div class="mb-5" id="tourSelectWrapper">
                                 <label class="block text-xs font-black uppercase tracking-wider text-slate-800 mb-2" for="bookingTour">Choose Tour</label>
-                                <div class="relative rounded-2xl bg-white shadow-2xs border border-slate-200 overflow-hidden focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
-                                    <select class="w-full px-4 py-3.5 bg-transparent font-bold text-slate-900 text-sm focus:outline-none cursor-pointer" id="bookingTour" name="tour_id" required autocomplete="off">
+                                <div class="relative">
+                                    <select class="w-full h-[52px] appearance-none rounded-2xl bg-white px-4 pr-11 font-bold text-slate-900 text-sm border-2 border-slate-200 shadow-2xs hover:border-slate-300 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all cursor-pointer" id="bookingTour" name="tour_id" required autocomplete="off">
                                         <option value="">Select a tour...</option>
                                         @foreach($modalTours as $t)
                                             <option value="{{ $t->id }}">{{ $t->name }}</option>
                                         @endforeach
                                     </select>
+                                    <div class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 flex items-center justify-center">
+                                        <i class="bi bi-chevron-down text-xs font-black"></i>
+                                    </div>
                                 </div>
                             </div>
 
@@ -137,7 +140,7 @@
                             <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 mb-3">
                                 <div class="sm:col-span-4 lg:col-span-3">
                                     <label class="block text-xs font-black uppercase tracking-wider text-slate-800 mb-2" for="bookingAdults">Guests</label>
-                                    <div class="flex items-center justify-between bg-white shadow-2xs rounded-2xl border border-slate-200 p-1 h-[52px]">
+                                    <div class="flex items-center justify-between bg-white shadow-2xs rounded-2xl border-2 border-slate-200 p-1 h-[52px]">
                                         <button type="button" class="w-10 h-10 flex items-center justify-center text-primary hover:bg-orange-50 rounded-xl transition-colors cursor-pointer" data-action="minus" data-target="adults" aria-label="Decrease guest count">
                                             <i class="bi bi-dash-circle-fill text-lg"></i>
                                         </button>
@@ -150,7 +153,7 @@
                                 </div>
                                 <div class="sm:col-span-8 lg:col-span-9 booking-location-wrapper relative">
                                     <label class="block text-xs font-black uppercase tracking-wider text-slate-800 mb-2" for="bookingLocation">Pickup Location</label>
-                                    <div class="relative rounded-2xl bg-white shadow-2xs border border-slate-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 flex items-center h-[52px] transition-all">
+                                    <div class="relative rounded-2xl bg-white shadow-2xs border-2 border-slate-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 flex items-center h-[52px] transition-all">
                                         <span class="pl-3.5 pr-2 text-primary shrink-0"><i class="bi bi-geo-alt-fill text-base"></i></span>
                                         <input type="text" class="flex-1 bg-transparent font-bold text-slate-900 text-sm border-0 focus:outline-none placeholder:text-slate-400 min-w-0" name="location" id="bookingLocation" required placeholder="Hotel / Residence in Dubai" autocomplete="off">
                                         <button class="px-3.5 h-full text-slate-400 hover:text-primary hover:bg-slate-50 border-l border-slate-100 transition-colors cursor-pointer rounded-r-2xl shrink-0" type="button" id="detectLocation" aria-label="Detect current location" title="Detect Current Location">

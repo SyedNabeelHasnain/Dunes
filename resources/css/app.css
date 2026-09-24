@@ -798,23 +798,6 @@
   border-radius: 9999px;
   box-shadow: 0 2px 6px rgba(249, 115, 22, 0.3);
 }
-.tier-card-check {
-  display: none;
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--color-primary, #F69044);
-  color: #ffffff;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-}
-.tier-card.selected .tier-card-check {
-  display: flex;
-}
 .tier-card-inner {
   display: flex;
   align-items: center;
@@ -836,6 +819,12 @@
   margin: 0;
   line-height: 1.35;
 }
+.tier-card-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
 .tier-card-price {
   text-align: right;
   flex-shrink: 0;
@@ -844,12 +833,39 @@
   font-size: 0.75rem;
   color: #94a3b8;
   text-decoration: line-through;
+  line-height: 1.2;
+  margin-bottom: 2px;
 }
 .tier-card-price .current {
   font-size: 1.15rem;
   font-weight: 900;
   font-family: monospace;
   color: var(--color-primary, #F69044);
+  line-height: 1;
+}
+.tier-card-check {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid #cbd5e1;
+  background: #ffffff;
+  color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 900;
+  flex-shrink: 0;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.tier-card:hover .tier-card-check {
+  border-color: rgba(246, 144, 68, 0.6);
+}
+.tier-card.selected .tier-card-check {
+  background: var(--color-primary, #F69044);
+  border-color: var(--color-primary, #F69044);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(246, 144, 68, 0.35);
 }
 .tier-placeholder {
   padding: 2rem 1rem;

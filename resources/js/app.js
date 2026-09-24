@@ -1796,7 +1796,8 @@ const App = {
 
         const renderResults = (items) => {
             dropdown.innerHTML = '';
-            if (!items || items.length === 0) {
+            // Only render and show if the input is actively focused
+            if (!items || items.length === 0 || document.activeElement !== locationInput) {
                 dropdown.style.display = 'none';
                 return;
             }
@@ -1816,10 +1817,24 @@ const App = {
                 `;
                 el.addEventListener('mousedown', (e) => {
                     e.preventDefault();
+                    e.stopPropagation();
+
+                    // Set chosen value
                     locationInput.value = item.name + (item.detail ? ', ' + item.detail : '');
+
+                    // Immediately hide & clear dropdown
+                    clearTimeout(debounceTimer);
+                    dropdown.innerHTML = '';
+                    dropdown.style.display = 'none';
+
+                    // Mark that selection just occurred to prevent input event from re-opening
+                    locationInput.dataset.justSelected = 'true';
                     locationInput.dispatchEvent(new Event('input', { bubbles: true }));
                     locationInput.dispatchEvent(new Event('change', { bubbles: true }));
-                    dropdown.style.display = 'none';
+
+                    // Blur input as selection is complete
+                    locationInput.blur();
+
                     if (typeof this.validateStep1 === 'function') {
                         this.validateStep1(false);
                     }
@@ -1833,6 +1848,11 @@ const App = {
         const showPopular = () => renderResults(popularLocations);
 
         const searchLocations = async (query) => {
+            if (document.activeElement !== locationInput) {
+                dropdown.style.display = 'none';
+                return;
+            }
+
             const q = query.trim().toLowerCase();
             // 1. Instant local filter
             const localMatches = popularLocations.filter(p => 
@@ -1840,7 +1860,7 @@ const App = {
                 p.detail.toLowerCase().includes(q)
             );
 
-            if (localMatches.length > 0) {
+            if (localMatches.length > 0 && document.activeElement === locationInput) {
                 renderResults(localMatches);
             }
 
@@ -1850,7 +1870,7 @@ const App = {
                 const res = await fetch(url);
                 if (res.ok) {
                     const data = await res.json();
-                    if (data && data.features && data.features.length > 0) {
+                    if (data && data.features && data.features.length > 0 && document.activeElement === locationInput) {
                         const photonResults = data.features.map(f => {
                             const props = f.properties || {};
                             const name = props['name:en'] || props.name || props.street || query;
@@ -1870,7 +1890,7 @@ const App = {
                                 merged.push(item);
                             }
                         });
-                        if (merged.length > 0) {
+                        if (merged.length > 0 && document.activeElement === locationInput) {
                             renderResults(merged.slice(0, 8));
                             return;
                         }
@@ -1878,24 +1898,56 @@ const App = {
                 }
             } catch (e) {}
 
-            if (localMatches.length === 0) {
+            if (localMatches.length === 0 && document.activeElement === locationInput) {
                 renderResults([{ name: query, detail: 'Dubai, UAE' }, ...popularLocations.slice(0, 4)]);
             }
         };
 
         locationInput.addEventListener('focus', () => {
-            if (!locationInput.value.trim()) showPopular();
-            else searchLocations(locationInput.value.trim());
+            if (locationInput.dataset.justSelected === 'true') {
+                return;
+            }
+            const val = locationInput.value.trim();
+            if (val.length >= 2) {
+                searchLocations(val);
+            }
         });
 
         locationInput.addEventListener('input', () => {
+            if (locationInput.dataset.justSelected === 'true') {
+                locationInput.dataset.justSelected = 'false';
+                dropdown.style.display = 'none';
+                return;
+            }
+
+            if (document.activeElement !== locationInput) {
+                dropdown.style.display = 'none';
+                return;
+            }
+
             const val = locationInput.value.trim();
             clearTimeout(debounceTimer);
             if (!val) {
-                showPopular();
+                dropdown.style.display = 'none';
                 return;
             }
-            debounceTimer = setTimeout(() => searchLocations(val), 150);
+            debounceTimer = setTimeout(() => {
+                if (document.activeElement === locationInput) {
+                    searchLocations(val);
+                }
+            }, 150);
+        });
+
+        locationInput.addEventListener('blur', () => {
+            setTimeout(() => {
+                dropdown.style.display = 'none';
+            }, 180);
+        });
+
+        locationInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                dropdown.style.display = 'none';
+            }
         });
 
         document.addEventListener('click', (e) => {
@@ -2025,15 +2077,17 @@ const App = {
                     const pType = (t.price_type || 'per person').toLowerCase();
                     h += `<div class="tier-card${t.is_popular ? ' popular' : ''}" data-tier="${t.id}" data-price="${t.price}" data-name="${t.name}" data-price-type="${pType}">
                         ${t.is_popular ? '<div class="tier-popular-badge">Popular</div>' : ''}
-                        <div class="tier-card-check"><i class="bi bi-check-lg"></i></div>
                         <div class="tier-card-inner">
                             <div class="tier-card-info">
                                 <h4>${t.name}</h4>
                                 <p>${t.description || ''}</p>
                             </div>
-                            <div class="tier-card-price">
-                                ${save ? `<div class="old" data-aed="${t.old_price}">AED ${t.old_price}</div>` : ''}
-                                <div class="current" data-aed="${t.price}">AED ${t.price}</div>
+                            <div class="tier-card-right">
+                                <div class="tier-card-price">
+                                    ${save ? `<div class="old" data-aed="${t.old_price}">AED ${t.old_price}</div>` : ''}
+                                    <div class="current" data-aed="${t.price}">AED ${t.price}</div>
+                                </div>
+                                <div class="tier-card-check"><i class="bi bi-check-lg"></i></div>
                             </div>
                         </div>
                     </div>`;
