@@ -1,6 +1,44 @@
 @extends('layouts.app')
 
 @section('content')
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "{{ request()->url() }}#webpage",
+      "url": "{{ request()->url() }}",
+      "name": "Guest Review & Feedback | Dunes Discovery Tourism",
+      "description": "Verified guest review and rating submission for Dubai desert safaris and tours by Dunes Discovery Tourism.",
+      "isPartOf": {
+        "@type": "WebSite",
+        "@id": "{{ route('home') }}#website",
+        "url": "{{ route('home') }}",
+        "name": "Dunes Discovery Tourism LLC Dubai"
+      },
+      "breadcrumb": {
+        "@type": "BreadcrumbList",
+        "@id": "{{ request()->url() }}#breadcrumb",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "{{ rtrim(route('home'), '/') }}/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Guest Reviews",
+            "item": "{{ request()->url() }}"
+          }
+        ]
+      }
+    }
+  ]
+}
+</script>
 <div class="py-16 sm:py-24 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 min-h-[85vh] text-slate-100 flex items-center">
     <div class="max-w-2xl mx-auto px-4 sm:px-6 w-full">
 
@@ -11,7 +49,7 @@
                     <i class="bi bi-check-circle-fill"></i>
                 </div>
 
-                <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">Thank You, {{ $booking->name }}!</h2>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">Thank You, {{ $booking->name }}!</h1>
                 <p class="text-slate-400 text-sm sm:text-base leading-relaxed mb-6">
                     Your verified review and safari photos have been received. We are thrilled you chose Dunes Discovery Tourism for your Dubai desert adventure!
                 </p>
@@ -50,7 +88,7 @@
                         <span class="inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-full px-3 py-1 text-xs font-bold mb-1.5">
                             <i class="bi bi-patch-check-fill"></i> Verified Guest Experience
                         </span>
-                        <h2 class="text-lg sm:text-xl font-bold text-white mb-0">{{ $booking->tour->name ?? $booking->tour_name ?? 'Dubai Desert Safari' }}</h2>
+                        <h1 class="text-lg sm:text-xl font-bold text-white mb-0">{{ $booking->tour->name ?? $booking->tour_name ?? 'Dubai Desert Safari' }}</h1>
                     </div>
                     <div class="text-left sm:text-right">
                         <span class="text-white/40 block text-[10px] font-bold uppercase tracking-wider">Booking Ref</span>

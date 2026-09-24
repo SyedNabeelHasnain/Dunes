@@ -155,7 +155,7 @@
               "@type": "ListItem",
               "position": 1,
               "name": "Home",
-              "item": "{{ route('home') }}"
+              "item": "{{ rtrim(route('home'), '/') }}/"
             },
             {
               "@type": "ListItem",
@@ -920,9 +920,9 @@ if(window.fbq){
             <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow flex flex-col h-full">
                 <div class="flex justify-between items-start mb-3">
                     <div class="flex items-center gap-3">
-                        <img src="{{ $avatar }}" alt="{{ $rev->reviewer_name }}" class="w-11 h-11 rounded-full object-cover shadow-xs shrink-0" onerror="this.onerror=null;this.src='{{ asset('images/avatar-default.svg') }}'">
+                        <img src="{{ $avatar }}" width="44" height="44" loading="lazy" alt="{{ $rev->reviewer_name }}" class="w-11 h-11 rounded-full object-cover shadow-xs shrink-0" onerror="this.onerror=null;this.src='{{ asset('images/avatar-default.svg') }}'">
                         <div>
-                            <h4 class="font-bold text-slate-900 text-sm mb-0.5">{{ $rev->reviewer_name }}</h4>
+                            <h3 class="font-bold text-slate-900 text-sm mb-0.5">{{ $rev->reviewer_name }}</h3>
                             <span class="text-emerald-600 font-bold text-xs inline-flex items-center gap-1"><i class="bi bi-patch-check-fill"></i>Verified Guest</span>
                         </div>
                     </div>
@@ -934,7 +934,7 @@ if(window.fbq){
                 </div>
 
                 @if($rev->review_title)
-                <h5 class="font-bold text-slate-900 text-sm mb-2">"{{ $rev->review_title }}"</h5>
+                <h4 class="font-bold text-slate-900 text-sm mb-2">"{{ $rev->review_title }}"</h4>
                 @endif
 
                 <p class="text-slate-600 text-xs sm:text-sm mb-4 flex-grow leading-relaxed">
@@ -948,7 +948,7 @@ if(window.fbq){
                     <div class="flex gap-2">
                         @foreach(array_slice($rev->photos, 0, 3) as $photo)
                         <a href="{{ asset($photo) }}" target="_blank" rel="noopener noreferrer" class="w-14 h-14 rounded-xl overflow-hidden shadow-xs border border-slate-200 shrink-0">
-                            <img src="{{ asset($photo) }}" alt="Traveler photo" class="w-full h-full object-cover">
+                            <img src="{{ asset($photo) }}" width="56" height="56" loading="lazy" alt="Verified traveler photo from {{ $tour->name }}" class="w-full h-full object-cover">
                         </a>
                         @endforeach
                     </div>
@@ -993,7 +993,7 @@ if(window.fbq){
             <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-200 hover:border-slate-300 flex flex-col h-full group">
                 <a href="{{ route('tours.show', $t->slug) }}" class="flex flex-col h-full text-inherit">
                     <div class="relative overflow-hidden aspect-[16/10]">
-                        <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }}" loading="lazy">
+                        <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy">
                         @if($t->is_bestseller)
                         <span class="absolute top-3 left-3 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-md inline-flex items-center gap-1">
                             <i class="bi bi-fire text-amber-300"></i>Best Seller

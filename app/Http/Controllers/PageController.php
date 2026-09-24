@@ -292,8 +292,9 @@ class PageController extends Controller
 
         $pageTitle = 'Review Your Safari Adventure | Dunes Discovery Tourism';
         $pageDesc = 'Share your verified guest review, rate your desert safari captain, and upload your tour photos.';
+        $pageRobots = ($ref === 'guest') ? 'index, follow' : 'noindex, nofollow';
 
-        return view('pages.submit-review', compact('booking', 'score', 'googleReviewUrl', 'pageTitle', 'pageDesc'));
+        return view('pages.submit-review', compact('booking', 'score', 'googleReviewUrl', 'pageTitle', 'pageDesc', 'pageRobots'));
     }
 
     /**

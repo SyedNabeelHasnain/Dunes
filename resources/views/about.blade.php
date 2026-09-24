@@ -19,7 +19,7 @@
             "@type": "ListItem",
             "position": 1,
             "name": "Home",
-            "item": "{{ route('home') }}"
+            "item": "{{ rtrim(route('home'), '/') }}/"
           },
           {
             "@type": "ListItem",
@@ -128,7 +128,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div class="lg:col-span-6">
                 <div class="relative">
-                    <img src="{{ asset('images/dubai-desert-safari-tour-dune-discovery-tourism.avif') }}" alt="Dunes Discovery Story" class="w-full rounded-2xl shadow-xl object-cover" onerror="this.src='https://placehold.co/800x600/F58F43/white?text=Our+Story'">
+                    <img src="{{ asset('images/dubai-desert-safari-tour-dune-discovery-tourism.avif') }}" alt="Dunes Discovery Tourism Desert Safari Experience Dubai" width="800" height="600" loading="lazy" class="w-full rounded-2xl shadow-xl object-cover" onerror="this.src='https://placehold.co/800x600/F58F43/white?text=Our+Story'">
                     <div class="hidden sm:block absolute -bottom-6 -right-6 bg-primary text-white p-5 rounded-2xl shadow-2xl">
                         <div class="text-2xl font-black mb-0.5">6+ Years</div>
                         <span class="text-xs text-white/80 block">Of Excellence</span>

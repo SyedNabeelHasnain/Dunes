@@ -440,10 +440,10 @@
                     <div class="flex items-center gap-1.5 sm:gap-2 lg:hidden">
                         <!-- Review Circle Popover Triggers -->
                         <div class="nav-review-circle w-8 h-8 rounded-full bg-white shadow-xs flex items-center justify-center cursor-pointer relative" onclick="toggleReviewPopover(this, event)" id="taCircle" title="TripAdvisor Reviews">
-                            <img src="{{ asset('images/tripadvisor-color-logo.svg') }}" alt="TripAdvisor" class="w-5 h-5 object-contain">
+                            <img src="{{ asset('images/tripadvisor-color-logo.svg') }}" alt="TripAdvisor" width="20" height="20" class="w-5 h-5 object-contain">
                         </div>
                         <div class="nav-review-circle w-8 h-8 rounded-full bg-white shadow-xs flex items-center justify-center cursor-pointer relative" onclick="toggleReviewPopover(this, event)" id="googleCircle" title="Google Reviews">
-                            <img src="{{ asset('images/Google-G.avif') }}" alt="Google" class="w-5 h-5 object-contain">
+                            <img src="{{ asset('images/Google-G.avif') }}" alt="Google" width="20" height="20" class="w-5 h-5 object-contain">
                         </div>
 
                         <!-- Quick Search Button -->
@@ -657,7 +657,7 @@
 
                     <div class="flex flex-wrap gap-2 mt-4">
                         <a href="{{ $settings['social_tripadvisor'] ?? 'https://www.tripadvisor.com/Attraction_Review-g295424-d29026644-Reviews-Dunes_Discovery-Dubai_Emirate_of_Dubai.html' }}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 p-1.5 px-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-colors">
-                            <img src="{{ asset('images/tripadvisor-logo-circle-owl-icon-black-green.png') }}" alt="TripAdvisor" class="w-5 h-5 object-contain">
+                            <img src="{{ asset('images/tripadvisor-logo-circle-owl-icon-black-green.png') }}" alt="TripAdvisor" width="20" height="20" loading="lazy" class="w-5 h-5 object-contain">
                             <div>
                                 <div class="text-white font-bold text-xs leading-none">4.9</div>
                                 <div class="text-amber-400 text-[9px] flex gap-0.5 mt-0.5">
@@ -666,7 +666,7 @@
                             </div>
                         </a>
                         <a href="{{ $settings['social_google'] ?? 'https://search.google.com/local/writereview?placeid=ChIJbWsIEIVEdEER4uHEhb2dbcQ' }}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 p-1.5 px-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-colors">
-                            <img src="https://www.gstatic.com/marketing-cms/assets/images/d5/dc/cfe9ce8b4425b410b49b7f2dd3f3/g.webp=s48-fcrop64=1,00000000ffffffff-rw" alt="Google" class="w-5 h-5 object-contain">
+                            <img src="https://www.gstatic.com/marketing-cms/assets/images/d5/dc/cfe9ce8b4425b410b49b7f2dd3f3/g.webp=s48-fcrop64=1,00000000ffffffff-rw" alt="Google" width="20" height="20" loading="lazy" class="w-5 h-5 object-contain">
                             <div>
                                 <div class="text-white font-bold text-xs leading-none">5.0</div>
                                 <div class="text-amber-400 text-[9px] flex gap-0.5 mt-0.5">

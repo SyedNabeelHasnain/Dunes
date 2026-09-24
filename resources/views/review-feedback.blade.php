@@ -1,3 +1,6 @@
+@php
+    $pageRobots = 'noindex, nofollow';
+@endphp
 @extends('layouts.app')
 
 @section('title', 'Your Feedback - Dunes Discovery Tourism')
@@ -11,7 +14,7 @@
                 <i class="bi bi-chat-heart"></i>
             </div>
 
-            <h2 class="text-2xl font-black text-slate-900 mb-2">We value your honesty</h2>
+            <h1 class="text-2xl font-black text-slate-900 mb-2">We value your honesty</h1>
             <p class="text-slate-500 text-sm leading-relaxed mb-6">
                 Dear <strong class="text-slate-700">{{ $booking->name }}</strong>, our goal is to deliver exceptional 5-star desert safari adventures. Please let us know what we could have done better on your {{ $booking->tour_name }}.
             </p>

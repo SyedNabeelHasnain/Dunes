@@ -19,7 +19,7 @@
             "@type": "ListItem",
             "position": 1,
             "name": "Home",
-            "item": "{{ route('home') }}"
+            "item": "{{ rtrim(route('home'), '/') }}/"
           },
           {
             "@type": "ListItem",

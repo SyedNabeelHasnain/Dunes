@@ -306,7 +306,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                             5% OFF Unlocked
                         </span>
                     </div>
-                    <h3 class="font-extrabold text-white text-xl sm:text-2xl mb-1.5">Undecided on which desert safari is best for your party?</h3>
+                    <h2 class="font-extrabold text-white text-xl sm:text-2xl mb-1.5">Undecided on which desert safari is best for your party?</h2>
                     <p class="text-slate-300 text-sm">Take our 30-second interactive matching quiz or customize your own private 4x4, buggy, and VIP dinner setup.</p>
                 </div>
                 <div class="flex flex-col sm:flex-row gap-3 shrink-0 w-full sm:w-auto">
@@ -343,7 +343,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                 <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-200 hover:border-slate-300 flex flex-col h-full group">
                     <a href="{{ route('tours.show', $t->slug) }}" class="flex flex-col h-full text-inherit">
                         <div class="relative overflow-hidden aspect-[16/10]">
-                            <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }}" loading="lazy">
+                            <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy">
                             @if($t->is_bestseller)
                             <span class="absolute top-3 left-3 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-md inline-flex items-center gap-1">
                                 <i class="bi bi-fire text-amber-300"></i>Best Seller

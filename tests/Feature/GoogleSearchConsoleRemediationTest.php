@@ -255,4 +255,65 @@ class GoogleSearchConsoleRemediationTest extends TestCase
         $this->assertNotEmpty($urls[0]);
         $this->assertEquals(count($urls[0]), count($lastmods[0]), 'Every URL entry in sitemap-pages must have a lastmod timestamp');
     }
+
+    /**
+     * Test 11: Core Public Pages Have Strictly ONE <h1> Heading
+     */
+    public function test_all_core_public_pages_have_strictly_one_h1_heading(): void
+    {
+        $routes = [
+            '/',
+            '/about',
+            '/contact',
+            '/faq',
+            '/tours',
+            '/rate-card',
+            '/blog',
+            '/payment-cancel',
+            '/thankyou',
+            '/review/guest',
+        ];
+
+        foreach ($routes as $route) {
+            $response = $this->get($route);
+            $response->assertStatus(200);
+
+            $content = $response->getContent();
+            $h1Count = substr_count(strtolower($content), '<h1');
+            $this->assertEquals(1, $h1Count, "Route [{$route}] must have strictly ONE <h1> heading");
+        }
+    }
+
+    /**
+     * Test 12: Rate Card Page Has Valid BreadcrumbList Schema
+     */
+    public function test_rate_card_page_has_valid_breadcrumb_list_schema(): void
+    {
+        $response = $this->get('/rate-card');
+        $response->assertStatus(200);
+
+        $content = $response->getContent();
+        $this->assertStringContainsString('"@type": "BreadcrumbList"', $content);
+        $this->assertStringContainsString('"name": "Rate Card"', $content);
+    }
+
+    /**
+     * Test 13: BreadcrumbList Home Entries Match Homepage Canonical Trailing Slash
+     */
+    public function test_breadcrumb_list_home_entries_match_canonical_trailing_slash(): void
+    {
+        $routes = ['/about', '/contact', '/faq', '/rate-card', '/tours', '/blog'];
+
+        foreach ($routes as $route) {
+            $response = $this->get($route);
+            $response->assertStatus(200);
+
+            $content = $response->getContent();
+            $this->assertStringContainsString('"name"', $content);
+            $this->assertStringContainsString('"Home"', $content);
+            preg_match('/"name"\s*:\s*"Home"\s*,\s*"item"\s*:\s*"([^"]+)"/i', $content, $matches);
+            $this->assertNotEmpty($matches, "Home breadcrumb item must be present on [{$route}]");
+            $this->assertStringEndsWith('/', $matches[1], "Breadcrumb home entry on [{$route}] must end with trailing slash");
+        }
+    }
 }

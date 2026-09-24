@@ -40,6 +40,49 @@
 @endpush
 
 @section('content')
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "{{ route('rate-card') }}#webpage",
+      "url": "{{ route('rate-card') }}",
+      "name": "Official Dubai Desert Safaris & Tours Rate Card | Dunes Discovery",
+      "description": "Verified official rates and pricing for Dubai desert safaris, quad biking, dune buggy rentals, marina dhow cruises, and private VIP tours.",
+      "isPartOf": {
+        "@type": "WebSite",
+        "@id": "{{ route('home') }}#website",
+        "url": "{{ route('home') }}",
+        "name": "Dunes Discovery Tourism LLC Dubai"
+      },
+      "breadcrumb": {
+        "@type": "BreadcrumbList",
+        "@id": "{{ route('rate-card') }}#breadcrumb",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "{{ rtrim(route('home'), '/') }}/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Rate Card",
+            "item": "{{ route('rate-card') }}"
+          }
+        ]
+      },
+      "publisher": {
+        "@type": "TravelAgency",
+        "@id": "{{ route('home') }}#organization",
+        "name": "Dunes Discovery Tourism L.L.C"
+      }
+    }
+  ]
+}
+</script>
 <div class="rc-page py-6 sm:py-10 bg-slate-50 min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -68,7 +111,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center relative z-10">
                 <div class="lg:col-span-8">
                     <div class="flex items-center gap-3 mb-3">
-                        <img src="{{ asset('images/logo-white.png') }}" alt="Dunes Discovery Tourism" class="h-10 w-auto">
+                        <img src="{{ asset('images/logo-white.png') }}" alt="Dunes Discovery Tourism" width="160" height="46" class="h-10 w-auto">
                         <span class="bg-amber-400 text-slate-950 font-bold rounded-full px-3 py-0.5 text-[11px] uppercase tracking-wider">
                             Official 2026 Price Guide
                         </span>
@@ -152,7 +195,7 @@
                             @php
                                 $imgFile = !empty($t->hero_image) ? preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->hero_image) : 'desert-safari-poster.avif';
                             @endphp
-                            <img src="{{ asset('images/' . $imgFile) }}" alt="{{ $t->name }}" loading="lazy" class="w-full h-full object-cover">
+                            <img src="{{ asset('images/' . $imgFile) }}" width="400" height="250" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy" class="w-full h-full object-cover">
                             <div class="absolute top-2.5 left-2.5 flex flex-col gap-1.5">
                                 @if($t->is_bestseller)
                                 <span class="bg-amber-400 text-slate-950 font-bold rounded-full px-2.5 py-0.5 text-[10px] uppercase shadow-xs">

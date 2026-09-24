@@ -24,7 +24,7 @@
             "@type": "ListItem",
             "position": 1,
             "name": "Home",
-            "item": "{{ url('/') }}"
+            "item": "{{ rtrim(url('/'), '/') }}/"
           },
           {
             "@type": "ListItem",
@@ -341,7 +341,7 @@
                     <div class="bg-slate-900 border border-white/10 rounded-2xl overflow-hidden flex flex-col h-full transition-all duration-300 hover:-translate-y-1 hover:border-primary hover:shadow-2xl">
                         <!-- Image Wrap -->
                         <div class="relative h-56 overflow-hidden">
-                            <img src="{{ $heroImg }}" alt="{{ $tour->name }} from {{ $locationData['name'] }}" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+                            <img src="{{ $heroImg }}" width="400" height="224" alt="{{ $tour->name }} from {{ $locationData['name'] }}" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
                             <div class="absolute top-3 left-3">
                                 <span class="inline-flex items-center gap-1 bg-slate-950/80 text-amber-400 border border-amber-400/30 backdrop-blur-md rounded-full px-2.5 py-1 text-xs font-bold">
                                     <i class="bi bi-star-fill text-amber-400"></i> {{ $tour->rating ?: '4.9' }} ({{ $tour->review_count ?: '480+' }})

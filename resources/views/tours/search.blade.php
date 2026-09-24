@@ -16,7 +16,7 @@
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "{{ route('home') }}"
+        "item": "{{ rtrim(route('home'), '/') }}/"
       },
       {
         "@type": "ListItem",
@@ -244,7 +244,7 @@
                     <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col h-full group">
                         <a href="{{ route('tours.show', $t->slug) }}" class="flex flex-col h-full text-inherit">
                             <div class="relative overflow-hidden aspect-[16/10]">
-                                <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai" loading="lazy">
+                                <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy">
                                 @if($t->is_bestseller)
                                 <span class="absolute top-3 left-3 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-md inline-flex items-center gap-1">
                                     <i class="bi bi-fire text-amber-300"></i>Best Seller

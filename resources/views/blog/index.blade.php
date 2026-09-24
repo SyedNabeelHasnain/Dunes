@@ -13,7 +13,7 @@
   "@@context": "https://schema.org",
   "@type": "BreadcrumbList",
   "itemListElement": [
-    {"@type":"ListItem","position":1,"name":"Home","item":"{{ route('home') }}"},
+    {"@type":"ListItem","position":1,"name":"Home","item":"{{ rtrim(route('home'), '/') }}/"},
     {"@type":"ListItem","position":2,"name":"Blog","item":"{{ route('blog.index') }}"}
     @if ($cat)
     ,{"@type":"ListItem","position":3,"name":"{{ $cat->name }}","item":"{{ route('blog.index', ['category' => $cat->slug]) }}"}
@@ -116,7 +116,7 @@
                 <a href="{{ route('blog.show', $featuredPost->slug) }}" class="block h-full group text-inherit">
                     <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 flex flex-col h-full">
                         <div class="relative overflow-hidden aspect-[16/9]">
-                            <img src="{{ $featuredImg }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $featuredPost->featured_image_alt ?: $featuredPost->title }}">
+                            <img src="{{ $featuredImg }}" width="800" height="450" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $featuredPost->featured_image_alt ?: $featuredPost->title }}">
                             @if ($featuredPost->category)
                             <span class="absolute top-4 left-4 bg-primary text-white rounded-full px-3 py-1 text-xs font-bold shadow-md">{{ $featuredPost->category?->name }}</span>
                             @endif
@@ -150,7 +150,7 @@
                 <a href="{{ route('blog.show', $sidePost->slug) }}" class="block flex-1 group text-inherit">
                     <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-200 flex flex-col sm:flex-row h-full">
                         <div class="sm:w-5/12 relative aspect-[16/10] sm:aspect-auto">
-                            <img src="{{ $sideImg }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $sidePost->featured_image_alt ?: $sidePost->title }}">
+                            <img src="{{ $sideImg }}" width="400" height="250" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $sidePost->featured_image_alt ?: $sidePost->title }}">
                             @if ($sidePost->category)
                             <span class="absolute top-2 left-2 bg-primary text-white rounded-full px-2 py-0.5 text-[10px] font-bold shadow-sm">{{ $sidePost->category?->name }}</span>
                             @endif
@@ -213,7 +213,7 @@
         @endphp
         <article class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 flex flex-col h-full group">
             <a href="{{ route('blog.show', $post->slug) }}" class="block relative aspect-[16/10] overflow-hidden">
-                <img src="{{ $postImg }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $post->featured_image_alt ?: $post->title }}" loading="lazy">
+                <img src="{{ $postImg }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $post->featured_image_alt ?: $post->title }}" loading="lazy">
                 @if ($post->category)
                 <span class="absolute top-3 left-3 bg-primary text-white rounded-full px-2.5 py-0.5 text-xs font-bold shadow-sm">{{ $post->category?->name }}</span>
                 @endif

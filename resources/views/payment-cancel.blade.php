@@ -10,7 +10,7 @@
             <div class="w-16 h-16 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center text-3xl mx-auto mb-4">
                 <i class="bi bi-x-circle-fill"></i>
             </div>
-            <h2 class="text-2xl font-black text-slate-900 mb-2">Payment Cancelled</h2>
+            <h1 class="text-2xl font-black text-slate-900 mb-2">Payment Cancelled</h1>
             <p class="text-slate-500 text-sm sm:text-base leading-relaxed mb-4">
                 Your payment was not completed. You can retry your reservation or contact our concierge team for immediate assistance.
             </p>

@@ -18,7 +18,7 @@
     
     // Breadcrumb Schema
     $breadcrumbItems = [
-        ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => route('home')],
+        ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => rtrim(route('home'), '/') . '/'],
         ['@type' => 'ListItem', 'position' => 2, 'name' => 'Blog', 'item' => route('blog.index')]
     ];
     if ($post->category) {
