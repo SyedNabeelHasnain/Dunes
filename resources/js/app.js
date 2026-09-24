@@ -2017,19 +2017,23 @@ const App = {
                 let ah = '';
                 data.addons.forEach(a => {
                     const iconName = a.icon ? (a.icon.startsWith('bi-') ? a.icon : 'bi-' + a.icon) : 'bi-plus-circle';
-                    ah += `<div class="addon-card-horizontal" data-addon="${a.id}" data-price="${a.price}">
-                        <input type="checkbox" name="addons[]" value="${a.id}">
-                        <div class="addon-check-abs"><i class="bi bi-check-lg"></i></div>
-                        <div class="d-flex align-items-center gap-2 mb-2">
-                            <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; font-size: 0.95rem;">
-                                <i class="${iconName}"></i>
-                            </div>
-                            <h5 class="fw-bold text-dark mb-0 fs-6 text-truncate" style="max-width: 140px;">${a.name}</h5>
+                    ah += `<div class="addon-card-horizontal group relative flex flex-col justify-between p-3.5 sm:p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-primary/60 hover:shadow-md transition-all cursor-pointer select-none shrink-0" data-addon="${a.id}" data-price="${a.price}">
+                        <input type="checkbox" name="addons[]" value="${a.id}" class="sr-only">
+                        <div class="addon-check-abs hidden absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-500 text-white items-center justify-center text-[10px] font-black shadow-2xs">
+                            <i class="bi bi-check-lg"></i>
                         </div>
-                        <p class="small text-muted mb-2 lh-sm text-truncate-2" style="font-size: 0.78rem; min-height: 28px;">${a.description || 'Optional safari enhancement'}</p>
-                        <div class="mt-auto d-flex align-items-center justify-content-between">
-                            <span class="badge bg-light text-dark border fw-bold rounded-pill" data-aed="${a.price}" data-is-addon="true">+AED ${parseFloat(a.price).toFixed(2)}</span>
-                            <span class="small fw-bold text-primary addon-status-label" style="font-size: 0.75rem;">+ Add</span>
+                        <div>
+                            <div class="flex items-center gap-2.5 mb-2 pr-6">
+                                <div class="w-8 h-8 rounded-xl bg-orange-50 text-primary border border-orange-200/60 flex items-center justify-center shrink-0 text-sm">
+                                    <i class="${iconName}"></i>
+                                </div>
+                                <h5 class="font-extrabold text-slate-900 text-xs sm:text-sm leading-tight truncate" title="${a.name}">${a.name}</h5>
+                            </div>
+                            <p class="text-[11px] text-slate-500 font-medium line-clamp-2 mb-3 leading-relaxed min-h-[32px]">${a.description || 'Optional safari enhancement'}</p>
+                        </div>
+                        <div class="mt-auto pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
+                            <span class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-800 font-black text-xs font-mono border border-slate-200/80 shadow-2xs" data-aed="${a.price}" data-is-addon="true">+AED ${parseFloat(a.price).toFixed(2)}</span>
+                            <span class="addon-status-label inline-flex items-center gap-1 text-[11px] font-extrabold text-primary bg-orange-50 hover:bg-orange-100 border border-orange-200/80 px-2.5 py-0.5 rounded-full transition-all">+ Add</span>
                         </div>
                     </div>`;
                 });
@@ -2043,14 +2047,29 @@ const App = {
                     item.addEventListener('click', e => {
                         if (e.target.tagName !== 'INPUT') {
                             const inp = item.querySelector('input');
-                            inp.checked = !inp.checked;
+                            if (inp) inp.checked = !inp.checked;
                         }
-                        const isChecked = item.querySelector('input').checked;
+                        const isChecked = item.querySelector('input')?.checked || false;
                         item.classList.toggle('selected', isChecked);
+                        const checkBadge = item.querySelector('.addon-check-abs');
+                        if (checkBadge) {
+                            if (isChecked) {
+                                checkBadge.classList.remove('hidden');
+                                checkBadge.classList.add('flex');
+                            } else {
+                                checkBadge.classList.add('hidden');
+                                checkBadge.classList.remove('flex');
+                            }
+                        }
                         const statusLabel = item.querySelector('.addon-status-label');
                         if (statusLabel) {
-                            statusLabel.textContent = isChecked ? '✓ Added' : '+ Add';
-                            statusLabel.className = isChecked ? 'small fw-bold text-success addon-status-label' : 'small fw-bold text-primary addon-status-label';
+                            if (isChecked) {
+                                statusLabel.textContent = '✓ Added';
+                                statusLabel.className = 'addon-status-label inline-flex items-center gap-1 text-[11px] font-black text-white bg-emerald-500 border border-emerald-600 px-2.5 py-0.5 rounded-full shadow-2xs transition-all';
+                            } else {
+                                statusLabel.textContent = '+ Add';
+                                statusLabel.className = 'addon-status-label inline-flex items-center gap-1 text-[11px] font-extrabold text-primary bg-orange-50 border border-orange-200/80 px-2.5 py-0.5 rounded-full transition-all';
+                            }
                         }
                         this.updateAddons();
                     });
@@ -2164,7 +2183,7 @@ const App = {
         if (totalEl) totalEl.innerHTML = formatMoney(total);
         if (summaryTotalEl) {
             if (discount > 0) {
-                summaryTotalEl.innerHTML = `<span class="text-decoration-line-through text-muted small me-2">${formatMoney(baseTotal)}</span> <span class="text-success fw-bold">${formatMoney(total)}</span>`;
+                summaryTotalEl.innerHTML = `<span class="line-through text-slate-400 text-xs me-2">${formatMoney(baseTotal)}</span> <span class="text-emerald-600 font-extrabold">${formatMoney(total)}</span>`;
             } else {
                 summaryTotalEl.innerHTML = formatMoney(total);
             }
@@ -2174,12 +2193,12 @@ const App = {
         const submitBtn = document.getElementById('submitBooking');
         if (submitBtn) {
             if (method === 'cash') {
-                submitBtn.innerHTML = 'Confirm <i class="bi bi-check-lg"></i>';
+                submitBtn.innerHTML = '<span>Confirm Booking</span> <i class="bi bi-check-lg text-lg"></i>';
             } else {
                 const cur = Alpine.store('currency').code;
                 const converted = payNow * (Alpine.store('currency').rates[cur] || 1);
                 const approx = cur !== 'AED' ? ` (~ ${Alpine.store('currency').symbols[cur]}${Math.round(converted)})` : '';
-                submitBtn.innerHTML = `Pay AED ${Number(payNow).toFixed(2)}${approx} <i class="bi bi-credit-card"></i>`;
+                submitBtn.innerHTML = `<span>Pay AED ${Number(payNow).toFixed(2)}${approx}</span> <i class="bi bi-credit-card text-lg"></i>`;
             }
         }
     },

@@ -68,31 +68,31 @@
             </div>
 
             <!-- Modal Body & Form -->
-            <div class="flex-1 overflow-y-auto bg-slate-50 min-h-0">
-                <form id="bookingForm" autocomplete="off" class="h-full flex flex-col needs-validation">
-                    @csrf
-                    <!-- Honeypot anti-spam field -->
-                    <div style="position:absolute;left:-9999px">
-                        <input type="text" name="website_url" value="" tabindex="-1" autocomplete="off">
-                    </div>
-                    <input type="hidden" name="action" value="booking">
-                    <input type="hidden" name="utm_source" id="utmSource">
-                    <input type="hidden" name="utm_medium" id="utmMedium">
-                    <input type="hidden" name="utm_campaign" id="utmCampaign">
-                    <input type="hidden" name="gps_lat" id="gpsLat">
-                    <input type="hidden" name="gps_lng" id="gpsLng">
-                    <input type="hidden" name="gps_address" id="gpsAddress">
-                    <input type="hidden" name="gps_accuracy" id="gpsAccuracy">
-                    <input type="hidden" name="gps_timestamp" id="gpsTimestamp">
-                    <input type="hidden" name="gps_consent" id="gpsConsent" value="No">
-                    <input type="hidden" name="gps_source" id="gpsSource" value="Not Available">
-                    <input type="hidden" name="payment_method" id="paymentMethod" value="cash">
-                    <input type="hidden" name="payment_amount" id="paymentAmount" value="0">
+            <form id="bookingForm" autocomplete="off" class="flex-1 flex flex-col min-h-0 needs-validation m-0 p-0">
+                @csrf
+                <!-- Honeypot anti-spam field -->
+                <div style="position:absolute;left:-9999px">
+                    <input type="text" name="website_url" value="" tabindex="-1" autocomplete="off">
+                </div>
+                <input type="hidden" name="action" value="booking">
+                <input type="hidden" name="utm_source" id="utmSource">
+                <input type="hidden" name="utm_medium" id="utmMedium">
+                <input type="hidden" name="utm_campaign" id="utmCampaign">
+                <input type="hidden" name="gps_lat" id="gpsLat">
+                <input type="hidden" name="gps_lng" id="gpsLng">
+                <input type="hidden" name="gps_address" id="gpsAddress">
+                <input type="hidden" name="gps_accuracy" id="gpsAccuracy">
+                <input type="hidden" name="gps_timestamp" id="gpsTimestamp">
+                <input type="hidden" name="gps_consent" id="gpsConsent" value="No">
+                <input type="hidden" name="gps_source" id="gpsSource" value="Not Available">
+                <input type="hidden" name="payment_method" id="paymentMethod" value="cash">
+                <input type="hidden" name="payment_amount" id="paymentAmount" value="0">
 
-                    <div class="booking-scroll-area p-4 sm:p-6 flex-1">
+                <!-- Scrollable Body ONLY -->
+                <div class="booking-scroll-area flex-1 overflow-y-auto bg-slate-50 min-h-0 p-4 sm:p-6 lg:p-7">
 
-                        <!-- Step 1: Select Tour, Package and Date -->
-                        <div class="step-content active" data-step="1">
+                    <!-- Step 1: Select Tour, Package and Date -->
+                    <div class="step-content active" data-step="1">
                             <div class="mb-5" id="tourSelectWrapper">
                                 <label class="block text-xs font-black uppercase tracking-wider text-slate-800 mb-2" for="bookingTour">Choose Tour</label>
                                 <div class="relative rounded-2xl bg-white shadow-2xs border border-slate-200 overflow-hidden focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
@@ -180,15 +180,15 @@
                             </div>
 
                             <!-- Dynamic Tour-Specific Addons Section -->
-                            <div class="mb-5" id="addonsSection" style="display:none">
-                                <div class="flex items-center justify-between mb-2">
+                            <div class="mb-6" id="addonsSection" style="display:none">
+                                <div class="flex items-center justify-between mb-2.5">
                                     <div class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
                                         <i class="bi bi-stars text-amber-500"></i>
                                         <span>Enhance Your Safari (Optional Add-ons)</span>
                                     </div>
-                                    <span class="px-2 py-0.5 rounded-full bg-orange-50 text-primary text-[10px] font-bold">1-Click Add</span>
+                                    <span class="px-2.5 py-0.5 rounded-full bg-orange-50 text-primary border border-orange-200/60 text-[10px] font-extrabold uppercase tracking-wide">1-Click Add</span>
                                 </div>
-                                <div class="addon-horizontal-wrapper flex gap-2 overflow-x-auto pb-2 scrollbar-none" id="addonList"></div>
+                                <div class="addon-horizontal-wrapper flex gap-3 overflow-x-auto pb-3 pt-1 scrollbar-none" id="addonList"></div>
                             </div>
 
                             <!-- OTP verification state banners -->
@@ -310,32 +310,32 @@
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Modal Sticky Footer with Live Total & Action Buttons -->
-                    <div class="border-t border-slate-200/80 bg-white py-3.5 px-4 sm:px-6 sticky bottom-0 z-20 pb-safe shrink-0 shadow-lg">
-                        <div class="flex items-center justify-between w-full">
-                            <div class="text-left">
-                                <small class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Total Amount</small>
-                                <div class="font-black text-primary font-mono text-xl sm:text-2xl leading-none" id="bookingTotal">AED 0.00</div>
-                            </div>
-                            <div class="flex items-center gap-2 ml-auto" id="continueBtnWrapper">
-                                <button type="button" 
-                                        class="px-5 sm:px-7 py-3 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all cursor-pointer inline-flex items-center gap-2" 
-                                        id="nextStep">
-                                    <span>Continue</span>
-                                    <i class="bi bi-arrow-right"></i>
-                                </button>
-                                <button type="submit" 
-                                        class="px-5 sm:px-7 py-3 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all cursor-pointer hidden items-center gap-2" 
-                                        id="submitBooking">
-                                    <span>Confirm Booking</span>
-                                    <i class="bi bi-check-lg"></i>
-                                </button>
-                            </div>
+                <!-- Modal Static Fixed Footer with Live Total & Action Buttons -->
+                <div class="border-t border-slate-200/90 bg-white py-4 px-5 sm:px-7 shrink-0 shadow-xs z-10">
+                    <div class="flex items-center justify-between w-full gap-4">
+                        <div class="text-left">
+                            <small class="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-slate-500 block mb-0.5">Total Amount</small>
+                            <div class="font-black text-primary font-mono text-xl sm:text-2xl leading-none" id="bookingTotal">AED 0.00</div>
+                        </div>
+                        <div class="flex items-center gap-2.5 ml-auto" id="continueBtnWrapper">
+                            <button type="button" 
+                                    class="px-6 sm:px-8 py-3 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all cursor-pointer inline-flex items-center gap-2" 
+                                    id="nextStep">
+                                <span>Continue</span>
+                                <i class="bi bi-arrow-right"></i>
+                            </button>
+                            <button type="submit" 
+                                    class="px-6 sm:px-8 py-3 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all cursor-pointer hidden items-center gap-2" 
+                                    id="submitBooking">
+                                <span>Confirm Booking</span>
+                                <i class="bi bi-check-lg text-base"></i>
+                            </button>
                         </div>
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>

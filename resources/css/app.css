@@ -866,22 +866,27 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--color-slate-200, #e2e8f0);
-  border-radius: 1rem;
-  padding: 0.85rem;
-  background: #ffffff;
+  justify-content: space-between;
+  border: 1.5px solid var(--color-slate-200, #e2e8f0);
+  border-radius: 1.25rem;
+  padding: 1rem;
+  background: #ffffff !important;
   cursor: pointer;
-  transition: all 0.2s ease;
-  min-width: 170px;
-  max-width: 200px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 200px;
+  max-width: 230px;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 .addon-card-horizontal:hover {
-  border-color: rgba(246, 144, 68, 0.4);
+  border-color: var(--color-primary, #F69044);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px -2px rgba(246, 144, 68, 0.15);
 }
 .addon-card-horizontal.selected {
-  border-color: var(--color-primary, #F69044);
-  background: #fff9f5;
-  box-shadow: 0 0 0 1px var(--color-primary, #F69044);
+  border-color: var(--color-primary, #F69044) !important;
+  background: #fff8f3 !important;
+  box-shadow: 0 0 0 1px var(--color-primary, #F69044), 0 4px 14px rgba(246, 144, 68, 0.18) !important;
 }
 .addon-card-horizontal input[type="checkbox"] {
   display: none;
@@ -889,19 +894,20 @@
 .addon-check-abs {
   display: none;
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 18px;
-  height: 18px;
+  top: 10px;
+  right: 10px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: #10b981;
   color: #ffffff;
   align-items: center;
   justify-content: center;
-  font-size: 0.65rem;
+  font-size: 0.7rem;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
 }
 .addon-card-horizontal.selected .addon-check-abs {
-  display: flex;
+  display: flex !important;
 }
 
 /* Form Validation Field Animations */

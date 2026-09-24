@@ -115,4 +115,26 @@ class VisualQAExportTest extends TestCase
         $this->assertStringContainsString('class="relative z-10 w-full max-w-2xl transform overflow-hidden rounded-3xl bg-slate-950 p-5 sm:p-7 text-left align-middle shadow-2xl transition-all border border-orange-500/40 text-white flex flex-col min-h-[500px]"', $html);
         $this->assertStringContainsString('class="relative z-10 w-full max-w-5xl transform overflow-hidden rounded-3xl bg-slate-950 text-left align-middle shadow-2xl transition-all border border-orange-500/40 text-white flex flex-col max-h-[92vh]"', $html);
     }
+
+    public function test_booking_modal_has_isolated_body_scroll_and_anchored_footer(): void
+    {
+        $response = $this->get('/');
+        $response->assertStatus(200);
+        $html = $response->getContent();
+
+        // 1. Form wraps the whole body and footer as a flex column
+        $this->assertStringContainsString('<form id="bookingForm" autocomplete="off" class="flex-1 flex flex-col min-h-0 needs-validation m-0 p-0">', $html);
+
+        // 2. Scrollable area is isolated to the body ONLY
+        $this->assertStringContainsString('<div class="booking-scroll-area flex-1 overflow-y-auto bg-slate-50 min-h-0 p-4 sm:p-6 lg:p-7">', $html);
+
+        // 3. Footer is anchored statically outside the scrollable body with generous padding
+        $this->assertStringContainsString('<div class="border-t border-slate-200/90 bg-white py-4 px-5 sm:px-7 shrink-0 shadow-xs z-10">', $html);
+        $this->assertStringContainsString('<span>Confirm Booking</span>', $html);
+
+        // 4. Addons section has clean spacing and 1-click pill
+        $this->assertStringContainsString('id="addonsSection"', $html);
+        $this->assertStringContainsString('1-Click Add</span>', $html);
+        $this->assertStringContainsString('class="addon-horizontal-wrapper flex gap-3 overflow-x-auto pb-3 pt-1 scrollbar-none" id="addonList"', $html);
+    }
 }
