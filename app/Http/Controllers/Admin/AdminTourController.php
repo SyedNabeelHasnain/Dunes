@@ -99,6 +99,9 @@ class AdminTourController extends Controller
         }
 
         Cache::forget('site_tours_header_cache');
+        Cache::forget('site_home_cache');
+        Cache::forget('sitemap_tours_xml');
+        Cache::forget('sitemap_images_xml');
 
         return redirect()->route('admin.tours.index')->with('success', 'Tour created successfully.');
     }
@@ -178,6 +181,8 @@ class AdminTourController extends Controller
 
         Cache::forget('site_tours_header_cache');
         Cache::forget('site_home_cache');
+        Cache::forget('sitemap_tours_xml');
+        Cache::forget('sitemap_images_xml');
 
         return redirect()->route('admin.tours.index')->with('success', 'Tour updated successfully.');
     }
@@ -191,6 +196,8 @@ class AdminTourController extends Controller
         $tour->delete();
         Cache::forget('site_tours_header_cache');
         Cache::forget('site_home_cache');
+        Cache::forget('sitemap_tours_xml');
+        Cache::forget('sitemap_images_xml');
 
         return redirect()->route('admin.tours.index')->with('success', 'Tour deleted successfully.');
     }
@@ -560,6 +567,11 @@ class AdminTourController extends Controller
         $tour = Tour::findOrFail($id);
         $tour->status = $tour->status === 'active' ? 'inactive' : 'active';
         $tour->save();
+
+        Cache::forget('site_tours_header_cache');
+        Cache::forget('site_home_cache');
+        Cache::forget('sitemap_tours_xml');
+        Cache::forget('sitemap_images_xml');
 
         return response()->json([
             'success' => true,

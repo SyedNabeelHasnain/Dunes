@@ -1,3 +1,6 @@
+@php
+    $pageRobots = 'noindex, nofollow';
+@endphp
 @extends('layouts.app')
 
 @section('page_title', 'Manage Email Subscription | ' . ($settings['site_name'] ?? 'Dunes Discovery Tourism'))

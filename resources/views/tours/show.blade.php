@@ -76,13 +76,15 @@
               "sameAs": "https://www.wikidata.org/wiki/Q612"
             }
           ],
+          @if(($tour->review_count ?? 0) > 0)
           "aggregateRating": {
             "@type": "AggregateRating",
-            "ratingValue": "{{ $tour->rating ?: '4.9' }}",
-            "reviewCount": "{{ $tour->review_count ?: '1247' }}",
+            "ratingValue": "{{ $tour->rating ?: '5.0' }}",
+            "reviewCount": "{{ $tour->review_count }}",
             "bestRating": "5",
             "worstRating": "1"
           },
+          @endif
           @if(isset($approvedReviews) && $approvedReviews->count() > 0)
           "review": [
             @foreach($approvedReviews as $ridx => $rev)
@@ -108,7 +110,7 @@
             "url": {!! json_encode(request()->url()) !!},
             "priceCurrency": "AED",
             "price": "{{ number_format($minPrice, 2, '.', '') }}",
-            "priceValidUntil": "2026-12-31",
+            "priceValidUntil": "{{ now()->addYear()->endOfYear()->format('Y-m-d') }}",
             "validFrom": "{{ now()->startOfYear()->toIso8601String() }}",
             "itemCondition": "https://schema.org/NewCondition",
             "availability": "https://schema.org/InStock",

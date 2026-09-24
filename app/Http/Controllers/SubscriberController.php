@@ -121,6 +121,7 @@ class SubscriberController extends Controller
             return response()->view('subscribers.unsubscribe', [
                 'subscriber' => null,
                 'message' => 'Invalid or expired unsubscribe link.',
+                'pageRobots' => 'noindex, nofollow',
             ], 404);
         }
 
@@ -128,6 +129,7 @@ class SubscriberController extends Controller
             'subscriber' => $subscriber,
             'token' => $token,
             'alreadyUnsubscribed' => $subscriber->status === 'unsubscribed',
+            'pageRobots' => 'noindex, nofollow',
         ]);
     }
 
@@ -142,6 +144,7 @@ class SubscriberController extends Controller
             return response()->view('subscribers.unsubscribe', [
                 'subscriber' => null,
                 'message' => 'Invalid or expired unsubscribe link.',
+                'pageRobots' => 'noindex, nofollow',
             ], 404);
         }
 
@@ -171,6 +174,7 @@ class SubscriberController extends Controller
             'subscriber' => $subscriber,
             'token' => $token,
             'completed' => true,
+            'pageRobots' => 'noindex, nofollow',
         ]);
     }
 

@@ -212,8 +212,7 @@ class TourController extends Controller
         $pageDesc = "Looking for {$displayQuery}? Compare verified Dubai desert safari packages with 4x4 hotel pickup, 5-star live BBQ dinner, and instant confirmation. DET Licensed #1430583.";
         $pageKeys = strtolower("{$cleanQuery}, {$cleanQuery} dubai, best {$cleanQuery} dubai, desert safari dubai, dunes discovery");
         $canonical = route('tours.search', ['q' => $cleanQuery]);
-        $robotsMeta = $isFallback ? 'noindex, follow' : 'index, follow, max-snippet:-1, max-image-preview:large';
-        $pageRobots = $robotsMeta;
+        $pageRobots = 'noindex, follow';
 
         $ogImage = asset('images/desert-safari-poster.avif');
         if ($tours->isNotEmpty() && $tours->first()->hero_image) {
@@ -241,7 +240,6 @@ class TourController extends Controller
             'pageDesc',
             'pageKeys',
             'canonical',
-            'robotsMeta',
             'pageRobots',
             'ogImage'
         ));

@@ -70,13 +70,6 @@
     <link rel="preload" as="image" href="{{ $featImgPath }}" type="image/avif">
 @endpush
 
-<!-- Article OG Overrides & Metadata -->
-@push('scripts')
-<script>
-    document.querySelector('meta[property="og:type"]')?.setAttribute('content', 'article');
-</script>
-@endpush
-
 <script type="application/ld+json">{!! json_encode($articleSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
 <script type="application/ld+json">{!! json_encode($breadcrumbSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
 @if ($post->faqs->count() > 0)

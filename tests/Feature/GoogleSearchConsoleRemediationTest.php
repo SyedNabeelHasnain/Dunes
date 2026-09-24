@@ -2,6 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\BlogCategory;
+use App\Models\BlogPost;
+use App\Models\Booking;
 use App\Models\Tour;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -128,5 +131,128 @@ class GoogleSearchConsoleRemediationTest extends TestCase
 
         $secondLoc = $matches[1][1];
         $this->assertFalse(str_ends_with($secondLoc, '/'), 'Sitemap subpage entry must NOT terminate with a trailing slash');
+    }
+
+    /**
+     * Test 6: Blog Post Server Renders og:type article and Canonical
+     */
+    public function test_blog_post_server_renders_og_type_article_and_canonical(): void
+    {
+        $category = BlogCategory::create([
+            'name' => 'Safari Guides',
+            'slug' => 'safari-guides',
+            'status' => 'active',
+        ]);
+
+        $post = BlogPost::create([
+            'category_id' => $category->id,
+            'title' => 'Ultimate Dubai Safari Guide',
+            'slug' => 'ultimate-dubai-safari-guide',
+            'excerpt' => 'Everything you need to know before booking your desert safari in Dubai.',
+            'content' => 'Complete guide to quad biking, dune bashing, and BBQ dinner in Dubai.',
+            'status' => 'published',
+            'published_at' => now(),
+        ]);
+
+        $response = $this->get('/blog/'.$post->slug);
+        $response->assertStatus(200);
+
+        $content = $response->getContent();
+        $this->assertStringContainsString('<meta property="og:type" content="article">', $content);
+        $this->assertStringNotContainsString("setAttribute('content', 'article')", $content, 'Client-side og:type modification script must be removed');
+    }
+
+    /**
+     * Test 7: Internal Search Returns noindex, follow Directives
+     */
+    public function test_internal_search_has_noindex_follow_robots_directive(): void
+    {
+        $response = $this->get('/search?q=safari');
+        $response->assertStatus(200);
+
+        $content = $response->getContent();
+        $this->assertStringContainsString('<meta name="robots" content="noindex, follow">', $content);
+    }
+
+    /**
+     * Test 8: Sensitive and Transactional Routes Have noindex, nofollow Directives
+     */
+    public function test_sensitive_and_transactional_routes_have_noindex_nofollow_directive(): void
+    {
+        // 1. Thank you page
+        $responseThankYou = $this->get('/thankyou');
+        $responseThankYou->assertStatus(200);
+        $this->assertStringContainsString('<meta name="robots" content="noindex, nofollow">', $responseThankYou->getContent());
+
+        // 2. Payment Cancel page
+        $responseCancel = $this->get('/payment-cancel');
+        $responseCancel->assertStatus(200);
+        $this->assertStringContainsString('<meta name="robots" content="noindex, nofollow">', $responseCancel->getContent());
+
+        // 3. Voucher page
+        $booking = Booking::create([
+            'reference' => 'TEST-ROBOTS-101',
+            'tour_name' => 'Evening Desert Safari',
+            'tour_date' => now()->toDateString(),
+            'status' => 'confirmed',
+            'payment_status' => 'paid',
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+            'phone' => '+971501234567',
+            'adults' => 2,
+            'children' => 0,
+            'infants' => 0,
+            'pickup_location' => 'Dubai Marina',
+            'subtotal' => 300,
+            'total' => 300,
+        ]);
+        $responseVoucher = $this->get('/booking/'.$booking->reference.'/voucher');
+        $responseVoucher->assertStatus(200);
+        $this->assertStringContainsString('<meta name="robots" content="noindex, nofollow">', $responseVoucher->getContent());
+
+        // 4. Unsubscribe page (404/invalid token scenario)
+        $responseUnsub = $this->get('/unsubscribe/invalid-or-sample-token');
+        $responseUnsub->assertStatus(404);
+        $this->assertStringContainsString('<meta name="robots" content="noindex, nofollow">', $responseUnsub->getContent());
+    }
+
+    /**
+     * Test 9: Tour Without Reviews Omits AggregateRating Schema
+     */
+    public function test_tour_without_reviews_omits_aggregate_rating(): void
+    {
+        $tour = Tour::create([
+            'name' => 'New Quad Safari Without Reviews',
+            'slug' => 'new-quad-safari-no-reviews',
+            'short_desc' => 'Adventure safari with no reviews yet.',
+            'hero_image' => 'quad-safari.avif',
+            'status' => 'active',
+            'duration' => '3 Hours',
+            'rating' => 5.0,
+            'review_count' => 0,
+        ]);
+
+        $response = $this->get('/'.$tour->slug);
+        $response->assertStatus(200);
+
+        $content = $response->getContent();
+        $this->assertStringNotContainsString('"@type": "AggregateRating"', $content, 'Tour with 0 reviews must not emit fabricated AggregateRating');
+    }
+
+    /**
+     * Test 10: Sitemap pages() Includes lastmod Tag For Every Entry
+     */
+    public function test_sitemap_pages_includes_lastmod_timestamps(): void
+    {
+        $response = $this->get('/sitemap-pages.xml');
+        $response->assertStatus(200);
+
+        $content = $response->getContent();
+
+        preg_match_all('/<url>/', $content, $urls);
+        preg_match_all('/<lastmod>(.*?)<\/lastmod>/', $content, $lastmods);
+
+        $this->assertNotEmpty($urls[0]);
+        $this->assertEquals(count($urls[0]), count($lastmods[0]), 'Every URL entry in sitemap-pages must have a lastmod timestamp');
     }
 }

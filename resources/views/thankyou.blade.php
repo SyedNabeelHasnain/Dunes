@@ -1,3 +1,6 @@
+@php
+    $pageRobots = 'noindex, nofollow';
+@endphp
 @extends('layouts.app')
 
 @section('content')

@@ -25,7 +25,8 @@ class VoucherController extends Controller
             $qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=4&data='.urlencode($verificationUrl);
         }
 
-        return view('booking.voucher', compact('booking', 'qrCodeUrl'));
+        $pageRobots = 'noindex, nofollow';
+        return view('booking.voucher', compact('booking', 'qrCodeUrl', 'pageRobots'));
     }
 
     /**

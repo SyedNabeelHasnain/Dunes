@@ -7,6 +7,7 @@ use App\Models\BlogCategory;
 use App\Models\BlogPost;
 use App\Models\BlogTag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class AdminBlogController extends Controller
@@ -70,6 +71,9 @@ class AdminBlogController extends Controller
             $post->tags()->sync($tagIds);
         }
 
+        Cache::forget('sitemap_blogs_xml');
+        Cache::forget('sitemap_images_xml');
+
         return redirect()->route('admin.blogs.index')->with('success', 'Blog post created successfully.');
     }
 
@@ -125,6 +129,9 @@ class AdminBlogController extends Controller
             $post->tags()->sync($tagIds);
         }
 
+        Cache::forget('sitemap_blogs_xml');
+        Cache::forget('sitemap_images_xml');
+
         return redirect()->route('admin.blogs.index')->with('success', 'Blog post updated successfully.');
     }
 
@@ -135,6 +142,9 @@ class AdminBlogController extends Controller
     {
         $post = BlogPost::findOrFail($id);
         $post->delete();
+
+        Cache::forget('sitemap_blogs_xml');
+        Cache::forget('sitemap_images_xml');
 
         return redirect()->route('admin.blogs.index')->with('success', 'Blog post deleted successfully.');
     }
@@ -150,6 +160,9 @@ class AdminBlogController extends Controller
             $post->published_at = now();
         }
         $post->save();
+
+        Cache::forget('sitemap_blogs_xml');
+        Cache::forget('sitemap_images_xml');
 
         return response()->json([
             'success' => true,

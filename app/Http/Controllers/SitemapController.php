@@ -147,10 +147,29 @@ class SitemapController extends Controller
             $staticPages['/'.$loc['slug']] = ['changefreq' => 'weekly', 'priority' => '0.9'];
         }
 
+        $latestTour = Tour::where('status', 'active')->latest('updated_at')->first();
+        $latestBlog = BlogPost::where('status', 'published')->latest('updated_at')->first();
+        $weeklyMod = now()->startOfWeek()->toAtomString();
+        $monthlyMod = now()->startOfMonth()->toAtomString();
+        $tourMod = $latestTour?->updated_at ? $latestTour->updated_at->toAtomString() : $weeklyMod;
+        $blogMod = $latestBlog?->updated_at ? $latestBlog->updated_at->toAtomString() : $weeklyMod;
+
         foreach ($staticPages as $page => $meta) {
             $loc = ($page === '' || $page === '/') ? (rtrim(url('/'), '/').'/') : url($page);
+
+            if (in_array($page, ['', '/tours', '/dune-buggy-rental-dubai', '/rate-card'], true)) {
+                $pageLastmod = $tourMod;
+            } elseif ($page === '/blog') {
+                $pageLastmod = $blogMod;
+            } elseif ($meta['changefreq'] === 'monthly') {
+                $pageLastmod = $monthlyMod;
+            } else {
+                $pageLastmod = $weeklyMod;
+            }
+
             $xml .= "  <url>\n";
             $xml .= '    <loc>'.$loc."</loc>\n";
+            $xml .= '    <lastmod>'.$pageLastmod."</lastmod>\n";
             $xml .= "    <changefreq>{$meta['changefreq']}</changefreq>\n";
             $xml .= "    <priority>{$meta['priority']}</priority>\n";
             $xml .= "  </url>\n";

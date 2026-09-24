@@ -38,9 +38,10 @@
     $pageTitle = $pageTitle ?? "Dunes Discovery Tourism | Dubai Desert Safari Tours ({$currentYear})";
     $pageDesc = $pageDesc ?? 'Book Dubai best desert safari tours from AED 99. Evening safari, city tours, dhow cruises with instant confirmation.';
     $pageKeys = $pageKeys ?? 'dubai desert safari,desert safari dubai,evening desert safari';
-    $pageRobots = $pageRobots ?? 'index,follow';
+    $pageRobots = $pageRobots ?? 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
     $canonical = $canonical ?? (request()->is('/') ? rtrim(url('/'), '/') . '/' : request()->url());
     $ogImage = $ogImage ?? asset('images/desert-safari-poster.avif');
+    $ogType = $ogType ?? 'website';
 @endphp
 <!DOCTYPE html>
 <html lang="en">
@@ -111,7 +112,7 @@
     <title>{{ $pageTitle }}</title>
     <meta name="description" content="{{ $pageDesc }}">
     <meta name="keywords" content="{{ $pageKeys }}">
-    <meta name="robots" content="{{ $pageRobots ?? 'index, follow, max-image-preview:large' }}">
+    <meta name="robots" content="{{ $pageRobots }}">
     <meta name="author" content="Dunes Discovery Tourism">
     <link rel="canonical" href="{{ $canonical }}">
     <link rel="alternate" hreflang="en" href="{{ $canonical }}">
@@ -123,7 +124,7 @@
     <link rel="dns-prefetch" href="https://connect.facebook.net">
 
     <!-- OpenGraph Metadata -->
-    <meta property="og:type" content="website">
+    <meta property="og:type" content="{{ $ogType }}">
     <meta property="og:url" content="{{ $canonical }}">
     <meta property="og:title" content="{{ $pageTitle }}">
     <meta property="og:description" content="{{ $pageDesc }}">

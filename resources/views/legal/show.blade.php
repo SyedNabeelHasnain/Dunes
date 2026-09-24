@@ -19,7 +19,7 @@
         "name": "Dunes Discovery Tourism LLC Dubai"
       },
       "publisher": {
-        "@type": "TouristInformationCenter",
+        "@type": "TravelAgency",
         "@id": "{{ route('home') }}#organization",
         "name": "Dunes Discovery Tourism L.L.C",
         "url": "{{ route('home') }}",

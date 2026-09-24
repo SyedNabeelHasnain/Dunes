@@ -1,9 +1,11 @@
 User-agent: *
 Allow: /
 Disallow: /admin/
-Disallow: /includes/
-Disallow: /phpmailer/
-Disallow: /ajax.php
+Disallow: /booking/
+Disallow: /thankyou
+Disallow: /payment-cancel
+Disallow: /unsubscribe/
+Disallow: /search
 
 User-agent: GPTBot
 Allow: /
@@ -25,5 +27,5 @@ Allow: /
 
 User-agent: Diffbot
 Allow: /
+
 Sitemap: https://dunesdiscoverytourism.com/sitemap_index.xml
-Sitemap: https://dunesdiscoverytourism.com/sitemap.xml
