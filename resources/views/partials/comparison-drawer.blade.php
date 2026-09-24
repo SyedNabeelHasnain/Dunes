@@ -128,11 +128,11 @@
          x-transition:leave="ease-in duration-200"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
-         class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity"
+         class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity z-0"
          @click="$store.modal.close()"></div>
 
     <!-- Drawer Panel (Slides up from bottom) -->
-    <div class="fixed inset-x-0 bottom-0 max-h-[88vh] h-[85vh] flex flex-col rounded-t-[2rem] bg-slate-950 border-t-2 border-primary shadow-2xl text-white overflow-hidden transition-transform"
+    <div class="fixed inset-x-0 bottom-0 z-10 max-h-[88vh] h-[85vh] flex flex-col rounded-t-[2rem] bg-slate-950 border-t-2 border-primary shadow-2xl text-white overflow-hidden transition-transform"
          x-show="$store.modal.active === 'compare'"
          x-transition:enter="transform transition ease-out duration-300"
          x-transition:enter-start="translate-y-full"

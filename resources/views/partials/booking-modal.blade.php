@@ -33,11 +33,11 @@
          x-transition:leave="ease-in duration-150"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
-         class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity"
+         class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity z-0"
          @click="$store.modal.close()"></div>
 
     <!-- Modal Dialog Panel (Bottom Sheet on Mobile, Centered Modal on Desktop) -->
-    <div class="min-h-full flex items-end sm:items-center justify-center p-0 sm:p-4 text-center">
+    <div class="relative z-10 min-h-full flex items-end sm:items-center justify-center p-0 sm:p-4 text-center">
         <div x-show="$store.modal.active === 'booking'"
              x-transition:enter="transform transition ease-out duration-300"
              x-transition:enter-start="translate-y-full sm:translate-y-4 sm:scale-95 opacity-0"
@@ -45,7 +45,7 @@
              x-transition:leave="transform transition ease-in duration-200"
              x-transition:leave-start="translate-y-0 sm:scale-100 opacity-100"
              x-transition:leave-end="translate-y-full sm:translate-y-4 sm:scale-95 opacity-0"
-             class="w-full sm:max-w-2xl lg:max-w-3xl rounded-t-3xl sm:rounded-3xl bg-white text-left align-middle shadow-2xl transition-all border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[88vh]"
+             class="relative z-10 w-full sm:max-w-2xl lg:max-w-3xl rounded-t-3xl sm:rounded-3xl bg-white text-left align-middle shadow-2xl transition-all border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[88vh]"
              @click.stop>
 
             <!-- Modal Header -->
@@ -94,7 +94,7 @@
                         <!-- Step 1: Select Tour, Package and Date -->
                         <div class="step-content active" data-step="1">
                             <div class="mb-5" id="tourSelectWrapper">
-                                <label class="block text-xs font-black uppercase tracking-wider text-slate-500 mb-2" for="bookingTour">Choose Tour</label>
+                                <label class="block text-xs font-black uppercase tracking-wider text-slate-800 mb-2" for="bookingTour">Choose Tour</label>
                                 <div class="relative rounded-2xl bg-white shadow-2xs border border-slate-200 overflow-hidden focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
                                     <select class="w-full px-4 py-3.5 bg-transparent font-bold text-slate-900 text-sm focus:outline-none cursor-pointer" id="bookingTour" name="tour_id" required autocomplete="off">
                                         <option value="">Select a tour...</option>
@@ -106,7 +106,7 @@
                             </div>
 
                             <div class="mb-5">
-                                <div class="text-xs font-black uppercase tracking-wider text-slate-500 mb-2">Select Package</div>
+                                <div class="text-xs font-black uppercase tracking-wider text-slate-800 mb-2">Select Package</div>
                                 <div class="tier-cards" id="tierCards">
                                     <div class="text-center py-6 text-slate-400">
                                         <i class="bi bi-cursor-fill text-3xl mb-1 block"></i>
@@ -118,7 +118,7 @@
 
                             <div class="mb-5">
                                 <div class="flex items-center justify-between mb-2 gap-2 flex-wrap">
-                                    <div class="text-xs font-black uppercase tracking-wider text-slate-500">When</div>
+                                    <div class="text-xs font-black uppercase tracking-wider text-slate-800">When</div>
                                     <div class="flex items-center gap-2">
                                         <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer" id="calendarTrigger">
                                             <i class="bi bi-calendar3 text-primary"></i>
@@ -136,7 +136,7 @@
 
                             <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 mb-3">
                                 <div class="sm:col-span-4 lg:col-span-3">
-                                    <label class="block text-xs font-black uppercase tracking-wider text-slate-500 mb-2" for="bookingAdults">Guests</label>
+                                    <label class="block text-xs font-black uppercase tracking-wider text-slate-800 mb-2" for="bookingAdults">Guests</label>
                                     <div class="flex items-center justify-between bg-white shadow-2xs rounded-2xl border border-slate-200 p-1 h-[52px]">
                                         <button type="button" class="w-10 h-10 flex items-center justify-center text-primary hover:bg-orange-50 rounded-xl transition-colors cursor-pointer" data-action="minus" data-target="adults" aria-label="Decrease guest count">
                                             <i class="bi bi-dash-circle-fill text-lg"></i>
@@ -149,7 +149,7 @@
                                     <input type="hidden" name="children" id="bookingChildren" value="0">
                                 </div>
                                 <div class="sm:col-span-8 lg:col-span-9">
-                                    <label class="block text-xs font-black uppercase tracking-wider text-slate-500 mb-2" for="bookingLocation">Pickup Location</label>
+                                    <label class="block text-xs font-black uppercase tracking-wider text-slate-800 mb-2" for="bookingLocation">Pickup Location</label>
                                     <div class="relative rounded-2xl bg-white shadow-2xs border border-slate-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 overflow-hidden flex items-center h-[52px] transition-all">
                                         <span class="pl-3.5 pr-2 text-primary"><i class="bi bi-geo-alt-fill text-base"></i></span>
                                         <input type="text" class="flex-1 bg-transparent font-bold text-slate-900 text-sm border-0 focus:outline-none placeholder:text-slate-400" name="location" id="bookingLocation" required placeholder="Hotel / Residence in Dubai" autocomplete="street-address">
@@ -182,7 +182,7 @@
                             <!-- Dynamic Tour-Specific Addons Section -->
                             <div class="mb-5" id="addonsSection" style="display:none">
                                 <div class="flex items-center justify-between mb-2">
-                                    <div class="text-xs font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                                    <div class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
                                         <i class="bi bi-stars text-amber-500"></i>
                                         <span>Enhance Your Safari (Optional Add-ons)</span>
                                     </div>
@@ -196,17 +196,17 @@
 
                             <!-- Contact Info -->
                             <div class="mb-5 space-y-3">
-                                <div class="text-xs font-black uppercase tracking-wider text-slate-500 mb-2">Contact Info</div>
+                                <div class="text-xs font-black uppercase tracking-wider text-slate-800 mb-2">Contact Info</div>
                                 <div>
-                                    <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1" for="bookingName">Full Name</label>
+                                    <label class="block text-[11px] font-extrabold text-slate-800 uppercase tracking-wider mb-1" for="bookingName">Full Name</label>
                                     <input type="text" class="w-full px-4 py-3 rounded-2xl bg-white border border-slate-200 text-sm font-semibold text-slate-900 shadow-2xs focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-slate-400" id="bookingName" name="name" placeholder="John Doe" autocomplete="name" required data-form="booking" data-field="name">
                                 </div>
                                 <div>
-                                    <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1" for="bookingEmail">Email Address</label>
+                                    <label class="block text-[11px] font-extrabold text-slate-800 uppercase tracking-wider mb-1" for="bookingEmail">Email Address</label>
                                     <input type="email" class="w-full px-4 py-3 rounded-2xl bg-white border border-slate-200 text-sm font-semibold text-slate-900 shadow-2xs focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-slate-400" id="bookingEmail" name="email" placeholder="name@example.com" autocomplete="email" required data-form="booking" data-field="email">
                                 </div>
                                 <div>
-                                    <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1" for="bookingPhone">Phone Number</label>
+                                    <label class="block text-[11px] font-extrabold text-slate-800 uppercase tracking-wider mb-1" for="bookingPhone">Phone Number</label>
                                     <div class="welcome-phone-field rounded-2xl bg-white border border-slate-200 shadow-2xs focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
                                         <input type="tel" class="w-full py-3 px-4 bg-transparent text-sm font-semibold text-slate-900 border-0 focus:outline-none placeholder:text-slate-400" id="bookingPhone" name="phone" placeholder="50 123 4567" autocomplete="tel" required data-form="booking" data-field="phone">
                                     </div>
@@ -215,7 +215,7 @@
 
                             <!-- OTP Verification Fields -->
                             <div class="mb-5 hidden" id="otpFieldsWrapper">
-                                <div class="text-xs font-black uppercase tracking-wider text-slate-500 mb-2">Email Verification Code</div>
+                                <div class="text-xs font-black uppercase tracking-wider text-slate-800 mb-2">Email Verification Code</div>
                                 <div class="flex rounded-2xl shadow-2xs border border-slate-200 bg-white overflow-hidden">
                                     <input type="text" class="flex-1 px-4 py-3 bg-transparent text-center font-black font-mono tracking-widest text-lg text-slate-900 border-0 focus:outline-none" id="bookingOtpCode" placeholder="Enter 6-digit OTP">
                                     <button class="px-5 bg-primary hover:bg-primary-dark text-white font-bold text-xs transition-colors cursor-pointer" type="button" id="verifyOtpBtn">Verify</button>
@@ -228,14 +228,14 @@
 
                             <!-- Special Requests -->
                             <div class="mb-5">
-                                <label class="block text-xs font-black uppercase tracking-wider text-slate-500 mb-2" for="bookingRequests">Special Requests / Dietary Notes</label>
+                                <label class="block text-xs font-black uppercase tracking-wider text-slate-800 mb-2" for="bookingRequests">Special Requests / Dietary Notes</label>
                                 <textarea class="w-full p-3.5 rounded-2xl bg-white border border-slate-200 text-xs sm:text-sm font-medium text-slate-900 shadow-2xs focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-slate-400" id="bookingRequests" name="requests" rows="3" placeholder="Any dietary requirements, hotel room numbers, baby seat needs..." autocomplete="off" data-form="booking" data-field="requests"></textarea>
                             </div>
 
                             <!-- Luxury Voucher & Promo Code Section -->
                             <div class="p-4 rounded-2xl bg-white shadow-2xs border border-slate-200 mb-5" id="promoCodeCard">
                                 <div class="flex items-center justify-between mb-2">
-                                    <label class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5" for="bookingPromoCode">
+                                    <label class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5" for="bookingPromoCode">
                                         <i class="bi bi-ticket-perforated-fill text-primary"></i> Have a Promo Code or Voucher?
                                     </label>
                                     <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold hidden" id="promoAppliedBadge">
@@ -275,7 +275,7 @@
 
                             <!-- Payment Options -->
                             <div class="mb-5" id="paymentOptions" data-ziina-active="{{ $ziinaActive ? '1' : '0' }}" data-advance-percent="{{ $advancePercent }}">
-                                <div class="text-xs font-black uppercase tracking-wider text-slate-500 mb-2">Payment Options</div>
+                                <div class="text-xs font-black uppercase tracking-wider text-slate-800 mb-2">Payment Options</div>
                                 <div class="payment-options grid grid-cols-1 sm:grid-cols-3 gap-2">
                                     <div class="payment-option selected p-3 rounded-2xl border-2 border-primary bg-orange-50/40 cursor-pointer text-left transition-all" data-value="cash">
                                         <div class="payment-option-title font-bold text-slate-900 text-xs sm:text-sm">Cash</div>

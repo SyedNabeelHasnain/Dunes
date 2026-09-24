@@ -28,11 +28,11 @@
          x-transition:leave="ease-in duration-150"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
-         class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity"
+         class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity z-0"
          @click="$store.modal.close()"></div>
 
     <!-- Modal Dialog Panel -->
-    <div class="min-h-full flex items-center justify-center p-3 sm:p-4 text-center">
+    <div class="relative z-10 min-h-full flex items-center justify-center p-3 sm:p-4 text-center">
         <div x-show="$store.modal.active === 'safari-matcher'"
              x-transition:enter="ease-out duration-200"
              x-transition:enter-start="opacity-0 scale-95 translate-y-4"
@@ -40,7 +40,7 @@
              x-transition:leave="ease-in duration-150"
              x-transition:leave-start="opacity-100 scale-100 translate-y-0"
              x-transition:leave-end="opacity-0 scale-95 translate-y-4"
-             class="w-full max-w-2xl transform overflow-hidden rounded-3xl bg-slate-950 p-5 sm:p-7 text-left align-middle shadow-2xl transition-all border border-orange-500/40 text-white flex flex-col min-h-[500px]"
+             class="relative z-10 w-full max-w-2xl transform overflow-hidden rounded-3xl bg-slate-950 p-5 sm:p-7 text-left align-middle shadow-2xl transition-all border border-orange-500/40 text-white flex flex-col min-h-[500px]"
              @click.stop>
             
             <!-- Modal Header -->

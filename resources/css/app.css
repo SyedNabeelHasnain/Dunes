@@ -712,16 +712,17 @@
   width: 72px;
   padding: 8px 4px;
   text-align: center;
-  border: 1px solid var(--color-slate-200, #e2e8f0);
+  border: 1.5px solid #cbd5e1;
   border-radius: 1rem;
-  background: #ffffff;
+  background: #ffffff !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   cursor: pointer;
   transition: all 0.2s ease;
   user-select: none;
 }
 .date-card:hover {
   border-color: var(--color-primary, #F69044);
-  background: #fff4eb;
+  background: #fff4eb !important;
   transform: translateY(-1px);
 }
 .date-card.selected {
@@ -732,13 +733,13 @@
 }
 .date-card .day {
   font-size: 0.65rem;
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
-  color: #64748b;
+  color: #334155;
   margin-bottom: 2px;
 }
 .date-card.selected .day {
-  color: rgba(255, 255, 255, 0.9) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
 }
 .date-card .date {
   font-size: 1.25rem;
@@ -751,13 +752,13 @@
 }
 .date-card .month {
   font-size: 0.65rem;
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
-  color: #94a3b8;
+  color: #475569;
   margin-top: 2px;
 }
 .date-card.selected .month {
-  color: rgba(255, 255, 255, 0.9) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
 }
 
 /* Tier Selection Cards */
