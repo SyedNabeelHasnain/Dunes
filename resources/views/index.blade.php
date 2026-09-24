@@ -122,19 +122,19 @@ if (!function_exists('renderReviewCardMarkup')) {
         </p>
 
         <div class="flex flex-col sm:flex-row gap-3 justify-center items-center mb-10">
-            <a href="#" class="btn-desert-animated text-base sm:text-lg font-bold rounded-full px-8 py-3.5 shadow-xl text-white inline-flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto" @click.prevent="$store.modal.open('booking')">
+            <button type="button" class="btn-desert-animated text-base sm:text-lg font-bold rounded-full px-8 py-3.5 shadow-xl text-white inline-flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto" @click="$store.modal.open('booking')">
                 <i class="bi bi-calendar-check text-lg"></i>
                 <span>Book Online Now</span>
-            </a>
+            </button>
             <button type="button" class="inline-flex items-center justify-center gap-2 text-base font-bold rounded-full px-6 py-3.5 border border-primary/60 text-primary bg-slate-900/60 backdrop-blur-md hover:bg-slate-900/80 transition-all cursor-pointer w-full sm:w-auto" @click="$store.modal.open('safari-matcher')">
                 <i class="bi bi-compass text-amber-400 text-lg"></i>
                 <span>Safari Match Concierge</span>
                 <span class="bg-amber-400 text-slate-950 font-bold rounded-full px-2 py-0.5 text-[10px]">5% OFF</span>
             </button>
-            <a href="#" class="btn-desert-animated-dark text-base font-bold rounded-full px-6 py-3.5 inline-flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto" data-action="open-booking" data-tour="1" data-tier="1" @click.prevent="$store.modal.open('booking', { tourId: 1, tierId: 1 })">
+            <button type="button" class="btn-desert-animated-dark text-base font-bold rounded-full px-6 py-3.5 inline-flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto" data-action="open-booking" data-tour="1" data-tier="1" @click="$store.modal.open('booking', { tourId: 1, tierId: 1 })">
                 <span class="font-bold text-white text-sm">Starting from</span>
                 <span class="text-xl font-black text-primary" data-aed="79">AED 79</span>
-            </a>
+            </button>
         </div>
 
         <div class="max-w-3xl mx-auto mb-8 bg-black/25 backdrop-blur-xs rounded-2xl p-4 sm:p-5 border border-white/10">
@@ -608,10 +608,10 @@ if (!function_exists('renderReviewCardMarkup')) {
             Reserve your safari experience in 60 seconds with instant booking confirmation. Free cancellation up to 24 hours prior with full refund.
         </p>
         <div class="flex flex-wrap justify-center gap-4">
-            <a href="#" class="btn-desert-animated text-base sm:text-lg font-bold rounded-full px-8 py-3.5 shadow-xl inline-flex items-center gap-2 cursor-pointer" @click.prevent="$store.modal.open('booking')">
+            <button type="button" class="btn-desert-animated text-base sm:text-lg font-bold rounded-full px-8 py-3.5 shadow-xl inline-flex items-center gap-2 cursor-pointer text-white" @click="$store.modal.open('booking')">
                 <i class="bi bi-calendar-check text-lg"></i>
                 <span>Book Your Tour Now</span>
-            </a>
+            </button>
             @php $waNumClean = preg_replace('/[^0-9]/', '', $settings['whatsapp_phone'] ?? '971502456056'); @endphp
             <a href="https://wa.me/{{ $waNumClean }}?text={{ urlencode('Hi Dunes Discovery Tourism! I would like to inquire about booking a desert safari.') }}" target="_blank" rel="noopener" class="border border-white/30 hover:border-white bg-slate-900/40 hover:bg-slate-900/60 backdrop-blur-xs text-white text-base font-bold rounded-full px-6 py-3.5 inline-flex items-center gap-2 shadow-sm transition-all">
                 <i class="bi bi-whatsapp text-emerald-400 text-lg"></i>

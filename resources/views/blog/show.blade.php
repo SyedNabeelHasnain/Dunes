@@ -81,10 +81,10 @@
     @foreach($post->faqs as $fi => $faq)
     {
       "@type": "Question",
-      "name": "{{ $faq->question }}",
+      "name": {!! json_encode($faq->question) !!},
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "{{ $faq->answer }}"
+        "text": {!! json_encode($faq->answer) !!}
       }
     }{{ $loop->last ? '' : ',' }}
     @endforeach

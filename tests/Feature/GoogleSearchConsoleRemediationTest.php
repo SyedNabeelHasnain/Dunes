@@ -316,4 +316,97 @@ class GoogleSearchConsoleRemediationTest extends TestCase
             $this->assertStringEndsWith('/', $matches[1], "Breadcrumb home entry on [{$route}] must end with trailing slash");
         }
     }
+
+    /**
+     * Test 14: 404 Error Page Renders HTTP 404 and Has Noindex Directive
+     */
+    public function test_404_error_page_renders_status_and_noindex_directive(): void
+    {
+        $response = $this->get('/non-existent-page-url-xyz');
+        $response->assertStatus(404);
+
+        $content = $response->getContent();
+        $this->assertStringContainsString('<meta name="robots" content="noindex, follow">', $content);
+        $this->assertStringContainsString('<h1', $content);
+    }
+
+    /**
+     * Test 15: Multi-Engine Site Verification Tags (Google & Bing)
+     */
+    public function test_multi_engine_site_verification_tags(): void
+    {
+        putenv('GOOGLE_SITE_VERIFICATION=google_test_token_123');
+        putenv('BING_SITE_VERIFICATION=bing_test_token_456');
+
+        $response = $this->get('/');
+        $response->assertStatus(200);
+
+        $content = $response->getContent();
+        $this->assertStringContainsString('<meta name="google-site-verification" content="google_test_token_123">', $content);
+        $this->assertStringContainsString('<meta name="msvalidate.01" content="bing_test_token_456">', $content);
+
+        putenv('GOOGLE_SITE_VERIFICATION');
+        putenv('BING_SITE_VERIFICATION');
+    }
+
+    /**
+     * Test 16: Semantic Buttons for Interactive Modal Triggers
+     */
+    public function test_interactive_booking_triggers_use_semantic_buttons(): void
+    {
+        $response = $this->get('/');
+        $response->assertStatus(200);
+
+        $content = $response->getContent();
+        // Desktop & Mobile booking triggers should not be <a href="#" data-action="open-booking">
+        $this->assertStringNotContainsString('<a class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full font-extrabold text-xs text-white bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 shadow-sm hover:shadow-md transition-all cursor-pointer" href="#" data-action="open-booking">', $content);
+        $this->assertStringContainsString('data-action="open-booking"', $content);
+    }
+
+    /**
+     * Test 17: TravelAgency Schema Has Map Linked to Coordinates
+     */
+    public function test_travel_agency_schema_has_map_linked_to_coordinates(): void
+    {
+        $response = $this->get('/');
+        $response->assertStatus(200);
+
+        $content = $response->getContent();
+        $this->assertStringContainsString('"hasMap": "https://maps.google.com/?q=25.2048,55.2708"', $content);
+    }
+
+    /**
+     * Test 18: Blog Post FAQ Schema Produces Valid JSON
+     */
+    public function test_blog_post_faq_schema_handles_quotes_and_produces_valid_json(): void
+    {
+        $category = BlogCategory::create([
+            'name' => 'Safari Tips',
+            'slug' => 'safari-tips',
+        ]);
+
+        $post = BlogPost::create([
+            'title' => 'Guide to "Dune Bashing" in Dubai',
+            'slug' => 'guide-to-dune-bashing',
+            'excerpt' => 'Complete guide with quotes "and" formatting.',
+            'content' => 'Full article body with plenty of details about desert safari safety.',
+            'category_id' => $category->id,
+            'status' => 'published',
+            'published_at' => now(),
+        ]);
+
+        $post->faqs()->create([
+            'question' => 'Is "dune bashing" safe for kids?',
+            'answer' => 'Yes, our "experienced" drivers use 5-point harnesses and roll cages.',
+            'priority' => 1,
+        ]);
+
+        $response = $this->get('/blog/'.$post->slug);
+        $response->assertStatus(200);
+
+        $content = $response->getContent();
+        $this->assertStringContainsString('"@type": "FAQPage"', $content);
+        $this->assertStringContainsString('Is \"dune bashing\" safe for kids?', $content);
+    }
 }
+

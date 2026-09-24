@@ -3,6 +3,7 @@
 @php
     $pageTitle = 'Server Error (500) | Dunes Discovery Tourism';
     $pageDesc = 'Something unexpected occurred on our server. Please try again or contact our support team.';
+    $pageRobots = 'noindex, nofollow';
 @endphp
 
 @section('content')

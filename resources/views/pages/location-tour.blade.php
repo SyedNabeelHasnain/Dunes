@@ -121,10 +121,10 @@
         @foreach($locationData['faqs'] as $index => $faq)
         {
           "@type": "Question",
-          "name": "{!! addslashes($faq['q']) !!}",
+          "name": {!! json_encode($faq['q']) !!},
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "{!! addslashes($faq['a']) !!}"
+            "text": {!! json_encode($faq['a']) !!}
           }
         }{{ $loop->last ? '' : ',' }}
         @endforeach

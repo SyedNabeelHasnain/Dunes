@@ -21,7 +21,8 @@
     $adsId = $settings['google_ads_id'] ?? 'AW-17859624049';
     $conversionLabel = $settings['google_conversion_label'] ?? 'eR3SCLimtvobEPH4kMRC';
     $conversionSendTo = (!empty($adsId) && !empty($conversionLabel)) ? "{$adsId}/{$conversionLabel}" : '';
-    $gVerify = $settings['google_site_verification'] ?? '';
+    $gVerify = $settings['google_site_verification'] ?? config('services.google.site_verification') ?? env('GOOGLE_SITE_VERIFICATION', '');
+    $bingVerify = $settings['bing_site_verification'] ?? config('services.bing.site_verification') ?? env('BING_SITE_VERIFICATION', '');
     
     $metaActive = isset($settings['meta_active']) && $settings['meta_active'] === '1';
     $metaCapi = isset($settings['meta_capi_enabled']) && $settings['meta_capi_enabled'] === '1';
@@ -151,6 +152,9 @@
     @if(!empty($gVerify))
     <meta name="google-site-verification" content="{{ $gVerify }}">
     @endif
+    @if(!empty($bingVerify))
+    <meta name="msvalidate.01" content="{{ $bingVerify }}">
+    @endif
     
     <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('images/icon-192.png') }}">
@@ -267,6 +271,7 @@
             "latitude": 25.2048,
             "longitude": 55.2708
           },
+          "hasMap": "https://maps.google.com/?q=25.2048,55.2708",
           "contactPoint": [
             {
               "@@type": "ContactPoint",
@@ -431,9 +436,9 @@
                         <a class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full font-bold text-xs bg-emerald-500 hover:bg-emerald-600 text-white shadow-xs hover:shadow-sm transition-all cursor-pointer" href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener">
                             <i class="bi bi-whatsapp"></i><span>WhatsApp</span>
                         </a>
-                        <a class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full font-extrabold text-xs text-white bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 shadow-sm hover:shadow-md transition-all cursor-pointer" href="#" data-action="open-booking">
+                        <button type="button" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full font-extrabold text-xs text-white bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 shadow-sm hover:shadow-md transition-all cursor-pointer" data-action="open-booking">
                             <i class="bi bi-calendar-check"></i><span>Book Now</span>
-                        </a>
+                        </button>
                     </div>
 
                     <!-- Mobile App Bar Actions (Thumb-Friendly, uncluttered) -->
@@ -457,10 +462,10 @@
                         </a>
 
                         <!-- Compact Book Now Button -->
-                        <a href="#" class="px-2.5 sm:px-3.5 py-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold text-[11px] sm:text-xs shadow-xs flex items-center gap-1 cursor-pointer" data-action="open-booking" aria-label="Book Now">
+                        <button type="button" class="px-2.5 sm:px-3.5 py-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold text-[11px] sm:text-xs shadow-xs flex items-center gap-1 cursor-pointer" data-action="open-booking" aria-label="Book Now">
                             <i class="bi bi-calendar-check"></i>
                             <span class="hidden sm:inline">Book</span>
-                        </a>
+                        </button>
 
                         <!-- Hamburger Drawer Trigger -->
                         <button class="p-1.5 sm:p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer focus:outline-none" type="button" @click="$store.mobileNav.toggle()" aria-label="Menu">

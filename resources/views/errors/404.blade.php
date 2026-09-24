@@ -3,6 +3,7 @@
 @php
     $pageTitle = 'Page Not Found (404) | Dunes Discovery Tourism';
     $pageDesc = 'The page you are looking for does not exist or has been moved. Explore our Dubai desert safari tours or return home.';
+    $pageRobots = 'noindex, follow';
 @endphp
 
 @section('content')
