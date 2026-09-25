@@ -30,14 +30,14 @@
 
         <!-- Email or Username -->
         <div>
-            <label for="email" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+            <label for="login_email" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                 {{ __('Email or Username') }}
             </label>
             <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                     <i class="bi bi-person-fill text-sm"></i>
                 </div>
-                <input id="email" 
+                <input id="login_email" 
                        type="text" 
                        name="email" 
                        value="{{ old('email') }}" 

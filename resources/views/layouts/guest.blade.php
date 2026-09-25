@@ -17,9 +17,10 @@
             $hasVite = file_exists(public_path('build/manifest.json'));
         @endphp
         @if($hasVite)
-            @vite(['resources/css/app.css', 'resources/js/app.js'])
+            @vite(['resources/css/app.css', 'resources/js/admin.js'])
         @else
             <link href="{{ asset('assets/css/app.min.css') }}" rel="stylesheet">
+            <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
         @endif
 
         <style>

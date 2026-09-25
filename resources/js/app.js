@@ -962,7 +962,9 @@ const App = {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
         inputs.forEach(input => {
-            if (input.id !== 'bookingEmail' && input.id !== 'email') return;
+            // Strictly scope OTP verification to customer booking flow. Never touch admin or authentication forms.
+            if (input.id !== 'bookingEmail') return;
+            if (input.closest('form[action*="login"], form[action*="password"], form[action*="register"], .auth-card, #loginForm, .admin-portal')) return;
 
             const parent = input.parentElement;
             if (!parent.classList.contains('email-verify-wrapper')) {
@@ -2554,15 +2556,25 @@ const App = {
 
     initForms() {
         document.querySelectorAll('form').forEach(form => {
-            form.addEventListener('submit', async e => {
-                e.preventDefault();
+            // Strictly exclude authentication, admin CMS, and logout forms from AJAX interception
+            if (
+                form.matches('form[action*="login"], form[action*="password"], form[action*="register"], form[action*="logout"], #logout-form, .auth-form, .admin-form') ||
+                form.closest('.auth-card') ||
+                window.location.pathname.startsWith('/login') ||
+                window.location.pathname.startsWith('/admin') ||
+                window.location.pathname.startsWith('/password')
+            ) {
+                return;
+            }
 
-                const emailInput = form.querySelector('#bookingEmail, #email');
+            form.addEventListener('submit', async e => {
+                const emailInput = form.querySelector('#bookingEmail');
                 if (emailInput && !emailInput.classList.contains('is-verified')) {
                     const emailVal = emailInput.value.trim();
                     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
                     if (emailVal && emailRegex.test(emailVal)) {
+                        e.preventDefault();
                         this.toast('Please verify your email address first.', 'error');
                         if (!emailInput.parentElement.querySelector('.email-verify-btn')) {
                             this.showVerifyButton(emailInput);
@@ -2571,6 +2583,8 @@ const App = {
                         return;
                     }
                 }
+
+                e.preventDefault();
 
                 const errEl = document.getElementById('bookingError');
                 if (errEl) { errEl.classList.add('d-none'); errEl.textContent = ''; }

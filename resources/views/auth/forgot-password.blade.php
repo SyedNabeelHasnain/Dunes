@@ -12,12 +12,12 @@
 
         <!-- Email Address -->
         <div>
-            <x-input-label for="email" :value="__('Email Address')" />
+            <x-input-label for="forgot_email" :value="__('Email Address')" />
             <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                     <i class="bi bi-envelope-fill text-sm"></i>
                 </div>
-                <input id="email" class="w-full h-11 pl-10 pr-4 rounded-xl border border-slate-300 bg-slate-50/50 text-slate-900 text-sm font-medium placeholder:text-slate-400 focus:bg-white focus:border-[#F27405] focus:ring-4 focus:ring-[#F27405]/15 focus:outline-none outline-none transition-all duration-150" type="email" name="email" value="{{ old('email') }}" required autofocus placeholder="admin@dunesdiscoverytourism.com" />
+                <input id="forgot_email" class="w-full h-11 pl-10 pr-4 rounded-xl border border-slate-300 bg-slate-50/50 text-slate-900 text-sm font-medium placeholder:text-slate-400 focus:bg-white focus:border-[#F27405] focus:ring-4 focus:ring-[#F27405]/15 focus:outline-none outline-none transition-all duration-150" type="email" name="email" value="{{ old('email') }}" required autofocus placeholder="admin@dunesdiscoverytourism.com" />
             </div>
             <x-input-error :messages="$errors->get('email')" class="mt-1.5" />
         </div>
