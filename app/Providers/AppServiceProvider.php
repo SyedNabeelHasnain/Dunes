@@ -23,6 +23,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Ensure Dompdf font cache directory exists and is writable
+        $fontDir = storage_path('fonts');
+        if (!is_dir($fontDir)) {
+            @mkdir($fontDir, 0775, true);
+        }
+
         View::composer('*', function ($view) {
             try {
                 $settings = app(SettingsService::class)->all();

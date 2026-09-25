@@ -340,4 +340,92 @@ class AdminPortalTest extends TestCase
             );
         }
     }
+
+    /**
+     * Test that admin can download booking ticket voucher as PDF.
+     */
+    public function test_admin_can_download_ticket_pdf(): void
+    {
+        $tour = Tour::create([
+            'name' => 'Evening Red Dunes Desert Safari',
+            'slug' => 'evening-red-dunes-desert-safari',
+            'category' => 'desert-safari',
+            'duration' => '6 Hours',
+            'min_price' => 150,
+            'is_active' => true,
+        ]);
+
+        $booking = Booking::create([
+            'reference' => 'BK-TEST-1234',
+            'tour_id' => $tour->id,
+            'tour_name' => $tour->name,
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+            'phone' => '+971501234567',
+            'tour_date' => now()->addDays(2)->toDateString(),
+            'adults' => 2,
+            'children' => 0,
+            'infants' => 0,
+            'subtotal' => 300,
+            'total' => 300,
+            'status' => 'confirmed',
+            'payment_status' => 'paid',
+        ]);
+
+        $response = $this->actingAs($this->adminUser)->get("/admin/bookings/{$booking->id}/ticket");
+        $response->assertStatus(200);
+        $response->assertHeader('content-type', 'application/pdf');
+    }
+
+    /**
+     * Test public customer voucher PDF download.
+     */
+    public function test_customer_can_download_voucher_pdf(): void
+    {
+        $booking = Booking::create([
+            'reference' => 'DDT-VOUCH-999',
+            'tour_name' => 'Morning Dune Buggy Tour',
+            'name' => 'Jane Smith',
+            'email' => 'jane@example.com',
+            'phone' => '+971559876543',
+            'tour_date' => '2026-11-20',
+            'adults' => 1,
+            'subtotal' => 450,
+            'total' => 450,
+            'status' => 'confirmed',
+            'payment_status' => 'paid',
+        ]);
+
+        $response = $this->get("/booking/{$booking->reference}/ticket-pdf");
+        $response->assertStatus(200);
+        $response->assertHeader('content-type', 'application/pdf');
+    }
+
+    /**
+     * Test ticket PDF handles edge cases (no tier, no tour relation, no addons, unpaid status, null notes).
+     */
+    public function test_ticket_pdf_handles_edge_cases_cleanly(): void
+    {
+        $booking = Booking::create([
+            'reference' => 'DDT-EDGE-001',
+            'tour_name' => 'VIP Private Safari',
+            'name' => 'Edge Case Traveler',
+            'email' => 'edge@example.com',
+            'phone' => '+971500000000',
+            'tour_date' => '2026-10-15',
+            'adults' => 2,
+            'children' => 0,
+            'infants' => 0,
+            'subtotal' => 600,
+            'total' => 600,
+            'status' => 'pending',
+            'payment_status' => 'unpaid',
+            'payment_amount' => 0,
+            'balance_due' => 600,
+        ]);
+
+        $response = $this->actingAs($this->adminUser)->get("/admin/bookings/{$booking->id}/ticket");
+        $response->assertStatus(200);
+        $response->assertHeader('content-type', 'application/pdf');
+    }
 }

@@ -182,6 +182,31 @@
         </tr>
     </table>
 
+@php
+    $siteSettings = isset($settings) && ($settings instanceof \Illuminate\Support\Collection || is_array($settings))
+        ? $settings
+        : (function_exists('app') ? app(\App\Services\SettingsService::class)->all() : collect());
+
+    $tourDateDisplay = 'Date on Request';
+    if (!empty($booking->tour_date)) {
+        if ($booking->tour_date instanceof \DateTimeInterface) {
+            $tourDateDisplay = $booking->tour_date->format('l, F j, Y');
+        } else {
+            try {
+                $tourDateDisplay = \Carbon\Carbon::parse($booking->tour_date)->format('l, F j, Y');
+            } catch (\Throwable $e) {
+                $tourDateDisplay = (string) $booking->tour_date;
+            }
+        }
+    }
+
+    $totalAmount = (float) ($booking->total ?? 0);
+    $discountAmount = (float) ($booking->discount_amount ?? 0);
+    $originalTotal = (float) ($booking->original_total ?? ($totalAmount + $discountAmount));
+    $paidAmount = (float) ($booking->payment_amount ?? ($booking->payment_status === 'paid' ? $totalAmount : 0));
+    $balanceDue = (float) ($booking->balance_due ?? max(0, $totalAmount - $paidAmount));
+@endphp
+
     <!-- Main Content 2-Column Split -->
     <table style="width: 100%;" cellpadding="0" cellspacing="0">
         <tr>
@@ -192,19 +217,19 @@
                 <table class="data-table">
                     <tr>
                         <td class="label-cell">Guest Name:</td>
-                        <td class="val-cell">{{ $booking->name }}</td>
+                        <td class="val-cell">{{ $booking->name ?? 'Valued Guest' }}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Contact Phone:</td>
-                        <td class="val-cell">{{ $booking->phone }}</td>
+                        <td class="val-cell">{{ $booking->phone ?? 'N/A' }}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Email Address:</td>
-                        <td class="val-cell">{{ $booking->email }}</td>
+                        <td class="val-cell">{{ $booking->email ?? 'N/A' }}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Tour / Activity:</td>
-                        <td class="val-cell" style="color: #F58F43; font-weight: bold; font-size: 12px;">{{ $booking->tour_name }}</td>
+                        <td class="val-cell" style="color: #F58F43; font-weight: bold; font-size: 12px;">{{ $booking->tour_name ?: ($booking->tour?->name ?? 'Desert Safari Tour') }}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Selected Tier:</td>
@@ -215,9 +240,9 @@
                     <tr>
                         <td class="label-cell">Party Size:</td>
                         <td class="val-cell">
-                            {{ $booking->adults }} Adult{{ $booking->adults > 1 ? 's' : '' }}
-                            @if($booking->children > 0), {{ $booking->children }} Child{{ $booking->children > 1 ? 'ren' : '' }}@endif
-                            @if($booking->infants > 0), {{ $booking->infants }} Infant{{ $booking->infants > 1 ? 's' : '' }}@endif
+                            {{ (int)($booking->adults ?? 1) }} Adult{{ ($booking->adults ?? 1) > 1 ? 's' : '' }}
+                            @if(!empty($booking->children) && $booking->children > 0), {{ $booking->children }} Child{{ $booking->children > 1 ? 'ren' : '' }}@endif
+                            @if(!empty($booking->infants) && $booking->infants > 0), {{ $booking->infants }} Infant{{ $booking->infants > 1 ? 's' : '' }}@endif
                         </td>
                     </tr>
                     @if($booking->addons && $booking->addons->count() > 0)
@@ -234,7 +259,7 @@
                 <table class="data-table">
                     <tr>
                         <td class="label-cell">Tour Date:</td>
-                        <td class="val-cell">{{ $booking->tour_date ? $booking->tour_date->format('l, F j, Y') : 'Date on Request' }}</td>
+                        <td class="val-cell">{{ $tourDateDisplay }}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Pickup Time:</td>
@@ -244,7 +269,7 @@
                         <td class="label-cell">Pickup Location:</td>
                         <td class="val-cell">{{ $booking->pickup_location ?: 'Hotel Lobby / Residence in Dubai / Sharjah' }}</td>
                     </tr>
-                    @if($booking->notes)
+                    @if(!empty($booking->notes))
                     <tr>
                         <td class="label-cell">Special Requests:</td>
                         <td class="val-cell" style="font-style: italic; color: #475569;">{{ $booking->notes }}</td>
@@ -262,8 +287,14 @@
                     <div style="font-size: 10px; font-weight: bold; color: #475569; text-transform: uppercase; margin-bottom: 6px;">E-Ticket Digital Verification</div>
                     @if(!empty($qrCodeUrl))
                         <img src="{{ $qrCodeUrl }}" width="110" height="110" style="display: block; margin: 0 auto;" alt="Verification QR">
+                    @elseif(!empty($qrSvg))
+                        <div style="display: block; margin: 0 auto; width: 110px; height: 110px; text-align: center;">
+                            {!! $qrSvg !!}
+                        </div>
                     @else
-                        <div style="width: 100px; height: 100px; border: 2px dashed #cbd5e1; margin: 0 auto; line-height: 100px; color: #94a3b8; font-size: 10px;">QR CODE</div>
+                        <div style="width: 110px; height: 110px; border: 2px dashed #cbd5e1; border-radius: 4px; margin: 0 auto; line-height: 100px; color: #64748b; font-size: 10px; font-weight: bold;">
+                            #{{ $booking->reference }}
+                        </div>
                     @endif
                     <div style="font-size: 9px; color: #64748b; margin-top: 6px;">Scan with smartphone camera to verify live booking status with driver/host</div>
                 </div>
@@ -272,36 +303,36 @@
                 <div class="price-box">
                     <div style="font-size: 11px; font-weight: bold; color: #0f172a; text-transform: uppercase; margin-bottom: 6px;">Payment Breakdown</div>
                     <table class="price-table">
-                        @if($booking->coupon_code && (float)$booking->discount_amount > 0)
+                        @if(!empty($booking->coupon_code) && $discountAmount > 0)
                         <tr>
                             <td style="color: #64748b;">Package Total:</td>
-                            <td style="text-align: right; text-decoration: line-through; color: #94a3b8;">AED {{ number_format($booking->original_total ?: ($booking->total + $booking->discount_amount), 2) }}</td>
+                            <td style="text-align: right; text-decoration: line-through; color: #94a3b8;">AED {{ number_format($originalTotal, 2) }}</td>
                         </tr>
                         <tr>
                             <td style="color: #16a34a;">Promo ({{ $booking->coupon_code }}):</td>
-                            <td style="text-align: right; color: #16a34a; font-weight: bold;">- AED {{ number_format($booking->discount_amount, 2) }}</td>
+                            <td style="text-align: right; color: #16a34a; font-weight: bold;">- AED {{ number_format($discountAmount, 2) }}</td>
                         </tr>
                         <tr>
                             <td style="color: #64748b;">Net Total:</td>
-                            <td style="text-align: right; font-weight: bold;">AED {{ number_format($booking->total, 2) }}</td>
+                            <td style="text-align: right; font-weight: bold;">AED {{ number_format($totalAmount, 2) }}</td>
                         </tr>
                         @else
                         <tr>
                             <td style="color: #64748b;">Total Price:</td>
-                            <td style="text-align: right; font-weight: bold;">AED {{ number_format($booking->total, 2) }}</td>
+                            <td style="text-align: right; font-weight: bold;">AED {{ number_format($totalAmount, 2) }}</td>
                         </tr>
                         @endif
                         <tr>
                             <td style="color: #64748b;">Amount Paid:</td>
-                            <td style="text-align: right; font-weight: bold; color: #16a34a;">AED {{ number_format($booking->payment_amount ?: ($booking->payment_status === 'paid' ? $booking->total : 0), 2) }}</td>
+                            <td style="text-align: right; font-weight: bold; color: #16a34a;">AED {{ number_format($paidAmount, 2) }}</td>
                         </tr>
                         <tr class="price-total">
                             <td>Remaining Due:</td>
                             <td style="text-align: right;" class="due-highlight">
-                                @if($booking->payment_status === 'paid')
+                                @if($booking->payment_status === 'paid' || $balanceDue <= 0.001)
                                     <span style="color: #16a34a;">AED 0.00 (PAID IN FULL)</span>
                                 @else
-                                    AED {{ number_format($booking->balance_due ?: ($booking->total - ($booking->payment_amount ?: 0)), 2) }}
+                                    AED {{ number_format($balanceDue, 2) }}
                                 @endif
                             </td>
                         </tr>
@@ -332,12 +363,12 @@
         <tr>
             <td style="vertical-align: top;">
                 <strong>DUNES DISCOVERY TOURISM LLC</strong><br>
-                Dubai, United Arab Emirates | Reg. Tourism License #{{ $settings['company_license_number'] ?? $settings['site_det_license'] ?? '1430583' }}<br>
-                Web: <span style="color: #F58F43;">dunesdiscoverytourism.com</span> | Email: {{ $settings['site_email'] ?? 'info@dunesdiscoverytourism.com' }}
+                Dubai, United Arab Emirates | Reg. Tourism License #{{ $siteSettings['company_license_number'] ?? $siteSettings['site_det_license'] ?? '1430583' }}<br>
+                Web: <span style="color: #F58F43;">dunesdiscoverytourism.com</span> | Email: {{ $siteSettings['site_email'] ?? 'info@dunesdiscoverytourism.com' }}
             </td>
             <td style="text-align: right; vertical-align: top;">
                 <strong>24/7 Concierge Hotline & WhatsApp Support</strong><br>
-                <span style="font-size: 11px; font-weight: bold; color: #0f172a;">{{ $settings['site_phone'] ?? '+971 50 245 6056' }}</span><br>
+                <span style="font-size: 11px; font-weight: bold; color: #0f172a;">{{ $siteSettings['site_phone'] ?? '+971 50 245 6056' }}</span><br>
                 Emergency Dispatch: Available 24 Hours Daily
             </td>
         </tr>
