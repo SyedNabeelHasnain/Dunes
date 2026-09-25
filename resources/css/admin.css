@@ -172,36 +172,234 @@
   box-shadow: 0 0 0 3px rgba(246, 144, 68, 0.2);
 }
 
-/* DataTables Export Buttons (B) */
+/* DataTables Export & Toolbar Buttons (B) */
 .dataTables_wrapper .dt-buttons {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  flex-wrap: wrap;
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.375rem !important;
+  flex-wrap: wrap !important;
 }
-.dataTables_wrapper .dt-buttons .btn,
-.dataTables_wrapper .dt-buttons button {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  font-size: 0.78rem;
-  font-weight: 600;
-  padding: 0.4rem 0.85rem;
+
+/* Direct toolbar pill buttons (Excel, PDF, Print, Columns) */
+.dataTables_wrapper .dt-buttons > .btn,
+.dataTables_wrapper .dt-buttons > button,
+.dataTables_wrapper .dt-buttons > .dt-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.375rem !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  line-height: 1rem !important;
+  padding: 0.4rem 0.85rem !important;
+  border-radius: 9999px !important;
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #334155 !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.dataTables_wrapper .dt-buttons > .btn:hover,
+.dataTables_wrapper .dt-buttons > button:hover,
+.dataTables_wrapper .dt-buttons > .dt-button:hover {
+  background-color: #f8fafc !important;
+  border-color: #F69044 !important;
+  color: #d57a32 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Down arrow icon inside ColVis button */
+.dataTables_wrapper .dt-buttons span.dt-button-down-arrow {
+  display: inline-block !important;
+  font-size: 8px !important;
+  margin-left: 4px !important;
+  opacity: 0.55 !important;
+  vertical-align: middle !important;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.dataTables_wrapper .dt-buttons button.buttons-colvis[aria-expanded="true"] span.dt-button-down-arrow,
+.dataTables_wrapper .dt-buttons button.dt-button-active span.dt-button-down-arrow {
+  transform: rotate(180deg) !important;
+  opacity: 0.9 !important;
+}
+
+/* DataTables Button Collection Backdrop (Click-outside dismiss) */
+div.dt-button-background {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: transparent !important;
+  z-index: 1040 !important;
+}
+
+/* Luxury DataTables Column Visibility Popover Dropdown */
+div.dt-button-collection {
+  position: absolute !important;
+  z-index: 1050 !important;
+  min-width: 14.5rem !important;
+  max-width: 20rem !important;
+  margin-top: 0.4rem !important;
+  padding: 0.375rem !important;
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.03) !important;
+  box-sizing: border-box !important;
+  animation: dtDropdownIn 0.16s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  overflow: hidden !important;
+}
+
+@keyframes dtDropdownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Dropdown Menu Header / Title */
+div.dt-button-collection-title {
+  padding: 0.5rem 0.75rem 0.375rem !important;
+  font-size: 0.6875rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  color: #94a3b8 !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  margin-bottom: 0.25rem !important;
+  text-align: left !important;
+}
+
+/* Dropdown Items List Container */
+div.dt-button-collection [role="menu"],
+div.dt-button-collection > div {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.125rem !important;
+  max-height: 19rem !important;
+  overflow-y: auto !important;
+  padding: 0.125rem !important;
+}
+
+/* Sleek Scrollbar */
+div.dt-button-collection [role="menu"]::-webkit-scrollbar,
+div.dt-button-collection > div::-webkit-scrollbar {
+  width: 4px;
+}
+div.dt-button-collection [role="menu"]::-webkit-scrollbar-track,
+div.dt-button-collection > div::-webkit-scrollbar-track {
+  background: transparent;
+}
+div.dt-button-collection [role="menu"]::-webkit-scrollbar-thumb,
+div.dt-button-collection > div::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
   border-radius: 9999px;
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
-  color: #334155;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  cursor: pointer;
-  transition: all 0.15s ease;
 }
-.dataTables_wrapper .dt-buttons .btn:hover,
-.dataTables_wrapper .dt-buttons button:hover {
-  background-color: #f8fafc;
-  border-color: #F69044;
-  color: #d57a32;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+
+/* Individual Column Toggle Row in Dropdown */
+div.dt-button-collection button.dt-button,
+div.dt-button-collection .dt-button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.8125rem !important;
+  font-weight: 500 !important;
+  line-height: 1.25rem !important;
+  color: #334155 !important;
+  border-radius: 0.625rem !important;
+  background-color: transparent !important;
+  border: 1px solid transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+  text-align: left !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  transition: all 0.12s ease !important;
+  user-select: none !important;
+  box-sizing: border-box !important;
+}
+
+div.dt-button-collection button.dt-button:hover,
+div.dt-button-collection .dt-button:hover {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+  border-color: #f1f5f9 !important;
+}
+
+/* Active State (Column is VISIBLE) */
+div.dt-button-collection button.dt-button.dt-button-active,
+div.dt-button-collection button.dt-button.active,
+div.dt-button-collection .dt-button.dt-button-active,
+div.dt-button-collection .dt-button.active {
+  background-color: rgba(246, 144, 68, 0.08) !important;
+  color: #c2410c !important;
+  font-weight: 600 !important;
+  border-color: rgba(246, 144, 68, 0.15) !important;
+}
+
+div.dt-button-collection button.dt-button.dt-button-active:hover,
+div.dt-button-collection button.dt-button.active:hover,
+div.dt-button-collection .dt-button.dt-button-active:hover,
+div.dt-button-collection .dt-button.active:hover {
+  background-color: rgba(246, 144, 68, 0.14) !important;
+  color: #9a3412 !important;
+}
+
+/* Custom Checkbox Indicator for Column Toggle */
+div.dt-button-collection button.dt-button::after,
+div.dt-button-collection .dt-button::after {
+  content: "" !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 1.1rem !important;
+  height: 1.1rem !important;
+  margin-left: 0.75rem !important;
+  border-radius: 0.35rem !important;
+  border: 1.5px solid #cbd5e1 !important;
+  background-color: #ffffff !important;
+  flex-shrink: 0 !important;
+  font-size: 0.65rem !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+  color: transparent !important;
+  transition: all 0.12s ease !important;
+}
+
+div.dt-button-collection button.dt-button.dt-button-active::after,
+div.dt-button-collection button.dt-button.active::after,
+div.dt-button-collection .dt-button.dt-button-active::after,
+div.dt-button-collection .dt-button.active::after {
+  content: "✓" !important;
+  background-color: #F69044 !important;
+  border-color: #F69044 !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 2px rgba(246, 144, 68, 0.25) !important;
+}
+
+/* Inactive State (Column is HIDDEN) */
+div.dt-button-collection button.dt-button:not(.dt-button-active):not(.active),
+div.dt-button-collection .dt-button:not(.dt-button-active):not(.active) {
+  color: #94a3b8 !important;
+  font-weight: 400 !important;
+}
+
+div.dt-button-collection button.dt-button:not(.dt-button-active):not(.active):hover,
+div.dt-button-collection .dt-button:not(.dt-button-active):not(.active):hover {
+  color: #64748b !important;
+  background-color: #f8fafc !important;
 }
 
 /* DataTables Column Sorting Arrows */

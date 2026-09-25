@@ -152,7 +152,7 @@
         <table class="w-full text-left border-collapse table datatable" id="bookingsTable">
             <thead>
                 <tr class="border-b border-slate-200 bg-slate-50/80 text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                    <th class="py-3 px-4 no-sort no-export w-9">
+                    <th class="py-3 px-4 no-sort no-export no-colvis w-9">
                         <input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary bulk-select-all cursor-pointer" title="Select All">
                     </th>
                     <th class="py-3 px-4">Ref & Time</th>

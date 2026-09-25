@@ -391,6 +391,13 @@ window.initTailwindDataTables = function() {
         const $table = window.jQuery(this);
         if ($table.find('tbody tr').length > 0 && $table.find('tbody td[colspan]').length === 0) {
             if (!window.jQuery.fn.DataTable.isDataTable($table)) {
+                // If table is wrapped in a redundant single overflow container, unwrap it
+                // so the DataTables wrapper controls its own scroll area and prevents
+                // toolbar buttons or popover dropdowns from being clipped
+                if ($table.parent().hasClass('overflow-x-auto') && $table.parent().children().length === 1) {
+                    $table.unwrap();
+                }
+
                 $table.DataTable({
                     pageLength: 25,
                     ordering: true,
@@ -421,7 +428,9 @@ window.initTailwindDataTables = function() {
                         {
                             extend: 'colvis',
                             text: '<i class="bi bi-columns-gap me-1 text-slate-500"></i>Columns',
-                            className: 'btn btn-sm bg-white border border-slate-200 shadow-sm rounded-full px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:border-primary transition'
+                            className: 'btn btn-sm bg-white border border-slate-200 shadow-sm rounded-full px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:border-primary transition',
+                            popoverTitle: 'Toggle Visible Columns',
+                            columns: ':not(.no-colvis)'
                         }
                     ],
                     language: {

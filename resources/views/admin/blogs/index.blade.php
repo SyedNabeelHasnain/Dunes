@@ -21,7 +21,7 @@
     </div>
 
     <!-- Blogs Table Card -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden p-5">
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse text-sm text-slate-700 datatable" id="blogsTable">
                 <thead class="bg-slate-50/80 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
