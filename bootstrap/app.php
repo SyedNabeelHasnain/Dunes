@@ -26,6 +26,21 @@ return Application::configure(basePath: dirname(__DIR__))
             fn (Request $request) => $request->is('api/*') || $request->is('ajax.php') || $request->ajax(),
         );
 
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpException $e, Request $request) {
+            if ($e->getStatusCode() === 419) {
+                if ($request->is('api/*') || $request->is('ajax.php') || $request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Security token expired. Please refresh the page.',
+                    ], 419);
+                }
+
+                return redirect()->route('login')
+                    ->with('status', 'Your session expired for security reasons. Please enter your credentials to sign in.')
+                    ->withInput($request->except('password', '_token'));
+            }
+        });
+
         $exceptions->render(function (DecryptException $e, Request $request) {
             if ($request->is('api/*') || $request->is('ajax.php') || $request->ajax()) {
                 return response()->json([
