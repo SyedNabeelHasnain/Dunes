@@ -109,7 +109,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <script>window.CSRF_TOKEN = "{{ csrf_token() }}";</script>
+    <script>
+        window.CSRF_TOKEN = "{{ csrf_token() }}";
+        window.WHATSAPP_FORM_ENABLED = "{{ (string)($settings['whatsapp_form_enabled'] ?? '1') }}";
+        window.WHATSAPP_NUMBER = "{{ (string)($settings['site_whatsapp'] ?? '971502456056') }}";
+    </script>
     <title>{{ $pageTitle }}</title>
     <meta name="description" content="{{ $pageDesc }}">
     <meta name="keywords" content="{{ $pageKeys }}">
@@ -733,6 +737,7 @@
         @include('partials.exit-intent-modal')
     @endif
     @include('partials.custom-safari-modal')
+    @include('partials.whatsapp-modal')
 
     <!-- Global Toast Container for App.toast notifications -->
     <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 p-3 pointer-events-none" aria-live="polite" aria-atomic="true"></div>

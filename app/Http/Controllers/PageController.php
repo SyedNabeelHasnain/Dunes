@@ -207,18 +207,29 @@ class PageController extends Controller
     public function logWhatsapp(Request $request): JsonResponse
     {
         $request->validate([
-            'phone' => 'required|string',
+            'phone' => 'nullable|string',
             'name' => 'nullable|string',
             'tour_name' => 'nullable|string',
             'page_url' => 'nullable|string',
             'message_text' => 'nullable|string',
         ]);
 
-        $name = trim($request->input('name', 'Anonymous'));
-        $phone = trim($request->input('phone'));
-        $tourName = trim($request->input('tour_name', 'General Inquiry'));
+        $name = trim($request->input('name', 'Anonymous')) ?: 'Anonymous';
+        $phone = trim($request->input('phone', 'N/A')) ?: 'N/A';
+        $tourName = trim($request->input('tour_name', 'General Inquiry')) ?: 'General Inquiry';
         $pageUrl = trim($request->input('page_url', ''));
         $messageText = trim($request->input('message_text', ''));
+
+        $settings = app(SettingsService::class);
+        $whatsappNum = preg_replace('/[^0-9]/', '', $settings->get('site_whatsapp', '971502456056')) ?: '971502456056';
+
+        if (empty($messageText)) {
+            $messageText = ($tourName && $tourName !== 'General Inquiry')
+                ? "Hi Dunes Discovery Tourism, I would like to inquire about {$tourName}."
+                : "Hi Dunes Discovery Tourism, I would like to inquire about Dubai desert safaris.";
+        }
+
+        $redirectUrl = "https://wa.me/{$whatsappNum}?text=".urlencode($messageText);
 
         // Collect request context
         $ctx = $this->tracker->collectRequestContext('whatsapp');
@@ -241,7 +252,6 @@ class PageController extends Controller
 
             // Send Admin Email Notification
             try {
-                $settings = app(SettingsService::class);
                 $adminEmail = $settings->get('site_email', 'info@dunesdiscoverytourism.com');
                 Mail::to($adminEmail)->send(
                     (new WhatsappLeadNotification($name, $phone, $tourName, $pageUrl, $messageText))->from($adminEmail, 'Dunes Discovery Tourism')
@@ -254,6 +264,7 @@ class PageController extends Controller
                 'success' => true,
                 'message' => 'WhatsApp click logged successfully',
                 'inquiry_id' => $inquiry->id,
+                'redirect_url' => $redirectUrl,
             ]);
 
         } catch (\Throwable $e) {

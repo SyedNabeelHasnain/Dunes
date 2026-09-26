@@ -1403,54 +1403,81 @@ const App = {
     },
 
     initWhatsApp() {
-        const modal = document.getElementById('whatsappModal');
-        if (!modal) return;
         const form = document.getElementById('whatsappForm');
         const startBtn = document.getElementById('startChatBtn');
         const nameInp = document.getElementById('waName');
         const phoneInp = document.getElementById('waPhone');
+        const agreeInp = document.getElementById('waAgreement');
 
         this.initPhoneInputs();
 
         const check = () => {
             if (startBtn && nameInp && phoneInp) {
-                startBtn.disabled = !(nameInp.value.trim() && phoneInp.value.trim());
+                const agreeValid = !agreeInp || agreeInp.checked;
+                startBtn.disabled = !(nameInp.value.trim() && phoneInp.value.trim() && agreeValid);
             }
         };
 
         nameInp?.addEventListener('input', check);
         phoneInp?.addEventListener('input', check);
+        agreeInp?.addEventListener('change', check);
 
-        document.addEventListener('click', e => {
-            const el = e.target.closest('a, button, .fab-whatsapp, .btn-circle-whatsapp, .btn-whatsapp-animated');
-            if (!el) return;
-            const href = el.getAttribute ? (el.getAttribute('href') || '') : '';
-            const isWa = href.includes('wa.me') || href.includes('api.whatsapp.com') ||
-                         el.classList.contains('fab-whatsapp') || el.classList.contains('btn-circle-whatsapp') ||
-                         el.classList.contains('btn-whatsapp-animated') || el.closest('.fab-whatsapp, .btn-circle-whatsapp');
-            if (!isWa) return;
+        if (!this._waClickListenerBound) {
+            this._waClickListenerBound = true;
+            document.addEventListener('click', e => {
+                const el = e.target.closest('a, button, span, .fab-whatsapp, .btn-circle-whatsapp, .btn-whatsapp-animated');
+                if (!el) return;
+                const href = el.getAttribute ? (el.getAttribute('href') || '') : '';
+                // Don't intercept purely social share links without target number
+                if (href.includes('wa.me/?text=') || href.includes('whatsapp://send?text=')) return;
 
-            e.preventDefault();
-            e.stopPropagation();
+                const isWa = href.includes('wa.me') || href.includes('api.whatsapp.com') ||
+                             el.classList.contains('fab-whatsapp') || el.classList.contains('btn-circle-whatsapp') ||
+                             el.classList.contains('btn-whatsapp-animated') || el.closest('.fab-whatsapp, .btn-circle-whatsapp, .btn-whatsapp-animated');
+                if (!isWa) return;
 
-            let tourName = '';
-            if (el.dataset?.tourName) {
-                tourName = el.dataset.tourName;
-            } else if (location.pathname.includes('/tours/') || document.querySelector('.tour-hero')) {
-                const h1 = document.querySelector('h1');
-                if (h1) tourName = h1.innerText.trim();
-            }
+                // Don't intercept the submit button inside the modal itself
+                if (el.id === 'startChatBtn' || el.closest('#whatsappForm')) return;
 
-            this.openWhatsApp(tourName, href);
-        });
+                e.preventDefault();
+                e.stopPropagation();
+
+                let tourName = '';
+                if (el.dataset?.tourName) {
+                    tourName = el.dataset.tourName;
+                } else if (location.pathname.includes('/tours/') || document.querySelector('.tour-hero')) {
+                    const h1 = document.querySelector('h1');
+                    if (h1) tourName = h1.innerText.trim();
+                }
+
+                this.openWhatsApp(tourName, href);
+            });
+        }
     },
 
     openWhatsApp(tourName = '', directHref = '') {
         const modal = document.getElementById('whatsappModal');
-        const formEnabled = (window.WHATSAPP_FORM_ENABLED === '1');
+        const formEnabled = (
+            window.WHATSAPP_FORM_ENABLED === '1' ||
+            window.WHATSAPP_FORM_ENABLED === 1 ||
+            window.WHATSAPP_FORM_ENABLED === true ||
+            window.WHATSAPP_FORM_ENABLED === 'true' ||
+            window.WHATSAPP_FORM_ENABLED === 'yes'
+        );
         const defaultNum = (window.WHATSAPP_NUMBER || '971502456056').replace(/[^0-9]/g, '');
-        const defaultMsg = encodeURIComponent(tourName ? `Hello, I would like to inquire about ${tourName}.` : 'Hello, I would like to inquire about Dubai desert safaris.');
-        const fallbackUrl = directHref || `https://wa.me/${defaultNum}?text=${defaultMsg}`;
+
+        let prefillMsg = '';
+        if (directHref) {
+            try {
+                const u = new URL(directHref, window.location.origin);
+                prefillMsg = u.searchParams.get('text') || '';
+            } catch (e) {}
+        }
+        if (!prefillMsg) {
+            prefillMsg = tourName ? `Hello, I would like to inquire about ${tourName}.` : 'Hello, I would like to inquire about Dubai desert safaris.';
+        }
+        const defaultMsgEncoded = encodeURIComponent(prefillMsg);
+        const fallbackUrl = directHref || `https://wa.me/${defaultNum}?text=${defaultMsgEncoded}`;
 
         if (!formEnabled || !modal) {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || window.CSRF_TOKEN || '';
@@ -1462,6 +1489,7 @@ const App = {
             fd.append('phone', 'N/A');
             fd.append('tour_name', tourName || 'General Inquiry');
             fd.append('page_url', window.location.href);
+            fd.append('message_text', prefillMsg);
 
             if (typeof window.gtag === 'function') {
                 window.gtag('event', 'conversion', { 'send_to': 'AW-17859624049/eR3SCLimtvobEPH4kMRC' });
@@ -1495,8 +1523,15 @@ const App = {
 
         const tourNameInp = document.getElementById('waTourName');
         const pageUrlInp = document.getElementById('waPageUrl');
-        if (tourNameInp) tourNameInp.value = tourName;
+        const msgTextInp = document.getElementById('waMessageText');
+        const tourDisplay = document.getElementById('waTourNameDisplay');
+        const errEl = document.getElementById('waError');
+
+        if (errEl) errEl.classList.add('d-none');
+        if (tourNameInp) tourNameInp.value = tourName || 'General Inquiry';
         if (pageUrlInp) pageUrlInp.value = window.location.href;
+        if (msgTextInp) msgTextInp.value = prefillMsg;
+        if (tourDisplay) tourDisplay.textContent = tourName || 'Dubai Desert Safari Experience';
 
         const map = {
             'gpsLat': 'waGpsLat',
@@ -1512,7 +1547,20 @@ const App = {
             if (src && dest && src.value) dest.value = src.value;
         }
 
-        Alpine.store('modal').open('whatsapp');
+        const startBtn = document.getElementById('startChatBtn');
+        const nameInp = document.getElementById('waName');
+        const phoneInp = document.getElementById('waPhone');
+        const agreeInp = document.getElementById('waAgreement');
+        if (startBtn && nameInp && phoneInp) {
+            const agreeValid = !agreeInp || agreeInp.checked;
+            startBtn.disabled = !(nameInp.value.trim() && phoneInp.value.trim() && agreeValid);
+        }
+
+        this.initPhoneInputs();
+
+        if (window.Alpine && Alpine.store('modal')) {
+            Alpine.store('modal').open('whatsapp');
+        }
     },
 
     initUTM() {
@@ -2738,6 +2786,15 @@ const App = {
                         }
 
                         if (targetUrl) {
+                            if (action === 'logWhatsApp') {
+                                Alpine.store('modal').close();
+                                form.reset();
+                                const win = window.open(targetUrl, '_blank');
+                                if (!win) {
+                                    window.location.href = targetUrl;
+                                }
+                                return;
+                            }
                             if (typeof window.gtagSendEvent === 'function') {
                                 window.gtagSendEvent(targetUrl, eventParams);
                             } else {
