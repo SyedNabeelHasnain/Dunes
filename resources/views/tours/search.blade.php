@@ -149,30 +149,56 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- Search Refinement & Query Modification Bar -->
-        <div class="bg-slate-50 rounded-2xl p-4 sm:p-5 mb-8 border border-slate-200/80 shadow-xs">
-            <form action="{{ route('tours.search') }}" method="GET" class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
-                <div class="lg:col-span-5">
-                    <div class="relative">
-                        <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                        <input type="text" name="q" value="{{ $cleanQuery }}" class="w-full rounded-full pl-11 pr-24 py-2.5 bg-white border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs" placeholder="Search safaris, quad biking, dune buggy..." required>
-                        <button type="submit" class="btn-desert-animated rounded-full absolute right-1.5 top-1/2 -translate-y-1/2 px-4 py-1 text-xs font-bold text-white shadow-xs cursor-pointer">
-                            Update
+        <div class="bg-slate-50/90 rounded-2xl sm:rounded-3xl p-3 sm:p-4 mb-8 border border-slate-200/80 shadow-xs">
+            <div class="flex flex-col lg:flex-row lg:items-center gap-3 sm:gap-4">
+                <!-- Search Input Form -->
+                <form action="{{ route('tours.search') }}" method="GET" class="w-full lg:w-[440px] xl:w-[480px] shrink-0 m-0">
+                    <div class="relative flex items-center bg-white rounded-full border border-slate-200 shadow-2xs hover:border-slate-300 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all p-1.5 pl-4 sm:pl-5">
+                        <i class="bi bi-search text-slate-400 text-sm shrink-0 mr-2.5"></i>
+                        <input type="text" 
+                               name="q" 
+                               value="{{ $cleanQuery }}" 
+                               class="w-full bg-transparent border-none text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-0 p-0" 
+                               placeholder="Refine search (e.g. quad bike, buggy, vip)..." 
+                               required>
+                        @if(!empty($cleanQuery))
+                        <button type="button" 
+                                onclick="this.previousElementSibling.value=''; this.previousElementSibling.focus();"
+                                title="Clear input"
+                                class="text-slate-300 hover:text-slate-500 p-1 mx-1 transition-colors text-xs inline-flex items-center justify-center shrink-0 cursor-pointer">
+                            <i class="bi bi-x-circle-fill"></i>
+                        </button>
+                        @endif
+                        <button type="submit" 
+                                class="shrink-0 px-4 sm:px-5 py-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-xs font-bold transition-all shadow-2xs hover:shadow-xs flex items-center gap-1.5 cursor-pointer ml-1">
+                            <span>Update</span>
+                            <i class="bi bi-arrow-right text-[10px]"></i>
                         </button>
                     </div>
-                </div>
-                <div class="lg:col-span-7">
-                    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1 items-center">
-                        <span class="text-xs text-slate-500 font-bold shrink-0 inline-flex items-center gap-1">
-                            <i class="bi bi-funnel"></i>Suggestions:
-                        </span>
+                </form>
+
+                <!-- Divider on desktop -->
+                <div class="hidden lg:block h-7 w-px bg-slate-200/90 shrink-0"></div>
+
+                <!-- Suggestions / Filter Pills -->
+                @if(!empty($intent['pills']) && count($intent['pills']) > 0)
+                <div class="flex-1 min-w-0 flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth py-0.5">
+                    <span class="text-xs text-slate-500 font-bold shrink-0 inline-flex items-center gap-1.5">
+                        <i class="bi bi-funnel-fill text-primary text-[11px]"></i>
+                        <span>Suggestions:</span>
+                    </span>
+                    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
                         @foreach($intent['pills'] as $pill)
-                            <a href="{{ route('tours.search', ['q' => $pill]) }}" class="bg-white hover:bg-slate-50 text-slate-700 hover:text-primary border border-slate-200 hover:border-primary rounded-full px-3.5 py-1.5 text-xs font-semibold shrink-0 whitespace-nowrap inline-flex items-center gap-1 transition-colors shadow-xs">
-                                <i class="bi bi-plus-circle text-primary"></i> {{ $pill }}
+                            <a href="{{ route('tours.search', ['q' => $pill]) }}" 
+                               class="bg-white hover:bg-orange-500 hover:text-white text-slate-700 border border-slate-200/90 hover:border-orange-500 rounded-full px-3 sm:px-3.5 py-1.5 text-xs font-semibold shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 transition-all shadow-2xs hover:shadow-xs group">
+                                <i class="bi bi-plus-circle text-primary group-hover:text-white transition-colors text-[11px]"></i>
+                                <span>{{ $pill }}</span>
                             </a>
                         @endforeach
                     </div>
                 </div>
-            </form>
+                @endif
+            </div>
         </div>
 
         <!-- Generative Engine Optimization (GEO) Direct-Answer Overview Box -->

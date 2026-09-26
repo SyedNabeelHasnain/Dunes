@@ -151,6 +151,9 @@ class LiveSearchTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Evening Desert Safari Dubai');
         $response->assertSee('noindex, follow');
+        $response->assertSee('Suggestions:');
+        $response->assertSee('no-scrollbar');
+        $response->assertSee('Update');
     }
 
     public function test_standard_search_route_with_ajax_header_returns_json(): void
