@@ -260,7 +260,9 @@ class TourController extends Controller
         $cleanQuery = preg_replace('/\s+/', ' ', $cleanQuery);
         $categoryFilter = trim((string) ($request->input('category') ?? ''));
 
-        if (mb_strlen($cleanQuery) < 2 && empty($categoryFilter)) {
+        $isAll = $request->boolean('all');
+
+        if (mb_strlen($cleanQuery) < 2 && empty($categoryFilter) && ! $isAll) {
             return response()->json([
                 'success' => true,
                 'query' => $cleanQuery,

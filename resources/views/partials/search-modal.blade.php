@@ -1,40 +1,51 @@
 @php
-    $searchCatalogTours = \Illuminate\Support\Facades\Cache::remember('site_search_modal_catalog_v2', 3600, function() {
-        return \App\Models\Tour::where('status', 'active')
-            ->with(['tiers', 'category'])
-            ->orderBy('priority', 'asc')
-            ->get()
-            ->map(function($t) {
-                $minPrice = $t->tiers->min('pivot.price') ?? 0;
-                $thumb = $t->thumb_image ?: $t->hero_image ?: 'desert-safari-poster.avif';
-                $thumb = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $thumb);
-                return [
-                    'id' => $t->id,
-                    'name' => $t->name,
-                    'slug' => $t->slug,
-                    'url' => url('/' . $t->slug),
-                    'category' => $t->category ? $t->category->name : 'Desert Safari',
-                    'category_slug' => $t->category ? $t->category->slug : 'desert-safari',
-                    'duration' => $t->duration ?: '4-6 Hours',
-                    'rating' => (float) ($t->rating ?: 4.9),
-                    'reviews_count' => (int) ($t->review_count ?: 850),
-                    'price' => (float) $minPrice,
-                    'price_formatted' => $minPrice > 0 ? 'From AED ' . number_format($minPrice) : 'Best Rates',
-                    'image' => asset('images/' . $thumb),
-                    'is_bestseller' => (bool) $t->is_bestseller,
-                    'is_featured' => (bool) $t->is_featured,
-                    'badge' => $t->is_bestseller ? 'Bestseller' : ($t->is_featured ? 'Popular' : ($t->category ? $t->category->name : 'Safari')),
-                    'highlights' => $t->short_desc ? \Illuminate\Support\Str::limit(strip_tags($t->short_desc), 85) : 'Luxury 4x4 Transfers, Red Dunes & BBQ Dinner',
-                    'keywords' => strtolower($t->name . ' ' . ($t->meta_keywords ?? '') . ' ' . ($t->category ? $t->category->name : '') . ' ' . ($t->short_desc ?? '')),
-                ];
-            })->values();
-    });
+    try {
+        $searchCatalogArray = \Illuminate\Support\Facades\Cache::remember('site_search_modal_catalog_v4', 3600, function() {
+            return \App\Models\Tour::where('status', 'active')
+                ->with(['tiers', 'category'])
+                ->orderBy('priority', 'asc')
+                ->get()
+                ->map(function($t) {
+                    $minPrice = $t->tiers->min('pivot.price') ?? 0;
+                    $thumb = $t->thumb_image ?: $t->hero_image ?: 'desert-safari-poster.avif';
+                    $thumb = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $thumb);
+                    return [
+                        'id' => (int) $t->id,
+                        'name' => (string) $t->name,
+                        'slug' => (string) $t->slug,
+                        'url' => url('/' . $t->slug),
+                        'category' => $t->category ? (string) $t->category->name : 'Desert Safari',
+                        'category_slug' => $t->category ? (string) $t->category->slug : 'desert-safari',
+                        'duration' => (string) ($t->duration ?: '4-6 Hours'),
+                        'rating' => (float) ($t->rating ?: 4.9),
+                        'reviews_count' => (int) ($t->review_count ?: 850),
+                        'price' => (float) $minPrice,
+                        'price_formatted' => $minPrice > 0 ? 'From AED ' . number_format($minPrice) : 'Best Rates',
+                        'image' => asset('images/' . $thumb),
+                        'is_bestseller' => (bool) $t->is_bestseller,
+                        'is_featured' => (bool) $t->is_featured,
+                        'badge' => $t->is_bestseller ? 'Bestseller' : ($t->is_featured ? 'Popular' : ($t->category ? (string) $t->category->name : 'Safari')),
+                        'highlights' => $t->short_desc ? \Illuminate\Support\Str::limit(strip_tags($t->short_desc), 85) : 'Luxury 4x4 Transfers, Red Dunes & BBQ Dinner',
+                        'keywords' => strtolower($t->name . ' ' . ($t->meta_keywords ?? '') . ' ' . ($t->category ? (string) $t->category->name : '') . ' ' . ($t->short_desc ?? '')),
+                    ];
+                })->values()->all();
+        });
+        if (!is_array($searchCatalogArray)) {
+            $searchCatalogArray = [];
+        }
+    } catch (\Throwable $e) {
+        $searchCatalogArray = [];
+    }
 @endphp
+
+<!-- Preloaded Catalog JSON Script for 0ms Client Matching (Clean and Safe from Attribute Quotes) -->
+<script type="application/json" id="siteSearchCatalogData">
+{!! json_encode($searchCatalogArray, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!}
+</script>
 
 <!-- Global Interactive Search Modal (Tailwind v4 + Alpine.js) -->
 <div id="globalSearchModal"
      x-data="globalSearchModal({
-         catalog: {{ \Illuminate\Support\Js::from($searchCatalogTours) }},
          searchUrl: '{{ route('tours.search') }}',
          liveSearchUrl: '{{ route('tours.search.live') }}'
      })"
@@ -112,12 +123,11 @@
                         
                         <!-- Input Action Controls (Clear + Loading Indicator) -->
                         <div class="absolute right-20 sm:right-24 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
-                            <span x-show="loading" x-cloak class="text-primary text-sm inline-flex items-center animate-spin" title="Searching live catalog...">
+                            <span x-show="loading" class="text-primary text-sm inline-flex items-center animate-spin" title="Searching live catalog...">
                                 <i class="bi bi-arrow-clockwise"></i>
                             </span>
                             <button type="button" 
                                     x-show="query.length > 0" 
-                                    x-cloak
                                     @click="clearQuery" 
                                     class="w-6 h-6 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center transition-colors text-xs cursor-pointer"
                                     aria-label="Clear query">
@@ -171,7 +181,7 @@
                 </div>
 
                 <!-- STATE 2: LIVE SEARCH RESULTS & FILTERS (query.length >= 2) -->
-                <div x-show="isSearching" x-cloak class="space-y-3">
+                <div x-show="isSearching" class="space-y-3">
                     <!-- Real-Time Category Narrowing Filters Bar -->
                     <div x-show="availableCategories.length > 1" class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
                         <button type="button" 
@@ -208,7 +218,7 @@
 
                     <!-- Scrollable Live Results List -->
                     <div x-ref="resultsList" class="max-h-[360px] sm:max-h-[400px] overflow-y-auto space-y-2 pr-1 divide-y divide-slate-100 scrollbar-thin">
-                        <template x-for="(tour, index) in filteredResults" :key="tour.id">
+                        <template x-for="(tour, index) in filteredResults" :key="tour.id || index">
                             <a :href="tour.url" 
                                :data-selected="selectedIndex === index"
                                class="group flex items-center justify-between p-2.5 sm:p-3 rounded-2xl transition-all cursor-pointer border pt-2.5"

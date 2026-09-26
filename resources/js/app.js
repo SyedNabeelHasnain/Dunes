@@ -3757,8 +3757,9 @@ Alpine.data('customSafariModal', (config = {}) => ({
 Alpine.data('globalSearchModal', (config = {}) => ({
     query: '',
     categoryFilter: 'all',
-    catalog: config.catalog || [],
+    catalog: Array.isArray(config.catalog) ? config.catalog : [],
     serverResults: [],
+    serverQuery: '',
     loading: false,
     selectedIndex: -1,
     searchUrl: config.searchUrl || '/search',
@@ -3766,8 +3767,12 @@ Alpine.data('globalSearchModal', (config = {}) => ({
     debounceTimer: null,
 
     init() {
+        this.loadCatalog();
         this.$watch('$store.modal.active', active => {
             if (active === 'search') {
+                if (!Array.isArray(this.catalog) || this.catalog.length === 0) {
+                    this.loadCatalog();
+                }
                 this.$nextTick(() => {
                     const input = this.$refs.searchInput;
                     if (input) {
@@ -3781,21 +3786,61 @@ Alpine.data('globalSearchModal', (config = {}) => ({
         });
     },
 
+    loadCatalog() {
+        // 1. Try reading from DOM json script tag if catalog is empty
+        if (!Array.isArray(this.catalog) || this.catalog.length === 0) {
+            const dataEl = document.getElementById('siteSearchCatalogData');
+            if (dataEl && dataEl.textContent) {
+                try {
+                    const parsed = JSON.parse(dataEl.textContent.trim());
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        this.catalog = parsed;
+                        return;
+                    }
+                } catch (e) {}
+            }
+        }
+
+        // 2. Fetch full catalog in background if empty
+        if (!Array.isArray(this.catalog) || this.catalog.length === 0) {
+            const targetUrl = new URL(this.liveSearchUrl || '/search/live', window.location.origin);
+            targetUrl.searchParams.set('all', '1');
+            fetch(targetUrl.toString(), {
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.success && Array.isArray(data.results)) {
+                    this.catalog = data.results;
+                }
+            })
+            .catch(() => {});
+        }
+    },
+
     get isSearching() {
         return this.query.trim().length >= 2;
     },
 
     get matchedTours() {
-        const q = this.query.trim().toLowerCase();
+        const q = (this.query || '').trim().toLowerCase();
         if (q.length < 2) return [];
 
-        if (this.serverResults && this.serverResults.length > 0) {
+        // If server results match current query and category, use them
+        if (this.serverQuery === q && Array.isArray(this.serverResults) && this.serverResults.length > 0) {
             return this.serverResults;
+        }
+
+        // Instant 0ms client-side search across preloaded catalog
+        const catalogList = Array.isArray(this.catalog) ? this.catalog : [];
+        if (catalogList.length === 0) {
+            return Array.isArray(this.serverResults) ? this.serverResults : [];
         }
 
         const tokens = q.split(/\s+/).filter(t => t.length > 1);
 
-        return this.catalog.filter(tour => {
+        return catalogList.filter(tour => {
+            if (!tour || typeof tour !== 'object') return false;
             const name = (tour.name || '').toLowerCase();
             const cat = (tour.category || '').toLowerCase();
             const keywords = (tour.keywords || '').toLowerCase();
@@ -3823,10 +3868,11 @@ Alpine.data('globalSearchModal', (config = {}) => ({
 
     get availableCategories() {
         const list = this.matchedTours;
-        if (!list || list.length === 0) return [];
+        if (!Array.isArray(list) || list.length === 0) return [];
 
         const map = new Map();
         list.forEach(t => {
+            if (!t || typeof t !== 'object') return;
             const name = t.category || 'Desert Safari';
             const slug = t.category_slug || 'desert-safari';
             if (!map.has(slug)) {
@@ -3844,10 +3890,11 @@ Alpine.data('globalSearchModal', (config = {}) => ({
 
     get filteredResults() {
         const list = this.matchedTours;
+        if (!Array.isArray(list)) return [];
         if (this.categoryFilter === 'all') {
             return list;
         }
-        return list.filter(t => (t.category_slug === this.categoryFilter) || (t.category === this.categoryFilter));
+        return list.filter(t => t && ((t.category_slug === this.categoryFilter) || (t.category === this.categoryFilter)));
     },
 
     handleInput() {
@@ -3856,6 +3903,7 @@ Alpine.data('globalSearchModal', (config = {}) => ({
 
         if (q.length < 2) {
             this.serverResults = [];
+            this.serverQuery = '';
             this.loading = false;
             this.categoryFilter = 'all';
             return;
@@ -3865,7 +3913,7 @@ Alpine.data('globalSearchModal', (config = {}) => ({
         this.loading = true;
         this.debounceTimer = setTimeout(() => {
             this.fetchServerResults();
-        }, 220);
+        }, 180);
     },
 
     async fetchServerResults() {
@@ -3876,20 +3924,35 @@ Alpine.data('globalSearchModal', (config = {}) => ({
         }
 
         try {
-            const url = new URL(this.liveSearchUrl, window.location.origin);
+            const url = new URL(this.liveSearchUrl || '/search/live', window.location.origin);
             url.searchParams.set('q', q);
             if (this.categoryFilter !== 'all') {
                 url.searchParams.set('category', this.categoryFilter);
             }
 
-            const res = await fetch(url.toString(), {
+            let res = await fetch(url.toString(), {
                 headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
             });
+
+            // Fallback to AJAX gateway if direct live search endpoint returned non-200
+            if (!res.ok) {
+                const ajaxUrl = new URL('/ajax.php', window.location.origin);
+                ajaxUrl.searchParams.set('action', 'live_search');
+                ajaxUrl.searchParams.set('q', q);
+                if (this.categoryFilter !== 'all') {
+                    ajaxUrl.searchParams.set('category', this.categoryFilter);
+                }
+                res = await fetch(ajaxUrl.toString(), {
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                });
+            }
+
             if (res.ok) {
                 const data = await res.json();
                 if (data && data.success && Array.isArray(data.results)) {
                     if (this.query.trim().toLowerCase() === q.toLowerCase()) {
                         this.serverResults = data.results;
+                        this.serverQuery = q.toLowerCase();
                     }
                 }
             }
@@ -3908,6 +3971,7 @@ Alpine.data('globalSearchModal', (config = {}) => ({
     clearQuery() {
         this.query = '';
         this.serverResults = [];
+        this.serverQuery = '';
         this.categoryFilter = 'all';
         this.selectedIndex = -1;
         this.loading = false;
@@ -3974,8 +4038,12 @@ Alpine.data('globalSearchModal', (config = {}) => ({
         const words = q.split(/\s+/).filter(w => w.length > 1).map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
         if (words.length === 0) return text;
 
-        const regex = new RegExp('(' + words.join('|') + ')', 'gi');
-        return text.replace(regex, '<mark class="bg-amber-100 text-orange-950 font-black px-0.5 rounded">$1</mark>');
+        try {
+            const regex = new RegExp('(' + words.join('|') + ')', 'gi');
+            return text.replace(regex, '<mark class="bg-amber-100 text-orange-950 font-black px-0.5 rounded">$1</mark>');
+        } catch (e) {
+            return text;
+        }
     }
 }));
 
