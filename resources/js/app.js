@@ -3751,6 +3751,234 @@ Alpine.data('customSafariModal', (config = {}) => ({
     }
 }));
 
+/**
+ * 6.4 Global Search Modal Auto-Complete & Real-time Narrowing Component
+ */
+Alpine.data('globalSearchModal', (config = {}) => ({
+    query: '',
+    categoryFilter: 'all',
+    catalog: config.catalog || [],
+    serverResults: [],
+    loading: false,
+    selectedIndex: -1,
+    searchUrl: config.searchUrl || '/search',
+    liveSearchUrl: config.liveSearchUrl || '/search/live',
+    debounceTimer: null,
+
+    init() {
+        this.$watch('$store.modal.active', active => {
+            if (active === 'search') {
+                this.$nextTick(() => {
+                    const input = this.$refs.searchInput;
+                    if (input) {
+                        input.focus();
+                        input.select();
+                    }
+                });
+            } else {
+                this.selectedIndex = -1;
+            }
+        });
+    },
+
+    get isSearching() {
+        return this.query.trim().length >= 2;
+    },
+
+    get matchedTours() {
+        const q = this.query.trim().toLowerCase();
+        if (q.length < 2) return [];
+
+        if (this.serverResults && this.serverResults.length > 0) {
+            return this.serverResults;
+        }
+
+        const tokens = q.split(/\s+/).filter(t => t.length > 1);
+
+        return this.catalog.filter(tour => {
+            const name = (tour.name || '').toLowerCase();
+            const cat = (tour.category || '').toLowerCase();
+            const keywords = (tour.keywords || '').toLowerCase();
+            const highlights = (tour.highlights || '').toLowerCase();
+
+            if (name.includes(q) || cat.includes(q) || keywords.includes(q) || highlights.includes(q)) {
+                return true;
+            }
+
+            if (tokens.length > 1) {
+                return tokens.every(t => name.includes(t) || cat.includes(t) || keywords.includes(t) || highlights.includes(t));
+            }
+
+            return tokens.some(t => name.includes(t) || cat.includes(t) || keywords.includes(t));
+        }).sort((a, b) => {
+            const aName = (a.name || '').toLowerCase();
+            const bName = (b.name || '').toLowerCase();
+            const aExact = aName.includes(q) ? 1 : 0;
+            const bExact = bName.includes(q) ? 1 : 0;
+            if (aExact !== bExact) return bExact - aExact;
+            if (a.is_bestseller !== b.is_bestseller) return (b.is_bestseller ? 1 : 0) - (a.is_bestseller ? 1 : 0);
+            return (a.priority || 0) - (b.priority || 0);
+        });
+    },
+
+    get availableCategories() {
+        const list = this.matchedTours;
+        if (!list || list.length === 0) return [];
+
+        const map = new Map();
+        list.forEach(t => {
+            const name = t.category || 'Desert Safari';
+            const slug = t.category_slug || 'desert-safari';
+            if (!map.has(slug)) {
+                map.set(slug, { name, slug, count: 0 });
+            }
+            map.get(slug).count++;
+        });
+
+        return Array.from(map.values());
+    },
+
+    get totalMatchCount() {
+        return this.matchedTours.length;
+    },
+
+    get filteredResults() {
+        const list = this.matchedTours;
+        if (this.categoryFilter === 'all') {
+            return list;
+        }
+        return list.filter(t => (t.category_slug === this.categoryFilter) || (t.category === this.categoryFilter));
+    },
+
+    handleInput() {
+        const q = this.query.trim();
+        this.selectedIndex = -1;
+
+        if (q.length < 2) {
+            this.serverResults = [];
+            this.loading = false;
+            this.categoryFilter = 'all';
+            return;
+        }
+
+        clearTimeout(this.debounceTimer);
+        this.loading = true;
+        this.debounceTimer = setTimeout(() => {
+            this.fetchServerResults();
+        }, 220);
+    },
+
+    async fetchServerResults() {
+        const q = this.query.trim();
+        if (q.length < 2) {
+            this.loading = false;
+            return;
+        }
+
+        try {
+            const url = new URL(this.liveSearchUrl, window.location.origin);
+            url.searchParams.set('q', q);
+            if (this.categoryFilter !== 'all') {
+                url.searchParams.set('category', this.categoryFilter);
+            }
+
+            const res = await fetch(url.toString(), {
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.success && Array.isArray(data.results)) {
+                    if (this.query.trim().toLowerCase() === q.toLowerCase()) {
+                        this.serverResults = data.results;
+                    }
+                }
+            }
+        } catch (e) {
+            // Silently fall back to client catalog
+        } finally {
+            this.loading = false;
+        }
+    },
+
+    selectCategory(slug) {
+        this.categoryFilter = slug;
+        this.selectedIndex = -1;
+    },
+
+    clearQuery() {
+        this.query = '';
+        this.serverResults = [];
+        this.categoryFilter = 'all';
+        this.selectedIndex = -1;
+        this.loading = false;
+        this.$nextTick(() => {
+            this.$refs.searchInput?.focus();
+        });
+    },
+
+    setQuery(text) {
+        this.query = text;
+        this.categoryFilter = 'all';
+        this.handleInput();
+        this.$nextTick(() => {
+            this.$refs.searchInput?.focus();
+        });
+    },
+
+    navigateDown() {
+        const count = this.filteredResults.length;
+        if (count === 0) return;
+        this.selectedIndex = (this.selectedIndex + 1) % count;
+        this.scrollToSelected();
+    },
+
+    navigateUp() {
+        const count = this.filteredResults.length;
+        if (count === 0) return;
+        this.selectedIndex = (this.selectedIndex - 1 + count) % count;
+        this.scrollToSelected();
+    },
+
+    scrollToSelected() {
+        this.$nextTick(() => {
+            const listEl = this.$refs.resultsList;
+            if (!listEl) return;
+            const activeEl = listEl.querySelector('[data-selected="true"]');
+            if (activeEl) {
+                activeEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            }
+        });
+    },
+
+    handleEnter(e) {
+        if (this.selectedIndex >= 0 && this.filteredResults[this.selectedIndex]) {
+            e.preventDefault();
+            window.location.href = this.filteredResults[this.selectedIndex].url;
+        }
+        // Otherwise allow form to submit naturally
+    },
+
+    handleEscape() {
+        if (this.query.trim().length > 0) {
+            this.clearQuery();
+        } else {
+            Alpine.store('modal').close();
+        }
+    },
+
+    highlightMatch(text) {
+        if (!text) return '';
+        const q = this.query.trim();
+        if (q.length < 2) return text;
+
+        const words = q.split(/\s+/).filter(w => w.length > 1).map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+        if (words.length === 0) return text;
+
+        const regex = new RegExp('(' + words.join('|') + ')', 'gi');
+        return text.replace(regex, '<mark class="bg-amber-100 text-orange-950 font-black px-0.5 rounded">$1</mark>');
+    }
+}));
+
 
 // =============================================================================
 // 7. INITIALIZE ALPINE & APP ENGINE

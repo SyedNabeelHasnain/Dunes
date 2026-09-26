@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ZiinaWebhookController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SubscriberController;
+use App\Http\Controllers\TourController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,6 +19,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('v1')->group(function () {
+    // Tours Auto-complete Live Search
+    Route::get('/tours/search', [TourController::class, 'liveSearch']);
+
     // GeoIP & IP utilities
     Route::get('/geoip', [ApiController::class, 'geoip']);
 

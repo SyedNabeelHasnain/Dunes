@@ -126,6 +126,10 @@ class AjaxGatewayController extends Controller
             case 'subscribe':
                 return app(SubscriberController::class)->subscribe($request);
 
+            case 'live_search':
+            case 'search':
+                return app(TourController::class)->liveSearch($request);
+
             default:
                 return response()->json(['error' => 'Invalid action'], 400);
         }

@@ -74,6 +74,7 @@ Route::redirect('/dashboard', '/admin')->name('dashboard');
 
 Route::get('/tours', [TourController::class, 'index'])->name('tours.index');
 Route::get('/search', [TourController::class, 'search'])->name('tours.search');
+Route::get('/search/live', [TourController::class, 'liveSearch'])->name('tours.search.live');
 Route::get('/build-your-own-safari', [TourController::class, 'customizer'])->name('tours.customizer');
 Route::redirect('/custom-safari', '/build-your-own-safari', 301);
 Route::get('/tours/{slug}', function ($slug) {

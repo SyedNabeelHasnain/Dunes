@@ -9,6 +9,7 @@ use App\Models\Review;
 use App\Models\Tour;
 use App\Services\SettingsService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class TourController extends Controller
@@ -164,6 +165,10 @@ class TourController extends Controller
         $cleanQuery = trim(preg_replace('/[^\p{L}\p{N}\s\-\+\&]/u', ' ', strip_tags($rawQuery)));
         $cleanQuery = preg_replace('/\s+/', ' ', $cleanQuery);
 
+        if ($request->ajax() || $request->wantsJson()) {
+            return $this->liveSearch($request);
+        }
+
         if (empty($cleanQuery)) {
             return redirect()->route('tours.index');
         }
@@ -243,6 +248,97 @@ class TourController extends Controller
             'pageRobots',
             'ogImage'
         ));
+    }
+
+    /**
+     * Real-time live search auto-complete and category filtering.
+     */
+    public function liveSearch(Request $request)
+    {
+        $rawQuery = (string) ($request->input('q') ?? $request->input('query') ?? $request->input('search') ?? '');
+        $cleanQuery = trim(preg_replace('/[^\p{L}\p{N}\s\-\+\&]/u', ' ', strip_tags($rawQuery)));
+        $cleanQuery = preg_replace('/\s+/', ' ', $cleanQuery);
+        $categoryFilter = trim((string) ($request->input('category') ?? ''));
+
+        if (mb_strlen($cleanQuery) < 2 && empty($categoryFilter)) {
+            return response()->json([
+                'success' => true,
+                'query' => $cleanQuery,
+                'count' => 0,
+                'categories' => [],
+                'results' => [],
+            ]);
+        }
+
+        $allActiveTours = Cache::remember('site_active_tours_search', 600, function () {
+            return Tour::where('status', 'active')
+                ->with(['tiers', 'category'])
+                ->orderBy('priority', 'asc')
+                ->get();
+        });
+
+        if (! empty($cleanQuery)) {
+            $intent = $this->analyzeSearchIntent($cleanQuery);
+            $scoredTours = $this->scoreAndRankTours($allActiveTours, $cleanQuery, $intent);
+        } else {
+            $scoredTours = $allActiveTours;
+        }
+
+        // Calculate available categories and their counts in the matched set
+        $availableCategories = $scoredTours->groupBy(function ($tour) {
+            return $tour->category ? $tour->category->name : 'Desert Safari';
+        })->map(function ($group, $name) {
+            $first = $group->first();
+
+            return [
+                'name' => $name,
+                'slug' => $first->category ? $first->category->slug : Str::slug($name),
+                'count' => $group->count(),
+            ];
+        })->values();
+
+        // If category filter is applied, narrow down the tours
+        if (! empty($categoryFilter) && $categoryFilter !== 'all') {
+            $scoredTours = $scoredTours->filter(function ($tour) use ($categoryFilter) {
+                $catSlug = $tour->category ? $tour->category->slug : 'desert-safari';
+                $catName = $tour->category ? $tour->category->name : 'Desert Safari';
+
+                return strtolower($catSlug) === strtolower($categoryFilter) || strtolower($catName) === strtolower($categoryFilter);
+            });
+        }
+
+        $results = $scoredTours->map(function ($tour) {
+            $minPrice = $tour->tiers->min('pivot.price') ?? 0;
+            $thumbImage = $tour->thumb_image ?: $tour->hero_image ?: 'desert-safari-poster.avif';
+            $thumbImage = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $thumbImage);
+
+            return [
+                'id' => $tour->id,
+                'name' => $tour->name,
+                'slug' => $tour->slug,
+                'url' => url('/'.$tour->slug),
+                'category' => $tour->category ? $tour->category->name : 'Desert Safari',
+                'category_slug' => $tour->category ? $tour->category->slug : 'desert-safari',
+                'duration' => $tour->duration ?: '4-6 Hours',
+                'rating' => (float) ($tour->rating ?: 4.9),
+                'reviews_count' => (int) ($tour->review_count ?: 850),
+                'price' => (float) $minPrice,
+                'price_formatted' => $minPrice > 0 ? 'From AED '.number_format($minPrice) : 'Best Rates',
+                'image' => asset('images/'.$thumbImage),
+                'is_bestseller' => (bool) $tour->is_bestseller,
+                'is_featured' => (bool) $tour->is_featured,
+                'badge' => $tour->is_bestseller ? 'Bestseller' : ($tour->is_featured ? 'Popular' : ($tour->category ? $tour->category->name : 'Safari')),
+                'highlights' => $tour->short_desc ? Str::limit(strip_tags($tour->short_desc), 85) : 'Luxury 4x4 Transfers, Red Dunes & BBQ Dinner',
+            ];
+        })->values();
+
+        return response()->json([
+            'success' => true,
+            'query' => $cleanQuery,
+            'count' => $results->count(),
+            'categories' => $availableCategories,
+            'results' => $results,
+        ]);
     }
 
     /**
