@@ -144,9 +144,15 @@ class MultiLanguageArchitectureTest extends TestCase
         ]);
 
         $driver = new DeepLTranslationDriver('dummy-key', 'free');
-        $translated = $driver->translate('Welcome to <span class="highlight">Dubai</span>', 'ar', 'en');
+        $translated = $driver->translate('Welcome to <span class="highlight">Dubai</span>', 'ar', 'en', true);
 
         $this->assertEquals('مرحبا بكم في <span class="highlight">دبي</span>', $translated);
+
+        Http::assertSent(function ($request) {
+            $data = $request->data();
+            return isset($data['tag_handling']) && $data['tag_handling'] === 'html'
+                && ! isset($data['preserve_formatting']);
+        });
     }
 
     /**

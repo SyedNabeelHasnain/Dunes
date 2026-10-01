@@ -29,7 +29,7 @@ class AdminTranslationSettingController extends Controller
             'deepl_auth_key',
             'deepl_endpoint_type',
             'google_translate_api_key',
-        ])->pluck('setting_value', 'setting_key');
+        ])->pluck('setting_value', 'setting_key')->toArray();
 
         $activeService = strtolower(trim($settings['translation_active_service'] ?? 'none'));
 
@@ -56,6 +56,7 @@ class AdminTranslationSettingController extends Controller
         }
 
         $this->manager->clearCache();
+        app(\App\Services\SettingsService::class)->clearCache();
 
         return redirect()->route('admin.settings.translations')
             ->with('success', 'Translation service settings updated successfully.');

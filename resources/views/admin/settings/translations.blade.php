@@ -138,9 +138,41 @@
 
                     <div class="space-y-4">
                         <div>
-                            <label for="deepl_auth_key" class="block text-xs font-bold text-slate-700 mb-1">DeepL Authentication Key</label>
-                            <input type="password" name="deepl_auth_key" id="deepl_auth_key" value="{{ $settings['deepl_auth_key'] ?? '' }}" placeholder="e.g. 12345678-abcd-1234-efgh-123456789012:fx" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 focus:border-primary focus:ring-1 focus:ring-primary outline-hidden font-mono">
-                            <span class="text-[11px] text-slate-400">Keys ending with <code class="bg-slate-100 px-1 py-0.5 rounded">:fx</code> use the Free API tier automatically.</span>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label for="deepl_auth_key" class="block text-xs font-bold text-slate-700">DeepL Authentication Key</label>
+                                @if(!empty($settings['deepl_auth_key']))
+                                    <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                                        <i class="bi bi-shield-check"></i> Key Settled & Saved
+                                    </span>
+                                @else
+                                    <span class="text-[11px] font-medium text-slate-400">Not configured yet</span>
+                                @endif
+                            </div>
+
+                            <div x-data="{ showKey: false }" class="relative">
+                                <input :type="showKey ? 'text' : 'password'" 
+                                       name="deepl_auth_key" 
+                                       id="deepl_auth_key" 
+                                       value="{{ $settings['deepl_auth_key'] ?? '' }}" 
+                                       autocomplete="new-password"
+                                       placeholder="e.g. 12345678-abcd-1234-efgh-123456789012:fx" 
+                                       class="w-full rounded-xl border border-slate-200 bg-white ps-3.5 pe-10 py-2.5 text-xs text-slate-800 focus:border-primary focus:ring-1 focus:ring-primary outline-hidden font-mono">
+                                <button type="button" 
+                                        @click="showKey = !showKey" 
+                                        class="absolute inset-y-0 end-0 pe-3 flex items-center text-slate-400 hover:text-slate-700 cursor-pointer transition"
+                                        title="Click to Reveal / Hide Key">
+                                    <i class="bi text-sm" :class="showKey ? 'bi-eye-slash-fill' : 'bi-eye-fill'"></i>
+                                </button>
+                            </div>
+
+                            <div class="flex items-center justify-between mt-1 text-[11px] text-slate-500">
+                                <span>Keys ending with <code class="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-700">:fx</code> use the Free API tier automatically.</span>
+                                @if(!empty($settings['deepl_auth_key']))
+                                    <span class="text-slate-400 font-mono text-[10px]">
+                                        Saved: {{ Str::mask($settings['deepl_auth_key'], '*', 4, -4) }}
+                                    </span>
+                                @endif
+                            </div>
                         </div>
 
                         <div>
@@ -173,9 +205,41 @@
 
                     <div class="space-y-4">
                         <div>
-                            <label for="google_translate_api_key" class="block text-xs font-bold text-slate-700 mb-1">Google Cloud API Key</label>
-                            <input type="password" name="google_translate_api_key" id="google_translate_api_key" value="{{ $settings['google_translate_api_key'] ?? '' }}" placeholder="e.g. AIzaSy..." class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 focus:border-primary focus:ring-1 focus:ring-primary outline-hidden font-mono">
-                            <span class="text-[11px] text-slate-400">Google Cloud Console > Credentials > API Key (with Cloud Translation API enabled).</span>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label for="google_translate_api_key" class="block text-xs font-bold text-slate-700">Google Cloud API Key</label>
+                                @if(!empty($settings['google_translate_api_key']))
+                                    <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                                        <i class="bi bi-shield-check"></i> Key Settled & Saved
+                                    </span>
+                                @else
+                                    <span class="text-[11px] font-medium text-slate-400">Not configured yet</span>
+                                @endif
+                            </div>
+
+                            <div x-data="{ showKey: false }" class="relative">
+                                <input :type="showKey ? 'text' : 'password'" 
+                                       name="google_translate_api_key" 
+                                       id="google_translate_api_key" 
+                                       value="{{ $settings['google_translate_api_key'] ?? '' }}" 
+                                       autocomplete="new-password"
+                                       placeholder="e.g. AIzaSy..." 
+                                       class="w-full rounded-xl border border-slate-200 bg-white ps-3.5 pe-10 py-2.5 text-xs text-slate-800 focus:border-primary focus:ring-1 focus:ring-primary outline-hidden font-mono">
+                                <button type="button" 
+                                        @click="showKey = !showKey" 
+                                        class="absolute inset-y-0 end-0 pe-3 flex items-center text-slate-400 hover:text-slate-700 cursor-pointer transition"
+                                        title="Click to Reveal / Hide Key">
+                                    <i class="bi text-sm" :class="showKey ? 'bi-eye-slash-fill' : 'bi-eye-fill'"></i>
+                                </button>
+                            </div>
+
+                            <div class="flex items-center justify-between mt-1 text-[11px] text-slate-500">
+                                <span>Google Cloud Console > Credentials > API Key (with Cloud Translation API enabled).</span>
+                                @if(!empty($settings['google_translate_api_key']))
+                                    <span class="text-slate-400 font-mono text-[10px]">
+                                        Saved: {{ Str::mask($settings['google_translate_api_key'], '*', 4, -4) }}
+                                    </span>
+                                @endif
+                            </div>
                         </div>
 
                         <div class="pt-2">

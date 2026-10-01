@@ -78,7 +78,6 @@ class DeepLTranslationDriver implements TranslationDriverInterface
 
         if ($isHtml) {
             $payload['tag_handling'] = 'html';
-            $payload['preserve_formatting'] = '1';
         }
 
         $response = Http::withHeaders([
