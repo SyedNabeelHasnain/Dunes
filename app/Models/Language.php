@@ -121,18 +121,13 @@ class Language extends Model
     public static function getDefault(): ?self
     {
         try {
-            if (! Schema::hasTable('languages')) {
-                return self::fallbackDefault();
-            }
+            $active = self::getActive();
 
-            return Cache::rememberForever('language_default', function () {
-                return self::where('code', 'en')->first()
-                    ?? self::where('is_default', true)->first()
-                    ?? self::fallbackDefault();
-            });
+            return $active->firstWhere('is_default', true)
+                ?? $active->firstWhere('code', 'en')
+                ?? $active->first()
+                ?? self::fallbackDefault();
         } catch (\Throwable $e) {
-            Log::warning('Language::getDefault() query failed: '.$e->getMessage());
-
             return self::fallbackDefault();
         }
     }
@@ -158,15 +153,28 @@ class Language extends Model
                 }
             }
 
-            return Cache::rememberForever('languages_active', function () {
-                $languages = self::where('is_active', true)
+            $rows = Cache::rememberForever('languages_active_data', function () {
+                return self::where('is_active', true)
                     ->orderBy('is_default', 'desc')
                     ->orderBy('sort_order', 'asc')
                     ->orderBy('name', 'asc')
-                    ->get();
-
-                return $languages->isNotEmpty() ? $languages : self::fallbackCollection();
+                    ->get()
+                    ->toArray();
             });
+
+            if (empty($rows) || ! is_array($rows)) {
+                return self::fallbackCollection();
+            }
+
+            $models = array_map(function ($row) {
+                $lang = new self();
+                $lang->forceFill($row);
+                $lang->exists = true;
+
+                return $lang;
+            }, $rows);
+
+            return new Collection($models);
         } catch (\Throwable $e) {
             Log::warning('Language::getActive() query failed: '.$e->getMessage());
 
@@ -182,7 +190,7 @@ class Language extends Model
     public static function getActiveCodes(): array
     {
         try {
-            $codes = self::getActive()->pluck('code')->toArray();
+            $codes = self::getActive()->pluck('code')->all();
 
             return ! empty($codes) ? $codes : ['en'];
         } catch (\Throwable $e) {
@@ -198,6 +206,7 @@ class Language extends Model
         try {
             Cache::forget('language_default');
             Cache::forget('languages_active');
+            Cache::forget('languages_active_data');
             Cache::forget('all_languages');
         } catch (\Throwable $e) {
             // Silently ignore cache clearing issues during bootstrap/migration

@@ -45,9 +45,9 @@
     $ogType = $ogType ?? 'website';
 @endphp
 <!DOCTYPE html>
-<html lang="{{ $currentLocale ?? 'en' }}" dir="{{ $textDir ?? 'ltr' }}">
+<html lang="{{ $currentLocale ?? app()->getLocale() ?? 'en' }}" dir="{{ ($isRtl ?? (app()->getLocale() === 'ar')) ? 'rtl' : 'ltr' }}">
 <head>
-    @if($isRtl ?? false)
+    @if(($isRtl ?? false) || ($currentLocale ?? app()->getLocale()) === 'ar')
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
