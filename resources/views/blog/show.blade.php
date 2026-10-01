@@ -171,13 +171,23 @@
                 </div>
                 @endif
 
-                <!-- Post HTML Content -->
+                <!-- Post HTML Content with In-Article Conversion Cards -->
                 <div class="blog-content prose max-w-none text-slate-800 leading-relaxed" itemprop="articleBody">
-                    {!! $post->content !!}
+                    {!! $processedContent ?? $post->content !!}
                 </div>
 
                 @if ($post->featured_image_caption)
                 <p class="text-slate-500 text-xs text-center mt-3 italic">{{ $post->featured_image_caption }}</p>
+                @endif
+
+                <!-- End-of-Article Tour Conversion Showcase -->
+                @if (isset($matchedTour) && $matchedTour)
+                    @include('partials.in-article-tour-card', [
+                        'tour' => $matchedTour,
+                        'post' => $post,
+                        'variant' => 'end-article',
+                        'recommendedTours' => $recommendedTours ?? collect()
+                    ])
                 @endif
 
                 <!-- FAQs Accordion with Alpine.js -->
@@ -240,17 +250,25 @@
             <!-- Sidebar Widgets (4 cols) -->
             <aside class="lg:col-span-4">
                 <div class="sticky top-24 space-y-6">
-                    <!-- CTA Widget -->
-                    <div class="rounded-2xl p-6 bg-gradient-to-br from-primary to-orange-600 text-white shadow-lg">
-                        <h3 class="font-extrabold text-lg text-white mb-1.5">Book a Desert Safari</h3>
-                        <p class="text-xs text-white/90 mb-4 leading-relaxed">From <span data-aed="99" class="font-bold">AED 99</span> per person. Instant confirmation.</p>
-                        <button data-action="open-booking" class="w-full bg-white hover:bg-slate-50 text-slate-950 font-bold rounded-full py-2.5 text-xs transition-colors cursor-pointer shadow-xs mb-2" @click="$store.modal.open('booking')">
-                            <i class="bi bi-calendar-check mr-1.5"></i>Book Now
-                        </button>
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode('Hi! I read your blog about ' . $post->title . ' and would like to know more.') }}" class="w-full border border-white/40 hover:border-white text-white font-bold rounded-full py-2 text-xs transition-colors flex items-center justify-center gap-1.5" target="_blank" rel="noopener noreferrer">
-                            <i class="bi bi-whatsapp text-emerald-300"></i>Ask on WhatsApp
-                        </a>
-                    </div>
+                    <!-- Contextual Tour Booking Sidebar Widget -->
+                    @if (isset($matchedTour) && $matchedTour)
+                        @include('partials.in-article-tour-card', [
+                            'tour' => $matchedTour,
+                            'post' => $post,
+                            'variant' => 'sidebar'
+                        ])
+                    @else
+                        <div class="rounded-2xl p-6 bg-gradient-to-br from-primary to-orange-600 text-white shadow-lg">
+                            <h3 class="font-extrabold text-lg text-white mb-1.5">Book a Desert Safari</h3>
+                            <p class="text-xs text-white/90 mb-4 leading-relaxed">From <span data-aed="99" class="font-bold">AED 99</span> per person. Instant confirmation.</p>
+                            <button data-action="open-booking" class="w-full bg-white hover:bg-slate-50 text-slate-950 font-bold rounded-full py-2.5 text-xs transition-colors cursor-pointer shadow-xs mb-2" @click="$store.modal.open('booking')">
+                                <i class="bi bi-calendar-check mr-1.5"></i>Book Now
+                            </button>
+                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode('Hi! I read your blog about ' . $post->title . ' and would like to know more.') }}" class="w-full border border-white/40 hover:border-white text-white font-bold rounded-full py-2 text-xs transition-colors flex items-center justify-center gap-1.5" target="_blank" rel="noopener noreferrer">
+                                <i class="bi bi-whatsapp text-emerald-300"></i>Ask on WhatsApp
+                            </a>
+                        </div>
+                    @endif
 
                     <!-- Categories Sidebar -->
                     @php $cats = \App\Models\BlogCategory::where('status', 'active')->orderBy('priority', 'asc')->get(); @endphp
@@ -301,6 +319,15 @@
     </div>
 </article>
 
+<!-- Mobile Sticky Booking Bar -->
+@if (isset($matchedTour) && $matchedTour)
+    @include('partials.in-article-tour-card', [
+        'tour' => $matchedTour,
+        'post' => $post,
+        'variant' => 'mobile-sticky'
+    ])
+@endif
+
 <!-- Related Articles Bottom Section -->
 @if ($relatedPosts->count() > 0)
 <section class="py-12 sm:py-16 bg-slate-50 border-t border-slate-200">
@@ -340,7 +367,12 @@
         <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">Ready for Your Dubai Adventure?</h2>
         <p class="text-slate-300 text-sm sm:text-base mb-6">Join thousands of satisfied guests who have experienced Dubai with Dunes Discovery Tourism.</p>
         <div class="flex gap-3 justify-center flex-wrap">
-            <button data-action="open-booking" class="btn-desert-animated rounded-full px-8 py-3.5 font-bold text-white text-sm shadow-lg cursor-pointer" @click="$store.modal.open('booking')">Book a Desert Safari</button>
+            <button data-action="open-booking" 
+                    class="btn-desert-animated rounded-full px-8 py-3.5 font-bold text-white text-sm shadow-lg cursor-pointer" 
+                    data-tour="{{ $matchedTour->id ?? '' }}"
+                    @click="$store.modal.open('booking'{{ isset($matchedTour) && $matchedTour ? ', { tourId: ' . $matchedTour->id . ' }' : '' }})">
+                Book {{ isset($matchedTour) && $matchedTour ? $matchedTour->name : 'a Desert Safari' }}
+            </button>
             <a href="{{ route('tours.index') }}" class="border border-white/40 hover:border-white text-white rounded-full px-8 py-3.5 font-bold text-sm transition-colors">Browse All Tours</a>
         </div>
     </div>
