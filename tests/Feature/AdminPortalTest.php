@@ -428,4 +428,71 @@ class AdminPortalTest extends TestCase
         $response->assertStatus(200);
         $response->assertHeader('content-type', 'application/pdf');
     }
+
+    /**
+     * Test admin can update tour core changes via PUT /admin/tours/{id}.
+     */
+    public function test_admin_can_update_tour_core_changes(): void
+    {
+        $cat = Category::firstOrCreate(['slug' => 'desert-safari'], ['name' => 'Desert Safari', 'priority' => 1]);
+        $tour = Tour::create([
+            'slug' => 'evening-desert-safari',
+            'name' => 'Evening Desert Safari',
+            'category_id' => $cat->id,
+            'short_desc' => 'Original short desc',
+            'full_desc' => 'Original full desc',
+            'duration' => '6 Hours',
+            'pickup_time' => '2:30 PM',
+            'dropoff_time' => '9:30 PM',
+            'status' => 'active',
+            'priority' => 1,
+        ]);
+
+        $payload = [
+            'category_id' => $cat->id,
+            'name' => [
+                'en' => 'Updated Desert Safari',
+                'ar' => 'رحلة صحراوية محدثة',
+            ],
+            'short_desc' => [
+                'en' => 'Updated short description',
+                'ar' => 'وصف قصير محدث',
+            ],
+            'full_desc' => [
+                'en' => '<p>Updated full description</p>',
+                'ar' => '<p>وصف كامل محدث</p>',
+            ],
+            'duration' => '7 Hours',
+            'pickup_time' => '3:00 PM',
+            'dropoff_time' => '10:00 PM',
+            'min_age' => 5,
+            'group_size' => 'Up to 6',
+            'languages' => 'English, Arabic',
+            'priority' => 2,
+            'status' => 'active',
+            'is_featured' => '1',
+            'is_bestseller' => '1',
+            'meta_title' => [
+                'en' => 'Updated SEO Title',
+                'ar' => 'عنوان محدث',
+            ],
+            'meta_desc' => [
+                'en' => 'Updated Meta Desc',
+                'ar' => 'وصف سيو محدث',
+            ],
+            'meta_keywords' => [
+                'en' => 'desert, safari',
+                'ar' => 'صحراء, سفاري',
+            ],
+        ];
+
+        $response = $this->actingAs($this->adminUser)->put("/admin/tours/{$tour->id}", $payload);
+
+        $response->assertStatus(302);
+        $response->assertRedirect('/admin/tours');
+
+        $tour->refresh();
+        $this->assertEquals('Updated Desert Safari', $tour->getTranslation('name', 'en'));
+        $this->assertEquals('رحلة صحراوية محدثة', $tour->getTranslation('name', 'ar'));
+    }
 }

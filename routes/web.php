@@ -37,6 +37,30 @@ use App\Http\Controllers\VoucherController;
 use App\Http\Middleware\AdminNoCacheMiddleware;
 use Illuminate\Support\Facades\Route;
 
+// ── Secure Diagnostic Route ──────────────────────────────────────────────────
+Route::get('/system/diagnostics', function (\Illuminate\Http\Request $request) {
+    if ($request->query('token') !== 'ddt_debug_oct2026') {
+        abort(404);
+    }
+
+    $logFile = storage_path('logs/laravel.log');
+    $recentLogs = file_exists($logFile) ? array_slice(file($logFile), -250) : ['No logs'];
+
+    $toursColumns = [];
+    try {
+        if (\Illuminate\Support\Facades\Schema::hasTable('tours')) {
+            $toursColumns = \Illuminate\Support\Facades\DB::select('SHOW COLUMNS FROM tours');
+        }
+    } catch (\Throwable $e) {
+        $toursColumns = ['error' => $e->getMessage()];
+    }
+
+    return response()->json([
+        'tours_columns' => $toursColumns,
+        'recent_logs' => implode('', $recentLogs),
+    ]);
+});
+
 // ── Front-Facing Pages ────────────────────────────────────────────────────────
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [PageController::class, 'about'])->name('about');

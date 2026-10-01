@@ -282,4 +282,23 @@ class MultiLanguageArchitectureTest extends TestCase
         $switchUrl = switch_locale_url('ar');
         $this->assertStringContainsString('/ar', $switchUrl);
     }
+
+    /**
+     * Test admin can update translation settings.
+     */
+    public function test_admin_can_update_translation_settings(): void
+    {
+        $admin = User::first() ?? User::factory()->create();
+
+        $response = $this->actingAs($admin)->post('/admin/settings/translations', [
+            'translation_active_service' => 'deepl',
+            'deepl_auth_key' => 'test-key:fx',
+            'deepl_endpoint_type' => 'free',
+            'google_translate_api_key' => '',
+        ]);
+
+        $response->assertStatus(302);
+        $response->assertRedirect('/admin/settings/translations');
+        $this->assertEquals('deepl', Setting::where('setting_key', 'translation_active_service')->value('setting_value'));
+    }
 }
