@@ -51,6 +51,9 @@ class TranslateCatalogCommand extends Command
      */
     public function handle(TranslationManager $translationManager): int
     {
+        @set_time_limit(0);
+        @ini_set('memory_limit', '512M');
+
         $this->info('===========================================================');
         $this->info('  Dunes Discovery Tourism - Global Multilingual Catalog Translator');
         $this->info('===========================================================');
@@ -187,28 +190,21 @@ class TranslateCatalogCommand extends Command
             $this->line("\nTranslating {$modelName} records...");
 
             try {
-                $records = $modelClass::all();
+                $recordCount = $modelClass::count();
             } catch (\Throwable $e) {
                 $this->error("Failed to query {$modelName}: ".$e->getMessage());
                 continue;
             }
 
-            $recordCount = $records->count();
-            $translatedInModel = 0;
-
-            foreach ($records as $record) {
-                $count = $this->translateRecord($record, $targetLocales, $htmlFields, $driver, $force, $dryRun);
-                $translatedInModel += $count;
-            }
-
-            $totalFieldsTranslated += $translatedInModel;
+            $count = $this->translateModelBatch($modelName, $modelClass, $htmlFields, $targetLocales, $driver, $force, $dryRun);
+            $totalFieldsTranslated += $count;
             $summary[] = [
                 'model' => $modelName,
                 'records' => $recordCount,
-                'fields_translated' => $translatedInModel,
+                'fields_translated' => $count,
             ];
 
-            $this->info("Completed {$modelName}: {$translatedInModel} field translations across {$recordCount} records.");
+            $this->info("Completed {$modelName}: {$count} field translations across {$recordCount} records.");
         }
 
         // 4. Clear Frontend & Sitemap Caches
@@ -230,104 +226,142 @@ class TranslateCatalogCommand extends Command
     }
 
     /**
-     * Translate an individual model record into the given target locales.
+     * Translate records for a given model in high-efficiency batches.
      *
-     * @param Model $record
-     * @param array<string> $targetLocales
+     * @param string $modelName
+     * @param string $modelClass
      * @param array<string> $htmlFields
+     * @param array<string> $targetLocales
      * @param DeepLTranslationDriver $driver
      * @param bool $force
      * @param bool $dryRun
      * @return int Number of translated fields saved
      */
-    protected function translateRecord(
-        Model $record,
-        array $targetLocales,
+    protected function translateModelBatch(
+        string $modelName,
+        string $modelClass,
         array $htmlFields,
+        array $targetLocales,
         DeepLTranslationDriver $driver,
         bool $force,
         bool $dryRun
     ): int {
-        if (! property_exists($record, 'translatable') || ! is_array($record->translatable)) {
+        try {
+            $records = $modelClass::all();
+        } catch (\Throwable $e) {
+            $this->error("Failed to query {$modelName}: ".$e->getMessage());
             return 0;
         }
 
-        $translatableAttributes = $record->translatable;
-        $totalCount = 0;
-        $recordDirty = false;
+        $totalFields = 0;
+        $recordsById = $records->keyBy(fn ($r) => (string) $r->getKey());
 
         foreach ($targetLocales as $locale) {
-            $plainBatch = [];
-            $htmlBatch = [];
-
-            foreach ($translatableAttributes as $attribute) {
-                // Determine English base source
-                $enValue = $this->getEnglishSource($record, $attribute);
-                if (empty($enValue) || ! is_string($enValue) || trim($enValue) === '') {
+            // 1. Collect all plain-text attributes needing translation
+            $plainItems = [];
+            foreach ($records as $record) {
+                if (! property_exists($record, 'translatable') || ! is_array($record->translatable)) {
                     continue;
                 }
 
-                // Check if target translation already exists
-                $existing = $record->getTranslation($attribute, $locale, false);
-                if (! empty($existing) && ! $force) {
+                foreach ($record->translatable as $attribute) {
+                    if (in_array($attribute, $htmlFields, true)) {
+                        continue;
+                    }
+
+                    $existing = $record->getTranslation($attribute, $locale, false);
+                    if (! empty($existing) && ! $force) {
+                        continue;
+                    }
+
+                    $enValue = $this->getEnglishSource($record, $attribute);
+                    if (! empty($enValue) && is_string($enValue) && trim($enValue) !== '') {
+                        $key = $record->getKey().'___'.$attribute;
+                        $plainItems[$key] = $enValue;
+                    }
+                }
+            }
+
+            // 2. Batch-translate plain items in chunks of 30
+            if (! empty($plainItems)) {
+                $chunks = array_chunk($plainItems, 30, true);
+                foreach ($chunks as $chunk) {
+                    try {
+                        $translated = $driver->translate($chunk, $locale, 'en', false);
+                        foreach ($translated as $compoundKey => $val) {
+                            if (empty($val) || ! is_string($val)) {
+                                continue;
+                            }
+                            $parts = explode('___', $compoundKey, 2);
+                            if (count($parts) !== 2) {
+                                continue;
+                            }
+                            [$recId, $attr] = $parts;
+                            if (isset($recordsById[$recId])) {
+                                if (! $dryRun) {
+                                    $recordsById[$recId]->setTranslation($attr, $locale, $val);
+                                }
+                                $totalFields++;
+                            }
+                        }
+                        if (! app()->runningUnitTests()) {
+                            usleep(100000); // 100ms pause between batches
+                        }
+                    } catch (\Throwable $e) {
+                        $this->warn("DeepL plain batch error for [{$locale}] in {$modelName}: ".$e->getMessage());
+                    }
+                }
+            }
+
+            // 3. Translate HTML fields individually to prevent payload/timeout issues
+            foreach ($records as $record) {
+                if (! property_exists($record, 'translatable') || ! is_array($record->translatable)) {
                     continue;
                 }
 
-                // Sort into plain vs HTML batch
-                if (in_array($attribute, $htmlFields, true)) {
-                    $htmlBatch[$attribute] = $enValue;
-                } else {
-                    $plainBatch[$attribute] = $enValue;
-                }
-            }
+                foreach ($htmlFields as $htmlAttr) {
+                    if (! in_array($htmlAttr, $record->translatable, true)) {
+                        continue;
+                    }
 
-            // Perform batch translations via DeepL
-            if (! empty($plainBatch)) {
-                try {
-                    $translated = $driver->translate($plainBatch, $locale, 'en', false);
-                    foreach ($translated as $attr => $translatedVal) {
-                        if (! empty($translatedVal) && is_string($translatedVal)) {
-                            if (! $dryRun) {
-                                $record->setTranslation($attr, $locale, $translatedVal);
-                            }
-                            $totalCount++;
-                            $recordDirty = true;
-                        }
+                    $existing = $record->getTranslation($htmlAttr, $locale, false);
+                    if (! empty($existing) && ! $force) {
+                        continue;
                     }
-                    if (! app()->runningUnitTests()) {
-                        usleep(100000); // 100ms rate-limit pause in production
-                    }
-                } catch (\Throwable $e) {
-                    $this->warn("DeepL plain translation error for [{$locale}] on record #{$record->getKey()}: ".$e->getMessage());
-                }
-            }
 
-            if (! empty($htmlBatch)) {
-                try {
-                    $translated = $driver->translate($htmlBatch, $locale, 'en', true);
-                    foreach ($translated as $attr => $translatedVal) {
-                        if (! empty($translatedVal) && is_string($translatedVal)) {
+                    $enValue = $this->getEnglishSource($record, $htmlAttr);
+                    if (empty($enValue) || ! is_string($enValue) || trim($enValue) === '') {
+                        continue;
+                    }
+
+                    try {
+                        $transHtml = $driver->translate($enValue, $locale, 'en', true);
+                        if (! empty($transHtml) && is_string($transHtml)) {
                             if (! $dryRun) {
-                                $record->setTranslation($attr, $locale, $translatedVal);
+                                $record->setTranslation($htmlAttr, $locale, $transHtml);
                             }
-                            $totalCount++;
-                            $recordDirty = true;
+                            $totalFields++;
                         }
+                        if (! app()->runningUnitTests()) {
+                            usleep(100000);
+                        }
+                    } catch (\Throwable $e) {
+                        $this->warn("DeepL HTML translation error for [{$locale}] on {$modelName} #{$record->getKey()}: ".$e->getMessage());
                     }
-                    if (! app()->runningUnitTests()) {
-                        usleep(100000); // 100ms rate-limit pause in production
-                    }
-                } catch (\Throwable $e) {
-                    $this->warn("DeepL HTML translation error for [{$locale}] on record #{$record->getKey()}: ".$e->getMessage());
                 }
             }
         }
 
-        if ($recordDirty && ! $dryRun) {
-            $record->saveQuietly();
+        // 4. Save any updated records
+        if (! $dryRun) {
+            foreach ($records as $record) {
+                if ($record->isDirty()) {
+                    $record->saveQuietly();
+                }
+            }
         }
 
-        return $totalCount;
+        return $totalFields;
     }
 
     /**

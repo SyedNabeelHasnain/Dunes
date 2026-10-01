@@ -54,22 +54,22 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-16">
         <nav aria-label="breadcrumb">
             <ol class="flex items-center gap-2 text-xs sm:text-sm text-white/70 mb-4">
-                <li><a href="{{ route('home') }}" class="hover:text-white transition-colors">Home</a></li>
+                <li><a href="{{ route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') }}</a></li>
                 <li><span class="text-white/40">/</span></li>
-                <li class="text-white font-semibold" aria-current="page">FAQ</li>
+                <li class="text-white font-semibold" aria-current="page">{{ __('ui.faq.title') }}</li>
             </ol>
         </nav>
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
             <div>
                 <span class="glass rounded-full px-3.5 py-1 text-xs inline-flex items-center gap-1.5 mb-2">
-                    <i class="bi bi-patch-question-fill text-primary"></i>Help Center & Direct Answers
+                    <i class="bi bi-patch-question-fill text-primary"></i>{{ __('ui.faq.help_center') }}
                 </span>
-                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-2">Frequently Asked Questions</h1>
-                <p class="text-sm sm:text-base text-white/80 max-w-2xl leading-relaxed">Clear, direct answers about bookings, timings, halal food, safety, and tour inclusions.</p>
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-2">{{ __('ui.faq.title') }}</h1>
+                <p class="text-sm sm:text-base text-white/80 max-w-2xl leading-relaxed">{{ __('ui.faq.subtitle') }}</p>
             </div>
             <div class="hidden lg:block shrink-0">
                 <span class="bg-primary/20 text-primary border border-primary/40 px-4 py-2 rounded-full font-bold text-sm inline-flex items-center gap-1.5">
-                    <i class="bi bi-clock-history"></i>24/7 Support Available
+                    <i class="bi bi-clock-history"></i>{{ __('ui.faq.support_247') }}
                 </span>
             </div>
         </div>
@@ -119,7 +119,7 @@
             <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 shadow-xs">
                 <div class="relative">
                     <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
-                    <input type="text" id="faqSearchInput" class="w-full rounded-full pl-11 pr-4 py-3 bg-white border border-slate-200 text-sm text-slate-800 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs" placeholder="Search questions (e.g., cancel, clothing, quad, pickup, timing)..." oninput="handleFaqSearch(this.value)">
+                    <input type="text" id="faqSearchInput" class="w-full rounded-full pl-11 pr-4 py-3 bg-white border border-slate-200 text-sm text-slate-800 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs" placeholder="{{ __('ui.faq.search_placeholder') }}" oninput="handleFaqSearch(this.value)">
                 </div>
             </div>
         </div>
@@ -148,16 +148,16 @@
             <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl text-slate-500">
                 <i class="bi bi-search"></i>
             </div>
-            <h3 class="text-base font-bold text-slate-900 mb-1">No matching questions found</h3>
-            <p class="text-slate-500 text-xs">Can't find what you're looking for? Reach out directly via WhatsApp for instant answers.</p>
+            <h3 class="text-base font-bold text-slate-900 mb-1">{{ __('ui.faq.no_results_title') }}</h3>
+            <p class="text-slate-500 text-xs">{{ __('ui.faq.no_results_desc') }}</p>
         </div>
 
         <div class="mt-14 p-8 sm:p-12 text-center bg-slate-50 rounded-3xl border border-slate-200">
             <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl text-primary shadow-xs">
                 <i class="bi bi-chat-dots-fill"></i>
             </div>
-            <h2 class="text-2xl font-extrabold text-slate-900 mb-2">Still Have Questions?</h2>
-            <p class="text-slate-600 text-sm mb-6 max-w-md mx-auto">Our dedicated team is ready 24/7 to help you with any inquiries or custom tour arrangements.</p>
+            <h2 class="text-2xl font-extrabold text-slate-900 mb-2">{{ __('ui.faq.still_have_questions') }}</h2>
+            <p class="text-slate-600 text-sm mb-6 max-w-md mx-auto">{{ __('ui.faq.team_ready') }}</p>
             <div class="flex flex-col sm:flex-row justify-center gap-3">
                 <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode('Hi! I have a question about your tours.') }}" class="btn-whatsapp-animated rounded-full px-6 py-3 font-bold text-white text-sm inline-flex items-center justify-center gap-2 shadow-sm" target="_blank" rel="noopener noreferrer">
                     <i class="bi bi-whatsapp"></i>
@@ -165,7 +165,7 @@
                 </a>
                 <a href="{{ route('contact') }}" class="btn-desert-animated rounded-full px-6 py-3 font-bold text-white text-sm inline-flex items-center justify-center gap-2 shadow-sm">
                     <i class="bi bi-envelope"></i>
-                    <span>Contact Us</span>
+                    <span>{{ __('ui.nav.contact') }}</span>
                 </a>
             </div>
         </div>

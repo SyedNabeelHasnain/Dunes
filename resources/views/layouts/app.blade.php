@@ -398,11 +398,11 @@
                     <!-- Desktop Nav Links (Hidden on mobile/tablet) -->
                     <ul class="hidden lg:flex items-center gap-1 xl:gap-2 text-sm font-semibold text-slate-700">
                         <li>
-                            <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('home') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('home') }}">Home</a>
+                            <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('home') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('home') }}">{{ __('ui.nav.home') }}</a>
                         </li>
                         <li class="relative" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">
                             <div class="inline-flex items-center rounded-xl {{ request()->routeIs('tours.*') ? 'bg-slate-900 text-white font-bold shadow-xs' : '' }}">
-                                <a class="px-3 py-2 rounded-l-xl transition-all {{ request()->routeIs('tours.*') ? 'text-white' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('tours.index') }}">Tours</a>
+                                <a class="px-3 py-2 rounded-l-xl transition-all {{ request()->routeIs('tours.*') ? 'text-white' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('tours.index') }}">{{ __('ui.nav.all_tours') }}</a>
                                 <button type="button" @click="open = !open" :aria-expanded="open" class="px-1.5 py-2 rounded-r-xl transition-all hover:opacity-80 cursor-pointer" aria-label="Toggle Tours Submenu">
                                     <i class="bi bi-chevron-down text-[10px] transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
                                 </button>
@@ -419,7 +419,7 @@
                                  style="display: none;">
                                 <a class="flex items-center gap-2 px-3 py-2.5 rounded-xl font-bold text-primary hover:bg-orange-50 transition-colors text-xs" href="{{ route('tours.customizer') }}">
                                     <i class="bi bi-sliders text-amber-500"></i>
-                                    <span>Build Your Own Safari</span>
+                                    <span>{{ __('ui.nav.customizer') }}</span>
                                 </a>
                                 <div class="my-1 border-t border-slate-200"></div>
                                 <div class="max-h-72 overflow-y-auto space-y-0.5">
@@ -432,16 +432,16 @@
                             </div>
                         </li>
                         <li>
-                            <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('about') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('about') }}">About Us</a>
+                            <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('about') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('about') }}">{{ __('ui.nav.about') }}</a>
                         </li>
                         <li>
-                            <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('blog.*') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('blog.index') }}">Blog</a>
+                            <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('blog.*') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('blog.index') }}">{{ __('ui.nav.blog') }}</a>
                         </li>
                         <li>
-                            <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('faq') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('faq') }}">FAQ</a>
+                            <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('faq') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('faq') }}">{{ __('ui.nav.faq') }}</a>
                         </li>
                         <li>
-                            <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('contact') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('contact') }}">Contact</a>
+                            <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('contact') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('contact') }}">{{ __('ui.nav.contact') }}</a>
                         </li>
                     </ul>
 
@@ -537,9 +537,10 @@
                 </div>
 
                 <!-- Search Input in Drawer -->
+                <!-- Search Input in Drawer -->
                 <form action="{{ route('tours.search') }}" method="GET" class="relative mb-3">
                     <i class="bi bi-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
-                    <input type="text" name="q" class="w-full rounded-full pl-9 pr-4 py-2 bg-slate-100 text-slate-800 text-xs font-semibold border-0 focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="Search safaris, buggies, VIP..." required>
+                    <input type="text" name="q" class="w-full rounded-full pl-9 pr-4 py-2 bg-slate-100 text-slate-800 text-xs font-semibold border-0 focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="{{ __('ui.nav.search_placeholder') }}" required>
                 </form>
 
                 <!-- Interactive Features CTAs -->
@@ -559,7 +560,7 @@
                     <a href="{{ route('tours.customizer') }}" class="w-full rounded-2xl p-2.5 flex items-center justify-between text-left border border-slate-200 bg-slate-50 hover:bg-orange-50 text-slate-800 font-bold text-xs transition-colors" @click="$store.mobileNav.close()">
                         <span class="flex items-center gap-2">
                             <i class="bi bi-sliders text-primary"></i>
-                            <span>Build Your Own Safari</span>
+                            <span>{{ __('ui.nav.customizer') }}</span>
                         </span>
                         <i class="bi bi-chevron-right text-slate-500 text-[10px]"></i>
                     </a>
@@ -567,22 +568,22 @@
 
                 <!-- Navigation Links List -->
                 <nav class="space-y-1">
-                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('home') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('home') }}" @click="$store.mobileNav.close()">Home</a>
-                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('tours.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('tours.index') }}" @click="$store.mobileNav.close()">All Tours</a>
-                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('about') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('about') }}" @click="$store.mobileNav.close()">About Us</a>
-                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('blog.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('blog.index') }}" @click="$store.mobileNav.close()">Travel Blog</a>
-                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('faq') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('faq') }}" @click="$store.mobileNav.close()">FAQ</a>
-                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('contact') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('contact') }}" @click="$store.mobileNav.close()">Contact</a>
+                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('home') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('home') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.home') }}</a>
+                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('tours.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('tours.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.all_tours') }}</a>
+                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('about') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('about') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.about') }}</a>
+                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('blog.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('blog.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.blog') }}</a>
+                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('faq') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('faq') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.faq') }}</a>
+                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('contact') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('contact') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.contact') }}</a>
                 </nav>
             </div>
 
             <!-- Drawer Bottom Direct Contact -->
             <div class="pt-4 border-t border-slate-200 space-y-2">
                 <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="w-full py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors">
-                    <i class="bi bi-whatsapp"></i><span>Chat on WhatsApp</span>
+                    <i class="bi bi-whatsapp"></i><span>{{ __('ui.common.whatsapp_chat') }}</span>
                 </a>
                 <button type="button" class="w-full py-2.5 rounded-full bg-primary hover:bg-primary-dark text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer" @click="$store.mobileNav.close(); $store.modal.open('booking');">
-                    <i class="bi bi-calendar-check"></i><span>Book Online Now</span>
+                    <i class="bi bi-calendar-check"></i><span>{{ __('ui.common.book_online') }}</span>
                 </button>
             </div>
         </div>
@@ -623,7 +624,7 @@
                 <div class="sm:col-span-2 lg:col-span-4">
                     <img src="{{ asset('images/logo-white.png') }}" alt="Dunes Discovery Tourism" width="160" height="46" class="h-9 w-auto object-contain mb-4">
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-sm mb-4">
-                        Your trusted partner for unforgettable Dubai desert safari and city tour experiences since 2018. Licensed by Dubai Economy & Tourism (DET License: 1430583).
+                        {{ __('ui.footer.about_text') }}
                     </p>
                     <div class="flex items-center gap-3">
                         <a href="https://instagram.com/dunesdiscoverytourism" target="_blank" rel="noopener" class="w-9 h-9 rounded-full border border-slate-700 bg-slate-900/60 hover:bg-slate-800 hover:border-slate-500 text-slate-300 hover:text-white flex items-center justify-center transition-colors text-sm" aria-label="Follow Dunes Discovery Tourism on Instagram">
@@ -640,46 +641,46 @@
 
                 <!-- Col 2: Desert Safaris -->
                 <div class="col-span-1 lg:col-span-2">
-                    <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 mb-3.5">Desert Safaris</h3>
+                    <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 mb-3.5">{{ __('ui.footer.desert_safaris') }}</h3>
                     <ul class="space-y-2 text-xs sm:text-sm">
-                        <li><a href="{{ route('tours.show', 'evening-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">Evening Safari</a></li>
-                        <li><a href="{{ route('tours.show', 'morning-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">Morning Safari</a></li>
-                        <li><a href="{{ route('tours.show', 'overnight-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">Overnight Safari</a></li>
-                        <li><a href="{{ route('tours.show', 'desert-safari-quad-biking-dubai') }}" class="text-slate-300 hover:text-white transition-colors">Quad Biking Safari</a></li>
-                        <li><a href="{{ route('tours.show', 'luxury-vip-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">VIP Desert Safari</a></li>
+                        <li><a href="{{ route('tours.show', 'evening-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.evening_safari') }}</a></li>
+                        <li><a href="{{ route('tours.show', 'morning-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.morning_safari') }}</a></li>
+                        <li><a href="{{ route('tours.show', 'overnight-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.overnight_safari') }}</a></li>
+                        <li><a href="{{ route('tours.show', 'desert-safari-quad-biking-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.quad_biking') }}</a></li>
+                        <li><a href="{{ route('tours.show', 'luxury-vip-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.vip_safari') }}</a></li>
                     </ul>
                 </div>
 
                 <!-- Col 3: Tours & Cruises -->
                 <div class="col-span-1 lg:col-span-2">
-                    <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 mb-3.5">Tours & Cruises</h3>
+                    <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 mb-3.5">{{ __('ui.footer.tours_cruises') }}</h3>
                     <ul class="space-y-2 text-xs sm:text-sm">
-                        <li><a href="{{ route('tours.show', 'dubai-city-tour') }}" class="text-slate-300 hover:text-white transition-colors">Dubai City Tour</a></li>
-                        <li><a href="{{ route('tours.show', 'abu-dhabi-city-tour-from-dubai') }}" class="text-slate-300 hover:text-white transition-colors">Abu Dhabi Tour</a></li>
-                        <li><a href="{{ route('tours.show', 'dhow-cruise-catamaran-cruise-dinner-dubai') }}" class="text-slate-300 hover:text-white transition-colors">Marina Cruise</a></li>
-                        <li><a href="{{ route('rate-card') }}" class="text-slate-300 hover:text-white transition-colors inline-flex items-center gap-1.5"><i class="bi bi-file-earmark-pdf text-amber-400"></i>Rate Card (PDF)</a></li>
-                        <li><a href="{{ route('blog.index') }}" class="text-slate-300 hover:text-white transition-colors">Travel Guides & Blog</a></li>
+                        <li><a href="{{ route('tours.show', 'dubai-city-tour') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.dubai_city_tour') }}</a></li>
+                        <li><a href="{{ route('tours.show', 'abu-dhabi-city-tour-from-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.abu_dhabi_tour') }}</a></li>
+                        <li><a href="{{ route('tours.show', 'dhow-cruise-catamaran-cruise-dinner-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.marina_cruise') }}</a></li>
+                        <li><a href="{{ route('rate-card') }}" class="text-slate-300 hover:text-white transition-colors inline-flex items-center gap-1.5"><i class="bi bi-file-earmark-pdf text-amber-400"></i>{{ __('ui.footer.rate_card_pdf') }}</a></li>
+                        <li><a href="{{ route('blog.index') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.nav.blog') }}</a></li>
                     </ul>
                 </div>
 
                 <!-- Col 4: Trust & Policies -->
                 <div class="col-span-1 lg:col-span-2">
-                    <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 mb-3.5">Trust & Policies</h3>
+                    <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 mb-3.5">{{ __('ui.footer.trust_policies') }}</h3>
                     <ul class="space-y-2 text-xs sm:text-sm">
-                        <li><a href="{{ route('terms') }}" class="text-slate-300 hover:text-white transition-colors">Terms & Conditions</a></li>
-                        <li><a href="{{ route('privacy') }}" class="text-slate-300 hover:text-white transition-colors">Privacy Policy</a></li>
-                        <li><a href="{{ route('cookies') }}" class="text-slate-300 hover:text-white transition-colors">Cookie Policy</a></li>
-                        <li><a href="{{ route('cancellation') }}" class="text-slate-300 hover:text-white transition-colors">Cancellation & Refund</a></li>
-                        <li><a href="{{ route('payment.security') }}" class="text-slate-300 hover:text-white transition-colors">Payment Security</a></li>
-                        <li><a href="{{ route('safety.waiver') }}" class="text-slate-300 hover:text-white transition-colors">Safety & Waiver</a></li>
-                        <li><a href="{{ route('ai.editorial') }}" class="text-slate-300 hover:text-white transition-colors">AI & Editorial Policy</a></li>
-                        <li><a href="{{ route('responsible.tourism') }}" class="text-slate-300 hover:text-white transition-colors">Responsible Tourism</a></li>
+                        <li><a href="{{ route('terms') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.terms') }}</a></li>
+                        <li><a href="{{ route('privacy') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.privacy') }}</a></li>
+                        <li><a href="{{ route('cookies') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.cookies') }}</a></li>
+                        <li><a href="{{ route('cancellation') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.refund') }}</a></li>
+                        <li><a href="{{ route('payment.security') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.payment_security') }}</a></li>
+                        <li><a href="{{ route('safety.waiver') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.safety_waiver') }}</a></li>
+                        <li><a href="{{ route('ai.editorial') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.ai_editorial') }}</a></li>
+                        <li><a href="{{ route('responsible.tourism') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.responsible_tourism') }}</a></li>
                     </ul>
                 </div>
 
                 <!-- Col 5: Contact & Help -->
                 <div class="sm:col-span-2 lg:col-span-2">
-                    <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 mb-3.5">Contact & Help</h3>
+                    <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 mb-3.5">{{ __('ui.footer.contact_help') }}</h3>
                     <ul class="space-y-2 text-xs sm:text-sm">
                         <li><a href="tel:{{ preg_replace('/[^0-9+]/','',$phone) }}" class="text-slate-300 hover:text-white transition-colors inline-flex items-center gap-2"><i class="bi bi-telephone text-primary"></i><span>{{ $phone }}</span></a></li>
                         <li><a href="mailto:{{ $email }}" class="text-slate-300 hover:text-white transition-colors inline-flex items-center gap-2"><i class="bi bi-envelope text-primary"></i><span class="break-all">{{ $email }}</span></a></li>
@@ -714,23 +715,23 @@
             <div class="border-t border-slate-800/80 pt-6">
                 <div class="flex flex-col lg:flex-row items-center justify-between gap-4 text-center lg:text-left">
                     <div>
-                        <p class="text-slate-400 text-xs mb-1">&copy; {{ date('Y') }} {{ $settings['site_name'] ?? 'Dunes Discovery Tourism L.L.C.' }} {{ $settings['site_copyright'] ?? 'All rights reserved.' }} Department of Economy & Tourism License #{{ $settings['company_license_number'] ?? '1430583' }}.</p>
+                        <p class="text-slate-400 text-xs mb-1">&copy; {{ date('Y') }} {{ $settings['site_name'] ?? 'Dunes Discovery Tourism L.L.C.' }} {{ __('ui.footer.rights_reserved') }} Department of Economy & Tourism License #{{ $settings['company_license_number'] ?? '1430583' }}.</p>
                         <div class="flex flex-wrap justify-center lg:justify-start items-center gap-x-2.5 gap-y-1 text-xs text-slate-300">
-                            <a href="{{ route('terms') }}" class="hover:text-white transition-colors">Terms & Conditions</a>
+                            <a href="{{ route('terms') }}" class="hover:text-white transition-colors">{{ __('ui.footer.terms') }}</a>
                             <span class="text-slate-500">&bull;</span>
-                            <a href="{{ route('privacy') }}" class="hover:text-white transition-colors">Privacy Policy</a>
+                            <a href="{{ route('privacy') }}" class="hover:text-white transition-colors">{{ __('ui.footer.privacy') }}</a>
                             <span class="text-slate-500">&bull;</span>
-                            <a href="{{ route('cookies') }}" class="hover:text-white transition-colors">Cookie Policy</a>
+                            <a href="{{ route('cookies') }}" class="hover:text-white transition-colors">{{ __('ui.footer.cookies') }}</a>
                             <span class="text-slate-500">&bull;</span>
-                            <a href="{{ route('cancellation') }}" class="hover:text-white transition-colors">100% Refund Policy</a>
+                            <a href="{{ route('cancellation') }}" class="hover:text-white transition-colors">{{ __('ui.footer.refund_100') }}</a>
                             <span class="text-slate-500">&bull;</span>
-                            <a href="{{ route('payment.security') }}" class="hover:text-white transition-colors">Payment Security</a>
+                            <a href="{{ route('payment.security') }}" class="hover:text-white transition-colors">{{ __('ui.footer.payment_security') }}</a>
                             <span class="text-slate-500">&bull;</span>
-                            <a href="{{ route('safety.waiver') }}" class="hover:text-white transition-colors">Safety Waiver</a>
+                            <a href="{{ route('safety.waiver') }}" class="hover:text-white transition-colors">{{ __('ui.footer.safety_waiver') }}</a>
                             <span class="text-slate-500">&bull;</span>
-                            <a href="{{ route('ai.editorial') }}" class="hover:text-white transition-colors">AI Policy</a>
+                            <a href="{{ route('ai.editorial') }}" class="hover:text-white transition-colors">{{ __('ui.footer.ai_editorial') }}</a>
                             <span class="text-slate-500">&bull;</span>
-                            <a href="{{ route('responsible.tourism') }}" class="hover:text-white transition-colors">Sustainability</a>
+                            <a href="{{ route('responsible.tourism') }}" class="hover:text-white transition-colors">{{ __('ui.footer.responsible_tourism') }}</a>
                         </div>
                     </div>
                     <div class="inline-flex items-center gap-2 bg-slate-900 border border-slate-800 px-4 py-2 rounded-full flex-wrap justify-center">

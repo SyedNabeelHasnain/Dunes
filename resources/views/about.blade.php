@@ -59,23 +59,23 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-16">
         <nav aria-label="breadcrumb">
             <ol class="flex items-center gap-2 text-xs sm:text-sm text-white/70 mb-4">
-                <li><a href="{{ route('home') }}" class="hover:text-white transition-colors">Home</a></li>
+                <li><a href="{{ route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') }}</a></li>
                 <li><span class="text-white/40">/</span></li>
-                <li class="text-white font-semibold" aria-current="page">About Us</li>
+                <li class="text-white font-semibold" aria-current="page">{{ __('ui.nav.about') }}</li>
             </ol>
         </nav>
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
             <div>
                 <div class="flex flex-wrap gap-2 mb-3">
                     <span class="glass rounded-full px-3.5 py-1 text-xs inline-flex items-center gap-1.5">
-                        <i class="bi bi-calendar3 text-primary"></i>Trusted Since 2018
+                        <i class="bi bi-calendar3 text-primary"></i>{{ __('ui.about.trusted_since') }}
                     </span>
                     <span class="bg-emerald-600/90 rounded-full px-3.5 py-1 text-xs font-semibold text-white inline-flex items-center gap-1.5">
-                        <i class="bi bi-patch-check-fill text-emerald-200"></i>DTCM Licensed Operator
+                        <i class="bi bi-patch-check-fill text-emerald-200"></i>{{ __('ui.about.licensed_operator') }}
                     </span>
                 </div>
-                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-2">About Dunes Discovery Tourism</h1>
-                <p class="text-sm sm:text-base text-white/80 max-w-2xl leading-relaxed">Your licensed destination management partner for authentic Arabian desert expeditions & luxury Dubai tours.</p>
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-2">{{ __('ui.about.title') }}</h1>
+                <p class="text-sm sm:text-base text-white/80 max-w-2xl leading-relaxed">{{ __('ui.about.subtitle') }}</p>
             </div>
             <div class="hidden lg:block shrink-0">
                 <span class="bg-primary/20 text-primary border border-primary/40 px-4 py-2 rounded-full font-bold text-sm inline-flex items-center gap-1.5">

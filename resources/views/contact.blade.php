@@ -67,27 +67,27 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-16">
         <nav aria-label="breadcrumb">
             <ol class="flex items-center gap-2 text-xs sm:text-sm text-white/70 mb-4">
-                <li><a href="{{ route('home') }}" class="hover:text-white transition-colors">Home</a></li>
+                <li><a href="{{ route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') }}</a></li>
                 <li><span class="text-white/40">/</span></li>
-                <li class="text-white font-semibold" aria-current="page">Contact Us</li>
+                <li class="text-white font-semibold" aria-current="page">{{ __('ui.nav.contact') }}</li>
             </ol>
         </nav>
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
             <div>
                 <div class="flex flex-wrap gap-2 mb-3">
                     <span class="glass rounded-full px-3.5 py-1 text-xs inline-flex items-center gap-1.5">
-                        <i class="bi bi-headset text-primary"></i>24/7 Dedicated Concierge
+                        <i class="bi bi-headset text-primary"></i>{{ __('ui.contact_page.concierge') }}
                     </span>
                     <span class="bg-emerald-600/90 rounded-full px-3.5 py-1 text-xs font-semibold text-white inline-flex items-center gap-1.5">
-                        <i class="bi bi-patch-check-fill text-emerald-200"></i>DTCM Licensed Operator
+                        <i class="bi bi-patch-check-fill text-emerald-200"></i>{{ __('ui.trust.licensed_operator') }}
                     </span>
                 </div>
-                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-2">Get in Touch with Us</h1>
-                <p class="text-sm sm:text-base text-white/80 max-w-2xl leading-relaxed">We are ready 24/7 to assist with your Dubai safari reservations, custom itineraries & group inquiries.</p>
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-2">{{ __('ui.contact_page.title') }}</h1>
+                <p class="text-sm sm:text-base text-white/80 max-w-2xl leading-relaxed">{{ __('ui.contact_page.subtitle') }}</p>
             </div>
             <div class="hidden lg:block shrink-0">
                 <span class="bg-primary/20 text-primary border border-primary/40 px-4 py-2 rounded-full font-bold text-sm inline-flex items-center gap-1.5">
-                    <i class="bi bi-lightning-charge"></i>Instant WhatsApp Response
+                    <i class="bi bi-lightning-charge"></i>{{ __('ui.contact_page.instant_whatsapp') }}
                 </span>
             </div>
         </div>
@@ -143,7 +143,7 @@
                 <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-xl mx-auto mb-3 group-hover:scale-110 transition-transform">
                     <i class="bi bi-telephone"></i>
                 </div>
-                <div class="font-bold text-slate-900 text-base mb-1">Phone</div>
+                <div class="font-bold text-slate-900 text-base mb-1">{{ __('ui.contact_page.phone_title') }}</div>
                 <div class="text-slate-600 text-sm">{{ $phoneVal }}</div>
             </a>
             
@@ -151,7 +151,7 @@
                 <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-xl mx-auto mb-3 group-hover:scale-110 transition-transform">
                     <i class="bi bi-envelope"></i>
                 </div>
-                <div class="font-bold text-slate-900 text-base mb-1">Email</div>
+                <div class="font-bold text-slate-900 text-base mb-1">{{ __('ui.contact_page.email_title') }}</div>
                 <div class="text-slate-600 text-sm">{{ $emailVal }}</div>
             </a>
             
@@ -159,15 +159,15 @@
                 <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl mx-auto mb-3 group-hover:scale-110 transition-transform">
                     <i class="bi bi-whatsapp"></i>
                 </div>
-                <div class="font-bold text-slate-900 text-base mb-1">WhatsApp</div>
-                <div class="text-slate-600 text-sm">Chat with us 24/7</div>
+                <div class="font-bold text-slate-900 text-base mb-1">{{ __('ui.contact_page.whatsapp_title') }}</div>
+                <div class="text-slate-600 text-sm">{{ __('ui.contact_page.chat_247') }}</div>
             </a>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
             <div class="lg:col-span-7">
                 <div class="bg-white rounded-2xl p-6 sm:p-10 border border-slate-200 shadow-md">
-                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-6">Send Us a Message</h2>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-6">{{ __('ui.contact_page.send_message') }}</h2>
                     <form id="contactForm" autocomplete="off" class="needs-validation space-y-5" novalidate>
                         @csrf
                         <!-- Honeypot field -->
@@ -182,8 +182,8 @@
                                     'type' => 'text',
                                     'id' => 'name',
                                     'name' => 'name',
-                                    'label' => 'Full Name',
-                                    'placeholder' => 'Full Name',
+                                    'label' => __('ui.contact_page.full_name'),
+                                    'placeholder' => __('ui.contact_page.full_name'),
                                     'autocomplete' => 'name',
                                     'required' => true,
                                     'inputAttrs' => ['data-form' => 'contact', 'data-field' => 'name']
@@ -194,8 +194,8 @@
                                     'type' => 'email',
                                     'id' => 'email',
                                     'name' => 'email',
-                                    'label' => 'Email Address',
-                                    'placeholder' => 'Email Address',
+                                    'label' => __('ui.contact_page.email_address'),
+                                    'placeholder' => __('ui.contact_page.email_address'),
                                     'autocomplete' => 'email',
                                     'required' => true,
                                     'inputAttrs' => ['data-form' => 'contact', 'data-field' => 'email']
@@ -206,7 +206,7 @@
                                     'type' => 'tel',
                                     'id' => 'phone',
                                     'name' => 'phone',
-                                    'label' => 'Phone Number',
+                                    'label' => __('ui.contact_page.phone_number'),
                                     'placeholder' => '50 123 4567',
                                     'autocomplete' => 'tel',
                                     'wrapperClass' => 'relative rounded-xl phone-field',
@@ -218,8 +218,8 @@
                                     'type' => 'text',
                                     'id' => 'subject',
                                     'name' => 'subject',
-                                    'label' => 'Subject',
-                                    'placeholder' => 'Subject',
+                                    'label' => __('ui.contact_page.subject'),
+                                    'placeholder' => __('ui.contact_page.subject'),
                                     'autocomplete' => 'off',
                                     'inputAttrs' => ['data-form' => 'contact', 'data-field' => 'subject']
                                 ]) !!}
@@ -230,8 +230,8 @@
                             {!! renderFloatingTextarea([
                                 'id' => 'message',
                                 'name' => 'message',
-                                'label' => 'Your Message',
-                                'placeholder' => 'Your Message',
+                                'label' => __('ui.contact_page.your_message'),
+                                'placeholder' => __('ui.contact_page.your_message'),
                                 'autocomplete' => 'off',
                                 'required' => true,
                                 'inputAttrs' => ['style' => 'height: 140px', 'data-form' => 'contact', 'data-field' => 'message']
@@ -242,7 +242,7 @@
                             <div class="legal-agreement-wrapper flex items-start gap-2.5">
                                 <input class="rounded text-primary focus:ring-primary w-4 h-4 mt-0.5 cursor-pointer" type="checkbox" id="contactAgreement" required>
                                 <label class="text-xs text-slate-600 leading-normal" for="contactAgreement">
-                                    I agree to the <a href="{{ route('terms') }}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline font-semibold">Terms & Conditions</a> and <a href="{{ route('privacy') }}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline font-semibold">Privacy Policy</a>.
+                                    I agree to the <a href="{{ route('terms') }}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline font-semibold">{{ __('ui.footer.terms') }}</a> and <a href="{{ route('privacy') }}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline font-semibold">{{ __('ui.footer.privacy') }}</a>.
                                 </label>
                             </div>
                         </div>
@@ -259,7 +259,7 @@
 
                         <div class="text-center pt-2">
                             <button type="submit" class="btn-desert-animated text-base font-bold rounded-full px-8 py-3.5 text-white shadow-md inline-flex items-center gap-2 cursor-pointer w-full sm:w-auto justify-center" id="submitContactBtn" onclick="if(typeof gtagReportConversion==='function'){gtagReportConversion();}">
-                                <span>Send Message</span>
+                                <span>{{ __('ui.contact_page.send_btn') }}</span>
                                 <i class="bi bi-send"></i>
                             </button>
                         </div>

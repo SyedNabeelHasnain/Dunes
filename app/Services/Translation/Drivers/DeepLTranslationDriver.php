@@ -83,7 +83,7 @@ class DeepLTranslationDriver implements TranslationDriverInterface
         $response = Http::withHeaders([
             'Authorization' => 'DeepL-Auth-Key '.$this->authKey,
             'Content-Type' => 'application/json',
-        ])->timeout(30)->post($this->getBaseUrl().'/translate', $payload);
+        ])->timeout(60)->post($this->getBaseUrl().'/translate', $payload);
 
         if (! $response->successful()) {
             $errorMsg = $response->json('message') ?? $response->body();
