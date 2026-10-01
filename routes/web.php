@@ -44,15 +44,22 @@ Route::get('/system/migrate-status', function () {
         $exitCode = \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
         $artisanOutput = \Illuminate\Support\Facades\Artisan::output();
         \App\Models\Language::clearLanguageCache();
-        $hasAfter = \Illuminate\Support\Facades\Schema::hasTable('languages');
-        $activeLangs = $hasAfter ? \App\Models\Language::all()->toArray() : [];
+        $getActive = \App\Models\Language::getActive();
+        $codes = \App\Models\Language::getActiveCodes();
+        $matched = $getActive->firstWhere('code', 'ar');
 
         return response()->json([
             'has_languages_before' => $hasBefore,
             'exit_code' => $exitCode,
             'artisan_output' => $artisanOutput,
-            'has_languages_after' => $hasAfter,
-            'languages' => $activeLangs,
+            'get_active_count' => $getActive->count(),
+            'get_active_codes' => $codes,
+            'matched_ar' => $matched ? $matched->toArray() : null,
+            'all_languages' => \App\Models\Language::all()->toArray(),
+            'request_uri' => request()->getRequestUri(),
+            'request_path' => request()->path(),
+            'request_segments' => request()->segments(),
+            'app_locale' => app()->getLocale(),
         ]);
     } catch (\Throwable $e) {
         return response()->json([
