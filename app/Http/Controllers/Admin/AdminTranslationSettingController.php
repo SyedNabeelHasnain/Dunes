@@ -105,4 +105,43 @@ class AdminTranslationSettingController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Trigger catalog translation via Artisan command.
+     */
+    public function translateCatalog(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'force' => 'nullable|boolean',
+            'locale' => 'nullable|string|max:10',
+            'model' => 'nullable|string|max:50',
+        ]);
+
+        try {
+            $params = [];
+            if (! empty($validated['force'])) {
+                $params['--force'] = true;
+            }
+            if (! empty($validated['locale'])) {
+                $params['--locale'] = $validated['locale'];
+            }
+            if (! empty($validated['model'])) {
+                $params['--model'] = $validated['model'];
+            }
+
+            \Illuminate\Support\Facades\Artisan::call('app:translate-catalog', $params);
+            $output = \Illuminate\Support\Facades\Artisan::output();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Global catalog translation executed successfully.',
+                'output' => $output,
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Catalog translation error: '.$e->getMessage(),
+            ], 500);
+        }
+    }
 }

@@ -76,6 +76,28 @@ class Language extends Model
     }
 
     /**
+     * Get unicode emoji flag for display.
+     */
+    public function getFlagEmojiAttribute(): string
+    {
+        if (! empty($this->flag) && preg_match('/[\x{1F1E6}-\x{1F1FF}]/u', $this->flag)) {
+            return $this->flag;
+        }
+
+        return match (strtolower($this->code)) {
+            'en' => '🇬🇧',
+            'ar' => '🇦🇪',
+            'ru' => '🇷🇺',
+            'es' => '🇪🇸',
+            'it' => '🇮🇹',
+            'fr' => '🇫🇷',
+            'de' => '🇩🇪',
+            'zh' => '🇨🇳',
+            default => '🌐',
+        };
+    }
+
+    /**
      * Fallback collection with default English language in memory.
      *
      * @return Collection<int, Language>
@@ -88,7 +110,7 @@ class Language extends Model
             'name' => 'English',
             'native_name' => 'English',
             'direction' => 'ltr',
-            'flag' => 'gb',
+            'flag' => '🇬🇧',
             'is_default' => true,
             'is_active' => true,
             'sort_order' => 1,
@@ -108,7 +130,7 @@ class Language extends Model
             'name' => 'English',
             'native_name' => 'English',
             'direction' => 'ltr',
-            'flag' => 'gb',
+            'flag' => '🇬🇧',
             'is_default' => true,
             'is_active' => true,
             'sort_order' => 1,

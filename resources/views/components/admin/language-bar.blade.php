@@ -117,15 +117,7 @@
                             : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'">
                     
                     <span class="text-sm">
-                        @if($lang->flag)
-                            {{ $lang->flag }}
-                        @elseif($lang->code === 'en')
-                            🇬🇧
-                        @elseif($lang->code === 'ar')
-                            🇦🇪
-                        @else
-                            🌐
-                        @endif
+                        {{ $lang->flag_emoji }}
                     </span>
 
                     <span>{{ $lang->name }} ({{ strtoupper($lang->code) }})</span>

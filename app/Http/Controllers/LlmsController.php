@@ -156,8 +156,11 @@ class LlmsController extends Controller
         $md .= '- [Privacy Policy]('.url('/privacy-policy')."): Data protection commitments, cookie policy, and GDPR compliance.\n\n";
 
         $md .= "## International & Multilingual Portals\n\n";
-        $md .= '- [English Portal (Default Root)]('.url('/')."): Primary commercial tourism portal, tours catalog, and real-time checkout in English.\n";
-        $md .= '- [Arabic Portal (البوابة الرسمية بالعربية)]('.url('/ar')."): Fully localized Arabic portal with RTL layout, Arabic itinerary details, FAQs, and multilingual booking concierge.\n\n";
+        $md .= '- [English Portal (Default Root)]('.url('/')."): Primary commercial tourism portal, tours catalog, and real-time checkout in English (LTR).\n";
+        $md .= '- [Arabic Portal (البوابة الرسمية بالعربية)]('.url('/ar')."): Fully localized Arabic portal with native RTL layout, Cairo typography, Arabic itinerary details, FAQs, and booking concierge (RTL).\n";
+        $md .= '- [Russian Portal (Русскоязычный портал)]('.url('/ru')."): Официальный портал на русском языке: бронирование сафари в пустыне Дубая, аренда багги 1000cc, квадроциклы и туры по городу (LTR).\n";
+        $md .= '- [Spanish Portal (Portal Oficial en Español)]('.url('/es')."): Portal turístico en español: reservas de safaris por el desierto de Dubái, alquiler de buggies, paseos en camello y cenas VIP (LTR).\n";
+        $md .= '- [Italian Portal (Portale Ufficiale in Italiano)]('.url('/it')."): Portale ufficiale in lingua italiana: escursioni safari nel deserto di Dubai, tour in dune buggy, crociere dhow e cene beduine (LTR).\n\n";
 
         $md .= "## Optional\n\n";
         $md .= '- [Full LLM Knowledge Base]('.url('/llms-full.txt')."): Comprehensive full-text specifications, pricing tiers, FAQs, and entity knowledge graph for AI crawlers.\n";
@@ -349,7 +352,15 @@ class LlmsController extends Controller
         $md .= "### Verified Guest Review & Photo Submission\n";
         $md .= '- **Public Portal**: Accessible at '.url('/review/guest').".\n";
         $md .= "- **Photo Submission**: Guests can submit up to 4 tour snapshots (JPG/PNG/WEBP/AVIF up to 5MB each) to showcase genuine desert safari experiences.\n";
-        $md .= "- **Verification & Moderation**: Integrated with booking references and DET License #1430583 compliance. 4+ star reviews automatically qualify for Google Reviews syndication.\n\n";
+        $md .= "---\n\n";
+        $md .= "## SECTION 7: GLOBAL MULTILINGUAL PORTALS & REGIONAL LOCALIZATION\n\n";
+        $md .= "Dunes Discovery Tourism operates in 5 global languages with fully localized routes, static dictionaries, and indexable SERP content:\n";
+        $md .= "- **English (`en`)**: Base default root (`" . url('/') . "`), LTR layout, global international travelers.\n";
+        $md .= "- **Arabic (`ar`)**: Official regional portal (`" . url('/ar') . "`), RTL direction, native Cairo typography, GCC and Arab world travelers.\n";
+        $md .= "- **Russian (`ru`)**: Russian portal (`" . url('/ru') . "`), LTR layout, CIS and Russian-speaking luxury travelers.\n";
+        $md .= "- **Spanish (`es`)**: Spanish portal (`" . url('/es') . "`), LTR layout, Spain and Latin American markets.\n";
+        $md .= "- **Italian (`it`)**: Italian portal (`" . url('/it') . "`), LTR layout, Italian outbound leisure travelers.\n";
+        $md .= "- **Hreflang Synchronization**: All URLs across all 5 languages are linked with bidirectional `<link rel=\"alternate\" hreflang=\"...\" />` tags and unified XML sitemaps.\n\n";
 
         return $md;
     }

@@ -302,14 +302,14 @@
               "telephone": "{{ $phone }}",
               "contactType": "customer service",
               "areaServed": "AE",
-              "availableLanguage": ["en", "ar"]
+              "availableLanguage": {!! json_encode(isset($activeLanguages) ? $activeLanguages->pluck('code')->toArray() : ['en', 'ar', 'ru', 'es', 'it']) !!}
             },
             {
               "@@type": "ContactPoint",
               "telephone": "+971502456056",
               "contactType": "reservations",
               "areaServed": "AE",
-              "availableLanguage": ["en", "ar"]
+              "availableLanguage": {!! json_encode(isset($activeLanguages) ? $activeLanguages->pluck('code')->toArray() : ['en', 'ar', 'ru', 'es', 'it']) !!}
             }
           ],
           "openingHoursSpecification": {

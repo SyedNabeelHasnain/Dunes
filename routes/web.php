@@ -211,6 +211,7 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::get('/settings/translations', [AdminTranslationSettingController::class, 'index'])->name('settings.translations');
     Route::post('/settings/translations', [AdminTranslationSettingController::class, 'update'])->name('settings.translations.update');
     Route::post('/settings/translations/test', [AdminTranslationSettingController::class, 'testConnection'])->name('settings.translations.test');
+    Route::post('/settings/translations/translate-catalog', [AdminTranslationSettingController::class, 'translateCatalog'])->name('settings.translations.translate-catalog');
 
     // ── In-Form Auto-Translate AJAX API ─────────────────────────────────────
     Route::post('/api/translate', [AdminTranslationApiController::class, 'translate'])->name('api.translate');

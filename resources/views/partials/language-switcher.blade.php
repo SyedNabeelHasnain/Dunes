@@ -6,7 +6,7 @@
 @endphp
 <div class="relative inline-block text-left" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">
     <button @click="open = !open" :aria-expanded="open" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-slate-800 bg-white border border-slate-200/90 shadow-sm hover:border-primary/50 transition-all cursor-pointer min-h-[38px]" type="button" id="{{ $dropdownId }}">
-        <span class="text-base leading-none">{{ $curLang ? ($curLang->flag ?: ($curLang->code === 'ar' ? '🇦🇪' : '🇬🇧')) : '🌐' }}</span>
+        <span class="text-base leading-none">{{ $curLang ? $curLang->flag_emoji : '🌐' }}</span>
         <span class="font-extrabold uppercase text-[11px]">{{ strtoupper($curLocale) }}</span>
         <i class="bi bi-chevron-down text-[10px] text-slate-500 transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
     </button>
@@ -31,7 +31,7 @@
                 <a href="{{ $switchUrl }}"
                    class="w-full rounded-xl px-2.5 py-2 text-xs font-semibold {{ $isCur ? 'bg-orange-50/80 text-primary font-bold' : 'text-slate-700 hover:bg-slate-50 hover:text-primary' }} flex items-center justify-between transition-colors">
                     <span class="flex items-center gap-2">
-                        <span class="text-base leading-none">{{ $language->flag ?: ($language->code === 'ar' ? '🇦🇪' : '🇬🇧') }}</span>
+                        <span class="text-base leading-none">{{ $language->flag_emoji }}</span>
                         <span>{{ $language->name }}</span>
                         @if($language->native_name && $language->native_name !== $language->name)
                             <small class="text-slate-400 font-normal">({{ $language->native_name }})</small>

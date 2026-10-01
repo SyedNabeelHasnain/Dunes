@@ -7,6 +7,10 @@
     activeService: '{{ $activeService ?? 'none' }}',
     testTesting: false,
     testResult: null,
+    catalogTranslating: false,
+    catalogResult: null,
+    catalogForce: false,
+    catalogLocale: '',
     testDriver(driver) {
         this.testTesting = true;
         this.testResult = null;
@@ -35,6 +39,31 @@
         .catch(err => {
             this.testTesting = false;
             this.testResult = { success: false, message: 'Request error: ' + err.message };
+        });
+    },
+    runCatalogTranslation() {
+        this.catalogTranslating = true;
+        this.catalogResult = null;
+
+        fetch('{{ route('admin.settings.translations.translate-catalog') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                force: this.catalogForce,
+                locale: this.catalogLocale
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            this.catalogTranslating = false;
+            this.catalogResult = data;
+        })
+        .catch(err => {
+            this.catalogTranslating = false;
+            this.catalogResult = { success: false, message: 'Request error: ' + err.message };
         });
     }
 }">
@@ -259,6 +288,78 @@
                 </button>
             </div>
         </form>
+    </div>
+
+    <!-- Global Catalog Auto-Translation Card -->
+    <div class="rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden mb-8">
+        <div class="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-amber-50/60 to-orange-50/40 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center text-lg shadow-sm">
+                    <i class="bi bi-magic"></i>
+                </div>
+                <div>
+                    <h6 class="text-sm font-black text-slate-900">One-Click Global Catalog Auto-Translation (DeepL)</h6>
+                    <div class="text-xs text-slate-500">Translate all 14 commercial tours, 20+ blog posts, FAQs, itineraries, legal pages, and email templates across all 5 languages.</div>
+                </div>
+            </div>
+            <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-200">
+                5 Languages (EN, AR, RU, ES, IT)
+            </span>
+        </div>
+
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <!-- Target Locales -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Target Language</label>
+                    <select x-model="catalogLocale" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 focus:border-primary focus:ring-1 focus:ring-primary outline-hidden">
+                        <option value="">All 4 Non-Default Languages (AR, RU, ES, IT)</option>
+                        <option value="ar">Arabic Only (العربية - RTL)</option>
+                        <option value="ru">Russian Only (Русский - LTR)</option>
+                        <option value="es">Spanish Only (Español - LTR)</option>
+                        <option value="it">Italian Only (Italiano - LTR)</option>
+                    </select>
+                </div>
+
+                <!-- Force Mode -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Translation Strategy</label>
+                    <label class="flex items-center gap-2 p-2 rounded-xl border border-slate-200 bg-slate-50/50 cursor-pointer select-none">
+                        <input type="checkbox" x-model="catalogForce" class="rounded border-slate-300 text-primary focus:ring-primary">
+                        <span class="text-xs text-slate-700 font-medium">Overwrite existing non-empty translations</span>
+                    </label>
+                </div>
+
+                <!-- Action Button -->
+                <div class="flex items-end">
+                    <button type="button" 
+                            @click="runCatalogTranslation()" 
+                            :disabled="catalogTranslating"
+                            class="w-full py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white text-xs font-bold transition shadow-xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50">
+                        <i class="bi" :class="catalogTranslating ? 'bi-arrow-repeat animate-spin' : 'bi-translate'"></i>
+                        <span x-text="catalogTranslating ? 'Translating Catalog via DeepL...' : 'Translate Entire Portal Catalog Now'"></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Translation Result Banner / Terminal Output -->
+            <div x-show="catalogResult !== null" x-cloak class="mt-4">
+                <div class="rounded-xl p-4 border" :class="catalogResult && catalogResult.success ? 'bg-emerald-50/50 border-emerald-200' : 'bg-rose-50/50 border-rose-200'">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-2 text-xs font-bold" :class="catalogResult && catalogResult.success ? 'text-emerald-800' : 'text-rose-800'">
+                            <i class="bi" :class="catalogResult && catalogResult.success ? 'bi-check-circle-fill text-emerald-600' : 'bi-exclamation-triangle-fill text-rose-600'"></i>
+                            <span x-text="catalogResult ? catalogResult.message : ''"></span>
+                        </div>
+                        <button type="button" @click="catalogResult = null" class="text-xs opacity-60 hover:opacity-100 cursor-pointer">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                    <template x-if="catalogResult && catalogResult.output">
+                        <pre class="mt-2 p-3 rounded-lg bg-slate-900 text-slate-100 text-[11px] font-mono whitespace-pre-wrap max-h-60 overflow-y-auto" x-text="catalogResult.output"></pre>
+                    </template>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 @endsection
