@@ -11,8 +11,9 @@ class LocationLandingController extends Controller
     /**
      * Display a programmatic geo-location pickup landing page.
      */
-    public function show(string $location)
+    public function show(...$params)
     {
+        $location = (string) end($params);
         $locationData = LocationLandingService::find($location);
 
         if (! $locationData) {

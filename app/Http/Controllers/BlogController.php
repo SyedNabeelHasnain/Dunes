@@ -94,8 +94,9 @@ class BlogController extends Controller
     /**
      * Display a specific blog post.
      */
-    public function show(string $slug)
+    public function show(...$params)
     {
+        $slug = (string) end($params);
         $post = BlogPost::where('slug', $slug)
             ->with(['category', 'tags', 'faqs'])
             ->first();

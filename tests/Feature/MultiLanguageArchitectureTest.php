@@ -393,6 +393,18 @@ class MultiLanguageArchitectureTest extends TestCase
         $resIt->assertStatus(200);
         $resIt->assertSee('lang="it"', false);
         $resIt->assertSee('dir="ltr"', false);
+
+        // Verify localized dynamic tour detail page
+        $tour = Tour::first() ?? Tour::create([
+            'slug' => 'evening-desert-safari-dubai',
+            'name' => 'Evening Desert Safari Dubai',
+            'status' => 'active',
+            'priority' => 1,
+        ]);
+        $this->get('/ar/'.$tour->slug)->assertStatus(200)->assertSee('dir="rtl"', false);
+        $this->get('/ru/'.$tour->slug)->assertStatus(200)->assertSee('dir="ltr"', false);
+        $this->get('/es/'.$tour->slug)->assertStatus(200)->assertSee('dir="ltr"', false);
+        $this->get('/it/'.$tour->slug)->assertStatus(200)->assertSee('dir="ltr"', false);
     }
 
     /**

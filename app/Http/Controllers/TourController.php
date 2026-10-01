@@ -54,7 +54,7 @@ class TourController extends Controller
         return view('tours.index', compact('categories', 'tours', 'selectedCategorySlug', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
     }
 
-    public function showBuggy()
+    public function showBuggy(...$params)
     {
         return $this->show('dune-buggy-rental-dubai');
     }
@@ -62,8 +62,9 @@ class TourController extends Controller
     /**
      * Display details for a specific tour.
      */
-    public function show(string $slug)
+    public function show(...$params)
     {
+        $slug = (string) end($params);
         $query = Tour::where('slug', $slug)
             ->with(['itineraries', 'tiers', 'addons', 'contentItems', 'category']);
 
