@@ -45,8 +45,19 @@
     $ogType = $ogType ?? 'website';
 @endphp
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ $currentLocale ?? 'en' }}" dir="{{ $textDir ?? 'ltr' }}">
 <head>
+    @if($isRtl ?? false)
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body, html, input, button, select, textarea, .font-sans {
+            font-family: 'Cairo', system-ui, -apple-system, sans-serif !important;
+        }
+    </style>
+    @endif
+
     @if(!empty($adsId))
     <!-- Google tag (gtag.js) {{ $adsId }} (Sitewide First-Party Conversion Tag) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ $adsId }}"></script>
@@ -120,8 +131,14 @@
     <meta name="robots" content="{{ $pageRobots }}">
     <meta name="author" content="Dunes Discovery Tourism">
     <link rel="canonical" href="{{ $canonical }}">
-    <link rel="alternate" hreflang="en" href="{{ $canonical }}">
-    <link rel="alternate" hreflang="x-default" href="{{ $canonical }}">
+    <link rel="alternate" hreflang="x-default" href="{{ switch_locale_url('en') }}">
+    @if(isset($activeLanguages) && is_iterable($activeLanguages))
+        @foreach($activeLanguages as $langItem)
+            <link rel="alternate" hreflang="{{ $langItem->code }}" href="{{ switch_locale_url($langItem->code) }}">
+        @endforeach
+    @else
+        <link rel="alternate" hreflang="en" href="{{ switch_locale_url('en') }}">
+    @endif
     
     <link rel="preconnect" href="https://www.googletagmanager.com">
     <link rel="preconnect" href="https://connect.facebook.net">
@@ -333,7 +350,7 @@
             },
             "query-input": "required name=search_term_string"
           },
-          "inLanguage": "en"
+          "inLanguage": {!! json_encode(isset($activeLanguages) ? $activeLanguages->pluck('code')->toArray() : ['en', 'ar']) !!}
         },
         {
           "@@type": "WebPage",
@@ -341,6 +358,7 @@
           "url": "{{ $canonical }}",
           "name": {!! json_encode($pageTitle) !!},
           "description": {!! json_encode($pageDesc) !!},
+          "inLanguage": "{{ $currentLocale ?? 'en' }}",
           "isPartOf": {
             "@@id": "{{ url('/') }}#website"
           },
@@ -439,6 +457,7 @@
                         <button type="button" class="w-9 h-9 rounded-full bg-white border border-slate-200/90 shadow-2xs flex items-center justify-center text-slate-600 hover:text-primary hover:border-primary/50 transition-all cursor-pointer" @click="$store.modal.open('search')" title="Search Dubai tours" aria-label="Search Dubai tours">
                             <i class="bi bi-search text-xs"></i>
                         </button>
+                        @include('partials.language-switcher', ['switcherId' => 'desktopLanguageDropdownBtn'])
                         @include('partials.currency-switcher', ['switcherId' => 'desktopCurrencyDropdownBtn'])
                         <a class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full font-bold text-xs bg-emerald-500 hover:bg-emerald-600 text-white shadow-xs hover:shadow-sm transition-all cursor-pointer" href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener">
                             <i class="bi bi-whatsapp"></i><span>WhatsApp</span>
@@ -509,6 +528,7 @@
                 <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-4">
                     <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery" width="140" height="90" class="h-9 w-auto object-contain">
                     <div class="flex items-center gap-2">
+                        @include('partials.language-switcher', ['switcherId' => 'mobileLanguageDropdownBtn'])
                         @include('partials.currency-switcher', ['switcherId' => 'mobileCurrencyDropdownBtn'])
                         <button type="button" class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer" @click="$store.mobileNav.close()" aria-label="Close">
                             <i class="bi bi-x-lg text-xs"></i>

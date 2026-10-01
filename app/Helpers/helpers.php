@@ -115,3 +115,58 @@ if (! function_exists('formatWhatsApp')) {
         return "https://wa.me/{$number}".($message ? '?text='.urlencode($message) : '');
     }
 }
+
+if (! function_exists('localized_route')) {
+    /**
+     * Generate a localized URL for a named route.
+     */
+    function localized_route(string $name, mixed $parameters = [], ?string $locale = null, bool $absolute = true): string
+    {
+        $locale = $locale ?: app()->getLocale();
+
+        // English is the default root locale - no prefix
+        if ($locale === 'en' || empty($locale)) {
+            return route($name, $parameters, $absolute);
+        }
+
+        // For non-default locales (e.g. ar), prefix the path with /{locale}
+        $relativePath = route($name, $parameters, false);
+        $localizedPath = ($relativePath === '/' || $relativePath === '') ? "/{$locale}" : "/{$locale}{$relativePath}";
+
+        return $absolute ? url($localizedPath) : $localizedPath;
+    }
+}
+
+if (! function_exists('switch_locale_url')) {
+    /**
+     * Generate the URL to switch the current page to the target locale.
+     */
+    function switch_locale_url(string $targetLocale): string
+    {
+        $request = request();
+        $segments = $request->segments();
+
+        // Check if the first segment is an active non-default language
+        if (! empty($segments)) {
+            $first = $segments[0];
+            $languages = \App\Models\Language::getActive();
+            if ($languages->contains('code', $first) && $first !== 'en') {
+                array_shift($segments);
+            } elseif ($first === 'en') {
+                array_shift($segments);
+            }
+        }
+
+        if ($targetLocale === 'en' || empty($targetLocale)) {
+            $path = empty($segments) ? '/' : '/'.implode('/', $segments);
+        } else {
+            $path = empty($segments) ? "/{$targetLocale}" : "/{$targetLocale}/".implode('/', $segments);
+        }
+
+        $queryString = $request->getQueryString();
+        $fullUrl = url($path).($queryString ? '?'.$queryString : '');
+
+        return $fullUrl;
+    }
+}
+

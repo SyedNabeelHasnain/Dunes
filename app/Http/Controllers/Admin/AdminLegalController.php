@@ -3,13 +3,17 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Language;
 use App\Models\LegalItem;
 use App\Models\LegalPage;
 use App\Models\LegalSection;
+use App\Traits\NormalizesLocalizedInputs;
 use Illuminate\Http\Request;
 
 class AdminLegalController extends Controller
 {
+    use NormalizesLocalizedInputs;
+
     /**
      * Display a listing of Legal Pages.
      */
@@ -26,8 +30,9 @@ class AdminLegalController extends Controller
     public function edit(int $id)
     {
         $page = LegalPage::with(['sections.items'])->findOrFail($id);
+        $languages = Language::getActive();
 
-        return view('admin.legal.edit', compact('page'));
+        return view('admin.legal.edit', compact('page', 'languages'));
     }
 
     /**
@@ -38,22 +43,17 @@ class AdminLegalController extends Controller
         $page = LegalPage::findOrFail($id);
 
         $request->validate([
-            'title' => 'required|string|max:255',
-            'title_ar' => 'nullable|string|max:255',
-            'subtitle' => 'nullable|string|max:255',
-            'subtitle_ar' => 'nullable|string|max:255',
-            'description' => 'nullable|string',
-            'description_ar' => 'nullable|string',
+            'title' => 'required',
+            'subtitle' => 'nullable',
+            'description' => 'nullable',
         ]);
 
-        $page->update([
-            'title' => $request->input('title'),
-            'title_ar' => $request->input('title_ar'),
-            'subtitle' => $request->input('subtitle'),
-            'subtitle_ar' => $request->input('subtitle_ar'),
-            'description' => $request->input('description'),
-            'description_ar' => $request->input('description_ar'),
-        ]);
+        $data = $this->normalizeLocalizedData(
+            $request->all(),
+            ['title', 'subtitle', 'description']
+        );
+
+        $page->update($data);
 
         return redirect()->route('admin.legal.index')->with('success', 'Legal page updated successfully.');
     }
@@ -66,14 +66,18 @@ class AdminLegalController extends Controller
         $page = LegalPage::findOrFail($id);
 
         $request->validate([
-            'heading' => 'required|string|max:255',
-            'heading_ar' => 'nullable|string|max:255',
-            'subheading' => 'nullable|string|max:255',
-            'subheading_ar' => 'nullable|string|max:255',
+            'heading' => 'required',
+            'subheading' => 'nullable',
             'priority' => 'required|integer',
         ]);
 
-        $page->sections()->create($request->only(['heading', 'heading_ar', 'subheading', 'subheading_ar', 'priority']));
+        $data = $this->normalizeLocalizedData(
+            $request->all(),
+            ['heading', 'subheading']
+        );
+        $data['priority'] = (int) $request->input('priority', 0);
+
+        $page->sections()->create($data);
 
         return redirect()->route('admin.legal.edit', $id)->with('success', 'Section added successfully.');
     }
@@ -86,12 +90,17 @@ class AdminLegalController extends Controller
         $section = LegalSection::findOrFail($sectionId);
 
         $request->validate([
-            'content' => 'required|string',
-            'content_ar' => 'nullable|string',
+            'content' => 'required',
             'priority' => 'required|integer',
         ]);
 
-        $section->items()->create($request->only(['content', 'content_ar', 'priority']));
+        $data = $this->normalizeLocalizedData(
+            $request->all(),
+            ['content']
+        );
+        $data['priority'] = (int) $request->input('priority', 0);
+
+        $section->items()->create($data);
 
         return redirect()->route('admin.legal.edit', $section->page_id)->with('success', 'Item added successfully.');
     }

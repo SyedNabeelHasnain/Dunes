@@ -155,6 +155,10 @@ class LlmsController extends Controller
         $md .= '- [Terms & Booking Conditions]('.url('/terms-condition')."): Transparent 24-hour free cancellation policy, refund guarantees, and booking policies.\n";
         $md .= '- [Privacy Policy]('.url('/privacy-policy')."): Data protection commitments, cookie policy, and GDPR compliance.\n\n";
 
+        $md .= "## International & Multilingual Portals\n\n";
+        $md .= '- [English Portal (Default Root)]('.url('/')."): Primary commercial tourism portal, tours catalog, and real-time checkout in English.\n";
+        $md .= '- [Arabic Portal (البوابة الرسمية بالعربية)]('.url('/ar')."): Fully localized Arabic portal with RTL layout, Arabic itinerary details, FAQs, and multilingual booking concierge.\n\n";
+
         $md .= "## Optional\n\n";
         $md .= '- [Full LLM Knowledge Base]('.url('/llms-full.txt')."): Comprehensive full-text specifications, pricing tiers, FAQs, and entity knowledge graph for AI crawlers.\n";
         $md .= '- [XML Sitemap Index]('.url('/sitemap_index.xml')."): Complete hierarchical URL and image sitemap index for search engines.\n";

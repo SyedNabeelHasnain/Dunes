@@ -8,8 +8,10 @@ use App\Models\Booking;
 use App\Models\Category;
 use App\Models\ContentItem;
 use App\Models\Itinerary;
+use App\Models\Language;
 use App\Models\Tier;
 use App\Models\Tour;
+use App\Traits\NormalizesLocalizedInputs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +19,7 @@ use Illuminate\Support\Str;
 
 class AdminTourController extends Controller
 {
+    use NormalizesLocalizedInputs;
     /**
      * Display a listing of tours.
      */
@@ -35,8 +38,9 @@ class AdminTourController extends Controller
         $categories = Category::all();
         $tiers = Tier::where('status', 'active')->get();
         $addons = Addon::where('status', 'active')->get();
+        $languages = Language::getActive();
 
-        return view('admin.tours.create', compact('categories', 'tiers', 'addons'));
+        return view('admin.tours.create', compact('categories', 'tiers', 'addons', 'languages'));
     }
 
     /**
@@ -45,10 +49,10 @@ class AdminTourController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required',
             'category_id' => 'required|integer',
-            'short_desc' => 'required|string',
-            'full_desc' => 'required|string',
+            'short_desc' => 'required',
+            'full_desc' => 'required',
             'duration' => 'required|string|max:255',
             'pickup_time' => 'required|string|max:255',
             'dropoff_time' => 'required|string|max:255',
@@ -58,8 +62,11 @@ class AdminTourController extends Controller
             'thumb_image' => 'nullable|image|max:2048',
         ]);
 
-        $data = $request->except(['tiers', 'addons', 'hero_image', 'thumb_image']);
-        $data['slug'] = Str::slug($request->name);
+        $data = $this->normalizeLocalizedData(
+            $request->except(['tiers', 'addons', 'hero_image', 'thumb_image']),
+            ['name', 'short_desc', 'full_desc', 'meta_title', 'meta_desc', 'meta_keywords']
+        );
+        $data['slug'] = Str::slug($this->extractSlugSource($request->name));
 
         // Handle image uploads
         if ($request->hasFile('hero_image')) {
@@ -115,8 +122,9 @@ class AdminTourController extends Controller
         $categories = Category::all();
         $tiers = Tier::where('status', 'active')->get();
         $addons = Addon::where('status', 'active')->get();
+        $languages = Language::getActive();
 
-        return view('admin.tours.edit', compact('tour', 'categories', 'tiers', 'addons'));
+        return view('admin.tours.edit', compact('tour', 'categories', 'tiers', 'addons', 'languages'));
     }
 
     /**
@@ -127,10 +135,10 @@ class AdminTourController extends Controller
         $tour = Tour::findOrFail($id);
 
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required',
             'category_id' => 'required|integer',
-            'short_desc' => 'required|string',
-            'full_desc' => 'required|string',
+            'short_desc' => 'required',
+            'full_desc' => 'required',
             'duration' => 'required|string|max:255',
             'pickup_time' => 'required|string|max:255',
             'dropoff_time' => 'required|string|max:255',
@@ -140,8 +148,13 @@ class AdminTourController extends Controller
             'thumb_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:3072',
         ]);
 
-        $data = $request->except(['tiers', 'addons', 'hero_image', 'thumb_image']);
-        $data['slug'] = Str::slug($request->name);
+        $data = $this->normalizeLocalizedData(
+            $request->except(['tiers', 'addons', 'hero_image', 'thumb_image']),
+            ['name', 'short_desc', 'full_desc', 'meta_title', 'meta_desc', 'meta_keywords']
+        );
+        if ($request->has('name')) {
+            $data['slug'] = Str::slug($this->extractSlugSource($request->name));
+        }
 
         if ($request->hasFile('hero_image')) {
             $data['hero_image'] = $request->file('hero_image')->store('tours/hero', 'public');
@@ -437,14 +450,15 @@ class AdminTourController extends Controller
 
         $request->validate([
             'time' => 'required|string|max:255',
-            'title' => 'required|string|max:255',
+            'title' => 'required',
             'duration' => 'nullable|string|max:255',
             'icon' => 'nullable|string|max:255',
             'priority' => 'required|integer',
-            'description' => 'nullable|string',
+            'description' => 'nullable',
         ]);
 
-        $tour->itineraries()->create($request->validated());
+        $data = $this->normalizeLocalizedData($request->all(), ['title', 'description']);
+        $tour->itineraries()->create($data);
 
         return response()->json(['success' => true, 'message' => 'Itinerary item added successfully.']);
     }
@@ -458,14 +472,15 @@ class AdminTourController extends Controller
 
         $request->validate([
             'time' => 'required|string|max:255',
-            'title' => 'required|string|max:255',
+            'title' => 'required',
             'duration' => 'nullable|string|max:255',
             'icon' => 'nullable|string|max:255',
             'priority' => 'required|integer',
-            'description' => 'nullable|string',
+            'description' => 'nullable',
         ]);
 
-        $itinerary->update($request->validated());
+        $data = $this->normalizeLocalizedData($request->all(), ['title', 'description']);
+        $itinerary->update($data);
 
         return response()->json(['success' => true, 'message' => 'Itinerary item updated successfully.']);
     }
@@ -488,13 +503,14 @@ class AdminTourController extends Controller
     {
         $request->validate([
             'type' => 'required|string|in:inclusion,exclusion,highlight,not_allowed',
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'title' => 'required',
+            'description' => 'nullable',
             'icon' => 'nullable|string|max:255',
             'priority' => 'required|integer',
         ]);
 
-        $item = ContentItem::create($request->validated());
+        $data = $this->normalizeLocalizedData($request->all(), ['title', 'description']);
+        $item = ContentItem::create($data);
 
         return response()->json(['success' => true, 'message' => 'Content item created successfully.', 'item' => $item]);
     }

@@ -2,12 +2,18 @@
 
 namespace App\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class LegalSection extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations;
+
+    public array $translatable = [
+        'heading',
+        'subheading',
+    ];
 
     protected $fillable = ['page_id', 'heading', 'heading_ar', 'subheading', 'subheading_ar', 'priority'];
 

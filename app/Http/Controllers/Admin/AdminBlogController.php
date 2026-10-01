@@ -6,12 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\BlogCategory;
 use App\Models\BlogPost;
 use App\Models\BlogTag;
+use App\Models\Language;
+use App\Traits\NormalizesLocalizedInputs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class AdminBlogController extends Controller
 {
+    use NormalizesLocalizedInputs;
     /**
      * Display a listing of blog posts.
      */
@@ -29,8 +32,9 @@ class AdminBlogController extends Controller
     {
         $categories = BlogCategory::where('status', 'active')->orderBy('priority', 'asc')->get();
         $tags = BlogTag::all();
+        $languages = Language::getActive();
 
-        return view('admin.blogs.create', compact('categories', 'tags'));
+        return view('admin.blogs.create', compact('categories', 'tags', 'languages'));
     }
 
     /**
@@ -39,16 +43,19 @@ class AdminBlogController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'excerpt' => 'required|string|max:500',
+            'title' => 'required',
+            'content' => 'required',
+            'excerpt' => 'required',
             'category_id' => 'required|integer',
             'status' => 'required|string|in:draft,published,scheduled',
             'featured_image' => 'nullable|image|max:4096',
         ]);
 
-        $data = $request->except(['tags', 'featured_image']);
-        $data['slug'] = Str::slug($request->title);
+        $data = $this->normalizeLocalizedData(
+            $request->except(['tags', 'featured_image']),
+            ['title', 'subtitle', 'excerpt', 'content', 'meta_title', 'meta_desc', 'meta_keywords']
+        );
+        $data['slug'] = Str::slug($this->extractSlugSource($request->title));
 
         if ($request->hasFile('featured_image')) {
             $data['featured_image'] = $request->file('featured_image')->store('blogs', 'public');
@@ -85,8 +92,9 @@ class AdminBlogController extends Controller
         $post = BlogPost::with('tags')->findOrFail($id);
         $categories = BlogCategory::where('status', 'active')->orderBy('priority', 'asc')->get();
         $tags = BlogTag::all();
+        $languages = Language::getActive();
 
-        return view('admin.blogs.edit', compact('post', 'categories', 'tags'));
+        return view('admin.blogs.edit', compact('post', 'categories', 'tags', 'languages'));
     }
 
     /**
@@ -97,16 +105,21 @@ class AdminBlogController extends Controller
         $post = BlogPost::findOrFail($id);
 
         $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'excerpt' => 'required|string|max:500',
+            'title' => 'required',
+            'content' => 'required',
+            'excerpt' => 'required',
             'category_id' => 'required|integer',
             'status' => 'required|string|in:draft,published,scheduled',
             'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:5120',
         ]);
 
-        $data = $request->except(['tags', 'featured_image']);
-        $data['slug'] = Str::slug($request->title);
+        $data = $this->normalizeLocalizedData(
+            $request->except(['tags', 'featured_image']),
+            ['title', 'subtitle', 'excerpt', 'content', 'meta_title', 'meta_desc', 'meta_keywords']
+        );
+        if ($request->has('title')) {
+            $data['slug'] = Str::slug($this->extractSlugSource($request->title));
+        }
 
         if ($request->hasFile('featured_image')) {
             $data['featured_image'] = $request->file('featured_image')->store('blogs', 'public');

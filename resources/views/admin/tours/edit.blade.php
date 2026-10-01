@@ -20,45 +20,104 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <!-- Left Column (Core Forms & Details) -->
-        <div class="lg:col-span-8 space-y-6">
-            <!-- Core Information Card -->
-            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-                <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-                    <h2 class="text-sm font-black text-slate-900">Core Information</h2>
-                    <span class="text-xs font-mono text-slate-400">ID: #{{ $tour->id }}</span>
-                </div>
-                
-                <div class="p-6">
-                    <form action="{{ route('admin.tours.update', $tour->id) }}" method="POST" enctype="multipart/form-data" id="editTourForm">
-                        @csrf
-                        @method('PUT')
+    <!-- Multi-Language Form Context -->
+    <div x-data="{
+        activeLocale: 'en',
+        isLocaleComplete(code) {
+            let nameEl = document.querySelector('[data-locale=\'' + code + '\'][data-field=\'name\']');
+            let shortEl = document.querySelector('[data-locale=\'' + code + '\'][data-field=\'short_desc\']');
+            return nameEl && nameEl.value.trim() !== '' && shortEl && shortEl.value.trim() !== '';
+        },
+        validateAll(e) {
+            let activeLangs = {{ json_encode($languages->pluck('code')->toArray()) }};
+            for (let code of activeLangs) {
+                let nameEl = document.querySelector('[data-locale=\'' + code + '\'][data-field=\'name\']');
+                let shortEl = document.querySelector('[data-locale=\'' + code + '\'][data-field=\'short_desc\']');
+                if (!nameEl || nameEl.value.trim() === '' || !shortEl || shortEl.value.trim() === '') {
+                    e.preventDefault();
+                    this.activeLocale = code;
+                    alert('Please complete all required fields for language [' + code.toUpperCase() + '] before saving.');
+                    if (nameEl && nameEl.value.trim() === '') {
+                        nameEl.focus();
+                    } else if (shortEl) {
+                        shortEl.focus();
+                    }
+                    return false;
+                }
+            }
+            return true;
+        }
+    }" @language-content-updated.window="$dispatch('input')">
 
-                        <div class="space-y-4">
-                            <div>
-                                <label for="tour_name" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Tour Name *</label>
-                                <input type="text" name="name" id="tour_name" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" value="{{ old('name', $tour->name) }}" required>
-                            </div>
+        <x-admin.language-bar :languages="$languages" :required-fields="['name', 'short_desc', 'full_desc']" :html-fields="['full_desc']" />
 
-                            <div>
-                                <label for="category_id" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Category *</label>
-                                <select name="category_id" id="category_id" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" required>
-                                    @foreach($categories as $category)
-                                        <option value="{{ $category->id }}" {{ old('category_id', $tour->category_id) == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Left Column (Core Forms & Details) -->
+            <div class="lg:col-span-8 space-y-6">
+                <!-- Core Information Card -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                        <h2 class="text-sm font-black text-slate-900">Core Information</h2>
+                        <span class="text-xs font-mono text-slate-400">ID: #{{ $tour->id }}</span>
+                    </div>
+                    
+                    <div class="p-6">
+                        <form action="{{ route('admin.tours.update', $tour->id) }}" method="POST" enctype="multipart/form-data" id="editTourForm" @submit="validateAll($event)">
+                            @csrf
+                            @method('PUT')
 
-                            <div>
-                                <label for="short_desc" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Short Description *</label>
-                                <textarea name="short_desc" id="short_desc" rows="2" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" required>{{ old('short_desc', $tour->short_desc) }}</textarea>
-                            </div>
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="category_id" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Category *</label>
+                                    <select name="category_id" id="category_id" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" required>
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->id }}" {{ old('category_id', $tour->category_id) == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
 
-                            <div>
-                                <label for="full_desc" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Full Description *</label>
-                                <textarea name="full_desc" id="full_desc" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 wysiwyg-editor focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" rows="6" required>{{ old('full_desc', $tour->full_desc) }}</textarea>
-                            </div>
+                                @foreach($languages as $lang)
+                                    <div x-show="activeLocale === '{{ $lang->code }}'" x-cloak class="space-y-4">
+                                        <div>
+                                            <div class="flex items-center justify-between mb-1.5">
+                                                <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider">Tour Name ({{ $lang->name }}) *</label>
+                                                @if($lang->isRtl())
+                                                    <span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">RTL Mode</span>
+                                                @endif
+                                            </div>
+                                            <input type="text"
+                                                   name="name[{{ $lang->code }}]"
+                                                   data-locale="{{ $lang->code }}"
+                                                   data-field="name"
+                                                   dir="{{ $lang->isRtl() ? 'rtl' : 'ltr' }}"
+                                                   class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden {{ $lang->isRtl() ? 'text-right font-arabic' : '' }}"
+                                                   value="{{ old('name.'.$lang->code, $tour->getTranslation('name', $lang->code, false)) }}"
+                                                   required>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Short Description ({{ $lang->name }}) *</label>
+                                            <textarea name="short_desc[{{ $lang->code }}]"
+                                                      data-locale="{{ $lang->code }}"
+                                                      data-field="short_desc"
+                                                      dir="{{ $lang->isRtl() ? 'rtl' : 'ltr' }}"
+                                                      rows="2"
+                                                      class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden {{ $lang->isRtl() ? 'text-right font-arabic' : '' }}"
+                                                      required>{{ old('short_desc.'.$lang->code, $tour->getTranslation('short_desc', $lang->code, false)) }}</textarea>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Full Description ({{ $lang->name }}) *</label>
+                                            <textarea name="full_desc[{{ $lang->code }}]"
+                                                      data-locale="{{ $lang->code }}"
+                                                      data-field="full_desc"
+                                                      dir="{{ $lang->isRtl() ? 'rtl' : 'ltr' }}"
+                                                      class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 wysiwyg-editor focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden {{ $lang->isRtl() ? 'text-right font-arabic' : '' }}"
+                                                      rows="6"
+                                                      required>{{ old('full_desc.'.$lang->code, $tour->getTranslation('full_desc', $lang->code, false)) }}</textarea>
+                                        </div>
+                                    </div>
+                                @endforeach
 
                             <!-- Package Tiers -->
                             <div class="pt-4 border-t border-slate-100">
@@ -343,18 +402,42 @@
                 <h3 class="text-xs font-black uppercase tracking-wider text-primary flex items-center gap-2">
                     <i class="bi bi-search text-base"></i> SEO Customization
                 </h3>
-                <div>
-                    <label for="meta_title" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Meta Title</label>
-                    <input type="text" name="meta_title" form="editTourForm" id="meta_title" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" value="{{ old('meta_title', $tour->meta_title) }}">
-                </div>
-                <div>
-                    <label for="meta_desc" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Meta Description</label>
-                    <textarea name="meta_desc" form="editTourForm" id="meta_desc" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" rows="3">{{ old('meta_desc', $tour->meta_desc) }}</textarea>
-                </div>
-                <div>
-                    <label for="meta_keywords" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Meta Keywords</label>
-                    <input type="text" name="meta_keywords" form="editTourForm" id="meta_keywords" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" value="{{ old('meta_keywords', $tour->meta_keywords) }}">
-                </div>
+                @foreach($languages as $lang)
+                    <div x-show="activeLocale === '{{ $lang->code }}'" x-cloak class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Meta Title ({{ $lang->name }})</label>
+                            <input type="text"
+                                   name="meta_title[{{ $lang->code }}]"
+                                   form="editTourForm"
+                                   data-locale="{{ $lang->code }}"
+                                   data-field="meta_title"
+                                   dir="{{ $lang->isRtl() ? 'rtl' : 'ltr' }}"
+                                   class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden {{ $lang->isRtl() ? 'text-right font-arabic' : '' }}"
+                                   value="{{ old('meta_title.'.$lang->code, $tour->getTranslation('meta_title', $lang->code, false)) }}">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Meta Description ({{ $lang->name }})</label>
+                            <textarea name="meta_desc[{{ $lang->code }}]"
+                                      form="editTourForm"
+                                      data-locale="{{ $lang->code }}"
+                                      data-field="meta_desc"
+                                      dir="{{ $lang->isRtl() ? 'rtl' : 'ltr' }}"
+                                      class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden {{ $lang->isRtl() ? 'text-right font-arabic' : '' }}"
+                                      rows="3">{{ old('meta_desc.'.$lang->code, $tour->getTranslation('meta_desc', $lang->code, false)) }}</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Meta Keywords ({{ $lang->name }})</label>
+                            <input type="text"
+                                   name="meta_keywords[{{ $lang->code }}]"
+                                   form="editTourForm"
+                                   data-locale="{{ $lang->code }}"
+                                   data-field="meta_keywords"
+                                   dir="{{ $lang->isRtl() ? 'rtl' : 'ltr' }}"
+                                   class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden {{ $lang->isRtl() ? 'text-right font-arabic' : '' }}"
+                                   value="{{ old('meta_keywords.'.$lang->code, $tour->getTranslation('meta_keywords', $lang->code, false)) }}">
+                        </div>
+                    </div>
+                @endforeach
             </div>
 
             <!-- Images -->
@@ -381,6 +464,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 
 <!-- Category Manager Modal (Alpine.js) -->

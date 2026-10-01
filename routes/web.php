@@ -8,11 +8,14 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminEmailCampaignController;
 use App\Http\Controllers\Admin\AdminEmailTemplateController;
 use App\Http\Controllers\Admin\AdminFaqController;
+use App\Http\Controllers\Admin\AdminLanguageController;
 use App\Http\Controllers\Admin\AdminLegalController;
 use App\Http\Controllers\Admin\AdminMailSettingController;
 use App\Http\Controllers\Admin\AdminOperationsController;
 use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\AdminSettingController;
+use App\Http\Controllers\Admin\AdminTranslationApiController;
+use App\Http\Controllers\Admin\AdminTranslationSettingController;
 use App\Http\Controllers\Admin\AdminSubscriberController;
 use App\Http\Controllers\Admin\AdminSubscriberGroupController;
 use App\Http\Controllers\Admin\AdminTourController;
@@ -196,6 +199,22 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::get('/settings/google', [AdminSettingController::class, 'google'])->name('settings.google');
     Route::get('/settings/meta', [AdminSettingController::class, 'meta'])->name('settings.meta');
     Route::get('/settings/currency', [AdminSettingController::class, 'currency'])->name('settings.currency');
+
+    // ── Multi-Language & Locales Management ──────────────────────────────────
+    Route::get('/settings/languages', [AdminLanguageController::class, 'index'])->name('settings.languages');
+    Route::post('/settings/languages', [AdminLanguageController::class, 'store'])->name('settings.languages.store');
+    Route::put('/settings/languages/{id}', [AdminLanguageController::class, 'update'])->name('settings.languages.update');
+    Route::delete('/settings/languages/{id}', [AdminLanguageController::class, 'destroy'])->name('settings.languages.destroy');
+    Route::post('/settings/languages/{id}/toggle-status', [AdminLanguageController::class, 'toggleStatus'])->name('settings.languages.toggle-status');
+
+    // ── Translation Services APIs ───────────────────────────────────────────
+    Route::get('/settings/translations', [AdminTranslationSettingController::class, 'index'])->name('settings.translations');
+    Route::post('/settings/translations', [AdminTranslationSettingController::class, 'update'])->name('settings.translations.update');
+    Route::post('/settings/translations/test', [AdminTranslationSettingController::class, 'testConnection'])->name('settings.translations.test');
+
+    // ── In-Form Auto-Translate AJAX API ─────────────────────────────────────
+    Route::post('/api/translate', [AdminTranslationApiController::class, 'translate'])->name('api.translate');
+
     Route::post('/settings/update', [AdminSettingController::class, 'update'])->name('settings.update');
     Route::post('/settings/sync-currency', [AdminSettingController::class, 'syncExchangeRates'])->name('settings.sync-currency');
     Route::post('/clear-cache', [AdminSettingController::class, 'clearCache'])->name('clear-cache');
@@ -279,5 +298,50 @@ Route::redirect('/quad-bike-tour-dubai', '/desert-safari-quad-biking-dubai', 301
 Route::redirect('/vip-desert-safari-dubai', '/evening-desert-safari-dubai', 301);
 Route::redirect('/buggy-tour-dubai', '/dune-buggy-rental-dubai', 301);
 
-// ── Root-level Dynamic Tour Slugs (Fallback Route) ───────────────────────────
+// ── Multi-Language Localized Route Group (Non-Default Locales, e.g. /ar) ─────
+Route::prefix('{locale}')
+    ->where(['locale' => '^(?!admin|api|ajax|storage|images|css|js|favicon\.ico|en$)[a-z]{2}(-[a-z]{2})?$'])
+    ->group(function () {
+        Route::get('/', [HomeController::class, 'index'])->name('locale.home');
+        Route::get('/about', [PageController::class, 'about'])->name('locale.about');
+        Route::get('/contact', [PageController::class, 'contact'])->name('locale.contact');
+        Route::get('/faq', [PageController::class, 'faq'])->name('locale.faq');
+        Route::get('/rate-card', [RateCardController::class, 'index'])->name('locale.rate-card');
+        Route::redirect('/pricing-guide', '/rate-card', 301);
+
+        // Legal policies
+        Route::get('/terms-condition', [LegalController::class, 'terms'])->name('locale.terms');
+        Route::get('/privacy-policy', [LegalController::class, 'privacy'])->name('locale.privacy');
+        Route::get('/cookie-policy', [LegalController::class, 'cookies'])->name('locale.cookies');
+        Route::get('/cancellation-refund-policy', [LegalController::class, 'cancellation'])->name('locale.cancellation');
+        Route::get('/payment-security-policy', [LegalController::class, 'paymentSecurity'])->name('locale.payment.security');
+        Route::get('/safety-liability-waiver', [LegalController::class, 'safetyWaiver'])->name('locale.safety.waiver');
+        Route::get('/ai-editorial-policy', [LegalController::class, 'aiEditorial'])->name('locale.ai.editorial');
+        Route::get('/responsible-tourism-policy', [LegalController::class, 'responsibleTourism'])->name('locale.responsible.tourism');
+
+        // Tours & search
+        Route::get('/tours', [TourController::class, 'index'])->name('locale.tours.index');
+        Route::get('/search', [TourController::class, 'search'])->name('locale.tours.search');
+        Route::get('/search/live', [TourController::class, 'liveSearch'])->name('locale.tours.search.live');
+        Route::get('/build-your-own-safari', [TourController::class, 'customizer'])->name('locale.tours.customizer');
+        Route::redirect('/custom-safari', '/build-your-own-safari', 301);
+
+        // Blog
+        Route::get('/blog', [BlogController::class, 'index'])->name('locale.blog.index');
+        Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('locale.blog.show');
+
+        // Booking confirmation
+        Route::get('/thankyou', [BookingController::class, 'thankyou'])->name('locale.booking.thankyou');
+        Route::get('/payment-cancel', [BookingController::class, 'paymentCancel'])->name('locale.booking.cancel');
+
+        // High-Value & Geo
+        Route::get('/dune-buggy-rental-dubai', [TourController::class, 'showBuggy'])->name('locale.tours.buggy');
+        Route::get('/desert-safari-from-{location}', [LocationLandingController::class, 'show'])->name('locale.tours.location');
+
+        // Localized Dynamic Tour Slugs
+        Route::get('/{slug}', [TourController::class, 'show'])->name('locale.tours.show');
+    });
+
+// ── Root-level Dynamic Tour Slugs (Fallback Route for Default Locale) ─────────
 Route::get('/{slug}', [TourController::class, 'show'])->name('tours.show');
+

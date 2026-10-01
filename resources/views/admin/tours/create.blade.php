@@ -18,8 +18,37 @@
             <span class="text-xs text-slate-400">All required fields marked *</span>
         </div>
         
-        <div class="p-6">
-            <form action="{{ route('admin.tours.store') }}" method="POST" enctype="multipart/form-data">
+        <div class="p-6" x-data="{
+            activeLocale: 'en',
+            isLocaleComplete(code) {
+                let nameEl = document.querySelector('[data-locale=\'' + code + '\'][data-field=\'name\']');
+                let shortEl = document.querySelector('[data-locale=\'' + code + '\'][data-field=\'short_desc\']');
+                return nameEl && nameEl.value.trim() !== '' && shortEl && shortEl.value.trim() !== '';
+            },
+            validateAll(e) {
+                let activeLangs = {{ json_encode($languages->pluck('code')->toArray()) }};
+                for (let code of activeLangs) {
+                    let nameEl = document.querySelector('[data-locale=\'' + code + '\'][data-field=\'name\']');
+                    let shortEl = document.querySelector('[data-locale=\'' + code + '\'][data-field=\'short_desc\']');
+                    if (!nameEl || nameEl.value.trim() === '' || !shortEl || shortEl.value.trim() === '') {
+                        e.preventDefault();
+                        this.activeLocale = code;
+                        alert('Please complete all required fields for language [' + code.toUpperCase() + '] before creating.');
+                        if (nameEl && nameEl.value.trim() === '') {
+                            nameEl.focus();
+                        } else if (shortEl) {
+                            shortEl.focus();
+                        }
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }" @language-content-updated.window="$dispatch('input')">
+
+            <x-admin.language-bar :languages="$languages" :required-fields="['name', 'short_desc', 'full_desc']" :html-fields="['full_desc']" />
+
+            <form action="{{ route('admin.tours.store') }}" method="POST" enctype="multipart/form-data" @submit="validateAll($event)">
                 @csrf
 
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -30,14 +59,6 @@
                             <h2 class="text-xs font-black uppercase tracking-wider text-primary flex items-center gap-2">
                                 <i class="bi bi-info-circle text-base"></i> Basic Information
                             </h2>
-                            
-                            <div>
-                                <label for="tour_name" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Tour Name *</label>
-                                <input type="text" name="name" id="tour_name" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" value="{{ old('name') }}" placeholder="e.g. Premium Desert Safari" required>
-                                @error('name')
-                                    <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
 
                             <div>
                                 <label for="category_id" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Category *</label>
@@ -52,21 +73,51 @@
                                 @enderror
                             </div>
 
-                            <div>
-                                <label for="short_desc" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Short Description (Excerpt) *</label>
-                                <textarea name="short_desc" id="short_desc" rows="2" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 placeholder-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" placeholder="Brief tagline shown on cards" required>{{ old('short_desc') }}</textarea>
-                                @error('short_desc')
-                                    <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
+                            @foreach($languages as $lang)
+                                <div x-show="activeLocale === '{{ $lang->code }}'" x-cloak class="space-y-4">
+                                    <div>
+                                        <div class="flex items-center justify-between mb-1.5">
+                                            <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider">Tour Name ({{ $lang->name }}) *</label>
+                                            @if($lang->isRtl())
+                                                <span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">RTL Mode</span>
+                                            @endif
+                                        </div>
+                                        <input type="text"
+                                               name="name[{{ $lang->code }}]"
+                                               data-locale="{{ $lang->code }}"
+                                               data-field="name"
+                                               dir="{{ $lang->isRtl() ? 'rtl' : 'ltr' }}"
+                                               class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden {{ $lang->isRtl() ? 'text-right font-arabic' : '' }}"
+                                               value="{{ old('name.'.$lang->code) }}"
+                                               placeholder="e.g. {{ $lang->code === 'ar' ? 'رحلة سفاري صحراوية مسائية فاخرة' : 'Premium Desert Safari' }}"
+                                               required>
+                                    </div>
 
-                            <div>
-                                <label for="full_desc" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Full Description *</label>
-                                <textarea name="full_desc" id="full_desc" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 wysiwyg-editor focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" rows="6" placeholder="Detailed description shown on details page" required>{{ old('full_desc') }}</textarea>
-                                @error('full_desc')
-                                    <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Short Description ({{ $lang->name }}) *</label>
+                                        <textarea name="short_desc[{{ $lang->code }}]"
+                                                  data-locale="{{ $lang->code }}"
+                                                  data-field="short_desc"
+                                                  dir="{{ $lang->isRtl() ? 'rtl' : 'ltr' }}"
+                                                  rows="2"
+                                                  class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 placeholder-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden {{ $lang->isRtl() ? 'text-right font-arabic' : '' }}"
+                                                  placeholder="Brief tagline shown on cards"
+                                                  required>{{ old('short_desc.'.$lang->code) }}</textarea>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Full Description ({{ $lang->name }}) *</label>
+                                        <textarea name="full_desc[{{ $lang->code }}]"
+                                                  data-locale="{{ $lang->code }}"
+                                                  data-field="full_desc"
+                                                  dir="{{ $lang->isRtl() ? 'rtl' : 'ltr' }}"
+                                                  class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 wysiwyg-editor focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden {{ $lang->isRtl() ? 'text-right font-arabic' : '' }}"
+                                                  rows="6"
+                                                  placeholder="Detailed description shown on details page"
+                                                  required>{{ old('full_desc.'.$lang->code) }}</textarea>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
 
                         <!-- Package Tiers Pricing Assignment -->
@@ -242,6 +293,7 @@
             </form>
         </div>
     </div>
+</div>
 </div>
 
 <script>

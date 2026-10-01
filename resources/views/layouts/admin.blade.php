@@ -149,6 +149,12 @@
             <a href="{{ route('admin.settings.currency') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.currency*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
                 <i class="bi bi-currency-exchange text-cyan-400 text-base"></i> <span>Currency & Rates</span>
             </a>
+            <a href="{{ route('admin.settings.languages') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.languages*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-translate text-emerald-400 text-base"></i> <span>Languages & Locales</span>
+            </a>
+            <a href="{{ route('admin.settings.translations') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.translations*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-robot text-amber-400 text-base"></i> <span>Translation APIs</span>
+            </a>
             <button type="button" class="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-slate-400 hover:bg-slate-900 hover:text-white transition clear-cache-trigger">
                 <i class="bi bi-arrow-repeat text-amber-400 text-base"></i> <span>Purge Cache</span>
             </button>
@@ -277,6 +283,12 @@
             </a>
             <a href="{{ route('admin.settings.currency') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.currency*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Currency & Rates' : ''">
                 <i class="bi bi-currency-exchange text-cyan-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Currency & Rates</span>
+            </a>
+            <a href="{{ route('admin.settings.languages') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.languages*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Languages & Locales' : ''">
+                <i class="bi bi-translate text-emerald-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Languages & Locales</span>
+            </a>
+            <a href="{{ route('admin.settings.translations') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.translations*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Translation APIs' : ''">
+                <i class="bi bi-robot text-amber-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Translation APIs</span>
             </a>
             <button type="button" class="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-slate-400 hover:bg-slate-900 hover:text-white transition clear-cache-trigger" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Purge Cache' : ''">
                 <i class="bi bi-arrow-repeat text-amber-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Purge Cache</span>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
+use App\Models\Language;
 use App\Models\Tour;
 use App\Services\LocationLandingService;
 use Illuminate\Http\Response;
@@ -51,24 +52,45 @@ class SitemapController extends Controller
     {
         $content = Cache::remember('sitemap_tours_xml', 3600, function () {
             $tours = Tour::where('status', 'active')->select('slug', 'name', 'hero_image', 'updated_at')->get();
+            $languages = Language::getActive();
 
             $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
-            $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">'."\n";
+            $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml">'."\n";
 
             foreach ($tours as $tour) {
-                $xml .= "  <url>\n";
-                $xml .= '    <loc>'.url('/'.$tour->slug)."</loc>\n";
-                $xml .= '    <lastmod>'.($tour->updated_at ? $tour->updated_at->toAtomString() : now()->toAtomString())."</lastmod>\n";
-                $xml .= "    <changefreq>daily</changefreq>\n";
-                $xml .= "    <priority>0.9</priority>\n";
-                if (! empty($tour->hero_image)) {
-                    $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image);
-                    $xml .= "    <image:image>\n";
-                    $xml .= '      <image:loc>'.asset('images/'.$imgFile)."</image:loc>\n";
-                    $xml .= '      <image:title>'.htmlspecialchars($tour->name)."</image:title>\n";
-                    $xml .= "    </image:image>\n";
+                $lastmod = $tour->updated_at ? $tour->updated_at->toAtomString() : now()->toAtomString();
+                $enUrl = url('/'.$tour->slug);
+
+                // Alternates array
+                $alternates = [
+                    'x-default' => $enUrl,
+                ];
+                foreach ($languages as $lang) {
+                    $alternates[$lang->code] = $lang->is_default ? $enUrl : url('/'.$lang->code.'/'.$tour->slug);
                 }
-                $xml .= "  </url>\n";
+
+                // Render entry for each active language
+                foreach ($languages as $lang) {
+                    $pageLoc = $alternates[$lang->code];
+                    $xml .= "  <url>\n";
+                    $xml .= "    <loc>{$pageLoc}</loc>\n";
+                    $xml .= "    <lastmod>{$lastmod}</lastmod>\n";
+                    $xml .= "    <changefreq>daily</changefreq>\n";
+                    $xml .= "    <priority>0.9</priority>\n";
+
+                    foreach ($alternates as $hreflang => $altUrl) {
+                        $xml .= "    <xhtml:link rel=\"alternate\" hreflang=\"{$hreflang}\" href=\"{$altUrl}\" />\n";
+                    }
+
+                    if (! empty($tour->hero_image) && $lang->is_default) {
+                        $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image);
+                        $xml .= "    <image:image>\n";
+                        $xml .= '      <image:loc>'.asset('images/'.$imgFile)."</image:loc>\n";
+                        $xml .= '      <image:title>'.htmlspecialchars($tour->name)."</image:title>\n";
+                        $xml .= "    </image:image>\n";
+                    }
+                    $xml .= "  </url>\n";
+                }
             }
 
             $xml .= '</urlset>';
@@ -86,24 +108,43 @@ class SitemapController extends Controller
     {
         $content = Cache::remember('sitemap_blogs_xml', 3600, function () {
             $blogs = BlogPost::where('status', 'published')->select('slug', 'title', 'featured_image', 'updated_at')->get();
+            $languages = Language::getActive();
 
             $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
-            $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">'."\n";
+            $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml">'."\n";
 
             foreach ($blogs as $blog) {
-                $xml .= "  <url>\n";
-                $xml .= '    <loc>'.url('/blog/'.$blog->slug)."</loc>\n";
-                $xml .= '    <lastmod>'.($blog->updated_at ? $blog->updated_at->toAtomString() : now()->toAtomString())."</lastmod>\n";
-                $xml .= "    <changefreq>weekly</changefreq>\n";
-                $xml .= "    <priority>0.8</priority>\n";
-                if (! empty($blog->featured_image)) {
-                    $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $blog->featured_image);
-                    $xml .= "    <image:image>\n";
-                    $xml .= '      <image:loc>'.asset('images/blog/'.$imgFile)."</image:loc>\n";
-                    $xml .= '      <image:title>'.htmlspecialchars($blog->title)."</image:title>\n";
-                    $xml .= "    </image:image>\n";
+                $lastmod = $blog->updated_at ? $blog->updated_at->toAtomString() : now()->toAtomString();
+                $enUrl = url('/blog/'.$blog->slug);
+
+                $alternates = [
+                    'x-default' => $enUrl,
+                ];
+                foreach ($languages as $lang) {
+                    $alternates[$lang->code] = $lang->is_default ? $enUrl : url('/'.$lang->code.'/blog/'.$blog->slug);
                 }
-                $xml .= "  </url>\n";
+
+                foreach ($languages as $lang) {
+                    $pageLoc = $alternates[$lang->code];
+                    $xml .= "  <url>\n";
+                    $xml .= "    <loc>{$pageLoc}</loc>\n";
+                    $xml .= "    <lastmod>{$lastmod}</lastmod>\n";
+                    $xml .= "    <changefreq>weekly</changefreq>\n";
+                    $xml .= "    <priority>0.8</priority>\n";
+
+                    foreach ($alternates as $hreflang => $altUrl) {
+                        $xml .= "    <xhtml:link rel=\"alternate\" hreflang=\"{$hreflang}\" href=\"{$altUrl}\" />\n";
+                    }
+
+                    if (! empty($blog->featured_image) && $lang->is_default) {
+                        $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $blog->featured_image);
+                        $xml .= "    <image:image>\n";
+                        $xml .= '      <image:loc>'.asset('images/blog/'.$imgFile)."</image:loc>\n";
+                        $xml .= '      <image:title>'.htmlspecialchars($blog->title)."</image:title>\n";
+                        $xml .= "    </image:image>\n";
+                    }
+                    $xml .= "  </url>\n";
+                }
             }
 
             $xml .= '</urlset>';
@@ -119,8 +160,10 @@ class SitemapController extends Controller
      */
     public function pages(): Response
     {
+        $languages = Language::getActive();
+
         $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
-        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
+        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'."\n";
 
         $staticPages = [
             '' => ['changefreq' => 'weekly', 'priority' => '1.0'],
@@ -155,8 +198,6 @@ class SitemapController extends Controller
         $blogMod = $latestBlog?->updated_at ? $latestBlog->updated_at->toAtomString() : $weeklyMod;
 
         foreach ($staticPages as $page => $meta) {
-            $loc = ($page === '' || $page === '/') ? (rtrim(url('/'), '/').'/') : url($page);
-
             if (in_array($page, ['', '/tours', '/dune-buggy-rental-dubai', '/rate-card'], true)) {
                 $pageLastmod = $tourMod;
             } elseif ($page === '/blog') {
@@ -167,12 +208,33 @@ class SitemapController extends Controller
                 $pageLastmod = $weeklyMod;
             }
 
-            $xml .= "  <url>\n";
-            $xml .= '    <loc>'.$loc."</loc>\n";
-            $xml .= '    <lastmod>'.$pageLastmod."</lastmod>\n";
-            $xml .= "    <changefreq>{$meta['changefreq']}</changefreq>\n";
-            $xml .= "    <priority>{$meta['priority']}</priority>\n";
-            $xml .= "  </url>\n";
+            // Alternates
+            $enUrl = ($page === '' || $page === '/') ? (rtrim(url('/'), '/').'/') : url($page);
+            $alternates = [
+                'x-default' => $enUrl,
+            ];
+            foreach ($languages as $lang) {
+                if ($lang->is_default) {
+                    $alternates[$lang->code] = $enUrl;
+                } else {
+                    $alternates[$lang->code] = ($page === '' || $page === '/') ? url('/'.$lang->code) : url('/'.$lang->code.$page);
+                }
+            }
+
+            foreach ($languages as $lang) {
+                $loc = $alternates[$lang->code];
+                $xml .= "  <url>\n";
+                $xml .= '    <loc>'.$loc."</loc>\n";
+                $xml .= '    <lastmod>'.$pageLastmod."</lastmod>\n";
+                $xml .= "    <changefreq>{$meta['changefreq']}</changefreq>\n";
+                $xml .= "    <priority>{$meta['priority']}</priority>\n";
+
+                foreach ($alternates as $hreflang => $altUrl) {
+                    $xml .= "    <xhtml:link rel=\"alternate\" hreflang=\"{$hreflang}\" href=\"{$altUrl}\" />\n";
+                }
+
+                $xml .= "  </url>\n";
+            }
         }
 
         $xml .= '</urlset>';

@@ -2,12 +2,23 @@
 
 namespace App\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class BlogPost extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations;
+
+    public array $translatable = [
+        'title',
+        'subtitle',
+        'excerpt',
+        'content',
+        'meta_title',
+        'meta_desc',
+        'meta_keywords',
+    ];
 
     protected $fillable = [
         'slug', 'title', 'subtitle', 'category_id', 'excerpt', 'content',

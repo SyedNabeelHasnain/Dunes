@@ -2,14 +2,20 @@
 
 namespace App\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class BlogPostFaq extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations;
 
     public $timestamps = false;
+
+    public array $translatable = [
+        'question',
+        'answer',
+    ];
 
     protected $fillable = ['post_id', 'question', 'answer', 'priority'];
 
