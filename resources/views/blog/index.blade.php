@@ -37,13 +37,13 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-16">
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="flex items-center gap-2 text-xs sm:text-sm text-white/70">
-                <li><a href="{{ route('home') }}" class="hover:text-white transition-colors">Home</a></li>
+                <li><a href="{{ route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') }}</a></li>
                 <li><span class="text-white/40">/</span></li>
                 <li class="{{ !$cat ? 'text-white font-semibold' : '' }}">
                     @if($cat)
-                        <a href="{{ route('blog.index') }}" class="hover:text-white transition-colors">Blog</a>
+                        <a href="{{ route('blog.index') }}" class="hover:text-white transition-colors">{{ __('ui.nav.blog') }}</a>
                     @else
-                        Blog
+                        {{ __('ui.nav.blog') }}
                     @endif
                 </li>
                 @if ($cat)
@@ -58,14 +58,14 @@
             @elseif ($search)
                 Search: <em class="text-amber-400 not-italic">"{{ $search }}"</em>
             @else
-                Dubai Travel Blog
+                {{ __('ui.blog.title') }}
             @endif
         </h1>
         <p class="text-slate-300 text-sm sm:text-base max-w-2xl leading-relaxed">
             @if ($cat && $cat->description)
                 {{ $cat->description }}
             @elseif (!$search)
-                Expert guides, travel tips, and stories from Dubai's desert safari specialists.
+                {{ __('ui.blog.subtitle') }}
             @else
                 {{ $total }} {{ Str::plural('result', $total) }} found for "{{ $search }}"
             @endif
@@ -78,7 +78,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex gap-2 overflow-x-auto no-scrollbar w-full sm:w-auto pb-1">
-                <a href="{{ route('blog.index') }}" class="rounded-full px-4 py-1.5 text-xs sm:text-sm font-bold whitespace-nowrap transition-colors {{ !$categorySlug && !$search ? 'bg-primary text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">All</a>
+                <a href="{{ route('blog.index') }}" class="rounded-full px-4 py-1.5 text-xs sm:text-sm font-bold whitespace-nowrap transition-colors {{ !$categorySlug && !$search ? 'bg-primary text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">{{ __('ui.common.view_all') }}</a>
                 @foreach ($categories as $c)
                 <a href="{{ route('blog.index', ['category' => $c->slug]) }}" class="rounded-full px-4 py-1.5 text-xs sm:text-sm font-bold whitespace-nowrap transition-colors {{ $categorySlug === $c->slug ? 'bg-primary text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">{{ $c->name }}</a>
                 @endforeach
@@ -88,7 +88,7 @@
                     <input type="hidden" name="category" value="{{ $categorySlug }}">
                 @endif
                 <div class="relative w-full sm:w-64">
-                    <input type="search" name="search" class="w-full rounded-full pl-4 pr-10 py-1.5 bg-slate-100 border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/40" placeholder="Search articles..." value="{{ $search }}">
+                    <input type="search" name="search" class="w-full rounded-full pl-4 pr-10 py-1.5 bg-slate-100 border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/40" placeholder="{{ __('ui.nav.search') }}..." value="{{ $search }}">
                     <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-primary transition-colors" aria-label="Search articles">
                         <i class="bi bi-search text-xs"></i>
                     </button>
@@ -104,7 +104,7 @@
     <div class="mb-12">
         <div class="flex items-center gap-2 mb-6">
             <span class="bg-amber-400 text-slate-950 font-bold px-3.5 py-1 rounded-full text-xs inline-flex items-center gap-1.5">
-                <i class="bi bi-star-fill"></i> Featured Guides
+                <i class="bi bi-star-fill"></i> {{ __('ui.common.featured') }}
             </span>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
@@ -130,7 +130,7 @@
                             </div>
                             <div class="flex items-center gap-4 text-slate-500 text-xs pt-3 border-t border-slate-200">
                                 <span><i class="bi bi-person text-primary mr-1"></i>{{ $featuredPost->author_name ?: 'Dunes Discovery' }}</span>
-                                <span><i class="bi bi-clock text-primary mr-1"></i>{{ $featuredPost->read_time }} min read</span>
+                                <span><i class="bi bi-clock text-primary mr-1"></i>{{ $featuredPost->read_time }} {{ __('ui.blog.read_time') }}</span>
                                 @if ($featuredPost->published_at)
                                     <span><i class="bi bi-calendar3 text-primary mr-1"></i>{{ $featuredPost->published_at->format('M j, Y') }}</span>
                                 @endif

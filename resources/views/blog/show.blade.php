@@ -54,7 +54,7 @@
         'url' => $canonical,
         'wordCount' => str_word_count(strip_tags($post->content ?? '')),
         'timeRequired' => 'PT' . (int)($post->read_time ?: 5) . 'M',
-        'inLanguage' => 'en',
+        'inLanguage' => app()->getLocale(),
         'keywords' => $pageKeys,
         'articleSection' => $post->category ? $post->category->name : 'Travel'
     ];
@@ -102,9 +102,9 @@
             <!-- Breadcrumbs -->
             <nav aria-label="breadcrumb" class="mb-4">
                 <ol class="flex items-center gap-2 text-xs sm:text-sm text-white/70 flex-wrap">
-                    <li><a href="{{ route('home') }}" class="hover:text-white transition-colors">Home</a></li>
+                    <li><a href="{{ route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') }}</a></li>
                     <li><span class="text-white/40">/</span></li>
-                    <li><a href="{{ route('blog.index') }}" class="hover:text-white transition-colors">Blog</a></li>
+                    <li><a href="{{ route('blog.index') }}" class="hover:text-white transition-colors">{{ __('ui.nav.blog') }}</a></li>
                     @if ($post->category)
                     <li><span class="text-white/40">/</span></li>
                     <li><a href="{{ route('blog.index', ['category' => $post->category?->slug]) }}" class="hover:text-white transition-colors">{{ $post->category?->name }}</a></li>
@@ -141,7 +141,7 @@
                     @if ($publishedAt)
                     <span itemprop="datePublished" content="{{ $publishedAt->toIso8601String() }}"><i class="bi bi-calendar3 mr-1 text-primary"></i>{{ $publishedAt->format('F j, Y') }}</span>
                     @endif
-                    <span><i class="bi bi-clock mr-1 text-primary"></i>{{ $post->read_time }} min read</span>
+                    <span><i class="bi bi-clock mr-1 text-primary"></i>{{ $post->read_time }} {{ __('ui.blog.read_time') }}</span>
                 </div>
             </div>
         </div>
@@ -195,7 +195,7 @@
                 <div class="mt-12 pt-8 border-t border-slate-200" id="faqs" x-data="{ openFaq: 0 }">
                     <h2 class="text-xl sm:text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
                         <i class="bi bi-question-circle text-primary"></i>
-                        <span>Frequently Asked Questions</span>
+                        <span>{{ __('ui.tour.faqs') }}</span>
                     </h2>
                     <div class="space-y-3">
                         @foreach ($post->faqs as $fi => $faq)
@@ -296,7 +296,7 @@
                     <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
                         <div class="p-4 border-b border-slate-200">
                             <h3 class="font-bold text-sm text-slate-900 flex items-center gap-1.5">
-                                <i class="bi bi-newspaper text-primary"></i>Related Articles
+                                <i class="bi bi-newspaper text-primary"></i>{{ __('ui.blog.related_posts') }}
                             </h3>
                         </div>
                         <div class="divide-y divide-slate-200">
@@ -306,7 +306,7 @@
                                 <img src="{{ $rpImg }}" class="w-13 h-13 object-cover rounded-xl shrink-0" loading="lazy" alt="{{ $rp->title }}">
                                 <div>
                                     <div class="font-bold text-slate-900 text-xs line-clamp-2 group-hover:text-primary transition-colors leading-snug">{{ $rp->title }}</div>
-                                    <span class="text-slate-500 text-[11px] mt-1 block"><i class="bi bi-clock mr-1 text-primary"></i>{{ $rp->read_time }} min</span>
+                                    <span class="text-slate-500 text-[11px] mt-1 block"><i class="bi bi-clock mr-1 text-primary"></i>{{ $rp->read_time }} {{ __('ui.blog.read_time') }}</span>
                                 </div>
                             </a>
                             @endforeach
@@ -332,7 +332,7 @@
 @if ($relatedPosts->count() > 0)
 <section class="py-12 sm:py-16 bg-slate-50 border-t border-slate-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-2xl font-extrabold text-slate-900 mb-8">You Might Also Like</h2>
+        <h2 class="text-2xl font-extrabold text-slate-900 mb-8">{{ __('ui.blog.related_posts') }}</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             @foreach ($relatedPosts as $rp)
             @php $rpImg = $rp->featured_image ? asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $rp->featured_image)) : asset('images/desert-safari-poster.avif'); @endphp
