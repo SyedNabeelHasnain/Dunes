@@ -253,4 +253,27 @@ class MultiLanguageArchitectureTest extends TestCase
         $response->assertSee('xhtml:link rel="alternate" hreflang="ar"', false);
         $response->assertSee('xhtml:link rel="alternate" hreflang="en"', false);
     }
+
+    /**
+     * Test bulletproof fallback resiliency when languages table is missing or unmigrated.
+     */
+    public function test_fallback_resiliency_when_languages_table_is_missing(): void
+    {
+        \Illuminate\Support\Facades\Schema::dropIfExists('languages');
+        Language::clearLanguageCache();
+
+        $active = Language::getActive();
+        $this->assertNotEmpty($active);
+        $this->assertEquals('en', $active->first()->code);
+
+        $default = Language::getDefault();
+        $this->assertNotNull($default);
+        $this->assertEquals('en', $default->code);
+
+        $codes = Language::getActiveCodes();
+        $this->assertEquals(['en'], $codes);
+
+        $switchUrl = switch_locale_url('ar');
+        $this->assertStringContainsString('/ar', $switchUrl);
+    }
 }

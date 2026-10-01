@@ -5,7 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class Language extends Model
 {
@@ -73,14 +76,65 @@ class Language extends Model
     }
 
     /**
+     * Fallback collection with default English language in memory.
+     *
+     * @return Collection<int, Language>
+     */
+    public static function fallbackCollection(): Collection
+    {
+        $english = new self([
+            'id' => 1,
+            'code' => 'en',
+            'name' => 'English',
+            'native_name' => 'English',
+            'direction' => 'ltr',
+            'flag' => 'gb',
+            'is_default' => true,
+            'is_active' => true,
+            'sort_order' => 1,
+        ]);
+
+        return new Collection([$english]);
+    }
+
+    /**
+     * Fallback default English language instance.
+     */
+    public static function fallbackDefault(): self
+    {
+        return new self([
+            'id' => 1,
+            'code' => 'en',
+            'name' => 'English',
+            'native_name' => 'English',
+            'direction' => 'ltr',
+            'flag' => 'gb',
+            'is_default' => true,
+            'is_active' => true,
+            'sort_order' => 1,
+        ]);
+    }
+
+    /**
      * Get the default system language (English).
      */
     public static function getDefault(): ?self
     {
-        return Cache::rememberForever('language_default', function () {
-            return self::where('code', 'en')->first()
-                ?? self::where('is_default', true)->first();
-        });
+        try {
+            if (! Schema::hasTable('languages')) {
+                return self::fallbackDefault();
+            }
+
+            return Cache::rememberForever('language_default', function () {
+                return self::where('code', 'en')->first()
+                    ?? self::where('is_default', true)->first()
+                    ?? self::fallbackDefault();
+            });
+        } catch (\Throwable $e) {
+            Log::warning('Language::getDefault() query failed: '.$e->getMessage());
+
+            return self::fallbackDefault();
+        }
     }
 
     /**
@@ -90,13 +144,34 @@ class Language extends Model
      */
     public static function getActive(): Collection
     {
-        return Cache::rememberForever('languages_active', function () {
-            return self::where('is_active', true)
-                ->orderBy('is_default', 'desc')
-                ->orderBy('sort_order', 'asc')
-                ->orderBy('name', 'asc')
-                ->get();
-        });
+        try {
+            // Self-healing: if languages table does not exist yet, trigger migration safely
+            if (! Schema::hasTable('languages')) {
+                try {
+                    Artisan::call('migrate', ['--force' => true]);
+                } catch (\Throwable $migrationError) {
+                    Log::warning('Self-healing migration failed: '.$migrationError->getMessage());
+                }
+
+                if (! Schema::hasTable('languages')) {
+                    return self::fallbackCollection();
+                }
+            }
+
+            return Cache::rememberForever('languages_active', function () {
+                $languages = self::where('is_active', true)
+                    ->orderBy('is_default', 'desc')
+                    ->orderBy('sort_order', 'asc')
+                    ->orderBy('name', 'asc')
+                    ->get();
+
+                return $languages->isNotEmpty() ? $languages : self::fallbackCollection();
+            });
+        } catch (\Throwable $e) {
+            Log::warning('Language::getActive() query failed: '.$e->getMessage());
+
+            return self::fallbackCollection();
+        }
     }
 
     /**
@@ -106,7 +181,13 @@ class Language extends Model
      */
     public static function getActiveCodes(): array
     {
-        return self::getActive()->pluck('code')->toArray();
+        try {
+            $codes = self::getActive()->pluck('code')->toArray();
+
+            return ! empty($codes) ? $codes : ['en'];
+        } catch (\Throwable $e) {
+            return ['en'];
+        }
     }
 
     /**
@@ -114,8 +195,12 @@ class Language extends Model
      */
     public static function clearLanguageCache(): void
     {
-        Cache::forget('language_default');
-        Cache::forget('languages_active');
-        Cache::forget('all_languages');
+        try {
+            Cache::forget('language_default');
+            Cache::forget('languages_active');
+            Cache::forget('all_languages');
+        } catch (\Throwable $e) {
+            // Silently ignore cache clearing issues during bootstrap/migration
+        }
     }
 }

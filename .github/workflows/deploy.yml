@@ -204,7 +204,7 @@ jobs:
       run: |
         SUCCESS=0
         for i in 1 2 3; do
-          if sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 u410503041@${{ steps.ftp_server.outputs.host }} "cd /home/u410503041/domains/dunesdiscoverytourism.com/public_html && unzip -o public.zip && rm -f public.zip && cd /home/u410503041/public_html && unzip -o public.zip && rm -f public.zip && cd /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel && unzip -o core.zip && rm -f core.zip && rm -rf storage/framework/views && mkdir -p storage/framework/views && find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html -type d -exec chmod 755 {} + && find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html -type f -exec chmod 644 {} + && chmod -R 775 /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/storage /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/bootstrap/cache && php artisan migrate --force; php artisan config:clear; php artisan cache:clear; php artisan route:clear; php artisan view:clear; php artisan event:clear; touch /home/u410503041/domains/dunesdiscoverytourism.com/public_html/.htaccess /home/u410503041/public_html/.htaccess"; then
+          if sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 u410503041@${{ steps.ftp_server.outputs.host }} "cd /home/u410503041/domains/dunesdiscoverytourism.com/public_html && unzip -o public.zip && rm -f public.zip && cd /home/u410503041/public_html && unzip -o public.zip && rm -f public.zip && cd /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel && unzip -o core.zip && rm -f core.zip && rm -rf storage/framework/views && mkdir -p storage/framework/views && find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html -type d -exec chmod 755 {} + && find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html -type f -exec chmod 644 {} + && chmod -R 775 /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/storage /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/bootstrap/cache && PHP_BIN=\$(which php8.5 2>/dev/null || which php8.4 2>/dev/null || which php84 2>/dev/null || which ea-php84 2>/dev/null || which /usr/bin/php8.5 2>/dev/null || which /usr/bin/php8.4 2>/dev/null || which /opt/alt/php84/usr/bin/php 2>/dev/null || which php); echo \"Using PHP binary: \$PHP_BIN\"; \$PHP_BIN -v; \$PHP_BIN artisan migrate --force; \$PHP_BIN artisan config:clear; \$PHP_BIN artisan cache:clear; \$PHP_BIN artisan route:clear; \$PHP_BIN artisan view:clear; \$PHP_BIN artisan event:clear; touch /home/u410503041/domains/dunesdiscoverytourism.com/public_html/.htaccess /home/u410503041/public_html/.htaccess"; then
             SUCCESS=1
             break
           fi
@@ -218,6 +218,25 @@ jobs:
 
     - name: Trigger Web-Based Health Check
       run: |
+        echo "Testing homepage..."
         curl -i -s "https://dunesdiscoverytourism.com/" | head -n 25
+        echo "Testing geo-landing page..."
         curl -i -s "https://dunesdiscoverytourism.com/desert-safari-from-dubai-marina" | head -n 15
+        echo "Testing about page..."
+        curl -i -s "https://dunesdiscoverytourism.com/about" | head -n 15
+        echo "Testing tours page..."
+        curl -i -s "https://dunesdiscoverytourism.com/tours" | head -n 15
+        echo "Testing sitemap..."
+        curl -i -s "https://dunesdiscoverytourism.com/sitemap-pages.xml" | head -n 15
+
+        # Strict HTTP status verification
+        for url in "https://dunesdiscoverytourism.com/" "https://dunesdiscoverytourism.com/about" "https://dunesdiscoverytourism.com/tours" "https://dunesdiscoverytourism.com/desert-safari-from-dubai-marina" "https://dunesdiscoverytourism.com/sitemap-pages.xml"; do
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+          echo "Status for $url: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "Health check failed for $url with status $STATUS"
+            exit 1
+          fi
+        done
+        echo "All live health checks passed with 200 OK!"
 

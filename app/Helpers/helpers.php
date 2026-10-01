@@ -149,11 +149,17 @@ if (! function_exists('switch_locale_url')) {
         // Check if the first segment is an active non-default language
         if (! empty($segments)) {
             $first = $segments[0];
-            $languages = \App\Models\Language::getActive();
-            if ($languages->contains('code', $first) && $first !== 'en') {
-                array_shift($segments);
-            } elseif ($first === 'en') {
-                array_shift($segments);
+            try {
+                $languages = \App\Models\Language::getActive();
+                if ($languages->contains('code', $first) && $first !== 'en') {
+                    array_shift($segments);
+                } elseif ($first === 'en') {
+                    array_shift($segments);
+                }
+            } catch (\Throwable $e) {
+                if ($first === 'en' || $first === 'ar') {
+                    array_shift($segments);
+                }
             }
         }
 

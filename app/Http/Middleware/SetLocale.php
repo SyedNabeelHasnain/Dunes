@@ -46,16 +46,7 @@ class SetLocale
         try {
             $activeLanguages = Language::getActive();
         } catch (\Throwable $e) {
-            $activeLanguages = collect([
-                new Language([
-                    'code' => 'en',
-                    'name' => 'English',
-                    'native_name' => 'English',
-                    'direction' => 'ltr',
-                    'is_default' => true,
-                    'is_active' => true,
-                ]),
-            ]);
+            $activeLanguages = Language::fallbackCollection();
         }
 
         // Rule 2: Check if segment 1 matches an active non-default language

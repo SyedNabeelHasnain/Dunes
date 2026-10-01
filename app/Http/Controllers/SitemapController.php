@@ -52,7 +52,11 @@ class SitemapController extends Controller
     {
         $content = Cache::remember('sitemap_tours_xml', 3600, function () {
             $tours = Tour::where('status', 'active')->select('slug', 'name', 'hero_image', 'updated_at')->get();
-            $languages = Language::getActive();
+            try {
+                $languages = Language::getActive();
+            } catch (\Throwable $e) {
+                $languages = Language::fallbackCollection();
+            }
 
             $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
             $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml">'."\n";
@@ -108,7 +112,11 @@ class SitemapController extends Controller
     {
         $content = Cache::remember('sitemap_blogs_xml', 3600, function () {
             $blogs = BlogPost::where('status', 'published')->select('slug', 'title', 'featured_image', 'updated_at')->get();
-            $languages = Language::getActive();
+            try {
+                $languages = Language::getActive();
+            } catch (\Throwable $e) {
+                $languages = Language::fallbackCollection();
+            }
 
             $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
             $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml">'."\n";
@@ -160,7 +168,11 @@ class SitemapController extends Controller
      */
     public function pages(): Response
     {
-        $languages = Language::getActive();
+        try {
+            $languages = Language::getActive();
+        } catch (\Throwable $e) {
+            $languages = Language::fallbackCollection();
+        }
 
         $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
         $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'."\n";
