@@ -37,6 +37,32 @@ use App\Http\Controllers\VoucherController;
 use App\Http\Middleware\AdminNoCacheMiddleware;
 use Illuminate\Support\Facades\Route;
 
+// ── Maintenance & Diagnostic Route ──────────────────────────────────────────
+Route::get('/system/migrate-status', function () {
+    try {
+        $hasBefore = \Illuminate\Support\Facades\Schema::hasTable('languages');
+        $exitCode = \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        $artisanOutput = \Illuminate\Support\Facades\Artisan::output();
+        \App\Models\Language::clearLanguageCache();
+        $hasAfter = \Illuminate\Support\Facades\Schema::hasTable('languages');
+        $activeLangs = $hasAfter ? \App\Models\Language::all()->toArray() : [];
+
+        return response()->json([
+            'has_languages_before' => $hasBefore,
+            'exit_code' => $exitCode,
+            'artisan_output' => $artisanOutput,
+            'has_languages_after' => $hasAfter,
+            'languages' => $activeLangs,
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'line' => $e->getLine(),
+            'file' => $e->getFile(),
+        ], 500);
+    }
+});
+
 // ── Front-Facing Pages ────────────────────────────────────────────────────────
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [PageController::class, 'about'])->name('about');
