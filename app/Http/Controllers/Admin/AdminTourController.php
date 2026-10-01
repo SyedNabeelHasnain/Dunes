@@ -54,19 +54,28 @@ class AdminTourController extends Controller
             'short_desc' => 'required',
             'full_desc' => 'required',
             'duration' => 'required|string|max:255',
-            'pickup_time' => 'required|string|max:255',
-            'dropoff_time' => 'required|string|max:255',
+            'pickup_time' => 'nullable|string|max:255',
+            'dropoff_time' => 'nullable|string|max:255',
             'priority' => 'required|integer',
             'status' => 'required|string|in:active,inactive',
-            'hero_image' => 'nullable|image|max:4096',
-            'thumb_image' => 'nullable|image|max:2048',
+            'hero_image' => 'nullable|image|max:5120',
+            'thumb_image' => 'nullable|image|max:3072',
         ]);
 
         $data = $this->normalizeLocalizedData(
             $request->except(['tiers', 'addons', 'hero_image', 'thumb_image']),
             ['name', 'short_desc', 'full_desc', 'meta_title', 'meta_desc', 'meta_keywords']
         );
-        $data['slug'] = Str::slug($this->extractSlugSource($request->name));
+        $baseSlug = Str::slug($this->extractSlugSource($request->name));
+        $slug = ! empty($baseSlug) ? $baseSlug : 'tour-'.time();
+        $counter = 1;
+        while (Tour::where('slug', $slug)->exists()) {
+            $slug = $baseSlug.'-'.$counter;
+            $counter++;
+        }
+        $data['slug'] = $slug;
+        $data['is_featured'] = $request->boolean('is_featured');
+        $data['is_bestseller'] = $request->boolean('is_bestseller');
 
         // Handle image uploads
         if ($request->hasFile('hero_image')) {
@@ -82,10 +91,10 @@ class AdminTourController extends Controller
         if ($request->has('tiers')) {
             $tiersData = [];
             foreach ($request->input('tiers') as $tierId => $pivot) {
-                if (isset($pivot['price'])) {
+                if (isset($pivot['price']) && $pivot['price'] !== '' && $pivot['price'] !== null) {
                     $tiersData[$tierId] = [
                         'price' => (float) $pivot['price'],
-                        'old_price' => isset($pivot['old_price']) ? (float) $pivot['old_price'] : null,
+                        'old_price' => ! empty($pivot['old_price']) ? (float) $pivot['old_price'] : null,
                         'price_type' => $pivot['price_type'] ?? 'per person',
                     ];
                 }
@@ -96,7 +105,7 @@ class AdminTourController extends Controller
         if ($request->has('addons')) {
             $addonsData = [];
             foreach ($request->input('addons') as $addonId => $pivot) {
-                if (isset($pivot['price'])) {
+                if (isset($pivot['price']) && $pivot['price'] !== '' && $pivot['price'] !== null) {
                     $addonsData[$addonId] = [
                         'price' => (float) $pivot['price'],
                     ];
@@ -140,8 +149,8 @@ class AdminTourController extends Controller
             'short_desc' => 'required',
             'full_desc' => 'required',
             'duration' => 'required|string|max:255',
-            'pickup_time' => 'required|string|max:255',
-            'dropoff_time' => 'required|string|max:255',
+            'pickup_time' => 'nullable|string|max:255',
+            'dropoff_time' => 'nullable|string|max:255',
             'priority' => 'required|integer',
             'status' => 'required|string|in:active,inactive',
             'hero_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:5120',
@@ -153,8 +162,19 @@ class AdminTourController extends Controller
             ['name', 'short_desc', 'full_desc', 'meta_title', 'meta_desc', 'meta_keywords']
         );
         if ($request->has('name')) {
-            $data['slug'] = Str::slug($this->extractSlugSource($request->name));
+            $baseSlug = Str::slug($this->extractSlugSource($request->name));
+            if (! empty($baseSlug)) {
+                $slug = $baseSlug;
+                $counter = 1;
+                while (Tour::where('slug', $slug)->where('id', '!=', $tour->id)->exists()) {
+                    $slug = $baseSlug.'-'.$counter;
+                    $counter++;
+                }
+                $data['slug'] = $slug;
+            }
         }
+        $data['is_featured'] = $request->boolean('is_featured');
+        $data['is_bestseller'] = $request->boolean('is_bestseller');
 
         if ($request->hasFile('hero_image')) {
             $data['hero_image'] = $request->file('hero_image')->store('tours/hero', 'public');
@@ -169,7 +189,7 @@ class AdminTourController extends Controller
         if ($request->has('tiers')) {
             $tiersData = [];
             foreach ($request->input('tiers') as $tierId => $pivot) {
-                if (isset($pivot['price'])) {
+                if (isset($pivot['price']) && $pivot['price'] !== '' && $pivot['price'] !== null) {
                     $tiersData[$tierId] = [
                         'price' => (float) $pivot['price'],
                         'old_price' => ! empty($pivot['old_price']) ? (float) $pivot['old_price'] : null,
@@ -183,7 +203,7 @@ class AdminTourController extends Controller
         if ($request->has('addons')) {
             $addonsData = [];
             foreach ($request->input('addons') as $addonId => $pivot) {
-                if (isset($pivot['price'])) {
+                if (isset($pivot['price']) && $pivot['price'] !== '' && $pivot['price'] !== null) {
                     $addonsData[$addonId] = [
                         'price' => (float) $pivot['price'],
                     ];
