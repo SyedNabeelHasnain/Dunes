@@ -203,6 +203,11 @@ return [
         'subject' => 'Subject',
         'your_message' => 'Your Message',
         'send_btn' => 'Send Message',
+        'google_reviews' => 'Google Reviews',
+        'write_review' => 'Write a Review',
+        'get_directions' => 'Get Directions',
+        'business_hours' => '24/7 Operations & Concierge',
+        'license_verified' => 'DET Licensed Operator #1430583',
     ],
 
     // Tour Tabs

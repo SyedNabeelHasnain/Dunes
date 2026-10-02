@@ -22,6 +22,8 @@ class AdminSettingController extends Controller
             'site_address', 'company_license_number', 'google_maps_embed_url',
             'social_tripadvisor', 'social_google', 'social_facebook', 'social_instagram',
             'social_youtube', 'social_tiktok', 'footer_about', 'site_copyright',
+            'site_latitude', 'site_longitude', 'site_postal_code',
+            'google_place_id', 'google_cid', 'google_review_url',
         ];
 
         $settings = Setting::whereIn('setting_key', $keys)
@@ -69,6 +71,12 @@ class AdminSettingController extends Controller
     {
         $settings = Setting::where('setting_key', 'like', 'google_%')
             ->orWhere('setting_key', 'like', 'recaptcha_%')
+            ->orWhereIn('setting_key', [
+                'site_latitude', 'site_longitude', 'site_postal_code',
+                'company_license_number', 'site_address', 'site_name', 'site_phone',
+                'google_place_id', 'google_cid', 'google_review_url',
+                'google_business_hours', 'google_service_area', 'google_primary_category'
+            ])
             ->get()
             ->pluck('setting_value', 'setting_key');
 
@@ -134,10 +142,13 @@ class AdminSettingController extends Controller
             'promo_welcome_modal_subheadline', 'promo_welcome_modal_discount',
             'promo_welcome_modal_timer_minutes', 'promo_welcome_modal_delay_seconds',
 
-            // Google Integrations
+            // Google Integrations & Business Profile (Local SEO)
             'google_active', 'google_gtm_id', 'google_ga4_id', 'google_analytics_id', 'google_tag_manager_id',
             'google_ads_id', 'google_conversion_label', 'google_site_verification', 'google_maps_api_key',
             'recaptcha_site_key', 'recaptcha_secret_key',
+            'google_place_id', 'google_cid', 'google_review_url',
+            'site_latitude', 'site_longitude', 'site_postal_code',
+            'google_business_hours', 'google_service_area', 'google_primary_category',
 
             // Meta Integrations
             'meta_active', 'meta_pixel_id', 'meta_access_token', 'meta_capi_enabled', 'meta_test_event_code',

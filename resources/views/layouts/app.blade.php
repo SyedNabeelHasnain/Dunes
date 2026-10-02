@@ -35,6 +35,15 @@
     $conciergePromoActive = isset($settings['concierge_promo_active']) && $settings['concierge_promo_active'] === '1';
     $conciergePromoDiscount = $settings['concierge_promo_discount'] ?? '5';
 
+    $siteLat = $settings['site_latitude'] ?? '25.2048';
+    $siteLng = $settings['site_longitude'] ?? '55.2708';
+    $googlePlaceId = $settings['google_place_id'] ?? 'ChIJbWsIEIVEdEER4uHEhb2dbcQ';
+    $googleCid = $settings['google_cid'] ?? '14185012580795441634';
+    $googleReviewUrl = $settings['google_review_url'] ?? (!empty($googlePlaceId) ? "https://search.google.com/local/writereview?placeid={$googlePlaceId}" : '');
+    $detLicense = $settings['company_license_number'] ?? ($settings['site_det_license'] ?? '1430583');
+    $sitePostalCode = $settings['site_postal_code'] ?? '00000';
+    $siteAddress = $settings['site_address'] ?? 'Al Fahidi, Bur Dubai, Dubai, United Arab Emirates';
+
     $currentYear = date('Y');
     $pageTitle = $pageTitle ?? "Dunes Discovery Tourism | Dubai Desert Safari Tours ({$currentYear})";
     $pageDesc = $pageDesc ?? 'Book Dubai best desert safari tours from AED 99. Evening safari, city tours, dhow cruises with instant confirmation.';
@@ -164,6 +173,8 @@
     
     <meta name="geo.region" content="AE-DU">
     <meta name="geo.placename" content="Dubai">
+    <meta name="geo.position" content="{{ $siteLat }};{{ $siteLng }}">
+    <meta name="ICBM" content="{{ $siteLat }}, {{ $siteLng }}">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -238,11 +249,27 @@
           "priceRange": "AED 79 - AED 1500",
           "currenciesAccepted": "AED, USD, EUR, GBP",
           "paymentAccepted": "Cash, Credit Card, Debit Card, Ziina",
-          "identifier": {
-            "@@type": "PropertyValue",
-            "propertyID": "DET Tourism License",
-            "value": "{{ $settings['site_det_license'] ?? '1430583' }}"
-          },
+          "identifier": [
+            {
+              "@@type": "PropertyValue",
+              "propertyID": "DET Tourism License",
+              "value": "{{ $detLicense }}"
+            }
+            @if(!empty($googlePlaceId))
+            ,{
+              "@@type": "PropertyValue",
+              "propertyID": "Google Place ID",
+              "value": "{{ $googlePlaceId }}"
+            }
+            @endif
+            @if(!empty($googleCid))
+            ,{
+              "@@type": "PropertyValue",
+              "propertyID": "Google CID",
+              "value": "{{ $googleCid }}"
+            }
+            @endif
+          ],
           "hasCredential": {
             "@@type": "EducationalOccupationalCredential",
             "name": "Dubai Department of Economy and Tourism (DET) Tourism Operator License",
@@ -286,16 +313,18 @@
           @endif
           "address": {
             "@@type": "PostalAddress",
+            "streetAddress": "{{ $siteAddress }}",
             "addressLocality": "Dubai",
             "addressRegion": "Dubai",
+            "postalCode": "{{ $sitePostalCode }}",
             "addressCountry": "AE"
           },
           "geo": {
             "@@type": "GeoCoordinates",
-            "latitude": 25.2048,
-            "longitude": 55.2708
+            "latitude": {{ (float)$siteLat }},
+            "longitude": {{ (float)$siteLng }}
           },
-          "hasMap": "https://maps.google.com/?q=25.2048,55.2708",
+          "hasMap": "https://maps.google.com/?q={{ $siteLat }},{{ $siteLng }}",
           "contactPoint": [
             {
               "@@type": "ContactPoint",
@@ -319,6 +348,12 @@
             "closes": "23:59"
           },
           "sameAs": [
+            @if(!empty($googleReviewUrl))
+            "{{ $googleReviewUrl }}",
+            @endif
+            @if(!empty($googleCid))
+            "https://maps.google.com/?cid={{ $googleCid }}",
+            @endif
             "https://www.facebook.com/dunesdiscoverytourism",
             "https://www.instagram.com/dunesdiscoverytourism",
             "https://www.tripadvisor.com"

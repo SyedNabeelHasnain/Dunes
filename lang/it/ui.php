@@ -203,6 +203,11 @@ return [
         'subject' => 'Oggetto',
         'your_message' => 'Il tuo messaggio',
         'send_btn' => 'Invia messaggio',
+        'google_reviews' => 'Recensioni Google',
+        'write_review' => 'Scrivi una recensione',
+        'get_directions' => 'Ottieni indicazioni',
+        'business_hours' => 'Operativo e Concierge 24/7',
+        'license_verified' => 'Operatore licenziato DET #1430583',
     ],
 
     // Schede del tour

@@ -203,6 +203,11 @@ return [
         'subject' => 'Asunto',
         'your_message' => 'Su mensaje',
         'send_btn' => 'Enviar mensaje',
+        'google_reviews' => 'Reseñas de Google',
+        'write_review' => 'Escribir una reseña',
+        'get_directions' => 'Cómo llegar',
+        'business_hours' => 'Operaciones y Concierge 24/7',
+        'license_verified' => 'Operador autorizado DET #1430583',
     ],
 
     // Pestañas del tour

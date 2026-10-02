@@ -634,5 +634,59 @@
         "setting_key": "promo_welcome_modal_delay_seconds",
         "setting_value": "5",
         "updated_at": "2026-09-16 23:13:31"
+    },
+    {
+        "id": 107,
+        "setting_key": "google_place_id",
+        "setting_value": "ChIJbWsIEIVEdEER4uHEhb2dbcQ",
+        "updated_at": "2026-10-02 12:00:00"
+    },
+    {
+        "id": 108,
+        "setting_key": "google_cid",
+        "setting_value": "14185012580795441634",
+        "updated_at": "2026-10-02 12:00:00"
+    },
+    {
+        "id": 109,
+        "setting_key": "google_review_url",
+        "setting_value": "https://search.google.com/local/writereview?placeid=ChIJbWsIEIVEdEER4uHEhb2dbcQ",
+        "updated_at": "2026-10-02 12:00:00"
+    },
+    {
+        "id": 110,
+        "setting_key": "site_latitude",
+        "setting_value": "25.2048493",
+        "updated_at": "2026-10-02 12:00:00"
+    },
+    {
+        "id": 111,
+        "setting_key": "site_longitude",
+        "setting_value": "55.2707828",
+        "updated_at": "2026-10-02 12:00:00"
+    },
+    {
+        "id": 112,
+        "setting_key": "site_postal_code",
+        "setting_value": "00000",
+        "updated_at": "2026-10-02 12:00:00"
+    },
+    {
+        "id": 113,
+        "setting_key": "google_business_hours",
+        "setting_value": "Monday - Sunday: 24 Hours (00:00 - 23:59)",
+        "updated_at": "2026-10-02 12:00:00"
+    },
+    {
+        "id": 114,
+        "setting_key": "google_service_area",
+        "setting_value": "Dubai, Sharjah, Ajman, Lahbab Desert, Al Marmoom, United Arab Emirates",
+        "updated_at": "2026-10-02 12:00:00"
+    },
+    {
+        "id": 115,
+        "setting_key": "google_primary_category",
+        "setting_value": "Tour Operator",
+        "updated_at": "2026-10-02 12:00:00"
     }
 ]

@@ -35,25 +35,40 @@
         "name": "{{ $settings['site_name'] ?? 'Dunes Discovery Tourism LLC' }}",
         "telephone": "{{ $settings['site_phone'] ?? '+971 50 245 6056' }}",
         "email": "{{ $settings['site_email'] ?? 'info@dunesdiscoverytourism.com' }}",
+        "hasMap": "https://maps.google.com/?q={{ $settings['site_latitude'] ?? '25.2048' }},{{ $settings['site_longitude'] ?? '55.2708' }}",
         "address": {
           "@type": "PostalAddress",
-          "streetAddress": "{{ $settings['site_address'] ?? 'Al Fahidi, Bur Dubai' }}",
+          "streetAddress": "{{ $settings['site_address'] ?? 'Al Fahidi, Bur Dubai, Dubai, United Arab Emirates' }}",
           "addressLocality": "Dubai",
           "addressRegion": "Dubai",
-          "postalCode": "00000",
+          "postalCode": "{{ $settings['site_postal_code'] ?? '00000' }}",
           "addressCountry": "AE"
         },
         "geo": {
           "@type": "GeoCoordinates",
-          "latitude": "25.2048",
-          "longitude": "55.2708"
+          "latitude": "{{ $settings['site_latitude'] ?? '25.2048' }}",
+          "longitude": "{{ $settings['site_longitude'] ?? '55.2708' }}"
         },
         "openingHoursSpecification": {
           "@type": "OpeningHoursSpecification",
           "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
           "opens": "00:00",
           "closes": "23:59"
-        }
+        },
+        "identifier": [
+          {
+            "@type": "PropertyValue",
+            "propertyID": "DET Tourism License",
+            "value": "{{ $settings['company_license_number'] ?? '1430583' }}"
+          }
+          @if(!empty($settings['google_place_id']))
+          ,{
+            "@type": "PropertyValue",
+            "propertyID": "Google Place ID",
+            "value": "{{ $settings['google_place_id'] }}"
+          }
+          @endif
+        ]
       }
     }
   ]
@@ -267,9 +282,74 @@
                 </div>
             </div>
             
-            <div class="lg:col-span-5 flex flex-col">
-                <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200 flex-grow h-full min-h-[350px]">
-                    <iframe src="{{ $settings['google_maps_embed_url'] ?? 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14439.467468694034!2d55.2707828!3d25.2048493!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f434910086b6d%3A0xc4db9db186e4e1e2!2sDunes%20Discovery%20Tourism%20LLC!5e0!3m2!1sen!2sae!4v1700000000000!5m2!1sen!2sae' }}" class="w-full h-full border-0 min-h-[400px]" allowfullscreen loading="lazy"></iframe>
+            <div class="lg:col-span-5 flex flex-col gap-6">
+                <!-- Google Verified Entity & Review Card -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-md">
+                    <div class="flex items-center justify-between gap-4 mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl shrink-0">
+                                <i class="bi bi-google"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-black text-slate-900 leading-tight">Dunes Discovery Tourism LLC</h3>
+                                <div class="flex items-center gap-1.5 mt-0.5">
+                                    <div class="flex text-amber-400 text-xs">
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                    </div>
+                                    <span class="text-xs font-bold text-slate-900">4.9</span>
+                                    <span class="text-[11px] text-slate-500">(2,840+ {{ __('ui.contact_page.google_reviews') }})</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-bold border border-emerald-200 shrink-0">
+                            <i class="bi bi-patch-check-fill text-emerald-600"></i> Verified
+                        </span>
+                    </div>
+
+                    <p class="text-xs text-slate-600 mb-4 leading-relaxed">
+                        Official Dubai Department of Economy and Tourism (DET) Licensed Desert Safari & Adventure Destination Management Operator.
+                    </p>
+
+                    <div class="space-y-2 mb-5 text-xs text-slate-600">
+                        <div class="flex items-center gap-2">
+                            <i class="bi bi-geo-alt-fill text-primary shrink-0"></i>
+                            <span>{{ $settings['site_address'] ?? 'Al Fahidi, Bur Dubai, Dubai, United Arab Emirates' }}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="bi bi-clock-fill text-slate-400 shrink-0"></i>
+                            <span>{{ __('ui.contact_page.business_hours') }}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="bi bi-shield-check text-emerald-600 shrink-0"></i>
+                            <span>{{ __('ui.contact_page.license_verified') }}</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t border-slate-100">
+                        <a href="{{ $settings['google_review_url'] ?? ('https://search.google.com/local/writereview?placeid=' . ($settings['google_place_id'] ?? 'ChIJbWsIEIVEdEER4uHEhb2dbcQ')) }}" 
+                           target="_blank" 
+                           rel="noopener noreferrer" 
+                           class="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-bold text-slate-800 transition">
+                            <i class="bi bi-star-fill text-amber-500"></i>
+                            <span>{{ __('ui.contact_page.write_review') }}</span>
+                        </a>
+                        <a href="https://maps.google.com/?q={{ $settings['site_latitude'] ?? '25.2048' }},{{ $settings['site_longitude'] ?? '55.2708' }}" 
+                           target="_blank" 
+                           rel="noopener noreferrer" 
+                           class="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-primary hover:bg-[#e07b32] text-xs font-bold text-white shadow-xs transition">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>{{ __('ui.contact_page.get_directions') }}</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Google Maps Interactive Embed -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200 flex-grow h-full min-h-[300px]">
+                    <iframe src="{{ $settings['google_maps_embed_url'] ?? 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14439.467468694034!2d55.2707828!3d25.2048493!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f434910086b6d%3A0xc4db9db186e4e1e2!2sDunes%20Discovery%20Tourism%20LLC!5e0!3m2!1sen!2sae!4v1700000000000!5m2!1sen!2sae' }}" class="w-full h-full border-0 min-h-[320px]" allowfullscreen loading="lazy"></iframe>
                 </div>
             </div>
         </div>

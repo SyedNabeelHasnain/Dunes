@@ -203,6 +203,11 @@ return [
         'subject' => 'Тема',
         'your_message' => 'Ваше сообщение',
         'send_btn' => 'Отправить сообщение',
+        'google_reviews' => 'Отзывы Google',
+        'write_review' => 'Оставить отзыв',
+        'get_directions' => 'Проложить маршрут',
+        'business_hours' => 'Круглосуточная поддержка 24/7',
+        'license_verified' => 'Лицензированный оператор DET № 1430583',
     ],
 
     // Вкладки тура
