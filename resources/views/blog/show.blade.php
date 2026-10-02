@@ -351,7 +351,7 @@
                         <p class="text-slate-500 text-xs line-clamp-2 mb-3 leading-relaxed">{{ $rp->excerpt }}</p>
                     @endif
                     <div class="text-[11px] text-slate-500 mt-auto pt-2 border-t border-slate-200">
-                        <i class="bi bi-clock mr-1 text-primary"></i>{{ $rp->read_time }} min read
+                        <i class="bi bi-clock mr-1 text-primary"></i>{{ $rp->read_time }} {{ __('ui.blog_journal.min_read') }}
                     </div>
                 </div>
             </article>
@@ -364,16 +364,16 @@
 <!-- Bottom CTA -->
 <section class="py-12 sm:py-16 bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 text-white border-t border-primary/30">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">Ready for Your Dubai Adventure?</h2>
-        <p class="text-slate-300 text-sm sm:text-base mb-6">Join thousands of satisfied guests who have experienced Dubai with Dunes Discovery Tourism.</p>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">{{ __('ui.blog_journal.ready_adventure') }}</h2>
+        <p class="text-slate-300 text-sm sm:text-base mb-6">{{ __('ui.blog_journal.satisfied_guests') }}</p>
         <div class="flex gap-3 justify-center flex-wrap">
             <button data-action="open-booking" 
                     class="btn-desert-animated rounded-full px-8 py-3.5 font-bold text-white text-sm shadow-lg cursor-pointer" 
                     data-tour="{{ $matchedTour->id ?? '' }}"
                     @click="$store.modal.open('booking'{{ isset($matchedTour) && $matchedTour ? ', { tourId: ' . $matchedTour->id . ' }' : '' }})">
-                Book {{ isset($matchedTour) && $matchedTour ? $matchedTour->name : 'a Desert Safari' }}
+                {{ __('ui.blog_journal.book_tour_name', ['name' => (isset($matchedTour) && $matchedTour ? $matchedTour->name : __('ui.home_categories.evening_title'))]) }}
             </button>
-            <a href="{{ route('tours.index') }}" class="border border-white/40 hover:border-white text-white rounded-full px-8 py-3.5 font-bold text-sm transition-colors">Browse All Tours</a>
+            <a href="{{ route('tours.index') }}" class="border border-white/40 hover:border-white text-white rounded-full px-8 py-3.5 font-bold text-sm transition-colors">{{ __('ui.blog_journal.browse_all_tours') }}</a>
         </div>
     </div>
 </section>

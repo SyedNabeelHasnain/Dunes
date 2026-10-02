@@ -9,11 +9,11 @@
     
     // Prepare Tabs Array
     $tabs = [];
-    if($highlights->count()) $tabs['highlights'] = 'Highlights';
-    if($tour->itineraries->count()) $tabs['itinerary'] = 'Itinerary';
-    if($inclusions->count() || $exclusions->count()) $tabs['inex'] = 'Inclusion & Exclusion';
-    if($notAllowed->count()) $tabs['info'] = 'Important Information';
-    if($faqs->count()) $tabs['faqs'] = 'FAQ';
+    if($highlights->count()) $tabs['highlights'] = __('ui.tour_tabs.highlights');
+    if($tour->itineraries->count()) $tabs['itinerary'] = __('ui.tour_tabs.itinerary');
+    if($inclusions->count() || $exclusions->count()) $tabs['inex'] = __('ui.tour_tabs.inex');
+    if($notAllowed->count()) $tabs['info'] = __('ui.tour_tabs.info');
+    if($faqs->count()) $tabs['faqs'] = __('ui.tour_tabs.faqs');
     $heroAvifUrl = asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image ?: 'evening-desert-safari-dubai-dune-discovery-tourism.avif'));
 @endphp
 
@@ -276,7 +276,7 @@ if(window.fbq){
                 </div>
                 <div class="hidden md:flex items-center gap-2 border-l border-white/25 pl-6">
                     <i class="bi bi-geo-alt-fill text-primary"></i>
-                    <span class="font-medium">Hotel Pickup & Drop Included</span>
+                    <span class="font-medium">{{ __('ui.trust_strip.hotel_pickup') }}</span>
                 </div>
             </div>
         </div>
@@ -290,29 +290,29 @@ if(window.fbq){
             <div class="flex items-center gap-2.5">
                 <i class="bi bi-patch-check-fill text-primary text-xl shrink-0"></i>
                 <div>
-                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">DTCM Licensed</div>
-                    <div class="text-slate-500 text-[11px]">UAE Tourism Authority</div>
+                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">{{ __('ui.trust_strip.dtcm_licensed') }}</div>
+                    <div class="text-slate-500 text-[11px]">{{ __('ui.trust_strip.dtcm_desc') }}</div>
                 </div>
             </div>
             <div class="flex items-center gap-2.5">
                 <i class="bi bi-arrow-repeat text-emerald-600 text-xl shrink-0"></i>
                 <div>
-                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">100% Free Cancel</div>
-                    <div class="text-slate-500 text-[11px]">Up to 24h in advance</div>
+                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">{{ __('ui.trust_strip.free_cancel') }}</div>
+                    <div class="text-slate-500 text-[11px]">{{ __('ui.trust_strip.free_cancel_desc') }}</div>
                 </div>
             </div>
             <div class="flex items-center gap-2.5">
                 <i class="bi bi-award-fill text-amber-500 text-xl shrink-0"></i>
                 <div>
-                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">100% Halal Food</div>
-                    <div class="text-slate-500 text-[11px]">Veg, Non-Veg & Jain</div>
+                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">{{ __('ui.trust_strip.halal_food') }}</div>
+                    <div class="text-slate-500 text-[11px]">{{ __('ui.trust_strip.halal_food_desc') }}</div>
                 </div>
             </div>
             <div class="flex items-center gap-2.5">
                 <i class="bi bi-shield-lock-fill text-cyan-600 text-xl shrink-0"></i>
                 <div>
-                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">Secure Checkout</div>
-                    <div class="text-slate-500 text-[11px]">Card / Cash on Pickup</div>
+                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">{{ __('ui.trust_strip.secure_checkout') }}</div>
+                    <div class="text-slate-500 text-[11px]">{{ __('ui.trust_strip.secure_checkout_desc') }}</div>
                 </div>
             </div>
         </div>
@@ -329,14 +329,14 @@ if(window.fbq){
                 <div class="bg-primary/5 rounded-2xl p-6 mb-8 border-l-4 border-primary shadow-xs">
                     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
                         <h2 class="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
-                            <i class="bi bi-lightning-charge-fill text-primary"></i>Experience at a Glance
+                            <i class="bi bi-lightning-charge-fill text-primary"></i>{{ __('ui.tour_glance.title') }}
                         </h2>
                         <div class="flex flex-wrap gap-2">
                             <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full px-3 py-1 text-xs font-bold inline-flex items-center gap-1">
-                                <i class="bi bi-patch-check-fill text-emerald-500"></i>DTCM License #1430583
+                                <i class="bi bi-patch-check-fill text-emerald-500"></i>{{ __('ui.tour_glance.dtcm_badge') }}
                             </span>
                             <span class="bg-primary/10 text-primary border border-primary/20 rounded-full px-3 py-1 text-xs font-bold inline-flex items-center gap-1">
-                                <i class="bi bi-check-circle-fill"></i>No Driver's License Required
+                                <i class="bi bi-check-circle-fill"></i>{{ __('ui.tour_glance.no_license_badge') }}
                             </span>
                         </div>
                     </div>
@@ -344,57 +344,57 @@ if(window.fbq){
                         <div class="flex items-start gap-2.5">
                             <i class="bi bi-clock text-primary mt-0.5 text-base shrink-0"></i>
                             <div>
-                                <strong class="block text-slate-900 text-xs sm:text-sm">Duration:</strong>
+                                <strong class="block text-slate-900 text-xs sm:text-sm">{{ __('ui.tour_glance.duration') }}</strong>
                                 <span class="text-slate-600 text-xs sm:text-sm">{{ $tour->duration ?: '6 - 7 Hours' }}</span>
                             </div>
                         </div>
                         <div class="flex items-start gap-2.5">
                             <i class="bi bi-truck text-primary mt-0.5 text-base shrink-0"></i>
                             <div>
-                                <strong class="block text-slate-900 text-xs sm:text-sm">Transfer Vehicle:</strong>
-                                <span class="text-slate-600 text-xs sm:text-sm">4x4 Luxury Toyota Land Cruiser / Prado</span>
+                                <strong class="block text-slate-900 text-xs sm:text-sm">{{ __('ui.tour_glance.transfer_vehicle') }}</strong>
+                                <span class="text-slate-600 text-xs sm:text-sm">{{ __('ui.tour_glance.vehicle_val') }}</span>
                             </div>
                         </div>
                         <div class="flex items-start gap-2.5">
                             <i class="bi bi-geo-alt text-primary mt-0.5 text-base shrink-0"></i>
                             <div>
-                                <strong class="block text-slate-900 text-xs sm:text-sm">Destination:</strong>
-                                <span class="text-slate-600 text-xs sm:text-sm">Lahbab High Red Dunes, Dubai, UAE</span>
+                                <strong class="block text-slate-900 text-xs sm:text-sm">{{ __('ui.tour_glance.destination') }}</strong>
+                                <span class="text-slate-600 text-xs sm:text-sm">{{ __('ui.tour_glance.destination_val') }}</span>
                             </div>
                         </div>
                         <div class="flex items-start gap-2.5">
                             <i class="bi bi-cup-hot text-primary mt-0.5 text-base shrink-0"></i>
                             <div>
-                                <strong class="block text-slate-900 text-xs sm:text-sm">Dining & Beverages:</strong>
-                                <span class="text-slate-600 text-xs sm:text-sm">100% Halal BBQ Buffet, Arabic Coffee & Dates</span>
+                                <strong class="block text-slate-900 text-xs sm:text-sm">{{ __('ui.tour_glance.dining_beverages') }}</strong>
+                                <span class="text-slate-600 text-xs sm:text-sm">{{ __('ui.tour_glance.dining_val') }}</span>
                             </div>
                         </div>
                         <div class="flex items-start gap-2.5">
                             <i class="bi bi-arrow-repeat text-primary mt-0.5 text-base shrink-0"></i>
                             <div>
-                                <strong class="block text-slate-900 text-xs sm:text-sm">Cancellation Policy:</strong>
-                                <span class="text-slate-600 text-xs sm:text-sm">100% Free Cancellation up to 24h</span>
+                                <strong class="block text-slate-900 text-xs sm:text-sm">{{ __('ui.tour_glance.cancellation') }}</strong>
+                                <span class="text-slate-600 text-xs sm:text-sm">{{ __('ui.tour_glance.cancellation_val') }}</span>
                             </div>
                         </div>
                         <div class="flex items-start gap-2.5">
                             <i class="bi bi-ticket-perforated text-primary mt-0.5 text-base shrink-0"></i>
                             <div>
-                                <strong class="block text-slate-900 text-xs sm:text-sm">Instant Confirmation:</strong>
-                                <span class="text-slate-600 text-xs sm:text-sm">Immediate WhatsApp & Email e-Ticket</span>
+                                <strong class="block text-slate-900 text-xs sm:text-sm">{{ __('ui.tour_glance.instant_confirmation') }}</strong>
+                                <span class="text-slate-600 text-xs sm:text-sm">{{ __('ui.tour_glance.instant_confirm_val') }}</span>
                             </div>
                         </div>
                         <div class="flex items-start gap-2.5">
                             <i class="bi bi-shield-check text-primary mt-0.5 text-base shrink-0"></i>
                             <div>
-                                <strong class="block text-slate-900 text-xs sm:text-sm">Safety & Insurance:</strong>
-                                <span class="text-slate-600 text-xs sm:text-sm">Full Comprehensive Passenger Insurance</span>
+                                <strong class="block text-slate-900 text-xs sm:text-sm">{{ __('ui.tour_glance.safety_insurance') }}</strong>
+                                <span class="text-slate-600 text-xs sm:text-sm">{{ __('ui.tour_glance.safety_val') }}</span>
                             </div>
                         </div>
                         <div class="flex items-start gap-2.5">
                             <i class="bi bi-chat-dots text-primary mt-0.5 text-base shrink-0"></i>
                             <div>
-                                <strong class="block text-slate-900 text-xs sm:text-sm">Languages:</strong>
-                                <span class="text-slate-600 text-xs sm:text-sm">{{ $tour->languages ?: 'English, Arabic, Hindi, Russian' }}</span>
+                                <strong class="block text-slate-900 text-xs sm:text-sm">{{ __('ui.tour_glance.languages') }}</strong>
+                                <span class="text-slate-600 text-xs sm:text-sm">{{ $tour->languages ?: __('ui.tour_glance.languages_val') }}</span>
                             </div>
                         </div>
                     </div>
@@ -404,14 +404,14 @@ if(window.fbq){
                 <div class="mb-10">
                     <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-3">
                         <span class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-lg"><i class="bi bi-info-circle"></i></span>
-                        <span>About {{ $tour->name }}</span>
+                        <span>{{ __('ui.tour_glance.about_tour', ['name' => $tour->name]) }}</span>
                     </h2>
                     <div x-data="{ expanded: false }" class="relative">
                         <div id="tourDescriptionText" :class="expanded ? '' : 'line-clamp-4'" class="text-slate-600 text-base leading-relaxed">
                             {!! nl2br(e($tour->full_desc)) !!}
                         </div>
                         <button type="button" class="mt-3 text-sm font-bold text-primary hover:text-primary-hover inline-flex items-center gap-1.5 border border-primary/30 rounded-full px-4 py-1.5 cursor-pointer shadow-xs transition-colors" @click="expanded = !expanded">
-                            <span x-text="expanded ? 'Read Less' : 'Read More'"></span>
+                            <span x-text="expanded ? '{{ __('ui.common.view_all') }}' : '{{ __('ui.common.view_details') }}'"></span>
                             <i class="bi" :class="expanded ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
                         </button>
                     </div>
@@ -565,35 +565,35 @@ if(window.fbq){
                 <!-- Practical Travel Tips & Packing Guide -->
                 <div class="bg-white rounded-2xl p-6 mb-8 border border-slate-200/80 shadow-xs">
                     <h2 class="text-base sm:text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                        <i class="bi bi-info-square-fill text-primary"></i>Essential Tips & What to Pack
+                        <i class="bi bi-info-square-fill text-primary"></i>{{ __('ui.tour_glance.essential_tips') }}
                     </h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="flex items-start gap-2.5">
                             <i class="bi bi-check2-circle text-emerald-600 mt-0.5 text-base shrink-0"></i>
                             <div>
-                                <strong class="block text-slate-900 text-xs sm:text-sm">Recommended Attire:</strong>
-                                <span class="text-slate-600 text-xs sm:text-sm">Casual loose-fitting clothes. Light jacket during winter evenings (Nov - Feb).</span>
+                                <strong class="block text-slate-900 text-xs sm:text-sm">{{ __('ui.tour_glance.recommended_attire') }}</strong>
+                                <span class="text-slate-600 text-xs sm:text-sm">{{ __('ui.tour_glance.recommended_attire_val') }}</span>
                             </div>
                         </div>
                         <div class="flex items-start gap-2.5">
                             <i class="bi bi-check2-circle text-emerald-600 mt-0.5 text-base shrink-0"></i>
                             <div>
-                                <strong class="block text-slate-900 text-xs sm:text-sm">Footwear:</strong>
-                                <span class="text-slate-600 text-xs sm:text-sm">Sandals, flip-flops, or sneakers suitable for walking on soft sand dunes.</span>
+                                <strong class="block text-slate-900 text-xs sm:text-sm">{{ __('ui.tour_glance.footwear') }}</strong>
+                                <span class="text-slate-600 text-xs sm:text-sm">{{ __('ui.tour_glance.footwear_val') }}</span>
                             </div>
                         </div>
                         <div class="flex items-start gap-2.5">
                             <i class="bi bi-check2-circle text-emerald-600 mt-0.5 text-base shrink-0"></i>
                             <div>
-                                <strong class="block text-slate-900 text-xs sm:text-sm">Sun & Dust Protection:</strong>
-                                <span class="text-slate-600 text-xs sm:text-sm">Sunglasses, sunblock, and a camera or smartphone for sunset photography.</span>
+                                <strong class="block text-slate-900 text-xs sm:text-sm">{{ __('ui.tour_glance.sun_protection') }}</strong>
+                                <span class="text-slate-600 text-xs sm:text-sm">{{ __('ui.tour_glance.sun_protection_val') }}</span>
                             </div>
                         </div>
                         <div class="flex items-start gap-2.5">
                             <i class="bi bi-check2-circle text-emerald-600 mt-0.5 text-base shrink-0"></i>
                             <div>
-                                <strong class="block text-slate-900 text-xs sm:text-sm">Families & Seniors:</strong>
-                                <span class="text-slate-600 text-xs sm:text-sm">Child booster seats and gentle direct-to-camp scenic transfers available on request.</span>
+                                <strong class="block text-slate-900 text-xs sm:text-sm">{{ __('ui.tour_glance.family_seniors') }}</strong>
+                                <span class="text-slate-600 text-xs sm:text-sm">{{ __('ui.tour_glance.family_seniors_val') }}</span>
                             </div>
                         </div>
                     </div>
@@ -605,12 +605,12 @@ if(window.fbq){
                     <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
                         <div>
                             <h2 class="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2 mb-1">
-                                <i class="bi bi-ui-checks text-primary"></i>Package Comparison & Pricing
+                                <i class="bi bi-ui-checks text-primary"></i>{{ __('ui.tour_glance.pkg_comparison') }}
                             </h2>
-                            <p class="text-slate-600 text-xs sm:text-sm">Select the ideal tier for your group and budget.</p>
+                            <p class="text-slate-600 text-xs sm:text-sm">{{ __('ui.tour_glance.pkg_comparison_sub') }}</p>
                         </div>
                         <span class="bg-primary/10 text-primary px-3.5 py-1.5 rounded-full text-xs font-bold inline-flex items-center gap-1">
-                            <i class="bi bi-check2-all"></i>Best Price Guarantee
+                            <i class="bi bi-check2-all"></i>{{ __('ui.trust.best_price_guarantee') }}
                         </span>
                     </div>
 
@@ -624,7 +624,7 @@ if(window.fbq){
                         <div class="bg-white rounded-2xl p-5 border-2 flex flex-col h-full relative transition-all duration-300 hover:shadow-lg {{ $tier->is_popular ? 'border-primary shadow-md' : 'border-slate-300 shadow-xs' }}">
                             @if($tier->is_popular)
                             <div class="absolute -top-3 left-1/2 -translate-x-1/2">
-                                <span class="bg-primary text-white rounded-full px-3 py-0.5 text-[10px] font-extrabold uppercase tracking-wider shadow-sm">Most Popular</span>
+                                <span class="bg-primary text-white rounded-full px-3 py-0.5 text-[10px] font-extrabold uppercase tracking-wider shadow-sm">{{ __('ui.common.popular') }}</span>
                             </div>
                             @endif
                             <div class="text-center pt-2 pb-3 mb-3 border-b border-slate-200">
@@ -635,38 +635,38 @@ if(window.fbq){
                                     <span class="text-xs text-slate-500 line-through" data-aed="{{ $tOldPrice }}">AED {{ number_format($tOldPrice) }}</span>
                                     @endif
                                 </div>
-                                <span class="text-[11px] text-slate-500 block mt-0.5">Per Person (All Inclusive)</span>
+                                <span class="text-[11px] text-slate-500 block mt-0.5">{{ __('ui.tour_glance.per_person_all_inclusive') }}</span>
                             </div>
 
                             <ul class="space-y-2 mb-5 flex-grow text-xs text-slate-700">
                                 <li class="flex items-center gap-2">
                                     <i class="bi bi-check-circle-fill text-emerald-600"></i>
-                                    <span>{{ $tour->duration }} Desert Experience</span>
+                                    <span>{{ $tour->duration }} {{ __('ui.tour_glance.desert_experience') }}</span>
                                 </li>
                                 <li class="flex items-center gap-2">
                                     <i class="bi bi-check-circle-fill text-emerald-600"></i>
-                                    <span>4x4 Land Cruiser Transfers</span>
+                                    <span>{{ __('ui.tour_glance.luxury_transfers') }}</span>
                                 </li>
                                 <li class="flex items-center gap-2">
                                     <i class="bi bi-check-circle-fill text-emerald-600"></i>
-                                    <span>BBQ Buffet & Live Shows</span>
+                                    <span>{{ __('ui.tour_glance.bbq_live_shows') }}</span>
                                 </li>
                                 @if(stripos($tier->name, 'quad') !== false || stripos($tier->name, 'buggy') !== false)
                                 <li class="flex items-center gap-2 font-bold text-primary">
                                     <i class="bi bi-check-circle-fill"></i>
-                                    <span>Self-Drive ATV / Buggy Ride</span>
+                                    <span>{{ __('ui.tour_glance.self_drive_atv') }}</span>
                                 </li>
                                 @endif
                                 @if(stripos($tier->name, 'vip') !== false || stripos($tier->name, 'private') !== false)
                                 <li class="flex items-center gap-2 font-bold text-amber-600">
                                     <i class="bi bi-check-circle-fill"></i>
-                                    <span>VIP Table Service & Chalet</span>
+                                    <span>{{ __('ui.tour_glance.vip_service') }}</span>
                                 </li>
                                 @endif
                             </ul>
 
                             <button type="button" class="w-full rounded-full py-2.5 text-xs sm:text-sm font-bold cursor-pointer transition-colors {{ $tier->is_popular ? 'btn-desert-animated text-white' : 'border border-primary text-primary hover:bg-primary hover:text-white' }}" data-action="open-booking" data-tour="{{ $tour->id }}" data-tier="{{ $tier->id }}" @click.prevent="$store.modal.open('booking', { tourId: {{ $tour->id }}, tierId: {{ $tier->id }} })">
-                                Select {{ $tier->name }}
+                                {{ __('ui.tour_glance.select_tier', ['tier' => $tier->name]) }}
                             </button>
                         </div>
                         @endforeach

@@ -10,19 +10,19 @@
         <!-- Eyebrow Badge -->
         <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-amber-400 text-xs font-bold uppercase tracking-wider mb-4 shadow-sm">
             <i class="bi bi-envelope-paper-heart"></i>
-            <span>VIP Travel Club & Special Offers</span>
+            <span>{{ __('ui.newsletter.eyebrow') }}</span>
         </div>
 
         <!-- Section Heading -->
         <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mb-3 tracking-tight">
-            Receive Exclusive <span class="bg-gradient-to-r from-orange-400 to-amber-300 bg-clip-text text-transparent">Desert Safari Offers</span> & Guides
+            {{ __('ui.newsletter.title_prefix') }} <span class="bg-gradient-to-r from-orange-400 to-amber-300 bg-clip-text text-transparent">{{ __('ui.newsletter.title_highlight') }}</span> {{ __('ui.newsletter.title_suffix') }}
         </h2>
         <p class="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto mb-8 leading-relaxed">
-            Subscribe to {{ $siteName }} for verified member discounts, seasonal adventure rates, and insider Dubai desert travel guides delivered directly to your inbox.
+            {{ __('ui.newsletter.subtitle', ['site' => $siteName]) }}
         </p>
 
         <!-- Subscription Card / Form -->
-        <div class="rounded-3xl p-4 sm:p-6 text-left bg-white/5 border border-white/20 backdrop-blur-xl shadow-2xl">
+        <div class="rounded-3xl p-4 sm:p-6 text-left rtl:text-right bg-white/5 border border-white/20 backdrop-blur-xl shadow-2xl">
             <form id="publicNewsletterForm" class="space-y-3" novalidate>
                 @csrf
                 <!-- Anti-Bot Honeypot -->
@@ -33,21 +33,21 @@
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
                     <!-- Name Input -->
                     <div class="md:col-span-4 relative">
-                        <i class="bi bi-person absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                        <input type="text" name="name" id="newsletterName" class="w-full rounded-full pl-11 pr-4 py-3 bg-white text-slate-800 text-sm font-semibold border-0 shadow-sm focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="Your Name (Optional)" maxlength="100">
+                        <i class="bi bi-person absolute left-4 rtl:left-auto rtl:right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                        <input type="text" name="name" id="newsletterName" class="w-full rounded-full pl-11 pr-4 rtl:pr-11 rtl:pl-4 py-3 bg-white text-slate-800 text-sm font-semibold border-0 shadow-sm focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="{{ __('ui.newsletter.name_placeholder') }}" maxlength="100">
                     </div>
 
                     <!-- Email Input -->
                     <div class="md:col-span-5 relative">
-                        <i class="bi bi-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                        <input type="email" name="email" id="newsletterEmail" class="w-full rounded-full pl-11 pr-4 py-3 bg-white text-slate-800 text-sm font-semibold border-0 shadow-sm focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="Enter your email address *" required maxlength="255">
+                        <i class="bi bi-envelope absolute left-4 rtl:left-auto rtl:right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                        <input type="email" name="email" id="newsletterEmail" class="w-full rounded-full pl-11 pr-4 rtl:pr-11 rtl:pl-4 py-3 bg-white text-slate-800 text-sm font-semibold border-0 shadow-sm focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="{{ __('ui.newsletter.email_placeholder') }}" required maxlength="255">
                     </div>
 
                     <!-- Submit Button -->
                     <div class="md:col-span-3">
                         <button type="submit" id="btnNewsletterSubmit" class="w-full rounded-full py-3 px-4 font-bold text-white bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 shadow-md flex items-center justify-center gap-2 text-sm transition-all cursor-pointer">
-                            <span>Join Club</span>
-                            <i class="bi bi-arrow-right"></i>
+                            <span>{{ __('ui.newsletter.join_btn') }}</span>
+                            <i class="bi bi-arrow-right rtl:rotate-180"></i>
                         </button>
                     </div>
                 </div>
@@ -56,7 +56,7 @@
                 <div class="flex items-center gap-2 pt-2">
                     <input class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer" type="checkbox" name="consent" id="newsletterConsent" required checked>
                     <label class="text-xs text-slate-300 cursor-pointer" for="newsletterConsent">
-                        I agree to receive personalized newsletters and travel offers. Unsubscribe easily at any time.
+                        {{ __('ui.newsletter.consent_text') }}
                     </label>
                 </div>
 
@@ -69,9 +69,9 @@
 
         <!-- Trust Badges -->
         <div class="flex flex-wrap items-center justify-center gap-6 mt-6 text-xs text-slate-300">
-            <div class="flex items-center gap-1.5"><i class="bi bi-shield-check text-emerald-400"></i><span>Zero spam guarantee</span></div>
-            <div class="flex items-center gap-1.5"><i class="bi bi-lock-fill text-amber-400"></i><span>100% Privacy protected</span></div>
-            <div class="flex items-center gap-1.5"><i class="bi bi-check2-circle text-slate-300"></i><span>Instant one-click unsubscribe</span></div>
+            <div class="flex items-center gap-1.5"><i class="bi bi-shield-check text-emerald-400"></i><span>{{ __('ui.newsletter.zero_spam') }}</span></div>
+            <div class="flex items-center gap-1.5"><i class="bi bi-lock-fill text-amber-400"></i><span>{{ __('ui.newsletter.privacy_protected') }}</span></div>
+            <div class="flex items-center gap-1.5"><i class="bi bi-check2-circle text-slate-300"></i><span>{{ __('ui.newsletter.one_click_unsub') }}</span></div>
         </div>
     </div>
 </section>

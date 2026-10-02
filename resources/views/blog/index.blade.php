@@ -184,9 +184,9 @@
     @if ($posts->count() === 0)
     <div class="text-center py-16">
         <i class="bi bi-search text-5xl text-slate-300 block mb-4"></i>
-        <h3 class="text-xl font-bold text-slate-900 mb-1">No articles found</h3>
-        <p class="text-slate-500 text-sm mb-6">Try a different search term or browse all categories.</p>
-        <a href="{{ route('blog.index') }}" class="btn-desert-animated-dark text-white rounded-full px-6 py-2.5 text-xs font-bold inline-block shadow-md">Browse All Articles</a>
+        <h3 class="text-xl font-bold text-slate-900 mb-1">{{ __('ui.blog_journal.no_articles_title') }}</h3>
+        <p class="text-slate-500 text-sm mb-6">{{ __('ui.blog_journal.no_articles_desc') }}</p>
+        <a href="{{ route('blog.index') }}" class="btn-desert-animated-dark text-white rounded-full px-6 py-2.5 text-xs font-bold inline-block shadow-md">{{ __('ui.blog_journal.browse_all') }}</a>
     </div>
     @else
 
@@ -194,15 +194,15 @@
     <div class="flex justify-between items-center mb-6 flex-wrap gap-2">
         <h2 class="text-xs uppercase font-extrabold tracking-wider text-slate-500">
             @if ($cat)
-                Articles in {{ $cat->name }}
+                {{ __('ui.blog_journal.articles_in', ['category' => $cat->name]) }}
             @elseif ($search)
-                Search Results
+                {{ __('ui.blog_journal.search_results') }}
             @else
-                Latest Articles
+                {{ __('ui.blog_journal.latest_articles') }}
             @endif
             <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full text-xs font-bold ml-1.5">{{ $total }}</span>
         </h2>
-        <div class="text-slate-500 text-xs">Page {{ $page }} of {{ $totalPages }}</div>
+        <div class="text-slate-500 text-xs">{{ __('ui.blog_journal.page_x_of_y', ['current' => $page, 'total' => $totalPages]) }}</div>
     </div>
     @endif
 
@@ -215,7 +215,7 @@
             <a href="{{ route('blog.show', $post->slug) }}" class="block relative aspect-[16/10] overflow-hidden">
                 <img src="{{ $postImg }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $post->featured_image_alt ?: $post->title }}" loading="lazy">
                 @if ($post->category)
-                <span class="absolute top-3 left-3 bg-primary text-white rounded-full px-2.5 py-0.5 text-xs font-bold shadow-sm">{{ $post->category?->name }}</span>
+                <span class="absolute top-3 left-3 rtl:left-auto rtl:right-3 bg-primary text-white rounded-full px-2.5 py-0.5 text-xs font-bold shadow-sm">{{ $post->category?->name }}</span>
                 @endif
             </a>
             <div class="p-5 flex flex-col flex-grow">
@@ -245,7 +245,7 @@
         <ul class="flex items-center gap-1.5">
             @if ($page > 1)
             <li>
-                <a class="w-9 h-9 rounded-xl flex items-center justify-center font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors" href="{{ $posts->previousPageUrl() }}"><i class="bi bi-chevron-left"></i></a>
+                <a class="w-9 h-9 rounded-xl flex items-center justify-center font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors" href="{{ $posts->previousPageUrl() }}"><i class="bi bi-chevron-left rtl:rotate-180"></i></a>
             </li>
             @endif
             @for ($p = max(1, $page-2); $p <= min($totalPages, $page+2); $p++)
@@ -255,7 +255,7 @@
             @endfor
             @if ($page < $totalPages)
             <li>
-                <a class="w-9 h-9 rounded-xl flex items-center justify-center font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors" href="{{ $posts->nextPageUrl() }}"><i class="bi bi-chevron-right"></i></a>
+                <a class="w-9 h-9 rounded-xl flex items-center justify-center font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors" href="{{ $posts->nextPageUrl() }}"><i class="bi bi-chevron-right rtl:rotate-180"></i></a>
             </li>
             @endif
         </ul>
@@ -266,9 +266,9 @@
 
     <!-- CTA Banner -->
     <div class="rounded-3xl p-8 sm:p-12 text-center mt-14 bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-primary/30 shadow-xl text-white">
-        <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">Ready for Your Dubai Adventure?</h2>
-        <p class="text-slate-300 text-sm sm:text-base max-w-xl mx-auto mb-6">Book a desert safari tour and make memories that last a lifetime.</p>
-        <button data-action="open-booking" class="btn-desert-animated rounded-full px-8 py-3.5 font-bold text-white text-sm shadow-lg cursor-pointer" @click="$store.modal.open('booking')">Book a Tour Now</button>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">{{ __('ui.blog_journal.ready_adventure') }}</h2>
+        <p class="text-slate-300 text-sm sm:text-base max-w-xl mx-auto mb-6">{{ __('ui.blog_journal.adventure_desc') }}</p>
+        <button data-action="open-booking" class="btn-desert-animated rounded-full px-8 py-3.5 font-bold text-white text-sm shadow-lg cursor-pointer" @click="$store.modal.open('booking')">{{ __('ui.blog_journal.book_now_btn') }}</button>
     </div>
 </div>
 @endsection

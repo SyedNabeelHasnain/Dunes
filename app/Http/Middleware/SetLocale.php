@@ -64,6 +64,14 @@ class SetLocale
         App::setLocale($currentLocale);
         Carbon::setLocale($currentLocale);
 
+        if ($currentLocale !== 'en') {
+            URL::defaults(['locale' => $currentLocale]);
+        }
+
+        if ($request->hasSession()) {
+            $request->session()->put('locale', $currentLocale);
+        }
+
         $isRtl = $currentLanguage ? $currentLanguage->isRtl() : false;
         $textDir = $isRtl ? 'rtl' : 'ltr';
 

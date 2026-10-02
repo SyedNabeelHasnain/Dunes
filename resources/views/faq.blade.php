@@ -83,29 +83,29 @@
             <div class="flex items-center gap-2.5">
                 <i class="bi bi-patch-check-fill text-primary text-xl shrink-0"></i>
                 <div>
-                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">DTCM Licensed Operator</div>
-                    <div class="text-slate-500 text-[11px]">Dubai Tourism Authority</div>
+                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">{{ __('ui.trust_strip.dtcm_licensed') }}</div>
+                    <div class="text-slate-500 text-[11px]">{{ __('ui.trust_strip.dtcm_desc') }}</div>
                 </div>
             </div>
             <div class="flex items-center gap-2.5">
                 <i class="bi bi-arrow-repeat text-emerald-600 text-xl shrink-0"></i>
                 <div>
-                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">100% Free Cancellation</div>
-                    <div class="text-slate-500 text-[11px]">Full refund 24h prior</div>
+                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">{{ __('ui.trust_strip.free_cancel') }}</div>
+                    <div class="text-slate-500 text-[11px]">{{ __('ui.trust_strip.free_cancel_desc') }}</div>
                 </div>
             </div>
             <div class="flex items-center gap-2.5">
                 <i class="bi bi-award-fill text-amber-500 text-xl shrink-0"></i>
                 <div>
-                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">100% Halal Food</div>
-                    <div class="text-slate-500 text-[11px]">Veg, Non-Veg & Jain</div>
+                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">{{ __('ui.trust_strip.halal_food') }}</div>
+                    <div class="text-slate-500 text-[11px]">{{ __('ui.trust_strip.halal_food_desc') }}</div>
                 </div>
             </div>
             <div class="flex items-center gap-2.5">
                 <i class="bi bi-shield-lock-fill text-cyan-600 text-xl shrink-0"></i>
                 <div>
-                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">Instant Confirmation</div>
-                    <div class="text-slate-500 text-[11px]">Card / Cash on Pickup</div>
+                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">{{ __('ui.why_choose_us.instant_confirm') }}</div>
+                    <div class="text-slate-500 text-[11px]">{{ __('ui.trust_strip.secure_checkout_desc') }}</div>
                 </div>
             </div>
         </div>
@@ -161,7 +161,7 @@
             <div class="flex flex-col sm:flex-row justify-center gap-3">
                 <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode('Hi! I have a question about your tours.') }}" class="btn-whatsapp-animated rounded-full px-6 py-3 font-bold text-white text-sm inline-flex items-center justify-center gap-2 shadow-sm" target="_blank" rel="noopener noreferrer">
                     <i class="bi bi-whatsapp"></i>
-                    <span>WhatsApp 24/7</span>
+                    <span>{{ __('ui.faq.whatsapp_247') }}</span>
                 </a>
                 <a href="{{ route('contact') }}" class="btn-desert-animated rounded-full px-6 py-3 font-bold text-white text-sm inline-flex items-center justify-center gap-2 shadow-sm">
                     <i class="bi bi-envelope"></i>

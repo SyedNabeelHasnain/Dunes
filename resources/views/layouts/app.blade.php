@@ -457,8 +457,7 @@
                         <button type="button" class="w-9 h-9 rounded-full bg-white border border-slate-200/90 shadow-2xs flex items-center justify-center text-slate-600 hover:text-primary hover:border-primary/50 transition-all cursor-pointer" @click="$store.modal.open('search')" title="Search Dubai tours" aria-label="Search Dubai tours">
                             <i class="bi bi-search text-xs"></i>
                         </button>
-                        @include('partials.language-switcher', ['switcherId' => 'desktopLanguageDropdownBtn'])
-                        @include('partials.currency-switcher', ['switcherId' => 'desktopCurrencyDropdownBtn'])
+                        @include('partials.language-currency-switcher', ['switcherId' => 'desktopLangCurrencyDropdownBtn'])
                         <a class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full font-bold text-xs bg-emerald-500 hover:bg-emerald-600 text-white shadow-xs hover:shadow-sm transition-all cursor-pointer" href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener">
                             <i class="bi bi-whatsapp"></i><span>WhatsApp</span>
                         </a>
@@ -528,8 +527,7 @@
                 <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-4">
                     <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery" width="140" height="90" class="h-9 w-auto object-contain">
                     <div class="flex items-center gap-2">
-                        @include('partials.language-switcher', ['switcherId' => 'mobileLanguageDropdownBtn'])
-                        @include('partials.currency-switcher', ['switcherId' => 'mobileCurrencyDropdownBtn'])
+                        @include('partials.language-currency-switcher', ['switcherId' => 'mobileLangCurrencyDropdownBtn'])
                         <button type="button" class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer" @click="$store.mobileNav.close()" aria-label="Close">
                             <i class="bi bi-x-lg text-xs"></i>
                         </button>

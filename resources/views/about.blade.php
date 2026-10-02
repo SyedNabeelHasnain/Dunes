@@ -79,7 +79,7 @@
             </div>
             <div class="hidden lg:block shrink-0">
                 <span class="bg-primary/20 text-primary border border-primary/40 px-4 py-2 rounded-full font-bold text-sm inline-flex items-center gap-1.5">
-                    <i class="bi bi-star-fill text-amber-400"></i>10,000+ Happy Guests
+                    <i class="bi bi-star-fill text-amber-400"></i>{{ __('ui.about.happy_guests') }}
                 </span>
             </div>
         </div>
@@ -93,29 +93,29 @@
             <div class="flex items-center gap-2.5">
                 <i class="bi bi-patch-check-fill text-primary text-xl shrink-0"></i>
                 <div>
-                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">DTCM Licensed Operator</div>
-                    <div class="text-slate-500 text-[11px]">Dubai Tourism Authority</div>
+                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">{{ __('ui.trust_strip.dtcm_licensed') }}</div>
+                    <div class="text-slate-500 text-[11px]">{{ __('ui.trust_strip.dtcm_desc') }}</div>
                 </div>
             </div>
             <div class="flex items-center gap-2.5">
                 <i class="bi bi-arrow-repeat text-emerald-600 text-xl shrink-0"></i>
                 <div>
-                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">100% Free Cancellation</div>
-                    <div class="text-slate-500 text-[11px]">Full refund 24h prior</div>
+                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">{{ __('ui.trust_strip.free_cancel') }}</div>
+                    <div class="text-slate-500 text-[11px]">{{ __('ui.trust_strip.free_cancel_desc') }}</div>
                 </div>
             </div>
             <div class="flex items-center gap-2.5">
                 <i class="bi bi-award-fill text-amber-500 text-xl shrink-0"></i>
                 <div>
-                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">100% Halal Food</div>
-                    <div class="text-slate-500 text-[11px]">Veg, Non-Veg & Jain</div>
+                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">{{ __('ui.trust_strip.halal_food') }}</div>
+                    <div class="text-slate-500 text-[11px]">{{ __('ui.trust_strip.halal_food_desc') }}</div>
                 </div>
             </div>
             <div class="flex items-center gap-2.5">
                 <i class="bi bi-truck text-cyan-600 text-xl shrink-0"></i>
                 <div>
-                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">25+ Luxury 4x4 Fleet</div>
-                    <div class="text-slate-500 text-[11px]">Land Cruiser 300 Series</div>
+                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">{{ __('ui.trust_strip.vehicles_fleet') }}</div>
+                    <div class="text-slate-500 text-[11px]">{{ __('ui.trust_strip.vehicles_fleet_desc') }}</div>
                 </div>
             </div>
         </div>
@@ -130,31 +130,31 @@
                 <div class="relative">
                     <img src="{{ asset('images/dubai-desert-safari-tour-dune-discovery-tourism.avif') }}" alt="Dunes Discovery Tourism Desert Safari Experience Dubai" width="800" height="600" loading="lazy" class="w-full rounded-2xl shadow-xl object-cover" onerror="this.src='https://placehold.co/800x600/F58F43/white?text=Our+Story'">
                     <div class="hidden sm:block absolute -bottom-6 -right-6 bg-primary text-white p-5 rounded-2xl shadow-2xl">
-                        <div class="text-2xl font-black mb-0.5">6+ Years</div>
-                        <span class="text-xs text-white/80 block">Of Excellence</span>
+                        <div class="text-2xl font-black mb-0.5">{{ __('ui.about_story.years_exp') }}</div>
+                        <span class="text-xs text-white/80 block">{{ __('ui.about_story.years_sub') }}</span>
                     </div>
                 </div>
             </div>
             <div class="lg:col-span-6">
                 <div class="lg:pl-6">
                     <div class="inline-flex items-center gap-2 mb-3">
-                        <span class="bg-primary/10 text-primary px-3.5 py-1 rounded-full text-xs font-bold">OUR STORY</span>
+                        <span class="bg-primary/10 text-primary px-3.5 py-1 rounded-full text-xs font-bold">{{ __('ui.about_story.badge') }}</span>
                     </div>
-                    <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight leading-tight">Crafting Unforgettable Arabian Experiences</h2>
-                    <p class="text-slate-700 text-base sm:text-lg mb-4 leading-relaxed font-medium">Founded in 2018, Dunes Discovery Tourism has grown from a small family operation to one of Dubai's most trusted tour companies.</p>
-                    <p class="text-slate-600 text-sm sm:text-base mb-6 leading-relaxed">Our passion for the Arabian desert and commitment to exceptional service has made us the preferred choice for travelers from around the world. We specialize in authentic desert safari experiences that blend adventure, culture, and comfort.</p>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight leading-tight">{{ __('ui.about_story.title') }}</h2>
+                    <p class="text-slate-700 text-base sm:text-lg mb-4 leading-relaxed font-medium">{{ __('ui.about_story.p1') }}</p>
+                    <p class="text-slate-600 text-sm sm:text-base mb-6 leading-relaxed">{{ __('ui.about_story.p2') }}</p>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="flex items-center gap-3">
                             <div class="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 text-sm">
                                 <i class="bi bi-check-lg font-bold"></i>
                             </div>
-                            <span class="font-bold text-slate-800 text-xs sm:text-sm">Licensed & Insured</span>
+                            <span class="font-bold text-slate-800 text-xs sm:text-sm">{{ __('ui.about_story.licensed_insured') }}</span>
                         </div>
                         <div class="flex items-center gap-3">
                             <div class="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 text-sm">
                                 <i class="bi bi-check-lg font-bold"></i>
                             </div>
-                            <span class="font-bold text-slate-800 text-xs sm:text-sm">Modern Fleet</span>
+                            <span class="font-bold text-slate-800 text-xs sm:text-sm">{{ __('ui.about_story.modern_fleet') }}</span>
                         </div>
                     </div>
                 </div>
@@ -167,51 +167,51 @@
 <section class="py-12 sm:py-20 bg-slate-50 border-t border-slate-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-10 sm:mb-14">
-            <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">Why Choose Us</h2>
-            <p class="text-slate-600 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">We go the extra mile to ensure your Dubai adventure is nothing short of perfect.</p>
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">{{ __('ui.why_choose_us.title') }}</h2>
+            <p class="text-slate-600 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">{{ __('ui.why_choose_us.subtitle_about') }}</p>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs hover:shadow-lg transition-all duration-300">
                 <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-xl mb-4">
                     <i class="bi bi-shield-check"></i>
                 </div>
-                <h3 class="text-lg font-bold text-slate-900 mb-2">Licensed & Insured</h3>
-                <p class="text-slate-600 text-sm leading-relaxed">Fully licensed by Dubai Tourism with comprehensive insurance for all guests, ensuring your peace of mind.</p>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">{{ __('ui.why_choose_us.licensed_insured') }}</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">{{ __('ui.why_choose_us.licensed_insured_desc') }}</p>
             </div>
             <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs hover:shadow-lg transition-all duration-300">
                 <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-xl mb-4">
                     <i class="bi bi-people"></i>
                 </div>
-                <h3 class="text-lg font-bold text-slate-900 mb-2">Expert Team</h3>
-                <p class="text-slate-600 text-sm leading-relaxed">Professional drivers with years of desert experience and multilingual guides who know the dunes like no one else.</p>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">{{ __('ui.why_choose_us.expert_team') }}</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">{{ __('ui.why_choose_us.expert_team_desc') }}</p>
             </div>
             <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs hover:shadow-lg transition-all duration-300">
                 <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-xl mb-4">
                     <i class="bi bi-trophy"></i>
                 </div>
-                <h3 class="text-lg font-bold text-slate-900 mb-2">Award Winning</h3>
-                <p class="text-slate-600 text-sm leading-relaxed">Consistently rated 4.8+ stars across Google, TripAdvisor, and other platforms for our service quality.</p>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">{{ __('ui.why_choose_us.award_winning') }}</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">{{ __('ui.why_choose_us.award_winning_desc') }}</p>
             </div>
             <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs hover:shadow-lg transition-all duration-300">
                 <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-xl mb-4">
                     <i class="bi bi-truck"></i>
                 </div>
-                <h3 class="text-lg font-bold text-slate-900 mb-2">Modern Fleet</h3>
-                <p class="text-slate-600 text-sm leading-relaxed">Well-maintained Toyota Land Cruisers equipped with the latest safety features and powerful air conditioning.</p>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">{{ __('ui.why_choose_us.modern_fleet') }}</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">{{ __('ui.why_choose_us.modern_fleet_desc') }}</p>
             </div>
             <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs hover:shadow-lg transition-all duration-300">
                 <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-xl mb-4">
                     <i class="bi bi-heart"></i>
                 </div>
-                <h3 class="text-lg font-bold text-slate-900 mb-2">Guest First</h3>
-                <p class="text-slate-600 text-sm leading-relaxed">Personalized service with attention to dietary needs, celebrations, and special requests to make it yours.</p>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">{{ __('ui.why_choose_us.guest_first') }}</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">{{ __('ui.why_choose_us.guest_first_desc') }}</p>
             </div>
             <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs hover:shadow-lg transition-all duration-300">
                 <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-xl mb-4">
                     <i class="bi bi-currency-dollar"></i>
                 </div>
-                <h3 class="text-lg font-bold text-slate-900 mb-2">Best Value</h3>
-                <p class="text-slate-600 text-sm leading-relaxed">Competitive prices with no hidden fees. What you see is what you pay. Quality adventure at the right price.</p>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">{{ __('ui.why_choose_us.best_value') }}</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">{{ __('ui.why_choose_us.best_value_desc') }}</p>
             </div>
         </div>
     </div>
@@ -224,32 +224,32 @@
             <div class="p-2">
                 <i class="bi bi-trophy text-primary text-2xl mb-1.5 block"></i>
                 <div class="text-xl font-bold text-white mb-0.5">#1</div>
-                <div class="text-slate-300 text-xs">Desert Safari</div>
+                <div class="text-slate-300 text-xs">{{ __('ui.trust_strip.no_1_safari') }}</div>
             </div>
             <div class="p-2">
                 <i class="bi bi-shield-check text-primary text-2xl mb-1.5 block"></i>
                 <div class="text-xl font-bold text-white mb-0.5">100%</div>
-                <div class="text-slate-300 text-xs">Secure Pay</div>
+                <div class="text-slate-300 text-xs">{{ __('ui.trust_strip.secure_pay') }}</div>
             </div>
             <div class="p-2">
                 <i class="bi bi-clock-history text-primary text-2xl mb-1.5 block"></i>
                 <div class="text-xl font-bold text-white mb-0.5">Fast</div>
-                <div class="text-slate-300 text-xs">Booking</div>
+                <div class="text-slate-300 text-xs">{{ __('ui.trust_strip.fast_booking') }}</div>
             </div>
             <div class="p-2">
                 <i class="bi bi-truck text-primary text-2xl mb-1.5 block"></i>
                 <div class="text-xl font-bold text-white mb-0.5">25+</div>
-                <div class="text-slate-300 text-xs">Vehicles</div>
+                <div class="text-slate-300 text-xs">{{ __('ui.trust_strip.vehicles_fleet') }}</div>
             </div>
             <div class="p-2">
                 <i class="bi bi-geo-alt text-primary text-2xl mb-1.5 block"></i>
                 <div class="text-xl font-bold text-white mb-0.5">Local</div>
-                <div class="text-slate-300 text-xs">Expert Guides</div>
+                <div class="text-slate-300 text-xs">{{ __('ui.why_choose_us.expert_team') }}</div>
             </div>
             <div class="p-2">
                 <i class="bi bi-star text-primary text-2xl mb-1.5 block"></i>
                 <div class="text-xl font-bold text-white mb-0.5">Best</div>
-                <div class="text-slate-300 text-xs">Price Promise</div>
+                <div class="text-slate-300 text-xs">{{ __('ui.why_choose_us.best_price') }}</div>
             </div>
         </div>
     </div>

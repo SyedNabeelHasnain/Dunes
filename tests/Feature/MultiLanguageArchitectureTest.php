@@ -477,4 +477,39 @@ class MultiLanguageArchitectureTest extends TestCase
         $response->assertJsonStructure(['success', 'message', 'output']);
         $this->assertTrue($response->json('success'));
     }
+
+    /**
+     * Test navigation preserves locale across pages.
+     */
+    public function test_navigation_preserves_locale_across_pages(): void
+    {
+        $this->artisan('migrate');
+
+        // 1. Visit Arabic homepage
+        $responseAr = $this->get('/ar');
+        $responseAr->assertStatus(200);
+        $responseAr->assertSee('/ar/about', false);
+        $responseAr->assertSee('/ar/tours', false);
+        $responseAr->assertSee('/ar/contact', false);
+        $responseAr->assertSee('/ar/faq', false);
+
+        // 2. Visit Arabic about page directly via the link
+        $responseAbout = $this->get('/ar/about');
+        $responseAbout->assertStatus(200);
+        $responseAbout->assertSee('lang="ar"', false);
+        $responseAbout->assertSee('dir="rtl"', false);
+        $responseAbout->assertSee('/ar/tours', false);
+        $responseAbout->assertSee('/ar/contact', false);
+
+        // 3. Visit Russian homepage
+        $responseRu = $this->get('/ru');
+        $responseRu->assertStatus(200);
+        $responseRu->assertSee('/ru/about', false);
+        $responseRu->assertSee('/ru/tours', false);
+
+        // 4. Default English homepage should have no prefix
+        $responseEn = $this->get('/');
+        $responseEn->assertStatus(200);
+        $responseEn->assertSee('href="http://localhost/about"', false);
+    }
 }

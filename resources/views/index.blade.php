@@ -149,11 +149,11 @@ if (!function_exists('renderReviewCardMarkup')) {
             </div>
             <div class="border-l border-r border-white/25 px-6 sm:px-12">
                 <div class="text-2xl sm:text-3xl font-black text-white">4.9/5</div>
-                <div class="uppercase font-semibold text-[10px] sm:text-xs tracking-wider text-slate-300">Top Rated</div>
+                <div class="uppercase font-semibold text-[10px] sm:text-xs tracking-wider text-slate-300">{{ __('ui.trust_strip.top_rated') }}</div>
             </div>
             <div>
                 <div class="text-2xl sm:text-3xl font-black text-white">24/7</div>
-                <div class="uppercase font-semibold text-[10px] sm:text-xs tracking-wider text-slate-300">Support</div>
+                <div class="uppercase font-semibold text-[10px] sm:text-xs tracking-wider text-slate-300">{{ __('ui.trust_strip.support_247') }}</div>
             </div>
         </div>
     </div>
@@ -166,29 +166,29 @@ if (!function_exists('renderReviewCardMarkup')) {
             <div class="flex items-center gap-2.5">
                 <i class="bi bi-patch-check-fill text-primary text-xl shrink-0"></i>
                 <div>
-                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">DTCM Licensed Operator</div>
-                    <div class="text-slate-500 text-[11px]">Dubai Tourism Authority</div>
+                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">{{ __('ui.trust_strip.dtcm_licensed') }}</div>
+                    <div class="text-slate-500 text-[11px]">{{ __('ui.trust_strip.dtcm_desc') }}</div>
                 </div>
             </div>
             <div class="flex items-center gap-2.5">
                 <i class="bi bi-arrow-repeat text-emerald-600 text-xl shrink-0"></i>
                 <div>
-                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">100% Free Cancellation</div>
-                    <div class="text-slate-500 text-[11px]">Full refund 24h prior</div>
+                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">{{ __('ui.trust_strip.free_cancel') }}</div>
+                    <div class="text-slate-500 text-[11px]">{{ __('ui.trust_strip.free_cancel_desc') }}</div>
                 </div>
             </div>
             <div class="flex items-center gap-2.5">
                 <i class="bi bi-award-fill text-amber-500 text-xl shrink-0"></i>
                 <div>
-                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">100% Halal Food</div>
-                    <div class="text-slate-500 text-[11px]">Veg, Non-Veg & Jain</div>
+                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">{{ __('ui.trust_strip.halal_food') }}</div>
+                    <div class="text-slate-500 text-[11px]">{{ __('ui.trust_strip.halal_food_desc') }}</div>
                 </div>
             </div>
             <div class="flex items-center gap-2.5">
                 <i class="bi bi-shield-lock-fill text-cyan-600 text-xl shrink-0"></i>
                 <div>
-                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">Secure Reservation</div>
-                    <div class="text-slate-500 text-[11px]">Online / Cash on Pickup</div>
+                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">{{ __('ui.trust_strip.secure_checkout') }}</div>
+                    <div class="text-slate-500 text-[11px]">{{ __('ui.trust_strip.secure_checkout_desc') }}</div>
                 </div>
             </div>
         </div>
@@ -202,32 +202,32 @@ if (!function_exists('renderReviewCardMarkup')) {
             <div class="p-2">
                 <i class="bi bi-trophy text-primary text-2xl mb-1.5 block"></i>
                 <div class="text-xl font-bold text-white mb-0.5">#1</div>
-                <div class="text-slate-300 text-xs">Desert Safari</div>
+                <div class="text-slate-300 text-xs">{{ __('ui.trust_strip.no_1_safari') }}</div>
             </div>
             <div class="p-2">
                 <i class="bi bi-shield-check text-primary text-2xl mb-1.5 block"></i>
                 <div class="text-xl font-bold text-white mb-0.5">100%</div>
-                <div class="text-slate-300 text-xs">Secure Pay</div>
+                <div class="text-slate-300 text-xs">{{ __('ui.trust_strip.secure_pay') }}</div>
             </div>
             <div class="p-2">
                 <i class="bi bi-clock-history text-primary text-2xl mb-1.5 block"></i>
                 <div class="text-xl font-bold text-white mb-0.5">Fast</div>
-                <div class="text-slate-300 text-xs">Booking</div>
+                <div class="text-slate-300 text-xs">{{ __('ui.trust_strip.fast_booking') }}</div>
             </div>
             <div class="p-2">
                 <i class="bi bi-truck text-primary text-2xl mb-1.5 block"></i>
                 <div class="text-xl font-bold text-white mb-0.5">25+</div>
-                <div class="text-slate-300 text-xs">Vehicles</div>
+                <div class="text-slate-300 text-xs">{{ __('ui.trust_strip.vehicles_fleet') }}</div>
             </div>
             <div class="p-2">
                 <i class="bi bi-geo-alt text-primary text-2xl mb-1.5 block"></i>
                 <div class="text-xl font-bold text-white mb-0.5">Local</div>
-                <div class="text-slate-300 text-xs">Expert Guides</div>
+                <div class="text-slate-300 text-xs">{{ __('ui.why_choose_us.expert_team') }}</div>
             </div>
             <div class="p-2">
                 <i class="bi bi-star text-primary text-2xl mb-1.5 block"></i>
                 <div class="text-xl font-bold text-white mb-0.5">Best</div>
-                <div class="text-slate-300 text-xs">Price Promise</div>
+                <div class="text-slate-300 text-xs">{{ __('ui.why_choose_us.best_price') }}</div>
             </div>
         </div>
     </div>
@@ -238,10 +238,10 @@ if (!function_exists('renderReviewCardMarkup')) {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-10 sm:mb-12">
             <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">
-                Explore Dubai <span class="text-primary">by Experience</span>
+                {{ __('ui.home_categories.title') }} <span class="text-primary">{{ __('ui.home_categories.title_highlight') }}</span>
             </h2>
             <p class="text-slate-600 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-                Choose from our signature desert expeditions, high-power self-drive rentals, skyline cruises, and cultural city tours.
+                {{ __('ui.home_categories.subtitle') }}
             </p>
         </div>
 
@@ -250,11 +250,11 @@ if (!function_exists('renderReviewCardMarkup')) {
                 <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 text-2xl group-hover:scale-110 transition-transform">
                     <i class="bi bi-sunset-fill"></i>
                 </div>
-                <h3 class="text-lg font-bold text-slate-900 mb-2">Evening Desert Safari</h3>
-                <p class="text-slate-600 text-sm mb-4 flex-grow leading-relaxed">Red dune bashing, camel rides, sandboarding, live Tanoura & fire shows, plus a 5-star live BBQ dinner.</p>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">{{ __('ui.home_categories.evening_title') }}</h3>
+                <p class="text-slate-600 text-sm mb-4 flex-grow leading-relaxed">{{ __('ui.home_categories.evening_desc') }}</p>
                 <a href="{{ url('/evening-desert-safari-dubai') }}" class="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:text-primary-hover transition-colors mt-auto">
-                    <span>Explore Safaris</span>
-                    <i class="bi bi-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    <span>{{ __('ui.home_categories.evening_btn') }}</span>
+                    <i class="bi bi-arrow-right rtl:rotate-180 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform"></i>
                 </a>
             </div>
 
@@ -262,11 +262,11 @@ if (!function_exists('renderReviewCardMarkup')) {
                 <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 text-2xl group-hover:scale-110 transition-transform">
                     <i class="bi bi-speedometer2"></i>
                 </div>
-                <h3 class="text-lg font-bold text-slate-900 mb-2">Dune Buggy & ATV</h3>
-                <p class="text-slate-600 text-sm mb-4 flex-grow leading-relaxed">Self-drive 1000cc Can-Am Maverick and Polaris RZR buggies across the untamed Lahbab dunes.</p>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">{{ __('ui.home_categories.buggy_title') }}</h3>
+                <p class="text-slate-600 text-sm mb-4 flex-grow leading-relaxed">{{ __('ui.home_categories.buggy_desc') }}</p>
                 <a href="{{ url('/dune-buggy-rental-dubai') }}" class="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:text-primary-hover transition-colors mt-auto">
-                    <span>Explore Buggies</span>
-                    <i class="bi bi-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    <span>{{ __('ui.home_categories.buggy_btn') }}</span>
+                    <i class="bi bi-arrow-right rtl:rotate-180 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform"></i>
                 </a>
             </div>
 
@@ -274,11 +274,11 @@ if (!function_exists('renderReviewCardMarkup')) {
                 <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 text-2xl group-hover:scale-110 transition-transform">
                     <i class="bi bi-water"></i>
                 </div>
-                <h3 class="text-lg font-bold text-slate-900 mb-2">Marina Dhow Cruise</h3>
-                <p class="text-slate-600 text-sm mb-4 flex-grow leading-relaxed">Gourmet international buffet dinner cruise along the illuminated Dubai Marina & JBR skyline.</p>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">{{ __('ui.home_categories.cruise_title') }}</h3>
+                <p class="text-slate-600 text-sm mb-4 flex-grow leading-relaxed">{{ __('ui.home_categories.cruise_desc') }}</p>
                 <a href="{{ url('/dhow-cruise-catamaran-cruise-dinner-dubai') }}" class="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:text-primary-hover transition-colors mt-auto">
-                    <span>Explore Cruises</span>
-                    <i class="bi bi-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    <span>{{ __('ui.home_categories.cruise_btn') }}</span>
+                    <i class="bi bi-arrow-right rtl:rotate-180 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform"></i>
                 </a>
             </div>
 
@@ -286,35 +286,35 @@ if (!function_exists('renderReviewCardMarkup')) {
                 <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 text-2xl group-hover:scale-110 transition-transform">
                     <i class="bi bi-building"></i>
                 </div>
-                <h3 class="text-lg font-bold text-slate-900 mb-2">Abu Dhabi City Tour</h3>
-                <p class="text-slate-600 text-sm mb-4 flex-grow leading-relaxed">Chauffeured full-day luxury sightseeing tour to the Sheikh Zayed Grand Mosque & Louvre Museum.</p>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">{{ __('ui.home_categories.city_title') }}</h3>
+                <p class="text-slate-600 text-sm mb-4 flex-grow leading-relaxed">{{ __('ui.home_categories.city_desc') }}</p>
                 <a href="{{ url('/abu-dhabi-city-tour-from-dubai') }}" class="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:text-primary-hover transition-colors mt-auto">
-                    <span>Explore Tours</span>
-                    <i class="bi bi-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    <span>{{ __('ui.home_categories.city_btn') }}</span>
+                    <i class="bi bi-arrow-right rtl:rotate-180 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform"></i>
                 </a>
             </div>
         </div>
 
         <div class="mt-8 p-6 sm:p-8 rounded-2xl shadow-sm bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-primary/30">
             <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
-                <div class="text-center lg:text-left">
-                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2 mb-2">
+                <div class="text-center lg:text-left rtl:lg:text-right">
+                    <div class="flex flex-wrap items-center justify-center lg:justify-start rtl:lg:justify-start gap-2 mb-2">
                         <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold bg-primary/20 text-primary border border-primary/40">
-                            <i class="bi bi-compass"></i> Safari Selection Concierge
+                            <i class="bi bi-compass"></i> {{ __('ui.home_concierge.badge') }}
                         </span>
                         <span class="bg-amber-400 text-slate-950 rounded-full px-2.5 py-0.5 text-xs font-bold">
-                            5% OFF Unlocked
+                            {{ __('ui.home_concierge.discount_badge') }}
                         </span>
                     </div>
-                    <h2 class="font-extrabold text-white text-xl sm:text-2xl mb-1.5">Undecided on which desert safari is best for your party?</h2>
-                    <p class="text-slate-300 text-sm">Take our 30-second interactive matching quiz or customize your own private 4x4, buggy, and VIP dinner setup.</p>
+                    <h2 class="font-extrabold text-white text-xl sm:text-2xl mb-1.5">{{ __('ui.home_concierge.heading') }}</h2>
+                    <p class="text-slate-300 text-sm">{{ __('ui.home_concierge.subheading') }}</p>
                 </div>
                 <div class="flex flex-col sm:flex-row gap-3 shrink-0 w-full sm:w-auto">
                     <button type="button" class="btn-desert-animated text-sm font-bold rounded-full px-5 py-3 text-white inline-flex items-center justify-center gap-2 cursor-pointer shadow-md" @click="$store.modal.open('safari-matcher')">
-                        <i class="bi bi-compass"></i> Safari Match Concierge
+                        <i class="bi bi-compass"></i> {{ __('ui.home_concierge.quiz_btn') }}
                     </button>
                     <a href="{{ route('tours.customizer') }}" class="border border-white/40 hover:border-white text-white text-sm font-bold rounded-full px-5 py-3 inline-flex items-center justify-center gap-2 transition-colors">
-                        <i class="bi bi-sliders"></i> Custom Safari
+                        <i class="bi bi-sliders"></i> {{ __('ui.home_concierge.custom_btn') }}
                     </a>
                 </div>
             </div>
@@ -327,10 +327,10 @@ if (!function_exists('renderReviewCardMarkup')) {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-10 sm:mb-12">
             <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">
-                Popular <span class="text-primary">Tours</span>
+                {{ __('ui.home_popular.title') }} <span class="text-primary">{{ __('ui.home_popular.title_highlight') }}</span>
             </h2>
             <p class="text-slate-600 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
-                Handpicked experiences for unforgettable memories in the heart of Dubai.
+                {{ __('ui.home_popular.subtitle') }}
             </p>
         </div>
 
@@ -345,8 +345,8 @@ if (!function_exists('renderReviewCardMarkup')) {
                         <div class="relative overflow-hidden aspect-[16/10]">
                             <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy">
                             @if($t->is_bestseller)
-                            <span class="absolute top-3 left-3 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-md inline-flex items-center gap-1">
-                                <i class="bi bi-fire text-amber-300"></i>Best Seller
+                            <span class="absolute top-3 left-3 rtl:left-auto rtl:right-3 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-md inline-flex items-center gap-1">
+                                <i class="bi bi-fire text-amber-300"></i>{{ __('ui.home_popular.bestseller') }}
                             </span>
                             @endif
                             <div class="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
@@ -368,22 +368,22 @@ if (!function_exists('renderReviewCardMarkup')) {
                             @php $homeBookings = (int)(($t->id * 3 + (int)date('j')) % 5 + 3); @endphp
                             <div class="inline-flex items-center gap-1.5 text-red-600 text-xs font-bold mb-3">
                                 <i class="bi bi-fire text-red-500"></i>
-                                <span>{{ $homeBookings }} booked in last 6 hours</span>
+                                <span>{{ __('ui.home_popular.booked_recent', ['count' => $homeBookings]) }}</span>
                             </div>
                             <div class="flex justify-between items-end mt-auto pt-3 border-t border-slate-200">
                                 <div>
-                                    <span class="block text-[10px] uppercase font-bold text-slate-500">Starting from</span>
+                                    <span class="block text-[10px] uppercase font-bold text-slate-500">{{ __('ui.home_popular.starting_from') }}</span>
                                     <span class="text-lg font-black text-primary" data-aed="{{ $minPrice }}">AED {{ number_format($minPrice) }}</span>
                                 </div>
                                 <div class="flex items-center gap-1.5">
                                     <button type="button" class="border border-slate-300 hover:border-primary text-slate-700 bg-white hover:text-primary text-xs font-semibold rounded-full px-2.5 py-1 transition-colors btn-toggle-compare inline-flex items-center gap-1 cursor-pointer" data-tour-id="{{ $t->id }}" onclick="event.preventDefault(); event.stopPropagation(); window.DunesCompare && window.DunesCompare.toggle(this);">
-                                        <i class="bi bi-shuffle"></i> <span class="compare-btn-text">Compare</span>
+                                        <i class="bi bi-shuffle"></i> <span class="compare-btn-text">{{ __('ui.home_popular.compare') }}</span>
                                     </button>
                                     <span role="button" tabindex="0" class="btn-circle-whatsapp fab-whatsapp w-8 h-8 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center cursor-pointer shadow-xs transition-transform hover:scale-105" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp" onclick="event.preventDefault(); event.stopPropagation(); if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp('{{ addslashes($t->name) }}'); }" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();if(window.App&&typeof window.App.openWhatsApp==='function'){window.App.openWhatsApp('{{ addslashes($t->name) }}');}}">
                                         <i class="bi bi-whatsapp text-sm"></i>
                                     </span>
                                     <div class="w-8 h-8 rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white flex items-center justify-center transition-colors">
-                                        <i class="bi bi-arrow-right text-sm"></i>
+                                        <i class="bi bi-arrow-right rtl:rotate-180 text-sm"></i>
                                     </div>
                                 </div>
                             </div>
@@ -395,8 +395,8 @@ if (!function_exists('renderReviewCardMarkup')) {
 
         <div class="text-center">
             <a href="{{ route('tours.index') }}" class="btn-desert-animated-dark text-base font-bold rounded-full px-8 py-3.5 inline-flex items-center gap-2 shadow-md">
-                <span>View All Tours</span>
-                <i class="bi bi-arrow-right"></i>
+                <span>{{ __('ui.home_popular.view_all') }}</span>
+                <i class="bi bi-arrow-right rtl:rotate-180"></i>
             </a>
         </div>
     </div>
@@ -409,9 +409,9 @@ if (!function_exists('renderReviewCardMarkup')) {
 <section class="reviews-section bg-primary/5 py-12 sm:py-16 overflow-hidden">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 text-center">
         <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">
-            What Our <span class="text-primary">Guests Say</span>
+            {{ __('ui.home_reviews.title') }} <span class="text-primary">{{ __('ui.home_reviews.title_highlight') }}</span>
         </h2>
-        <p class="text-slate-600 text-base sm:text-lg">Real reviews from real travelers around the world.</p>
+        <p class="text-slate-600 text-base sm:text-lg">{{ __('ui.home_reviews.subtitle') }}</p>
     </div>
 
     @php
@@ -447,10 +447,10 @@ if (!function_exists('renderReviewCardMarkup')) {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-10 sm:mb-12">
             <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">
-                Why <span class="text-primary">Choose Us</span>
+                {{ __('ui.why_choose_us.title') }}
             </h2>
             <p class="text-slate-600 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
-                Trusted by thousands of travelers worldwide for premium desert experiences.
+                {{ __('ui.why_choose_us.subtitle_home') }}
             </p>
         </div>
 
@@ -459,22 +459,22 @@ if (!function_exists('renderReviewCardMarkup')) {
                 <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl">
                     <i class="bi bi-shield-check"></i>
                 </div>
-                <h3 class="text-lg sm:text-xl font-bold text-slate-900 mb-2">Best Price Guarantee</h3>
-                <p class="text-slate-600 text-sm leading-relaxed">We match any competitor price. No hidden fees, what you see is what you pay.</p>
+                <h3 class="text-lg sm:text-xl font-bold text-slate-900 mb-2">{{ __('ui.why_choose_us.best_price') }}</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">{{ __('ui.why_choose_us.best_price_desc') }}</p>
             </div>
             <div class="bg-slate-50 hover:bg-white rounded-2xl p-6 sm:p-8 text-center border border-slate-200 hover:border-primary/40 shadow-xs hover:shadow-lg transition-all duration-300">
                 <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl">
                     <i class="bi bi-lightning-charge"></i>
                 </div>
-                <h3 class="text-lg sm:text-xl font-bold text-slate-900 mb-2">Instant Confirmation</h3>
-                <p class="text-slate-600 text-sm leading-relaxed">Receive immediate booking confirmation via email and WhatsApp.</p>
+                <h3 class="text-lg sm:text-xl font-bold text-slate-900 mb-2">{{ __('ui.why_choose_us.instant_confirm') }}</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">{{ __('ui.why_choose_us.instant_confirm_desc') }}</p>
             </div>
             <div class="bg-slate-50 hover:bg-white rounded-2xl p-6 sm:p-8 text-center border border-slate-200 hover:border-primary/40 shadow-xs hover:shadow-lg transition-all duration-300">
                 <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl">
                     <i class="bi bi-calendar-x"></i>
                 </div>
-                <h3 class="text-lg sm:text-xl font-bold text-slate-900 mb-2">Free Cancellation</h3>
-                <p class="text-slate-600 text-sm leading-relaxed">Cancel up to 24 hours before for a full refund. Flexibility guaranteed.</p>
+                <h3 class="text-lg sm:text-xl font-bold text-slate-900 mb-2">{{ __('ui.why_choose_us.free_cancel') }}</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">{{ __('ui.why_choose_us.free_cancel_desc') }}</p>
             </div>
         </div>
     </div>
@@ -485,10 +485,10 @@ if (!function_exists('renderReviewCardMarkup')) {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-10 sm:mb-12">
             <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">
-                Dubai Desert Safari <span class="text-primary">Essential Guide</span>
+                {{ __('ui.guide_section.title') }} <span class="text-primary">{{ __('ui.guide_section.title_highlight') }}</span>
             </h2>
             <p class="text-slate-600 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-                Key facts, locations, and guidelines to help you plan the perfect Arabian desert adventure.
+                {{ __('ui.guide_section.subtitle') }}
             </p>
         </div>
 
@@ -498,9 +498,9 @@ if (!function_exists('renderReviewCardMarkup')) {
                     <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-lg shrink-0">
                         <i class="bi bi-geo-alt-fill"></i>
                     </div>
-                    <h3 class="text-base font-bold text-slate-900">Location & Dunes</h3>
+                    <h3 class="text-base font-bold text-slate-900">{{ __('ui.guide_section.loc_title') }}</h3>
                 </div>
-                <p class="text-slate-600 text-sm leading-relaxed">Our desert safaris take place in the iconic <strong>Lahbab Red Dunes</strong> (Big Red) and the Dubai Desert Conservation Area, celebrated for deep terracotta-colored sand dunes reaching heights over 300 feet.</p>
+                <p class="text-slate-600 text-sm leading-relaxed">{{ __('ui.guide_section.loc_desc') }}</p>
             </div>
 
             <div class="bg-white p-6 rounded-2xl shadow-xs border-l-4 border-primary hover:shadow-md transition-shadow">
@@ -508,9 +508,9 @@ if (!function_exists('renderReviewCardMarkup')) {
                     <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-lg shrink-0">
                         <i class="bi bi-truck"></i>
                     </div>
-                    <h3 class="text-base font-bold text-slate-900">4x4 Fleet & Safety</h3>
+                    <h3 class="text-base font-bold text-slate-900">{{ __('ui.guide_section.fleet_title') }}</h3>
                 </div>
-                <p class="text-slate-600 text-sm leading-relaxed">Every transfer is conducted in modern, climate-controlled <strong>4x4 Toyota Land Cruisers</strong> equipped with reinforced roll cages, comprehensive passenger insurance, and RTA-certified desert marshals.</p>
+                <p class="text-slate-600 text-sm leading-relaxed">{{ __('ui.guide_section.fleet_desc') }}</p>
             </div>
 
             <div class="bg-white p-6 rounded-2xl shadow-xs border-l-4 border-primary hover:shadow-md transition-shadow">
@@ -518,9 +518,9 @@ if (!function_exists('renderReviewCardMarkup')) {
                     <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-lg shrink-0">
                         <i class="bi bi-cup-hot-fill"></i>
                     </div>
-                    <h3 class="text-base font-bold text-slate-900">Dining & Dietary Options</h3>
+                    <h3 class="text-base font-bold text-slate-900">{{ __('ui.guide_section.dining_title') }}</h3>
                 </div>
-                <p class="text-slate-600 text-sm leading-relaxed">Experience a 5-star <strong>100% Halal live BBQ buffet</strong> prepared fresh at our Bedouin-style camp, featuring dedicated counters for Vegetarian, Non-Vegetarian, Jain, and Gluten-Free dining options.</p>
+                <p class="text-slate-600 text-sm leading-relaxed">{{ __('ui.guide_section.dining_desc') }}</p>
             </div>
 
             <div class="bg-white p-6 rounded-2xl shadow-xs border-l-4 border-primary hover:shadow-md transition-shadow">
@@ -528,9 +528,9 @@ if (!function_exists('renderReviewCardMarkup')) {
                     <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-lg shrink-0">
                         <i class="bi bi-clock-history"></i>
                     </div>
-                    <h3 class="text-base font-bold text-slate-900">Timing & Duration</h3>
+                    <h3 class="text-base font-bold text-slate-900">{{ __('ui.guide_section.timing_title') }}</h3>
                 </div>
-                <p class="text-slate-600 text-sm leading-relaxed"><strong>Evening Safaris</strong> run from 2:30 PM to 9:30 PM (6-7 hours total). <strong>Morning Safaris</strong> run from 7:00 AM to 11:30 AM (4 hours). Chauffeur hotel pick and drop is included across Dubai & Sharjah.</p>
+                <p class="text-slate-600 text-sm leading-relaxed">{{ __('ui.guide_section.timing_desc') }}</p>
             </div>
 
             <div class="bg-white p-6 rounded-2xl shadow-xs border-l-4 border-primary hover:shadow-md transition-shadow">
@@ -538,9 +538,9 @@ if (!function_exists('renderReviewCardMarkup')) {
                     <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-lg shrink-0">
                         <i class="bi bi-people-fill"></i>
                     </div>
-                    <h3 class="text-base font-bold text-slate-900">Family & Child Safety</h3>
+                    <h3 class="text-base font-bold text-slate-900">{{ __('ui.guide_section.family_title') }}</h3>
                 </div>
-                <p class="text-slate-600 text-sm leading-relaxed">Families with children or seniors can request <strong>child safety booster seats</strong> and gentle non-dune-bashing direct scenic transfers to the camp for a relaxing evening experience.</p>
+                <p class="text-slate-600 text-sm leading-relaxed">{{ __('ui.guide_section.family_desc') }}</p>
             </div>
 
             <div class="bg-white p-6 rounded-2xl shadow-xs border-l-4 border-primary hover:shadow-md transition-shadow">
@@ -548,9 +548,9 @@ if (!function_exists('renderReviewCardMarkup')) {
                     <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-lg shrink-0">
                         <i class="bi bi-patch-check-fill"></i>
                     </div>
-                    <h3 class="text-base font-bold text-slate-900">Booking & Cancellation</h3>
+                    <h3 class="text-base font-bold text-slate-900">{{ __('ui.guide_section.booking_title') }}</h3>
                 </div>
-                <p class="text-slate-600 text-sm leading-relaxed">Reserve instantly with <strong>zero advance payment</strong> (Cash on Pickup) or secure card payment. Enjoy <strong>100% full refund</strong> on cancellations made up to 24 hours prior to departure.</p>
+                <p class="text-slate-600 text-sm leading-relaxed">{{ __('ui.guide_section.booking_desc') }}</p>
             </div>
         </div>
     </div>
@@ -561,9 +561,9 @@ if (!function_exists('renderReviewCardMarkup')) {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-10 sm:mb-12">
             <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">
-                Common <span class="text-primary">Questions</span>
+                {{ __('ui.faq_section.common_questions') }}
             </h2>
-            <p class="text-slate-600 text-base sm:text-lg">Everything you need to know about our desert safari tours.</p>
+            <p class="text-slate-600 text-base sm:text-lg">{{ __('ui.faq_section.subtitle') }}</p>
         </div>
 
         <div x-data="{ activeFaq: null }" class="max-w-3xl mx-auto space-y-3">
@@ -588,7 +588,7 @@ if (!function_exists('renderReviewCardMarkup')) {
 
         <div class="text-center mt-10">
             <a href="{{ route('faq') }}" class="btn-desert-animated text-sm sm:text-base font-bold rounded-full px-8 py-3.5 inline-flex items-center gap-2 shadow-md">
-                <span>View All FAQs</span>
+                <span>{{ __('ui.faq_section.view_all') }}</span>
                 <i class="bi bi-arrow-right"></i>
             </a>
         </div>
@@ -603,30 +603,30 @@ if (!function_exists('renderReviewCardMarkup')) {
 
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-amber-400/30 text-amber-300 text-xs font-bold uppercase tracking-wider mb-5 shadow-lg">
-            <i class="bi bi-patch-check-fill text-amber-400"></i> Licensed Dubai Tour Operator • DTCM Permit #1430583
+            <i class="bi bi-patch-check-fill text-amber-400"></i> {{ __('ui.home_cta.license_badge') }}
         </div>
         <h2 class="text-3xl sm:text-5xl font-black mb-4 text-white tracking-tight leading-tight">
-            Ready for Your <span class="bg-gradient-to-r from-orange-400 via-amber-300 to-yellow-400 bg-clip-text text-transparent">Dubai Desert Adventure</span>?
+            {{ __('ui.home_cta.title_prefix') }} <span class="bg-gradient-to-r from-orange-400 via-amber-300 to-yellow-400 bg-clip-text text-transparent">{{ __('ui.home_cta.title_highlight') }}</span>?
         </h2>
         <p class="text-base sm:text-lg mb-8 text-slate-300 max-w-2xl mx-auto leading-relaxed font-normal">
-            Reserve your safari experience in 60 seconds with instant booking confirmation. Free cancellation up to 24 hours prior with full refund.
+            {{ __('ui.home_cta.subtitle') }}
         </p>
         <div class="flex flex-wrap justify-center gap-4">
             <button type="button" class="btn-desert-animated text-base sm:text-lg font-bold rounded-full px-8 py-3.5 shadow-xl inline-flex items-center gap-2 cursor-pointer text-white" @click="$store.modal.open('booking')">
                 <i class="bi bi-calendar-check text-lg"></i>
-                <span>Book Your Tour Now</span>
+                <span>{{ __('ui.home_cta.book_btn') }}</span>
             </button>
             @php $waNumClean = preg_replace('/[^0-9]/', '', $settings['whatsapp_phone'] ?? '971502456056'); @endphp
             <a href="https://wa.me/{{ $waNumClean }}?text={{ urlencode('Hi Dunes Discovery Tourism! I would like to inquire about booking a desert safari.') }}" target="_blank" rel="noopener" class="border border-slate-700 hover:border-white bg-slate-900/80 hover:bg-slate-900 text-white text-base font-bold rounded-full px-6 py-3.5 inline-flex items-center gap-2 shadow-md transition-all">
                 <i class="bi bi-whatsapp text-emerald-400 text-lg"></i>
-                <span>WhatsApp Us</span>
+                <span>{{ __('ui.home_cta.whatsapp_btn') }}</span>
             </a>
         </div>
         <div class="flex flex-wrap justify-center items-center gap-4 sm:gap-8 mt-10 text-slate-300 text-xs sm:text-sm font-medium">
-            <div class="inline-flex items-center gap-1.5"><i class="bi bi-check-circle-fill text-amber-400"></i> Free 24h Cancellation</div>
-            <div class="inline-flex items-center gap-1.5"><i class="bi bi-check-circle-fill text-amber-400"></i> Luxury 4x4 Land Cruiser Transfers</div>
-            <div class="inline-flex items-center gap-1.5"><i class="bi bi-check-circle-fill text-amber-400"></i> Pay Online or Cash on Pickup</div>
-            <div class="inline-flex items-center gap-1.5"><i class="bi bi-check-circle-fill text-amber-400"></i> Instant Digital Voucher</div>
+            <div class="inline-flex items-center gap-1.5"><i class="bi bi-check-circle-fill text-amber-400"></i> {{ __('ui.home_cta.badge_cancel') }}</div>
+            <div class="inline-flex items-center gap-1.5"><i class="bi bi-check-circle-fill text-amber-400"></i> {{ __('ui.home_cta.badge_transfers') }}</div>
+            <div class="inline-flex items-center gap-1.5"><i class="bi bi-check-circle-fill text-amber-400"></i> {{ __('ui.home_cta.badge_payment') }}</div>
+            <div class="inline-flex items-center gap-1.5"><i class="bi bi-check-circle-fill text-amber-400"></i> {{ __('ui.home_cta.badge_voucher') }}</div>
         </div>
     </div>
 </section>
