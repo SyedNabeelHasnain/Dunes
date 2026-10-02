@@ -129,4 +129,30 @@ class WhatsAppLeadTest extends TestCase
 
         $this->assertEquals('1', Setting::where('setting_key', 'whatsapp_form_enabled')->value('setting_value'));
     }
+
+    public function test_admin_whatsapp_index_renders_lead_with_numeric_phone_and_details_modal_markup(): void
+    {
+        $admin = User::first() ?: User::factory()->create([
+            'email' => 'admin@dunesdiscoverytourism.com',
+            'role' => 'admin',
+        ]);
+
+        $lead = WhatsappInquiry::create([
+            'name' => 'Sara Al Nuaimi',
+            'phone' => '971501234567',
+            'tour_name' => 'VIP Evening Red Dunes Safari',
+            'page_url' => 'http://localhost/vip-evening-safari',
+            'message_text' => 'Interested in VIP booking for 4 guests',
+            'device_type' => 'mobile',
+            'city' => 'Dubai',
+            'country' => 'AE',
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('admin.whatsapp.leads'));
+        $response->assertStatus(200);
+        $response->assertSee('Sara Al Nuaimi');
+        $response->assertSee('data-phone="971501234567"', false);
+        // Verify defensive String coercion is present in the page scripts
+        $response->assertSee('const cleanPhone = String(phone).replace(/[^0-9]/g, \'\');', false);
+    }
 }

@@ -423,7 +423,7 @@ $(document).ready(function() {
                                 Swal.fire('Copied!', 'Payment link copied to clipboard.', 'success');
                             });
                         } else if (result.dismiss === Swal.DismissReason.cancel) {
-                            const waPhone = (data.payment && data.payment.phone ? data.payment.phone : '').replace(/[^0-9]/g, '');
+                            const waPhone = String(data.payment && data.payment.phone ? data.payment.phone : '').replace(/[^0-9]/g, '');
                             const waName = data.payment && data.payment.name ? data.payment.name : 'there';
                             const waUrl = `https://wa.me/${waPhone}?text=${encodeURIComponent('Hi ' + waName + ', here is your payment link from Dunes Discovery Tourism: ' + data.payment.link)}`;
                             window.open(waUrl, '_blank');

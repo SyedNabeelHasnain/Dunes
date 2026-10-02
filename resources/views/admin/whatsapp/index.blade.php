@@ -412,17 +412,18 @@ $(document).ready(function() {
     // View Details Modal Handler
     $('.view-lead-btn').on('click', function() {
         const btn = $(this);
-        const name = btn.data('name') || 'Visitor';
-        const phone = btn.data('phone') || 'No Phone';
-        const context = btn.data('context') || 'General Inquiry';
-        const url = btn.data('url') || '#';
-        const msg = btn.data('msg') || 'No message text provided.';
-        const ip = btn.data('ip') || '-';
-        const loc = btn.data('location') || 'Unknown Location';
-        const device = btn.data('device') || '-';
+        const name = String(btn.attr('data-name') || btn.data('name') || 'Visitor').trim();
+        const rawPhone = btn.attr('data-phone') !== undefined ? btn.attr('data-phone') : btn.data('phone');
+        const phone = (rawPhone !== undefined && rawPhone !== null && String(rawPhone).trim() !== '') ? String(rawPhone).trim() : '';
+        const context = String(btn.attr('data-context') || btn.data('context') || 'General Inquiry').trim();
+        const url = String(btn.attr('data-url') || btn.data('url') || '#').trim();
+        const msg = String(btn.attr('data-msg') || btn.data('msg') || 'No message text provided.').trim();
+        const ip = String(btn.attr('data-ip') || btn.data('ip') || '-').trim();
+        const loc = String(btn.attr('data-location') || btn.data('location') || 'Unknown Location').trim();
+        const device = String(btn.attr('data-device') || btn.data('device') || '-').trim();
 
         $('#modalCustomerName').text(name);
-        $('#modalCustomerPhone').text(phone);
+        $('#modalCustomerPhone').text(phone || 'No Phone');
         $('#modalTourName').text(context);
         $('#modalPageUrl').attr('href', url).text(url);
         $('#modalClientIp').text(ip);
@@ -431,14 +432,18 @@ $(document).ready(function() {
         $('#modalMessageText').text(msg);
 
         if (phone && phone !== 'No Phone') {
-            const cleanPhone = phone.replace(/[^0-9]/g, '');
-            const chatMsg = encodeURIComponent('Hi ' + name + '! Thanks for reaching out to Dunes Discovery Tourism regarding ' + context + '. How can we assist you?');
-            $('#modalDirectChatBtn').attr('href', `https://wa.me/${cleanPhone}?text=${chatMsg}`).show();
+            const cleanPhone = String(phone).replace(/[^0-9]/g, '');
+            if (cleanPhone) {
+                const chatMsg = encodeURIComponent('Hi ' + name + '! Thanks for reaching out to Dunes Discovery Tourism regarding ' + context + '. How can we assist you?');
+                $('#modalDirectChatBtn').attr('href', `https://wa.me/${cleanPhone}?text=${chatMsg}`).show();
+            } else {
+                $('#modalDirectChatBtn').hide();
+            }
         } else {
             $('#modalDirectChatBtn').hide();
         }
 
-        const id = btn.data('id');
+        const id = btn.attr('data-id') || btn.data('id');
         $('#modalDeleteLeadBtn').off('click').on('click', function() {
             window.dispatchEvent(new CustomEvent('close-lead-modal'));
             promptPermanentDeleteLead(id, name, phone);
@@ -578,7 +583,9 @@ $(document).ready(function() {
  * 2-Step Cautionary Double Confirmation for Permanent Single WhatsApp Lead Deletion
  */
 window.promptPermanentDeleteLead = function(id, name, phone) {
-    const verifyTarget = (phone && phone !== 'No Phone') ? phone.trim() : name.trim();
+    const phoneStr = (phone !== undefined && phone !== null && phone !== false) ? String(phone).trim() : '';
+    const nameStr = (name !== undefined && name !== null && name !== false) ? String(name).trim() : 'Visitor';
+    const verifyTarget = (phoneStr && phoneStr !== 'No Phone') ? phoneStr : nameStr;
 
     // Step 1: Caution Dialog
     Swal.fire({
