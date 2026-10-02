@@ -90,20 +90,20 @@
     <div class="flex items-center gap-3 px-4 py-2.5 rounded-full shadow-2xl bg-slate-950/95 border border-primary backdrop-blur-md">
         <div class="flex items-center -space-x-2" id="compareThumbBubbles"></div>
         <div class="text-white text-xs font-bold pe-2 border-r border-slate-700 hidden sm:block">
-            <span id="compareCountLabel" x-text="$store.compare.items ? $store.compare.items.length : 0">0</span>/3 Selected
+            <span id="compareCountLabel" x-text="$store.compare.items ? $store.compare.items.length : 0">0</span>/3
         </div>
         <button type="button" 
                 class="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs shadow-sm hover:shadow-md transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5" 
                 id="openCompareDrawerBtn" 
                 @click="$store.modal.open('compare')">
             <i class="bi bi-shuffle"></i>
-            <span>Compare Safaris</span>
+            <span>{{ __('ui.common.compare_safaris') }}</span>
         </button>
         <button type="button" 
                 class="text-slate-400 hover:text-white p-0 text-xs transition-colors cursor-pointer" 
                 id="clearCompareBtn" 
                 @click="$store.compare.clear()" 
-                title="Clear all">
+                title="{{ __('ui.comparison.clear') }}">
             <i class="bi bi-x-circle-fill"></i>
         </button>
     </div>
@@ -149,8 +149,8 @@
                     <i class="bi bi-shuffle text-lg"></i>
                 </span>
                 <div>
-                    <h5 class="font-extrabold text-sm sm:text-base text-white leading-tight">Compare Safari Experiences</h5>
-                    <p class="text-slate-300 text-xs hidden sm:block">Side-by-side comparison of vehicles, dune bashing, dinner & entertainment</p>
+                    <h5 class="font-extrabold text-sm sm:text-base text-white leading-tight">{{ __('ui.comparison.title') }}</h5>
+                    <p class="text-slate-300 text-xs hidden sm:block">{{ __('ui.comparison.empty_msg') }}</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
@@ -159,7 +159,7 @@
                         id="drawerPresetBtn"
                         @click="$store.compare.loadBestsellers()">
                     <i class="bi bi-lightning-fill text-amber-400"></i>
-                    <span>Compare Top 3</span>
+                    <span>{{ __('ui.comparison.compare_top_3') }}</span>
                 </button>
                 <button type="button" 
                         class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-colors cursor-pointer" 
@@ -177,15 +177,15 @@
                 <div class="w-16 h-16 rounded-full bg-slate-900 border border-slate-800 text-slate-300 flex items-center justify-center mx-auto mb-4 text-2xl">
                     <i class="bi bi-compass"></i>
                 </div>
-                <h5 class="text-base sm:text-lg font-bold text-white mb-2">No Safaris Selected for Comparison</h5>
+                <h5 class="text-base sm:text-lg font-bold text-white mb-2">{{ __('ui.comparison.title') }}</h5>
                 <p class="text-slate-300 text-xs sm:text-sm max-w-md mx-auto mb-6">
-                    Click the <strong class="text-white">+ Compare</strong> button on any safari card, or click below to analyze our Top 3 most popular Dubai experiences side-by-side:
+                    {{ __('ui.comparison.empty_msg') }}
                 </p>
                 <button type="button" 
                         class="px-5 py-2.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs sm:text-sm shadow-md transition-all cursor-pointer inline-flex items-center gap-2" 
                         @click="$store.compare.loadBestsellers()">
                     <i class="bi bi-stars"></i>
-                    <span>Compare Top 3 Bestsellers</span>
+                    <span>{{ __('ui.comparison.compare_bestsellers') }}</span>
                 </button>
             </div>
 
@@ -194,36 +194,36 @@
                 <table class="w-full text-left text-sm border-collapse min-w-[640px]" id="compareTable">
                     <thead>
                         <tr id="compareRowHeader" class="border-b border-slate-700">
-                            <th class="w-44 min-w-[176px] pb-4 text-xs font-bold uppercase tracking-wider text-slate-300">Feature</th>
+                            <th class="w-44 min-w-[176px] pb-4 text-xs font-bold uppercase tracking-wider text-slate-300">{{ __('ui.tour_glance.title') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-700/80 text-xs sm:text-sm">
                         <tr id="compareRowPrice">
-                            <td class="py-3 font-semibold text-slate-300 flex items-center gap-2"><i class="bi bi-cash-stack text-amber-400"></i>Starting Price</td>
+                            <td class="py-3 font-semibold text-slate-300 flex items-center gap-2"><i class="bi bi-cash-stack text-amber-400"></i>{{ __('ui.common.starting_from') }}</td>
                         </tr>
                         <tr id="compareRowDuration">
-                            <td class="py-3 font-semibold text-slate-300 flex items-center gap-2"><i class="bi bi-clock-history text-amber-400"></i>Duration</td>
+                            <td class="py-3 font-semibold text-slate-300 flex items-center gap-2"><i class="bi bi-clock-history text-amber-400"></i>{{ __('ui.tour_glance.duration') }}</td>
                         </tr>
                         <tr id="compareRowVehicle">
-                            <td class="py-3 font-semibold text-slate-300 flex items-center gap-2"><i class="bi bi-truck text-amber-400"></i>Vehicle & Transfer</td>
+                            <td class="py-3 font-semibold text-slate-300 flex items-center gap-2"><i class="bi bi-truck text-amber-400"></i>{{ __('ui.tour_glance.transfer_vehicle') }}</td>
                         </tr>
                         <tr id="compareRowDuneBashing">
-                            <td class="py-3 font-semibold text-slate-300 flex items-center gap-2"><i class="bi bi-speedometer2 text-amber-400"></i>Dune Bashing</td>
+                            <td class="py-3 font-semibold text-slate-300 flex items-center gap-2"><i class="bi bi-speedometer2 text-amber-400"></i>{{ __('ui.reviews_section.dune_bashing') }}</td>
                         </tr>
                         <tr id="compareRowDining">
-                            <td class="py-3 font-semibold text-slate-300 flex items-center gap-2"><i class="bi bi-cup-hot-fill text-amber-400"></i>Camp & Dinner</td>
+                            <td class="py-3 font-semibold text-slate-300 flex items-center gap-2"><i class="bi bi-cup-hot-fill text-amber-400"></i>{{ __('ui.tour_glance.dining_beverages') }}</td>
                         </tr>
                         <tr id="compareRowShows">
-                            <td class="py-3 font-semibold text-slate-300 flex items-center gap-2"><i class="bi bi-fire text-amber-400"></i>Live Shows</td>
+                            <td class="py-3 font-semibold text-slate-300 flex items-center gap-2"><i class="bi bi-fire text-amber-400"></i>{{ __('ui.tour_glance.bbq_live_shows') }}</td>
                         </tr>
                         <tr id="compareRowInclusions">
-                            <td class="py-3 font-semibold text-slate-300 flex items-center gap-2"><i class="bi bi-gift-fill text-amber-400"></i>Inclusions</td>
+                            <td class="py-3 font-semibold text-slate-300 flex items-center gap-2"><i class="bi bi-gift-fill text-amber-400"></i>{{ __('ui.tour.inclusions') }}</td>
                         </tr>
                         <tr id="compareRowCancellation">
-                            <td class="py-3 font-semibold text-slate-300 flex items-center gap-2"><i class="bi bi-shield-check text-emerald-400"></i>Cancellation</td>
+                            <td class="py-3 font-semibold text-slate-300 flex items-center gap-2"><i class="bi bi-shield-check text-emerald-400"></i>{{ __('ui.tour_glance.cancellation') }}</td>
                         </tr>
                         <tr id="compareRowAction">
-                            <td class="py-3 font-semibold text-slate-300">Book Experience</td>
+                            <td class="py-3 font-semibold text-slate-300">{{ __('ui.comparison.book_experience') }}</td>
                         </tr>
                     </tbody>
                 </table>

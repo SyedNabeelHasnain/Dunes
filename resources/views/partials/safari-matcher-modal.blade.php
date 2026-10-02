@@ -272,7 +272,7 @@
                                 <div class="flex items-start justify-between gap-2">
                                     <h5 class="font-extrabold text-white text-base truncate" x-text="result ? result.name : ''">Evening Desert Safari</h5>
                                     <div class="text-right shrink-0">
-                                        <div class="text-lg font-black text-amber-400 font-mono" x-text="'AED ' + ((result && result.min_price) ? result.min_price : 120)">AED 150</div>
+                                        <div class="text-lg font-black text-amber-400 font-mono" x-text="'{{ __('ui.common.aed') }} ' + ((result && result.min_price) ? result.min_price : 120)">{{ __('ui.common.aed') }} 150</div>
                                         <small class="text-slate-400 text-[10px]">per person</small>
                                     </div>
                                 </div>
@@ -317,15 +317,15 @@
                          <button type="button" 
                                  class="sm:col-span-7 w-full py-3.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2" 
                                  @click="book()">
-                             <span>{{ $conciergePromoActive ? "Book with {$conciergePromoDiscount}% OFF" : "Book Recommended Safari" }}</span>
-                             <i class="bi bi-arrow-right"></i>
+                             <span>{{ $conciergePromoActive ? __('ui.common.book_now') . " ({$conciergePromoDiscount}% OFF)" : __('ui.common.book_now') }}</span>
+                             <i class="bi bi-arrow-right rtl:rotate-180"></i>
                          </button>
                          <a :href="waUrl" 
                             target="_blank" 
                             rel="noopener" 
                             class="sm:col-span-5 w-full py-3.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm shadow-md transition-all flex items-center justify-center gap-2">
                              <i class="bi bi-whatsapp"></i>
-                             <span>Ask Concierge</span>
+                             <span>{{ __('ui.common.whatsapp_inquire') }}</span>
                          </a>
                      </div>
 

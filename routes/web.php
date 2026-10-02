@@ -11,7 +11,9 @@ use App\Http\Controllers\Admin\AdminFaqController;
 use App\Http\Controllers\Admin\AdminLanguageController;
 use App\Http\Controllers\Admin\AdminLegalController;
 use App\Http\Controllers\Admin\AdminMailSettingController;
+use App\Http\Controllers\Admin\AdminMenuController;
 use App\Http\Controllers\Admin\AdminOperationsController;
+use App\Http\Controllers\Admin\AdminPageController;
 use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\AdminTranslationApiController;
@@ -188,6 +190,22 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::post('/legal-pages/section/{sectionId}/item/add', [AdminLegalController::class, 'addItem'])->name('legal.item.add');
     Route::delete('/legal-pages/section/{id}', [AdminLegalController::class, 'deleteSection'])->name('legal.section.delete');
     Route::delete('/legal-pages/item/{id}', [AdminLegalController::class, 'deleteItem'])->name('legal.item.delete');
+
+    // Pages & Dynamic Content Manager
+    Route::get('/pages', [AdminPageController::class, 'index'])->name('pages.index');
+    Route::get('/pages/{id}/edit', [AdminPageController::class, 'edit'])->name('pages.edit');
+    Route::put('/pages/{id}', [AdminPageController::class, 'update'])->name('pages.update');
+    Route::post('/pages/{id}/sections', [AdminPageController::class, 'addSection'])->name('pages.sections.add');
+    Route::put('/pages/{pageId}/sections/{sectionId}', [AdminPageController::class, 'updateSection'])->name('pages.sections.update');
+    Route::delete('/pages/{pageId}/sections/{sectionId}', [AdminPageController::class, 'deleteSection'])->name('pages.sections.delete');
+    Route::post('/pages/{pageId}/sections/{sectionId}/toggle-status', [AdminPageController::class, 'toggleSectionStatus'])->name('pages.sections.toggle-status');
+
+    // Navigation & Menus Manager
+    Route::get('/menus', [AdminMenuController::class, 'index'])->name('menus.index');
+    Route::post('/menus', [AdminMenuController::class, 'store'])->name('menus.store');
+    Route::put('/menus/{id}', [AdminMenuController::class, 'update'])->name('menus.update');
+    Route::delete('/menus/{id}', [AdminMenuController::class, 'destroy'])->name('menus.destroy');
+    Route::post('/menus/{id}/toggle-status', [AdminMenuController::class, 'toggleStatus'])->name('menus.toggle-status');
 
     // Admin Profile & Security
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile');

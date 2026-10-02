@@ -235,9 +235,9 @@ if(window.fbq){
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full pb-10 pt-28 text-white">
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="flex items-center gap-2 text-xs sm:text-sm text-white/75 flex-wrap">
-                <li><a href="{{ route('home') }}" class="hover:text-white transition-colors">Home</a></li>
+                <li><a href="{{ route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') }}</a></li>
                 <li><span class="text-white/40">/</span></li>
-                <li><a href="{{ route('tours.index') }}" class="hover:text-white transition-colors">Tours</a></li>
+                <li><a href="{{ route('tours.index') }}" class="hover:text-white transition-colors">{{ __('ui.nav.all_tours') }}</a></li>
                 <li><span class="text-white/40">/</span></li>
                 <li class="text-white font-semibold truncate max-w-[200px] sm:max-w-none" aria-current="page">{{ $tour->name }}</li>
             </ol>
@@ -249,11 +249,11 @@ if(window.fbq){
                 </span>
                 @if($tour->is_bestseller)
                 <span class="bg-primary text-white px-3.5 py-1.5 rounded-full text-xs font-bold inline-flex items-center gap-1.5 shadow-sm">
-                    <i class="bi bi-fire text-amber-300"></i>Best Seller
+                    <i class="bi bi-fire text-amber-300"></i>{{ __('ui.common.bestseller') }}
                 </span>
                 @endif
                 <span class="bg-emerald-600/90 text-white px-3.5 py-1.5 rounded-full text-xs font-semibold inline-flex items-center gap-1.5">
-                    <i class="bi bi-shield-check text-emerald-200"></i>DTCM Licensed Operator
+                    <i class="bi bi-shield-check text-emerald-200"></i>{{ __('ui.trust.licensed_operator') }}
                 </span>
             </div>
             <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4 text-white tracking-tight leading-tight">{{ $tour->name }}</h1>
@@ -272,7 +272,7 @@ if(window.fbq){
                         <i class="bi bi-star-fill"></i>
                         <i class="bi bi-star-fill"></i>
                     </div>
-                    <span class="font-medium">{{ $tour->rating }} <span class="text-white/70">({{ number_format($tour->review_count) }} reviews)</span></span>
+                    <span class="font-medium">{{ $tour->rating }} <span class="text-white/70">({{ number_format($tour->review_count) }} {{ __('ui.common.reviews') }})</span></span>
                 </div>
                 <div class="hidden md:flex items-center gap-2 border-l border-white/25 pl-6">
                     <i class="bi bi-geo-alt-fill text-primary"></i>
@@ -481,7 +481,7 @@ if(window.fbq){
                             @if($inclusions->count())
                             <div class="bg-emerald-50/70 border-l-4 border-emerald-500 p-5 rounded-2xl">
                                 <h3 class="text-sm font-bold text-emerald-800 mb-4 flex items-center gap-2">
-                                    <i class="bi bi-check-circle-fill text-emerald-600"></i>What's Included
+                                    <i class="bi bi-check-circle-fill text-emerald-600"></i>{{ __('ui.tour.inclusions') }}
                                 </h3>
                                 <ul class="space-y-2.5 text-xs sm:text-sm text-slate-700">
                                     @foreach($inclusions as $inc)
@@ -497,7 +497,7 @@ if(window.fbq){
                             @if($exclusions->count())
                             <div class="bg-red-50/70 border-l-4 border-red-500 p-5 rounded-2xl">
                                 <h3 class="text-sm font-bold text-red-800 mb-4 flex items-center gap-2">
-                                    <i class="bi bi-x-circle-fill text-red-600"></i>Not Included
+                                    <i class="bi bi-x-circle-fill text-red-600"></i>{{ __('ui.tour.exclusions') }}
                                 </h3>
                                 <ul class="space-y-2.5 text-xs sm:text-sm text-slate-700">
                                     @foreach($exclusions as $exc)
@@ -518,7 +518,7 @@ if(window.fbq){
                     <div x-show="currentTab === 'info'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0">
                         <div class="bg-amber-50/70 border-l-4 border-amber-500 p-5 rounded-2xl">
                             <h3 class="text-sm font-bold text-amber-800 mb-3 flex items-center gap-2">
-                                <i class="bi bi-exclamation-triangle-fill text-amber-600"></i>Important Information
+                                <i class="bi bi-exclamation-triangle-fill text-amber-600"></i>{{ __('ui.tour.important_info') }}
                             </h3>
                             <ul class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm text-slate-700">
                                 @foreach($notAllowed as $na)
@@ -630,9 +630,9 @@ if(window.fbq){
                             <div class="text-center pt-2 pb-3 mb-3 border-b border-slate-200">
                                 <h3 class="text-base font-bold text-slate-900 mb-1.5">{{ $tier->name }}</h3>
                                 <div class="flex items-baseline justify-center gap-2">
-                                    <span class="text-2xl font-black text-primary" data-aed="{{ $tPrice }}">AED {{ number_format($tPrice) }}</span>
+                                    <span class="text-2xl font-black text-primary" data-aed="{{ $tPrice }}">{{ __('ui.common.aed') }} {{ number_format($tPrice) }}</span>
                                     @if($saveAmt)
-                                    <span class="text-xs text-slate-500 line-through" data-aed="{{ $tOldPrice }}">AED {{ number_format($tOldPrice) }}</span>
+                                    <span class="text-xs text-slate-500 line-through" data-aed="{{ $tOldPrice }}">{{ __('ui.common.aed') }} {{ number_format($tOldPrice) }}</span>
                                     @endif
                                 </div>
                                 <span class="text-[11px] text-slate-500 block mt-0.5">{{ __('ui.tour_glance.per_person_all_inclusive') }}</span>
@@ -680,7 +680,7 @@ if(window.fbq){
                 <!-- Contextual Cross-Tour Internal Links -->
                 <div class="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs mb-8">
                     <h3 class="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
-                        <i class="bi bi-compass text-primary"></i>Explore More Dubai Adventures
+                        <i class="bi bi-compass text-primary"></i>{{ __('ui.tour.similar_tours') }}
                     </h3>
                     <div class="flex flex-wrap gap-2">
                         <a href="{{ url('/dune-buggy-rental-dubai') }}" class="inline-flex items-center gap-1.5 bg-slate-50 hover:bg-white text-slate-700 hover:text-primary border border-slate-200 hover:border-primary rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors">
@@ -708,8 +708,8 @@ if(window.fbq){
                     <!-- Booking Card -->
                     <div class="bg-white rounded-2xl p-6 shadow-xl border border-slate-200">
                         <div class="text-center pb-4 mb-4 border-b border-slate-200">
-                            <span class="text-[11px] uppercase font-bold text-slate-500 tracking-wider">Starting from</span>
-                            <div class="text-3xl font-black text-primary mt-0.5" data-aed="{{ $minPrice }}">AED {{ number_format($minPrice) }}</div>
+                            <span class="text-[11px] uppercase font-bold text-slate-500 tracking-wider">{{ __('ui.common.starting_from') }}</span>
+                            <div class="text-3xl font-black text-primary mt-0.5" data-aed="{{ $minPrice }}">{{ __('ui.common.aed') }} {{ number_format($minPrice) }}</div>
                         </div>
 
                         <!-- Urgency Widget -->
@@ -718,15 +718,15 @@ if(window.fbq){
                                 <i class="bi bi-fire text-lg"></i>
                             </div>
                             <div>
-                                <div class="text-[10px] uppercase font-extrabold tracking-wider text-amber-800">HIGH DEMAND</div>
-                                <div class="text-xs font-bold text-slate-800">14 people booked in the last 24h</div>
+                                <div class="text-[10px] uppercase font-extrabold tracking-wider text-amber-800">{{ __('ui.tour_sidebar.high_demand') }}</div>
+                                <div class="text-xs font-bold text-slate-800">{{ __('ui.tour_sidebar.booked_last_24h', ['count' => 14]) }}</div>
                             </div>
                         </div>
 
                         <!-- Package Selector -->
                         <div class="mb-5">
                             <h3 class="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
-                                <i class="bi bi-box-seam text-primary"></i>Select Package
+                                <i class="bi bi-box-seam text-primary"></i>{{ __('ui.tour_sidebar.select_package') }}
                             </h3>
                             <div class="space-y-2.5">
                                 @foreach($tour->tiers->sortBy('priority') as $tier)
@@ -737,7 +737,7 @@ if(window.fbq){
                                 @endphp
                                 <div class="package-option p-3.5 border rounded-2xl relative cursor-pointer transition-all hover:shadow-xs {{ $tier->is_popular ? 'border-primary bg-primary/5' : 'border-slate-200 bg-white hover:border-slate-300' }}" data-action="open-booking" data-tour="{{ $tour->id }}" data-tier="{{ $tier->id }}" @click="$store.modal.open('booking', { tourId: {{ $tour->id }}, tierId: {{ $tier->id }} })">
                                     @if($tier->is_popular)
-                                    <span class="bg-primary text-white text-[9px] font-black uppercase tracking-wider rounded-full px-2 py-0.5 absolute top-2 right-2">POPULAR</span>
+                                    <span class="bg-primary text-white text-[9px] font-black uppercase tracking-wider rounded-full px-2 py-0.5 absolute top-2 right-2">{{ __('ui.tour_sidebar.popular_badge') }}</span>
                                     @endif
                                     <div class="flex justify-between items-start">
                                         <div class="pr-2">
@@ -748,9 +748,9 @@ if(window.fbq){
                                         </div>
                                         <div class="text-right shrink-0 {{ $tier->is_popular ? 'mt-4' : '' }}">
                                             @if($save)
-                                            <span class="text-[10px] text-slate-400 line-through block" data-aed="{{ $tOldPrice }}">AED {{ number_format($tOldPrice) }}</span>
+                                            <span class="text-[10px] text-slate-400 line-through block" data-aed="{{ $tOldPrice }}">{{ __('ui.common.aed') }} {{ number_format($tOldPrice) }}</span>
                                             @endif
-                                            <span class="text-sm font-bold text-primary block" data-aed="{{ $tPrice }}">AED {{ number_format($tPrice) }}</span>
+                                            <span class="text-sm font-bold text-primary block" data-aed="{{ $tPrice }}">{{ __('ui.common.aed') }} {{ number_format($tPrice) }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -767,32 +767,32 @@ if(window.fbq){
                             <div class="flex items-center justify-between gap-2 mb-1">
                                 <div class="flex items-center gap-1.5 text-red-600 font-bold text-xs">
                                     <i class="bi bi-fire"></i>
-                                    <span>High Demand: {{ $detailBookings }} booked today</span>
+                                    <span>{{ __('ui.tour_sidebar.booked_today', ['count' => $detailBookings]) }}</span>
                                 </div>
-                                <span class="bg-red-500 text-white rounded-full px-2 py-0.5 text-[10px] font-bold">Only 2 4x4s left</span>
+                                <span class="bg-red-500 text-white rounded-full px-2 py-0.5 text-[10px] font-bold">{{ __('ui.tour_sidebar.spots_left', ['count' => 2]) }}</span>
                             </div>
                             <div class="flex items-center gap-1.5 text-slate-500 text-[11px]">
                                 <i class="bi bi-eye-fill text-primary"></i>
-                                <span>{{ $viewingNow }} travelers are viewing this package right now</span>
+                                <span>{{ __('ui.tour_sidebar.viewing_now', ['count' => $viewingNow]) }}</span>
                             </div>
                         </div>
 
                         <!-- CTA Actions -->
                         <div class="space-y-2.5">
                             <button class="w-full btn-desert-animated text-base font-bold rounded-full py-3.5 text-white shadow-lg cursor-pointer" @click.prevent="$store.modal.open('booking', { tourId: {{ $tour->id }} })">
-                                <i class="bi bi-calendar-check-fill me-2"></i>Book Online Now
+                                <i class="bi bi-calendar-check-fill me-2"></i>{{ __('ui.common.book_online_now') }}
                             </button>
                             <button type="button" class="w-full border border-slate-300 hover:border-primary text-slate-700 hover:text-primary text-sm font-bold rounded-full py-2.5 transition-colors btn-toggle-compare cursor-pointer flex items-center justify-center gap-2" data-tour-id="{{ $tour->id }}" onclick="event.preventDefault(); window.DunesCompare && window.DunesCompare.toggle(this);">
-                                <i class="bi bi-shuffle"></i><span class="compare-btn-text">Compare this Safari</span>
+                                <i class="bi bi-shuffle"></i><span class="compare-btn-text">{{ __('ui.common.compare_this_safari') }}</span>
                             </button>
                             <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode('Hi! I want to book ' . $tour->name) }}" class="w-full btn-whatsapp-animated text-sm font-bold rounded-full py-3 text-white flex items-center justify-center gap-2 shadow-sm" target="_blank" rel="noopener noreferrer">
-                                <i class="bi bi-whatsapp text-lg"></i>Inquire via WhatsApp
+                                <i class="bi bi-whatsapp text-lg"></i>{{ __('ui.common.whatsapp_inquire') }}
                             </a>
                         </div>
 
                         <div class="mt-3 text-center">
                             <a href="{{ route('tours.customizer') }}" class="text-xs text-slate-500 hover:text-primary font-bold inline-flex items-center gap-1 transition-colors">
-                                <i class="bi bi-sliders text-amber-500"></i> Need a bespoke setup? <u>Build your custom safari</u>
+                                <i class="bi bi-sliders text-amber-500"></i> {{ __('ui.tour_sidebar.custom_safari_prompt') }}
                             </a>
                         </div>
 
@@ -800,43 +800,48 @@ if(window.fbq){
                         <div class="grid grid-cols-3 gap-2 mt-5 pt-4 text-center border-t border-slate-200">
                             <div class="bg-slate-50 p-2 rounded-xl">
                                 <i class="bi bi-lightning-charge-fill text-primary block mb-0.5 text-sm"></i>
-                                <span class="block font-bold text-slate-800 text-[10px]">Instant Voucher</span>
+                                <span class="block font-bold text-slate-800 text-[10px]">{{ __('ui.tour_sidebar.instant_voucher') }}</span>
                             </div>
                             <div class="bg-slate-50 p-2 rounded-xl">
                                 <span class="block mb-0.5 text-emerald-600 font-bold text-xs">24h</span>
-                                <span class="block font-bold text-slate-800 text-[10px]">Free Cancel</span>
+                                <span class="block font-bold text-slate-800 text-[10px]">{{ __('ui.tour_sidebar.free_cancel_24h') }}</span>
                             </div>
                             <div class="bg-slate-50 p-2 rounded-xl">
                                 <i class="bi bi-shield-check text-cyan-600 block mb-0.5 text-sm"></i>
-                                <span class="block font-bold text-slate-800 text-[10px]">Ziina Verified</span>
+                                <span class="block font-bold text-slate-800 text-[10px]">{{ __('ui.tour_sidebar.ziina_verified') }}</span>
                             </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3 mt-4 text-center">
                             <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200">
                                 <i class="bi bi-clock-history text-primary block mb-1 text-lg"></i>
-                                <span class="text-slate-500 block text-[9px] uppercase font-bold tracking-wider">DURATION</span>
+                                <span class="text-slate-500 block text-[9px] uppercase font-bold tracking-wider">{{ __('ui.tour_sidebar.duration_label') }}</span>
                                 <span class="font-bold text-xs text-slate-900">{{ $tour->duration }}</span>
                             </div>
                             <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200">
                                 <i class="bi bi-translate text-primary block mb-1 text-lg"></i>
-                                <span class="text-slate-500 block text-[9px] uppercase font-bold tracking-wider">LANGUAGES</span>
+                                <span class="text-slate-500 block text-[9px] uppercase font-bold tracking-wider">{{ __('ui.tour_sidebar.languages_label') }}</span>
                                 <span class="font-bold text-xs text-slate-900 truncate block">{{ $tour->languages }}</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Need Help Card -->
+                    <!-- Need Help Card (Dynamic CMS + Fallback) -->
+                    @php
+                        $cms = app(\App\Services\CmsContentService::class);
+                        $needHelpTitle = $cms->getSectionTitle('tours_sidebar', 'need_help', __('ui.tour_sidebar.need_help'));
+                        $needHelpDesc = $cms->getSectionSubtitle('tours_sidebar', 'need_help', __('ui.tour_sidebar.help_desc'));
+                    @endphp
                     <div class="bg-slate-900 text-white rounded-2xl p-6 shadow-xl relative overflow-hidden">
                         <div class="relative z-10">
-                            <h3 class="text-lg font-bold text-white mb-2">Need Help?</h3>
-                            <p class="text-xs text-slate-300 mb-4 leading-relaxed">Our travel experts are available 24/7 to help you with your booking.</p>
+                            <h3 class="text-lg font-bold text-white mb-2">{{ $needHelpTitle }}</h3>
+                            <p class="text-xs text-slate-300 mb-4 leading-relaxed">{{ $needHelpDesc }}</p>
                             <a href="tel:{{ preg_replace('/[^0-9+]/','',$phoneVal) }}" class="flex items-center gap-3 text-white group">
                                 <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                                     <i class="bi bi-telephone-fill"></i>
                                 </div>
                                 <div>
-                                    <span class="block text-xs text-slate-400">Call Us</span>
+                                    <span class="block text-xs text-slate-400">{{ __('ui.tour_sidebar.call_us') }}</span>
                                     <span class="font-bold text-sm">{{ $phoneVal }}</span>
                                 </div>
                             </a>
@@ -852,23 +857,28 @@ if(window.fbq){
 <!-- ── Verified Guest Reviews & Traveler Photos Section ───────────────────────────── -->
 <section class="py-12 sm:py-16 bg-slate-50 border-t border-b border-slate-200" id="guest-reviews">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        @php
+            $cms = app(\App\Services\CmsContentService::class);
+            $reviewsTitle = $cms->getSectionTitle('home', 'reviews', __('ui.reviews_section.title'));
+            $reviewsSubtitle = $cms->getSectionSubtitle('home', 'reviews', __('ui.reviews_section.subtitle'));
+        @endphp
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pb-4 border-b border-slate-200">
             <div>
                 <div class="flex items-center gap-2 mb-1.5">
                     <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full px-3 py-0.5 text-xs font-bold inline-flex items-center gap-1">
-                        <i class="bi bi-patch-check-fill text-emerald-500"></i> 100% Verified Guest Feedback
+                        <i class="bi bi-patch-check-fill text-emerald-500"></i> {{ __('ui.reviews_section.verified_feedback') }}
                     </span>
-                    <span class="text-slate-400 text-xs">• DET License #1430583</span>
+                    <span class="text-slate-400 text-xs">• {{ __('ui.reviews_section.det_license', ['license' => '1430583']) }}</span>
                 </div>
-                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Verified Guest Reviews & Safari Photos</h2>
-                <p class="text-slate-600 text-xs sm:text-sm mt-0.5">Authentic experiences and real traveler snapshots from our certified Dubai desert tours.</p>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">{{ $reviewsTitle }}</h2>
+                <p class="text-slate-600 text-xs sm:text-sm mt-0.5">{{ $reviewsSubtitle }}</p>
             </div>
             <div class="flex flex-wrap gap-2.5">
                 <button type="button" class="border border-slate-300 hover:border-primary text-slate-700 hover:text-primary rounded-full px-4 py-2 text-xs font-bold cursor-pointer btn-toggle-compare inline-flex items-center gap-1.5 transition-colors" data-tour-id="{{ $tour->id }}" onclick="event.preventDefault(); window.DunesCompare && window.DunesCompare.toggle(this);">
-                    <i class="bi bi-shuffle"></i> Compare Safaris
+                    <i class="bi bi-shuffle"></i> {{ __('ui.reviews_section.compare_safaris') }}
                 </button>
                 <a href="{{ route('review.rate', ['ref' => 'guest']) }}" class="btn-desert-animated rounded-full px-5 py-2 text-xs font-bold text-white shadow-sm inline-flex items-center gap-1.5">
-                    <i class="bi bi-camera-fill"></i> Submit Review & Photos
+                    <i class="bi bi-camera-fill"></i> {{ __('ui.reviews_section.submit_review') }}
                 </a>
             </div>
         </div>
@@ -882,26 +892,26 @@ if(window.fbq){
                         <div class="flex text-amber-400 text-base">
                             <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                         </div>
-                        <span class="text-slate-500 font-bold text-xs">Overall Guest Rating</span>
+                        <span class="text-slate-500 font-bold text-xs">{{ __('ui.reviews_section.overall_rating') }}</span>
                     </div>
                 </div>
                 <div class="md:col-span-5 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-slate-600">
                     <div class="flex items-center gap-1.5">
                         <i class="bi bi-check-circle-fill text-emerald-600"></i>
-                        <span>Dune Bashing: <strong>5.0/5</strong></span>
+                        <span>{{ __('ui.reviews_section.dune_bashing') }}: <strong>5.0/5</strong></span>
                     </div>
                     <div class="flex items-center gap-1.5">
                         <i class="bi bi-check-circle-fill text-emerald-600"></i>
-                        <span>BBQ Quality: <strong>4.9/5</strong></span>
+                        <span>{{ __('ui.reviews_section.bbq_quality') }}: <strong>4.9/5</strong></span>
                     </div>
                     <div class="flex items-center gap-1.5">
                         <i class="bi bi-check-circle-fill text-emerald-600"></i>
-                        <span>Captains: <strong>5.0/5</strong></span>
+                        <span>{{ __('ui.reviews_section.captains') }}: <strong>5.0/5</strong></span>
                     </div>
                 </div>
                 <div class="md:col-span-3 text-center md:text-right">
                     <span class="inline-flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-full px-3 py-1.5 text-xs text-slate-700 font-medium">
-                        <i class="bi bi-google text-blue-500"></i> Google 4.9 &nbsp;|&nbsp; <i class="bi bi-patch-check-fill text-emerald-500"></i> Direct UGC
+                        <i class="bi bi-google text-blue-500"></i> {{ __('ui.reviews_section.google_direct') }}
                     </span>
                 </div>
             </div>
@@ -923,7 +933,7 @@ if(window.fbq){
                         <img src="{{ $avatar }}" width="44" height="44" loading="lazy" alt="{{ $rev->reviewer_name }}" class="w-11 h-11 rounded-full object-cover shadow-xs shrink-0" onerror="this.onerror=null;this.src='{{ asset('images/avatar-default.svg') }}'">
                         <div>
                             <h3 class="font-bold text-slate-900 text-sm mb-0.5">{{ $rev->reviewer_name }}</h3>
-                            <span class="text-emerald-600 font-bold text-xs inline-flex items-center gap-1"><i class="bi bi-patch-check-fill"></i>Verified Guest</span>
+                            <span class="text-emerald-600 font-bold text-xs inline-flex items-center gap-1"><i class="bi bi-patch-check-fill"></i>{{ __('ui.reviews_section.verified_guest') }}</span>
                         </div>
                     </div>
                     <div class="text-amber-400 text-xs flex gap-0.5">
@@ -944,7 +954,7 @@ if(window.fbq){
                 @if(!empty($rev->photos) && is_array($rev->photos) && count($rev->photos) > 0)
                 <!-- Guest Uploaded Photo Strip -->
                 <div class="mb-4 pt-3 border-t border-slate-200">
-                    <span class="text-slate-500 block mb-2 text-[10px] uppercase font-bold tracking-wider">Guest Photos</span>
+                    <span class="text-slate-500 block mb-2 text-[10px] uppercase font-bold tracking-wider">{{ __('ui.reviews_section.guest_photos') }}</span>
                     <div class="flex gap-2">
                         @foreach(array_slice($rev->photos, 0, 3) as $photo)
                         <a href="{{ asset($photo) }}" target="_blank" rel="noopener noreferrer" class="w-14 h-14 rounded-xl overflow-hidden shadow-xs border border-slate-200 shrink-0">
@@ -956,15 +966,15 @@ if(window.fbq){
                 @endif
 
                 <div class="flex justify-between items-center mt-auto pt-3 border-t border-slate-200 text-[11px] text-slate-500">
-                    <span><i class="bi bi-calendar3 me-1"></i>{{ $rev->published_date ? \Carbon\Carbon::parse($rev->published_date)->format('M d, Y') : 'Recent Guest' }}</span>
+                    <span><i class="bi bi-calendar3 me-1"></i>{{ $rev->published_date ? \Carbon\Carbon::parse($rev->published_date)->format('M d, Y') : __('ui.reviews_section.recent_guest') }}</span>
                     <span class="bg-slate-100 text-slate-600 rounded-full px-2.5 py-0.5 font-medium">{{ ucfirst($rev->source ?: 'direct_ugc') }}</span>
                 </div>
             </div>
             @empty
             <div class="col-span-3 text-center py-8 text-slate-500">
-                <p class="mb-3 text-sm">Be the first to share photos and review this safari experience!</p>
+                <p class="mb-3 text-sm">{{ __('ui.reviews_section.first_review_prompt') }}</p>
                 <a href="{{ route('review.rate', ['ref' => 'guest']) }}" class="btn-desert-animated rounded-full px-6 py-2.5 font-bold text-white text-xs inline-flex items-center gap-2 shadow-md">
-                    <i class="bi bi-star-fill"></i> Submit Guest Review
+                    <i class="bi bi-star-fill"></i> {{ __('ui.reviews_section.submit_guest_review') }}
                 </a>
             </div>
             @endforelse
@@ -979,10 +989,10 @@ if(window.fbq){
         <div class="flex justify-between items-center mb-8">
             <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 flex items-center gap-3">
                 <span class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-lg"><i class="bi bi-compass"></i></span>
-                <span>You Might Also Like</span>
+                <span>{{ __('ui.reviews_section.you_might_also_like') }}</span>
             </h2>
             <a href="{{ route('tours.index') }}" class="text-sm font-bold text-primary hover:text-primary-hover inline-flex items-center gap-1">
-                <span>View All Tours</span>
+                <span>{{ __('ui.common.view_all_tours') }}</span>
                 <i class="bi bi-arrow-right"></i>
             </a>
         </div>
@@ -996,7 +1006,7 @@ if(window.fbq){
                         <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy">
                         @if($t->is_bestseller)
                         <span class="absolute top-3 left-3 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-md inline-flex items-center gap-1">
-                            <i class="bi bi-fire text-amber-300"></i>Best Seller
+                            <i class="bi bi-fire text-amber-300"></i>{{ __('ui.common.bestseller') }}
                         </span>
                         @endif
                         <div class="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
@@ -1017,8 +1027,8 @@ if(window.fbq){
                         <h3 class="text-base font-bold text-slate-900 mb-3 line-clamp-2 group-hover:text-primary transition-colors leading-snug">{{ $t->name }}</h3>
                         <div class="flex justify-between items-end mt-auto pt-3 border-t border-slate-200">
                             <div>
-                                <span class="block text-[10px] uppercase font-bold text-slate-500">Starting from</span>
-                                <span class="text-lg font-black text-primary" data-aed="{{ $minPriceRel }}">AED {{ number_format($minPriceRel) }}</span>
+                                <span class="block text-[10px] uppercase font-bold text-slate-500">{{ __('ui.common.starting_from') }}</span>
+                                <span class="text-lg font-black text-primary" data-aed="{{ $minPriceRel }}">{{ __('ui.common.aed') }} {{ number_format($minPriceRel) }}</span>
                             </div>
                             <div class="flex items-center gap-1.5">
                                 <span role="button" tabindex="0" class="btn-circle-whatsapp fab-whatsapp w-8 h-8 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center cursor-pointer shadow-xs transition-transform hover:scale-105" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp" onclick="event.preventDefault(); event.stopPropagation(); if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp('{{ addslashes($t->name) }}'); }" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();if(window.App&&typeof window.App.openWhatsApp==='function'){window.App.openWhatsApp('{{ addslashes($t->name) }}');}}">
@@ -1041,15 +1051,15 @@ if(window.fbq){
 <!-- Mobile Book Bar Sticky bottom (visible on screens below lg) -->
 <div class="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md px-4 py-3 border-t border-slate-200 shadow-2xl lg:hidden flex items-center justify-between z-30 pb-safe">
     <div>
-        <span class="text-slate-400 block text-[9px] uppercase font-bold tracking-wider">Starting From</span>
-        <div class="text-xl font-black text-primary" data-aed="{{ $minPrice }}">AED {{ number_format($minPrice) }}</div>
+        <span class="text-slate-400 block text-[9px] uppercase font-bold tracking-wider">{{ __('ui.common.starting_from') }}</span>
+        <div class="text-xl font-black text-primary" data-aed="{{ $minPrice }}">{{ __('ui.common.aed') }} {{ number_format($minPrice) }}</div>
     </div>
     <div class="flex items-center gap-2">
         <button type="button" class="border border-slate-300 text-slate-700 text-xs font-bold rounded-full px-3.5 py-2.5 btn-toggle-compare whitespace-nowrap cursor-pointer inline-flex items-center gap-1" data-tour-id="{{ $tour->id }}" onclick="event.preventDefault(); window.DunesCompare && window.DunesCompare.toggle(this);">
-            <i class="bi bi-shuffle"></i><span class="compare-btn-text">Compare</span>
+            <i class="bi bi-shuffle"></i><span class="compare-btn-text">{{ __('ui.common.compare') }}</span>
         </button>
         <button class="btn-desert-animated text-xs sm:text-sm font-bold text-white rounded-full px-5 py-2.5 shadow-md whitespace-nowrap cursor-pointer inline-flex items-center gap-1" data-action="open-booking" data-tour="{{ $tour->id }}" @click.prevent="$store.modal.open('booking', { tourId: {{ $tour->id }} })">
-            <i class="bi bi-calendar-check-fill"></i>Book Now
+            <i class="bi bi-calendar-check-fill"></i>{{ __('ui.common.book_now') }}
         </button>
     </div>
 </div>

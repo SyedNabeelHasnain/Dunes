@@ -155,13 +155,13 @@
                                 </div>
                             </div>
                             <div class="sm:col-span-5 text-center sm:text-right border-t sm:border-t-0 sm:border-l border-slate-200 pt-4 sm:pt-0 sm:pl-4">
-                                <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Starting From</div>
+                                <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">{{ __('ui.common.starting_from') }}</div>
                                 <div class="text-3xl font-black text-primary font-mono my-1" x-text="matchedTour.price">AED 150</div>
                                 <button type="button" 
                                         class="w-full py-3 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs sm:text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2" 
                                         @click="bookMatched()">
                                     <i class="bi bi-calendar-check-fill"></i>
-                                    <span>{{ $conciergePromoActive ? "Book with {$conciergePromoDiscount}% OFF" : "Book Recommended Tour" }}</span>
+                                    <span>{{ $conciergePromoActive ? __('ui.common.book_now') . " ({$conciergePromoDiscount}% OFF)" : __('ui.common.book_now') }}</span>
                                 </button>
                             </div>
                         </div>

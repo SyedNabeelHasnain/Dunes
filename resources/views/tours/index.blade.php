@@ -49,29 +49,29 @@
             <div class="flex items-center gap-2.5">
                 <i class="bi bi-patch-check-fill text-primary text-xl shrink-0"></i>
                 <div>
-                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">DTCM Licensed Operator</div>
-                    <div class="text-slate-500 text-[11px]">Dubai Tourism Authority</div>
+                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">{{ __('ui.trust_strip.dtcm_licensed') }}</div>
+                    <div class="text-slate-500 text-[11px]">{{ __('ui.trust_strip.dtcm_desc') }}</div>
                 </div>
             </div>
             <div class="flex items-center gap-2.5">
                 <i class="bi bi-arrow-repeat text-emerald-600 text-xl shrink-0"></i>
                 <div>
-                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">100% Free Cancellation</div>
-                    <div class="text-slate-500 text-[11px]">Full refund 24h prior</div>
+                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">{{ __('ui.trust_strip.free_cancel') }}</div>
+                    <div class="text-slate-500 text-[11px]">{{ __('ui.trust_strip.free_cancel_desc') }}</div>
                 </div>
             </div>
             <div class="flex items-center gap-2.5">
                 <i class="bi bi-award-fill text-amber-500 text-xl shrink-0"></i>
                 <div>
-                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">100% Halal Food</div>
-                    <div class="text-slate-500 text-[11px]">Veg, Non-Veg & Jain</div>
+                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">{{ __('ui.trust_strip.halal_food') }}</div>
+                    <div class="text-slate-500 text-[11px]">{{ __('ui.trust_strip.halal_food_desc') }}</div>
                 </div>
             </div>
             <div class="flex items-center gap-2.5">
                 <i class="bi bi-shield-lock-fill text-cyan-600 text-xl shrink-0"></i>
                 <div>
-                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">Instant Confirmation</div>
-                    <div class="text-slate-500 text-[11px]">Card / Cash on Pickup</div>
+                    <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">{{ __('ui.trust_strip.secure_checkout') }}</div>
+                    <div class="text-slate-500 text-[11px]">{{ __('ui.trust_strip.secure_checkout_desc') }}</div>
                 </div>
             </div>
         </div>
@@ -93,27 +93,23 @@
                 <div class="text-center lg:text-left">
                     <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2 mb-2">
                         <span class="rounded-full px-3 py-1 font-bold text-xs bg-primary/20 border border-primary/40 text-primary inline-flex items-center gap-1">
-                            <i class="bi bi-stars"></i> Interactive Concierge
+                            <i class="bi bi-stars"></i> {{ __('ui.home_concierge.badge') }}
                         </span>
                         @if($conciergePromoActive)
                         <span class="bg-amber-400 text-slate-950 rounded-full px-2.5 py-0.5 text-xs font-bold inline-flex items-center gap-1">
-                            <i class="bi bi-gift-fill"></i> {{ $conciergePromoDiscount }}% OFF Match Bonus
+                            <i class="bi bi-gift-fill"></i> {{ __('ui.home_concierge.discount_badge') }}
                         </span>
                         @endif
                     </div>
-                    <h2 class="font-extrabold text-white text-xl sm:text-2xl mb-1.5">Not sure which Dubai Safari to choose?</h2>
+                    <h2 class="font-extrabold text-white text-xl sm:text-2xl mb-1.5">{{ __('ui.home_concierge.heading') }}</h2>
                     <p class="text-slate-300 text-xs sm:text-sm max-w-2xl leading-relaxed">
-                        @if($conciergePromoActive)
-                        Answer 3 quick questions about your group style, timing, and must-have perks. Our <strong>Safari Match Concierge</strong> will recommend your ideal adventure and unlock an instant <strong>{{ $conciergePromoDiscount }}% promo code ({{ $conciergePromoCode }})</strong>.
-                        @else
-                        Answer 3 quick questions about your group style, timing, and must-have perks. Our <strong>Safari Match Concierge</strong> will instantly recommend your ideal desert adventure tailored to your party.
-                        @endif
+                        {{ __('ui.home_concierge.subheading') }}
                     </p>
                 </div>
                 <div class="shrink-0 w-full sm:w-auto text-center lg:text-right">
                     <button type="button" class="w-full sm:w-auto btn-desert-animated rounded-full px-6 py-3 font-bold text-white text-sm shadow-md inline-flex items-center justify-center gap-2 cursor-pointer" @click="$store.modal.open('safari-matcher')">
                         <i class="bi bi-compass text-base"></i>
-                        <span>Launch Safari Concierge</span>
+                        <span>{{ __('ui.home_concierge.quiz_btn') }}</span>
                     </button>
                 </div>
             </div>
@@ -131,7 +127,7 @@
                 <div class="lg:col-span-8">
                     <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
                         <button onclick="filterTours('')" data-category="" class="filter-btn {{ !$selectedCategorySlug ? 'bg-slate-900 text-white shadow-xs' : 'bg-white text-slate-700 border border-slate-300 hover:border-primary' }} rounded-full px-4 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer transition-colors">
-                            <i class="bi bi-grid-fill"></i> All ({{ $tours->count() }})
+                            <i class="bi bi-grid-fill"></i> {{ __('ui.common.view_all') }} ({{ $tours->count() }})
                         </button>
                         @foreach($categories as $cat)
                             @php
@@ -168,7 +164,7 @@
                                 <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy">
                                 @if($t->is_bestseller)
                                 <span class="absolute top-3 left-3 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-md inline-flex items-center gap-1">
-                                    <i class="bi bi-fire text-amber-300"></i>Best Seller
+                                    <i class="bi bi-fire text-amber-300"></i>{{ __('ui.home_popular.bestseller') }}
                                 </span>
                                 @endif
                                 <div class="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
@@ -190,29 +186,29 @@
                                 @php $bookingsToday = (int)(($t->id * 3 + (int)date('j')) % 5 + 3); @endphp
                                 <div class="inline-flex items-center gap-1.5 text-red-600 text-xs font-bold mb-3">
                                     <i class="bi bi-fire text-red-500"></i>
-                                    <span>{{ $bookingsToday }} booked in last 6 hours</span>
+                                    <span>{{ __('ui.home_popular.booked_recent', ['count' => $bookingsToday]) }}</span>
                                 </div>
                                 
                                 <div class="flex flex-wrap gap-1.5 mb-4">
                                     <span class="bg-slate-50 text-slate-600 border border-slate-200 text-[10px] font-medium px-2 py-0.5 rounded-full inline-flex items-center gap-1">
-                                        <i class="bi bi-check2 text-emerald-600"></i>4x4 Pickup
+                                        <i class="bi bi-check2 text-emerald-600"></i>{{ __('ui.rate_card.free_pickup') }}
                                     </span>
                                     <span class="bg-slate-50 text-slate-600 border border-slate-200 text-[10px] font-medium px-2 py-0.5 rounded-full inline-flex items-center gap-1">
-                                        <i class="bi bi-check2 text-emerald-600"></i>Halal Live BBQ
+                                        <i class="bi bi-check2 text-emerald-600"></i>{{ __('ui.trust_strip.halal_food') }}
                                     </span>
                                     <span class="bg-slate-50 text-slate-600 border border-slate-200 text-[10px] font-medium px-2 py-0.5 rounded-full inline-flex items-center gap-1">
-                                        <i class="bi bi-check2 text-emerald-600"></i>Free Cancel 24h
+                                        <i class="bi bi-check2 text-emerald-600"></i>{{ __('ui.trust_strip.free_cancel') }}
                                     </span>
                                 </div>
 
                                 <div class="flex justify-between items-end mt-auto pt-3 border-t border-slate-200">
                                     <div>
-                                        <span class="block text-[10px] uppercase font-bold text-slate-500">Starting from</span>
-                                        <span class="text-lg font-black text-primary" data-aed="{{ $minPrice }}">AED {{ number_format($minPrice) }}</span>
+                                        <span class="block text-[10px] uppercase font-bold text-slate-500">{{ __('ui.common.starting_from') }}</span>
+                                        <span class="text-lg font-black text-primary" data-aed="{{ $minPrice }}">{{ __('ui.common.aed') }} {{ number_format($minPrice) }}</span>
                                     </div>
                                     <div class="flex items-center gap-1.5">
                                         <button type="button" class="border border-slate-300 hover:border-primary text-slate-700 bg-white hover:text-primary text-xs font-semibold rounded-full px-2.5 py-1 transition-colors btn-toggle-compare inline-flex items-center gap-1 cursor-pointer" data-tour-id="{{ $t->id }}" onclick="event.preventDefault(); event.stopPropagation(); window.DunesCompare && window.DunesCompare.toggle(this);">
-                                            <i class="bi bi-shuffle"></i> <span class="compare-btn-text">Compare</span>
+                                            <i class="bi bi-shuffle"></i> <span class="compare-btn-text">{{ __('ui.common.compare') }}</span>
                                         </button>
                                         <span role="button" tabindex="0" class="btn-circle-whatsapp fab-whatsapp w-8 h-8 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center cursor-pointer shadow-xs transition-transform hover:scale-105" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp" onclick="event.preventDefault(); event.stopPropagation(); if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp('{{ addslashes($t->name) }}'); }" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();if(window.App&&typeof window.App.openWhatsApp==='function'){window.App.openWhatsApp('{{ addslashes($t->name) }}');}}">
                                             <i class="bi bi-whatsapp text-sm"></i>
@@ -235,7 +231,7 @@
             </div>
             <h2 class="text-2xl font-bold text-slate-900 mb-2">No Tours Found</h2>
             <p class="text-slate-500 mb-6 text-sm">We couldn't find any tours matching your criteria.</p>
-            <button onclick="resetFilters()" class="btn-desert-animated-dark font-bold text-white text-sm rounded-full px-6 py-3 cursor-pointer shadow-md">View All Tours</button>
+            <button onclick="resetFilters()" class="btn-desert-animated-dark font-bold text-white text-sm rounded-full px-6 py-3 cursor-pointer shadow-md">{{ __('ui.common.view_all_tours') }}</button>
         </div>
         @else
         <div class="text-center py-12">
@@ -244,7 +240,7 @@
             </div>
             <h2 class="text-2xl font-bold text-slate-900 mb-2">No Tours Found</h2>
             <p class="text-slate-500 mb-6 text-sm">We couldn't find any tours matching your search query. Try exploring all our amazing experiences!</p>
-            <a href="{{ route('tours.index') }}" class="btn-desert-animated-dark font-bold text-white text-sm rounded-full px-6 py-3 inline-block shadow-md">View All Tours</a>
+            <a href="{{ route('tours.index') }}" class="btn-desert-animated-dark font-bold text-white text-sm rounded-full px-6 py-3 inline-block shadow-md">{{ __('ui.common.view_all_tours') }}</a>
         </div>
         @endif
     </div>

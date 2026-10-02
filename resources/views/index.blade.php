@@ -10,8 +10,9 @@ if (!function_exists('renderReviewCardMarkup')) {
         }
 
         $isUgc = ($r->source === 'direct_ugc');
+        $badgeText = $isUgc ? __('ui.reviews_section.verified_guest') : (($r->source == 'google') ? 'Google' : ucfirst($r->source));
         $sourceBadge = $isUgc 
-            ? '<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full px-2.5 py-0.5 text-xs font-bold"><i class="bi bi-patch-check-fill text-emerald-500"></i> Verified Guest</span>'
+            ? '<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full px-2.5 py-0.5 text-xs font-bold"><i class="bi bi-patch-check-fill text-emerald-500"></i> ' . htmlspecialchars($badgeText) . '</span>'
             : '<span class="inline-flex items-center gap-1 bg-slate-100 text-slate-700 rounded-full px-2.5 py-0.5 text-xs font-medium">' . (($r->source == 'google') ? '<i class="bi bi-google text-blue-500"></i> Google' : '<i class="bi bi-star-fill text-emerald-500"></i> ' . ucfirst($r->source)) . '</span>';
 
         $url = !empty($r->review_url) ? $r->review_url : route('review.rate', ['ref' => 'guest']);
@@ -28,8 +29,10 @@ if (!function_exists('renderReviewCardMarkup')) {
             $photosHtml .= '</div>';
         }
 
+        $actionText = $isUgc ? __('ui.reviews_section.submit_review') : __('ui.common.view_details');
+
         return '
-        <div class="review-card h-full flex flex-col text-left">
+        <div class="review-card h-full flex flex-col text-left rtl:text-right">
             <div class="flex justify-between items-center mb-3">
                 <div class="flex items-center gap-2 min-w-0">
                     <img src="' . htmlspecialchars($avatar) . '" alt="' . htmlspecialchars($r->reviewer_name) . '" class="w-10 h-10 rounded-full object-cover shrink-0" referrerpolicy="no-referrer" loading="lazy" onerror="this.onerror=null;this.src=\'' . $fallbackAvatar . '\'">
@@ -45,7 +48,7 @@ if (!function_exists('renderReviewCardMarkup')) {
             ' . $photosHtml . '
             <div class="flex justify-between items-center mt-auto pt-3 border-t border-slate-200">
                 ' . $sourceBadge . '
-                <a href="' . htmlspecialchars($url) . '" ' . ($isUgc ? '' : 'target="_blank" rel="noopener"') . ' class="text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-primary hover:text-white border border-slate-300 hover:border-primary rounded-full px-3 py-1 transition-colors shadow-2xs">' . ($isUgc ? 'Review' : 'View') . '</a>
+                <a href="' . htmlspecialchars($url) . '" ' . ($isUgc ? '' : 'target="_blank" rel="noopener"') . ' class="text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-primary hover:text-white border border-slate-300 hover:border-primary rounded-full px-3 py-1 transition-colors shadow-2xs">' . htmlspecialchars($actionText) . '</a>
             </div>
         </div>';
     }
@@ -124,16 +127,16 @@ if (!function_exists('renderReviewCardMarkup')) {
         <div class="flex flex-col sm:flex-row gap-3 justify-center items-center mb-10">
             <button type="button" class="btn-desert-animated text-base sm:text-lg font-bold rounded-full px-8 py-3.5 shadow-xl text-white inline-flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto" @click="$store.modal.open('booking')">
                 <i class="bi bi-calendar-check text-lg"></i>
-                <span>Book Online Now</span>
+                <span>{{ __('ui.common.book_online_now') }}</span>
             </button>
             <button type="button" class="inline-flex items-center justify-center gap-2 text-base font-bold rounded-full px-6 py-3.5 border border-primary/60 text-primary bg-slate-900/60 backdrop-blur-md hover:bg-slate-900/80 transition-all cursor-pointer w-full sm:w-auto" @click="$store.modal.open('safari-matcher')">
                 <i class="bi bi-compass text-amber-400 text-lg"></i>
-                <span>Safari Match Concierge</span>
+                <span>{{ __('ui.home_concierge.quiz_btn') }}</span>
                 <span class="bg-amber-400 text-slate-950 font-bold rounded-full px-2 py-0.5 text-[10px]">5% OFF</span>
             </button>
             <button type="button" class="btn-desert-animated-dark text-base font-bold rounded-full px-6 py-3.5 inline-flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto" data-action="open-booking" data-tour="1" data-tier="1" @click="$store.modal.open('booking', { tourId: 1, tierId: 1 })">
-                <span class="font-bold text-white text-sm">Starting from</span>
-                <span class="text-xl font-black text-primary" data-aed="79">AED 79</span>
+                <span class="font-bold text-white text-sm">{{ __('ui.common.starting_from') }}</span>
+                <span class="text-xl font-black text-primary" data-aed="79">{{ __('ui.common.aed') }} 79</span>
             </button>
         </div>
 
@@ -145,7 +148,7 @@ if (!function_exists('renderReviewCardMarkup')) {
         <div class="flex justify-center items-center gap-6 sm:gap-12 opacity-85 text-center">
             <div>
                 <div class="text-2xl sm:text-3xl font-black text-white">10K+</div>
-                <div class="uppercase font-semibold text-[10px] sm:text-xs tracking-wider text-slate-300">Happy Guests</div>
+                <div class="uppercase font-semibold text-[10px] sm:text-xs tracking-wider text-slate-300">{{ __('ui.common.happy_guests') }}</div>
             </div>
             <div class="border-l border-r border-white/25 px-6 sm:px-12">
                 <div class="text-2xl sm:text-3xl font-black text-white">4.9/5</div>
@@ -373,7 +376,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                             <div class="flex justify-between items-end mt-auto pt-3 border-t border-slate-200">
                                 <div>
                                     <span class="block text-[10px] uppercase font-bold text-slate-500">{{ __('ui.home_popular.starting_from') }}</span>
-                                    <span class="text-lg font-black text-primary" data-aed="{{ $minPrice }}">AED {{ number_format($minPrice) }}</span>
+                                    <span class="text-lg font-black text-primary" data-aed="{{ $minPrice }}">{{ __('ui.common.aed') }} {{ number_format($minPrice) }}</span>
                                 </div>
                                 <div class="flex items-center gap-1.5">
                                     <button type="button" class="border border-slate-300 hover:border-primary text-slate-700 bg-white hover:text-primary text-xs font-semibold rounded-full px-2.5 py-1 transition-colors btn-toggle-compare inline-flex items-center gap-1 cursor-pointer" data-tour-id="{{ $t->id }}" onclick="event.preventDefault(); event.stopPropagation(); window.DunesCompare && window.DunesCompare.toggle(this);">

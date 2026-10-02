@@ -80,7 +80,7 @@
                                     </div>
                                     <div class="font-bold text-white text-xs mb-0.5">Standard Evening</div>
                                     <div class="text-slate-300 text-[10px] leading-tight">Dune bashing & BBQ show</div>
-                                    <div class="font-extrabold text-amber-400 text-xs mt-2" data-aed="150">AED 150/guest</div>
+                                    <div class="font-extrabold text-amber-400 text-xs mt-2" data-aed="150">{{ __('ui.common.aed') }} 150/guest</div>
                                 </div>
 
                                 <!-- Base 2 -->
@@ -93,7 +93,7 @@
                                     </div>
                                     <div class="font-bold text-white text-xs mb-0.5">VIP Luxury Safari</div>
                                     <div class="text-slate-300 text-[10px] leading-tight">VIP table & waiter service</div>
-                                    <div class="font-extrabold text-amber-400 text-xs mt-2" data-aed="250">AED 250/guest</div>
+                                    <div class="font-extrabold text-amber-400 text-xs mt-2" data-aed="250">{{ __('ui.common.aed') }} 250/guest</div>
                                 </div>
 
                                 <!-- Base 3 -->
@@ -106,7 +106,7 @@
                                     </div>
                                     <div class="font-bold text-white text-xs mb-0.5">Morning Safari</div>
                                     <div class="text-slate-300 text-[10px] leading-tight">Cool air & sunrise photos</div>
-                                    <div class="font-extrabold text-amber-400 text-xs mt-2" data-aed="120">AED 120/guest</div>
+                                    <div class="font-extrabold text-amber-400 text-xs mt-2" data-aed="120">{{ __('ui.common.aed') }} 120/guest</div>
                                 </div>
 
                                 <!-- Base 4 -->
@@ -119,7 +119,7 @@
                                     </div>
                                     <div class="font-bold text-white text-xs mb-0.5">Overnight Safari</div>
                                     <div class="text-slate-300 text-[10px] leading-tight">Bedouin tent & breakfast</div>
-                                    <div class="font-extrabold text-amber-400 text-xs mt-2" data-aed="350">AED 350/guest</div>
+                                    <div class="font-extrabold text-amber-400 text-xs mt-2" data-aed="350">{{ __('ui.common.aed') }} 350/guest</div>
                                 </div>
                             </div>
                         </div>

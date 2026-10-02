@@ -259,13 +259,13 @@
                         ])
                     @else
                         <div class="rounded-2xl p-6 bg-gradient-to-br from-primary to-orange-600 text-white shadow-lg">
-                            <h3 class="font-extrabold text-lg text-white mb-1.5">Book a Desert Safari</h3>
-                            <p class="text-xs text-white/90 mb-4 leading-relaxed">From <span data-aed="99" class="font-bold">AED 99</span> per person. Instant confirmation.</p>
+                            <h3 class="font-extrabold text-lg text-white mb-1.5">{{ __('ui.blog_journal.book_now_btn') }}</h3>
+                            <p class="text-xs text-white/90 mb-4 leading-relaxed">{{ __('ui.common.from') }} <span data-aed="99" class="font-bold">{{ __('ui.common.aed') }} 99</span> {{ __('ui.common.per_person') }}.</p>
                             <button data-action="open-booking" class="w-full bg-white hover:bg-slate-50 text-slate-950 font-bold rounded-full py-2.5 text-xs transition-colors cursor-pointer shadow-xs mb-2" @click="$store.modal.open('booking')">
-                                <i class="bi bi-calendar-check mr-1.5"></i>Book Now
+                                <i class="bi bi-calendar-check mr-1.5"></i>{{ __('ui.common.book_now') }}
                             </button>
                             <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode('Hi! I read your blog about ' . $post->title . ' and would like to know more.') }}" class="w-full border border-white/40 hover:border-white text-white font-bold rounded-full py-2 text-xs transition-colors flex items-center justify-center gap-1.5" target="_blank" rel="noopener noreferrer">
-                                <i class="bi bi-whatsapp text-emerald-300"></i>Ask on WhatsApp
+                                <i class="bi bi-whatsapp text-emerald-300"></i>{{ __('ui.common.whatsapp_inquire') }}
                             </a>
                         </div>
                     @endif

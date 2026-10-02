@@ -100,9 +100,9 @@
             </div>
             <div class="hidden lg:block shrink-0 text-right">
                 <span class="bg-primary/20 text-primary border border-primary/40 px-4 py-2 rounded-full font-bold text-sm inline-flex items-center gap-1.5">
-                    <i class="bi bi-shield-check"></i>Best Price Guarantee
+                    <i class="bi bi-shield-check"></i>{{ __('ui.trust.best_price_guarantee') }}
                 </span>
-                <div class="text-white/60 text-xs mt-1">Starting from AED {{ number_format($minPrice) }}</div>
+                <div class="text-white/60 text-xs mt-1">{{ __('ui.common.starting_from') }} {{ __('ui.common.aed') }} {{ number_format($minPrice) }}</div>
             </div>
         </div>
     </div>
@@ -307,21 +307,21 @@
                                         <i class="bi bi-check2 text-emerald-600"></i>4x4 Pickup
                                     </span>
                                     <span class="bg-slate-50 text-slate-600 border border-slate-200 text-[10px] font-medium px-2 py-0.5 rounded-full inline-flex items-center gap-1">
-                                        <i class="bi bi-check2 text-emerald-600"></i>Halal Live BBQ
+                                        <i class="bi bi-check2 text-emerald-600"></i>{{ __('ui.trust_strip.halal_food') }}
                                     </span>
                                     <span class="bg-slate-50 text-slate-600 border border-slate-200 text-[10px] font-medium px-2 py-0.5 rounded-full inline-flex items-center gap-1">
-                                        <i class="bi bi-check2 text-emerald-600"></i>Free Cancel 24h
+                                        <i class="bi bi-check2 text-emerald-600"></i>{{ __('ui.trust_strip.free_cancel') }}
                                     </span>
                                 </div>
 
                                 <div class="flex justify-between items-end mt-auto pt-3 border-t border-slate-100">
                                     <div>
-                                        <span class="block text-[10px] uppercase font-bold text-slate-400">Starting from</span>
-                                        <span class="text-lg font-black text-primary" data-aed="{{ $minPrice }}">AED {{ number_format($minPrice) }}</span>
+                                        <span class="block text-[10px] uppercase font-bold text-slate-400">{{ __('ui.common.starting_from') }}</span>
+                                        <span class="text-lg font-black text-primary" data-aed="{{ $minPrice }}">{{ __('ui.common.aed') }} {{ number_format($minPrice) }}</span>
                                     </div>
                                     <div class="flex items-center gap-1.5">
                                         <button type="button" class="border border-slate-300 hover:border-primary text-slate-600 hover:text-primary text-xs font-semibold rounded-full px-2.5 py-1 transition-colors btn-toggle-compare inline-flex items-center gap-1 cursor-pointer" data-tour-id="{{ $t->id }}" onclick="event.preventDefault(); event.stopPropagation(); window.DunesCompare && window.DunesCompare.toggle(this);">
-                                            <i class="bi bi-shuffle"></i> <span class="compare-btn-text">Compare</span>
+                                            <i class="bi bi-shuffle"></i> <span class="compare-btn-text">{{ __('ui.common.compare') }}</span>
                                         </button>
                                         <span role="button" tabindex="0" class="btn-circle-whatsapp fab-whatsapp w-8 h-8 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center cursor-pointer shadow-xs transition-transform hover:scale-105" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp" onclick="event.preventDefault(); event.stopPropagation(); if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp('{{ addslashes($t->name) }}'); }" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();if(window.App&&typeof window.App.openWhatsApp==='function'){window.App.openWhatsApp('{{ addslashes($t->name) }}');}}">
                                             <i class="bi bi-whatsapp text-sm"></i>

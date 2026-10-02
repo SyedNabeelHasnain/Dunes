@@ -192,16 +192,16 @@
                             data-tour="{{ $tour->id }}"
                             @click="$store.modal.open('booking', { tourId: {{ $tour->id }} })">
                         <i class="bi bi-calendar-check-fill text-sm"></i>
-                        <span>Book Online</span>
+                        <span>{{ __('ui.common.book_online') }}</span>
                     </button>
 
                     <a href="{{ $waUrl }}" 
                        target="_blank" 
                        rel="noopener noreferrer" 
-                       class="w-full sm:w-auto btn-whatsapp-animated font-extrabold text-xs sm:text-sm px-4 py-3 rounded-full shadow-md inline-flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all text-white"
+                       class="w-full sm:w-auto btn-whatsapp-animated font-extrabold text-xs sm:text-sm px-4 py-3 rounded-full shadow-md inline-flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all text-white" 
                        aria-label="Ask about {{ $tour->name }} on WhatsApp">
                         <i class="bi bi-whatsapp text-sm"></i>
-                        <span>WhatsApp</span>
+                        <span>{{ __('ui.common.whatsapp') }}</span>
                     </a>
                 </div>
             </div>
@@ -210,9 +210,9 @@
 
     <!-- Bottom Trust Footer -->
     <div class="mt-4 pt-3 border-t border-slate-200/60 flex items-center justify-between flex-wrap gap-2 text-[11px] text-slate-500">
-        <span class="flex items-center gap-1"><i class="bi bi-shield-check text-emerald-600"></i> 100% Verified Local Operator</span>
-        <span class="flex items-center gap-1"><i class="bi bi-clock-history text-primary"></i> Instant E-Ticket Confirmation</span>
-        <span class="flex items-center gap-1"><i class="bi bi-arrow-counterclockwise text-blue-600"></i> Free 24h Cancellation</span>
+        <span class="flex items-center gap-1"><i class="bi bi-shield-check text-emerald-600"></i> {{ __('ui.trust.licensed_operator') }}</span>
+        <span class="flex items-center gap-1"><i class="bi bi-clock-history text-primary"></i> {{ __('ui.trust.instant_confirmation') }}</span>
+        <span class="flex items-center gap-1"><i class="bi bi-arrow-counterclockwise text-blue-600"></i> {{ __('ui.trust_strip.free_cancel') }}</span>
         <a href="{{ route('tours.show', $tour->slug) }}" class="font-bold text-primary hover:underline ml-auto flex items-center gap-1">
             <span>Full Tour Itinerary</span><i class="bi bi-chevron-right text-[10px]"></i>
         </a>
@@ -287,14 +287,14 @@
                                     data-tour="{{ $tour->id }}"
                                     @click="$store.modal.open('booking', { tourId: {{ $tour->id }} })">
                                 <i class="bi bi-calendar-check-fill"></i>
-                                <span>Book Online Now</span>
+                                <span>{{ __('ui.common.book_online_now') }}</span>
                             </button>
                             <a href="{{ $waUrl }}" 
                                target="_blank" 
                                rel="noopener noreferrer" 
                                class="w-full sm:w-auto btn-whatsapp-animated font-extrabold text-xs px-4 py-2.5 rounded-full shadow-md inline-flex items-center justify-center gap-2 text-white">
                                 <i class="bi bi-whatsapp"></i>
-                                <span>WhatsApp Concierge</span>
+                                <span>{{ __('ui.common.whatsapp_inquire') }}</span>
                             </a>
                         </div>
                     </div>
@@ -391,22 +391,22 @@
                 data-tour="{{ $tour->id }}"
                 @click="$store.modal.open('booking', { tourId: {{ $tour->id }} })">
             <i class="bi bi-calendar-check-fill"></i>
-            <span>Book Online Now</span>
+            <span>{{ __('ui.common.book_online_now') }}</span>
         </button>
 
         <a href="{{ $waUrl }}" 
            class="w-full btn-whatsapp-animated text-white font-bold rounded-full py-2 text-xs transition-colors flex items-center justify-center gap-1.5" 
            target="_blank" 
-           rel="noopener noreferrer"
+           rel="noopener noreferrer" 
            aria-label="Inquire about {{ $tour->name }} on WhatsApp">
             <i class="bi bi-whatsapp"></i>
-            <span>Ask on WhatsApp</span>
+            <span>{{ __('ui.common.whatsapp_inquire') }}</span>
         </a>
 
         <div class="mt-3 text-center">
             <a href="{{ route('tours.show', $tour->slug) }}" class="text-[11px] text-slate-400 hover:text-primary transition-colors font-medium inline-flex items-center gap-1">
-                <span>View Full Package Details</span>
-                <i class="bi bi-arrow-right text-[10px]"></i>
+                <span>{{ __('ui.common.view_details') }}</span>
+                <i class="bi bi-arrow-right rtl:rotate-180 text-[10px]"></i>
             </a>
         </div>
     </div>
@@ -435,8 +435,8 @@
                 <span class="truncate">{{ $tour->name }}</span>
             </div>
             <div class="flex items-baseline gap-1.5">
-                <span class="text-sm font-black text-slate-900" data-aed="{{ $minPrice }}">AED {{ number_format($minPrice) }}</span>
-                <span class="text-[10px] text-slate-500">/ person</span>
+                <span class="text-sm font-black text-slate-900" data-aed="{{ $minPrice }}">{{ __('ui.common.aed') }} {{ number_format($minPrice) }}</span>
+                <span class="text-[10px] text-slate-500">/ {{ __('ui.rate_card.per_person') }}</span>
                 <span class="text-[10px] text-amber-500 font-bold ml-1"><i class="bi bi-star-fill text-[9px]"></i> {{ $tour->rating ?: '4.9' }}</span>
             </div>
         </div>
@@ -456,7 +456,7 @@
                     data-tour="{{ $tour->id }}"
                     @click="$store.modal.open('booking', { tourId: {{ $tour->id }} })">
                 <i class="bi bi-calendar-check-fill text-[11px]"></i>
-                <span>Book Now</span>
+                <span>{{ __('ui.common.book_now') }}</span>
             </button>
         </div>
     </div>

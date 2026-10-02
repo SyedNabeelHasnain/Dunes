@@ -226,7 +226,7 @@ gtag('event', 'conversion_event_submit_lead_form', {
                     }
                 @endphp
                 <a href="{{ $waLink }}" target="_blank" rel="noopener" class="btn-whatsapp-animated w-full font-bold rounded-full py-3.5 text-white text-center inline-flex items-center justify-center gap-2 text-sm shadow-sm">
-                    <i class="bi bi-whatsapp"></i> WhatsApp Us
+                    <i class="bi bi-whatsapp"></i> {{ __('ui.home_cta.whatsapp_btn') }}
                 </a>
             </div>
         </div>

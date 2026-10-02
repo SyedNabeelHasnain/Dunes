@@ -113,14 +113,14 @@
                         class="sm:col-span-7 w-full py-3.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2" 
                         id="exitIntentClaimBtn">
                     <i class="bi bi-tag-fill"></i>
-                    <span>Claim {{ $exitIntentDiscount }}% & Book Now</span>
+                    <span>{{ __('ui.common.save') }} {{ $exitIntentDiscount }}% & {{ __('ui.common.book_now') }}</span>
                 </button>
                 <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',(string)($settings['site_whatsapp'] ?? '971502456056')) }}?text={{ urlencode('Hi Dunes Discovery, I am looking to book a desert safari with the ' . $exitIntentDiscount . '% discount code ' . $exitIntentCode . '. Could you recommend the best package for my group?') }}" 
                    class="sm:col-span-5 w-full py-3.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm shadow-md transition-all flex items-center justify-center gap-2" 
                    target="_blank" 
                    rel="noopener noreferrer">
                     <i class="bi bi-whatsapp"></i>
-                    <span>WhatsApp</span>
+                    <span>{{ __('ui.common.whatsapp') }}</span>
                 </a>
             </div>
 

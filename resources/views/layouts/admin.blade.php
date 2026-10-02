@@ -109,6 +109,12 @@
             <a href="{{ route('admin.legal.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.legal*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
                 <i class="bi bi-shield-check text-base"></i> <span>Legal Policies</span>
             </a>
+            <a href="{{ route('admin.pages.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.pages*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-file-earmark-richtext-fill text-base text-amber-400"></i> <span>Pages & Content</span>
+            </a>
+            <a href="{{ route('admin.menus.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.menus*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-menu-button-wide-fill text-base text-sky-400"></i> <span>Navigation & Menus</span>
+            </a>
 
             <div class="pt-4 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">Email Marketing</div>
             <a href="{{ route('admin.subscribers.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.subscribers*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
@@ -243,6 +249,12 @@
             </a>
             <a href="{{ route('admin.legal.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.legal*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Legal Policies' : ''">
                 <i class="bi bi-shield-check text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Legal Policies</span>
+            </a>
+            <a href="{{ route('admin.pages.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.pages*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Pages & Content' : ''">
+                <i class="bi bi-file-earmark-richtext-fill text-base shrink-0 text-amber-400"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Pages & Content</span>
+            </a>
+            <a href="{{ route('admin.menus.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.menus*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Navigation & Menus' : ''">
+                <i class="bi bi-menu-button-wide-fill text-base shrink-0 text-sky-400"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Navigation & Menus</span>
             </a>
 
             <div x-show="!$store.admin.sidebarCollapsed" class="pt-4 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Email Marketing</div>

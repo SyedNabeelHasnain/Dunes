@@ -88,9 +88,9 @@
             <div class="flex items-center justify-between p-4 sm:p-5 pb-3">
                 <div class="flex items-center gap-2 sm:gap-2.5">
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-primary/10 text-primary border border-primary/20">
-                        <i class="bi bi-search"></i> Search Dubai Safaris
+                        <i class="bi bi-search"></i> {{ __('ui.nav.search') }}
                     </span>
-                    <span class="hidden sm:inline-block text-[11px] font-semibold text-slate-400">DET Licensed #1430583</span>
+                    <span class="hidden sm:inline-block text-[11px] font-semibold text-slate-400">{{ __('ui.reviews_section.det_license', ['license' => '1430583']) }}</span>
                 </div>
                 <button type="button" 
                         @click="$store.modal.close()" 
@@ -117,7 +117,7 @@
                                @keydown.enter="handleEnter($event)"
                                @keydown.escape.prevent="handleEscape"
                                class="w-full pl-11 sm:pl-12 pr-28 sm:pr-32 py-3.5 sm:py-4 rounded-2xl bg-slate-50 border-2 border-slate-200 focus:border-primary focus:bg-white text-sm sm:text-base font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none transition-all shadow-2xs" 
-                               placeholder="Search safaris, buggies, quad biking, cruises..." 
+                               placeholder="{{ __('ui.nav.search_placeholder') }}" 
                                autocomplete="off" 
                                required>
                         
@@ -129,14 +129,14 @@
                             <button type="button" 
                                     x-show="query.length > 0" 
                                     @click="clearQuery" 
-                                    class="w-6 h-6 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center transition-colors text-xs cursor-pointer"
+                                    class="w-6 h-6 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center transition-colors text-xs cursor-pointer" 
                                     aria-label="Clear query">
                                 <i class="bi bi-x-lg text-[10px]"></i>
                             </button>
                         </div>
 
                         <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 sm:py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-xs sm:text-sm shadow-xs transition-colors cursor-pointer">
-                            Search
+                            {{ __('ui.nav.search') }}
                         </button>
                     </div>
                 </form>
@@ -147,7 +147,7 @@
                     <div class="trending-searches-wrapper">
                         <div class="flex items-center justify-between mb-2.5">
                             <span class="text-[11px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                                <i class="bi bi-fire text-amber-500"></i> Popular Searches
+                                <i class="bi bi-fire text-amber-500"></i> {{ __('ui.common.popular') }} {{ __('ui.nav.search') }}
                             </span>
                             <span class="hidden sm:inline-block text-[11px] text-slate-400">Press <kbd class="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 font-mono text-[10px]">Ctrl+K</kbd> anytime</span>
                         </div>
@@ -252,10 +252,10 @@
                                 </div>
                                 <!-- Price & Action CTA -->
                                 <div class="text-right shrink-0 pl-3">
-                                    <span class="text-[9px] sm:text-[10px] text-slate-400 block font-bold uppercase tracking-wider">Starts From</span>
+                                    <span class="text-[9px] sm:text-[10px] text-slate-400 block font-bold uppercase tracking-wider">{{ __('ui.common.starting_from') }}</span>
                                     <div class="text-xs sm:text-sm font-black text-primary font-mono whitespace-nowrap" x-text="tour.price_formatted"></div>
                                     <div class="text-[10px] font-bold text-slate-400 group-hover:text-primary flex items-center justify-end gap-1 mt-0.5 transition-colors">
-                                        <span class="hidden sm:inline">View</span>
+                                        <span class="hidden sm:inline">{{ __('ui.common.view_details') }}</span>
                                         <i class="bi bi-arrow-right text-xs group-hover:translate-x-0.5 transition-transform"></i>
                                     </div>
                                 </div>
@@ -278,7 +278,7 @@
                                         @click="if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp(query); }"
                                         class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs inline-flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer">
                                     <i class="bi bi-whatsapp"></i>
-                                    <span>Ask Safari Concierge on WhatsApp</span>
+                                    <span>{{ __('ui.common.whatsapp_inquire') }}</span>
                                 </button>
                             </div>
                         </div>
@@ -288,7 +288,7 @@
                     <div x-show="filteredResults.length > 0" class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
                         <span class="text-slate-400 text-[11px]">Instant live match</span>
                         <a :href="searchUrl + '?q=' + encodeURIComponent(query)" class="font-bold text-primary hover:text-primary-dark transition-colors inline-flex items-center gap-1">
-                            <span>View all results on full page</span>
+                            <span>{{ __('ui.common.view_all') }}</span>
                             <i class="bi bi-arrow-right"></i>
                         </a>
                     </div>
@@ -298,10 +298,10 @@
             <!-- Footer -->
             <div class="flex items-center justify-between p-3.5 sm:p-4 px-5 sm:px-6 bg-slate-50 border-t border-slate-200 text-xs">
                 <span class="text-slate-500 flex items-center gap-1 font-medium">
-                    <i class="bi bi-patch-check-fill text-emerald-500 text-sm"></i> 100% Free 24h Cancellation
+                    <i class="bi bi-patch-check-fill text-emerald-500 text-sm"></i> {{ __('ui.trust_strip.free_cancel') }}
                 </span>
                 <a href="{{ route('tours.index') }}" class="font-bold text-primary hover:text-primary-dark transition-colors inline-flex items-center gap-1">
-                    <span>Browse full catalog</span>
+                    <span>{{ __('ui.common.view_all_tours') }}</span>
                     <i class="bi bi-arrow-right"></i>
                 </a>
             </div>

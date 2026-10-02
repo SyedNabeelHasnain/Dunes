@@ -160,7 +160,7 @@
                             <p class="text-slate-500 text-xs mb-3 leading-relaxed">
                                 Dune bashing, sunset photo stop, camel ride, sandboarding, 5-star live BBQ dinner & 3 cultural shows.
                             </p>
-                            <div class="font-black text-primary text-base" data-aed="150">AED 150 <span class="text-slate-400 font-normal text-xs">/ guest</span></div>
+                            <div class="font-black text-primary text-base" data-aed="150">{{ __('ui.common.aed') }} 150 <span class="text-slate-400 font-normal text-xs">/ guest</span></div>
                         </div>
 
                         <div class="custom-card p-4 rounded-2xl cursor-pointer transition-all bg-white border-2 border-slate-200 hover:border-primary/50 shadow-xs" data-group="base" data-name="VIP Luxury Evening Safari" data-price="250" data-tour-id="2">
@@ -172,7 +172,7 @@
                             <p class="text-slate-500 text-xs mb-3 leading-relaxed">
                                 Extreme Lahbab dune bashing, reserved elevated VIP table with private dedicated waiter & table service.
                             </p>
-                            <div class="font-black text-primary text-base" data-aed="250">AED 250 <span class="text-slate-400 font-normal text-xs">/ guest</span></div>
+                            <div class="font-black text-primary text-base" data-aed="250">{{ __('ui.common.aed') }} 250 <span class="text-slate-400 font-normal text-xs">/ guest</span></div>
                         </div>
 
                         <div class="custom-card p-4 rounded-2xl cursor-pointer transition-all bg-white border-2 border-slate-200 hover:border-primary/50 shadow-xs" data-group="base" data-name="Morning Desert Safari" data-price="120" data-tour-id="4">
@@ -184,7 +184,7 @@
                             <p class="text-slate-500 text-xs mb-3 leading-relaxed">
                                 Crisp morning air, 40-min high dune drive, sunrise photos, camel ride & sandboarding. Back by 12:30 PM.
                             </p>
-                            <div class="font-black text-primary text-base" data-aed="120">AED 120 <span class="text-slate-400 font-normal text-xs">/ guest</span></div>
+                            <div class="font-black text-primary text-base" data-aed="120">{{ __('ui.common.aed') }} 120 <span class="text-slate-400 font-normal text-xs">/ guest</span></div>
                         </div>
 
                         <div class="custom-card p-4 rounded-2xl cursor-pointer transition-all bg-white border-2 border-slate-200 hover:border-primary/50 shadow-xs" data-group="base" data-name="Overnight Stargazing Safari" data-price="350" data-tour-id="5">
@@ -196,7 +196,7 @@
                             <p class="text-slate-500 text-xs mb-3 leading-relaxed">
                                 Full evening safari + private overnight Bedouin tent, campfire stargazing & freshly cooked sunrise breakfast.
                             </p>
-                            <div class="font-black text-primary text-base" data-aed="350">AED 350 <span class="text-slate-400 font-normal text-xs">/ guest</span></div>
+                            <div class="font-black text-primary text-base" data-aed="350">{{ __('ui.common.aed') }} 350 <span class="text-slate-400 font-normal text-xs">/ guest</span></div>
                         </div>
                     </div>
                 </div>
@@ -424,7 +424,7 @@
                         <div class="flex justify-between items-baseline mb-1">
                             <span class="text-slate-300 text-xs">Estimated Total:</span>
                             <div class="text-right">
-                                <span class="text-3xl font-black text-amber-400" id="customizerTotalDisplay" data-aed="300">AED 300</span>
+                                <span class="text-3xl font-black text-amber-400" id="customizerTotalDisplay" data-aed="300">{{ __('ui.common.aed') }} 300</span>
                                 <span class="text-slate-300 block text-[10px] mt-0.5">inclusive of all taxes & DTCM fees</span>
                             </div>
                         </div>

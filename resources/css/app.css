@@ -82,6 +82,26 @@
 .d-flex { display: flex !important; }
 
 /* ==========================================================================
+   Responsive Expanded Site Content Container Width
+   Upgrades max-w-7xl (1280px) to modern responsive widescreen dimensions
+   ========================================================================== */
+@media (min-width: 1280px) {
+  .max-w-7xl {
+    max-width: 1400px !important;
+  }
+}
+@media (min-width: 1536px) {
+  .max-w-7xl {
+    max-width: 1480px !important;
+  }
+}
+@media (min-width: 1920px) {
+  .max-w-7xl {
+    max-width: 1536px !important;
+  }
+}
+
+/* ==========================================================================
    CSS Custom Properties (Backward Compatibility & Global Root Variables)
    ========================================================================== */
 :root {

@@ -19,14 +19,14 @@
         </p>
         <div class="flex flex-col sm:flex-row justify-center gap-3">
             <a href="{{ route('home') }}" class="btn-desert-animated px-5 py-3 rounded-full font-bold text-white text-sm shadow-md inline-flex items-center justify-center gap-2">
-                <i class="bi bi-house-door-fill"></i> Return to Homepage
+                <i class="bi bi-house-door-fill"></i> {{ __('ui.nav.home') }}
             </a>
             <a href="{{ route('tours.index') }}" class="border-2 border-primary text-primary hover:bg-primary hover:text-white px-5 py-3 rounded-full font-bold text-sm transition-colors inline-flex items-center justify-center gap-2">
-                <i class="bi bi-grid-fill"></i> Explore Desert Tours
+                <i class="bi bi-grid-fill"></i> {{ __('ui.common.view_all_tours') }}
             </a>
         </div>
         <div class="mt-6 pt-4 border-t border-slate-200 text-slate-500 text-xs">
-            Need immediate assistance? <a href="https://wa.me/971502456056?text=Hi%20Dunes%20Team%2C%20I%20need%20help%20finding%20a%20tour" target="_blank" rel="noopener" class="text-primary font-bold hover:underline inline-flex items-center gap-1"><i class="bi bi-whatsapp"></i> Chat on WhatsApp</a>
+            Need immediate assistance? <a href="https://wa.me/971502456056?text=Hi%20Dunes%20Team%2C%20I%20need%20help%20finding%20a%20tour" target="_blank" rel="noopener" class="text-primary font-bold hover:underline inline-flex items-center gap-1"><i class="bi bi-whatsapp"></i> {{ __('ui.common.whatsapp_chat') }}</a>
         </div>
     </div>
 </div>

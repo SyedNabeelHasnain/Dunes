@@ -447,22 +447,15 @@
 
                     <!-- Desktop Right Actions (Hidden on mobile/tablet) -->
                     <div class="hidden lg:flex items-center gap-2 xl:gap-3">
-                        <button type="button" class="hidden 2xl:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-primary border border-primary/30 hover:border-primary hover:bg-orange-50/50 transition-all cursor-pointer shadow-2xs" @click="$store.modal.open('safari-matcher')" aria-label="Safari Match Concierge">
-                            <i class="bi bi-compass text-amber-500"></i>
-                            <span>Safari Concierge</span>
-                            @if($conciergePromoActive)
-                            <span class="px-1.5 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[9px] font-black">{{ $conciergePromoDiscount }}% OFF</span>
-                            @endif
-                        </button>
-                        <button type="button" class="w-9 h-9 rounded-full bg-white border border-slate-200/90 shadow-2xs flex items-center justify-center text-slate-600 hover:text-primary hover:border-primary/50 transition-all cursor-pointer" @click="$store.modal.open('search')" title="Search Dubai tours" aria-label="Search Dubai tours">
+                        <button type="button" class="w-9 h-9 rounded-full bg-white border border-slate-200/90 shadow-2xs flex items-center justify-center text-slate-600 hover:text-primary hover:border-primary/50 transition-all cursor-pointer" @click="$store.modal.open('search')" title="{{ __('ui.nav.search') }}" aria-label="{{ __('ui.nav.search') }}">
                             <i class="bi bi-search text-xs"></i>
                         </button>
                         @include('partials.language-currency-switcher', ['switcherId' => 'desktopLangCurrencyDropdownBtn'])
                         <a class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full font-bold text-xs bg-emerald-500 hover:bg-emerald-600 text-white shadow-xs hover:shadow-sm transition-all cursor-pointer" href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener">
-                            <i class="bi bi-whatsapp"></i><span>WhatsApp</span>
+                            <i class="bi bi-whatsapp"></i><span>{{ __('ui.common.whatsapp') }}</span>
                         </a>
                         <button type="button" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full font-extrabold text-xs text-white bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 shadow-sm hover:shadow-md transition-all cursor-pointer" data-action="open-booking">
-                            <i class="bi bi-calendar-check"></i><span>Book Now</span>
+                            <i class="bi bi-calendar-check"></i><span>{{ __('ui.common.book_now') }}</span>
                         </button>
                     </div>
 
@@ -482,14 +475,14 @@
                         </button>
 
                         <!-- WhatsApp Direct Button -->
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-100 flex items-center justify-center transition-colors cursor-pointer text-xs" aria-label="WhatsApp" target="_blank" rel="noopener">
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-100 flex items-center justify-center transition-colors cursor-pointer text-xs" aria-label="{{ __('ui.common.whatsapp') }}" target="_blank" rel="noopener">
                             <i class="bi bi-whatsapp"></i>
                         </a>
 
                         <!-- Compact Book Now Button -->
-                        <button type="button" class="px-2.5 sm:px-3.5 py-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold text-[11px] sm:text-xs shadow-xs flex items-center gap-1 cursor-pointer" data-action="open-booking" aria-label="Book Now">
+                        <button type="button" class="px-2.5 sm:px-3.5 py-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold text-[11px] sm:text-xs shadow-xs flex items-center gap-1 cursor-pointer" data-action="open-booking" aria-label="{{ __('ui.common.book_now') }}">
                             <i class="bi bi-calendar-check"></i>
-                            <span class="hidden sm:inline">Book</span>
+                            <span class="hidden sm:inline">{{ __('ui.common.book') }}</span>
                         </button>
 
                         <!-- Hamburger Drawer Trigger -->
@@ -547,8 +540,8 @@
                         <div class="flex items-center gap-2.5">
                             <span class="text-amber-400 text-lg"><i class="bi bi-compass"></i></span>
                             <div>
-                                <div class="font-bold text-white text-xs leading-none">Safari Match Concierge</div>
-                                <small class="text-white/60 text-[10px]">Find ideal tour in 30 seconds</small>
+                                <div class="font-bold text-white text-xs leading-none">{{ __('ui.footer.safari_concierge_btn') }}</div>
+                                <small class="text-white/60 text-[10px]">{{ __('ui.footer.safari_concierge_desc') }}</small>
                             </div>
                         </div>
                         @if($conciergePromoActive)
@@ -635,17 +628,39 @@
                             <i class="bi bi-whatsapp"></i>
                         </a>
                     </div>
+                    <div class="mt-4">
+                        <button type="button" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold text-white bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 shadow-sm hover:shadow-md transition-all cursor-pointer" @click="$store.modal.open('safari-matcher')" aria-label="{{ __('ui.footer.safari_concierge_btn') }}">
+                            <i class="bi bi-compass text-white"></i>
+                            <span>{{ __('ui.footer.safari_concierge_btn') }}</span>
+                            @if($conciergePromoActive)
+                            <span class="px-1.5 py-0.5 rounded-full bg-black/30 text-amber-200 text-[9px] font-black">{{ $conciergePromoDiscount }}% OFF</span>
+                            @endif
+                        </button>
+                    </div>
                 </div>
+
+                @php
+                    $cmsSvc = app(\App\Services\CmsContentService::class);
+                    $footerSafaris = $cmsSvc->getMenuItems('footer_desert_safaris');
+                    $footerTours = $cmsSvc->getMenuItems('footer_tours_cruises');
+                    $footerPolicies = $cmsSvc->getMenuItems('footer_trust_policies');
+                @endphp
 
                 <!-- Col 2: Desert Safaris -->
                 <div class="col-span-1 lg:col-span-2">
                     <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 mb-3.5">{{ __('ui.footer.desert_safaris') }}</h3>
                     <ul class="space-y-2 text-xs sm:text-sm">
-                        <li><a href="{{ route('tours.show', 'evening-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.evening_safari') }}</a></li>
-                        <li><a href="{{ route('tours.show', 'morning-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.morning_safari') }}</a></li>
-                        <li><a href="{{ route('tours.show', 'overnight-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.overnight_safari') }}</a></li>
-                        <li><a href="{{ route('tours.show', 'desert-safari-quad-biking-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.quad_biking') }}</a></li>
-                        <li><a href="{{ route('tours.show', 'luxury-vip-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.vip_safari') }}</a></li>
+                        @if($footerSafaris->count() > 0)
+                            @foreach($footerSafaris as $fItem)
+                            <li><a href="{{ $fItem->resolved_url }}" target="{{ $fItem->target }}" class="text-slate-300 hover:text-white transition-colors">{{ $fItem->label }}</a></li>
+                            @endforeach
+                        @else
+                            <li><a href="{{ route('tours.show', 'evening-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.evening_safari') }}</a></li>
+                            <li><a href="{{ route('tours.show', 'morning-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.morning_safari') }}</a></li>
+                            <li><a href="{{ route('tours.show', 'overnight-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.overnight_safari') }}</a></li>
+                            <li><a href="{{ route('tours.show', 'desert-safari-quad-biking-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.quad_biking') }}</a></li>
+                            <li><a href="{{ route('tours.show', 'luxury-vip-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.vip_safari') }}</a></li>
+                        @endif
                     </ul>
                 </div>
 
@@ -653,11 +668,17 @@
                 <div class="col-span-1 lg:col-span-2">
                     <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 mb-3.5">{{ __('ui.footer.tours_cruises') }}</h3>
                     <ul class="space-y-2 text-xs sm:text-sm">
-                        <li><a href="{{ route('tours.show', 'dubai-city-tour') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.dubai_city_tour') }}</a></li>
-                        <li><a href="{{ route('tours.show', 'abu-dhabi-city-tour-from-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.abu_dhabi_tour') }}</a></li>
-                        <li><a href="{{ route('tours.show', 'dhow-cruise-catamaran-cruise-dinner-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.marina_cruise') }}</a></li>
-                        <li><a href="{{ route('rate-card') }}" class="text-slate-300 hover:text-white transition-colors inline-flex items-center gap-1.5"><i class="bi bi-file-earmark-pdf text-amber-400"></i>{{ __('ui.footer.rate_card_pdf') }}</a></li>
-                        <li><a href="{{ route('blog.index') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.nav.blog') }}</a></li>
+                        @if($footerTours->count() > 0)
+                            @foreach($footerTours as $fItem)
+                            <li><a href="{{ $fItem->resolved_url }}" target="{{ $fItem->target }}" class="text-slate-300 hover:text-white transition-colors">{{ $fItem->label }}</a></li>
+                            @endforeach
+                        @else
+                            <li><a href="{{ route('tours.show', 'dubai-city-tour') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.dubai_city_tour') }}</a></li>
+                            <li><a href="{{ route('tours.show', 'abu-dhabi-city-tour-from-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.abu_dhabi_tour') }}</a></li>
+                            <li><a href="{{ route('tours.show', 'dhow-cruise-catamaran-cruise-dinner-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.marina_cruise') }}</a></li>
+                            <li><a href="{{ route('rate-card') }}" class="text-slate-300 hover:text-white transition-colors inline-flex items-center gap-1.5"><i class="bi bi-file-earmark-pdf text-amber-400"></i>{{ __('ui.footer.rate_card_pdf') }}</a></li>
+                            <li><a href="{{ route('blog.index') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.nav.blog') }}</a></li>
+                        @endif
                     </ul>
                 </div>
 
@@ -665,14 +686,17 @@
                 <div class="col-span-1 lg:col-span-2">
                     <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 mb-3.5">{{ __('ui.footer.trust_policies') }}</h3>
                     <ul class="space-y-2 text-xs sm:text-sm">
-                        <li><a href="{{ route('terms') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.terms') }}</a></li>
-                        <li><a href="{{ route('privacy') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.privacy') }}</a></li>
-                        <li><a href="{{ route('cookies') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.cookies') }}</a></li>
-                        <li><a href="{{ route('cancellation') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.refund') }}</a></li>
-                        <li><a href="{{ route('payment.security') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.payment_security') }}</a></li>
-                        <li><a href="{{ route('safety.waiver') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.safety_waiver') }}</a></li>
-                        <li><a href="{{ route('ai.editorial') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.ai_editorial') }}</a></li>
-                        <li><a href="{{ route('responsible.tourism') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.responsible_tourism') }}</a></li>
+                        @if($footerPolicies->count() > 0)
+                            @foreach($footerPolicies as $fItem)
+                            <li><a href="{{ $fItem->resolved_url }}" target="{{ $fItem->target }}" class="text-slate-300 hover:text-white transition-colors">{{ $fItem->label }}</a></li>
+                            @endforeach
+                        @else
+                            <li><a href="{{ route('terms') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.terms') }}</a></li>
+                            <li><a href="{{ route('privacy') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.privacy') }}</a></li>
+                            <li><a href="{{ route('cookies') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.cookies') }}</a></li>
+                            <li><a href="{{ route('cancellation') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.refund') }}</a></li>
+                            <li><a href="{{ route('payment.security') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.payment_security') }}</a></li>
+                        @endif
                     </ul>
                 </div>
 
@@ -713,7 +737,7 @@
             <div class="border-t border-slate-800/80 pt-6">
                 <div class="flex flex-col lg:flex-row items-center justify-between gap-4 text-center lg:text-left">
                     <div>
-                        <p class="text-slate-400 text-xs mb-1">&copy; {{ date('Y') }} {{ $settings['site_name'] ?? 'Dunes Discovery Tourism L.L.C.' }} {{ __('ui.footer.rights_reserved') }} Department of Economy & Tourism License #{{ $settings['company_license_number'] ?? '1430583' }}.</p>
+                        <p class="text-slate-400 text-xs mb-1">{{ __('ui.footer.license_line', ['year' => date('Y'), 'name' => $settings['site_name'] ?? 'Dunes Discovery Tourism L.L.C.', 'license' => $settings['company_license_number'] ?? '1430583']) }}</p>
                         <div class="flex flex-wrap justify-center lg:justify-start items-center gap-x-2.5 gap-y-1 text-xs text-slate-300">
                             <a href="{{ route('terms') }}" class="hover:text-white transition-colors">{{ __('ui.footer.terms') }}</a>
                             <span class="text-slate-500">&bull;</span>
@@ -733,7 +757,7 @@
                         </div>
                     </div>
                     <div class="inline-flex items-center gap-2 bg-slate-900 border border-slate-800 px-4 py-2 rounded-full flex-wrap justify-center">
-                        <span class="text-slate-300 text-xs inline-flex items-center gap-1 font-semibold"><i class="bi bi-shield-lock-fill text-emerald-400"></i>Secure Checkout:</span>
+                        <span class="text-slate-300 text-xs inline-flex items-center gap-1 font-semibold"><i class="bi bi-shield-lock-fill text-emerald-400"></i>{{ __('ui.footer.secure_checkout') }}</span>
                         <span class="bg-white rounded px-2 py-0.5 inline-flex items-center justify-center shadow-2xs h-6"><img src="{{ asset('images/visa-card.svg') }}" alt="Visa" width="32" height="20" class="h-3.5 w-auto object-contain"></span>
                         <span class="bg-white rounded px-2 py-0.5 inline-flex items-center justify-center shadow-2xs h-6"><img src="{{ asset('images/mastercard.svg') }}" alt="Mastercard" width="28" height="20" class="h-3.5 w-auto object-contain"></span>
                         <span class="bg-white rounded px-2 py-0.5 inline-flex items-center justify-center shadow-2xs h-6"><img src="{{ asset('images/americanexpress.svg') }}" alt="American Express" width="28" height="20" class="h-3.5 w-auto object-contain"></span>

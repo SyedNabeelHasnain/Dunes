@@ -55,7 +55,7 @@
                         <i class="bi bi-chevron-left text-sm"></i>
                     </button>
                     <div>
-                        <h5 class="text-base sm:text-lg font-black text-slate-900 leading-tight" id="bookingModalTitle">Book Your Adventure</h5>
+                        <h5 class="text-base sm:text-lg font-black text-slate-900 leading-tight" id="bookingModalTitle">{{ __('ui.booking.title') }}</h5>
                         <div class="text-primary text-xs font-extrabold hidden" id="bookingModalSubtitle">Step 1 of 2</div>
                     </div>
                 </div>
@@ -94,10 +94,10 @@
                     <!-- Step 1: Select Tour, Package and Date -->
                     <div class="step-content active" data-step="1">
                             <div class="mb-5" id="tourSelectWrapper">
-                                <label class="block text-xs font-black uppercase tracking-wider text-slate-800 mb-2" for="bookingTour">Choose Tour</label>
+                                <label class="block text-xs font-black uppercase tracking-wider text-slate-800 mb-2" for="bookingTour">{{ __('ui.booking.choose_tour') }}</label>
                                 <div class="relative">
                                     <select class="w-full h-[52px] appearance-none rounded-2xl bg-white px-4 pr-11 font-bold text-slate-900 text-sm border-2 border-slate-200 shadow-2xs hover:border-slate-300 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all cursor-pointer" id="bookingTour" name="tour_id" required autocomplete="off">
-                                        <option value="">Select a tour...</option>
+                                        <option value="">{{ __('ui.booking.select_tier') }}</option>
                                         @foreach($modalTours as $t)
                                             <option value="{{ $t->id }}">{{ $t->name }}</option>
                                         @endforeach
@@ -109,7 +109,7 @@
                             </div>
 
                             <div class="mb-5">
-                                <div class="text-xs font-black uppercase tracking-wider text-slate-800 mb-2">Select Package</div>
+                                <div class="text-xs font-black uppercase tracking-wider text-slate-800 mb-2">{{ __('ui.booking.select_package') }}</div>
                                 <div class="tier-cards" id="tierCards">
                                     <div class="text-center py-6 text-slate-400">
                                         <i class="bi bi-cursor-fill text-3xl mb-1 block"></i>
@@ -121,11 +121,11 @@
 
                             <div class="mb-5">
                                 <div class="flex items-center justify-between mb-2 gap-2 flex-wrap">
-                                    <div class="text-xs font-black uppercase tracking-wider text-slate-800">When</div>
+                                    <div class="text-xs font-black uppercase tracking-wider text-slate-800">{{ __('ui.booking.when') }}</div>
                                     <div class="flex items-center gap-2">
                                         <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer" id="calendarTrigger">
                                             <i class="bi bi-calendar3 text-primary"></i>
-                                            <span>Select from Calendar</span>
+                                            <span>{{ __('ui.booking.select_date') }}</span>
                                         </button>
                                         <div class="date-nav flex items-center gap-1">
                                             <button type="button" class="w-8 h-8 rounded-full bg-white border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-700 shadow-2xs transition-colors cursor-pointer" id="datePrev" aria-label="Previous date"><i class="bi bi-chevron-left text-xs"></i></button>
@@ -139,7 +139,7 @@
 
                             <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 mb-3">
                                 <div class="sm:col-span-4 lg:col-span-3">
-                                    <label class="block text-xs font-black uppercase tracking-wider text-slate-800 mb-2" for="bookingAdults">Guests</label>
+                                    <label class="block text-xs font-black uppercase tracking-wider text-slate-800 mb-2" for="bookingAdults">{{ __('ui.booking.guests') }}</label>
                                     <div class="flex items-center justify-between bg-white shadow-2xs rounded-2xl border-2 border-slate-200 p-1 h-[52px]">
                                         <button type="button" class="w-10 h-10 flex items-center justify-center text-primary hover:bg-orange-50 rounded-xl transition-colors cursor-pointer" data-action="minus" data-target="adults" aria-label="Decrease guest count">
                                             <i class="bi bi-dash-circle-fill text-lg"></i>
@@ -152,10 +152,10 @@
                                     <input type="hidden" name="children" id="bookingChildren" value="0">
                                 </div>
                                 <div class="sm:col-span-8 lg:col-span-9 booking-location-wrapper relative">
-                                    <label class="block text-xs font-black uppercase tracking-wider text-slate-800 mb-2" for="bookingLocation">Pickup Location</label>
+                                    <label class="block text-xs font-black uppercase tracking-wider text-slate-800 mb-2" for="bookingLocation">{{ __('ui.booking.pickup_location_label') }}</label>
                                     <div class="relative rounded-2xl bg-white shadow-2xs border-2 border-slate-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 flex items-center h-[52px] transition-all">
                                         <span class="pl-3.5 pr-2 text-primary shrink-0"><i class="bi bi-geo-alt-fill text-base"></i></span>
-                                        <input type="text" class="flex-1 bg-transparent font-bold text-slate-900 text-sm border-0 focus:outline-none placeholder:text-slate-400 min-w-0" name="location" id="bookingLocation" required placeholder="Hotel / Residence in Dubai" autocomplete="off">
+                                        <input type="text" class="flex-1 bg-transparent font-bold text-slate-900 text-sm border-0 focus:outline-none placeholder:text-slate-400 min-w-0" name="location" id="bookingLocation" required placeholder="{{ __('ui.booking.pickup_placeholder') }}" autocomplete="off">
                                         <button class="px-3.5 h-full text-slate-400 hover:text-primary hover:bg-slate-50 border-l border-slate-100 transition-colors cursor-pointer rounded-r-2xl shrink-0" type="button" id="detectLocation" aria-label="Detect current location" title="Detect Current Location">
                                             <i class="bi bi-crosshair"></i>
                                         </button>
@@ -187,7 +187,7 @@
                                 <div class="flex items-center justify-between mb-2.5">
                                     <div class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
                                         <i class="bi bi-stars text-amber-500"></i>
-                                        <span>Enhance Your Safari (Optional Add-ons)</span>
+                                        <span>{{ __('ui.booking.addons_title') }}</span>
                                     </div>
                                     <span class="px-2.5 py-0.5 rounded-full bg-orange-50 text-primary border border-orange-200/60 text-[10px] font-extrabold uppercase tracking-wide">1-Click Add</span>
                                 </div>
@@ -199,17 +199,17 @@
 
                             <!-- Contact Info -->
                             <div class="mb-5 space-y-3">
-                                <div class="text-xs font-black uppercase tracking-wider text-slate-800 mb-2">Contact Info</div>
+                                <div class="text-xs font-black uppercase tracking-wider text-slate-800 mb-2">{{ __('ui.booking.step_contact') }}</div>
                                 <div>
-                                    <label class="block text-[11px] font-extrabold text-slate-800 uppercase tracking-wider mb-1" for="bookingName">Full Name</label>
+                                    <label class="block text-[11px] font-extrabold text-slate-800 uppercase tracking-wider mb-1" for="bookingName">{{ __('ui.booking.name') }}</label>
                                     <input type="text" class="w-full px-4 py-3 rounded-2xl bg-white border border-slate-200 text-sm font-semibold text-slate-900 shadow-2xs focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-slate-400" id="bookingName" name="name" placeholder="John Doe" autocomplete="name" required data-form="booking" data-field="name">
                                 </div>
                                 <div>
-                                    <label class="block text-[11px] font-extrabold text-slate-800 uppercase tracking-wider mb-1" for="bookingEmail">Email Address</label>
+                                    <label class="block text-[11px] font-extrabold text-slate-800 uppercase tracking-wider mb-1" for="bookingEmail">{{ __('ui.booking.email') }}</label>
                                     <input type="email" class="w-full px-4 py-3 rounded-2xl bg-white border border-slate-200 text-sm font-semibold text-slate-900 shadow-2xs focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-slate-400" id="bookingEmail" name="email" placeholder="name@example.com" autocomplete="email" required data-form="booking" data-field="email">
                                 </div>
                                 <div>
-                                    <label class="block text-[11px] font-extrabold text-slate-800 uppercase tracking-wider mb-1" for="bookingPhone">Phone Number</label>
+                                    <label class="block text-[11px] font-extrabold text-slate-800 uppercase tracking-wider mb-1" for="bookingPhone">{{ __('ui.booking.phone') }}</label>
                                     <div class="welcome-phone-field rounded-2xl bg-white border border-slate-200 shadow-2xs focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
                                         <input type="tel" class="w-full py-3 px-4 bg-transparent text-sm font-semibold text-slate-900 border-0 focus:outline-none placeholder:text-slate-400" id="bookingPhone" name="phone" placeholder="50 123 4567" autocomplete="tel" required data-form="booking" data-field="phone">
                                     </div>
@@ -231,7 +231,7 @@
 
                             <!-- Special Requests -->
                             <div class="mb-5">
-                                <label class="block text-xs font-black uppercase tracking-wider text-slate-800 mb-2" for="bookingRequests">Special Requests / Dietary Notes</label>
+                                <label class="block text-xs font-black uppercase tracking-wider text-slate-800 mb-2" for="bookingRequests">{{ __('ui.booking.special_requests') }}</label>
                                 <textarea class="w-full p-3.5 rounded-2xl bg-white border border-slate-200 text-xs sm:text-sm font-medium text-slate-900 shadow-2xs focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-slate-400" id="bookingRequests" name="requests" rows="3" placeholder="Any dietary requirements, hotel room numbers, baby seat needs..." autocomplete="off" data-form="booking" data-field="requests"></textarea>
                             </div>
 
@@ -318,20 +318,20 @@
                 <div class="border-t border-slate-200/90 bg-white py-4 px-5 sm:px-7 shrink-0 shadow-xs z-10">
                     <div class="flex items-center justify-between w-full gap-4">
                         <div class="text-left">
-                            <small class="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-slate-500 block mb-0.5">Total Amount</small>
+                            <small class="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-slate-500 block mb-0.5">{{ __('ui.booking.total') }}</small>
                             <div class="font-black text-primary font-mono text-xl sm:text-2xl leading-none" id="bookingTotal">AED 0.00</div>
                         </div>
                         <div class="flex items-center gap-2.5 ml-auto" id="continueBtnWrapper">
                             <button type="button" 
                                     class="px-6 sm:px-8 py-3 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all cursor-pointer inline-flex items-center gap-2" 
                                     id="nextStep">
-                                <span>Continue</span>
+                                <span>{{ __('ui.common.continue') }}</span>
                                 <i class="bi bi-arrow-right"></i>
                             </button>
                             <button type="submit" 
                                     class="px-6 sm:px-8 py-3 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all cursor-pointer hidden items-center gap-2" 
                                     id="submitBooking">
-                                <span>Confirm Booking</span>
+                                <span>{{ __('ui.common.confirm_booking') }}</span>
                                 <i class="bi bi-check-lg text-base"></i>
                             </button>
                         </div>
