@@ -15,7 +15,7 @@
                 Your payment was not completed. You can retry your reservation or contact our concierge team for immediate assistance.
             </p>
             @if($booking)
-                <div class="p-4 bg-slate-50 rounded-2xl mb-6 border border-slate-200 text-left">
+                <div class="p-4 bg-slate-50 rounded-2xl mb-6 border border-slate-200 text-start">
                     <div class="text-slate-500 text-xs font-bold uppercase tracking-wider">Reference</div>
                     <div class="font-mono font-extrabold text-slate-900 text-base sm:text-lg">#{{ $booking->reference }}</div>
                 </div>

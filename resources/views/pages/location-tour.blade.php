@@ -541,7 +541,7 @@
                         <button type="button"
                                 @click="activeFaq = (activeFaq === {{ $index }} ? null : {{ $index }})"
                                 :aria-expanded="activeFaq === {{ $index }}"
-                                class="w-full text-left px-5 sm:px-6 py-4 sm:py-5 flex items-center justify-between gap-4 font-bold transition-colors cursor-pointer"
+                                class="w-full text-start px-5 sm:px-6 py-4 sm:py-5 flex items-center justify-between gap-4 font-bold transition-colors cursor-pointer"
                                 :class="activeFaq === {{ $index }} ? 'text-amber-400 bg-amber-500/10' : 'text-white hover:text-amber-400'">
                             <span class="text-sm sm:text-base font-bold">{{ $faq['q'] }}</span>
                             <svg class="w-5 h-5 shrink-0 transition-transform duration-300"

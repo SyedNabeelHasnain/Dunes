@@ -56,6 +56,7 @@ class AjaxGatewayController extends Controller
                             'price' => $tier->pivot->price,
                             'old_price' => $tier->pivot->old_price,
                             'price_type' => $tier->pivot->price_type,
+                            'capacity' => (int) ($tier->vehicle_capacity ?? (preg_match('/(4|four)/i', $tier->name ?? '') ? 4 : (preg_match('/(1|single|solo)/i', $tier->name ?? '') ? 1 : 2))),
                         ];
                     });
 

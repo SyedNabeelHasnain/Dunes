@@ -191,7 +191,7 @@
 
             <!-- Comparison Table / Grid -->
             <div id="compareTableWrapper" class="overflow-x-auto" x-show="$store.compare.items && $store.compare.items.length > 0">
-                <table class="w-full text-left text-sm border-collapse min-w-[640px]" id="compareTable">
+                <table class="w-full text-start text-sm border-collapse min-w-[640px]" id="compareTable">
                     <thead>
                         <tr id="compareRowHeader" class="border-b border-slate-700">
                             <th class="w-44 min-w-[176px] pb-4 text-xs font-bold uppercase tracking-wider text-slate-300">{{ __('ui.tour_glance.title') }}</th>

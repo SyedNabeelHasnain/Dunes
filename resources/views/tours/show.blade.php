@@ -542,7 +542,7 @@ if(window.fbq){
                             @foreach($faqs as $index => $f)
                             <div class="bg-slate-50 rounded-2xl border border-slate-200/80 overflow-hidden">
                                 <button type="button" 
-                                        class="w-full text-left px-5 py-4 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
+                                        class="w-full text-start px-5 py-4 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
                                         @click="openFaq = (openFaq === {{ $index }} ? null : {{ $index }})">
                                     <span class="inline-flex items-center gap-2.5 text-sm sm:text-base">
                                         <i class="bi bi-question-circle-fill text-primary"></i>
@@ -746,7 +746,7 @@ if(window.fbq){
                                             <span class="text-[11px] text-slate-500 line-clamp-1 mt-0.5 block">{{ $tier->description }}</span>
                                             @endif
                                         </div>
-                                        <div class="text-right shrink-0 {{ $tier->is_popular ? 'mt-4' : '' }}">
+                                        <div class="text-end shrink-0 {{ $tier->is_popular ? 'mt-4' : '' }}">
                                             @if($save)
                                             <span class="text-[10px] text-slate-400 line-through block" data-aed="{{ $tOldPrice }}">{{ __('ui.common.aed') }} {{ number_format($tOldPrice) }}</span>
                                             @endif
@@ -909,7 +909,7 @@ if(window.fbq){
                         <span>{{ __('ui.reviews_section.captains') }}: <strong>5.0/5</strong></span>
                     </div>
                 </div>
-                <div class="md:col-span-3 text-center md:text-right">
+                <div class="md:col-span-3 text-center md:text-end">
                     <span class="inline-flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-full px-3 py-1.5 text-xs text-slate-700 font-medium">
                         <i class="bi bi-google text-blue-500"></i> {{ __('ui.reviews_section.google_direct') }}
                     </span>

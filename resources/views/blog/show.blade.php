@@ -201,7 +201,7 @@
                         @foreach ($post->faqs as $fi => $faq)
                         <div class="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-xs">
                             <button type="button" 
-                                    class="w-full text-left px-5 py-4 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
+                                    class="w-full text-start px-5 py-4 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
                                     @click="openFaq = (openFaq === {{ $fi }} ? null : {{ $fi }})">
                                 <span class="text-sm sm:text-base">{{ $faq->question }}</span>
                                 <i class="bi bi-chevron-down transition-transform duration-300 text-slate-500 shrink-0"

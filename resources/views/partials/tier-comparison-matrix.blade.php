@@ -19,7 +19,7 @@
         <table class="w-full text-center text-sm border-collapse min-w-[620px]">
             <thead class="bg-slate-50 border-b border-slate-200">
                 <tr>
-                    <th class="text-left py-4 px-4 text-slate-500 font-bold uppercase text-xs w-[28%] min-w-[180px]">Feature / Inclusion</th>
+                    <th class="text-start py-4 px-4 text-slate-500 font-bold uppercase text-xs w-[28%] min-w-[180px]">Feature / Inclusion</th>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
                     <th class="py-4 px-3 min-w-[140px] {{ $tier->is_popular ? 'bg-orange-50/60 border-x border-orange-200' : '' }}">
                         @if($tier->is_popular)
@@ -34,7 +34,7 @@
             </thead>
             <tbody class="divide-y divide-slate-200 text-xs sm:text-sm">
                 <tr>
-                    <td class="text-left py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
+                    <td class="text-start py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
                         <i class="bi bi-compass text-primary"></i> Dune Bashing & Sandboarding
                     </td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
@@ -50,7 +50,7 @@
                     @endforeach
                 </tr>
                 <tr>
-                    <td class="text-left py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
+                    <td class="text-start py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
                         <i class="bi bi-house-door text-primary"></i> Camp Seating & Service
                     </td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
@@ -66,7 +66,7 @@
                     @endforeach
                 </tr>
                 <tr>
-                    <td class="text-left py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
+                    <td class="text-start py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
                         <i class="bi bi-fire text-primary"></i> Live Desert Shows
                     </td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
@@ -77,7 +77,7 @@
                     @endforeach
                 </tr>
                 <tr>
-                    <td class="text-left py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
+                    <td class="text-start py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
                         <i class="bi bi-egg-fried text-primary"></i> BBQ Buffet Dinner
                     </td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
@@ -91,7 +91,7 @@
                     @endforeach
                 </tr>
                 <tr>
-                    <td class="text-left py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
+                    <td class="text-start py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
                         <i class="bi bi-truck text-primary"></i> Transfer Vehicle
                     </td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
@@ -105,7 +105,7 @@
                     @endforeach
                 </tr>
                 <tr>
-                    <td class="text-left py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
+                    <td class="text-start py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
                         <i class="bi bi-speedometer2 text-primary"></i> Quad Biking / Buggy
                     </td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
@@ -119,7 +119,7 @@
                     @endforeach
                 </tr>
                 <tr>
-                    <td class="text-left py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
+                    <td class="text-start py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
                         <i class="bi bi-heart text-primary"></i> Camel Ride & Henna
                     </td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
@@ -131,7 +131,7 @@
             </tbody>
             <tfoot class="bg-slate-50 border-t border-slate-200">
                 <tr>
-                    <td class="text-left py-3.5 px-4 font-bold text-slate-500 text-xs">Select Package:</td>
+                    <td class="text-start py-3.5 px-4 font-bold text-slate-500 text-xs">Select Package:</td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
                     <td class="py-3.5 px-3 {{ $tier->is_popular ? 'bg-orange-50/60 border-x border-orange-200' : '' }}">
                         <button type="button" 

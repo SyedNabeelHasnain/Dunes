@@ -98,7 +98,7 @@
                     Compare certified Dubai desert safaris, buggy rentals, and sightseeing experiences with 4x4 hotel transfers, 5-star live BBQ dining, and instant confirmation.
                 </p>
             </div>
-            <div class="hidden lg:block shrink-0 text-right">
+            <div class="hidden lg:block shrink-0 text-end">
                 <span class="bg-primary/20 text-primary border border-primary/40 px-4 py-2 rounded-full font-bold text-sm inline-flex items-center gap-1.5">
                     <i class="bi bi-shield-check"></i>{{ __('ui.trust.best_price_guarantee') }}
                 </span>
@@ -352,7 +352,7 @@
         <div x-data="{ activeSearchFaq: null }" class="space-y-3">
             <div class="bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-xs">
                 <button type="button" 
-                        class="w-full text-left px-5 sm:px-6 py-4 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
+                        class="w-full text-start px-5 sm:px-6 py-4 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
                         @click="activeSearchFaq = (activeSearchFaq === 1 ? null : 1)">
                     <span class="text-sm sm:text-base">Are hotel pickups and drop-offs included in all safaris?</span>
                     <i class="bi bi-chevron-down transition-transform duration-300 text-slate-400 shrink-0"
@@ -365,7 +365,7 @@
 
             <div class="bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-xs">
                 <button type="button" 
-                        class="w-full text-left px-5 sm:px-6 py-4 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
+                        class="w-full text-start px-5 sm:px-6 py-4 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
                         @click="activeSearchFaq = (activeSearchFaq === 2 ? null : 2)">
                     <span class="text-sm sm:text-base">Do I need an international driver's license for Dune Buggies or Quad Bikes?</span>
                     <i class="bi bi-chevron-down transition-transform duration-300 text-slate-400 shrink-0"
@@ -378,7 +378,7 @@
 
             <div class="bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-xs">
                 <button type="button" 
-                        class="w-full text-left px-5 sm:px-6 py-4 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
+                        class="w-full text-start px-5 sm:px-6 py-4 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
                         @click="activeSearchFaq = (activeSearchFaq === 3 ? null : 3)">
                     <span class="text-sm sm:text-base">What is your cancellation policy?</span>
                     <i class="bi bi-chevron-down transition-transform duration-300 text-slate-400 shrink-0"
@@ -391,7 +391,7 @@
 
             <div class="bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-xs">
                 <button type="button" 
-                        class="w-full text-left px-5 sm:px-6 py-4 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
+                        class="w-full text-start px-5 sm:px-6 py-4 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
                         @click="activeSearchFaq = (activeSearchFaq === 4 ? null : 4)">
                     <span class="text-sm sm:text-base">Is Dunes Discovery an officially licensed tour operator in Dubai?</span>
                     <i class="bi bi-chevron-down transition-transform duration-300 text-slate-400 shrink-0"

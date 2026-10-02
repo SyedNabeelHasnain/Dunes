@@ -90,7 +90,7 @@
         <!-- Safari Match Concierge Recommendation Banner -->
         <div class="rounded-2xl p-6 sm:p-8 mb-8 shadow-sm relative overflow-hidden bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-primary/30">
             <div class="flex flex-col lg:flex-row items-center justify-between gap-6 relative z-10">
-                <div class="text-center lg:text-left">
+                <div class="text-center lg:text-start">
                     <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2 mb-2">
                         <span class="rounded-full px-3 py-1 font-bold text-xs bg-primary/20 border border-primary/40 text-primary inline-flex items-center gap-1">
                             <i class="bi bi-stars"></i> {{ __('ui.home_concierge.badge') }}
@@ -106,7 +106,7 @@
                         {{ __('ui.home_concierge.subheading') }}
                     </p>
                 </div>
-                <div class="shrink-0 w-full sm:w-auto text-center lg:text-right">
+                <div class="shrink-0 w-full sm:w-auto text-center lg:text-end">
                     <button type="button" class="w-full sm:w-auto btn-desert-animated rounded-full px-6 py-3 font-bold text-white text-sm shadow-md inline-flex items-center justify-center gap-2 cursor-pointer" @click="$store.modal.open('safari-matcher')">
                         <i class="bi bi-compass text-base"></i>
                         <span>{{ __('ui.home_concierge.quiz_btn') }}</span>

@@ -7,10 +7,10 @@
     $rateInr = $settingsService->get('currency_rate_inr', '22.85');
     $dropdownId = $switcherId ?? 'currencyDropdownBtn';
 @endphp
-<div class="relative inline-block text-left" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">
+<div class="relative inline-block text-start" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">
     <button @click="open = !open" :aria-expanded="open" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-slate-800 bg-white border border-slate-200/90 shadow-sm hover:border-primary/50 transition-all cursor-pointer min-h-[38px]" type="button" id="{{ $dropdownId }}">
         <span class="current-currency-flag">&#x1F1E6;&#x1F1EA;</span>
-        <span class="current-currency-code font-extrabold ml-1">AED</span>
+        <span class="current-currency-code font-extrabold ms-1">AED</span>
         <i class="bi bi-chevron-down text-[10px] text-slate-500 transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
     </button>
     <div x-show="open" 
@@ -20,7 +20,7 @@
          x-transition:leave="transition ease-in duration-100"
          x-transition:leave-start="opacity-100 scale-100 translate-y-0"
          x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
-         class="absolute right-0 mt-2 w-48 rounded-2xl bg-white p-2 shadow-xl border border-slate-200 z-50 focus:outline-none"
+         class="absolute end-0 mt-2 w-48 rounded-2xl bg-white p-2 shadow-xl border border-slate-200 z-50 focus:outline-none"
          style="display: none;">
         <div class="px-2 py-1 text-[11px] font-extrabold uppercase tracking-wider text-slate-500">
             Display Currency

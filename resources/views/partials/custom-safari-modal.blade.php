@@ -31,7 +31,7 @@
              x-transition:leave="ease-in duration-150"
              x-transition:leave-start="opacity-100 scale-100 translate-y-0"
              x-transition:leave-end="opacity-0 scale-95 translate-y-4"
-             class="relative z-10 w-full max-w-5xl transform overflow-hidden rounded-3xl bg-slate-950 text-left align-middle shadow-2xl transition-all border border-orange-500/40 text-white flex flex-col max-h-[92vh]"
+             class="relative z-10 w-full max-w-5xl transform overflow-hidden rounded-3xl bg-slate-950 text-start align-middle shadow-2xl transition-all border border-orange-500/40 text-white flex flex-col max-h-[92vh]"
              @click.stop>
             
             <!-- Modal Header -->
@@ -72,7 +72,7 @@
                             <div class="grid grid-cols-2 gap-2.5">
                                 <!-- Base 1 -->
                                 <div @click="base = { name: 'Standard Evening Red Dunes', price: 150, tourId: 1 }" 
-                                     class="p-3 rounded-2xl cursor-pointer transition-all border text-left"
+                                     class="p-3 rounded-2xl cursor-pointer transition-all border text-start"
                                      :class="base.name === 'Standard Evening Red Dunes' ? 'bg-orange-500/15 border-primary shadow-sm' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="flex items-center justify-between mb-1.5">
                                         <i class="bi bi-sunset text-lg text-amber-400"></i>
@@ -85,7 +85,7 @@
 
                                 <!-- Base 2 -->
                                 <div @click="base = { name: 'VIP Luxury Evening Safari', price: 250, tourId: 2 }" 
-                                     class="p-3 rounded-2xl cursor-pointer transition-all border text-left"
+                                     class="p-3 rounded-2xl cursor-pointer transition-all border text-start"
                                      :class="base.name === 'VIP Luxury Evening Safari' ? 'bg-orange-500/15 border-primary shadow-sm' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="flex items-center justify-between mb-1.5">
                                         <i class="bi bi-award text-lg text-amber-400"></i>
@@ -98,7 +98,7 @@
 
                                 <!-- Base 3 -->
                                 <div @click="base = { name: 'Morning Desert Safari', price: 120, tourId: 4 }" 
-                                     class="p-3 rounded-2xl cursor-pointer transition-all border text-left"
+                                     class="p-3 rounded-2xl cursor-pointer transition-all border text-start"
                                      :class="base.name === 'Morning Desert Safari' ? 'bg-orange-500/15 border-primary shadow-sm' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="flex items-center justify-between mb-1.5">
                                         <i class="bi bi-sunrise text-lg text-sky-400"></i>
@@ -111,7 +111,7 @@
 
                                 <!-- Base 4 -->
                                 <div @click="base = { name: 'Overnight Stargazing Safari', price: 350, tourId: 5 }" 
-                                     class="p-3 rounded-2xl cursor-pointer transition-all border text-left"
+                                     class="p-3 rounded-2xl cursor-pointer transition-all border text-start"
                                      :class="base.name === 'Overnight Stargazing Safari' ? 'bg-orange-500/15 border-primary shadow-sm' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="flex items-center justify-between mb-1.5">
                                         <i class="bi bi-moon-stars text-lg text-emerald-400"></i>
@@ -131,19 +131,19 @@
                             </label>
                             <div class="grid grid-cols-3 gap-2">
                                 <div @click="transfer = { name: 'Shared 4x4 Land Cruiser', price: 0, type: 'flat' }"
-                                     class="p-2.5 rounded-xl cursor-pointer transition-all border text-left"
+                                     class="p-2.5 rounded-xl cursor-pointer transition-all border text-start"
                                      :class="transfer.name === 'Shared 4x4 Land Cruiser' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="font-bold text-white text-xs">Shared 4x4</div>
                                     <div class="text-emerald-400 font-bold text-[10px] mt-1">FREE</div>
                                 </div>
                                 <div @click="transfer = { name: 'Private 7-Seater 4x4', price: 350, type: 'flat' }"
-                                     class="p-2.5 rounded-xl cursor-pointer transition-all border text-left"
+                                     class="p-2.5 rounded-xl cursor-pointer transition-all border text-start"
                                      :class="transfer.name === 'Private 7-Seater 4x4' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="font-bold text-white text-xs">Private 4x4</div>
                                     <div class="text-amber-400 font-bold text-[10px] mt-1" data-aed="350">+AED 350 flat</div>
                                 </div>
                                 <div @click="transfer = { name: 'VIP Range Rover', price: 750, type: 'flat' }"
-                                     class="p-2.5 rounded-xl cursor-pointer transition-all border text-left"
+                                     class="p-2.5 rounded-xl cursor-pointer transition-all border text-start"
                                      :class="transfer.name === 'VIP Range Rover' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="font-bold text-white text-xs">VIP SUV</div>
                                     <div class="text-amber-400 font-bold text-[10px] mt-1" data-aed="750">+AED 750 flat</div>
@@ -158,25 +158,25 @@
                             </label>
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
                                 <div @click="sports = { name: 'Scenic Only', price: 0, type: 'per_person' }"
-                                     class="p-2 rounded-xl cursor-pointer transition-all border text-left"
+                                     class="p-2 rounded-xl cursor-pointer transition-all border text-start"
                                      :class="sports.name === 'Scenic Only' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="font-bold text-white text-xs">None</div>
                                     <div class="text-emerald-400 font-bold text-[9px] mt-1">INCLUDED</div>
                                 </div>
                                 <div @click="sports = { name: '250cc Quad Biking', price: 120, type: 'per_person' }"
-                                     class="p-2 rounded-xl cursor-pointer transition-all border text-left"
+                                     class="p-2 rounded-xl cursor-pointer transition-all border text-start"
                                      :class="sports.name === '250cc Quad Biking' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="font-bold text-white text-xs">250cc Quad</div>
                                     <div class="text-amber-400 font-bold text-[9px] mt-1" data-aed="120">+AED 120</div>
                                 </div>
                                 <div @click="sports = { name: '400cc Quad Biking', price: 220, type: 'per_person' }"
-                                     class="p-2 rounded-xl cursor-pointer transition-all border text-left"
+                                     class="p-2 rounded-xl cursor-pointer transition-all border text-start"
                                      :class="sports.name === '400cc Quad Biking' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="font-bold text-white text-xs">400cc Quad</div>
                                     <div class="text-amber-400 font-bold text-[9px] mt-1" data-aed="220">+AED 220</div>
                                 </div>
                                 <div @click="sports = { name: '1000cc Can-Am Buggy', price: 550, type: 'flat' }"
-                                     class="p-2 rounded-xl cursor-pointer transition-all border text-left"
+                                     class="p-2 rounded-xl cursor-pointer transition-all border text-start"
                                      :class="sports.name === '1000cc Can-Am Buggy' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
                                     <div class="font-bold text-white text-xs">1000cc Buggy</div>
                                     <div class="text-amber-400 font-bold text-[9px] mt-1" data-aed="550">+AED 550</div>
@@ -239,19 +239,19 @@
                                 <div class="space-y-2 mb-4 text-xs">
                                     <div class="flex justify-between text-slate-300">
                                         <span>Base:</span>
-                                        <strong class="text-white font-semibold text-right" x-text="base.name">Standard Evening</strong>
+                                        <strong class="text-white font-semibold text-end" x-text="base.name">Standard Evening</strong>
                                     </div>
                                     <div class="flex justify-between text-slate-300">
                                         <span>Transfer:</span>
-                                        <strong class="text-white font-semibold text-right" x-text="transfer.name">Shared 4x4</strong>
+                                        <strong class="text-white font-semibold text-end" x-text="transfer.name">Shared 4x4</strong>
                                     </div>
                                     <div class="flex justify-between text-slate-300">
                                         <span>Sports:</span>
-                                        <strong class="text-white font-semibold text-right" x-text="sports.name">Scenic Only</strong>
+                                        <strong class="text-white font-semibold text-end" x-text="sports.name">Scenic Only</strong>
                                     </div>
                                     <div class="flex justify-between text-slate-300">
                                         <span>Addons:</span>
-                                        <strong class="text-white font-semibold text-right" x-text="summaryAddons">None</strong>
+                                        <strong class="text-white font-semibold text-end" x-text="summaryAddons">None</strong>
                                     </div>
                                 </div>
                             </div>

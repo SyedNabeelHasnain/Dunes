@@ -40,7 +40,7 @@
              x-transition:leave="ease-in duration-150"
              x-transition:leave-start="opacity-100 scale-100 translate-y-0"
              x-transition:leave-end="opacity-0 scale-95 translate-y-4"
-             class="relative z-10 w-full max-w-2xl transform overflow-hidden rounded-3xl bg-slate-950 p-5 sm:p-7 text-left align-middle shadow-2xl transition-all border border-orange-500/40 text-white flex flex-col min-h-[500px]"
+             class="relative z-10 w-full max-w-2xl transform overflow-hidden rounded-3xl bg-slate-950 p-5 sm:p-7 text-start align-middle shadow-2xl transition-all border border-orange-500/40 text-white flex flex-col min-h-[500px]"
              @click.stop>
             
             <!-- Modal Header -->
@@ -83,7 +83,7 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div @click="selectOption('group', 'family')" 
-                             class="p-3.5 rounded-2xl cursor-pointer transition-all border text-left bg-slate-900/80 border-slate-700/80 hover:border-primary hover:bg-orange-500/10"
+                             class="p-3.5 rounded-2xl cursor-pointer transition-all border text-start bg-slate-900/80 border-slate-700/80 hover:border-primary hover:bg-orange-500/10"
                              :class="answers.group === 'family' ? 'border-primary bg-orange-500/15' : ''">
                             <div class="flex items-start gap-3">
                                 <i class="bi bi-people-fill text-2xl text-amber-400 shrink-0"></i>
@@ -95,7 +95,7 @@
                         </div>
 
                         <div @click="selectOption('group', 'adventure')" 
-                             class="p-3.5 rounded-2xl cursor-pointer transition-all border text-left bg-slate-900/80 border-slate-700/80 hover:border-primary hover:bg-orange-500/10"
+                             class="p-3.5 rounded-2xl cursor-pointer transition-all border text-start bg-slate-900/80 border-slate-700/80 hover:border-primary hover:bg-orange-500/10"
                              :class="answers.group === 'adventure' ? 'border-primary bg-orange-500/15' : ''">
                             <div class="flex items-start gap-3">
                                 <i class="bi bi-lightning-charge-fill text-2xl text-amber-400 shrink-0"></i>
@@ -107,7 +107,7 @@
                         </div>
 
                         <div @click="selectOption('group', 'luxury')" 
-                             class="p-3.5 rounded-2xl cursor-pointer transition-all border text-left bg-slate-900/80 border-slate-700/80 hover:border-primary hover:bg-orange-500/10"
+                             class="p-3.5 rounded-2xl cursor-pointer transition-all border text-start bg-slate-900/80 border-slate-700/80 hover:border-primary hover:bg-orange-500/10"
                              :class="answers.group === 'luxury' ? 'border-primary bg-orange-500/15' : ''">
                             <div class="flex items-start gap-3">
                                 <i class="bi bi-award-fill text-2xl text-amber-400 shrink-0"></i>
@@ -119,7 +119,7 @@
                         </div>
 
                         <div @click="selectOption('group', 'budget')" 
-                             class="p-3.5 rounded-2xl cursor-pointer transition-all border text-left bg-slate-900/80 border-slate-700/80 hover:border-primary hover:bg-orange-500/10"
+                             class="p-3.5 rounded-2xl cursor-pointer transition-all border text-start bg-slate-900/80 border-slate-700/80 hover:border-primary hover:bg-orange-500/10"
                              :class="answers.group === 'budget' ? 'border-primary bg-orange-500/15' : ''">
                             <div class="flex items-start gap-3">
                                 <i class="bi bi-tag-fill text-2xl text-amber-400 shrink-0"></i>
@@ -139,7 +139,7 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div @click="selectOption('vibe', 'evening')" 
-                             class="p-3.5 rounded-2xl cursor-pointer transition-all border text-left bg-slate-900/80 border-slate-700/80 hover:border-primary hover:bg-orange-500/10"
+                             class="p-3.5 rounded-2xl cursor-pointer transition-all border text-start bg-slate-900/80 border-slate-700/80 hover:border-primary hover:bg-orange-500/10"
                              :class="answers.vibe === 'evening' ? 'border-primary bg-orange-500/15' : ''">
                             <div class="flex items-start gap-3">
                                 <i class="bi bi-sunset-fill text-2xl text-amber-400 shrink-0"></i>
@@ -151,7 +151,7 @@
                         </div>
 
                         <div @click="selectOption('vibe', 'morning')" 
-                             class="p-3.5 rounded-2xl cursor-pointer transition-all border text-left bg-slate-900/80 border-slate-700/80 hover:border-primary hover:bg-orange-500/10"
+                             class="p-3.5 rounded-2xl cursor-pointer transition-all border text-start bg-slate-900/80 border-slate-700/80 hover:border-primary hover:bg-orange-500/10"
                              :class="answers.vibe === 'morning' ? 'border-primary bg-orange-500/15' : ''">
                             <div class="flex items-start gap-3">
                                 <i class="bi bi-sunrise-fill text-2xl text-amber-400 shrink-0"></i>
@@ -163,7 +163,7 @@
                         </div>
 
                         <div @click="selectOption('vibe', 'overnight')" 
-                             class="p-3.5 rounded-2xl cursor-pointer transition-all border text-left bg-slate-900/80 border-slate-700/80 hover:border-primary hover:bg-orange-500/10"
+                             class="p-3.5 rounded-2xl cursor-pointer transition-all border text-start bg-slate-900/80 border-slate-700/80 hover:border-primary hover:bg-orange-500/10"
                              :class="answers.vibe === 'overnight' ? 'border-primary bg-orange-500/15' : ''">
                             <div class="flex items-start gap-3">
                                 <i class="bi bi-moon-stars-fill text-2xl text-amber-400 shrink-0"></i>
@@ -175,7 +175,7 @@
                         </div>
 
                         <div @click="selectOption('vibe', 'cruise')" 
-                             class="p-3.5 rounded-2xl cursor-pointer transition-all border text-left bg-slate-900/80 border-slate-700/80 hover:border-primary hover:bg-orange-500/10"
+                             class="p-3.5 rounded-2xl cursor-pointer transition-all border text-start bg-slate-900/80 border-slate-700/80 hover:border-primary hover:bg-orange-500/10"
                              :class="answers.vibe === 'cruise' ? 'border-primary bg-orange-500/15' : ''">
                             <div class="flex items-start gap-3">
                                 <i class="bi bi-water text-2xl text-amber-400 shrink-0"></i>
@@ -195,7 +195,7 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div @click="selectOption('perk', 'quad_buggy')" 
-                             class="p-3.5 rounded-2xl cursor-pointer transition-all border text-left bg-slate-900/80 border-slate-700/80 hover:border-primary hover:bg-orange-500/10"
+                             class="p-3.5 rounded-2xl cursor-pointer transition-all border text-start bg-slate-900/80 border-slate-700/80 hover:border-primary hover:bg-orange-500/10"
                              :class="answers.perk === 'quad_buggy' ? 'border-primary bg-orange-500/15' : ''">
                             <div class="flex items-start gap-3">
                                 <i class="bi bi-speedometer2 text-2xl text-amber-400 shrink-0"></i>
@@ -207,7 +207,7 @@
                         </div>
 
                         <div @click="selectOption('perk', 'vip_service')" 
-                             class="p-3.5 rounded-2xl cursor-pointer transition-all border text-left bg-slate-900/80 border-slate-700/80 hover:border-primary hover:bg-orange-500/10"
+                             class="p-3.5 rounded-2xl cursor-pointer transition-all border text-start bg-slate-900/80 border-slate-700/80 hover:border-primary hover:bg-orange-500/10"
                              :class="answers.perk === 'vip_service' ? 'border-primary bg-orange-500/15' : ''">
                             <div class="flex items-start gap-3">
                                 <i class="bi bi-cup-hot-fill text-2xl text-amber-400 shrink-0"></i>
@@ -219,7 +219,7 @@
                         </div>
 
                         <div @click="selectOption('perk', 'private_car')" 
-                             class="p-3.5 rounded-2xl cursor-pointer transition-all border text-left bg-slate-900/80 border-slate-700/80 hover:border-primary hover:bg-orange-500/10"
+                             class="p-3.5 rounded-2xl cursor-pointer transition-all border text-start bg-slate-900/80 border-slate-700/80 hover:border-primary hover:bg-orange-500/10"
                              :class="answers.perk === 'private_car' ? 'border-primary bg-orange-500/15' : ''">
                             <div class="flex items-start gap-3">
                                 <i class="bi bi-car-front-fill text-2xl text-amber-400 shrink-0"></i>
@@ -231,7 +231,7 @@
                         </div>
 
                         <div @click="selectOption('perk', 'all_inclusive')" 
-                             class="p-3.5 rounded-2xl cursor-pointer transition-all border text-left bg-slate-900/80 border-slate-700/80 hover:border-primary hover:bg-orange-500/10"
+                             class="p-3.5 rounded-2xl cursor-pointer transition-all border text-start bg-slate-900/80 border-slate-700/80 hover:border-primary hover:bg-orange-500/10"
                              :class="answers.perk === 'all_inclusive' ? 'border-primary bg-orange-500/15' : ''">
                             <div class="flex items-start gap-3">
                                 <i class="bi bi-star-fill text-2xl text-amber-400 shrink-0"></i>
@@ -266,12 +266,12 @@
                         <div class="flex flex-col sm:flex-row items-center gap-4">
                             <div class="w-full sm:w-32 h-24 rounded-xl overflow-hidden shrink-0 relative bg-slate-800">
                                 <img :src="result ? result.thumb : '/images/desert-safari-poster.avif'" :alt="result ? result.name : 'Dunes Discovery Tour'" class="w-full h-full object-cover">
-                                <span class="absolute top-1 left-1 px-1.5 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[9px]">Top Match</span>
+                                <span class="absolute top-1 start-1 px-1.5 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[9px]">Top Match</span>
                             </div>
-                            <div class="flex-1 min-w-0 text-left">
+                            <div class="flex-1 min-w-0 text-start">
                                 <div class="flex items-start justify-between gap-2">
                                     <h5 class="font-extrabold text-white text-base truncate" x-text="result ? result.name : ''">Evening Desert Safari</h5>
-                                    <div class="text-right shrink-0">
+                                    <div class="text-end shrink-0">
                                         <div class="text-lg font-black text-amber-400 font-mono" x-text="'{{ __('ui.common.aed') }} ' + ((result && result.min_price) ? result.min_price : 120)">{{ __('ui.common.aed') }} 150</div>
                                         <small class="text-slate-400 text-[10px]">per person</small>
                                     </div>
@@ -298,7 +298,7 @@
 
                      @if($conciergePromoActive)
                      <!-- Gamified Reward Box: Concierge Discount Certificate -->
-                     <div class="p-3.5 rounded-2xl mb-4 bg-gradient-to-r from-orange-500/20 to-amber-500/10 border-2 border-dashed border-orange-500/50 flex items-center justify-between flex-wrap gap-2 text-left">
+                     <div class="p-3.5 rounded-2xl mb-4 bg-gradient-to-r from-orange-500/20 to-amber-500/10 border-2 border-dashed border-orange-500/50 flex items-center justify-between flex-wrap gap-2 text-start">
                          <div class="flex items-center gap-3">
                              <div class="w-9 h-9 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center shrink-0 text-lg">
                                  <i class="bi bi-gift-fill"></i>

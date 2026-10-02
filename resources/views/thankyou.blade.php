@@ -138,7 +138,7 @@ gtag('event', 'conversion_event_submit_lead_form', {
                         </div>
                         <div>
                             <div class="text-slate-500 text-xs font-bold uppercase tracking-wider">Date</div>
-                            <div class="font-semibold text-slate-800 text-sm sm:text-base">{{ $booking->tour_date ? $booking->tour_date->format('M j, Y') : '' }}</div>
+                            <div class="font-semibold text-slate-800 text-sm sm:text-base">{{ $booking->tour_date ? ($booking->tour_date instanceof \DateTimeInterface ? $booking->tour_date->format('M j, Y') : date('M j, Y', strtotime($booking->tour_date))) : 'To be confirmed' }}</div>
                         </div>
                     </div>
 

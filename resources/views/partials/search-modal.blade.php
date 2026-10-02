@@ -78,7 +78,7 @@
              x-transition:leave="ease-in duration-150"
              x-transition:leave-start="opacity-100 scale-100 translate-y-0"
              x-transition:leave-end="opacity-0 scale-95 translate-y-4"
-             class="relative z-10 w-full max-w-2xl transform overflow-hidden rounded-3xl bg-white text-left align-middle shadow-2xl transition-all border border-slate-200"
+             class="relative z-10 w-full max-w-2xl transform overflow-hidden rounded-3xl bg-white text-start align-middle shadow-2xl transition-all border border-slate-200"
              @click.stop>
             
             <!-- Luxury Orange & Gold Ambient Top Accent Bar -->
@@ -251,7 +251,7 @@
                                     </div>
                                 </div>
                                 <!-- Price & Action CTA -->
-                                <div class="text-right shrink-0 pl-3">
+                                <div class="text-end shrink-0 ps-3">
                                     <span class="text-[9px] sm:text-[10px] text-slate-400 block font-bold uppercase tracking-wider">{{ __('ui.common.starting_from') }}</span>
                                     <div class="text-xs sm:text-sm font-black text-primary font-mono whitespace-nowrap" x-text="tour.price_formatted"></div>
                                     <div class="text-[10px] font-bold text-slate-400 group-hover:text-primary flex items-center justify-end gap-1 mt-0.5 transition-colors">

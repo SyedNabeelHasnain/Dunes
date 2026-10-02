@@ -64,7 +64,7 @@
              x-transition:leave="ease-in duration-150"
              x-transition:leave-start="opacity-100 scale-100 translate-y-0"
              x-transition:leave-end="opacity-0 scale-95 translate-y-4"
-             class="relative z-10 w-full max-w-4xl transform overflow-hidden rounded-3xl bg-white text-left align-middle shadow-2xl transition-all border border-slate-200"
+             class="relative z-10 w-full max-w-4xl transform overflow-hidden rounded-3xl bg-white text-start align-middle shadow-2xl transition-all border border-slate-200"
              @click.stop>
             
             <!-- Luxury Orange & Gold Ambient Glow Bar -->
@@ -73,7 +73,7 @@
             <!-- Close Button -->
             <button type="button" 
                     @click="$store.modal.close()" 
-                    class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-800 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer absolute top-4 right-4 z-10" 
+                    class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-800 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer absolute top-4 end-4 z-10" 
                     id="closeWelcomeOfferBtn" 
                     aria-label="Close">
                 <i class="bi bi-x-lg text-xs"></i>
@@ -83,7 +83,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
                     
                     <!-- Left Visual & Highlights Column -->
-                    <div class="lg:col-span-5 text-center lg:text-left">
+                    <div class="lg:col-span-5 text-center lg:text-start">
                         <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 text-primary font-black text-[11px] uppercase tracking-wider mb-3">
                             <i class="bi bi-gift-fill text-amber-500"></i>
                             <span>First-Time Guest Special</span>
@@ -98,7 +98,7 @@
                         </p>
 
                         <!-- Trust Pillars -->
-                        <div class="space-y-2 mb-6 text-left">
+                        <div class="space-y-2 mb-6 text-start">
                             <div class="flex items-center gap-2 text-xs font-bold text-slate-800">
                                 <i class="bi bi-shield-check text-emerald-500 text-base"></i>
                                 <span>100% Free 24h Cancellation</span>
@@ -139,16 +139,16 @@
                                     <div>
                                         <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1" for="welcomeName">Full Name <span class="text-red-500">*</span></label>
                                         <div class="relative rounded-xl shadow-2xs overflow-hidden border border-slate-200 bg-white focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
-                                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-primary"><i class="bi bi-person-fill"></i></span>
-                                            <input type="text" class="w-full pl-10 pr-3 py-2.5 bg-transparent text-xs sm:text-sm font-semibold text-slate-800 border-0 focus:outline-none placeholder:text-slate-400" id="welcomeName" name="name" placeholder="e.g. Sarah Connor" required autocomplete="name">
+                                            <span class="absolute start-3.5 top-1/2 -translate-y-1/2 text-primary"><i class="bi bi-person-fill"></i></span>
+                                            <input type="text" class="w-full ps-10 pe-3 py-2.5 bg-transparent text-xs sm:text-sm font-semibold text-slate-800 border-0 focus:outline-none placeholder:text-slate-400" id="welcomeName" name="name" placeholder="e.g. Sarah Connor" required autocomplete="name">
                                         </div>
                                     </div>
 
                                     <div>
                                         <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1" for="welcomeEmail">Email Address <span class="text-red-500">*</span></label>
                                         <div class="relative rounded-xl shadow-2xs overflow-hidden border border-slate-200 bg-white focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
-                                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-primary"><i class="bi bi-envelope-fill"></i></span>
-                                            <input type="email" class="w-full pl-10 pr-3 py-2.5 bg-transparent text-xs sm:text-sm font-semibold text-slate-800 border-0 focus:outline-none placeholder:text-slate-400" id="welcomeEmail" name="email" placeholder="name@example.com" required autocomplete="email">
+                                            <span class="absolute start-3.5 top-1/2 -translate-y-1/2 text-primary"><i class="bi bi-envelope-fill"></i></span>
+                                            <input type="email" class="w-full ps-10 pe-3 py-2.5 bg-transparent text-xs sm:text-sm font-semibold text-slate-800 border-0 focus:outline-none placeholder:text-slate-400" id="welcomeEmail" name="email" placeholder="name@example.com" required autocomplete="email">
                                         </div>
                                     </div>
 
@@ -211,7 +211,7 @@
 
 <!-- Floating Persistent Voucher Reminder Pill (Appears when claimed) -->
 <div id="welcomeFloatingPill" 
-     class="hidden fixed bottom-6 left-6 z-40 mb-safe items-center gap-2 p-2 px-3.5 rounded-full bg-slate-950/95 text-white border border-orange-500/50 shadow-2xl backdrop-blur-md cursor-pointer hover:scale-105 transition-all">
+     class="hidden fixed bottom-6 start-6 z-40 mb-safe items-center gap-2 p-2 px-3.5 rounded-full bg-slate-950/95 text-white border border-orange-500/50 shadow-2xl backdrop-blur-md cursor-pointer hover:scale-105 transition-all">
     <span class="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-xs">{{ (int)$popupDiscount }}% OFF</span>
     <span class="text-xs font-bold font-mono text-white" id="floatingPillCode">FIRST25-OFF</span>
     <span class="text-xs text-slate-300 font-mono hidden sm:inline" id="floatingPillTimer">{{ sprintf('%02d', $popupTimerMins) }}:00</span>

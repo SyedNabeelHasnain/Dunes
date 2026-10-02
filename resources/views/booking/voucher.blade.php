@@ -85,7 +85,7 @@
                     <p class="text-amber-400 text-xs uppercase font-bold tracking-wider mb-0.5">Official Safari & Experience Voucher</p>
                     <span class="text-white/60 text-[11px]">Licensed Dubai Tourism Operator &bull; DTCM Certified</span>
                 </div>
-                <div class="text-left sm:text-right">
+                <div class="text-start sm:text-end">
                     <span class="text-white/60 block text-[10px] font-bold uppercase tracking-wider mb-1">Booking Reference</span>
                     <span class="badge-ref inline-block bg-white/10 border border-white/20 text-amber-400 font-mono text-base sm:text-lg font-extrabold px-3.5 py-1 rounded-xl tracking-wider">
                         #{{ $booking->reference }}
@@ -243,7 +243,7 @@
                     <strong class="text-slate-800">DUNES DISCOVERY TOURISM LLC</strong> &bull; Dubai, United Arab Emirates<br>
                     License #{{ $settings['company_license_number'] ?? $settings['site_det_license'] ?? '1430583' }} &bull; Web: dunesdiscoverytourism.com
                 </div>
-                <div class="sm:text-right">
+                <div class="sm:text-end">
                     <strong>24/7 Concierge Hotline:</strong> <a href="tel:{{ preg_replace('/[^0-9+]/', '', $settings['site_phone'] ?? '+971502456056') }}" class="font-bold text-slate-800 hover:text-primary">{{ $settings['site_phone'] ?? '+971 50 245 6056' }}</a><br>
                     Support: {{ $settings['site_email'] ?? 'info@dunesdiscoverytourism.com' }}
                 </div>

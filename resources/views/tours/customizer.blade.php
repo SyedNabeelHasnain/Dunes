@@ -399,23 +399,23 @@
                     <div class="space-y-2 mb-4 text-xs">
                         <div class="flex justify-between">
                             <span class="text-slate-300">Base Safari:</span>
-                            <span class="font-bold text-white text-right" id="summaryBaseName">Standard Evening</span>
+                            <span class="font-bold text-white text-end" id="summaryBaseName">Standard Evening</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-slate-300">Transfer:</span>
-                            <span class="font-bold text-white text-right" id="summaryTransferName">Shared 4x4</span>
+                            <span class="font-bold text-white text-end" id="summaryTransferName">Shared 4x4</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-slate-300">Motorsports:</span>
-                            <span class="font-bold text-white text-right" id="summarySportsName">Scenic Only</span>
+                            <span class="font-bold text-white text-end" id="summarySportsName">Scenic Only</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-slate-300">Addons:</span>
-                            <span class="font-bold text-white text-right" id="summaryAddonsName">None</span>
+                            <span class="font-bold text-white text-end" id="summaryAddonsName">None</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-slate-300">Party Size:</span>
-                            <span class="font-bold text-white text-right" id="summaryGuests">2 Adults</span>
+                            <span class="font-bold text-white text-end" id="summaryGuests">2 Adults</span>
                         </div>
                     </div>
 
@@ -423,7 +423,7 @@
                     <div class="pt-4 border-t border-white/20 mb-4">
                         <div class="flex justify-between items-baseline mb-1">
                             <span class="text-slate-300 text-xs">Estimated Total:</span>
-                            <div class="text-right">
+                            <div class="text-end">
                                 <span class="text-3xl font-black text-amber-400" id="customizerTotalDisplay" data-aed="300">{{ __('ui.common.aed') }} 300</span>
                                 <span class="text-slate-300 block text-[10px] mt-0.5">inclusive of all taxes & DTCM fees</span>
                             </div>

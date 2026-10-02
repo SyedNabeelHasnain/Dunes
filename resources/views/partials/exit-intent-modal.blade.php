@@ -68,7 +68,7 @@
             </p>
 
             <!-- Gamified Coupon Certificate Card -->
-            <div class="rounded-2xl p-4 mb-6 bg-gradient-to-r from-orange-500/15 to-amber-500/10 border-2 border-dashed border-orange-500/40 flex items-center justify-between flex-wrap gap-2 text-left">
+            <div class="rounded-2xl p-4 mb-6 bg-gradient-to-r from-orange-500/15 to-amber-500/10 border-2 border-dashed border-orange-500/40 flex items-center justify-between flex-wrap gap-2 text-start">
                 <div>
                     <span class="text-[10px] uppercase font-bold text-slate-300 block tracking-wider">Instant Promo Code</span>
                     <span class="font-mono font-black text-2xl text-amber-400 tracking-wider" id="exitIntentCodeDisplay">{{ $exitIntentCode }}</span>
@@ -88,7 +88,7 @@
             </div>
 
             <!-- Trust Guarantees -->
-            <div class="grid grid-cols-2 gap-2.5 text-left mb-6 text-xs text-slate-300">
+            <div class="grid grid-cols-2 gap-2.5 text-start mb-6 text-xs text-slate-300">
                 <div class="flex items-center gap-2">
                     <i class="bi bi-patch-check-fill text-primary"></i>
                     <span>DET Licensed #1430583</span>

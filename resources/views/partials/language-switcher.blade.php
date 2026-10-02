@@ -4,7 +4,7 @@
     $langs = $activeLanguages ?? \App\Models\Language::getActive();
     $curLang = $currentLanguage ?? ($langs->firstWhere('code', $curLocale) ?: $langs->first());
 @endphp
-<div class="relative inline-block text-left" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">
+<div class="relative inline-block text-start" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">
     <button @click="open = !open" :aria-expanded="open" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-slate-800 bg-white border border-slate-200/90 shadow-sm hover:border-primary/50 transition-all cursor-pointer min-h-[38px]" type="button" id="{{ $dropdownId }}">
         <span class="text-base leading-none">{{ $curLang ? $curLang->flag_emoji : '🌐' }}</span>
         <span class="font-extrabold uppercase text-[11px]">{{ strtoupper($curLocale) }}</span>
@@ -17,7 +17,7 @@
          x-transition:leave="transition ease-in duration-100"
          x-transition:leave-start="opacity-100 scale-100 translate-y-0"
          x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
-         class="absolute {{ ($isRtl ?? false) ? 'left-0' : 'right-0' }} mt-2 w-52 rounded-2xl bg-white p-2 shadow-xl border border-slate-200 z-50 focus:outline-none"
+         class="absolute end-0 mt-2 w-52 rounded-2xl bg-white p-2 shadow-xl border border-slate-200 z-50 focus:outline-none"
          style="display: none;">
         <div class="px-2 py-1 text-[11px] font-extrabold uppercase tracking-wider text-slate-500">
             Select Language

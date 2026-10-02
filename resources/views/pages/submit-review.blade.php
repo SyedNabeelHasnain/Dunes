@@ -55,7 +55,7 @@
                 </p>
 
                 @if(session('submitted_rating') >= 4 && !empty($googleReviewUrl))
-                    <div class="bg-gradient-to-br from-blue-500/10 to-emerald-500/10 border border-blue-500/30 rounded-2xl p-6 text-left mb-6">
+                    <div class="bg-gradient-to-br from-blue-500/10 to-emerald-500/10 border border-blue-500/30 rounded-2xl p-6 text-start mb-6">
                         <div class="flex items-center gap-2.5 mb-2">
                             <img src="{{ asset('images/Google-G.avif') }}" alt="Google" class="w-6 h-6 object-contain">
                             <h3 class="font-bold text-white text-base mb-0">Help Fellow Travelers on Google!</h3>
@@ -90,7 +90,7 @@
                         </span>
                         <h1 class="text-lg sm:text-xl font-bold text-white mb-0">{{ $booking->tour->name ?? $booking->tour_name ?? 'Dubai Desert Safari' }}</h1>
                     </div>
-                    <div class="text-left sm:text-right">
+                    <div class="text-start sm:text-end">
                         <span class="text-white/40 block text-[10px] font-bold uppercase tracking-wider">Booking Ref</span>
                         <span class="bg-slate-950 border border-slate-700 text-amber-400 font-mono text-xs px-2.5 py-1 rounded-lg inline-block">#{{ $booking->reference }}</span>
                     </div>

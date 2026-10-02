@@ -49,7 +49,17 @@ class CouponController extends Controller
             if ($pricing && (float) $pricing->price > 0) {
                 $priceType = strtolower($pricing->price_type ?? 'per person');
                 if (in_array($priceType, ['per buggy', 'per vehicle', 'per group', 'private'])) {
-                    $subtotal = (float) $pricing->price;
+                    $tier = Tier::find($tierId);
+                    $capacity = 2;
+                    if ($tier && isset($tier->vehicle_capacity) && (int) $tier->vehicle_capacity > 0) {
+                        $capacity = (int) $tier->vehicle_capacity;
+                    } elseif ($tier && preg_match('/(4|four)/i', $tier->name ?? '')) {
+                        $capacity = 4;
+                    } elseif ($tier && preg_match('/(1|single|solo)/i', $tier->name ?? '')) {
+                        $capacity = 1;
+                    }
+                    $vehicles = (int) ceil(($adults + $children) / max(1, $capacity));
+                    $subtotal = $vehicles * (float) $pricing->price;
                 } else {
                     $childPrice = round((float) $pricing->price * 0.70, 2);
                     $subtotal = ((float) $pricing->price * $adults) + ($childPrice * $children);

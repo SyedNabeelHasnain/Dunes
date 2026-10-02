@@ -100,7 +100,7 @@ class VisualQAExportTest extends TestCase
         // 1. Booking modal stacking context (Backdrop z-0, dialog relative z-10)
         $this->assertStringContainsString('class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity z-0"', $html);
         $this->assertStringContainsString('class="relative z-10 min-h-full flex items-end sm:items-center justify-center p-0 sm:p-4 text-center"', $html);
-        $this->assertStringContainsString('class="relative z-10 w-full sm:max-w-2xl lg:max-w-3xl rounded-t-3xl sm:rounded-3xl bg-white text-left align-middle shadow-2xl transition-all border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[88vh]"', $html);
+        $this->assertStringContainsString('class="relative z-10 w-full sm:max-w-2xl lg:max-w-3xl rounded-t-3xl sm:rounded-3xl bg-white text-start align-middle shadow-2xl transition-all border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[88vh]"', $html);
 
         // 2. High contrast section labels in booking modal
         $this->assertStringContainsString('text-slate-800 mb-2" for="bookingTour">Choose Tour</label>', $html);
@@ -110,10 +110,10 @@ class VisualQAExportTest extends TestCase
         $this->assertStringContainsString('text-slate-800 mb-2" for="bookingLocation">Pickup Location</label>', $html);
 
         // 3. Other modals have elevated stacking context
-        $this->assertStringContainsString('class="relative z-10 w-full max-w-4xl transform overflow-hidden rounded-3xl bg-white text-left align-middle shadow-2xl transition-all border border-slate-200"', $html);
-        $this->assertStringContainsString('class="relative z-10 w-full max-w-2xl transform overflow-hidden rounded-3xl bg-white text-left align-middle shadow-2xl transition-all border border-slate-200"', $html);
-        $this->assertStringContainsString('class="relative z-10 w-full max-w-2xl transform overflow-hidden rounded-3xl bg-slate-950 p-5 sm:p-7 text-left align-middle shadow-2xl transition-all border border-orange-500/40 text-white flex flex-col min-h-[500px]"', $html);
-        $this->assertStringContainsString('class="relative z-10 w-full max-w-5xl transform overflow-hidden rounded-3xl bg-slate-950 text-left align-middle shadow-2xl transition-all border border-orange-500/40 text-white flex flex-col max-h-[92vh]"', $html);
+        $this->assertStringContainsString('class="relative z-10 w-full max-w-4xl transform overflow-hidden rounded-3xl bg-white text-start align-middle shadow-2xl transition-all border border-slate-200"', $html);
+        $this->assertStringContainsString('class="relative z-10 w-full max-w-2xl transform overflow-hidden rounded-3xl bg-white text-start align-middle shadow-2xl transition-all border border-slate-200"', $html);
+        $this->assertStringContainsString('class="relative z-10 w-full max-w-2xl transform overflow-hidden rounded-3xl bg-slate-950 p-5 sm:p-7 text-start align-middle shadow-2xl transition-all border border-orange-500/40 text-white flex flex-col min-h-[500px]"', $html);
+        $this->assertStringContainsString('class="relative z-10 w-full max-w-5xl transform overflow-hidden rounded-3xl bg-slate-950 text-start align-middle shadow-2xl transition-all border border-orange-500/40 text-white flex flex-col max-h-[92vh]"', $html);
     }
 
     public function test_booking_modal_has_isolated_body_scroll_and_anchored_footer(): void

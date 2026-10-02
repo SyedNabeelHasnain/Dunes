@@ -45,7 +45,7 @@
              x-transition:leave="transform transition ease-in duration-200"
              x-transition:leave-start="translate-y-0 sm:scale-100 opacity-100"
              x-transition:leave-end="translate-y-full sm:translate-y-4 sm:scale-95 opacity-0"
-             class="relative z-10 w-full sm:max-w-2xl lg:max-w-3xl rounded-t-3xl sm:rounded-3xl bg-white text-left align-middle shadow-2xl transition-all border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[88vh]"
+             class="relative z-10 w-full sm:max-w-2xl lg:max-w-3xl rounded-t-3xl sm:rounded-3xl bg-white text-start align-middle shadow-2xl transition-all border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[88vh]"
              @click.stop>
 
             <!-- Modal Header -->
@@ -102,7 +102,7 @@
                                             <option value="{{ $t->id }}">{{ $t->name }}</option>
                                         @endforeach
                                     </select>
-                                    <div class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 flex items-center justify-center">
+                                    <div class="pointer-events-none absolute end-4 top-1/2 -translate-y-1/2 text-slate-400 flex items-center justify-center">
                                         <i class="bi bi-chevron-down text-xs font-black"></i>
                                     </div>
                                 </div>
@@ -176,7 +176,7 @@
                                     <div class="font-extrabold text-slate-900 text-sm truncate" id="summaryTourName">Loading...</div>
                                     <div class="text-xs text-slate-500" id="summaryTierName"></div>
                                 </div>
-                                <div class="text-right shrink-0">
+                                <div class="text-end shrink-0">
                                     <div class="font-black text-primary font-mono text-base" id="summaryTotal">AED 0</div>
                                     <a href="#" class="text-xs font-bold text-slate-400 hover:text-primary transition-colors" id="editStep1">Edit</a>
                                 </div>
@@ -280,16 +280,16 @@
                             <div class="mb-5" id="paymentOptions" data-ziina-active="{{ $ziinaActive ? '1' : '0' }}" data-advance-percent="{{ $advancePercent }}">
                                 <div class="text-xs font-black uppercase tracking-wider text-slate-800 mb-2">Payment Options</div>
                                 <div class="payment-options grid grid-cols-1 sm:grid-cols-3 gap-2">
-                                    <div class="payment-option selected p-3 rounded-2xl border-2 border-primary bg-orange-50/40 cursor-pointer text-left transition-all" data-value="cash">
+                                    <div class="payment-option selected p-3 rounded-2xl border-2 border-primary bg-orange-50/40 cursor-pointer text-start transition-all" data-value="cash">
                                         <div class="payment-option-title font-bold text-slate-900 text-xs sm:text-sm">Cash</div>
                                         <div class="payment-option-sub text-slate-500 text-[11px]">Pay on pickup</div>
                                     </div>
                                     @if($ziinaActive)
-                                    <div class="payment-option p-3 rounded-2xl border border-slate-200 bg-white hover:border-primary/50 cursor-pointer text-left transition-all" data-value="advance">
+                                    <div class="payment-option p-3 rounded-2xl border border-slate-200 bg-white hover:border-primary/50 cursor-pointer text-start transition-all" data-value="advance">
                                         <div class="payment-option-title font-bold text-slate-900 text-xs sm:text-sm">Advance</div>
                                         <div class="payment-option-sub text-slate-500 text-[11px]">Hold slot ({{ $advancePercent }}%)</div>
                                     </div>
-                                    <div class="payment-option p-3 rounded-2xl border border-slate-200 bg-white hover:border-primary/50 cursor-pointer text-left transition-all" data-value="full">
+                                    <div class="payment-option p-3 rounded-2xl border border-slate-200 bg-white hover:border-primary/50 cursor-pointer text-start transition-all" data-value="full">
                                         <div class="payment-option-title font-bold text-slate-900 text-xs sm:text-sm">Full</div>
                                         <div class="payment-option-sub text-slate-500 text-[11px]">Instant confirmation</div>
                                     </div>
@@ -317,11 +317,11 @@
                 <!-- Modal Static Fixed Footer with Live Total & Action Buttons -->
                 <div class="border-t border-slate-200/90 bg-white py-4 px-5 sm:px-7 shrink-0 shadow-xs z-10">
                     <div class="flex items-center justify-between w-full gap-4">
-                        <div class="text-left">
+                        <div class="text-start">
                             <small class="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-slate-500 block mb-0.5">{{ __('ui.booking.total') }}</small>
                             <div class="font-black text-primary font-mono text-xl sm:text-2xl leading-none" id="bookingTotal">AED 0.00</div>
                         </div>
-                        <div class="flex items-center gap-2.5 ml-auto" id="continueBtnWrapper">
+                        <div class="flex items-center gap-2.5 ms-auto" id="continueBtnWrapper">
                             <button type="button" 
                                     class="px-6 sm:px-8 py-3 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all cursor-pointer inline-flex items-center gap-2" 
                                     id="nextStep">

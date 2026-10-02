@@ -138,7 +138,7 @@
                     </div>
                 </div>
                 <div class="lg:col-span-4 hidden lg:flex justify-end">
-                    <div class="p-5 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/15 text-left rtl:text-right min-w-[220px]">
+                    <div class="p-5 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/15 text-start min-w-[220px]">
                         <div class="text-slate-300 text-xs mb-1">{{ __('ui.rate_card.customer_ratings') }}</div>
                         <div class="flex items-center gap-2 mb-1">
                             <span class="text-2xl font-black text-white">4.9 / 5.0</span>
@@ -150,7 +150,7 @@
                     </div>
                 </div>
             </div>
-            <div class="absolute -right-16 -bottom-16 w-80 h-80 rounded-full bg-primary/20 blur-3xl pointer-events-none"></div>
+            <div class="absolute -end-16 -bottom-16 w-80 h-80 rounded-full bg-primary/20 blur-3xl pointer-events-none"></div>
         </div>
 
         <!-- Free Doorstep Pickup Banner -->
@@ -259,15 +259,15 @@
                                     <div class="space-y-2">
                                     @foreach($t->tiers as $tier)
                                     <div class="flex items-center justify-between py-1.5 border-b border-dashed border-slate-300 last:border-b-0 text-xs">
-                                        <div class="pr-2 rtl:pr-0 rtl:pl-2">
+                                        <div class="pe-2">
                                             <div class="font-bold text-slate-800">{{ $tier->name }}</div>
                                             @if($tier->description)
                                             <span class="text-slate-400 text-[10px] block line-clamp-1">{{ Str::limit($tier->description, 35) }}</span>
                                             @endif
                                         </div>
-                                        <div class="text-right rtl:text-left shrink-0">
+                                        <div class="text-end shrink-0">
                                             @if(!empty($tier->pivot->old_price))
-                                            <span class="text-slate-400 line-through text-[11px] mr-1 rtl:mr-0 rtl:ml-1" data-aed="{{ $tier->pivot->old_price }}">AED {{ number_format($tier->pivot->old_price) }}</span>
+                                            <span class="text-slate-400 line-through text-[11px] me-1" data-aed="{{ $tier->pivot->old_price }}">AED {{ number_format($tier->pivot->old_price) }}</span>
                                             @endif
                                             <span class="font-black text-primary text-sm" data-aed="{{ $tier->pivot->price }}">AED {{ number_format($tier->pivot->price) }}</span>
                                             <span class="text-slate-400 text-[9px] block">/ {{ $tier->pivot->price_type && $tier->pivot->price_type !== 'person' ? $tier->pivot->price_type : __('ui.rate_card.per_person') }}</span>
@@ -278,7 +278,7 @@
                                 @else
                                     <div class="flex items-center justify-between py-1.5 text-xs">
                                         <div class="font-bold text-slate-800">{{ __('ui.rate_card.standard_exp') }}</div>
-                                        <div class="text-right rtl:text-left">
+                                        <div class="text-end">
                                             <span class="font-black text-primary text-sm" data-aed="{{ $t->price }}">AED {{ number_format($t->price) }}</span>
                                             <span class="text-slate-400 text-[9px] block">/ {{ __('ui.rate_card.per_person') }}</span>
                                         </div>

@@ -30,7 +30,7 @@
              x-transition:leave="ease-in duration-150"
              x-transition:leave-start="opacity-100 scale-100 translate-y-0"
              x-transition:leave-end="opacity-0 scale-95 translate-y-4"
-             class="relative z-10 w-full max-w-lg transform overflow-hidden rounded-3xl bg-white text-left align-middle shadow-2xl transition-all border border-slate-200/80 flex flex-col"
+             class="relative z-10 w-full max-w-lg transform overflow-hidden rounded-3xl bg-white text-start align-middle shadow-2xl transition-all border border-slate-200/80 flex flex-col"
              @click.stop>
 
             <!-- Luxury Emerald Gradient Top Accent Bar -->

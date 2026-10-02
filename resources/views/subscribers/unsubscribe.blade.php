@@ -36,7 +36,7 @@
                         You will no longer receive marketing promotions, travel tips, or newsletters from {{ $settings['site_name'] ?? 'Dunes Discovery Tourism' }} at <strong class="text-slate-700">{{ $subscriber->email }}</strong>.
                     </p>
                     
-                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-600 text-xs mb-6 text-left leading-relaxed">
+                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-600 text-xs mb-6 text-start leading-relaxed">
                         <i class="bi bi-info-circle text-primary me-1"></i> <strong>Note:</strong> You will still receive essential transactional notifications regarding any confirmed bookings or customer service inquiries.
                     </div>
 

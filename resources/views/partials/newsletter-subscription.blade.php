@@ -22,7 +22,7 @@
         </p>
 
         <!-- Subscription Card / Form -->
-        <div class="rounded-3xl p-4 sm:p-6 text-left rtl:text-right bg-white/5 border border-white/20 backdrop-blur-xl shadow-2xl">
+        <div class="rounded-3xl p-4 sm:p-6 text-start bg-white/5 border border-white/20 backdrop-blur-xl shadow-2xl">
             <form id="publicNewsletterForm" class="space-y-3" novalidate>
                 @csrf
                 <!-- Anti-Bot Honeypot -->
@@ -33,14 +33,14 @@
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
                     <!-- Name Input -->
                     <div class="md:col-span-4 relative">
-                        <i class="bi bi-person absolute left-4 rtl:left-auto rtl:right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                        <input type="text" name="name" id="newsletterName" class="w-full rounded-full pl-11 pr-4 rtl:pr-11 rtl:pl-4 py-3 bg-white text-slate-800 text-sm font-semibold border-0 shadow-sm focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="{{ __('ui.newsletter.name_placeholder') }}" maxlength="100">
+                        <i class="bi bi-person absolute start-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                        <input type="text" name="name" id="newsletterName" class="w-full rounded-full ps-11 pe-4 py-3 bg-white text-slate-800 text-sm font-semibold border-0 shadow-sm focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="{{ __('ui.newsletter.name_placeholder') }}" maxlength="100">
                     </div>
 
                     <!-- Email Input -->
                     <div class="md:col-span-5 relative">
-                        <i class="bi bi-envelope absolute left-4 rtl:left-auto rtl:right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                        <input type="email" name="email" id="newsletterEmail" class="w-full rounded-full pl-11 pr-4 rtl:pr-11 rtl:pl-4 py-3 bg-white text-slate-800 text-sm font-semibold border-0 shadow-sm focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="{{ __('ui.newsletter.email_placeholder') }}" required maxlength="255">
+                        <i class="bi bi-envelope absolute start-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                        <input type="email" name="email" id="newsletterEmail" class="w-full rounded-full ps-11 pe-4 py-3 bg-white text-slate-800 text-sm font-semibold border-0 shadow-sm focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="{{ __('ui.newsletter.email_placeholder') }}" required maxlength="255">
                     </div>
 
                     <!-- Submit Button -->

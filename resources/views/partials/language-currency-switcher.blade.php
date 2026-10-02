@@ -11,7 +11,7 @@
     $rateSar = $settingsService->get('currency_rate_sar', '1.0210');
     $rateInr = $settingsService->get('currency_rate_inr', '22.85');
 @endphp
-<div class="relative inline-block text-left" x-data="{ open: false, activeTab: 'lang' }" @click.outside="open = false" @keydown.escape.window="open = false">
+<div class="relative inline-block text-start" x-data="{ open: false, activeTab: 'lang' }" @click.outside="open = false" @keydown.escape.window="open = false">
     <button @click="open = !open" :aria-expanded="open" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-slate-800 bg-white border border-slate-200/90 shadow-2xs hover:border-primary/50 transition-all cursor-pointer min-h-[38px]" type="button" id="{{ $dropdownId }}" aria-label="Language and Currency Switcher">
         <span class="text-sm leading-none">{{ $curLang ? $curLang->flag_emoji : '🌐' }}</span>
         <span class="font-extrabold uppercase text-[11px]">{{ strtoupper($curLocale) }}</span>
@@ -26,7 +26,7 @@
          x-transition:leave="transition ease-in duration-100"
          x-transition:leave-start="opacity-100 scale-100 translate-y-0"
          x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
-         class="absolute {{ ($isRtl ?? false) ? 'left-0' : 'right-0' }} mt-2 w-64 rounded-2xl bg-white p-2.5 shadow-xl border border-slate-200 z-50 focus:outline-none"
+         class="absolute end-0 mt-2 w-64 rounded-2xl bg-white p-2.5 shadow-xl border border-slate-200 z-50 focus:outline-none"
          style="display: none;">
         <!-- Tabs Header -->
         <div class="flex items-center p-1 bg-slate-100 rounded-xl mb-2 text-xs font-bold">
