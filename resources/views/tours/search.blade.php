@@ -170,9 +170,9 @@
                         </button>
                         @endif
                         <button type="submit" 
-                                class="shrink-0 px-4 sm:px-5 py-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-xs font-bold transition-all shadow-2xs hover:shadow-xs flex items-center gap-1.5 cursor-pointer ml-1">
+                                class="shrink-0 px-4 sm:px-5 py-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-xs font-bold transition-all shadow-2xs hover:shadow-xs flex items-center gap-1.5 cursor-pointer ms-1">
                             <span>Update</span>
-                            <i class="bi bi-arrow-right text-[10px]"></i>
+                            <i class="bi bi-arrow-right rtl:rotate-180 text-[10px]"></i>
                         </button>
                     </div>
                 </form>
@@ -327,7 +327,7 @@
                                             <i class="bi bi-whatsapp text-sm"></i>
                                         </span>
                                         <div class="w-8 h-8 rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white flex items-center justify-center transition-colors">
-                                            <i class="bi bi-arrow-right text-sm"></i>
+                                            <i class="bi bi-arrow-right rtl:rotate-180 text-sm"></i>
                                         </div>
                                     </div>
                                 </div>

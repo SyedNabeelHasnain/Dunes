@@ -105,7 +105,7 @@
                 <!-- Search Input Form -->
                 <form action="{{ route('tours.search') }}" method="GET" id="globalSearchForm" @submit="handleEnter($event)">
                     <div class="relative mb-3.5">
-                        <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg sm:text-xl"></i>
+                        <i class="bi bi-search absolute start-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg sm:text-xl"></i>
                         <input type="text" 
                                name="q" 
                                id="globalSearchModalInput" 
@@ -116,13 +116,13 @@
                                @keydown.arrow-up.prevent="navigateUp"
                                @keydown.enter="handleEnter($event)"
                                @keydown.escape.prevent="handleEscape"
-                               class="w-full pl-11 sm:pl-12 pr-28 sm:pr-32 py-3.5 sm:py-4 rounded-2xl bg-slate-50 border-2 border-slate-200 focus:border-primary focus:bg-white text-sm sm:text-base font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none transition-all shadow-2xs" 
+                               class="w-full ps-11 sm:ps-12 pe-28 sm:pe-32 py-3.5 sm:py-4 rounded-2xl bg-slate-50 border-2 border-slate-200 focus:border-primary focus:bg-white text-sm sm:text-base font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none transition-all shadow-2xs" 
                                placeholder="{{ __('ui.nav.search_placeholder') }}" 
                                autocomplete="off" 
                                required>
                         
                         <!-- Input Action Controls (Clear + Loading Indicator) -->
-                        <div class="absolute right-20 sm:right-24 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+                        <div class="absolute end-20 sm:end-24 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
                             <span x-show="loading" class="text-primary text-sm inline-flex items-center animate-spin" title="Searching live catalog...">
                                 <i class="bi bi-arrow-clockwise"></i>
                             </span>
@@ -135,7 +135,7 @@
                             </button>
                         </div>
 
-                        <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 sm:py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-xs sm:text-sm shadow-xs transition-colors cursor-pointer">
+                        <button type="submit" class="absolute end-2 top-1/2 -translate-y-1/2 px-4 py-2 sm:py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-xs sm:text-sm shadow-xs transition-colors cursor-pointer">
                             {{ __('ui.nav.search') }}
                         </button>
                     </div>
@@ -256,7 +256,7 @@
                                     <div class="text-xs sm:text-sm font-black text-primary font-mono whitespace-nowrap" x-text="tour.price_formatted"></div>
                                     <div class="text-[10px] font-bold text-slate-400 group-hover:text-primary flex items-center justify-end gap-1 mt-0.5 transition-colors">
                                         <span class="hidden sm:inline">{{ __('ui.common.view_details') }}</span>
-                                        <i class="bi bi-arrow-right text-xs group-hover:translate-x-0.5 transition-transform"></i>
+                                        <i class="bi bi-arrow-right rtl:rotate-180 text-xs group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform"></i>
                                     </div>
                                 </div>
                             </a>
@@ -289,7 +289,7 @@
                         <span class="text-slate-400 text-[11px]">Instant live match</span>
                         <a :href="searchUrl + '?q=' + encodeURIComponent(query)" class="font-bold text-primary hover:text-primary-dark transition-colors inline-flex items-center gap-1">
                             <span>{{ __('ui.common.view_all') }}</span>
-                            <i class="bi bi-arrow-right"></i>
+                            <i class="bi bi-arrow-right rtl:rotate-180"></i>
                         </a>
                     </div>
                 </div>
@@ -302,7 +302,7 @@
                 </span>
                 <a href="{{ route('tours.index') }}" class="font-bold text-primary hover:text-primary-dark transition-colors inline-flex items-center gap-1">
                     <span>{{ __('ui.common.view_all_tours') }}</span>
-                    <i class="bi bi-arrow-right"></i>
+                    <i class="bi bi-arrow-right rtl:rotate-180"></i>
                 </a>
             </div>
         </div>

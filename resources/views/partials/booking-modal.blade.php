@@ -96,7 +96,7 @@
                             <div class="mb-5" id="tourSelectWrapper">
                                 <label class="block text-xs font-black uppercase tracking-wider text-slate-800 mb-2" for="bookingTour">{{ __('ui.booking.choose_tour') }}</label>
                                 <div class="relative">
-                                    <select class="w-full h-[52px] appearance-none rounded-2xl bg-white px-4 pr-11 font-bold text-slate-900 text-sm border-2 border-slate-200 shadow-2xs hover:border-slate-300 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all cursor-pointer" id="bookingTour" name="tour_id" required autocomplete="off">
+                                    <select class="w-full h-[52px] appearance-none rounded-2xl bg-white px-4 pe-11 font-bold text-slate-900 text-sm border-2 border-slate-200 shadow-2xs hover:border-slate-300 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all cursor-pointer" id="bookingTour" name="tour_id" required autocomplete="off">
                                         <option value="">{{ __('ui.booking.select_tier') }}</option>
                                         @foreach($modalTours as $t)
                                             <option value="{{ $t->id }}">{{ $t->name }}</option>
@@ -128,8 +128,8 @@
                                             <span>{{ __('ui.booking.select_date') }}</span>
                                         </button>
                                         <div class="date-nav flex items-center gap-1">
-                                            <button type="button" class="w-8 h-8 rounded-full bg-white border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-700 shadow-2xs transition-colors cursor-pointer" id="datePrev" aria-label="Previous date"><i class="bi bi-chevron-left text-xs"></i></button>
-                                            <button type="button" class="w-8 h-8 rounded-full bg-white border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-700 shadow-2xs transition-colors cursor-pointer" id="dateNext" aria-label="Next date"><i class="bi bi-chevron-right text-xs"></i></button>
+                                            <button type="button" class="w-8 h-8 rounded-full bg-white border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-700 shadow-2xs transition-colors cursor-pointer" id="datePrev" aria-label="Previous date"><i class="bi bi-chevron-left rtl:rotate-180 text-xs"></i></button>
+                                            <button type="button" class="w-8 h-8 rounded-full bg-white border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-700 shadow-2xs transition-colors cursor-pointer" id="dateNext" aria-label="Next date"><i class="bi bi-chevron-right rtl:rotate-180 text-xs"></i></button>
                                         </div>
                                     </div>
                                 </div>
@@ -154,9 +154,9 @@
                                 <div class="sm:col-span-8 lg:col-span-9 booking-location-wrapper relative">
                                     <label class="block text-xs font-black uppercase tracking-wider text-slate-800 mb-2" for="bookingLocation">{{ __('ui.booking.pickup_location_label') }}</label>
                                     <div class="relative rounded-2xl bg-white shadow-2xs border-2 border-slate-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 flex items-center h-[52px] transition-all">
-                                        <span class="pl-3.5 pr-2 text-primary shrink-0"><i class="bi bi-geo-alt-fill text-base"></i></span>
+                                        <span class="ps-3.5 pe-2 text-primary shrink-0"><i class="bi bi-geo-alt-fill text-base"></i></span>
                                         <input type="text" class="flex-1 bg-transparent font-bold text-slate-900 text-sm border-0 focus:outline-none placeholder:text-slate-400 min-w-0" name="location" id="bookingLocation" required placeholder="{{ __('ui.booking.pickup_placeholder') }}" autocomplete="off">
-                                        <button class="px-3.5 h-full text-slate-400 hover:text-primary hover:bg-slate-50 border-l border-slate-100 transition-colors cursor-pointer rounded-r-2xl shrink-0" type="button" id="detectLocation" aria-label="Detect current location" title="Detect Current Location">
+                                        <button class="px-3.5 h-full text-slate-400 hover:text-primary hover:bg-slate-50 border-s border-slate-100 transition-colors cursor-pointer rounded-e-2xl shrink-0" type="button" id="detectLocation" aria-label="Detect current location" title="Detect Current Location">
                                             <i class="bi bi-crosshair"></i>
                                         </button>
                                     </div>
@@ -249,7 +249,7 @@
                                     <input type="text" class="flex-1 px-3.5 py-2.5 bg-transparent text-xs sm:text-sm font-semibold text-slate-800 border-0 focus:outline-none placeholder:text-slate-400 uppercase" id="bookingPromoCode" name="coupon_code" placeholder="Enter promo code (e.g. DUNESWELCOME)" autocomplete="off" spellcheck="false">
                                     <button class="px-4 bg-primary hover:bg-primary-dark text-white font-bold text-xs transition-colors cursor-pointer flex items-center gap-1" type="button" id="applyPromoBtn">
                                         <span>Apply</span>
-                                        <i class="bi bi-arrow-right-short"></i>
+                                        <i class="bi bi-arrow-right-short rtl:rotate-180"></i>
                                     </button>
                                 </div>
                                 
@@ -319,14 +319,14 @@
                     <div class="flex items-center justify-between w-full gap-4">
                         <div class="text-start">
                             <small class="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-slate-500 block mb-0.5">{{ __('ui.booking.total') }}</small>
-                            <div class="font-black text-primary font-mono text-xl sm:text-2xl leading-none" id="bookingTotal">AED 0.00</div>
+                            <div class="font-black text-primary font-mono text-xl sm:text-2xl leading-none" id="bookingTotal" data-aed="0">AED 0.00</div>
                         </div>
                         <div class="flex items-center gap-2.5 ms-auto" id="continueBtnWrapper">
                             <button type="button" 
                                     class="px-6 sm:px-8 py-3 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all cursor-pointer inline-flex items-center gap-2" 
                                     id="nextStep">
                                 <span>{{ __('ui.common.continue') }}</span>
-                                <i class="bi bi-arrow-right"></i>
+                                <i class="bi bi-arrow-right rtl:rotate-180"></i>
                             </button>
                             <button type="submit" 
                                     class="px-6 sm:px-8 py-3 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all cursor-pointer hidden items-center gap-2" 

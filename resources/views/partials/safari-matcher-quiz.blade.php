@@ -154,7 +154,7 @@
                                     <span>No hidden charges • Instant WhatsApp support</span>
                                 </div>
                             </div>
-                            <div class="sm:col-span-5 text-center sm:text-right border-t sm:border-t-0 sm:border-l border-slate-200 pt-4 sm:pt-0 sm:pl-4">
+                            <div class="sm:col-span-5 text-center sm:text-end border-t sm:border-t-0 sm:border-s border-slate-200 pt-4 sm:pt-0 sm:ps-4">
                                 <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">{{ __('ui.common.starting_from') }}</div>
                                 <div class="text-3xl font-black text-primary font-mono my-1" x-text="matchedTour.price">AED 150</div>
                                 <button type="button" 

@@ -2363,7 +2363,10 @@ const App = {
         else if (method === 'full' || method === 'cash') payNow = total;
 
         const formatMoney = (v) => Alpine.store('currency').formatDisplayPrice(v);
-        if (totalEl) totalEl.innerHTML = formatMoney(total);
+        if (totalEl) {
+            totalEl.innerHTML = formatMoney(total);
+            totalEl.setAttribute('data-aed', total);
+        }
         if (summaryTotalEl) {
             if (discount > 0) {
                 summaryTotalEl.innerHTML = `<span class="line-through text-slate-400 text-xs me-2">${formatMoney(baseTotal)}</span> <span class="text-emerald-600 font-extrabold">${formatMoney(total)}</span>`;
@@ -2518,7 +2521,10 @@ const App = {
         const selTier = document.getElementById('selectedTier');
         if (selTier) selTier.value = '';
         const bTotal = document.getElementById('bookingTotal');
-        if (bTotal) bTotal.textContent = 'AED 0.00';
+        if (bTotal) {
+            bTotal.textContent = 'AED 0.00';
+            bTotal.setAttribute('data-aed', '0');
+        }
         const pMethod = document.getElementById('paymentMethod');
         if (pMethod) pMethod.value = 'cash';
         const pAmt = document.getElementById('paymentAmount');

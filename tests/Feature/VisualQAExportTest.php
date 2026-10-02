@@ -151,7 +151,7 @@ class VisualQAExportTest extends TestCase
         $this->assertTrue($footerPos > $formStartPos && $footerPos < $formEndPos, 'Footer must be nested inside <form id="bookingForm">');
 
         // 7. Step 1 fields have unclipped appearance-none select and unified border-2
-        $this->assertStringContainsString('appearance-none rounded-2xl bg-white px-4 pr-11 font-bold text-slate-900 text-sm border-2 border-slate-200', $html);
+        $this->assertStringContainsString('appearance-none rounded-2xl bg-white px-4 pe-11 font-bold text-slate-900 text-sm border-2 border-slate-200', $html);
         $this->assertStringContainsString('bi bi-chevron-down text-xs font-black', $html);
     }
 }

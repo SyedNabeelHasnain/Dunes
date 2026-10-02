@@ -88,8 +88,8 @@
                     <input type="hidden" name="category" value="{{ $categorySlug }}">
                 @endif
                 <div class="relative w-full sm:w-64">
-                    <input type="search" name="search" class="w-full rounded-full pl-4 pr-10 py-1.5 bg-slate-100 border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/40" placeholder="{{ __('ui.nav.search') }}..." value="{{ $search }}">
-                    <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-primary transition-colors" aria-label="Search articles">
+                    <input type="search" name="search" class="w-full rounded-full ps-4 pe-10 py-1.5 bg-slate-100 border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/40" placeholder="{{ __('ui.nav.search') }}..." value="{{ $search }}">
+                    <button type="submit" class="absolute end-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-primary transition-colors" aria-label="Search articles">
                         <i class="bi bi-search text-xs"></i>
                     </button>
                 </div>
@@ -118,7 +118,7 @@
                         <div class="relative overflow-hidden aspect-[16/9]">
                             <img src="{{ $featuredImg }}" width="800" height="450" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $featuredPost->featured_image_alt ?: $featuredPost->title }}">
                             @if ($featuredPost->category)
-                            <span class="absolute top-4 left-4 bg-primary text-white rounded-full px-3 py-1 text-xs font-bold shadow-md">{{ $featuredPost->category?->name }}</span>
+                            <span class="absolute top-4 start-4 bg-primary text-white rounded-full px-3 py-1 text-xs font-bold shadow-md">{{ $featuredPost->category?->name }}</span>
                             @endif
                         </div>
                         <div class="p-6 flex flex-col justify-between flex-grow">
@@ -129,10 +129,10 @@
                                 @endif
                             </div>
                             <div class="flex items-center gap-4 text-slate-500 text-xs pt-3 border-t border-slate-200">
-                                <span><i class="bi bi-person text-primary mr-1"></i>{{ $featuredPost->author_name ?: 'Dunes Discovery' }}</span>
-                                <span><i class="bi bi-clock text-primary mr-1"></i>{{ $featuredPost->read_time }} {{ __('ui.blog.read_time') }}</span>
+                                <span><i class="bi bi-person text-primary me-1"></i>{{ $featuredPost->author_name ?: 'Dunes Discovery' }}</span>
+                                <span><i class="bi bi-clock text-primary me-1"></i>{{ $featuredPost->read_time }} {{ __('ui.blog.read_time') }}</span>
                                 @if ($featuredPost->published_at)
-                                    <span><i class="bi bi-calendar3 text-primary mr-1"></i>{{ $featuredPost->published_at->format('M j, Y') }}</span>
+                                    <span><i class="bi bi-calendar3 text-primary me-1"></i>{{ $featuredPost->published_at->format('M j, Y') }}</span>
                                 @endif
                             </div>
                         </div>
@@ -152,7 +152,7 @@
                         <div class="sm:w-5/12 relative aspect-[16/10] sm:aspect-auto">
                             <img src="{{ $sideImg }}" width="400" height="250" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $sidePost->featured_image_alt ?: $sidePost->title }}">
                             @if ($sidePost->category)
-                            <span class="absolute top-2 left-2 bg-primary text-white rounded-full px-2 py-0.5 text-[10px] font-bold shadow-sm">{{ $sidePost->category?->name }}</span>
+                            <span class="absolute top-2 start-2 bg-primary text-white rounded-full px-2 py-0.5 text-[10px] font-bold shadow-sm">{{ $sidePost->category?->name }}</span>
                             @endif
                         </div>
                         <div class="sm:w-7/12 p-4 flex flex-col justify-between flex-grow">
@@ -200,7 +200,7 @@
             @else
                 {{ __('ui.blog_journal.latest_articles') }}
             @endif
-            <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full text-xs font-bold ml-1.5">{{ $total }}</span>
+            <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full text-xs font-bold ms-1.5">{{ $total }}</span>
         </h2>
         <div class="text-slate-500 text-xs">{{ __('ui.blog_journal.page_x_of_y', ['current' => $page, 'total' => $totalPages]) }}</div>
     </div>
@@ -215,7 +215,7 @@
             <a href="{{ route('blog.show', $post->slug) }}" class="block relative aspect-[16/10] overflow-hidden">
                 <img src="{{ $postImg }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $post->featured_image_alt ?: $post->title }}" loading="lazy">
                 @if ($post->category)
-                <span class="absolute top-3 left-3 rtl:left-auto rtl:right-3 bg-primary text-white rounded-full px-2.5 py-0.5 text-xs font-bold shadow-sm">{{ $post->category?->name }}</span>
+                <span class="absolute top-3 start-3 bg-primary text-white rounded-full px-2.5 py-0.5 text-xs font-bold shadow-sm">{{ $post->category?->name }}</span>
                 @endif
             </a>
             <div class="p-5 flex flex-col flex-grow">
@@ -231,7 +231,7 @@
                         @if ($post->published_at)
                             <span>{{ $post->published_at->format('M j') }}</span>
                         @endif
-                        <span><i class="bi bi-clock mr-1 text-primary"></i>{{ $post->read_time }}m</span>
+                        <span><i class="bi bi-clock me-1 text-primary"></i>{{ $post->read_time }}m</span>
                     </div>
                 </div>
             </div>

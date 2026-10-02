@@ -150,7 +150,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                 <div class="text-2xl sm:text-3xl font-black text-white">10K+</div>
                 <div class="uppercase font-semibold text-[10px] sm:text-xs tracking-wider text-slate-300">{{ __('ui.common.happy_guests') }}</div>
             </div>
-            <div class="border-l border-r border-white/25 px-6 sm:px-12">
+            <div class="border-s border-e border-white/25 px-6 sm:px-12">
                 <div class="text-2xl sm:text-3xl font-black text-white">4.9/5</div>
                 <div class="uppercase font-semibold text-[10px] sm:text-xs tracking-wider text-slate-300">{{ __('ui.trust_strip.top_rated') }}</div>
             </div>
@@ -348,7 +348,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                         <div class="relative overflow-hidden aspect-[16/10]">
                             <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy">
                             @if($t->is_bestseller)
-                            <span class="absolute top-3 left-3 rtl:left-auto rtl:right-3 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-md inline-flex items-center gap-1">
+                            <span class="absolute top-3 start-3 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-md inline-flex items-center gap-1">
                                 <i class="bi bi-fire text-amber-300"></i>{{ __('ui.home_popular.bestseller') }}
                             </span>
                             @endif
@@ -592,7 +592,7 @@ if (!function_exists('renderReviewCardMarkup')) {
         <div class="text-center mt-10">
             <a href="{{ route('faq') }}" class="btn-desert-animated text-sm sm:text-base font-bold rounded-full px-8 py-3.5 inline-flex items-center gap-2 shadow-md">
                 <span>{{ __('ui.faq_section.view_all') }}</span>
-                <i class="bi bi-arrow-right"></i>
+                <i class="bi bi-arrow-right rtl:rotate-180"></i>
             </a>
         </div>
     </div>
@@ -601,8 +601,8 @@ if (!function_exists('renderReviewCardMarkup')) {
 <!-- CTA booking banner -->
 <section class="cta-section py-16 sm:py-24 relative bg-slate-950 text-white overflow-hidden border-t border-slate-800">
     <!-- Ambient Desert Glow Effects -->
-    <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-b from-orange-500/20 via-amber-500/10 to-transparent blur-3xl pointer-events-none -z-0"></div>
-    <div class="absolute -bottom-24 right-10 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none -z-0"></div>
+    <div class="absolute -top-24 start-1/2 -translate-x-1/2 rtl:translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-b from-orange-500/20 via-amber-500/10 to-transparent blur-3xl pointer-events-none -z-0"></div>
+    <div class="absolute -bottom-24 end-10 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none -z-0"></div>
 
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-amber-400/30 text-amber-300 text-xs font-bold uppercase tracking-wider mb-5 shadow-lg">

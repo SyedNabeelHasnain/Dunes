@@ -37,6 +37,7 @@ class CouponController extends Controller
         $email = $request->input('email');
         $adults = (int) $request->input('adults', 1);
         $children = (int) $request->input('children', 0);
+        $infants = (int) $request->input('infants', 0);
         $totalGuests = (int) $request->input('guests', max(1, $adults + $children));
         $tourDate = $request->input('date');
 
@@ -58,7 +59,7 @@ class CouponController extends Controller
                     } elseif ($tier && preg_match('/(1|single|solo)/i', $tier->name ?? '')) {
                         $capacity = 1;
                     }
-                    $vehicles = (int) ceil(($adults + $children) / max(1, $capacity));
+                    $vehicles = (int) ceil(($adults + $children + $infants) / max(1, $capacity));
                     $subtotal = $vehicles * (float) $pricing->price;
                 } else {
                     $childPrice = round((float) $pricing->price * 0.70, 2);

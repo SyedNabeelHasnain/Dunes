@@ -287,7 +287,7 @@
     </div>
 
     <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse table datatable" id="recentBookingsTable">
+        <table class="w-full text-start border-collapse table datatable" id="recentBookingsTable">
             <thead>
                 <tr class="border-b border-slate-200 bg-slate-50/80 text-[11px] font-bold uppercase tracking-wider text-slate-500">
                     <th class="py-3 px-4">Booking Ref</th>
@@ -295,7 +295,7 @@
                     <th class="py-3 px-4">Tour / Activity</th>
                     <th class="py-3 px-4">Total</th>
                     <th class="py-3 px-4 text-center">Status</th>
-                    <th class="py-3 px-4 text-right no-sort">Action</th>
+                    <th class="py-3 px-4 text-end no-sort">Action</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 text-xs">
@@ -325,7 +325,7 @@
                         @endphp
                         <span class="inline-block px-3 py-1 rounded-full text-[11px] font-bold capitalize {{ $badgeClass }}">{{ $b->status }}</span>
                     </td>
-                    <td class="py-3.5 px-4 text-right">
+                    <td class="py-3.5 px-4 text-end">
                         <div class="inline-flex items-center gap-1.5">
                             <a href="{{ route('admin.bookings.show', $b->id) }}" class="w-8 h-8 rounded-full border border-slate-200 hover:border-primary hover:text-primary flex items-center justify-center text-slate-500 transition" title="View Details">
                                 <i class="bi bi-eye-fill"></i>

@@ -114,11 +114,7 @@ class AdminTourController extends Controller
             $tour->addons()->sync($addonsData);
         }
 
-        Cache::forget('site_tours_header_cache');
-        Cache::forget('site_home_cache');
-        Cache::forget('site_active_tours_search');
-        Cache::forget('sitemap_tours_xml');
-        Cache::forget('sitemap_images_xml');
+        $this->clearTourCaches();
 
         return redirect()->route('admin.tours.index')->with('success', 'Tour created successfully.');
     }
@@ -213,11 +209,7 @@ class AdminTourController extends Controller
             $tour->addons()->sync($addonsData);
         }
 
-        Cache::forget('site_tours_header_cache');
-        Cache::forget('site_home_cache');
-        Cache::forget('site_active_tours_search');
-        Cache::forget('sitemap_tours_xml');
-        Cache::forget('sitemap_images_xml');
+        $this->clearTourCaches();
 
         return redirect()->route('admin.tours.index')->with('success', 'Tour updated successfully.');
     }
@@ -229,11 +221,7 @@ class AdminTourController extends Controller
     {
         $tour = Tour::findOrFail($id);
         $tour->delete();
-        Cache::forget('site_tours_header_cache');
-        Cache::forget('site_home_cache');
-        Cache::forget('site_active_tours_search');
-        Cache::forget('sitemap_tours_xml');
-        Cache::forget('sitemap_images_xml');
+        $this->clearTourCaches();
 
         return redirect()->route('admin.tours.index')->with('success', 'Tour deleted successfully.');
     }
@@ -461,9 +449,7 @@ class AdminTourController extends Controller
             }
         }
 
-        Cache::forget('site_tours_header_cache');
-        Cache::forget('site_home_cache');
-        Cache::forget('site_active_tours_search');
+        $this->clearTourCaches();
 
         return redirect()->route('admin.pricing.index')->with('success', 'Pricing updated successfully.');
     }
@@ -611,16 +597,31 @@ class AdminTourController extends Controller
         $tour->status = $tour->status === 'active' ? 'inactive' : 'active';
         $tour->save();
 
-        Cache::forget('site_tours_header_cache');
-        Cache::forget('site_home_cache');
-        Cache::forget('site_active_tours_search');
-        Cache::forget('sitemap_tours_xml');
-        Cache::forget('sitemap_images_xml');
+        $this->clearTourCaches();
 
         return response()->json([
             'success' => true,
             'status' => $tour->status,
             'message' => 'Tour status updated to '.ucfirst($tour->status).'.',
         ]);
+    }
+
+    /**
+     * Clear all tour related caches across all supported locales and feeds.
+     */
+    protected function clearTourCaches(): void
+    {
+        Cache::forget('site_tours_header_cache');
+        Cache::forget('site_home_cache');
+        Cache::forget('site_active_tours_search');
+        foreach (['en', 'ar', 'ru', 'es', 'it'] as $loc) {
+            Cache::forget('site_active_tours_search_'.$loc);
+        }
+        Cache::forget('sitemap_tours_xml');
+        Cache::forget('sitemap_images_xml');
+        Cache::forget('gttd_products_xml');
+        Cache::forget('gttd_options_xml');
+        Cache::forget('gttd_feed_xml');
+        Cache::forget('gttd_feed_json');
     }
 }

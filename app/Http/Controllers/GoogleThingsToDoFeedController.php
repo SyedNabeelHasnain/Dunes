@@ -272,9 +272,9 @@ class GoogleThingsToDoFeedController extends Controller
                         'tier_slug' => $tier->slug,
                         'currency' => 'AED',
                         'amount' => number_format($priceNum, 2, '.', ''),
-                        'price_micros' => (int) round($priceNum * 1000000),
+                        'price_micros' => $this->toMicros($priceNum),
                         'original_amount' => $oldPriceNum > $priceNum ? number_format($oldPriceNum, 2, '.', '') : null,
-                        'original_price_micros' => $oldPriceNum > $priceNum ? (int) round($oldPriceNum * 1000000) : null,
+                        'original_price_micros' => $oldPriceNum > $priceNum ? $this->toMicros($oldPriceNum) : null,
                         'landing_page_url' => $bookingUrl,
                     ];
                 }
@@ -650,5 +650,17 @@ class GoogleThingsToDoFeedController extends Controller
     protected function escapeXml(?string $value): string
     {
         return htmlspecialchars((string) $value, ENT_XML1 | ENT_QUOTES, 'UTF-8');
+    }
+
+    /**
+     * Convert float amount to exact micro-units (1 AED = 1,000,000 micros).
+     */
+    protected function toMicros(float $amount): int
+    {
+        if (function_exists('bcmul')) {
+            return (int) bcmul(number_format($amount, 2, '.', ''), '1000000', 0);
+        }
+
+        return (int) round($amount * 1000000);
     }
 }

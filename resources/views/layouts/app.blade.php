@@ -540,11 +540,11 @@
 
         <div x-show="$store.mobileNav.open"
              x-transition:enter="transition ease-out duration-300 transform"
-             x-transition:enter-start="translate-x-full"
+             x-transition:enter-start="ltr:translate-x-full rtl:-translate-x-full"
              x-transition:enter-end="translate-x-0"
              x-transition:leave="transition ease-in duration-200 transform"
              x-transition:leave-start="translate-x-0"
-             x-transition:leave-end="translate-x-full"
+             x-transition:leave-end="ltr:translate-x-full rtl:-translate-x-full"
              class="fixed inset-y-0 end-0 max-w-xs sm:max-w-sm w-full bg-white z-50 shadow-2xl p-5 flex flex-col justify-between overflow-y-auto lg:hidden"
              style="display: none;"
              id="mainOffcanvas">

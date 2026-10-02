@@ -115,7 +115,7 @@ class BookingController extends Controller
             } elseif (preg_match('/(1|single|solo)/i', $tier->name ?? '')) {
                 $capacity = 1;
             }
-            $vehicles = (int) ceil(($adults + $children) / max(1, $capacity));
+            $vehicles = (int) ceil(($adults + $children + $infants) / max(1, $capacity));
             $subtotal = $vehicles * $price;
         } else {
             // Children get a 30% discount (they pay 70% of the adult price)

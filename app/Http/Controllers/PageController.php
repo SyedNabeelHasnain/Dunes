@@ -207,18 +207,18 @@ class PageController extends Controller
     public function logWhatsapp(Request $request): JsonResponse
     {
         $request->validate([
-            'phone' => 'nullable|string',
-            'name' => 'nullable|string',
-            'tour_name' => 'nullable|string',
-            'page_url' => 'nullable|string',
-            'message_text' => 'nullable|string',
+            'phone' => 'nullable|string|max:50',
+            'name' => 'nullable|string|max:100',
+            'tour_name' => 'nullable|string|max:150',
+            'page_url' => 'nullable|string|max:255',
+            'message_text' => 'nullable|string|max:1000',
         ]);
 
-        $name = trim($request->input('name', 'Anonymous')) ?: 'Anonymous';
-        $phone = trim($request->input('phone', 'N/A')) ?: 'N/A';
-        $tourName = trim($request->input('tour_name', 'General Inquiry')) ?: 'General Inquiry';
-        $pageUrl = trim($request->input('page_url', ''));
-        $messageText = trim($request->input('message_text', ''));
+        $name = strip_tags(trim($request->input('name', 'Anonymous'))) ?: 'Anonymous';
+        $phone = strip_tags(trim($request->input('phone', 'N/A'))) ?: 'N/A';
+        $tourName = strip_tags(trim($request->input('tour_name', 'General Inquiry'))) ?: 'General Inquiry';
+        $pageUrl = strip_tags(trim($request->input('page_url', '')));
+        $messageText = strip_tags(trim($request->input('message_text', '')));
 
         $settings = app(SettingsService::class);
         $whatsappNum = preg_replace('/[^0-9]/', '', $settings->get('site_whatsapp', '971502456056')) ?: '971502456056';

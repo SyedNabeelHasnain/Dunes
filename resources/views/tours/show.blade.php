@@ -264,7 +264,7 @@ if(window.fbq){
                     </div>
                     <span class="font-medium">{{ $tour->duration }}</span>
                 </div>
-                <div class="flex items-center gap-2 sm:border-l sm:border-white/25 sm:pl-6">
+                <div class="flex items-center gap-2 sm:border-s sm:border-white/25 sm:ps-6">
                     <div class="text-amber-400 flex gap-0.5 text-sm">
                         <i class="bi bi-star-fill"></i>
                         <i class="bi bi-star-fill"></i>
@@ -274,7 +274,7 @@ if(window.fbq){
                     </div>
                     <span class="font-medium">{{ $tour->rating }} <span class="text-white/70">({{ number_format($tour->review_count) }} {{ __('ui.common.reviews') }})</span></span>
                 </div>
-                <div class="hidden md:flex items-center gap-2 border-l border-white/25 pl-6">
+                <div class="hidden md:flex items-center gap-2 border-s border-white/25 ps-6">
                     <i class="bi bi-geo-alt-fill text-primary"></i>
                     <span class="font-medium">{{ __('ui.trust_strip.hotel_pickup') }}</span>
                 </div>
@@ -456,10 +456,10 @@ if(window.fbq){
                     <!-- Itinerary Tab -->
                     @if(isset($tabs['itinerary']))
                     <div x-show="currentTab === 'itinerary'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0">
-                        <div class="relative pl-6 border-l-2 border-primary/30 space-y-6 ml-3">
+                        <div class="relative ps-6 border-s-2 border-primary/30 space-y-6 ms-3">
                             @foreach($tour->itineraries->sortBy('priority') as $it)
                             <div class="relative pb-2">
-                                <div class="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-primary border-4 border-white shadow-xs"></div>
+                                <div class="absolute -start-[31px] top-1.5 w-4 h-4 rounded-full bg-primary border-4 border-white shadow-xs"></div>
                                 <div class="flex items-center justify-between gap-3 mb-1.5">
                                     <span class="bg-primary/10 text-primary text-xs font-bold rounded-full px-3 py-0.5">{{ $it->time }}</span>
                                     @if($it->duration)
@@ -623,7 +623,7 @@ if(window.fbq){
                         @endphp
                         <div class="bg-white rounded-2xl p-5 border-2 flex flex-col h-full relative transition-all duration-300 hover:shadow-lg {{ $tier->is_popular ? 'border-primary shadow-md' : 'border-slate-300 shadow-xs' }}">
                             @if($tier->is_popular)
-                            <div class="absolute -top-3 left-1/2 -translate-x-1/2">
+                            <div class="absolute -top-3 start-1/2 -translate-x-1/2 rtl:translate-x-1/2">
                                 <span class="bg-primary text-white rounded-full px-3 py-0.5 text-[10px] font-extrabold uppercase tracking-wider shadow-sm">{{ __('ui.common.popular') }}</span>
                             </div>
                             @endif
@@ -737,10 +737,10 @@ if(window.fbq){
                                 @endphp
                                 <div class="package-option p-3.5 border rounded-2xl relative cursor-pointer transition-all hover:shadow-xs {{ $tier->is_popular ? 'border-primary bg-primary/5' : 'border-slate-200 bg-white hover:border-slate-300' }}" data-action="open-booking" data-tour="{{ $tour->id }}" data-tier="{{ $tier->id }}" @click="$store.modal.open('booking', { tourId: {{ $tour->id }}, tierId: {{ $tier->id }} })">
                                     @if($tier->is_popular)
-                                    <span class="bg-primary text-white text-[9px] font-black uppercase tracking-wider rounded-full px-2 py-0.5 absolute top-2 right-2">{{ __('ui.tour_sidebar.popular_badge') }}</span>
+                                    <span class="bg-primary text-white text-[9px] font-black uppercase tracking-wider rounded-full px-2 py-0.5 absolute top-2 end-2">{{ __('ui.tour_sidebar.popular_badge') }}</span>
                                     @endif
                                     <div class="flex justify-between items-start">
-                                        <div class="pr-2">
+                                        <div class="pe-2">
                                             <div class="text-xs font-bold text-slate-900">{{ $tier->name }}</div>
                                             @if($tier->description)
                                             <span class="text-[11px] text-slate-500 line-clamp-1 mt-0.5 block">{{ $tier->description }}</span>
@@ -993,7 +993,7 @@ if(window.fbq){
             </h2>
             <a href="{{ route('tours.index') }}" class="text-sm font-bold text-primary hover:text-primary-hover inline-flex items-center gap-1">
                 <span>{{ __('ui.common.view_all_tours') }}</span>
-                <i class="bi bi-arrow-right"></i>
+                <i class="bi bi-arrow-right rtl:rotate-180"></i>
             </a>
         </div>
 
@@ -1005,7 +1005,7 @@ if(window.fbq){
                     <div class="relative overflow-hidden aspect-[16/10]">
                         <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy">
                         @if($t->is_bestseller)
-                        <span class="absolute top-3 left-3 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-md inline-flex items-center gap-1">
+                        <span class="absolute top-3 start-3 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-md inline-flex items-center gap-1">
                             <i class="bi bi-fire text-amber-300"></i>{{ __('ui.common.bestseller') }}
                         </span>
                         @endif
@@ -1035,7 +1035,7 @@ if(window.fbq){
                                     <i class="bi bi-whatsapp text-sm"></i>
                                 </span>
                                 <div class="w-8 h-8 rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white flex items-center justify-center transition-colors">
-                                    <i class="bi bi-arrow-right text-sm"></i>
+                                    <i class="bi bi-arrow-right rtl:rotate-180 text-sm"></i>
                                 </div>
                             </div>
                         </div>

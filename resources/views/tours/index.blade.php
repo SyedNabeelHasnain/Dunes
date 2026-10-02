@@ -120,8 +120,8 @@
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
                 <div class="lg:col-span-4">
                     <div class="relative">
-                        <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                        <input type="text" id="tourSearchInput" class="w-full rounded-full pl-11 pr-4 py-2.5 bg-white border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs" placeholder="Search safaris, buggies, cruises..." oninput="handleTourSearch(this.value)">
+                        <i class="bi bi-search absolute start-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="tourSearchInput" class="w-full rounded-full ps-11 pe-4 py-2.5 bg-white border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs" placeholder="{{ __('ui.nav.search_placeholder') }}" oninput="handleTourSearch(this.value)">
                     </div>
                 </div>
                 <div class="lg:col-span-8">
@@ -163,7 +163,7 @@
                             <div class="relative overflow-hidden aspect-[16/10]">
                                 <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy">
                                 @if($t->is_bestseller)
-                                <span class="absolute top-3 left-3 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-md inline-flex items-center gap-1">
+                                <span class="absolute top-3 start-3 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-md inline-flex items-center gap-1">
                                     <i class="bi bi-fire text-amber-300"></i>{{ __('ui.home_popular.bestseller') }}
                                 </span>
                                 @endif
@@ -214,7 +214,7 @@
                                             <i class="bi bi-whatsapp text-sm"></i>
                                         </span>
                                         <div class="w-8 h-8 rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white flex items-center justify-center transition-colors">
-                                            <i class="bi bi-arrow-right text-sm"></i>
+                                            <i class="bi bi-arrow-right rtl:rotate-180 text-sm"></i>
                                         </div>
                                     </div>
                                 </div>

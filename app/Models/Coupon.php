@@ -210,6 +210,7 @@ class Coupon extends Model
             if ($this->max_discount !== null && $this->max_discount > 0) {
                 $discount = min($discount, (float) $this->max_discount);
             }
+            $discount = min($subtotal, $discount);
         } elseif ($this->discount_type === 'fixed') {
             $discount = (float) $this->discount_value;
             if ($this->max_discount !== null && $this->max_discount > 0) {

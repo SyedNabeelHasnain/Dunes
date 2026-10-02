@@ -1,23 +1,23 @@
 <!-- Real-Time Social Proof & Urgency Toast Component (Tailwind v4) -->
 <div id="dunesSocialProofToast" 
-     class="fixed bottom-24 sm:bottom-6 left-4 sm:left-6 z-40 max-w-sm w-[calc(100%-2rem)] pb-safe opacity-0 translate-y-6 scale-95 pointer-events-none transition-all duration-500 ease-out" 
+     class="fixed bottom-24 sm:bottom-6 start-4 sm:start-6 z-40 max-w-sm w-[calc(100%-2rem)] pb-safe opacity-0 translate-y-6 scale-95 pointer-events-none transition-all duration-500 ease-out" 
      aria-live="polite" 
      role="status" 
      style="display: none;">
     <div class="p-3 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-slate-200/90 flex items-center gap-3 relative">
         <button type="button" 
-                class="absolute top-2 right-2.5 w-6 h-6 rounded-full text-slate-500 hover:text-slate-800 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer text-base leading-none" 
+                class="absolute top-2 end-2.5 w-6 h-6 rounded-full text-slate-500 hover:text-slate-800 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer text-base leading-none" 
                 id="socialProofCloseBtn" 
                 aria-label="Dismiss">&times;</button>
         
         <div class="relative shrink-0 w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shadow-2xs">
             <img id="spTourImage" src="{{ asset('images/evening-desert-safari-dubai-hero.avif') }}" alt="Tour" class="w-full h-full object-cover" width="48" height="48" loading="lazy">
-            <span class="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-2xs text-emerald-500 text-xs flex items-center justify-center" title="Verified Guest Booking">
+            <span class="absolute -bottom-1 -end-1 bg-white rounded-full p-0.5 shadow-2xs text-emerald-500 text-xs flex items-center justify-center" title="Verified Guest Booking">
                 <i class="bi bi-patch-check-fill"></i>
             </span>
         </div>
 
-        <div class="flex-1 min-w-0 pr-4">
+        <div class="flex-1 min-w-0 pe-4">
             <div class="flex items-center gap-1 mb-0.5">
                 <span class="font-bold text-slate-900 text-xs truncate max-w-[130px]" id="spCustomerName">Michael R.</span>
                 <span class="text-slate-500 text-[11px]">booked</span>

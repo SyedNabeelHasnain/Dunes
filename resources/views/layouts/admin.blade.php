@@ -161,7 +161,7 @@
             <a href="{{ route('admin.settings.translations') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.translations*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
                 <i class="bi bi-robot text-amber-400 text-base"></i> <span>Translation APIs</span>
             </a>
-            <button type="button" class="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-slate-400 hover:bg-slate-900 hover:text-white transition clear-cache-trigger">
+            <button type="button" class="w-full text-start flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-slate-400 hover:bg-slate-900 hover:text-white transition clear-cache-trigger">
                 <i class="bi bi-arrow-repeat text-amber-400 text-base"></i> <span>Purge Cache</span>
             </button>
 
@@ -305,7 +305,7 @@
             <a href="{{ route('admin.settings.translations') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.translations*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Translation APIs' : ''">
                 <i class="bi bi-robot text-amber-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Translation APIs</span>
             </a>
-            <button type="button" class="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-slate-400 hover:bg-slate-900 hover:text-white transition clear-cache-trigger" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Purge Cache' : ''">
+            <button type="button" class="w-full text-start flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-slate-400 hover:bg-slate-900 hover:text-white transition clear-cache-trigger" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Purge Cache' : ''">
                 <i class="bi bi-arrow-repeat text-amber-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Purge Cache</span>
             </button>
 
@@ -418,7 +418,7 @@
                         <a href="{{ url('/') }}" target="_blank" class="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-50 font-medium transition">
                             <i class="bi bi-box-arrow-up-right text-cyan-500"></i> View Live Website
                         </a>
-                        <button type="button" class="w-full text-left flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-50 font-medium transition clear-cache-trigger">
+                        <button type="button" class="w-full text-start flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-50 font-medium transition clear-cache-trigger">
                             <i class="bi bi-arrow-repeat text-amber-500"></i> Purge All Caches
                         </button>
                         <div class="border-t border-slate-100 my-1"></div>

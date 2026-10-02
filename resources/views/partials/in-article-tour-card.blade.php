@@ -95,7 +95,7 @@
 <!-- In-Article Interactive Booking Card (Mid-Content Conversion Block) -->
 <div class="my-10 not-prose rounded-3xl border-2 border-primary/25 bg-gradient-to-br from-amber-500/5 via-white to-orange-500/10 p-5 sm:p-7 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group">
     <!-- Decorative Ambient Glow -->
-    <div class="absolute -top-16 -right-16 w-44 h-44 bg-primary/10 rounded-full blur-2xl pointer-events-none group-hover:scale-125 transition-transform duration-700"></div>
+    <div class="absolute -top-16 -end-16 w-44 h-44 bg-primary/10 rounded-full blur-2xl pointer-events-none group-hover:scale-125 transition-transform duration-700"></div>
 
     <!-- Header Pill Bar -->
     <div class="flex items-center justify-between flex-wrap gap-2.5 mb-5 pb-3.5 border-b border-slate-200/70">
@@ -127,18 +127,18 @@
                      height="275">
                 
                 <!-- Duration Badge -->
-                <span class="absolute bottom-3 left-3 bg-slate-950/85 backdrop-blur-md text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow-xs flex items-center gap-1.5">
+                <span class="absolute bottom-3 start-3 bg-slate-950/85 backdrop-blur-md text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow-xs flex items-center gap-1.5">
                     <i class="bi bi-clock text-primary"></i>{{ $tour->duration }}
                 </span>
 
                 <!-- Rating Badge -->
-                <span class="absolute top-3 right-3 bg-white/95 backdrop-blur-md text-slate-900 text-[11px] font-black px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1">
+                <span class="absolute top-3 end-3 bg-white/95 backdrop-blur-md text-slate-900 text-[11px] font-black px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1">
                     <i class="bi bi-star-fill text-amber-500"></i>{{ $tour->rating ?: '4.9' }}
                     <span class="text-slate-500 font-semibold text-[10px]">({{ number_format($tour->review_count ?: 1247) }})</span>
                 </span>
 
                 @if ($tour->is_bestseller)
-                <span class="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1">
+                <span class="absolute top-3 start-3 bg-red-600 text-white text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1">
                     <i class="bi bi-fire text-amber-300"></i> Bestseller
                 </span>
                 @endif
@@ -213,8 +213,8 @@
         <span class="flex items-center gap-1"><i class="bi bi-shield-check text-emerald-600"></i> {{ __('ui.trust.licensed_operator') }}</span>
         <span class="flex items-center gap-1"><i class="bi bi-clock-history text-primary"></i> {{ __('ui.trust.instant_confirmation') }}</span>
         <span class="flex items-center gap-1"><i class="bi bi-arrow-counterclockwise text-blue-600"></i> {{ __('ui.trust_strip.free_cancel') }}</span>
-        <a href="{{ route('tours.show', $tour->slug) }}" class="font-bold text-primary hover:underline ml-auto flex items-center gap-1">
-            <span>Full Tour Itinerary</span><i class="bi bi-chevron-right text-[10px]"></i>
+        <a href="{{ route('tours.show', $tour->slug) }}" class="font-bold text-primary hover:underline ms-auto flex items-center gap-1">
+            <span>Full Tour Itinerary</span><i class="bi bi-chevron-right text-[10px] rtl:rotate-180"></i>
         </a>
     </div>
 </div>
@@ -223,7 +223,7 @@
 <!-- End-of-Article Tour Conversion Showcase (Bottom of Post) -->
 <div class="mt-12 mb-8 rounded-3xl border-2 border-primary/30 bg-slate-900 text-white p-6 sm:p-8 shadow-xl relative overflow-hidden">
     <!-- Ambient Background Accent -->
-    <div class="absolute -bottom-20 -left-20 w-60 h-60 bg-primary/20 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-20 -start-20 w-60 h-60 bg-primary/20 rounded-full blur-3xl pointer-events-none"></div>
 
     <div class="relative z-10">
         <div class="text-center max-w-2xl mx-auto mb-6">
@@ -246,7 +246,7 @@
                              alt="{{ $tour->name }}" 
                              class="w-full h-full object-cover" 
                              loading="lazy">
-                        <span class="absolute top-2.5 right-2.5 bg-slate-900/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                        <span class="absolute top-2.5 end-2.5 bg-slate-900/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
                             <i class="bi bi-star-fill text-amber-400"></i>{{ $tour->rating ?: '4.9' }}
                         </span>
                     </div>
@@ -340,7 +340,7 @@
 <!-- Contextual Sidebar Booking Card -->
 <div class="rounded-2xl p-5 bg-gradient-to-br from-slate-900 to-slate-950 text-white shadow-xl border border-primary/30 relative overflow-hidden group">
     <!-- Ambient Accent Glow -->
-    <div class="absolute -top-12 -right-12 w-32 h-32 bg-primary/20 rounded-full blur-2xl pointer-events-none group-hover:scale-125 transition-transform duration-700"></div>
+    <div class="absolute -top-12 -end-12 w-32 h-32 bg-primary/20 rounded-full blur-2xl pointer-events-none group-hover:scale-125 transition-transform duration-700"></div>
 
     <div class="relative z-10">
         <div class="flex items-center justify-between gap-2 mb-3">
@@ -357,8 +357,8 @@
                  alt="{{ $tour->name }}" 
                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                  loading="lazy">
-            <span class="absolute bottom-2 left-2 bg-slate-950/80 backdrop-blur-md text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                <i class="bi bi-clock mr-1 text-primary"></i>{{ $tour->duration }}
+            <span class="absolute bottom-2 start-2 bg-slate-950/80 backdrop-blur-md text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                <i class="bi bi-clock me-1 text-primary"></i>{{ $tour->duration }}
             </span>
         </div>
 
@@ -437,7 +437,7 @@
             <div class="flex items-baseline gap-1.5">
                 <span class="text-sm font-black text-slate-900" data-aed="{{ $minPrice }}">{{ __('ui.common.aed') }} {{ number_format($minPrice) }}</span>
                 <span class="text-[10px] text-slate-500">/ {{ __('ui.rate_card.per_person') }}</span>
-                <span class="text-[10px] text-amber-500 font-bold ml-1"><i class="bi bi-star-fill text-[9px]"></i> {{ $tour->rating ?: '4.9' }}</span>
+                <span class="text-[10px] text-amber-500 font-bold ms-1"><i class="bi bi-star-fill text-[9px]"></i> {{ $tour->rating ?: '4.9' }}</span>
             </div>
         </div>
 

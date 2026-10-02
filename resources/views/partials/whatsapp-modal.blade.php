@@ -157,7 +157,7 @@
                             class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold text-sm shadow-md shadow-emerald-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                         <i class="bi bi-whatsapp text-lg"></i>
                         <span>Start WhatsApp Chat</span>
-                        <i class="bi bi-arrow-right text-xs"></i>
+                        <i class="bi bi-arrow-right rtl:rotate-180 text-xs"></i>
                     </button>
                 </div>
 

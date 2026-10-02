@@ -40,9 +40,9 @@
     </div>
 
     <!-- Arabic View -->
-    <div x-show="lang === 'ar'" class="text-right space-y-4" dir="rtl" style="display: none;">
+    <div x-show="lang === 'ar'" class="text-start space-y-4" dir="rtl" style="display: none;">
         @if($page->description_ar || $page->description)
-            <div class="p-3.5 bg-slate-50 rounded-2xl text-slate-600 text-xs sm:text-sm border-r-4 border-primary leading-relaxed">
+            <div class="p-3.5 bg-slate-50 rounded-2xl text-slate-600 text-xs sm:text-sm border-s-4 border-primary leading-relaxed">
                 {!! nl2br(e($page->description_ar ?: $page->description)) !!}
             </div>
         @endif
@@ -55,7 +55,7 @@
                 @endif
 
                 @if($section->items->count() > 0)
-                    <ul class="space-y-2 text-xs sm:text-sm text-slate-600 pr-0">
+                    <ul class="space-y-2 text-xs sm:text-sm text-slate-600 pe-0">
                         @foreach($section->items as $item)
                             <li class="flex items-start gap-2">
                                 <i class="bi bi-check2 text-primary shrink-0 mt-0.5 font-bold"></i>

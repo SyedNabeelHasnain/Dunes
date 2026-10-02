@@ -164,7 +164,7 @@
 
                                     <button type="submit" class="w-full py-3.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2" id="claimOfferSubmitBtn">
                                         <span>Claim My {{ (int)$popupDiscount }}% Discount</span>
-                                        <i class="bi bi-arrow-right"></i>
+                                        <i class="bi bi-arrow-right rtl:rotate-180"></i>
                                     </button>
 
                                     <div class="text-center text-slate-500 text-[11px]">
@@ -371,7 +371,7 @@
                 .then(res => res.json().then(data => ({ status: res.status, body: data })))
                 .then(({ status, body }) => {
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<span>Claim My Discount</span> <i class="bi bi-arrow-right"></i>';
+                    submitBtn.innerHTML = '<span>Claim My Discount</span> <i class="bi bi-arrow-right rtl:rotate-180"></i>';
 
                     if (status === 200 && body.success && body.coupon) {
                         const code = body.coupon.code;
@@ -399,7 +399,7 @@
                 })
                 .catch(() => {
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<span>Claim My Discount</span> <i class="bi bi-arrow-right"></i>';
+                    submitBtn.innerHTML = '<span>Claim My Discount</span> <i class="bi bi-arrow-right rtl:rotate-180"></i>';
                     if (errorBox) {
                         errorBox.innerText = 'Network error. Please try again.';
                         errorBox.classList.remove('hidden');

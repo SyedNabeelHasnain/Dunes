@@ -273,7 +273,7 @@ class TourController extends Controller
             ]);
         }
 
-        $allActiveTours = Cache::remember('site_active_tours_search', 600, function () {
+        $allActiveTours = Cache::remember('site_active_tours_search_'.app()->getLocale(), 600, function () {
             return Tour::where('status', 'active')
                 ->with(['tiers', 'category'])
                 ->orderBy('priority', 'asc')

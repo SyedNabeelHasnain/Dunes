@@ -139,9 +139,9 @@
                 </div>
                 <div class="flex gap-4 items-center">
                     @if ($publishedAt)
-                    <span itemprop="datePublished" content="{{ $publishedAt->toIso8601String() }}"><i class="bi bi-calendar3 mr-1 text-primary"></i>{{ $publishedAt->format('F j, Y') }}</span>
+                    <span itemprop="datePublished" content="{{ $publishedAt->toIso8601String() }}"><i class="bi bi-calendar3 me-1 text-primary"></i>{{ $publishedAt->format('F j, Y') }}</span>
                     @endif
-                    <span><i class="bi bi-clock mr-1 text-primary"></i>{{ $post->read_time }} {{ __('ui.blog.read_time') }}</span>
+                    <span><i class="bi bi-clock me-1 text-primary"></i>{{ $post->read_time }} {{ __('ui.blog.read_time') }}</span>
                 </div>
             </div>
         </div>
@@ -231,7 +231,7 @@
 
                 <!-- Social Share Widget -->
                 <div class="mt-10 pt-6 border-t border-slate-200 flex items-center gap-2 sm:gap-3 flex-wrap text-xs">
-                    <span class="font-bold text-slate-500 uppercase tracking-wider text-[11px] mr-2">Share:</span>
+                    <span class="font-bold text-slate-500 uppercase tracking-wider text-[11px] me-2">Share:</span>
                     <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($canonical) }}" target="_blank" rel="noopener noreferrer" class="border border-slate-200 hover:border-primary text-slate-700 hover:text-primary rounded-full px-3.5 py-1.5 transition-colors inline-flex items-center gap-1 font-semibold">
                         <i class="bi bi-facebook text-blue-600"></i>Facebook
                     </a>
@@ -262,7 +262,7 @@
                             <h3 class="font-extrabold text-lg text-white mb-1.5">{{ __('ui.blog_journal.book_now_btn') }}</h3>
                             <p class="text-xs text-white/90 mb-4 leading-relaxed">{{ __('ui.common.from') }} <span data-aed="99" class="font-bold">{{ __('ui.common.aed') }} 99</span> {{ __('ui.common.per_person') }}.</p>
                             <button data-action="open-booking" class="w-full bg-white hover:bg-slate-50 text-slate-950 font-bold rounded-full py-2.5 text-xs transition-colors cursor-pointer shadow-xs mb-2" @click="$store.modal.open('booking')">
-                                <i class="bi bi-calendar-check mr-1.5"></i>{{ __('ui.common.book_now') }}
+                                <i class="bi bi-calendar-check me-1.5"></i>{{ __('ui.common.book_now') }}
                             </button>
                             <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode('Hi! I read your blog about ' . $post->title . ' and would like to know more.') }}" class="w-full border border-white/40 hover:border-white text-white font-bold rounded-full py-2 text-xs transition-colors flex items-center justify-center gap-1.5" target="_blank" rel="noopener noreferrer">
                                 <i class="bi bi-whatsapp text-emerald-300"></i>{{ __('ui.common.whatsapp_inquire') }}
@@ -306,7 +306,7 @@
                                 <img src="{{ $rpImg }}" class="w-13 h-13 object-cover rounded-xl shrink-0" loading="lazy" alt="{{ $rp->title }}">
                                 <div>
                                     <div class="font-bold text-slate-900 text-xs line-clamp-2 group-hover:text-primary transition-colors leading-snug">{{ $rp->title }}</div>
-                                    <span class="text-slate-500 text-[11px] mt-1 block"><i class="bi bi-clock mr-1 text-primary"></i>{{ $rp->read_time }} {{ __('ui.blog.read_time') }}</span>
+                                    <span class="text-slate-500 text-[11px] mt-1 block"><i class="bi bi-clock me-1 text-primary"></i>{{ $rp->read_time }} {{ __('ui.blog.read_time') }}</span>
                                 </div>
                             </a>
                             @endforeach
@@ -340,7 +340,7 @@
                 <a href="{{ route('blog.show', $rp->slug) }}" class="block relative aspect-[16/10] overflow-hidden">
                     <img src="{{ $rpImg }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $rp->featured_image_alt ?: $rp->title }}" loading="lazy">
                     @if ($rp->category)
-                        <span class="absolute top-3 left-3 bg-primary text-white rounded-full px-2.5 py-0.5 text-xs font-bold shadow-sm">{{ $rp->category?->name }}</span>
+                        <span class="absolute top-3 start-3 bg-primary text-white rounded-full px-2.5 py-0.5 text-xs font-bold shadow-sm">{{ $rp->category?->name }}</span>
                     @endif
                 </a>
                 <div class="p-5 flex flex-col flex-grow">
@@ -351,7 +351,7 @@
                         <p class="text-slate-500 text-xs line-clamp-2 mb-3 leading-relaxed">{{ $rp->excerpt }}</p>
                     @endif
                     <div class="text-[11px] text-slate-500 mt-auto pt-2 border-t border-slate-200">
-                        <i class="bi bi-clock mr-1 text-primary"></i>{{ $rp->read_time }} {{ __('ui.blog_journal.min_read') }}
+                        <i class="bi bi-clock me-1 text-primary"></i>{{ $rp->read_time }} {{ __('ui.blog_journal.min_read') }}
                     </div>
                 </div>
             </article>
