@@ -165,9 +165,9 @@ Alpine.store('currency', {
         document.querySelectorAll(priceSelectors.join(',')).forEach(el => {
             if (!el.dataset.aed) {
                 const txt = el.textContent.trim();
-                const match = txt.match(/AED\s*([0-9,]+(?:\.[0-9]{1,2})?)/i) || txt.match(/([0-9,]+(?:\.[0-9]{1,2})?)/);
+                const match = txt.match(/(?:AED|Dhs|د\.إ)\s*([0-9,]+(?:\.[0-9]{1,2})?)/i) || (el.dataset.price ? [null, el.dataset.price] : null);
                 if (match) {
-                    const val = parseFloat(match[1].replace(/,/g, ''));
+                    const val = parseFloat(String(match[1]).replace(/,/g, ''));
                     if (!isNaN(val) && val > 0) {
                         el.dataset.aed = val;
                         const isOld = el.classList.contains('text-decoration-line-through') || el.classList.contains('old') || el.classList.contains('rc-old-price');
@@ -313,6 +313,33 @@ Alpine.store('modal', {
                     if (titleEl) titleEl.textContent = 'Book Your Adventure';
                     if (wrapper) wrapper.classList.remove('hidden', 'd-none');
                 }
+
+                if (data.adults) {
+                    const adultsInput = document.getElementById('bookingAdults');
+                    if (adultsInput) adultsInput.value = data.adults;
+                }
+                if (data.children !== undefined) {
+                    const childrenInput = document.getElementById('bookingChildren');
+                    if (childrenInput) childrenInput.value = data.children;
+                }
+                if (data.date) {
+                    const dateInput = document.getElementById('bookingDate');
+                    if (dateInput) dateInput.value = data.date;
+                }
+
+                if (data.promo || data.coupon) {
+                    const promoCode = String(data.promo || data.coupon).trim().toUpperCase();
+                    const promoInput = document.getElementById('bookingPromoCode');
+                    if (promoInput) {
+                        promoInput.value = promoCode;
+                        setTimeout(() => {
+                            if (typeof window.validateCurrentPromo === 'function') {
+                                window.validateCurrentPromo();
+                            }
+                        }, 350);
+                    }
+                }
+
                 window.App.updateStep?.();
             }
 
@@ -958,6 +985,9 @@ const App = {
     },
 
     initEmailVerification() {
+        if (!window.DunesConfig?.email_verification_required) {
+            return;
+        }
         const inputs = document.querySelectorAll('input[type="email"]');
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -2125,7 +2155,15 @@ const App = {
                 data.tiers.forEach(t => {
                     const save = t.old_price > t.price ? Math.round(((t.old_price - t.price) / t.old_price) * 100) : 0;
                     const pType = (t.price_type || 'per person').toLowerCase();
-                    h += `<div class="tier-card${t.is_popular ? ' popular' : ''}" data-tier="${t.id}" data-price="${t.price}" data-name="${t.name}" data-price-type="${pType}">
+                    let capacity = 2;
+                    if (t.capacity && parseInt(t.capacity, 10) > 0) {
+                        capacity = parseInt(t.capacity, 10);
+                    } else if (/(4|four)/i.test(t.name || '')) {
+                        capacity = 4;
+                    } else if (/(1|single|solo)/i.test(t.name || '')) {
+                        capacity = 1;
+                    }
+                    h += `<div class="tier-card${t.is_popular ? ' popular' : ''}" data-tier="${t.id}" data-price="${t.price}" data-name="${t.name}" data-price-type="${pType}" data-capacity="${capacity}">
                         ${t.is_popular ? '<div class="tier-popular-badge">Popular</div>' : ''}
                         <div class="tier-card-inner">
                             <div class="tier-card-info">
@@ -2264,7 +2302,9 @@ const App = {
         const priceType = (selectedTierCard?.dataset.priceType || 'per person').toLowerCase();
         let total = 0;
         if (['per buggy', 'per vehicle', 'per group', 'private'].includes(priceType)) {
-            total = price;
+            const capacity = parseInt(selectedTierCard?.dataset.capacity || '2', 10) || 2;
+            const vehicles = Math.ceil((adults + children) / capacity);
+            total = price * vehicles;
         } else {
             total = (price * adults) + (price * 0.70 * children);
         }
@@ -2280,7 +2320,9 @@ const App = {
 
         let baseTotal = 0;
         if (['per buggy', 'per vehicle', 'per group', 'private'].includes(priceType)) {
-            baseTotal = this.selectedPrice;
+            const capacity = parseInt(selectedTierCard?.dataset.capacity || '2', 10) || 2;
+            const vehicles = Math.ceil((adults + children) / capacity);
+            baseTotal = this.selectedPrice * vehicles;
         } else {
             baseTotal = (this.selectedPrice * adults) + (this.selectedPrice * 0.70 * children);
         }

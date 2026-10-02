@@ -592,7 +592,7 @@
             Swal.fire({
                 icon: 'success',
                 title: 'Success',
-                text: "{{ session('success') }}",
+                text: @js(session('success')),
                 timer: 3000,
                 showConfirmButton: false,
                 toast: true,
@@ -604,7 +604,7 @@
             Swal.fire({
                 icon: 'success',
                 title: 'Success',
-                text: "{{ session('status') === 'profile-updated' ? 'Profile details updated successfully!' : (session('status') === 'password-updated' ? 'Password changed successfully!' : session('status')) }}",
+                text: @js(session('status') === 'profile-updated' ? 'Profile details updated successfully!' : (session('status') === 'password-updated' ? 'Password changed successfully!' : session('status'))),
                 timer: 3000,
                 showConfirmButton: false,
                 toast: true,
@@ -616,7 +616,7 @@
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: "{{ session('error') }}",
+                text: @js(session('error')),
                 confirmButtonColor: '#F69044'
             });
         @endif
@@ -625,7 +625,7 @@
             Swal.fire({
                 icon: 'error',
                 title: 'Validation Error',
-                html: '<ul style="text-align:left; font-size:13px;">@foreach($errors->all() as $err)<li>{{ $err }}</li>@endforeach</ul>',
+                html: @js('<ul style="text-align:left; font-size:13px;">' . implode('', array_map(fn($e) => '<li>' . e($e) . '</li>', $errors->all())) . '</ul>'),
                 confirmButtonColor: '#F69044'
             });
         @endif

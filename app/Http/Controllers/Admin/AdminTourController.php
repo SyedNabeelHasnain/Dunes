@@ -116,6 +116,7 @@ class AdminTourController extends Controller
 
         Cache::forget('site_tours_header_cache');
         Cache::forget('site_home_cache');
+        Cache::forget('site_active_tours_search');
         Cache::forget('sitemap_tours_xml');
         Cache::forget('sitemap_images_xml');
 
@@ -214,6 +215,7 @@ class AdminTourController extends Controller
 
         Cache::forget('site_tours_header_cache');
         Cache::forget('site_home_cache');
+        Cache::forget('site_active_tours_search');
         Cache::forget('sitemap_tours_xml');
         Cache::forget('sitemap_images_xml');
 
@@ -229,6 +231,7 @@ class AdminTourController extends Controller
         $tour->delete();
         Cache::forget('site_tours_header_cache');
         Cache::forget('site_home_cache');
+        Cache::forget('site_active_tours_search');
         Cache::forget('sitemap_tours_xml');
         Cache::forget('sitemap_images_xml');
 
@@ -458,6 +461,10 @@ class AdminTourController extends Controller
             }
         }
 
+        Cache::forget('site_tours_header_cache');
+        Cache::forget('site_home_cache');
+        Cache::forget('site_active_tours_search');
+
         return redirect()->route('admin.pricing.index')->with('success', 'Pricing updated successfully.');
     }
 
@@ -606,6 +613,7 @@ class AdminTourController extends Controller
 
         Cache::forget('site_tours_header_cache');
         Cache::forget('site_home_cache');
+        Cache::forget('site_active_tours_search');
         Cache::forget('sitemap_tours_xml');
         Cache::forget('sitemap_images_xml');
 

@@ -667,8 +667,10 @@ document.addEventListener('DOMContentLoaded', function() {
         totalDisplayEl.innerText = `AED ${finalTotal}`;
 
         // Dynamic currency conversion
-        if (window.DunesApp && typeof window.DunesApp.updatePrices === 'function') {
-            window.DunesApp.updatePrices();
+        if (window.Alpine && window.Alpine.store('currency')) {
+            window.Alpine.store('currency').convertAllPrices();
+        } else if (window.DunesApp && typeof window.DunesApp.convertAllPrices === 'function') {
+            window.DunesApp.convertAllPrices();
         }
 
         // WhatsApp pre-filled text
@@ -687,8 +689,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Book Now Handler: transfer custom spec to Booking Modal
     if (bookNowBtn) {
         bookNowBtn.addEventListener('click', function() {
+            const promo = (promoInputEl ? promoInputEl.value : '').trim();
             if (window.Alpine && window.Alpine.store('modal')) {
-                window.Alpine.store('modal').open('booking', { tourId: state.base.tourId });
+                window.Alpine.store('modal').open('booking', { 
+                    tourId: state.base.tourId,
+                    adults: state.adults,
+                    children: state.children,
+                    promo: promo || undefined
+                });
             }
 
             // Set Tour ID in select
@@ -722,7 +730,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             // Apply promo code if entered
-            const promo = (promoInputEl.value || '').trim();
             if (promo) {
                 const promoInput = document.getElementById('bookingPromoCode');
                 if (promoInput) promoInput.value = promo;

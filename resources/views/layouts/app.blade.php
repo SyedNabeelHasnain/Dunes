@@ -52,7 +52,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        body, html, input, button, select, textarea, .font-sans {
+        [dir="rtl"], [dir="rtl"] body, [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4, [dir="rtl"] h5, [dir="rtl"] h6, [dir="rtl"] p, [dir="rtl"] span, [dir="rtl"] a, [dir="rtl"] input, [dir="rtl"] button, [dir="rtl"] select, [dir="rtl"] textarea, [dir="rtl"] .font-sans, [dir="rtl"] .font-heading {
             font-family: 'Cairo', system-ui, -apple-system, sans-serif !important;
         }
     </style>
@@ -375,7 +375,7 @@
 <body class="flex flex-col min-h-screen bg-slate-50 text-slate-900 antialiased font-sans selection:bg-orange-500 selection:text-white" x-data="{}" :class="{ 'overflow-hidden': $store.mobileNav.open || $store.modal.active }">
 
     <!-- WCAG 2.2 SC 2.4.1 Skip to Main Content Link -->
-    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2.5 focus:bg-primary focus:text-white focus:rounded-xl focus:shadow-lg focus:font-bold">Skip to main content</a>
+    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:start-4 focus:z-50 focus:px-4 focus:py-2.5 focus:bg-primary focus:text-white focus:rounded-xl focus:shadow-lg focus:font-bold">Skip to main content</a>
 
     @if($googleActive && !empty($gtmId) && strpos($gtmId, 'G-') !== 0)
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ $gtmId }}" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -399,8 +399,8 @@
                     <ul class="hidden lg:flex items-center gap-1 xl:gap-2 text-sm font-semibold text-slate-700">
                         <li class="relative" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">
                             <div class="inline-flex items-center rounded-xl {{ request()->routeIs('tours.*') ? 'bg-slate-900 text-white font-bold shadow-xs' : '' }}">
-                                <a class="px-3 py-2 rounded-l-xl transition-all {{ request()->routeIs('tours.*') ? 'text-white' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('tours.index') }}">{{ __('ui.nav.all_tours') }}</a>
-                                <button type="button" @click="open = !open" :aria-expanded="open" class="px-1.5 py-2 rounded-r-xl transition-all hover:opacity-80 cursor-pointer" aria-label="Toggle Tours Submenu">
+                                <a class="px-3 py-2 rounded-s-xl transition-all {{ request()->routeIs('tours.*') ? 'text-white' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('tours.index') }}">{{ __('ui.nav.all_tours') }}</a>
+                                <button type="button" @click="open = !open" :aria-expanded="open" class="px-1.5 py-2 rounded-e-xl transition-all hover:opacity-80 cursor-pointer" aria-label="Toggle Tours Submenu">
                                     <i class="bi bi-chevron-down text-[10px] transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
                                 </button>
                             </div>
@@ -412,7 +412,7 @@
                                  x-transition:leave="transition ease-in duration-100"
                                  x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                                  x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
-                                 class="absolute left-0 mt-2 w-72 rounded-2xl bg-white p-2 shadow-xl border border-slate-200 z-50 focus:outline-none"
+                                 class="absolute start-0 mt-2 w-72 rounded-2xl bg-white p-2 shadow-xl border border-slate-200 z-50 focus:outline-none"
                                  style="display: none;">
                                 <a class="flex items-center gap-2 px-3 py-2.5 rounded-xl font-bold text-primary hover:bg-orange-50 transition-colors text-xs" href="{{ route('tours.customizer') }}">
                                     <i class="bi bi-sliders text-amber-500"></i>
@@ -510,7 +510,7 @@
              x-transition:leave="transition ease-in duration-200 transform"
              x-transition:leave-start="translate-x-0"
              x-transition:leave-end="translate-x-full"
-             class="fixed inset-y-0 right-0 max-w-xs sm:max-w-sm w-full bg-white z-50 shadow-2xl p-5 flex flex-col justify-between overflow-y-auto lg:hidden"
+             class="fixed inset-y-0 end-0 max-w-xs sm:max-w-sm w-full bg-white z-50 shadow-2xl p-5 flex flex-col justify-between overflow-y-auto lg:hidden"
              style="display: none;"
              id="mainOffcanvas">
             <div>
@@ -527,15 +527,14 @@
                 </div>
 
                 <!-- Search Input in Drawer -->
-                <!-- Search Input in Drawer -->
                 <form action="{{ route('tours.search') }}" method="GET" class="relative mb-3">
-                    <i class="bi bi-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
-                    <input type="text" name="q" class="w-full rounded-full pl-9 pr-4 py-2 bg-slate-100 text-slate-800 text-xs font-semibold border-0 focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="{{ __('ui.nav.search_placeholder') }}" required>
+                    <i class="bi bi-search absolute start-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                    <input type="text" name="q" class="w-full rounded-full ps-9 pe-4 py-2 bg-slate-100 text-slate-800 text-xs font-semibold border-0 focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="{{ __('ui.nav.search_placeholder') }}" required>
                 </form>
 
                 <!-- Interactive Features CTAs -->
                 <div class="space-y-2 mb-4">
-                    <button type="button" class="w-full rounded-2xl p-3 flex items-center justify-between text-left border border-amber-400/30 shadow-xs cursor-pointer" style="background: linear-gradient(135deg, #1E293B, #0F172A);" @click="$store.mobileNav.close(); $store.modal.open('safari-matcher');">
+                    <button type="button" class="w-full rounded-2xl p-3 flex items-center justify-between text-start border border-amber-400/30 shadow-xs cursor-pointer" style="background: linear-gradient(135deg, #1E293B, #0F172A);" @click="$store.mobileNav.close(); $store.modal.open('safari-matcher');">
                         <div class="flex items-center gap-2.5">
                             <span class="text-amber-400 text-lg"><i class="bi bi-compass"></i></span>
                             <div>
@@ -547,12 +546,12 @@
                         <span class="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[9px]">{{ $conciergePromoDiscount }}% OFF</span>
                         @endif
                     </button>
-                    <a href="{{ route('tours.customizer') }}" class="w-full rounded-2xl p-2.5 flex items-center justify-between text-left border border-slate-200 bg-slate-50 hover:bg-orange-50 text-slate-800 font-bold text-xs transition-colors" @click="$store.mobileNav.close()">
+                    <a href="{{ route('tours.customizer') }}" class="w-full rounded-2xl p-2.5 flex items-center justify-between text-start border border-slate-200 bg-slate-50 hover:bg-orange-50 text-slate-800 font-bold text-xs transition-colors" @click="$store.mobileNav.close()">
                         <span class="flex items-center gap-2">
                             <i class="bi bi-sliders text-primary"></i>
                             <span>{{ __('ui.nav.customizer') }}</span>
                         </span>
-                        <i class="bi bi-chevron-right text-slate-500 text-[10px]"></i>
+                        <i class="bi bi-chevron-right text-slate-500 text-[10px] rtl:rotate-180"></i>
                     </a>
                 </div>
 
@@ -733,7 +732,7 @@
             
             <!-- Bottom Bar with Legal Links and Payment Badges -->
             <div class="border-t border-slate-800/80 pt-6">
-                <div class="flex flex-col lg:flex-row items-center justify-between gap-4 text-center lg:text-left">
+                <div class="flex flex-col lg:flex-row items-center justify-between gap-4 text-center lg:text-start">
                     <div>
                         <p class="text-slate-400 text-xs mb-1">{{ __('ui.footer.license_line', ['year' => date('Y'), 'name' => $settings['site_name'] ?? 'Dunes Discovery Tourism L.L.C.', 'license' => $settings['company_license_number'] ?? '1430583']) }}</p>
                         <div class="flex flex-wrap justify-center lg:justify-start items-center gap-x-2.5 gap-y-1 text-xs text-slate-300">
@@ -781,7 +780,7 @@
     @include('partials.whatsapp-modal')
 
     <!-- Global Toast Container for App.toast notifications -->
-    <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 p-3 pointer-events-none" aria-live="polite" aria-atomic="true"></div>
+    <div id="toastContainer" class="fixed bottom-4 end-4 z-[60] flex flex-col gap-2 p-3 pointer-events-none" aria-live="polite" aria-atomic="true"></div>
 
     <script>
         window.DunesRates = {

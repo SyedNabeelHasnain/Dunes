@@ -54,7 +54,7 @@
             </div>
             
             <div class="p-6">
-                <form action="{{ route('admin.blogs.store') }}" method="POST" enctype="multipart/form-data" @submit="validateAll($event)">
+                <form action="{{ route('admin.blogs.store') }}" method="POST" enctype="multipart/form-data" novalidate @submit="validateAll($event)">
                     @csrf
 
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -92,8 +92,7 @@
                                                    dir="{{ $lang->isRtl() ? 'rtl' : 'ltr' }}"
                                                    class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden {{ $lang->isRtl() ? 'text-right font-arabic' : '' }}"
                                                    value="{{ old('title.'.$lang->code) }}"
-                                                   placeholder="{{ $lang->code === 'en' ? 'e.g. 10 Best Things to Do in Dubai Desert' : '' }}"
-                                                   required>
+                                                   placeholder="{{ $lang->code === 'en' ? 'e.g. 10 Best Things to Do in Dubai Desert' : '' }}">
                                         </div>
 
                                         <div>
@@ -104,8 +103,7 @@
                                                       dir="{{ $lang->isRtl() ? 'rtl' : 'ltr' }}"
                                                       rows="2"
                                                       class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800 placeholder-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden {{ $lang->isRtl() ? 'text-right font-arabic' : '' }}"
-                                                      placeholder="{{ $lang->code === 'en' ? 'Brief summary displayed on listings' : '' }}"
-                                                      required>{{ old('excerpt.'.$lang->code) }}</textarea>
+                                                      placeholder="{{ $lang->code === 'en' ? 'Brief summary displayed on listings' : '' }}">{{ old('excerpt.'.$lang->code) }}</textarea>
                                         </div>
 
                                         <div>
@@ -116,8 +114,7 @@
                                                       dir="{{ $lang->isRtl() ? 'rtl' : 'ltr' }}"
                                                       class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 wysiwyg-editor focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden {{ $lang->isRtl() ? 'text-right font-arabic' : '' }}"
                                                       rows="12"
-                                                      placeholder="{{ $lang->code === 'en' ? 'Write article here...' : '' }}"
-                                                      required>{{ old('content.'.$lang->code) }}</textarea>
+                                                      placeholder="{{ $lang->code === 'en' ? 'Write article here...' : '' }}">{{ old('content.'.$lang->code) }}</textarea>
                                         </div>
                                     </div>
                                 @endforeach

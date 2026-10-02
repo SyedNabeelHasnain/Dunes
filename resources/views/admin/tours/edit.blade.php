@@ -62,7 +62,7 @@
                     </div>
                     
                     <div class="p-6">
-                        <form action="{{ route('admin.tours.update', $tour->id) }}" method="POST" enctype="multipart/form-data" id="editTourForm" @submit="validateAll($event)">
+                        <form action="{{ route('admin.tours.update', $tour->id) }}" method="POST" enctype="multipart/form-data" id="editTourForm" novalidate @submit="validateAll($event)">
                             @csrf
                             @method('PUT')
 
@@ -91,8 +91,7 @@
                                                    data-field="name"
                                                    dir="{{ $lang->isRtl() ? 'rtl' : 'ltr' }}"
                                                    class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden {{ $lang->isRtl() ? 'text-right font-arabic' : '' }}"
-                                                   value="{{ old('name.'.$lang->code, $tour->getTranslation('name', $lang->code, false)) }}"
-                                                   required>
+                                                   value="{{ old('name.'.$lang->code, $tour->getTranslation('name', $lang->code, false)) }}">
                                         </div>
 
                                         <div>
@@ -102,8 +101,7 @@
                                                       data-field="short_desc"
                                                       dir="{{ $lang->isRtl() ? 'rtl' : 'ltr' }}"
                                                       rows="2"
-                                                      class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden {{ $lang->isRtl() ? 'text-right font-arabic' : '' }}"
-                                                      required>{{ old('short_desc.'.$lang->code, $tour->getTranslation('short_desc', $lang->code, false)) }}</textarea>
+                                                      class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden {{ $lang->isRtl() ? 'text-right font-arabic' : '' }}">{{ old('short_desc.'.$lang->code, $tour->getTranslation('short_desc', $lang->code, false)) }}</textarea>
                                         </div>
 
                                         <div>
@@ -113,8 +111,7 @@
                                                       data-field="full_desc"
                                                       dir="{{ $lang->isRtl() ? 'rtl' : 'ltr' }}"
                                                       class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 wysiwyg-editor focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden {{ $lang->isRtl() ? 'text-right font-arabic' : '' }}"
-                                                      rows="6"
-                                                      required>{{ old('full_desc.'.$lang->code, $tour->getTranslation('full_desc', $lang->code, false)) }}</textarea>
+                                                      rows="6">{{ old('full_desc.'.$lang->code, $tour->getTranslation('full_desc', $lang->code, false)) }}</textarea>
                                         </div>
                                     </div>
                                 @endforeach

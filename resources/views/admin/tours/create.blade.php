@@ -48,7 +48,7 @@
 
             <x-admin.language-bar :languages="$languages" :required-fields="['name', 'short_desc', 'full_desc']" :html-fields="['full_desc']" />
 
-            <form action="{{ route('admin.tours.store') }}" method="POST" enctype="multipart/form-data" @submit="validateAll($event)">
+            <form action="{{ route('admin.tours.store') }}" method="POST" enctype="multipart/form-data" novalidate @submit="validateAll($event)">
                 @csrf
 
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -89,8 +89,7 @@
                                                dir="{{ $lang->isRtl() ? 'rtl' : 'ltr' }}"
                                                class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden {{ $lang->isRtl() ? 'text-right font-arabic' : '' }}"
                                                value="{{ old('name.'.$lang->code) }}"
-                                               placeholder="e.g. {{ $lang->code === 'ar' ? 'رحلة سفاري صحراوية مسائية فاخرة' : 'Premium Desert Safari' }}"
-                                               required>
+                                               placeholder="e.g. {{ $lang->code === 'ar' ? 'رحلة سفاري صحراوية مسائية فاخرة' : 'Premium Desert Safari' }}">
                                     </div>
 
                                     <div>
@@ -101,8 +100,7 @@
                                                   dir="{{ $lang->isRtl() ? 'rtl' : 'ltr' }}"
                                                   rows="2"
                                                   class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 placeholder-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden {{ $lang->isRtl() ? 'text-right font-arabic' : '' }}"
-                                                  placeholder="Brief tagline shown on cards"
-                                                  required>{{ old('short_desc.'.$lang->code) }}</textarea>
+                                                  placeholder="Brief tagline shown on cards">{{ old('short_desc.'.$lang->code) }}</textarea>
                                     </div>
 
                                     <div>
@@ -113,8 +111,7 @@
                                                   dir="{{ $lang->isRtl() ? 'rtl' : 'ltr' }}"
                                                   class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 wysiwyg-editor focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden {{ $lang->isRtl() ? 'text-right font-arabic' : '' }}"
                                                   rows="6"
-                                                  placeholder="Detailed description shown on details page"
-                                                  required>{{ old('full_desc.'.$lang->code) }}</textarea>
+                                                  placeholder="Detailed description shown on details page">{{ old('full_desc.'.$lang->code) }}</textarea>
                                     </div>
                                 </div>
                             @endforeach

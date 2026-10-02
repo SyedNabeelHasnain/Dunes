@@ -397,7 +397,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const p = parseFloat(selectedTierCard.dataset.price) || 0;
                 const pType = (selectedTierCard.dataset.priceType || 'per person').toLowerCase();
                 if (['per buggy', 'per vehicle', 'per group', 'private'].includes(pType)) {
-                    subtotal = p;
+                    const capacity = parseInt(selectedTierCard.dataset.capacity || '2', 10) || 2;
+                    const vehicles = Math.ceil((adults + children) / capacity);
+                    subtotal = p * vehicles;
                 } else {
                     subtotal = (p * adults) + (p * 0.70 * children);
                 }

@@ -9,6 +9,7 @@ use App\Models\Language;
 use App\Models\Tour;
 use App\Traits\NormalizesLocalizedInputs;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class AdminFaqController extends Controller
 {
@@ -58,6 +59,8 @@ class AdminFaqController extends Controller
             'entity_id' => $entityId,
         ]);
 
+        Cache::forget('site_home_cache');
+
         return redirect()->route('admin.faqs.index')->with('success', 'FAQ created successfully.');
     }
 
@@ -96,6 +99,8 @@ class AdminFaqController extends Controller
             'entity_id' => $entityId,
         ]);
 
+        Cache::forget('site_home_cache');
+
         return redirect()->route('admin.faqs.index')->with('success', 'FAQ updated successfully.');
     }
 
@@ -108,6 +113,8 @@ class AdminFaqController extends Controller
         FaqAssignment::where('faq_id', $faq->id)->delete();
         $faq->delete();
 
+        Cache::forget('site_home_cache');
+
         return redirect()->route('admin.faqs.index')->with('success', 'FAQ deleted successfully.');
     }
 
@@ -119,6 +126,8 @@ class AdminFaqController extends Controller
         $faq = Faq::findOrFail($id);
         $faq->status = $faq->status === 'active' ? 'inactive' : 'active';
         $faq->save();
+
+        Cache::forget('site_home_cache');
 
         return response()->json([
             'success' => true,

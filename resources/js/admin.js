@@ -341,6 +341,9 @@ window.initQuillEditors = function() {
         if (textarea.dataset.quillInitialized === 'true') return;
         textarea.dataset.quillInitialized = 'true';
 
+        // Strip native required attribute so hidden textarea never blocks form submission
+        textarea.removeAttribute('required');
+
         const wrapper = document.createElement('div');
         wrapper.className = 'quill-editor-container mb-3 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden';
         textarea.parentNode.insertBefore(wrapper, textarea);
@@ -366,10 +369,12 @@ window.initQuillEditors = function() {
 
         quill.on('text-change', () => {
             textarea.value = quill.root.innerHTML === '<p><br></p>' ? '' : quill.root.innerHTML;
+            textarea.dispatchEvent(new Event('input', { bubbles: true }));
         });
 
         const form = textarea.closest('form');
         if (form) {
+            form.setAttribute('novalidate', 'true');
             form.addEventListener('submit', () => {
                 textarea.value = quill.root.innerHTML === '<p><br></p>' ? '' : quill.root.innerHTML;
             });

@@ -55,7 +55,14 @@ class AdminBlogController extends Controller
             $request->except(['tags', 'featured_image']),
             ['title', 'subtitle', 'excerpt', 'content', 'meta_title', 'meta_desc', 'meta_keywords']
         );
-        $data['slug'] = Str::slug($this->extractSlugSource($request->title));
+        $baseSlug = Str::slug($this->extractSlugSource($request->title)) ?: 'article';
+        $slug = $baseSlug;
+        $counter = 1;
+        while (BlogPost::where('slug', $slug)->exists()) {
+            $slug = $baseSlug.'-'.$counter;
+            $counter++;
+        }
+        $data['slug'] = $slug;
 
         if ($request->hasFile('featured_image')) {
             $data['featured_image'] = $request->file('featured_image')->store('blogs', 'public');
@@ -118,7 +125,14 @@ class AdminBlogController extends Controller
             ['title', 'subtitle', 'excerpt', 'content', 'meta_title', 'meta_desc', 'meta_keywords']
         );
         if ($request->has('title')) {
-            $data['slug'] = Str::slug($this->extractSlugSource($request->title));
+            $baseSlug = Str::slug($this->extractSlugSource($request->title)) ?: 'article';
+            $slug = $baseSlug;
+            $counter = 1;
+            while (BlogPost::where('slug', $slug)->where('id', '!=', $post->id)->exists()) {
+                $slug = $baseSlug.'-'.$counter;
+                $counter++;
+            }
+            $data['slug'] = $slug;
         }
 
         if ($request->hasFile('featured_image')) {

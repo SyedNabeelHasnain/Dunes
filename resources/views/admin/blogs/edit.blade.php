@@ -57,7 +57,7 @@
             </div>
             
             <div class="p-6">
-                <form action="{{ route('admin.blogs.update', $post->id) }}" method="POST" enctype="multipart/form-data" @submit="validateAll($event)">
+                <form action="{{ route('admin.blogs.update', $post->id) }}" method="POST" enctype="multipart/form-data" novalidate @submit="validateAll($event)">
                     @csrf
                     @method('PUT')
 
@@ -93,8 +93,7 @@
                                                    data-field="title"
                                                    dir="{{ $lang->isRtl() ? 'rtl' : 'ltr' }}"
                                                    class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden {{ $lang->isRtl() ? 'text-right font-arabic' : '' }}"
-                                                   value="{{ old('title.'.$lang->code, $post->getTranslation('title', $lang->code, false)) }}"
-                                                   required>
+                                                   value="{{ old('title.'.$lang->code, $post->getTranslation('title', $lang->code, false)) }}">
                                         </div>
 
                                         <div>
@@ -104,8 +103,7 @@
                                                       data-field="excerpt"
                                                       dir="{{ $lang->isRtl() ? 'rtl' : 'ltr' }}"
                                                       rows="2"
-                                                      class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden {{ $lang->isRtl() ? 'text-right font-arabic' : '' }}"
-                                                      required>{{ old('excerpt.'.$lang->code, $post->getTranslation('excerpt', $lang->code, false)) }}</textarea>
+                                                      class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden {{ $lang->isRtl() ? 'text-right font-arabic' : '' }}">{{ old('excerpt.'.$lang->code, $post->getTranslation('excerpt', $lang->code, false)) }}</textarea>
                                         </div>
 
                                         <div>
@@ -115,8 +113,7 @@
                                                       data-field="content"
                                                       dir="{{ $lang->isRtl() ? 'rtl' : 'ltr' }}"
                                                       class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 wysiwyg-editor focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden {{ $lang->isRtl() ? 'text-right font-arabic' : '' }}"
-                                                      rows="12"
-                                                      required>{{ old('content.'.$lang->code, $post->getTranslation('content', $lang->code, false)) }}</textarea>
+                                                      rows="12">{{ old('content.'.$lang->code, $post->getTranslation('content', $lang->code, false)) }}</textarea>
                                         </div>
                                     </div>
                                 @endforeach

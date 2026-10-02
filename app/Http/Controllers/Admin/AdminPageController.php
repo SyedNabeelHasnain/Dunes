@@ -112,15 +112,23 @@ class AdminPageController extends Controller
             ['title', 'subtitle', 'body']
         );
 
-        $section->update([
+        $updatePayload = [
             'name' => $request->input('name'),
             'title' => $data['title'] ?? null,
             'subtitle' => $data['subtitle'] ?? null,
-            'body' => $data['body'] ?? null,
-            'extra_data' => $request->input('extra_data'),
             'order' => (int) $request->input('order', $section->order),
             'is_active' => $request->has('is_active') ? (bool) $request->input('is_active') : $section->is_active,
-        ]);
+        ];
+
+        if ($request->has('body')) {
+            $updatePayload['body'] = $data['body'] ?? null;
+        }
+
+        if ($request->has('extra_data')) {
+            $updatePayload['extra_data'] = $request->input('extra_data');
+        }
+
+        $section->update($updatePayload);
 
         app(CmsContentService::class)->clearCache();
 

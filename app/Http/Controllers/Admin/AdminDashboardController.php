@@ -458,6 +458,9 @@ class AdminDashboardController extends Controller
             'payment' => [
                 'link' => $intent['redirect_url'],
                 'amount' => $amount,
+                'name' => $name,
+                'phone' => $phone,
+                'email' => $email,
                 'created_at' => now()->format('Y-m-d H:i:s'),
                 'status' => $intent['status'] ?? 'pending',
                 'notes' => $description,

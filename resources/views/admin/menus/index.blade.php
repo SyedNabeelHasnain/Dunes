@@ -66,7 +66,14 @@
                         </td>
                         <td class="py-3 px-4 text-right pe-4">
                             <div class="inline-flex items-center gap-2">
-                                <button type="button" @click="activeItem = {{ json_encode($item) }}; editModal = true" class="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 text-xs font-bold transition" title="Edit">
+                                <button type="button" @click="activeItem = {
+                                    id: {{ $item->id }},
+                                    url: {{ json_encode($item->url) }},
+                                    order: {{ (int)$item->order }},
+                                    target: {{ json_encode($item->target ?? '_self') }},
+                                    is_active: {{ $item->is_active ? 'true' : 'false' }},
+                                    labels: {{ json_encode($labels) }}
+                                }; editModal = true" class="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 text-xs font-bold transition" title="Edit">
                                     <i class="bi bi-pencil"></i>
                                 </button>
                                 <form action="{{ route('admin.menus.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Delete this menu link?')">
@@ -128,6 +135,65 @@
                 <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
                     <button type="button" @click="addModal = false" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 transition">Cancel</button>
                     <button type="submit" class="px-5 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold shadow-xs transition">Create Link</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Link Modal -->
+    <div x-show="editModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs" style="display: none;">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-lg w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto" @click.outside="editModal = false">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <h3 class="text-sm font-black text-slate-900">Edit Menu Link</h3>
+                <button type="button" @click="editModal = false" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
+            </div>
+            <form :action="'{{ url('/admin/menus') }}/' + (activeItem ? activeItem.id : '')" method="POST" class="space-y-3">
+                @csrf
+                @method('PUT')
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Target URL *</label>
+                        <input type="text" name="url" :value="activeItem ? activeItem.url : ''" placeholder="/tours or https://..." class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs text-slate-800" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Display Order</label>
+                        <input type="number" name="order" :value="activeItem ? activeItem.order : 0" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs text-slate-800">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Target Window</label>
+                        <select name="target" :value="activeItem ? activeItem.target : '_self'" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs text-slate-800 bg-white">
+                            <option value="_self">Same Window (_self)</option>
+                            <option value="_blank">New Tab (_blank)</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center pt-5">
+                        <label class="inline-flex items-center gap-2 cursor-pointer">
+                            <input type="hidden" name="is_active" value="0">
+                            <input type="checkbox" name="is_active" value="1" :checked="activeItem && activeItem.is_active" class="rounded border-slate-300 text-primary focus:ring-primary">
+                            <span class="text-xs font-bold text-slate-700">Link is Active</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="space-y-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Link Labels (Multilingual)</span>
+                    @foreach($languages as $lang)
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-600 mb-0.5">
+                            {{ $lang->flag }} {{ $lang->name }} ({{ strtoupper($lang->code) }})
+                        </label>
+                        <input type="text" name="label[{{ $lang->code }}]" :value="activeItem && activeItem.labels ? (activeItem.labels['{{ $lang->code }}'] || '') : ''" placeholder="Label in {{ $lang->name }}" class="w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs bg-white text-slate-800" dir="{{ $lang->direction }}" {{ $lang->code === 'en' ? 'required' : '' }}>
+                    </div>
+                    @endforeach
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button type="button" @click="editModal = false" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 transition">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold shadow-xs transition">Save Changes</button>
                 </div>
             </form>
         </div>

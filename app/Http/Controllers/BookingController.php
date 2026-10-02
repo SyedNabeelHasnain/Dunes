@@ -107,7 +107,16 @@ class BookingController extends Controller
         $childPrice = round($price * 0.70, 2);
 
         if (in_array($priceType, ['per buggy', 'per vehicle', 'per group', 'private'])) {
-            $subtotal = $price;
+            $capacity = 2;
+            if (isset($tier->vehicle_capacity) && (int) $tier->vehicle_capacity > 0) {
+                $capacity = (int) $tier->vehicle_capacity;
+            } elseif (preg_match('/(4|four)/i', $tier->name ?? '')) {
+                $capacity = 4;
+            } elseif (preg_match('/(1|single|solo)/i', $tier->name ?? '')) {
+                $capacity = 1;
+            }
+            $vehicles = (int) ceil(($adults + $children) / max(1, $capacity));
+            $subtotal = $vehicles * $price;
         } else {
             // Children get a 30% discount (they pay 70% of the adult price)
             $subtotal = ($price * $adults) + ($childPrice * $children);
@@ -457,40 +466,58 @@ class BookingController extends Controller
                 $intentStatus = $intent['status'] ?? '';
 
                 if ($intentStatus === 'completed') {
-                    $wasCompleted = ($paymentRecord && $paymentRecord->status === 'completed');
+                    $shouldNotify = false;
+                    $newStatus = 'paid';
 
-                    if ($paymentRecord && ! $wasCompleted) {
-                        $paymentRecord->update(['status' => 'completed']);
-                    }
+                    DB::transaction(function () use (
+                        $booking, $paymentRecord, $intent, $intentStatus, $method, &$shouldNotify, &$newStatus
+                    ) {
+                        $lockedBooking = Booking::where('id', $booking->id)->lockForUpdate()->first();
+                        $lockedPayment = $paymentRecord ? BookingPayment::where('id', $paymentRecord->id)->lockForUpdate()->first() : null;
 
-                    $totalPaid = BookingPayment::where('booking_id', $booking->id)
-                        ->where('status', 'completed')
-                        ->sum('amount');
+                        $wasCompleted = ($lockedPayment && $lockedPayment->status === 'completed')
+                            || ($lockedBooking && $lockedBooking->status === 'confirmed' && in_array($lockedBooking->payment_status, ['paid', 'partial']));
 
-                    if ($totalPaid <= 0 && isset($intent['amount'])) {
-                        $totalPaid = (float) ($intent['amount'] / 100);
-                    }
+                        if ($lockedPayment && $lockedPayment->status !== 'completed') {
+                            $lockedPayment->update(['status' => 'completed']);
+                        }
 
-                    $remBalance = max(0, (float) $booking->total - (float) $totalPaid);
-                    $newStatus = ($remBalance <= 0) ? 'paid' : (($method === 'advance' || $totalPaid > 0) ? 'partial' : 'paid');
+                        $totalPaid = BookingPayment::where('booking_id', $lockedBooking->id)
+                            ->where('status', 'completed')
+                            ->sum('amount');
 
-                    if ($booking->payment_status !== $newStatus || $booking->balance_due != $remBalance) {
-                        $booking->update([
-                            'payment_status' => $newStatus,
-                            'ziina_status' => $intentStatus,
-                            'status' => 'confirmed',
-                            'balance_due' => $remBalance,
-                            'payment_amount' => $totalPaid,
-                        ]);
+                        if ($totalPaid <= 0 && isset($intent['amount'])) {
+                            $totalPaid = (float) ($intent['amount'] / 100);
+                        }
 
-                        // Send booking confirmation email on first completion
+                        $remBalance = max(0, (float) $lockedBooking->total - (float) $totalPaid);
+                        $newStatus = ($remBalance <= 0) ? 'paid' : (($method === 'advance' || $totalPaid > 0) ? 'partial' : 'paid');
+
+                        if ($lockedBooking->payment_status !== $newStatus || $lockedBooking->balance_due != $remBalance) {
+                            $lockedBooking->update([
+                                'payment_status' => $newStatus,
+                                'ziina_status' => $intentStatus,
+                                'status' => 'confirmed',
+                                'balance_due' => $remBalance,
+                                'payment_amount' => $totalPaid,
+                            ]);
+                        }
+
+                        // Send booking confirmation email and record coupon on first completion only
                         if (! $wasCompleted) {
-                            $this->recordCouponUsage($booking);
-                            if ($newStatus === 'partial') {
-                                $this->sendEmailNotification('booking_advance', $booking);
-                            } else {
-                                $this->sendEmailNotification('booking_full', $booking);
-                            }
+                            $this->recordCouponUsage($lockedBooking);
+                            $shouldNotify = true;
+                        }
+                    });
+
+                    // Reload booking model with fresh attributes after transaction
+                    $booking->refresh();
+
+                    if ($shouldNotify) {
+                        if ($newStatus === 'partial') {
+                            $this->sendEmailNotification('booking_advance', $booking);
+                        } else {
+                            $this->sendEmailNotification('booking_full', $booking);
                         }
 
                         // Dispatch Purchase Event to Meta Conversions API

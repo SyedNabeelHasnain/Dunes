@@ -45,10 +45,6 @@ class RecoverAbandonedBookingsCommand extends Command
                 $query->where('payment_status', 'unpaid')
                     ->orWhereNull('payment_status');
             })
-            ->where(function ($query) {
-                $query->where('payment_method', '!=', 'cash')
-                    ->orWhereNull('payment_method');
-            })
             ->whereBetween('created_at', [$startTime, $endTime])
             ->whereNotNull('email')
             ->where('email', '!=', '')

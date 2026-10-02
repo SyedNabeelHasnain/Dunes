@@ -66,11 +66,11 @@ return [
     // Booking Modal & Forms
     'booking' => [
         'title' => 'Prenota il tuo Safari nel Deserto',
-        'choose_tour' => 'Choose Tour',
-        'select_package' => 'Select Package',
-        'when' => 'When',
-        'guests' => 'Guests',
-        'pickup_location_label' => 'Pickup Location',
+        'choose_tour' => 'Scegli il Tour',
+        'select_package' => 'Seleziona Pacchetto',
+        'when' => 'Quando',
+        'guests' => 'Ospiti',
+        'pickup_location_label' => 'Luogo di Prelievo',
         'step_select' => '1. Seleziona Esperienza e Data',
         'step_guests' => '2. Ospiti e Servizi Aggiuntivi',
         'step_contact' => '3. Contatto e Dettagli Prelievo',

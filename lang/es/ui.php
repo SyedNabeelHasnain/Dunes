@@ -66,11 +66,11 @@ return [
     // Booking Modal & Forms
     'booking' => [
         'title' => 'Reserva tu Safari por el Desierto',
-        'choose_tour' => 'Choose Tour',
-        'select_package' => 'Select Package',
-        'when' => 'When',
-        'guests' => 'Guests',
-        'pickup_location_label' => 'Pickup Location',
+        'choose_tour' => 'Elegir Tour',
+        'select_package' => 'Seleccionar Paquete',
+        'when' => 'Cuándo',
+        'guests' => 'Pasajeros',
+        'pickup_location_label' => 'Lugar de Recogida',
         'step_select' => '1. Seleccionar Experiencia y Fecha',
         'step_guests' => '2. Pasajeros y Complementos',
         'step_contact' => '3. Contacto y Detalles de Recogida',
