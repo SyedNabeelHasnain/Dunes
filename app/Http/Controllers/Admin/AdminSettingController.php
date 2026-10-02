@@ -84,6 +84,45 @@ class AdminSettingController extends Controller
     }
 
     /**
+     * Show Google Things to Do (GTTD) partner feed management dashboard.
+     */
+    public function gttd()
+    {
+        $keys = [
+            'gttd_feed_enabled', 'gttd_partner_id', 'gttd_default_poi_place_id',
+            'google_place_id', 'google_cid', 'google_review_url',
+            'site_latitude', 'site_longitude', 'company_license_number', 'site_name',
+        ];
+
+        $settings = Setting::whereIn('setting_key', $keys)
+            ->get()
+            ->pluck('setting_value', 'setting_key');
+
+        $activeToursCount = \App\Models\Tour::where('status', 'active')->count();
+        $totalTiersCount = \Illuminate\Support\Facades\DB::table('tour_tiers')->count();
+
+        $feedUrls = [
+            'products_xml' => url('/feeds/google-things-to-do/products.xml'),
+            'options_xml' => url('/feeds/google-things-to-do/options.xml'),
+            'operators_xml' => url('/feeds/google-things-to-do/operators.xml'),
+            'unified_xml' => url('/feeds/google-things-to-do/feed.xml'),
+            'feed_json' => url('/feeds/google-things-to-do/feed.json'),
+        ];
+
+        return view('admin.settings.gttd', compact('settings', 'activeToursCount', 'totalTiersCount', 'feedUrls'));
+    }
+
+    /**
+     * Flush Google Things to Do feed caches.
+     */
+    public function flushGttdCache()
+    {
+        \App\Http\Controllers\GoogleThingsToDoFeedController::flushCache();
+
+        return back()->with('success', 'Google Things To Do feeds cache flushed successfully.');
+    }
+
+    /**
      * Show Meta/Facebook integrations settings.
      */
     public function meta()
@@ -150,6 +189,9 @@ class AdminSettingController extends Controller
             'site_latitude', 'site_longitude', 'site_postal_code',
             'google_business_hours', 'google_service_area', 'google_primary_category',
 
+            // Google Things To Do (GTTD) Partner Feeds
+            'gttd_feed_enabled', 'gttd_partner_id', 'gttd_default_poi_place_id',
+
             // Meta Integrations
             'meta_active', 'meta_pixel_id', 'meta_access_token', 'meta_capi_enabled', 'meta_test_event_code',
 
@@ -203,6 +245,10 @@ class AdminSettingController extends Controller
             } catch (\Throwable $e) {}
         }
 
+        if ($request->has('gttd_form_submitted')) {
+            $settings['gttd_feed_enabled'] = $request->has('gttd_feed_enabled') ? '1' : '0';
+        }
+
         foreach ($settings as $key => $value) {
             Setting::updateOrCreate(
                 ['setting_key' => $key],
@@ -213,6 +259,7 @@ class AdminSettingController extends Controller
         Cache::forget('site_settings_cache');
         Cache::forget('site_home_cache');
         app(\App\Services\SettingsService::class)->clearCache();
+        \App\Http\Controllers\GoogleThingsToDoFeedController::flushCache();
 
         return back()->with('success', 'Settings updated successfully.');
     }

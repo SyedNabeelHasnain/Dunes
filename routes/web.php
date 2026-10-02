@@ -25,6 +25,7 @@ use App\Http\Controllers\Admin\AdminWhatsappController;
 use App\Http\Controllers\AjaxGatewayController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\GoogleThingsToDoFeedController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LegalController;
 use App\Http\Controllers\LlmsController;
@@ -215,6 +216,8 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::get('/settings/seo', [AdminSettingController::class, 'seo'])->name('settings.seo');
     Route::get('/settings/marketing', [AdminSettingController::class, 'marketing'])->name('settings.marketing');
     Route::get('/settings/google', [AdminSettingController::class, 'google'])->name('settings.google');
+    Route::get('/settings/gttd', [AdminSettingController::class, 'gttd'])->name('settings.gttd');
+    Route::post('/settings/gttd/flush-cache', [AdminSettingController::class, 'flushGttdCache'])->name('settings.gttd.flush-cache');
     Route::get('/settings/meta', [AdminSettingController::class, 'meta'])->name('settings.meta');
     Route::get('/settings/currency', [AdminSettingController::class, 'currency'])->name('settings.currency');
 
@@ -289,6 +292,13 @@ Route::get('/sitemap-tours.xml', [SitemapController::class, 'tours'])->name('sit
 Route::get('/sitemap-blogs.xml', [SitemapController::class, 'blogs'])->name('sitemap.blogs');
 Route::get('/sitemap-pages.xml', [SitemapController::class, 'pages'])->name('sitemap.pages');
 Route::get('/sitemap-images.xml', [SitemapController::class, 'images'])->name('sitemap.images');
+
+// ── Google Things to Do (GTTD) Partner Feeds ──────────────────────────────
+Route::get('/feeds/google-things-to-do/products.xml', [GoogleThingsToDoFeedController::class, 'productsXml'])->name('feeds.gttd.products');
+Route::get('/feeds/google-things-to-do/options.xml', [GoogleThingsToDoFeedController::class, 'optionsXml'])->name('feeds.gttd.options');
+Route::get('/feeds/google-things-to-do/operators.xml', [GoogleThingsToDoFeedController::class, 'operatorsXml'])->name('feeds.gttd.operators');
+Route::get('/feeds/google-things-to-do/feed.xml', [GoogleThingsToDoFeedController::class, 'unifiedXml'])->name('feeds.gttd.unified');
+Route::get('/feeds/google-things-to-do/feed.json', [GoogleThingsToDoFeedController::class, 'feedJson'])->name('feeds.gttd.json');
 
 // ── AI Search Engine & LLM Markdown Endpoints (GEO Optimization) ─────────────
 Route::get('/llms.txt', [LlmsController::class, 'index'])->name('llms.txt');
