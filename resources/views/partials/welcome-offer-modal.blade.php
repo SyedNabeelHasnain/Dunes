@@ -1,6 +1,28 @@
 @php
     $settingsService = app(\App\Services\SettingsService::class);
-    $popupActive = ($settingsService->get('promo_welcome_modal_enabled', $settingsService->get('welcome_popup_active', '1'))) === '1';
+    $modalEnabled = $settingsService->get('promo_welcome_modal_enabled');
+    $modalActive = $settingsService->get('welcome_popup_active');
+
+    // If either setting explicitly says '0', it is definitively disabled
+    $popupActive = true;
+    if ($modalEnabled === '0' || $modalActive === '0') {
+        $popupActive = false;
+    } elseif ($modalEnabled !== '1' && $modalActive !== '1') {
+        // If neither is explicitly enabled as '1', default to false
+        $popupActive = false;
+    }
+
+    // If welcome coupon is explicitly marked inactive in the coupons manager, do not show popup
+    if ($popupActive) {
+        try {
+            $activeCoupon = \App\Models\Coupon::whereIn('code', ['DUNESWELCOME', 'FIRST25'])->where('status', 'active')->first();
+            $inactiveCoupon = \App\Models\Coupon::whereIn('code', ['DUNESWELCOME', 'FIRST25'])->where('status', 'inactive')->first();
+            if ($inactiveCoupon && !$activeCoupon) {
+                $popupActive = false;
+            }
+        } catch (\Throwable $e) {}
+    }
+
     $popupDiscount = (float)$settingsService->get('promo_welcome_modal_discount', $settingsService->get('welcome_popup_discount', '25'));
     $popupTimerMins = (int)$settingsService->get('promo_welcome_modal_timer_minutes', $settingsService->get('welcome_popup_timer_mins', '15'));
     $popupDelaySec = (int)$settingsService->get('promo_welcome_modal_delay_seconds', $settingsService->get('welcome_popup_delay_sec', '5'));

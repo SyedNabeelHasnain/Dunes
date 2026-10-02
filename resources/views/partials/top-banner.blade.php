@@ -1,10 +1,32 @@
 @php
     $settingsService = app(\App\Services\SettingsService::class);
-    $topBannerActive = ($settingsService->get('promo_top_banner_enabled', $settingsService->get('top_promo_banner_active', '1'))) === '1';
+    $bannerEnabled = $settingsService->get('promo_top_banner_enabled');
+    $bannerActive = $settingsService->get('top_promo_banner_active');
+
+    // If either setting explicitly says '0', it is definitively disabled
+    $topBannerActive = true;
+    if ($bannerEnabled === '0' || $bannerActive === '0') {
+        $topBannerActive = false;
+    } elseif ($bannerEnabled !== '1' && $bannerActive !== '1') {
+        // If neither is explicitly enabled as '1', default to false
+        $topBannerActive = false;
+    }
+
+    $topBannerCode = trim($settingsService->get('promo_top_banner_code', $settingsService->get('top_promo_banner_code', 'DUNESWELCOME')));
+
+    // If promo code exists in DB and is marked inactive, do NOT display banner
+    if ($topBannerActive && !empty($topBannerCode)) {
+        try {
+            $coupon = \App\Models\Coupon::where('code', $topBannerCode)->first();
+            if ($coupon && $coupon->status !== 'active') {
+                $topBannerActive = false;
+            }
+        } catch (\Throwable $e) {}
+    }
+
     $topBannerBadge = $settingsService->get('promo_top_banner_badge', 'Limited Time Offer');
     $rawBannerText = $settingsService->get('promo_top_banner_text', $settingsService->get('top_promo_banner_text', 'Special Online Exclusive: Get 25% OFF on all Desert Safari Tours! • 100% Free 24h Cancellation'));
     $topBannerText = trim(preg_replace('/[\x{1F300}-\x{1F64F}\x{1F680}-\x{1F6FF}\x{1F900}-\x{1F9FF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}]/u', '', $rawBannerText));
-    $topBannerCode = $settingsService->get('promo_top_banner_code', $settingsService->get('top_promo_banner_code', 'DUNESWELCOME'));
 @endphp
 
 @if($topBannerActive)

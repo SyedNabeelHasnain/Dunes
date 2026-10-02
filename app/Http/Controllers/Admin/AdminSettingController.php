@@ -164,11 +164,32 @@ class AdminSettingController extends Controller
         }
 
         if ($request->has('promo_banner_form_submitted')) {
-            $settings['promo_top_banner_enabled'] = $request->has('promo_top_banner_enabled') ? '1' : '0';
+            $bannerState = $request->has('promo_top_banner_enabled') ? '1' : '0';
+            $settings['promo_top_banner_enabled'] = $bannerState;
+            $settings['top_promo_banner_active'] = $bannerState;
+
+            // Synchronize coupon status for the banner code
+            $bannerCode = strtoupper(trim($request->input('promo_top_banner_code', 'DUNESWELCOME'))) ?: 'DUNESWELCOME';
+            try {
+                \App\Models\Coupon::where('code', $bannerCode)->update([
+                    'status' => $bannerState === '1' ? 'active' : 'inactive',
+                ]);
+            } catch (\Throwable $e) {}
         }
 
         if ($request->has('promo_modal_form_submitted')) {
-            $settings['promo_welcome_modal_enabled'] = $request->has('promo_welcome_modal_enabled') ? '1' : '0';
+            $modalState = $request->has('promo_welcome_modal_enabled') ? '1' : '0';
+            $settings['promo_welcome_modal_enabled'] = $modalState;
+            $settings['welcome_popup_active'] = $modalState;
+
+            // Synchronize welcome promo code status
+            try {
+                if ($modalState === '0') {
+                    \App\Models\Coupon::whereIn('code', ['DUNESWELCOME', 'FIRST25'])->update([
+                        'status' => 'inactive',
+                    ]);
+                }
+            } catch (\Throwable $e) {}
         }
 
         foreach ($settings as $key => $value) {
@@ -180,6 +201,7 @@ class AdminSettingController extends Controller
 
         Cache::forget('site_settings_cache');
         Cache::forget('site_home_cache');
+        app(\App\Services\SettingsService::class)->clearCache();
 
         return back()->with('success', 'Settings updated successfully.');
     }

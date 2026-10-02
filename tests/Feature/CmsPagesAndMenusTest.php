@@ -198,4 +198,59 @@ class CmsPagesAndMenusTest extends TestCase
         // Safari Concierge button should be present in footer
         $response->assertSee('Safari Concierge');
     }
+
+    public function test_top_banner_and_welcome_modal_do_not_render_when_disabled_or_inactive(): void
+    {
+        \App\Models\Setting::updateOrCreate(['setting_key' => 'top_promo_banner_active'], ['setting_value' => '0']);
+        \App\Models\Setting::updateOrCreate(['setting_key' => 'promo_top_banner_enabled'], ['setting_value' => '0']);
+        \App\Models\Setting::updateOrCreate(['setting_key' => 'welcome_popup_active'], ['setting_value' => '0']);
+        \App\Models\Setting::updateOrCreate(['setting_key' => 'promo_welcome_modal_enabled'], ['setting_value' => '0']);
+
+        app(\App\Services\SettingsService::class)->clearCache();
+
+        $response = $this->get('/');
+        $response->assertStatus(200);
+
+        // Banner and welcome modal must NOT be rendered in HTML
+        $response->assertDontSee('id="dunesTopPromoBanner"', false);
+        $response->assertDontSee('id="welcomeOfferModal"', false);
+        $response->assertDontSee('Special Online Exclusive: Get 25% OFF');
+    }
+
+    public function test_deactivated_coupon_disables_top_banner_and_modal(): void
+    {
+        \App\Models\Setting::updateOrCreate(['setting_key' => 'top_promo_banner_active'], ['setting_value' => '1']);
+        \App\Models\Setting::updateOrCreate(['setting_key' => 'promo_top_banner_enabled'], ['setting_value' => '1']);
+        \App\Models\Setting::updateOrCreate(['setting_key' => 'promo_top_banner_code'], ['setting_value' => 'DUNESWELCOME']);
+
+        \App\Models\Coupon::updateOrCreate(
+            ['code' => 'DUNESWELCOME'],
+            [
+                'name' => 'First-Time Welcome 25% Promo (Top Banner)',
+                'discount_type' => 'percentage',
+                'discount_value' => 25.00,
+                'status' => 'inactive',
+            ]
+        );
+
+        app(\App\Services\SettingsService::class)->clearCache();
+
+        $response = $this->get('/');
+        $response->assertStatus(200);
+
+        // Because coupon is inactive, banner must NOT render
+        $response->assertDontSee('id="dunesTopPromoBanner"', false);
+    }
+
+    public function test_logo_links_to_home_and_home_button_removed_from_menu(): void
+    {
+        $response = $this->get('/');
+        $response->assertStatus(200);
+
+        // Logo has link to home
+        $response->assertSee('aria-label="Dunes Discovery Tourism"', false);
+
+        // Header menu starts with All Tours, not a standalone Home button
+        $response->assertDontSee('>Home</a>', false);
+    }
 }

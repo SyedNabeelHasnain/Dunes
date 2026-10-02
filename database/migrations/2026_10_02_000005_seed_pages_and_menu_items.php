@@ -262,17 +262,10 @@ return new class extends Migration
             // Header
             [
                 'location' => 'header',
-                'label' => json_encode(['en' => 'Home', 'ar' => 'الرئيسية', 'ru' => 'Главная', 'es' => 'Inicio', 'it' => 'Home']),
-                'url' => '/',
-                'route_name' => 'home',
-                'order' => 1,
-            ],
-            [
-                'location' => 'header',
                 'label' => json_encode(['en' => 'All Experiences', 'ar' => 'جميع التجارب', 'ru' => 'Все туры', 'es' => 'Todas las Experiencias', 'it' => 'Tutte le Esperienze']),
                 'url' => '/tours',
                 'route_name' => 'tours.index',
-                'order' => 2,
+                'order' => 1,
             ],
             [
                 'location' => 'header',

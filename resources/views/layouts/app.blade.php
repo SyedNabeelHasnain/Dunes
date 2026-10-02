@@ -391,15 +391,12 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16 sm:h-18">
                     <!-- Brand Logo -->
-                    <a class="flex items-center flex-shrink-0" href="{{ route('home') }}">
+                    <a class="flex items-center flex-shrink-0 hover:opacity-90 transition-opacity" href="{{ route('home') }}" aria-label="Dunes Discovery Tourism">
                         <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery Tourism" width="160" height="103" class="h-9 sm:h-10 w-auto object-contain" fetchpriority="high">
                     </a>
 
                     <!-- Desktop Nav Links (Hidden on mobile/tablet) -->
                     <ul class="hidden lg:flex items-center gap-1 xl:gap-2 text-sm font-semibold text-slate-700">
-                        <li>
-                            <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('home') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('home') }}">{{ __('ui.nav.home') }}</a>
-                        </li>
                         <li class="relative" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">
                             <div class="inline-flex items-center rounded-xl {{ request()->routeIs('tours.*') ? 'bg-slate-900 text-white font-bold shadow-xs' : '' }}">
                                 <a class="px-3 py-2 rounded-l-xl transition-all {{ request()->routeIs('tours.*') ? 'text-white' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('tours.index') }}">{{ __('ui.nav.all_tours') }}</a>
@@ -518,7 +515,9 @@
              id="mainOffcanvas">
             <div>
                 <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-4">
-                    <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery" width="140" height="90" class="h-9 w-auto object-contain">
+                    <a href="{{ route('home') }}" @click="$store.mobileNav.close()" class="flex items-center hover:opacity-90 transition-opacity" aria-label="Dunes Discovery Tourism">
+                        <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery" width="140" height="90" class="h-9 w-auto object-contain">
+                    </a>
                     <div class="flex items-center gap-2">
                         @include('partials.language-currency-switcher', ['switcherId' => 'mobileLangCurrencyDropdownBtn'])
                         <button type="button" class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer" @click="$store.mobileNav.close()" aria-label="Close">
@@ -559,7 +558,6 @@
 
                 <!-- Navigation Links List -->
                 <nav class="space-y-1">
-                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('home') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('home') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.home') }}</a>
                     <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('tours.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('tours.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.all_tours') }}</a>
                     <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('about') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('about') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.about') }}</a>
                     <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('blog.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('blog.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.blog') }}</a>

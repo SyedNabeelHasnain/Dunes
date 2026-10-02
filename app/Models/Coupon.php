@@ -260,6 +260,14 @@ class Coupon extends Model
             if ($normalized === 'SAVE5') {
                 $coupon->status = $exitIntentActive ? 'active' : 'inactive';
             }
+            if ($normalized === 'DUNESWELCOME') {
+                try {
+                    $bannerDisabled = DB::table('settings')->whereIn('setting_key', ['top_promo_banner_active', 'promo_top_banner_enabled'])->where('setting_value', '0')->exists();
+                    if ($bannerDisabled) {
+                        $coupon->status = 'inactive';
+                    }
+                } catch (\Throwable $e) {}
+            }
 
             return $coupon;
         }
@@ -300,6 +308,12 @@ class Coupon extends Model
 
         // Automatic fallback for official first-time visitor 25% promo codes (including dynamic FIRST25-* codes)
         if (in_array($normalized, ['DUNESWELCOME', 'FIRST25']) || str_starts_with($normalized, 'FIRST25-')) {
+            $bannerDisabled = false;
+            try {
+                $bannerDisabled = DB::table('settings')->whereIn('setting_key', ['top_promo_banner_active', 'promo_top_banner_enabled'])->where('setting_value', '0')->exists();
+            } catch (\Throwable $e) {}
+            $initialStatus = $bannerDisabled ? 'inactive' : 'active';
+
             try {
                 return static::firstOrCreate(
                     ['code' => $normalized],
@@ -311,7 +325,7 @@ class Coupon extends Model
                         'min_spend' => 0.00,
                         'min_guests' => 1,
                         'usage_limit_per_user' => 10,
-                        'status' => 'active',
+                        'status' => $initialStatus,
                         'valid_from' => now()->subDay(),
                         'first_time_only' => true,
                         'is_featured' => true,
@@ -323,7 +337,7 @@ class Coupon extends Model
                     'name' => $normalized === 'DUNESWELCOME' ? 'First-Time Welcome 25% Promo (Top Banner)' : 'First-Time Guest 25% Promo',
                     'discount_type' => 'percentage',
                     'discount_value' => 25.00,
-                    'status' => 'active',
+                    'status' => $initialStatus,
                     'first_time_only' => true,
                 ]);
             }
