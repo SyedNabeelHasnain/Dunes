@@ -254,7 +254,7 @@ if(window.fbq){
 <!-- Tour Hero Section -->
 <section class="relative min-h-[50vh] flex items-end bg-cover bg-center overflow-hidden" style="background: url('{{ $heroAvifUrl }}') center/cover no-repeat; margin-top: calc(-1 * var(--header-h, 72px));">
     <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-black/20"></div>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full pb-10 pt-28 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full pb-10 pt-36 sm:pt-40 lg:pt-44 text-white">
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="flex items-center gap-2 text-xs sm:text-sm text-white/75 flex-wrap">
                 <li><a href="{{ localized_route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') }}</a></li>
@@ -266,7 +266,7 @@ if(window.fbq){
         </nav>
         <div>
             <div class="flex flex-wrap gap-2 mb-3">
-                <span class="glass px-3.5 py-1.5 rounded-full text-xs font-semibold inline-flex items-center gap-1.5">
+                <span class="glass-dark text-white px-3.5 py-1.5 rounded-full text-xs font-semibold inline-flex items-center gap-1.5 shadow-xs">
                     <i class="bi bi-tag-fill text-primary"></i>{{ $tour->category ? $tour->category->name : 'Tour' }}
                 </span>
                 @if($tour->is_bestseller)
@@ -1056,7 +1056,7 @@ if(window.fbq){
                         </span>
                         @endif
                         <div class="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
-                            <span class="glass text-white text-xs font-semibold px-2.5 py-1 rounded-full inline-flex items-center gap-1">
+                            <span class="glass-dark text-white text-xs font-semibold px-2.5 py-1 rounded-full inline-flex items-center gap-1">
                                 <i class="bi bi-tag-fill text-primary"></i>{{ $t->category ? $t->category->name : 'Tour' }}
                             </span>
                         </div>

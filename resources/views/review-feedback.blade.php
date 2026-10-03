@@ -6,7 +6,7 @@
 @section('title', 'Your Feedback - Dunes Discovery Tourism')
 
 @section('content')
-<section class="py-16 bg-gradient-to-b from-slate-50 to-white min-h-[75vh] flex items-center">
+<section class="page-standalone-clearance bg-gradient-to-b from-slate-50 to-white min-h-[75vh] flex items-center">
     <div class="max-w-xl mx-auto px-4 w-full">
         <div class="bg-white rounded-3xl shadow-xl border border-slate-100 p-8 sm:p-10 text-center">
             

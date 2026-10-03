@@ -4,7 +4,7 @@
 @extends('layouts.app')
 
 @section('content')
-<section class="py-16 min-h-[75vh] flex items-center bg-slate-50">
+<section class="page-standalone-clearance min-h-[75vh] flex items-center bg-slate-50">
     <div class="max-w-xl mx-auto px-4 w-full">
         <div class="bg-white rounded-3xl shadow-xl border border-slate-200 p-8 sm:p-10 text-center">
             <div class="w-16 h-16 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center text-3xl mx-auto mb-4">

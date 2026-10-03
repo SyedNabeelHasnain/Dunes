@@ -74,7 +74,7 @@ gtag('event', 'conversion_event_submit_lead_form', {
     @endif
 @endif
 
-<section class="py-12 bg-slate-50 min-h-[85vh] flex items-center">
+<section class="page-standalone-clearance bg-slate-50 min-h-[85vh] flex items-center">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 w-full">
 
         <!-- Success Header Card -->

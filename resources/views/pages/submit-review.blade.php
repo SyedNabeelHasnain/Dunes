@@ -39,7 +39,7 @@
   ]
 }
 </script>
-<div class="py-16 sm:py-24 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 min-h-[85vh] text-slate-100 flex items-center">
+<div class="page-standalone-clearance bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 min-h-[85vh] text-slate-100 flex items-center">
     <div class="max-w-2xl mx-auto px-4 sm:px-6 w-full">
 
         @if(session('review_submitted'))

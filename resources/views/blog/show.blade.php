@@ -96,11 +96,11 @@
 @endif
 
 <article itemscope itemtype="https://schema.org/{{ $post->schema_type ?? 'BlogPosting' }}" class="blog-article">
-    <header class="bg-slate-950 text-white relative overflow-hidden min-h-[420px]" style="margin-top: calc(-1 * var(--header-h, 72px));">
+    <header class="hero-subpage bg-slate-950 text-white relative overflow-hidden min-h-[420px]" style="margin-top: calc(-1 * var(--header-h, 72px)); padding-top: calc(var(--header-h, 72px) + 2.25rem); padding-bottom: 3.5rem;">
         @if ($post->featured_image)
         <img src="{{ $featImgPath }}" class="absolute inset-0 w-full h-full object-cover opacity-25" alt="{{ $post->featured_image_alt ?: $post->title }}" fetchpriority="high" itemprop="image">
         @endif
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-24 pb-14">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <!-- Breadcrumbs -->
             <nav aria-label="breadcrumb" class="mb-4">
                 <ol class="flex items-center gap-2 text-xs sm:text-sm text-white/70 flex-wrap">

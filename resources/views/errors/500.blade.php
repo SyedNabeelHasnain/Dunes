@@ -7,7 +7,7 @@
 @endphp
 
 @section('content')
-<div class="min-h-[85vh] flex items-center justify-center py-12 px-4" style="background: linear-gradient(135deg, #FFF9F5 0%, #FFF0E6 100%);">
+<div class="page-standalone-clearance min-h-[85vh] flex items-center justify-center px-4" style="background: linear-gradient(135deg, #FFF9F5 0%, #FFF0E6 100%);">
     <div class="max-w-md w-full bg-white/95 backdrop-blur-xl rounded-3xl shadow-xl border border-slate-200 p-8 sm:p-10 text-center">
         <div class="mb-4 text-amber-500">
             <i class="bi bi-exclamation-triangle-fill text-6xl inline-block" style="filter: drop-shadow(0 10px 15px rgba(245, 158, 11, 0.25));"></i>

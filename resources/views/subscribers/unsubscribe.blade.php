@@ -7,7 +7,7 @@
 @section('meta_description', 'Manage your newsletter preferences and unsubscribe options.')
 
 @section('content')
-<div class="max-w-xl mx-auto px-4 py-16 sm:py-24 min-h-[75vh] flex items-center">
+<div class="page-standalone-clearance max-w-xl mx-auto px-4 min-h-[75vh] flex items-center">
     <div class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden w-full">
         <!-- Card Header -->
         <div class="bg-slate-900 text-white p-6 sm:p-8 text-center">

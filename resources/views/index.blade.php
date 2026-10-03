@@ -353,7 +353,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                             </span>
                             @endif
                             <div class="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
-                                <span class="glass text-white text-xs font-semibold px-2.5 py-1 rounded-full inline-flex items-center gap-1">
+                                <span class="glass-dark text-white text-xs font-semibold px-2.5 py-1 rounded-full inline-flex items-center gap-1">
                                     <i class="bi bi-tag-fill text-primary"></i>{{ $category ? $category->name : 'Tours' }}
                                 </span>
                             </div>
