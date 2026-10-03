@@ -83,8 +83,9 @@ Route::get('/search', [TourController::class, 'search'])->name('tours.search');
 Route::get('/search/live', [TourController::class, 'liveSearch'])->name('tours.search.live');
 Route::get('/build-your-own-safari', [TourController::class, 'customizer'])->name('tours.customizer');
 Route::redirect('/custom-safari', '/build-your-own-safari', 301);
-Route::get('/tours/{slug}', function ($slug) {
-    return redirect('/'.$slug, 301);
+Route::get('/tours/{slug}', function (\Illuminate\Http\Request $request, $slug) {
+    $queryString = $request->getQueryString();
+    return redirect('/'.$slug . ($queryString ? '?'.$queryString : ''), 301);
 });
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
@@ -299,6 +300,7 @@ Route::get('/feeds/google-things-to-do/options.xml', [GoogleThingsToDoFeedContro
 Route::get('/feeds/google-things-to-do/operators.xml', [GoogleThingsToDoFeedController::class, 'operatorsXml'])->name('feeds.gttd.operators');
 Route::get('/feeds/google-things-to-do/feed.xml', [GoogleThingsToDoFeedController::class, 'unifiedXml'])->name('feeds.gttd.unified');
 Route::get('/feeds/google-things-to-do/feed.json', [GoogleThingsToDoFeedController::class, 'feedJson'])->name('feeds.gttd.json');
+Route::get('/feeds/google-things-to-do/proto.json', [GoogleThingsToDoFeedController::class, 'protoJson'])->name('feeds.gttd.proto');
 
 // ── AI Search Engine & LLM Markdown Endpoints (GEO Optimization) ─────────────
 Route::get('/llms.txt', [LlmsController::class, 'index'])->name('llms.txt');

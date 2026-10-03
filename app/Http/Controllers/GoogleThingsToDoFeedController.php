@@ -106,6 +106,24 @@ class GoogleThingsToDoFeedController extends Controller
         });
 
         return response()->json($data, 200, [
+            'Content-Type' => 'application/json; charset=UTF-8',
+            'Cache-Control' => 'public, max-age=3600',
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * Return Official Google Things to Do ext.travel.ttd.proto.feeds.v1.ProductFeed JSON.
+     */
+    public function protoJson(): JsonResponse
+    {
+        $this->ensureFeedEnabled();
+
+        $data = Cache::remember('gttd_proto_json', $this->cacheTtl, function () {
+            return $this->buildProtoFeedData();
+        });
+
+        return response()->json($data, 200, [
+            'Content-Type' => 'application/json; charset=UTF-8',
             'Cache-Control' => 'public, max-age=3600',
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
@@ -120,6 +138,7 @@ class GoogleThingsToDoFeedController extends Controller
         Cache::forget('gttd_operators_xml');
         Cache::forget('gttd_unified_xml');
         Cache::forget('gttd_feed_json');
+        Cache::forget('gttd_proto_json');
     }
 
     /**
@@ -179,7 +198,7 @@ class GoogleThingsToDoFeedController extends Controller
 
         foreach ($tours as $tour) {
             $poi = $this->resolvePoiForTour($tour);
-            $landingUrl = url('/tours/' . $tour->slug) . '?utm_source=google&utm_medium=things_to_do&utm_campaign=gttd_free';
+            $landingUrl = url('/' . $tour->slug) . '?utm_source=google&utm_medium=things_to_do&utm_campaign=gttd_free';
 
             $heroImage = $tour->hero_image ?: $tour->thumb_image;
             $imageUrl = $heroImage ? (str_starts_with($heroImage, 'http') ? $heroImage : asset('images/' . ltrim($heroImage, '/'))) : asset('images/desert-safari-poster.avif');
@@ -209,6 +228,29 @@ class GoogleThingsToDoFeedController extends Controller
                 ];
             }
 
+            // Nested options for product
+            $nestedOptions = [];
+            if ($tour->tiers && $tour->tiers->count() > 0) {
+                foreach ($tour->tiers as $tier) {
+                    $priceNum = (float) ($tier->pivot->price ?? 0);
+                    $oldPriceNum = (float) ($tier->pivot->old_price ?? 0);
+                    $tierSlug = $tier->slug ?? (string) $tier->id;
+                    $optBookingUrl = url('/' . $tour->slug) . '?tier=' . $tierSlug . '&utm_source=google&utm_medium=things_to_do&utm_campaign=gttd_free';
+
+                    $nestedOptions[] = [
+                        'option_id' => 'dunes-opt-' . $tour->id . '-' . $tier->id,
+                        'title' => $tour->name . ' - ' . ($tier->display_name ?: $tier->name),
+                        'tier_slug' => $tierSlug,
+                        'currency' => 'AED',
+                        'amount' => number_format($priceNum, 2, '.', ''),
+                        'price_micros' => $this->toMicros($priceNum),
+                        'original_amount' => $oldPriceNum > $priceNum ? number_format($oldPriceNum, 2, '.', '') : null,
+                        'original_price_micros' => $oldPriceNum > $priceNum ? $this->toMicros($oldPriceNum) : null,
+                        'landing_page_url' => $optBookingUrl,
+                    ];
+                }
+            }
+
             $products[] = [
                 'product_id' => 'dunes-tour-' . $tour->id,
                 'operator_id' => $operator['operator_id'],
@@ -228,13 +270,14 @@ class GoogleThingsToDoFeedController extends Controller
                     'poi_name' => $poi['name'],
                     'latitude' => $poi['lat'],
                     'longitude' => $poi['lng'],
-                    'locality' => 'Dubai',
-                    'country_code' => 'AE',
+                    'locality' => $poi['locality'] ?? 'Dubai',
+                    'country_code' => $poi['country_code'] ?? 'AE',
                 ],
                 'media' => [
                     'image_url' => $imageUrl,
                 ],
                 'features' => $features,
+                'options' => $nestedOptions,
                 'is_bestseller' => (bool) $tour->is_bestseller,
                 'is_featured' => (bool) $tour->is_featured,
             ];
@@ -257,25 +300,36 @@ class GoogleThingsToDoFeedController extends Controller
 
         foreach ($tours as $tour) {
             $productId = 'dunes-tour-' . $tour->id;
-            $tourUrl = url('/tours/' . $tour->slug);
+            $tourUrl = url('/' . $tour->slug);
 
             if ($tour->tiers && $tour->tiers->count() > 0) {
                 foreach ($tour->tiers as $tier) {
                     $priceNum = (float) ($tier->pivot->price ?? 0);
                     $oldPriceNum = (float) ($tier->pivot->old_price ?? 0);
-                    $bookingUrl = $tourUrl . '?tier=' . ($tier->slug ?? $tier->id) . '&utm_source=google&utm_medium=things_to_do&utm_campaign=gttd_free';
+                    $tierSlug = $tier->slug ?? (string) $tier->id;
+                    $bookingUrl = $tourUrl . '?tier=' . $tierSlug . '&utm_source=google&utm_medium=things_to_do&utm_campaign=gttd_free';
 
                     $options[] = [
                         'option_id' => 'dunes-opt-' . $tour->id . '-' . $tier->id,
                         'product_id' => $productId,
                         'title' => $tour->name . ' - ' . ($tier->display_name ?: $tier->name),
-                        'tier_slug' => $tier->slug,
+                        'tier_slug' => $tierSlug,
                         'currency' => 'AED',
                         'amount' => number_format($priceNum, 2, '.', ''),
                         'price_micros' => $this->toMicros($priceNum),
                         'original_amount' => $oldPriceNum > $priceNum ? number_format($oldPriceNum, 2, '.', '') : null,
                         'original_price_micros' => $oldPriceNum > $priceNum ? $this->toMicros($oldPriceNum) : null,
                         'landing_page_url' => $bookingUrl,
+                        'taxes_and_fees_included' => true,
+                        'cancellation_policy' => [
+                            'has_free_cancellation' => true,
+                            'free_cancellation_hours' => 24,
+                            'refund_percent' => 100,
+                            'description' => 'Free cancellation up to 24 hours before tour start for 100% full refund.',
+                        ],
+                        'fulfillment_type' => 'FULFILLMENT_TYPE_MOBILE_TICKET',
+                        'instant_confirmation' => true,
+                        'supported_languages' => ['en', 'ar', 'ru', 'es', 'it'],
                     ];
                 }
             } else {
@@ -292,6 +346,16 @@ class GoogleThingsToDoFeedController extends Controller
                     'original_amount' => '150.00',
                     'original_price_micros' => 150000000,
                     'landing_page_url' => $bookingUrl,
+                    'taxes_and_fees_included' => true,
+                    'cancellation_policy' => [
+                        'has_free_cancellation' => true,
+                        'free_cancellation_hours' => 24,
+                        'refund_percent' => 100,
+                        'description' => 'Free cancellation up to 24 hours before tour start for 100% full refund.',
+                    ],
+                    'fulfillment_type' => 'FULFILLMENT_TYPE_MOBILE_TICKET',
+                    'instant_confirmation' => true,
+                    'supported_languages' => ['en', 'ar', 'ru', 'es', 'it'],
                 ];
             }
         }
@@ -300,49 +364,317 @@ class GoogleThingsToDoFeedController extends Controller
     }
 
     /**
+     * Build Google Things To Do ext.travel.ttd.proto.feeds.v1.ProductFeed structure.
+     */
+    public function buildProtoFeedData(): array
+    {
+        $tours = Tour::where('status', 'active')
+            ->with(['category', 'tiers', 'contentItems'])
+            ->orderBy('priority', 'asc')
+            ->get();
+
+        $operator = $this->getOperatorData();
+        $products = [];
+
+        foreach ($tours as $tour) {
+            $poi = $this->resolvePoiForTour($tour);
+            $landingUrl = url('/' . $tour->slug) . '?utm_source=google&utm_medium=things_to_do&utm_campaign=gttd_free';
+
+            $heroImage = $tour->hero_image ?: $tour->thumb_image;
+            $imageUrl = $heroImage ? (str_starts_with($heroImage, 'http') ? $heroImage : asset('images/' . ltrim($heroImage, '/'))) : asset('images/desert-safari-poster.avif');
+
+            $isoDuration = $this->toIsoDuration($tour->duration);
+
+            $desc = strip_tags($tour->short_desc ?: $tour->full_desc ?: $tour->name);
+            $desc = trim(preg_replace('/\s+/', ' ', $desc));
+
+            // Extract features
+            $features = [];
+            if ($tour->contentItems && $tour->contentItems->count() > 0) {
+                foreach ($tour->contentItems->take(6) as $ci) {
+                    if (!empty($ci->title)) {
+                        $features[] = ['text' => strip_tags($ci->title)];
+                    }
+                }
+            }
+            if (empty($features)) {
+                $features = [
+                    ['text' => 'Professional Licensed Safari Guide & Driver'],
+                    ['text' => 'Comfortable 4x4 Air-Conditioned Vehicle Pickup'],
+                    ['text' => 'Dune Bashing & Desert Photographic Opportunities'],
+                    ['text' => 'Instant Booking Confirmation & 24/7 Concierge Support'],
+                ];
+            }
+
+            // Options list
+            $protoOptions = [];
+            if ($tour->tiers && $tour->tiers->count() > 0) {
+                foreach ($tour->tiers as $tier) {
+                    $priceNum = (float) ($tier->pivot->price ?? 0);
+                    $oldPriceNum = (float) ($tier->pivot->old_price ?? 0);
+                    $tierSlug = $tier->slug ?? (string) $tier->id;
+                    $bookingUrl = url('/' . $tour->slug) . '?tier=' . $tierSlug . '&utm_source=google&utm_medium=things_to_do&utm_campaign=gttd_free';
+
+                    $priceUnits = (int) floor($priceNum);
+                    $priceNanos = (int) round(($priceNum - $priceUnits) * 1000000000);
+
+                    $priceOption = [
+                        'price' => [
+                            'currency_code' => 'AED',
+                            'units' => $priceUnits,
+                            'nanos' => $priceNanos,
+                        ],
+                        'fees_and_taxes' => [
+                            'included' => true,
+                            'tax_description' => 'Includes 5% UAE VAT and all local tourism municipality fees',
+                        ],
+                    ];
+
+                    if ($oldPriceNum > $priceNum) {
+                        $oldUnits = (int) floor($oldPriceNum);
+                        $oldNanos = (int) round(($oldPriceNum - $oldUnits) * 1000000000);
+                        $priceOption['original_price'] = [
+                            'currency_code' => 'AED',
+                            'units' => $oldUnits,
+                            'nanos' => $oldNanos,
+                        ];
+                    }
+
+                    $protoOptions[] = [
+                        'option_id' => 'dunes-opt-' . $tour->id . '-' . $tier->id,
+                        'title' => $tour->name . ' - ' . ($tier->display_name ?: $tier->name),
+                        'landing_page_list' => [
+                            'landing_pages' => [
+                                [
+                                    'url' => $bookingUrl,
+                                ],
+                            ],
+                        ],
+                        'price_options' => [
+                            $priceOption,
+                        ],
+                        'cancellation_policy' => [
+                            'refund_conditions' => [
+                                [
+                                    'refund_percent' => 100,
+                                    'time_before_start' => 'P1D',
+                                ],
+                            ],
+                        ],
+                        'fulfillment_type' => 'FULFILLMENT_TYPE_MOBILE_TICKET',
+                        'instant_confirmation' => true,
+                        'language_codes' => ['en', 'ar', 'ru', 'es', 'it'],
+                    ];
+                }
+            } else {
+                $bookingUrl = url('/' . $tour->slug) . '?utm_source=google&utm_medium=things_to_do&utm_campaign=gttd_free';
+                $protoOptions[] = [
+                    'option_id' => 'dunes-opt-' . $tour->id . '-default',
+                    'title' => $tour->name . ' - Standard Experience',
+                    'landing_page_list' => [
+                        'landing_pages' => [
+                            [
+                                'url' => $bookingUrl,
+                            ],
+                        ],
+                    ],
+                    'price_options' => [
+                        [
+                            'price' => [
+                                'currency_code' => 'AED',
+                                'units' => 99,
+                                'nanos' => 0,
+                            ],
+                            'original_price' => [
+                                'currency_code' => 'AED',
+                                'units' => 150,
+                                'nanos' => 0,
+                            ],
+                            'fees_and_taxes' => [
+                                'included' => true,
+                                'tax_description' => 'Includes 5% UAE VAT and all local tourism municipality fees',
+                            ],
+                        ],
+                    ],
+                    'cancellation_policy' => [
+                        'refund_conditions' => [
+                            [
+                                'refund_percent' => 100,
+                                'time_before_start' => 'P1D',
+                            ],
+                        ],
+                    ],
+                    'fulfillment_type' => 'FULFILLMENT_TYPE_MOBILE_TICKET',
+                    'instant_confirmation' => true,
+                    'language_codes' => ['en', 'ar', 'ru', 'es', 'it'],
+                ];
+            }
+
+            $products[] = [
+                'product_id' => 'dunes-tour-' . $tour->id,
+                'operator' => [
+                    'name' => $operator['name'],
+                    'google_business_profile_name' => $operator['google_business_profile_name'],
+                    'phone_number' => $operator['phone'],
+                    'url' => $operator['url'],
+                ],
+                'title' => $tour->name,
+                'description' => $desc,
+                'inventory_types' => [
+                    'INVENTORY_TYPE_EXPERIENCE',
+                    'INVENTORY_TYPE_OFFICIAL',
+                ],
+                'category' => $tour->category?->name ?? 'Desert Safari',
+                'landing_page_list' => [
+                    'landing_pages' => [
+                        [
+                            'url' => $landingUrl,
+                            'tag' => 'official',
+                        ],
+                    ],
+                ],
+                'rating' => [
+                    'average_value' => (float) ($tour->rating ?: 4.9),
+                    'rating_count' => (int) ($tour->review_count ?: 2840),
+                ],
+                'media' => [
+                    [
+                        'url' => $imageUrl,
+                    ],
+                ],
+                'features' => $features,
+                'duration' => $isoDuration,
+                'related_locations' => [
+                    [
+                        'relation_type' => 'RELATION_TYPE_ADMISSION_TICKET_LOCATION',
+                        'location' => [
+                            'place_info' => [
+                                'place_id' => $poi['place_id'],
+                                'name' => $poi['name'],
+                                'lat_lng' => [
+                                    'latitude' => $poi['lat'],
+                                    'longitude' => $poi['lng'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                'options' => $protoOptions,
+            ];
+        }
+
+        return [
+            'feed_metadata' => [
+                'feed_name' => 'ext.travel.ttd.proto.feeds.v1.ProductFeed',
+                'nonce' => uniqid('gttd_prod_', true),
+                'timestamp' => now()->toIso8601String(),
+                'publisher' => 'Dunes Discovery Tourism L.L.C.',
+                'license' => 'Dubai DET #1430583',
+            ],
+            'products' => $products,
+        ];
+    }
+
+    /**
      * Resolve Point of Interest for a given tour.
      */
-    protected function resolvePoiForTour(Tour $tour): array
+    public function resolvePoiForTour(Tour $tour): array
     {
         $slug = strtolower($tour->slug);
         $cat = strtolower($tour->category?->name ?? '');
 
-        // 1. Water Sports / Dhow Cruise / Marina
-        if (str_contains($slug, 'dhow') || str_contains($slug, 'cruise') || str_contains($slug, 'marina') || str_contains($cat, 'cruise')) {
+        // 1. Abu Dhabi City Tour
+        if (str_contains($slug, 'abu-dhabi')) {
             return [
-                'name' => 'Dubai Marina & Dhow Cruise Canal',
-                'place_id' => 'ChIJY3Y7ZvhDXz4RcKk7a-JqY6U',
-                'lat' => 25.0805,
-                'lng' => 55.1403,
+                'name' => 'Sheikh Zayed Grand Mosque, Abu Dhabi',
+                'place_id' => 'ChIJUz3K_qV3Xj4R-3qZ7i6F0tY',
+                'lat' => 24.4128,
+                'lng' => 54.4750,
+                'locality' => 'Abu Dhabi',
+                'country_code' => 'AE',
             ];
         }
 
-        // 2. City Tours / Downtown Dubai / Burj Khalifa
+        // 2. Quad Biking Arena (Big Red Sand Dune / Al Badayer)
+        if (str_contains($slug, 'quad')) {
+            return [
+                'name' => 'Big Red Sand Dune (Al Badayer Quad Grounds)',
+                'place_id' => 'ChIJy2N8h6Ptdj4R2fP4-dJ7e6M',
+                'lat' => 24.9606,
+                'lng' => 55.7289,
+                'locality' => 'Dubai',
+                'country_code' => 'AE',
+            ];
+        }
+
+        // 3. Dune Buggy Staging Grounds
+        if (str_contains($slug, 'buggy')) {
+            return [
+                'name' => 'Lahbab High Red Dunes Buggy Arena',
+                'place_id' => 'ChIJt7e4-c9xdj4R_hY6W5xrqU8',
+                'lat' => 24.9754,
+                'lng' => 55.5928,
+                'locality' => 'Dubai',
+                'country_code' => 'AE',
+            ];
+        }
+
+        // 4. Water Sports / Dhow Cruise / Marina
+        if (str_contains($slug, 'dhow') || str_contains($slug, 'cruise') || str_contains($slug, 'marina') || str_contains($cat, 'cruise')) {
+            return [
+                'name' => 'Dubai Marina Yacht Club & Canal',
+                'place_id' => 'ChIJY3Y7ZvhDXz4RcKk7a-JqY6U',
+                'lat' => 25.0805,
+                'lng' => 55.1403,
+                'locality' => 'Dubai',
+                'country_code' => 'AE',
+            ];
+        }
+
+        // 5. City Tours / Downtown Dubai / Burj Khalifa
         if (str_contains($slug, 'city') || str_contains($slug, 'burj') || str_contains($cat, 'city')) {
             return [
                 'name' => 'Downtown Dubai & Burj Khalifa',
                 'place_id' => 'ChIJv_Q67d5DXz4R3M_4y_iN8t8',
                 'lat' => 25.1972,
                 'lng' => 55.2744,
+                'locality' => 'Dubai',
+                'country_code' => 'AE',
             ];
         }
 
-        // 3. Al Marmoom Desert Conservation Reserve
+        // 6. Al Marmoom Desert Conservation Reserve
         if (str_contains($slug, 'marmoom') || str_contains($slug, 'conservation')) {
             return [
                 'name' => 'Al Marmoom Desert Conservation Reserve',
                 'place_id' => 'ChIJY8o_Z0mldj4RsJ1b9YJ-P7Q',
                 'lat' => 24.8789,
                 'lng' => 55.3370,
+                'locality' => 'Dubai',
+                'country_code' => 'AE',
             ];
         }
 
-        // 4. Default: Lahbab Red Dunes Dubai (Primary Safari Location)
+        // 7. Overnight Desert Safari
+        if (str_contains($slug, 'overnight')) {
+            return [
+                'name' => 'Lahbab Desert Conservation Camp & Stargazing',
+                'place_id' => 'ChIJt7e4-c9xdj4R_hY6W5xrqU8',
+                'lat' => 24.9754,
+                'lng' => 55.5928,
+                'locality' => 'Dubai',
+                'country_code' => 'AE',
+            ];
+        }
+
+        // 8. Default: Lahbab Red Dunes Dubai (Primary Safari Location)
         return [
             'name' => 'Lahbab Red Dunes Desert Dubai',
             'place_id' => 'ChIJt7e4-c9xdj4R_hY6W5xrqU8',
             'lat' => 24.9754,
             'lng' => 55.5928,
+            'locality' => 'Dubai',
+            'country_code' => 'AE',
         ];
     }
 
@@ -397,6 +729,7 @@ class GoogleThingsToDoFeedController extends Controller
             $xml .= "      <operator_id>{$p['operator_id']}</operator_id>\n";
             $xml .= "      <inventory_types>\n";
             $xml .= "        <inventory_type>{$p['inventory_type']}</inventory_type>\n";
+            $xml .= "        <inventory_type>OFFICIAL</inventory_type>\n";
             $xml .= "      </inventory_types>\n";
             $xml .= "      <title lang=\"en\">{$title}</title>\n";
             $xml .= "      <description lang=\"en\">{$desc}</description>\n";
@@ -427,6 +760,14 @@ class GoogleThingsToDoFeedController extends Controller
                 $xml .= "        <feature>{$fEsc}</feature>\n";
             }
             $xml .= "      </features>\n";
+            $xml .= "      <cancellation_policy>\n";
+            $xml .= "        <free_cancellation_hours>24</free_cancellation_hours>\n";
+            $xml .= "      </cancellation_policy>\n";
+            $xml .= "      <fulfillment>\n";
+            $xml .= "        <fulfillment_type>FULFILLMENT_TYPE_MOBILE_TICKET</fulfillment_type>\n";
+            $xml .= "        <instant_confirmation>true</instant_confirmation>\n";
+            $xml .= "      </fulfillment>\n";
+            $xml .= "      <official_site_partner>true</official_site_partner>\n";
             $xml .= "    </product>\n";
         }
 
@@ -468,7 +809,23 @@ class GoogleThingsToDoFeedController extends Controller
                 $xml .= "        <original_amount>{$opt['original_amount']}</original_amount>\n";
                 $xml .= "        <original_price_micros>{$opt['original_price_micros']}</original_price_micros>\n";
             }
+            $xml .= "        <taxes_and_fees_included>true</taxes_and_fees_included>\n";
             $xml .= "      </pricing>\n";
+            $xml .= "      <cancellation_policy>\n";
+            $xml .= "        <free_cancellation_hours>24</free_cancellation_hours>\n";
+            $xml .= "        <refund_percent>100</refund_percent>\n";
+            $xml .= "      </cancellation_policy>\n";
+            $xml .= "      <fulfillment>\n";
+            $xml .= "        <fulfillment_type>FULFILLMENT_TYPE_MOBILE_TICKET</fulfillment_type>\n";
+            $xml .= "        <instant_confirmation>true</instant_confirmation>\n";
+            $xml .= "      </fulfillment>\n";
+            $xml .= "      <supported_languages>\n";
+            $xml .= "        <language>en</language>\n";
+            $xml .= "        <language>ar</language>\n";
+            $xml .= "        <language>ru</language>\n";
+            $xml .= "        <language>es</language>\n";
+            $xml .= "        <language>it</language>\n";
+            $xml .= "      </supported_languages>\n";
             $xml .= "      <landing_page_url>{$url}</landing_page_url>\n";
             $xml .= "    </option>\n";
         }
@@ -581,6 +938,7 @@ class GoogleThingsToDoFeedController extends Controller
             $xml .= "      <operator_id>{$p['operator_id']}</operator_id>\n";
             $xml .= "      <inventory_types>\n";
             $xml .= "        <inventory_type>{$p['inventory_type']}</inventory_type>\n";
+            $xml .= "        <inventory_type>OFFICIAL</inventory_type>\n";
             $xml .= "      </inventory_types>\n";
             $xml .= "      <title lang=\"en\">{$title}</title>\n";
             $xml .= "      <description lang=\"en\">{$desc}</description>\n";
@@ -611,6 +969,14 @@ class GoogleThingsToDoFeedController extends Controller
                 $xml .= "        <feature>{$fEsc}</feature>\n";
             }
             $xml .= "      </features>\n";
+            $xml .= "      <cancellation_policy>\n";
+            $xml .= "        <free_cancellation_hours>24</free_cancellation_hours>\n";
+            $xml .= "      </cancellation_policy>\n";
+            $xml .= "      <fulfillment>\n";
+            $xml .= "        <fulfillment_type>FULFILLMENT_TYPE_MOBILE_TICKET</fulfillment_type>\n";
+            $xml .= "        <instant_confirmation>true</instant_confirmation>\n";
+            $xml .= "      </fulfillment>\n";
+            $xml .= "      <official_site_partner>true</official_site_partner>\n";
             $xml .= "    </product>\n";
         }
         $xml .= "  </products>\n";
@@ -633,7 +999,23 @@ class GoogleThingsToDoFeedController extends Controller
                 $xml .= "        <original_amount>{$opt['original_amount']}</original_amount>\n";
                 $xml .= "        <original_price_micros>{$opt['original_price_micros']}</original_price_micros>\n";
             }
+            $xml .= "        <taxes_and_fees_included>true</taxes_and_fees_included>\n";
             $xml .= "      </pricing>\n";
+            $xml .= "      <cancellation_policy>\n";
+            $xml .= "        <free_cancellation_hours>24</free_cancellation_hours>\n";
+            $xml .= "        <refund_percent>100</refund_percent>\n";
+            $xml .= "      </cancellation_policy>\n";
+            $xml .= "      <fulfillment>\n";
+            $xml .= "        <fulfillment_type>FULFILLMENT_TYPE_MOBILE_TICKET</fulfillment_type>\n";
+            $xml .= "        <instant_confirmation>true</instant_confirmation>\n";
+            $xml .= "      </fulfillment>\n";
+            $xml .= "      <supported_languages>\n";
+            $xml .= "        <language>en</language>\n";
+            $xml .= "        <language>ar</language>\n";
+            $xml .= "        <language>ru</language>\n";
+            $xml .= "        <language>es</language>\n";
+            $xml .= "        <language>it</language>\n";
+            $xml .= "      </supported_languages>\n";
             $xml .= "      <landing_page_url>{$optUrl}</landing_page_url>\n";
             $xml .= "    </option>\n";
         }

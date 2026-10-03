@@ -7,6 +7,20 @@
     $notAllowed = $tour->contentItems->where('type', 'not_allowed')->sortBy('priority');
     $minPrice = $tour->tiers->min('pivot.price') ?? 0;
     
+    // Google Things to Do & Landing Page Option Resolution
+    $requestedTier = request('tier');
+    $activeTier = null;
+    if ($requestedTier && $tour->tiers) {
+        $activeTier = $tour->tiers->first(function ($t) use ($requestedTier) {
+            return (string) $t->slug === (string) $requestedTier
+                || (string) $t->id === (string) $requestedTier
+                || \Illuminate\Support\Str::slug($t->name) === (string) $requestedTier;
+        });
+    }
+    $activePrice = $activeTier ? ($activeTier->pivot?->price ?? $minPrice) : $minPrice;
+    $activeOldPrice = $activeTier ? ($activeTier->pivot?->old_price ?? 0) : null;
+    $defaultTierId = $activeTier ? $activeTier->id : ($tour->tiers->where('pivot.price', $minPrice)->first()?->id ?? ($tour->tiers->first()?->id ?? null));
+
     // Prepare Tabs Array
     $tabs = [];
     if($highlights->count()) $tabs['highlights'] = __('ui.tour_tabs.highlights');
@@ -107,9 +121,9 @@
           @endif
           "offers": {
             "@type": "Offer",
-            "url": {!! json_encode(request()->url()) !!},
+            "url": {!! json_encode(request()->fullUrl()) !!},
             "priceCurrency": "AED",
-            "price": "{{ number_format($minPrice, 2, '.', '') }}",
+            "price": "{{ number_format($activePrice, 2, '.', '') }}",
             "priceValidUntil": "{{ now()->addYear()->endOfYear()->format('Y-m-d') }}",
             "validFrom": "{{ now()->startOfYear()->toIso8601String() }}",
             "itemCondition": "https://schema.org/NewCondition",
@@ -124,6 +138,12 @@
               "merchantReturnDays": 1,
               "returnMethod": "https://schema.org/ReturnInStore",
               "returnFees": "https://schema.org/FreeReturn"
+            },
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "price": "{{ number_format($activePrice, 2, '.', '') }}",
+              "priceCurrency": "AED",
+              "valueAddedTaxIncluded": true
             }
           }
           @if($tour->itineraries->count() > 0)
@@ -203,12 +223,12 @@ window.dataLayer.push({
   event: "view_item",
   ecommerce: {
     currency: "AED",
-    value: {{ $minPrice }},
+    value: {{ $activePrice }},
     items: [{
       item_id: "{{ $tour->id }}",
       item_name: "{{ $tour->name }}",
       item_category: "{{ $tour->category ? $tour->category->slug : '' }}",
-      price: {{ $minPrice }}
+      price: {{ $activePrice }}
     }]
   }
 });
@@ -222,7 +242,7 @@ if(window.fbq){
     fbq('track', 'ViewContent', {
         content_ids: ['TOUR-{{ $tour->id }}'],
         content_type: 'product',
-        value: {{ $minPrice }},
+        value: {{ $activePrice }},
         currency: 'AED'
     });
 }
@@ -620,9 +640,16 @@ if(window.fbq){
                             $tPrice = $tier->pivot?->price ?? 0;
                             $tOldPrice = $tier->pivot?->old_price ?? 0;
                             $saveAmt = ($tOldPrice > 0 && $tOldPrice > $tPrice) ? ($tOldPrice - $tPrice) : 0;
+                            $isSelectedOption = ($activeTier && $tier->id === $activeTier->id);
                         @endphp
-                        <div class="bg-white rounded-2xl p-5 border-2 flex flex-col h-full relative transition-all duration-300 hover:shadow-lg {{ $tier->is_popular ? 'border-primary shadow-md' : 'border-slate-300 shadow-xs' }}">
-                            @if($tier->is_popular)
+                        <div class="bg-white rounded-2xl p-5 border-2 flex flex-col h-full relative transition-all duration-300 hover:shadow-lg {{ $isSelectedOption ? 'border-primary ring-4 ring-primary/20 shadow-lg' : ($tier->is_popular ? 'border-primary shadow-md' : 'border-slate-300 shadow-xs') }}">
+                            @if($isSelectedOption)
+                            <div class="absolute -top-3 start-1/2 -translate-x-1/2 rtl:translate-x-1/2">
+                                <span class="bg-emerald-600 text-white rounded-full px-3 py-0.5 text-[10px] font-extrabold uppercase tracking-wider shadow-sm flex items-center gap-1">
+                                    <i class="bi bi-patch-check-fill"></i> Selected Option
+                                </span>
+                            </div>
+                            @elseif($tier->is_popular)
                             <div class="absolute -top-3 start-1/2 -translate-x-1/2 rtl:translate-x-1/2">
                                 <span class="bg-primary text-white rounded-full px-3 py-0.5 text-[10px] font-extrabold uppercase tracking-wider shadow-sm">{{ __('ui.common.popular') }}</span>
                             </div>
@@ -708,8 +735,20 @@ if(window.fbq){
                     <!-- Booking Card -->
                     <div class="bg-white rounded-2xl p-6 shadow-xl border border-slate-200">
                         <div class="text-center pb-4 mb-4 border-b border-slate-200">
+                            @if($activeTier)
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-50 text-emerald-700 border border-emerald-200 mb-1.5">
+                                <i class="bi bi-patch-check-fill text-emerald-600"></i> Selected: {{ $activeTier->name }}
+                            </span>
+                            <div class="text-3xl font-black text-primary mt-0.5" data-aed="{{ $activePrice }}">{{ __('ui.common.aed') }} {{ number_format($activePrice) }}</div>
+                            @if($activeOldPrice && $activeOldPrice > $activePrice)
+                            <div class="text-xs text-slate-400 line-through mt-0.5" data-aed="{{ $activeOldPrice }}">{{ __('ui.common.aed') }} {{ number_format($activeOldPrice) }}</div>
+                            @endif
+                            <span class="text-[10px] text-slate-500 block mt-1"><i class="bi bi-shield-check text-emerald-600"></i> Best Price Guaranteed • Includes 5% UAE VAT</span>
+                            @else
                             <span class="text-[11px] uppercase font-bold text-slate-500 tracking-wider">{{ __('ui.common.starting_from') }}</span>
                             <div class="text-3xl font-black text-primary mt-0.5" data-aed="{{ $minPrice }}">{{ __('ui.common.aed') }} {{ number_format($minPrice) }}</div>
+                            <span class="text-[10px] text-slate-500 block mt-1"><i class="bi bi-shield-check text-emerald-600"></i> Includes 5% UAE VAT & Local Fees</span>
+                            @endif
                         </div>
 
                         <!-- Urgency Widget -->
@@ -734,9 +773,14 @@ if(window.fbq){
                                     $tPrice = $tier->pivot?->price ?? 0;
                                     $tOldPrice = $tier->pivot?->old_price ?? 0;
                                     $save = ($tOldPrice > 0 && $tOldPrice > $tPrice) ? ($tOldPrice - $tPrice) : 0;
+                                    $isTierActive = ($activeTier && $tier->id === $activeTier->id);
                                 @endphp
-                                <div class="package-option p-3.5 border rounded-2xl relative cursor-pointer transition-all hover:shadow-xs {{ $tier->is_popular ? 'border-primary bg-primary/5' : 'border-slate-200 bg-white hover:border-slate-300' }}" data-action="open-booking" data-tour="{{ $tour->id }}" data-tier="{{ $tier->id }}" @click="$store.modal.open('booking', { tourId: {{ $tour->id }}, tierId: {{ $tier->id }} })">
-                                    @if($tier->is_popular)
+                                <div class="package-option p-3.5 border rounded-2xl relative cursor-pointer transition-all hover:shadow-xs {{ $isTierActive ? 'border-primary ring-2 ring-primary/20 bg-primary/5 shadow-xs' : ($tier->is_popular ? 'border-primary bg-primary/5' : 'border-slate-200 bg-white hover:border-slate-300') }}" data-action="open-booking" data-tour="{{ $tour->id }}" data-tier="{{ $tier->id }}" @click="$store.modal.open('booking', { tourId: {{ $tour->id }}, tierId: {{ $tier->id }} })">
+                                    @if($isTierActive)
+                                    <span class="bg-emerald-600 text-white text-[9px] font-black uppercase tracking-wider rounded-full px-2 py-0.5 absolute top-2 end-2 flex items-center gap-1">
+                                        <i class="bi bi-check2"></i> Selected Option
+                                    </span>
+                                    @elseif($tier->is_popular)
                                     <span class="bg-primary text-white text-[9px] font-black uppercase tracking-wider rounded-full px-2 py-0.5 absolute top-2 end-2">{{ __('ui.tour_sidebar.popular_badge') }}</span>
                                     @endif
                                     <div class="flex justify-between items-start">
@@ -746,7 +790,7 @@ if(window.fbq){
                                             <span class="text-[11px] text-slate-500 line-clamp-1 mt-0.5 block">{{ $tier->description }}</span>
                                             @endif
                                         </div>
-                                        <div class="text-end shrink-0 {{ $tier->is_popular ? 'mt-4' : '' }}">
+                                        <div class="text-end shrink-0 {{ ($tier->is_popular || $isTierActive) ? 'mt-4' : '' }}">
                                             @if($save)
                                             <span class="text-[10px] text-slate-400 line-through block" data-aed="{{ $tOldPrice }}">{{ __('ui.common.aed') }} {{ number_format($tOldPrice) }}</span>
                                             @endif
@@ -779,7 +823,7 @@ if(window.fbq){
 
                         <!-- CTA Actions -->
                         <div class="space-y-2.5">
-                            <button class="w-full btn-desert-animated text-base font-bold rounded-full py-3.5 text-white shadow-lg cursor-pointer" @click.prevent="$store.modal.open('booking', { tourId: {{ $tour->id }} })">
+                            <button class="w-full btn-desert-animated text-base font-bold rounded-full py-3.5 text-white shadow-lg cursor-pointer" @click.prevent="$store.modal.open('booking', { tourId: {{ $tour->id }}{{ $defaultTierId ? ', tierId: ' . $defaultTierId : '' }} })">
                                 <i class="bi bi-calendar-check-fill me-2"></i>{{ __('ui.common.book_online_now') }}
                             </button>
                             <button type="button" class="w-full border border-slate-300 hover:border-primary text-slate-700 hover:text-primary text-sm font-bold rounded-full py-2.5 transition-colors btn-toggle-compare cursor-pointer flex items-center justify-center gap-2" data-tour-id="{{ $tour->id }}" onclick="event.preventDefault(); window.DunesCompare && window.DunesCompare.toggle(this);">
@@ -1051,14 +1095,19 @@ if(window.fbq){
 <!-- Mobile Book Bar Sticky bottom (visible on screens below lg) -->
 <div class="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md px-4 py-3 border-t border-slate-200 shadow-2xl lg:hidden flex items-center justify-between z-30 pb-safe">
     <div>
+        @if($activeTier)
+        <span class="text-emerald-700 block text-[9px] uppercase font-extrabold tracking-wider truncate max-w-[140px]">{{ $activeTier->name }}</span>
+        <div class="text-xl font-black text-primary" data-aed="{{ $activePrice }}">{{ __('ui.common.aed') }} {{ number_format($activePrice) }}</div>
+        @else
         <span class="text-slate-400 block text-[9px] uppercase font-bold tracking-wider">{{ __('ui.common.starting_from') }}</span>
         <div class="text-xl font-black text-primary" data-aed="{{ $minPrice }}">{{ __('ui.common.aed') }} {{ number_format($minPrice) }}</div>
+        @endif
     </div>
     <div class="flex items-center gap-2">
         <button type="button" class="border border-slate-300 text-slate-700 text-xs font-bold rounded-full px-3.5 py-2.5 btn-toggle-compare whitespace-nowrap cursor-pointer inline-flex items-center gap-1" data-tour-id="{{ $tour->id }}" onclick="event.preventDefault(); window.DunesCompare && window.DunesCompare.toggle(this);">
             <i class="bi bi-shuffle"></i><span class="compare-btn-text">{{ __('ui.common.compare') }}</span>
         </button>
-        <button class="btn-desert-animated text-xs sm:text-sm font-bold text-white rounded-full px-5 py-2.5 shadow-md whitespace-nowrap cursor-pointer inline-flex items-center gap-1" data-action="open-booking" data-tour="{{ $tour->id }}" @click.prevent="$store.modal.open('booking', { tourId: {{ $tour->id }} })">
+        <button class="btn-desert-animated text-xs sm:text-sm font-bold text-white rounded-full px-5 py-2.5 shadow-md whitespace-nowrap cursor-pointer inline-flex items-center gap-1" data-action="open-booking" data-tour="{{ $tour->id }}" @click.prevent="$store.modal.open('booking', { tourId: {{ $tour->id }}{{ $defaultTierId ? ', tierId: ' . $defaultTierId : '' }} })">
             <i class="bi bi-calendar-check-fill"></i>{{ __('ui.common.book_now') }}
         </button>
     </div>

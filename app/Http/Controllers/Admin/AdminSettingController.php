@@ -107,6 +107,7 @@ class AdminSettingController extends Controller
             'operators_xml' => url('/feeds/google-things-to-do/operators.xml'),
             'unified_xml' => url('/feeds/google-things-to-do/feed.xml'),
             'feed_json' => url('/feeds/google-things-to-do/feed.json'),
+            'proto_json' => url('/feeds/google-things-to-do/proto.json'),
         ];
 
         return view('admin.settings.gttd', compact('settings', 'activeToursCount', 'totalTiersCount', 'feedUrls'));

@@ -281,4 +281,196 @@ class GoogleThingsToDoFeedTest extends TestCase
         $flushResponse->assertRedirect();
         $flushResponse->assertSessionHas('success');
     }
+
+    /**
+     * Test 9: Proto JSON feed returns official ProductFeed schema with units and nanos
+     */
+    public function test_proto_json_feed_returns_official_product_feed_schema(): void
+    {
+        $response = $this->get('/feeds/google-things-to-do/proto.json');
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'application/json; charset=UTF-8');
+
+        $response->assertJsonStructure([
+            'feed_metadata' => [
+                'feed_name',
+                'nonce',
+                'timestamp',
+                'publisher',
+                'license',
+            ],
+            'products' => [
+                '*' => [
+                    'product_id',
+                    'operator' => [
+                        'name',
+                        'google_business_profile_name',
+                        'phone_number',
+                        'url',
+                    ],
+                    'title',
+                    'description',
+                    'inventory_types',
+                    'category',
+                    'landing_page_list' => [
+                        'landing_pages' => [
+                            '*' => ['url', 'tag'],
+                        ],
+                    ],
+                    'rating' => ['average_value', 'rating_count'],
+                    'media' => [
+                        '*' => ['url'],
+                    ],
+                    'features' => [
+                        '*' => ['text'],
+                    ],
+                    'duration',
+                    'related_locations' => [
+                        '*' => [
+                            'relation_type',
+                            'location' => [
+                                'place_info' => [
+                                    'place_id',
+                                    'name',
+                                    'lat_lng' => ['latitude', 'longitude'],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'options' => [
+                        '*' => [
+                            'option_id',
+                            'title',
+                            'landing_page_list' => [
+                                'landing_pages' => [
+                                    '*' => ['url'],
+                                ],
+                            ],
+                            'price_options' => [
+                                '*' => [
+                                    'price' => ['currency_code', 'units', 'nanos'],
+                                    'fees_and_taxes' => ['included', 'tax_description'],
+                                ],
+                            ],
+                            'cancellation_policy' => [
+                                'refund_conditions' => [
+                                    '*' => ['refund_percent', 'time_before_start'],
+                                ],
+                            ],
+                            'fulfillment_type',
+                            'instant_confirmation',
+                            'language_codes',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $data = $response->json();
+        $this->assertEquals('ext.travel.ttd.proto.feeds.v1.ProductFeed', $data['feed_metadata']['feed_name']);
+        $product = $data['products'][0];
+        $this->assertContains('INVENTORY_TYPE_OFFICIAL', $product['inventory_types']);
+        $this->assertContains('INVENTORY_TYPE_EXPERIENCE', $product['inventory_types']);
+        $this->assertEquals(99, $product['options'][0]['price_options'][0]['price']['units']);
+        $this->assertTrue($product['options'][0]['price_options'][0]['fees_and_taxes']['included']);
+        $this->assertEquals('FULFILLMENT_TYPE_MOBILE_TICKET', $product['options'][0]['fulfillment_type']);
+        $this->assertEquals(100, $product['options'][0]['cancellation_policy']['refund_conditions'][0]['refund_percent']);
+    }
+
+    /**
+     * Test 10: High-precision POI resolution across distinct landmark categories
+     */
+    public function test_high_precision_poi_resolution_across_landmark_categories(): void
+    {
+        $controller = app(\App\Http\Controllers\GoogleThingsToDoFeedController::class);
+
+        // Abu Dhabi City Tour must map to Sheikh Zayed Grand Mosque, NOT Dubai Downtown
+        $abuDhabi = new Tour(['slug' => 'abu-dhabi-city-tour-from-dubai', 'name' => 'Abu Dhabi City Tour']);
+        $poiAbuDhabi = $controller->resolvePoiForTour($abuDhabi);
+        $this->assertEquals('ChIJUz3K_qV3Xj4R-3qZ7i6F0tY', $poiAbuDhabi['place_id']);
+        $this->assertStringContainsString('Sheikh Zayed Grand Mosque', $poiAbuDhabi['name']);
+
+        // Quad Biking must map to Big Red Dune Quad Arena
+        $quad = new Tour(['slug' => 'desert-safari-quad-biking-dubai', 'name' => 'Quad Biking Safari']);
+        $poiQuad = $controller->resolvePoiForTour($quad);
+        $this->assertEquals('ChIJy2N8h6Ptdj4R2fP4-dJ7e6M', $poiQuad['place_id']);
+
+        // Dhow Cruise must map to Dubai Marina
+        $cruise = new Tour(['slug' => 'dhow-cruise-catamaran-cruise-dinner-dubai', 'name' => 'Marina Cruise']);
+        $poiCruise = $controller->resolvePoiForTour($cruise);
+        $this->assertEquals('ChIJY3Y7ZvhDXz4RcKk7a-JqY6U', $poiCruise['place_id']);
+
+        // Dubai City Tour must map to Burj Khalifa
+        $city = new Tour(['slug' => 'dubai-city-tour', 'name' => 'Dubai City Tour']);
+        $poiCity = $controller->resolvePoiForTour($city);
+        $this->assertEquals('ChIJv_Q67d5DXz4R3M_4y_iN8t8', $poiCity['place_id']);
+
+        // Desert Safari must map to Lahbab Red Dunes
+        $safari = new Tour(['slug' => 'evening-desert-safari-dubai', 'name' => 'Evening Desert Safari']);
+        $poiSafari = $controller->resolvePoiForTour($safari);
+        $this->assertEquals('ChIJt7e4-c9xdj4R_hY6W5xrqU8', $poiSafari['place_id']);
+    }
+
+    /**
+     * Test 11: Landing page synchronizes requested tier for 100% price accuracy score
+     */
+    public function test_landing_page_synchronizes_requested_tier_for_100_percent_price_accuracy(): void
+    {
+        $tour = Tour::where('slug', 'premium-red-dunes-safari')->first();
+
+        $vipTier = Tier::create([
+            'name' => 'VIP Majlis Package',
+            'slug' => 'vip',
+            'display_name' => 'VIP Majlis Package',
+            'status' => 'active',
+        ]);
+
+        $tour->tiers()->attach($vipTier->id, [
+            'price' => 199.00,
+            'old_price' => 280.00,
+            'price_type' => 'per_person',
+        ]);
+
+        // Hit canonical landing page with Google feed tier query: ?tier=vip
+        $response = $this->get('/' . $tour->slug . '?tier=vip');
+        $response->assertStatus(200);
+
+        $content = $response->getContent();
+
+        // Must display the requested tier's visual price in hero/sidebar
+        $this->assertStringContainsString('data-aed="199"', $content);
+        $this->assertStringContainsString('Selected: VIP Majlis Package', $content);
+
+        // Schema.org Offer JSON-LD must strictly match the feed option price (199.00)
+        $this->assertStringContainsString('"price": "199.00"', $content);
+        $this->assertStringContainsString('"valueAddedTaxIncluded": true', $content);
+
+        // Also assert that legacy /tours/{slug}?tier=vip permanently 301 redirects to /{slug}?tier=vip preserving the query
+        $legacyRedirect = $this->get('/tours/' . $tour->slug . '?tier=vip');
+        $legacyRedirect->assertStatus(301);
+        $legacyRedirect->assertRedirect('/' . $tour->slug . '?tier=vip');
+    }
+
+    /**
+     * Test 12: XML feeds contain rich cancellation policy and fulfillment tags
+     */
+    public function test_xml_feeds_contain_rich_cancellation_and_fulfillment_tags(): void
+    {
+        $prodResponse = $this->get('/feeds/google-things-to-do/products.xml');
+        $prodResponse->assertStatus(200);
+        $prodContent = $prodResponse->getContent();
+        $this->assertStringContainsString('<free_cancellation_hours>24</free_cancellation_hours>', $prodContent);
+        $this->assertStringContainsString('<fulfillment_type>FULFILLMENT_TYPE_MOBILE_TICKET</fulfillment_type>', $prodContent);
+        $this->assertStringContainsString('<official_site_partner>true</official_site_partner>', $prodContent);
+
+        $optResponse = $this->get('/feeds/google-things-to-do/options.xml');
+        $optResponse->assertStatus(200);
+        $optContent = $optResponse->getContent();
+        $this->assertStringContainsString('<taxes_and_fees_included>true</taxes_and_fees_included>', $optContent);
+        $this->assertStringContainsString('<free_cancellation_hours>24</free_cancellation_hours>', $optContent);
+        $this->assertStringContainsString('<refund_percent>100</refund_percent>', $optContent);
+        $this->assertStringContainsString('<language>en</language>', $optContent);
+        $this->assertStringContainsString('<language>ar</language>', $optContent);
+    }
 }

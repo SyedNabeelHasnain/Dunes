@@ -21,8 +21,13 @@
                 <tr>
                     <th class="text-start py-4 px-4 text-slate-500 font-bold uppercase text-xs w-[28%] min-w-[180px]">Feature / Inclusion</th>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
-                    <th class="py-4 px-3 min-w-[140px] {{ $tier->is_popular ? 'bg-orange-50/60 border-x border-orange-200' : '' }}">
-                        @if($tier->is_popular)
+                    @php
+                        $isTierSelected = isset($activeTier) && $activeTier && $tier->id === $activeTier->id;
+                    @endphp
+                    <th class="py-4 px-3 min-w-[140px] {{ $isTierSelected ? 'bg-orange-100/70 border-x-2 border-primary' : ($tier->is_popular ? 'bg-orange-50/60 border-x border-orange-200' : '') }}">
+                        @if($isTierSelected)
+                        <span class="inline-block px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[9px] font-black uppercase mb-1">SELECTED OPTION</span>
+                        @elseif($tier->is_popular)
                         <span class="inline-block px-2 py-0.5 rounded-full bg-primary text-white text-[9px] font-black uppercase mb-1">MOST POPULAR</span>
                         @endif
                         <div class="font-extrabold text-slate-900 text-sm">{{ $tier->name }}</div>
@@ -133,12 +138,16 @@
                 <tr>
                     <td class="text-start py-3.5 px-4 font-bold text-slate-500 text-xs">Select Package:</td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
-                    <td class="py-3.5 px-3 {{ $tier->is_popular ? 'bg-orange-50/60 border-x border-orange-200' : '' }}">
+                    @php
+                        $isTierSelected = isset($activeTier) && $activeTier && $tier->id === $activeTier->id;
+                    @endphp
+                    <td class="py-3.5 px-3 {{ $isTierSelected ? 'bg-orange-100/70 border-x-2 border-primary' : ($tier->is_popular ? 'bg-orange-50/60 border-x border-orange-200' : '') }}">
                         <button type="button" 
-                                class="w-full py-2.5 px-3 rounded-full text-xs font-bold transition-all shadow-xs cursor-pointer {{ $tier->is_popular ? 'bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-sm' : 'border border-primary text-primary hover:bg-primary hover:text-white' }}" 
+                                class="w-full py-2.5 px-3 rounded-full text-xs font-bold transition-all shadow-xs cursor-pointer {{ ($isTierSelected || $tier->is_popular) ? 'bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-sm' : 'border border-primary text-primary hover:bg-primary hover:text-white' }}" 
                                 data-action="open-booking" 
                                 data-tour="{{ $tour->id }}" 
-                                data-tier="{{ $tier->id }}">
+                                data-tier="{{ $tier->id }}"
+                                @click.prevent="$store.modal.open('booking', { tourId: {{ $tour->id }}, tierId: {{ $tier->id }} })">
                             Select {{ $tier->name }}
                         </button>
                     </td>
