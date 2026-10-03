@@ -45,6 +45,8 @@
     $siteAddress = $settings['site_address'] ?? 'Al Fahidi, Bur Dubai, Dubai, United Arab Emirates';
 
     $currentYear = date('Y');
+    $currentLocale = $currentLocale ?? app()->getLocale() ?? 'en';
+    $activeLanguages = $activeLanguages ?? \App\Models\Language::getActive();
     $pageTitle = $pageTitle ?? "Dunes Discovery Tourism | Dubai Desert Safari Tours ({$currentYear})";
     $pageDesc = $pageDesc ?? 'Book Dubai best desert safari tours from AED 99. Evening safari, city tours, dhow cruises with instant confirmation.';
     $pageKeys = $pageKeys ?? 'dubai desert safari,desert safari dubai,evening desert safari';
@@ -54,7 +56,7 @@
     $ogType = $ogType ?? 'website';
 @endphp
 <!DOCTYPE html>
-<html lang="{{ $currentLocale ?? app()->getLocale() ?? 'en' }}" dir="{{ ($isRtl ?? (app()->getLocale() === 'ar')) ? 'rtl' : 'ltr' }}">
+<html lang="{{ $currentLocale }}" dir="{{ ($isRtl ?? ($currentLocale === 'ar')) ? 'rtl' : 'ltr' }}">
 <head>
     @if(($isRtl ?? false) || ($currentLocale ?? app()->getLocale()) === 'ar')
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -163,7 +165,28 @@
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:site_name" content="Dunes Discovery Tourism">
-    <meta property="og:locale" content="en_US">
+    @php
+        $ogLocaleMap = [
+            'en' => 'en_US',
+            'ar' => 'ar_AE',
+            'ru' => 'ru_RU',
+            'es' => 'es_ES',
+            'it' => 'it_IT',
+            'de' => 'de_DE',
+            'fr' => 'fr_FR',
+            'zh' => 'zh_CN',
+        ];
+        $activeLocaleCode = $currentLocale ?? app()->getLocale() ?? 'en';
+        $currentOgLocale = $ogLocaleMap[$activeLocaleCode] ?? str_replace('-', '_', $activeLocaleCode);
+    @endphp
+    <meta property="og:locale" content="{{ $currentOgLocale }}">
+    @if(isset($activeLanguages) && is_iterable($activeLanguages))
+        @foreach($activeLanguages as $langItem)
+            @if($langItem->code !== $activeLocaleCode)
+                <meta property="og:locale:alternate" content="{{ $ogLocaleMap[$langItem->code] ?? str_replace('-', '_', $langItem->code) }}">
+            @endif
+        @endforeach
+    @endif
     
     <!-- Twitter Card Metadata -->
     <meta name="twitter:card" content="summary_large_image">
@@ -358,8 +381,8 @@
             "https://www.instagram.com/dunesdiscoverytourism",
             "https://www.tripadvisor.com"
           ],
-          "termsOfService": "{{ route('terms') }}",
-          "privacyPolicy": "{{ route('privacy') }}",
+          "termsOfService": "{{ localized_route('terms') }}",
+          "privacyPolicy": "{{ localized_route('privacy') }}",
           "hasMerchantReturnPolicy": {
             "@@type": "MerchantReturnPolicy",
             "applicableCountry": "AE",
@@ -381,11 +404,11 @@
             "@@type": "SearchAction",
             "target": {
               "@@type": "EntryPoint",
-              "urlTemplate": "{{ url('/tours') }}?search={search_term_string}"
+              "urlTemplate": "{{ localized_route('tours.search') }}?search={search_term_string}"
             },
             "query-input": "required name=search_term_string"
           },
-          "inLanguage": {!! json_encode(isset($activeLanguages) ? $activeLanguages->pluck('code')->toArray() : ['en', 'ar']) !!}
+          "inLanguage": {!! json_encode(isset($activeLanguages) ? $activeLanguages->pluck('code')->toArray() : ['en', 'ar', 'ru', 'es', 'it']) !!}
         },
         {
           "@@type": "WebPage",
@@ -393,7 +416,7 @@
           "url": "{{ $canonical }}",
           "name": {!! json_encode($pageTitle) !!},
           "description": {!! json_encode($pageDesc) !!},
-          "inLanguage": "{{ $currentLocale ?? 'en' }}",
+          "inLanguage": "{{ $currentLocale }}",
           "isPartOf": {
             "@@id": "{{ url('/') }}#website"
           },

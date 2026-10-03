@@ -74,19 +74,30 @@ class BlogController extends Controller
         $sideFeatured = $featuredPosts->slice(1, 2);
 
         $settingsService = app(SettingsService::class);
+        $currentLocale = app()->getLocale();
         $currentYear = date('Y');
-        $defaultTitle = "Dubai Desert Safari & Travel Blog ({$currentYear}) | Expert Insights | Dunes Discovery";
-        $defaultDesc = 'Read insider travel tips, desert safari packing guides, buggy safety advice, and Dubai itinerary recommendations by Dunes Discovery Tourism.';
-        $defaultKeys = 'dubai travel blog, desert safari guide, dubai desert tips, travel advice dubai';
 
-        $pageTitle = $categorySlug
-            ? ucwords(str_replace('-', ' ', $categorySlug))." Guides ({$currentYear}) | Dunes Discovery Blog"
-            : ($settingsService->get('seo_blog_title') ?: $defaultTitle);
-        $pageDesc = $settingsService->get('seo_blog_description') ?: $defaultDesc;
-        $pageKeys = $settingsService->get('seo_blog_keywords') ?: $defaultKeys;
+        if ($currentLocale === 'en' || empty($currentLocale)) {
+            $defaultTitle = "Dubai Desert Safari & Travel Blog ({$currentYear}) | Expert Insights | Dunes Discovery";
+            $defaultDesc = 'Read insider travel tips, desert safari packing guides, buggy safety advice, and Dubai itinerary recommendations by Dunes Discovery Tourism.';
+            $defaultKeys = 'dubai travel blog, desert safari guide, dubai desert tips, travel advice dubai';
+
+            $pageTitle = $categorySlug
+                ? ucwords(str_replace('-', ' ', $categorySlug))." Guides ({$currentYear}) | Dunes Discovery Blog"
+                : ($settingsService->get('seo_blog_title') ?: $defaultTitle);
+            $pageDesc = $settingsService->get('seo_blog_description') ?: $defaultDesc;
+            $pageKeys = $settingsService->get('seo_blog_keywords') ?: $defaultKeys;
+        } else {
+            $pageTitle = $categorySlug
+                ? ucwords(str_replace('-', ' ', $categorySlug))." ({$currentYear}) | ".__('ui.nav.blog')
+                : ($settingsService->get("seo_blog_title_{$currentLocale}") ?: __('ui.seo.blog_title', ['year' => $currentYear]));
+            $pageDesc = $settingsService->get("seo_blog_description_{$currentLocale}") ?: __('ui.seo.blog_description');
+            $pageKeys = $settingsService->get("seo_blog_keywords_{$currentLocale}") ?: __('ui.seo.blog_keywords');
+        }
+
         $ogImageSetting = $settingsService->get('seo_blog_og_image');
         $ogImage = $ogImageSetting ? asset(ltrim($ogImageSetting, '/')) : asset('images/desert-safari-poster.avif');
-        $canonical = $categorySlug ? route('blog.index', ['category' => $categorySlug]) : route('blog.index');
+        $canonical = $categorySlug ? localized_route('blog.index', ['category' => $categorySlug]) : localized_route('blog.index');
 
         return view('blog.index', compact('posts', 'categories', 'popularTags', 'featuredPost', 'sideFeatured', 'categorySlug', 'tagSlug', 'search', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
     }
@@ -126,7 +137,8 @@ class BlogController extends Controller
         }
 
         $featImgPath = $post->featured_image ? asset('images/blog/'.preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $post->featured_image)) : asset('images/desert-safari-poster.avif');
-        $canonical = $post->canonical_url ?: route('blog.show', $post->slug);
+        $currentLocale = app()->getLocale();
+        $canonical = $post->canonical_url ?: (($currentLocale && $currentLocale !== 'en') ? url('/'.$currentLocale.'/blog/'.$post->slug) : route('blog.show', $post->slug));
         $ogImage = $post->og_image ?: $featImgPath;
         $pageTitle = $post->meta_title ?: $post->title.' | Dunes Discovery';
         $pageDesc = $post->meta_desc ?: ($post->excerpt ?: Str::limit(strip_tags($post->content), 155));

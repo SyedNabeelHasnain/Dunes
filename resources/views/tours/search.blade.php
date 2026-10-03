@@ -9,20 +9,21 @@
   "name": {!! json_encode($pageTitle) !!},
   "description": {!! json_encode($pageDesc) !!},
   "url": "{{ $canonical }}",
+  "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
   "breadcrumb": {
     "@type": "BreadcrumbList",
     "itemListElement": [
       {
         "@type": "ListItem",
         "position": 1,
-        "name": "Home",
-        "item": "{{ rtrim(route('home'), '/') }}/"
+        "name": "{{ __('ui.nav.home') ?? 'Home' }}",
+        "item": "{{ localized_route('home') }}"
       },
       {
         "@type": "ListItem",
         "position": 2,
-        "name": "Tours",
-        "item": "{{ route('tours.index') }}"
+        "name": "{{ __('ui.nav.tours') ?? 'Tours' }}",
+        "item": "{{ localized_route('tours.index') }}"
       },
       {
         "@type": "ListItem",
@@ -44,7 +45,7 @@
         "@type": "ListItem",
         "position": {{ $idx + 1 }},
         "name": {!! json_encode($t->name) !!},
-        "url": "{{ route('tours.show', $t->slug) }}",
+        "url": "{{ localized_route('tours.show', $t->slug) }}",
         "image": "{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}",
         "offers": {
           "@type": "Offer",
@@ -67,9 +68,9 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-16">
         <nav aria-label="breadcrumb">
             <ol class="flex items-center gap-2 text-xs sm:text-sm text-white/70 mb-4">
-                <li><a href="{{ route('home') }}" class="hover:text-white transition-colors">Home</a></li>
+                <li><a href="{{ localized_route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') ?? 'Home' }}</a></li>
                 <li><span class="text-white/40">/</span></li>
-                <li><a href="{{ route('tours.index') }}" class="hover:text-white transition-colors">Tours</a></li>
+                <li><a href="{{ localized_route('tours.index') }}" class="hover:text-white transition-colors">{{ __('ui.nav.tours') ?? 'Tours' }}</a></li>
                 <li><span class="text-white/40">/</span></li>
                 <li class="text-white font-semibold truncate max-w-[200px] sm:max-w-none" aria-current="page">{{ $displayQuery }}</li>
             </ol>

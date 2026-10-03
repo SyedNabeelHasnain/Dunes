@@ -13,10 +13,10 @@
   "@@context": "https://schema.org",
   "@type": "BreadcrumbList",
   "itemListElement": [
-    {"@type":"ListItem","position":1,"name":"Home","item":"{{ rtrim(route('home'), '/') }}/"},
-    {"@type":"ListItem","position":2,"name":"Blog","item":"{{ route('blog.index') }}"}
+    {"@type":"ListItem","position":1,"name":"{{ __('ui.nav.home') ?? 'Home' }}","item":"{{ localized_route('home') }}"},
+    {"@type":"ListItem","position":2,"name":"{{ __('ui.nav.blog') ?? 'Blog' }}","item":"{{ localized_route('blog.index') }}"}
     @if ($cat)
-    ,{"@type":"ListItem","position":3,"name":"{{ $cat->name }}","item":"{{ route('blog.index', ['category' => $cat->slug]) }}"}
+    ,{"@type":"ListItem","position":3,"name":"{{ $cat->name }}","item":"{{ localized_route('blog.index', ['category' => $cat->slug]) }}"}
     @endif
   ]
 }
@@ -26,9 +26,10 @@
 {
   "@@context": "https://schema.org",
   "@type": "CollectionPage",
-  "name": "{{ $cat ? $cat->name . ' Blog' : 'Dubai Travel Blog' }}",
-  "description": "{{ $cat ? $cat->description : 'Expert guides and travel tips.' }}",
-  "url": "{{ request()->fullUrl() }}"
+  "name": "{{ $cat ? $cat->name . ' Blog' : ($pageTitle ?? 'Dubai Travel Blog') }}",
+  "description": "{{ $cat ? $cat->description : ($pageDesc ?? 'Expert guides and travel tips.') }}",
+  "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
+  "url": "{{ $canonical }}"
 }
 </script>
 
@@ -37,11 +38,11 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-16">
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="flex items-center gap-2 text-xs sm:text-sm text-white/70">
-                <li><a href="{{ route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') }}</a></li>
+                <li><a href="{{ localized_route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') }}</a></li>
                 <li><span class="text-white/40">/</span></li>
                 <li class="{{ !$cat ? 'text-white font-semibold' : '' }}">
                     @if($cat)
-                        <a href="{{ route('blog.index') }}" class="hover:text-white transition-colors">{{ __('ui.nav.blog') }}</a>
+                        <a href="{{ localized_route('blog.index') }}" class="hover:text-white transition-colors">{{ __('ui.nav.blog') }}</a>
                     @else
                         {{ __('ui.nav.blog') }}
                     @endif

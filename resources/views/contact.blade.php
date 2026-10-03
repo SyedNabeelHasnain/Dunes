@@ -8,24 +8,25 @@
   "@graph": [
     {
       "@type": "ContactPage",
-      "@id": "{{ route('contact') }}#webpage",
-      "url": "{{ route('contact') }}",
-      "name": "Contact Dunes Discovery Tourism Dubai",
-      "description": "Contact Dunes Discovery Tourism LLC for 24/7 Dubai desert safari bookings, dune buggy inquiries, and private group packages.",
+      "@id": "{{ $canonical }}#webpage",
+      "url": "{{ $canonical }}",
+      "name": {!! json_encode($pageTitle) !!},
+      "description": {!! json_encode($pageDesc) !!},
+      "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
       "breadcrumb": {
         "@type": "BreadcrumbList",
         "itemListElement": [
           {
             "@type": "ListItem",
             "position": 1,
-            "name": "Home",
-            "item": "{{ rtrim(route('home'), '/') }}/"
+            "name": "{{ __('ui.nav.home') ?? 'Home' }}",
+            "item": "{{ localized_route('home') }}"
           },
           {
             "@type": "ListItem",
             "position": 2,
-            "name": "Contact Us",
-            "item": "{{ route('contact') }}"
+            "name": "{{ __('ui.nav.contact') ?? 'Contact Us' }}",
+            "item": "{{ $canonical }}"
           }
         ]
       },
@@ -82,7 +83,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-16">
         <nav aria-label="breadcrumb">
             <ol class="flex items-center gap-2 text-xs sm:text-sm text-white/70 mb-4">
-                <li><a href="{{ route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') }}</a></li>
+                <li><a href="{{ localized_route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') }}</a></li>
                 <li><span class="text-white/40">/</span></li>
                 <li class="text-white font-semibold" aria-current="page">{{ __('ui.nav.contact') }}</li>
             </ol>

@@ -15,6 +15,8 @@ return [
         'book_now' => 'Book Experience',
         'search' => 'Search',
         'search_placeholder' => 'Search desert safaris, buggy tours, dune bashing...',
+        'tours' => 'Tours',
+        'legal_policies' => 'Legal & Policies',
     ],
 
     // Common Badges, Units & Trust Signals
@@ -529,5 +531,36 @@ return [
         'empty_msg' => 'Click the + Compare button on any safari card, or click below to analyze our Top 3 most popular Dubai experiences side-by-side:',
         'book_experience' => 'Book Experience',
         'clear' => 'Clear',
+    ],
+
+    // SEO & High-CTR SERP Metadata
+    'seo' => [
+        'home_title' => 'Dubai Desert Safari Tours :year | Best Price from AED 79 | Dunes Discovery Tourism',
+        'home_description' => 'Book top-rated Dubai Desert Safari, 1000cc Dune Buggy, Quad Biking, & Dhow Cruise dinners from AED 79. 4x4 Land Cruiser pickup, live BBQ, & 24h free cancellation.',
+        'home_keywords' => 'dubai desert safari, desert safari dubai, evening desert safari dubai, dune buggy rental dubai, quad biking dubai, dhow cruise dubai, abu dhabi city tour',
+
+        'tours_title' => 'Top Dubai Desert Safari & City Tours (:year) | Best Deals | Dunes Discovery',
+        'tours_description' => 'Explore top-rated Dubai desert safaris, 1000cc dune buggy rentals, dhow cruise dinners, and luxury Abu Dhabi city tours. Instant confirmation & 24h free cancellation.',
+        'tours_keywords' => 'dubai desert safari tours, dune buggy dubai, quad biking dubai, dhow cruise dubai, abu dhabi city tour',
+
+        'blog_title' => 'Dubai Travel & Desert Safari Blog (:year) | Insider Tips | Dunes Discovery',
+        'blog_description' => 'Expert guides, travel tips, and desert safari packing advice for Dubai travelers. Written by licensed safari guides and local destination specialists.',
+        'blog_keywords' => 'dubai travel blog, desert safari guide, dubai desert tips, travel advice dubai',
+
+        'about_title' => 'About Dunes Discovery Tourism (:year) | Leading Dubai Desert Safari Operator',
+        'about_description' => "Learn about Dunes Discovery Tourism LLC, Dubai's premier DTCM-licensed desert safari & adventure operator since 2018. Over 25+ luxury 4x4 Land Cruisers, 5-star live BBQ camps, and 10,000+ happy travelers.",
+        'about_keywords' => 'about dunes discovery tourism, dubai desert safari operator, licensed tourism company dubai, luxury desert safaris',
+
+        'contact_title' => 'Contact Dunes Discovery Tourism (:year) | 24/7 Dubai Support & Booking',
+        'contact_description' => 'Get in touch with Dunes Discovery Tourism Dubai. 24/7 WhatsApp assistance (+971 50 245 6056), instant bookings, custom group tours, and corporate desert safaris.',
+        'contact_keywords' => 'contact dunes discovery, dubai desert safari contact, book desert safari whatsapp, tourism office dubai',
+
+        'faq_title' => 'Dubai Desert Safari FAQs (:year) | Complete Traveler Guide | Dunes Discovery',
+        'faq_description' => 'Find instant answers to all questions about Dubai desert safaris, what to wear, dune bashing safety, child booster seats, 100% Halal live BBQ dining, and free 24h cancellations.',
+        'faq_keywords' => 'dubai desert safari faq, desert safari questions, what to wear desert safari dubai, halal bbq desert safari',
+
+        'rate_card_title' => 'Official Rate Card & Pricing Guide :year | Dunes Discovery Tourism',
+        'rate_card_description' => 'View transparent, all-inclusive rates for all Dubai Desert Safari packages, VIP majlis upgrades, buggy rentals, and private transport options.',
+        'rate_card_keywords' => 'desert safari prices dubai, safari rate card 2026, dubai buggy prices, vip safari rates',
     ],
 ];

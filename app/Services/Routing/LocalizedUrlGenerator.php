@@ -23,7 +23,11 @@ class LocalizedUrlGenerator extends UrlGenerator
         if ($locale && $locale !== 'en' && ! str_starts_with($name, 'locale.') && ! str_starts_with($name, 'admin.') && ! str_starts_with($name, 'api.')) {
             $localizedName = "locale.{$name}";
             if ($this->routes->hasNamedRoute($localizedName)) {
-                return parent::route($localizedName, $parameters, $absolute);
+                $params = is_array($parameters)
+                    ? array_merge(['locale' => $locale], $parameters)
+                    : ['locale' => $locale, 'slug' => $parameters];
+
+                return parent::route($localizedName, $params, $absolute);
             }
         }
 

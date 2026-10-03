@@ -41,8 +41,9 @@
       "@graph": [
         {
           "@type": ["Product", "TouristTrip"],
-          "@id": "{{ request()->url() }}#trip",
+          "@id": "{{ $canonical }}#trip",
           "name": {!! json_encode($tour->name) !!},
+          "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
           "description": {!! json_encode(Str::limit(strip_tags($tour->short_desc ?: $tour->full_desc), 300)) !!},
           "image": [
             {!! json_encode($heroAvifUrl) !!}
@@ -169,25 +170,25 @@
         },
         {
           "@type": "BreadcrumbList",
-          "@id": "{{ request()->url() }}#breadcrumb",
+          "@id": "{{ $canonical }}#breadcrumb",
           "itemListElement": [
             {
               "@type": "ListItem",
               "position": 1,
-              "name": "Home",
-              "item": "{{ rtrim(route('home'), '/') }}/"
+              "name": "{{ __('ui.nav.home') ?? 'Home' }}",
+              "item": "{{ localized_route('home') }}"
             },
             {
               "@type": "ListItem",
               "position": 2,
-              "name": "Tours",
-              "item": "{{ route('tours.index') }}"
+              "name": "{{ __('ui.nav.tours') ?? 'Tours' }}",
+              "item": "{{ localized_route('tours.index') }}"
             },
             {
               "@type": "ListItem",
               "position": 3,
               "name": {!! json_encode($tour->name) !!},
-              "item": "{{ request()->url() }}"
+              "item": "{{ $canonical }}"
             }
           ]
         }
@@ -195,7 +196,8 @@
         ,
         {
           "@type": "FAQPage",
-          "@id": "{{ request()->url() }}#faq",
+          "@id": "{{ $canonical }}#faq",
+          "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
           "mainEntity": [
             @foreach($faqs as $fidx => $f)
             {
@@ -255,9 +257,9 @@ if(window.fbq){
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full pb-10 pt-28 text-white">
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="flex items-center gap-2 text-xs sm:text-sm text-white/75 flex-wrap">
-                <li><a href="{{ route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') }}</a></li>
+                <li><a href="{{ localized_route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') }}</a></li>
                 <li><span class="text-white/40">/</span></li>
-                <li><a href="{{ route('tours.index') }}" class="hover:text-white transition-colors">{{ __('ui.nav.all_tours') }}</a></li>
+                <li><a href="{{ localized_route('tours.index') }}" class="hover:text-white transition-colors">{{ __('ui.nav.all_tours') }}</a></li>
                 <li><span class="text-white/40">/</span></li>
                 <li class="text-white font-semibold truncate max-w-[200px] sm:max-w-none" aria-current="page">{{ $tour->name }}</li>
             </ol>

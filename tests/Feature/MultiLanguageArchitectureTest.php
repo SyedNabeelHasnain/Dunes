@@ -24,31 +24,19 @@ class MultiLanguageArchitectureTest extends TestCase
         parent::setUp();
 
         // Seed default languages if not present
-        if (! Language::where('code', 'en')->exists()) {
-            Language::create([
-                'code' => 'en',
-                'name' => 'English',
-                'native_name' => 'English',
-                'direction' => 'ltr',
-                'flag' => '🇬🇧',
-                'is_default' => true,
-                'is_active' => true,
-                'sort_order' => 1,
-            ]);
+        $languages = [
+            ['code' => 'en', 'name' => 'English', 'native_name' => 'English', 'direction' => 'ltr', 'flag' => '🇬🇧', 'is_default' => true, 'is_active' => true, 'sort_order' => 1],
+            ['code' => 'ar', 'name' => 'Arabic', 'native_name' => 'العربية', 'direction' => 'rtl', 'flag' => '🇦🇪', 'is_default' => false, 'is_active' => true, 'sort_order' => 2],
+            ['code' => 'ru', 'name' => 'Russian', 'native_name' => 'Русский', 'direction' => 'ltr', 'flag' => '🇷🇺', 'is_default' => false, 'is_active' => true, 'sort_order' => 3],
+            ['code' => 'es', 'name' => 'Spanish', 'native_name' => 'Español', 'direction' => 'ltr', 'flag' => '🇪🇸', 'is_default' => false, 'is_active' => true, 'sort_order' => 4],
+            ['code' => 'it', 'name' => 'Italian', 'native_name' => 'Italiano', 'direction' => 'ltr', 'flag' => '🇮🇹', 'is_default' => false, 'is_active' => true, 'sort_order' => 5],
+        ];
+
+        foreach ($languages as $langData) {
+            Language::updateOrCreate(['code' => $langData['code']], $langData);
         }
 
-        if (! Language::where('code', 'ar')->exists()) {
-            Language::create([
-                'code' => 'ar',
-                'name' => 'Arabic',
-                'native_name' => 'العربية',
-                'direction' => 'rtl',
-                'flag' => '🇦🇪',
-                'is_default' => false,
-                'is_active' => true,
-                'sort_order' => 2,
-            ]);
-        }
+        Language::clearLanguageCache();
     }
 
     /**
@@ -511,5 +499,156 @@ class MultiLanguageArchitectureTest extends TestCase
         $responseEn = $this->get('/');
         $responseEn->assertStatus(200);
         $responseEn->assertSee('href="http://localhost/about"', false);
+    }
+
+    /**
+     * Test self-referential canonical tags across all 5 languages for SERP accuracy.
+     */
+    public function test_multilingual_serp_canonicals_self_referential_across_all_languages(): void
+    {
+        $tour = Tour::firstOrCreate(
+            ['slug' => 'evening-desert-safari-dubai'],
+            [
+                'name' => 'Evening Desert Safari Dubai',
+                'status' => 'active',
+                'priority' => 1,
+            ]
+        );
+
+        $locales = ['en', 'ar', 'ru', 'es', 'it'];
+
+        foreach ($locales as $loc) {
+            // Home canonical
+            $homeUrl = $loc === 'en' ? '/' : "/{$loc}";
+            $expectedHomeCanonical = $loc === 'en' ? 'http://localhost/' : "http://localhost/{$loc}";
+            $resHome = $this->get($homeUrl);
+            $resHome->assertStatus(200);
+            $resHome->assertSee('<link rel="canonical" href="'.$expectedHomeCanonical.'">', false);
+
+            // Tours index canonical
+            $toursUrl = $loc === 'en' ? '/tours' : "/{$loc}/tours";
+            $expectedToursCanonical = "http://localhost{$toursUrl}";
+            $resTours = $this->get($toursUrl);
+            $resTours->assertStatus(200);
+            $resTours->assertSee('<link rel="canonical" href="'.$expectedToursCanonical.'">', false);
+
+            // Tour show canonical
+            $tourUrl = $loc === 'en' ? "/{$tour->slug}" : "/{$loc}/{$tour->slug}";
+            $expectedTourCanonical = "http://localhost{$tourUrl}";
+            $resTour = $this->get($tourUrl);
+            $resTour->assertStatus(200);
+            $resTour->assertSee('<link rel="canonical" href="'.$expectedTourCanonical.'">', false);
+        }
+    }
+
+    /**
+     * Test OpenGraph locales and alternates across all 5 languages.
+     */
+    public function test_opengraph_locales_and_alternates_across_all_five_languages(): void
+    {
+        $ogMap = [
+            'en' => 'en_US',
+            'ar' => 'ar_AE',
+            'ru' => 'ru_RU',
+            'es' => 'es_ES',
+            'it' => 'it_IT',
+        ];
+
+        foreach ($ogMap as $code => $ogLocale) {
+            $url = $code === 'en' ? '/' : "/{$code}";
+            $res = $this->get($url);
+            $res->assertStatus(200);
+            $res->assertSee('<meta property="og:locale" content="'.$ogLocale.'">', false);
+
+            // Check that alternate locales are present
+            foreach ($ogMap as $altCode => $altOgLocale) {
+                if ($altCode !== $code) {
+                    $res->assertSee('<meta property="og:locale:alternate" content="'.$altOgLocale.'">', false);
+                }
+            }
+        }
+    }
+
+    /**
+     * Test hreflang tags for all 5 languages plus x-default are present in HTML head.
+     */
+    public function test_all_five_hreflang_tags_rendered_in_head(): void
+    {
+        $res = $this->get('/');
+        $res->assertStatus(200);
+        $res->assertSee('<link rel="alternate" hreflang="x-default" href="http://localhost/">', false);
+        $res->assertSee('<link rel="alternate" hreflang="en" href="http://localhost/">', false);
+        $res->assertSee('<link rel="alternate" hreflang="ar" href="http://localhost/ar">', false);
+        $res->assertSee('<link rel="alternate" hreflang="ru" href="http://localhost/ru">', false);
+        $res->assertSee('<link rel="alternate" hreflang="es" href="http://localhost/es">', false);
+        $res->assertSee('<link rel="alternate" hreflang="it" href="http://localhost/it">', false);
+    }
+
+    /**
+     * Test Schema.org inLanguage tags on WebPage and TouristTrip entities across languages.
+     */
+    public function test_schema_json_ld_inlanguage_across_multilingual_entities(): void
+    {
+        $tour = Tour::firstOrCreate(
+            ['slug' => 'evening-desert-safari-dubai'],
+            [
+                'name' => 'Evening Desert Safari Dubai',
+                'status' => 'active',
+                'priority' => 1,
+            ]
+        );
+
+        // Arabic homepage
+        $resAr = $this->get('/ar');
+        $resAr->assertStatus(200);
+        $resAr->assertSee('"inLanguage": "ar"', false);
+
+        // Russian homepage
+        $resRu = $this->get('/ru');
+        $resRu->assertStatus(200);
+        $resRu->assertSee('"inLanguage": "ru"', false);
+
+        // Arabic tour page
+        $resTourAr = $this->get('/ar/'.$tour->slug);
+        $resTourAr->assertStatus(200);
+        $resTourAr->assertSee('"inLanguage": "ar"', false);
+
+        // Russian tour page
+        $resTourRu = $this->get('/ru/'.$tour->slug);
+        $resTourRu->assertStatus(200);
+        $resTourRu->assertSee('"inLanguage": "ru"', false);
+    }
+
+    /**
+     * Test XML Sitemaps include all 5 languages with bidirectional alternate links.
+     */
+    public function test_sitemaps_include_all_five_languages_with_bidirectional_alternates(): void
+    {
+        Tour::firstOrCreate(
+            ['slug' => 'evening-desert-safari-dubai'],
+            [
+                'name' => 'Evening Desert Safari Dubai',
+                'status' => 'active',
+                'priority' => 1,
+            ]
+        );
+
+        $resTours = $this->get('/sitemap-tours.xml');
+        $resTours->assertStatus(200);
+        $resTours->assertSee('xhtml:link rel="alternate" hreflang="x-default"', false);
+        $resTours->assertSee('xhtml:link rel="alternate" hreflang="en"', false);
+        $resTours->assertSee('xhtml:link rel="alternate" hreflang="ar"', false);
+        $resTours->assertSee('xhtml:link rel="alternate" hreflang="ru"', false);
+        $resTours->assertSee('xhtml:link rel="alternate" hreflang="es"', false);
+        $resTours->assertSee('xhtml:link rel="alternate" hreflang="it"', false);
+
+        $resPages = $this->get('/sitemap-pages.xml');
+        $resPages->assertStatus(200);
+        $resPages->assertSee('xhtml:link rel="alternate" hreflang="x-default"', false);
+        $resPages->assertSee('xhtml:link rel="alternate" hreflang="en"', false);
+        $resPages->assertSee('xhtml:link rel="alternate" hreflang="ar"', false);
+        $resPages->assertSee('xhtml:link rel="alternate" hreflang="ru"', false);
+        $resPages->assertSee('xhtml:link rel="alternate" hreflang="es"', false);
+        $resPages->assertSee('xhtml:link rel="alternate" hreflang="it"', false);
     }
 }

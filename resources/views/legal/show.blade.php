@@ -7,11 +7,11 @@
   "@graph": [
     {
       "@type": "WebPage",
-      "@id": "{{ request()->url() }}#webpage",
-      "url": "{{ request()->url() }}",
+      "@id": "{{ $canonical }}#webpage",
+      "url": "{{ $canonical }}",
       "name": "{{ $pageTitle ?? $page->title }}",
       "description": "{{ $pageDesc ?? $page->description }}",
-      "inLanguage": ["en", "ar"],
+      "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
       "isPartOf": {
         "@type": "WebSite",
         "@id": "{{ route('home') }}#website",
@@ -34,25 +34,25 @@
     },
     {
       "@type": "BreadcrumbList",
-      "@id": "{{ request()->url() }}#breadcrumb",
+      "@id": "{{ $canonical }}#breadcrumb",
       "itemListElement": [
         {
           "@type": "ListItem",
           "position": 1,
-          "name": "Home",
-          "item": "{{ rtrim(route('home'), '/') }}/"
+          "name": "{{ __('ui.nav.home') ?? 'Home' }}",
+          "item": "{{ localized_route('home') }}"
         },
         {
           "@type": "ListItem",
           "position": 2,
-          "name": "Legal & Policies",
-          "item": "{{ route('terms') }}"
+          "name": "{{ __('ui.nav.legal_policies') ?? 'Legal & Trust' }}",
+          "item": "{{ localized_route('terms') }}"
         },
         {
           "@type": "ListItem",
           "position": 3,
           "name": "{{ $page->title }}",
-          "item": "{{ request()->url() }}"
+          "item": "{{ $canonical }}"
         }
       ]
     }
@@ -134,9 +134,9 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="flex items-center gap-2 text-xs text-white/75 flex-wrap">
-                <li><a href="{{ route('home') }}" class="hover:text-white transition-colors">Home</a></li>
+                <li><a href="{{ localized_route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') ?? 'Home' }}</a></li>
                 <li class="text-white/40">/</li>
-                <li><a href="{{ route('terms') }}" class="hover:text-white transition-colors">Legal & Trust</a></li>
+                <li><a href="{{ localized_route('terms') }}" class="hover:text-white transition-colors">{{ __('ui.nav.legal_policies') ?? 'Legal & Trust' }}</a></li>
                 <li class="text-white/40">/</li>
                 <li class="text-white font-medium" aria-current="page">{{ $page->title }}</li>
             </ol>

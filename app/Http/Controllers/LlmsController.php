@@ -162,6 +162,13 @@ class LlmsController extends Controller
         $md .= '- [Spanish Portal (Portal Oficial en Español)]('.url('/es')."): Portal turístico en español: reservas de safaris por el desierto de Dubái, alquiler de buggies, paseos en camello y cenas VIP (LTR).\n";
         $md .= '- [Italian Portal (Portale Ufficiale in Italiano)]('.url('/it')."): Portale ufficiale in lingua italiana: escursioni safari nel deserto di Dubai, tour in dune buggy, crociere dhow e cene beduine (LTR).\n\n";
 
+        $md .= "### Multilingual Tours Catalogs\n\n";
+        $md .= '- [English Tours Catalog]('.url('/tours').")\n";
+        $md .= '- [Arabic Tours Catalog (كتالوج رحلات السفاري)]('.url('/ar/tours').")\n";
+        $md .= '- [Russian Tours Catalog (Каталог экскурсий и сафари)]('.url('/ru/tours').")\n";
+        $md .= '- [Spanish Tours Catalog (Catálogo de safaris y tours)]('.url('/es/tours').")\n";
+        $md .= '- [Italian Tours Catalog (Catalogo escursioni e safari)]('.url('/it/tours').")\n\n";
+
         $md .= "## Optional\n\n";
         $md .= '- [Full LLM Knowledge Base]('.url('/llms-full.txt')."): Comprehensive full-text specifications, pricing tiers, FAQs, and entity knowledge graph for AI crawlers.\n";
         $md .= '- [XML Sitemap Index]('.url('/sitemap_index.xml')."): Complete hierarchical URL and image sitemap index for search engines.\n";
@@ -271,7 +278,12 @@ class LlmsController extends Controller
 
                 $md .= "- **Standard Inclusions**: 4x4 air-conditioned hotel pickup & drop-off, dune bashing, sandboarding, camel riding, Arabic coffee & dates, 100% Halal BBQ dinner (Veg, Non-Veg, Jain options), live entertainment shows (Tanoura, Fire show, Belly dance).\n";
                 $md .= "- **Cancellation Policy**: 100% Full Refund if cancelled up to 24 hours before tour departure.\n";
-                $md .= '- **Booking URL**: '.url('/'.$tour->slug)."\n\n";
+                $md .= "- **Direct Booking URLs Across All 5 Supported Languages**:\n";
+                $md .= '  - English: '.url('/'.$tour->slug)."\n";
+                $md .= '  - Arabic: '.url('/ar/'.$tour->slug)."\n";
+                $md .= '  - Russian: '.url('/ru/'.$tour->slug)."\n";
+                $md .= '  - Spanish: '.url('/es/'.$tour->slug)."\n";
+                $md .= '  - Italian: '.url('/it/'.$tour->slug)."\n\n";
             }
         } else {
             $md .= "### 1. Dune Buggy Rental Dubai (`/dune-buggy-rental-dubai`)\n";
@@ -281,14 +293,24 @@ class LlmsController extends Controller
             $md .= "- **Duration**: 3 Hours Total (1-2 Hours Dune Driving)\n";
             $md .= "- **Pricing Tiers**: 1-Seater Solo (AED 599), 2-Seater Duo (AED 899), 4-Seater Family (AED 1,299)\n";
             $md .= "- **Age**: Driver 16+ (No license required). Passenger 5+.\n";
-            $md .= '- **URL**: '.url('/dune-buggy-rental-dubai')."\n\n";
+            $md .= "- **Booking URLs**:\n";
+            $md .= '  - English: '.url('/dune-buggy-rental-dubai')."\n";
+            $md .= '  - Arabic: '.url('/ar/dune-buggy-rental-dubai')."\n";
+            $md .= '  - Russian: '.url('/ru/dune-buggy-rental-dubai')."\n";
+            $md .= '  - Spanish: '.url('/es/dune-buggy-rental-dubai')."\n";
+            $md .= '  - Italian: '.url('/it/dune-buggy-rental-dubai')."\n\n";
 
             $md .= "### 2. Evening Desert Safari Dubai (`/evening-desert-safari-dubai`)\n";
             $md .= "- **Category**: Premium Desert Safari / Cultural Camp Experience\n";
             $md .= "- **Duration**: 6 Hours (03:00 PM to 09:00 PM)\n";
             $md .= "- **Pricing Tiers**: Standard Bus Pickup (AED 99), 4x4 Land Cruiser Hotel Pickup (AED 149), VIP Table Service (AED 250)\n";
             $md .= "- **Inclusions**: High-dune bashing, sandboarding, camel ride, henna tattoo, 5-star BBQ dinner, 3 live shows.\n";
-            $md .= '- **URL**: '.url('/evening-desert-safari-dubai')."\n\n";
+            $md .= "- **Booking URLs**:\n";
+            $md .= '  - English: '.url('/evening-desert-safari-dubai')."\n";
+            $md .= '  - Arabic: '.url('/ar/evening-desert-safari-dubai')."\n";
+            $md .= '  - Russian: '.url('/ru/evening-desert-safari-dubai')."\n";
+            $md .= '  - Spanish: '.url('/es/evening-desert-safari-dubai')."\n";
+            $md .= '  - Italian: '.url('/it/evening-desert-safari-dubai')."\n\n";
         }
 
         $md .= "---\n\n";

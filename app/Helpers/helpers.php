@@ -122,16 +122,33 @@ if (! function_exists('localized_route')) {
      */
     function localized_route(string $name, mixed $parameters = [], ?string $locale = null, bool $absolute = true): string
     {
-        $locale = $locale ?: app()->getLocale();
+        $targetLocale = $locale ?: app()->getLocale();
 
         // English is the default root locale - no prefix
-        if ($locale === 'en' || empty($locale)) {
-            return route($name, $parameters, $absolute);
+        if ($targetLocale === 'en' || empty($targetLocale)) {
+            $baseName = str_starts_with($name, 'locale.') ? substr($name, 7) : $name;
+            if ($baseName === 'home') {
+                return $absolute ? (rtrim(url('/'), '/').'/') : '/';
+            }
+            return route($baseName, $parameters, $absolute);
         }
 
-        // For non-default locales (e.g. ar), prefix the path with /{locale}
-        $relativePath = route($name, $parameters, false);
-        $localizedPath = ($relativePath === '/' || $relativePath === '') ? "/{$locale}" : "/{$locale}{$relativePath}";
+        // Non-default locale: if named localized route exists, use it directly
+        $localizedName = str_starts_with($name, 'locale.') ? $name : "locale.{$name}";
+        $routes = app('routes');
+        if ($routes && $routes->hasNamedRoute($localizedName)) {
+            $params = is_array($parameters)
+                ? array_merge(['locale' => $targetLocale], $parameters)
+                : ['locale' => $targetLocale, 'slug' => $parameters];
+
+            return route($localizedName, $params, $absolute);
+        }
+
+        // Fallback: manually construct localized URL
+        $baseName = str_starts_with($name, 'locale.') ? substr($name, 7) : $name;
+        $relativePath = route($baseName, $parameters, false);
+        $cleanPath = preg_replace('#^/[a-z]{2}(-[a-z]{2})?(?=/|$)#', '', $relativePath);
+        $localizedPath = ($cleanPath === '/' || $cleanPath === '') ? "/{$targetLocale}" : "/{$targetLocale}{$cleanPath}";
 
         return $absolute ? url($localizedPath) : $localizedPath;
     }
@@ -170,7 +187,11 @@ if (! function_exists('switch_locale_url')) {
         }
 
         $queryString = $request->getQueryString();
-        $fullUrl = url($path).($queryString ? '?'.$queryString : '');
+        if ($path === '/') {
+            $fullUrl = rtrim(url('/'), '/').'/'.($queryString ? '?'.$queryString : '');
+        } else {
+            $fullUrl = url($path).($queryString ? '?'.$queryString : '');
+        }
 
         return $fullUrl;
     }

@@ -39,17 +39,26 @@ class TourController extends Controller
         $tours = $query->orderBy('priority', 'asc')->get();
 
         $settingsService = app(SettingsService::class);
+        $currentLocale = app()->getLocale();
         $currentYear = date('Y');
-        $defaultTitle = "Top Dubai Desert Safari & City Tours ({$currentYear}) | Best Deals | Dunes Discovery";
-        $defaultDesc = 'Explore top-rated Dubai desert safaris, 1000cc dune buggy rentals, dhow cruise dinners, and luxury Abu Dhabi city tours. Instant confirmation & 24h free cancellation.';
-        $defaultKeys = 'dubai desert safari tours, dune buggy dubai, quad biking dubai, dhow cruise dubai, abu dhabi city tour';
 
-        $pageTitle = $settingsService->get('seo_tours_title') ?: $defaultTitle;
-        $pageDesc = $settingsService->get('seo_tours_description') ?: $defaultDesc;
-        $pageKeys = $settingsService->get('seo_tours_keywords') ?: $defaultKeys;
+        if ($currentLocale === 'en' || empty($currentLocale)) {
+            $defaultTitle = "Top Dubai Desert Safari & City Tours ({$currentYear}) | Best Deals | Dunes Discovery";
+            $defaultDesc = 'Explore top-rated Dubai desert safaris, 1000cc dune buggy rentals, dhow cruise dinners, and luxury Abu Dhabi city tours. Instant confirmation & 24h free cancellation.';
+            $defaultKeys = 'dubai desert safari tours, dune buggy dubai, quad biking dubai, dhow cruise dubai, abu dhabi city tour';
+
+            $pageTitle = $settingsService->get('seo_tours_title') ?: $defaultTitle;
+            $pageDesc = $settingsService->get('seo_tours_description') ?: $defaultDesc;
+            $pageKeys = $settingsService->get('seo_tours_keywords') ?: $defaultKeys;
+        } else {
+            $pageTitle = $settingsService->get("seo_tours_title_{$currentLocale}") ?: __('ui.seo.tours_title', ['year' => $currentYear]);
+            $pageDesc = $settingsService->get("seo_tours_description_{$currentLocale}") ?: __('ui.seo.tours_description');
+            $pageKeys = $settingsService->get("seo_tours_keywords_{$currentLocale}") ?: __('ui.seo.tours_keywords');
+        }
+
         $ogImageSetting = $settingsService->get('seo_tours_og_image');
         $ogImage = $ogImageSetting ? asset(ltrim($ogImageSetting, '/')) : asset('images/desert-safari-poster.avif');
-        $canonical = route('tours.index');
+        $canonical = localized_route('tours.index');
 
         return view('tours.index', compact('categories', 'tours', 'selectedCategorySlug', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
     }
@@ -139,7 +148,8 @@ class TourController extends Controller
         $pageDesc = $tour->meta_desc ?: (strlen($tour->short_desc ?? '') > 50 ? strip_tags($tour->short_desc) : $defaultDesc);
 
         $pageKeys = $tour->meta_keywords ?: strtolower("{$tour->name}, {$tour->name} dubai, book {$tour->name}, desert safari dubai, dubai tours {$currentYear}");
-        $canonical = url('/'.$tour->slug);
+        $currentLocale = app()->getLocale();
+        $canonical = ($currentLocale && $currentLocale !== 'en') ? url('/'.$currentLocale.'/'.$tour->slug) : url('/'.$tour->slug);
 
         $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image ?: 'evening-desert-safari-dubai-dune-discovery-tourism.avif');
         $ogImage = asset('images/'.$imgFile);
@@ -217,7 +227,7 @@ class TourController extends Controller
         $pageTitle = "{$displayQuery} Dubai ({$currentYear} Deals {$priceText}) | Dunes Discovery";
         $pageDesc = "Looking for {$displayQuery}? Compare verified Dubai desert safari packages with 4x4 hotel pickup, 5-star live BBQ dinner, and instant confirmation. DET Licensed #1430583.";
         $pageKeys = strtolower("{$cleanQuery}, {$cleanQuery} dubai, best {$cleanQuery} dubai, desert safari dubai, dunes discovery");
-        $canonical = route('tours.search', ['q' => $cleanQuery]);
+        $canonical = localized_route('tours.search', ['q' => $cleanQuery]);
         $pageRobots = 'noindex, follow';
 
         $ogImage = asset('images/desert-safari-poster.avif');
@@ -622,7 +632,7 @@ class TourController extends Controller
         $pageTitle = 'Build Your Own Dubai Desert Safari (Customizer 2026) | Dunes Discovery';
         $pageDesc = 'Customize your bespoke Dubai desert safari experience. Configure private Land Cruisers, 1000cc Can-Am buggies, 400cc quad bikes, and VIP waiter table service with live real-time pricing.';
         $pageKeys = 'custom desert safari dubai, build your own safari dubai, bespoke desert safari, private land cruiser safari, vip desert safari customizer';
-        $canonical = route('tours.customizer');
+        $canonical = localized_route('tours.customizer');
         $ogImage = asset('images/desert-safari-poster.avif');
 
         return view('tours.customizer', compact('allTours', 'categories', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));

@@ -8,19 +8,19 @@
   "@graph": [
     {
       "@type": "BreadcrumbList",
-      "@id": "{{ route('faq') }}#breadcrumb",
+      "@id": "{{ $canonical }}#breadcrumb",
       "itemListElement": [
         {
           "@type": "ListItem",
           "position": 1,
-          "name": "Home",
-          "item": "{{ rtrim(route('home'), '/') }}/"
+          "name": "{{ __('ui.nav.home') ?? 'Home' }}",
+          "item": "{{ localized_route('home') }}"
         },
         {
           "@type": "ListItem",
           "position": 2,
-          "name": "FAQ",
-          "item": "{{ route('faq') }}"
+          "name": "{{ __('ui.nav.faq') ?? 'FAQ' }}",
+          "item": "{{ $canonical }}"
         }
       ]
     }
@@ -28,7 +28,8 @@
     ,
     {
       "@type": "FAQPage",
-      "@id": "{{ route('faq') }}#faqpage",
+      "@id": "{{ $canonical }}#faqpage",
+      "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
       "mainEntity": [
         @foreach($faqs as $index => $f)
         {
@@ -54,7 +55,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-16">
         <nav aria-label="breadcrumb">
             <ol class="flex items-center gap-2 text-xs sm:text-sm text-white/70 mb-4">
-                <li><a href="{{ route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') }}</a></li>
+                <li><a href="{{ localized_route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') }}</a></li>
                 <li><span class="text-white/40">/</span></li>
                 <li class="text-white font-semibold" aria-current="page">{{ __('ui.faq.title') }}</li>
             </ol>

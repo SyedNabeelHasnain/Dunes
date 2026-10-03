@@ -11,6 +11,7 @@
       "url": "{{ $canonical }}",
       "name": "{{ $locationData['meta_title'] }}",
       "description": "{{ $locationData['meta_desc'] }}",
+      "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
       "isPartOf": {
         "@type": "WebSite",
         "@id": "{{ url('/') }}#website",
@@ -23,14 +24,14 @@
           {
             "@type": "ListItem",
             "position": 1,
-            "name": "Home",
-            "item": "{{ rtrim(url('/'), '/') }}/"
+            "name": "{{ __('ui.nav.home') ?? 'Home' }}",
+            "item": "{{ localized_route('home') }}"
           },
           {
             "@type": "ListItem",
             "position": 2,
-            "name": "Desert Safari Dubai",
-            "item": "{{ route('tours.index') }}"
+            "name": "{{ __('ui.nav.tours') ?? 'Desert Safari Dubai' }}",
+            "item": "{{ localized_route('tours.index') }}"
           },
           {
             "@type": "ListItem",
@@ -46,6 +47,7 @@
       "@id": "{{ $canonical }}#trip",
       "name": "{{ $locationData['headline'] }}",
       "description": "{{ $locationData['subheadline'] }}",
+      "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
       "provider": {
         "@type": "TravelAgency",
         "name": "Dunes Discovery Tourism LLC",
@@ -144,9 +146,9 @@
             <!-- Breadcrumbs -->
             <nav aria-label="breadcrumb" class="mb-5">
                 <ol class="flex items-center gap-2 text-xs text-white/60 flex-wrap">
-                    <li><a href="{{ url('/') }}" class="hover:text-white transition-colors inline-flex items-center gap-1"><i class="bi bi-house-door"></i> Home</a></li>
+                    <li><a href="{{ localized_route('home') }}" class="hover:text-white transition-colors inline-flex items-center gap-1"><i class="bi bi-house-door"></i> {{ __('ui.nav.home') ?? 'Home' }}</a></li>
                     <li class="text-white/30">/</li>
-                    <li><a href="{{ route('tours.index') }}" class="hover:text-white transition-colors">Desert Safaris</a></li>
+                    <li><a href="{{ localized_route('tours.index') }}" class="hover:text-white transition-colors">{{ __('ui.nav.tours') ?? 'Desert Safaris' }}</a></li>
                     <li class="text-white/30">/</li>
                     <li class="text-amber-400 font-medium" aria-current="page">{{ $locationData['name'] }} Pickup</li>
                 </ol>

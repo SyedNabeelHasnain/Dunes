@@ -9,7 +9,8 @@
     $authorBio = $post->author_bio ?? '';
     
     $featImgPath = $post->featured_image ? asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $post->featured_image)) : asset('images/desert-safari-poster.avif');
-    $canonical = $post->canonical_url ?: route('blog.show', $post->slug);
+    $currentLocale = $currentLocale ?? app()->getLocale() ?? 'en';
+    $canonical = $canonical ?? ($post->canonical_url ?: (($currentLocale && $currentLocale !== 'en') ? url('/'.$currentLocale.'/blog/'.$post->slug) : route('blog.show', $post->slug)));
     $ogImageUrl = $post->og_image ?: $featImgPath;
     
     $pageTitle = $post->meta_title ?: $post->title . ' | Dunes Discovery';
@@ -18,11 +19,11 @@
     
     // Breadcrumb Schema
     $breadcrumbItems = [
-        ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => rtrim(route('home'), '/') . '/'],
-        ['@type' => 'ListItem', 'position' => 2, 'name' => 'Blog', 'item' => route('blog.index')]
+        ['@type' => 'ListItem', 'position' => 1, 'name' => __('ui.nav.home') ?? 'Home', 'item' => localized_route('home')],
+        ['@type' => 'ListItem', 'position' => 2, 'name' => __('ui.nav.blog') ?? 'Blog', 'item' => localized_route('blog.index')]
     ];
     if ($post->category) {
-        $breadcrumbItems[] = ['@type' => 'ListItem', 'position' => 3, 'name' => $post->category?->name, 'item' => route('blog.index', ['category' => $post->category?->slug])];
+        $breadcrumbItems[] = ['@type' => 'ListItem', 'position' => 3, 'name' => $post->category?->name, 'item' => localized_route('blog.index', ['category' => $post->category?->slug])];
         $breadcrumbItems[] = ['@type' => 'ListItem', 'position' => 4, 'name' => $post->title, 'item' => $canonical];
     } else {
         $breadcrumbItems[] = ['@type' => 'ListItem', 'position' => 3, 'name' => $post->title, 'item' => $canonical];
@@ -39,7 +40,7 @@
             '@type' => 'Person',
             'name' => $authorName,
             'jobTitle' => $authorTitle,
-            'worksFor' => ['@type' => 'Organization', 'name' => 'Dunes Discovery Tourism', 'url' => route('home')]
+            'worksFor' => ['@type' => 'Organization', 'name' => 'Dunes Discovery Tourism', 'url' => localized_route('home')]
         ],
         'publisher' => [
             '@type' => 'TravelAgency',
@@ -54,7 +55,7 @@
         'url' => $canonical,
         'wordCount' => str_word_count(strip_tags($post->content ?? '')),
         'timeRequired' => 'PT' . (int)($post->read_time ?: 5) . 'M',
-        'inLanguage' => app()->getLocale(),
+        'inLanguage' => $currentLocale,
         'keywords' => $pageKeys,
         'articleSection' => $post->category ? $post->category->name : 'Travel'
     ];
@@ -77,6 +78,7 @@
 {
   "@@context": "https://schema.org",
   "@type": "FAQPage",
+  "inLanguage": "{{ $currentLocale }}",
   "mainEntity": [
     @foreach($post->faqs as $fi => $faq)
     {
@@ -102,12 +104,12 @@
             <!-- Breadcrumbs -->
             <nav aria-label="breadcrumb" class="mb-4">
                 <ol class="flex items-center gap-2 text-xs sm:text-sm text-white/70 flex-wrap">
-                    <li><a href="{{ route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') }}</a></li>
+                    <li><a href="{{ localized_route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') }}</a></li>
                     <li><span class="text-white/40">/</span></li>
-                    <li><a href="{{ route('blog.index') }}" class="hover:text-white transition-colors">{{ __('ui.nav.blog') }}</a></li>
+                    <li><a href="{{ localized_route('blog.index') }}" class="hover:text-white transition-colors">{{ __('ui.nav.blog') }}</a></li>
                     @if ($post->category)
                     <li><span class="text-white/40">/</span></li>
-                    <li><a href="{{ route('blog.index', ['category' => $post->category?->slug]) }}" class="hover:text-white transition-colors">{{ $post->category?->name }}</a></li>
+                    <li><a href="{{ localized_route('blog.index', ['category' => $post->category?->slug]) }}" class="hover:text-white transition-colors">{{ $post->category?->name }}</a></li>
                     @endif
                     <li><span class="text-white/40">/</span></li>
                     <li class="text-white font-semibold truncate max-w-[200px] sm:max-w-none">{{ Str::limit($post->title, 40) }}</li>
@@ -115,7 +117,7 @@
             </nav>
 
             @if ($post->category)
-            <a href="{{ route('blog.index', ['category' => $post->category?->slug]) }}" class="bg-primary text-white rounded-full px-3.5 py-1 text-xs font-bold mb-4 inline-block shadow-sm">{{ $post->category?->name }}</a>
+            <a href="{{ localized_route('blog.index', ['category' => $post->category?->slug]) }}" class="bg-primary text-white rounded-full px-3.5 py-1 text-xs font-bold mb-4 inline-block shadow-sm">{{ $post->category?->name }}</a>
             @endif
 
             <h1 itemprop="headline" class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4 max-w-4xl">{{ $post->title }}</h1>

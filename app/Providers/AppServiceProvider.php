@@ -64,6 +64,13 @@ class AppServiceProvider extends ServiceProvider
             } catch (\Throwable $e) {
                 $view->with('settings', collect());
             }
+
+            try {
+                $activeLanguages = \App\Models\Language::getActive();
+                $view->with('activeLanguages', $activeLanguages);
+            } catch (\Throwable $e) {
+                $view->with('activeLanguages', \App\Models\Language::fallbackCollection());
+            }
         });
     }
 }

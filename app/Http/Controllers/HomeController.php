@@ -86,17 +86,27 @@ class HomeController extends Controller
         }
 
         $settingsService = app(SettingsService::class);
+        $currentLocale = app()->getLocale();
         $currentYear = date('Y');
-        $defaultTitle = "Dubai Desert Safari Tours {$currentYear} | Best Price from AED 79 | Dunes Discovery Tourism";
-        $defaultDesc = 'Book top-rated Dubai Desert Safari, 1000cc Dune Buggy, Quad Biking, & Dhow Cruise dinners from AED 79. 4x4 Land Cruiser pickup, live BBQ, & 24h free cancellation.';
-        $defaultKeys = 'dubai desert safari, desert safari dubai, evening desert safari dubai, dune buggy rental dubai, quad biking dubai, dhow cruise dubai, abu dhabi city tour';
 
-        $pageTitle = $settingsService->get('seo_home_title') ?: $defaultTitle;
-        $pageDesc = $settingsService->get('seo_home_description') ?: $defaultDesc;
-        $pageKeys = $settingsService->get('seo_home_keywords') ?: $defaultKeys;
+        if ($currentLocale === 'en' || empty($currentLocale)) {
+            $defaultTitle = "Dubai Desert Safari Tours {$currentYear} | Best Price from AED 79 | Dunes Discovery Tourism";
+            $defaultDesc = 'Book top-rated Dubai Desert Safari, 1000cc Dune Buggy, Quad Biking, & Dhow Cruise dinners from AED 79. 4x4 Land Cruiser pickup, live BBQ, & 24h free cancellation.';
+            $defaultKeys = 'dubai desert safari, desert safari dubai, evening desert safari dubai, dune buggy rental dubai, quad biking dubai, dhow cruise dubai, abu dhabi city tour';
+
+            $pageTitle = $settingsService->get('seo_home_title') ?: $defaultTitle;
+            $pageDesc = $settingsService->get('seo_home_description') ?: $defaultDesc;
+            $pageKeys = $settingsService->get('seo_home_keywords') ?: $defaultKeys;
+            $canonical = rtrim(route('home'), '/').'/';
+        } else {
+            $pageTitle = $settingsService->get("seo_home_title_{$currentLocale}") ?: __('ui.seo.home_title', ['year' => $currentYear]);
+            $pageDesc = $settingsService->get("seo_home_description_{$currentLocale}") ?: __('ui.seo.home_description');
+            $pageKeys = $settingsService->get("seo_home_keywords_{$currentLocale}") ?: __('ui.seo.home_keywords');
+            $canonical = url('/'.$currentLocale);
+        }
+
         $ogImageSetting = $settingsService->get('seo_home_og_image');
         $ogImage = $ogImageSetting ? asset(ltrim($ogImageSetting, '/')) : asset('images/desert-safari-poster.avif');
-        $canonical = rtrim(route('home'), '/').'/';
 
         return view('index', compact('categories', 'bestsellers', 'reviews', 'faqs', 'allActiveTours', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
     }

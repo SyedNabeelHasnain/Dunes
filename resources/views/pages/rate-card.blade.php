@@ -46,37 +46,38 @@
   "@graph": [
     {
       "@type": "WebPage",
-      "@id": "{{ route('rate-card') }}#webpage",
-      "url": "{{ route('rate-card') }}",
-      "name": "Official Dubai Desert Safaris & Tours Rate Card | Dunes Discovery",
-      "description": "Verified official rates and pricing for Dubai desert safaris, quad biking, dune buggy rentals, marina dhow cruises, and private VIP tours.",
+      "@id": "{{ $canonical }}#webpage",
+      "url": "{{ $canonical }}",
+      "name": {!! json_encode($pageTitle) !!},
+      "description": {!! json_encode($pageDesc) !!},
+      "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
       "isPartOf": {
         "@type": "WebSite",
-        "@id": "{{ route('home') }}#website",
-        "url": "{{ route('home') }}",
+        "@id": "{{ url('/') }}#website",
+        "url": "{{ url('/') }}",
         "name": "Dunes Discovery Tourism LLC Dubai"
       },
       "breadcrumb": {
         "@type": "BreadcrumbList",
-        "@id": "{{ route('rate-card') }}#breadcrumb",
+        "@id": "{{ $canonical }}#breadcrumb",
         "itemListElement": [
           {
             "@type": "ListItem",
             "position": 1,
-            "name": "Home",
-            "item": "{{ rtrim(route('home'), '/') }}/"
+            "name": "{{ __('ui.nav.home') ?? 'Home' }}",
+            "item": "{{ localized_route('home') }}"
           },
           {
             "@type": "ListItem",
             "position": 2,
             "name": "Rate Card",
-            "item": "{{ route('rate-card') }}"
+            "item": "{{ $canonical }}"
           }
         ]
       },
       "publisher": {
         "@type": "TravelAgency",
-        "@id": "{{ route('home') }}#organization",
+        "@id": "{{ url('/') }}#organization",
         "name": "Dunes Discovery Tourism L.L.C"
       }
     }

@@ -7,9 +7,9 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-16">
         <nav aria-label="breadcrumb">
             <ol class="flex items-center gap-2 text-xs sm:text-sm text-white/70 mb-4">
-                <li><a href="{{ route('home') }}" class="hover:text-white transition-colors">Home</a></li>
+                <li><a href="{{ localized_route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') ?? 'Home' }}</a></li>
                 <li><span class="text-white/40">/</span></li>
-                <li class="text-white font-semibold" aria-current="page">Tours</li>
+                <li class="text-white font-semibold" aria-current="page">{{ __('ui.nav.tours') ?? 'Tours' }}</li>
             </ol>
         </nav>
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
@@ -365,24 +365,25 @@ window.addEventListener('popstate', () => {
   "@graph": [
     {
       "@type": "CollectionPage",
-      "@id": "{{ route('tours.index') }}#webpage",
-      "url": "{{ route('tours.index') }}",
-      "name": "Dubai Desert Safari Tours & City Experiences | Dunes Discovery",
-      "description": "Browse and book the best Dubai desert safari tours, dune buggy rentals, quad biking, and dhow cruise dinners with Dunes Discovery Tourism.",
+      "@id": "{{ $canonical }}#webpage",
+      "url": "{{ $canonical }}",
+      "name": {!! json_encode($pageTitle) !!},
+      "description": {!! json_encode($pageDesc) !!},
+      "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
       "breadcrumb": {
         "@type": "BreadcrumbList",
         "itemListElement": [
           {
             "@type": "ListItem",
             "position": 1,
-            "name": "Home",
-            "item": "{{ rtrim(route('home'), '/') }}/"
+            "name": "{{ __('ui.nav.home') ?? 'Home' }}",
+            "item": "{{ localized_route('home') }}"
           },
           {
             "@type": "ListItem",
             "position": 2,
-            "name": "Tours",
-            "item": "{{ route('tours.index') }}"
+            "name": "{{ __('ui.nav.tours') ?? 'Tours' }}",
+            "item": "{{ $canonical }}"
           }
         ]
       },
@@ -395,7 +396,7 @@ window.addEventListener('popstate', () => {
             "@type": "ListItem",
             "position": {{ $idx + 1 }},
             "name": {!! json_encode($t->name) !!},
-            "url": "{{ route('tours.show', $t->slug) }}"
+            "url": "{{ localized_route('tours.show', ['slug' => $t->slug]) }}"
           }{{ $idx < $tours->count() - 1 ? ',' : '' }}
           @endforeach
         ]

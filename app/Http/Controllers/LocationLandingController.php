@@ -58,7 +58,8 @@ class LocationLandingController extends Controller
 
         $pageTitle = $locationData['meta_title'];
         $pageDesc = $locationData['meta_desc'];
-        $canonical = url('/'.$locationData['slug']);
+        $currentLocale = app()->getLocale();
+        $canonical = ($currentLocale && $currentLocale !== 'en') ? url('/'.$currentLocale.'/'.$locationData['slug']) : url('/'.$locationData['slug']);
         $ogImage = asset('images/desert-safari-poster.avif');
 
         return view('pages.location-tour', compact(

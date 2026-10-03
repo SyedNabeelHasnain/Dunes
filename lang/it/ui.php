@@ -15,6 +15,8 @@ return [
         'book_now' => 'Prenota Esperienza',
         'search' => 'Cerca',
         'search_placeholder' => 'Cerca safari nel deserto, tour in buggy, dune bashing...',
+        'tours' => 'Tour ed Esperienze',
+        'legal_policies' => 'Termini e Politiche Legali',
     ],
 
     // Common Badges, Units & Trust Signals
@@ -529,5 +531,36 @@ return [
         'empty_msg' => 'Fai clic sul pulsante + Confronta su qualsiasi scheda safari, o fai clic qui sotto per confrontare i nostri 3 tour più popolari:',
         'book_experience' => 'Prenota Esperienza',
         'clear' => 'Cancella',
+    ],
+
+    // SEO e meta tag (SEO & SERP)
+    'seo' => [
+        'home_title' => 'Safari nel Deserto di Dubai :year | Miglior Prezzo da 79 AED | Dunes Discovery',
+        'home_description' => 'Prenota i migliori safari nel deserto di Dubai, noleggio dune buggy 1000cc, quad e cene in crociera Dhow da 79 AED. Trasferimento in 4x4 Land Cruiser, barbecue e cancellazione gratuita 24h.',
+        'home_keywords' => 'safari deserto dubai, escursioni dubai, safari serale dubai, noleggio dune buggy dubai, quad dubai, crociera dhow dubai, tour abu dhabi',
+
+        'tours_title' => 'I Migliori Safari ed Escursioni a Dubai (:year) | Offerte | Dunes Discovery',
+        'tours_description' => 'Scopri i migliori safari nel deserto di Dubai, buggy 1000cc, cene in dhow e tour di lusso ad Abu Dhabi. Conferma istantanea e cancellazione gratuita.',
+        'tours_keywords' => 'escursioni safari dubai, dune buggy dubai, quad dubai, crociera dhow dubai, tour abu dhabi',
+
+        'blog_title' => 'Blog di Viaggi e Safari a Dubai (:year) | Consigli Utili | Dunes Discovery',
+        'blog_description' => 'Guide esperte, consigli di viaggio e cosa indossare per il safari nel deserto a Dubai. Scritto da guide certificate ed esperti locali.',
+        'blog_keywords' => 'blog viaggi dubai, guida safari deserto, consigli dubai deserto, vacanze a dubai',
+
+        'about_title' => 'Chi Siamo | Dunes Discovery Tourism (:year) | Operatore Leader a Dubai',
+        'about_description' => 'Scopri Dunes Discovery Tourism LLC, tour operator con licenza DTCM a Dubai dal 2018. Oltre 25 veicoli 4x4 di lusso, campo 5 stelle e più di 10.000 viaggiatori felici.',
+        'about_keywords' => 'chi siamo dunes discovery, tour operator dubai safari, agenzia autorizzata dubai, safari lusso dubai',
+
+        'contact_title' => 'Contatti Dunes Discovery Tourism (:year) | Assistenza e Prenotazioni 24/7',
+        'contact_description' => 'Contatta Dunes Discovery Tourism Dubai. Assistenza WhatsApp 24/7 (+971 50 245 6056), prenotazioni immediate, tour di gruppo e aziendali.',
+        'contact_keywords' => 'contatti dunes discovery, telefono safari dubai, prenota safari whatsapp, agenzia viaggi dubai',
+
+        'faq_title' => 'Domande Frequenti sui Safari a Dubai (:year) | Guida Completa | Dunes Discovery',
+        'faq_description' => 'Risposte a tutte le domande sul safari nel deserto a Dubai: abbigliamento consigliato, sicurezza sulle dune, seggiolini per bambini, cena halal e cancellazione gratuita.',
+        'faq_keywords' => 'domande frequenti safari dubai, faq safari deserto, come vestirsi safari dubai, barbecue halal safari',
+
+        'rate_card_title' => 'Listino Prezzi Ufficiale Escursioni :year | Dunes Discovery Tourism',
+        'rate_card_description' => 'Tariffe ufficiali tutto compreso per tutti i pacchetti safari nel deserto di Dubai, upgrade majlis VIP, noleggio buggy e trasporti privati.',
+        'rate_card_keywords' => 'prezzi safari dubai, tariffe safari 2026, costo buggy dubai, prezzi safari vip',
     ],
 ];

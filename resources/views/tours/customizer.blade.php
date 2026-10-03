@@ -11,8 +11,9 @@
   "@graph": [
     {
       "@type": "Service",
-      "@id": "{{ route('tours.customizer') }}#service",
+      "@id": "{{ $canonical ?? localized_route('tours.customizer') }}#service",
       "name": "Custom Dubai Desert Safari Builder & Configurator",
+      "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
       "provider": {
         "@type": "TravelAgency",
         "name": "Dunes Discovery Tourism LLC",
@@ -35,20 +36,20 @@
         {
           "@type": "ListItem",
           "position": 1,
-          "name": "Home",
-          "item": "{{ rtrim(route('home'), '/') }}/"
+          "name": "{{ __('ui.nav.home') ?? 'Home' }}",
+          "item": "{{ localized_route('home') }}"
         },
         {
           "@type": "ListItem",
           "position": 2,
-          "name": "Tours",
-          "item": "{{ route('tours.index') }}"
+          "name": "{{ __('ui.nav.tours') ?? 'Tours' }}",
+          "item": "{{ localized_route('tours.index') }}"
         },
         {
           "@type": "ListItem",
           "position": 3,
           "name": "Build Your Own Safari",
-          "item": "{{ route('tours.customizer') }}"
+          "item": "{{ $canonical ?? localized_route('tours.customizer') }}"
         }
       ]
     }
@@ -64,9 +65,9 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-16">
         <nav aria-label="breadcrumb">
             <ol class="flex items-center gap-2 text-xs sm:text-sm text-white/70 mb-4">
-                <li><a href="{{ route('home') }}" class="hover:text-white transition-colors">Home</a></li>
+                <li><a href="{{ localized_route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') ?? 'Home' }}</a></li>
                 <li><span class="text-white/40">/</span></li>
-                <li><a href="{{ route('tours.index') }}" class="hover:text-white transition-colors">Tours</a></li>
+                <li><a href="{{ localized_route('tours.index') }}" class="hover:text-white transition-colors">{{ __('ui.nav.tours') ?? 'Tours' }}</a></li>
                 <li><span class="text-white/40">/</span></li>
                 <li class="text-white font-semibold" aria-current="page">Custom Safari Builder</li>
             </ol>
