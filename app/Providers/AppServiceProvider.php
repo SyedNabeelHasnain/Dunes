@@ -51,6 +51,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Force HTTPS in production
+        if ($this->app->environment('production')) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
+
         // Ensure Dompdf font cache directory exists and is writable
         $fontDir = storage_path('fonts');
         if (!is_dir($fontDir)) {
