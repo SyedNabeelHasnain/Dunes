@@ -141,7 +141,7 @@
 <div class="bg-slate-950 text-slate-100 min-h-screen">
 
     <!-- ── HERO SECTION ──────────────────────────────────────────────────────── -->
-    <section class="hero-subpage relative border-b border-white/10 overflow-hidden" style="background: radial-gradient(circle at 80% 20%, rgba(246, 144, 68, 0.18) 0%, transparent 60%), radial-gradient(circle at 10% 80%, rgba(30, 41, 59, 0.8) 0%, transparent 70%), #0B1120; margin-top: calc(-1 * var(--header-h, 72px)); padding-top: calc(var(--header-h, 72px) + 2.25rem); padding-bottom: 3.5rem;">
+    <section class="hero-subpage relative border-b border-white/10 overflow-hidden" style="background: radial-gradient(circle at 80% 20%, rgba(246, 144, 68, 0.18) 0%, transparent 60%), radial-gradient(circle at 10% 80%, rgba(30, 41, 59, 0.8) 0%, transparent 70%), #0B1120; padding-top: calc(var(--header-h, 72px) + 2.5rem); padding-bottom: 3.5rem;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <!-- Breadcrumbs -->
             <nav aria-label="breadcrumb" class="mb-5">

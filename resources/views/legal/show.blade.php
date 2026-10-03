@@ -130,7 +130,7 @@
 </style>
 
 <!-- Hero / Page Header -->
-<section class="page-header hero-subpage relative overflow-hidden bg-slate-950 text-white" style="margin-top: calc(-1 * var(--header-h, 72px)); padding-top: calc(var(--header-h, 72px) + 2.25rem); padding-bottom: 3rem;">
+<section class="page-header hero-subpage relative overflow-hidden bg-slate-950 text-white" style="padding-top: calc(var(--header-h, 72px) + 2.5rem);">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="flex items-center gap-2 text-xs text-white/75 flex-wrap">

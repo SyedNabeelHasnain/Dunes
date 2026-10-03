@@ -50,7 +50,7 @@
 @endpush
 
 <!-- Page Header Section -->
-<section class="hero-subpage bg-slate-950 text-white relative overflow-hidden" style="margin-top: calc(-1 * var(--header-h, 72px)); padding-top: calc(var(--header-h, 72px) + 2.25rem); padding-bottom: 3rem;">
+<section class="hero-subpage bg-slate-950 text-white relative overflow-hidden" style="padding-top: calc(var(--header-h, 72px) + 2.5rem);">
     <div class="absolute inset-0 w-full h-full bg-[radial-gradient(ellipse_at_15%_20%,rgba(246,144,68,0.18)_0%,transparent_60%)]"></div>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <nav aria-label="breadcrumb">

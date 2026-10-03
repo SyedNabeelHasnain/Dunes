@@ -96,7 +96,7 @@
 @endif
 
 <article itemscope itemtype="https://schema.org/{{ $post->schema_type ?? 'BlogPosting' }}" class="blog-article">
-    <header class="hero-subpage bg-slate-950 text-white relative overflow-hidden min-h-[420px]" style="margin-top: calc(-1 * var(--header-h, 72px)); padding-top: calc(var(--header-h, 72px) + 2.25rem); padding-bottom: 3.5rem;">
+    <header class="hero-subpage bg-slate-950 text-white relative overflow-hidden min-h-[420px]" style="padding-top: calc(var(--header-h, 72px) + 2.5rem);">
         @if ($post->featured_image)
         <img src="{{ $featImgPath }}" class="absolute inset-0 w-full h-full object-cover opacity-25" alt="{{ $post->featured_image_alt ?: $post->title }}" fetchpriority="high" itemprop="image">
         @endif
