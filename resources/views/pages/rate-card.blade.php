@@ -100,7 +100,7 @@
                 <button type="button" class="btn-desert-animated rounded-full px-4 py-1.5 text-xs font-bold text-white shadow-sm inline-flex items-center gap-1.5 cursor-pointer" onclick="window.print()">
                     <i class="bi bi-printer-fill"></i> {{ __('ui.rate_card.print_pdf') }}
                 </button>
-                <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}?text={{ urlencode('Hello Dunes Discovery Tourism, I am viewing your official rate card and would like to make an inquiry.') }}" target="_blank" rel="noopener" class="btn-whatsapp-animated rounded-full px-4 py-1.5 text-xs font-bold text-white inline-flex items-center gap-1.5 shadow-sm">
+                <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}?text={{ urlencode('Hello Dunes Discovery Tourism, I am viewing your official rate card and would like to make an inquiry.') }}" target="_blank" rel="noopener" class="btn-whatsapp btn-whatsapp-animated rounded-full px-4 py-1.5 text-xs font-bold text-white inline-flex items-center gap-1.5 shadow-sm cursor-pointer" data-action="whatsapp" data-tour-name="Official Rate Card Inquiry">
                     <i class="bi bi-whatsapp"></i> {{ __('ui.rate_card.whatsapp_booking') }}
                 </a>
             </div>
@@ -363,7 +363,7 @@
                 {{ __('ui.rate_card.corporate_desc') }}
             </p>
             <div class="flex flex-wrap justify-center gap-3">
-                <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}?text={{ urlencode('Hello Dunes Discovery Tourism, I would like to request a custom group / corporate tour quote.') }}" target="_blank" rel="noopener" class="btn-whatsapp-animated rounded-full px-6 py-3 font-bold text-white text-xs sm:text-sm inline-flex items-center gap-2 shadow-sm">
+                <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}?text={{ urlencode('Hello Dunes Discovery Tourism, I would like to request a custom group / corporate tour quote.') }}" target="_blank" rel="noopener" class="btn-whatsapp btn-whatsapp-animated rounded-full px-6 py-3 font-bold text-white text-xs sm:text-sm inline-flex items-center gap-2 shadow-sm cursor-pointer" data-action="whatsapp" data-tour-name="Corporate Group Tour Inquiry">
                     <i class="bi bi-whatsapp text-lg"></i> {{ __('ui.rate_card.chat_whatsapp') }}
                 </a>
                 <button type="button" class="btn-desert-animated rounded-full px-6 py-3 font-bold text-white text-xs sm:text-sm inline-flex items-center gap-2 shadow-sm cursor-pointer" onclick="window.print()">

@@ -159,7 +159,7 @@
             <h2 class="text-2xl font-extrabold text-slate-900 mb-2">{{ __('ui.faq.still_have_questions') }}</h2>
             <p class="text-slate-600 text-sm mb-6 max-w-md mx-auto">{{ __('ui.faq.team_ready') }}</p>
             <div class="flex flex-col sm:flex-row justify-center gap-3">
-                <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode('Hi! I have a question about your tours.') }}" class="btn-whatsapp-animated rounded-full px-6 py-3 font-bold text-white text-sm inline-flex items-center justify-center gap-2 shadow-sm" target="_blank" rel="noopener noreferrer">
+                <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode('Hi! I have a question about your tours.') }}" class="btn-whatsapp-animated rounded-full px-6 py-3 font-bold text-white text-sm inline-flex items-center justify-center gap-2 shadow-sm cursor-pointer" target="_blank" rel="noopener noreferrer" data-action="whatsapp">
                     <i class="bi bi-whatsapp"></i>
                     <span>{{ __('ui.faq.whatsapp_247') }}</span>
                 </a>

@@ -447,7 +447,7 @@
                             <i class="bi bi-calendar-check-fill"></i>
                             <span>Book Custom Safari Online</span>
                         </button>
-                        <a href="#" target="_blank" rel="noopener" class="w-full btn-whatsapp-animated rounded-full py-3 font-bold text-white text-sm flex items-center justify-center gap-2 shadow-xs" id="customizerWhatsAppBtn">
+                        <a href="#" target="_blank" rel="noopener" class="btn-whatsapp w-full btn-whatsapp-animated rounded-full py-3 font-bold text-white text-sm flex items-center justify-center gap-2 shadow-xs cursor-pointer" id="customizerWhatsAppBtn" data-action="whatsapp" data-tour-name="Bespoke Dubai Desert Safari">
                             <i class="bi bi-whatsapp"></i>
                             <span>Inquire via WhatsApp</span>
                         </a>

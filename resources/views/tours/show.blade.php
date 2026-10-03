@@ -785,7 +785,7 @@ if(window.fbq){
                             <button type="button" class="w-full border border-slate-300 hover:border-primary text-slate-700 hover:text-primary text-sm font-bold rounded-full py-2.5 transition-colors btn-toggle-compare cursor-pointer flex items-center justify-center gap-2" data-tour-id="{{ $tour->id }}" onclick="event.preventDefault(); window.DunesCompare && window.DunesCompare.toggle(this);">
                                 <i class="bi bi-shuffle"></i><span class="compare-btn-text">{{ __('ui.common.compare_this_safari') }}</span>
                             </button>
-                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode('Hi! I want to book ' . $tour->name) }}" class="w-full btn-whatsapp-animated text-sm font-bold rounded-full py-3 text-white flex items-center justify-center gap-2 shadow-sm" target="_blank" rel="noopener noreferrer">
+                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode('Hi! I want to book ' . $tour->name) }}" class="w-full btn-whatsapp-animated text-sm font-bold rounded-full py-3 text-white flex items-center justify-center gap-2 shadow-sm cursor-pointer" target="_blank" rel="noopener noreferrer" data-action="whatsapp" data-tour-name="{{ $tour->name }}">
                                 <i class="bi bi-whatsapp text-lg"></i>{{ __('ui.common.whatsapp_inquire') }}
                             </a>
                         </div>

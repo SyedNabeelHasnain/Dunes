@@ -68,7 +68,7 @@
                 $cleanPhone = preg_replace('/[^0-9]/', '', $booking->phone);
                 $waMsg = 'Hello Dunes Discovery! Regarding my booking #' . $booking->reference . ' for ' . $booking->tour_name;
             @endphp
-            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode($waMsg) }}" target="_blank" rel="noopener noreferrer" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold rounded-full px-4 py-2 shadow-xs inline-flex items-center gap-1.5 transition-colors">
+            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode($waMsg) }}" target="_blank" rel="noopener noreferrer" class="btn-whatsapp bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold rounded-full px-4 py-2 shadow-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer" data-action="whatsapp" data-tour-name="{{ $booking->tour_name }}">
                 <i class="bi bi-whatsapp"></i> Concierge
             </a>
         </div>

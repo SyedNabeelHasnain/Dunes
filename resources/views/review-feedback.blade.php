@@ -33,7 +33,7 @@
 
             <div class="mt-6 pt-4 border-t border-slate-100 text-xs text-slate-500">
                 Need immediate assistance? Speak directly with our guest relations team on 
-                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $settings['site_whatsapp'] ?? '971502456056') }}" target="_blank" rel="noopener noreferrer" class="text-emerald-600 font-bold hover:underline inline-flex items-center gap-1">
+                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $settings['site_whatsapp'] ?? '971502456056') }}" target="_blank" rel="noopener noreferrer" class="btn-whatsapp text-emerald-600 font-bold hover:underline inline-flex items-center gap-1 cursor-pointer" data-action="whatsapp" data-tour-name="Guest Feedback Assistance">
                     <i class="bi bi-whatsapp"></i> WhatsApp
                 </a>.
             </div>

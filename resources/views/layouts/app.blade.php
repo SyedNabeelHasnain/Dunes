@@ -483,7 +483,7 @@
                             <i class="bi bi-search text-xs"></i>
                         </button>
                         @include('partials.language-currency-switcher', ['switcherId' => 'desktopLangCurrencyDropdownBtn'])
-                        <a class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full font-bold text-xs bg-emerald-500 hover:bg-emerald-600 text-white shadow-xs hover:shadow-sm transition-all cursor-pointer" href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener">
+                        <a class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full font-bold text-xs bg-emerald-500 hover:bg-emerald-600 text-white shadow-xs hover:shadow-sm transition-all cursor-pointer btn-whatsapp" href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" data-action="whatsapp">
                             <i class="bi bi-whatsapp"></i><span>{{ __('ui.common.whatsapp') }}</span>
                         </a>
                         <button type="button" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full font-extrabold text-xs text-white bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 shadow-sm hover:shadow-md transition-all cursor-pointer" data-action="open-booking">
@@ -507,7 +507,7 @@
                         </button>
 
                         <!-- WhatsApp Direct Button -->
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-100 flex items-center justify-center transition-colors cursor-pointer text-xs" aria-label="{{ __('ui.common.whatsapp') }}" target="_blank" rel="noopener">
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-100 flex items-center justify-center transition-colors cursor-pointer text-xs btn-whatsapp" aria-label="{{ __('ui.common.whatsapp') }}" target="_blank" rel="noopener" data-action="whatsapp">
                             <i class="bi bi-whatsapp"></i>
                         </a>
 
@@ -602,7 +602,7 @@
 
             <!-- Drawer Bottom Direct Contact -->
             <div class="pt-4 border-t border-slate-200 space-y-2">
-                <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="w-full py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors">
+                <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="w-full py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors btn-whatsapp" data-action="whatsapp" @click="$store.mobileNav.close();">
                     <i class="bi bi-whatsapp"></i><span>{{ __('ui.common.whatsapp_chat') }}</span>
                 </a>
                 <button type="button" class="w-full py-2.5 rounded-full bg-primary hover:bg-primary-dark text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer" @click="$store.mobileNav.close(); $store.modal.open('booking');">
@@ -738,7 +738,7 @@
                     <ul class="space-y-2 text-xs sm:text-sm">
                         <li><a href="tel:{{ preg_replace('/[^0-9+]/','',$phone) }}" class="text-slate-300 hover:text-white transition-colors inline-flex items-center gap-2"><i class="bi bi-telephone text-primary"></i><span>{{ $phone }}</span></a></li>
                         <li><a href="mailto:{{ $email }}" class="text-slate-300 hover:text-white transition-colors inline-flex items-center gap-2"><i class="bi bi-envelope text-primary"></i><span class="break-all">{{ $email }}</span></a></li>
-                        <li><a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="text-slate-300 hover:text-white transition-colors inline-flex items-center gap-2"><i class="bi bi-whatsapp text-emerald-400"></i><span>24/7 WhatsApp</span></a></li>
+                        <li><a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="text-slate-300 hover:text-white transition-colors inline-flex items-center gap-2 btn-whatsapp cursor-pointer" data-action="whatsapp"><i class="bi bi-whatsapp text-emerald-400"></i><span>24/7 WhatsApp</span></a></li>
                         <li class="text-slate-300 inline-flex items-start gap-2"><i class="bi bi-geo-alt text-primary shrink-0 mt-0.5"></i><span>{{ $settings['site_address'] ?? 'Dubai, United Arab Emirates' }}</span></li>
                     </ul>
 

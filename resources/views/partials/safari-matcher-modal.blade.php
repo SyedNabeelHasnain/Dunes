@@ -323,7 +323,10 @@
                          <a :href="waUrl" 
                             target="_blank" 
                             rel="noopener" 
-                            class="sm:col-span-5 w-full py-3.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm shadow-md transition-all flex items-center justify-center gap-2">
+                            class="btn-whatsapp sm:col-span-5 w-full py-3.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                           data-action="whatsapp"
+                           :data-tour-name="result ? result.name : ''"
+                           @click.prevent="window.openWhatsApp ? window.openWhatsApp(result ? result.name : '', waUrl) : null">
                              <i class="bi bi-whatsapp"></i>
                              <span>{{ __('ui.common.whatsapp_inquire') }}</span>
                          </a>

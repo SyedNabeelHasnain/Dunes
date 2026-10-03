@@ -175,3 +175,20 @@
         </div>
     </div>
 </div>
+
+<script>
+window.openWhatsApp = function(tourName, directHref) {
+    if (window.App && typeof window.App.openWhatsApp === 'function') {
+        window.App.openWhatsApp(tourName, directHref);
+    } else if (window.Alpine && Alpine.store('modal')) {
+        Alpine.store('modal').open('whatsapp');
+    } else {
+        const modal = document.getElementById('whatsappModal');
+        if (modal) {
+            modal.style.display = 'block';
+            modal.classList.add('show', 'active');
+            document.body.classList.add('modal-open');
+        }
+    }
+};
+</script>

@@ -198,7 +198,9 @@
                     <a href="{{ $waUrl }}" 
                        target="_blank" 
                        rel="noopener noreferrer" 
-                       class="w-full sm:w-auto btn-whatsapp-animated font-extrabold text-xs sm:text-sm px-4 py-3 rounded-full shadow-md inline-flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all text-white" 
+                       class="btn-whatsapp w-full sm:w-auto btn-whatsapp-animated font-extrabold text-xs sm:text-sm px-4 py-3 rounded-full shadow-md inline-flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all text-white cursor-pointer" 
+                       data-action="whatsapp"
+                       data-tour-name="{{ $tour->name }}"
                        aria-label="Ask about {{ $tour->name }} on WhatsApp">
                         <i class="bi bi-whatsapp text-sm"></i>
                         <span>{{ __('ui.common.whatsapp') }}</span>
@@ -292,7 +294,9 @@
                             <a href="{{ $waUrl }}" 
                                target="_blank" 
                                rel="noopener noreferrer" 
-                               class="w-full sm:w-auto btn-whatsapp-animated font-extrabold text-xs px-4 py-2.5 rounded-full shadow-md inline-flex items-center justify-center gap-2 text-white">
+                               class="btn-whatsapp w-full sm:w-auto btn-whatsapp-animated font-extrabold text-xs px-4 py-2.5 rounded-full shadow-md inline-flex items-center justify-center gap-2 text-white cursor-pointer"
+                               data-action="whatsapp"
+                               data-tour-name="{{ $tour->name }}">
                                 <i class="bi bi-whatsapp"></i>
                                 <span>{{ __('ui.common.whatsapp_inquire') }}</span>
                             </a>
@@ -395,7 +399,9 @@
         </button>
 
         <a href="{{ $waUrl }}" 
-           class="w-full btn-whatsapp-animated text-white font-bold rounded-full py-2 text-xs transition-colors flex items-center justify-center gap-1.5" 
+           class="btn-whatsapp w-full btn-whatsapp-animated text-white font-bold rounded-full py-2 text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer" 
+           data-action="whatsapp"
+           data-tour-name="{{ $tour->name }}"
            target="_blank" 
            rel="noopener noreferrer" 
            aria-label="Inquire about {{ $tour->name }} on WhatsApp">
@@ -443,7 +449,9 @@
 
         <div class="flex items-center gap-1.5 shrink-0">
             <a href="{{ $waUrl }}" 
-               class="w-8 h-8 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center text-sm shadow-xs transition-transform active:scale-90"
+               class="btn-whatsapp w-8 h-8 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center text-sm shadow-xs transition-transform active:scale-90 cursor-pointer"
+               data-action="whatsapp"
+               data-tour-name="{{ $tour->name }}"
                target="_blank" 
                rel="noopener noreferrer" 
                aria-label="Inquire on WhatsApp">

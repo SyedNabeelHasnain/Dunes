@@ -274,7 +274,10 @@
                                     <a :href="waUrl" 
                                        target="_blank" 
                                        rel="noopener" 
-                                       class="w-full py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-xs transition-colors flex items-center justify-center gap-2">
+                                       class="btn-whatsapp w-full py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                                       data-action="whatsapp"
+                                       :data-tour-name="base ? base.name : 'Custom Desert Safari'"
+                                       @click.prevent="window.openWhatsApp ? window.openWhatsApp(base ? base.name : 'Custom Desert Safari', waUrl) : null">
                                         <i class="bi bi-whatsapp"></i>
                                         <span>WhatsApp Inquire</span>
                                     </a>

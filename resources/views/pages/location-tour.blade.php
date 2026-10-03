@@ -180,7 +180,7 @@
                         <a href="#safari-packages" class="btn-desert-animated font-bold rounded-full px-7 py-3.5 text-white text-center shadow-lg inline-flex items-center justify-center gap-2 text-sm sm:text-base">
                             <i class="bi bi-compass"></i> View Safaris & Reserve Seats
                         </a>
-                        <a href="https://wa.me/971502456056?text={{ urlencode('Hi Dunes Discovery Tourism, I am staying in ' . $locationData['name'] . ' and would like to inquire about Desert Safari hotel pickup.') }}" target="_blank" rel="noopener" class="border border-white/25 hover:bg-white/10 text-white font-bold rounded-full px-6 py-3.5 text-center transition-colors inline-flex items-center justify-center gap-2 text-sm sm:text-base">
+                        <a href="https://wa.me/971502456056?text={{ urlencode('Hi Dunes Discovery Tourism, I am staying in ' . $locationData['name'] . ' and would like to inquire about Desert Safari hotel pickup.') }}" target="_blank" rel="noopener" class="btn-whatsapp border border-white/25 hover:bg-white/10 text-white font-bold rounded-full px-6 py-3.5 text-center transition-colors inline-flex items-center justify-center gap-2 text-sm sm:text-base cursor-pointer" data-action="whatsapp" data-tour-name="Dubai Desert Safari ({{ $locationData['name'] }})">
                             <i class="bi bi-whatsapp text-emerald-400"></i> WhatsApp Concierge
                         </a>
                     </div>
@@ -607,7 +607,7 @@
                         data-location-name="{{ $locationData['name'] }}">
                     <i class="bi bi-calendar2-check"></i> Book Desert Safari Now
                 </button>
-                <a href="https://wa.me/971502456056?text={{ urlencode('Hi Dunes Discovery Tourism, I want to book a Desert Safari from ' . $locationData['name'] . '. Please share details.') }}" target="_blank" rel="noopener" class="border border-white/20 hover:bg-white/10 text-white font-bold rounded-full px-6 py-4 text-sm sm:text-base transition-colors inline-flex items-center justify-center gap-2">
+                <a href="https://wa.me/971502456056?text={{ urlencode('Hi Dunes Discovery Tourism, I want to book a Desert Safari from ' . $locationData['name'] . '. Please share details.') }}" target="_blank" rel="noopener" class="btn-whatsapp border border-white/20 hover:bg-white/10 text-white font-bold rounded-full px-6 py-4 text-sm sm:text-base transition-colors inline-flex items-center justify-center gap-2 cursor-pointer" data-action="whatsapp" data-tour-name="Dubai Desert Safari ({{ $locationData['name'] }})">
                     <i class="bi bi-whatsapp text-emerald-400"></i> Ask via WhatsApp
                 </a>
             </div>

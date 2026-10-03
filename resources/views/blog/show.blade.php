@@ -264,7 +264,7 @@
                             <button data-action="open-booking" class="w-full bg-white hover:bg-slate-50 text-slate-950 font-bold rounded-full py-2.5 text-xs transition-colors cursor-pointer shadow-xs mb-2" @click="$store.modal.open('booking')">
                                 <i class="bi bi-calendar-check me-1.5"></i>{{ __('ui.common.book_now') }}
                             </button>
-                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode('Hi! I read your blog about ' . $post->title . ' and would like to know more.') }}" class="w-full border border-white/40 hover:border-white text-white font-bold rounded-full py-2 text-xs transition-colors flex items-center justify-center gap-1.5" target="_blank" rel="noopener noreferrer">
+                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode('Hi! I read your blog about ' . $post->title . ' and would like to know more.') }}" class="btn-whatsapp w-full border border-white/40 hover:border-white text-white font-bold rounded-full py-2 text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer" target="_blank" rel="noopener noreferrer" data-action="whatsapp" data-tour-name="{{ $post->title }}">
                                 <i class="bi bi-whatsapp text-emerald-300"></i>{{ __('ui.common.whatsapp_inquire') }}
                             </a>
                         </div>

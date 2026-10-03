@@ -1455,19 +1455,41 @@ const App = {
         if (!this._waClickListenerBound) {
             this._waClickListenerBound = true;
             document.addEventListener('click', e => {
-                const el = e.target.closest('a, button, span, .fab-whatsapp, .btn-circle-whatsapp, .btn-whatsapp-animated');
+                // Find interactive container element (not an inner text span or icon)
+                const el = e.target.closest(
+                    'a[href*="wa.me"], a[href*="whatsapp.com"], a[href*="whatsapp:"], ' +
+                    'button[data-action="whatsapp"], a[data-action="whatsapp"], ' +
+                    '.fab-whatsapp, .btn-circle-whatsapp, .btn-whatsapp-animated, .btn-whatsapp, ' +
+                    '[data-action="open-whatsapp"], [data-whatsapp]'
+                ) || (
+                    e.target.closest('.bi-whatsapp')
+                        ? e.target.closest('a, button, [role="button"]')
+                        : null
+                );
+
                 if (!el) return;
-                const href = el.getAttribute ? (el.getAttribute('href') || '') : '';
+
+                // Don't intercept the submit button inside the modal itself or admin lead details
+                if (el.id === 'startChatBtn' || el.closest('#whatsappForm') || el.closest('#whatsappLeadModal') || el.closest('.admin-wrapper')) return;
+
+                // Extract URL (checking attribute, dataset, or property for Alpine :href or JS set href)
+                const rawHref = el.getAttribute ? (el.getAttribute('href') || el.dataset?.href || '') : '';
+                const href = (rawHref && rawHref !== '#' && !rawHref.startsWith('javascript:')) 
+                    ? rawHref 
+                    : (el.href && !el.href.endsWith('#') && !el.href.startsWith('javascript:') ? el.href : '');
+
                 // Don't intercept purely social share links without target number
                 if (href.includes('wa.me/?text=') || href.includes('whatsapp://send?text=')) return;
 
-                const isWa = href.includes('wa.me') || href.includes('api.whatsapp.com') ||
+                // Verify this is a WhatsApp link or button
+                const isWa = href.includes('wa.me') || href.includes('api.whatsapp.com') || href.includes('whatsapp:') ||
                              el.classList.contains('fab-whatsapp') || el.classList.contains('btn-circle-whatsapp') ||
-                             el.classList.contains('btn-whatsapp-animated') || el.closest('.fab-whatsapp, .btn-circle-whatsapp, .btn-whatsapp-animated');
-                if (!isWa) return;
+                             el.classList.contains('btn-whatsapp-animated') || el.classList.contains('btn-whatsapp') ||
+                             el.dataset?.action === 'whatsapp' || el.dataset?.action === 'open-whatsapp' ||
+                             !!el.closest('.fab-whatsapp, .btn-circle-whatsapp, .btn-whatsapp-animated, .btn-whatsapp') ||
+                             !!el.querySelector('.bi-whatsapp');
 
-                // Don't intercept the submit button inside the modal itself
-                if (el.id === 'startChatBtn' || el.closest('#whatsappForm')) return;
+                if (!isWa) return;
 
                 e.preventDefault();
                 e.stopPropagation();
@@ -1475,6 +1497,10 @@ const App = {
                 let tourName = '';
                 if (el.dataset?.tourName) {
                     tourName = el.dataset.tourName;
+                } else if (el.closest('[data-tour-name]')?.dataset?.tourName) {
+                    tourName = el.closest('[data-tour-name]').dataset.tourName;
+                } else if (el.closest('.tour-card, article')?.querySelector('h2, h3, h4')) {
+                    tourName = el.closest('.tour-card, article').querySelector('h2, h3, h4').innerText.trim();
                 } else if (location.pathname.includes('/tours/') || document.querySelector('.tour-hero')) {
                     const h1 = document.querySelector('h1');
                     if (h1) tourName = h1.innerText.trim();
@@ -1488,6 +1514,7 @@ const App = {
     openWhatsApp(tourName = '', directHref = '') {
         const modal = document.getElementById('whatsappModal');
         const formEnabled = (
+            typeof window.WHATSAPP_FORM_ENABLED === 'undefined' ||
             window.WHATSAPP_FORM_ENABLED === '1' ||
             window.WHATSAPP_FORM_ENABLED === 1 ||
             window.WHATSAPP_FORM_ENABLED === true ||
@@ -1581,6 +1608,21 @@ const App = {
         const nameInp = document.getElementById('waName');
         const phoneInp = document.getElementById('waPhone');
         const agreeInp = document.getElementById('waAgreement');
+
+        // Pre-fill name and phone if already known from guest session or other forms
+        if (nameInp && !nameInp.value) {
+            const guestName = document.getElementById('bookingName')?.value
+                || document.getElementById('welcomeName')?.value
+                || localStorage.getItem('dunes_guest_name') || '';
+            if (guestName) nameInp.value = guestName;
+        }
+        if (phoneInp && !phoneInp.value) {
+            const guestPhone = document.getElementById('bookingPhone')?.value
+                || document.getElementById('welcomePhone')?.value
+                || localStorage.getItem('dunes_guest_phone') || '';
+            if (guestPhone) phoneInp.value = guestPhone;
+        }
+
         if (startBtn && nameInp && phoneInp) {
             const agreeValid = !agreeInp || agreeInp.checked;
             startBtn.disabled = !(nameInp.value.trim() && phoneInp.value.trim() && agreeValid);
@@ -1590,6 +1632,13 @@ const App = {
 
         if (window.Alpine && Alpine.store('modal')) {
             Alpine.store('modal').open('whatsapp');
+        } else if (modal) {
+            modal.style.display = 'block';
+            modal.classList.add('show', 'active');
+            modal.removeAttribute('aria-hidden');
+            modal.setAttribute('aria-modal', 'true');
+            document.body.style.overflow = 'hidden';
+            document.body.classList.add('modal-open');
         }
     },
 
@@ -3298,6 +3347,9 @@ const App = {
 window.App = App;
 window.DunesApp = App;
 window.DunesCompare = Alpine.store('compare');
+window.openWhatsApp = function(tourName = '', directHref = '') {
+    App.openWhatsApp(tourName, directHref);
+};
 
 
 // =============================================================================

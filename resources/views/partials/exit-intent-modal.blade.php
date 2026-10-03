@@ -116,7 +116,9 @@
                     <span>{{ __('ui.common.save') }} {{ $exitIntentDiscount }}% & {{ __('ui.common.book_now') }}</span>
                 </button>
                 <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',(string)($settings['site_whatsapp'] ?? '971502456056')) }}?text={{ urlencode('Hi Dunes Discovery, I am looking to book a desert safari with the ' . $exitIntentDiscount . '% discount code ' . $exitIntentCode . '. Could you recommend the best package for my group?') }}" 
-                   class="sm:col-span-5 w-full py-3.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm shadow-md transition-all flex items-center justify-center gap-2" 
+                   class="btn-whatsapp sm:col-span-5 w-full py-3.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer" 
+                   data-action="whatsapp"
+                   data-tour-name="Exit Intent Special Offer ({{ $exitIntentCode }})"
                    target="_blank" 
                    rel="noopener noreferrer">
                     <i class="bi bi-whatsapp"></i>

@@ -191,7 +191,7 @@
                     <i class="bi bi-printer"></i>
                     <span>Print / Save PDF</span>
                 </button>
-                <a href="https://wa.me/{{ preg_replace('/[^0-9]/','', $waPhone ?? '971502456056') }}?text={{ urlencode('Hello Dunes Discovery Tourism, I have an inquiry regarding: ' . $page->title) }}" target="_blank" rel="noopener" class="text-xs sm:text-sm border border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white font-medium rounded-full px-3.5 py-1.5 inline-flex items-center gap-1.5 transition-colors">
+                <a href="https://wa.me/{{ preg_replace('/[^0-9]/','', $waPhone ?? '971502456056') }}?text={{ urlencode('Hello Dunes Discovery Tourism, I have an inquiry regarding: ' . $page->title) }}" target="_blank" rel="noopener" class="btn-whatsapp text-xs sm:text-sm border border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white font-medium rounded-full px-3.5 py-1.5 inline-flex items-center gap-1.5 transition-colors cursor-pointer" data-action="whatsapp" data-tour-name="{{ $page->title }}">
                     <i class="bi bi-whatsapp"></i>
                     <span>Inquire via WhatsApp</span>
                 </a>
@@ -333,7 +333,7 @@
                         Our legal compliance desk and customer concierge team in Dubai are available 24/7 to assist with any policy questions, corporate travel agreements, or booking amendments.
                     </p>
                     <div class="flex flex-col sm:flex-row justify-center gap-3">
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','', $waPhone ?? '971502456056') }}?text={{ urlencode('Hi Dunes Discovery Tourism, I have a question regarding: ' . $page->title) }}" class="btn-whatsapp-animated text-sm sm:text-base font-bold rounded-full px-6 py-3 text-white inline-flex items-center justify-center gap-2 shadow-sm" target="_blank" rel="noopener">
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','', $waPhone ?? '971502456056') }}?text={{ urlencode('Hi Dunes Discovery Tourism, I have a question regarding: ' . $page->title) }}" class="btn-whatsapp btn-whatsapp-animated text-sm sm:text-base font-bold rounded-full px-6 py-3 text-white inline-flex items-center justify-center gap-2 shadow-sm cursor-pointer" target="_blank" rel="noopener" data-action="whatsapp" data-tour-name="{{ $page->title }}">
                             <i class="bi bi-whatsapp"></i>
                             <span>Chat with Legal Desk</span>
                         </a>

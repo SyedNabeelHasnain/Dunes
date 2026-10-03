@@ -409,8 +409,8 @@ $(document).ready(function() {
         });
     }
 
-    // View Details Modal Handler
-    $('.view-lead-btn').on('click', function() {
+    // View Details Modal Handler (Delegated for pagination, sorting & dynamic search)
+    $(document).on('click', '.view-lead-btn', function() {
         const btn = $(this);
         const name = String(btn.attr('data-name') || btn.data('name') || 'Visitor').trim();
         const rawPhone = btn.attr('data-phone') !== undefined ? btn.attr('data-phone') : btn.data('phone');

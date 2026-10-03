@@ -275,8 +275,10 @@
                             </p>
                             <div class="inline-flex items-center gap-2">
                                 <button type="button" 
-                                        @click="if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp(query); }"
-                                        class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs inline-flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer">
+                                        class="btn-whatsapp px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs inline-flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
+                                        data-action="whatsapp"
+                                        :data-tour-name="query || 'Desert Safari Search'"
+                                        @click="if(window.openWhatsApp){ window.openWhatsApp(query || 'Desert Safari'); } else if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp(query || 'Desert Safari'); }">
                                     <i class="bi bi-whatsapp"></i>
                                     <span>{{ __('ui.common.whatsapp_inquire') }}</span>
                                 </button>

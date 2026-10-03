@@ -170,7 +170,7 @@
                 <div class="text-slate-600 text-sm">{{ $emailVal }}</div>
             </a>
             
-            <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$whatsappVal) }}" target="_blank" rel="noopener" class="bg-slate-50 hover:bg-white rounded-2xl p-6 text-center border border-slate-200 hover:border-primary/40 shadow-xs hover:shadow-lg transition-all duration-300 group">
+            <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$whatsappVal) }}" target="_blank" rel="noopener" class="bg-slate-50 hover:bg-white rounded-2xl p-6 text-center border border-slate-200 hover:border-primary/40 shadow-xs hover:shadow-lg transition-all duration-300 group cursor-pointer btn-whatsapp" data-action="whatsapp">
                 <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl mx-auto mb-3 group-hover:scale-110 transition-transform">
                     <i class="bi bi-whatsapp"></i>
                 </div>
