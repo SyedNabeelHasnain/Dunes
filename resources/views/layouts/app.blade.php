@@ -838,7 +838,7 @@
     @include('partials.whatsapp-modal')
 
     <!-- Global Toast Container for App.toast notifications -->
-    <div id="toastContainer" class="fixed bottom-4 end-4 z-[60] flex flex-col gap-2 p-3 pointer-events-none" aria-live="polite" aria-atomic="true"></div>
+    <div id="toastContainer" class="toast-container fixed bottom-5 end-5 z-[9999] flex flex-col gap-2.5 max-w-sm w-full pointer-events-none px-4 sm:px-0" aria-live="polite" aria-atomic="true"></div>
 
     <script>
         window.DunesRates = {

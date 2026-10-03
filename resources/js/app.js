@@ -904,23 +904,55 @@ const App = {
         const icons = {
             success: '<i class="bi bi-check-circle-fill"></i>',
             error: '<i class="bi bi-x-circle-fill"></i>',
-            warning: '<i class="bi bi-exclamation-circle-fill"></i>',
+            warning: '<i class="bi bi-exclamation-triangle-fill"></i>',
             info: '<i class="bi bi-info-circle-fill"></i>'
         };
 
+        const titles = {
+            success: 'Success',
+            error: 'Action Failed',
+            warning: 'Notice',
+            info: 'Information'
+        };
+
         const t = document.createElement('div');
-        t.className = 'toast ' + type;
+        t.className = 'toast ' + (type || 'info');
+        t.setAttribute('role', 'alert');
+        t.setAttribute('aria-live', 'assertive');
         t.innerHTML = `
             <div class="toast-icon">${icons[type] || icons.info}</div>
             <div class="toast-content">
-                <strong>${type === 'success' ? 'Success' : type === 'error' ? 'Error' : 'Notice'}</strong>
-                <p>${msg}</p>
+                <div class="toast-title">${titles[type] || 'Notice'}</div>
+                <p class="toast-message">${msg}</p>
             </div>
-            <div class="toast-close" onclick="this.parentElement.remove()"><i class="bi bi-x"></i></div>
+            <button type="button" class="toast-close" aria-label="Close notification"><i class="bi bi-x-lg"></i></button>
         `;
 
+        const dismiss = () => {
+            if (t._dismissed) return;
+            t._dismissed = true;
+            t.classList.add('toast-exit');
+            setTimeout(() => {
+                if (t.parentNode) t.remove();
+            }, 260);
+        };
+
+        const closeBtn = t.querySelector('.toast-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dismiss();
+            });
+        }
+
         container.appendChild(t);
-        setTimeout(() => t.remove(), 5000);
+
+        let timer = setTimeout(dismiss, 5000);
+
+        t.addEventListener('mouseenter', () => clearTimeout(timer));
+        t.addEventListener('mouseleave', () => {
+            timer = setTimeout(dismiss, 2500);
+        });
     },
 
     initLegalModal() {
