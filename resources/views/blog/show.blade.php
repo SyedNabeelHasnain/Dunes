@@ -154,10 +154,10 @@
             <!-- Main Content (8 cols) -->
             <div class="lg:col-span-8">
                 @if ($post->ai_summary)
-                <div class="border-l-4 border-primary bg-primary/5 rounded-2xl p-5 mb-8">
+                <div class="border-s-4 border-primary bg-primary/5 rounded-2xl p-5 mb-8">
                     <div class="flex items-center gap-2 mb-1.5">
                         <i class="bi bi-robot text-primary"></i>
-                        <span class="font-bold text-xs uppercase text-primary tracking-wider">Quick Summary</span>
+                        <span class="font-bold text-xs uppercase text-primary tracking-wider">{{ __('ui.blog.quick_summary') ?? 'Quick Summary' }}</span>
                     </div>
                     <p class="text-slate-700 text-sm leading-relaxed mb-0">{{ $post->ai_summary }}</p>
                 </div>

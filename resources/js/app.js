@@ -322,6 +322,10 @@ Alpine.store('modal', {
                     const childrenInput = document.getElementById('bookingChildren');
                     if (childrenInput) childrenInput.value = data.children;
                 }
+                if (data.infants !== undefined) {
+                    const infantsInput = document.getElementById('bookingInfants');
+                    if (infantsInput) infantsInput.value = data.infants;
+                }
                 if (data.date) {
                     const dateInput = document.getElementById('bookingDate');
                     if (dateInput) dateInput.value = data.date;
@@ -2342,6 +2346,7 @@ const App = {
     calculateBaseTotal() {
         const adults = parseInt(document.getElementById('bookingAdults')?.value) || 1;
         const children = parseInt(document.getElementById('bookingChildren')?.value) || 0;
+        const infants = parseInt(document.getElementById('bookingInfants')?.value) || 0;
         let price = this.selectedPrice || 0;
         const selectedTierCard = document.querySelector('.tier-card.selected');
         if (price <= 0 && selectedTierCard && selectedTierCard.dataset.price) {
@@ -2352,7 +2357,7 @@ const App = {
         let total = 0;
         if (['per buggy', 'per vehicle', 'per group', 'private'].includes(priceType)) {
             const capacity = parseInt(selectedTierCard?.dataset.capacity || '2', 10) || 2;
-            const vehicles = Math.ceil((adults + children) / capacity);
+            const vehicles = Math.ceil((adults + children + infants) / capacity);
             total = price * vehicles;
         } else {
             total = (price * adults) + (price * 0.70 * children);
@@ -2364,13 +2369,14 @@ const App = {
     updateTotal() {
         const adults = parseInt(document.getElementById('bookingAdults')?.value) || 1;
         const children = parseInt(document.getElementById('bookingChildren')?.value) || 0;
+        const infants = parseInt(document.getElementById('bookingInfants')?.value) || 0;
         const selectedTierCard = document.querySelector('.tier-card.selected');
         const priceType = (selectedTierCard?.dataset.priceType || 'per person').toLowerCase();
 
         let baseTotal = 0;
         if (['per buggy', 'per vehicle', 'per group', 'private'].includes(priceType)) {
             const capacity = parseInt(selectedTierCard?.dataset.capacity || '2', 10) || 2;
-            const vehicles = Math.ceil((adults + children) / capacity);
+            const vehicles = Math.ceil((adults + children + infants) / capacity);
             baseTotal = this.selectedPrice * vehicles;
         } else {
             baseTotal = (this.selectedPrice * adults) + (this.selectedPrice * 0.70 * children);

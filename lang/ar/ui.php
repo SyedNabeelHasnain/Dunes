@@ -127,6 +127,7 @@ return [
         'related_posts' => 'مقالات ذات صلة',
         'related_tours' => 'رحلات سفاري موصى بها',
         'table_of_contents' => 'جدول المحتويات',
+        'quick_summary' => 'ملخص سريع',
     ],
 
     // Footer

@@ -348,7 +348,7 @@ if(window.fbq){
             <!-- Main Details (Left 8 Cols) -->
             <div class="lg:col-span-8">
                 <!-- GEO & AI Search "Tour at a Glance" Quick Facts Card -->
-                <div class="bg-primary/5 rounded-2xl p-6 mb-8 border-l-4 border-primary shadow-xs">
+                <div class="bg-primary/5 rounded-2xl p-6 mb-8 border-s-4 border-primary shadow-xs">
                     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
                         <h2 class="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
                             <i class="bi bi-lightning-charge-fill text-primary"></i>{{ __('ui.tour_glance.title') }}
@@ -501,7 +501,7 @@ if(window.fbq){
                     <div x-show="currentTab === 'inex'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             @if($inclusions->count())
-                            <div class="bg-emerald-50/70 border-l-4 border-emerald-500 p-5 rounded-2xl">
+                            <div class="bg-emerald-50/70 border-s-4 border-emerald-500 p-5 rounded-2xl">
                                 <h3 class="text-sm font-bold text-emerald-800 mb-4 flex items-center gap-2">
                                     <i class="bi bi-check-circle-fill text-emerald-600"></i>{{ __('ui.tour.inclusions') }}
                                 </h3>
@@ -517,7 +517,7 @@ if(window.fbq){
                             @endif
 
                             @if($exclusions->count())
-                            <div class="bg-red-50/70 border-l-4 border-red-500 p-5 rounded-2xl">
+                            <div class="bg-red-50/70 border-s-4 border-red-500 p-5 rounded-2xl">
                                 <h3 class="text-sm font-bold text-red-800 mb-4 flex items-center gap-2">
                                     <i class="bi bi-x-circle-fill text-red-600"></i>{{ __('ui.tour.exclusions') }}
                                 </h3>
@@ -538,7 +538,7 @@ if(window.fbq){
                     <!-- Important Information Tab -->
                     @if(isset($tabs['info']))
                     <div x-show="currentTab === 'info'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0">
-                        <div class="bg-amber-50/70 border-l-4 border-amber-500 p-5 rounded-2xl">
+                        <div class="bg-amber-50/70 border-s-4 border-amber-500 p-5 rounded-2xl">
                             <h3 class="text-sm font-bold text-amber-800 mb-3 flex items-center gap-2">
                                 <i class="bi bi-exclamation-triangle-fill text-amber-600"></i>{{ __('ui.tour.important_info') }}
                             </h3>

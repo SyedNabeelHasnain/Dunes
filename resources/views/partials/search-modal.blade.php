@@ -1,6 +1,6 @@
 @php
     try {
-        $searchCatalogArray = \Illuminate\Support\Facades\Cache::remember('site_search_modal_catalog_v4', 3600, function() {
+        $searchCatalogArray = \Illuminate\Support\Facades\Cache::remember('site_search_modal_catalog_v4_' . app()->getLocale(), 3600, function() {
             return \App\Models\Tour::where('status', 'active')
                 ->with(['tiers', 'category'])
                 ->orderBy('priority', 'asc')
@@ -13,7 +13,7 @@
                         'id' => (int) $t->id,
                         'name' => (string) $t->name,
                         'slug' => (string) $t->slug,
-                        'url' => url('/' . $t->slug),
+                        'url' => localized_route('tours.show', $t->slug),
                         'category' => $t->category ? (string) $t->category->name : 'Desert Safari',
                         'category_slug' => $t->category ? (string) $t->category->slug : 'desert-safari',
                         'duration' => (string) ($t->duration ?: '4-6 Hours'),
@@ -217,7 +217,7 @@
                     </div>
 
                     <!-- Scrollable Live Results List -->
-                    <div x-ref="resultsList" class="max-h-[360px] sm:max-h-[400px] overflow-y-auto space-y-2 pr-1 divide-y divide-slate-100 scrollbar-thin">
+                    <div x-ref="resultsList" class="max-h-[360px] sm:max-h-[400px] overflow-y-auto space-y-2 pe-1 divide-y divide-slate-100 scrollbar-thin">
                         <template x-for="(tour, index) in filteredResults" :key="tour.id || index">
                             <a :href="tour.url" 
                                :data-selected="selectedIndex === index"

@@ -154,13 +154,13 @@
             <div class="flex flex-col lg:flex-row lg:items-center gap-3 sm:gap-4">
                 <!-- Search Input Form -->
                 <form action="{{ route('tours.search') }}" method="GET" class="w-full lg:w-[440px] xl:w-[480px] shrink-0 m-0">
-                    <div class="relative flex items-center bg-white rounded-full border border-slate-200 shadow-2xs hover:border-slate-300 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all p-1.5 pl-4 sm:pl-5">
-                        <i class="bi bi-search text-slate-400 text-sm shrink-0 mr-2.5"></i>
+                    <div class="relative flex items-center bg-white rounded-full border border-slate-200 shadow-2xs hover:border-slate-300 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all p-1.5 ps-4 sm:ps-5">
+                        <i class="bi bi-search text-slate-400 text-sm shrink-0 me-2.5"></i>
                         <input type="text" 
                                name="q" 
                                value="{{ $cleanQuery }}" 
                                class="w-full bg-transparent border-none text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-0 p-0" 
-                               placeholder="Refine search (e.g. quad bike, buggy, vip)..." 
+                               placeholder="{{ __('ui.nav.search_placeholder') }}" 
                                required>
                         @if(!empty($cleanQuery))
                         <button type="button" 

@@ -496,7 +496,7 @@ if (!function_exists('renderReviewCardMarkup')) {
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="bg-white p-6 rounded-2xl shadow-xs border-l-4 border-primary hover:shadow-md transition-shadow">
+            <div class="bg-white p-6 rounded-2xl shadow-xs border-s-4 border-primary hover:shadow-md transition-shadow">
                 <div class="flex items-center gap-3 mb-3">
                     <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-lg shrink-0">
                         <i class="bi bi-geo-alt-fill"></i>
@@ -506,7 +506,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                 <p class="text-slate-600 text-sm leading-relaxed">{{ __('ui.guide_section.loc_desc') }}</p>
             </div>
 
-            <div class="bg-white p-6 rounded-2xl shadow-xs border-l-4 border-primary hover:shadow-md transition-shadow">
+            <div class="bg-white p-6 rounded-2xl shadow-xs border-s-4 border-primary hover:shadow-md transition-shadow">
                 <div class="flex items-center gap-3 mb-3">
                     <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-lg shrink-0">
                         <i class="bi bi-truck"></i>
@@ -516,7 +516,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                 <p class="text-slate-600 text-sm leading-relaxed">{{ __('ui.guide_section.fleet_desc') }}</p>
             </div>
 
-            <div class="bg-white p-6 rounded-2xl shadow-xs border-l-4 border-primary hover:shadow-md transition-shadow">
+            <div class="bg-white p-6 rounded-2xl shadow-xs border-s-4 border-primary hover:shadow-md transition-shadow">
                 <div class="flex items-center gap-3 mb-3">
                     <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-lg shrink-0">
                         <i class="bi bi-cup-hot-fill"></i>
@@ -526,7 +526,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                 <p class="text-slate-600 text-sm leading-relaxed">{{ __('ui.guide_section.dining_desc') }}</p>
             </div>
 
-            <div class="bg-white p-6 rounded-2xl shadow-xs border-l-4 border-primary hover:shadow-md transition-shadow">
+            <div class="bg-white p-6 rounded-2xl shadow-xs border-s-4 border-primary hover:shadow-md transition-shadow">
                 <div class="flex items-center gap-3 mb-3">
                     <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-lg shrink-0">
                         <i class="bi bi-clock-history"></i>
@@ -536,7 +536,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                 <p class="text-slate-600 text-sm leading-relaxed">{{ __('ui.guide_section.timing_desc') }}</p>
             </div>
 
-            <div class="bg-white p-6 rounded-2xl shadow-xs border-l-4 border-primary hover:shadow-md transition-shadow">
+            <div class="bg-white p-6 rounded-2xl shadow-xs border-s-4 border-primary hover:shadow-md transition-shadow">
                 <div class="flex items-center gap-3 mb-3">
                     <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-lg shrink-0">
                         <i class="bi bi-people-fill"></i>
@@ -546,7 +546,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                 <p class="text-slate-600 text-sm leading-relaxed">{{ __('ui.guide_section.family_desc') }}</p>
             </div>
 
-            <div class="bg-white p-6 rounded-2xl shadow-xs border-l-4 border-primary hover:shadow-md transition-shadow">
+            <div class="bg-white p-6 rounded-2xl shadow-xs border-s-4 border-primary hover:shadow-md transition-shadow">
                 <div class="flex items-center gap-3 mb-3">
                     <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-lg shrink-0">
                         <i class="bi bi-patch-check-fill"></i>

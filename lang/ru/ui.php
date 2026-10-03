@@ -127,6 +127,7 @@ return [
         'related_posts' => 'Похожие статьи',
         'related_tours' => 'Рекомендуемые сафари',
         'table_of_contents' => 'Содержание',
+        'quick_summary' => 'Краткое содержание',
     ],
 
     // Footer

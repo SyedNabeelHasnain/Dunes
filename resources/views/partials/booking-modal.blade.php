@@ -52,7 +52,7 @@
             <div class="flex items-center justify-between py-3.5 px-4 sm:px-6 border-b border-slate-200 bg-white sticky top-0 z-20 shrink-0">
                 <div class="flex items-center gap-3">
                     <button type="button" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-colors cursor-pointer hidden" id="headerBackBtn">
-                        <i class="bi bi-chevron-left text-sm"></i>
+                        <i class="bi bi-chevron-left rtl:rotate-180 text-sm"></i>
                     </button>
                     <div>
                         <h5 class="text-base sm:text-lg font-black text-slate-900 leading-tight" id="bookingModalTitle">{{ __('ui.booking.title') }}</h5>
@@ -150,6 +150,7 @@
                                         </button>
                                     </div>
                                     <input type="hidden" name="children" id="bookingChildren" value="0">
+                                    <input type="hidden" name="infants" id="bookingInfants" value="0">
                                 </div>
                                 <div class="sm:col-span-8 lg:col-span-9 booking-location-wrapper relative">
                                     <label class="block text-xs font-black uppercase tracking-wider text-slate-800 mb-2" for="bookingLocation">{{ __('ui.booking.pickup_location_label') }}</label>
@@ -457,7 +458,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!isSilent) {
                 if (applyBtn) {
                     applyBtn.disabled = false;
-                    applyBtn.innerHTML = '<span>Apply</span> <i class="bi bi-arrow-right-short text-base"></i>';
+                    applyBtn.innerHTML = '<span>Apply</span> <i class="bi bi-arrow-right-short rtl:rotate-180 text-base"></i>';
                 }
                 if (promoInput) promoInput.disabled = false;
             }
@@ -522,7 +523,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!isSilent) {
                 if (applyBtn) {
                     applyBtn.disabled = false;
-                    applyBtn.innerHTML = '<span>Apply</span> <i class="bi bi-arrow-right-short text-base"></i>';
+                    applyBtn.innerHTML = '<span>Apply</span> <i class="bi bi-arrow-right-short rtl:rotate-180 text-base"></i>';
                 }
                 if (promoInput) promoInput.disabled = false;
                 if (errorBox) {

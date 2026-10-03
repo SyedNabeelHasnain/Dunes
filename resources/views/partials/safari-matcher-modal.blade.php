@@ -354,9 +354,9 @@
                          class="px-3 py-1.5 rounded-full border border-slate-700 hover:border-slate-500 text-slate-300 transition-colors cursor-pointer flex items-center gap-1" 
                          x-show="step > 1" 
                          @click="step--">
-                     <i class="bi bi-chevron-left"></i> Back
+                     <i class="bi bi-chevron-left rtl:rotate-180"></i> Back
                  </button>
-                 <div class="ml-auto flex items-center gap-1.5 text-[11px]">
+                 <div class="ms-auto flex items-center gap-1.5 text-[11px]">
                      <i class="bi bi-shield-lock-fill text-amber-400"></i>
                      <span>DET Licensed #1430583 • No Credit Card Required</span>
                  </div>

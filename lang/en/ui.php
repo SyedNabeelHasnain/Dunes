@@ -127,6 +127,7 @@ return [
         'related_posts' => 'Related Articles',
         'related_tours' => 'Recommended Related Safaris',
         'table_of_contents' => 'Table of Contents',
+        'quick_summary' => 'Quick Summary',
     ],
 
     // Footer

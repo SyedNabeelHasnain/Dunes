@@ -614,8 +614,10 @@ class AdminTourController extends Controller
         Cache::forget('site_tours_header_cache');
         Cache::forget('site_home_cache');
         Cache::forget('site_active_tours_search');
+        Cache::forget('site_search_modal_catalog_v4');
         foreach (['en', 'ar', 'ru', 'es', 'it'] as $loc) {
             Cache::forget('site_active_tours_search_'.$loc);
+            Cache::forget('site_search_modal_catalog_v4_'.$loc);
         }
         Cache::forget('sitemap_tours_xml');
         Cache::forget('sitemap_images_xml');

@@ -55,7 +55,7 @@
     <!-- Top Action Bar (Web Only) -->
     <div class="no-print max-w-4xl mx-auto flex justify-between items-center flex-wrap gap-3 mb-6">
         <a href="{{ url('/') }}" class="bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 text-xs sm:text-sm font-bold rounded-full px-4 py-2 shadow-xs inline-flex items-center gap-1.5 transition-colors">
-            <i class="bi bi-arrow-left text-primary"></i> Return to Site
+            <i class="bi bi-arrow-left rtl:rotate-180 text-primary"></i> Return to Site
         </a>
         <div class="flex items-center gap-2 flex-wrap">
             <button type="button" onclick="window.print()" class="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs sm:text-sm font-bold rounded-full px-4 py-2 shadow-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer">
@@ -225,11 +225,11 @@
             @endif
 
             <!-- Guidelines -->
-            <div class="bg-amber-50/80 border-l-4 border-amber-500 rounded-r-2xl p-4 text-xs text-amber-900 space-y-1.5 leading-relaxed">
+            <div class="bg-amber-50/80 border-s-4 border-amber-500 rounded-e-2xl p-4 text-xs text-amber-900 space-y-1.5 leading-relaxed">
                 <h6 class="font-bold uppercase tracking-wider text-amber-950 text-[11px] flex items-center gap-1.5 mb-1.5">
                     <i class="bi bi-info-circle-fill text-amber-500"></i> Important Safari Information & Advisory
                 </h6>
-                <ul class="list-disc pl-4 space-y-1 text-[11px] text-amber-900/90">
+                <ul class="list-disc ps-4 space-y-1 text-[11px] text-amber-900/90">
                     <li><strong>Pickup Notice:</strong> Your licensed safari captain will call or WhatsApp 30 to 45 minutes prior to pickup to confirm your exact vehicle arrival time.</li>
                     <li><strong>Identification:</strong> Please present this voucher (digital or printed) together with valid photo ID upon boarding.</li>
                     <li><strong>Clothing:</strong> Casual comfortable wear and sports footwear recommended. Light jackets are advisable for desert evenings in winter.</li>

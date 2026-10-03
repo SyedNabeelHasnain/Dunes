@@ -13,7 +13,7 @@
     <!-- English View -->
     <div x-show="lang === 'en'" class="space-y-4">
         @if($page->description)
-            <div class="p-3.5 bg-slate-50 rounded-2xl text-slate-600 text-xs sm:text-sm border-l-4 border-primary leading-relaxed">
+            <div class="p-3.5 bg-slate-50 rounded-2xl text-slate-600 text-xs sm:text-sm border-s-4 border-primary leading-relaxed">
                 {!! nl2br(e($page->description)) !!}
             </div>
         @endif

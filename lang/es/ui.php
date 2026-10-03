@@ -127,6 +127,7 @@ return [
         'related_posts' => 'Artículos Relacionados',
         'related_tours' => 'Safaris Relacionados Recomendados',
         'table_of_contents' => 'Tabla de Contenidos',
+        'quick_summary' => 'Resumen Rápido',
     ],
 
     // Footer
