@@ -118,6 +118,31 @@ class BookingEngineTest extends TestCase
     }
 
     /**
+     * Test that MATCH5 honors its database active status even if concierge_promo_active setting is 0.
+     */
+    public function test_match5_honors_database_active_status_regardless_of_settings_toggle(): void
+    {
+        Setting::updateOrCreate(['setting_key' => 'concierge_promo_active'], ['setting_value' => '0']);
+        Coupon::updateOrCreate(
+            ['code' => 'MATCH5'],
+            [
+                'name' => 'Safari Match Concierge 5% Discount',
+                'discount_type' => 'percentage',
+                'discount_value' => 5.00,
+                'min_spend' => 0.00,
+                'status' => 'active',
+            ]
+        );
+
+        $coupon = Coupon::findByCode('MATCH5');
+        $this->assertNotNull($coupon);
+        $this->assertEquals('active', $coupon->status);
+        $check = $coupon->validateEligibility(200.00);
+        $this->assertTrue($check['valid']);
+        $this->assertEquals(10.00, $check['discount']);
+    }
+
+    /**
      * Test 25% first-time welcome coupons (DUNESWELCOME and FIRST25).
      */
     public function test_welcome_25_percent_coupons(): void

@@ -119,7 +119,32 @@ class AdminCouponController extends Controller
         $data['first_time_only'] = $request->has('first_time_only');
         $data['is_featured'] = $request->has('is_featured');
 
-        Coupon::create($data);
+        $coupon = Coupon::create($data);
+
+        if (in_array($coupon->code, ['DUNESWELCOME', 'FIRST25'])) {
+            $bannerState = $coupon->status === 'active' ? '1' : '0';
+            Setting::updateOrCreate(['setting_key' => 'top_promo_banner_active'], ['setting_value' => $bannerState]);
+            Setting::updateOrCreate(['setting_key' => 'promo_top_banner_enabled'], ['setting_value' => $bannerState]);
+            Setting::updateOrCreate(['setting_key' => 'welcome_popup_active'], ['setting_value' => $bannerState]);
+            Setting::updateOrCreate(['setting_key' => 'promo_welcome_modal_enabled'], ['setting_value' => $bannerState]);
+            Cache::forget('site_settings_cache');
+            Cache::forget('site_home_cache');
+            app(\App\Services\SettingsService::class)->clearCache();
+        }
+
+        if ($coupon->code === 'MATCH5') {
+            Setting::updateOrCreate(['setting_key' => 'concierge_promo_active'], ['setting_value' => $coupon->status === 'active' ? '1' : '0']);
+            Cache::forget('site_settings_cache');
+            Cache::forget('site_home_cache');
+            app(\App\Services\SettingsService::class)->clearCache();
+        }
+
+        if ($coupon->code === 'SAVE5') {
+            Setting::updateOrCreate(['setting_key' => 'exit_intent_promo_active'], ['setting_value' => $coupon->status === 'active' ? '1' : '0']);
+            Cache::forget('site_settings_cache');
+            Cache::forget('site_home_cache');
+            app(\App\Services\SettingsService::class)->clearCache();
+        }
 
         return redirect()->route('admin.coupons.index')->with('success', "Coupon {$data['code']} created successfully!");
     }
@@ -184,6 +209,20 @@ class AdminCouponController extends Controller
             app(\App\Services\SettingsService::class)->clearCache();
         }
 
+        if ($coupon->code === 'MATCH5') {
+            Setting::updateOrCreate(['setting_key' => 'concierge_promo_active'], ['setting_value' => $coupon->status === 'active' ? '1' : '0']);
+            Cache::forget('site_settings_cache');
+            Cache::forget('site_home_cache');
+            app(\App\Services\SettingsService::class)->clearCache();
+        }
+
+        if ($coupon->code === 'SAVE5') {
+            Setting::updateOrCreate(['setting_key' => 'exit_intent_promo_active'], ['setting_value' => $coupon->status === 'active' ? '1' : '0']);
+            Cache::forget('site_settings_cache');
+            Cache::forget('site_home_cache');
+            app(\App\Services\SettingsService::class)->clearCache();
+        }
+
         return redirect()->route('admin.coupons.index')->with('success', "Coupon {$coupon->code} updated successfully!");
     }
 
@@ -214,6 +253,20 @@ class AdminCouponController extends Controller
             Setting::updateOrCreate(['setting_key' => 'promo_top_banner_enabled'], ['setting_value' => $bannerState]);
             Setting::updateOrCreate(['setting_key' => 'welcome_popup_active'], ['setting_value' => $bannerState]);
             Setting::updateOrCreate(['setting_key' => 'promo_welcome_modal_enabled'], ['setting_value' => $bannerState]);
+            Cache::forget('site_settings_cache');
+            Cache::forget('site_home_cache');
+            app(\App\Services\SettingsService::class)->clearCache();
+        }
+
+        if ($coupon->code === 'MATCH5') {
+            Setting::updateOrCreate(['setting_key' => 'concierge_promo_active'], ['setting_value' => $coupon->status === 'active' ? '1' : '0']);
+            Cache::forget('site_settings_cache');
+            Cache::forget('site_home_cache');
+            app(\App\Services\SettingsService::class)->clearCache();
+        }
+
+        if ($coupon->code === 'SAVE5') {
+            Setting::updateOrCreate(['setting_key' => 'exit_intent_promo_active'], ['setting_value' => $coupon->status === 'active' ? '1' : '0']);
             Cache::forget('site_settings_cache');
             Cache::forget('site_home_cache');
             app(\App\Services\SettingsService::class)->clearCache();

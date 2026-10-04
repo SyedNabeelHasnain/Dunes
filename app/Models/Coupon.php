@@ -256,18 +256,30 @@ class Coupon extends Model
 
         if ($coupon) {
             if ($normalized === 'MATCH5') {
-                $coupon->status = $conciergeActive ? 'active' : 'inactive';
+                if ($coupon->getRawOriginal('status') === 'active' || $conciergeActive) {
+                    $coupon->status = 'active';
+                } else {
+                    $coupon->status = 'inactive';
+                }
             }
             if ($normalized === 'SAVE5') {
-                $coupon->status = $exitIntentActive ? 'active' : 'inactive';
+                if ($coupon->getRawOriginal('status') === 'active' || $exitIntentActive) {
+                    $coupon->status = 'active';
+                } else {
+                    $coupon->status = 'inactive';
+                }
             }
             if ($normalized === 'DUNESWELCOME') {
-                try {
-                    $bannerDisabled = DB::table('settings')->whereIn('setting_key', ['top_promo_banner_active', 'promo_top_banner_enabled'])->where('setting_value', '0')->exists();
-                    if ($bannerDisabled) {
-                        $coupon->status = 'inactive';
-                    }
-                } catch (\Throwable $e) {}
+                if ($coupon->getRawOriginal('status') === 'active') {
+                    $coupon->status = 'active';
+                } else {
+                    try {
+                        $bannerDisabled = DB::table('settings')->whereIn('setting_key', ['top_promo_banner_active', 'promo_top_banner_enabled'])->where('setting_value', '0')->exists();
+                        if (! $bannerDisabled) {
+                            $coupon->status = 'active';
+                        }
+                    } catch (\Throwable $e) {}
+                }
             }
 
             return $coupon;
