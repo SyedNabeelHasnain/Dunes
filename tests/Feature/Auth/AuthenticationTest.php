@@ -108,4 +108,16 @@ class AuthenticationTest extends TestCase
         $this->assertEquals(302, $response->getStatusCode());
         $this->assertEquals(route('login'), $response->headers->get('Location'));
     }
+
+    public function test_too_many_requests_exception_redirects_to_login_gracefully(): void
+    {
+        $request = \Illuminate\Http\Request::create('/login', 'POST');
+        $request->setLaravelSession($this->app['session']->driver());
+        $exception = new \Symfony\Component\HttpKernel\Exception\HttpException(429, 'Too Many Requests');
+
+        $response = $this->app->make(\Illuminate\Contracts\Debug\ExceptionHandler::class)->render($request, $exception);
+
+        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertEquals(route('login'), $response->headers->get('Location'));
+    }
 }

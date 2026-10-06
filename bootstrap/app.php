@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->trustProxies(at: '*');
         $middleware->web(append: [
             TrackVisitor::class,
             SecurityHeaders::class,
@@ -38,6 +39,19 @@ return Application::configure(basePath: dirname(__DIR__))
 
                 return redirect()->route('login')
                     ->with('status', 'Your session expired for security reasons. Please enter your credentials to sign in.')
+                    ->withInput($request->except('password', '_token'));
+            }
+
+            if ($e->getStatusCode() === 429) {
+                if ($request->is('api/*') || $request->is('ajax.php') || $request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Too many requests. Please wait a moment and try again.',
+                    ], 429);
+                }
+
+                return redirect()->route('login')
+                    ->with('status', 'Too many requests were detected from your network. Please wait a moment and try again.')
                     ->withInput($request->except('password', '_token'));
             }
         });
