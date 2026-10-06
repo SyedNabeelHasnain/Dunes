@@ -70,8 +70,8 @@
                                 <label for="google_cid" class="block text-xs font-bold text-slate-700 mb-1.5">
                                     Google Customer ID (CID)
                                 </label>
-                                <input type="text" name="google_cid" id="google_cid" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['google_cid'] ?? '14185012580795441634' }}" placeholder="14185012580795441634">
-                                <div class="mt-1 text-[11px] text-slate-500">Decimal CID (14185012580795441634) or Hex (0xc4db9db186e4e1e2).</div>
+                                <input type="text" name="google_cid" id="google_cid" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['google_cid'] ?? '14154142641213989346' }}" placeholder="14154142641213989346">
+                                <div class="mt-1 text-[11px] text-slate-500">Decimal CID (14154142641213989346) or Hex (0xc46d9dbd85c4e1e2).</div>
                             </div>
                         </div>
 
@@ -159,7 +159,7 @@
                                class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 transition">
                                 <i class="bi bi-star-fill text-amber-500"></i> Test Review Modal
                             </a>
-                            <a href="https://maps.google.com/?cid={{ $settings['google_cid'] ?? '14185012580795441634' }}" 
+                            <a href="https://maps.google.com/?cid={{ $settings['google_cid'] ?? '14154142641213989346' }}" 
                                target="_blank" 
                                rel="noopener noreferrer" 
                                class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 transition">

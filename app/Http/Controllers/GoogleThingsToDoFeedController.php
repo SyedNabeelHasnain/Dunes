@@ -163,7 +163,7 @@ class GoogleThingsToDoFeedController extends Controller
         $phone = $settings['site_phone'] ?? '+971 50 245 6056';
         $address = $settings['site_address'] ?? 'Al Fahidi, Bur Dubai, Dubai, United Arab Emirates';
         $postalCode = $settings['site_postal_code'] ?? '00000';
-        $cid = $settings['google_cid'] ?? '14185012580795441634';
+        $cid = $settings['google_cid'] ?? '14154142641213989346';
 
         return [
             'operator_id' => $placeId,

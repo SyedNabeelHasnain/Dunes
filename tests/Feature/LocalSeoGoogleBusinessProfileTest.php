@@ -42,7 +42,7 @@ class LocalSeoGoogleBusinessProfileTest extends TestCase
         $response->assertSee('Google Integration Suite', false);
         $response->assertSee('Google Business Profile & Local SEO Entity', false);
         $response->assertSee('ChIJbWsIEIVEdEER4uHEhb2dbcQ');
-        $response->assertSee('14185012580795441634');
+        $response->assertSee('14154142641213989346');
         $response->assertSee('Test Review Modal');
         $response->assertSee('Open Listing on Google Maps');
     }
@@ -119,12 +119,12 @@ class LocalSeoGoogleBusinessProfileTest extends TestCase
         $this->assertStringContainsString('"propertyID": "Google Place ID"', $content);
         $this->assertStringContainsString('"value": "ChIJbWsIEIVEdEER4uHEhb2dbcQ"', $content);
         $this->assertStringContainsString('"propertyID": "Google CID"', $content);
-        $this->assertStringContainsString('"value": "14185012580795441634"', $content);
+        $this->assertStringContainsString('"value": "14154142641213989346"', $content);
         $this->assertStringContainsString('"latitude": 25.2048', $content);
         $this->assertStringContainsString('"longitude": 55.2708', $content);
         $this->assertStringContainsString('"hasMap": "https://maps.google.com/?q=25.2048,55.2708"', $content);
         $this->assertStringContainsString('https://search.google.com/local/writereview?placeid=ChIJbWsIEIVEdEER4uHEhb2dbcQ', $content);
-        $this->assertStringContainsString('https://maps.google.com/?cid=14185012580795441634', $content);
+        $this->assertStringContainsString('https://maps.google.com/?cid=14154142641213989346', $content);
     }
 
     /**

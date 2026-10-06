@@ -38,7 +38,7 @@
     $siteLat = $settings['site_latitude'] ?? '25.2048';
     $siteLng = $settings['site_longitude'] ?? '55.2708';
     $googlePlaceId = $settings['google_place_id'] ?? 'ChIJbWsIEIVEdEER4uHEhb2dbcQ';
-    $googleCid = $settings['google_cid'] ?? '14185012580795441634';
+    $googleCid = $settings['google_cid'] ?? '14154142641213989346';
     $googleReviewUrl = $settings['google_review_url'] ?? (!empty($googlePlaceId) ? "https://search.google.com/local/writereview?placeid={$googlePlaceId}" : '');
     $detLicense = $settings['company_license_number'] ?? ($settings['site_det_license'] ?? '1430583');
     $sitePostalCode = $settings['site_postal_code'] ?? '00000';

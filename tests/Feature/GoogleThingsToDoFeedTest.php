@@ -22,7 +22,7 @@ class GoogleThingsToDoFeedTest extends TestCase
         Setting::updateOrCreate(['setting_key' => 'site_name'], ['setting_value' => 'Dunes Discovery Tourism L.L.C.']);
         Setting::updateOrCreate(['setting_key' => 'company_license_number'], ['setting_value' => '1430583']);
         Setting::updateOrCreate(['setting_key' => 'google_place_id'], ['setting_value' => 'ChIJbWsIEIVEdEER4uHEhb2dbcQ']);
-        Setting::updateOrCreate(['setting_key' => 'google_cid'], ['setting_value' => '14185012580795441634']);
+        Setting::updateOrCreate(['setting_key' => 'google_cid'], ['setting_value' => '14154142641213989346']);
         Setting::updateOrCreate(['setting_key' => 'site_phone'], ['setting_value' => '+971 50 245 6056']);
         Setting::updateOrCreate(['setting_key' => 'site_address'], ['setting_value' => 'Al Fahidi, Bur Dubai, Dubai, United Arab Emirates']);
         Setting::updateOrCreate(['setting_key' => 'site_postal_code'], ['setting_value' => '00000']);
