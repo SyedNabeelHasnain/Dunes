@@ -221,8 +221,8 @@ class GoogleReviewSyncTest extends TestCase
         // Verify it was rendered on the home page
         $response->assertSee('Unfeatured Google Reviewer');
 
-        // Verify cached in site_social_proof_feed
-        $cached = Cache::get('site_social_proof_feed');
+        // Verify cached in site_home_reviews_feed
+        $cached = Cache::get('site_home_reviews_feed');
         $this->assertNotNull($cached);
         $this->assertTrue($cached->contains('reviewer_name', 'Unfeatured Google Reviewer'));
     }

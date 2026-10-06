@@ -4,6 +4,13 @@
 @php
 if (!function_exists('renderReviewCardMarkup')) {
     function renderReviewCardMarkup($r) {
+        if (is_array($r)) {
+            $r = (object) $r;
+        }
+        if (!is_object($r)) {
+            return '';
+        }
+
         $rating = (float) ($r->rating ?? 5.0);
         $fullStars = (int) floor($rating);
         $hasHalf = ($rating - $fullStars) >= 0.3 && ($rating - $fullStars) <= 0.7;
@@ -34,20 +41,30 @@ if (!function_exists('renderReviewCardMarkup')) {
         }
 
         $url = !empty($r->review_url) ? $r->review_url : route('review.rate', ['ref' => 'guest']);
-        $avatar = !empty($r->reviewer_avatar_url) ? (str_starts_with($r->reviewer_avatar_url, 'http') ? $r->reviewer_avatar_url : asset($r->reviewer_avatar_url)) : asset('images/avatar-default.svg');
+        $reviewerAvatar = !empty($r->reviewer_avatar_url) ? (string) $r->reviewer_avatar_url : '';
+        $avatar = !empty($reviewerAvatar) ? (str_starts_with($reviewerAvatar, 'http') ? $reviewerAvatar : asset($reviewerAvatar)) : asset('images/avatar-default.svg');
         $fallbackAvatar = asset('images/avatar-default.svg');
 
         $dateFormatted = '';
         if (!empty($r->published_date)) {
-            $dateFormatted = ($r->published_date instanceof \DateTimeInterface)
-                ? $r->published_date->format('M Y')
-                : \Carbon\Carbon::parse($r->published_date)->format('M Y');
+            try {
+                $dateFormatted = ($r->published_date instanceof \DateTimeInterface)
+                    ? $r->published_date->format('M Y')
+                    : \Carbon\Carbon::parse($r->published_date)->format('M Y');
+            } catch (\Throwable $e) {
+                $dateFormatted = '';
+            }
         }
 
+        $photos = $r->photos ?? [];
+        if (is_string($photos)) {
+            $photos = json_decode($photos, true) ?: [];
+        }
         $photosHtml = '';
-        if (!empty($r->photos) && is_array($r->photos) && count($r->photos) > 0) {
+        if (is_array($photos) && count($photos) > 0) {
             $photosHtml .= '<div class="flex gap-1.5 mb-2 mt-1">';
-            foreach (array_slice($r->photos, 0, 3) as $p) {
+            foreach (array_slice($photos, 0, 3) as $p) {
+                if (!is_string($p) || empty($p)) continue;
                 $pUrl = str_starts_with($p, 'http') ? $p : asset($p);
                 $photosHtml .= '<a href="' . htmlspecialchars($pUrl) . '" target="_blank" rel="noopener noreferrer" class="rounded-lg overflow-hidden inline-block shadow-xs border border-slate-200 w-12 h-12 shrink-0"><img src="' . htmlspecialchars($pUrl) . '" alt="Traveler photo" class="w-full h-full object-cover" loading="lazy"></a>';
             }
@@ -55,21 +72,24 @@ if (!function_exists('renderReviewCardMarkup')) {
         }
 
         $actionText = $isUgc ? __('ui.reviews_section.submit_review') : __('ui.common.view_details');
+        $reviewerName = htmlspecialchars((string)($r->reviewer_name ?? 'Traveler'));
+        $reviewTitle = !empty($r->review_title) ? htmlspecialchars((string)$r->review_title) : '';
+        $reviewText = htmlspecialchars((string)($r->review_text ?? ''));
 
         return '
         <div class="review-card h-full flex flex-col text-start">
             <div class="flex justify-between items-center mb-3">
                 <div class="flex items-center gap-2 min-w-0">
-                    <img src="' . htmlspecialchars($avatar) . '" alt="' . htmlspecialchars($r->reviewer_name ?? 'Traveler') . '" class="w-10 h-10 rounded-full object-cover shrink-0 shadow-2xs" referrerpolicy="no-referrer" loading="lazy" onerror="this.onerror=null;this.src=\'' . $fallbackAvatar . '\'">
+                    <img src="' . htmlspecialchars($avatar) . '" alt="' . $reviewerName . '" class="w-10 h-10 rounded-full object-cover shrink-0 shadow-2xs" referrerpolicy="no-referrer" loading="lazy" onerror="this.onerror=null;this.src=\'' . $fallbackAvatar . '\'">
                     <div class="min-w-0">
-                        <div class="font-bold text-slate-900 text-sm truncate">' . htmlspecialchars($r->reviewer_name ?? 'Traveler') . '</div>
+                        <div class="font-bold text-slate-900 text-sm truncate">' . $reviewerName . '</div>
                         <div class="text-slate-500 text-xs">' . htmlspecialchars($dateFormatted) . '</div>
                     </div>
                 </div>
                 <div class="flex gap-0.5 text-xs shrink-0">' . $stars . '</div>
             </div>
-            ' . (!empty($r->review_title) ? '<h3 class="text-sm font-bold mb-1.5 text-slate-900 line-clamp-1">' . htmlspecialchars($r->review_title) . '</h3>' : '') . '
-            <p class="text-slate-600 text-sm mb-2 flex-grow line-clamp-3 leading-relaxed">"' . htmlspecialchars($r->review_text ?? '') . '"</p>
+            ' . ($reviewTitle ? '<h3 class="text-sm font-bold mb-1.5 text-slate-900 line-clamp-1">' . $reviewTitle . '</h3>' : '') . '
+            <p class="text-slate-600 text-sm mb-2 flex-grow line-clamp-3 leading-relaxed">"' . $reviewText . '"</p>
             ' . $photosHtml . '
             <div class="flex justify-between items-center mt-auto pt-3 border-t border-slate-200">
                 ' . $sourceBadge . '
@@ -443,13 +463,20 @@ if (!function_exists('renderReviewCardMarkup')) {
     </div>
 
     @php
-        $googleReviews = $reviews->filter(fn($r) => strtolower($r->source ?? '') === 'google');
+        $reviewsCollection = collect($reviews ?? []);
+        $googleReviews = $reviewsCollection->filter(function ($r) {
+            $src = is_object($r) ? ($r->source ?? '') : (is_array($r) ? ($r['source'] ?? '') : '');
+            return strtolower((string)$src) === 'google';
+        });
         if ($googleReviews->isEmpty()) {
-            $googleReviews = $reviews->take(10);
+            $googleReviews = $reviewsCollection->take(10);
         }
-        $tripReviews = $reviews->filter(fn($r) => strtolower($r->source ?? '') === 'tripadvisor');
+        $tripReviews = $reviewsCollection->filter(function ($r) {
+            $src = is_object($r) ? ($r->source ?? '') : (is_array($r) ? ($r['source'] ?? '') : '');
+            return strtolower((string)$src) === 'tripadvisor';
+        });
         if ($tripReviews->isEmpty()) {
-            $tripReviews = $reviews->skip(5)->take(10);
+            $tripReviews = $reviewsCollection->skip(5)->take(10);
         }
     @endphp
 

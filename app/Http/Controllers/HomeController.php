@@ -36,7 +36,7 @@ class HomeController extends Controller
         }
 
         try {
-            $reviews = Cache::remember('site_social_proof_feed', 3600, function () {
+            $reviews = Cache::remember('site_home_reviews_feed', 3600, function () {
                 // Primary collection: high-priority featured approved reviews
                 $featured = Review::where('status', 'approved')
                     ->where('is_featured', true)
@@ -90,6 +90,7 @@ class HomeController extends Controller
 
                 return $featured;
             });
+            $reviews = collect($reviews);
         } catch (\Throwable $e) {
             $reviews = collect();
         }

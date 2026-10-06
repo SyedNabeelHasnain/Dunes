@@ -407,6 +407,7 @@ class PageController extends Controller
             ]
         );
 
+        Cache::forget('site_home_reviews_feed');
         Cache::forget('site_social_proof_feed');
         Cache::forget('site_home_cache');
 

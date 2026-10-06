@@ -344,6 +344,7 @@ class GoogleReviewSyncService
     public function purgeCaches(): void
     {
         try {
+            Cache::forget('site_home_reviews_feed');
             Cache::forget('site_social_proof_feed');
             Cache::forget('site_home_cache');
             Cache::forget('site_settings_cache');
