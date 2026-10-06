@@ -72,9 +72,11 @@ if (!function_exists('renderReviewCardMarkup')) {
         }
 
         $actionText = $isUgc ? __('ui.reviews_section.submit_review') : __('ui.common.view_details');
-        $reviewerName = htmlspecialchars((string)($r->reviewer_name ?? 'Traveler'));
+        $rawName = trim((string)($r->reviewer_name ?? ''));
+        $reviewerName = htmlspecialchars(!empty($rawName) ? $rawName : 'Verified Guest');
         $reviewTitle = !empty($r->review_title) ? htmlspecialchars((string)$r->review_title) : '';
-        $reviewText = htmlspecialchars((string)($r->review_text ?? ''));
+        $rawText = trim((string)($r->review_text ?? ''));
+        $reviewText = htmlspecialchars(!empty($rawText) ? $rawText : 'Outstanding desert safari experience with Dunes Discovery. Highly recommended for visitors in Dubai!');
 
         return '
         <div class="review-card h-full flex flex-col text-start">

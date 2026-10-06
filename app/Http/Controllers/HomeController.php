@@ -40,6 +40,10 @@ class HomeController extends Controller
                 // Primary collection: high-priority featured approved reviews
                 $featured = Review::where('status', 'approved')
                     ->where('is_featured', true)
+                    ->whereNotNull('review_text')
+                    ->where('review_text', '!=', '')
+                    ->whereNotNull('reviewer_name')
+                    ->where('reviewer_name', '!=', '')
                     ->orderBy('published_date', 'desc')
                     ->limit(10)
                     ->get();
@@ -52,6 +56,10 @@ class HomeController extends Controller
                 if ($googleCount < 5) {
                     $extraGoogle = Review::where('status', 'approved')
                         ->where('source', 'google')
+                        ->whereNotNull('review_text')
+                        ->where('review_text', '!=', '')
+                        ->whereNotNull('reviewer_name')
+                        ->where('reviewer_name', '!=', '')
                         ->whereNotIn('id', $featuredIds)
                         ->where('rating', '>=', 4.0)
                         ->orderBy('published_date', 'desc')
@@ -66,6 +74,10 @@ class HomeController extends Controller
                 if ($tripCount < 5) {
                     $extraTrip = Review::where('status', 'approved')
                         ->where('source', 'tripadvisor')
+                        ->whereNotNull('review_text')
+                        ->where('review_text', '!=', '')
+                        ->whereNotNull('reviewer_name')
+                        ->where('reviewer_name', '!=', '')
                         ->whereNotIn('id', $featuredIds)
                         ->where('rating', '>=', 4.0)
                         ->orderBy('published_date', 'desc')
@@ -79,6 +91,10 @@ class HomeController extends Controller
                 // If overall count is still under 8, backfill with any high-rated approved reviews
                 if ($featured->count() < 8) {
                     $fillers = Review::where('status', 'approved')
+                        ->whereNotNull('review_text')
+                        ->where('review_text', '!=', '')
+                        ->whereNotNull('reviewer_name')
+                        ->where('reviewer_name', '!=', '')
                         ->whereNotIn('id', $featuredIds)
                         ->where('rating', '>=', 4.0)
                         ->orderBy('published_date', 'desc')
