@@ -83,6 +83,14 @@
                             <div class="mt-1 text-[11px] text-slate-500">Direct write-review intent URL shown on Contact page and customer communications.</div>
                         </div>
 
+                        <div>
+                            <label for="google_places_api_key" class="block text-xs font-bold text-slate-700 mb-1.5">
+                                Google Places API Key
+                            </label>
+                            <input type="password" name="google_places_api_key" id="google_places_api_key" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['google_places_api_key'] ?? '' }}" placeholder="AIzaSy...">
+                            <div class="mt-1 text-[11px] text-slate-500">Google Cloud API key with Places API enabled for automatic live review sync.</div>
+                        </div>
+
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div>
                                 <label for="site_latitude" class="block text-xs font-bold text-slate-700 mb-1.5">Latitude (GPS)</label>

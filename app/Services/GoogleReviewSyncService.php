@@ -166,8 +166,8 @@ class GoogleReviewSyncService
                 'updated' => $updated,
                 'skipped' => $skipped,
                 'total' => $totalGoogle,
-                'place_rating' => $placeRating ? round((float) $placeRating, 1) : 4.9,
-                'user_ratings_total' => $userRatingsTotal ?: 1450,
+                'place_rating' => $placeRating ? round((float) $placeRating, 1) : 5.0,
+                'user_ratings_total' => $userRatingsTotal ?: 329,
                 'last_synced_at' => $syncedAt,
                 'message' => "Successfully synchronized Google Reviews: {$added} new added, {$updated} updated.",
             ];
@@ -399,7 +399,7 @@ class GoogleReviewSyncService
             return $envKey;
         }
 
-        return $this->settings->get('google_maps_api_key');
+        return $this->settings->get('google_places_api_key') ?: $this->settings->get('google_maps_api_key');
     }
 
     /**
@@ -441,8 +441,8 @@ class GoogleReviewSyncService
     {
         $now = now();
         return [
-            'rating' => 4.9,
-            'user_ratings_total' => 1480,
+            'rating' => 5.0,
+            'user_ratings_total' => 329,
             'url' => $this->getGoogleReviewUrl(),
             'reviews' => [
                 [
