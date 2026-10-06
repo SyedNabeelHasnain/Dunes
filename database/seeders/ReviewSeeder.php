@@ -36,6 +36,13 @@ class ReviewSeeder extends Seeder
                     'status' => $r['status'] ?: 'approved',
                     'photos' => $r['photos'] ?? [],
                     'is_featured' => (bool) $r['is_featured'],
+                    'is_local_guide' => (bool) ($r['is_local_guide'] ?? false),
+                    'reviewer_reviews_count' => isset($r['reviewer_reviews_count']) ? (int) $r['reviewer_reviews_count'] : null,
+                    'likes_count' => isset($r['likes_count']) ? (int) $r['likes_count'] : 0,
+                    'owner_response_text' => $r['owner_response_text'] ?? null,
+                    'owner_response_date' => ! empty($r['owner_response_date']) ? date('Y-m-d H:i:s', strtotime($r['owner_response_date'])) : null,
+                    'language' => $r['language'] ?? null,
+                    'visited_in' => $r['visited_in'] ?? null,
                     'imported_at' => $r['imported_at'] ? date('Y-m-d H:i:s', strtotime($r['imported_at'])) : now(),
                 ]
             );

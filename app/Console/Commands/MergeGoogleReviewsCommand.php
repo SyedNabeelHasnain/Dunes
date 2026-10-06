@@ -14,7 +14,7 @@ class MergeGoogleReviewsCommand extends Command
      * @var string
      */
     protected $signature = 'reviews:merge-extracted
-                            {--source-file= : Path to newly extracted Google reviews JSON}
+                            {--source-file= : Path to newly extracted Google reviews JSON or CSV}
                             {--master-file= : Path to master seed reviews.json}
                             {--sync-db : Also persist and upsert records into the reviews database table}';
 
@@ -23,7 +23,7 @@ class MergeGoogleReviewsCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Harmonize and deduplicate extracted Google reviews into master reviews.json and database.';
+    protected $description = 'Harmonize, deduplicate, and import extracted Google reviews (JSON or CSV) into master reviews.json and database.';
 
     /**
      * Execute the console command.
@@ -42,13 +42,19 @@ class MergeGoogleReviewsCommand extends Command
         }
 
         $masterReviews = json_decode(File::get($masterPath), true) ?: [];
-        $this->info("Loaded " . count($masterReviews) . " existing reviews from master file.");
+        $this->info('Loaded ' . count($masterReviews) . ' existing reviews from master file.');
 
         // 1. Data Cleaning & Sanitization on Existing Records
         $fixedCount = 0;
-        foreach ($masterReviews as &$m) {
+        $cleanedMaster = [];
+        foreach ($masterReviews as $m) {
+            // Remove legacy mock dummy reviews (g1-g5)
+            if (($m['source'] ?? '') === 'google' && in_array($m['source_review_id'] ?? '', ['g1', 'g2', 'g3', 'g4', 'g5'])) {
+                $fixedCount++;
+                continue;
+            }
             // Fix ID 115 anomaly: mislabeled source 'Google' on TripAdvisor review
-            if ($m['id'] === 115 && $m['source'] === 'Google') {
+            if (($m['id'] ?? null) === 115 && ($m['source'] ?? '') === 'Google') {
                 $m['source'] = 'tripadvisor';
                 $fixedCount++;
             }
@@ -56,11 +62,12 @@ class MergeGoogleReviewsCommand extends Command
             if (! isset($m['photos']) || ! is_array($m['photos'])) {
                 $m['photos'] = [];
             }
+            $cleanedMaster[] = $m;
         }
-        unset($m);
+        $masterReviews = $cleanedMaster;
 
         if ($fixedCount > 0) {
-            $this->warn("Repaired {$fixedCount} mislabeled legacy review record(s) (e.g., ID 115 source -> tripadvisor).");
+            $this->warn("Repaired/purged {$fixedCount} legacy review record(s) (mock placeholders or mislabeled sources).");
         }
 
         // 2. Build In-Memory Index for Deduplication
@@ -86,12 +93,11 @@ class MergeGoogleReviewsCommand extends Command
 
         $addedCount = 0;
         $updatedCount = 0;
-        $skippedCount = 0;
 
         // 3. Process Newly Extracted Reviews (if extracted file exists)
         if (File::exists($extractedPath)) {
-            $extractedReviews = json_decode(File::get($extractedPath), true) ?: [];
-            $this->info("Loaded " . count($extractedReviews) . " newly extracted Google reviews.");
+            $extractedReviews = $this->loadExtractedReviews($extractedPath);
+            $this->info('Loaded ' . count($extractedReviews) . ' newly extracted Google reviews from source.');
 
             foreach ($extractedReviews as $ext) {
                 $source = 'google';
@@ -100,7 +106,7 @@ class MergeGoogleReviewsCommand extends Command
                 $extDate = $ext['published_date'] ?? null;
                 $normName = $this->normalizeName($extName);
 
-                // Check match by source_review_id
+                // Check match by source_review_id or fuzzy match by author name + published date
                 $matchedIdx = null;
                 if ($extSrid && isset($sridIndex[$source . ':' . $extSrid])) {
                     $matchedIdx = $sridIndex[$source . ':' . $extSrid];
@@ -109,7 +115,7 @@ class MergeGoogleReviewsCommand extends Command
                 }
 
                 if ($matchedIdx !== null) {
-                    // Update existing record with richer data (photos, high-res avatar, review url)
+                    // Update existing record with richer data
                     $existing = &$masterReviews[$matchedIdx];
                     $changed = false;
 
@@ -118,18 +124,59 @@ class MergeGoogleReviewsCommand extends Command
                         $changed = true;
                     }
 
-                    if (! empty($ext['reviewer_avatar_url']) && (str_contains($existing['reviewer_avatar_url'] ?? '', 'ui-avatars.com') || empty($existing['reviewer_avatar_url']))) {
+                    if (! empty($ext['reviewer_avatar_url']) && (str_contains($existing['reviewer_avatar_url'] ?? '', 'ui-avatars.com') || empty($existing['reviewer_avatar_url']) || ! empty($ext['reviewer_avatar_url']))) {
                         $existing['reviewer_avatar_url'] = $ext['reviewer_avatar_url'];
                         $changed = true;
                     }
 
-                    if (! empty($ext['photos']) && empty($existing['photos'])) {
+                    if (! empty($ext['photos']) && (empty($existing['photos']) || count($ext['photos']) > count($existing['photos']))) {
                         $existing['photos'] = $ext['photos'];
                         $changed = true;
                     }
 
                     if (empty($existing['review_url']) && ! empty($ext['review_url'])) {
                         $existing['review_url'] = $ext['review_url'];
+                        $changed = true;
+                    }
+
+                    if (! empty($ext['reviewer_profile_url']) && empty($existing['reviewer_profile_url'])) {
+                        $existing['reviewer_profile_url'] = $ext['reviewer_profile_url'];
+                        $changed = true;
+                    }
+
+                    if (isset($ext['is_local_guide'])) {
+                        $existing['is_local_guide'] = (bool) $ext['is_local_guide'];
+                        $changed = true;
+                    }
+
+                    if (isset($ext['reviewer_reviews_count']) && $ext['reviewer_reviews_count'] !== null) {
+                        $existing['reviewer_reviews_count'] = (int) $ext['reviewer_reviews_count'];
+                        $changed = true;
+                    }
+
+                    if (isset($ext['likes_count'])) {
+                        $existing['likes_count'] = (int) $ext['likes_count'];
+                        $changed = true;
+                    }
+
+                    if (! empty($ext['owner_response_text'])) {
+                        $existing['owner_response_text'] = $ext['owner_response_text'];
+                        $existing['owner_response_date'] = $ext['owner_response_date'] ?? null;
+                        $changed = true;
+                    }
+
+                    if (! empty($ext['language']) && empty($existing['language'])) {
+                        $existing['language'] = $ext['language'];
+                        $changed = true;
+                    }
+
+                    if (! empty($ext['visited_in']) && empty($existing['visited_in'])) {
+                        $existing['visited_in'] = $ext['visited_in'];
+                        $changed = true;
+                    }
+
+                    if (empty($existing['review_text']) && ! empty($ext['review_text'])) {
+                        $existing['review_text'] = $ext['review_text'];
                         $changed = true;
                     }
 
@@ -144,8 +191,8 @@ class MergeGoogleReviewsCommand extends Command
                         'source_review_id' => $extSrid ?: ('g_' . md5($extName . '_' . $extDate)),
                         'review_url' => $ext['review_url'] ?? null,
                         'published_date' => $extDate ?: now()->format('Y-m-d'),
-                        'reviewer_name' => $extName,
-                        'reviewer_avatar_url' => $ext['reviewer_avatar_url'] ?? 'https://ui-avatars.com/api/?name=' . urlencode($extName) . '&background=00476d&color=ffffff&bold=true',
+                        'reviewer_name' => $extName ?: 'Google Customer',
+                        'reviewer_avatar_url' => $ext['reviewer_avatar_url'] ?? ('https://ui-avatars.com/api/?name=' . urlencode($extName ?: 'Google Customer') . '&background=00476d&color=ffffff&bold=true'),
                         'reviewer_profile_url' => $ext['reviewer_profile_url'] ?? null,
                         'rating' => (float) ($ext['rating'] ?? 5.0),
                         'review_title' => $ext['review_title'] ?? 'Dunes Discovery Tourism LLC',
@@ -153,6 +200,13 @@ class MergeGoogleReviewsCommand extends Command
                         'photos' => $ext['photos'] ?? [],
                         'status' => $ext['status'] ?? 'approved',
                         'is_featured' => (int) ($ext['is_featured'] ?? 0),
+                        'is_local_guide' => (bool) ($ext['is_local_guide'] ?? false),
+                        'reviewer_reviews_count' => isset($ext['reviewer_reviews_count']) ? (int) $ext['reviewer_reviews_count'] : null,
+                        'likes_count' => isset($ext['likes_count']) ? (int) $ext['likes_count'] : 0,
+                        'owner_response_text' => $ext['owner_response_text'] ?? null,
+                        'owner_response_date' => $ext['owner_response_date'] ?? null,
+                        'language' => $ext['language'] ?? null,
+                        'visited_in' => $ext['visited_in'] ?? null,
                         'imported_at' => now()->format('Y-m-d H:i:s'),
                         'updated_at' => now()->format('Y-m-d H:i:s'),
                     ];
@@ -160,7 +214,7 @@ class MergeGoogleReviewsCommand extends Command
                     $masterReviews[] = $newRecord;
                     $newIdx = count($masterReviews) - 1;
 
-                    // Update index
+                    // Update indexes
                     if ($newRecord['source_review_id']) {
                         $sridIndex['google:' . $newRecord['source_review_id']] = $newIdx;
                     }
@@ -170,12 +224,12 @@ class MergeGoogleReviewsCommand extends Command
                 }
             }
         } else {
-            $this->comment("No external JSON provided at [{$extractedPath}]. Cleaned and formatted existing reviews.");
+            $this->comment("No external review file provided at [{$extractedPath}]. Cleaned and formatted existing reviews.");
         }
 
         // 4. Save formatted JSON to master reviews.json
         File::put($masterPath, json_encode($masterReviews, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-        $this->info("Master reviews file updated successfully: " . count($masterReviews) . " total reviews.");
+        $this->info('Master reviews file updated successfully: ' . count($masterReviews) . ' total reviews.');
 
         // 5. Database Upsert (if requested)
         if ($syncDb) {
@@ -199,6 +253,13 @@ class MergeGoogleReviewsCommand extends Command
                         'photos' => $r['photos'] ?? [],
                         'status' => $r['status'] ?? 'approved',
                         'is_featured' => (bool) ($r['is_featured'] ?? false),
+                        'is_local_guide' => (bool) ($r['is_local_guide'] ?? false),
+                        'reviewer_reviews_count' => isset($r['reviewer_reviews_count']) ? (int) $r['reviewer_reviews_count'] : null,
+                        'likes_count' => isset($r['likes_count']) ? (int) $r['likes_count'] : 0,
+                        'owner_response_text' => $r['owner_response_text'] ?? null,
+                        'owner_response_date' => ! empty($r['owner_response_date']) ? date('Y-m-d H:i:s', strtotime($r['owner_response_date'])) : null,
+                        'language' => $r['language'] ?? null,
+                        'visited_in' => $r['visited_in'] ?? null,
                         'imported_at' => ! empty($r['imported_at']) ? date('Y-m-d H:i:s', strtotime($r['imported_at'])) : now(),
                     ]
                 );
@@ -219,6 +280,112 @@ class MergeGoogleReviewsCommand extends Command
         );
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * Load reviews from CSV or JSON based on file extension.
+     */
+    protected function loadExtractedReviews(string $path): array
+    {
+        if (str_ends_with(strtolower($path), '.csv')) {
+            return $this->loadReviewsFromCsv($path);
+        }
+
+        return json_decode(File::get($path), true) ?: [];
+    }
+
+    /**
+     * Parse and map Google Maps Reviews Scraper CSV.
+     */
+    protected function loadReviewsFromCsv(string $path): array
+    {
+        $reviews = [];
+        $handle = fopen($path, 'r');
+        if (! $handle) {
+            return [];
+        }
+
+        $header = fgetcsv($handle, 0, ',', '"', '\\');
+        if (! $header) {
+            fclose($handle);
+            return [];
+        }
+
+        // Clean invisible BOM or non-printable characters from header keys
+        $header = array_map(function ($col) {
+            return trim(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $col));
+        }, $header);
+
+        while (($row = fgetcsv($handle, 0, ',', '"', '\\')) !== false) {
+            if (count($row) !== count($header)) {
+                continue;
+            }
+
+            $data = array_combine($header, $row);
+
+            $photos = [];
+            for ($i = 0; $i <= 7; $i++) {
+                $key = "reviewImageUrls/{$i}";
+                if (! empty($data[$key])) {
+                    $url = trim($data[$key]);
+                    if (filter_var($url, FILTER_VALIDATE_URL)) {
+                        $photos[] = $url;
+                    }
+                }
+            }
+
+            $publishedDate = null;
+            if (! empty($data['publishedAtDate'])) {
+                $ts = strtotime($data['publishedAtDate']);
+                if ($ts !== false) {
+                    $publishedDate = date('Y-m-d', $ts);
+                }
+            }
+
+            $ownerResponseDate = null;
+            if (! empty($data['responseFromOwnerDate'])) {
+                $ts = strtotime($data['responseFromOwnerDate']);
+                if ($ts !== false) {
+                    $ownerResponseDate = date('Y-m-d H:i:s', $ts);
+                }
+            }
+
+            $rating = 5.0;
+            if (! empty($data['stars']) && is_numeric($data['stars'])) {
+                $rating = (float) $data['stars'];
+            } elseif (! empty($data['rating']) && is_numeric($data['rating'])) {
+                $rating = (float) $data['rating'];
+            }
+
+            $text = ! empty($data['text']) ? $data['text'] : (! empty($data['textTranslated']) ? $data['textTranslated'] : '');
+
+            $reviews[] = [
+                'source' => 'google',
+                'source_review_id' => ! empty($data['reviewId']) ? trim($data['reviewId']) : null,
+                'review_url' => ! empty($data['reviewUrl']) ? trim($data['reviewUrl']) : null,
+                'published_date' => $publishedDate ?: now()->format('Y-m-d'),
+                'reviewer_name' => ! empty($data['name']) ? trim($data['name']) : 'Google Customer',
+                'reviewer_avatar_url' => ! empty($data['reviewerPhotoUrl']) ? trim($data['reviewerPhotoUrl']) : null,
+                'reviewer_profile_url' => ! empty($data['reviewerUrl']) ? trim($data['reviewerUrl']) : null,
+                'rating' => $rating,
+                'review_title' => ! empty($data['title']) ? trim($data['title']) : 'Dunes Discovery Tourism LLC',
+                'review_text' => $text,
+                'photos' => $photos,
+                'status' => 'approved',
+                'is_featured' => ($rating >= 5.0 && mb_strlen($text) >= 50) ? 1 : 0,
+                'is_local_guide' => strtolower(trim($data['isLocalGuide'] ?? '')) === 'true',
+                'reviewer_reviews_count' => isset($data['reviewerNumberOfReviews']) && is_numeric($data['reviewerNumberOfReviews']) ? (int) $data['reviewerNumberOfReviews'] : null,
+                'likes_count' => isset($data['likesCount']) && is_numeric($data['likesCount']) ? (int) $data['likesCount'] : 0,
+                'owner_response_text' => ! empty($data['responseFromOwnerText']) ? trim($data['responseFromOwnerText']) : null,
+                'owner_response_date' => $ownerResponseDate,
+                'language' => ! empty($data['language']) ? substr(trim($data['language']), 0, 10) : null,
+                'visited_in' => ! empty($data['visitedIn']) ? substr(trim($data['visitedIn']), 0, 50) : null,
+            ];
+        }
+
+        fclose($handle);
+
+        return $reviews;
     }
 
     /**

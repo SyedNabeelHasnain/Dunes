@@ -180,16 +180,43 @@
                     @forelse($reviews as $r)
                     <tr class="hover:bg-slate-50/60 transition-colors">
                         <td class="py-3 px-4">
-                            <div class="font-bold text-slate-900 text-xs">{{ $r->reviewer_name }}</div>
-                            @if($r->is_featured)
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 mt-1 rounded-full text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-200">
-                                    <i class="bi bi-star-fill text-amber-500"></i> Featured
-                                </span>
-                            @endif
+                            <div class="flex items-center gap-2">
+                                @if(!empty($r->reviewer_avatar_url))
+                                    <img src="{{ $r->reviewer_avatar_url }}" alt="{{ $r->reviewer_name }}" class="w-7 h-7 rounded-full object-cover border border-slate-200 shadow-2xs shrink-0" loading="lazy" onerror="this.style.display='none'">
+                                @endif
+                                <div class="min-w-0">
+                                    <div class="font-bold text-slate-900 text-xs truncate">
+                                        @if(!empty($r->reviewer_profile_url))
+                                            <a href="{{ $r->reviewer_profile_url }}" target="_blank" rel="noopener" class="hover:text-primary transition underline-offset-2 hover:underline">
+                                                {{ $r->reviewer_name }}
+                                            </a>
+                                        @else
+                                            {{ $r->reviewer_name }}
+                                        @endif
+                                    </div>
+                                    @if(!empty($r->reviewer_reviews_count))
+                                        <span class="text-[10px] text-slate-400 font-medium">{{ $r->reviewer_reviews_count }} reviews</span>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-1 mt-1.5">
+                                @if($r->is_featured)
+                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-200">
+                                        <i class="bi bi-star-fill text-amber-500"></i> Featured
+                                    </span>
+                                @endif
+                                @if($r->is_local_guide)
+                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-orange-50 text-orange-700 border border-orange-200" title="Google Local Guide">
+                                        <i class="bi bi-patch-check-fill text-orange-500"></i> Local Guide
+                                    </span>
+                                @endif
+                            </div>
                         </td>
                         <td class="py-3 px-4">
-                            <div class="font-bold text-slate-800 text-xs">{{ $r->review_title }}</div>
-                            <div class="text-slate-500 text-xs truncate max-w-sm">{{ $r->review_text }}</div>
+                            @if(!empty($r->review_title))
+                                <div class="font-bold text-slate-800 text-xs mb-0.5">{{ $r->review_title }}</div>
+                            @endif
+                            <div class="text-slate-600 text-xs line-clamp-3">{{ $r->review_text }}</div>
                             @if(!empty($r->photos) && is_array($r->photos))
                                 <div class="flex items-center gap-1.5 mt-2">
                                     @foreach($r->photos as $p)
@@ -198,6 +225,27 @@
                                         </a>
                                     @endforeach
                                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">{{ count($r->photos) }} photo(s)</span>
+                                </div>
+                            @endif
+                            @if(!empty($r->owner_response_text))
+                                <div class="mt-2 p-2 rounded-xl bg-blue-50/60 border border-blue-100 text-[11px] text-blue-900">
+                                    <div class="font-bold flex items-center gap-1 text-[10px] text-blue-700 mb-0.5 uppercase tracking-wide">
+                                        <i class="bi bi-reply-fill"></i> Response from owner
+                                        @if(!empty($r->owner_response_date))
+                                            <span class="text-slate-400 font-normal">({{ \Carbon\Carbon::parse($r->owner_response_date)->format('M j, Y') }})</span>
+                                        @endif
+                                    </div>
+                                    <p class="text-slate-600 line-clamp-2">{{ $r->owner_response_text }}</p>
+                                </div>
+                            @endif
+                            @if(!empty($r->visited_in) || !empty($r->likes_count))
+                                <div class="flex items-center gap-3 mt-1.5 text-[10px] text-slate-400">
+                                    @if(!empty($r->visited_in))
+                                        <span><i class="bi bi-geo-alt"></i> Visited: {{ $r->visited_in }}</span>
+                                    @endif
+                                    @if(!empty($r->likes_count) && $r->likes_count > 0)
+                                        <span><i class="bi bi-hand-thumbs-up"></i> {{ $r->likes_count }} like(s)</span>
+                                    @endif
                                 </div>
                             @endif
                         </td>
