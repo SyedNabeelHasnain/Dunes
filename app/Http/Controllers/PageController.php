@@ -16,6 +16,7 @@ use App\Services\SettingsService;
 use App\Services\VisitorTrackerService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -320,8 +321,16 @@ class PageController extends Controller
             $score = 5;
         }
 
+        if ($score <= 3) {
+            $pageTitle = 'Guest Feedback | Dunes Discovery Tourism';
+            $pageDesc = 'Share your private feedback to help us improve your desert safari adventure.';
+            $pageRobots = 'noindex, nofollow';
+
+            return view('review-feedback', compact('booking', 'score', 'pageTitle', 'pageDesc', 'pageRobots'));
+        }
+
         $settings = app(SettingsService::class);
-        $googleReviewUrl = $settings->get('google_review_url', 'https://maps.google.com/?cid=123456789');
+        $googleReviewUrl = $settings->get('google_review_url', 'https://search.google.com/local/writereview?placeid=ChIJbWsIEIVEdEER4uHEhb2dbcQ');
 
         // Optional direct redirect if explicitly requested
         if ($request->has('google_direct') && $score >= 4) {
@@ -398,8 +407,11 @@ class PageController extends Controller
             ]
         );
 
+        Cache::forget('site_social_proof_feed');
+        Cache::forget('site_home_cache');
+
         $settings = app(SettingsService::class);
-        $googleReviewUrl = $settings->get('google_review_url', 'https://maps.google.com/?cid=123456789');
+        $googleReviewUrl = $settings->get('google_review_url', 'https://search.google.com/local/writereview?placeid=ChIJbWsIEIVEdEER4uHEhb2dbcQ');
 
         if ($request->expectsJson()) {
             return response()->json([

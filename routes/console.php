@@ -22,3 +22,7 @@ Schedule::command('currency:sync-rates')->dailyAt('02:00');
 
 // Dispatch scheduled email marketing campaigns (every 5 minutes)
 Schedule::command('campaigns:send-scheduled')->everyFiveMinutes();
+
+// Synchronize customer reviews and rating metrics from Google Places API daily at midnight
+Schedule::command('reviews:sync-google')->daily()->withoutOverlapping()->runInBackground();
+

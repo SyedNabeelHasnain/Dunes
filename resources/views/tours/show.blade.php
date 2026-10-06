@@ -114,7 +114,7 @@
                 "@type": "Person",
                 "name": {!! json_encode($rev->reviewer_name ?: 'Verified Traveler') !!}
               },
-              "datePublished": "{{ $rev->published_date ? $rev->published_date->format('Y-m-d') : $rev->created_at->format('Y-m-d') }}",
+              "datePublished": "{{ $rev->published_date ? (\Carbon\Carbon::parse($rev->published_date)->format('Y-m-d')) : ($rev->created_at ? \Carbon\Carbon::parse($rev->created_at)->format('Y-m-d') : date('Y-m-d')) }}",
               "reviewBody": {!! json_encode(Str::limit($rev->review_text, 280)) !!}
             }{{ $ridx < $approvedReviews->count() - 1 ? ',' : '' }}
             @endforeach
@@ -965,26 +965,44 @@ if(window.fbq){
 
         <!-- Reviews Grid -->
         @php
-            $displayReviews = isset($approvedReviews) && $approvedReviews->count() ? $approvedReviews : \App\Models\Review::where('status', 'approved')->latest()->take(3)->get();
+            $displayReviews = isset($approvedReviews) && $approvedReviews->count() ? $approvedReviews : \App\Models\Review::where('status', 'approved')->orderByRaw("CASE WHEN source = 'google' THEN 0 WHEN source = 'tripadvisor' THEN 1 ELSE 2 END")->latest('published_date')->take(6)->get();
         @endphp
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             @forelse($displayReviews as $rev)
             @php
                 $avatar = !empty($rev->reviewer_avatar_url) ? (str_starts_with($rev->reviewer_avatar_url, 'http') ? $rev->reviewer_avatar_url : asset($rev->reviewer_avatar_url)) : asset('images/avatar-default.svg');
+                $sourceLower = strtolower($rev->source ?? 'google');
+                $isGoogle = ($sourceLower === 'google');
+                $isTrip = ($sourceLower === 'tripadvisor');
+                $rating = (float) ($rev->rating ?? 5.0);
+                $fullStars = (int) floor($rating);
+                $hasHalf = ($rating - $fullStars) >= 0.3 && ($rating - $fullStars) <= 0.7;
             @endphp
             <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow flex flex-col h-full">
                 <div class="flex justify-between items-start mb-3">
                     <div class="flex items-center gap-3">
-                        <img src="{{ $avatar }}" width="44" height="44" loading="lazy" alt="{{ $rev->reviewer_name }}" class="w-11 h-11 rounded-full object-cover shadow-xs shrink-0" onerror="this.onerror=null;this.src='{{ asset('images/avatar-default.svg') }}'">
+                        <img src="{{ $avatar }}" width="44" height="44" loading="lazy" alt="{{ $rev->reviewer_name }}" class="w-11 h-11 rounded-full object-cover shadow-xs shrink-0" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='{{ asset('images/avatar-default.svg') }}'">
                         <div>
                             <h3 class="font-bold text-slate-900 text-sm mb-0.5">{{ $rev->reviewer_name }}</h3>
-                            <span class="text-emerald-600 font-bold text-xs inline-flex items-center gap-1"><i class="bi bi-patch-check-fill"></i>{{ __('ui.reviews_section.verified_guest') }}</span>
+                            @if($isGoogle)
+                                <span class="text-blue-600 font-bold text-xs inline-flex items-center gap-1"><img src="{{ asset('images/Google-G.avif') }}" alt="Google" class="w-3 h-3 inline-block" width="12" height="12"> Google Verified</span>
+                            @elseif($isTrip)
+                                <span class="text-emerald-600 font-bold text-xs inline-flex items-center gap-1"><i class="bi bi-star-fill text-emerald-500"></i> TripAdvisor</span>
+                            @else
+                                <span class="text-emerald-600 font-bold text-xs inline-flex items-center gap-1"><i class="bi bi-patch-check-fill"></i> {{ __('ui.reviews_section.verified_guest') }}</span>
+                            @endif
                         </div>
                     </div>
                     <div class="text-amber-400 text-xs flex gap-0.5">
-                        @for($i = 1; $i <= 5; $i++)
-                            <i class="bi bi-star{{ $i <= floor($rev->rating) ? '-fill' : '' }}"></i>
+                        @for($i = 0; $i < 5; $i++)
+                            @if($i < $fullStars)
+                                <i class="bi bi-star-fill"></i>
+                            @elseif($hasHalf && $i === $fullStars)
+                                <i class="bi bi-star-half"></i>
+                            @else
+                                <i class="bi bi-star text-slate-300"></i>
+                            @endif
                         @endfor
                     </div>
                 </div>
@@ -1003,8 +1021,9 @@ if(window.fbq){
                     <span class="text-slate-500 block mb-2 text-[10px] uppercase font-bold tracking-wider">{{ __('ui.reviews_section.guest_photos') }}</span>
                     <div class="flex gap-2">
                         @foreach(array_slice($rev->photos, 0, 3) as $photo)
-                        <a href="{{ asset($photo) }}" target="_blank" rel="noopener noreferrer" class="w-14 h-14 rounded-xl overflow-hidden shadow-xs border border-slate-200 shrink-0">
-                            <img src="{{ asset($photo) }}" width="56" height="56" loading="lazy" alt="Verified traveler photo from {{ $tour->name }}" class="w-full h-full object-cover">
+                        @php $photoUrl = str_starts_with($photo, 'http') ? $photo : asset($photo); @endphp
+                        <a href="{{ $photoUrl }}" target="_blank" rel="noopener noreferrer" class="w-14 h-14 rounded-xl overflow-hidden shadow-xs border border-slate-200 shrink-0">
+                            <img src="{{ $photoUrl }}" width="56" height="56" loading="lazy" alt="Verified traveler photo from {{ $tour->name }}" class="w-full h-full object-cover">
                         </a>
                         @endforeach
                     </div>
@@ -1013,7 +1032,13 @@ if(window.fbq){
 
                 <div class="flex justify-between items-center mt-auto pt-3 border-t border-slate-200 text-[11px] text-slate-500">
                     <span><i class="bi bi-calendar3 me-1"></i>{{ $rev->published_date ? \Carbon\Carbon::parse($rev->published_date)->format('M d, Y') : __('ui.reviews_section.recent_guest') }}</span>
-                    <span class="bg-slate-100 text-slate-600 rounded-full px-2.5 py-0.5 font-medium">{{ ucfirst($rev->source ?: 'direct_ugc') }}</span>
+                    @if($isGoogle)
+                        <span class="bg-blue-50 text-blue-700 border border-blue-200/60 rounded-full px-2.5 py-0.5 font-semibold text-[11px] inline-flex items-center gap-1"><img src="{{ asset('images/Google-G.avif') }}" alt="Google" class="w-3 h-3 inline-block" width="12" height="12"> Google</span>
+                    @elseif($isTrip)
+                        <span class="bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-full px-2.5 py-0.5 font-semibold text-[11px] inline-flex items-center gap-1"><i class="bi bi-star-fill text-emerald-500"></i> TripAdvisor</span>
+                    @else
+                        <span class="bg-slate-100 text-slate-600 rounded-full px-2.5 py-0.5 font-medium text-[11px]">{{ ucfirst($rev->source ?: 'direct_ugc') }}</span>
+                    @endif
                 </div>
             </div>
             @empty

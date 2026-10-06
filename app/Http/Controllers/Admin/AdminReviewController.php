@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Review;
+use App\Services\GoogleReviewSyncService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -71,6 +72,8 @@ class AdminReviewController extends Controller
             ->groupBy('source')
             ->get();
 
+        $lastSyncedAt = app(GoogleReviewSyncService::class)->getLastSyncedAt();
+
         return view('admin.reviews.index', compact(
             'reviews',
             'stats',
@@ -79,7 +82,8 @@ class AdminReviewController extends Controller
             'rating',
             'status',
             'source',
-            'search'
+            'search',
+            'lastSyncedAt'
         ));
     }
 
@@ -174,5 +178,21 @@ class AdminReviewController extends Controller
             'status' => $review->status,
             'message' => 'Review status updated to '.ucfirst($review->status).'.',
         ]);
+    }
+
+    /**
+     * Trigger on-demand Google Reviews synchronization via AJAX.
+     */
+    public function syncGoogle(Request $request, GoogleReviewSyncService $syncService)
+    {
+        $force = $request->boolean('force', false);
+        $result = $syncService->sync($force);
+
+        if (! ($result['success'] ?? false)) {
+            $statusCode = ($result['rate_limited'] ?? false) ? 429 : 422;
+            return response()->json($result, $statusCode);
+        }
+
+        return response()->json($result);
     }
 }

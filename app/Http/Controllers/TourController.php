@@ -157,8 +157,9 @@ class TourController extends Controller
         // Top verified reviews for Schema.org review rich snippets
         $approvedReviews = Review::where('status', 'approved')
             ->where('rating', '>=', 4.5)
+            ->orderByRaw("CASE WHEN source = 'google' THEN 0 WHEN source = 'tripadvisor' THEN 1 ELSE 2 END")
             ->latest('published_date')
-            ->take(5)
+            ->take(6)
             ->get();
 
         // Track form load timestamp for analytics

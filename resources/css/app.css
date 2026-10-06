@@ -59,7 +59,7 @@
 
   @keyframes marquee {
     0% { transform: translateX(0); }
-    100% { transform: translateX(calc(-100% - 1rem)); }
+    100% { transform: translateX(calc(-50% - 0.5rem)); }
   }
 
   @keyframes fieldShakeStrong {
@@ -176,7 +176,18 @@
 
 @keyframes marquee {
   0% { transform: translateX(0); }
-  100% { transform: translateX(calc(-100% - 1rem)); }
+  100% { transform: translateX(calc(-50% - 0.5rem)); }
+}
+
+@keyframes marquee-rtl {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(50% + 0.5rem)); }
+}
+
+[dir="rtl"] .animate-marquee,
+[dir="rtl"] .marquee-track,
+[dir="rtl"] .reviews-track {
+  animation-name: marquee-rtl;
 }
 
 @keyframes fieldShakeStrong {

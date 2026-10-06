@@ -43,7 +43,7 @@
       }
     },
     {
-      "@type": "TouristTrip",
+      "@type": ["Product", "TouristTrip"],
       "@id": "{{ $canonical }}#trip",
       "name": "{{ $locationData['headline'] }}",
       "description": "{{ $locationData['subheadline'] }}",
@@ -110,11 +110,29 @@
       },
       "aggregateRating": {
         "@type": "AggregateRating",
-        "ratingValue": "4.9",
-        "reviewCount": "1250",
+        "ratingValue": "5.0",
+        "reviewCount": "{{ count($reviews) > 0 ? count($reviews) : 329 }}",
         "bestRating": "5",
         "worstRating": "1"
-      }
+      }@if(count($reviews) > 0),
+      "review": [
+        @foreach($reviews->take(3) as $rev)
+        {
+          "@type": "Review",
+          "reviewRating": {
+            "@type": "Rating",
+            "ratingValue": "{{ $rev->rating ?: 5 }}",
+            "bestRating": "5"
+          },
+          "author": {
+            "@type": "Person",
+            "name": {!! json_encode($rev->reviewer_name ?: 'Verified Traveler') !!}
+          },
+          "datePublished": "{{ $rev->published_date ? (\Carbon\Carbon::parse($rev->published_date)->format('Y-m-d')) : date('Y-m-d') }}",
+          "reviewBody": {!! json_encode(Str::limit($rev->review_text ?: 'Incredible desert safari experience with Dunes Discovery Tourism.', 200)) !!}
+        }{{ $loop->last ? '' : ',' }}
+        @endforeach
+      ]@endif
     },
     {
       "@type": "FAQPage",
@@ -498,27 +516,47 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 @foreach($reviews->take(3) as $rev)
+                    @php
+                        $sourceLower = strtolower($rev->source ?? 'google');
+                        $isGoogle = ($sourceLower === 'google');
+                        $isTrip = ($sourceLower === 'tripadvisor');
+                        $avatarUrl = !empty($rev->reviewer_avatar_url) ? (str_starts_with($rev->reviewer_avatar_url, 'http') ? $rev->reviewer_avatar_url : asset($rev->reviewer_avatar_url)) : null;
+                    @endphp
                     <div class="bg-slate-900 border border-white/10 rounded-2xl p-6 flex flex-col h-full">
                         <div class="flex items-center justify-between mb-4">
                             <div class="text-amber-400 flex gap-1 text-sm">
-                                @for($i = 0; $i < ($rev->rating ?: 5); $i++)
+                                @for($i = 0; $i < (int) floor($rev->rating ?: 5); $i++)
                                     <i class="bi bi-star-fill"></i>
                                 @endfor
                             </div>
-                            <span class="inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-full px-2.5 py-0.5 text-xs font-semibold">
-                                <i class="bi bi-patch-check-fill"></i> Verified Guest
-                            </span>
+                            @if($isGoogle)
+                                <span class="inline-flex items-center gap-1.5 bg-blue-500/15 text-blue-400 border border-blue-500/30 rounded-full px-2.5 py-0.5 text-xs font-semibold">
+                                    <img src="{{ asset('images/Google-G.avif') }}" alt="Google" class="w-3.5 h-3.5 inline-block shrink-0" width="14" height="14" loading="lazy"> Google Verified
+                                </span>
+                            @elseif($isTrip)
+                                <span class="inline-flex items-center gap-1.5 bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-full px-2.5 py-0.5 text-xs font-semibold">
+                                    <i class="bi bi-star-fill text-emerald-400"></i> TripAdvisor
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-full px-2.5 py-0.5 text-xs font-semibold">
+                                    <i class="bi bi-patch-check-fill"></i> Verified Guest
+                                </span>
+                            @endif
                         </div>
                         <p class="text-slate-300 text-xs sm:text-sm leading-relaxed flex-grow mb-6">
-                            "{{ Str::limit($rev->comment ?: 'Incredible experience! The driver arrived exactly on time at our hotel lobby. Dune bashing was thrilling and the live BBQ show was phenomenal.', 180) }}"
+                            "{{ Str::limit($rev->review_text ?: 'Incredible experience! The driver arrived exactly on time at our hotel lobby. Dune bashing was thrilling and the live BBQ show was phenomenal.', 180) }}"
                         </p>
                         <div class="flex items-center gap-3 pt-4 border-t border-white/10">
-                            <div class="w-9 h-9 rounded-full bg-amber-400 text-slate-950 font-bold flex items-center justify-center text-xs">
-                                {{ strtoupper(substr($rev->author_name ?: 'G', 0, 1)) }}
-                            </div>
-                            <div>
-                                <h4 class="text-white font-bold text-xs sm:text-sm mb-0">{{ $rev->author_name ?: 'Verified Traveler' }}</h4>
-                                <span class="text-slate-400 text-[11px] block">{{ $rev->author_location ?: 'Dubai Tourist' }}</span>
+                            @if($avatarUrl)
+                                <img src="{{ $avatarUrl }}" alt="{{ $rev->reviewer_name ?? 'Traveler' }}" class="w-9 h-9 rounded-full object-cover shrink-0 border border-white/10" referrerpolicy="no-referrer" loading="lazy" onerror="this.onerror=null;this.src='{{ asset('images/avatar-default.svg') }}'">
+                            @else
+                                <div class="w-9 h-9 rounded-full bg-amber-400 text-slate-950 font-bold flex items-center justify-center text-xs shrink-0">
+                                    {{ strtoupper(substr($rev->reviewer_name ?: 'G', 0, 1)) }}
+                                </div>
+                            @endif
+                            <div class="min-w-0">
+                                <h4 class="text-white font-bold text-xs sm:text-sm mb-0 truncate">{{ $rev->reviewer_name ?: 'Verified Traveler' }}</h4>
+                                <span class="text-slate-400 text-[11px] block">{{ $rev->published_date ? (\Carbon\Carbon::parse($rev->published_date)->format('M Y')) : ($locationData['name'] . ' Guest') }}</span>
                             </div>
                         </div>
                     </div>

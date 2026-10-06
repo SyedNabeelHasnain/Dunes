@@ -10,9 +10,23 @@
             <h1 class="text-2xl font-black text-slate-900 tracking-tight">Customer Reviews & Ratings Hub</h1>
             <p class="text-xs text-slate-500 mt-0.5">Manage customer testimonials, moderate Google/TripAdvisor reviews, and showcase ratings on the website.</p>
         </div>
-        <button type="button" @click="$dispatch('open-add-review')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-xs shadow-xs transition-all cursor-pointer">
-            <i class="bi bi-plus-lg"></i> Log New Review
-        </button>
+        <div class="flex flex-wrap items-center gap-2.5">
+            <!-- Prominent Google Reviews Sync Button -->
+            <button type="button" 
+                    id="syncGoogleReviewsBtn" 
+                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-blue-200/80 bg-blue-50/90 hover:bg-blue-100 text-blue-700 font-bold text-xs shadow-2xs hover:shadow-xs transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                    title="Pull latest live customer reviews from Google Places API">
+                <i class="bi bi-arrow-repeat text-sm sync-icon transition-transform"></i>
+                <span class="btn-text">Sync Google Reviews</span>
+                <span class="inline-flex items-center text-[10px] font-medium bg-blue-200/60 text-blue-800 px-1.5 py-0.5 rounded-md last-synced-badge" title="Last sync timestamp">
+                    {{ !empty($lastSyncedAt) ? \Carbon\Carbon::parse($lastSyncedAt)->diffForHumans() : 'Never' }}
+                </span>
+            </button>
+
+            <button type="button" @click="$dispatch('open-add-review')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-xs shadow-xs transition-all cursor-pointer">
+                <i class="bi bi-plus-lg"></i> Log New Review
+            </button>
+        </div>
     </div>
 
     <!-- 4 Key Performance Metric Cards -->
@@ -187,8 +201,27 @@
                                 </div>
                             @endif
                         </td>
-                        <td class="py-3 px-4">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200 capitalize">{{ $r->source }}</span>
+                        <td class="py-3 px-4" data-order="{{ $r->source }}">
+                            @php
+                                $src = strtolower($r->source ?? '');
+                            @endphp
+                            @if($src === 'google')
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200/90 shadow-2xs">
+                                    <i class="bi bi-google text-blue-600"></i> Google
+                                </span>
+                            @elseif($src === 'tripadvisor')
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/90 shadow-2xs">
+                                    <i class="bi bi-compass-fill text-emerald-600"></i> TripAdvisor
+                                </span>
+                            @elseif($src === 'direct_ugc' || $src === 'direct')
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-purple-50 text-purple-700 border border-purple-200/90 shadow-2xs">
+                                    <i class="bi bi-patch-check-fill text-purple-600"></i> Direct UGC
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200/90 shadow-2xs capitalize">
+                                    <i class="bi bi-pencil-square text-slate-500"></i> {{ $r->source ?: 'Manual' }}
+                                </span>
+                            @endif
                         </td>
                         <td class="py-3 px-4 text-center" data-order="{{ $r->rating }}">
                             <div class="text-amber-400 flex items-center justify-center gap-0.5">
@@ -485,6 +518,97 @@ $(document).ready(function() {
 
         // Show Alpine modal
         window.dispatchEvent(new CustomEvent('open-edit-review'));
+    });
+
+    // Automated Google Review Sync AJAX handler with SweetAlert2 feedback
+    $('#syncGoogleReviewsBtn').on('click', function(e) {
+        e.preventDefault();
+        const $btn = $(this);
+        const $icon = $btn.find('.sync-icon');
+        const $text = $btn.find('.btn-text');
+        const originalText = $text.text();
+
+        $btn.prop('disabled', true);
+        $icon.addClass('animate-spin');
+        $text.text('Syncing with Google...');
+
+        $.ajax({
+            url: "{{ route('admin.reviews.sync-google') }}",
+            type: "POST",
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                'Accept': 'application/json'
+            },
+            data: {
+                force: 0
+            },
+            success: function(res) {
+                const added = res.added ?? 0;
+                const updated = res.updated ?? 0;
+                const total = res.total ?? 0;
+                const rating = res.place_rating ?? '4.9';
+                const ratingsCount = res.user_ratings_total ?? 0;
+                const msg = res.message || 'Synchronization complete.';
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Google Reviews Synced!',
+                    html: `
+                        <div class="text-left text-xs space-y-2 py-1">
+                            <div class="p-3 bg-emerald-50 text-emerald-800 rounded-xl border border-emerald-200">
+                                <strong>${msg}</strong>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 pt-1 text-slate-700">
+                                <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                                    <span class="text-[10px] uppercase font-bold text-slate-400 block">New Added</span>
+                                    <span class="text-base font-black text-emerald-600">+${added}</span>
+                                </div>
+                                <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                                    <span class="text-[10px] uppercase font-bold text-slate-400 block">Updated</span>
+                                    <span class="text-base font-black text-blue-600">${updated}</span>
+                                </div>
+                                <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                                    <span class="text-[10px] uppercase font-bold text-slate-400 block">Total Google</span>
+                                    <span class="text-base font-black text-slate-900">${total}</span>
+                                </div>
+                                <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                                    <span class="text-[10px] uppercase font-bold text-slate-400 block">Google Rating</span>
+                                    <span class="text-base font-black text-amber-500">★ ${rating}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    confirmButtonColor: '#F58F43',
+                    confirmButtonText: 'Refresh Table',
+                    allowOutsideClick: false
+                }).then(() => {
+                    window.location.reload();
+                });
+            },
+            error: function(xhr) {
+                const res = xhr.responseJSON || {};
+                if (xhr.status === 429) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Rate Limit Cooldown',
+                        text: res.message || 'Google reviews were synchronized recently. Please wait a minute before requesting another sync.',
+                        confirmButtonColor: '#F58F43'
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Sync Failed',
+                        text: res.message || 'Unable to sync reviews from Google. Please verify your Google API key and Place ID settings.',
+                        confirmButtonColor: '#F58F43'
+                    });
+                }
+            },
+            complete: function() {
+                $btn.prop('disabled', false);
+                $icon.removeClass('animate-spin');
+                $text.text(originalText);
+            }
+        });
     });
 });
 </script>

@@ -8,6 +8,7 @@ use App\Models\FaqAssignment;
 use App\Models\Review;
 use App\Models\Tour;
 use App\Services\SettingsService;
+use Illuminate\Support\Facades\Cache;
 
 class HomeController extends Controller
 {
@@ -35,11 +36,60 @@ class HomeController extends Controller
         }
 
         try {
-            $reviews = Review::where('status', 'approved')
-                ->where('is_featured', true)
-                ->orderBy('published_date', 'desc')
-                ->limit(10)
-                ->get();
+            $reviews = Cache::remember('site_social_proof_feed', 3600, function () {
+                // Primary collection: high-priority featured approved reviews
+                $featured = Review::where('status', 'approved')
+                    ->where('is_featured', true)
+                    ->orderBy('published_date', 'desc')
+                    ->limit(10)
+                    ->get();
+
+                $featuredIds = $featured->pluck('id')->all();
+                $googleCount = $featured->where('source', 'google')->count();
+                $tripCount = $featured->where('source', 'tripadvisor')->count();
+
+                // Ensure high-quality Google reviews are prominently included even if not manually marked featured
+                if ($googleCount < 5) {
+                    $extraGoogle = Review::where('status', 'approved')
+                        ->where('source', 'google')
+                        ->whereNotIn('id', $featuredIds)
+                        ->where('rating', '>=', 4.0)
+                        ->orderBy('published_date', 'desc')
+                        ->limit(8 - $googleCount)
+                        ->get();
+
+                    $featured = $featured->concat($extraGoogle);
+                    $featuredIds = $featured->pluck('id')->all();
+                }
+
+                // Ensure TripAdvisor reviews are populated for the alternating marquee track
+                if ($tripCount < 5) {
+                    $extraTrip = Review::where('status', 'approved')
+                        ->where('source', 'tripadvisor')
+                        ->whereNotIn('id', $featuredIds)
+                        ->where('rating', '>=', 4.0)
+                        ->orderBy('published_date', 'desc')
+                        ->limit(8 - $tripCount)
+                        ->get();
+
+                    $featured = $featured->concat($extraTrip);
+                    $featuredIds = $featured->pluck('id')->all();
+                }
+
+                // If overall count is still under 8, backfill with any high-rated approved reviews
+                if ($featured->count() < 8) {
+                    $fillers = Review::where('status', 'approved')
+                        ->whereNotIn('id', $featuredIds)
+                        ->where('rating', '>=', 4.0)
+                        ->orderBy('published_date', 'desc')
+                        ->limit(12 - $featured->count())
+                        ->get();
+
+                    $featured = $featured->concat($fillers);
+                }
+
+                return $featured;
+            });
         } catch (\Throwable $e) {
             $reviews = collect();
         }

@@ -3397,14 +3397,14 @@ window.openWhatsApp = function(tourName = '', directHref = '') {
 const reviewData = {
     'taCircle': {
         title: 'TripAdvisor',
-        logo: 'https://static.tacdn.com/img2/brand_refresh_2025/logos/wordmark.svg',
+        logo: '/images/tripadvisor-color-logo.svg',
         score: '4.9',
         url: 'https://www.tripadvisor.com/Attraction_Review-g295424-d29026644-Reviews-Dunes_Discovery-Dubai_Emirate_of_Dubai.html',
         btnText: 'Read Reviews'
     },
     'googleCircle': {
         title: 'Google Reviews',
-        logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/250px-Google_2015_logo.svg.png',
+        logo: '/images/google-logo.png',
         score: '5.0',
         url: 'https://www.google.com/maps/search/?api=1&query=Google&query_place_id=ChIJbWsIEIVEdEER4uHEhb2dbcQ',
         btnText: 'See Reviews'

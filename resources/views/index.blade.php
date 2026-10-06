@@ -4,27 +4,52 @@
 @php
 if (!function_exists('renderReviewCardMarkup')) {
     function renderReviewCardMarkup($r) {
+        $rating = (float) ($r->rating ?? 5.0);
+        $fullStars = (int) floor($rating);
+        $hasHalf = ($rating - $fullStars) >= 0.3 && ($rating - $fullStars) <= 0.7;
         $stars = '';
         for($i = 0; $i < 5; $i++) {
-            $stars .= $i < floor($r->rating) ? '<i class="bi bi-star-fill text-amber-400"></i>' : '<i class="bi bi-star text-slate-300"></i>';
+            if ($i < $fullStars) {
+                $stars .= '<i class="bi bi-star-fill text-amber-400"></i>';
+            } elseif ($hasHalf && $i === $fullStars) {
+                $stars .= '<i class="bi bi-star-half text-amber-400"></i>';
+            } else {
+                $stars .= '<i class="bi bi-star text-slate-300"></i>';
+            }
         }
 
-        $isUgc = ($r->source === 'direct_ugc');
-        $badgeText = $isUgc ? __('ui.reviews_section.verified_guest') : (($r->source == 'google') ? 'Google' : ucfirst($r->source));
-        $sourceBadge = $isUgc 
-            ? '<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full px-2.5 py-0.5 text-xs font-bold"><i class="bi bi-patch-check-fill text-emerald-500"></i> ' . htmlspecialchars($badgeText) . '</span>'
-            : '<span class="inline-flex items-center gap-1 bg-slate-100 text-slate-700 rounded-full px-2.5 py-0.5 text-xs font-medium">' . (($r->source == 'google') ? '<i class="bi bi-google text-blue-500"></i> Google' : '<i class="bi bi-star-fill text-emerald-500"></i> ' . ucfirst($r->source)) . '</span>';
+        $sourceLower = strtolower((string)($r->source ?? 'google'));
+        $isUgc = ($sourceLower === 'direct_ugc');
+        $isGoogle = ($sourceLower === 'google');
+        $isTripAdvisor = ($sourceLower === 'tripadvisor');
+
+        if ($isGoogle) {
+            $sourceBadge = '<span class="inline-flex items-center gap-1.5 bg-blue-50 text-blue-800 border border-blue-200/60 rounded-full px-2.5 py-0.5 text-xs font-semibold shadow-2xs"><img src="' . asset('images/Google-G.avif') . '" alt="Google" class="w-3.5 h-3.5 inline-block shrink-0" width="14" height="14" loading="lazy"> Google Verified</span>';
+        } elseif ($isTripAdvisor) {
+            $sourceBadge = '<span class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200/60 rounded-full px-2.5 py-0.5 text-xs font-semibold shadow-2xs"><i class="bi bi-star-fill text-emerald-600"></i> TripAdvisor</span>';
+        } elseif ($isUgc) {
+            $sourceBadge = '<span class="inline-flex items-center gap-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-full px-2.5 py-0.5 text-xs font-bold shadow-2xs"><i class="bi bi-patch-check-fill text-amber-600"></i> ' . htmlspecialchars(__('ui.reviews_section.verified_guest')) . '</span>';
+        } else {
+            $sourceBadge = '<span class="inline-flex items-center gap-1 bg-slate-100 text-slate-700 rounded-full px-2.5 py-0.5 text-xs font-medium">' . ucfirst($sourceLower) . '</span>';
+        }
 
         $url = !empty($r->review_url) ? $r->review_url : route('review.rate', ['ref' => 'guest']);
         $avatar = !empty($r->reviewer_avatar_url) ? (str_starts_with($r->reviewer_avatar_url, 'http') ? $r->reviewer_avatar_url : asset($r->reviewer_avatar_url)) : asset('images/avatar-default.svg');
         $fallbackAvatar = asset('images/avatar-default.svg');
 
+        $dateFormatted = '';
+        if (!empty($r->published_date)) {
+            $dateFormatted = ($r->published_date instanceof \DateTimeInterface)
+                ? $r->published_date->format('M Y')
+                : \Carbon\Carbon::parse($r->published_date)->format('M Y');
+        }
+
         $photosHtml = '';
         if (!empty($r->photos) && is_array($r->photos) && count($r->photos) > 0) {
             $photosHtml .= '<div class="flex gap-1.5 mb-2 mt-1">';
             foreach (array_slice($r->photos, 0, 3) as $p) {
-                $pUrl = asset($p);
-                $photosHtml .= '<a href="' . htmlspecialchars($pUrl) . '" target="_blank" rel="noopener" class="rounded-lg overflow-hidden inline-block shadow-xs border border-slate-200 w-12 h-12 shrink-0"><img src="' . htmlspecialchars($pUrl) . '" alt="Traveler photo" class="w-full h-full object-cover" loading="lazy"></a>';
+                $pUrl = str_starts_with($p, 'http') ? $p : asset($p);
+                $photosHtml .= '<a href="' . htmlspecialchars($pUrl) . '" target="_blank" rel="noopener noreferrer" class="rounded-lg overflow-hidden inline-block shadow-xs border border-slate-200 w-12 h-12 shrink-0"><img src="' . htmlspecialchars($pUrl) . '" alt="Traveler photo" class="w-full h-full object-cover" loading="lazy"></a>';
             }
             $photosHtml .= '</div>';
         }
@@ -35,20 +60,20 @@ if (!function_exists('renderReviewCardMarkup')) {
         <div class="review-card h-full flex flex-col text-start">
             <div class="flex justify-between items-center mb-3">
                 <div class="flex items-center gap-2 min-w-0">
-                    <img src="' . htmlspecialchars($avatar) . '" alt="' . htmlspecialchars($r->reviewer_name) . '" class="w-10 h-10 rounded-full object-cover shrink-0" referrerpolicy="no-referrer" loading="lazy" onerror="this.onerror=null;this.src=\'' . $fallbackAvatar . '\'">
+                    <img src="' . htmlspecialchars($avatar) . '" alt="' . htmlspecialchars($r->reviewer_name ?? 'Traveler') . '" class="w-10 h-10 rounded-full object-cover shrink-0 shadow-2xs" referrerpolicy="no-referrer" loading="lazy" onerror="this.onerror=null;this.src=\'' . $fallbackAvatar . '\'">
                     <div class="min-w-0">
-                        <div class="font-bold text-slate-900 text-sm truncate">' . htmlspecialchars($r->reviewer_name) . '</div>
-                        <div class="text-slate-500 text-xs">' . ($r->published_date ? $r->published_date->format('M Y') : '') . '</div>
+                        <div class="font-bold text-slate-900 text-sm truncate">' . htmlspecialchars($r->reviewer_name ?? 'Traveler') . '</div>
+                        <div class="text-slate-500 text-xs">' . htmlspecialchars($dateFormatted) . '</div>
                     </div>
                 </div>
                 <div class="flex gap-0.5 text-xs shrink-0">' . $stars . '</div>
             </div>
-            ' . ($r->review_title ? '<h3 class="text-sm font-bold mb-1.5 text-slate-900 line-clamp-1">' . htmlspecialchars($r->review_title) . '</h3>' : '') . '
-            <p class="text-slate-600 text-sm mb-2 flex-grow line-clamp-3 leading-relaxed">"' . htmlspecialchars($r->review_text) . '"</p>
+            ' . (!empty($r->review_title) ? '<h3 class="text-sm font-bold mb-1.5 text-slate-900 line-clamp-1">' . htmlspecialchars($r->review_title) . '</h3>' : '') . '
+            <p class="text-slate-600 text-sm mb-2 flex-grow line-clamp-3 leading-relaxed">"' . htmlspecialchars($r->review_text ?? '') . '"</p>
             ' . $photosHtml . '
             <div class="flex justify-between items-center mt-auto pt-3 border-t border-slate-200">
                 ' . $sourceBadge . '
-                <a href="' . htmlspecialchars($url) . '" ' . ($isUgc ? '' : 'target="_blank" rel="noopener"') . ' class="text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-primary hover:text-white border border-slate-300 hover:border-primary rounded-full px-3 py-1 transition-colors shadow-2xs">' . htmlspecialchars($actionText) . '</a>
+                <a href="' . htmlspecialchars($url) . '" ' . ($isUgc ? '' : 'target="_blank" rel="noopener noreferrer"') . ' class="text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-primary hover:text-white border border-slate-300 hover:border-primary rounded-full px-3 py-1 transition-colors shadow-2xs">' . htmlspecialchars($actionText) . '</a>
             </div>
         </div>';
     }
@@ -418,8 +443,14 @@ if (!function_exists('renderReviewCardMarkup')) {
     </div>
 
     @php
-        $googleReviews = $reviews->where('source', 'google');
-        $tripReviews = $reviews->where('source', 'tripadvisor');
+        $googleReviews = $reviews->filter(fn($r) => strtolower($r->source ?? '') === 'google');
+        if ($googleReviews->isEmpty()) {
+            $googleReviews = $reviews->take(10);
+        }
+        $tripReviews = $reviews->filter(fn($r) => strtolower($r->source ?? '') === 'tripadvisor');
+        if ($tripReviews->isEmpty()) {
+            $tripReviews = $reviews->skip(5)->take(10);
+        }
     @endphp
 
     <div class="reviews-marquee mb-5">

@@ -325,7 +325,7 @@
               "sameAs": "https://www.wikidata.org/wiki/Q878"
             }
           ],
-          @if(request()->is('/'))
+          @if(request()->is('/') || request()->routeIs('home') || request()->routeIs('locale.home'))
           "aggregateRating": {
             "@@type": "AggregateRating",
             "ratingValue": "4.9",
@@ -776,7 +776,7 @@
                             </div>
                         </a>
                         <a href="{{ $settings['social_google'] ?? 'https://search.google.com/local/writereview?placeid=ChIJbWsIEIVEdEER4uHEhb2dbcQ' }}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 p-1.5 px-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-colors">
-                            <img src="https://www.gstatic.com/marketing-cms/assets/images/d5/dc/cfe9ce8b4425b410b49b7f2dd3f3/g.webp=s48-fcrop64=1,00000000ffffffff-rw" alt="Google" width="20" height="20" loading="lazy" class="w-5 h-5 object-contain">
+                            <img src="{{ asset('images/Google-G.avif') }}" alt="Google" width="20" height="20" loading="lazy" class="w-5 h-5 object-contain">
                             <div>
                                 <div class="text-white font-bold text-xs leading-none">5.0</div>
                                 <div class="text-amber-400 text-[9px] flex gap-0.5 mt-0.5">

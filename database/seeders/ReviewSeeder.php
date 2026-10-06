@@ -34,6 +34,7 @@ class ReviewSeeder extends Seeder
                     'review_title' => $r['review_title'],
                     'review_text' => $r['review_text'],
                     'status' => $r['status'] ?: 'approved',
+                    'photos' => $r['photos'] ?? [],
                     'is_featured' => (bool) $r['is_featured'],
                     'imported_at' => $r['imported_at'] ? date('Y-m-d H:i:s', strtotime($r['imported_at'])) : now(),
                 ]
