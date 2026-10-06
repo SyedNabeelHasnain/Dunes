@@ -63,7 +63,7 @@
 <section class="hero-subpage bg-slate-950 text-white relative overflow-hidden" style="padding-top: calc(var(--header-h, 72px) + 2.5rem);">
     <div class="absolute inset-0 w-full h-full bg-[radial-gradient(ellipse_at_20%_20%,rgba(246,144,68,0.22)_0%,transparent_65%)]"></div>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <nav aria-label="breadcrumb">
+        <nav aria-label="{{ __('ui.common.breadcrumb') }}">
             <ol class="flex items-center gap-2 text-xs sm:text-sm text-white/70 mb-4">
                 <li><a href="{{ localized_route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') ?? 'Home' }}</a></li>
                 <li><span class="text-white/40">/</span></li>
@@ -434,11 +434,11 @@
                     <!-- Promo Code Input (e.g. DUNESWELCOME) -->
                     <div class="mb-5">
                         <div class="flex rounded-full overflow-hidden border border-white/20 bg-white/5">
-                            <input type="text" class="w-full bg-transparent text-white font-mono uppercase px-4 py-2 text-xs focus:outline-none placeholder-slate-500" id="customizerPromoInput" placeholder="Promo code (e.g. DUNESWELCOME)">
-                            <button class="bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold px-4 py-2 text-xs transition-colors cursor-pointer shrink-0" type="button" id="customizerApplyPromoBtn">Apply</button>
+                            <input type="text" class="w-full bg-transparent text-white font-mono uppercase px-4 py-2 text-xs focus:outline-none placeholder-slate-500" id="customizerPromoInput" placeholder="{{ __('ui.booking.promo_placeholder') }}">
+                            <button class="bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold px-4 py-2 text-xs transition-colors cursor-pointer shrink-0" type="button" id="customizerApplyPromoBtn">{{ __('ui.booking.apply') }}</button>
                         </div>
                         <div class="text-xs text-emerald-400 font-bold mt-1.5 hidden" id="customizerPromoNotice">
-                            <i class="bi bi-check-circle-fill me-1"></i> Discount Applied!
+                            <i class="bi bi-check-circle-fill me-1"></i> {{ __('ui.booking.promo_applied') }}
                         </div>
                     </div>
 
@@ -446,11 +446,11 @@
                     <div class="space-y-2.5">
                         <button type="button" class="w-full btn-desert-animated font-bold rounded-full py-3.5 text-white text-sm shadow-md flex items-center justify-center gap-2 cursor-pointer" id="customizerBookNowBtn">
                             <i class="bi bi-calendar-check-fill"></i>
-                            <span>Book Custom Safari Online</span>
+                            <span>{{ __('ui.common.book_online') }}</span>
                         </button>
                         <a href="#" target="_blank" rel="noopener" class="btn-whatsapp w-full btn-whatsapp-animated rounded-full py-3 font-bold text-white text-sm flex items-center justify-center gap-2 shadow-xs cursor-pointer" id="customizerWhatsAppBtn" data-action="whatsapp" data-tour-name="Bespoke Dubai Desert Safari">
                             <i class="bi bi-whatsapp"></i>
-                            <span>Inquire via WhatsApp</span>
+                            <span>{{ __('ui.common.whatsapp_inquire') }}</span>
                         </a>
                     </div>
 
@@ -591,26 +591,56 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Promo code
     if (applyPromoBtn) {
-        applyPromoBtn.addEventListener('click', () => {
+        applyPromoBtn.addEventListener('click', async () => {
             const code = (promoInputEl.value || '').trim().toUpperCase();
-            const conciergeActive = {{ $conciergePromoActive ? 'true' : 'false' }};
-            if (code === 'DUNESWELCOME' || code === 'FIRST25' || code.startsWith('FIRST25-')) {
-                state.discountPercent = 25;
-                promoNoticeEl.classList.remove('hidden', 'text-red-400');
-                promoNoticeEl.classList.add('text-emerald-400');
-                promoNoticeEl.innerText = `Promo ${code} applied (25% OFF)`;
-                updateCalculation();
-            } else if ((code === 'MATCH5' && conciergeActive) || code === 'SAVE5') {
-                state.discountPercent = 5;
-                promoNoticeEl.classList.remove('hidden', 'text-red-400');
-                promoNoticeEl.classList.add('text-emerald-400');
-                promoNoticeEl.innerText = `Promo ${code} applied (5% OFF)`;
-                updateCalculation();
-            } else {
+            if (!code) {
                 state.discountPercent = 0;
-                promoNoticeEl.classList.remove('hidden', 'text-emerald-400');
-                promoNoticeEl.classList.add('text-red-400');
-                promoNoticeEl.innerText = 'Invalid or inactive promo code.';
+                promoNoticeEl.classList.add('hidden');
+                updateCalculation();
+                return;
+            }
+
+            try {
+                const subtotal = state.base.price * (state.adults + state.children);
+                const resp = await fetch('/api/v1/coupon/validate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    },
+                    body: JSON.stringify({
+                        code: code,
+                        subtotal: subtotal || 100,
+                        adults: state.adults,
+                        children: state.children
+                    })
+                });
+                const data = await resp.json();
+                if (data.success && data.coupon) {
+                    state.discountPercent = parseFloat(data.coupon.discount_percent || data.coupon.discount_value || 0);
+                    promoNoticeEl.classList.remove('hidden', 'text-red-400');
+                    promoNoticeEl.classList.add('text-emerald-400');
+                    promoNoticeEl.innerText = `Promo ${code} applied (${state.discountPercent}% OFF)`;
+                    updateCalculation();
+                } else {
+                    state.discountPercent = 0;
+                    promoNoticeEl.classList.remove('hidden', 'text-emerald-400');
+                    promoNoticeEl.classList.add('text-red-400');
+                    promoNoticeEl.innerText = data.message || 'Invalid or inactive promo code.';
+                    updateCalculation();
+                }
+            } catch (err) {
+                if (code === 'DUNESWELCOME' || code === 'FIRST25' || code.startsWith('FIRST25-')) {
+                    state.discountPercent = 25;
+                    promoNoticeEl.classList.remove('hidden', 'text-red-400');
+                    promoNoticeEl.classList.add('text-emerald-400');
+                    promoNoticeEl.innerText = `Promo ${code} applied (25% OFF)`;
+                } else {
+                    state.discountPercent = 0;
+                    promoNoticeEl.classList.remove('hidden', 'text-emerald-400');
+                    promoNoticeEl.classList.add('text-red-400');
+                    promoNoticeEl.innerText = 'Unable to validate promo code.';
+                }
                 updateCalculation();
             }
         });

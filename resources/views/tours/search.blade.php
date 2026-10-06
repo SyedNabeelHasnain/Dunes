@@ -66,7 +66,7 @@
 <section class="hero-subpage bg-slate-950 text-white relative overflow-hidden" style="padding-top: calc(var(--header-h, 72px) + 2.5rem);">
     <div class="absolute inset-0 w-full h-full bg-[radial-gradient(ellipse_at_15%_20%,rgba(246,144,68,0.2)_0%,transparent_60%)]"></div>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <nav aria-label="breadcrumb">
+        <nav aria-label="{{ __('ui.common.breadcrumb') }}">
             <ol class="flex items-center gap-2 text-xs sm:text-sm text-white/70 mb-4">
                 <li><a href="{{ localized_route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') ?? 'Home' }}</a></li>
                 <li><span class="text-white/40">/</span></li>
@@ -165,14 +165,14 @@
                         @if(!empty($cleanQuery))
                         <button type="button" 
                                 onclick="this.previousElementSibling.value=''; this.previousElementSibling.focus();"
-                                title="Clear input"
+                                title="{{ __('ui.common.clear_search') }}"
                                 class="text-slate-300 hover:text-slate-500 p-1 mx-1 transition-colors text-xs inline-flex items-center justify-center shrink-0 cursor-pointer">
                             <i class="bi bi-x-circle-fill"></i>
                         </button>
                         @endif
                         <button type="submit" 
                                 class="shrink-0 px-4 sm:px-5 py-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-xs font-bold transition-all shadow-2xs hover:shadow-xs flex items-center gap-1.5 cursor-pointer ms-1">
-                            <span>Update</span>
+                            <span>{{ __('ui.common.update') }}</span>
                             <i class="bi bi-arrow-right rtl:rotate-180 text-[10px]"></i>
                         </button>
                     </div>
@@ -273,12 +273,12 @@
                             <div class="relative overflow-hidden aspect-[16/10]">
                                 <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy">
                                 @if($t->is_bestseller)
-                                <span class="absolute top-3 left-3 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-md inline-flex items-center gap-1">
-                                    <i class="bi bi-fire text-amber-300"></i>Best Seller
+                                <span class="absolute top-3 start-3 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-md inline-flex items-center gap-1">
+                                    <i class="bi bi-fire text-amber-300"></i>{{ __('ui.home_popular.bestseller') }}
                                 </span>
                                 @elseif($t->is_featured)
-                                <span class="absolute top-3 left-3 bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md inline-flex items-center gap-1">
-                                    <i class="bi bi-award"></i>Featured
+                                <span class="absolute top-3 start-3 bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md inline-flex items-center gap-1">
+                                    <i class="bi bi-award"></i>{{ __('ui.common.featured') }}
                                 </span>
                                 @endif
                                 <div class="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/70 via-black/30 to-transparent">

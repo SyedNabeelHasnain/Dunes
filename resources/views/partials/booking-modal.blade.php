@@ -56,13 +56,13 @@
                     </button>
                     <div>
                         <h5 class="text-base sm:text-lg font-black text-slate-900 leading-tight" id="bookingModalTitle">{{ __('ui.booking.title') }}</h5>
-                        <div class="text-primary text-xs font-extrabold hidden" id="bookingModalSubtitle">Step 1 of 2</div>
+                        <div class="text-primary text-xs font-extrabold hidden" id="bookingModalSubtitle" data-step1="{{ __('ui.booking.step_1_of_2') }}" data-step2="{{ __('ui.booking.step_2_of_2') }}">{{ __('ui.booking.step_1_of_2') }}</div>
                     </div>
                 </div>
                 <button type="button" 
                         class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-800 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer" 
                         @click="$store.modal.close()" 
-                        aria-label="Close">
+                        aria-label="{{ __('ui.common.close') }}">
                     <i class="bi bi-x-lg text-xs"></i>
                 </button>
             </div>
@@ -128,8 +128,8 @@
                                             <span>{{ __('ui.booking.select_date') }}</span>
                                         </button>
                                         <div class="date-nav flex items-center gap-1">
-                                            <button type="button" class="w-8 h-8 rounded-full bg-white border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-700 shadow-2xs transition-colors cursor-pointer" id="datePrev" aria-label="Previous date"><i class="bi bi-chevron-left rtl:rotate-180 text-xs"></i></button>
-                                            <button type="button" class="w-8 h-8 rounded-full bg-white border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-700 shadow-2xs transition-colors cursor-pointer" id="dateNext" aria-label="Next date"><i class="bi bi-chevron-right rtl:rotate-180 text-xs"></i></button>
+                                            <button type="button" class="w-8 h-8 rounded-full bg-white border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-700 shadow-2xs transition-colors cursor-pointer" id="datePrev" aria-label="{{ __('ui.common.previous_date') }}"><i class="bi bi-chevron-left rtl:rotate-180 text-xs"></i></button>
+                                            <button type="button" class="w-8 h-8 rounded-full bg-white border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-700 shadow-2xs transition-colors cursor-pointer" id="dateNext" aria-label="{{ __('ui.common.next_date') }}"><i class="bi bi-chevron-right rtl:rotate-180 text-xs"></i></button>
                                         </div>
                                     </div>
                                 </div>
@@ -141,11 +141,11 @@
                                 <div class="sm:col-span-4 lg:col-span-3">
                                     <label class="block text-xs font-black uppercase tracking-wider text-slate-800 mb-2" for="bookingAdults">{{ __('ui.booking.guests') }}</label>
                                     <div class="flex items-center justify-between bg-white shadow-2xs rounded-2xl border-2 border-slate-200 p-1 h-[52px]">
-                                        <button type="button" class="w-10 h-10 flex items-center justify-center text-primary hover:bg-orange-50 rounded-xl transition-colors cursor-pointer" data-action="minus" data-target="adults" aria-label="Decrease guest count">
+                                        <button type="button" class="w-10 h-10 flex items-center justify-center text-primary hover:bg-orange-50 rounded-xl transition-colors cursor-pointer" data-action="minus" data-target="adults" aria-label="{{ __('ui.booking.decrease_guests') }}">
                                             <i class="bi bi-dash-circle-fill text-lg"></i>
                                         </button>
                                         <input type="number" class="w-10 text-center font-black text-slate-900 border-0 bg-transparent p-0 text-base focus:outline-none" name="adults" id="bookingAdults" value="1" min="1" max="50" readonly autocomplete="off">
-                                        <button type="button" class="w-10 h-10 flex items-center justify-center text-primary hover:bg-orange-50 rounded-xl transition-colors cursor-pointer" data-action="plus" data-target="adults" aria-label="Increase guest count">
+                                        <button type="button" class="w-10 h-10 flex items-center justify-center text-primary hover:bg-orange-50 rounded-xl transition-colors cursor-pointer" data-action="plus" data-target="adults" aria-label="{{ __('ui.booking.increase_guests') }}">
                                             <i class="bi bi-plus-circle-fill text-lg"></i>
                                         </button>
                                     </div>
@@ -157,7 +157,7 @@
                                     <div class="relative rounded-2xl bg-white shadow-2xs border-2 border-slate-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 flex items-center h-[52px] transition-all">
                                         <span class="ps-3.5 pe-2 text-primary shrink-0"><i class="bi bi-geo-alt-fill text-base"></i></span>
                                         <input type="text" class="flex-1 bg-transparent font-bold text-slate-900 text-sm border-0 focus:outline-none placeholder:text-slate-400 min-w-0" name="location" id="bookingLocation" required placeholder="{{ __('ui.booking.pickup_placeholder') }}" autocomplete="off">
-                                        <button class="px-3.5 h-full text-slate-400 hover:text-primary hover:bg-slate-50 border-s border-slate-100 transition-colors cursor-pointer rounded-e-2xl shrink-0" type="button" id="detectLocation" aria-label="Detect current location" title="Detect Current Location">
+                                        <button class="px-3.5 h-full text-slate-400 hover:text-primary hover:bg-slate-50 border-s border-slate-100 transition-colors cursor-pointer rounded-e-2xl shrink-0" type="button" id="detectLocation" aria-label="{{ __('ui.common.detect_location') }}" title="{{ __('ui.common.detect_location') }}">
                                             <i class="bi bi-crosshair"></i>
                                         </button>
                                     </div>
@@ -203,53 +203,53 @@
                                 <div class="text-xs font-black uppercase tracking-wider text-slate-800 mb-2">{{ __('ui.booking.step_contact') }}</div>
                                 <div>
                                     <label class="block text-[11px] font-extrabold text-slate-800 uppercase tracking-wider mb-1" for="bookingName">{{ __('ui.booking.name') }}</label>
-                                    <input type="text" class="w-full px-4 py-3 rounded-2xl bg-white border border-slate-200 text-sm font-semibold text-slate-900 shadow-2xs focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-slate-400" id="bookingName" name="name" placeholder="John Doe" autocomplete="name" required data-form="booking" data-field="name">
+                                    <input type="text" class="w-full px-4 py-3 rounded-2xl bg-white border border-slate-200 text-sm font-semibold text-slate-900 shadow-2xs focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-slate-400" id="bookingName" name="name" placeholder="{{ __('ui.booking.name_placeholder') }}" autocomplete="name" required data-form="booking" data-field="name">
                                 </div>
                                 <div>
                                     <label class="block text-[11px] font-extrabold text-slate-800 uppercase tracking-wider mb-1" for="bookingEmail">{{ __('ui.booking.email') }}</label>
-                                    <input type="email" class="w-full px-4 py-3 rounded-2xl bg-white border border-slate-200 text-sm font-semibold text-slate-900 shadow-2xs focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-slate-400" id="bookingEmail" name="email" placeholder="name@example.com" autocomplete="email" required data-form="booking" data-field="email">
+                                    <input type="email" class="w-full px-4 py-3 rounded-2xl bg-white border border-slate-200 text-sm font-semibold text-slate-900 shadow-2xs focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-slate-400" id="bookingEmail" name="email" placeholder="{{ __('ui.booking.email_placeholder') }}" autocomplete="email" required data-form="booking" data-field="email">
                                 </div>
                                 <div>
                                     <label class="block text-[11px] font-extrabold text-slate-800 uppercase tracking-wider mb-1" for="bookingPhone">{{ __('ui.booking.phone') }}</label>
                                     <div class="welcome-phone-field rounded-2xl bg-white border border-slate-200 shadow-2xs focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
-                                        <input type="tel" class="w-full py-3 px-4 bg-transparent text-sm font-semibold text-slate-900 border-0 focus:outline-none placeholder:text-slate-400" id="bookingPhone" name="phone" placeholder="50 123 4567" autocomplete="tel" required data-form="booking" data-field="phone">
+                                        <input type="tel" class="w-full py-3 px-4 bg-transparent text-sm font-semibold text-slate-900 border-0 focus:outline-none placeholder:text-slate-400" id="bookingPhone" name="phone" placeholder="{{ __('ui.booking.phone_placeholder') }}" autocomplete="tel" required data-form="booking" data-field="phone">
                                     </div>
                                 </div>
                             </div>
 
                             <!-- OTP Verification Fields -->
                             <div class="mb-5 hidden" id="otpFieldsWrapper">
-                                <div class="text-xs font-black uppercase tracking-wider text-slate-800 mb-2">Email Verification Code</div>
+                                <div class="text-xs font-black uppercase tracking-wider text-slate-800 mb-2">{{ __('ui.booking.email_verification') }}</div>
                                 <div class="flex rounded-2xl shadow-2xs border border-slate-200 bg-white overflow-hidden">
-                                    <input type="text" class="flex-1 px-4 py-3 bg-transparent text-center font-black font-mono tracking-widest text-lg text-slate-900 border-0 focus:outline-none" id="bookingOtpCode" placeholder="Enter 6-digit OTP">
-                                    <button class="px-5 bg-primary hover:bg-primary-dark text-white font-bold text-xs transition-colors cursor-pointer" type="button" id="verifyOtpBtn">Verify</button>
+                                    <input type="text" class="flex-1 px-4 py-3 bg-transparent text-center font-black font-mono tracking-widest text-lg text-slate-900 border-0 focus:outline-none" id="bookingOtpCode" placeholder="{{ __('ui.booking.otp_placeholder') }}">
+                                    <button class="px-5 bg-primary hover:bg-primary-dark text-white font-bold text-xs transition-colors cursor-pointer" type="button" id="verifyOtpBtn">{{ __('ui.booking.verify') }}</button>
                                 </div>
                                 <div class="flex justify-between mt-2 px-1 text-xs">
                                     <span class="text-slate-400" id="otpTimer"></span>
-                                    <a href="#" class="font-bold text-primary hover:underline" id="resendOtpBtn">Resend Code</a>
+                                    <a href="#" class="font-bold text-primary hover:underline" id="resendOtpBtn">{{ __('ui.booking.resend_code') }}</a>
                                 </div>
                             </div>
 
                             <!-- Special Requests -->
                             <div class="mb-5">
                                 <label class="block text-xs font-black uppercase tracking-wider text-slate-800 mb-2" for="bookingRequests">{{ __('ui.booking.special_requests') }}</label>
-                                <textarea class="w-full p-3.5 rounded-2xl bg-white border border-slate-200 text-xs sm:text-sm font-medium text-slate-900 shadow-2xs focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-slate-400" id="bookingRequests" name="requests" rows="3" placeholder="Any dietary requirements, hotel room numbers, baby seat needs..." autocomplete="off" data-form="booking" data-field="requests"></textarea>
+                                <textarea class="w-full p-3.5 rounded-2xl bg-white border border-slate-200 text-xs sm:text-sm font-medium text-slate-900 shadow-2xs focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-slate-400" id="bookingRequests" name="requests" rows="3" placeholder="{{ __('ui.booking.special_placeholder') }}" autocomplete="off" data-form="booking" data-field="requests"></textarea>
                             </div>
 
                             <!-- Luxury Voucher & Promo Code Section -->
                             <div class="p-4 rounded-2xl bg-white shadow-2xs border border-slate-200 mb-5" id="promoCodeCard">
                                 <div class="flex items-center justify-between mb-2">
                                     <label class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5" for="bookingPromoCode">
-                                        <i class="bi bi-ticket-perforated-fill text-primary"></i> Have a Promo Code or Voucher?
+                                        <i class="bi bi-ticket-perforated-fill text-primary"></i> {{ __('ui.booking.promo_code') }}
                                     </label>
                                     <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold hidden" id="promoAppliedBadge">
-                                        <i class="bi bi-check2-circle"></i> Applied
+                                        <i class="bi bi-check2-circle"></i> {{ __('ui.booking.promo_applied') }}
                                     </span>
                                 </div>
                                 <div class="flex rounded-xl border border-slate-200 bg-white overflow-hidden focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all" id="promoInputGroup">
-                                    <input type="text" class="flex-1 px-3.5 py-2.5 bg-transparent text-xs sm:text-sm font-semibold text-slate-800 border-0 focus:outline-none placeholder:text-slate-400 uppercase" id="bookingPromoCode" name="coupon_code" placeholder="Enter promo code (e.g. DUNESWELCOME)" autocomplete="off" spellcheck="false">
+                                    <input type="text" class="flex-1 px-3.5 py-2.5 bg-transparent text-xs sm:text-sm font-semibold text-slate-800 border-0 focus:outline-none placeholder:text-slate-400 uppercase" id="bookingPromoCode" name="coupon_code" placeholder="{{ __('ui.booking.promo_placeholder') }}" autocomplete="off" spellcheck="false">
                                     <button class="px-4 bg-primary hover:bg-primary-dark text-white font-bold text-xs transition-colors cursor-pointer flex items-center gap-1" type="button" id="applyPromoBtn">
-                                        <span>Apply</span>
+                                        <span>{{ __('ui.booking.apply') }}</span>
                                         <i class="bi bi-arrow-right-short rtl:rotate-180"></i>
                                     </button>
                                 </div>
@@ -262,37 +262,37 @@
                                         <div>
                                             <div class="flex items-center gap-2">
                                                 <span class="px-2 py-0.5 rounded-md bg-slate-900 text-amber-400 font-mono font-bold text-xs" id="promoCodeLabel">CODE</span>
-                                                <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold text-[10px]" id="promoDiscountBadge">Applied</span>
+                                                <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold text-[10px]" id="promoDiscountBadge">{{ __('ui.booking.promo_applied') }}</span>
                                             </div>
-                                            <div class="text-xs font-bold text-emerald-600 mt-0.5" id="promoSavingsText">Savings applied</div>
+                                            <div class="text-xs font-bold text-emerald-600 mt-0.5" id="promoSavingsText">{{ __('ui.booking.savings_applied') }}</div>
                                         </div>
                                     </div>
-                                    <button type="button" class="text-xs text-red-500 hover:text-red-700 font-semibold cursor-pointer" id="removePromoBtn" aria-label="Remove promo code">
-                                        <i class="bi bi-x-circle me-1"></i>Remove
+                                    <button type="button" class="text-xs text-red-500 hover:text-red-700 font-semibold cursor-pointer" id="removePromoBtn" aria-label="{{ __('ui.common.remove') }}">
+                                        <i class="bi bi-x-circle me-1"></i>{{ __('ui.common.remove') }}
                                     </button>
                                 </div>
                                 <div class="hidden mt-2 text-xs text-red-600 items-center gap-1.5" id="promoErrorBox">
                                     <i class="bi bi-exclamation-circle-fill shrink-0"></i>
-                                    <span id="promoErrorMessage">Invalid promo code.</span>
+                                    <span id="promoErrorMessage">{{ __('ui.booking.invalid_promo') }}</span>
                                 </div>
                             </div>
 
                             <!-- Payment Options -->
                             <div class="mb-5" id="paymentOptions" data-ziina-active="{{ $ziinaActive ? '1' : '0' }}" data-advance-percent="{{ $advancePercent }}">
-                                <div class="text-xs font-black uppercase tracking-wider text-slate-800 mb-2">Payment Options</div>
+                                <div class="text-xs font-black uppercase tracking-wider text-slate-800 mb-2">{{ __('ui.booking.payment_options') }}</div>
                                 <div class="payment-options grid grid-cols-1 sm:grid-cols-3 gap-2">
                                     <div class="payment-option selected p-3 rounded-2xl border-2 border-primary bg-orange-50/40 cursor-pointer text-start transition-all" data-value="cash">
-                                        <div class="payment-option-title font-bold text-slate-900 text-xs sm:text-sm">Cash</div>
-                                        <div class="payment-option-sub text-slate-500 text-[11px]">Pay on pickup</div>
+                                        <div class="payment-option-title font-bold text-slate-900 text-xs sm:text-sm">{{ __('ui.booking.cash') }}</div>
+                                        <div class="payment-option-sub text-slate-500 text-[11px]">{{ __('ui.booking.pay_on_pickup') }}</div>
                                     </div>
                                     @if($ziinaActive)
                                     <div class="payment-option p-3 rounded-2xl border border-slate-200 bg-white hover:border-primary/50 cursor-pointer text-start transition-all" data-value="advance">
-                                        <div class="payment-option-title font-bold text-slate-900 text-xs sm:text-sm">Advance</div>
-                                        <div class="payment-option-sub text-slate-500 text-[11px]">Hold slot ({{ $advancePercent }}%)</div>
+                                        <div class="payment-option-title font-bold text-slate-900 text-xs sm:text-sm">{{ __('ui.booking.advance') }}</div>
+                                        <div class="payment-option-sub text-slate-500 text-[11px]">{{ __('ui.booking.hold_slot', ['percent' => $advancePercent]) }}</div>
                                     </div>
                                     <div class="payment-option p-3 rounded-2xl border border-slate-200 bg-white hover:border-primary/50 cursor-pointer text-start transition-all" data-value="full">
-                                        <div class="payment-option-title font-bold text-slate-900 text-xs sm:text-sm">Full</div>
-                                        <div class="payment-option-sub text-slate-500 text-[11px]">Instant confirmation</div>
+                                        <div class="payment-option-title font-bold text-slate-900 text-xs sm:text-sm">{{ __('ui.booking.full_payment') }}</div>
+                                        <div class="payment-option-sub text-slate-500 text-[11px]">{{ __('ui.booking.instant_confirmation') }}</div>
                                     </div>
                                     @endif
                                 </div>
@@ -304,12 +304,12 @@
                                 <label class="flex items-start gap-2.5 text-xs text-slate-600 cursor-pointer">
                                     <input class="mt-0.5 rounded border-slate-300 text-primary focus:ring-primary/20" type="checkbox" id="bookingAgreement" required>
                                     <span>
-                                        I agree to the <a href="{{ route('terms') }}" target="_blank" rel="noopener noreferrer" class="text-primary font-bold hover:underline">Terms & Conditions</a> and <a href="{{ route('privacy') }}" target="_blank" rel="noopener noreferrer" class="text-primary font-bold hover:underline">Privacy Policy</a>.
+                                        I agree to the <a href="{{ route('terms') }}" target="_blank" rel="noopener noreferrer" class="text-primary font-bold hover:underline">{{ __('ui.nav.terms') ?? 'Terms & Conditions' }}</a> and <a href="{{ route('privacy') }}" target="_blank" rel="noopener noreferrer" class="text-primary font-bold hover:underline">{{ __('ui.nav.privacy') ?? 'Privacy Policy' }}</a>.
                                     </span>
-                                								</label>
+                                </label>
                                 <label class="flex items-start gap-2.5 text-xs text-slate-500 cursor-pointer">
                                     <input class="mt-0.5 rounded border-slate-300 text-primary focus:ring-primary/20" type="checkbox" id="bookingNewsletter" name="subscribe_newsletter" value="1" checked>
-                                    <span>Keep me updated with exclusive desert safari deals, seasonal discounts & travel guides.</span>
+                                    <span>{{ __('ui.booking.keep_updated') }}</span>
                                 </label>
                             </div>
                         </div>

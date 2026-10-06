@@ -501,8 +501,15 @@ class TourController extends Controller
 
         foreach ($allTours as $tour) {
             $score = 0;
-            $tName = strtolower($tour->name);
-            $tDesc = strtolower(($tour->short_desc ?? '').' '.($tour->full_desc ?? ''));
+            $allNames = method_exists($tour, 'getTranslations') ? array_values($tour->getTranslations('name')) : [];
+            $allNames[] = (string) $tour->name;
+            $tName = strtolower(implode(' ', array_filter($allNames)));
+
+            $allShort = method_exists($tour, 'getTranslations') ? array_values($tour->getTranslations('short_desc')) : [];
+            $allFull = method_exists($tour, 'getTranslations') ? array_values($tour->getTranslations('full_desc')) : [];
+            $allDesc = array_merge($allShort, $allFull, [(string) ($tour->short_desc ?? ''), (string) ($tour->full_desc ?? '')]);
+            $tDesc = strtolower(implode(' ', array_filter($allDesc)));
+
             $tKeys = strtolower($tour->meta_keywords ?? '');
             $catSlug = strtolower($tour->category ? $tour->category->slug : '');
             $catName = strtolower($tour->category ? $tour->category->name : '');

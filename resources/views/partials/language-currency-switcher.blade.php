@@ -12,7 +12,7 @@
     $rateInr = $settingsService->get('currency_rate_inr', '22.85');
 @endphp
 <div class="relative inline-block text-start" x-data="{ open: false, activeTab: 'lang' }" @click.outside="open = false" @keydown.escape.window="open = false">
-    <button @click="open = !open" :aria-expanded="open" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-slate-800 bg-white border border-slate-200/90 shadow-2xs hover:border-primary/50 transition-all cursor-pointer min-h-[38px]" type="button" id="{{ $dropdownId }}" aria-label="Language and Currency Switcher">
+    <button @click="open = !open" :aria-expanded="open" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-slate-800 bg-white border border-slate-200/90 shadow-2xs hover:border-primary/50 transition-all cursor-pointer min-h-[38px]" type="button" id="{{ $dropdownId }}" aria-label="{{ __('ui.common.language_currency_switcher') }}">
         <span class="text-sm leading-none">{{ $curLang ? $curLang->flag_emoji : '🌐' }}</span>
         <span class="font-extrabold uppercase text-[11px]">{{ strtoupper($curLocale) }}</span>
         <span class="text-slate-300">/</span>

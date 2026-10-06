@@ -32,7 +32,7 @@ if (!function_exists('renderReviewCardMarkup')) {
         $actionText = $isUgc ? __('ui.reviews_section.submit_review') : __('ui.common.view_details');
 
         return '
-        <div class="review-card h-full flex flex-col text-left rtl:text-right">
+        <div class="review-card h-full flex flex-col text-start">
             <div class="flex justify-between items-center mb-3">
                 <div class="flex items-center gap-2 min-w-0">
                     <img src="' . htmlspecialchars($avatar) . '" alt="' . htmlspecialchars($r->reviewer_name) . '" class="w-10 h-10 rounded-full object-cover shrink-0" referrerpolicy="no-referrer" loading="lazy" onerror="this.onerror=null;this.src=\'' . $fallbackAvatar . '\'">
@@ -300,8 +300,8 @@ if (!function_exists('renderReviewCardMarkup')) {
 
         <div class="mt-8 p-6 sm:p-8 rounded-2xl shadow-sm bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-primary/30">
             <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
-                <div class="text-center lg:text-left rtl:lg:text-right">
-                    <div class="flex flex-wrap items-center justify-center lg:justify-start rtl:lg:justify-start gap-2 mb-2">
+                <div class="text-center lg:text-start">
+                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2 mb-2">
                         <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold bg-primary/20 text-primary border border-primary/40">
                             <i class="bi bi-compass"></i> {{ __('ui.home_concierge.badge') }}
                         </span>
@@ -573,7 +573,7 @@ if (!function_exists('renderReviewCardMarkup')) {
             @foreach($faqs as $index => $f)
             <div class="bg-slate-50 hover:bg-slate-50/80 rounded-2xl border border-slate-200 overflow-hidden transition-all duration-200">
                 <button type="button" 
-                        class="w-full text-left px-5 sm:px-6 py-4.5 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
+                        class="w-full text-start px-5 sm:px-6 py-4.5 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
                         @click="activeFaq = (activeFaq === {{ $index }} ? null : {{ $index }})">
                     <span class="text-sm sm:text-base">{{ $f->question }}</span>
                     <i class="bi bi-chevron-down transition-transform duration-300 text-slate-500 shrink-0"

@@ -104,7 +104,9 @@ class BookingController extends Controller
 
         $price = (float) $pricing->price;
         $priceType = strtolower($pricing->price_type ?? 'per person');
-        $childPrice = round($price * 0.70, 2);
+        $childPrice = (isset($pricing->child_price) && (float) $pricing->child_price > 0)
+            ? (float) $pricing->child_price
+            : round($price * 0.70, 2);
 
         if (in_array($priceType, ['per buggy', 'per vehicle', 'per group', 'private'])) {
             $capacity = 2;
@@ -115,10 +117,10 @@ class BookingController extends Controller
             } elseif (preg_match('/(1|single|solo)/i', $tier->name ?? '')) {
                 $capacity = 1;
             }
-            $vehicles = (int) ceil(($adults + $children + $infants) / max(1, $capacity));
+            $vehicles = (int) ceil(($adults + $children) / max(1, $capacity));
             $subtotal = $vehicles * $price;
         } else {
-            // Children get a 30% discount (they pay 70% of the adult price)
+            // Children get configured child_price or 30% discount (they pay 70% of the adult price)
             $subtotal = ($price * $adults) + ($childPrice * $children);
         }
 

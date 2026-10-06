@@ -57,7 +57,7 @@
                 <button type="button" 
                         @click="$store.modal.close()" 
                         class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-800 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer" 
-                        aria-label="Close modal">
+                        aria-label="{{ __('ui.common.close') }}">
                     <i class="bi bi-x-lg text-xs"></i>
                 </button>
             </div>
@@ -96,13 +96,13 @@
                 <!-- Full Name Field -->
                 <div>
                     <label class="block text-[11px] font-extrabold text-slate-800 uppercase tracking-wider mb-1.5" for="waName">
-                        Your Full Name <span class="text-rose-500">*</span>
+                        {{ __('ui.booking.name') }} <span class="text-rose-500">*</span>
                     </label>
                     <div class="relative">
                         <input type="text" 
                                id="waName" 
                                name="name" 
-                               placeholder="e.g. John Smith" 
+                               placeholder="{{ __('ui.booking.name_placeholder') }}" 
                                autocomplete="name" 
                                required 
                                data-form="whatsapp" 
@@ -114,13 +114,13 @@
                 <!-- Phone Number Field -->
                 <div>
                     <label class="block text-[11px] font-extrabold text-slate-800 uppercase tracking-wider mb-1.5" for="waPhone">
-                        WhatsApp Phone Number <span class="text-rose-500">*</span>
+                        {{ __('ui.booking.phone') }} <span class="text-rose-500">*</span>
                     </label>
                     <div class="welcome-phone-field rounded-2xl bg-white border border-slate-200 shadow-2xs focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all">
                         <input type="tel" 
                                id="waPhone" 
                                name="phone" 
-                               placeholder="50 123 4567" 
+                               placeholder="{{ __('ui.booking.phone_placeholder') }}" 
                                autocomplete="tel" 
                                required 
                                data-form="whatsapp" 
@@ -141,7 +141,7 @@
                                checked 
                                class="rounded-md border-slate-300 text-emerald-600 focus:ring-emerald-500 w-4 h-4 mt-0.5 shrink-0 cursor-pointer">
                         <span class="text-[11px] text-slate-600 leading-snug">
-                            I agree to the <a href="{{ route('terms') }}" target="_blank" class="text-emerald-600 font-bold hover:underline">Terms & Conditions</a> and <a href="{{ route('privacy') }}" target="_blank" class="text-emerald-600 font-bold hover:underline">Privacy Policy</a>.
+                            I agree to the <a href="{{ route('terms') }}" target="_blank" class="text-emerald-600 font-bold hover:underline">{{ __('ui.nav.terms') ?? 'Terms & Conditions' }}</a> and <a href="{{ route('privacy') }}" target="_blank" class="text-emerald-600 font-bold hover:underline">{{ __('ui.nav.privacy') ?? 'Privacy Policy' }}</a>.
                         </span>
                     </label>
                 </div>
@@ -156,7 +156,7 @@
                             disabled 
                             class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold text-sm shadow-md shadow-emerald-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                         <i class="bi bi-whatsapp text-lg"></i>
-                        <span>Start WhatsApp Chat</span>
+                        <span>{{ __('ui.common.start_whatsapp_chat') }}</span>
                         <i class="bi bi-arrow-right rtl:rotate-180 text-xs"></i>
                     </button>
                 </div>

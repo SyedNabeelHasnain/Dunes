@@ -458,7 +458,7 @@
                         <li class="relative" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">
                             <div class="inline-flex items-center rounded-xl {{ request()->routeIs('tours.*') ? 'bg-slate-900 text-white font-bold shadow-xs' : '' }}">
                                 <a class="px-3 py-2 rounded-s-xl transition-all {{ request()->routeIs('tours.*') ? 'text-white' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('tours.index') }}">{{ __('ui.nav.all_tours') }}</a>
-                                <button type="button" @click="open = !open" :aria-expanded="open" class="px-1.5 py-2 rounded-e-xl transition-all hover:opacity-80 cursor-pointer" aria-label="Toggle Tours Submenu">
+                                <button type="button" @click="open = !open" :aria-expanded="open" class="px-1.5 py-2 rounded-e-xl transition-all hover:opacity-80 cursor-pointer" aria-label="{{ __('ui.nav.all_tours') }}">
                                     <i class="bi bi-chevron-down text-[10px] transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
                                 </button>
                             </div>
@@ -517,15 +517,15 @@
                     <!-- Mobile App Bar Actions (Thumb-Friendly, uncluttered) -->
                     <div class="flex items-center gap-1.5 sm:gap-2 lg:hidden">
                         <!-- Review Circle Popover Triggers -->
-                        <div class="nav-review-circle w-8 h-8 rounded-full bg-white shadow-xs flex items-center justify-center cursor-pointer relative" onclick="toggleReviewPopover(this, event)" id="taCircle" title="TripAdvisor Reviews">
+                        <div class="nav-review-circle w-8 h-8 rounded-full bg-white shadow-xs flex items-center justify-center cursor-pointer relative" onclick="toggleReviewPopover(this, event)" id="taCircle" title="{{ __('ui.common.tripadvisor_reviews') }}">
                             <img src="{{ asset('images/tripadvisor-color-logo.svg') }}" alt="TripAdvisor" width="20" height="20" class="w-5 h-5 object-contain">
                         </div>
-                        <div class="nav-review-circle w-8 h-8 rounded-full bg-white shadow-xs flex items-center justify-center cursor-pointer relative" onclick="toggleReviewPopover(this, event)" id="googleCircle" title="Google Reviews">
+                        <div class="nav-review-circle w-8 h-8 rounded-full bg-white shadow-xs flex items-center justify-center cursor-pointer relative" onclick="toggleReviewPopover(this, event)" id="googleCircle" title="{{ __('ui.common.google_reviews') }}">
                             <img src="{{ asset('images/Google-G.avif') }}" alt="Google" width="20" height="20" class="w-5 h-5 object-contain">
                         </div>
 
                         <!-- Quick Search Button -->
-                        <button type="button" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer text-xs" @click="$store.modal.open('search')" aria-label="Search Dubai Tours">
+                        <button type="button" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer text-xs" @click="$store.modal.open('search')" aria-label="{{ __('ui.nav.search_placeholder') }}">
                             <i class="bi bi-search"></i>
                         </button>
 
@@ -541,7 +541,7 @@
                         </button>
 
                         <!-- Hamburger Drawer Trigger -->
-                        <button class="p-1.5 sm:p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer focus:outline-none" type="button" @click="$store.mobileNav.toggle()" aria-label="Menu">
+                        <button class="p-1.5 sm:p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer focus:outline-none" type="button" @click="$store.mobileNav.toggle()" aria-label="{{ __('ui.nav.all_tours') ?? 'Menu' }}">
                             <i class="bi bi-list text-xl sm:text-2xl"></i>
                         </button>
                     </div>
@@ -574,11 +574,11 @@
             <div>
                 <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-4">
                     <a href="{{ route('home') }}" @click="$store.mobileNav.close()" class="flex items-center hover:opacity-90 transition-opacity" aria-label="Dunes Discovery Tourism">
-                        <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery" width="140" height="90" class="h-9 w-auto object-contain">
+                        <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery Tourism" width="140" height="90" class="h-9 w-auto object-contain">
                     </a>
                     <div class="flex items-center gap-2">
                         @include('partials.language-currency-switcher', ['switcherId' => 'mobileLangCurrencyDropdownBtn'])
-                        <button type="button" class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer" @click="$store.mobileNav.close()" aria-label="Close">
+                        <button type="button" class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer" @click="$store.mobileNav.close()" aria-label="{{ __('ui.common.close') }}">
                             <i class="bi bi-x-lg text-xs"></i>
                         </button>
                     </div>
@@ -673,13 +673,13 @@
                         {{ __('ui.footer.about_text') }}
                     </p>
                     <div class="flex items-center gap-3">
-                        <a href="https://instagram.com/dunesdiscoverytourism" target="_blank" rel="noopener" class="w-9 h-9 rounded-full border border-slate-700 bg-slate-900/60 hover:bg-slate-800 hover:border-slate-500 text-slate-300 hover:text-white flex items-center justify-center transition-colors text-sm" aria-label="Follow Dunes Discovery Tourism on Instagram">
+                        <a href="https://instagram.com/dunesdiscoverytourism" target="_blank" rel="noopener" class="w-9 h-9 rounded-full border border-slate-700 bg-slate-900/60 hover:bg-slate-800 hover:border-slate-500 text-slate-300 hover:text-white flex items-center justify-center transition-colors text-sm" aria-label="Instagram">
                             <i class="bi bi-instagram"></i>
                         </a>
-                        <a href="https://facebook.com/dunesdiscoverytourism" target="_blank" rel="noopener" class="w-9 h-9 rounded-full border border-slate-700 bg-slate-900/60 hover:bg-slate-800 hover:border-slate-500 text-slate-300 hover:text-white flex items-center justify-center transition-colors text-sm" aria-label="Follow Dunes Discovery Tourism on Facebook">
+                        <a href="https://facebook.com/dunesdiscoverytourism" target="_blank" rel="noopener" class="w-9 h-9 rounded-full border border-slate-700 bg-slate-900/60 hover:bg-slate-800 hover:border-slate-500 text-slate-300 hover:text-white flex items-center justify-center transition-colors text-sm" aria-label="Facebook">
                             <i class="bi bi-facebook"></i>
                         </a>
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="w-9 h-9 rounded-full border border-slate-700 bg-slate-900/60 hover:bg-emerald-600 hover:border-emerald-500 text-slate-300 hover:text-white flex items-center justify-center transition-colors text-sm" aria-label="Chat with Dunes Discovery Tourism on WhatsApp">
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="w-9 h-9 rounded-full border border-slate-700 bg-slate-900/60 hover:bg-emerald-600 hover:border-emerald-500 text-slate-300 hover:text-white flex items-center justify-center transition-colors text-sm" aria-label="{{ __('ui.common.whatsapp') }}">
                             <i class="bi bi-whatsapp"></i>
                         </a>
                     </div>

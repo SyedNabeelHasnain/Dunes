@@ -454,7 +454,7 @@
                data-tour-name="{{ $tour->name }}"
                target="_blank" 
                rel="noopener noreferrer" 
-               aria-label="Inquire on WhatsApp">
+               aria-label="{{ __('ui.common.inquire_whatsapp') }}">
                 <i class="bi bi-whatsapp"></i>
             </a>
 

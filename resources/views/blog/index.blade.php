@@ -36,7 +36,7 @@
 <!-- Blog Hero -->
 <section class="hero-subpage bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white relative overflow-hidden" style="padding-top: calc(var(--header-h, 72px) + 2.5rem);">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <nav aria-label="breadcrumb" class="mb-4">
+        <nav aria-label="{{ __('ui.common.breadcrumb') }}" class="mb-4">
             <ol class="flex items-center gap-2 text-xs sm:text-sm text-white/70">
                 <li><a href="{{ localized_route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') }}</a></li>
                 <li><span class="text-white/40">/</span></li>
@@ -90,7 +90,7 @@
                 @endif
                 <div class="relative w-full sm:w-64">
                     <input type="search" name="search" class="w-full rounded-full ps-4 pe-10 py-1.5 bg-slate-100 border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/40" placeholder="{{ __('ui.nav.search') }}..." value="{{ $search }}">
-                    <button type="submit" class="absolute end-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-primary transition-colors" aria-label="Search articles">
+                    <button type="submit" class="absolute end-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-primary transition-colors" aria-label="{{ __('ui.nav.search') }}">
                         <i class="bi bi-search text-xs"></i>
                     </button>
                 </div>
@@ -242,7 +242,7 @@
 
     <!-- Pagination -->
     @if ($totalPages > 1)
-    <nav aria-label="Blog pagination" class="mt-12 flex justify-center">
+    <nav aria-label="{{ __('ui.common.pagination') }}" class="mt-12 flex justify-center">
         <ul class="flex items-center gap-1.5">
             @if ($page > 1)
             <li>

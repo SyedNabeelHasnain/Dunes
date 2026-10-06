@@ -95,7 +95,7 @@
                 <button type="button" 
                         @click="$store.modal.close()" 
                         class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-800 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer" 
-                        aria-label="Close search modal">
+                        aria-label="{{ __('ui.common.close') }}">
                     <i class="bi bi-x-lg text-xs"></i>
                 </button>
             </div>
@@ -123,14 +123,14 @@
                         
                         <!-- Input Action Controls (Clear + Loading Indicator) -->
                         <div class="absolute end-20 sm:end-24 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
-                            <span x-show="loading" class="text-primary text-sm inline-flex items-center animate-spin" title="Searching live catalog...">
+                            <span x-show="loading" class="text-primary text-sm inline-flex items-center animate-spin" title="{{ __('ui.nav.search') }}...">
                                 <i class="bi bi-arrow-clockwise"></i>
                             </span>
                             <button type="button" 
                                     x-show="query.length > 0" 
                                     @click="clearQuery" 
                                     class="w-6 h-6 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center transition-colors text-xs cursor-pointer" 
-                                    aria-label="Clear query">
+                                    aria-label="{{ __('ui.common.clear_search') }}">
                                 <i class="bi bi-x-lg text-[10px]"></i>
                             </button>
                         </div>
@@ -228,7 +228,7 @@
                                     <div class="w-16 h-14 sm:w-20 sm:h-16 rounded-xl overflow-hidden bg-slate-100 shrink-0 relative border border-slate-200/80 shadow-2xs">
                                         <img :src="tour.image" :alt="tour.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
                                         <span x-show="tour.badge" 
-                                              class="absolute bottom-1 left-1 px-1.5 py-0.5 rounded text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-white shadow-2xs"
+                                              class="absolute bottom-1 start-1 px-1.5 py-0.5 rounded text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-white shadow-2xs"
                                               :class="tour.is_bestseller ? 'bg-orange-500' : 'bg-slate-900/80'"
                                               x-text="tour.badge"></span>
                                     </div>

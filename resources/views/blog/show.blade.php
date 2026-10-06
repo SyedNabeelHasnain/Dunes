@@ -102,7 +102,7 @@
         @endif
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <!-- Breadcrumbs -->
-            <nav aria-label="breadcrumb" class="mb-4">
+            <nav aria-label="{{ __('ui.common.breadcrumb') }}" class="mb-4">
                 <ol class="flex items-center gap-2 text-xs sm:text-sm text-white/70 flex-wrap">
                     <li><a href="{{ localized_route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') }}</a></li>
                     <li><span class="text-white/40">/</span></li>

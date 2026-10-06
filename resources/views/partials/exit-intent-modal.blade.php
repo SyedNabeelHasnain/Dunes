@@ -48,7 +48,7 @@
                 <button type="button" 
                         class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-colors cursor-pointer" 
                         @click="$store.modal.close()" 
-                        aria-label="Close" 
+                        aria-label="{{ __('ui.common.close') }}" 
                         id="exitIntentCloseBtn">
                     <i class="bi bi-x-lg text-xs"></i>
                 </button>
@@ -80,9 +80,9 @@
                     <button type="button" 
                             class="px-3 py-1.5 rounded-full border border-amber-400/50 hover:bg-amber-400 hover:text-slate-950 text-amber-400 text-xs font-bold transition-all cursor-pointer flex items-center gap-1" 
                             id="exitIntentCopyBtn" 
-                            title="Copy Code">
+                            title="{{ __('ui.common.copy_code') }}">
                         <i class="bi bi-clipboard"></i>
-                        <span>Copy</span>
+                        <span>{{ __('ui.common.copy_code') }}</span>
                     </button>
                 </div>
             </div>

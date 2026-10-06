@@ -144,7 +144,7 @@
     <section class="hero-subpage relative border-b border-white/10 overflow-hidden" style="background: radial-gradient(circle at 80% 20%, rgba(246, 144, 68, 0.18) 0%, transparent 60%), radial-gradient(circle at 10% 80%, rgba(30, 41, 59, 0.8) 0%, transparent 70%), #0B1120; padding-top: calc(var(--header-h, 72px) + 2.5rem); padding-bottom: 3.5rem;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <!-- Breadcrumbs -->
-            <nav aria-label="breadcrumb" class="mb-5">
+            <nav aria-label="{{ __('ui.common.breadcrumb') }}" class="mb-5">
                 <ol class="flex items-center gap-2 text-xs text-white/60 flex-wrap">
                     <li><a href="{{ localized_route('home') }}" class="hover:text-white transition-colors inline-flex items-center gap-1"><i class="bi bi-house-door"></i> {{ __('ui.nav.home') ?? 'Home' }}</a></li>
                     <li class="text-white/30">/</li>
@@ -344,12 +344,12 @@
                         <!-- Image Wrap -->
                         <div class="relative h-56 overflow-hidden">
                             <img src="{{ $heroImg }}" width="400" height="224" alt="{{ $tour->name }} from {{ $locationData['name'] }}" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
-                            <div class="absolute top-3 left-3">
+                            <div class="absolute top-3 start-3">
                                 <span class="inline-flex items-center gap-1 bg-slate-950/80 text-amber-400 border border-amber-400/30 backdrop-blur-md rounded-full px-2.5 py-1 text-xs font-bold">
                                     <i class="bi bi-star-fill text-amber-400"></i> {{ $tour->rating ?: '4.9' }} ({{ $tour->review_count ?: '480+' }})
                                 </span>
                             </div>
-                            <div class="absolute top-3 right-3">
+                            <div class="absolute top-3 end-3">
                                 <span class="bg-primary text-white text-xs font-bold rounded-full px-3 py-1 shadow-md">
                                     {{ $locationData['name'] }} Pickup
                                 </span>

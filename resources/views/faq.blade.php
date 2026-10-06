@@ -53,7 +53,7 @@
 <section class="hero-subpage bg-slate-950 text-white relative overflow-hidden" style="padding-top: calc(var(--header-h, 72px) + 2.5rem);">
     <div class="absolute inset-0 w-full h-full bg-[radial-gradient(ellipse_at_15%_20%,rgba(246,144,68,0.18)_0%,transparent_60%)]"></div>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <nav aria-label="breadcrumb">
+        <nav aria-label="{{ __('ui.common.breadcrumb') }}">
             <ol class="flex items-center gap-2 text-xs sm:text-sm text-white/70 mb-4">
                 <li><a href="{{ localized_route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') }}</a></li>
                 <li><span class="text-white/40">/</span></li>
@@ -119,8 +119,8 @@
         <div class="mb-10">
             <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 shadow-xs">
                 <div class="relative">
-                    <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
-                    <input type="text" id="faqSearchInput" class="w-full rounded-full pl-11 pr-4 py-3 bg-white border border-slate-200 text-sm text-slate-800 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs" placeholder="{{ __('ui.faq.search_placeholder') }}" oninput="handleFaqSearch(this.value)">
+                    <i class="bi bi-search absolute start-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                    <input type="text" id="faqSearchInput" class="w-full rounded-full ps-11 pe-4 py-3 bg-white border border-slate-200 text-sm text-slate-800 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs" placeholder="{{ __('ui.faq.search_placeholder') }}" oninput="handleFaqSearch(this.value)">
                 </div>
             </div>
         </div>
@@ -129,7 +129,7 @@
             @foreach($faqs as $i => $f)
             <div class="faq-item bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden transition-all duration-200" data-question="{{ strtolower($f->question) }}" data-answer="{{ strtolower($f->answer) }}">
                 <button type="button" 
-                        class="w-full text-left px-5 sm:px-6 py-4.5 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
+                        class="w-full text-start px-5 sm:px-6 py-4.5 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
                         @click="openFaq = (openFaq === {{ $i }} ? null : {{ $i }})">
                     <span class="inline-flex items-center gap-3 text-sm sm:text-base">
                         <i class="bi bi-question-circle-fill text-primary shrink-0"></i>

@@ -14,20 +14,20 @@
                 <i class="bi bi-chat-heart"></i>
             </div>
 
-            <h1 class="text-2xl font-black text-slate-900 mb-2">We value your honesty</h1>
+            <h1 class="text-2xl font-black text-slate-900 mb-2">{{ __('ui.review_submit.feedback_title') }}</h1>
             <p class="text-slate-500 text-sm leading-relaxed mb-6">
                 Dear <strong class="text-slate-700">{{ $booking->name }}</strong>, our goal is to deliver exceptional 5-star desert safari adventures. Please let us know what we could have done better on your {{ $booking->tour_name }}.
             </p>
 
-            <form action="{{ route('review.feedback', $booking->reference) }}" method="POST" class="text-left">
+            <form action="{{ route('review.feedback', $booking->reference) }}" method="POST" class="text-start">
                 @csrf
                 <div class="mb-5">
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Your Detailed Feedback</label>
-                    <textarea name="feedback" rows="4" class="w-full rounded-2xl border border-slate-200 p-4 text-slate-800 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-colors leading-relaxed" placeholder="Tell our operations team what we can improve (driver, food, camp, timing)..." required></textarea>
+                    <textarea name="feedback" rows="4" class="w-full rounded-2xl border border-slate-200 p-4 text-slate-800 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-colors leading-relaxed" placeholder="{{ __('ui.review_submit.feedback_placeholder') }}" required></textarea>
                 </div>
 
                 <button type="submit" class="btn-desert-animated w-full rounded-full py-3.5 font-extrabold text-white shadow-lg text-sm sm:text-base cursor-pointer">
-                    Submit Private Feedback
+                    {{ __('ui.review_submit.submit_feedback') }}
                 </button>
             </form>
 

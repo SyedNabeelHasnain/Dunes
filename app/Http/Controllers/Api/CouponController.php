@@ -59,10 +59,12 @@ class CouponController extends Controller
                     } elseif ($tier && preg_match('/(1|single|solo)/i', $tier->name ?? '')) {
                         $capacity = 1;
                     }
-                    $vehicles = (int) ceil(($adults + $children + $infants) / max(1, $capacity));
+                    $vehicles = (int) ceil(($adults + $children) / max(1, $capacity));
                     $subtotal = $vehicles * (float) $pricing->price;
                 } else {
-                    $childPrice = round((float) $pricing->price * 0.70, 2);
+                    $childPrice = (isset($pricing->child_price) && (float) $pricing->child_price > 0)
+                        ? (float) $pricing->child_price
+                        : round((float) $pricing->price * 0.70, 2);
                     $subtotal = ((float) $pricing->price * $adults) + ($childPrice * $children);
                 }
             }

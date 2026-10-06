@@ -255,30 +255,15 @@ class Coupon extends Model
         $coupon = static::where('code', $normalized)->first();
 
         if ($coupon) {
+            // Respect database status, or settings toggle if either is active for MATCH5/SAVE5
             if ($normalized === 'MATCH5') {
-                if ($coupon->getRawOriginal('status') === 'active' || $conciergeActive) {
-                    $coupon->status = 'active';
-                } else {
-                    $coupon->status = 'inactive';
-                }
-            }
-            if ($normalized === 'SAVE5') {
-                if ($coupon->getRawOriginal('status') === 'active' || $exitIntentActive) {
-                    $coupon->status = 'active';
-                } else {
-                    $coupon->status = 'inactive';
-                }
-            }
-            if ($normalized === 'DUNESWELCOME') {
-                if ($coupon->getRawOriginal('status') === 'active') {
-                    $coupon->status = 'active';
-                } else {
-                    try {
-                        $bannerDisabled = DB::table('settings')->whereIn('setting_key', ['top_promo_banner_active', 'promo_top_banner_enabled'])->where('setting_value', '0')->exists();
-                        if (! $bannerDisabled) {
-                            $coupon->status = 'active';
-                        }
-                    } catch (\Throwable $e) {}
+                $coupon->status = ($coupon->getRawOriginal('status') === 'active' || $conciergeActive) ? 'active' : 'inactive';
+            } elseif ($normalized === 'SAVE5') {
+                $coupon->status = ($coupon->getRawOriginal('status') === 'active' || $exitIntentActive) ? 'active' : 'inactive';
+            } else {
+                $rawStatus = $coupon->getRawOriginal('status');
+                if (in_array($normalized, ['DUNESWELCOME', 'FIRST25']) || str_starts_with($normalized, 'FIRST25-')) {
+                    $coupon->status = ($rawStatus === 'active') ? 'active' : 'inactive';
                 }
             }
 

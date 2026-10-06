@@ -58,7 +58,7 @@
 <section class="hero-subpage bg-slate-950 text-white relative overflow-hidden" style="padding-top: calc(var(--header-h, 72px) + 2.5rem);">
     <div class="absolute inset-0 w-full h-full bg-[radial-gradient(ellipse_at_15%_20%,rgba(246,144,68,0.18)_0%,transparent_60%)]"></div>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <nav aria-label="breadcrumb">
+        <nav aria-label="{{ __('ui.common.breadcrumb') }}">
             <ol class="flex items-center gap-2 text-xs sm:text-sm text-white/70 mb-4">
                 <li><a href="{{ localized_route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') }}</a></li>
                 <li><span class="text-white/40">/</span></li>
@@ -130,14 +130,14 @@
             <div class="lg:col-span-6">
                 <div class="relative">
                     <img src="{{ asset('images/dubai-desert-safari-tour-dune-discovery-tourism.avif') }}" alt="Dunes Discovery Tourism Desert Safari Experience Dubai" width="800" height="600" loading="lazy" class="w-full rounded-2xl shadow-xl object-cover" onerror="this.src='https://placehold.co/800x600/F58F43/white?text=Our+Story'">
-                    <div class="hidden sm:block absolute -bottom-6 -right-6 bg-primary text-white p-5 rounded-2xl shadow-2xl">
+                    <div class="hidden sm:block absolute -bottom-6 -end-6 bg-primary text-white p-5 rounded-2xl shadow-2xl">
                         <div class="text-2xl font-black mb-0.5">{{ __('ui.about_story.years_exp') }}</div>
                         <span class="text-xs text-white/80 block">{{ __('ui.about_story.years_sub') }}</span>
                     </div>
                 </div>
             </div>
             <div class="lg:col-span-6">
-                <div class="lg:pl-6">
+                <div class="lg:ps-6">
                     <div class="inline-flex items-center gap-2 mb-3">
                         <span class="bg-primary/10 text-primary px-3.5 py-1 rounded-full text-xs font-bold">{{ __('ui.about_story.badge') }}</span>
                     </div>

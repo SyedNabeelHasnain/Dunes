@@ -40,7 +40,7 @@
         <span>CODE: <strong class="font-mono font-black">{{ $topBannerCode }}</strong></span>
         <i class="bi bi-clipboard"></i>
     </button>
-    <button type="button" class="text-white/60 hover:text-white transition-colors absolute end-3 top-1/2 -translate-y-1/2 p-1 text-xs cursor-pointer" aria-label="Dismiss announcement" onclick="document.getElementById('dunesTopPromoBanner').style.display='none'; if(window.syncHeaderHeight) window.syncHeaderHeight();">
+    <button type="button" class="text-white/60 hover:text-white transition-colors absolute end-3 top-1/2 -translate-y-1/2 p-1 text-xs cursor-pointer" aria-label="{{ __('ui.common.close') }}" onclick="document.getElementById('dunesTopPromoBanner').style.display='none'; if(window.syncHeaderHeight) window.syncHeaderHeight();">
         <i class="bi bi-x-lg"></i>
     </button>
 </div>

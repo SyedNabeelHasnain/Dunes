@@ -109,38 +109,38 @@
                         </div>
                         <input type="hidden" name="rating" id="ratingInput" value="{{ $score }}">
                         <div class="text-amber-400 text-xs sm:text-sm font-bold mt-2.5" id="ratingLabel">
-                            {{ $score == 5 ? '5 Stars - Outstanding Desert Safari!' : ($score == 4 ? '4 Stars - Very Good Experience' : 'Tell us how we can improve') }}
+                            {{ $score == 5 ? __('ui.review_submit.rating_5') : ($score == 4 ? __('ui.review_submit.rating_4') : __('ui.review_submit.rating_improve')) }}
                         </div>
                     </div>
 
                     @if(!$booking->id)
                     <!-- Guest Name -->
                     <div class="mb-4">
-                        <label for="guestName" class="block text-white text-xs sm:text-sm font-bold mb-1.5">Your Full Name <span class="text-rose-500">*</span></label>
-                        <input type="text" name="guest_name" id="guestName" required class="w-full bg-slate-950 border border-slate-700 focus:border-primary text-white rounded-xl px-4 py-3 text-sm focus:outline-none transition-colors" placeholder="e.g., Sarah Jenkins" value="{{ old('guest_name') }}">
+                        <label for="guestName" class="block text-white text-xs sm:text-sm font-bold mb-1.5">{{ __('ui.review_submit.full_name') }} <span class="text-rose-500">*</span></label>
+                        <input type="text" name="guest_name" id="guestName" required class="w-full bg-slate-950 border border-slate-700 focus:border-primary text-white rounded-xl px-4 py-3 text-sm focus:outline-none transition-colors" placeholder="{{ __('ui.booking.name_placeholder') }}" value="{{ old('guest_name') }}">
                     </div>
                     @endif
 
                     <!-- Review Title -->
                     <div class="mb-4">
-                        <label for="reviewTitle" class="block text-white text-xs sm:text-sm font-bold mb-1.5">Headline / Short Title</label>
-                        <input type="text" name="review_title" id="reviewTitle" class="w-full bg-slate-950 border border-slate-700 focus:border-primary text-white rounded-xl px-4 py-3 text-sm focus:outline-none transition-colors" placeholder="e.g., Unforgettable sunset & high dune bashing!" value="{{ old('review_title') }}">
+                        <label for="reviewTitle" class="block text-white text-xs sm:text-sm font-bold mb-1.5">{{ __('ui.review_submit.headline') }}</label>
+                        <input type="text" name="review_title" id="reviewTitle" class="w-full bg-slate-950 border border-slate-700 focus:border-primary text-white rounded-xl px-4 py-3 text-sm focus:outline-none transition-colors" placeholder="{{ __('ui.review_submit.headline_placeholder') }}" value="{{ old('review_title') }}">
                     </div>
 
                     <!-- Review Text -->
                     <div class="mb-6">
-                        <label for="reviewText" class="block text-white text-xs sm:text-sm font-bold mb-1.5">Your Review & Story <span class="text-rose-500">*</span></label>
-                        <textarea name="review_text" id="reviewText" rows="4" required class="w-full bg-slate-950 border border-slate-700 focus:border-primary text-white rounded-xl p-4 text-sm focus:outline-none transition-colors leading-relaxed" placeholder="Tell future guests about your safari captain, the red dunes drive, live shows, and food...">{{ old('review_text') }}</textarea>
-                        <span class="text-slate-400 text-[11px] block mt-1">Minimum 10 characters. Authentic guest feedback helps travelers make confident plans.</span>
+                        <label for="reviewText" class="block text-white text-xs sm:text-sm font-bold mb-1.5">{{ __('ui.review_submit.story') }} <span class="text-rose-500">*</span></label>
+                        <textarea name="review_text" id="reviewText" rows="4" required class="w-full bg-slate-950 border border-slate-700 focus:border-primary text-white rounded-xl p-4 text-sm focus:outline-none transition-colors leading-relaxed" placeholder="{{ __('ui.review_submit.story_placeholder') }}">{{ old('review_text') }}</textarea>
+                        <span class="text-slate-400 text-[11px] block mt-1">{{ __('ui.review_submit.min_chars') }}</span>
                     </div>
 
                     <!-- Photo Upload Dropzone -->
                     <div class="mb-8">
-                        <label class="block text-white text-xs sm:text-sm font-bold mb-2">Upload Safari Photos <span class="text-slate-400 font-normal">(Optional, up to 4 photos)</span></label>
+                        <label class="block text-white text-xs sm:text-sm font-bold mb-2">{{ __('ui.review_submit.upload_photos') }} <span class="text-slate-400 font-normal">{{ __('ui.review_submit.upload_hint') }}</span></label>
                         <div class="border-2 border-dashed border-amber-500/40 hover:border-primary rounded-2xl p-6 text-center bg-slate-950/60 hover:bg-slate-950/90 cursor-pointer transition-all" id="photoDropzone" onclick="document.getElementById('photoInput').click()">
                             <i class="bi bi-camera-fill text-amber-400 text-3xl block mb-2"></i>
-                            <span class="text-white font-bold text-xs sm:text-sm block">Click or Drop Photos Here</span>
-                            <small class="text-slate-400 text-[11px] block mt-0.5">JPG, PNG, WEBP up to 5MB each (Dune photos, buggy action, sunset selfies)</small>
+                            <span class="text-white font-bold text-xs sm:text-sm block">{{ __('ui.review_submit.dropzone_title') }}</span>
+                            <small class="text-slate-400 text-[11px] block mt-0.5">{{ __('ui.review_submit.dropzone_desc') }}</small>
                             <input type="file" name="photos[]" id="photoInput" class="hidden" multiple accept="image/jpeg,image/png,image/webp,image/avif">
                         </div>
                         <div class="flex flex-wrap gap-2.5 mt-3" id="photoPreviewArea"></div>
@@ -148,7 +148,7 @@
 
                     <!-- Submit Button -->
                     <button type="submit" class="btn-desert-animated w-full font-bold rounded-full py-4 text-white text-sm sm:text-base shadow-xl inline-flex items-center justify-center gap-2 cursor-pointer">
-                        <i class="bi bi-send-fill"></i> Submit My Review & Photos
+                        <i class="bi bi-send-fill"></i> {{ __('ui.review_submit.submit_btn') }}
                     </button>
                 </form>
 
@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         div.className = 'relative w-20 h-20 rounded-xl overflow-hidden border border-white/20 shadow-sm';
                         div.innerHTML = `
                             <img src="${e.target.result}" alt="Safari photo preview" class="w-full h-full object-cover">
-                            <button type="button" class="absolute top-1 right-1 bg-black/75 hover:bg-black text-white rounded-full w-5 h-5 flex items-center justify-center text-xs cursor-pointer" title="Remove">&times;</button>
+                            <button type="button" class="absolute top-1 end-1 bg-black/75 hover:bg-black text-white rounded-full w-5 h-5 flex items-center justify-center text-xs cursor-pointer" title="{{ __('ui.common.remove') }}">&times;</button>
                         `;
                         div.querySelector('button').addEventListener('click', function (ev) {
                             ev.stopPropagation();

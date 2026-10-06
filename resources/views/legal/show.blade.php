@@ -132,7 +132,7 @@
 <!-- Hero / Page Header -->
 <section class="page-header hero-subpage relative overflow-hidden bg-slate-950 text-white" style="padding-top: calc(var(--header-h, 72px) + 2.5rem);">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <nav aria-label="breadcrumb" class="mb-4">
+        <nav aria-label="{{ __('ui.common.breadcrumb') }}" class="mb-4">
             <ol class="flex items-center gap-2 text-xs text-white/75 flex-wrap">
                 <li><a href="{{ localized_route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') ?? 'Home' }}</a></li>
                 <li class="text-white/40">/</li>
@@ -235,20 +235,20 @@
                                     @foreach($page->sections as $section)
                                         <div class="legal-section-block pt-2" id="sec-{{ $section->id }}">
                                             <div class="flex items-start justify-between gap-3 mb-3">
-                                                <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 border-l-4 border-primary pl-3">
+                                                <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 border-s-4 border-primary ps-3">
                                                     {{ $section->heading }}
                                                 </h2>
-                                                <a href="#sec-{{ $section->id }}" class="text-slate-400 hover:text-primary transition-colors text-xs pt-1" title="Direct Link to Clause">
+                                                <a href="#sec-{{ $section->id }}" class="text-slate-400 hover:text-primary transition-colors text-xs pt-1" title="{{ __('ui.common.direct_link') }}">
                                                     <i class="bi bi-link-45deg text-lg"></i>
                                                 </a>
                                             </div>
 
                                             @if($section->subheading)
-                                                <h3 class="text-sm font-bold text-slate-600 mb-3 ml-4">{{ $section->subheading }}</h3>
+                                                <h3 class="text-sm font-bold text-slate-600 mb-3 ms-4">{{ $section->subheading }}</h3>
                                             @endif
 
                                             @if($section->items->count() > 0)
-                                                <ul class="space-y-3 ml-2 list-none p-0">
+                                                <ul class="space-y-3 ms-2 list-none p-0">
                                                     @foreach($section->items as $item)
                                                         <li class="flex items-start gap-3">
                                                             <i class="bi bi-check-circle-fill text-primary mt-1 shrink-0 text-sm"></i>
@@ -274,7 +274,7 @@
                         <!-- Arabic Container (RTL) -->
                         <div id="contentAr" class="legal-content-container legal-rtl hidden">
                             @if($page->description_ar || $page->description)
-                            <div class="p-5 bg-slate-50 rounded-2xl border-r-4 border-primary mb-8 text-slate-700 text-sm sm:text-base leading-loose">
+                            <div class="p-5 bg-slate-50 rounded-2xl border-s-4 border-primary mb-8 text-slate-700 text-sm sm:text-base leading-loose">
                                 {!! nl2br(e($page->description_ar ?: $page->description)) !!}
                             </div>
                             @endif
@@ -284,7 +284,7 @@
                                     @foreach($page->sections as $section)
                                         <div class="legal-section-block pt-2" id="sec-ar-{{ $section->id }}">
                                             <div class="flex items-start justify-between gap-3 mb-3">
-                                                <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 border-r-4 border-primary pr-3">
+                                                <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 border-s-4 border-primary ps-3">
                                                     {{ $section->heading_ar ?: $section->heading }}
                                                 </h2>
                                                 <a href="#sec-ar-{{ $section->id }}" class="text-slate-400 hover:text-primary transition-colors text-xs pt-1" title="رابط مباشر للبند">
@@ -293,11 +293,11 @@
                                             </div>
 
                                             @if($section->subheading_ar || $section->subheading)
-                                                <h3 class="text-sm font-bold text-slate-600 mb-3 mr-4">{{ $section->subheading_ar ?: $section->subheading }}</h3>
+                                                <h3 class="text-sm font-bold text-slate-600 mb-3 ms-4">{{ $section->subheading_ar ?: $section->subheading }}</h3>
                                             @endif
 
                                             @if($section->items->count() > 0)
-                                                <ul class="space-y-3 mr-2 list-none p-0">
+                                                <ul class="space-y-3 ms-2 list-none p-0">
                                                     @foreach($section->items as $item)
                                                         <li class="flex items-start gap-3">
                                                             <i class="bi bi-check-circle-fill text-primary mt-1 shrink-0 text-sm"></i>

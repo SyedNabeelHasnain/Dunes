@@ -234,7 +234,7 @@ class PageController extends Controller
     public function logWhatsapp(Request $request): JsonResponse
     {
         $request->validate([
-            'phone' => 'nullable|string|max:50',
+            'phone' => ['nullable', 'string', 'max:50', 'regex:/^([\+]?[0-9\s\-\(\)\.]{5,25}|N\/A)?$/i'],
             'name' => 'nullable|string|max:100',
             'tour_name' => 'nullable|string|max:150',
             'page_url' => 'nullable|string|max:255',

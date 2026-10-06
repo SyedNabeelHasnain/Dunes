@@ -197,7 +197,7 @@
                                 $imgFile = !empty($t->hero_image) ? preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->hero_image) : 'desert-safari-poster.avif';
                             @endphp
                             <img src="{{ asset('images/' . $imgFile) }}" width="400" height="250" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy" class="w-full h-full object-cover">
-                            <div class="absolute top-2.5 left-2.5 rtl:left-auto rtl:right-2.5 flex flex-col gap-1.5">
+                            <div class="absolute top-2.5 start-2.5 flex flex-col gap-1.5">
                                 @if($t->is_bestseller)
                                 <span class="bg-amber-400 text-slate-950 font-bold rounded-full px-2.5 py-0.5 text-[10px] uppercase shadow-xs">
                                     ⭐ {{ __('ui.home_popular.bestseller') }}
@@ -218,9 +218,9 @@
                                 
                                 <div class="flex flex-wrap gap-3 text-xs text-slate-500 mb-3">
                                     @if($t->pickup_time)
-                                    <span><i class="bi bi-clock-history mr-1 rtl:mr-0 rtl:ml-1 text-primary"></i>{{ $t->pickup_time }} - {{ $t->dropoff_time }}</span>
+                                    <span><i class="bi bi-clock-history me-1 text-primary"></i>{{ $t->pickup_time }} - {{ $t->dropoff_time }}</span>
                                     @endif
-                                    <span><i class="bi bi-star-fill text-amber-400 mr-1 rtl:mr-0 rtl:ml-1"></i>{{ $t->rating ?? '4.9' }} ({{ $t->review_count ?? '500+' }})</span>
+                                    <span><i class="bi bi-star-fill text-amber-400 me-1"></i>{{ $t->rating ?? '4.9' }} ({{ $t->review_count ?? '500+' }})</span>
                                 </div>
 
                                 <p class="text-slate-600 text-xs sm:text-sm leading-relaxed mb-4">
@@ -317,7 +317,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     @foreach($globalAddons as $addon)
                     <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex justify-between items-center">
-                        <div class="pr-2 rtl:pr-0 rtl:pl-2">
+                        <div class="pe-2">
                             <div class="font-bold text-slate-900 text-xs">{{ $addon->name }}</div>
                             @if($addon->description)
                             <span class="text-slate-500 text-[10px] block line-clamp-1">{{ Str::limit($addon->description, 45) }}</span>

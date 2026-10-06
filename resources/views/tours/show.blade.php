@@ -255,7 +255,7 @@ if(window.fbq){
 <section class="relative min-h-[50vh] flex items-end bg-cover bg-center overflow-hidden" style="background: url('{{ $heroAvifUrl }}') center/cover no-repeat;">
     <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-black/20"></div>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full pb-10 pt-36 sm:pt-40 lg:pt-44 text-white">
-        <nav aria-label="breadcrumb" class="mb-4">
+        <nav aria-label="{{ __('ui.common.breadcrumb') }}" class="mb-4">
             <ol class="flex items-center gap-2 text-xs sm:text-sm text-white/75 flex-wrap">
                 <li><a href="{{ localized_route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') }}</a></li>
                 <li><span class="text-white/40">/</span></li>

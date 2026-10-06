@@ -8,11 +8,11 @@
         <button type="button" 
                 class="absolute top-2 end-2.5 w-6 h-6 rounded-full text-slate-500 hover:text-slate-800 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer text-base leading-none" 
                 id="socialProofCloseBtn" 
-                aria-label="Dismiss">&times;</button>
+                aria-label="{{ __('ui.common.close') }}">&times;</button>
         
         <div class="relative shrink-0 w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shadow-2xs">
             <img id="spTourImage" src="{{ asset('images/evening-desert-safari-dubai-hero.avif') }}" alt="Tour" class="w-full h-full object-cover" width="48" height="48" loading="lazy">
-            <span class="absolute -bottom-1 -end-1 bg-white rounded-full p-0.5 shadow-2xs text-emerald-500 text-xs flex items-center justify-center" title="Verified Guest Booking">
+            <span class="absolute -bottom-1 -end-1 bg-white rounded-full p-0.5 shadow-2xs text-emerald-500 text-xs flex items-center justify-center" title="{{ __('ui.trust.instant_confirmation') }}">
                 <i class="bi bi-patch-check-fill"></i>
             </span>
         </div>

@@ -415,8 +415,9 @@ class GoogleThingsToDoFeedController extends Controller
                     $tierSlug = $tier->slug ?? (string) $tier->id;
                     $bookingUrl = url('/' . $tour->slug) . '?tier=' . $tierSlug . '&utm_source=google&utm_medium=things_to_do&utm_campaign=gttd_free';
 
-                    $priceUnits = (int) floor($priceNum);
-                    $priceNanos = (int) round(($priceNum - $priceUnits) * 1000000000);
+                    $cents = (int) round($priceNum * 100);
+                    $priceUnits = intdiv($cents, 100);
+                    $priceNanos = ($cents % 100) * 10000000;
 
                     $priceOption = [
                         'price' => [

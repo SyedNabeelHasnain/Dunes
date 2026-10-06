@@ -76,7 +76,7 @@
                     </div>
 
                     <div class="mb-6">
-                        <input type="text" name="other_reason" class="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-colors" placeholder="Tell us how we can improve (optional)..." maxlength="200">
+                        <input type="text" name="other_reason" class="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-colors" placeholder="{{ __('ui.review_submit.feedback_placeholder') }}" maxlength="200">
                     </div>
 
                     <div class="space-y-2.5">

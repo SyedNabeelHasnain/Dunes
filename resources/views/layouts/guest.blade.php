@@ -29,13 +29,13 @@
     </head>
     <body class="font-sans antialiased bg-gradient-to-br from-slate-50 via-amber-50/25 to-slate-100 text-slate-800 min-h-screen flex flex-col justify-center items-center py-10 px-4 sm:px-6 relative overflow-x-hidden selection:bg-[#F27405] selection:text-white">
         <!-- Ambient Decorative Blur Accents -->
-        <div class="absolute -top-32 -left-32 w-80 h-80 rounded-full bg-amber-400/10 blur-3xl pointer-events-none"></div>
-        <div class="absolute -bottom-32 -right-32 w-80 h-80 rounded-full bg-[#F27405]/10 blur-3xl pointer-events-none"></div>
+        <div class="absolute -top-32 -start-32 w-80 h-80 rounded-full bg-amber-400/10 blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-32 -end-32 w-80 h-80 rounded-full bg-[#F27405]/10 blur-3xl pointer-events-none"></div>
 
         <div class="w-full max-w-md relative z-10">
             <!-- Brand Logo -->
             <div class="text-center mb-6">
-                <a href="{{ url('/') }}" class="inline-block transition-transform duration-200 hover:scale-105" title="Return to Dunes Discovery Tourism Homepage">
+                <a href="{{ url('/') }}" class="inline-block transition-transform duration-200 hover:scale-105" title="{{ config('app.name', 'Dunes Discovery Tourism') }}">
                     <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'Dunes Discovery Tourism') }}" class="h-16 sm:h-20 w-auto object-contain mx-auto drop-shadow-xs">
                 </a>
             </div>
