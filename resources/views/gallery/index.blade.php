@@ -366,7 +366,7 @@
     <!-- ── Fullscreen Interactive Lightbox Modal ─────────────────────────────── -->
     <div x-show="lightboxOpen" 
          x-cloak 
-         class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/95 backdrop-blur-md"
+         class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4"
          x-transition:enter="ease-out duration-200"
          x-transition:enter-start="opacity-0"
          x-transition:enter-end="opacity-100"
@@ -376,33 +376,37 @@
          role="dialog"
          aria-modal="true">
 
+        <!-- Darkened Backdrop Overlay (clicking backdrop closes lightbox) -->
+        <div class="fixed inset-0 bg-slate-950/95 backdrop-blur-md transition-opacity cursor-pointer"
+             @click="closeLightbox()"></div>
+
         <!-- Close Button Top Right -->
         <button type="button" 
-                @click="closeLightbox()" 
-                class="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 w-11 h-11 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-colors cursor-pointer border border-white/20">
+                @click.stop="closeLightbox()" 
+                class="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 w-11 h-11 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-lg hover:scale-105 active:scale-95">
             <i class="bi bi-x-lg text-lg"></i>
             <span class="sr-only">Close</span>
         </button>
 
         <!-- Previous Button -->
         <button type="button" 
-                @click="prevItem()" 
-                class="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-colors cursor-pointer border border-white/20">
+                @click.stop="prevItem()" 
+                class="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-50 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-lg hover:scale-105 active:scale-95">
             <i class="bi bi-chevron-left text-xl rtl:rotate-180"></i>
             <span class="sr-only">Previous</span>
         </button>
 
         <!-- Next Button -->
         <button type="button" 
-                @click="nextItem()" 
-                class="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-colors cursor-pointer border border-white/20">
+                @click.stop="nextItem()" 
+                class="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 z-50 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-lg hover:scale-105 active:scale-95">
             <i class="bi bi-chevron-right text-xl rtl:rotate-180"></i>
             <span class="sr-only">Next</span>
         </button>
 
         <!-- Modal Content Container -->
         <div class="relative z-20 w-full max-w-5xl max-h-[92vh] flex flex-col lg:flex-row bg-slate-900 rounded-3xl overflow-hidden border border-white/10 shadow-2xl" 
-             @click.outside="closeLightbox()">
+             @click.stop>
 
             <!-- Media Preview Area -->
             <div class="relative lg:w-3/5 bg-black flex items-center justify-center min-h-[320px] sm:min-h-[440px] max-h-[60vh] lg:max-h-[85vh] p-2">
