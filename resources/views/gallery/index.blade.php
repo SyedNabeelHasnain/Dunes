@@ -114,6 +114,7 @@
         lightboxOpen: false,
         items: @js($filteredItems),
         currentIndex: 0,
+        touchStartX: 0,
         filterCategory(cat) {
             this.category = cat;
         },
@@ -179,7 +180,7 @@
             <div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-none">
                 <button type="button" 
                     @click="filterCategory('all')" 
-                    :class="category === 'all' ? 'bg-slate-900 text-white shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'"
+                    :class="category === 'all' ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'"
                     class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5">
                     <i class="bi bi-grid-fill"></i>
                     <span>{{ __('ui.gallery_section.filter_all') ?? 'All Moments' }}</span>
@@ -366,13 +367,15 @@
     <!-- ── Fullscreen Interactive Lightbox Modal ─────────────────────────────── -->
     <div x-show="lightboxOpen" 
          x-cloak 
-         class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4"
+         class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 select-none"
          x-transition:enter="ease-out duration-200"
          x-transition:enter-start="opacity-0"
          x-transition:enter-end="opacity-100"
          x-transition:leave="ease-in duration-150"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
+         @touchstart.passive="touchStartX = $event.changedTouches[0].screenX"
+         @touchend.passive="const diff = $event.changedTouches[0].screenX - touchStartX; if (diff > 45) prevItem(); else if (diff < -45) nextItem();"
          role="dialog"
          aria-modal="true">
 
@@ -392,7 +395,7 @@
         <button type="button" 
                 @click.stop="prevItem()" 
                 class="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-50 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-lg hover:scale-105 active:scale-95">
-            <i class="bi bi-chevron-left text-xl rtl:rotate-180"></i>
+            <i class="bi bi-chevron-left text-xl"></i>
             <span class="sr-only">Previous</span>
         </button>
 
@@ -400,7 +403,7 @@
         <button type="button" 
                 @click.stop="nextItem()" 
                 class="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 z-50 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-lg hover:scale-105 active:scale-95">
-            <i class="bi bi-chevron-right text-xl rtl:rotate-180"></i>
+            <i class="bi bi-chevron-right text-xl"></i>
             <span class="sr-only">Next</span>
         </button>
 
@@ -419,7 +422,8 @@
                     <img :src="activeItem.url" 
                          :alt="activeItem.review_title || 'Guest Safari Photo'" 
                          class="max-w-full max-h-[58vh] lg:max-h-[80vh] rounded-xl object-contain select-none"
-                         referrerpolicy="no-referrer">
+                         referrerpolicy="no-referrer"
+                         x-on:error="reportBrokenLink(activeItem.url); nextItem();">
                 </template>
             </div>
 

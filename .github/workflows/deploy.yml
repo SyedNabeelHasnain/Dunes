@@ -226,11 +226,13 @@ jobs:
         curl -i -s "https://dunesdiscoverytourism.com/about" | head -n 15
         echo "Testing tours page..."
         curl -i -s "https://dunesdiscoverytourism.com/tours" | head -n 15
+        echo "Testing gallery page..."
+        curl -i -s "https://dunesdiscoverytourism.com/gallery" | head -n 15
         echo "Testing sitemap..."
         curl -i -s "https://dunesdiscoverytourism.com/sitemap-pages.xml" | head -n 15
 
         # Strict HTTP status verification with graceful retry for LiteSpeed worker recycling
-        for url in "https://dunesdiscoverytourism.com/" "https://dunesdiscoverytourism.com/about" "https://dunesdiscoverytourism.com/tours" "https://dunesdiscoverytourism.com/desert-safari-from-dubai-marina" "https://dunesdiscoverytourism.com/sitemap-pages.xml"; do
+        for url in "https://dunesdiscoverytourism.com/" "https://dunesdiscoverytourism.com/about" "https://dunesdiscoverytourism.com/tours" "https://dunesdiscoverytourism.com/gallery" "https://dunesdiscoverytourism.com/desert-safari-from-dubai-marina" "https://dunesdiscoverytourism.com/sitemap-pages.xml"; do
           SUCCESS=0
           for attempt in 1 2 3 4 5; do
             STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$url")

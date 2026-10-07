@@ -514,6 +514,7 @@ if (!function_exists('renderReviewCardMarkup')) {
         activeItem: null,
         lightboxOpen: false,
         currentIndex: 0,
+        touchStartX: 0,
         get visibleItems() {
             if (this.category === 'all') return this.items.slice(0, 8);
             const filtered = this.items.filter(item => {
@@ -691,13 +692,15 @@ if (!function_exists('renderReviewCardMarkup')) {
     <!-- ── Fullscreen Interactive Lightbox Modal for Home ───────────────────────── -->
     <div x-show="lightboxOpen" 
          x-cloak 
-         class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4"
+         class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 select-none"
          x-transition:enter="ease-out duration-200"
          x-transition:enter-start="opacity-0"
          x-transition:enter-end="opacity-100"
          x-transition:leave="ease-in duration-150"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
+         @touchstart.passive="touchStartX = $event.changedTouches[0].screenX"
+         @touchend.passive="const diff = $event.changedTouches[0].screenX - touchStartX; if (diff > 45) prevItem(); else if (diff < -45) nextItem();"
          role="dialog"
          aria-modal="true">
 
@@ -717,7 +720,7 @@ if (!function_exists('renderReviewCardMarkup')) {
         <button type="button" 
                 @click.stop="prevItem()" 
                 class="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-50 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-lg hover:scale-105 active:scale-95">
-            <i class="bi bi-chevron-left text-xl rtl:rotate-180"></i>
+            <i class="bi bi-chevron-left text-xl"></i>
             <span class="sr-only">Previous</span>
         </button>
 
@@ -725,7 +728,7 @@ if (!function_exists('renderReviewCardMarkup')) {
         <button type="button" 
                 @click.stop="nextItem()" 
                 class="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 z-50 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-lg hover:scale-105 active:scale-95">
-            <i class="bi bi-chevron-right text-xl rtl:rotate-180"></i>
+            <i class="bi bi-chevron-right text-xl"></i>
             <span class="sr-only">Next</span>
         </button>
 
@@ -743,7 +746,8 @@ if (!function_exists('renderReviewCardMarkup')) {
                     <img :src="activeItem.url" 
                          :alt="activeItem.review_title || 'Guest Safari Photo'" 
                          class="max-w-full max-h-[58vh] lg:max-h-[80vh] rounded-xl object-contain select-none"
-                         referrerpolicy="no-referrer">
+                         referrerpolicy="no-referrer"
+                         x-on:error="reportBrokenLink(activeItem.url); nextItem();">
                 </template>
             </div>
 
