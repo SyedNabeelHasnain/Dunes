@@ -229,11 +229,19 @@ jobs:
         echo "Testing sitemap..."
         curl -i -s "https://dunesdiscoverytourism.com/sitemap-pages.xml" | head -n 15
 
-        # Strict HTTP status verification
+        # Strict HTTP status verification with graceful retry for LiteSpeed worker recycling
         for url in "https://dunesdiscoverytourism.com/" "https://dunesdiscoverytourism.com/about" "https://dunesdiscoverytourism.com/tours" "https://dunesdiscoverytourism.com/desert-safari-from-dubai-marina" "https://dunesdiscoverytourism.com/sitemap-pages.xml"; do
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$url")
-          echo "Status for $url: $STATUS"
-          if [ "$STATUS" != "200" ]; then
+          SUCCESS=0
+          for attempt in 1 2 3 4 5; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+            echo "Attempt $attempt for $url: status $STATUS"
+            if [ "$STATUS" = "200" ]; then
+              SUCCESS=1
+              break
+            fi
+            sleep 4
+          done
+          if [ $SUCCESS -ne 1 ]; then
             echo "Health check failed for $url with status $STATUS"
             exit 1
           fi
