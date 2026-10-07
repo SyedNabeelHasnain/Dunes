@@ -7,6 +7,7 @@ return [
         'desert_safari' => 'Safari por el Desierto',
         'all_tours' => 'Todas las Experiencias',
         'customizer' => 'Diseña tu Safari',
+        'gallery' => 'Galería de Viajeros',
         'blog' => 'Diario del Safari',
         'about' => 'Sobre Nosotros',
         'contact' => 'Contacto',
@@ -17,6 +18,27 @@ return [
         'search_placeholder' => 'Buscar safaris en el desierto, tours en buggy, dunas...',
         'tours' => 'Tours y Safaris',
         'legal_policies' => 'Términos y Políticas Legales',
+    ],
+
+    // Guest Experience Gallery Section
+    'gallery_section' => [
+        'eyebrow' => 'Momentos de Huéspedes Verificados',
+        'title' => 'Capturado en las Dunas por Nuestros Viajeros',
+        'subtitle' => 'Fotos y videos auténticos y sin filtros compartidos por huéspedes reales en Google Maps y TripAdvisor.',
+        'view_all' => 'Explorar Galería Completa',
+        'all_moments' => 'Todos los Momentos',
+        'verified_review' => 'Opinión Verificada',
+        'book_this' => 'Reservar Este Safari',
+        'close' => 'Cerrar',
+        'prev' => 'Anterior',
+        'next' => 'Siguiente',
+        'photo_by' => 'Publicado por',
+        'filter_all' => 'Todos los Momentos',
+        'filter_red_dunes' => 'Dunas Rojas y Safari',
+        'filter_buggy_quad' => 'Buggies y Quads',
+        'filter_camp_bbq' => 'Campamento y Barbacoa',
+        'filter_sunset_camels' => 'Atardecer y Camellos',
+        'filter_videos' => 'Videos',
     ],
 
     // Common Badges, Units & Trust Signals

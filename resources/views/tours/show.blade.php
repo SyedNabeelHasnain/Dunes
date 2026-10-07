@@ -900,6 +900,225 @@ if(window.fbq){
     </div>
 </section>
 
+<!-- ── Tour Guest Photos & Experience Media Gallery ───────────────────────────── -->
+@if(!empty($tourGalleryItems) && count($tourGalleryItems) > 0)
+<section class="py-10 sm:py-14 bg-slate-900 text-white relative overflow-hidden" 
+    id="tour-gallery"
+    x-data="{
+        items: @js($tourGalleryItems),
+        activeItem: null,
+        lightboxOpen: false,
+        currentIndex: 0,
+        openLightbox(item) {
+            this.currentIndex = this.items.findIndex(i => i.id === item.id);
+            if (this.currentIndex === -1) this.currentIndex = 0;
+            this.activeItem = this.items[this.currentIndex] || item;
+            this.lightboxOpen = true;
+            document.body.classList.add('overflow-hidden');
+        },
+        closeLightbox() {
+            this.lightboxOpen = false;
+            this.activeItem = null;
+            document.body.classList.remove('overflow-hidden');
+        },
+        nextItem() {
+            if (!this.items.length) return;
+            this.currentIndex = (this.currentIndex + 1) % this.items.length;
+            this.activeItem = this.items[this.currentIndex];
+        },
+        prevItem() {
+            if (!this.items.length) return;
+            this.currentIndex = (this.currentIndex - 1 + this.items.length) % this.items.length;
+            this.activeItem = this.items[this.currentIndex];
+        },
+        reportBrokenLink(url, cardElement) {
+            if (cardElement) { cardElement.remove(); }
+            fetch('{{ route('api.gallery.report-broken') }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                body: JSON.stringify({ url: url })
+            }).catch(() => {});
+        }
+    }"
+    @keydown.escape.window="closeLightbox()"
+    @keydown.arrow-right.window="lightboxOpen && nextItem()"
+    @keydown.arrow-left.window="lightboxOpen && prevItem()">
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-6 pb-4 border-b border-white/10">
+            <div>
+                <div class="flex items-center gap-2 mb-1.5">
+                    <span class="bg-primary/20 text-primary border border-primary/40 rounded-full px-3 py-0.5 text-xs font-bold inline-flex items-center gap-1">
+                        <i class="bi bi-camera-fill"></i> Real Safari Media
+                    </span>
+                    <span class="text-white/60 text-xs">• Verified Guests from Google & TripAdvisor</span>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Guest Photos & Moments from this Safari</h2>
+                <p class="text-white/70 text-xs sm:text-sm mt-0.5">Unfiltered photos taken by travelers on our red dunes expeditions and desert adventures.</p>
+            </div>
+            <a href="{{ localized_route('gallery.index') }}" class="btn-desert-animated rounded-full px-4 py-2 text-xs font-bold text-white shadow-xs inline-flex items-center gap-1.5 shrink-0">
+                <i class="bi bi-images"></i> Full Guest Gallery &rarr;
+            </a>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            <template x-for="item in items" :key="item.id">
+                <div class="tour-gallery-card group relative bg-slate-950 rounded-2xl overflow-hidden shadow-md border border-white/10 cursor-pointer aspect-4/3"
+                     @click="openLightbox(item)">
+                    <template x-if="item.type === 'video'">
+                        <div class="relative w-full h-full flex items-center justify-center">
+                            <img :src="item.thumbnail_url" 
+                                 :alt="item.review_title || 'Guest Safari Video'" 
+                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                                 loading="lazy"
+                                 referrerpolicy="no-referrer"
+                                 x-on:error="reportBrokenLink(item.url, $el.closest('.tour-gallery-card'))">
+                            <div class="absolute inset-0 bg-slate-950/40 flex items-center justify-center group-hover:bg-slate-950/20 transition-colors">
+                                <span class="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center shadow-lg">
+                                    <i class="bi bi-play-fill text-lg ml-0.5"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </template>
+                    <template x-if="item.type !== 'video'">
+                        <img :src="item.url" 
+                             :alt="item.review_title || 'Guest Safari Photo'" 
+                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                             loading="lazy"
+                             referrerpolicy="no-referrer"
+                             x-on:error="reportBrokenLink(item.url, $el.closest('.tour-gallery-card'))">
+                    </template>
+
+                    <!-- Top Pill -->
+                    <div class="absolute top-2 inset-x-2 flex items-center justify-between pointer-events-none">
+                        <template x-if="item.source === 'google'">
+                            <span class="bg-white/95 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
+                                <img src="{{ asset('images/Google-G.avif') }}" alt="Google" class="w-2.5 h-2.5 inline-block" width="10" height="10" onerror="this.onerror=null;this.src='{{ asset('images/google.svg') }}'"> Google
+                            </span>
+                        </template>
+                        <template x-if="item.source === 'tripadvisor'">
+                            <span class="bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
+                                <i class="bi bi-star-fill text-[9px] text-amber-300"></i> TripAdvisor
+                            </span>
+                        </template>
+                        <template x-if="item.source !== 'google' && item.source !== 'tripadvisor'">
+                            <span class="bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
+                                Verified
+                            </span>
+                        </template>
+                        <span class="bg-slate-950/80 text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5">
+                            <i class="bi bi-star-fill text-[9px]"></i> 5.0
+                        </span>
+                    </div>
+
+                    <!-- Bottom Overlay -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2.5">
+                        <span class="text-white text-xs font-bold truncate" x-text="item.reviewer_name"></span>
+                        <p class="text-white/80 text-[10px] line-clamp-1" x-text="item.review_text"></p>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <!-- Tour Lightbox Modal -->
+    <div x-show="lightboxOpen" 
+         x-cloak 
+         class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/95 backdrop-blur-md"
+         role="dialog"
+         aria-modal="true">
+
+        <button type="button" 
+                @click="closeLightbox()" 
+                class="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 w-11 h-11 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-colors cursor-pointer border border-white/20">
+            <i class="bi bi-x-lg text-lg"></i>
+            <span class="sr-only">Close</span>
+        </button>
+
+        <button type="button" 
+                @click="prevItem()" 
+                class="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-colors cursor-pointer border border-white/20">
+            <i class="bi bi-chevron-left text-xl rtl:rotate-180"></i>
+            <span class="sr-only">Previous</span>
+        </button>
+
+        <button type="button" 
+                @click="nextItem()" 
+                class="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-colors cursor-pointer border border-white/20">
+            <i class="bi bi-chevron-right text-xl rtl:rotate-180"></i>
+            <span class="sr-only">Next</span>
+        </button>
+
+        <div class="relative z-20 w-full max-w-5xl max-h-[92vh] flex flex-col lg:flex-row bg-slate-900 rounded-3xl overflow-hidden border border-white/10 shadow-2xl" 
+             @click.outside="closeLightbox()">
+
+            <div class="relative lg:w-3/5 bg-black flex items-center justify-center min-h-[300px] sm:min-h-[420px] max-h-[60vh] lg:max-h-[85vh] p-2">
+                <template x-if="activeItem && activeItem.type === 'video'">
+                    <div class="w-full h-full flex items-center justify-center">
+                        <video :src="activeItem.url" controls autoplay class="max-w-full max-h-[58vh] lg:max-h-[80vh] rounded-xl object-contain"></video>
+                    </div>
+                </template>
+                <template x-if="activeItem && activeItem.type !== 'video'">
+                    <img :src="activeItem.url" 
+                         :alt="activeItem.review_title || 'Guest Safari Photo'" 
+                         class="max-w-full max-h-[58vh] lg:max-h-[80vh] rounded-xl object-contain select-none"
+                         referrerpolicy="no-referrer">
+                </template>
+            </div>
+
+            <div class="lg:w-2/5 p-5 sm:p-6 bg-slate-900 text-white flex flex-col justify-between overflow-y-auto max-h-[40vh] lg:max-h-[85vh]">
+                <div>
+                    <div class="flex items-center justify-between gap-3 mb-4 pb-4 border-b border-white/10">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-primary/20 text-primary border border-primary/30 flex items-center justify-center font-black text-sm shrink-0">
+                                <span x-text="activeItem ? activeItem.reviewer_name.charAt(0).toUpperCase() : 'T'"></span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white text-sm sm:text-base leading-tight" x-text="activeItem ? activeItem.reviewer_name : 'Verified Guest'"></h4>
+                                <div class="flex items-center gap-1.5 mt-0.5">
+                                    <template x-if="activeItem && activeItem.source === 'google'">
+                                        <span class="text-blue-400 font-bold text-xs inline-flex items-center gap-1">
+                                            <img src="{{ asset('images/Google-G.avif') }}" alt="Google" class="w-3 h-3 inline-block" width="12" height="12" onerror="this.onerror=null;this.src='{{ asset('images/google.svg') }}'"> Google
+                                        </span>
+                                    </template>
+                                    <template x-if="activeItem && activeItem.source === 'tripadvisor'">
+                                        <span class="text-emerald-400 font-bold text-xs inline-flex items-center gap-1">
+                                            <i class="bi bi-star-fill text-xs text-amber-400"></i> TripAdvisor
+                                        </span>
+                                    </template>
+                                    <span class="text-white/40 text-xs">•</span>
+                                    <span class="text-xs text-white/60" x-text="activeItem ? activeItem.formatted_date : ''"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-amber-400 text-sm flex gap-0.5">
+                            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        </div>
+                    </div>
+
+                    <template x-if="activeItem && activeItem.review_title">
+                        <h5 class="text-base sm:text-lg font-bold text-white mb-2 leading-snug" x-text="activeItem.review_title"></h5>
+                    </template>
+                    <p class="text-white/80 text-xs sm:text-sm leading-relaxed mb-6 whitespace-pre-line" x-text="activeItem ? (activeItem.full_review_text || activeItem.review_text) : ''"></p>
+                </div>
+
+                <div class="pt-4 border-t border-white/10 space-y-3">
+                    <button type="button" 
+                            class="btn-desert-animated w-full py-3 px-4 rounded-xl font-bold text-sm text-white shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+                            @click="closeLightbox(); $store.modal.open('booking', { tourId: {{ $tour->id }} });">
+                        <i class="bi bi-calendar-check-fill text-base"></i>
+                        <span>Book This Experience Now</span>
+                    </button>
+                    <a href="{{ localized_route('gallery.index') }}" class="w-full py-2.5 px-4 rounded-xl font-bold text-xs text-center text-white/80 hover:text-white bg-white/10 hover:bg-white/20 transition-colors block">
+                        Browse More Guest Photos & Videos &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@endif
+
 <!-- ── Verified Guest Reviews & Traveler Photos Section ───────────────────────────── -->
 <section class="py-12 sm:py-16 bg-slate-50 border-t border-b border-slate-200" id="guest-reviews">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

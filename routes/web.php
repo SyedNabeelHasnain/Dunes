@@ -25,6 +25,7 @@ use App\Http\Controllers\Admin\AdminWhatsappController;
 use App\Http\Controllers\AjaxGatewayController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\GoogleThingsToDoFeedController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LegalController;
@@ -42,6 +43,8 @@ use Illuminate\Support\Facades\Route;
 
 // ── Front-Facing Pages ────────────────────────────────────────────────────────
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index');
+Route::post('/api/gallery/report-broken', [GalleryController::class, 'reportBroken'])->name('api.gallery.report-broken');
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 Route::get('/faq', [PageController::class, 'faq'])->name('faq');
@@ -336,6 +339,7 @@ Route::prefix('{locale}')
     ->where(['locale' => '^(?!admin|api|ajax|storage|images|css|js|favicon\.ico|en$)[a-z]{2}(-[a-z]{2})?$'])
     ->group(function () {
         Route::get('/', [HomeController::class, 'index'])->name('locale.home');
+        Route::get('/gallery', [GalleryController::class, 'index'])->name('locale.gallery.index');
         Route::get('/about', [PageController::class, 'about'])->name('locale.about');
         Route::get('/contact', [PageController::class, 'contact'])->name('locale.contact');
         Route::get('/faq', [PageController::class, 'faq'])->name('locale.faq');

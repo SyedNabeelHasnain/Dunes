@@ -175,6 +175,12 @@ class HomeController extends Controller
         $ogImageSetting = $settingsService->get('seo_home_og_image');
         $ogImage = $ogImageSetting ? asset(ltrim($ogImageSetting, '/')) : asset('images/desert-safari-poster.avif');
 
-        return view('index', compact('categories', 'bestsellers', 'reviews', 'faqs', 'allActiveTours', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
+        try {
+            $galleryItems = app(\App\Services\ReviewMediaGalleryService::class)->getHomepageItems(12);
+        } catch (\Throwable $e) {
+            $galleryItems = [];
+        }
+
+        return view('index', compact('categories', 'bestsellers', 'reviews', 'faqs', 'allActiveTours', 'galleryItems', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
     }
 }

@@ -505,6 +505,301 @@ if (!function_exists('renderReviewCardMarkup')) {
     </div>
 </section>
 
+<!-- ── Real Moments Captured by Our Guests (Reviews Media Gallery) ────────────── -->
+@if(!empty($galleryItems) && count($galleryItems) > 0)
+<section class="py-12 sm:py-20 bg-slate-900 text-white relative overflow-hidden" 
+    x-data="{
+        category: 'all',
+        items: @js($galleryItems),
+        activeItem: null,
+        lightboxOpen: false,
+        currentIndex: 0,
+        get visibleItems() {
+            if (this.category === 'all') return this.items.slice(0, 8);
+            const filtered = this.items.filter(item => {
+                if (this.category === 'videos') return item.type === 'video';
+                return item.category === this.category;
+            });
+            return filtered.length ? filtered.slice(0, 8) : this.items.slice(0, 8);
+        },
+        openLightbox(item) {
+            const list = this.visibleItems;
+            this.currentIndex = list.findIndex(i => i.id === item.id);
+            if (this.currentIndex === -1) this.currentIndex = 0;
+            this.activeItem = list[this.currentIndex] || item;
+            this.lightboxOpen = true;
+            document.body.classList.add('overflow-hidden');
+        },
+        closeLightbox() {
+            this.lightboxOpen = false;
+            this.activeItem = null;
+            document.body.classList.remove('overflow-hidden');
+        },
+        nextItem() {
+            const list = this.visibleItems;
+            if (!list.length) return;
+            this.currentIndex = (this.currentIndex + 1) % list.length;
+            this.activeItem = list[this.currentIndex];
+        },
+        prevItem() {
+            const list = this.visibleItems;
+            if (!list.length) return;
+            this.currentIndex = (this.currentIndex - 1 + list.length) % list.length;
+            this.activeItem = list[this.currentIndex];
+        },
+        reportBrokenLink(url, cardElement) {
+            if (cardElement) { cardElement.remove(); }
+            fetch('{{ route('api.gallery.report-broken') }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                body: JSON.stringify({ url: url })
+            }).catch(() => {});
+        }
+    }"
+    @keydown.escape.window="closeLightbox()"
+    @keydown.arrow-right.window="lightboxOpen && nextItem()"
+    @keydown.arrow-left.window="lightboxOpen && prevItem()">
+
+    <div class="absolute inset-0 w-full h-full bg-[radial-gradient(ellipse_at_80%_20%,rgba(246,144,68,0.15)_0%,transparent_60%)] pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <!-- Section Header -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 pb-6 border-b border-white/10">
+            <div>
+                <div class="inline-flex items-center gap-2 rounded-full bg-primary/20 border border-primary/40 text-primary px-3.5 py-1 text-xs font-bold mb-3 shadow-xs">
+                    <i class="bi bi-camera-fill"></i>
+                    <span>{{ __('ui.gallery_section.eyebrow') ?? 'Verified Guest Moments' }}</span>
+                </div>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-2">
+                    {{ __('ui.gallery_section.title') ?? 'Captured in the Dunes by Our Travelers' }}
+                </h2>
+                <p class="text-white/70 text-sm sm:text-base max-w-2xl leading-relaxed">
+                    {{ __('ui.gallery_section.subtitle') ?? 'Authentic, unfiltered photos and videos posted by real guests on Google Maps and TripAdvisor.' }}
+                </p>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="{{ localized_route('gallery.index') }}" class="btn-desert-animated text-xs sm:text-sm font-bold rounded-full px-5 py-2.5 text-white shadow-md inline-flex items-center gap-2 cursor-pointer whitespace-nowrap">
+                    <span>{{ __('ui.gallery_section.view_all') ?? 'Explore Full Gallery' }}</span>
+                    <i class="bi bi-arrow-right rtl:rotate-180"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Filter Tabs for Home -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-4 mb-8 scrollbar-none">
+            <button type="button" @click="category = 'all'" 
+                :class="category === 'all' ? 'bg-primary text-white shadow-sm' : 'bg-white/10 hover:bg-white/20 text-white/80'"
+                class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5">
+                <i class="bi bi-grid-fill"></i>
+                <span>{{ __('ui.gallery_section.filter_all') ?? 'All Moments' }}</span>
+            </button>
+            <button type="button" @click="category = 'red_dunes'" 
+                :class="category === 'red_dunes' ? 'bg-primary text-white shadow-sm' : 'bg-white/10 hover:bg-white/20 text-white/80'"
+                class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5">
+                <i class="bi bi-compass-fill"></i>
+                <span>{{ __('ui.gallery_section.filter_red_dunes') ?? 'Red Dunes' }}</span>
+            </button>
+            <button type="button" @click="category = 'buggy_quad'" 
+                :class="category === 'buggy_quad' ? 'bg-primary text-white shadow-sm' : 'bg-white/10 hover:bg-white/20 text-white/80'"
+                class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5">
+                <i class="bi bi-lightning-charge-fill"></i>
+                <span>{{ __('ui.gallery_section.filter_buggy_quad') ?? 'Buggies & Quads' }}</span>
+            </button>
+            <button type="button" @click="category = 'camp_bbq'" 
+                :class="category === 'camp_bbq' ? 'bg-primary text-white shadow-sm' : 'bg-white/10 hover:bg-white/20 text-white/80'"
+                class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5">
+                <i class="bi bi-fire"></i>
+                <span>{{ __('ui.gallery_section.filter_camp_bbq') ?? 'Camp & BBQ' }}</span>
+            </button>
+            <button type="button" @click="category = 'sunset_camels'" 
+                :class="category === 'sunset_camels' ? 'bg-primary text-white shadow-sm' : 'bg-white/10 hover:bg-white/20 text-white/80'"
+                class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5">
+                <i class="bi bi-sunset-fill"></i>
+                <span>{{ __('ui.gallery_section.filter_sunset_camels') ?? 'Sunset & Camels' }}</span>
+            </button>
+        </div>
+
+        <!-- Grid of Media Items -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
+            <template x-for="item in visibleItems" :key="item.id">
+                <div class="gallery-home-card group relative bg-slate-950 rounded-2xl overflow-hidden shadow-lg border border-white/10 cursor-pointer flex flex-col"
+                     @click="openLightbox(item)">
+                    <div class="relative w-full aspect-4/3 overflow-hidden">
+                        <template x-if="item.type === 'video'">
+                            <div class="relative w-full h-full flex items-center justify-center">
+                                <img :src="item.thumbnail_url" 
+                                     :alt="item.review_title || 'Guest Safari Video'" 
+                                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                                     loading="lazy"
+                                     referrerpolicy="no-referrer"
+                                     x-on:error="reportBrokenLink(item.url, $el.closest('.gallery-home-card'))">
+                                <div class="absolute inset-0 bg-slate-950/40 flex items-center justify-center group-hover:bg-slate-950/20 transition-colors">
+                                    <span class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center shadow-lg">
+                                        <i class="bi bi-play-fill text-xl ml-0.5"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </template>
+                        <template x-if="item.type !== 'video'">
+                            <img :src="item.url" 
+                                 :alt="item.review_title || 'Guest Safari Photo'" 
+                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                                 loading="lazy"
+                                 referrerpolicy="no-referrer"
+                                 x-on:error="reportBrokenLink(item.url, $el.closest('.gallery-home-card'))">
+                        </template>
+
+                        <!-- Top Source Pill -->
+                        <div class="absolute top-2 inset-x-2 flex items-center justify-between pointer-events-none">
+                            <span class="bg-slate-950/80 backdrop-blur-md text-white text-[10px] font-bold px-2 py-0.5 rounded-full border border-white/10" x-text="item.category_label"></span>
+                            <template x-if="item.source === 'google'">
+                                <span class="bg-white/95 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
+                                    <img src="{{ asset('images/Google-G.avif') }}" alt="Google" class="w-2.5 h-2.5 inline-block" width="10" height="10" onerror="this.onerror=null;this.src='{{ asset('images/google.svg') }}'"> Google
+                                </span>
+                            </template>
+                            <template x-if="item.source === 'tripadvisor'">
+                                <span class="bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
+                                    <i class="bi bi-star-fill text-[9px] text-amber-300"></i> TripAdvisor
+                                </span>
+                            </template>
+                        </div>
+
+                        <!-- Hover Bottom Overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3">
+                            <div class="flex items-center justify-between gap-1 mb-1">
+                                <span class="text-white text-xs font-bold truncate" x-text="item.reviewer_name"></span>
+                                <div class="text-amber-400 text-[10px] flex gap-0.5">
+                                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                                </div>
+                            </div>
+                            <p class="text-white/80 text-[11px] line-clamp-1" x-text="item.review_text"></p>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!-- Mobile View All CTA -->
+        <div class="mt-8 text-center md:hidden">
+            <a href="{{ localized_route('gallery.index') }}" class="btn-desert-animated text-xs font-bold rounded-full px-6 py-3 text-white shadow-md inline-flex items-center gap-2">
+                <span>{{ __('ui.gallery_section.view_all') ?? 'Explore Full Gallery' }} ({{ count($galleryItems) }}+ Photos)</span>
+                <i class="bi bi-arrow-right rtl:rotate-180"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- ── Fullscreen Interactive Lightbox Modal for Home ───────────────────────── -->
+    <div x-show="lightboxOpen" 
+         x-cloak 
+         class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/95 backdrop-blur-md"
+         x-transition:enter="ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         role="dialog"
+         aria-modal="true">
+
+        <button type="button" 
+                @click="closeLightbox()" 
+                class="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 w-11 h-11 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-colors cursor-pointer border border-white/20">
+            <i class="bi bi-x-lg text-lg"></i>
+            <span class="sr-only">Close</span>
+        </button>
+
+        <button type="button" 
+                @click="prevItem()" 
+                class="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-colors cursor-pointer border border-white/20">
+            <i class="bi bi-chevron-left text-xl rtl:rotate-180"></i>
+            <span class="sr-only">Previous</span>
+        </button>
+
+        <button type="button" 
+                @click="nextItem()" 
+                class="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-colors cursor-pointer border border-white/20">
+            <i class="bi bi-chevron-right text-xl rtl:rotate-180"></i>
+            <span class="sr-only">Next</span>
+        </button>
+
+        <div class="relative z-20 w-full max-w-5xl max-h-[92vh] flex flex-col lg:flex-row bg-slate-900 rounded-3xl overflow-hidden border border-white/10 shadow-2xl" 
+             @click.outside="closeLightbox()">
+
+            <div class="relative lg:w-3/5 bg-black flex items-center justify-center min-h-[300px] sm:min-h-[420px] max-h-[60vh] lg:max-h-[85vh] p-2">
+                <template x-if="activeItem && activeItem.type === 'video'">
+                    <div class="w-full h-full flex items-center justify-center">
+                        <video :src="activeItem.url" controls autoplay class="max-w-full max-h-[58vh] lg:max-h-[80vh] rounded-xl object-contain"></video>
+                    </div>
+                </template>
+                <template x-if="activeItem && activeItem.type !== 'video'">
+                    <img :src="activeItem.url" 
+                         :alt="activeItem.review_title || 'Guest Safari Photo'" 
+                         class="max-w-full max-h-[58vh] lg:max-h-[80vh] rounded-xl object-contain select-none"
+                         referrerpolicy="no-referrer">
+                </template>
+            </div>
+
+            <div class="lg:w-2/5 p-5 sm:p-6 bg-slate-900 text-white flex flex-col justify-between overflow-y-auto max-h-[40vh] lg:max-h-[85vh]">
+                <div>
+                    <div class="flex items-center justify-between gap-3 mb-4 pb-4 border-b border-white/10">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-primary/20 text-primary border border-primary/30 flex items-center justify-center font-black text-sm shrink-0">
+                                <span x-text="activeItem ? activeItem.reviewer_name.charAt(0).toUpperCase() : 'T'"></span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white text-sm sm:text-base leading-tight" x-text="activeItem ? activeItem.reviewer_name : 'Verified Guest'"></h4>
+                                <div class="flex items-center gap-1.5 mt-0.5">
+                                    <template x-if="activeItem && activeItem.source === 'google'">
+                                        <span class="text-blue-400 font-bold text-xs inline-flex items-center gap-1">
+                                            <img src="{{ asset('images/Google-G.avif') }}" alt="Google" class="w-3 h-3 inline-block" width="12" height="12" onerror="this.onerror=null;this.src='{{ asset('images/google.svg') }}'">
+                                            Google
+                                        </span>
+                                    </template>
+                                    <template x-if="activeItem && activeItem.source === 'tripadvisor'">
+                                        <span class="text-emerald-400 font-bold text-xs inline-flex items-center gap-1">
+                                            <i class="bi bi-star-fill text-xs text-amber-400"></i> TripAdvisor
+                                        </span>
+                                    </template>
+                                    <span class="text-white/40 text-xs">•</span>
+                                    <span class="text-xs text-white/60" x-text="activeItem ? activeItem.formatted_date : ''"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-amber-400 text-sm flex gap-0.5">
+                            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <span class="bg-primary/20 text-primary border border-primary/30 rounded-full px-3 py-1 text-xs font-semibold inline-flex items-center gap-1.5">
+                            <i class="bi bi-tag-fill"></i>
+                            <span x-text="activeItem ? activeItem.category_label : 'Desert Safari'"></span>
+                        </span>
+                    </div>
+
+                    <template x-if="activeItem && activeItem.review_title">
+                        <h5 class="text-base sm:text-lg font-bold text-white mb-2 leading-snug" x-text="activeItem.review_title"></h5>
+                    </template>
+                    <p class="text-white/80 text-xs sm:text-sm leading-relaxed mb-6 whitespace-pre-line" x-text="activeItem ? (activeItem.full_review_text || activeItem.review_text) : ''"></p>
+                </div>
+
+                <div class="pt-4 border-t border-white/10 space-y-3">
+                    <button type="button" 
+                            class="btn-desert-animated w-full py-3 px-4 rounded-xl font-bold text-sm text-white shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+                            @click="closeLightbox(); $store.modal.open('booking');">
+                        <i class="bi bi-calendar-check-fill text-base"></i>
+                        <span>{{ __('ui.gallery_section.book_this') ?? 'Book This Safari Adventure' }}</span>
+                    </button>
+                    <a href="{{ localized_route('gallery.index') }}" class="w-full py-2.5 px-4 rounded-xl font-bold text-xs text-center text-white/80 hover:text-white bg-white/10 hover:bg-white/20 transition-colors block">
+                        {{ __('ui.gallery_section.view_all') ?? 'View All Guest Photos & Videos' }} &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@endif
+
 <!-- Why Choose Us Section -->
 <section class="py-12 sm:py-16 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

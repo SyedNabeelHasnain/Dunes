@@ -7,6 +7,7 @@ return [
         'desert_safari' => 'Сафари в пустыне',
         'all_tours' => 'Все экскурсии',
         'customizer' => 'Конструктор сафари',
+        'gallery' => 'Галерея гостей',
         'blog' => 'Журнал сафари',
         'about' => 'О нас',
         'contact' => 'Контакты',
@@ -17,6 +18,27 @@ return [
         'search_placeholder' => 'Поиск сафари, аренда багги, катание по дюнам...',
         'tours' => 'Экскурсии и туры',
         'legal_policies' => 'Юридические условия и правила',
+    ],
+
+    // Guest Experience Gallery Section
+    'gallery_section' => [
+        'eyebrow' => 'Моменты наших гостей',
+        'title' => 'Кадры в дюнах от наших путешественников',
+        'subtitle' => 'Подлинные, нефильтрованные фото и видео от реальных гостей из Google Maps и TripAdvisor.',
+        'view_all' => 'Смотреть всю галерею',
+        'all_moments' => 'Все моменты',
+        'verified_review' => 'Подтвержденный отзыв',
+        'book_this' => 'Забронировать это сафари',
+        'close' => 'Закрыть',
+        'prev' => 'Назад',
+        'next' => 'Вперед',
+        'photo_by' => 'Автор фото',
+        'filter_all' => 'Все моменты',
+        'filter_red_dunes' => 'Красные дюны и сафари',
+        'filter_buggy_quad' => 'Багги и квадроциклы',
+        'filter_camp_bbq' => 'Лагерь и барбекю',
+        'filter_sunset_camels' => 'Закат и верблюды',
+        'filter_videos' => 'Видеоклипы',
     ],
 
     // Common Badges, Units & Trust Signals

@@ -7,6 +7,7 @@ return [
         'desert_safari' => 'رحلات السفاري الصحراوية',
         'all_tours' => 'كافة التجارب',
         'customizer' => 'صمّم رحلتك بنفسك',
+        'gallery' => 'معرض الصور والفيديوهات',
         'blog' => 'مدونة السفاري',
         'about' => 'من نحن',
         'contact' => 'اتصل بنا',
@@ -17,6 +18,27 @@ return [
         'search_placeholder' => 'ابحث عن رحلات السفاري، تأجير سيارات الباجي، ركوب الكثبان...',
         'tours' => 'الجولات والرحلات',
         'legal_policies' => 'السياسات والشروط القانونية',
+    ],
+
+    // Guest Experience Gallery Section
+    'gallery_section' => [
+        'eyebrow' => 'لحظات موثقة من ضيوفنا',
+        'title' => 'عدسات مسافرينا في قلب الكثبان الرملية',
+        'subtitle' => 'صور ومقاطع فيديو حقيقية غير معدلة شاركها ضيوفنا عبر خرائط جوجل وتريب أدفايزر.',
+        'view_all' => 'استكشف المعرض بالكامل',
+        'all_moments' => 'كل اللحظات',
+        'verified_review' => 'تقييم موثق',
+        'book_this' => 'احجز هذه المغامرة الآن',
+        'close' => 'إغلاق',
+        'prev' => 'السابق',
+        'next' => 'التالي',
+        'photo_by' => 'تم الرفع بواسطة',
+        'filter_all' => 'كل اللحظات',
+        'filter_red_dunes' => 'الكثبان الحمراء والسفاري',
+        'filter_buggy_quad' => 'الباجي والدراجات الصحراوية',
+        'filter_camp_bbq' => 'المخيم وعشاء الشواء',
+        'filter_sunset_camels' => 'الغروب وركوب الجمال',
+        'filter_videos' => 'مقاطع الفيديو',
     ],
 
     // Common Badges, Units & Trust Signals

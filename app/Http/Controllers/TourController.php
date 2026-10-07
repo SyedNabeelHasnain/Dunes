@@ -165,7 +165,13 @@ class TourController extends Controller
         // Track form load timestamp for analytics
         session(["form_load.booking_{$tour->id}" => microtime(true)]);
 
-        return view('tours.show', compact('tour', 'highlights', 'inclusions', 'exclusions', 'faqs', 'relatedTours', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage', 'minPrice', 'approvedReviews'));
+        try {
+            $tourGalleryItems = app(\App\Services\ReviewMediaGalleryService::class)->getTourItems($tour, 8);
+        } catch (\Throwable $e) {
+            $tourGalleryItems = [];
+        }
+
+        return view('tours.show', compact('tour', 'highlights', 'inclusions', 'exclusions', 'faqs', 'relatedTours', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage', 'minPrice', 'approvedReviews', 'tourGalleryItems'));
     }
 
     /**

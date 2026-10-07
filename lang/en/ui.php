@@ -7,6 +7,7 @@ return [
         'desert_safari' => 'Desert Safari',
         'all_tours' => 'All Experiences',
         'customizer' => 'Build Your Safari',
+        'gallery' => 'Guest Gallery',
         'blog' => 'Safari Journal',
         'about' => 'About Us',
         'contact' => 'Contact',
@@ -17,6 +18,27 @@ return [
         'search_placeholder' => 'Search desert safaris, buggy tours, dune bashing...',
         'tours' => 'Tours',
         'legal_policies' => 'Legal & Policies',
+    ],
+
+    // Guest Experience Gallery Section
+    'gallery_section' => [
+        'eyebrow' => 'Verified Guest Moments',
+        'title' => 'Captured in the Dunes by Our Travelers',
+        'subtitle' => 'Authentic, unfiltered photos and videos posted by real guests on Google Maps and TripAdvisor.',
+        'view_all' => 'Explore Full Gallery',
+        'all_moments' => 'All Moments',
+        'verified_review' => 'Verified Review',
+        'book_this' => 'Book This Safari',
+        'close' => 'Close',
+        'prev' => 'Previous',
+        'next' => 'Next',
+        'photo_by' => 'Uploaded by',
+        'filter_all' => 'All Moments',
+        'filter_red_dunes' => 'Red Dunes & Safari',
+        'filter_buggy_quad' => 'Buggies & Quads',
+        'filter_camp_bbq' => 'Camp & BBQ',
+        'filter_sunset_camels' => 'Sunset & Camels',
+        'filter_videos' => 'Video Clips',
     ],
 
     // Common Badges, Units & Trust Signals

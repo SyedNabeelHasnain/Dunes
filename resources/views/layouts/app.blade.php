@@ -487,6 +487,9 @@
                             </div>
                         </li>
                         <li>
+                            <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('gallery.*') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('gallery.index') }}">{{ __('ui.nav.gallery') }}</a>
+                        </li>
+                        <li>
                             <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('about') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('about') }}">{{ __('ui.nav.about') }}</a>
                         </li>
                         <li>
@@ -616,6 +619,7 @@
                 <!-- Navigation Links List -->
                 <nav class="space-y-1">
                     <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('tours.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('tours.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.all_tours') }}</a>
+                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('gallery.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('gallery.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.gallery') }}</a>
                     <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('about') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('about') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.about') }}</a>
                     <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('blog.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('blog.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.blog') }}</a>
                     <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('faq') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('faq') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.faq') }}</a>
@@ -732,6 +736,7 @@
                             <li><a href="{{ route('tours.show', 'abu-dhabi-city-tour-from-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.abu_dhabi_tour') }}</a></li>
                             <li><a href="{{ route('tours.show', 'dhow-cruise-catamaran-cruise-dinner-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.marina_cruise') }}</a></li>
                             <li><a href="{{ route('rate-card') }}" class="text-slate-300 hover:text-white transition-colors inline-flex items-center gap-1.5"><i class="bi bi-file-earmark-pdf text-amber-400"></i>{{ __('ui.footer.rate_card_pdf') }}</a></li>
+                            <li><a href="{{ route('gallery.index') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.nav.gallery') }}</a></li>
                             <li><a href="{{ route('blog.index') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.nav.blog') }}</a></li>
                         @endif
                     </ul>

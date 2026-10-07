@@ -7,6 +7,7 @@ return [
         'desert_safari' => 'Safari nel Deserto',
         'all_tours' => 'Tutte le Esperienze',
         'customizer' => 'Crea il tuo Safari',
+        'gallery' => 'Galleria Ospiti',
         'blog' => 'Diario del Safari',
         'about' => 'Chi Siamo',
         'contact' => 'Contatti',
@@ -17,6 +18,27 @@ return [
         'search_placeholder' => 'Cerca safari nel deserto, tour in buggy, dune bashing...',
         'tours' => 'Tour ed Esperienze',
         'legal_policies' => 'Termini e Politiche Legali',
+    ],
+
+    // Guest Experience Gallery Section
+    'gallery_section' => [
+        'eyebrow' => 'Momenti degli Ospiti Verificati',
+        'title' => 'Catturato tra le Dune dai Nostri Viaggiatori',
+        'subtitle' => 'Foto e video autentici e senza filtri condivisi da ospiti reali su Google Maps e TripAdvisor.',
+        'view_all' => 'Esplora Galleria Completa',
+        'all_moments' => 'Tutti i Momenti',
+        'verified_review' => 'Recensione Verificata',
+        'book_this' => 'Prenota Questo Safari',
+        'close' => 'Chiudi',
+        'prev' => 'Precedente',
+        'next' => 'Successivo',
+        'photo_by' => 'Caricato da',
+        'filter_all' => 'Tutti i Momenti',
+        'filter_red_dunes' => 'Dune Rosse e Safari',
+        'filter_buggy_quad' => 'Buggy e Quad',
+        'filter_camp_bbq' => 'Accampamento e Barbecue',
+        'filter_sunset_camels' => 'Tramonto e Cammelli',
+        'filter_videos' => 'Video Clip',
     ],
 
     // Common Badges, Units & Trust Signals
