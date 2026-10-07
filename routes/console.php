@@ -26,3 +26,6 @@ Schedule::command('campaigns:send-scheduled')->everyFiveMinutes();
 // Synchronize customer reviews and rating metrics from Google Places API daily at midnight
 Schedule::command('reviews:sync-google')->daily()->withoutOverlapping()->runInBackground();
 
+// Synchronize customer reviews and rating metrics from TripAdvisor Content API daily at 00:30 AM
+Schedule::command('reviews:sync-tripadvisor')->dailyAt('00:30')->withoutOverlapping()->runInBackground();
+

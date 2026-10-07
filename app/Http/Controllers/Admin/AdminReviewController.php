@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Review;
 use App\Services\GoogleReviewSyncService;
+use App\Services\TripAdvisorReviewSyncService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -73,6 +74,7 @@ class AdminReviewController extends Controller
             ->get();
 
         $lastSyncedAt = app(GoogleReviewSyncService::class)->getLastSyncedAt();
+        $lastSyncedTripAdvisor = app(TripAdvisorReviewSyncService::class)->getLastSyncedAt();
 
         return view('admin.reviews.index', compact(
             'reviews',
@@ -83,7 +85,8 @@ class AdminReviewController extends Controller
             'status',
             'source',
             'search',
-            'lastSyncedAt'
+            'lastSyncedAt',
+            'lastSyncedTripAdvisor'
         ));
     }
 
@@ -188,6 +191,22 @@ class AdminReviewController extends Controller
      * Trigger on-demand Google Reviews synchronization via AJAX.
      */
     public function syncGoogle(Request $request, GoogleReviewSyncService $syncService)
+    {
+        $force = $request->boolean('force', false);
+        $result = $syncService->sync($force);
+
+        if (! ($result['success'] ?? false)) {
+            $statusCode = ($result['rate_limited'] ?? false) ? 429 : 422;
+            return response()->json($result, $statusCode);
+        }
+
+        return response()->json($result);
+    }
+
+    /**
+     * Trigger on-demand TripAdvisor Reviews synchronization via AJAX.
+     */
+    public function syncTripAdvisor(Request $request, TripAdvisorReviewSyncService $syncService)
     {
         $force = $request->boolean('force', false);
         $result = $syncService->sync($force);

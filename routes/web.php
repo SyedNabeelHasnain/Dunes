@@ -159,6 +159,7 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::resource('faqs', AdminFaqController::class)->except(['create', 'show', 'edit']);
     Route::post('/faqs/{id}/toggle-status', [AdminFaqController::class, 'toggleStatus'])->name('faqs.toggle-status');
     Route::post('/reviews/sync-google', [AdminReviewController::class, 'syncGoogle'])->name('reviews.sync-google');
+    Route::post('/reviews/sync-tripadvisor', [AdminReviewController::class, 'syncTripAdvisor'])->name('reviews.sync-tripadvisor');
     Route::resource('reviews', AdminReviewController::class)->except(['create', 'show', 'edit']);
     Route::post('/reviews/{id}/toggle-status', [AdminReviewController::class, 'toggleStatus'])->name('reviews.toggle-status');
     Route::get('/inquiries/export/csv', [AdminDashboardController::class, 'exportInquiriesCsv'])->name('inquiries.export');

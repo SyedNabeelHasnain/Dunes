@@ -23,6 +23,18 @@
                 </span>
             </button>
 
+            <!-- Prominent TripAdvisor Reviews Sync Button -->
+            <button type="button" 
+                    id="syncTripAdvisorReviewsBtn" 
+                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-emerald-200/80 bg-emerald-50/90 hover:bg-emerald-100 text-emerald-700 font-bold text-xs shadow-2xs hover:shadow-xs transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                    title="Pull latest live customer reviews from TripAdvisor Content API">
+                <i class="bi bi-arrow-repeat text-sm sync-icon transition-transform"></i>
+                <span class="btn-text">Sync TripAdvisor</span>
+                <span class="inline-flex items-center text-[10px] font-medium bg-emerald-200/60 text-emerald-800 px-1.5 py-0.5 rounded-md last-synced-ta-badge" title="Last sync timestamp">
+                    {{ !empty($lastSyncedTripAdvisor) ? \Carbon\Carbon::parse($lastSyncedTripAdvisor)->diffForHumans() : 'Never' }}
+                </span>
+            </button>
+
             <button type="button" @click="$dispatch('open-add-review')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-xs shadow-xs transition-all cursor-pointer">
                 <i class="bi bi-plus-lg"></i> Log New Review
             </button>
@@ -654,6 +666,103 @@ $(document).ready(function() {
                         title: 'Sync Failed',
                         text: res.message || 'Unable to sync reviews from Google. Please verify your Google API key and Place ID settings.',
                         confirmButtonColor: '#F58F43'
+                    });
+                }
+            },
+            complete: function() {
+                $btn.prop('disabled', false);
+                $icon.removeClass('animate-spin');
+                $text.text(originalText);
+            }
+        });
+    });
+
+    // Automated TripAdvisor Review Sync AJAX handler with SweetAlert2 feedback
+    $('#syncTripAdvisorReviewsBtn').on('click', function(e) {
+        e.preventDefault();
+        const $btn = $(this);
+        const $icon = $btn.find('.sync-icon');
+        const $text = $btn.find('.btn-text');
+        const originalText = $text.text();
+
+        $btn.prop('disabled', true);
+        $icon.addClass('animate-spin');
+        $text.text('Syncing with TripAdvisor...');
+
+        $.ajax({
+            url: "{{ route('admin.reviews.sync-tripadvisor') }}",
+            type: "POST",
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                'Accept': 'application/json'
+            },
+            data: {
+                force: 0
+            },
+            success: function(res) {
+                const added = res.added ?? 0;
+                const updated = res.updated ?? 0;
+                const total = res.total ?? 0;
+                const rating = res.rating ?? '5.0';
+                const reviewsCount = res.reviews_count ?? 78;
+                const msg = res.message || 'Synchronization complete.';
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'TripAdvisor Reviews Synced!',
+                    html: `
+                        <div class="text-left text-xs space-y-3 py-1">
+                            <div class="p-3 bg-emerald-50 text-emerald-800 rounded-xl border border-emerald-200">
+                                <strong>${msg}</strong>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-2 text-slate-700">
+                                <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                                    <span class="text-[10px] uppercase font-bold text-slate-400 block">TripAdvisor Rating</span>
+                                    <span class="text-base font-black text-emerald-600">★ ${rating}</span>
+                                </div>
+                                <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                                    <span class="text-[10px] uppercase font-bold text-slate-400 block">TripAdvisor Total Reviews</span>
+                                    <span class="text-base font-black text-emerald-700">${reviewsCount}+</span>
+                                </div>
+                                <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                                    <span class="text-[10px] uppercase font-bold text-slate-400 block">Stored in Database</span>
+                                    <span class="text-base font-black text-slate-900">${total}</span>
+                                </div>
+                                <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                                    <span class="text-[10px] uppercase font-bold text-slate-400 block">Batch Updated</span>
+                                    <span class="text-base font-black text-emerald-600">${updated} updated (+${added} new)</span>
+                                </div>
+                            </div>
+
+                            <div class="p-2.5 bg-emerald-50/70 text-emerald-800 rounded-lg border border-emerald-200/60 text-[11px] leading-relaxed">
+                                <i class="bi bi-info-circle-fill text-emerald-600 me-1"></i>
+                                <strong>TripAdvisor Live Sync:</strong> TripAdvisor reviews and aggregate ratings are synchronized into your database catalog (${total} saved) and immediately updated on the public site and social proof feeds.
+                            </div>
+                        </div>
+                    `,
+                    confirmButtonColor: '#10b981',
+                    confirmButtonText: 'Refresh Table',
+                    allowOutsideClick: false
+                }).then(() => {
+                    window.location.reload();
+                });
+            },
+            error: function(xhr) {
+                const res = xhr.responseJSON || {};
+                if (xhr.status === 429) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Rate Limit Cooldown',
+                        text: res.message || 'TripAdvisor reviews were synchronized recently. Please wait a minute before requesting another sync.',
+                        confirmButtonColor: '#10b981'
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Sync Failed',
+                        text: res.message || 'Unable to sync reviews from TripAdvisor. Please verify your TripAdvisor API key and Location ID settings.',
+                        confirmButtonColor: '#10b981'
                     });
                 }
             },

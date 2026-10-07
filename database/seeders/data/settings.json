@@ -688,5 +688,35 @@
         "setting_key": "google_primary_category",
         "setting_value": "Tour Operator",
         "updated_at": "2026-10-02 12:00:00"
+    },
+    {
+        "id": 116,
+        "setting_key": "tripadvisor_location_id",
+        "setting_value": "29026644",
+        "updated_at": "2026-10-07 12:00:00"
+    },
+    {
+        "id": 117,
+        "setting_key": "tripadvisor_api_key",
+        "setting_value": "",
+        "updated_at": "2026-10-07 12:00:00"
+    },
+    {
+        "id": 118,
+        "setting_key": "tripadvisor_rating",
+        "setting_value": "5.0",
+        "updated_at": "2026-10-07 12:00:00"
+    },
+    {
+        "id": 119,
+        "setting_key": "tripadvisor_reviews_count",
+        "setting_value": "78",
+        "updated_at": "2026-10-07 12:00:00"
+    },
+    {
+        "id": 120,
+        "setting_key": "tripadvisor_last_synced_at",
+        "setting_value": "2026-01-07 12:00:00",
+        "updated_at": "2026-10-07 12:00:00"
     }
 ]

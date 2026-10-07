@@ -40,4 +40,9 @@ return [
         'place_id' => env('GOOGLE_PLACE_ID', 'ChIJbWsIEIVEdEER4uHEhb2dbcQ'),
     ],
 
+    'tripadvisor' => [
+        'api_key' => env('TRIPADVISOR_API_KEY'),
+        'location_id' => env('TRIPADVISOR_LOCATION_ID', '29026644'),
+    ],
+
 ];

@@ -24,6 +24,7 @@ class AdminSettingController extends Controller
             'social_youtube', 'social_tiktok', 'footer_about', 'site_copyright',
             'site_latitude', 'site_longitude', 'site_postal_code',
             'google_place_id', 'google_cid', 'google_review_url',
+            'tripadvisor_location_id', 'tripadvisor_api_key',
         ];
 
         $settings = Setting::whereIn('setting_key', $keys)
@@ -189,6 +190,9 @@ class AdminSettingController extends Controller
             'google_place_id', 'google_cid', 'google_review_url',
             'site_latitude', 'site_longitude', 'site_postal_code',
             'google_business_hours', 'google_service_area', 'google_primary_category',
+
+            // TripAdvisor Integrations & Content API
+            'tripadvisor_location_id', 'tripadvisor_api_key',
 
             // Google Things To Do (GTTD) Partner Feeds
             'gttd_feed_enabled', 'gttd_partner_id', 'gttd_default_poi_place_id',

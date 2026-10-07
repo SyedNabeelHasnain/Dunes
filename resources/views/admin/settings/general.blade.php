@@ -138,6 +138,25 @@
                                 <input type="url" name="social_tiktok" id="social_tiktok" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['social_tiktok'] ?? '' }}" placeholder="https://tiktok.com/@...">
                             </div>
                         </div>
+
+                        <!-- TripAdvisor Content API Sync Settings -->
+                        <div class="mt-4 pt-4 border-t border-slate-200/60">
+                            <h6 class="text-[11px] font-black uppercase tracking-wider text-emerald-700 mb-2.5 flex items-center gap-1.5">
+                                <i class="bi bi-award-fill"></i> TripAdvisor Content API & Auto-Sync
+                            </h6>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="tripadvisor_location_id" class="block text-xs font-bold text-slate-700 mb-1.5">TripAdvisor Location ID</label>
+                                    <input type="text" name="tripadvisor_location_id" id="tripadvisor_location_id" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['tripadvisor_location_id'] ?? '29026644' }}" placeholder="29026644">
+                                    <div class="mt-1 text-[11px] text-slate-500">Numerical Location ID for Dunes Discovery (e.g. 29026644 from d29026644).</div>
+                                </div>
+                                <div>
+                                    <label for="tripadvisor_api_key" class="block text-xs font-bold text-slate-700 mb-1.5">TripAdvisor Content API Key</label>
+                                    <input type="password" name="tripadvisor_api_key" id="tripadvisor_api_key" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['tripadvisor_api_key'] ?? '' }}" placeholder="Paste your TripAdvisor API Key here">
+                                    <div class="mt-1 text-[11px] text-slate-500">TripAdvisor Content API v1 key from TripAdvisor Developer Portal.</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
