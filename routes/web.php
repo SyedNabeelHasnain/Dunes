@@ -314,13 +314,6 @@ Route::get('/feeds/google-things-to-do/feed.xml', [GoogleThingsToDoFeedControlle
 Route::get('/feeds/google-things-to-do/feed.json', [GoogleThingsToDoFeedController::class, 'feedJson'])->name('feeds.gttd.json');
 Route::get('/feeds/google-things-to-do/proto.json', [GoogleThingsToDoFeedController::class, 'protoJson'])->name('feeds.gttd.proto');
 
-// ── AI Search Engine & LLM Markdown Endpoints (GEO Optimization) ─────────────
-Route::get('/llms.txt', [LlmsController::class, 'index'])->name('llms.txt');
-Route::get('/llms-full.txt', [LlmsController::class, 'full'])->name('llms.full');
-
-// ── IndexNow Search Engine Protocol Verification Key ─────────────────────────
-Route::get('/{key}.txt', [IndexNowController::class, 'verifyKey'])->where('key', '^[a-zA-Z0-9_\-]+$')->name('indexnow.key');
-
 // ── RFC 9116 Vulnerability Disclosure & Security Policy ──────────────────────
 Route::get('/.well-known/security.txt', function () {
     return response()->file(public_path('.well-known/security.txt'), [
@@ -329,6 +322,13 @@ Route::get('/.well-known/security.txt', function () {
     ]);
 })->name('security.txt');
 Route::redirect('/security.txt', '/.well-known/security.txt', 301);
+
+// ── AI Search Engine & LLM Markdown Endpoints (GEO Optimization) ─────────────
+Route::get('/llms.txt', [LlmsController::class, 'index'])->name('llms.txt');
+Route::get('/llms-full.txt', [LlmsController::class, 'full'])->name('llms.full');
+
+// ── IndexNow Search Engine Protocol Verification Key ─────────────────────────
+Route::get('/{key}.txt', [IndexNowController::class, 'verifyKey'])->where('key', '^(?!security$|robots$|llms$|llms-full$)[a-zA-Z0-9_\-]+$')->name('indexnow.key');
 
 // ── Explicit High-Value Tour Routes ─────────────────────────────────────────
 Route::get('/dune-buggy-rental-dubai', [TourController::class, 'showBuggy'])->name('tours.buggy');

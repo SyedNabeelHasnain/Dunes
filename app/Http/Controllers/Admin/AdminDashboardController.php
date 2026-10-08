@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\BlogPost;
 use App\Models\Booking;
 use App\Models\BookingPayment;
 use App\Models\Contact;
 use App\Models\EmailCampaign;
 use App\Models\RequestLog;
+use App\Models\Review;
 use App\Models\Subscriber;
+use App\Models\Tour;
 use App\Models\WhatsappInquiry;
 use App\Services\ZiinaPaymentService;
 use Illuminate\Http\JsonResponse;
@@ -64,6 +67,24 @@ class AdminDashboardController extends Controller
         $campaignsCount = EmailCampaign::count();
         $campaignsSent = EmailCampaign::where('status', 'sent')->count();
 
+        // 7. Inventory, Reviews, Blog & Daily Tour Operations
+        $activeToursCount = Tour::where('status', 'active')->count();
+        $totalToursCount = Tour::count();
+
+        $totalReviewsCount = Review::count();
+        $approvedReviewsCount = Review::where('status', 'approved')->count();
+        $avgReviewRating = (float) round(Review::where('status', 'approved')->avg('rating') ?: 5.0, 1);
+
+        $publishedBlogPostsCount = BlogPost::where('status', 'published')->count();
+        $totalBlogPostsCount = BlogPost::count();
+
+        $todayDeparturesCount = Booking::whereDate('tour_date', now()->format('Y-m-d'))
+            ->whereIn('status', ['confirmed', 'completed', 'pending'])
+            ->count();
+        $upcomingDeparturesCount = Booking::where('tour_date', '>=', now()->format('Y-m-d'))
+            ->whereIn('status', ['confirmed', 'pending'])
+            ->count();
+
         return [
             'revenue' => (float) $revenue,
             'total' => (int) $totalBookings,
@@ -81,6 +102,15 @@ class AdminDashboardController extends Controller
             'subscribers_count' => (int) $subscribersCount,
             'campaigns_count' => (int) $campaignsCount,
             'campaigns_sent' => (int) $campaignsSent,
+            'active_tours' => (int) $activeToursCount,
+            'total_tours' => (int) $totalToursCount,
+            'total_reviews' => (int) $totalReviewsCount,
+            'approved_reviews' => (int) $approvedReviewsCount,
+            'avg_rating' => (float) $avgReviewRating,
+            'published_posts' => (int) $publishedBlogPostsCount,
+            'total_posts' => (int) $totalBlogPostsCount,
+            'today_departures' => (int) $todayDeparturesCount,
+            'upcoming_departures' => (int) $upcomingDeparturesCount,
             'timestamp' => now()->toIso8601String(),
         ];
     }
@@ -108,8 +138,7 @@ class AdminDashboardController extends Controller
                 ->get();
 
             // Recent WhatsApp leads
-            $whatsappLeads = DB::table('whatsapp_inquiries')
-                ->orderBy('created_at', 'desc')
+            $whatsappLeads = WhatsappInquiry::orderBy('created_at', 'desc')
                 ->limit(5)
                 ->get();
 
@@ -121,6 +150,9 @@ class AdminDashboardController extends Controller
                 'pending' => 0, 'cancelled' => 0, 'drafts' => 0, 'aov' => 0, 'conversion_rate' => 0,
                 'new_inquiries' => 0, 'total_inquiries' => 0, 'whatsapp_leads' => 0,
                 'subscribers_count' => 0, 'campaigns_count' => 0, 'campaigns_sent' => 0,
+                'active_tours' => 0, 'total_tours' => 0, 'total_reviews' => 0, 'approved_reviews' => 0,
+                'avg_rating' => 5.0, 'published_posts' => 0, 'total_posts' => 0,
+                'today_departures' => 0, 'upcoming_departures' => 0,
                 'timestamp' => now()->toIso8601String(),
             ];
             $recentBookings = collect();

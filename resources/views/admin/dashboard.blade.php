@@ -149,6 +149,67 @@
     </div>
 </div>
 
+<!-- Real-Time Operations, Inventory & Content Management Hub -->
+<div class="p-4 bg-white rounded-2xl shadow-xs border border-slate-200/80 mb-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+        <div class="flex items-center gap-3 pt-2 sm:pt-0 sm:px-2">
+            <div class="w-11 h-11 rounded-xl bg-orange-50 text-primary flex items-center justify-center text-lg shrink-0">
+                <i class="bi bi-compass-fill"></i>
+            </div>
+            <div>
+                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Tours Inventory</div>
+                <div class="flex items-baseline gap-2 mt-0.5">
+                    <span class="text-lg font-black text-slate-900 kpi-number" id="kpiActiveTours">{{ number_format($stats['active_tours'] ?? 0) }}</span>
+                    <span class="text-[11px] text-slate-400">/ <span id="kpiTotalTours">{{ number_format($stats['total_tours'] ?? 0) }}</span> Total</span>
+                    <a href="{{ route('admin.tours.index') }}" class="text-xs font-semibold text-primary hover:underline flex items-center gap-1 ms-1">Manage <i class="bi bi-chevron-right text-[10px]"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3 pt-3 sm:pt-0 sm:px-4">
+            <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center text-lg shrink-0">
+                <i class="bi bi-star-fill"></i>
+            </div>
+            <div>
+                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Reviews & Rating</div>
+                <div class="flex items-baseline gap-2 mt-0.5">
+                    <span class="text-lg font-black text-amber-600 kpi-number" id="kpiApprovedReviews">{{ number_format($stats['approved_reviews'] ?? 0) }}</span>
+                    <span class="text-[11px] font-bold text-amber-500 bg-amber-50 px-1.5 py-0.5 rounded" id="kpiAvgRating">{{ number_format($stats['avg_rating'] ?? 5.0, 1) }} ★</span>
+                    <a href="{{ route('admin.reviews.index') }}" class="text-xs font-semibold text-primary hover:underline flex items-center gap-1 ms-1">Reviews <i class="bi bi-chevron-right text-[10px]"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3 pt-3 sm:pt-0 sm:px-4">
+            <div class="w-11 h-11 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center text-lg shrink-0">
+                <i class="bi bi-journal-richtext"></i>
+            </div>
+            <div>
+                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Travel Blog Articles</div>
+                <div class="flex items-baseline gap-2 mt-0.5">
+                    <span class="text-lg font-black text-slate-900 kpi-number" id="kpiPublishedPosts">{{ number_format($stats['published_posts'] ?? 0) }}</span>
+                    <span class="text-[11px] text-slate-400">/ <span id="kpiTotalPosts">{{ number_format($stats['total_posts'] ?? 0) }}</span> Posts</span>
+                    <a href="{{ route('admin.blogs.index') }}" class="text-xs font-semibold text-primary hover:underline flex items-center gap-1 ms-1">Articles <i class="bi bi-chevron-right text-[10px]"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3 pt-3 sm:pt-0 sm:px-4">
+            <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg shrink-0">
+                <i class="bi bi-truck-flatbed"></i>
+            </div>
+            <div>
+                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Operations & Departures</div>
+                <div class="flex items-baseline gap-2 mt-0.5">
+                    <span class="text-lg font-black text-emerald-600 kpi-number" id="kpiUpcomingDepartures">{{ number_format($stats['upcoming_departures'] ?? 0) }}</span>
+                    <span class="text-[11px] text-slate-500 font-medium">(<span id="kpiTodayDepartures">{{ number_format($stats['today_departures'] ?? 0) }}</span> Today)</span>
+                    <a href="{{ route('admin.operations.index') }}" class="text-xs font-semibold text-primary hover:underline flex items-center gap-1 ms-1">Dispatch <i class="bi bi-chevron-right text-[10px]"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Top Grossing Tours & Quick Action Row -->
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
     <div class="lg:col-span-8 bg-white rounded-2xl shadow-xs border border-slate-200/80 p-5">
@@ -243,21 +304,21 @@
             <i class="bi bi-people text-primary text-2xl"></i>
             <div>
                 <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Active Subscribers</div>
-                <div class="text-base font-black text-slate-900">{{ number_format($stats['subscribers_count'] ?? 0) }}</div>
+                <div class="text-base font-black text-slate-900 kpi-number" id="kpiSubscribersCount">{{ number_format($stats['subscribers_count'] ?? 0) }}</div>
             </div>
         </div>
         <div class="p-3 rounded-xl bg-slate-50 flex items-center gap-3">
             <i class="bi bi-broadcast text-amber-500 text-2xl"></i>
             <div>
                 <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Campaigns</div>
-                <div class="text-base font-black text-slate-900">{{ number_format($stats['campaigns_count'] ?? 0) }}</div>
+                <div class="text-base font-black text-slate-900 kpi-number" id="kpiCampaignsCount">{{ number_format($stats['campaigns_count'] ?? 0) }}</div>
             </div>
         </div>
         <div class="p-3 rounded-xl bg-slate-50 flex items-center gap-3">
             <i class="bi bi-check2-circle text-emerald-600 text-2xl"></i>
             <div>
                 <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Dispatched Broadcasts</div>
-                <div class="text-base font-black text-emerald-600">{{ number_format($stats['campaigns_sent'] ?? 0) }}</div>
+                <div class="text-base font-black text-emerald-600 kpi-number" id="kpiCampaignsSent">{{ number_format($stats['campaigns_sent'] ?? 0) }}</div>
             </div>
         </div>
         <div class="p-3 rounded-xl bg-slate-50 flex items-center justify-between">
@@ -491,6 +552,19 @@ $(document).ready(function() {
                     $('#kpiWhatsappLeads').text(Number(s.whatsapp_leads).toLocaleString());
                     $('#kpiTotalInquiries').text(Number(s.total_inquiries).toLocaleString());
                     $('#kpiDrafts').text(Number(s.drafts).toLocaleString());
+
+                    $('#kpiActiveTours').text(Number(s.active_tours || 0).toLocaleString());
+                    $('#kpiTotalTours').text(Number(s.total_tours || 0).toLocaleString());
+                    $('#kpiApprovedReviews').text(Number(s.approved_reviews || 0).toLocaleString());
+                    $('#kpiAvgRating').text(Number(s.avg_rating || 5.0).toFixed(1) + ' ★');
+                    $('#kpiPublishedPosts').text(Number(s.published_posts || 0).toLocaleString());
+                    $('#kpiTotalPosts').text(Number(s.total_posts || 0).toLocaleString());
+                    $('#kpiUpcomingDepartures').text(Number(s.upcoming_departures || 0).toLocaleString());
+                    $('#kpiTodayDepartures').text(Number(s.today_departures || 0).toLocaleString());
+
+                    $('#kpiSubscribersCount').text(Number(s.subscribers_count || 0).toLocaleString());
+                    $('#kpiCampaignsCount').text(Number(s.campaigns_count || 0).toLocaleString());
+                    $('#kpiCampaignsSent').text(Number(s.campaigns_sent || 0).toLocaleString());
 
                     $status.html(`Live as of <span class="font-bold text-emerald-600">${nowTime}</span>`);
 

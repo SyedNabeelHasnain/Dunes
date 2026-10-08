@@ -221,4 +221,30 @@ class AdminEmailCampaignController extends Controller
     {
         return redirect()->route('admin.campaigns.show', $id);
     }
+
+    /**
+     * Update campaign details (for draft or scheduled campaigns).
+     */
+    public function update(Request $request, int $id): RedirectResponse
+    {
+        $campaign = EmailCampaign::findOrFail($id);
+
+        if (in_array($campaign->status, ['sent', 'sending'])) {
+            return redirect()->route('admin.campaigns.show', $campaign->id)
+                ->with('error', 'Sent or active campaigns cannot be modified.');
+        }
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'subject' => 'required|string|max:255',
+            'group_id' => 'nullable|integer|exists:subscriber_groups,id',
+            'template_id' => 'nullable|integer|exists:email_templates,id',
+            'content_html' => 'required|string',
+        ]);
+
+        $campaign->update($validated);
+
+        return redirect()->route('admin.campaigns.show', $campaign->id)
+            ->with('success', "Campaign '{$campaign->title}' updated successfully.");
+    }
 }

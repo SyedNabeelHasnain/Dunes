@@ -211,7 +211,7 @@ class SeoDomainAuthorityFeaturesTest extends TestCase
     }
 
     /**
-     * Test Admin Dashboard KPI real-time counter calculations.
+     * Test Admin Dashboard KPI real-time counter calculations and live refresh API.
      */
     public function test_admin_dashboard_kpis_realtime_counters(): void
     {
@@ -232,6 +232,38 @@ class SeoDomainAuthorityFeaturesTest extends TestCase
         $this->assertArrayHasKey('revenue', $kpis);
         $this->assertArrayHasKey('total', $kpis);
         $this->assertArrayHasKey('whatsapp_leads', $kpis);
+        $this->assertArrayHasKey('active_tours', $kpis);
+        $this->assertArrayHasKey('total_tours', $kpis);
+        $this->assertArrayHasKey('total_reviews', $kpis);
+        $this->assertArrayHasKey('approved_reviews', $kpis);
+        $this->assertArrayHasKey('avg_rating', $kpis);
+        $this->assertArrayHasKey('published_posts', $kpis);
+        $this->assertArrayHasKey('total_posts', $kpis);
+        $this->assertArrayHasKey('today_departures', $kpis);
+        $this->assertArrayHasKey('upcoming_departures', $kpis);
+        $this->assertArrayHasKey('subscribers_count', $kpis);
+        $this->assertArrayHasKey('campaigns_count', $kpis);
         $this->assertGreaterThanOrEqual(1, $kpis['whatsapp_leads']);
+
+        // Verify live JSON endpoint returns all metrics
+        $apiResp = $this->actingAs($admin)->get('/admin/api/kpis');
+        $apiResp->assertStatus(200);
+        $apiResp->assertJsonPath('success', true);
+        $apiResp->assertJsonStructure([
+            'success',
+            'stats' => [
+                'revenue', 'total', 'confirmed', 'completed', 'pending',
+                'active_tours', 'total_tours', 'total_reviews', 'published_posts',
+                'today_departures', 'upcoming_departures', 'subscribers_count',
+            ],
+        ]);
+
+        // Verify dashboard view renders the Operations & Inventory hub
+        $viewResp = $this->actingAs($admin)->get('/admin/dashboard');
+        $viewResp->assertStatus(200);
+        $viewResp->assertSee('Tours Inventory');
+        $viewResp->assertSee('Reviews & Rating', false);
+        $viewResp->assertSee('Travel Blog Articles');
+        $viewResp->assertSee('Operations & Departures', false);
     }
 }

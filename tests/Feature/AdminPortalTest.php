@@ -495,4 +495,32 @@ class AdminPortalTest extends TestCase
         $this->assertEquals('Updated Desert Safari', $tour->getTranslation('name', 'en'));
         $this->assertEquals('رحلة صحراوية محدثة', $tour->getTranslation('name', 'ar'));
     }
+
+    /**
+     * Test admin can update draft email campaign via PUT /admin/campaigns/{id}.
+     */
+    public function test_admin_can_update_email_campaign(): void
+    {
+        $campaign = EmailCampaign::create([
+            'title' => 'Original Draft Campaign',
+            'subject' => 'Exclusive Summer Safari Deal',
+            'content_html' => '<p>Special discount for subscribers.</p>',
+            'status' => 'draft',
+        ]);
+
+        $payload = [
+            'title' => 'Updated Campaign Title',
+            'subject' => 'Updated Winter Safari Deal',
+            'content_html' => '<p>Updated content with 20% off.</p>',
+        ];
+
+        $response = $this->actingAs($this->adminUser)->put("/admin/campaigns/{$campaign->id}", $payload);
+
+        $response->assertStatus(302);
+        $response->assertRedirect("/admin/campaigns/{$campaign->id}");
+
+        $campaign->refresh();
+        $this->assertEquals('Updated Campaign Title', $campaign->title);
+        $this->assertEquals('Updated Winter Safari Deal', $campaign->subject);
+    }
 }
