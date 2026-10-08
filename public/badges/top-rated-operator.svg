@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="280" height="80" viewBox="0 0 280 80" fill="none">
+  <defs>
+    <filter id="cardShadow" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.06"/>
+    </filter>
+  </defs>
+
+  <!-- Card Background -->
+  <rect x="1" y="1" width="278" height="78" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5" filter="url(#cardShadow)"/>
+
+  <!-- Left Rating Circle (5.0) -->
+  <circle cx="42" cy="40" r="22" fill="#FEF3C7" stroke="#FDE68A" stroke-width="1"/>
+  <text x="42" y="38" text-anchor="middle" fill="#B45309" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="900">5.0</text>
+  
+  <!-- Tiny Stars below 5.0 -->
+  <g transform="translate(30, 44) scale(0.6)">
+    <polygon points="5,0 6.5,3.5 10,4 7.5,6.5 8,10 5,8 2,10 2.5,6.5 0,4 3.5,3.5" fill="#F59E0B"/>
+    <polygon points="15,0 16.5,3.5 20,4 17.5,6.5 18,10 15,8 12,10 12.5,6.5 10,4 13.5,3.5" fill="#F59E0B"/>
+    <polygon points="25,0 26.5,3.5 30,4 27.5,6.5 28,10 25,8 22,10 22.5,6.5 20,4 23.5,3.5" fill="#F59E0B"/>
+    <polygon points="35,0 36.5,3.5 40,4 37.5,6.5 38,10 35,8 32,10 32.5,6.5 30,4 33.5,3.5" fill="#F59E0B"/>
+  </g>
+
+  <!-- Typography -->
+  <text x="74" y="27" fill="#D97706" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="8.5" font-weight="800" letter-spacing="1">TRAVELER'S CHOICE</text>
+  <text x="74" y="44" fill="#0F172A" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13.5" font-weight="700">Dunes Discovery Tourism</text>
+  <text x="74" y="59" fill="#64748B" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="9.5" font-weight="500">Google &amp; TripAdvisor (329+ Reviews)</text>
+
+  <!-- Star Badge Icon Right -->
+  <circle cx="254" cy="40" r="10" fill="#FEF3C7"/>
+  <polygon points="254,34 255.8,38.5 260.5,39.1 257.1,42.2 258,47 254,44.5 250,47 250.9,42.2 247.5,39.1 252.2,38.5" fill="#F59E0B"/>
+</svg>

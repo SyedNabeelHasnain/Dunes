@@ -48,6 +48,9 @@ class AdminSettingController extends Controller
             'seo_contact_title', 'seo_contact_description', 'seo_contact_keywords', 'seo_contact_og_image',
             'seo_faq_title', 'seo_faq_description', 'seo_faq_keywords', 'seo_faq_og_image',
             'seo_rate_card_title', 'seo_rate_card_description', 'seo_rate_card_keywords', 'seo_rate_card_og_image',
+            'seo_sunset_title', 'seo_sunset_description', 'seo_sunset_keywords', 'seo_sunset_og_image',
+            'seo_press_title', 'seo_press_description', 'seo_press_keywords', 'seo_press_og_image',
+            'indexnow_enabled', 'indexnow_key', 'indexnow_last_submission',
         ];
 
         $settings = Setting::whereIn('setting_key', $keys)
@@ -175,6 +178,9 @@ class AdminSettingController extends Controller
             'seo_contact_title', 'seo_contact_description', 'seo_contact_keywords', 'seo_contact_og_image',
             'seo_faq_title', 'seo_faq_description', 'seo_faq_keywords', 'seo_faq_og_image',
             'seo_rate_card_title', 'seo_rate_card_description', 'seo_rate_card_keywords', 'seo_rate_card_og_image',
+            'seo_sunset_title', 'seo_sunset_description', 'seo_sunset_keywords', 'seo_sunset_og_image',
+            'seo_press_title', 'seo_press_description', 'seo_press_keywords', 'seo_press_og_image',
+            'indexnow_enabled', 'indexnow_key',
 
             // Marketing & Promos
             'promo_top_banner_enabled', 'promo_top_banner_badge', 'promo_top_banner_text',
@@ -252,6 +258,10 @@ class AdminSettingController extends Controller
 
         if ($request->has('gttd_form_submitted')) {
             $settings['gttd_feed_enabled'] = $request->has('gttd_feed_enabled') ? '1' : '0';
+        }
+
+        if ($request->has('indexnow_form_submitted')) {
+            $settings['indexnow_enabled'] = $request->has('indexnow_enabled') ? '1' : '0';
         }
 
         foreach ($settings as $key => $value) {
@@ -361,5 +371,16 @@ class AdminSettingController extends Controller
                 'message' => 'Failed to synchronize currency rates. Please verify connection.',
             ], 500);
         }
+    }
+
+    /**
+     * Submit all public URLs to search engines via IndexNow protocol on demand.
+     */
+    public function pingIndexNow(\App\Services\IndexNowService $indexNow)
+    {
+        $result = $indexNow->submitAll();
+        $msgType = $result['success'] ? 'success' : 'error';
+
+        return back()->with($msgType, $result['message']);
     }
 }

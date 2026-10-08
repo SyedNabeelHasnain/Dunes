@@ -1,18 +1,39 @@
 @extends('layouts.app')
 
 @push('schema')
-@if(!empty($schemaImages))
 <script type="application/ld+json">
 {!! json_encode([
   '@context' => 'https://schema.org',
-  '@type' => 'ImageGallery',
-  'name' => $pageTitle,
-  'description' => $pageDesc,
-  'url' => $canonical,
-  'image' => $schemaImages,
+  '@graph' => array_values(array_filter([
+    !empty($schemaImages) ? [
+      '@type' => 'ImageGallery',
+      '@id' => $canonical . '#gallery',
+      'name' => $pageTitle,
+      'description' => $pageDesc,
+      'url' => $canonical,
+      'image' => $schemaImages,
+    ] : null,
+    [
+      '@type' => 'BreadcrumbList',
+      '@id' => $canonical . '#breadcrumb',
+      'itemListElement' => [
+        [
+          '@type' => 'ListItem',
+          'position' => 1,
+          'name' => __('ui.nav.home') ?? 'Home',
+          'item' => localized_route('home'),
+        ],
+        [
+          '@type' => 'ListItem',
+          'position' => 2,
+          'name' => __('ui.gallery_section.eyebrow') ?? 'Guest Moments Gallery',
+          'item' => $canonical,
+        ],
+      ],
+    ],
+  ])),
 ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
 </script>
-@endif
 @endpush
 
 @section('content')
@@ -115,6 +136,57 @@
         items: @js($filteredItems),
         currentIndex: 0,
         touchStartX: 0,
+        copiedShare: false,
+        init() {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const targetId = params.get('item') || (window.location.hash ? window.location.hash.replace('#', '') : null);
+                if (targetId) {
+                    const found = this.items.find(i => String(i.id) === String(targetId) || String(i.id) === 'media_' + targetId);
+                    if (found) {
+                        this.openLightbox(found, false);
+                    }
+                }
+            } catch (e) {}
+        },
+        updateUrl(itemId = null) {
+            try {
+                const url = new URL(window.location);
+                if (itemId) {
+                    url.searchParams.set('item', itemId);
+                } else {
+                    url.searchParams.delete('item');
+                }
+                window.history.replaceState({}, '', url);
+            } catch (e) {}
+        },
+        get currentShareUrl() {
+            if (!this.activeItem) return window.location.href;
+            try {
+                const url = new URL(window.location.origin + window.location.pathname);
+                url.searchParams.set('item', this.activeItem.id);
+                return url.toString();
+            } catch (e) {
+                return window.location.href;
+            }
+        },
+        copyShareLink() {
+            navigator.clipboard.writeText(this.currentShareUrl).then(() => {
+                this.copiedShare = true;
+                setTimeout(() => { this.copiedShare = false; }, 2500);
+            });
+        },
+        nativeShare() {
+            if (navigator.share && this.activeItem) {
+                navigator.share({
+                    title: this.activeItem.review_title || 'Dubai Desert Safari Guest Photo',
+                    text: 'Verified moments from Dunes Discovery Tourism in Dubai:',
+                    url: this.currentShareUrl,
+                }).catch(() => {});
+            } else {
+                this.copyShareLink();
+            }
+        },
         filterCategory(cat) {
             this.category = cat;
         },
@@ -129,30 +201,41 @@
                 return matchCat && matchSrc;
             });
         },
-        openLightbox(item) {
+        openLightbox(item, push = true) {
             const currentList = this.visibleItems;
             this.currentIndex = currentList.findIndex(i => i.id === item.id);
             if (this.currentIndex === -1) this.currentIndex = 0;
             this.activeItem = currentList[this.currentIndex] || item;
             this.lightboxOpen = true;
             document.body.classList.add('overflow-hidden');
+            if (push && this.activeItem) {
+                this.updateUrl(this.activeItem.id);
+            }
         },
         closeLightbox() {
             this.lightboxOpen = false;
             this.activeItem = null;
+            this.copiedShare = false;
             document.body.classList.remove('overflow-hidden');
+            this.updateUrl(null);
         },
         nextItem() {
             const list = this.visibleItems;
             if (!list.length) return;
             this.currentIndex = (this.currentIndex + 1) % list.length;
             this.activeItem = list[this.currentIndex];
+            if (this.activeItem) {
+                this.updateUrl(this.activeItem.id);
+            }
         },
         prevItem() {
             const list = this.visibleItems;
             if (!list.length) return;
             this.currentIndex = (this.currentIndex - 1 + list.length) % list.length;
             this.activeItem = list[this.currentIndex];
+            if (this.activeItem) {
+                this.updateUrl(this.activeItem.id);
+            }
         },
         reportBrokenLink(url, cardElement) {
             if (cardElement) {
@@ -476,6 +559,41 @@
                         <h5 class="text-lg font-bold text-white mb-2 leading-snug" x-text="activeItem.review_title"></h5>
                     </template>
                     <p class="text-white/80 text-sm leading-relaxed mb-6 whitespace-pre-line" x-text="activeItem ? (activeItem.full_review_text || activeItem.review_text) : ''"></p>
+                </div>
+
+                <!-- Social Sharing Bar (Deep-Link Magnet) -->
+                <div class="py-2.5 px-3 bg-slate-800/80 rounded-2xl border border-white/10 mb-3 flex items-center justify-between gap-2 flex-wrap">
+                    <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                        <i class="bi bi-share text-amber-400"></i> Share Moment:
+                    </span>
+                    <div class="flex items-center gap-1.5">
+                        <!-- 1-Click Copy Link -->
+                        <button type="button" 
+                                @click="copyShareLink()"
+                                class="px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-all inline-flex items-center gap-1 cursor-pointer shadow-2xs border"
+                                :class="copiedShare ? 'bg-emerald-600 text-white border-emerald-500' : 'bg-slate-700/80 hover:bg-slate-600 text-slate-200 border-white/10'">
+                            <i :class="copiedShare ? 'bi bi-check2 text-xs' : 'bi bi-link-45deg text-sm'"></i>
+                            <span x-text="copiedShare ? 'Copied!' : 'Copy Link'"></span>
+                        </button>
+                        
+                        <!-- WhatsApp Share -->
+                        <a :href="'https://api.whatsapp.com/send?text=' + encodeURIComponent('Check out this verified Dubai desert safari photo: ' + currentShareUrl)" 
+                           target="_blank" 
+                           rel="noopener"
+                           class="px-2.5 py-1.5 rounded-xl text-[11px] font-bold bg-emerald-600/80 hover:bg-emerald-600 text-white border border-emerald-500/30 transition-all inline-flex items-center gap-1 cursor-pointer">
+                            <i class="bi bi-whatsapp text-xs"></i> WhatsApp
+                        </a>
+
+                        <!-- Mobile Native Share -->
+                        <template x-if="typeof navigator !== 'undefined' && navigator.share">
+                            <button type="button" 
+                                    @click="nativeShare()"
+                                    class="p-1.5 rounded-xl bg-slate-700/80 hover:bg-slate-600 text-slate-200 border border-white/10 transition-all inline-flex items-center justify-center cursor-pointer"
+                                    title="More share options">
+                                <i class="bi bi-three-dots text-xs"></i>
+                            </button>
+                        </template>
+                    </div>
                 </div>
 
                 <!-- Action CTAs -->

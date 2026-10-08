@@ -28,6 +28,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\GoogleThingsToDoFeedController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\IndexNowController;
 use App\Http\Controllers\LegalController;
 use App\Http\Controllers\LlmsController;
 use App\Http\Controllers\LocationLandingController;
@@ -36,6 +37,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RateCardController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SubscriberController;
+use App\Http\Controllers\SunsetGuideController;
 use App\Http\Controllers\TourController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Middleware\AdminNoCacheMiddleware;
@@ -50,6 +52,8 @@ Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 Route::get('/faq', [PageController::class, 'faq'])->name('faq');
 Route::get('/rate-card', [RateCardController::class, 'index'])->name('rate-card');
 Route::redirect('/pricing-guide', '/rate-card', 301);
+Route::get('/dubai-desert-sunset-times', [SunsetGuideController::class, 'index'])->name('sunset.guide');
+Route::get('/press-kit', [PageController::class, 'pressKit'])->name('press.kit');
 // ── Legal, Privacy & Compliance Policies ──────────────────────────────────
 Route::get('/terms-condition', [LegalController::class, 'terms'])->name('terms');
 Route::get('/privacy-policy', [LegalController::class, 'privacy'])->name('privacy');
@@ -91,6 +95,8 @@ Route::get('/tours/{slug}', function (\Illuminate\Http\Request $request, $slug) 
     return redirect('/'.$slug . ($queryString ? '?'.$queryString : ''), 301);
 });
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/feed.xml', [BlogController::class, 'feed'])->name('blog.feed');
+Route::get('/feed.xml', [BlogController::class, 'feed'])->name('feed.unified');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
 Route::get('/thankyou', [BookingController::class, 'thankyou'])->name('booking.thankyou');
@@ -220,6 +226,7 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     // Integrations & Portal Settings (General, SEO, Marketing, Google, Meta, Currency, Cache)
     Route::get('/settings/general', [AdminSettingController::class, 'general'])->name('settings.general');
     Route::get('/settings/seo', [AdminSettingController::class, 'seo'])->name('settings.seo');
+    Route::post('/settings/indexnow/ping', [AdminSettingController::class, 'pingIndexNow'])->name('settings.indexnow.ping');
     Route::get('/settings/marketing', [AdminSettingController::class, 'marketing'])->name('settings.marketing');
     Route::get('/settings/google', [AdminSettingController::class, 'google'])->name('settings.google');
     Route::get('/settings/gttd', [AdminSettingController::class, 'gttd'])->name('settings.gttd');
@@ -311,6 +318,9 @@ Route::get('/feeds/google-things-to-do/proto.json', [GoogleThingsToDoFeedControl
 Route::get('/llms.txt', [LlmsController::class, 'index'])->name('llms.txt');
 Route::get('/llms-full.txt', [LlmsController::class, 'full'])->name('llms.full');
 
+// ── IndexNow Search Engine Protocol Verification Key ─────────────────────────
+Route::get('/{key}.txt', [IndexNowController::class, 'verifyKey'])->where('key', '^[a-zA-Z0-9_\-]+$')->name('indexnow.key');
+
 // ── RFC 9116 Vulnerability Disclosure & Security Policy ──────────────────────
 Route::get('/.well-known/security.txt', function () {
     return response()->file(public_path('.well-known/security.txt'), [
@@ -345,6 +355,8 @@ Route::prefix('{locale}')
         Route::get('/faq', [PageController::class, 'faq'])->name('locale.faq');
         Route::get('/rate-card', [RateCardController::class, 'index'])->name('locale.rate-card');
         Route::redirect('/pricing-guide', '/rate-card', 301);
+        Route::get('/dubai-desert-sunset-times', [SunsetGuideController::class, 'index'])->name('locale.sunset.guide');
+        Route::get('/press-kit', [PageController::class, 'pressKit'])->name('locale.press.kit');
 
         // Legal policies
         Route::get('/terms-condition', [LegalController::class, 'terms'])->name('locale.terms');

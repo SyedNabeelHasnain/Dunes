@@ -186,6 +186,8 @@ class SitemapController extends Controller
             '/rate-card' => ['changefreq' => 'weekly', 'priority' => '0.8'],
             '/blog' => ['changefreq' => 'weekly', 'priority' => '0.8'],
             '/gallery' => ['changefreq' => 'daily', 'priority' => '0.85'],
+            '/dubai-desert-sunset-times' => ['changefreq' => 'daily', 'priority' => '0.85'],
+            '/press-kit' => ['changefreq' => 'weekly', 'priority' => '0.8'],
             '/dune-buggy-rental-dubai' => ['changefreq' => 'daily', 'priority' => '0.95'],
             '/terms-condition' => ['changefreq' => 'monthly', 'priority' => '0.6'],
             '/privacy-policy' => ['changefreq' => 'monthly', 'priority' => '0.6'],

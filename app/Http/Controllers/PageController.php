@@ -446,4 +446,105 @@ class PageController extends Controller
 
         return redirect()->route('home')->with('success', 'Thank you for your valuable feedback. Our management team will review your comments.');
     }
+
+    /**
+     * Show Official Press Kit & Partner Media Resources page.
+     */
+    public function pressKit()
+    {
+        $settings = app(SettingsService::class);
+        $currentLocale = app()->getLocale();
+        $currentYear = date('Y');
+
+        $canonical = ($currentLocale && $currentLocale !== 'en')
+            ? url('/' . $currentLocale . '/press-kit')
+            : url('/press-kit');
+
+        $pageTitle = $settings->get('seo_press_title') ?: "Official Press Kit & Media Resources ({$currentYear}) | Dunes Discovery Tourism Dubai";
+        $pageDesc = $settings->get('seo_press_description') ?: "Download official high-resolution brand assets, DTCM licensing credentials, fact sheet, and embeddable partner badges for Dunes Discovery Tourism.";
+        $pageKeys = $settings->get('seo_press_keywords') ?: "dunes discovery press kit, dubai desert safari media kit, dtcm license verification, dunes discovery logo, desert safari partner badges";
+
+        $ogImageSetting = $settings->get('seo_press_og_image');
+        $ogImage = $ogImageSetting ? asset(ltrim($ogImageSetting, '/')) : asset('images/dubai-desert-safari-tour-dune-discovery-tourism.avif');
+
+        // Official Fact Sheet Stats
+        $facts = [
+            'company_name' => 'Dunes Discovery Tourism L.L.C.',
+            'license_number' => $settings->get('company_license_number', '1430583'),
+            'license_authority' => 'Department of Economy and Tourism (DET / DTCM), Dubai',
+            'established_year' => '2018',
+            'fleet_size' => '25+ Specially Prepared Toyota Land Cruisers & Dune Buggies',
+            'primary_terrain' => 'Lahbab Red Sand Desert, Dubai, UAE (25.04° N, 55.67° E)',
+            'rating_google' => '5.0 / 5.0 (Google Maps Verified)',
+            'rating_tripadvisor' => '4.9 / 5.0 (TripAdvisor Traveler Choice)',
+            'total_reviews' => '329+ Verified Direct & Global Platform Reviews',
+            'contact_press' => $settings->getFromEmail(),
+            'phone' => $settings->get('site_phone', '+971 50 245 6056'),
+        ];
+
+        // Embeddable Partner Badges
+        $badges = [
+            [
+                'id' => 'partner',
+                'name' => 'Verified Desert Safari Partner',
+                'description' => 'Dark luxury theme with gold desert compass emblem for partner portals, hotel concierges, and affiliate directories.',
+                'image' => asset('badges/verified-safari-partner.svg'),
+                'embed_code' => '<a href="' . url('/') . '" target="_blank" rel="noopener" title="Dunes Discovery Tourism - Verified Desert Safari Partner"><img src="' . asset('badges/verified-safari-partner.svg') . '" alt="Dunes Discovery Tourism - Verified Desert Safari Partner" width="280" height="80" style="display:inline-block;max-width:100%;height:auto;border-radius:14px;" /></a>',
+            ],
+            [
+                'id' => 'top-rated',
+                'name' => '5.0 Star Top Rated Operator',
+                'description' => 'Clean light card displaying our 5.0 rating across 329+ verified reviews on Google and TripAdvisor.',
+                'image' => asset('badges/top-rated-operator.svg'),
+                'embed_code' => '<a href="' . url('/') . '" target="_blank" rel="noopener" title="Dunes Discovery Tourism - 5.0 Star Top Rated Operator"><img src="' . asset('badges/top-rated-operator.svg') . '" alt="Dunes Discovery Tourism - 5.0 Star Top Rated Operator" width="280" height="80" style="display:inline-block;max-width:100%;height:auto;border-radius:14px;" /></a>',
+            ],
+            [
+                'id' => 'licensed',
+                'name' => 'DTCM Government Licensed Badge',
+                'description' => 'Emerald verified seal showcasing our official Dubai Department of Economy and Tourism license #1430583.',
+                'image' => asset('badges/det-licensed-badge.svg'),
+                'embed_code' => '<a href="' . url('/') . '" target="_blank" rel="noopener" title="Dunes Discovery Tourism - DTCM Licensed Operator Dubai"><img src="' . asset('badges/det-licensed-badge.svg') . '" alt="Dunes Discovery Tourism - DTCM Licensed Operator Dubai" width="280" height="80" style="display:inline-block;max-width:100%;height:auto;border-radius:14px;" /></a>',
+            ],
+        ];
+
+        // Editorial Media Downloads
+        $editorialImages = [
+            [
+                'title' => 'Lahbab Red Dunes 4x4 Dune Bashing Action',
+                'category' => 'Desert Safaris',
+                'filename' => 'evening-desert-safari-dubai-dune-discovery-tourism.avif',
+                'credit' => 'Photo: Dunes Discovery Tourism LLC',
+            ],
+            [
+                'title' => 'Golden Hour Sunset over Crimson Dunes',
+                'category' => 'Sunset & Landscape',
+                'filename' => 'sunset-desert-safari-dubai-dunes-discovery-tourism.avif',
+                'credit' => 'Photo: Dunes Discovery Tourism LLC',
+            ],
+            [
+                'title' => 'VIP 5-Star Bedouin Desert Oasis Camp & BBQ',
+                'category' => 'Camp Experience',
+                'filename' => 'vip-desert-safari-dubai-camp-dinner-bbq.avif',
+                'credit' => 'Photo: Dunes Discovery Tourism LLC',
+            ],
+            [
+                'title' => 'High-Performance Can-Am Maverick Dune Buggy',
+                'category' => 'Motorsports',
+                'filename' => 'can-am-maverick-x3-dune-buggy-rental-dubai.avif',
+                'credit' => 'Photo: Dunes Discovery Tourism LLC',
+            ],
+        ];
+
+        return view('pages.press-kit', compact(
+            'pageTitle',
+            'pageDesc',
+            'pageKeys',
+            'canonical',
+            'ogImage',
+            'facts',
+            'badges',
+            'editorialImages',
+            'currentYear'
+        ));
+    }
 }

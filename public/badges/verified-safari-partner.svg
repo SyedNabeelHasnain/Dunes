@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="280" height="80" viewBox="0 0 280 80" fill="none">
+  <defs>
+    <linearGradient id="bgGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="goldGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FBBF24"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+    <filter id="glow1" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#F59E0B" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Card Background -->
+  <rect x="1" y="1" width="278" height="78" rx="14" fill="url(#bgGrad1)" stroke="url(#goldGrad1)" stroke-width="1.5"/>
+
+  <!-- Left Icon Circle -->
+  <circle cx="42" cy="40" r="22" fill="#1E293B" stroke="url(#goldGrad1)" stroke-width="1.2"/>
+  
+  <!-- Desert Dunes & Compass Icon -->
+  <path d="M28 47C33 42 39 42 44 47C48 43 53 43 56 47" stroke="url(#goldGrad1)" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="42" cy="31" r="5" fill="url(#goldGrad1)"/>
+  <path d="M42 22L43.2 25.5L46.8 26.5L43.2 27.5L42 31L40.8 27.5L37.2 26.5L40.8 25.5Z" fill="#FBBF24" filter="url(#glow1)"/>
+
+  <!-- Brand Typography -->
+  <text x="74" y="27" fill="#F59E0B" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="800" letter-spacing="1.2">OFFICIAL PARTNER</text>
+  <text x="74" y="44" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700">Dunes Discovery</text>
+  <text x="74" y="59" fill="#94A3B8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="9.5" font-weight="500">Verified Desert Safari Operator</text>
+
+  <!-- Right Checkmark Badge -->
+  <circle cx="254" cy="40" r="10" fill="#10B981" fill-opacity="0.2"/>
+  <circle cx="254" cy="40" r="7" fill="#10B981"/>
+  <path d="M251.5 40L253.5 42L257 38" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

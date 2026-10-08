@@ -8,6 +8,7 @@ use App\Models\BlogTag;
 use App\Models\Tour;
 use App\Services\SettingsService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class BlogController extends Controller
@@ -271,5 +272,39 @@ class BlogController extends Controller
         }
 
         return $cardHtml . "\n" . $content;
+    }
+
+    /**
+     * Generate official RSS 2.0 / Atom syndication feed for travel publications and news readers.
+     */
+    public function feed()
+    {
+        $posts = Cache::remember('site_blog_rss_feed', 3600, function () {
+            return BlogPost::where('status', 'published')
+                ->with(['category', 'tags'])
+                ->orderBy('published_at', 'desc')
+                ->limit(30)
+                ->get();
+        });
+
+        $latestPost = $posts->first();
+        $lastBuildDate = $latestPost && $latestPost->published_at
+            ? $latestPost->published_at->toRfc2822String()
+            : now()->toRfc2822String();
+
+        $content = view('blog.feed', [
+            'posts' => $posts,
+            'lastBuildDate' => $lastBuildDate,
+            'channelTitle' => 'Dunes Discovery Tourism | Dubai Desert Safari & Adventure Blog',
+            'channelLink' => url('/blog'),
+            'channelDescription' => 'Expert insider guides, desert safari tips, dune buggy safety, and cultural Dubai travel insights by DTCM-licensed operator Dunes Discovery Tourism.',
+            'channelLanguage' => 'en-us',
+            'feedUrl' => url('/feed.xml'),
+        ])->render();
+
+        return response($content, 200, [
+            'Content-Type' => 'application/rss+xml; charset=utf-8',
+            'Cache-Control' => 'public, max-age=3600',
+        ]);
     }
 }

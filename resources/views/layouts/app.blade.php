@@ -214,6 +214,7 @@
     <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('images/icon-192.png') }}">
     <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <link rel="alternate" type="application/rss+xml" title="Dunes Discovery Tourism Travel Blog" href="{{ url('/feed.xml') }}">
 
     <!-- Prevent Alpine.js modal/drawer flashing during page hydration -->
     <style>[x-cloak] { display: none !important; }</style>
@@ -738,6 +739,8 @@
                             <li><a href="{{ route('rate-card') }}" class="text-slate-300 hover:text-white transition-colors inline-flex items-center gap-1.5"><i class="bi bi-file-earmark-pdf text-amber-400"></i>{{ __('ui.footer.rate_card_pdf') }}</a></li>
                             <li><a href="{{ route('gallery.index') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.nav.gallery') }}</a></li>
                             <li><a href="{{ route('blog.index') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.nav.blog') }}</a></li>
+                            <li><a href="{{ route('sunset.guide') }}" class="text-slate-300 hover:text-white transition-colors">Dubai Desert Sunset Times</a></li>
+                            <li><a href="{{ route('press.kit') }}" class="text-slate-300 hover:text-white transition-colors">Press Kit &amp; Partner Badges</a></li>
                         @endif
                     </ul>
                 </div>

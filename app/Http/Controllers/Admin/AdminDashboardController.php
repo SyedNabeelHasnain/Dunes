@@ -9,6 +9,7 @@ use App\Models\Contact;
 use App\Models\EmailCampaign;
 use App\Models\RequestLog;
 use App\Models\Subscriber;
+use App\Models\WhatsappInquiry;
 use App\Services\ZiinaPaymentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -56,7 +57,7 @@ class AdminDashboardController extends Controller
         // 5. Customer Communications: Contact Inquiries & WhatsApp Leads
         $newInquiries = Contact::where('status', 'new')->count();
         $totalInquiries = Contact::count();
-        $totalWhatsappLeads = DB::table('whatsapp_inquiries')->count();
+        $totalWhatsappLeads = WhatsappInquiry::count();
 
         // 6. Audience & Email Marketing
         $subscribersCount = Subscriber::where('status', 'subscribed')->count();

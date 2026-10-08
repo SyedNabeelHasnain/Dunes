@@ -47,6 +47,15 @@
                     <button type="button" @click="activeTab = 'rate-card'" :class="activeTab === 'rate-card' ? 'bg-primary text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'" class="px-3.5 py-2 rounded-xl text-xs font-bold transition shrink-0" id="rate-card-tab">
                         Rate Card
                     </button>
+                    <button type="button" @click="activeTab = 'sunset'" :class="activeTab === 'sunset' ? 'bg-primary text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'" class="px-3.5 py-2 rounded-xl text-xs font-bold transition shrink-0" id="sunset-tab">
+                        Sunset Guide
+                    </button>
+                    <button type="button" @click="activeTab = 'press'" :class="activeTab === 'press' ? 'bg-primary text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'" class="px-3.5 py-2 rounded-xl text-xs font-bold transition shrink-0" id="press-tab">
+                        Press Kit
+                    </button>
+                    <button type="button" @click="activeTab = 'indexnow'" :class="activeTab === 'indexnow' ? 'bg-primary text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'" class="px-3.5 py-2 rounded-xl text-xs font-bold transition shrink-0" id="indexnow-tab">
+                        IndexNow Protocol
+                    </button>
                 </div>
 
                 <div id="seoTabsContent">
@@ -347,6 +356,154 @@
                                     <label for="seo_rate_card_og_image" class="block text-xs font-bold text-slate-700 mb-1.5">Rate Card OG Image</label>
                                     <input type="text" name="seo_rate_card_og_image" id="seo_rate_card_og_image" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['seo_rate_card_og_image'] ?? '' }}" placeholder="/images/og-rate-card.jpg">
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 9. Sunset Guide SEO -->
+                    <div x-show="activeTab === 'sunset'" id="tab-sunset" x-cloak>
+                        <div class="p-5 bg-slate-50/70 rounded-2xl border border-slate-200/80">
+                            <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+                                <h6 class="text-xs font-black uppercase tracking-wider text-primary flex items-center gap-2">
+                                    <i class="bi bi-sunset-fill"></i> Dubai Desert Sunset &amp; Golden Hour Guide (/dubai-desert-sunset-times)
+                                </h6>
+                                <span class="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[11px] font-bold text-amber-700">Link Magnet</span>
+                            </div>
+                            <p class="text-xs text-slate-500 mb-4">Dedicated landing page for astronomical sunset countdown, 12-month photography schedules, and golden hour timing charts.</p>
+
+                            <div class="mb-4">
+                                <div class="flex justify-between items-center mb-1.5">
+                                    <label for="seo_sunset_title" class="block text-xs font-bold text-slate-700">Sunset Guide Meta Title</label>
+                                    <span class="text-[11px] text-slate-400 char-count" data-target="seo_sunset_title">0 / 60</span>
+                                </div>
+                                <input type="text" name="seo_sunset_title" id="seo_sunset_title" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary seo-input" value="{{ $settings['seo_sunset_title'] ?? '' }}" placeholder="Dubai Desert Sunset Times {{ date('Y') }} | Lahbab Red Dunes Golden Hour Guide">
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="flex justify-between items-center mb-1.5">
+                                    <label for="seo_sunset_description" class="block text-xs font-bold text-slate-700">Sunset Guide Meta Description</label>
+                                    <span class="text-[11px] text-slate-400 char-count" data-target="seo_sunset_description">0 / 160</span>
+                                </div>
+                                <textarea name="seo_sunset_description" id="seo_sunset_description" rows="3" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary seo-input" placeholder="Complete astronomical guide to Dubai desert sunset times, golden hour photography windows, and evening safari departure schedules in Lahbab Red Dunes.">{{ $settings['seo_sunset_description'] ?? '' }}</textarea>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="seo_sunset_keywords" class="block text-xs font-bold text-slate-700 mb-1.5">Sunset Keywords</label>
+                                    <input type="text" name="seo_sunset_keywords" id="seo_sunset_keywords" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['seo_sunset_keywords'] ?? '' }}" placeholder="dubai desert sunset time, lahbab golden hour, evening safari sunset dubai">
+                                </div>
+                                <div>
+                                    <label for="seo_sunset_og_image" class="block text-xs font-bold text-slate-700 mb-1.5">Sunset OG Image</label>
+                                    <input type="text" name="seo_sunset_og_image" id="seo_sunset_og_image" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['seo_sunset_og_image'] ?? '' }}" placeholder="/images/evening-desert-safari-dubai-dune-discovery-tourism.avif">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 10. Press Kit SEO -->
+                    <div x-show="activeTab === 'press'" id="tab-press" x-cloak>
+                        <div class="p-5 bg-slate-50/70 rounded-2xl border border-slate-200/80">
+                            <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+                                <h6 class="text-xs font-black uppercase tracking-wider text-primary flex items-center gap-2">
+                                    <i class="bi bi-newspaper"></i> Official Press Kit &amp; Media Resources (/press-kit)
+                                </h6>
+                                <span class="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-[11px] font-bold text-blue-700">PR &amp; Authority</span>
+                            </div>
+                            <p class="text-xs text-slate-500 mb-4">Corporate fact sheet, brand identity downloads, and embeddable trust badges for travel publications and partners.</p>
+
+                            <div class="mb-4">
+                                <div class="flex justify-between items-center mb-1.5">
+                                    <label for="seo_press_title" class="block text-xs font-bold text-slate-700">Press Kit Meta Title</label>
+                                    <span class="text-[11px] text-slate-400 char-count" data-target="seo_press_title">0 / 60</span>
+                                </div>
+                                <input type="text" name="seo_press_title" id="seo_press_title" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary seo-input" value="{{ $settings['seo_press_title'] ?? '' }}" placeholder="Official Press Kit &amp; Media Resources {{ date('Y') }} | Dunes Discovery Tourism Dubai">
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="flex justify-between items-center mb-1.5">
+                                    <label for="seo_press_description" class="block text-xs font-bold text-slate-700">Press Kit Meta Description</label>
+                                    <span class="text-[11px] text-slate-400 char-count" data-target="seo_press_description">0 / 160</span>
+                                </div>
+                                <textarea name="seo_press_description" id="seo_press_description" rows="3" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary seo-input" placeholder="Official media kit, downloadable brand assets, DET licensing credentials, fact sheet, and embeddable badges for Dunes Discovery Tourism.">{{ $settings['seo_press_description'] ?? '' }}</textarea>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="seo_press_keywords" class="block text-xs font-bold text-slate-700 mb-1.5">Press Kit Keywords</label>
+                                    <input type="text" name="seo_press_keywords" id="seo_press_keywords" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['seo_press_keywords'] ?? '' }}" placeholder="dunes discovery press kit, dubai desert safari media kit, partner badges">
+                                </div>
+                                <div>
+                                    <label for="seo_press_og_image" class="block text-xs font-bold text-slate-700 mb-1.5">Press Kit OG Image</label>
+                                    <input type="text" name="seo_press_og_image" id="seo_press_og_image" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['seo_press_og_image'] ?? '' }}" placeholder="/images/dubai-desert-safari-tour-dune-discovery-tourism.avif">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 11. IndexNow Protocol -->
+                    <div x-show="activeTab === 'indexnow'" id="tab-indexnow" x-cloak>
+                        <input type="hidden" name="indexnow_form_submitted" value="1">
+                        <div class="p-5 bg-slate-50/70 rounded-2xl border border-slate-200/80">
+                            <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+                                <h6 class="text-xs font-black uppercase tracking-wider text-primary flex items-center gap-2">
+                                    <i class="bi bi-broadcast"></i> IndexNow Protocol (Instant Search Engine Indexing)
+                                </h6>
+                                <span class="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-bold text-emerald-700">Bing, Yandex, Seznam, Naver</span>
+                            </div>
+                            <p class="text-xs text-slate-500 mb-5">IndexNow allows website owners to instantly inform search engines about the latest content changes on their website, eliminating crawl delays.</p>
+
+                            <div class="p-4 bg-white rounded-2xl border border-slate-200 mb-5 flex items-center justify-between gap-4 flex-wrap">
+                                <div>
+                                    <div class="text-xs font-bold text-slate-900">Enable IndexNow Protocol</div>
+                                    <div class="text-[11px] text-slate-500 mt-0.5">Automatically dispatches URL changes when tours, blog posts, or pages are modified.</div>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="indexnow_enabled" value="1" class="sr-only peer" {{ ($settings['indexnow_enabled'] ?? '1') === '1' ? 'checked' : '' }}>
+                                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                </label>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="indexnow_key" class="block text-xs font-bold text-slate-700 mb-1.5">IndexNow API &amp; Verification Key (Hex / Alphanumeric)</label>
+                                <input type="text" name="indexnow_key" id="indexnow_key" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-mono text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['indexnow_key'] ?? '9f2b87e2467d4ab8a9b31d871e4f9b88' }}">
+                                <div class="text-[11px] text-slate-500 mt-1.5 flex items-center gap-2 flex-wrap">
+                                    <span>Verification File Location:</span>
+                                    <a href="{{ url('/' . ($settings['indexnow_key'] ?? '9f2b87e2467d4ab8a9b31d871e4f9b88') . '.txt') }}" target="_blank" class="text-primary hover:underline font-mono">
+                                        {{ url('/' . ($settings['indexnow_key'] ?? '9f2b87e2467d4ab8a9b31d871e4f9b88') . '.txt') }}
+                                    </a>
+                                </div>
+                            </div>
+
+                            @if(!empty($settings['indexnow_last_submission']))
+                            @php
+                                $lastSub = json_decode($settings['indexnow_last_submission'], true);
+                            @endphp
+                            @if(is_array($lastSub))
+                            <div class="p-4 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-700 mb-4">
+                                <div class="font-bold text-slate-900 mb-1 flex items-center gap-1.5">
+                                    <i class="bi bi-clock-history text-primary"></i> Last IndexNow Submission:
+                                </div>
+                                <div class="text-[11px] text-slate-600">
+                                    Status: <span class="font-bold {{ ($lastSub['success'] ?? false) ? 'text-emerald-600' : 'text-rose-600' }}">{{ $lastSub['status'] ?? 'N/A' }}</span> &bull; 
+                                    URLs Count: <span class="font-bold">{{ $lastSub['count'] ?? 0 }}</span> &bull; 
+                                    Timestamp: <span class="font-mono">{{ $lastSub['submitted_at'] ?? 'N/A' }}</span>
+                                </div>
+                                <div class="text-[11px] text-slate-500 mt-1">{{ $lastSub['message'] ?? '' }}</div>
+                            </div>
+                            @endif
+                            @endif
+
+                            <div class="mt-4 pt-4 border-t border-slate-200/80 flex items-center justify-between flex-wrap gap-3">
+                                <div>
+                                    <div class="text-xs font-bold text-slate-800">Manual Search Engine Ping</div>
+                                    <div class="text-[11px] text-slate-500">Dispatch immediate IndexNow notification for all active tours, blogs, and landing pages.</div>
+                                </div>
+                                <button type="submit" 
+                                        formaction="{{ route('admin.settings.indexnow.ping') }}" 
+                                        formmethod="POST"
+                                        class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs inline-flex items-center gap-1.5 cursor-pointer">
+                                    <i class="bi bi-send-fill text-xs"></i> Ping Search Engines Now
+                                </button>
                             </div>
                         </div>
                     </div>
