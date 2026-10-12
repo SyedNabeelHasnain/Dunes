@@ -34,49 +34,49 @@ return new class extends Migration
             'seo_default_title' => 'Dunes Discovery Tourism | Premium Dubai Desert Safari Tours',
             'seo_default_description' => 'Experience Dubai\'s premier desert safari adventures with Dunes Discovery Tourism. VIP majlis, dune bashing, quad biking, camel rides & gourmet BBQ.',
             'seo_default_keywords' => 'desert safari dubai, dubai safari, dunes discovery tourism, evening desert safari, vip desert safari',
-            'seo_default_og_image' => '/images/og-default.jpg',
+            'seo_default_og_image' => '/images/desert-safari-poster.avif',
 
             // Homepage SEO
             'seo_home_title' => 'Dunes Discovery Tourism | Dubai Desert Safari & Adventure Tours 2026',
             'seo_home_description' => 'Experience the best desert safari in Dubai with Dunes Discovery Tourism. High-octane dune bashing, quad biking, camel rides, falconry & 5-star VIP BBQ dinners.',
             'seo_home_keywords' => 'desert safari dubai, evening desert safari, dunes discovery, dubai safari tours 2026, quad biking dubai',
-            'seo_home_og_image' => '/images/og-home.jpg',
+            'seo_home_og_image' => '/images/evening-desert-safari-dubai-dune-discovery-tourism.avif',
 
             // Tours Catalog SEO
             'seo_tours_title' => 'Dubai Desert Safari Tours & Adventure Packages 2026 | Dunes Discovery',
             'seo_tours_description' => 'Browse our complete catalog of certified Dubai desert safari packages. Compare Standard, VIP, and Private tours with live pricing and instant confirmation.',
             'seo_tours_keywords' => 'dubai tour catalog, desert safari packages, evening safari, morning safari, overnight desert safari dubai',
-            'seo_tours_og_image' => '/images/og-tours.jpg',
+            'seo_tours_og_image' => '/images/dubai-desert-safari-tour-dune-discovery-tourism.avif',
 
             // Blog Catalog SEO
             'seo_blog_title' => 'Dubai Desert Safari & Travel Guide Blog 2026 | Dunes Discovery',
             'seo_blog_description' => 'Expert travel guides, insider tips, packing checklists, and cultural insights for your Dubai desert safari journey from certified tourism specialists.',
             'seo_blog_keywords' => 'dubai desert blog, desert safari tips, dubai travel guide, what to wear desert safari, dune bashing tips',
-            'seo_blog_og_image' => '/images/og-blog.jpg',
+            'seo_blog_og_image' => '/images/desert-safari-dubai-dune-discovery-tourism-HD.avif',
 
             // About Us SEO
             'seo_about_title' => 'About Dunes Discovery Tourism | Certified Dubai Desert Safari Experts',
             'seo_about_description' => 'Learn about Dunes Discovery Tourism LLC. Licensed by Dubai Department of Economy and Tourism (DET #1430583), offering trusted desert safari experiences since 2018.',
             'seo_about_keywords' => 'about dunes discovery, dubai tourism license 1430583, trusted dubai tour operator, desert safari team',
-            'seo_about_og_image' => '/images/og-about.jpg',
+            'seo_about_og_image' => '/images/dubai-desert-safar-camel-ride-dune-discovery-tourism.avif',
 
             // Contact Us SEO
             'seo_contact_title' => 'Contact Dunes Discovery Tourism | 24/7 Dubai Safari Support',
             'seo_contact_description' => 'Get in touch with Dunes Discovery Tourism. 24/7 customer support via WhatsApp (+971 50 245 6056), phone, and email for instant safari bookings and inquiries.',
             'seo_contact_keywords' => 'contact dunes discovery, dubai safari customer service, dunes whatsapp booking, dubai tour phone number',
-            'seo_contact_og_image' => '/images/og-contact.jpg',
+            'seo_contact_og_image' => '/images/dubai-desert-safari-camp-dune-discovery-tourism.avif',
 
             // FAQ SEO
             'seo_faq_title' => 'Frequently Asked Questions | Dubai Desert Safari Guide 2026',
             'seo_faq_description' => 'Find answers to top questions about Dubai desert safaris: pickup locations, safety, attire, infant policies, cancellation rules, and payment options.',
             'seo_faq_keywords' => 'desert safari faq, what to bring desert safari, dubai safari safety questions, desert safari timing faq',
-            'seo_faq_og_image' => '/images/og-faq.jpg',
+            'seo_faq_og_image' => '/images/dubai-desert-safari-dune-bashing-dune-discovery-tourism.avif',
 
             // Rate Card SEO
             'seo_rate_card_title' => 'Official Rate Card & Pricing Guide 2026 | Dunes Discovery Tourism',
             'seo_rate_card_description' => 'View transparent, all-inclusive rates for all Dubai Desert Safari packages, VIP majlis upgrades, buggy rentals, and private transport options.',
             'seo_rate_card_keywords' => 'desert safari prices dubai, safari rate card 2026, dubai buggy prices, vip safari rates',
-            'seo_rate_card_og_image' => '/images/og-rate-card.jpg',
+            'seo_rate_card_og_image' => '/images/dubai-desert-safari-bbq-dune-discovery-tourism.avif',
 
             // Marketing: Top Announcement Banner
             'promo_top_banner_enabled' => '1',

@@ -97,7 +97,7 @@ class BlogController extends Controller
         }
 
         $ogImageSetting = $settingsService->get('seo_blog_og_image');
-        $ogImage = $ogImageSetting ? asset(ltrim($ogImageSetting, '/')) : asset('images/desert-safari-poster.avif');
+        $ogImage = resolve_og_image($ogImageSetting, 'images/desert-safari-dubai-dune-discovery-tourism-HD.avif');
 
         $isFiltered = ! empty($categorySlug) || ! empty($tagSlug) || ! empty($search) || ! empty($request->except('page'));
         $pageRobots = $isFiltered
@@ -145,7 +145,7 @@ class BlogController extends Controller
             $relatedPosts = $relatedPosts->concat($extra);
         }
 
-        $featImgPath = $post->featured_image ? asset('images/blog/'.preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $post->featured_image)) : asset('images/desert-safari-poster.avif');
+        $featImgPath = $post->featured_image_url;
         $currentLocale = app()->getLocale();
 
         $defaultEnCanonical = url('/blog/'.$post->slug);
@@ -157,7 +157,7 @@ class BlogController extends Controller
             ? localized_route('blog.show', $post->slug)
             : ($customCanonical ?: localized_route('blog.show', $post->slug));
 
-        $ogImage = $post->og_image ?: $featImgPath;
+        $ogImage = $post->og_image ? resolve_og_image($post->og_image) : $featImgPath;
 
         $baseTitle = $post->meta_title ?: $post->title.' | Dunes Discovery';
         $baseDesc = $post->meta_desc ?: ($post->excerpt ?: Str::limit(strip_tags($post->content), 155));
@@ -192,6 +192,26 @@ class BlogController extends Controller
 
         // Inject the interactive tour card directly into post HTML content
         $processedContent = $this->injectTourCardIntoContent($post->content ?? '', $matchedTour, $post);
+
+        if (! empty($processedContent)) {
+            $processedContent = str_replace(
+                [
+                    '/luxury-vip-desert-safari-dubai',
+                    '/vip-desert-safari-dubai',
+                    '/cancellation-policy',
+                    '/custom-safari',
+                    '/pricing-guide',
+                ],
+                [
+                    '/evening-desert-safari-dubai',
+                    '/evening-desert-safari-dubai',
+                    '/cancellation-refund-policy',
+                    '/build-your-own-safari',
+                    '/rate-card',
+                ],
+                $processedContent
+            );
+        }
 
         if ($currentLocale && $currentLocale !== 'en' && ! empty($processedContent)) {
             $processedContent = (string) preg_replace(

@@ -33,7 +33,7 @@
             <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Total Bookings</div>
             <h3 class="text-xl lg:text-2xl font-black text-slate-900 mb-1 kpi-number" id="kpiTotalBookings">{{ number_format($stats['total']) }}</h3>
         </div>
-        <span class="text-[11px] text-slate-500">Active reservations</span>
+        <span class="text-[11px] text-slate-500">Active &bull; <span id="kpiCancelledBookings">{{ number_format($stats['cancelled'] ?? 0) }}</span> Cancelled</span>
     </div>
 
     <div class="p-4 bg-white rounded-2xl shadow-xs border border-slate-200/80 flex flex-col justify-between">
@@ -174,6 +174,7 @@
                 <div class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Reviews & Rating</div>
                 <div class="flex items-baseline gap-2 mt-0.5">
                     <span class="text-lg font-black text-amber-600 kpi-number" id="kpiApprovedReviews">{{ number_format($stats['approved_reviews'] ?? 0) }}</span>
+                    <span class="text-[11px] text-slate-400">/ <span id="kpiTotalReviews">{{ number_format($stats['total_reviews'] ?? 0) }}</span></span>
                     <span class="text-[11px] font-bold text-amber-500 bg-amber-50 px-1.5 py-0.5 rounded" id="kpiAvgRating">{{ number_format($stats['avg_rating'] ?? 5.0, 1) }} ★</span>
                     <a href="{{ route('admin.reviews.index') }}" class="text-xs font-semibold text-primary hover:underline flex items-center gap-1 ms-1">Reviews <i class="bi bi-chevron-right text-[10px]"></i></a>
                 </div>
@@ -506,22 +507,27 @@ $(document).ready(function() {
         });
     });
 
-    // Real-Time KPI Refresh with Shimmer Placeholders
-    $('#btnRefreshDashboardKpis').on('click', function(e) {
-        e.preventDefault();
-        const $btn = $(this);
+    // Real-Time KPI Refresh (Manual + Automatic Background Sync)
+    let isRefreshingKpis = false;
+
+    function refreshDashboardKpis(isManual = false) {
+        if (isRefreshingKpis) return;
+        isRefreshingKpis = true;
+
+        const $btn = $('#btnRefreshDashboardKpis');
         const $icon = $('#kpiSyncIcon');
         const $status = $('#kpiSyncStatus');
 
         $btn.prop('disabled', true);
         $icon.addClass('kpi-sync-spin');
-        $status.html('<span class="text-primary font-bold"><i class="bi bi-hourglass-split me-1"></i>Counting live from database...</span>');
 
-        // Render shimmer loaders as placeholders on all counter cards
-        $('.kpi-number').each(function() {
-            $(this).data('cached-html', $(this).html());
-            $(this).html('<span class="counter-shimmer"></span>');
-        });
+        if (isManual) {
+            $status.html('<span class="text-primary font-bold"><i class="bi bi-hourglass-split me-1"></i>Counting live from database...</span>');
+            $('.kpi-number').each(function() {
+                $(this).data('cached-html', $(this).html());
+                $(this).html('<span class="counter-shimmer"></span>');
+            });
+        }
 
         $.ajax({
             url: "{{ route('admin.api.kpis') }}",
@@ -532,6 +538,7 @@ $(document).ready(function() {
                 'Pragma': 'no-cache'
             },
             success: function(res) {
+                isRefreshingKpis = false;
                 $icon.removeClass('kpi-sync-spin');
                 $btn.prop('disabled', false);
 
@@ -540,6 +547,7 @@ $(document).ready(function() {
                     const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
                     $('#kpiTotalBookings').text(Number(s.total).toLocaleString());
+                    $('#kpiCancelledBookings').text(Number(s.cancelled || 0).toLocaleString());
                     $('#kpiConfirmedBookings').text(Number(s.confirmed_and_completed || (s.confirmed + s.completed)).toLocaleString());
                     $('#kpiConfirmedCount').text(Number(s.confirmed).toLocaleString());
                     $('#kpiCompletedCount').text(Number(s.completed).toLocaleString());
@@ -556,6 +564,7 @@ $(document).ready(function() {
                     $('#kpiActiveTours').text(Number(s.active_tours || 0).toLocaleString());
                     $('#kpiTotalTours').text(Number(s.total_tours || 0).toLocaleString());
                     $('#kpiApprovedReviews').text(Number(s.approved_reviews || 0).toLocaleString());
+                    $('#kpiTotalReviews').text(Number(s.total_reviews || 0).toLocaleString());
                     $('#kpiAvgRating').text(Number(s.avg_rating || 5.0).toFixed(1) + ' ★');
                     $('#kpiPublishedPosts').text(Number(s.published_posts || 0).toLocaleString());
                     $('#kpiTotalPosts').text(Number(s.total_posts || 0).toLocaleString());
@@ -568,18 +577,20 @@ $(document).ready(function() {
 
                     $status.html(`Live as of <span class="font-bold text-emerald-600">${nowTime}</span>`);
 
-                    const Toast = Swal.mixin({
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 2000,
-                        timerProgressBar: true
-                    });
-                    Toast.fire({
-                        icon: 'success',
-                        title: 'All Metrics Recounted Live!'
-                    });
-                } else {
+                    if (isManual) {
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 2000,
+                            timerProgressBar: true
+                        });
+                        Toast.fire({
+                            icon: 'success',
+                            title: 'All Metrics Recounted Live!'
+                        });
+                    }
+                } else if (isManual) {
                     $('.kpi-number').each(function() {
                         $(this).html($(this).data('cached-html'));
                     });
@@ -587,14 +598,35 @@ $(document).ready(function() {
                 }
             },
             error: function() {
+                isRefreshingKpis = false;
                 $icon.removeClass('kpi-sync-spin');
                 $btn.prop('disabled', false);
-                $('.kpi-number').each(function() {
-                    $(this).html($(this).data('cached-html'));
-                });
-                $status.html('<span class="text-rose-600">Sync error</span>');
+                if (isManual) {
+                    $('.kpi-number').each(function() {
+                        $(this).html($(this).data('cached-html'));
+                    });
+                    $status.html('<span class="text-rose-600">Sync error</span>');
+                }
             }
         });
+    }
+
+    $('#btnRefreshDashboardKpis').on('click', function(e) {
+        e.preventDefault();
+        refreshDashboardKpis(true);
+    });
+
+    // Automatic background KPI refresh every 30 seconds and on tab focus
+    setInterval(function() {
+        if (!document.hidden) {
+            refreshDashboardKpis(false);
+        }
+    }, 30000);
+
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            refreshDashboardKpis(false);
+        }
     });
 });
 </script>

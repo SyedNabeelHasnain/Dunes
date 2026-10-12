@@ -123,6 +123,7 @@ trait HasTranslations
 
     /**
      * Set all translations for an attribute: ['en' => '...', 'ar' => '...'].
+     * Merges with any existing translations for locales not present in $translations.
      */
     public function setTranslations(string $key, array $translations): self
     {
@@ -132,15 +133,16 @@ trait HasTranslations
             return $this;
         }
 
-        // Clean empty entries
-        $cleaned = [];
+        $merged = $this->exists ? $this->getTranslations($key) : [];
         foreach ($translations as $locale => $val) {
             if ($val !== null && $val !== '') {
-                $cleaned[$locale] = is_string($val) ? trim($val) : $val;
+                $merged[$locale] = is_string($val) ? trim($val) : $val;
+            } else {
+                unset($merged[$locale]);
             }
         }
 
-        $this->attributes[$key] = json_encode($cleaned, JSON_UNESCAPED_UNICODE);
+        $this->attributes[$key] = json_encode($merged, JSON_UNESCAPED_UNICODE);
 
         return $this;
     }

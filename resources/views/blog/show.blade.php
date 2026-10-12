@@ -8,10 +8,10 @@
     $authorTitle = $post->author_title ?? 'Dubai Tourism Expert';
     $authorBio = $post->author_bio ?? '';
     
-    $featImgPath = $post->featured_image ? asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $post->featured_image)) : asset('images/desert-safari-poster.avif');
+    $featImgPath = $post->featured_image_url;
     $currentLocale = $currentLocale ?? app()->getLocale() ?? 'en';
     $canonical = $canonical ?? localized_route('blog.show', $post->slug);
-    $ogImageUrl = $post->og_image ?: $featImgPath;
+    $ogImageUrl = isset($ogImage) ? resolve_og_image($ogImage) : $post->og_image_url;
     
     $pageTitle = $pageTitle ?? ($post->meta_title ?: $post->title . ' | Dunes Discovery');
     $pageDesc = $pageDesc ?? ($post->meta_desc ?: ($post->excerpt ?: Str::limit(strip_tags($post->content), 155)));

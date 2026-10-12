@@ -82,7 +82,7 @@ class AdminDashboardController extends Controller
             ->whereIn('status', ['confirmed', 'completed', 'pending'])
             ->count();
         $upcomingDeparturesCount = Booking::where('tour_date', '>=', now()->format('Y-m-d'))
-            ->whereIn('status', ['confirmed', 'pending'])
+            ->whereIn('status', ['confirmed', 'completed', 'pending'])
             ->count();
 
         return [
@@ -129,9 +129,13 @@ class AdminDashboardController extends Controller
                 ->limit(10)
                 ->get();
 
-            // Top Tours (by booking counts) - real-time fresh without cache
+            // Top Tours (by booking counts & collected/contracted revenue) - real-time fresh without cache
             $topTours = Booking::whereIn('status', ['confirmed', 'completed'])
-                ->select('tour_name', DB::raw('COUNT(*) as count'), DB::raw('SUM(total) as revenue'))
+                ->select(
+                    'tour_name',
+                    DB::raw('COUNT(*) as count'),
+                    DB::raw("SUM(CASE WHEN payment_status IN ('paid', 'partial') THEN (CASE WHEN payment_amount > 0 THEN payment_amount ELSE (CASE WHEN payment_status = 'paid' THEN total ELSE 0 END) END) ELSE total END) as revenue")
+                )
                 ->groupBy('tour_name')
                 ->orderBy('count', 'desc')
                 ->limit(5)

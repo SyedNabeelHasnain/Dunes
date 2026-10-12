@@ -265,7 +265,7 @@
 </div>
 
 <!-- Modal: View Details (Alpine.js) -->
-<div x-data="{ open: false }" @open-lead-modal.window="open = true" x-show="open" x-cloak class="relative z-50">
+<div x-data="{ open: false }" @open-lead-modal.window="open = true" @close-lead-modal.window="open = false" x-show="open" x-cloak class="relative z-50">
     <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" @click="open = false"></div>
     <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-16 flex items-center justify-center">
         <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-2xl w-full p-6 space-y-4" @click.stop>

@@ -21,6 +21,7 @@ class AdminMenuController extends Controller
             'footer_desert_safaris' => 'Footer: Desert Safaris (Col 2)',
             'footer_tours_cruises' => 'Footer: Tours & Cruises (Col 3)',
             'footer_trust_policies' => 'Footer: Trust & Policies (Col 4)',
+            'footer_contact_help' => 'Footer: Contact & Help',
         ];
 
         if (! array_key_exists($location, $validLocations)) {

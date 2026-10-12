@@ -18,6 +18,8 @@ class BlogPost extends Model
         'meta_title',
         'meta_desc',
         'meta_keywords',
+        'author_bio',
+        'ai_summary',
     ];
 
     protected $fillable = [
@@ -36,6 +38,35 @@ class BlogPost extends Model
         'priority' => 'integer',
         'published_at' => 'datetime',
     ];
+
+    public function getFeaturedImageUrlAttribute(): string
+    {
+        $img = $this->featured_image;
+        if (empty($img)) {
+            return asset('images/desert-safari-poster.avif');
+        }
+        if (str_starts_with($img, 'http://') || str_starts_with($img, 'https://')) {
+            return $img;
+        }
+        $clean = ltrim($img, '/');
+        if (str_starts_with($clean, 'blogs/')) {
+            return asset('storage/'.$clean);
+        }
+        if (str_starts_with($clean, 'images/')) {
+            return asset($clean);
+        }
+
+        return asset('images/blog/'.preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $clean));
+    }
+
+    public function getOgImageUrlAttribute(): string
+    {
+        if (! empty($this->og_image)) {
+            return resolve_og_image($this->og_image);
+        }
+
+        return $this->featured_image_url;
+    }
 
     public function category()
     {

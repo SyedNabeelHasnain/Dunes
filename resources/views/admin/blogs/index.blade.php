@@ -40,7 +40,7 @@
                         <td class="py-3 px-4">
                             <div class="flex items-center gap-3">
                                 @if($p->featured_image)
-                                    <img src="{{ asset('images/blog/' . $p->featured_image) }}" alt="{{ $p->title }}" class="w-12 h-12 rounded-xl object-cover border border-slate-200 shrink-0" onerror="this.src='{{ asset('images/desert-safari-poster.avif') }}'">
+                                    <img src="{{ $p->featured_image_url }}" alt="{{ $p->title }}" class="w-12 h-12 rounded-xl object-cover border border-slate-200 shrink-0" onerror="this.src='{{ asset('images/desert-safari-poster.avif') }}'">
                                 @else
                                     <img src="{{ asset('images/desert-safari-poster.avif') }}" alt="Default post thumbnail" class="w-12 h-12 rounded-xl object-cover border border-slate-200 shrink-0">
                                 @endif

@@ -38,7 +38,7 @@ class RateCardController extends Controller
         }
 
         $ogImageSetting = $settingsService->get('seo_rate_card_og_image');
-        $ogImage = $ogImageSetting ? asset(ltrim($ogImageSetting, '/')) : asset('images/desert-safari-poster.avif');
+        $ogImage = resolve_og_image($ogImageSetting, 'images/dubai-desert-safari-bbq-dune-discovery-tourism.avif');
         $canonical = localized_route('rate-card');
 
         $tours = Tour::with(['tiers', 'addons', 'category', 'itineraries'])

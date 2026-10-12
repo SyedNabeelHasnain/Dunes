@@ -45,8 +45,10 @@ class AdminReviewController extends Controller
 
         // 1. Review Key Performance Statistics
         $totalReviews = Review::count();
-        $avgRating = $totalReviews > 0 ? round((float) Review::avg('rating'), 1) : 5.0;
         $approvedCount = Review::where('status', 'approved')->count();
+        $avgRating = $approvedCount > 0
+            ? round((float) Review::where('status', 'approved')->avg('rating'), 1)
+            : ($totalReviews > 0 ? round((float) Review::avg('rating'), 1) : 5.0);
         $pendingCount = Review::where('status', 'pending')->count();
         $fiveStarCount = Review::where('rating', '>=', 5)->count();
         $fiveStarPct = $totalReviews > 0 ? round(($fiveStarCount / $totalReviews) * 100) : 100;

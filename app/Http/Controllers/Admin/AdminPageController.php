@@ -47,14 +47,22 @@ class AdminPageController extends Controller
             ['title', 'subtitle', 'meta_title', 'meta_description']
         );
 
-        $page->update([
+        $updatePayload = [
             'name' => $request->input('name'),
             'title' => $data['title'] ?? null,
             'subtitle' => $data['subtitle'] ?? null,
-            'meta_title' => $data['meta_title'] ?? null,
-            'meta_description' => $data['meta_description'] ?? null,
             'status' => $request->input('status', 'published'),
-        ]);
+        ];
+
+        if ($request->has('meta_title')) {
+            $updatePayload['meta_title'] = $data['meta_title'] ?? null;
+        }
+
+        if ($request->has('meta_description')) {
+            $updatePayload['meta_description'] = $data['meta_description'] ?? null;
+        }
+
+        $page->update($updatePayload);
 
         app(CmsContentService::class)->clearCache();
 

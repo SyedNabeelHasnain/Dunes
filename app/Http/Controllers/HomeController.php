@@ -174,7 +174,7 @@ class HomeController extends Controller
         }
 
         $ogImageSetting = $settingsService->get('seo_home_og_image');
-        $ogImage = $ogImageSetting ? asset(ltrim($ogImageSetting, '/')) : asset('images/desert-safari-poster.avif');
+        $ogImage = resolve_og_image($ogImageSetting, 'images/evening-desert-safari-dubai-dune-discovery-tourism.avif');
 
         try {
             $galleryItems = app(ReviewMediaGalleryService::class)->getHomepageItems(12);

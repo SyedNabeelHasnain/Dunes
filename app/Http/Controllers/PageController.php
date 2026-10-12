@@ -53,7 +53,7 @@ class PageController extends Controller
         }
 
         $ogImageSetting = $settings->get('seo_about_og_image');
-        $ogImage = $ogImageSetting ? asset(ltrim($ogImageSetting, '/')) : asset('images/dubai-desert-safari-tour-dune-discovery-tourism.avif');
+        $ogImage = resolve_og_image($ogImageSetting, 'images/dubai-desert-safar-camel-ride-dune-discovery-tourism.avif');
         $canonical = localized_route('about');
 
         return view('about', compact('pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
@@ -85,7 +85,7 @@ class PageController extends Controller
         }
 
         $ogImageSetting = $settings->get('seo_contact_og_image');
-        $ogImage = $ogImageSetting ? asset(ltrim($ogImageSetting, '/')) : asset('images/desert-safari-poster.avif');
+        $ogImage = resolve_og_image($ogImageSetting, 'images/dubai-desert-safari-camp-dune-discovery-tourism.avif');
         $canonical = localized_route('contact');
 
         return view('contact', compact('pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
@@ -123,7 +123,7 @@ class PageController extends Controller
         }
 
         $ogImageSetting = $settings->get('seo_faq_og_image');
-        $ogImage = $ogImageSetting ? asset(ltrim($ogImageSetting, '/')) : asset('images/desert-safari-poster.avif');
+        $ogImage = resolve_og_image($ogImageSetting, 'images/dubai-desert-safari-dune-bashing-dune-discovery-tourism.avif');
         $canonical = localized_route('faq');
 
         return view('faq', compact('faqs', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));

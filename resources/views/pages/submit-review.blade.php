@@ -9,8 +9,8 @@
       "@type": "WebPage",
       "@id": "{{ $canonical ?? request()->url() }}#webpage",
       "url": "{{ $canonical ?? request()->url() }}",
-      "name": "{{ $pageTitle ?? 'Guest Review & Feedback | Dunes Discovery Tourism' }}",
-      "description": "{{ $pageDesc ?? 'Verified guest review and rating submission for Dubai desert safaris and tours by Dunes Discovery Tourism.' }}",
+      "name": {!! json_encode($pageTitle ?? 'Guest Review & Feedback | Dunes Discovery Tourism', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "description": {!! json_encode($pageDesc ?? 'Verified guest review and rating submission for Dubai desert safaris and tours by Dunes Discovery Tourism.', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
       "isPartOf": {
         "@type": "WebSite",

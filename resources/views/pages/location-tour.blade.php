@@ -9,8 +9,8 @@
       "@type": "WebPage",
       "@id": "{{ $canonical }}#webpage",
       "url": "{{ $canonical }}",
-      "name": "{{ $locationData['meta_title'] }}",
-      "description": "{{ $locationData['meta_desc'] }}",
+      "name": {!! json_encode($pageTitle ?? $locationData['meta_title'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "description": {!! json_encode($pageDesc ?? $locationData['meta_desc'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
       "isPartOf": {
         "@type": "WebSite",

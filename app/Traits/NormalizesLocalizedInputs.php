@@ -2,8 +2,6 @@
 
 namespace App\Traits;
 
-use App\Models\Language;
-
 trait NormalizesLocalizedInputs
 {
     /**
@@ -27,24 +25,31 @@ trait NormalizesLocalizedInputs
      */
     protected function normalizeLocalizedData(array $data, array $translatableFields): array
     {
-        $activeCodes = Language::getActiveCodes();
-
         foreach ($translatableFields as $field) {
-            if (! isset($data[$field])) {
+            $arField = $field.'_ar';
+            if (! array_key_exists($field, $data)) {
                 continue;
             }
 
             $val = $data[$field];
             if (is_array($val)) {
-                // If English key missing, assign from first available
-                if (empty($val['en']) && ! empty($val)) {
-                    $firstKey = array_key_first($val);
-                    $val['en'] = $val[$firstKey];
+                if (! empty($data[$arField]) && is_string($data[$arField]) && empty($val['ar'])) {
+                    $val['ar'] = $data[$arField];
+                }
+                $nonEmpty = array_filter($val, fn ($v) => $v !== null && $v !== '');
+                // If English key missing, assign from first available non-empty translation
+                if (empty($val['en']) && ! empty($nonEmpty)) {
+                    $firstKey = array_key_first($nonEmpty);
+                    $val['en'] = $nonEmpty[$firstKey];
                 }
                 $data[$field] = $val;
-            } elseif (is_string($val) && ! empty($val)) {
-                // Backward compatibility: single string maps to English default
-                $data[$field] = ['en' => $val];
+            } elseif (is_string($val)) {
+                // Backward compatibility: single string maps to English default (+ optional _ar companion)
+                $normalized = ['en' => $val];
+                if (! empty($data[$arField]) && is_string($data[$arField])) {
+                    $normalized['ar'] = $data[$arField];
+                }
+                $data[$field] = $normalized;
             }
         }
 

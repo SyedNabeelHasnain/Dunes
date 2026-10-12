@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BlogPost;
 use App\Models\Category;
 use App\Models\Faq;
 use App\Models\FaqAssignment;
@@ -58,7 +59,7 @@ class TourController extends Controller
         }
 
         $ogImageSetting = $settingsService->get('seo_tours_og_image');
-        $ogImage = $ogImageSetting ? asset(ltrim($ogImageSetting, '/')) : asset('images/desert-safari-poster.avif');
+        $ogImage = resolve_og_image($ogImageSetting, 'images/dubai-desert-safari-tour-dune-discovery-tourism.avif');
         $canonical = localized_route('tours.index');
         $pageRobots = (! empty($selectedCategorySlug) || ! empty($request->query()))
             ? 'noindex, follow'
@@ -123,6 +124,10 @@ class TourController extends Controller
         $tour = $query->first();
 
         if (! $tour) {
+            if (BlogPost::where('slug', $slug)->where('status', 'published')->exists()) {
+                return redirect()->to(localized_route('blog.show', $slug), 301);
+            }
+
             abort(404);
         }
 

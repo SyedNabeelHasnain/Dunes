@@ -52,6 +52,8 @@
                     $c = $lang->code;
                     $titleTranslations = $page->getTranslations('title');
                     $subtitleTranslations = $page->getTranslations('subtitle');
+                    $metaTitleTranslations = $page->getTranslations('meta_title');
+                    $metaDescTranslations = $page->getTranslations('meta_description');
                 @endphp
                 <div x-show="activeLangTab === '{{ $c }}'" class="p-4 bg-slate-50/70 rounded-2xl border border-slate-200/80 space-y-3" dir="{{ $lang->direction }}">
                     <div class="flex items-center justify-between">
@@ -66,6 +68,14 @@
                     <div>
                         <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Subtitle / Hero Tagline ({{ strtoupper($c) }})</label>
                         <textarea name="subtitle[{{ $c }}]" rows="3" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary bg-white">{{ old('subtitle.'.$c, $subtitleTranslations[$c] ?? '') }}</textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">SEO Meta Title ({{ strtoupper($c) }})</label>
+                        <input type="text" name="meta_title[{{ $c }}]" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary bg-white" value="{{ old('meta_title.'.$c, $metaTitleTranslations[$c] ?? '') }}">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">SEO Meta Description ({{ strtoupper($c) }})</label>
+                        <textarea name="meta_description[{{ $c }}]" rows="2" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary bg-white">{{ old('meta_description.'.$c, $metaDescTranslations[$c] ?? '') }}</textarea>
                     </div>
                 </div>
                 @endforeach
@@ -104,8 +114,9 @@
                 @php
                     $secTitleTrans = $sec->getTranslations('title');
                     $secSubTrans = $sec->getTranslations('subtitle');
+                    $secBodyTrans = $sec->getTranslations('body');
                 @endphp
-                <div class="border border-slate-200 rounded-2xl p-4 bg-slate-50/50 hover:bg-slate-50 transition" x-data="{ expanded: false, editMode: false }">
+                <div class="border border-slate-200 rounded-2xl p-4 bg-slate-50/50 hover:bg-slate-50 transition" x-data="{ expanded: false, editMode: false, isActive: {{ $sec->is_active ? 'true' : 'false' }} }">
                     <div class="flex items-center justify-between gap-3">
                         <div class="flex items-center gap-2.5 min-w-0">
                             <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-slate-200 text-slate-700">#{{ $sec->section_key }}</span>
@@ -115,6 +126,12 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-2 shrink-0">
+                            <button type="button"
+                                @click="fetch('{{ route('admin.pages.sections.toggle-status', ['pageId' => $page->id, 'sectionId' => $sec->id]) }}', { method: 'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' } }).then(r => r.json()).then(d => { if(d.success) isActive = d.is_active; })"
+                                :class="isActive ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-500 border-slate-200'"
+                                class="px-2 py-1 rounded-lg border text-[10px] font-bold transition cursor-pointer"
+                                x-text="isActive ? 'Active' : 'Hidden'">
+                            </button>
                             <button type="button" @click="editMode = !editMode" class="px-2.5 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold transition">
                                 <i class="bi bi-pencil"></i> Edit
                             </button>
@@ -145,7 +162,7 @@
                                 </div>
                             </div>
 
-                            <!-- Multilingual Title & Subtitle for this Section -->
+                            <!-- Multilingual Title, Subtitle & Body for this Section -->
                             <div class="space-y-3 bg-white p-3 rounded-xl border border-slate-200">
                                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Translations Across Active Languages</span>
                                 @foreach($languages as $lang)
@@ -157,6 +174,7 @@
                                     </div>
                                     <input type="text" name="title[{{ $c }}]" placeholder="Heading in {{ $lang->name }}" value="{{ $secTitleTrans[$c] ?? '' }}" class="w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs bg-white text-slate-800" dir="{{ $lang->direction }}">
                                     <textarea name="subtitle[{{ $c }}]" rows="2" placeholder="Subtitle / text in {{ $lang->name }}" class="w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs bg-white text-slate-800" dir="{{ $lang->direction }}">{{ $secSubTrans[$c] ?? '' }}</textarea>
+                                    <textarea name="body[{{ $c }}]" rows="2" placeholder="Body content (optional) in {{ $lang->name }}" class="w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs bg-white text-slate-800" dir="{{ $lang->direction }}">{{ $secBodyTrans[$c] ?? '' }}</textarea>
                                 </div>
                                 @endforeach
                             </div>

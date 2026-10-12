@@ -52,7 +52,7 @@
     $pageKeys = $pageKeys ?? 'dubai desert safari,desert safari dubai,evening desert safari';
     $pageRobots = $pageRobots ?? 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
     $canonical = $canonical ?? (request()->is('/') ? rtrim(url('/'), '/') . '/' : request()->url());
-    $ogImage = $ogImage ?? asset('images/desert-safari-poster.avif');
+    $ogImage = resolve_og_image($ogImage ?? null);
     $ogType = $ogType ?? 'website';
 @endphp
 <!DOCTYPE html>

@@ -169,10 +169,10 @@ class AdminWhatsappController extends Controller
     /**
      * Export WhatsApp leads to CSV.
      */
-    public function exportCsv()
+    public function exportCsv(Request $request)
     {
         $fileName = 'dunes-whatsapp-leads-'.date('Y-m-d-His').'.csv';
-        $leads = DB::table('whatsapp_inquiries')
+        $query = DB::table('whatsapp_inquiries')
             ->leftJoin('request_logs', 'whatsapp_inquiries.request_log_id', '=', 'request_logs.id')
             ->select(
                 'whatsapp_inquiries.*',
@@ -182,9 +182,31 @@ class AdminWhatsappController extends Controller
                 'request_logs.device_type',
                 'request_logs.browser_name',
                 'request_logs.os_name'
-            )
-            ->orderBy('whatsapp_inquiries.created_at', 'desc')
-            ->get();
+            );
+
+        if ($request->filled('from_date')) {
+            $query->whereDate('whatsapp_inquiries.created_at', '>=', $request->input('from_date'));
+        }
+        if ($request->filled('to_date')) {
+            $query->whereDate('whatsapp_inquiries.created_at', '<=', $request->input('to_date'));
+        }
+        if ($request->filled('tour_name')) {
+            $query->where('whatsapp_inquiries.tour_name', $request->input('tour_name'));
+        }
+        if ($request->filled('device_type')) {
+            $query->where('request_logs.device_type', $request->input('device_type'));
+        }
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('whatsapp_inquiries.name', 'like', "%{$search}%")
+                    ->orWhere('whatsapp_inquiries.phone', 'like', "%{$search}%")
+                    ->orWhere('whatsapp_inquiries.tour_name', 'like', "%{$search}%")
+                    ->orWhere('whatsapp_inquiries.message_text', 'like', "%{$search}%");
+            });
+        }
+
+        $leads = $query->orderBy('whatsapp_inquiries.created_at', 'desc')->get();
 
         $headers = [
             'Content-type' => 'text/csv; charset=UTF-8',

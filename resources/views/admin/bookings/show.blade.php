@@ -249,6 +249,9 @@
                 <div>
                     <label for="status" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Booking Status</label>
                     <select name="status" id="status" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden bg-white">
+                        @if($booking->status === 'draft')
+                            <option value="draft" selected>Draft (Abandoned Checkout)</option>
+                        @endif
                         <option value="pending" {{ $booking->status === 'pending' ? 'selected' : '' }}>Pending</option>
                         <option value="confirmed" {{ $booking->status === 'confirmed' ? 'selected' : '' }}>Confirmed</option>
                         <option value="completed" {{ $booking->status === 'completed' ? 'selected' : '' }}>Completed</option>

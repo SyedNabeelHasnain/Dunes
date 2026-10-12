@@ -347,10 +347,23 @@ Route::redirect('/vip-desert-safari-dubai', '/evening-desert-safari-dubai', 301)
 Route::redirect('/luxury-vip-desert-safari-dubai', '/evening-desert-safari-dubai', 301);
 Route::redirect('/buggy-tour-dubai', '/dune-buggy-rental-dubai', 301);
 
-// ── Legacy Press Kit Media Asset 301 Redirects ──────────────────────────────
+// ── Legacy Press Kit & SEO OG Media Asset 301 Redirects ─────────────────────
 Route::redirect('/images/sunset-desert-safari-dubai-dunes-discovery-tourism.avif', '/images/dubai-desert-safar-camel-ride-dune-discovery-tourism.avif', 301);
 Route::redirect('/images/vip-desert-safari-dubai-camp-dinner-bbq.avif', '/images/dubai-desert-safari-bbq-dune-discovery-tourism.avif', 301);
 Route::redirect('/images/can-am-maverick-x3-dune-buggy-rental-dubai.avif', '/images/dubai-desert-safari-buggy-dune-discovery-tourism.avif', 301);
+Route::redirect('/images/quad-biking-desert-safari-dubai-dune-discovery-tourism.avif', '/images/desert-safari-quad-biking-hero.avif', 301);
+Route::redirect('/images/og-default.jpg', '/images/desert-safari-poster.avif', 301);
+Route::redirect('/images/og-home.jpg', '/images/evening-desert-safari-dubai-dune-discovery-tourism.avif', 301);
+Route::redirect('/images/og-tours.jpg', '/images/dubai-desert-safari-tour-dune-discovery-tourism.avif', 301);
+Route::redirect('/images/og-blog.jpg', '/images/desert-safari-dubai-dune-discovery-tourism-HD.avif', 301);
+Route::redirect('/images/og-about.jpg', '/images/dubai-desert-safar-camel-ride-dune-discovery-tourism.avif', 301);
+Route::redirect('/images/og-contact.jpg', '/images/dubai-desert-safari-camp-dune-discovery-tourism.avif', 301);
+Route::redirect('/images/og-faq.jpg', '/images/dubai-desert-safari-dune-bashing-dune-discovery-tourism.avif', 301);
+Route::redirect('/images/og-rate-card.jpg', '/images/dubai-desert-safari-bbq-dune-discovery-tourism.avif', 301);
+
+Route::get('/blog/images/{path}', function (string $path) {
+    return redirect('/images/'.ltrim($path, '/'), 301);
+})->where('path', '.*');
 
 // ── Multi-Language Localized Route Group (Non-Default Locales, e.g. /ar) ─────
 Route::prefix('{locale}')
@@ -377,12 +390,22 @@ Route::prefix('{locale}')
 
         // Tours & search
         Route::get('/tours', [TourController::class, 'index'])->name('locale.tours.index');
+        Route::get('/tours/{slug}', function (Request $request, string $locale, string $slug) {
+            $queryString = $request->getQueryString();
+
+            return redirect('/'.$locale.'/'.$slug.($queryString ? '?'.$queryString : ''), 301);
+        });
         Route::get('/search', [TourController::class, 'search'])->name('locale.tours.search');
         Route::get('/search/live', [TourController::class, 'liveSearch'])->name('locale.tours.search.live');
         Route::get('/build-your-own-safari', [TourController::class, 'customizer'])->name('locale.tours.customizer');
 
-        // Blog
+        // Blog & Feeds
         Route::get('/blog', [BlogController::class, 'index'])->name('locale.blog.index');
+        Route::get('/blog/feed.xml', [BlogController::class, 'feed'])->name('locale.blog.feed');
+        Route::get('/feed.xml', [BlogController::class, 'feed'])->name('locale.feed.unified');
+        Route::get('/blog/images/{path}', function (string $locale, string $path) {
+            return redirect('/images/'.ltrim($path, '/'), 301);
+        })->where('path', '.*');
         Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('locale.blog.show');
 
         // Booking confirmation & Reviews

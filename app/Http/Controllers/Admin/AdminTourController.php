@@ -556,13 +556,26 @@ class AdminTourController extends Controller
     public function addCategory(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name',
+            'name' => 'required|string|max:255',
         ]);
 
+        $newName = trim($request->input('name'));
+        $newSlug = Str::slug($newName);
+
+        $existing = Category::all()->first(function (Category $c) use ($newName, $newSlug) {
+            return $c->slug === $newSlug || strcasecmp((string) $c->getTranslation('name', 'en'), $newName) === 0;
+        });
+
+        if ($existing) {
+            return response()->json(['success' => false, 'message' => 'A category with this name already exists.'], 422);
+        }
+
         $category = Category::create([
-            'name' => trim($request->input('name')),
-            'slug' => Str::slug($request->input('name')),
+            'name' => ['en' => $newName],
+            'slug' => $newSlug,
         ]);
+
+        $this->clearTourCaches();
 
         return response()->json(['success' => true, 'message' => 'Category added successfully.', 'category' => $category]);
     }
@@ -577,14 +590,26 @@ class AdminTourController extends Controller
             'new' => 'required|string|max:255',
         ]);
 
-        $category = Category::where('name', $request->input('old'))
-            ->orWhere('slug', Str::slug($request->input('old')))
-            ->firstOrFail();
+        $oldName = trim($request->input('old'));
+        $oldSlug = Str::slug($oldName);
+        $newName = trim($request->input('new'));
+        $newSlug = Str::slug($newName);
 
-        $category->update([
-            'name' => trim($request->input('new')),
-            'slug' => Str::slug($request->input('new')),
-        ]);
+        $category = Category::all()->first(function (Category $c) use ($oldName, $oldSlug) {
+            return $c->slug === $oldSlug
+                || strcasecmp((string) $c->getTranslation('name', 'en'), $oldName) === 0
+                || strcasecmp((string) $c->name, $oldName) === 0;
+        });
+
+        if (! $category) {
+            abort(404, 'Category not found.');
+        }
+
+        $category->setTranslation('name', 'en', $newName);
+        $category->slug = $newSlug;
+        $category->save();
+
+        $this->clearTourCaches();
 
         return response()->json(['success' => true, 'message' => 'Category renamed successfully.']);
     }

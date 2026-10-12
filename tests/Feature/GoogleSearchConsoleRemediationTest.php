@@ -518,5 +518,80 @@ class GoogleSearchConsoleRemediationTest extends TestCase
         $this->get('/ar/desert-safari-from-dubai-marina')
             ->assertStatus(200)
             ->assertSee('<link rel="canonical" href="http://localhost/ar/desert-safari-from-dubai-marina">', false);
+
+        // 9. Relative /blog/images/* and legacy /images/og-*.jpg 301 redirects
+        $this->get('/blog/images/evening-desert-safari-dubai-dune-discovery-tourism.avif')
+            ->assertStatus(301)
+            ->assertRedirect(url('/images/evening-desert-safari-dubai-dune-discovery-tourism.avif'));
+        $this->get('/ar/blog/images/evening-desert-safari-dubai-dune-discovery-tourism.avif')
+            ->assertStatus(301)
+            ->assertRedirect(url('/images/evening-desert-safari-dubai-dune-discovery-tourism.avif'));
+        $this->get('/images/og-home.jpg')
+            ->assertStatus(301)
+            ->assertRedirect('/images/evening-desert-safari-dubai-dune-discovery-tourism.avif');
+
+        // 10. Root-level blog post slug accessed at /{slug} 301 redirects to /blog/{slug}
+        $this->get('/'.$post->slug)
+            ->assertStatus(301)
+            ->assertRedirect(url('/blog/'.$post->slug));
+        $this->get('/ar/'.$post->slug)
+            ->assertStatus(301)
+            ->assertRedirect(url('/ar/blog/'.$post->slug));
+
+        // 11. Localized /tours/{slug} 301 redirects and localized RSS feed works
+        $this->get('/ar/tours/evening-desert-safari-dubai')
+            ->assertStatus(301)
+            ->assertRedirect(url('/ar/evening-desert-safari-dubai'));
+        $this->get('/ar/blog/feed.xml')
+            ->assertStatus(200);
+    }
+
+    /**
+     * Test 22: Paginated Blog Hreflang Parity, Relative OG Image Normalization, and Multi-Language Preservation
+     */
+    public function test_paginated_blog_hreflang_and_multilang_preservation(): void
+    {
+        $category = BlogCategory::create(['name' => 'News', 'slug' => 'news']);
+        for ($i = 1; $i <= 15; $i++) {
+            BlogPost::create([
+                'title' => [
+                    'en' => "Safari Article {$i}",
+                    'ar' => "مقال سفاري {$i}",
+                    'ru' => "Статья сафари {$i}",
+                    'es' => "Artículo de safari {$i}",
+                    'it' => "Articolo safari {$i}",
+                ],
+                'slug' => "safari-article-{$i}",
+                'excerpt' => "Excerpt {$i}",
+                'content' => "<p>Content {$i}</p>",
+                'featured_image' => 'images/evening-desert-safari-dubai-dune-discovery-tourism.avif',
+                'og_image' => 'images/evening-desert-safari-dubai-dune-discovery-tourism.avif',
+                'category_id' => $category->id,
+                'status' => 'published',
+                'published_at' => now()->subMinutes($i),
+            ]);
+        }
+
+        // 1. Paginated /blog?page=2 keeps ?page=2 on both canonical and hreflang alternates
+        $resPage2 = $this->get('/blog?page=2');
+        $resPage2->assertStatus(200);
+        $resPage2->assertSee('<link rel="canonical" href="http://localhost/blog?page=2">', false);
+        $resPage2->assertSee('hreflang="ar" href="http://localhost/ar/blog?page=2"', false);
+
+        // 2. Relative og_image is resolved to absolute /images/... URL on blog detail page
+        $resPost = $this->get('/blog/safari-article-1');
+        $resPost->assertStatus(200);
+        $resPost->assertSee('<meta property="og:image" content="http://localhost/images/evening-desert-safari-dubai-dune-discovery-tourism.avif">', false);
+
+        // 3. Updating a translatable attribute with a scalar string or partial array preserves other languages
+        $firstPost = BlogPost::where('slug', 'safari-article-1')->firstOrFail();
+        $firstPost->update(['title' => 'Updated English Title']);
+        $firstPost->refresh();
+
+        $this->assertEquals('Updated English Title', $firstPost->getTranslation('title', 'en', false));
+        $this->assertEquals('مقال سفاري 1', $firstPost->getTranslation('title', 'ar', false));
+        $this->assertEquals('Статья сафари 1', $firstPost->getTranslation('title', 'ru', false));
+        $this->assertEquals('Artículo de safari 1', $firstPost->getTranslation('title', 'es', false));
+        $this->assertEquals('Articolo safari 1', $firstPost->getTranslation('title', 'it', false));
     }
 }

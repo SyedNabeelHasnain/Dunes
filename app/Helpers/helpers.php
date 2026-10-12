@@ -176,15 +176,16 @@ if (! function_exists('switch_locale_url')) {
         // Check if the first segment is an active non-default language
         if (! empty($segments)) {
             $first = $segments[0];
+            $knownCodes = ['en', 'ar', 'ru', 'es', 'it'];
             try {
                 $languages = Language::getActive();
-                if ($languages->contains('code', $first) && $first !== 'en') {
+                if (($languages->contains('code', $first) || in_array($first, $knownCodes, true)) && $first !== 'en') {
                     array_shift($segments);
                 } elseif ($first === 'en') {
                     array_shift($segments);
                 }
             } catch (Throwable $e) {
-                if (in_array($first, ['en', 'ar', 'ru', 'es', 'it'], true)) {
+                if (in_array($first, $knownCodes, true)) {
                     array_shift($segments);
                 }
             }
@@ -196,10 +197,52 @@ if (! function_exists('switch_locale_url')) {
             $path = empty($segments) ? "/{$targetLocale}" : "/{$targetLocale}/".implode('/', $segments);
         }
 
-        if ($path === '/') {
-            return rtrim(url('/'), '/').'/';
+        $baseUrl = ($path === '/') ? rtrim(url('/'), '/').'/' : url($path);
+
+        $pageNum = (int) $request->query('page', 0);
+        if ($pageNum > 1 && empty($request->except('page'))) {
+            return $baseUrl.'?page='.$pageNum;
         }
 
-        return url($path);
+        return $baseUrl;
+    }
+}
+
+if (! function_exists('resolve_og_image')) {
+    /**
+     * Normalize any OG image path or URL to an absolute existing asset URL.
+     */
+    function resolve_og_image(?string $raw, string $fallback = 'images/desert-safari-poster.avif'): string
+    {
+        if (empty($raw)) {
+            return asset($fallback);
+        }
+
+        $legacyMap = [
+            'og-default.jpg' => 'images/desert-safari-poster.avif',
+            'og-home.jpg' => 'images/evening-desert-safari-dubai-dune-discovery-tourism.avif',
+            'og-tours.jpg' => 'images/dubai-desert-safari-tour-dune-discovery-tourism.avif',
+            'og-blog.jpg' => 'images/desert-safari-dubai-dune-discovery-tourism-HD.avif',
+            'og-about.jpg' => 'images/dubai-desert-safar-camel-ride-dune-discovery-tourism.avif',
+            'og-contact.jpg' => 'images/dubai-desert-safari-camp-dune-discovery-tourism.avif',
+            'og-faq.jpg' => 'images/dubai-desert-safari-dune-bashing-dune-discovery-tourism.avif',
+            'og-rate-card.jpg' => 'images/dubai-desert-safari-bbq-dune-discovery-tourism.avif',
+        ];
+
+        $basename = basename(parse_url($raw, PHP_URL_PATH) ?: $raw);
+        if (isset($legacyMap[$basename])) {
+            return asset($legacyMap[$basename]);
+        }
+
+        if (str_starts_with($raw, 'http://') || str_starts_with($raw, 'https://')) {
+            return $raw;
+        }
+
+        $clean = ltrim($raw, '/');
+        if (! str_starts_with($clean, 'images/') && ! str_starts_with($clean, 'storage/') && ! str_starts_with($clean, 'uploads/')) {
+            $clean = 'images/'.$clean;
+        }
+
+        return asset($clean);
     }
 }

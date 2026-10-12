@@ -226,7 +226,7 @@ class AdminBookingController extends Controller
         $booking = Booking::findOrFail($id);
 
         $request->validate([
-            'status' => 'required|string|in:pending,confirmed,completed,cancelled',
+            'status' => 'required|string|in:draft,pending,confirmed,completed,cancelled',
             'payment_status' => 'required|string|in:unpaid,partial,paid,failed,cancelled',
             'balance_due' => 'required|numeric|min:0',
         ]);

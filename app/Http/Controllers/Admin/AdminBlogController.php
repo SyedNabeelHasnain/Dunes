@@ -54,7 +54,7 @@ class AdminBlogController extends Controller
 
         $data = $this->normalizeLocalizedData(
             $request->except(['tags', 'featured_image']),
-            ['title', 'subtitle', 'excerpt', 'content', 'meta_title', 'meta_desc', 'meta_keywords']
+            ['title', 'subtitle', 'excerpt', 'content', 'meta_title', 'meta_desc', 'meta_keywords', 'author_bio', 'ai_summary']
         );
         $baseSlug = Str::slug($this->extractSlugSource($request->title)) ?: 'article';
         $slug = $baseSlug;
@@ -77,13 +77,21 @@ class AdminBlogController extends Controller
 
         // Sync tags
         if ($request->has('tags')) {
-            $tagsInput = $request->input('tags', []);
+            $tagsInput = (array) $request->input('tags', []);
             $tagIds = [];
-            foreach ($tagsInput as $tagName) {
-                $tag = BlogTag::firstOrCreate(['name' => trim($tagName), 'slug' => Str::slug(trim($tagName))]);
-                $tagIds[] = $tag->id;
+            foreach ($tagsInput as $rawTag) {
+                foreach (explode(',', (string) $rawTag) as $tagName) {
+                    $trimmedTag = trim($tagName);
+                    if ($trimmedTag !== '' && Str::slug($trimmedTag) !== '') {
+                        $tag = BlogTag::firstOrCreate(
+                            ['slug' => Str::slug($trimmedTag)],
+                            ['name' => $trimmedTag]
+                        );
+                        $tagIds[] = $tag->id;
+                    }
+                }
             }
-            $post->tags()->sync($tagIds);
+            $post->tags()->sync(array_values(array_unique($tagIds)));
         }
 
         Cache::forget('sitemap_blogs_xml');
@@ -123,7 +131,7 @@ class AdminBlogController extends Controller
 
         $data = $this->normalizeLocalizedData(
             $request->except(['tags', 'featured_image']),
-            ['title', 'subtitle', 'excerpt', 'content', 'meta_title', 'meta_desc', 'meta_keywords']
+            ['title', 'subtitle', 'excerpt', 'content', 'meta_title', 'meta_desc', 'meta_keywords', 'author_bio', 'ai_summary']
         );
         if ($request->has('title')) {
             $baseSlug = Str::slug($this->extractSlugSource($request->title)) ?: 'article';
@@ -148,13 +156,21 @@ class AdminBlogController extends Controller
 
         // Sync tags
         if ($request->has('tags')) {
-            $tagsInput = $request->input('tags', []);
+            $tagsInput = (array) $request->input('tags', []);
             $tagIds = [];
-            foreach ($tagsInput as $tagName) {
-                $tag = BlogTag::firstOrCreate(['name' => trim($tagName), 'slug' => Str::slug(trim($tagName))]);
-                $tagIds[] = $tag->id;
+            foreach ($tagsInput as $rawTag) {
+                foreach (explode(',', (string) $rawTag) as $tagName) {
+                    $trimmedTag = trim($tagName);
+                    if ($trimmedTag !== '' && Str::slug($trimmedTag) !== '') {
+                        $tag = BlogTag::firstOrCreate(
+                            ['slug' => Str::slug($trimmedTag)],
+                            ['name' => $trimmedTag]
+                        );
+                        $tagIds[] = $tag->id;
+                    }
+                }
             }
-            $post->tags()->sync($tagIds);
+            $post->tags()->sync(array_values(array_unique($tagIds)));
         }
 
         Cache::forget('sitemap_blogs_xml');

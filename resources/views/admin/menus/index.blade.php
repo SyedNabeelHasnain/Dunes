@@ -57,12 +57,14 @@
                                 {{ $item->url }}
                             </span>
                         </td>
-                        <td class="py-3 px-4 text-center">
-                            @if($item->is_active)
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Active</span>
-                            @else
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200">Inactive</span>
-                            @endif
+                        <td class="py-3 px-4 text-center" x-data="{ isActive: {{ $item->is_active ? 'true' : 'false' }} }">
+                            <button type="button"
+                                @click="fetch('{{ route('admin.menus.toggle-status', $item->id) }}', { method: 'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' } }).then(r => r.json()).then(d => { if(d.success) isActive = d.is_active; })"
+                                :class="isActive ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-500 border-slate-200'"
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border transition cursor-pointer"
+                                title="Click to toggle status"
+                                x-text="isActive ? 'Active' : 'Inactive'">
+                            </button>
                         </td>
                         <td class="py-3 px-4 text-right pe-4">
                             <div class="inline-flex items-center gap-2">

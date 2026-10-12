@@ -712,19 +712,19 @@ if(window.fbq){
                         <i class="bi bi-compass text-primary"></i>{{ __('ui.tour.similar_tours') }}
                     </h3>
                     <div class="flex flex-wrap gap-2">
-                        <a href="{{ url('/dune-buggy-rental-dubai') }}" class="inline-flex items-center gap-1.5 bg-slate-50 hover:bg-white text-slate-700 hover:text-primary border border-slate-200 hover:border-primary rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors">
+                        <a href="{{ localized_route('tours.buggy') }}" class="inline-flex items-center gap-1.5 bg-slate-50 hover:bg-white text-slate-700 hover:text-primary border border-slate-200 hover:border-primary rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors">
                             <i class="bi bi-truck text-primary"></i>1000cc Dune Buggy Rental
                         </a>
-                        <a href="{{ url('/evening-desert-safari-dubai') }}" class="inline-flex items-center gap-1.5 bg-slate-50 hover:bg-white text-slate-700 hover:text-primary border border-slate-200 hover:border-primary rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors">
+                        <a href="{{ localized_route('tours.show', 'evening-desert-safari-dubai') }}" class="inline-flex items-center gap-1.5 bg-slate-50 hover:bg-white text-slate-700 hover:text-primary border border-slate-200 hover:border-primary rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors">
                             <i class="bi bi-sunset text-primary"></i>Evening Desert Safari
                         </a>
-                        <a href="{{ url('/desert-safari-quad-biking-dubai') }}" class="inline-flex items-center gap-1.5 bg-slate-50 hover:bg-white text-slate-700 hover:text-primary border border-slate-200 hover:border-primary rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors">
+                        <a href="{{ localized_route('tours.show', 'desert-safari-quad-biking-dubai') }}" class="inline-flex items-center gap-1.5 bg-slate-50 hover:bg-white text-slate-700 hover:text-primary border border-slate-200 hover:border-primary rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors">
                             <i class="bi bi-speedometer2 text-primary"></i>Quad Biking Adventure
                         </a>
-                        <a href="{{ url('/dhow-cruise-catamaran-cruise-dinner-dubai') }}" class="inline-flex items-center gap-1.5 bg-slate-50 hover:bg-white text-slate-700 hover:text-primary border border-slate-200 hover:border-primary rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors">
+                        <a href="{{ localized_route('tours.show', 'dhow-cruise-catamaran-cruise-dinner-dubai') }}" class="inline-flex items-center gap-1.5 bg-slate-50 hover:bg-white text-slate-700 hover:text-primary border border-slate-200 hover:border-primary rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors">
                             <i class="bi bi-water text-primary"></i>Marina Dhow Cruise Dinner
                         </a>
-                        <a href="{{ url('/abu-dhabi-city-tour-from-dubai') }}" class="inline-flex items-center gap-1.5 bg-slate-50 hover:bg-white text-slate-700 hover:text-primary border border-slate-200 hover:border-primary rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors">
+                        <a href="{{ localized_route('tours.show', 'abu-dhabi-city-tour-from-dubai') }}" class="inline-flex items-center gap-1.5 bg-slate-50 hover:bg-white text-slate-700 hover:text-primary border border-slate-200 hover:border-primary rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors">
                             <i class="bi bi-building text-primary"></i>Abu Dhabi City Tour
                         </a>
                     </div>

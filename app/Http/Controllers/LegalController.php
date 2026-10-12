@@ -223,8 +223,9 @@ class LegalController extends Controller
     /**
      * Generic fallback display for any legal page by slug.
      */
-    public function show(string $slug)
+    public function show(...$params)
     {
+        $slug = (string) end($params);
         $page = $this->getPageWithRelations($slug);
         $currentYear = date('Y');
         $pageTitle = "{$page->title} ({$currentYear}) | Dunes Discovery Tourism LLC Dubai";

@@ -104,19 +104,7 @@ class Language extends Model
      */
     public static function fallbackCollection(): Collection
     {
-        $english = new self([
-            'id' => 1,
-            'code' => 'en',
-            'name' => 'English',
-            'native_name' => 'English',
-            'direction' => 'ltr',
-            'flag' => '🇬🇧',
-            'is_default' => true,
-            'is_active' => true,
-            'sort_order' => 1,
-        ]);
-
-        return new Collection([$english]);
+        return new Collection([self::fallbackDefault()]);
     }
 
     /**

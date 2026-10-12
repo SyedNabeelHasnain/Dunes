@@ -269,7 +269,7 @@
                                 <div>
                                     <label for="featured_image" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Featured Image</label>
                                     @if($post->featured_image)
-                                        <div class="mb-2"><img src="{{ asset('images/blog/' . $post->featured_image) }}" alt="{{ $post->title }}" class="w-full h-24 rounded-xl object-cover border border-slate-200"></div>
+                                        <div class="mb-2"><img src="{{ $post->featured_image_url }}" alt="{{ $post->title }}" class="w-full h-24 rounded-xl object-cover border border-slate-200" onerror="this.src='{{ asset('images/desert-safari-poster.avif') }}'"></div>
                                     @endif
                                     <input type="file" name="featured_image" id="featured_image" class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
                                     <p class="text-[11px] text-slate-400 mt-1">Max size 4MB. PNG, JPG, WEBP.</p>

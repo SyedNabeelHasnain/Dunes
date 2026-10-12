@@ -146,6 +146,9 @@
             <a href="{{ route('admin.settings.google') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.google*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
                 <i class="bi bi-google text-rose-400 text-base"></i> <span>Google Integrations</span>
             </a>
+            <a href="{{ route('admin.settings.gttd') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.gttd*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-patch-check-fill text-emerald-400 text-base"></i> <span>Google Things To Do</span>
+            </a>
             <a href="{{ route('admin.settings.meta') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.meta*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
                 <i class="bi bi-meta text-sky-400 text-base"></i> <span>Meta / Facebook</span>
             </a>
