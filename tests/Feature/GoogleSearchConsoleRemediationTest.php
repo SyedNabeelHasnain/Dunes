@@ -510,5 +510,13 @@ class GoogleSearchConsoleRemediationTest extends TestCase
         $resFilteredTours->assertSee('<meta name="robots" content="noindex, follow">', false);
         $resFilteredTours->assertSee('<link rel="canonical" href="http://localhost/tours">', false);
         $resFilteredTours->assertDontSee('hreflang=', false);
+
+        // 8. Geo-location landing pages (EN & localized) render 200 OK with self-referential canonicals
+        $this->get('/desert-safari-from-dubai-marina')
+            ->assertStatus(200)
+            ->assertSee('<link rel="canonical" href="http://localhost/desert-safari-from-dubai-marina">', false);
+        $this->get('/ar/desert-safari-from-dubai-marina')
+            ->assertStatus(200)
+            ->assertSee('<link rel="canonical" href="http://localhost/ar/desert-safari-from-dubai-marina">', false);
     }
 }

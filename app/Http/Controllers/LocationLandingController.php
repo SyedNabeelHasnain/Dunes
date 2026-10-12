@@ -59,7 +59,7 @@ class LocationLandingController extends Controller
         $currentLocale = app()->getLocale();
         $currentYear = date('Y');
         $locName = $locationData['name'];
-        $driveTime = $locationData['drive_time'];
+        $driveTime = $locationData['transit_time'] ?? $locationData['drive_time'] ?? '45 Minutes';
 
         $localizedLocMeta = [
             'ar' => [

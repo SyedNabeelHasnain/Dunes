@@ -613,7 +613,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 @foreach($allLocations as $locKey => $loc)
                     @if($locKey !== $locationData['key'])
-                        <a href="{{ localized_route('location.safari', ['location' => $locKey]) }}" class="bg-slate-900/60 border border-white/10 hover:border-amber-500/50 hover:bg-slate-900 rounded-2xl p-5 transition-all hover:-translate-y-1 block group">
+                        <a href="{{ localized_route('tours.location', ['location' => $locKey]) }}" class="bg-slate-900/60 border border-white/10 hover:border-amber-500/50 hover:bg-slate-900 rounded-2xl p-5 transition-all hover:-translate-y-1 block group">
                             <div class="flex items-center justify-between mb-2">
                                 <h3 class="font-bold text-white text-sm sm:text-base group-hover:text-amber-400 transition-colors">{{ $loc['name'] }}</h3>
                                 <i class="bi bi-arrow-right text-amber-400 transition-transform group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1"></i>
