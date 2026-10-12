@@ -149,11 +149,7 @@ class PageController extends Controller
         $messageText = trim($request->input('message'));
 
         // Check if email is verified
-        $sessionVerified = session()->has('email_verified_'.md5($email));
-        $isVerified = $sessionVerified ||
-            VerifiedEmail::where('email', $email)->exists() ||
-            Booking::where('email', $email)->where('is_verified', true)->exists() ||
-            Contact::where('email', $email)->where('is_verified', true)->exists();
+        $isVerified = VerifiedEmail::isVerified($email);
 
         // Collect request context
         $gpsPost = [

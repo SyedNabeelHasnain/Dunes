@@ -1181,35 +1181,27 @@ const App = {
             });
         });
 
-        let lastCheckedEmail = '';
-
-        input.addEventListener('blur', async () => {
+        const triggerEmailCheck = (immediate = false) => {
+            if (this._emailCheckDebounce) {
+                clearTimeout(this._emailCheckDebounce);
+                this._emailCheckDebounce = null;
+            }
             const email = input.value.trim().toLowerCase();
-            input.classList.remove('shake-field', 'field-processing');
-
             if (!email) {
-                lastCheckedEmail = '';
                 this.resetFieldState(input);
                 return;
             }
-
             if (!emailRegex.test(email)) {
-                lastCheckedEmail = '';
-                this.setEmailBadge('invalid', 'Invalid Email');
-                this.showError(input, false);
                 return;
             }
-
-            if (input.classList.contains('is-verified') && lastCheckedEmail === email) {
+            if (input.classList.contains('is-verified') && input.dataset.verifiedEmail === email) {
                 return;
             }
-
             const otpWrapper = document.getElementById('otpFieldsWrapper');
-            if (otpWrapper && !otpWrapper.classList.contains('hidden') && lastCheckedEmail === email) {
+            if (otpWrapper && !otpWrapper.classList.contains('hidden') && input.dataset.otpSentEmail === email) {
                 return;
             }
 
-            lastCheckedEmail = email;
             const spinner = document.getElementById('emailCheckSpinner');
             if (spinner) {
                 spinner.classList.remove('hidden');
@@ -1220,44 +1212,148 @@ const App = {
                 sendOtpBtn.classList.remove('inline-flex');
             }
 
-            try {
-                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || window.CSRF_TOKEN || '';
-                const res = await fetch('/ajax.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'X-CSRF-TOKEN': csrfToken
-                    },
-                    body: `action=check_email_status&email=${encodeURIComponent(email)}&_token=${encodeURIComponent(csrfToken)}`
-                });
-                const raw = await res.text();
-                const data = JSON.parse(raw.replace(/^\uFEFF+/, '').trim());
-
-                if (data.success && data.verified) {
-                    this.markEmailVerified(input);
-                } else {
-                    this.showVerifyButton(input);
-                }
-            } catch (e) {
-                this.showVerifyButton(input);
-            } finally {
-                if (spinner) {
-                    spinner.classList.add('hidden');
-                    spinner.classList.remove('inline-flex');
-                }
-            }
-        });
+            const delay = immediate || this.isLocallyVerifiedEmail(email) ? 30 : 250;
+            this._emailCheckDebounce = setTimeout(() => {
+                this.checkEmailStatus(input);
+            }, delay);
+        };
 
         input.addEventListener('input', () => {
             const currentVal = input.value.trim().toLowerCase();
-            if (currentVal !== lastCheckedEmail) {
-                lastCheckedEmail = '';
-                this.resetFieldState(input);
-                if (emailRegex.test(currentVal)) {
-                    this.showVerifyButton(input);
-                }
+            if (input.classList.contains('is-verified') && input.dataset.verifiedEmail === currentVal) {
+                return;
+            }
+            this.resetFieldState(input);
+            if (emailRegex.test(currentVal)) {
+                triggerEmailCheck(false);
             }
         });
+
+        input.addEventListener('change', () => {
+            const currentVal = input.value.trim().toLowerCase();
+            if (emailRegex.test(currentVal)) {
+                triggerEmailCheck(true);
+            }
+        });
+
+        input.addEventListener('blur', async () => {
+            if (this._emailCheckDebounce) {
+                clearTimeout(this._emailCheckDebounce);
+                this._emailCheckDebounce = null;
+            }
+            const email = input.value.trim().toLowerCase();
+            input.classList.remove('shake-field', 'field-processing');
+
+            if (!email) {
+                this.resetFieldState(input);
+                return;
+            }
+
+            if (!emailRegex.test(email)) {
+                this.setEmailBadge('invalid', 'Invalid Email');
+                this.showError(input, false);
+                return;
+            }
+
+            if (input.classList.contains('is-verified') && input.dataset.verifiedEmail === email) {
+                return;
+            }
+
+            const otpWrapper = document.getElementById('otpFieldsWrapper');
+            if (otpWrapper && !otpWrapper.classList.contains('hidden') && input.dataset.otpSentEmail === email) {
+                return;
+            }
+
+            await this.checkEmailStatus(input);
+        });
+    },
+
+    _emailCheckDebounce: null,
+
+    isLocallyVerifiedEmail(email) {
+        if (!email) return false;
+        try {
+            const list = JSON.parse(localStorage.getItem('dunes_verified_emails') || '[]');
+            return Array.isArray(list) && list.includes(email.trim().toLowerCase());
+        } catch (e) {
+            return false;
+        }
+    },
+
+    rememberVerifiedEmail(email) {
+        if (!email) return;
+        const clean = email.trim().toLowerCase();
+        try {
+            localStorage.setItem('dunes_guest_email', clean);
+            const list = JSON.parse(localStorage.getItem('dunes_verified_emails') || '[]');
+            const arr = Array.isArray(list) ? list : [];
+            if (!arr.includes(clean)) {
+                arr.push(clean);
+                localStorage.setItem('dunes_verified_emails', JSON.stringify(arr.slice(-20)));
+            }
+        } catch (e) {}
+    },
+
+    async checkEmailStatus(input) {
+        if (!input) return false;
+        const email = input.value.trim().toLowerCase();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRegex.test(email)) return false;
+
+        if (input.classList.contains('is-verified') && input.dataset.verifiedEmail === email) {
+            return true;
+        }
+
+        const spinner = document.getElementById('emailCheckSpinner');
+        const sendOtpBtn = document.getElementById('sendEmailOtpBtn');
+        if (spinner) {
+            spinner.classList.remove('hidden');
+            spinner.classList.add('inline-flex');
+        }
+        if (sendOtpBtn) {
+            sendOtpBtn.classList.add('hidden');
+            sendOtpBtn.classList.remove('inline-flex');
+        }
+
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || window.CSRF_TOKEN || '';
+            const res = await fetch('/ajax.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: `action=check_email_status&email=${encodeURIComponent(email)}&_token=${encodeURIComponent(csrfToken)}`
+            });
+            const raw = await res.text();
+            const data = JSON.parse(raw.replace(/^\uFEFF+/, '').trim());
+
+            // Ensure the input value hasn't changed while fetch was in flight
+            if (input.value.trim().toLowerCase() !== email) {
+                return false;
+            }
+
+            if (data.success && data.verified) {
+                this.markEmailVerified(input);
+                return true;
+            } else {
+                const otpWrapper = document.getElementById('otpFieldsWrapper');
+                if (!otpWrapper || otpWrapper.classList.contains('hidden')) {
+                    this.showVerifyButton(input);
+                }
+                return false;
+            }
+        } catch (e) {
+            if (input.value.trim().toLowerCase() === email) {
+                this.showVerifyButton(input);
+            }
+            return false;
+        } finally {
+            if (spinner && input.value.trim().toLowerCase() === email) {
+                spinner.classList.add('hidden');
+                spinner.classList.remove('inline-flex');
+            }
+        }
     },
 
     setEmailBadge(state, text = '') {
@@ -1331,6 +1427,8 @@ const App = {
         if (!input) return;
         input.classList.remove('is-verified', 'shake-field', 'field-valid', 'field-invalid', 'field-processing');
         delete input.dataset.isVerified;
+        delete input.dataset.verifiedEmail;
+        delete input.dataset.otpSentEmail;
 
         if (input.id === 'bookingEmail') {
             if (this._otpTimerInterval) {
@@ -1383,9 +1481,12 @@ const App = {
 
     markEmailVerified(input) {
         if (!input) return;
+        const cleanEmail = input.value.trim().toLowerCase();
         this.resetFieldState(input);
         input.classList.add('is-verified', 'field-valid');
         input.dataset.isVerified = 'true';
+        input.dataset.verifiedEmail = cleanEmail;
+        this.rememberVerifiedEmail(cleanEmail);
 
         if (input.id === 'bookingEmail') {
             const verifiedIcon = document.getElementById('emailVerifiedIcon');
@@ -1463,6 +1564,12 @@ const App = {
             const data = JSON.parse(raw.replace(/^\uFEFF+/, '').trim());
 
             if (data.success) {
+                // If email is already verified in the database, mark it verified immediately without asking for OTP
+                if (data.already_verified || data.verified) {
+                    this.markEmailVerified(input);
+                    return;
+                }
+                input.dataset.otpSentEmail = email;
                 this.toast('6-digit verification code sent to ' + email, 'success');
                 if (sendBtn) {
                     sendBtn.classList.add('hidden');
@@ -1475,6 +1582,7 @@ const App = {
                 this.toast(msg, 'error');
                 // If already sent recently (cooldown), still show the OTP input box so user can type the code!
                 if (msg.toLowerCase().includes('wait') && msg.toLowerCase().includes('before requesting')) {
+                    input.dataset.otpSentEmail = email;
                     if (sendBtn) {
                         sendBtn.classList.add('hidden');
                         sendBtn.classList.remove('inline-flex');
@@ -3002,6 +3110,18 @@ const App = {
         if (this.currentStep === 2) {
             this.updateSummary();
             this.updateTotal();
+            const emailInput = document.getElementById('bookingEmail');
+            if (emailInput && window.DunesConfig?.email_verification_required) {
+                if (!emailInput.value.trim()) {
+                    try {
+                        const savedEmail = localStorage.getItem('dunes_guest_email') || '';
+                        if (savedEmail) emailInput.value = savedEmail;
+                    } catch (e) {}
+                }
+                if (emailInput.value.trim()) {
+                    this.checkEmailStatus(emailInput);
+                }
+            }
         }
     },
 

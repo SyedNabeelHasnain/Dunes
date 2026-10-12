@@ -25,18 +25,9 @@ class EmailVerificationController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid email address'], 400);
         }
 
-        $sessionVerified = session()->has('email_verified_'.md5($email));
-        if (! $sessionVerified) {
-            try {
-                if (VerifiedEmail::where('email', $email)->exists()) {
-                    session(['email_verified_'.md5($email) => true]);
-                    $sessionVerified = true;
-                }
-            } catch (\Throwable $e) {
-            }
-        }
+        $verified = VerifiedEmail::isVerified($email);
 
-        return response()->json(['success' => true, 'verified' => $sessionVerified]);
+        return response()->json(['success' => true, 'verified' => $verified]);
     }
 
     /**
@@ -47,6 +38,16 @@ class EmailVerificationController extends Controller
         $email = trim(strtolower($request->input('email', '')));
         if (empty($email) || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return response()->json(['success' => false, 'message' => 'Invalid email address'], 400);
+        }
+
+        // If already verified in DB/session, never send another OTP
+        if (VerifiedEmail::isVerified($email)) {
+            return response()->json([
+                'success' => true,
+                'already_verified' => true,
+                'verified' => true,
+                'message' => 'Email address is already verified.',
+            ]);
         }
 
         // Global rate limiting per email (max 5 OTPs per 10 minutes)
@@ -127,6 +128,10 @@ class EmailVerificationController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid email address'], 400);
         }
 
+        if (VerifiedEmail::isVerified($email)) {
+            return response()->json(['success' => true, 'verified' => true, 'message' => 'Email verified successfully']);
+        }
+
         if (strlen($otp) !== 6) {
             return response()->json(['success' => false, 'message' => 'OTP must be exactly 6 digits'], 400);
         }
@@ -175,16 +180,9 @@ class EmailVerificationController extends Controller
 
         if ($isValid) {
             RateLimiter::clear($attemptKey);
-            session(['email_verified_'.md5($email) => true]);
+            VerifiedEmail::markVerified($email);
 
-            // Persist email to verified_emails table
-            try {
-                VerifiedEmail::updateOrCreate(['email' => $email], ['verified_at' => now()]);
-            } catch (\Exception $e) {
-                Log::error('Failed to save verified email to DB: '.$e->getMessage());
-            }
-
-            return response()->json(['success' => true, 'message' => 'Email verified successfully']);
+            return response()->json(['success' => true, 'verified' => true, 'message' => 'Email verified successfully']);
         }
 
         RateLimiter::hit($attemptKey, 300);

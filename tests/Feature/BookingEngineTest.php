@@ -1122,6 +1122,26 @@ class BookingEngineTest extends TestCase
         ]);
         $status2->assertStatus(200)->assertJson(['success' => true, 'verified' => true]);
 
+        // Flush session to simulate a brand-new browser visit/device and verify no OTP repetition
+        session()->flush();
+
+        $statusAfterFlush = $this->post('/ajax.php', [
+            'action' => 'check_email_status',
+            'email' => $email,
+        ]);
+        $statusAfterFlush->assertStatus(200)->assertJson(['success' => true, 'verified' => true]);
+
+        // Even if send_otp is called for an already-verified email, it must immediately return already_verified=true
+        $sendAgainResp = $this->post('/ajax.php', [
+            'action' => 'send_otp',
+            'email' => $email,
+        ]);
+        $sendAgainResp->assertStatus(200)->assertJson([
+            'success' => true,
+            'already_verified' => true,
+            'verified' => true,
+        ]);
+
         // 3. Test WhatsApp lead logging with various international and local phone formats
         $phoneSamples = [
             '+971501234567',
