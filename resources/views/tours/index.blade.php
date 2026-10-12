@@ -159,7 +159,7 @@
                 @endphp
                 <div class="tour-item flex flex-col h-full" data-category="{{ $tourCatSlug }}" data-name="{{ strtolower($t->name) }}">
                     <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-200 hover:border-slate-300 flex flex-col h-full group">
-                        <a href="{{ route('tours.show', $t->slug) }}" class="flex flex-col h-full text-inherit">
+                        <a href="{{ localized_route('tours.show', $t->slug) }}" class="flex flex-col h-full text-inherit">
                             <div class="relative overflow-hidden aspect-[16/10]">
                                 <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy">
                                 @if($t->is_bestseller)
@@ -240,7 +240,7 @@
             </div>
             <h2 class="text-2xl font-bold text-slate-900 mb-2">No Tours Found</h2>
             <p class="text-slate-500 mb-6 text-sm">We couldn't find any tours matching your search query. Try exploring all our amazing experiences!</p>
-            <a href="{{ route('tours.index') }}" class="btn-desert-animated-dark font-bold text-white text-sm rounded-full px-6 py-3 inline-block shadow-md">{{ __('ui.common.view_all_tours') }}</a>
+            <a href="{{ localized_route('tours.index') }}" class="btn-desert-animated-dark font-bold text-white text-sm rounded-full px-6 py-3 inline-block shadow-md">{{ __('ui.common.view_all_tours') }}</a>
         </div>
         @endif
     </div>

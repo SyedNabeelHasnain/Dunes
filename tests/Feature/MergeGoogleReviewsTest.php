@@ -12,6 +12,7 @@ class MergeGoogleReviewsTest extends TestCase
     use RefreshDatabase;
 
     protected string $tempMasterPath;
+
     protected string $tempExtractedPath;
 
     protected function setUp(): void
@@ -158,7 +159,7 @@ class MergeGoogleReviewsTest extends TestCase
         ];
         File::put($this->tempMasterPath, json_encode($sampleMaster));
 
-        $csvContent = "\"address\",\"businessProfileId\",\"categories/0\",\"categories/1\",\"categoryName\",\"cid\",\"city\",\"countryCode\",\"fid\",\"hotelStars\",\"imageUrl\",\"isAdvertisement\",\"isLocalGuide\",\"kgmid\",\"language\",\"likesCount\",\"location/lat\",\"location/lng\",\"name\",\"neighborhood\",\"originalLanguage\",\"permanentlyClosed\",\"placeId\",\"postalCode\",\"price\",\"publishAt\",\"publishedAtDate\",\"rating\",\"responseFromOwnerDate\",\"responseFromOwnerText\",\"reviewId\",\"reviewImageUrls/0\",\"reviewImageUrls/1\",\"reviewImageUrls/2\",\"reviewImageUrls/3\",\"reviewImageUrls/4\",\"reviewImageUrls/5\",\"reviewImageUrls/6\",\"reviewImageUrls/7\",\"reviewOrigin\",\"reviewUrl\",\"reviewerId\",\"reviewerNumberOfReviews\",\"reviewerPhotoUrl\",\"reviewerUrl\",\"reviewsCount\",\"scrapedAt\",\"searchString\",\"stars\",\"state\",\"street\",\"temporarilyClosed\",\"text\",\"textTranslated\",\"title\",\"totalScore\",\"translatedLanguage\",\"url\",\"visitedIn\"\n" .
+        $csvContent = "\"address\",\"businessProfileId\",\"categories/0\",\"categories/1\",\"categoryName\",\"cid\",\"city\",\"countryCode\",\"fid\",\"hotelStars\",\"imageUrl\",\"isAdvertisement\",\"isLocalGuide\",\"kgmid\",\"language\",\"likesCount\",\"location/lat\",\"location/lng\",\"name\",\"neighborhood\",\"originalLanguage\",\"permanentlyClosed\",\"placeId\",\"postalCode\",\"price\",\"publishAt\",\"publishedAtDate\",\"rating\",\"responseFromOwnerDate\",\"responseFromOwnerText\",\"reviewId\",\"reviewImageUrls/0\",\"reviewImageUrls/1\",\"reviewImageUrls/2\",\"reviewImageUrls/3\",\"reviewImageUrls/4\",\"reviewImageUrls/5\",\"reviewImageUrls/6\",\"reviewImageUrls/7\",\"reviewOrigin\",\"reviewUrl\",\"reviewerId\",\"reviewerNumberOfReviews\",\"reviewerPhotoUrl\",\"reviewerUrl\",\"reviewsCount\",\"scrapedAt\",\"searchString\",\"stars\",\"state\",\"street\",\"temporarilyClosed\",\"text\",\"textTranslated\",\"title\",\"totalScore\",\"translatedLanguage\",\"url\",\"visitedIn\"\n".
             ",\"1522201601161585131\",\"Tour agency\",\"Service establishment\",\"Tour agency\",\"14154142641213989346\",,,\"0x4174448510086b6d:0xc46d9dbd85c4e1e2\",,,\"false\",\"true\",\"/g/11vk63ds_v\",\"en\",\"2\",\"24.35\",\"53.94\",\"Aron Popthorn\",,\"en\",\"false\",\"ChIJbWsIEIVEdEER4uHEhb2dbcQ\",,,\"2 days ago\",\"2026-10-04T14:04:18.925Z\",,\"2026-10-04T16:00:00.000Z\",\"Thank you for visiting!\",\"g_csv_test_1\",\"https://lh3.googleusercontent.com/photo1.jpg\",,,,,,,,\"Google\",\"https://www.google.com/maps/reviews/test\",\"105827233594346110028\",\"15\",\"https://lh3.googleusercontent.com/avatar.jpg\",\"https://www.google.com/maps/contrib/aron\",\"329\",\"2026-10-06T19:23:43.222Z\",\"DDT\",\"5\",,,\"false\",\"Greatest service experience!\",,,\"5\",\"en\",,\"September 2026\"\n";
 
         File::put($tempCsvPath, $csvContent);
@@ -202,4 +203,3 @@ class MergeGoogleReviewsTest extends TestCase
         }
     }
 }
-

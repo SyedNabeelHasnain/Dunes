@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 class AdminBlogController extends Controller
 {
     use NormalizesLocalizedInputs;
+
     /**
      * Display a listing of blog posts.
      */

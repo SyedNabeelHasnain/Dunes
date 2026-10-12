@@ -79,12 +79,12 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex gap-2 overflow-x-auto no-scrollbar w-full sm:w-auto pb-1">
-                <a href="{{ route('blog.index') }}" class="rounded-full px-4 py-1.5 text-xs sm:text-sm font-bold whitespace-nowrap transition-colors {{ !$categorySlug && !$search ? 'bg-primary text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">{{ __('ui.common.view_all') }}</a>
+                <a href="{{ localized_route('blog.index') }}" class="rounded-full px-4 py-1.5 text-xs sm:text-sm font-bold whitespace-nowrap transition-colors {{ !$categorySlug && !$search ? 'bg-primary text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">{{ __('ui.common.view_all') }}</a>
                 @foreach ($categories as $c)
-                <a href="{{ route('blog.index', ['category' => $c->slug]) }}" class="rounded-full px-4 py-1.5 text-xs sm:text-sm font-bold whitespace-nowrap transition-colors {{ $categorySlug === $c->slug ? 'bg-primary text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">{{ $c->name }}</a>
+                <a href="{{ localized_route('blog.index', ['category' => $c->slug]) }}" rel="nofollow" class="rounded-full px-4 py-1.5 text-xs sm:text-sm font-bold whitespace-nowrap transition-colors {{ $categorySlug === $c->slug ? 'bg-primary text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">{{ $c->name }}</a>
                 @endforeach
             </div>
-            <form action="{{ route('blog.index') }}" method="get" class="flex gap-2 w-full sm:w-auto">
+            <form action="{{ localized_route('blog.index') }}" method="get" class="flex gap-2 w-full sm:w-auto">
                 @if ($categorySlug)
                     <input type="hidden" name="category" value="{{ $categorySlug }}">
                 @endif
@@ -114,7 +114,7 @@
             @endphp
             <!-- Main Hero Featured Card -->
             <div class="lg:col-span-7">
-                <a href="{{ route('blog.show', $featuredPost->slug) }}" class="block h-full group text-inherit">
+                <a href="{{ localized_route('blog.show', $featuredPost->slug) }}" class="block h-full group text-inherit">
                     <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 flex flex-col h-full">
                         <div class="relative overflow-hidden aspect-[16/9]">
                             <img src="{{ $featuredImg }}" width="800" height="450" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $featuredPost->featured_image_alt ?: $featuredPost->title }}">
@@ -148,7 +148,7 @@
                 @php
                     $sideImg = $sidePost->featured_image ? asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $sidePost->featured_image)) : asset('images/desert-safari-poster.avif');
                 @endphp
-                <a href="{{ route('blog.show', $sidePost->slug) }}" class="block flex-1 group text-inherit">
+                <a href="{{ localized_route('blog.show', $sidePost->slug) }}" class="block flex-1 group text-inherit">
                     <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-200 flex flex-col sm:flex-row h-full">
                         <div class="sm:w-5/12 relative aspect-[16/10] sm:aspect-auto">
                             <img src="{{ $sideImg }}" width="400" height="250" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $sidePost->featured_image_alt ?: $sidePost->title }}">
@@ -187,7 +187,7 @@
         <i class="bi bi-search text-5xl text-slate-300 block mb-4"></i>
         <h3 class="text-xl font-bold text-slate-900 mb-1">{{ __('ui.blog_journal.no_articles_title') }}</h3>
         <p class="text-slate-500 text-sm mb-6">{{ __('ui.blog_journal.no_articles_desc') }}</p>
-        <a href="{{ route('blog.index') }}" class="btn-desert-animated-dark text-white rounded-full px-6 py-2.5 text-xs font-bold inline-block shadow-md">{{ __('ui.blog_journal.browse_all') }}</a>
+        <a href="{{ localized_route('blog.index') }}" class="btn-desert-animated-dark text-white rounded-full px-6 py-2.5 text-xs font-bold inline-block shadow-md">{{ __('ui.blog_journal.browse_all') }}</a>
     </div>
     @else
 
@@ -213,7 +213,7 @@
             $postImg = $post->featured_image ? asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $post->featured_image)) : asset('images/desert-safari-poster.avif');
         @endphp
         <article class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 flex flex-col h-full group">
-            <a href="{{ route('blog.show', $post->slug) }}" class="block relative aspect-[16/10] overflow-hidden">
+            <a href="{{ localized_route('blog.show', $post->slug) }}" class="block relative aspect-[16/10] overflow-hidden">
                 <img src="{{ $postImg }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $post->featured_image_alt ?: $post->title }}" loading="lazy">
                 @if ($post->category)
                 <span class="absolute top-3 start-3 bg-primary text-white rounded-full px-2.5 py-0.5 text-xs font-bold shadow-sm">{{ $post->category?->name }}</span>
@@ -221,7 +221,7 @@
             </a>
             <div class="p-5 flex flex-col flex-grow">
                 <h3 class="text-base font-bold text-slate-900 mb-2 line-clamp-2 group-hover:text-primary transition-colors leading-snug">
-                    <a href="{{ route('blog.show', $post->slug) }}">{{ $post->title }}</a>
+                    <a href="{{ localized_route('blog.show', $post->slug) }}">{{ $post->title }}</a>
                 </h3>
                 @if ($post->excerpt)
                 <p class="text-slate-600 text-xs sm:text-sm line-clamp-3 mb-4 flex-grow leading-relaxed">{{ $post->excerpt }}</p>

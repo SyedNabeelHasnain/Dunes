@@ -28,16 +28,16 @@ class SubmitIndexNowCommand extends Command
     {
         $this->info('Starting IndexNow submission...');
 
-        if (!$indexNow->isEnabled()) {
+        if (! $indexNow->isEnabled()) {
             $this->warn('IndexNow is currently disabled in site settings.');
-            if (!$this->confirm('Do you wish to proceed anyway?', false)) {
+            if (! $this->confirm('Do you wish to proceed anyway?', false)) {
                 return Command::SUCCESS;
             }
         }
 
         $specificUrls = $this->option('url');
 
-        if (!empty($specificUrls)) {
+        if (! empty($specificUrls)) {
             $result = $indexNow->submit($specificUrls);
         } else {
             $result = $indexNow->submitAll();
@@ -46,10 +46,12 @@ class SubmitIndexNowCommand extends Command
         if ($result['success']) {
             $this->info("✓ {$result['message']}");
             $this->line("Submitted {$result['count']} URLs successfully with status {$result['status']}.");
+
             return Command::SUCCESS;
         }
 
         $this->error("✗ {$result['message']}");
+
         return Command::FAILURE;
     }
 }

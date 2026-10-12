@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Language;
+
 if (! function_exists('buildHtmlAttrs')) {
     function buildHtmlAttrs(array $attrs = []): string
     {
@@ -130,6 +132,7 @@ if (! function_exists('localized_route')) {
             if ($baseName === 'home') {
                 return $absolute ? (rtrim(url('/'), '/').'/') : '/';
             }
+
             return route($baseName, $parameters, $absolute);
         }
 
@@ -137,9 +140,16 @@ if (! function_exists('localized_route')) {
         $localizedName = str_starts_with($name, 'locale.') ? $name : "locale.{$name}";
         $routes = app('routes');
         if ($routes && $routes->hasNamedRoute($localizedName)) {
-            $params = is_array($parameters)
-                ? array_merge(['locale' => $targetLocale], $parameters)
-                : ['locale' => $targetLocale, 'slug' => $parameters];
+            if (is_array($parameters)) {
+                $params = array_merge(['locale' => $targetLocale], $parameters);
+            } elseif ($parameters !== null && $parameters !== '') {
+                $routeObj = $routes->getByName($localizedName);
+                $paramNames = $routeObj ? $routeObj->parameterNames() : [];
+                $secondParam = $paramNames[1] ?? 'slug';
+                $params = ['locale' => $targetLocale, $secondParam => $parameters];
+            } else {
+                $params = ['locale' => $targetLocale];
+            }
 
             return route($localizedName, $params, $absolute);
         }
@@ -156,7 +166,7 @@ if (! function_exists('localized_route')) {
 
 if (! function_exists('switch_locale_url')) {
     /**
-     * Generate the URL to switch the current page to the target locale.
+     * Generate the clean canonical URL to switch the current page to the target locale.
      */
     function switch_locale_url(string $targetLocale): string
     {
@@ -167,14 +177,14 @@ if (! function_exists('switch_locale_url')) {
         if (! empty($segments)) {
             $first = $segments[0];
             try {
-                $languages = \App\Models\Language::getActive();
+                $languages = Language::getActive();
                 if ($languages->contains('code', $first) && $first !== 'en') {
                     array_shift($segments);
                 } elseif ($first === 'en') {
                     array_shift($segments);
                 }
-            } catch (\Throwable $e) {
-                if ($first === 'en' || $first === 'ar') {
+            } catch (Throwable $e) {
+                if (in_array($first, ['en', 'ar', 'ru', 'es', 'it'], true)) {
                     array_shift($segments);
                 }
             }
@@ -186,14 +196,10 @@ if (! function_exists('switch_locale_url')) {
             $path = empty($segments) ? "/{$targetLocale}" : "/{$targetLocale}/".implode('/', $segments);
         }
 
-        $queryString = $request->getQueryString();
         if ($path === '/') {
-            $fullUrl = rtrim(url('/'), '/').'/'.($queryString ? '?'.$queryString : '');
-        } else {
-            $fullUrl = url($path).($queryString ? '?'.$queryString : '');
+            return rtrim(url('/'), '/').'/';
         }
 
-        return $fullUrl;
+        return url($path);
     }
 }
-

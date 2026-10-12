@@ -141,7 +141,7 @@
                                checked 
                                class="rounded-md border-slate-300 text-emerald-600 focus:ring-emerald-500 w-4 h-4 mt-0.5 shrink-0 cursor-pointer">
                         <span class="text-[11px] text-slate-600 leading-snug">
-                            I agree to the <a href="{{ route('terms') }}" target="_blank" class="text-emerald-600 font-bold hover:underline">{{ __('ui.nav.terms') ?? 'Terms & Conditions' }}</a> and <a href="{{ route('privacy') }}" target="_blank" class="text-emerald-600 font-bold hover:underline">{{ __('ui.nav.privacy') ?? 'Privacy Policy' }}</a>.
+                            I agree to the <a href="{{ localized_route('terms') }}" target="_blank" class="text-emerald-600 font-bold hover:underline">{{ __('ui.nav.terms') ?? 'Terms & Conditions' }}</a> and <a href="{{ localized_route('privacy') }}" target="_blank" class="text-emerald-600 font-bold hover:underline">{{ __('ui.nav.privacy') ?? 'Privacy Policy' }}</a>.
                         </span>
                     </label>
                 </div>

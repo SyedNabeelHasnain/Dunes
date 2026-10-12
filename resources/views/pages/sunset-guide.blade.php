@@ -375,7 +375,7 @@
             <button type="button" class="btn-desert-animated px-8 py-3 rounded-full text-sm font-bold shadow-lg cursor-pointer" @click="$store.modal.open('booking')">
                 <i class="bi bi-calendar-check mr-1.5"></i> Book Evening Safari
             </button>
-            <a href="{{ localized_route('gallery.index') }}?category=sunset_camels" class="border border-white/20 hover:bg-white/10 px-6 py-3 rounded-full text-sm font-bold transition-colors">
+            <a href="{{ localized_route('gallery.index') }}" class="border border-white/20 hover:bg-white/10 px-6 py-3 rounded-full text-sm font-bold transition-colors">
                 <i class="bi bi-camera mr-1.5"></i> Browse Sunset Gallery
             </a>
         </div>

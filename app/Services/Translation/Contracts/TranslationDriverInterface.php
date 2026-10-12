@@ -7,10 +7,7 @@ interface TranslationDriverInterface
     /**
      * Translate a string or key-value map of strings from source locale to target locale.
      *
-     * @param string|array<string, string> $text
-     * @param string $targetLocale
-     * @param string $sourceLocale
-     * @param bool $isHtml
+     * @param  string|array<string, string>  $text
      * @return string|array<string, string>
      */
     public function translate(string|array $text, string $targetLocale, string $sourceLocale = 'en', bool $isHtml = false): string|array;

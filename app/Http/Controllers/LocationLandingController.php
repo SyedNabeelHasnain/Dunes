@@ -56,9 +56,32 @@ class LocationLandingController extends Controller
 
         $allLocations = LocationLandingService::getLocations();
 
-        $pageTitle = $locationData['meta_title'];
-        $pageDesc = $locationData['meta_desc'];
         $currentLocale = app()->getLocale();
+        $currentYear = date('Y');
+        $locName = $locationData['name'];
+        $driveTime = $locationData['drive_time'];
+
+        $localizedLocMeta = [
+            'ar' => [
+                'title' => "سفاري صحراء دبي مع توصيل من {$locName} ({$currentYear}) | على بُعد {$driveTime} | Dunes Discovery",
+                'desc' => "احجز رحلة سفاري صحراء دبي مع خدمة استقبال وتوصيل مجانية بسيارات الدفع الرباعي 4x4 من كافة فنادق وأبراج {$locName} ({$driveTime} إلى كثبان لهباب الحمراء).",
+            ],
+            'ru' => [
+                'title' => "Сафари в пустыне Дубая с трансфером из {$locName} ({$currentYear}) | {$driveTime} в пути | Dunes Discovery",
+                'desc' => "Забронируйте пустынное сафари в Дубае с бесплатным трансфером на 4x4 прямо из отелей и резиденций района {$locName} ({$driveTime} до красных дюн Лахбаб).",
+            ],
+            'es' => [
+                'title' => "Safari por el Desierto de Dubái desde {$locName} ({$currentYear}) | A {$driveTime} | Dunes Discovery",
+                'desc' => "Reserva tu safari por el desierto de Dubái con recogida puerta a puerta en 4x4 desde cualquier hotel o residencia en {$locName} ({$driveTime} hasta las dunas rojas de Lahbab).",
+            ],
+            'it' => [
+                'title' => "Safari nel Deserto di Dubai con Partenza da {$locName} ({$currentYear}) | A {$driveTime} | Dunes Discovery",
+                'desc' => "Prenota il tuo safari nel deserto di Dubai con trasferimento 4x4 porta a porta da tutti gli hotel e residence di {$locName} ({$driveTime} dalle dune rosse di Lahbab).",
+            ],
+        ];
+
+        $pageTitle = $localizedLocMeta[$currentLocale]['title'] ?? $locationData['meta_title'];
+        $pageDesc = $localizedLocMeta[$currentLocale]['desc'] ?? $locationData['meta_desc'];
         $canonical = ($currentLocale && $currentLocale !== 'en') ? url('/'.$currentLocale.'/'.$locationData['slug']) : url('/'.$locationData['slug']);
         $ogImage = asset('images/desert-safari-poster.avif');
 

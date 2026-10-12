@@ -17,9 +17,13 @@ class BlogPostInteractiveBookingTest extends TestCase
     use RefreshDatabase;
 
     protected Category $safariCat;
+
     protected Tour $eveningTour;
+
     protected Tour $buggyTour;
+
     protected Tour $quadTour;
+
     protected BlogCategory $blogCat;
 
     protected function setUp(): void
@@ -117,7 +121,7 @@ class BlogPostInteractiveBookingTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Dune Buggy Rental Dubai');
         $response->assertSee('AED 599');
-        $response->assertSee('$store.modal.open(\'booking\', { tourId: ' . $this->buggyTour->id . ' })', false);
+        $response->assertSee('$store.modal.open(\'booking\', { tourId: '.$this->buggyTour->id.' })', false);
     }
 
     public function test_blog_post_matches_tour_by_title_and_slug_keywords(): void
@@ -136,7 +140,7 @@ class BlogPostInteractiveBookingTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Desert Safari with Quad Biking');
         $response->assertSee('AED 199');
-        $response->assertSee('$store.modal.open(\'booking\', { tourId: ' . $this->quadTour->id . ' })', false);
+        $response->assertSee('$store.modal.open(\'booking\', { tourId: '.$this->quadTour->id.' })', false);
     }
 
     public function test_blog_post_renders_in_article_booking_card_with_whatsapp_and_booking_ctas(): void

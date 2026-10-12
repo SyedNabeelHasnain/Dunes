@@ -53,7 +53,7 @@ class LocaleManager
             if (File::exists($baseJsonPath)) {
                 File::copy($baseJsonPath, $jsonFilePath);
             } else {
-                File::put($jsonFilePath, json_encode(new \stdClass(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                File::put($jsonFilePath, json_encode(new \stdClass, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
             }
         }
 

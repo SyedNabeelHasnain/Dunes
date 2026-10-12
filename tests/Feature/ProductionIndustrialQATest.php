@@ -3,11 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\BlogPost;
-use App\Models\Category;
 use App\Models\Coupon;
-use App\Models\Tier;
 use App\Models\Tour;
 use App\Models\User;
+use App\Services\ZiinaPaymentService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -30,7 +29,7 @@ class ProductionIndustrialQATest extends TestCase
         $this->assertNotNull($tour);
 
         // Fetch Arabic tour page
-        $response = $this->get('/ar/' . $tour->slug);
+        $response = $this->get('/ar/'.$tour->slug);
         $response->assertStatus(200);
 
         // Assert logical border-s-4 is present on quick facts and sections
@@ -68,7 +67,7 @@ class ProductionIndustrialQATest extends TestCase
             'payment_method' => 'cash',
         ];
 
-        session(['email_verified_' . md5('industrial-qa@example.com') => true]);
+        session(['email_verified_'.md5('industrial-qa@example.com') => true]);
 
         $response = $this->postJson('/api/v1/booking/checkout', $payload);
 
@@ -142,7 +141,7 @@ class ProductionIndustrialQATest extends TestCase
         $this->actingAs($admin);
 
         $category = DB::table('blog_categories')->first();
-        if (!$category) {
+        if (! $category) {
             $catId = DB::table('blog_categories')->insertGetId([
                 'name' => 'Safari Tips',
                 'slug' => 'safari-tips',
@@ -186,7 +185,7 @@ class ProductionIndustrialQATest extends TestCase
         $admin = User::first();
         $this->actingAs($admin);
 
-        $this->mock(\App\Services\ZiinaPaymentService::class, function ($mock) {
+        $this->mock(ZiinaPaymentService::class, function ($mock) {
             $mock->shouldReceive('createPaymentIntent')->andReturn([
                 'id' => 'pi_test_123',
                 'status' => 'pending',

@@ -73,6 +73,7 @@ class VerifyGalleryMediaCommand extends Command
         );
 
         $this->info('Gallery cache successfully primed and verified.');
+
         return Command::SUCCESS;
     }
 }

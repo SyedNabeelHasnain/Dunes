@@ -99,7 +99,7 @@ class ReviewMediaGalleryTest extends TestCase
         $testUrl = 'https://example.com/reported-broken-photo.jpg';
 
         // Pre-cache as healthy
-        $cacheKey = 'gallery_media_status_' . md5($testUrl);
+        $cacheKey = 'gallery_media_status_'.md5($testUrl);
         Cache::put($cacheKey, true, 3600);
         $this->assertTrue((bool) Cache::get($cacheKey));
 

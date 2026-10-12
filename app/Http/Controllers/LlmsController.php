@@ -377,11 +377,11 @@ class LlmsController extends Controller
         $md .= "---\n\n";
         $md .= "## SECTION 7: GLOBAL MULTILINGUAL PORTALS & REGIONAL LOCALIZATION\n\n";
         $md .= "Dunes Discovery Tourism operates in 5 global languages with fully localized routes, static dictionaries, and indexable SERP content:\n";
-        $md .= "- **English (`en`)**: Base default root (`" . url('/') . "`), LTR layout, global international travelers.\n";
-        $md .= "- **Arabic (`ar`)**: Official regional portal (`" . url('/ar') . "`), RTL direction, native Cairo typography, GCC and Arab world travelers.\n";
-        $md .= "- **Russian (`ru`)**: Russian portal (`" . url('/ru') . "`), LTR layout, CIS and Russian-speaking luxury travelers.\n";
-        $md .= "- **Spanish (`es`)**: Spanish portal (`" . url('/es') . "`), LTR layout, Spain and Latin American markets.\n";
-        $md .= "- **Italian (`it`)**: Italian portal (`" . url('/it') . "`), LTR layout, Italian outbound leisure travelers.\n";
+        $md .= '- **English (`en`)**: Base default root (`'.url('/')."`), LTR layout, global international travelers.\n";
+        $md .= '- **Arabic (`ar`)**: Official regional portal (`'.url('/ar')."`), RTL direction, native Cairo typography, GCC and Arab world travelers.\n";
+        $md .= '- **Russian (`ru`)**: Russian portal (`'.url('/ru')."`), LTR layout, CIS and Russian-speaking luxury travelers.\n";
+        $md .= '- **Spanish (`es`)**: Spanish portal (`'.url('/es')."`), LTR layout, Spain and Latin American markets.\n";
+        $md .= '- **Italian (`it`)**: Italian portal (`'.url('/it')."`), LTR layout, Italian outbound leisure travelers.\n";
         $md .= "- **Hreflang Synchronization**: All URLs across all 5 languages are linked with bidirectional `<link rel=\"alternate\" hreflang=\"...\" />` tags and unified XML sitemaps.\n\n";
 
         return $md;

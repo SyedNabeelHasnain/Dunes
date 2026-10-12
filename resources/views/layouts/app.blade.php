@@ -142,6 +142,7 @@
     <meta name="robots" content="{{ $pageRobots }}">
     <meta name="author" content="Dunes Discovery Tourism">
     <link rel="canonical" href="{{ $canonical }}">
+    @if(!str_contains(strtolower($pageRobots ?? ''), 'noindex'))
     <link rel="alternate" hreflang="x-default" href="{{ switch_locale_url('en') }}">
     @if(isset($activeLanguages) && is_iterable($activeLanguages))
         @foreach($activeLanguages as $langItem)
@@ -149,6 +150,7 @@
         @endforeach
     @else
         <link rel="alternate" hreflang="en" href="{{ switch_locale_url('en') }}">
+    @endif
     @endif
     
     <link rel="preconnect" href="https://www.googletagmanager.com">
@@ -405,7 +407,7 @@
             "@@type": "SearchAction",
             "target": {
               "@@type": "EntryPoint",
-              "urlTemplate": "{{ localized_route('tours.search') }}?search={search_term_string}"
+              "urlTemplate": "{{ localized_route('tours.search') }}?q={search_term_string}"
             },
             "query-input": "required name=search_term_string"
           },
@@ -450,15 +452,15 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16 sm:h-18">
                     <!-- Brand Logo -->
-                    <a class="flex items-center flex-shrink-0 hover:opacity-90 transition-opacity" href="{{ route('home') }}" aria-label="Dunes Discovery Tourism">
+                    <a class="flex items-center flex-shrink-0 hover:opacity-90 transition-opacity" href="{{ localized_route('home') }}" aria-label="Dunes Discovery Tourism">
                         <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery Tourism" width="160" height="103" class="h-9 sm:h-10 w-auto object-contain" fetchpriority="high">
                     </a>
 
                     <!-- Desktop Nav Links (Hidden on mobile/tablet) -->
                     <ul class="hidden lg:flex items-center gap-1 xl:gap-2 text-sm font-semibold text-slate-700">
                         <li class="relative" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">
-                            <div class="inline-flex items-center rounded-xl {{ request()->routeIs('tours.*') ? 'bg-slate-900 text-white font-bold shadow-xs' : '' }}">
-                                <a class="px-3 py-2 rounded-s-xl transition-all {{ request()->routeIs('tours.*') ? 'text-white' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('tours.index') }}">{{ __('ui.nav.all_tours') }}</a>
+                            <div class="inline-flex items-center rounded-xl {{ request()->routeIs('tours.*', 'locale.tours.*') ? 'bg-slate-900 text-white font-bold shadow-xs' : '' }}">
+                                <a class="px-3 py-2 rounded-s-xl transition-all {{ request()->routeIs('tours.*', 'locale.tours.*') ? 'text-white' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ localized_route('tours.index') }}">{{ __('ui.nav.all_tours') }}</a>
                                 <button type="button" @click="open = !open" :aria-expanded="open" class="px-1.5 py-2 rounded-e-xl transition-all hover:opacity-80 cursor-pointer" aria-label="{{ __('ui.nav.all_tours') }}">
                                     <i class="bi bi-chevron-down text-[10px] transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
                                 </button>
@@ -473,14 +475,14 @@
                                  x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
                                  class="absolute start-0 mt-2 w-72 rounded-2xl bg-white p-2 shadow-xl border border-slate-200 z-50 focus:outline-none"
                                  style="display: none;">
-                                <a class="flex items-center gap-2 px-3 py-2.5 rounded-xl font-bold text-primary hover:bg-orange-50 transition-colors text-xs" href="{{ route('tours.customizer') }}">
+                                <a class="flex items-center gap-2 px-3 py-2.5 rounded-xl font-bold text-primary hover:bg-orange-50 transition-colors text-xs" href="{{ localized_route('tours.customizer') }}">
                                     <i class="bi bi-sliders text-amber-500"></i>
                                     <span>{{ __('ui.nav.customizer') }}</span>
                                 </a>
                                 <div class="my-1 border-t border-slate-200"></div>
                                 <div class="max-h-72 overflow-y-auto space-y-0.5">
                                     @foreach($allTours as $t)
-                                    <a class="block px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-primary transition-colors line-clamp-1" href="{{ route('tours.show', $t->slug) }}">
+                                    <a class="block px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-primary transition-colors line-clamp-1" href="{{ localized_route('tours.show', $t->slug) }}">
                                         {{ $t->name }}
                                     </a>
                                     @endforeach
@@ -488,19 +490,19 @@
                             </div>
                         </li>
                         <li>
-                            <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('gallery.*') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('gallery.index') }}">{{ __('ui.nav.gallery') }}</a>
+                            <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('gallery.*', 'locale.gallery.*') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ localized_route('gallery.index') }}">{{ __('ui.nav.gallery') }}</a>
                         </li>
                         <li>
-                            <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('about') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('about') }}">{{ __('ui.nav.about') }}</a>
+                            <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('about', 'locale.about') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ localized_route('about') }}">{{ __('ui.nav.about') }}</a>
                         </li>
                         <li>
-                            <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('blog.*') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('blog.index') }}">{{ __('ui.nav.blog') }}</a>
+                            <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('blog.*', 'locale.blog.*') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ localized_route('blog.index') }}">{{ __('ui.nav.blog') }}</a>
                         </li>
                         <li>
-                            <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('faq') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('faq') }}">{{ __('ui.nav.faq') }}</a>
+                            <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('faq', 'locale.faq') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ localized_route('faq') }}">{{ __('ui.nav.faq') }}</a>
                         </li>
                         <li>
-                            <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('contact') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ route('contact') }}">{{ __('ui.nav.contact') }}</a>
+                            <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('contact', 'locale.contact') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ localized_route('contact') }}">{{ __('ui.nav.contact') }}</a>
                         </li>
                     </ul>
 
@@ -577,7 +579,7 @@
              id="mainOffcanvas">
             <div>
                 <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-4">
-                    <a href="{{ route('home') }}" @click="$store.mobileNav.close()" class="flex items-center hover:opacity-90 transition-opacity" aria-label="Dunes Discovery Tourism">
+                    <a href="{{ localized_route('home') }}" @click="$store.mobileNav.close()" class="flex items-center hover:opacity-90 transition-opacity" aria-label="Dunes Discovery Tourism">
                         <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery Tourism" width="140" height="90" class="h-9 w-auto object-contain">
                     </a>
                     <div class="flex items-center gap-2">
@@ -589,7 +591,7 @@
                 </div>
 
                 <!-- Search Input in Drawer -->
-                <form action="{{ route('tours.search') }}" method="GET" class="relative mb-3">
+                <form action="{{ localized_route('tours.search') }}" method="GET" class="relative mb-3">
                     <i class="bi bi-search absolute start-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
                     <input type="text" name="q" class="w-full rounded-full ps-9 pe-4 py-2 bg-slate-100 text-slate-800 text-xs font-semibold border-0 focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="{{ __('ui.nav.search_placeholder') }}" required>
                 </form>
@@ -608,7 +610,7 @@
                         <span class="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[9px]">{{ $conciergePromoDiscount }}% OFF</span>
                         @endif
                     </button>
-                    <a href="{{ route('tours.customizer') }}" class="w-full rounded-2xl p-2.5 flex items-center justify-between text-start border border-slate-200 bg-slate-50 hover:bg-orange-50 text-slate-800 font-bold text-xs transition-colors" @click="$store.mobileNav.close()">
+                    <a href="{{ localized_route('tours.customizer') }}" class="w-full rounded-2xl p-2.5 flex items-center justify-between text-start border border-slate-200 bg-slate-50 hover:bg-orange-50 text-slate-800 font-bold text-xs transition-colors" @click="$store.mobileNav.close()">
                         <span class="flex items-center gap-2">
                             <i class="bi bi-sliders text-primary"></i>
                             <span>{{ __('ui.nav.customizer') }}</span>
@@ -619,12 +621,12 @@
 
                 <!-- Navigation Links List -->
                 <nav class="space-y-1">
-                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('tours.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('tours.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.all_tours') }}</a>
-                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('gallery.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('gallery.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.gallery') }}</a>
-                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('about') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('about') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.about') }}</a>
-                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('blog.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('blog.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.blog') }}</a>
-                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('faq') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('faq') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.faq') }}</a>
-                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('contact') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ route('contact') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.contact') }}</a>
+                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('tours.*', 'locale.tours.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('tours.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.all_tours') }}</a>
+                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('gallery.*', 'locale.gallery.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('gallery.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.gallery') }}</a>
+                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('about', 'locale.about') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('about') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.about') }}</a>
+                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('blog.*', 'locale.blog.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('blog.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.blog') }}</a>
+                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('faq', 'locale.faq') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('faq') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.faq') }}</a>
+                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('contact', 'locale.contact') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('contact') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.contact') }}</a>
                 </nav>
             </div>
 
@@ -715,11 +717,11 @@
                             <li><a href="{{ $fItem->resolved_url }}" target="{{ $fItem->target }}" class="text-slate-300 hover:text-white transition-colors">{{ $fItem->label }}</a></li>
                             @endforeach
                         @else
-                            <li><a href="{{ route('tours.show', 'evening-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.evening_safari') }}</a></li>
-                            <li><a href="{{ route('tours.show', 'morning-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.morning_safari') }}</a></li>
-                            <li><a href="{{ route('tours.show', 'overnight-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.overnight_safari') }}</a></li>
-                            <li><a href="{{ route('tours.show', 'desert-safari-quad-biking-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.quad_biking') }}</a></li>
-                            <li><a href="{{ route('tours.show', 'luxury-vip-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.vip_safari') }}</a></li>
+                            <li><a href="{{ localized_route('tours.show', 'evening-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.evening_safari') }}</a></li>
+                            <li><a href="{{ localized_route('tours.show', 'morning-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.morning_safari') }}</a></li>
+                            <li><a href="{{ localized_route('tours.show', 'overnight-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.overnight_safari') }}</a></li>
+                            <li><a href="{{ localized_route('tours.show', 'desert-safari-quad-biking-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.quad_biking') }}</a></li>
+                            <li><a href="{{ localized_route('tours.show', 'evening-desert-safari-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.vip_safari') }}</a></li>
                         @endif
                     </ul>
                 </div>
@@ -733,14 +735,14 @@
                             <li><a href="{{ $fItem->resolved_url }}" target="{{ $fItem->target }}" class="text-slate-300 hover:text-white transition-colors">{{ $fItem->label }}</a></li>
                             @endforeach
                         @else
-                            <li><a href="{{ route('tours.show', 'dubai-city-tour') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.dubai_city_tour') }}</a></li>
-                            <li><a href="{{ route('tours.show', 'abu-dhabi-city-tour-from-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.abu_dhabi_tour') }}</a></li>
-                            <li><a href="{{ route('tours.show', 'dhow-cruise-catamaran-cruise-dinner-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.marina_cruise') }}</a></li>
-                            <li><a href="{{ route('rate-card') }}" class="text-slate-300 hover:text-white transition-colors inline-flex items-center gap-1.5"><i class="bi bi-file-earmark-pdf text-amber-400"></i>{{ __('ui.footer.rate_card_pdf') }}</a></li>
-                            <li><a href="{{ route('gallery.index') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.nav.gallery') }}</a></li>
-                            <li><a href="{{ route('blog.index') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.nav.blog') }}</a></li>
-                            <li><a href="{{ route('sunset.guide') }}" class="text-slate-300 hover:text-white transition-colors">Dubai Desert Sunset Times</a></li>
-                            <li><a href="{{ route('press.kit') }}" class="text-slate-300 hover:text-white transition-colors">Press Kit &amp; Partner Badges</a></li>
+                            <li><a href="{{ localized_route('tours.show', 'dubai-city-tour') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.dubai_city_tour') }}</a></li>
+                            <li><a href="{{ localized_route('tours.show', 'abu-dhabi-city-tour-from-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.abu_dhabi_tour') }}</a></li>
+                            <li><a href="{{ localized_route('tours.show', 'dhow-cruise-catamaran-cruise-dinner-dubai') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.marina_cruise') }}</a></li>
+                            <li><a href="{{ localized_route('rate-card') }}" class="text-slate-300 hover:text-white transition-colors inline-flex items-center gap-1.5"><i class="bi bi-file-earmark-pdf text-amber-400"></i>{{ __('ui.footer.rate_card_pdf') }}</a></li>
+                            <li><a href="{{ localized_route('gallery.index') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.nav.gallery') }}</a></li>
+                            <li><a href="{{ localized_route('blog.index') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.nav.blog') }}</a></li>
+                            <li><a href="{{ localized_route('sunset.guide') }}" class="text-slate-300 hover:text-white transition-colors">Dubai Desert Sunset Times</a></li>
+                            <li><a href="{{ localized_route('press.kit') }}" class="text-slate-300 hover:text-white transition-colors">Press Kit &amp; Partner Badges</a></li>
                         @endif
                     </ul>
                 </div>
@@ -754,11 +756,11 @@
                             <li><a href="{{ $fItem->resolved_url }}" target="{{ $fItem->target }}" class="text-slate-300 hover:text-white transition-colors">{{ $fItem->label }}</a></li>
                             @endforeach
                         @else
-                            <li><a href="{{ route('terms') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.terms') }}</a></li>
-                            <li><a href="{{ route('privacy') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.privacy') }}</a></li>
-                            <li><a href="{{ route('cookies') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.cookies') }}</a></li>
-                            <li><a href="{{ route('cancellation') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.refund') }}</a></li>
-                            <li><a href="{{ route('payment.security') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.payment_security') }}</a></li>
+                            <li><a href="{{ localized_route('terms') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.terms') }}</a></li>
+                            <li><a href="{{ localized_route('privacy') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.privacy') }}</a></li>
+                            <li><a href="{{ localized_route('cookies') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.cookies') }}</a></li>
+                            <li><a href="{{ localized_route('cancellation') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.refund') }}</a></li>
+                            <li><a href="{{ localized_route('payment.security') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.payment_security') }}</a></li>
                         @endif
                     </ul>
                 </div>
@@ -802,21 +804,21 @@
                     <div>
                         <p class="text-slate-400 text-xs mb-1">{{ __('ui.footer.license_line', ['year' => date('Y'), 'name' => $settings['site_name'] ?? 'Dunes Discovery Tourism L.L.C.', 'license' => $settings['company_license_number'] ?? '1430583']) }}</p>
                         <div class="flex flex-wrap justify-center lg:justify-start items-center gap-x-2.5 gap-y-1 text-xs text-slate-300">
-                            <a href="{{ route('terms') }}" class="hover:text-white transition-colors">{{ __('ui.footer.terms') }}</a>
+                            <a href="{{ localized_route('terms') }}" class="hover:text-white transition-colors">{{ __('ui.footer.terms') }}</a>
                             <span class="text-slate-500">&bull;</span>
-                            <a href="{{ route('privacy') }}" class="hover:text-white transition-colors">{{ __('ui.footer.privacy') }}</a>
+                            <a href="{{ localized_route('privacy') }}" class="hover:text-white transition-colors">{{ __('ui.footer.privacy') }}</a>
                             <span class="text-slate-500">&bull;</span>
-                            <a href="{{ route('cookies') }}" class="hover:text-white transition-colors">{{ __('ui.footer.cookies') }}</a>
+                            <a href="{{ localized_route('cookies') }}" class="hover:text-white transition-colors">{{ __('ui.footer.cookies') }}</a>
                             <span class="text-slate-500">&bull;</span>
-                            <a href="{{ route('cancellation') }}" class="hover:text-white transition-colors">{{ __('ui.footer.refund_100') }}</a>
+                            <a href="{{ localized_route('cancellation') }}" class="hover:text-white transition-colors">{{ __('ui.footer.refund_100') }}</a>
                             <span class="text-slate-500">&bull;</span>
-                            <a href="{{ route('payment.security') }}" class="hover:text-white transition-colors">{{ __('ui.footer.payment_security') }}</a>
+                            <a href="{{ localized_route('payment.security') }}" class="hover:text-white transition-colors">{{ __('ui.footer.payment_security') }}</a>
                             <span class="text-slate-500">&bull;</span>
-                            <a href="{{ route('safety.waiver') }}" class="hover:text-white transition-colors">{{ __('ui.footer.safety_waiver') }}</a>
+                            <a href="{{ localized_route('safety.waiver') }}" class="hover:text-white transition-colors">{{ __('ui.footer.safety_waiver') }}</a>
                             <span class="text-slate-500">&bull;</span>
-                            <a href="{{ route('ai.editorial') }}" class="hover:text-white transition-colors">{{ __('ui.footer.ai_editorial') }}</a>
+                            <a href="{{ localized_route('ai.editorial') }}" class="hover:text-white transition-colors">{{ __('ui.footer.ai_editorial') }}</a>
                             <span class="text-slate-500">&bull;</span>
-                            <a href="{{ route('responsible.tourism') }}" class="hover:text-white transition-colors">{{ __('ui.footer.responsible_tourism') }}</a>
+                            <a href="{{ localized_route('responsible.tourism') }}" class="hover:text-white transition-colors">{{ __('ui.footer.responsible_tourism') }}</a>
                         </div>
                     </div>
                     <div class="inline-flex items-center gap-2 bg-slate-900 border border-slate-800 px-4 py-2 rounded-full flex-wrap justify-center">

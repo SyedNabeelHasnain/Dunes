@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 class GalleryController extends Controller
 {
     protected ReviewMediaGalleryService $galleryService;
+
     protected SettingsService $settings;
 
     public function __construct(ReviewMediaGalleryService $galleryService, SettingsService $settings)
@@ -40,12 +41,35 @@ class GalleryController extends Controller
 
         // SEO Metadata
         $currentLocale = app()->getLocale();
-        $canonical = ($currentLocale && $currentLocale !== 'en') ? url('/' . $currentLocale . '/gallery') : url('/gallery');
+        $canonical = localized_route('gallery.index');
         $currentYear = date('Y');
 
-        $pageTitle = "Customer Safari Gallery {$currentYear} | Real Traveler Photos & Videos | Dunes Discovery";
-        $pageDesc = "Browse authentic, unfiltered desert safari photos and videos uploaded by verified guests on Google Maps and TripAdvisor. Experience real red dunes adventures, quad biking, and camp evenings in Dubai.";
-        $pageKeys = "dubai desert safari gallery, desert safari photos, customer reviews photos dubai, real dunes discovery photos, buggy rental pictures, evening safari camp images";
+        $localizedGalleryMeta = [
+            'ar' => [
+                'title' => "معرض صور وفيديوهات سفاري صحراء دبي ({$currentYear}) | صور ضيوف حقيقية | Dunes Discovery",
+                'desc' => 'تصفح صوراً وفيديوهات حقيقية غير مفلترة لرحلات سفاري صحراء دبي بعدسة ضيوفنا الموثقين على خرائط جوجل وتريب أدفايزر في كثبان لهباب الحمراء.',
+            ],
+            'ru' => [
+                'title' => "Фотогалерея пустынного сафари в Дубае ({$currentYear}) | Реальные фото и видео гостей | Dunes Discovery",
+                'desc' => 'Смотрите реальные фотографии и видео сафари в пустыне Дубая от проверенных гостей из Google Maps и TripAdvisor: красные дюны Лахбаб, багги и бедуинский лагерь.',
+            ],
+            'es' => [
+                'title' => "Galería de Fotos y Videos del Safari en Dubái ({$currentYear}) | Clientes Reales | Dunes Discovery",
+                'desc' => 'Explora fotos y videos auténticos sin filtros del safari por el desierto de Dubái subidos por viajeros verificados en Google Maps y TripAdvisor.',
+            ],
+            'it' => [
+                'title' => "Galleria Foto e Video Safari nel Deserto di Dubai ({$currentYear}) | Ospiti Reali | Dunes Discovery",
+                'desc' => 'Sfoglia foto e video autentici del safari nel deserto di Dubai caricati da ospiti verificati su Google Maps e TripAdvisor tra le dune rosse di Lahbab.',
+            ],
+        ];
+
+        $pageTitle = $localizedGalleryMeta[$currentLocale]['title'] ?? "Customer Safari Gallery {$currentYear} | Real Traveler Photos & Videos | Dunes Discovery";
+        $pageDesc = $localizedGalleryMeta[$currentLocale]['desc'] ?? 'Browse authentic, unfiltered desert safari photos and videos uploaded by verified guests on Google Maps and TripAdvisor. Experience real red dunes adventures, quad biking, and camp evenings in Dubai.';
+        $pageKeys = 'dubai desert safari gallery, desert safari photos, customer reviews photos dubai, real dunes discovery photos, buggy rental pictures, evening safari camp images';
+
+        $pageRobots = (! empty($request->query()))
+            ? 'noindex, follow'
+            : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
 
         $firstItem = ! empty($filteredItems) ? $filteredItems[0] : null;
         $ogImage = $firstItem ? $firstItem['url'] : asset('images/evening-desert-safari-dubai-dune-discovery-tourism.avif');
@@ -57,7 +81,7 @@ class GalleryController extends Controller
                 '@type' => 'ImageObject',
                 'contentUrl' => $item['url'],
                 'name' => $item['review_title'] ?: 'Dubai Desert Safari Experience',
-                'caption' => $item['review_text'] ?: 'Photo by ' . $item['reviewer_name'],
+                'caption' => $item['review_text'] ?: 'Photo by '.$item['reviewer_name'],
                 'author' => [
                     '@type' => 'Person',
                     'name' => $item['reviewer_name'],
@@ -77,6 +101,7 @@ class GalleryController extends Controller
             'pageDesc',
             'pageKeys',
             'canonical',
+            'pageRobots',
             'ogImage',
             'schemaImages',
             'currentLocale'

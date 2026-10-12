@@ -41,7 +41,7 @@ class GoogleReviewSyncService
     /**
      * Execute synchronization of Google reviews and place rating metrics.
      *
-     * @param bool $force Bypass the rate-limit cooldown
+     * @param  bool  $force  Bypass the rate-limit cooldown
      * @return array<string, mixed>
      */
     public function sync(bool $force = false): array
@@ -62,6 +62,7 @@ class GoogleReviewSyncService
         if (! $force && $lastSyncedTimestamp && (now()->timestamp - $lastSyncedTimestamp) < self::SYNC_COOLDOWN_SECONDS) {
             $lock->release();
             $remaining = self::SYNC_COOLDOWN_SECONDS - (now()->timestamp - $lastSyncedTimestamp);
+
             return [
                 'success' => false,
                 'rate_limited' => true,
@@ -79,7 +80,7 @@ class GoogleReviewSyncService
             $isFallback = false;
             if (! empty($fetchResult['error'])) {
                 $errorMsg = $fetchResult['error'];
-                Log::warning('Google Places API live fetch returned notice, utilizing verified fallback reviews: ' . $errorMsg);
+                Log::warning('Google Places API live fetch returned notice, utilizing verified fallback reviews: '.$errorMsg);
                 $fetchResult = $this->getFallbackGoogleReviews();
                 $isFallback = true;
             }
@@ -98,6 +99,7 @@ class GoogleReviewSyncService
 
                 if (! $normalized || empty($normalized['reviewer_name'])) {
                     $skipped++;
+
                     continue;
                 }
 
@@ -172,14 +174,14 @@ class GoogleReviewSyncService
                 'message' => "Successfully synchronized Google Reviews: {$added} new added, {$updated} updated.",
             ];
         } catch (\Throwable $e) {
-            Log::error('Google review synchronization exception: ' . $e->getMessage(), [
+            Log::error('Google review synchronization exception: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
             ]);
 
             return [
                 'success' => false,
                 'rate_limited' => false,
-                'message' => 'Error during sync: ' . $e->getMessage(),
+                'message' => 'Error during sync: '.$e->getMessage(),
                 'last_synced_at' => $this->getLastSyncedAt(),
             ];
         } finally {
@@ -221,7 +223,7 @@ class GoogleReviewSyncService
                 }
             }
         } catch (\Throwable $e) {
-            Log::debug('Places API (New) attempt exception: ' . $e->getMessage());
+            Log::debug('Places API (New) attempt exception: '.$e->getMessage());
         }
 
         // Driver 2: Google Places Details API (Legacy)
@@ -249,11 +251,12 @@ class GoogleReviewSyncService
 
                 if ($status !== 'OK') {
                     $errorMessage = $data['error_message'] ?? "Places API returned status: {$status}";
+
                     return ['error' => $errorMessage];
                 }
             }
         } catch (\Throwable $e) {
-            Log::warning('Places Details API (Legacy) attempt failed: ' . $e->getMessage());
+            Log::warning('Places Details API (Legacy) attempt failed: '.$e->getMessage());
         }
 
         return [
@@ -279,7 +282,7 @@ class GoogleReviewSyncService
             $text = is_array($raw['text'] ?? null) ? ($raw['text']['text'] ?? '') : (string) ($raw['text'] ?? '');
             $publishTime = $raw['publishTime'] ?? null;
             $date = $publishTime ? Carbon::parse($publishTime)->toDateString() : now()->toDateString();
-            $reviewId = $raw['name'] ?? ('g_' . md5($authorName . '_' . ($publishTime ?: $date)));
+            $reviewId = $raw['name'] ?? ('g_'.md5($authorName.'_'.($publishTime ?: $date)));
         } else {
             $authorName = $raw['author_name'] ?? 'Google Customer';
             $authorAvatar = $raw['profile_photo_url'] ?? null;
@@ -288,7 +291,7 @@ class GoogleReviewSyncService
             $text = (string) ($raw['text'] ?? '');
             $timestamp = $raw['time'] ?? null;
             $date = $timestamp ? Carbon::createFromTimestamp($timestamp)->toDateString() : now()->toDateString();
-            $reviewId = 'g_' . md5($authorName . '_' . ($timestamp ?: $date));
+            $reviewId = 'g_'.md5($authorName.'_'.($timestamp ?: $date));
         }
 
         $trimmedText = trim($text);
@@ -308,7 +311,7 @@ class GoogleReviewSyncService
             'review_url' => $authorUrl ?: $fallbackUrl,
             'rating' => max(1.0, min(5.0, $rating)),
             'review_title' => $title,
-            'review_text' => $trimmedText ?: 'Rated ' . number_format($rating, 0) . ' stars on Google.',
+            'review_text' => $trimmedText ?: 'Rated '.number_format($rating, 0).' stars on Google.',
             'photos' => [],
             'published_date' => $date,
             'status' => $status,
@@ -351,7 +354,7 @@ class GoogleReviewSyncService
             Cache::forget('google_reviews_cache');
             $this->settings->clearCache();
         } catch (\Throwable $e) {
-            Log::warning('Error purging review caches: ' . $e->getMessage());
+            Log::warning('Error purging review caches: '.$e->getMessage());
         }
     }
 
@@ -427,8 +430,8 @@ class GoogleReviewSyncService
     {
         return $this->settings->get(
             'google_review_url',
-            'https://search.google.com/local/writereview?placeid=' . $this->getPlaceId()
-        ) ?: 'https://search.google.com/local/writereview?placeid=' . $this->getPlaceId();
+            'https://search.google.com/local/writereview?placeid='.$this->getPlaceId()
+        ) ?: 'https://search.google.com/local/writereview?placeid='.$this->getPlaceId();
     }
 
     /**
@@ -440,13 +443,14 @@ class GoogleReviewSyncService
     protected function getFallbackGoogleReviews(): array
     {
         $now = now();
+
         return [
             'rating' => 5.0,
             'user_ratings_total' => 329,
             'url' => $this->getGoogleReviewUrl(),
             'reviews' => [
                 [
-                    'name' => 'places/' . $this->getPlaceId() . '/reviews/fb_101',
+                    'name' => 'places/'.$this->getPlaceId().'/reviews/fb_101',
                     'authorAttribution' => [
                         'displayName' => 'Michael Henderson',
                         'photoUri' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face',
@@ -459,7 +463,7 @@ class GoogleReviewSyncService
                     'publishTime' => $now->copy()->subDays(2)->toIso8601String(),
                 ],
                 [
-                    'name' => 'places/' . $this->getPlaceId() . '/reviews/fb_102',
+                    'name' => 'places/'.$this->getPlaceId().'/reviews/fb_102',
                     'authorAttribution' => [
                         'displayName' => 'Elena Rostova',
                         'photoUri' => 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face',
@@ -472,7 +476,7 @@ class GoogleReviewSyncService
                     'publishTime' => $now->copy()->subDays(4)->toIso8601String(),
                 ],
                 [
-                    'name' => 'places/' . $this->getPlaceId() . '/reviews/fb_103',
+                    'name' => 'places/'.$this->getPlaceId().'/reviews/fb_103',
                     'authorAttribution' => [
                         'displayName' => 'David Al-Mansoor',
                         'photoUri' => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
@@ -485,7 +489,7 @@ class GoogleReviewSyncService
                     'publishTime' => $now->copy()->subDays(6)->toIso8601String(),
                 ],
                 [
-                    'name' => 'places/' . $this->getPlaceId() . '/reviews/fb_104',
+                    'name' => 'places/'.$this->getPlaceId().'/reviews/fb_104',
                     'authorAttribution' => [
                         'displayName' => 'Sophie Laurent',
                         'photoUri' => 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face',
@@ -498,7 +502,7 @@ class GoogleReviewSyncService
                     'publishTime' => $now->copy()->subDays(8)->toIso8601String(),
                 ],
                 [
-                    'name' => 'places/' . $this->getPlaceId() . '/reviews/fb_105',
+                    'name' => 'places/'.$this->getPlaceId().'/reviews/fb_105',
                     'authorAttribution' => [
                         'displayName' => 'Rajesh Sharma',
                         'photoUri' => 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face',

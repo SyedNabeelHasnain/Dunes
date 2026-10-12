@@ -34,6 +34,7 @@ class IndexNowService
     public function isEnabled(): bool
     {
         $val = $this->settings->get('indexnow_enabled', '1');
+
         return $val === '1' || $val === 'true';
     }
 
@@ -43,7 +44,8 @@ class IndexNowService
     public function getKey(): string
     {
         $key = trim((string) $this->settings->get('indexnow_key', ''));
-        return !empty($key) ? $key : self::DEFAULT_KEY;
+
+        return ! empty($key) ? $key : self::DEFAULT_KEY;
     }
 
     /**
@@ -56,6 +58,7 @@ class IndexNowService
         if (empty($host) || $host === 'localhost' || $host === '127.0.0.1') {
             return 'dunesdiscoverytourism.com';
         }
+
         return $host;
     }
 
@@ -64,14 +67,11 @@ class IndexNowService
      */
     public function getKeyLocation(): string
     {
-        return url('/' . $this->getKey() . '.txt');
+        return url('/'.$this->getKey().'.txt');
     }
 
     /**
      * Submit an array of URLs to the IndexNow protocol.
-     *
-     * @param array $urls
-     * @return array
      */
     public function submit(array $urls): array
     {
@@ -133,8 +133,8 @@ class IndexNowService
                 'success' => $isSuccess,
                 'status' => $status,
                 'message' => $isSuccess
-                    ? "Successfully submitted " . count($cleanUrls) . " URLs to search engines via IndexNow."
-                    : "IndexNow responded with status code {$status}: " . substr($response->body(), 0, 200),
+                    ? 'Successfully submitted '.count($cleanUrls).' URLs to search engines via IndexNow.'
+                    : "IndexNow responded with status code {$status}: ".substr($response->body(), 0, 200),
                 'count' => count($cleanUrls),
                 'submitted_at' => now()->toIso8601String(),
             ];
@@ -150,16 +150,16 @@ class IndexNowService
                 // Non-blocking
             }
 
-            Log::info("IndexNow submitted " . count($cleanUrls) . " URLs (HTTP {$status}).");
+            Log::info('IndexNow submitted '.count($cleanUrls)." URLs (HTTP {$status}).");
 
             return $result;
         } catch (\Throwable $e) {
-            Log::warning("IndexNow submission failed: " . $e->getMessage());
+            Log::warning('IndexNow submission failed: '.$e->getMessage());
 
             return [
                 'success' => false,
                 'status' => 500,
-                'message' => 'Network error connecting to IndexNow API: ' . $e->getMessage(),
+                'message' => 'Network error connecting to IndexNow API: '.$e->getMessage(),
                 'count' => count($cleanUrls),
                 'submitted_at' => now()->toIso8601String(),
             ];
@@ -196,16 +196,18 @@ class IndexNowService
         try {
             $tourSlugs = Tour::where('status', 'active')->pluck('slug');
             foreach ($tourSlugs as $slug) {
-                $urls[] = url('/' . $slug);
+                $urls[] = url('/'.$slug);
             }
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+        }
 
         try {
             $blogSlugs = BlogPost::where('status', 'published')->pluck('slug');
             foreach ($blogSlugs as $slug) {
-                $urls[] = url('/blog/' . $slug);
+                $urls[] = url('/blog/'.$slug);
             }
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+        }
 
         return $this->submit($urls);
     }

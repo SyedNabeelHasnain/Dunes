@@ -2,7 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Language;
+use App\Services\Routing\LocalizedUrlGenerator;
 use App\Services\SettingsService;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
             $routes = $app['router']->getRoutes();
             $app->instance('routes', $routes);
 
-            $url = new \App\Services\Routing\LocalizedUrlGenerator(
+            $url = new LocalizedUrlGenerator(
                 $routes,
                 $app->rebinding('request', function ($app, $request) {
                     $app['url']->setRequest($request);
@@ -35,6 +38,7 @@ class AppServiceProvider extends ServiceProvider
 
             $url->setKeyResolver(function () use ($app) {
                 $config = $app->make('config');
+
                 return [$config->get('app.key'), ...($config->get('app.previous_keys') ?? [])];
             });
 
@@ -53,12 +57,12 @@ class AppServiceProvider extends ServiceProvider
     {
         // Force HTTPS in production
         if ($this->app->environment('production')) {
-            \Illuminate\Support\Facades\URL::forceScheme('https');
+            URL::forceScheme('https');
         }
 
         // Ensure Dompdf font cache directory exists and is writable
         $fontDir = storage_path('fonts');
-        if (!is_dir($fontDir)) {
+        if (! is_dir($fontDir)) {
             @mkdir($fontDir, 0775, true);
         }
 
@@ -71,10 +75,10 @@ class AppServiceProvider extends ServiceProvider
             }
 
             try {
-                $activeLanguages = \App\Models\Language::getActive();
+                $activeLanguages = Language::getActive();
                 $view->with('activeLanguages', $activeLanguages);
             } catch (\Throwable $e) {
-                $view->with('activeLanguages', \App\Models\Language::fallbackCollection());
+                $view->with('activeLanguages', Language::fallbackCollection());
             }
         });
     }

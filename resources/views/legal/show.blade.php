@@ -129,6 +129,9 @@
 }
 </style>
 
+@php
+    $isAr = (($currentLocale ?? app()->getLocale() ?? 'en') === 'ar');
+@endphp
 <!-- Hero / Page Header -->
 <section class="page-header hero-subpage relative overflow-hidden bg-slate-950 text-white" style="padding-top: calc(var(--header-h, 72px) + 2.5rem);">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -138,7 +141,7 @@
                 <li class="text-white/40">/</li>
                 <li><a href="{{ localized_route('terms') }}" class="hover:text-white transition-colors">{{ __('ui.nav.legal_policies') ?? 'Legal & Trust' }}</a></li>
                 <li class="text-white/40">/</li>
-                <li class="text-white font-medium" aria-current="page">{{ $page->title }}</li>
+                <li class="text-white font-medium" aria-current="page">{{ $isAr && $page->title_ar ? $page->title_ar : $page->title }}</li>
             </ol>
         </nav>
         
@@ -148,21 +151,21 @@
                     <i class="bi bi-shield-check"></i>
                     <span>Official UAE Tourism Document &bull; License 1430583</span>
                 </div>
-                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight mb-1.5" id="legalPageHeaderTitle">{{ $page->title }}</h1>
+                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight mb-1.5" id="legalPageHeaderTitle">{{ $isAr && $page->title_ar ? $page->title_ar : $page->title }}</h1>
                 <p class="text-white/75 text-sm sm:text-base" id="legalPageHeaderSubtitle">
-                    {{ $page->subtitle ?: 'Dunes Discovery Tourism L.L.C • Dubai, United Arab Emirates' }}
+                    {{ $isAr ? ($page->subtitle_ar ?: ($page->subtitle ?: 'شركة ديونز ديسكفري للسياحة ذ.م.م • دبي، الإمارات العربية المتحدة')) : ($page->subtitle ?: 'Dunes Discovery Tourism L.L.C • Dubai, United Arab Emirates') }}
                 </p>
             </div>
 
             <!-- Language Switcher Pills -->
             <div class="legal-lang-switch bg-slate-900/80 p-1 rounded-full border border-white/20 inline-flex shrink-0 self-start md:self-center items-center shadow-lg">
-                <input type="radio" class="sr-only peer/en" name="legalLang" id="langEn" autocomplete="off" checked onchange="switchLegalLanguage('en')">
+                <input type="radio" class="sr-only peer/en" name="legalLang" id="langEn" autocomplete="off" {{ !$isAr ? 'checked' : '' }} onchange="switchLegalLanguage('en')">
                 <label class="cursor-pointer text-white/80 hover:text-white rounded-full px-3.5 py-1.5 text-xs font-medium flex items-center gap-1.5 transition-all peer-checked/en:bg-primary peer-checked/en:text-white peer-checked/en:font-bold peer-checked/en:shadow-md" for="langEn">
                     <span class="bg-white/20 rounded-full px-1.5 py-0.5 text-[10px] font-bold">EN</span>
                     <span>English</span>
                 </label>
 
-                <input type="radio" class="sr-only peer/ar" name="legalLang" id="langAr" autocomplete="off" onchange="switchLegalLanguage('ar')">
+                <input type="radio" class="sr-only peer/ar" name="legalLang" id="langAr" autocomplete="off" {{ $isAr ? 'checked' : '' }} onchange="switchLegalLanguage('ar')">
                 <label class="cursor-pointer text-white/80 hover:text-white rounded-full px-3.5 py-1.5 text-xs font-medium flex items-center gap-1.5 transition-all peer-checked/ar:bg-primary peer-checked/ar:text-white peer-checked/ar:font-bold peer-checked/ar:shadow-md" for="langAr">
                     <span class="bg-amber-400 text-slate-950 rounded-full px-1.5 py-0.5 text-[10px] font-bold">AR</span>
                     <span>العربية</span>
@@ -209,8 +212,8 @@
                     </div>
                     <nav class="flex flex-col gap-1" id="legalTocNav">
                         @foreach($page->sections as $sec)
-                        <a href="#sec-{{ $sec->id }}" class="legal-toc-link rounded-lg" data-en="{{ $sec->heading }}" data-ar="{{ $sec->heading_ar ?: $sec->heading }}">
-                            {{ $sec->heading }}
+                        <a href="#{{ $isAr ? 'sec-ar-' . $sec->id : 'sec-' . $sec->id }}" class="legal-toc-link rounded-lg" data-en="{{ $sec->heading }}" data-ar="{{ $sec->heading_ar ?: $sec->heading }}">
+                            {{ $isAr && $sec->heading_ar ? $sec->heading_ar : $sec->heading }}
                         </a>
                         @endforeach
                     </nav>
@@ -223,7 +226,7 @@
                     <div class="p-6 sm:p-8 lg:p-10">
 
                         <!-- English Container -->
-                        <div id="contentEn" class="legal-content-container">
+                        <div id="contentEn" class="legal-content-container {{ $isAr ? 'hidden' : '' }}">
                             @if($page->description)
                             <div class="p-5 bg-slate-50 rounded-2xl border-l-4 border-primary mb-8 text-slate-700 text-sm sm:text-base leading-relaxed">
                                 {!! nl2br(e($page->description)) !!}
@@ -272,7 +275,7 @@
                         </div>
 
                         <!-- Arabic Container (RTL) -->
-                        <div id="contentAr" class="legal-content-container legal-rtl hidden">
+                        <div id="contentAr" class="legal-content-container legal-rtl {{ $isAr ? '' : 'hidden' }}">
                             @if($page->description_ar || $page->description)
                             <div class="p-5 bg-slate-50 rounded-2xl border-s-4 border-primary mb-8 text-slate-700 text-sm sm:text-base leading-loose">
                                 {!! nl2br(e($page->description_ar ?: $page->description)) !!}
@@ -328,16 +331,16 @@
                     <div class="inline-flex items-center justify-center bg-amber-500/15 text-primary rounded-full shadow-xs mb-3 w-16 h-16">
                         <i class="bi bi-shield-lock-fill text-2xl"></i>
                     </div>
-                    <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 mb-2" id="legalHelpTitle">Questions About Our Policies or Compliance?</h3>
+                    <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 mb-2" id="legalHelpTitle">{{ $isAr ? 'هل لديك أي استفسار حول سياساتنا أو التراخيص الرسمية؟' : 'Questions About Our Policies or Compliance?' }}</h3>
                     <p class="text-slate-500 text-sm sm:text-base mb-6 max-w-xl mx-auto leading-relaxed" id="legalHelpDesc">
-                        Our legal compliance desk and customer concierge team in Dubai are available 24/7 to assist with any policy questions, corporate travel agreements, or booking amendments.
+                        {{ $isAr ? 'فريق الامتثال القانوني وخدمة العملاء في دبي متاح على مدار الساعة للرد على استفساراتكم أو تنسيق الحجوزات المؤسسية.' : 'Our legal compliance desk and customer concierge team in Dubai are available 24/7 to assist with any policy questions, corporate travel agreements, or booking amendments.' }}
                     </p>
                     <div class="flex flex-col sm:flex-row justify-center gap-3">
                         <a href="https://wa.me/{{ preg_replace('/[^0-9]/','', $waPhone ?? '971502456056') }}?text={{ urlencode('Hi Dunes Discovery Tourism, I have a question regarding: ' . $page->title) }}" class="btn-whatsapp btn-whatsapp-animated text-sm sm:text-base font-bold rounded-full px-6 py-3 text-white inline-flex items-center justify-center gap-2 shadow-sm cursor-pointer" target="_blank" rel="noopener" data-action="whatsapp" data-tour-name="{{ $page->title }}">
                             <i class="bi bi-whatsapp"></i>
                             <span>Chat with Legal Desk</span>
                         </a>
-                        <a href="{{ route('contact') }}" class="btn-desert-animated text-sm sm:text-base font-bold rounded-full px-6 py-3 text-white inline-flex items-center justify-center gap-2 shadow-sm">
+                        <a href="{{ localized_route('contact') }}" class="btn-desert-animated text-sm sm:text-base font-bold rounded-full px-6 py-3 text-white inline-flex items-center justify-center gap-2 shadow-sm">
                             <i class="bi bi-envelope"></i>
                             <span>Submit Formal Inquiry</span>
                         </a>
@@ -348,14 +351,14 @@
                 <div class="legal-policy-suite mt-6 p-4 bg-white rounded-2xl border border-slate-200 text-center">
                     <div class="text-xs text-slate-400 mb-3 font-bold uppercase tracking-wider">Comprehensive Policy Suite</div>
                     <div class="flex flex-wrap justify-center gap-2">
-                        <a href="{{ route('terms') }}" class="text-xs rounded-full px-3.5 py-1.5 border transition-colors {{ $page->slug === 'terms-condition' ? 'bg-primary text-white border-primary font-bold shadow-xs' : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-primary/50' }}">Terms & Conditions</a>
-                        <a href="{{ route('privacy') }}" class="text-xs rounded-full px-3.5 py-1.5 border transition-colors {{ $page->slug === 'privacy-policy' ? 'bg-primary text-white border-primary font-bold shadow-xs' : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-primary/50' }}">Privacy Policy</a>
-                        <a href="{{ route('cookies') }}" class="text-xs rounded-full px-3.5 py-1.5 border transition-colors {{ $page->slug === 'cookie-policy' ? 'bg-primary text-white border-primary font-bold shadow-xs' : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-primary/50' }}">Cookie Policy</a>
-                        <a href="{{ route('cancellation') }}" class="text-xs rounded-full px-3.5 py-1.5 border transition-colors {{ $page->slug === 'cancellation-refund-policy' ? 'bg-primary text-white border-primary font-bold shadow-xs' : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-primary/50' }}">Cancellation & Refund</a>
-                        <a href="{{ route('payment.security') }}" class="text-xs rounded-full px-3.5 py-1.5 border transition-colors {{ $page->slug === 'payment-security-policy' ? 'bg-primary text-white border-primary font-bold shadow-xs' : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-primary/50' }}">Payment Security</a>
-                        <a href="{{ route('safety.waiver') }}" class="text-xs rounded-full px-3.5 py-1.5 border transition-colors {{ $page->slug === 'safety-liability-waiver' ? 'bg-primary text-white border-primary font-bold shadow-xs' : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-primary/50' }}">Safety & Waiver</a>
-                        <a href="{{ route('ai.editorial') }}" class="text-xs rounded-full px-3.5 py-1.5 border transition-colors {{ $page->slug === 'ai-editorial-policy' ? 'bg-primary text-white border-primary font-bold shadow-xs' : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-primary/50' }}">AI & Editorial Policy</a>
-                        <a href="{{ route('responsible.tourism') }}" class="text-xs rounded-full px-3.5 py-1.5 border transition-colors {{ $page->slug === 'responsible-tourism-policy' ? 'bg-primary text-white border-primary font-bold shadow-xs' : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-primary/50' }}">Responsible Tourism</a>
+                        <a href="{{ localized_route('terms') }}" class="text-xs rounded-full px-3.5 py-1.5 border transition-colors {{ $page->slug === 'terms-condition' ? 'bg-primary text-white border-primary font-bold shadow-xs' : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-primary/50' }}">Terms & Conditions</a>
+                        <a href="{{ localized_route('privacy') }}" class="text-xs rounded-full px-3.5 py-1.5 border transition-colors {{ $page->slug === 'privacy-policy' ? 'bg-primary text-white border-primary font-bold shadow-xs' : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-primary/50' }}">Privacy Policy</a>
+                        <a href="{{ localized_route('cookies') }}" class="text-xs rounded-full px-3.5 py-1.5 border transition-colors {{ $page->slug === 'cookie-policy' ? 'bg-primary text-white border-primary font-bold shadow-xs' : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-primary/50' }}">Cookie Policy</a>
+                        <a href="{{ localized_route('cancellation') }}" class="text-xs rounded-full px-3.5 py-1.5 border transition-colors {{ $page->slug === 'cancellation-refund-policy' ? 'bg-primary text-white border-primary font-bold shadow-xs' : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-primary/50' }}">Cancellation & Refund</a>
+                        <a href="{{ localized_route('payment.security') }}" class="text-xs rounded-full px-3.5 py-1.5 border transition-colors {{ $page->slug === 'payment-security-policy' ? 'bg-primary text-white border-primary font-bold shadow-xs' : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-primary/50' }}">Payment Security</a>
+                        <a href="{{ localized_route('safety.waiver') }}" class="text-xs rounded-full px-3.5 py-1.5 border transition-colors {{ $page->slug === 'safety-liability-waiver' ? 'bg-primary text-white border-primary font-bold shadow-xs' : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-primary/50' }}">Safety & Waiver</a>
+                        <a href="{{ localized_route('ai.editorial') }}" class="text-xs rounded-full px-3.5 py-1.5 border transition-colors {{ $page->slug === 'ai-editorial-policy' ? 'bg-primary text-white border-primary font-bold shadow-xs' : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-primary/50' }}">AI & Editorial Policy</a>
+                        <a href="{{ localized_route('responsible.tourism') }}" class="text-xs rounded-full px-3.5 py-1.5 border transition-colors {{ $page->slug === 'responsible-tourism-policy' ? 'bg-primary text-white border-primary font-bold shadow-xs' : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-primary/50' }}">Responsible Tourism</a>
                     </div>
                 </div>
 

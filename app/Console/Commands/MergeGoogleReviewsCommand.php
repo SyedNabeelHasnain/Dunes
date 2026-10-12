@@ -38,11 +38,12 @@ class MergeGoogleReviewsCommand extends Command
 
         if (! File::exists($masterPath)) {
             $this->error("Master reviews file not found at: {$masterPath}");
+
             return Command::FAILURE;
         }
 
         $masterReviews = json_decode(File::get($masterPath), true) ?: [];
-        $this->info('Loaded ' . count($masterReviews) . ' existing reviews from master file.');
+        $this->info('Loaded '.count($masterReviews).' existing reviews from master file.');
 
         // 1. Data Cleaning & Sanitization on Existing Records
         $fixedCount = 0;
@@ -51,6 +52,7 @@ class MergeGoogleReviewsCommand extends Command
             // Remove legacy mock dummy reviews (g1-g5)
             if (($m['source'] ?? '') === 'google' && in_array($m['source_review_id'] ?? '', ['g1', 'g2', 'g3', 'g4', 'g5'])) {
                 $fixedCount++;
+
                 continue;
             }
             // Fix ID 115 anomaly: mislabeled source 'Google' on TripAdvisor review
@@ -82,12 +84,12 @@ class MergeGoogleReviewsCommand extends Command
             $source = strtolower($r['source'] ?? '');
 
             if (! empty($r['source_review_id'])) {
-                $sridIndex[$source . ':' . $r['source_review_id']] = $idx;
+                $sridIndex[$source.':'.$r['source_review_id']] = $idx;
             }
 
             if (! empty($r['reviewer_name']) && ! empty($r['published_date'])) {
                 $normName = $this->normalizeName($r['reviewer_name']);
-                $nameDateIndex[$source . ':' . $normName . ':' . $r['published_date']] = $idx;
+                $nameDateIndex[$source.':'.$normName.':'.$r['published_date']] = $idx;
             }
         }
 
@@ -97,7 +99,7 @@ class MergeGoogleReviewsCommand extends Command
         // 3. Process Newly Extracted Reviews (if extracted file exists)
         if (File::exists($extractedPath)) {
             $extractedReviews = $this->loadExtractedReviews($extractedPath);
-            $this->info('Loaded ' . count($extractedReviews) . ' newly extracted Google reviews from source.');
+            $this->info('Loaded '.count($extractedReviews).' newly extracted Google reviews from source.');
 
             foreach ($extractedReviews as $ext) {
                 $source = 'google';
@@ -108,10 +110,10 @@ class MergeGoogleReviewsCommand extends Command
 
                 // Check match by source_review_id or fuzzy match by author name + published date
                 $matchedIdx = null;
-                if ($extSrid && isset($sridIndex[$source . ':' . $extSrid])) {
-                    $matchedIdx = $sridIndex[$source . ':' . $extSrid];
-                } elseif ($extName && $extDate && isset($nameDateIndex[$source . ':' . $normName . ':' . $extDate])) {
-                    $matchedIdx = $nameDateIndex[$source . ':' . $normName . ':' . $extDate];
+                if ($extSrid && isset($sridIndex[$source.':'.$extSrid])) {
+                    $matchedIdx = $sridIndex[$source.':'.$extSrid];
+                } elseif ($extName && $extDate && isset($nameDateIndex[$source.':'.$normName.':'.$extDate])) {
+                    $matchedIdx = $nameDateIndex[$source.':'.$normName.':'.$extDate];
                 }
 
                 if ($matchedIdx !== null) {
@@ -188,11 +190,11 @@ class MergeGoogleReviewsCommand extends Command
                     $newRecord = [
                         'id' => $maxId,
                         'source' => 'google',
-                        'source_review_id' => $extSrid ?: ('g_' . md5($extName . '_' . $extDate)),
+                        'source_review_id' => $extSrid ?: ('g_'.md5($extName.'_'.$extDate)),
                         'review_url' => $ext['review_url'] ?? null,
                         'published_date' => $extDate ?: now()->format('Y-m-d'),
                         'reviewer_name' => $extName ?: 'Google Customer',
-                        'reviewer_avatar_url' => $ext['reviewer_avatar_url'] ?? ('https://ui-avatars.com/api/?name=' . urlencode($extName ?: 'Google Customer') . '&background=00476d&color=ffffff&bold=true'),
+                        'reviewer_avatar_url' => $ext['reviewer_avatar_url'] ?? ('https://ui-avatars.com/api/?name='.urlencode($extName ?: 'Google Customer').'&background=00476d&color=ffffff&bold=true'),
                         'reviewer_profile_url' => $ext['reviewer_profile_url'] ?? null,
                         'rating' => (float) ($ext['rating'] ?? 5.0),
                         'review_title' => $ext['review_title'] ?? 'Dunes Discovery Tourism LLC',
@@ -216,9 +218,9 @@ class MergeGoogleReviewsCommand extends Command
 
                     // Update indexes
                     if ($newRecord['source_review_id']) {
-                        $sridIndex['google:' . $newRecord['source_review_id']] = $newIdx;
+                        $sridIndex['google:'.$newRecord['source_review_id']] = $newIdx;
                     }
-                    $nameDateIndex['google:' . $normName . ':' . $newRecord['published_date']] = $newIdx;
+                    $nameDateIndex['google:'.$normName.':'.$newRecord['published_date']] = $newIdx;
 
                     $addedCount++;
                 }
@@ -229,7 +231,7 @@ class MergeGoogleReviewsCommand extends Command
 
         // 4. Save formatted JSON to master reviews.json
         File::put($masterPath, json_encode($masterReviews, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-        $this->info('Master reviews file updated successfully: ' . count($masterReviews) . ' total reviews.');
+        $this->info('Master reviews file updated successfully: '.count($masterReviews).' total reviews.');
 
         // 5. Database Upsert (if requested)
         if ($syncDb) {
@@ -272,8 +274,8 @@ class MergeGoogleReviewsCommand extends Command
             ['Metric', 'Count'],
             [
                 ['Total Reviews in Master File', count($masterReviews)],
-                ['Google Reviews', count(array_filter($masterReviews, fn($r) => strtolower($r['source']) === 'google'))],
-                ['TripAdvisor Reviews', count(array_filter($masterReviews, fn($r) => strtolower($r['source']) === 'tripadvisor'))],
+                ['Google Reviews', count(array_filter($masterReviews, fn ($r) => strtolower($r['source']) === 'google'))],
+                ['TripAdvisor Reviews', count(array_filter($masterReviews, fn ($r) => strtolower($r['source']) === 'tripadvisor'))],
                 ['New Reviews Added', $addedCount],
                 ['Existing Reviews Enhanced/Updated', $updatedCount],
             ]
@@ -308,6 +310,7 @@ class MergeGoogleReviewsCommand extends Command
         $header = fgetcsv($handle, 0, ',', '"', '\\');
         if (! $header) {
             fclose($handle);
+
             return [];
         }
 

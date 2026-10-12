@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Http\Controllers\GoogleThingsToDoFeedController;
 use App\Models\Category;
 use App\Models\Setting;
 use App\Models\Tier;
@@ -383,7 +384,7 @@ class GoogleThingsToDoFeedTest extends TestCase
      */
     public function test_high_precision_poi_resolution_across_landmark_categories(): void
     {
-        $controller = app(\App\Http\Controllers\GoogleThingsToDoFeedController::class);
+        $controller = app(GoogleThingsToDoFeedController::class);
 
         // Abu Dhabi City Tour must map to Sheikh Zayed Grand Mosque, NOT Dubai Downtown
         $abuDhabi = new Tour(['slug' => 'abu-dhabi-city-tour-from-dubai', 'name' => 'Abu Dhabi City Tour']);
@@ -433,7 +434,7 @@ class GoogleThingsToDoFeedTest extends TestCase
         ]);
 
         // Hit canonical landing page with Google feed tier query: ?tier=vip
-        $response = $this->get('/' . $tour->slug . '?tier=vip');
+        $response = $this->get('/'.$tour->slug.'?tier=vip');
         $response->assertStatus(200);
 
         $content = $response->getContent();
@@ -447,9 +448,9 @@ class GoogleThingsToDoFeedTest extends TestCase
         $this->assertStringContainsString('"valueAddedTaxIncluded": true', $content);
 
         // Also assert that legacy /tours/{slug}?tier=vip permanently 301 redirects to /{slug}?tier=vip preserving the query
-        $legacyRedirect = $this->get('/tours/' . $tour->slug . '?tier=vip');
+        $legacyRedirect = $this->get('/tours/'.$tour->slug.'?tier=vip');
         $legacyRedirect->assertStatus(301);
-        $legacyRedirect->assertRedirect('/' . $tour->slug . '?tier=vip');
+        $legacyRedirect->assertRedirect('/'.$tour->slug.'?tier=vip');
     }
 
     /**

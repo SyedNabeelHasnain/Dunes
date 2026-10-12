@@ -448,4 +448,67 @@ class GoogleSearchConsoleRemediationTest extends TestCase
         $respFull->assertHeader('Content-Type', 'text/markdown; charset=utf-8');
         $this->assertStringContainsString('Dunes Discovery Tourism', $respFull->getContent());
     }
+
+    /**
+     * Test 21: Complete Remediation of All 8 Google Search Console Page Indexing Categories
+     */
+    public function test_gsc_eight_indexing_categories_remediation(): void
+    {
+        // 1. robots.txt allows Googlebot to read noindex tags on /search, /thankyou, /payment-cancel, /unsubscribe/
+        $robots = file_get_contents(public_path('robots.txt'));
+        $this->assertStringNotContainsString("Disallow: /search\n", $robots);
+        $this->assertStringNotContainsString('Disallow: /thankyou', $robots);
+        $this->assertStringNotContainsString('Disallow: /payment-cancel', $robots);
+        $this->assertStringNotContainsString('Disallow: /unsubscribe/', $robots);
+        $this->assertStringContainsString('Disallow: /admin/', $robots);
+
+        // 2. Legacy /luxury-vip-desert-safari-dubai 301 redirects (EN & localized)
+        $this->get('/luxury-vip-desert-safari-dubai')
+            ->assertStatus(301)
+            ->assertRedirect('/evening-desert-safari-dubai');
+        $this->get('/ar/luxury-vip-desert-safari-dubai')
+            ->assertStatus(301)
+            ->assertRedirect(url('/ar/evening-desert-safari-dubai'));
+
+        // 3. Press kit missing .avif image 301 redirects
+        $this->get('/images/sunset-desert-safari-dubai-dunes-discovery-tourism.avif')
+            ->assertStatus(301)
+            ->assertRedirect('/images/dubai-desert-safar-camel-ride-dune-discovery-tourism.avif');
+
+        // 4. Localized /review/guest routes return 200 OK instead of 404
+        foreach (['ar', 'ru', 'es', 'it'] as $loc) {
+            $resReview = $this->get("/{$loc}/review/guest");
+            $resReview->assertStatus(200);
+            $resReview->assertSee('<link rel="canonical" href="http://localhost/'.$loc.'/review/guest">', false);
+        }
+
+        // 5. Inactive / unknown 2-letter prefixes do not serve duplicate 200 OK English pages
+        $this->get('/fr')->assertStatus(301)->assertRedirect(url('/'));
+        $this->get('/de')->assertStatus(301)->assertRedirect(url('/'));
+        $this->get('/zz')->assertStatus(404);
+
+        // 6. Localized blog posts have self-referential canonicals (even if canonical_url was English in DB)
+        $category = BlogCategory::create(['name' => 'Guides', 'slug' => 'guides']);
+        $post = BlogPost::create([
+            'title' => 'Ultimate Dubai Desert Safari Guide 2026',
+            'slug' => 'ultimate-dubai-desert-safari-guide-2026',
+            'excerpt' => 'Complete guide to Dubai desert safari.',
+            'content' => '<p>Detailed guide content.</p>',
+            'category_id' => $category->id,
+            'status' => 'published',
+            'canonical_url' => 'https://dunesdiscoverytourism.com/blog/ultimate-dubai-desert-safari-guide-2026',
+            'published_at' => now(),
+        ]);
+
+        $resArBlog = $this->get('/ar/blog/'.$post->slug);
+        $resArBlog->assertStatus(200);
+        $resArBlog->assertSee('<link rel="canonical" href="http://localhost/ar/blog/'.$post->slug.'">', false);
+
+        // 7. Query-filtered pages (/tours?category=..., /blog?category=..., /gallery?category=...) use noindex, follow and suppress hreflang
+        $resFilteredTours = $this->get('/tours?category=desert-safari');
+        $resFilteredTours->assertStatus(200);
+        $resFilteredTours->assertSee('<meta name="robots" content="noindex, follow">', false);
+        $resFilteredTours->assertSee('<link rel="canonical" href="http://localhost/tours">', false);
+        $resFilteredTours->assertDontSee('hreflang=', false);
+    }
 }

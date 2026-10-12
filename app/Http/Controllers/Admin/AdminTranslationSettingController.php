@@ -4,10 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Services\SettingsService;
+use App\Services\Translation\Drivers\DeepLTranslationDriver;
+use App\Services\Translation\Drivers\GoogleTranslationDriver;
 use App\Services\Translation\TranslationManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\View\View;
 
 class AdminTranslationSettingController extends Controller
@@ -56,7 +60,7 @@ class AdminTranslationSettingController extends Controller
         }
 
         $this->manager->clearCache();
-        app(\App\Services\SettingsService::class)->clearCache();
+        app(SettingsService::class)->clearCache();
 
         return redirect()->route('admin.settings.translations')
             ->with('success', 'Translation service settings updated successfully.');
@@ -86,13 +90,13 @@ class AdminTranslationSettingController extends Controller
                     ? $validated['endpoint_type']
                     : (Setting::where('setting_key', 'deepl_endpoint_type')->value('setting_value') ?? 'free');
 
-                $driver = new \App\Services\Translation\Drivers\DeepLTranslationDriver($authKey, $endpointType);
+                $driver = new DeepLTranslationDriver($authKey, $endpointType);
             } else {
                 $apiKey = ! empty($validated['api_key'])
                     ? $validated['api_key']
                     : (Setting::where('setting_key', 'google_translate_api_key')->value('setting_value') ?? '');
 
-                $driver = new \App\Services\Translation\Drivers\GoogleTranslationDriver($apiKey);
+                $driver = new GoogleTranslationDriver($apiKey);
             }
 
             $result = $driver->testConnection();
@@ -129,8 +133,8 @@ class AdminTranslationSettingController extends Controller
                 $params['--model'] = $validated['model'];
             }
 
-            \Illuminate\Support\Facades\Artisan::call('app:translate-catalog', $params);
-            $output = \Illuminate\Support\Facades\Artisan::output();
+            Artisan::call('app:translate-catalog', $params);
+            $output = Artisan::output();
 
             return response()->json([
                 'success' => true,

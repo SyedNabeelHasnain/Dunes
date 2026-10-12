@@ -153,7 +153,7 @@
         <div class="bg-slate-50/90 rounded-2xl sm:rounded-3xl p-3 sm:p-4 mb-8 border border-slate-200/80 shadow-xs">
             <div class="flex flex-col lg:flex-row lg:items-center gap-3 sm:gap-4">
                 <!-- Search Input Form -->
-                <form action="{{ route('tours.search') }}" method="GET" class="w-full lg:w-[440px] xl:w-[480px] shrink-0 m-0">
+                <form action="{{ localized_route('tours.search') }}" method="GET" class="w-full lg:w-[440px] xl:w-[480px] shrink-0 m-0">
                     <div class="relative flex items-center bg-white rounded-full border border-slate-200 shadow-2xs hover:border-slate-300 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all p-1.5 ps-4 sm:ps-5">
                         <i class="bi bi-search text-slate-400 text-sm shrink-0 me-2.5"></i>
                         <input type="text" 
@@ -190,7 +190,7 @@
                     </span>
                     <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
                         @foreach($intent['pills'] as $pill)
-                            <a href="{{ route('tours.search', ['q' => $pill]) }}" 
+                            <a href="{{ localized_route('tours.search', ['q' => $pill]) }}" rel="nofollow"
                                class="bg-white hover:bg-orange-500 hover:text-white text-slate-700 border border-slate-200/90 hover:border-orange-500 rounded-full px-3 sm:px-3.5 py-1.5 text-xs font-semibold shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 transition-all shadow-2xs hover:shadow-xs group">
                                 <i class="bi bi-plus-circle text-primary group-hover:text-white transition-colors text-[11px]"></i>
                                 <span>{{ $pill }}</span>
@@ -269,7 +269,7 @@
                 @endphp
                 <div class="tour-item flex flex-col h-full" data-category="{{ $tourCatSlug }}" data-name="{{ strtolower($t->name) }}">
                     <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col h-full group">
-                        <a href="{{ route('tours.show', $t->slug) }}" class="flex flex-col h-full text-inherit">
+                        <a href="{{ localized_route('tours.show', $t->slug) }}" class="flex flex-col h-full text-inherit">
                             <div class="relative overflow-hidden aspect-[16/10]">
                                 <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy">
                                 @if($t->is_bestseller)

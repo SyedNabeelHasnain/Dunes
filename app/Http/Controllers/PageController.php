@@ -250,7 +250,7 @@ class PageController extends Controller
         if (empty($messageText)) {
             $messageText = ($tourName && $tourName !== 'General Inquiry')
                 ? "Hi Dunes Discovery Tourism, I would like to inquire about {$tourName}."
-                : "Hi Dunes Discovery Tourism, I would like to inquire about Dubai desert safaris.";
+                : 'Hi Dunes Discovery Tourism, I would like to inquire about Dubai desert safaris.';
         }
 
         $redirectUrl = "https://wa.me/{$whatsappNum}?text=".urlencode($messageText);
@@ -301,8 +301,9 @@ class PageController extends Controller
     /**
      * Display Public Customer Review & Photo UGC Submission Portal.
      */
-    public function reviewRate(Request $request, string $ref)
+    public function reviewRate(Request $request, ...$params)
     {
+        $ref = (string) end($params);
         $booking = Booking::where('reference', $ref)->with('tour')->first();
         if (! $booking) {
             $booking = new Booking([
@@ -317,12 +318,15 @@ class PageController extends Controller
             $score = 5;
         }
 
+        $currentLocale = app()->getLocale();
+        $canonical = localized_route('review.rate', ['ref' => $ref]);
+
         if ($score <= 3) {
             $pageTitle = 'Guest Feedback | Dunes Discovery Tourism';
             $pageDesc = 'Share your private feedback to help us improve your desert safari adventure.';
             $pageRobots = 'noindex, nofollow';
 
-            return view('review-feedback', compact('booking', 'score', 'pageTitle', 'pageDesc', 'pageRobots'));
+            return view('review-feedback', compact('booking', 'score', 'pageTitle', 'pageDesc', 'pageRobots', 'canonical'));
         }
 
         $settings = app(SettingsService::class);
@@ -333,18 +337,38 @@ class PageController extends Controller
             return redirect()->away($googleReviewUrl);
         }
 
-        $pageTitle = 'Review Your Safari Adventure | Dunes Discovery Tourism';
-        $pageDesc = 'Share your verified guest review, rate your desert safari captain, and upload your tour photos.';
-        $pageRobots = ($ref === 'guest') ? 'index, follow' : 'noindex, nofollow';
+        $localizedReviewMeta = [
+            'ar' => [
+                'title' => 'قيّم مغامرة السفاري الخاصة بك | Dunes Discovery Tourism',
+                'desc' => 'شارك تقييمك الموثق، وقيّم سائق السفاري الصحراوي، وارفع صور رحلتك في صحراء دبي.',
+            ],
+            'ru' => [
+                'title' => 'Оставьте отзыв о вашем сафари в Дубае | Dunes Discovery Tourism',
+                'desc' => 'Поделитесь проверенным отзывом, оцените вашего капитана сафари и загрузите фотографии из пустыни Дубая.',
+            ],
+            'es' => [
+                'title' => 'Valora tu Aventura de Safari en Dubái | Dunes Discovery Tourism',
+                'desc' => 'Comparte tu reseña verificada, califica a tu capitán de safari y sube las fotos de tu tour en el desierto.',
+            ],
+            'it' => [
+                'title' => 'Valuta la Tua Avventura Safari a Dubai | Dunes Discovery Tourism',
+                'desc' => 'Condividi la tua recensione verificata, valuta il capitano del safari e carica le foto del tuo tour nel deserto.',
+            ],
+        ];
 
-        return view('pages.submit-review', compact('booking', 'score', 'googleReviewUrl', 'pageTitle', 'pageDesc', 'pageRobots'));
+        $pageTitle = $localizedReviewMeta[$currentLocale]['title'] ?? 'Review Your Safari Adventure | Dunes Discovery Tourism';
+        $pageDesc = $localizedReviewMeta[$currentLocale]['desc'] ?? 'Share your verified guest review, rate your desert safari captain, and upload your tour photos.';
+        $pageRobots = ($ref === 'guest' && empty($request->query())) ? 'index, follow' : 'noindex, nofollow';
+
+        return view('pages.submit-review', compact('booking', 'score', 'googleReviewUrl', 'pageTitle', 'pageDesc', 'pageRobots', 'canonical'));
     }
 
     /**
      * Process Public Customer Review & Photo UGC Submission.
      */
-    public function submitReview(Request $request, string $ref)
+    public function submitReview(Request $request, ...$params)
     {
+        $ref = (string) end($params);
         $booking = Booking::where('reference', $ref)->first();
         $isGuestMode = ! $booking;
 
@@ -419,7 +443,7 @@ class PageController extends Controller
             ]);
         }
 
-        return redirect()->route('review.rate', ['ref' => $ref])
+        return redirect()->to(localized_route('review.rate', ['ref' => $ref]))
             ->with('review_submitted', true)
             ->with('submitted_rating', $rating)
             ->with('google_review_url', $googleReviewUrl);
@@ -428,8 +452,9 @@ class PageController extends Controller
     /**
      * Submit private customer feedback for service recovery.
      */
-    public function submitFeedback(Request $request, string $ref)
+    public function submitFeedback(Request $request, ...$params)
     {
+        $ref = (string) end($params);
         $booking = Booking::where('reference', $ref)->firstOrFail();
         $feedback = trim($request->input('feedback', ''));
 
@@ -440,7 +465,7 @@ class PageController extends Controller
             ]);
         }
 
-        return redirect()->route('home')->with('success', 'Thank you for your valuable feedback. Our management team will review your comments.');
+        return redirect()->to(localized_route('home'))->with('success', 'Thank you for your valuable feedback. Our management team will review your comments.');
     }
 
     /**
@@ -452,13 +477,30 @@ class PageController extends Controller
         $currentLocale = app()->getLocale();
         $currentYear = date('Y');
 
-        $canonical = ($currentLocale && $currentLocale !== 'en')
-            ? url('/' . $currentLocale . '/press-kit')
-            : url('/press-kit');
+        $canonical = localized_route('press.kit');
 
-        $pageTitle = $settings->get('seo_press_title') ?: "Official Press Kit & Media Resources ({$currentYear}) | Dunes Discovery Tourism Dubai";
-        $pageDesc = $settings->get('seo_press_description') ?: "Download official high-resolution brand assets, DTCM licensing credentials, fact sheet, and embeddable partner badges for Dunes Discovery Tourism.";
-        $pageKeys = $settings->get('seo_press_keywords') ?: "dunes discovery press kit, dubai desert safari media kit, dtcm license verification, dunes discovery logo, desert safari partner badges";
+        $localizedPressMeta = [
+            'ar' => [
+                'title' => "الملف الصحفي والموارد الإعلامية الرسمية ({$currentYear}) | Dunes Discovery Tourism دبي",
+                'desc' => 'حمّل الشعارات الرسمية عالية الدقة، بيانات ترخيص دائرة الاقتصاد والسياحة بدبي DTCM #1430583، وشارات الشركاء المعتمدة لشركة Dunes Discovery Tourism.',
+            ],
+            'ru' => [
+                'title' => "Официальный пресс-кит и медиаресурсы ({$currentYear}) | Dunes Discovery Tourism Дубай",
+                'desc' => 'Скачайте официальные логотипы в высоком разрешении, данные лицензии DTCM #1430583, информационный бюллетень и партнерские бейджи Dunes Discovery Tourism.',
+            ],
+            'es' => [
+                'title' => "Kit de Prensa Oficial y Recursos Multimedia ({$currentYear}) | Dunes Discovery Tourism Dubái",
+                'desc' => 'Descarga activos de marca oficiales en alta resolución, credenciales de licencia DTCM #1430583, hoja informativa e insignias para socios de Dunes Discovery Tourism.',
+            ],
+            'it' => [
+                'title' => "Press Kit Ufficiale e Risorse Media ({$currentYear}) | Dunes Discovery Tourism Dubai",
+                'desc' => 'Scarica risorse del marchio ad alta risoluzione, credenziali di licenza DTCM #1430583, scheda informativa e badge partner per Dunes Discovery Tourism.',
+            ],
+        ];
+
+        $pageTitle = $localizedPressMeta[$currentLocale]['title'] ?? ($settings->get('seo_press_title') ?: "Official Press Kit & Media Resources ({$currentYear}) | Dunes Discovery Tourism Dubai");
+        $pageDesc = $localizedPressMeta[$currentLocale]['desc'] ?? ($settings->get('seo_press_description') ?: 'Download official high-resolution brand assets, DTCM licensing credentials, fact sheet, and embeddable partner badges for Dunes Discovery Tourism.');
+        $pageKeys = $settings->get('seo_press_keywords') ?: 'dunes discovery press kit, dubai desert safari media kit, dtcm license verification, dunes discovery logo, desert safari partner badges';
 
         $ogImageSetting = $settings->get('seo_press_og_image');
         $ogImage = $ogImageSetting ? asset(ltrim($ogImageSetting, '/')) : asset('images/dubai-desert-safari-tour-dune-discovery-tourism.avif');
@@ -485,25 +527,25 @@ class PageController extends Controller
                 'name' => 'Verified Desert Safari Partner',
                 'description' => 'Dark luxury theme with gold desert compass emblem for partner portals, hotel concierges, and affiliate directories.',
                 'image' => asset('badges/verified-safari-partner.svg'),
-                'embed_code' => '<a href="' . url('/') . '" target="_blank" rel="noopener" title="Dunes Discovery Tourism - Verified Desert Safari Partner"><img src="' . asset('badges/verified-safari-partner.svg') . '" alt="Dunes Discovery Tourism - Verified Desert Safari Partner" width="280" height="80" style="display:inline-block;max-width:100%;height:auto;border-radius:14px;" /></a>',
+                'embed_code' => '<a href="'.url('/').'" target="_blank" rel="noopener" title="Dunes Discovery Tourism - Verified Desert Safari Partner"><img src="'.asset('badges/verified-safari-partner.svg').'" alt="Dunes Discovery Tourism - Verified Desert Safari Partner" width="280" height="80" style="display:inline-block;max-width:100%;height:auto;border-radius:14px;" /></a>',
             ],
             [
                 'id' => 'top-rated',
                 'name' => '5.0 Star Top Rated Operator',
                 'description' => 'Clean light card displaying our 5.0 rating across 329+ verified reviews on Google and TripAdvisor.',
                 'image' => asset('badges/top-rated-operator.svg'),
-                'embed_code' => '<a href="' . url('/') . '" target="_blank" rel="noopener" title="Dunes Discovery Tourism - 5.0 Star Top Rated Operator"><img src="' . asset('badges/top-rated-operator.svg') . '" alt="Dunes Discovery Tourism - 5.0 Star Top Rated Operator" width="280" height="80" style="display:inline-block;max-width:100%;height:auto;border-radius:14px;" /></a>',
+                'embed_code' => '<a href="'.url('/').'" target="_blank" rel="noopener" title="Dunes Discovery Tourism - 5.0 Star Top Rated Operator"><img src="'.asset('badges/top-rated-operator.svg').'" alt="Dunes Discovery Tourism - 5.0 Star Top Rated Operator" width="280" height="80" style="display:inline-block;max-width:100%;height:auto;border-radius:14px;" /></a>',
             ],
             [
                 'id' => 'licensed',
                 'name' => 'DTCM Government Licensed Badge',
                 'description' => 'Emerald verified seal showcasing our official Dubai Department of Economy and Tourism license #1430583.',
                 'image' => asset('badges/det-licensed-badge.svg'),
-                'embed_code' => '<a href="' . url('/') . '" target="_blank" rel="noopener" title="Dunes Discovery Tourism - DTCM Licensed Operator Dubai"><img src="' . asset('badges/det-licensed-badge.svg') . '" alt="Dunes Discovery Tourism - DTCM Licensed Operator Dubai" width="280" height="80" style="display:inline-block;max-width:100%;height:auto;border-radius:14px;" /></a>',
+                'embed_code' => '<a href="'.url('/').'" target="_blank" rel="noopener" title="Dunes Discovery Tourism - DTCM Licensed Operator Dubai"><img src="'.asset('badges/det-licensed-badge.svg').'" alt="Dunes Discovery Tourism - DTCM Licensed Operator Dubai" width="280" height="80" style="display:inline-block;max-width:100%;height:auto;border-radius:14px;" /></a>',
             ],
         ];
 
-        // Editorial Media Downloads
+        // Editorial Media Downloads (Verified Existing Assets in public/images/)
         $editorialImages = [
             [
                 'title' => 'Lahbab Red Dunes 4x4 Dune Bashing Action',
@@ -512,21 +554,21 @@ class PageController extends Controller
                 'credit' => 'Photo: Dunes Discovery Tourism LLC',
             ],
             [
-                'title' => 'Golden Hour Sunset over Crimson Dunes',
+                'title' => 'Golden Hour Sunset & Camel Caravan in Lahbab',
                 'category' => 'Sunset & Landscape',
-                'filename' => 'sunset-desert-safari-dubai-dunes-discovery-tourism.avif',
+                'filename' => 'dubai-desert-safar-camel-ride-dune-discovery-tourism.avif',
                 'credit' => 'Photo: Dunes Discovery Tourism LLC',
             ],
             [
                 'title' => 'VIP 5-Star Bedouin Desert Oasis Camp & BBQ',
                 'category' => 'Camp Experience',
-                'filename' => 'vip-desert-safari-dubai-camp-dinner-bbq.avif',
+                'filename' => 'dubai-desert-safari-bbq-dune-discovery-tourism.avif',
                 'credit' => 'Photo: Dunes Discovery Tourism LLC',
             ],
             [
                 'title' => 'High-Performance Can-Am Maverick Dune Buggy',
                 'category' => 'Motorsports',
-                'filename' => 'can-am-maverick-x3-dune-buggy-rental-dubai.avif',
+                'filename' => 'dubai-desert-safari-buggy-dune-discovery-tourism.avif',
                 'credit' => 'Photo: Dunes Discovery Tourism LLC',
             ],
         ];

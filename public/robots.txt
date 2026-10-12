@@ -1,11 +1,8 @@
 User-agent: *
 Allow: /
 Disallow: /admin/
-Disallow: /booking/
-Disallow: /thankyou
-Disallow: /payment-cancel
-Disallow: /unsubscribe/
-Disallow: /search
+Disallow: /booking/draft
+Disallow: /ajax.php
 
 User-agent: GPTBot
 Allow: /

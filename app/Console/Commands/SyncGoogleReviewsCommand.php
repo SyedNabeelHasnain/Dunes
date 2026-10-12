@@ -49,7 +49,7 @@ class SyncGoogleReviewsCommand extends Command
                 ['Existing Reviews Updated', $result['updated'] ?? 0],
                 ['Reviews Skipped', $result['skipped'] ?? 0],
                 ['Total Google Reviews on File', $result['total'] ?? 0],
-                ['Google Place Rating', ($result['place_rating'] ?? 'N/A') . ' ★'],
+                ['Google Place Rating', ($result['place_rating'] ?? 'N/A').' ★'],
                 ['Total User Ratings Count', $result['user_ratings_total'] ?? 'N/A'],
                 ['Last Synced Timestamp', $result['last_synced_at'] ?? 'N/A'],
             ]

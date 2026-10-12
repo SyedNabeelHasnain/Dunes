@@ -7,6 +7,7 @@ use App\Models\Faq;
 use App\Models\FaqAssignment;
 use App\Models\Review;
 use App\Models\Tour;
+use App\Services\ReviewMediaGalleryService;
 use App\Services\SettingsService;
 use Illuminate\Support\Facades\Cache;
 
@@ -176,7 +177,7 @@ class HomeController extends Controller
         $ogImage = $ogImageSetting ? asset(ltrim($ogImageSetting, '/')) : asset('images/desert-safari-poster.avif');
 
         try {
-            $galleryItems = app(\App\Services\ReviewMediaGalleryService::class)->getHomepageItems(12);
+            $galleryItems = app(ReviewMediaGalleryService::class)->getHomepageItems(12);
         } catch (\Throwable $e) {
             $galleryItems = [];
         }

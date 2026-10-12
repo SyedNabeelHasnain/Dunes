@@ -837,7 +837,7 @@ if(window.fbq){
                         </div>
 
                         <div class="mt-3 text-center">
-                            <a href="{{ route('tours.customizer') }}" class="text-xs text-slate-500 hover:text-primary font-bold inline-flex items-center gap-1 transition-colors">
+                            <a href="{{ localized_route('tours.customizer') }}" class="text-xs text-slate-500 hover:text-primary font-bold inline-flex items-center gap-1 transition-colors">
                                 <i class="bi bi-sliders text-amber-500"></i> {{ __('ui.tour_sidebar.custom_safari_prompt') }}
                             </a>
                         </div>
@@ -1160,7 +1160,7 @@ if(window.fbq){
                 <button type="button" class="border border-slate-300 hover:border-primary text-slate-700 hover:text-primary rounded-full px-4 py-2 text-xs font-bold cursor-pointer btn-toggle-compare inline-flex items-center gap-1.5 transition-colors" data-tour-id="{{ $tour->id }}" onclick="event.preventDefault(); window.DunesCompare && window.DunesCompare.toggle(this);">
                     <i class="bi bi-shuffle"></i> {{ __('ui.reviews_section.compare_safaris') }}
                 </button>
-                <a href="{{ route('review.rate', ['ref' => 'guest']) }}" class="btn-desert-animated rounded-full px-5 py-2 text-xs font-bold text-white shadow-sm inline-flex items-center gap-1.5">
+                <a href="{{ localized_route('review.rate', ['ref' => 'guest']) }}" class="btn-desert-animated rounded-full px-5 py-2 text-xs font-bold text-white shadow-sm inline-flex items-center gap-1.5">
                     <i class="bi bi-camera-fill"></i> {{ __('ui.reviews_section.submit_review') }}
                 </a>
             </div>
@@ -1281,7 +1281,7 @@ if(window.fbq){
             @empty
             <div class="col-span-3 text-center py-8 text-slate-500">
                 <p class="mb-3 text-sm">{{ __('ui.reviews_section.first_review_prompt') }}</p>
-                <a href="{{ route('review.rate', ['ref' => 'guest']) }}" class="btn-desert-animated rounded-full px-6 py-2.5 font-bold text-white text-xs inline-flex items-center gap-2 shadow-md">
+                <a href="{{ localized_route('review.rate', ['ref' => 'guest']) }}" class="btn-desert-animated rounded-full px-6 py-2.5 font-bold text-white text-xs inline-flex items-center gap-2 shadow-md">
                     <i class="bi bi-star-fill"></i> {{ __('ui.reviews_section.submit_guest_review') }}
                 </a>
             </div>
@@ -1299,7 +1299,7 @@ if(window.fbq){
                 <span class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-lg"><i class="bi bi-compass"></i></span>
                 <span>{{ __('ui.reviews_section.you_might_also_like') }}</span>
             </h2>
-            <a href="{{ route('tours.index') }}" class="text-sm font-bold text-primary hover:text-primary-hover inline-flex items-center gap-1">
+            <a href="{{ localized_route('tours.index') }}" class="text-sm font-bold text-primary hover:text-primary-hover inline-flex items-center gap-1">
                 <span>{{ __('ui.common.view_all_tours') }}</span>
                 <i class="bi bi-arrow-right rtl:rotate-180"></i>
             </a>
@@ -1309,7 +1309,7 @@ if(window.fbq){
             @foreach($relatedTours as $t)
             @php $minPriceRel = $t->tiers->min('pivot.price') ?? 0; @endphp
             <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-200 hover:border-slate-300 flex flex-col h-full group">
-                <a href="{{ route('tours.show', $t->slug) }}" class="flex flex-col h-full text-inherit">
+                <a href="{{ localized_route('tours.show', $t->slug) }}" class="flex flex-col h-full text-inherit">
                     <div class="relative overflow-hidden aspect-[16/10]">
                         <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy">
                         @if($t->is_bestseller)

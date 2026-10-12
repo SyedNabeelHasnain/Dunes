@@ -42,22 +42,53 @@ class MenuItem extends Model
 
     public function getResolvedUrlAttribute(): string
     {
-        if (!empty($this->route_name)) {
+        $rawUrl = trim((string) ($this->url ?? ''));
+
+        // Normalize legacy or broken menu item paths to canonical targets
+        $legacyMap = [
+            '/luxury-vip-desert-safari-dubai' => '/evening-desert-safari-dubai',
+            '/vip-desert-safari-dubai' => '/evening-desert-safari-dubai',
+            '/cancellation-policy' => '/cancellation-refund-policy',
+            '/refund-policy' => '/cancellation-refund-policy',
+            '/terms' => '/terms-condition',
+            '/terms-and-conditions' => '/terms-condition',
+            '/privacy' => '/privacy-policy',
+            '/cookies' => '/cookie-policy',
+            '/custom-safari' => '/build-your-own-safari',
+            '/pricing-guide' => '/rate-card',
+        ];
+        if (isset($legacyMap[$rawUrl])) {
+            $rawUrl = $legacyMap[$rawUrl];
+        }
+
+        if (! empty($this->route_name)) {
             try {
-                return route($this->route_name);
+                if ($this->route_name === 'tours.show' && ! empty($rawUrl)) {
+                    $slug = ltrim($rawUrl, '/');
+
+                    return localized_route('tours.show', $slug);
+                }
+
+                return localized_route($this->route_name);
             } catch (\Throwable $e) {
                 // fallback to url attribute
             }
         }
 
-        if (empty($this->url)) {
-            return '/';
+        if (empty($rawUrl) || $rawUrl === '/') {
+            return localized_route('home');
         }
 
-        if (str_starts_with($this->url, 'http://') || str_starts_with($this->url, 'https://')) {
-            return $this->url;
+        if (str_starts_with($rawUrl, 'http://') || str_starts_with($rawUrl, 'https://')) {
+            return $rawUrl;
         }
 
-        return url($this->url);
+        $locale = app()->getLocale();
+        $cleanPath = '/'.ltrim($rawUrl, '/');
+        if ($locale && $locale !== 'en') {
+            return url('/'.$locale.$cleanPath);
+        }
+
+        return url($cleanPath);
     }
 }

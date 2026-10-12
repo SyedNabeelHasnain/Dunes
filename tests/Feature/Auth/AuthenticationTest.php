@@ -3,7 +3,13 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
+use Database\Seeders\UserSeeder;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
+use Illuminate\Session\TokenMismatchException;
+use Illuminate\Support\Facades\Hash;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
@@ -70,7 +76,7 @@ class AuthenticationTest extends TestCase
         $response->assertRedirect(route('dashboard', absolute: false));
 
         // Verify password hash in DB was healed
-        $this->assertTrue(\Illuminate\Support\Facades\Hash::check('admin123', $admin->fresh()->password));
+        $this->assertTrue(Hash::check('admin123', $admin->fresh()->password));
     }
 
     public function test_admin_can_self_heal_and_auto_create_when_table_empty(): void
@@ -90,20 +96,20 @@ class AuthenticationTest extends TestCase
 
     public function test_user_seeder_seeds_valid_hash_and_resilient_accounts(): void
     {
-        $this->seed(\Database\Seeders\UserSeeder::class);
+        $this->seed(UserSeeder::class);
 
         $admin = User::where('name', 'Admin')->orWhere('email', 'dunesdiscovery85@gmail.com')->first();
         $this->assertNotNull($admin);
-        $this->assertTrue(\Illuminate\Support\Facades\Hash::check('admin123', $admin->password));
+        $this->assertTrue(Hash::check('admin123', $admin->password));
     }
 
     public function test_token_mismatch_exception_redirects_to_login_with_status_message(): void
     {
-        $request = \Illuminate\Http\Request::create('/admin', 'POST');
+        $request = Request::create('/admin', 'POST');
         $request->setLaravelSession($this->app['session']->driver());
-        $exception = new \Illuminate\Session\TokenMismatchException('CSRF token mismatch.');
+        $exception = new TokenMismatchException('CSRF token mismatch.');
 
-        $response = $this->app->make(\Illuminate\Contracts\Debug\ExceptionHandler::class)->render($request, $exception);
+        $response = $this->app->make(ExceptionHandler::class)->render($request, $exception);
 
         $this->assertEquals(302, $response->getStatusCode());
         $this->assertEquals(route('login'), $response->headers->get('Location'));
@@ -111,11 +117,11 @@ class AuthenticationTest extends TestCase
 
     public function test_too_many_requests_exception_redirects_to_login_gracefully(): void
     {
-        $request = \Illuminate\Http\Request::create('/login', 'POST');
+        $request = Request::create('/login', 'POST');
         $request->setLaravelSession($this->app['session']->driver());
-        $exception = new \Symfony\Component\HttpKernel\Exception\HttpException(429, 'Too Many Requests');
+        $exception = new HttpException(429, 'Too Many Requests');
 
-        $response = $this->app->make(\Illuminate\Contracts\Debug\ExceptionHandler::class)->render($request, $exception);
+        $response = $this->app->make(ExceptionHandler::class)->render($request, $exception);
 
         $this->assertEquals(302, $response->getStatusCode());
         $this->assertEquals(route('login'), $response->headers->get('Location'));

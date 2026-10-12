@@ -54,7 +54,7 @@ return new class extends Migration
                     ['email' => $email],
                     ['verified_at' => $now]
                 );
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
             }
         }
     }

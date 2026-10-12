@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Models\BlogPost;
 use App\Models\Setting;
-use App\Models\Tour;
 use App\Models\User;
 use App\Models\WhatsappInquiry;
 use App\Services\IndexNowService;
@@ -117,7 +117,7 @@ class SeoDomainAuthorityFeaturesTest extends TestCase
         $this->assertEquals($key, trim($response->getContent()));
 
         // Invalid key request should return 404
-        $invalidResponse = $this->get("/unknown_fake_key.txt");
+        $invalidResponse = $this->get('/unknown_fake_key.txt');
         $invalidResponse->assertStatus(404);
     }
 
@@ -225,7 +225,7 @@ class SeoDomainAuthorityFeaturesTest extends TestCase
             'message_text' => 'Booking inquiry for sunset tour',
         ]);
 
-        $controller = app(\App\Http\Controllers\Admin\AdminDashboardController::class);
+        $controller = app(AdminDashboardController::class);
         $kpis = $controller->computeRealtimeKpis();
 
         $this->assertIsArray($kpis);

@@ -197,6 +197,7 @@ class AdminReviewController extends Controller
 
         if (! ($result['success'] ?? false)) {
             $statusCode = ($result['rate_limited'] ?? false) ? 429 : 422;
+
             return response()->json($result, $statusCode);
         }
 
@@ -213,6 +214,7 @@ class AdminReviewController extends Controller
 
         if (! ($result['success'] ?? false)) {
             $statusCode = ($result['rate_limited'] ?? false) ? 429 : 422;
+
             return response()->json($result, $statusCode);
         }
 

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 class DeepLTranslationDriver implements TranslationDriverInterface
 {
     protected string $authKey;
+
     protected string $endpointType; // 'free' or 'pro'
 
     public function __construct(string $authKey = '', string $endpointType = 'free')
@@ -40,6 +41,7 @@ class DeepLTranslationDriver implements TranslationDriverInterface
     protected function mapLocale(string $locale): string
     {
         $code = strtoupper(trim($locale));
+
         return match ($code) {
             'EN' => 'EN-US',
             default => $code,

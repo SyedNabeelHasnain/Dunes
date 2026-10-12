@@ -31,4 +31,3 @@ Schedule::command('reviews:sync-tripadvisor')->dailyAt('00:30')->withoutOverlapp
 
 // Audit and verify accessibility of customer review media gallery links weekly on Mondays at 03:00 AM
 Schedule::command('gallery:verify-media')->weeklyOn(1, '03:00')->withoutOverlapping()->runInBackground();
-

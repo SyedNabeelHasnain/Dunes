@@ -21,10 +21,12 @@ class AdminNoCacheMiddleware
             $response->header('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0, private');
             $response->header('Pragma', 'no-cache');
             $response->header('Expires', 'Sun, 02 Jan 1990 00:00:00 GMT');
+            $response->header('X-Robots-Tag', 'noindex, nofollow');
         } elseif ($response && isset($response->headers)) {
             $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0, private');
             $response->headers->set('Pragma', 'no-cache');
             $response->headers->set('Expires', 'Sun, 02 Jan 1990 00:00:00 GMT');
+            $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
         }
 
         return $response;

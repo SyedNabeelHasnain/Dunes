@@ -7,6 +7,7 @@ use App\Models\Faq;
 use App\Models\FaqAssignment;
 use App\Models\Review;
 use App\Models\Tour;
+use App\Services\ReviewMediaGalleryService;
 use App\Services\SettingsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -22,7 +23,7 @@ class TourController extends Controller
         if ($request->filled('q') || $request->filled('search')) {
             $searchTerm = trim((string) ($request->input('q') ?? $request->input('search')));
 
-            return redirect()->route('tours.search', ['q' => $searchTerm]);
+            return redirect()->to(localized_route('tours.search', ['q' => $searchTerm]), 301);
         }
 
         $selectedCategorySlug = $request->input('category');
@@ -59,8 +60,11 @@ class TourController extends Controller
         $ogImageSetting = $settingsService->get('seo_tours_og_image');
         $ogImage = $ogImageSetting ? asset(ltrim($ogImageSetting, '/')) : asset('images/desert-safari-poster.avif');
         $canonical = localized_route('tours.index');
+        $pageRobots = (! empty($selectedCategorySlug) || ! empty($request->query()))
+            ? 'noindex, follow'
+            : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
 
-        return view('tours.index', compact('categories', 'tours', 'selectedCategorySlug', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
+        return view('tours.index', compact('categories', 'tours', 'selectedCategorySlug', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage', 'pageRobots'));
     }
 
     public function showBuggy(...$params)
@@ -74,6 +78,41 @@ class TourController extends Controller
     public function show(...$params)
     {
         $slug = (string) end($params);
+
+        // Handle legacy tour & policy slug redirects across all locales (301 Permanent)
+        $legacySlugRedirects = [
+            'luxury-vip-desert-safari-dubai' => fn () => localized_route('tours.show', 'evening-desert-safari-dubai'),
+            'vip-desert-safari-dubai' => fn () => localized_route('tours.show', 'evening-desert-safari-dubai'),
+            'dubai-marina-dhow-cruise' => fn () => localized_route('tours.show', 'dhow-cruise-catamaran-cruise-dinner-dubai'),
+            'ocean-empress-dhow-cruise' => fn () => localized_route('tours.show', 'dhow-cruise-catamaran-cruise-dinner-dubai'),
+            'abu-dhabi-city-tour' => fn () => localized_route('tours.show', 'abu-dhabi-city-tour-from-dubai'),
+            'quad-bike-tour-dubai' => fn () => localized_route('tours.show', 'desert-safari-quad-biking-dubai'),
+            'buggy-tour-dubai' => fn () => localized_route('tours.buggy'),
+            'custom-safari' => fn () => localized_route('tours.customizer'),
+            'pricing-guide' => fn () => localized_route('rate-card'),
+            'terms' => fn () => localized_route('terms'),
+            'terms-and-conditions' => fn () => localized_route('terms'),
+            'terms-conditions' => fn () => localized_route('terms'),
+            'privacy' => fn () => localized_route('privacy'),
+            'cookies' => fn () => localized_route('cookies'),
+            'refund-policy' => fn () => localized_route('cancellation'),
+            'cancellation-policy' => fn () => localized_route('cancellation'),
+            'payment-policy' => fn () => localized_route('payment.security'),
+            'payment-security' => fn () => localized_route('payment.security'),
+            'security-policy' => fn () => localized_route('payment.security'),
+            'waiver' => fn () => localized_route('safety.waiver'),
+            'safety-waiver' => fn () => localized_route('safety.waiver'),
+            'safety-policy' => fn () => localized_route('safety.waiver'),
+            'ai-policy' => fn () => localized_route('ai.editorial'),
+            'editorial-policy' => fn () => localized_route('ai.editorial'),
+            'sustainability' => fn () => localized_route('responsible.tourism'),
+            'responsible-tourism' => fn () => localized_route('responsible.tourism'),
+        ];
+
+        if (isset($legacySlugRedirects[$slug])) {
+            return redirect()->to($legacySlugRedirects[$slug](), 301);
+        }
+
         $query = Tour::where('slug', $slug)
             ->with(['itineraries', 'tiers', 'addons', 'contentItems', 'category']);
 
@@ -140,16 +179,31 @@ class TourController extends Controller
         // Dynamic High-CTR SEO Metadata
         $minPrice = $tour->tiers->min('pivot.price') ?? 0;
         $currentYear = date('Y');
+        $currentLocale = app()->getLocale();
 
-        $priceText = $minPrice > 0 ? 'From AED '.number_format($minPrice) : 'Best Rates';
-        $pageTitle = $tour->meta_title ?: "{$tour->name} Dubai {$currentYear}: {$priceText} | Dunes Discovery";
+        $priceText = $minPrice > 0 ? __('ui.common.from').' '.__('ui.common.aed').' '.number_format($minPrice) : 'Best Rates';
+        $hasLocaleMetaTitle = $currentLocale && $currentLocale !== 'en' && method_exists($tour, 'hasTranslation') && $tour->hasTranslation('meta_title', $currentLocale);
+        $hasLocaleMetaDesc = $currentLocale && $currentLocale !== 'en' && method_exists($tour, 'hasTranslation') && $tour->hasTranslation('meta_desc', $currentLocale);
 
-        $defaultDesc = "Book {$tour->name} in Dubai. Luxury 4x4 Land Cruiser transfers, live BBQ dining, thrilling dune bashing, and 24/7 WhatsApp assistance. Instant confirmation {$priceText}.";
-        $pageDesc = $tour->meta_desc ?: (strlen($tour->short_desc ?? '') > 50 ? strip_tags($tour->short_desc) : $defaultDesc);
+        if ($currentLocale && $currentLocale !== 'en') {
+            $pageTitle = $hasLocaleMetaTitle
+                ? $tour->getTranslation('meta_title', $currentLocale)
+                : "{$tour->name} ({$currentYear}) — {$priceText} | Dunes Discovery";
+            $pageDesc = $hasLocaleMetaDesc
+                ? $tour->getTranslation('meta_desc', $currentLocale)
+                : "{$tour->name} — {$priceText}. ".Str::limit(strip_tags($tour->short_desc ?? ''), 130);
+        } else {
+            $enPriceText = $minPrice > 0 ? 'From AED '.number_format($minPrice) : 'Best Rates';
+            $pageTitle = $tour->meta_title ?: "{$tour->name} Dubai {$currentYear}: {$enPriceText} | Dunes Discovery";
+            $defaultDesc = "Book {$tour->name} in Dubai. Luxury 4x4 Land Cruiser transfers, live BBQ dining, thrilling dune bashing, and 24/7 WhatsApp assistance. Instant confirmation {$enPriceText}.";
+            $pageDesc = $tour->meta_desc ?: (strlen($tour->short_desc ?? '') > 50 ? strip_tags($tour->short_desc) : $defaultDesc);
+        }
 
         $pageKeys = $tour->meta_keywords ?: strtolower("{$tour->name}, {$tour->name} dubai, book {$tour->name}, desert safari dubai, dubai tours {$currentYear}");
-        $currentLocale = app()->getLocale();
         $canonical = ($currentLocale && $currentLocale !== 'en') ? url('/'.$currentLocale.'/'.$tour->slug) : url('/'.$tour->slug);
+        $pageRobots = (! empty(request()->query()))
+            ? 'noindex, follow'
+            : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
 
         $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image ?: 'evening-desert-safari-dubai-dune-discovery-tourism.avif');
         $ogImage = asset('images/'.$imgFile);
@@ -166,12 +220,12 @@ class TourController extends Controller
         session(["form_load.booking_{$tour->id}" => microtime(true)]);
 
         try {
-            $tourGalleryItems = app(\App\Services\ReviewMediaGalleryService::class)->getTourItems($tour, 8);
+            $tourGalleryItems = app(ReviewMediaGalleryService::class)->getTourItems($tour, 8);
         } catch (\Throwable $e) {
             $tourGalleryItems = [];
         }
 
-        return view('tours.show', compact('tour', 'highlights', 'inclusions', 'exclusions', 'faqs', 'relatedTours', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage', 'minPrice', 'approvedReviews', 'tourGalleryItems'));
+        return view('tours.show', compact('tour', 'highlights', 'inclusions', 'exclusions', 'faqs', 'relatedTours', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'pageRobots', 'ogImage', 'minPrice', 'approvedReviews', 'tourGalleryItems'));
     }
 
     /**
@@ -188,7 +242,7 @@ class TourController extends Controller
         }
 
         if (empty($cleanQuery)) {
-            return redirect()->route('tours.index');
+            return redirect()->to(localized_route('tours.index'), 301);
         }
 
         $categories = Category::orderBy('priority', 'asc')->get();
@@ -234,7 +288,7 @@ class TourController extends Controller
         $pageTitle = "{$displayQuery} Dubai ({$currentYear} Deals {$priceText}) | Dunes Discovery";
         $pageDesc = "Looking for {$displayQuery}? Compare verified Dubai desert safari packages with 4x4 hotel pickup, 5-star live BBQ dinner, and instant confirmation. DET Licensed #1430583.";
         $pageKeys = strtolower("{$cleanQuery}, {$cleanQuery} dubai, best {$cleanQuery} dubai, desert safari dubai, dunes discovery");
-        $canonical = localized_route('tours.search', ['q' => $cleanQuery]);
+        $canonical = localized_route('tours.search');
         $pageRobots = 'noindex, follow';
 
         $ogImage = asset('images/desert-safari-poster.avif');
@@ -336,7 +390,7 @@ class TourController extends Controller
                 'id' => $tour->id,
                 'name' => $tour->name,
                 'slug' => $tour->slug,
-                'url' => url('/'.$tour->slug),
+                'url' => localized_route('tours.show', $tour->slug),
                 'category' => $tour->category ? $tour->category->name : 'Desert Safari',
                 'category_slug' => $tour->category ? $tour->category->slug : 'desert-safari',
                 'duration' => $tour->duration ?: '4-6 Hours',
@@ -642,9 +696,30 @@ class TourController extends Controller
     {
         $allTours = Tour::where('status', 'active')->with(['tiers', 'category'])->orderBy('priority', 'asc')->get();
         $categories = Category::orderBy('priority', 'asc')->get();
+        $currentLocale = app()->getLocale();
+        $currentYear = date('Y');
 
-        $pageTitle = 'Build Your Own Dubai Desert Safari (Customizer 2026) | Dunes Discovery';
-        $pageDesc = 'Customize your bespoke Dubai desert safari experience. Configure private Land Cruisers, 1000cc Can-Am buggies, 400cc quad bikes, and VIP waiter table service with live real-time pricing.';
+        $localizedMeta = [
+            'ar' => [
+                'title' => "صمّم رحلة سفاري صحراء دبي الخاصة بك ({$currentYear}) | Dunes Discovery",
+                'desc' => 'صمّم تجربتك الخاصة في صحراء دبي مع سيارات لاند كروزر خاصة، عربات باجي 1000cc، دراجات رباعية، وخدمة كبار الشخصيات بأسعار فورية مباشرة.',
+            ],
+            'ru' => [
+                'title' => "Конструктор индивидуального сафари в пустыне Дубая ({$currentYear}) | Dunes Discovery",
+                'desc' => 'Соберите собственное сафари в Дубае: индивидуальный Land Cruiser 4x4, багги Can-Am 1000cc, квадроциклы и VIP-обслуживание с мгновенным расчетом цены.',
+            ],
+            'es' => [
+                'title' => "Diseña tu Propio Safari en el Desierto de Dubái ({$currentYear}) | Dunes Discovery",
+                'desc' => 'Personaliza tu safari a medida en Dubái: Land Cruiser 4x4 privado, buggies Can-Am 1000cc, quads ATV y servicio VIP en mesa con precios en tiempo real.',
+            ],
+            'it' => [
+                'title' => "Crea il Tuo Safari Su Misura nel Deserto di Dubai ({$currentYear}) | Dunes Discovery",
+                'desc' => 'Personalizza il tuo safari nel deserto di Dubai: Land Cruiser 4x4 privato, buggy Can-Am 1000cc, quad ATV e servizio VIP al tavolo con prezzi in tempo reale.',
+            ],
+        ];
+
+        $pageTitle = $localizedMeta[$currentLocale]['title'] ?? "Build Your Own Dubai Desert Safari (Customizer {$currentYear}) | Dunes Discovery";
+        $pageDesc = $localizedMeta[$currentLocale]['desc'] ?? 'Customize your bespoke Dubai desert safari experience. Configure private Land Cruisers, 1000cc Can-Am buggies, 400cc quad bikes, and VIP waiter table service with live real-time pricing.';
         $pageKeys = 'custom desert safari dubai, build your own safari dubai, bespoke desert safari, private land cruiser safari, vip desert safari customizer';
         $canonical = localized_route('tours.customizer');
         $ogImage = asset('images/desert-safari-poster.avif');

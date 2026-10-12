@@ -2,12 +2,16 @@
 
 namespace Tests\Feature;
 
+use App\Models\Coupon;
 use App\Models\MenuItem;
 use App\Models\Page;
 use App\Models\PageSection;
+use App\Models\Setting;
 use App\Models\User;
 use App\Services\CmsContentService;
+use App\Services\SettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 use Tests\TestCase;
 
 class CmsPagesAndMenusTest extends TestCase
@@ -175,7 +179,7 @@ class CmsPagesAndMenusTest extends TestCase
         $this->assertEquals(__('ui.tour_sidebar.need_help'), $title);
 
         $footerSafaris = $service->getMenuItems('footer_desert_safaris');
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $footerSafaris);
+        $this->assertInstanceOf(Collection::class, $footerSafaris);
     }
 
     public function test_frontend_renders_cms_menu_and_footer_concierge(): void
@@ -201,12 +205,12 @@ class CmsPagesAndMenusTest extends TestCase
 
     public function test_top_banner_and_welcome_modal_do_not_render_when_disabled_or_inactive(): void
     {
-        \App\Models\Setting::updateOrCreate(['setting_key' => 'top_promo_banner_active'], ['setting_value' => '0']);
-        \App\Models\Setting::updateOrCreate(['setting_key' => 'promo_top_banner_enabled'], ['setting_value' => '0']);
-        \App\Models\Setting::updateOrCreate(['setting_key' => 'welcome_popup_active'], ['setting_value' => '0']);
-        \App\Models\Setting::updateOrCreate(['setting_key' => 'promo_welcome_modal_enabled'], ['setting_value' => '0']);
+        Setting::updateOrCreate(['setting_key' => 'top_promo_banner_active'], ['setting_value' => '0']);
+        Setting::updateOrCreate(['setting_key' => 'promo_top_banner_enabled'], ['setting_value' => '0']);
+        Setting::updateOrCreate(['setting_key' => 'welcome_popup_active'], ['setting_value' => '0']);
+        Setting::updateOrCreate(['setting_key' => 'promo_welcome_modal_enabled'], ['setting_value' => '0']);
 
-        app(\App\Services\SettingsService::class)->clearCache();
+        app(SettingsService::class)->clearCache();
 
         $response = $this->get('/');
         $response->assertStatus(200);
@@ -219,11 +223,11 @@ class CmsPagesAndMenusTest extends TestCase
 
     public function test_deactivated_coupon_disables_top_banner_and_modal(): void
     {
-        \App\Models\Setting::updateOrCreate(['setting_key' => 'top_promo_banner_active'], ['setting_value' => '1']);
-        \App\Models\Setting::updateOrCreate(['setting_key' => 'promo_top_banner_enabled'], ['setting_value' => '1']);
-        \App\Models\Setting::updateOrCreate(['setting_key' => 'promo_top_banner_code'], ['setting_value' => 'DUNESWELCOME']);
+        Setting::updateOrCreate(['setting_key' => 'top_promo_banner_active'], ['setting_value' => '1']);
+        Setting::updateOrCreate(['setting_key' => 'promo_top_banner_enabled'], ['setting_value' => '1']);
+        Setting::updateOrCreate(['setting_key' => 'promo_top_banner_code'], ['setting_value' => 'DUNESWELCOME']);
 
-        \App\Models\Coupon::updateOrCreate(
+        Coupon::updateOrCreate(
             ['code' => 'DUNESWELCOME'],
             [
                 'name' => 'First-Time Welcome 25% Promo (Top Banner)',
@@ -233,7 +237,7 @@ class CmsPagesAndMenusTest extends TestCase
             ]
         );
 
-        app(\App\Services\SettingsService::class)->clearCache();
+        app(SettingsService::class)->clearCache();
 
         $response = $this->get('/');
         $response->assertStatus(200);

@@ -16,11 +16,11 @@ use App\Http\Controllers\Admin\AdminOperationsController;
 use App\Http\Controllers\Admin\AdminPageController;
 use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\AdminSettingController;
-use App\Http\Controllers\Admin\AdminTranslationApiController;
-use App\Http\Controllers\Admin\AdminTranslationSettingController;
 use App\Http\Controllers\Admin\AdminSubscriberController;
 use App\Http\Controllers\Admin\AdminSubscriberGroupController;
 use App\Http\Controllers\Admin\AdminTourController;
+use App\Http\Controllers\Admin\AdminTranslationApiController;
+use App\Http\Controllers\Admin\AdminTranslationSettingController;
 use App\Http\Controllers\Admin\AdminWhatsappController;
 use App\Http\Controllers\AjaxGatewayController;
 use App\Http\Controllers\BlogController;
@@ -41,6 +41,7 @@ use App\Http\Controllers\SunsetGuideController;
 use App\Http\Controllers\TourController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Middleware\AdminNoCacheMiddleware;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // ── Front-Facing Pages ────────────────────────────────────────────────────────
@@ -90,9 +91,10 @@ Route::get('/search', [TourController::class, 'search'])->name('tours.search');
 Route::get('/search/live', [TourController::class, 'liveSearch'])->name('tours.search.live');
 Route::get('/build-your-own-safari', [TourController::class, 'customizer'])->name('tours.customizer');
 Route::redirect('/custom-safari', '/build-your-own-safari', 301);
-Route::get('/tours/{slug}', function (\Illuminate\Http\Request $request, $slug) {
+Route::get('/tours/{slug}', function (Request $request, $slug) {
     $queryString = $request->getQueryString();
-    return redirect('/'.$slug . ($queryString ? '?'.$queryString : ''), 301);
+
+    return redirect('/'.$slug.($queryString ? '?'.$queryString : ''), 301);
 });
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/feed.xml', [BlogController::class, 'feed'])->name('blog.feed');
@@ -342,7 +344,13 @@ Route::redirect('/ocean-empress-dhow-cruise', '/dhow-cruise-catamaran-cruise-din
 Route::redirect('/abu-dhabi-city-tour', '/abu-dhabi-city-tour-from-dubai', 301);
 Route::redirect('/quad-bike-tour-dubai', '/desert-safari-quad-biking-dubai', 301);
 Route::redirect('/vip-desert-safari-dubai', '/evening-desert-safari-dubai', 301);
+Route::redirect('/luxury-vip-desert-safari-dubai', '/evening-desert-safari-dubai', 301);
 Route::redirect('/buggy-tour-dubai', '/dune-buggy-rental-dubai', 301);
+
+// ── Legacy Press Kit Media Asset 301 Redirects ──────────────────────────────
+Route::redirect('/images/sunset-desert-safari-dubai-dunes-discovery-tourism.avif', '/images/dubai-desert-safar-camel-ride-dune-discovery-tourism.avif', 301);
+Route::redirect('/images/vip-desert-safari-dubai-camp-dinner-bbq.avif', '/images/dubai-desert-safari-bbq-dune-discovery-tourism.avif', 301);
+Route::redirect('/images/can-am-maverick-x3-dune-buggy-rental-dubai.avif', '/images/dubai-desert-safari-buggy-dune-discovery-tourism.avif', 301);
 
 // ── Multi-Language Localized Route Group (Non-Default Locales, e.g. /ar) ─────
 Route::prefix('{locale}')
@@ -354,7 +362,6 @@ Route::prefix('{locale}')
         Route::get('/contact', [PageController::class, 'contact'])->name('locale.contact');
         Route::get('/faq', [PageController::class, 'faq'])->name('locale.faq');
         Route::get('/rate-card', [RateCardController::class, 'index'])->name('locale.rate-card');
-        Route::redirect('/pricing-guide', '/rate-card', 301);
         Route::get('/dubai-desert-sunset-times', [SunsetGuideController::class, 'index'])->name('locale.sunset.guide');
         Route::get('/press-kit', [PageController::class, 'pressKit'])->name('locale.press.kit');
 
@@ -373,15 +380,17 @@ Route::prefix('{locale}')
         Route::get('/search', [TourController::class, 'search'])->name('locale.tours.search');
         Route::get('/search/live', [TourController::class, 'liveSearch'])->name('locale.tours.search.live');
         Route::get('/build-your-own-safari', [TourController::class, 'customizer'])->name('locale.tours.customizer');
-        Route::redirect('/custom-safari', '/build-your-own-safari', 301);
 
         // Blog
         Route::get('/blog', [BlogController::class, 'index'])->name('locale.blog.index');
         Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('locale.blog.show');
 
-        // Booking confirmation
+        // Booking confirmation & Reviews
         Route::get('/thankyou', [BookingController::class, 'thankyou'])->name('locale.booking.thankyou');
         Route::get('/payment-cancel', [BookingController::class, 'paymentCancel'])->name('locale.booking.cancel');
+        Route::get('/review/{ref}', [PageController::class, 'reviewRate'])->name('locale.review.rate');
+        Route::post('/review/{ref}', [PageController::class, 'submitReview'])->name('locale.review.submit');
+        Route::post('/review/{ref}/feedback', [PageController::class, 'submitFeedback'])->name('locale.review.feedback');
 
         // High-Value & Geo
         Route::get('/dune-buggy-rental-dubai', [TourController::class, 'showBuggy'])->name('locale.tours.buggy');
@@ -393,4 +402,3 @@ Route::prefix('{locale}')
 
 // ── Root-level Dynamic Tour Slugs (Fallback Route for Default Locale) ─────────
 Route::get('/{slug}', [TourController::class, 'show'])->name('tours.show');
-

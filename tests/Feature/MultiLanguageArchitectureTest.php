@@ -13,6 +13,7 @@ use App\Services\Translation\TranslationManager;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class MultiLanguageArchitectureTest extends TestCase
@@ -89,8 +90,8 @@ class MultiLanguageArchitectureTest extends TestCase
         $manager->buildLocale($testLang);
 
         $baseDir = lang_path('fr');
-        $this->assertTrue(File::exists($baseDir . '/ui.php'));
-        $this->assertTrue(File::exists($baseDir . '/messages.php'));
+        $this->assertTrue(File::exists($baseDir.'/ui.php'));
+        $this->assertTrue(File::exists($baseDir.'/messages.php'));
         $this->assertTrue(File::exists(lang_path('fr.json')));
 
         // Purge locale
@@ -105,7 +106,7 @@ class MultiLanguageArchitectureTest extends TestCase
      */
     public function test_translatable_attributes_transparent_fallback_and_mutation(): void
     {
-        $tour = new Tour();
+        $tour = new Tour;
         $tour->name = [
             'en' => 'Evening Desert Safari',
             'ar' => 'سفاري صحراوي مسائي',
@@ -138,6 +139,7 @@ class MultiLanguageArchitectureTest extends TestCase
 
         Http::assertSent(function ($request) {
             $data = $request->data();
+
             return isset($data['tag_handling']) && $data['tag_handling'] === 'html'
                 && ! isset($data['preserve_formatting']);
         });
@@ -253,7 +255,7 @@ class MultiLanguageArchitectureTest extends TestCase
      */
     public function test_fallback_resiliency_when_languages_table_is_missing(): void
     {
-        \Illuminate\Support\Facades\Schema::dropIfExists('languages');
+        Schema::dropIfExists('languages');
         Language::clearLanguageCache();
 
         $active = Language::getActive();

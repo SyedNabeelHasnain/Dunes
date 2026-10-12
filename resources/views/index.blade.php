@@ -40,7 +40,7 @@ if (!function_exists('renderReviewCardMarkup')) {
             $sourceBadge = '<span class="inline-flex items-center gap-1 bg-slate-100 text-slate-700 rounded-full px-2.5 py-0.5 text-xs font-medium">' . ucfirst($sourceLower) . '</span>';
         }
 
-        $url = !empty($r->review_url) ? $r->review_url : route('review.rate', ['ref' => 'guest']);
+        $url = !empty($r->review_url) ? $r->review_url : localized_route('review.rate', ['ref' => 'guest']);
         $reviewerAvatar = !empty($r->reviewer_avatar_url) ? (string) $r->reviewer_avatar_url : '';
         $avatar = !empty($reviewerAvatar) ? (str_starts_with($reviewerAvatar, 'http') ? $reviewerAvatar : asset($reviewerAvatar)) : asset('images/avatar-default.svg');
         $fallbackAvatar = asset('images/avatar-default.svg');
@@ -957,7 +957,7 @@ if (!function_exists('renderReviewCardMarkup')) {
         </div>
 
         <div class="text-center mt-10">
-            <a href="{{ route('faq') }}" class="btn-desert-animated text-sm sm:text-base font-bold rounded-full px-8 py-3.5 inline-flex items-center gap-2 shadow-md">
+            <a href="{{ localized_route('faq') }}" class="btn-desert-animated text-sm sm:text-base font-bold rounded-full px-8 py-3.5 inline-flex items-center gap-2 shadow-md">
                 <span>{{ __('ui.faq_section.view_all') }}</span>
                 <i class="bi bi-arrow-right rtl:rotate-180"></i>
             </a>

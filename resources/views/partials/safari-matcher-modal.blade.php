@@ -339,7 +339,7 @@
                              <i class="bi bi-arrow-counterclockwise"></i>
                              <span>Retake Quiz</span>
                          </button>
-                         <a href="{{ route('tours.index') }}" class="text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1">
+                         <a href="{{ localized_route('tours.index') }}" class="text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1">
                              <i class="bi bi-shuffle"></i>
                              <span>Browse All Tours</span>
                          </a>

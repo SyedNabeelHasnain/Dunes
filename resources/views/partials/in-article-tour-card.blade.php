@@ -149,7 +149,7 @@
         <div class="md:col-span-7 flex flex-col justify-between">
             <div>
                 <h3 class="text-xl sm:text-2xl font-black text-slate-900 group-hover:text-primary transition-colors leading-snug mb-2">
-                    <a href="{{ route('tours.show', $tour->slug) }}" class="text-inherit hover:text-primary transition-colors">
+                    <a href="{{ localized_route('tours.show', $tour->slug) }}" class="text-inherit hover:text-primary transition-colors">
                         {{ $tour->name }}
                     </a>
                 </h3>
@@ -215,7 +215,7 @@
         <span class="flex items-center gap-1"><i class="bi bi-shield-check text-emerald-600"></i> {{ __('ui.trust.licensed_operator') }}</span>
         <span class="flex items-center gap-1"><i class="bi bi-clock-history text-primary"></i> {{ __('ui.trust.instant_confirmation') }}</span>
         <span class="flex items-center gap-1"><i class="bi bi-arrow-counterclockwise text-blue-600"></i> {{ __('ui.trust_strip.free_cancel') }}</span>
-        <a href="{{ route('tours.show', $tour->slug) }}" class="font-bold text-primary hover:underline ms-auto flex items-center gap-1">
+        <a href="{{ localized_route('tours.show', $tour->slug) }}" class="font-bold text-primary hover:underline ms-auto flex items-center gap-1">
             <span>Full Tour Itinerary</span><i class="bi bi-chevron-right text-[10px] rtl:rotate-180"></i>
         </a>
     </div>
@@ -257,7 +257,7 @@
                     <div>
                         <div class="text-primary text-xs font-bold uppercase tracking-wider mb-1">{{ $tour->category?->name ?? 'Desert Adventure' }}</div>
                         <h3 class="text-lg sm:text-xl font-black text-white mb-2 leading-snug">
-                            <a href="{{ route('tours.show', $tour->slug) }}" class="hover:text-primary transition-colors text-inherit">
+                            <a href="{{ localized_route('tours.show', $tour->slug) }}" class="hover:text-primary transition-colors text-inherit">
                                 {{ $tour->name }}
                             </a>
                         </h3>
@@ -367,7 +367,7 @@
         </div>
 
         <h3 class="font-extrabold text-base text-white mb-1.5 leading-snug">
-            <a href="{{ route('tours.show', $tour->slug) }}" class="text-inherit hover:text-primary transition-colors">
+            <a href="{{ localized_route('tours.show', $tour->slug) }}" class="text-inherit hover:text-primary transition-colors">
                 {{ $tour->name }}
             </a>
         </h3>
@@ -410,7 +410,7 @@
         </a>
 
         <div class="mt-3 text-center">
-            <a href="{{ route('tours.show', $tour->slug) }}" class="text-[11px] text-slate-400 hover:text-primary transition-colors font-medium inline-flex items-center gap-1">
+            <a href="{{ localized_route('tours.show', $tour->slug) }}" class="text-[11px] text-slate-400 hover:text-primary transition-colors font-medium inline-flex items-center gap-1">
                 <span>{{ __('ui.common.view_details') }}</span>
                 <i class="bi bi-arrow-right rtl:rotate-180 text-[10px]"></i>
             </a>

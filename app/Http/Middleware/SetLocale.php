@@ -15,7 +15,7 @@ class SetLocale
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -26,6 +26,7 @@ class SetLocale
             view()->share('currentLocale', 'en');
             view()->share('isRtl', false);
             view()->share('textDir', 'ltr');
+
             return $next($request);
         }
 
@@ -35,9 +36,9 @@ class SetLocale
         if ($segment1 === 'en') {
             $segments = $request->segments();
             array_shift($segments);
-            $targetPath = '/' . implode('/', $segments);
+            $targetPath = '/'.implode('/', $segments);
             $queryString = $request->getQueryString();
-            $targetUrl = $targetPath . ($queryString ? '?' . $queryString : '');
+            $targetUrl = $targetPath.($queryString ? '?'.$queryString : '');
 
             return redirect($targetUrl, 301);
         }
@@ -56,6 +57,22 @@ class SetLocale
             $currentLocale = $matchedLang->code;
             $currentLanguage = $matchedLang;
         } else {
+            // If this request matched the {locale} route group with an inactive/unsupported 2-letter code,
+            // never render a duplicate English page at /{unknown_code}/...
+            if ($request->route('locale') !== null || ($segment1 && preg_match('/^[a-z]{2}(-[a-z]{2})?$/', $segment1))) {
+                $segments = $request->segments();
+                $knownInactiveLocales = ['fr', 'de', 'zh', 'pt', 'nl', 'tr', 'pl', 'ja', 'ko', 'hi', 'ur', 'fa', 'he', 'id', 'ms', 'th', 'vi', 'sv', 'no', 'da', 'fi', 'el', 'cs', 'ro', 'hu', 'uk'];
+                if (count($segments) > 1 || in_array($segment1, $knownInactiveLocales, true)) {
+                    array_shift($segments);
+                    $targetPath = empty($segments) ? '/' : '/'.implode('/', $segments);
+                    $queryString = $request->getQueryString();
+
+                    return redirect($targetPath.($queryString ? '?'.$queryString : ''), 301);
+                }
+
+                abort(404);
+            }
+
             $currentLanguage = $activeLanguages->firstWhere('is_default', true) ?: $activeLanguages->first();
             $currentLocale = $currentLanguage ? $currentLanguage->code : 'en';
         }

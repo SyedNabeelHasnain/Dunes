@@ -17,14 +17,31 @@ class SunsetGuideController extends Controller
         $currentYear = date('Y');
 
         // Canonical URL
-        $canonical = ($currentLocale && $currentLocale !== 'en')
-            ? url('/' . $currentLocale . '/dubai-desert-sunset-times')
-            : url('/dubai-desert-sunset-times');
+        $canonical = localized_route('sunset.guide');
+
+        $localizedSunsetMeta = [
+            'ar' => [
+                'title' => "مواعيد غروب الشمس في صحراء دبي {$currentYear} | دليل الساعة الذهبية في كثبان لهباب | Dunes Discovery",
+                'desc' => 'دليل شامل لمواعيد غروب الشمس في صحراء دبي، أوقات الساعة الذهبية للتصوير، وجدول انطلاق رحلات السفاري المسائية في كثبان لهباب الحمراء على مدار العام.',
+            ],
+            'ru' => [
+                'title' => "Время заката в пустыне Дубая {$currentYear} | Гид по золотому часу в дюнах Лахбаб | Dunes Discovery",
+                'desc' => 'Полное расписание закатов в пустыне Дубая по месяцам, время «золотого часа» для фотосессий и график выезда на вечернее сафари в красные дюны Лахбаб.',
+            ],
+            'es' => [
+                'title' => "Horarios del Atardecer en el Desierto de Dubái {$currentYear} | Guía de Hora Dorada en Lahbab | Dunes Discovery",
+                'desc' => 'Guía completa de horarios de puesta de sol en el desierto de Dubái, ventanas de hora dorada para fotografía y salidas de safari vespertino en las dunas rojas de Lahbab.',
+            ],
+            'it' => [
+                'title' => "Orari del Tramonto nel Deserto di Dubai {$currentYear} | Guida all'Ora d'Oro a Lahbab | Dunes Discovery",
+                'desc' => 'Guida completa agli orari del tramonto nel deserto di Dubai, finestre fotografiche dell\'ora d\'oro e programmi del safari serale sulle dune rosse di Lahbab.',
+            ],
+        ];
 
         // Dynamic High-CTR SEO Metadata
-        $pageTitle = $settings->get('seo_sunset_title') ?: "Dubai Desert Sunset Times {$currentYear} | Lahbab Red Dunes Golden Hour Guide | Dunes Discovery";
-        $pageDesc = $settings->get('seo_sunset_description') ?: "Complete guide to Dubai desert sunset times, golden hour photography windows, and evening safari schedules in Lahbab Red Dunes. Live astronomical countdown and monthly reference charts.";
-        $pageKeys = $settings->get('seo_sunset_keywords') ?: "dubai desert sunset time, what time does the sun set in dubai desert, lahbab golden hour, evening safari sunset dubai, best time for desert photography dubai";
+        $pageTitle = $localizedSunsetMeta[$currentLocale]['title'] ?? ($settings->get('seo_sunset_title') ?: "Dubai Desert Sunset Times {$currentYear} | Lahbab Red Dunes Golden Hour Guide | Dunes Discovery");
+        $pageDesc = $localizedSunsetMeta[$currentLocale]['desc'] ?? ($settings->get('seo_sunset_description') ?: 'Complete guide to Dubai desert sunset times, golden hour photography windows, and evening safari schedules in Lahbab Red Dunes. Live astronomical countdown and monthly reference charts.');
+        $pageKeys = $settings->get('seo_sunset_keywords') ?: 'dubai desert sunset time, what time does the sun set in dubai desert, lahbab golden hour, evening safari sunset dubai, best time for desert photography dubai';
         $ogImage = asset('images/evening-desert-safari-dubai-dune-discovery-tourism.avif');
 
         // 12-Month Astronomical & Meteorological Reference Data for Lahbab Red Dunes (25.04° N, 55.67° E)
@@ -51,9 +68,9 @@ class SunsetGuideController extends Controller
             $sunsetTours = Tour::where('status', 'active')
                 ->where(function ($q) {
                     $q->where('slug', 'like', '%evening%')
-                      ->orWhere('slug', 'like', '%overnight%')
-                      ->orWhere('slug', 'like', '%sunset%')
-                      ->orWhere('is_bestseller', true);
+                        ->orWhere('slug', 'like', '%overnight%')
+                        ->orWhere('slug', 'like', '%sunset%')
+                        ->orWhere('is_bestseller', true);
                 })
                 ->with(['tiers', 'category'])
                 ->orderBy('priority', 'asc')

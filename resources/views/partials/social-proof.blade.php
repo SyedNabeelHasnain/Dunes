@@ -22,7 +22,7 @@
                 <span class="font-bold text-slate-900 text-xs truncate max-w-[130px]" id="spCustomerName">Michael R.</span>
                 <span class="text-slate-500 text-[11px]">booked</span>
             </div>
-            <a href="{{ route('tours.index') }}" id="spTourLink" class="block font-bold text-xs text-primary hover:text-primary-dark transition-colors truncate">
+            <a href="{{ localized_route('tours.index') }}" id="spTourLink" class="block font-bold text-xs text-primary hover:text-primary-dark transition-colors truncate">
                 Premium Evening Desert Safari
             </a>
             <div class="flex items-center gap-1.5 text-slate-500 text-[10px] mt-0.5">

@@ -7,10 +7,11 @@
   "@graph": [
     {
       "@type": "WebPage",
-      "@id": "{{ request()->url() }}#webpage",
-      "url": "{{ request()->url() }}",
-      "name": "Guest Review & Feedback | Dunes Discovery Tourism",
-      "description": "Verified guest review and rating submission for Dubai desert safaris and tours by Dunes Discovery Tourism.",
+      "@id": "{{ $canonical ?? request()->url() }}#webpage",
+      "url": "{{ $canonical ?? request()->url() }}",
+      "name": "{{ $pageTitle ?? 'Guest Review & Feedback | Dunes Discovery Tourism' }}",
+      "description": "{{ $pageDesc ?? 'Verified guest review and rating submission for Dubai desert safaris and tours by Dunes Discovery Tourism.' }}",
+      "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
       "isPartOf": {
         "@type": "WebSite",
         "@id": "{{ route('home') }}#website",
@@ -19,19 +20,19 @@
       },
       "breadcrumb": {
         "@type": "BreadcrumbList",
-        "@id": "{{ request()->url() }}#breadcrumb",
+        "@id": "{{ $canonical ?? request()->url() }}#breadcrumb",
         "itemListElement": [
           {
             "@type": "ListItem",
             "position": 1,
-            "name": "Home",
-            "item": "{{ rtrim(route('home'), '/') }}/"
+            "name": "{{ __('ui.nav.home') ?? 'Home' }}",
+            "item": "{{ localized_route('home') }}"
           },
           {
             "@type": "ListItem",
             "position": 2,
-            "name": "Guest Reviews",
-            "item": "{{ request()->url() }}"
+            "name": "{{ __('ui.reviews_section.submit_review') ?? 'Guest Reviews' }}",
+            "item": "{{ $canonical ?? request()->url() }}"
           }
         ]
       }
@@ -67,13 +68,13 @@
                             <a href="{{ $googleReviewUrl }}" target="_blank" rel="noopener" class="btn-desert-animated text-xs sm:text-sm font-bold rounded-full px-5 py-2.5 text-white shadow-md inline-flex items-center gap-2">
                                 <i class="bi bi-google"></i> Post on Google Reviews
                             </a>
-                            <a href="{{ route('home') }}" class="border border-white/20 hover:bg-white/10 text-white text-xs sm:text-sm font-bold rounded-full px-5 py-2.5 transition-colors inline-flex items-center">
+                            <a href="{{ localized_route('home') }}" class="border border-white/20 hover:bg-white/10 text-white text-xs sm:text-sm font-bold rounded-full px-5 py-2.5 transition-colors inline-flex items-center">
                                 Back to Home
                             </a>
                         </div>
                     </div>
                 @else
-                    <a href="{{ route('home') }}" class="btn-desert-animated text-sm sm:text-base font-bold rounded-full px-8 py-3.5 text-white inline-flex items-center gap-2 shadow-lg">
+                    <a href="{{ localized_route('home') }}" class="btn-desert-animated text-sm sm:text-base font-bold rounded-full px-8 py-3.5 text-white inline-flex items-center gap-2 shadow-lg">
                         <i class="bi bi-house-door-fill"></i> Return to Homepage
                     </a>
                 @endif
@@ -96,7 +97,7 @@
                     </div>
                 </div>
 
-                <form action="{{ route('review.submit', $booking->reference) }}" method="POST" enctype="multipart/form-data" id="reviewSubmitForm">
+                <form action="{{ localized_route('review.submit', ['ref' => $booking->reference]) }}" method="POST" enctype="multipart/form-data" id="reviewSubmitForm">
                     @csrf
 
                     <!-- Rating Picker -->

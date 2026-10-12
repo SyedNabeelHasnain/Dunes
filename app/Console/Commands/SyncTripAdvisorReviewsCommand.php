@@ -49,7 +49,7 @@ class SyncTripAdvisorReviewsCommand extends Command
                 ['Existing Reviews Updated', $result['updated'] ?? 0],
                 ['Reviews Skipped', $result['skipped'] ?? 0],
                 ['Total TripAdvisor Reviews on File', $result['total'] ?? 0],
-                ['TripAdvisor Rating', ($result['rating'] ?? 'N/A') . ' ★'],
+                ['TripAdvisor Rating', ($result['rating'] ?? 'N/A').' ★'],
                 ['Total Reviews Count', $result['reviews_count'] ?? 'N/A'],
                 ['Last Synced Timestamp', $result['last_synced_at'] ?? 'N/A'],
             ]

@@ -42,7 +42,7 @@ class TripAdvisorReviewSyncService
     /**
      * Execute synchronization of TripAdvisor reviews and rating metrics.
      *
-     * @param bool $force Bypass the rate-limit cooldown
+     * @param  bool  $force  Bypass the rate-limit cooldown
      * @return array<string, mixed>
      */
     public function sync(bool $force = false): array
@@ -63,6 +63,7 @@ class TripAdvisorReviewSyncService
         if (! $force && $lastSyncedTimestamp && (now()->timestamp - $lastSyncedTimestamp) < self::SYNC_COOLDOWN_SECONDS) {
             $lock->release();
             $remaining = self::SYNC_COOLDOWN_SECONDS - (now()->timestamp - $lastSyncedTimestamp);
+
             return [
                 'success' => false,
                 'rate_limited' => true,
@@ -80,7 +81,7 @@ class TripAdvisorReviewSyncService
             $isFallback = false;
             if (! empty($fetchResult['error'])) {
                 $errorMsg = $fetchResult['error'];
-                Log::warning('TripAdvisor API live fetch returned notice, utilizing verified fallback reviews: ' . $errorMsg);
+                Log::warning('TripAdvisor API live fetch returned notice, utilizing verified fallback reviews: '.$errorMsg);
                 $fetchResult = $this->getFallbackTripAdvisorReviews();
                 $isFallback = true;
             }
@@ -99,6 +100,7 @@ class TripAdvisorReviewSyncService
 
                 if (! $normalized || empty($normalized['reviewer_name'])) {
                     $skipped++;
+
                     continue;
                 }
 
@@ -175,14 +177,14 @@ class TripAdvisorReviewSyncService
                 'message' => "Successfully synchronized TripAdvisor Reviews: {$added} new added, {$updated} updated.",
             ];
         } catch (\Throwable $e) {
-            Log::error('TripAdvisor review synchronization exception: ' . $e->getMessage(), [
+            Log::error('TripAdvisor review synchronization exception: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
             ]);
 
             return [
                 'success' => false,
                 'rate_limited' => false,
-                'message' => 'Error during sync: ' . $e->getMessage(),
+                'message' => 'Error during sync: '.$e->getMessage(),
                 'last_synced_at' => $this->getLastSyncedAt(),
             ];
         } finally {
@@ -204,7 +206,7 @@ class TripAdvisorReviewSyncService
         }
 
         try {
-            $baseUrl = 'https://api.content.tripadvisor.com/api/v1/location/' . urlencode($locationId);
+            $baseUrl = 'https://api.content.tripadvisor.com/api/v1/location/'.urlencode($locationId);
 
             // Step 1: Fetch Location Details (Rating & Review Count)
             $detailsResponse = Http::timeout(12)
@@ -250,15 +252,17 @@ class TripAdvisorReviewSyncService
 
             if (! $reviewsResponse->successful()) {
                 $errorData = $reviewsResponse->json();
-                $message = $errorData['message'] ?? $errorData['error']['message'] ?? ('HTTP ' . $reviewsResponse->status());
+                $message = $errorData['message'] ?? $errorData['error']['message'] ?? ('HTTP '.$reviewsResponse->status());
+
                 return [
-                    'error' => 'TripAdvisor Content API returned: ' . $message,
+                    'error' => 'TripAdvisor Content API returned: '.$message,
                 ];
             }
         } catch (\Throwable $e) {
-            Log::warning('TripAdvisor API fetch exception: ' . $e->getMessage());
+            Log::warning('TripAdvisor API fetch exception: '.$e->getMessage());
+
             return [
-                'error' => 'TripAdvisor API connection failure: ' . $e->getMessage(),
+                'error' => 'TripAdvisor API connection failure: '.$e->getMessage(),
             ];
         }
 
@@ -277,7 +281,7 @@ class TripAdvisorReviewSyncService
         if (empty($reviewId)) {
             $authorSeed = $raw['user']['username'] ?? $raw['reviewer_name'] ?? 'traveler';
             $dateSeed = $raw['published_date'] ?? now()->toDateString();
-            $reviewId = 'ta_' . md5($authorSeed . '_' . $dateSeed);
+            $reviewId = 'ta_'.md5($authorSeed.'_'.$dateSeed);
         }
 
         // 2. Identify Author Information
@@ -300,7 +304,7 @@ class TripAdvisorReviewSyncService
         // Profile URL
         $authorProfileUrl = $raw['user']['profile_url']
             ?? $raw['reviewer_profile_url']
-            ?? (isset($raw['user']['username']) ? 'https://www.tripadvisor.com/Profile/' . urlencode($raw['user']['username']) : null);
+            ?? (isset($raw['user']['username']) ? 'https://www.tripadvisor.com/Profile/'.urlencode($raw['user']['username']) : null);
 
         // 3. Review Link
         $reviewUrl = $raw['url'] ?? $raw['review_url'] ?? $fallbackUrl;
@@ -337,7 +341,8 @@ class TripAdvisorReviewSyncService
             if (! empty($raw['owner_response']['published_date'])) {
                 try {
                     $ownerResponseDate = Carbon::parse($raw['owner_response']['published_date'])->toDateTimeString();
-                } catch (\Throwable $e) {}
+                } catch (\Throwable $e) {
+                }
             }
         } elseif (! empty($raw['owner_response_text'])) {
             $ownerResponseText = $raw['owner_response_text'];
@@ -364,7 +369,7 @@ class TripAdvisorReviewSyncService
             'review_url' => $reviewUrl ?: $fallbackUrl,
             'rating' => $rating,
             'review_title' => $title,
-            'review_text' => $text ?: 'Rated ' . number_format($rating, 0) . ' stars on TripAdvisor.',
+            'review_text' => $text ?: 'Rated '.number_format($rating, 0).' stars on TripAdvisor.',
             'photos' => $raw['photos'] ?? [],
             'published_date' => $publishedDate,
             'status' => $status,
@@ -408,7 +413,7 @@ class TripAdvisorReviewSyncService
             Cache::forget('tripadvisor_reviews_cache');
             $this->settings->clearCache();
         } catch (\Throwable $e) {
-            Log::warning('Error purging TripAdvisor review caches: ' . $e->getMessage());
+            Log::warning('Error purging TripAdvisor review caches: '.$e->getMessage());
         }
     }
 
@@ -484,8 +489,8 @@ class TripAdvisorReviewSyncService
     {
         return $this->settings->get(
             'social_tripadvisor',
-            'https://www.tripadvisor.com/Attraction_Review-g295424-d' . $this->getLocationId() . '-Reviews-Dunes_Discovery-Dubai_Emirate_of_Dubai.html'
-        ) ?: 'https://www.tripadvisor.com/Attraction_Review-g295424-d' . $this->getLocationId() . '-Reviews-Dunes_Discovery-Dubai_Emirate_of_Dubai.html';
+            'https://www.tripadvisor.com/Attraction_Review-g295424-d'.$this->getLocationId().'-Reviews-Dunes_Discovery-Dubai_Emirate_of_Dubai.html'
+        ) ?: 'https://www.tripadvisor.com/Attraction_Review-g295424-d'.$this->getLocationId().'-Reviews-Dunes_Discovery-Dubai_Emirate_of_Dubai.html';
     }
 
     /**
@@ -513,6 +518,7 @@ class TripAdvisorReviewSyncService
 
         // Secondary fallback if reviews.json is absent
         $now = now();
+
         return [
             'rating' => 5.0,
             'reviews_count' => 5,

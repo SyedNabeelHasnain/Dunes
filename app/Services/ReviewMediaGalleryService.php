@@ -13,8 +13,11 @@ use Illuminate\Support\Str;
 class ReviewMediaGalleryService
 {
     public const CACHE_KEY_ITEMS = 'site_guest_gallery_items';
+
     public const CACHE_KEY_HOMEPAGE = 'site_home_gallery_feed';
+
     public const CACHE_TTL_SECONDS = 43200; // 12 hours
+
     public const URL_STATUS_TTL_SECONDS = 86400; // 24 hours
 
     /**
@@ -52,7 +55,7 @@ class ReviewMediaGalleryService
      * Retrieve verified, healthy gallery items with optional filters.
      * Excludes broken media links automatically.
      *
-     * @param array<string, mixed> $options
+     * @param  array<string, mixed>  $options
      * @return array<int, array<string, mixed>>
      */
     public function getGalleryItems(array $options = []): array
@@ -116,7 +119,6 @@ class ReviewMediaGalleryService
     /**
      * Get verified media items specifically curated for the homepage.
      *
-     * @param int $limit
      * @return array<int, array<string, mixed>>
      */
     public function getHomepageItems(int $limit = 12): array
@@ -151,8 +153,6 @@ class ReviewMediaGalleryService
     /**
      * Get verified media items relevant to a specific tour.
      *
-     * @param Tour|int|string $tour
-     * @param int $limit
      * @return array<int, array<string, mixed>>
      */
     public function getTourItems(Tour|int|string $tour, int $limit = 8): array
@@ -193,6 +193,7 @@ class ReviewMediaGalleryService
             if ($isMorningOrSunrise && in_array($cat, ['sunset_camels', 'red_dunes'])) {
                 return true;
             }
+
             return false;
         });
 
@@ -211,6 +212,7 @@ class ReviewMediaGalleryService
     public function loadAndVerifyAllMedia(bool $force = false): array
     {
         $rawItems = $this->extractAllReviewMedia();
+
         return $this->filterHealthyItems($rawItems, $force);
     }
 
@@ -268,7 +270,7 @@ class ReviewMediaGalleryService
                 }
 
                 $items[] = [
-                    'id' => 'media_' . md5($url),
+                    'id' => 'media_'.md5($url),
                     'url' => $url,
                     'type' => $type, // 'image' or 'video'
                     'thumbnail_url' => $type === 'video' ? ($mediaEntry['thumbnail'] ?? $url) : $url,
@@ -325,7 +327,7 @@ class ReviewMediaGalleryService
             return false;
         }
 
-        $cacheKey = 'gallery_media_status_' . md5($url);
+        $cacheKey = 'gallery_media_status_'.md5($url);
 
         if (! $force && Cache::has($cacheKey)) {
             return (bool) Cache::get($cacheKey);
@@ -366,6 +368,7 @@ class ReviewMediaGalleryService
             // Connection error, DNS failure or timeout -> treat as unhealthy
             Cache::put($cacheKey, false, self::URL_STATUS_TTL_SECONDS);
             Log::debug("Review gallery URL health probe exception: {$e->getMessage()} for {$url}");
+
             return false;
         }
     }
@@ -379,7 +382,7 @@ class ReviewMediaGalleryService
             return;
         }
 
-        $cacheKey = 'gallery_media_status_' . md5($url);
+        $cacheKey = 'gallery_media_status_'.md5($url);
         Cache::put($cacheKey, false, self::URL_STATUS_TTL_SECONDS);
 
         // Invalidate aggregate gallery feeds so broken image is omitted on next load
@@ -397,14 +400,14 @@ class ReviewMediaGalleryService
             Cache::forget(self::CACHE_KEY_ITEMS);
             Cache::forget(self::CACHE_KEY_HOMEPAGE);
         } catch (\Throwable $e) {
-            Log::warning('Error purging gallery caches: ' . $e->getMessage());
+            Log::warning('Error purging gallery caches: '.$e->getMessage());
         }
     }
 
     /**
      * Calculate category statistics across verified gallery items.
      *
-     * @param array<int, array<string, mixed>> $items
+     * @param  array<int, array<string, mixed>>  $items
      * @return array<string, int>
      */
     public function getCategoryStats(array $items): array
@@ -488,8 +491,7 @@ class ReviewMediaGalleryService
     /**
      * Detect whether a media item is a video or an image.
      *
-     * @param string $url
-     * @param array<string, mixed>|string $rawEntry
+     * @param  array<string, mixed>|string  $rawEntry
      * @return string 'video'|'image'
      */
     protected function detectMediaType(string $url, $rawEntry): string

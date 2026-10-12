@@ -13,6 +13,7 @@ use App\Models\Subscriber;
 use App\Models\SubscriberGroup;
 use App\Models\Tier;
 use App\Models\Tour;
+use App\Models\VerifiedEmail;
 use App\Services\MetaCapiService;
 use App\Services\SettingsService;
 use App\Services\VisitorTrackerService;
@@ -198,7 +199,7 @@ class BookingController extends Controller
         }
 
         // Email Verification check (session or previously verified email in DB)
-        $sessionVerified = \App\Models\VerifiedEmail::isVerified($email);
+        $sessionVerified = VerifiedEmail::isVerified($email);
         $isVerified = $sessionVerified ? 1 : 0;
         $requireVerification = app(SettingsService::class)->get('email_verification_required', '1') === '1';
         if ($requireVerification && ! $sessionVerified) {
@@ -308,7 +309,7 @@ class BookingController extends Controller
             });
 
             // Permanently record the customer's email as verified in the database for future bookings
-            \App\Models\VerifiedEmail::markVerified($email);
+            VerifiedEmail::markVerified($email);
 
             // Log detailed context in request_logs table
             $logId = $this->tracker->logRequest('booking', $booking->id, 'booking', $ctx);

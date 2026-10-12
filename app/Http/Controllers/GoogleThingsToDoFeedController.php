@@ -171,7 +171,7 @@ class GoogleThingsToDoFeedController extends Controller
             'google_business_profile_name' => $placeId,
             'google_cid' => $cid,
             'phone' => $phone,
-            'url' => rtrim(url('/'), '/') . '/',
+            'url' => rtrim(url('/'), '/').'/',
             'address' => [
                 'street_address' => $address,
                 'locality' => 'Dubai',
@@ -198,10 +198,10 @@ class GoogleThingsToDoFeedController extends Controller
 
         foreach ($tours as $tour) {
             $poi = $this->resolvePoiForTour($tour);
-            $landingUrl = url('/' . $tour->slug) . '?utm_source=google&utm_medium=things_to_do&utm_campaign=gttd_free';
+            $landingUrl = url('/'.$tour->slug).'?utm_source=google&utm_medium=things_to_do&utm_campaign=gttd_free';
 
             $heroImage = $tour->hero_image ?: $tour->thumb_image;
-            $imageUrl = $heroImage ? (str_starts_with($heroImage, 'http') ? $heroImage : asset('images/' . ltrim($heroImage, '/'))) : asset('images/desert-safari-poster.avif');
+            $imageUrl = $heroImage ? (str_starts_with($heroImage, 'http') ? $heroImage : asset('images/'.ltrim($heroImage, '/'))) : asset('images/desert-safari-poster.avif');
 
             // Format duration
             $isoDuration = $this->toIsoDuration($tour->duration);
@@ -214,7 +214,7 @@ class GoogleThingsToDoFeedController extends Controller
             $features = [];
             if ($tour->contentItems && $tour->contentItems->count() > 0) {
                 foreach ($tour->contentItems->take(5) as $ci) {
-                    if (!empty($ci->title)) {
+                    if (! empty($ci->title)) {
                         $features[] = strip_tags($ci->title);
                     }
                 }
@@ -235,11 +235,11 @@ class GoogleThingsToDoFeedController extends Controller
                     $priceNum = (float) ($tier->pivot->price ?? 0);
                     $oldPriceNum = (float) ($tier->pivot->old_price ?? 0);
                     $tierSlug = $tier->slug ?? (string) $tier->id;
-                    $optBookingUrl = url('/' . $tour->slug) . '?tier=' . $tierSlug . '&utm_source=google&utm_medium=things_to_do&utm_campaign=gttd_free';
+                    $optBookingUrl = url('/'.$tour->slug).'?tier='.$tierSlug.'&utm_source=google&utm_medium=things_to_do&utm_campaign=gttd_free';
 
                     $nestedOptions[] = [
-                        'option_id' => 'dunes-opt-' . $tour->id . '-' . $tier->id,
-                        'title' => $tour->name . ' - ' . ($tier->display_name ?: $tier->name),
+                        'option_id' => 'dunes-opt-'.$tour->id.'-'.$tier->id,
+                        'title' => $tour->name.' - '.($tier->display_name ?: $tier->name),
                         'tier_slug' => $tierSlug,
                         'currency' => 'AED',
                         'amount' => number_format($priceNum, 2, '.', ''),
@@ -252,7 +252,7 @@ class GoogleThingsToDoFeedController extends Controller
             }
 
             $products[] = [
-                'product_id' => 'dunes-tour-' . $tour->id,
+                'product_id' => 'dunes-tour-'.$tour->id,
                 'operator_id' => $operator['operator_id'],
                 'title' => $tour->name,
                 'description' => $desc,
@@ -299,20 +299,20 @@ class GoogleThingsToDoFeedController extends Controller
         $options = [];
 
         foreach ($tours as $tour) {
-            $productId = 'dunes-tour-' . $tour->id;
-            $tourUrl = url('/' . $tour->slug);
+            $productId = 'dunes-tour-'.$tour->id;
+            $tourUrl = url('/'.$tour->slug);
 
             if ($tour->tiers && $tour->tiers->count() > 0) {
                 foreach ($tour->tiers as $tier) {
                     $priceNum = (float) ($tier->pivot->price ?? 0);
                     $oldPriceNum = (float) ($tier->pivot->old_price ?? 0);
                     $tierSlug = $tier->slug ?? (string) $tier->id;
-                    $bookingUrl = $tourUrl . '?tier=' . $tierSlug . '&utm_source=google&utm_medium=things_to_do&utm_campaign=gttd_free';
+                    $bookingUrl = $tourUrl.'?tier='.$tierSlug.'&utm_source=google&utm_medium=things_to_do&utm_campaign=gttd_free';
 
                     $options[] = [
-                        'option_id' => 'dunes-opt-' . $tour->id . '-' . $tier->id,
+                        'option_id' => 'dunes-opt-'.$tour->id.'-'.$tier->id,
                         'product_id' => $productId,
-                        'title' => $tour->name . ' - ' . ($tier->display_name ?: $tier->name),
+                        'title' => $tour->name.' - '.($tier->display_name ?: $tier->name),
                         'tier_slug' => $tierSlug,
                         'currency' => 'AED',
                         'amount' => number_format($priceNum, 2, '.', ''),
@@ -334,11 +334,11 @@ class GoogleThingsToDoFeedController extends Controller
                 }
             } else {
                 // Fallback option if no tiers attached
-                $bookingUrl = $tourUrl . '?utm_source=google&utm_medium=things_to_do&utm_campaign=gttd_free';
+                $bookingUrl = $tourUrl.'?utm_source=google&utm_medium=things_to_do&utm_campaign=gttd_free';
                 $options[] = [
-                    'option_id' => 'dunes-opt-' . $tour->id . '-default',
+                    'option_id' => 'dunes-opt-'.$tour->id.'-default',
                     'product_id' => $productId,
-                    'title' => $tour->name . ' - Standard Ticket',
+                    'title' => $tour->name.' - Standard Ticket',
                     'tier_slug' => 'standard',
                     'currency' => 'AED',
                     'amount' => '99.00',
@@ -378,10 +378,10 @@ class GoogleThingsToDoFeedController extends Controller
 
         foreach ($tours as $tour) {
             $poi = $this->resolvePoiForTour($tour);
-            $landingUrl = url('/' . $tour->slug) . '?utm_source=google&utm_medium=things_to_do&utm_campaign=gttd_free';
+            $landingUrl = url('/'.$tour->slug).'?utm_source=google&utm_medium=things_to_do&utm_campaign=gttd_free';
 
             $heroImage = $tour->hero_image ?: $tour->thumb_image;
-            $imageUrl = $heroImage ? (str_starts_with($heroImage, 'http') ? $heroImage : asset('images/' . ltrim($heroImage, '/'))) : asset('images/desert-safari-poster.avif');
+            $imageUrl = $heroImage ? (str_starts_with($heroImage, 'http') ? $heroImage : asset('images/'.ltrim($heroImage, '/'))) : asset('images/desert-safari-poster.avif');
 
             $isoDuration = $this->toIsoDuration($tour->duration);
 
@@ -392,7 +392,7 @@ class GoogleThingsToDoFeedController extends Controller
             $features = [];
             if ($tour->contentItems && $tour->contentItems->count() > 0) {
                 foreach ($tour->contentItems->take(6) as $ci) {
-                    if (!empty($ci->title)) {
+                    if (! empty($ci->title)) {
                         $features[] = ['text' => strip_tags($ci->title)];
                     }
                 }
@@ -413,7 +413,7 @@ class GoogleThingsToDoFeedController extends Controller
                     $priceNum = (float) ($tier->pivot->price ?? 0);
                     $oldPriceNum = (float) ($tier->pivot->old_price ?? 0);
                     $tierSlug = $tier->slug ?? (string) $tier->id;
-                    $bookingUrl = url('/' . $tour->slug) . '?tier=' . $tierSlug . '&utm_source=google&utm_medium=things_to_do&utm_campaign=gttd_free';
+                    $bookingUrl = url('/'.$tour->slug).'?tier='.$tierSlug.'&utm_source=google&utm_medium=things_to_do&utm_campaign=gttd_free';
 
                     $cents = (int) round($priceNum * 100);
                     $priceUnits = intdiv($cents, 100);
@@ -442,8 +442,8 @@ class GoogleThingsToDoFeedController extends Controller
                     }
 
                     $protoOptions[] = [
-                        'option_id' => 'dunes-opt-' . $tour->id . '-' . $tier->id,
-                        'title' => $tour->name . ' - ' . ($tier->display_name ?: $tier->name),
+                        'option_id' => 'dunes-opt-'.$tour->id.'-'.$tier->id,
+                        'title' => $tour->name.' - '.($tier->display_name ?: $tier->name),
                         'landing_page_list' => [
                             'landing_pages' => [
                                 [
@@ -468,10 +468,10 @@ class GoogleThingsToDoFeedController extends Controller
                     ];
                 }
             } else {
-                $bookingUrl = url('/' . $tour->slug) . '?utm_source=google&utm_medium=things_to_do&utm_campaign=gttd_free';
+                $bookingUrl = url('/'.$tour->slug).'?utm_source=google&utm_medium=things_to_do&utm_campaign=gttd_free';
                 $protoOptions[] = [
-                    'option_id' => 'dunes-opt-' . $tour->id . '-default',
-                    'title' => $tour->name . ' - Standard Experience',
+                    'option_id' => 'dunes-opt-'.$tour->id.'-default',
+                    'title' => $tour->name.' - Standard Experience',
                     'landing_page_list' => [
                         'landing_pages' => [
                             [
@@ -512,7 +512,7 @@ class GoogleThingsToDoFeedController extends Controller
             }
 
             $products[] = [
-                'product_id' => 'dunes-tour-' . $tour->id,
+                'product_id' => 'dunes-tour-'.$tour->id,
                 'operator' => [
                     'name' => $operator['name'],
                     'google_business_profile_name' => $operator['google_business_profile_name'],
@@ -688,10 +688,10 @@ class GoogleThingsToDoFeedController extends Controller
             return 'PT6H';
         }
         if (preg_match('/(\d+)\s*(hour|hr|h)/i', $duration, $m)) {
-            return 'PT' . $m[1] . 'H';
+            return 'PT'.$m[1].'H';
         }
         if (preg_match('/(\d+)\s*(minute|min|m)/i', $duration, $m)) {
-            return 'PT' . $m[1] . 'M';
+            return 'PT'.$m[1].'M';
         }
         if (stripos($duration, 'full day') !== false) {
             return 'PT10H';
@@ -699,6 +699,7 @@ class GoogleThingsToDoFeedController extends Controller
         if (stripos($duration, 'overnight') !== false) {
             return 'PT18H';
         }
+
         return 'PT6H';
     }
 
@@ -710,8 +711,8 @@ class GoogleThingsToDoFeedController extends Controller
         $products = $this->getProductsData();
         $now = now()->toIso8601String();
 
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        $xml .= '<feed xmlns="http://www.google.com/schemas/things-to-do/1.0">' . "\n";
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+        $xml .= '<feed xmlns="http://www.google.com/schemas/things-to-do/1.0">'."\n";
         $xml .= "  <metadata>\n";
         $xml .= "    <processing_instruction>PROCESS_ALL</processing_instruction>\n";
         $xml .= "    <generation_timestamp>{$now}</generation_timestamp>\n";
@@ -786,8 +787,8 @@ class GoogleThingsToDoFeedController extends Controller
         $options = $this->getOptionsData();
         $now = now()->toIso8601String();
 
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        $xml .= '<feed xmlns="http://www.google.com/schemas/things-to-do/1.0">' . "\n";
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+        $xml .= '<feed xmlns="http://www.google.com/schemas/things-to-do/1.0">'."\n";
         $xml .= "  <metadata>\n";
         $xml .= "    <processing_instruction>PROCESS_ALL</processing_instruction>\n";
         $xml .= "    <generation_timestamp>{$now}</generation_timestamp>\n";
@@ -806,7 +807,7 @@ class GoogleThingsToDoFeedController extends Controller
             $xml .= "        <currency>{$opt['currency']}</currency>\n";
             $xml .= "        <price_micros>{$opt['price_micros']}</price_micros>\n";
             $xml .= "        <amount>{$opt['amount']}</amount>\n";
-            if (!empty($opt['original_amount'])) {
+            if (! empty($opt['original_amount'])) {
                 $xml .= "        <original_amount>{$opt['original_amount']}</original_amount>\n";
                 $xml .= "        <original_price_micros>{$opt['original_price_micros']}</original_price_micros>\n";
             }
@@ -854,8 +855,8 @@ class GoogleThingsToDoFeedController extends Controller
         $country = $this->escapeXml($op['address']['country_code']);
         $postal = $this->escapeXml($op['address']['postal_code']);
 
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        $xml .= '<feed xmlns="http://www.google.com/schemas/things-to-do/1.0">' . "\n";
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+        $xml .= '<feed xmlns="http://www.google.com/schemas/things-to-do/1.0">'."\n";
         $xml .= "  <metadata>\n";
         $xml .= "    <processing_instruction>PROCESS_ALL</processing_instruction>\n";
         $xml .= "    <generation_timestamp>{$now}</generation_timestamp>\n";
@@ -900,8 +901,8 @@ class GoogleThingsToDoFeedController extends Controller
         $country = $this->escapeXml($op['address']['country_code']);
         $postal = $this->escapeXml($op['address']['postal_code']);
 
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        $xml .= '<feed xmlns="http://www.google.com/schemas/things-to-do/1.0">' . "\n";
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+        $xml .= '<feed xmlns="http://www.google.com/schemas/things-to-do/1.0">'."\n";
         $xml .= "  <metadata>\n";
         $xml .= "    <processing_instruction>PROCESS_ALL</processing_instruction>\n";
         $xml .= "    <generation_timestamp>{$now}</generation_timestamp>\n";
@@ -996,7 +997,7 @@ class GoogleThingsToDoFeedController extends Controller
             $xml .= "        <currency>{$opt['currency']}</currency>\n";
             $xml .= "        <price_micros>{$opt['price_micros']}</price_micros>\n";
             $xml .= "        <amount>{$opt['amount']}</amount>\n";
-            if (!empty($opt['original_amount'])) {
+            if (! empty($opt['original_amount'])) {
                 $xml .= "        <original_amount>{$opt['original_amount']}</original_amount>\n";
                 $xml .= "        <original_price_micros>{$opt['original_price_micros']}</original_price_micros>\n";
             }

@@ -46,8 +46,8 @@
 <!-- Global Interactive Search Modal (Tailwind v4 + Alpine.js) -->
 <div id="globalSearchModal"
      x-data="globalSearchModal({
-         searchUrl: '{{ route('tours.search') }}',
-         liveSearchUrl: '{{ route('tours.search.live') }}'
+         searchUrl: '{{ localized_route('tours.search') }}',
+         liveSearchUrl: '{{ localized_route('tours.search.live') }}'
      })"
      x-show="$store.modal.active === 'search'"
      x-cloak
@@ -103,7 +103,7 @@
             <!-- Body -->
             <div class="p-4 sm:p-6 pt-0">
                 <!-- Search Input Form -->
-                <form action="{{ route('tours.search') }}" method="GET" id="globalSearchForm" @submit="handleEnter($event)">
+                <form action="{{ localized_route('tours.search') }}" method="GET" id="globalSearchForm" @submit="handleEnter($event)">
                     <div class="relative mb-3.5">
                         <i class="bi bi-search absolute start-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg sm:text-xl"></i>
                         <input type="text" 
@@ -302,7 +302,7 @@
                 <span class="text-slate-500 flex items-center gap-1 font-medium">
                     <i class="bi bi-patch-check-fill text-emerald-500 text-sm"></i> {{ __('ui.trust_strip.free_cancel') }}
                 </span>
-                <a href="{{ route('tours.index') }}" class="font-bold text-primary hover:text-primary-dark transition-colors inline-flex items-center gap-1">
+                <a href="{{ localized_route('tours.index') }}" class="font-bold text-primary hover:text-primary-dark transition-colors inline-flex items-center gap-1">
                     <span>{{ __('ui.common.view_all_tours') }}</span>
                     <i class="bi bi-arrow-right rtl:rotate-180"></i>
                 </a>

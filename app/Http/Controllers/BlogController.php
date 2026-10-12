@@ -98,9 +98,17 @@ class BlogController extends Controller
 
         $ogImageSetting = $settingsService->get('seo_blog_og_image');
         $ogImage = $ogImageSetting ? asset(ltrim($ogImageSetting, '/')) : asset('images/desert-safari-poster.avif');
-        $canonical = $categorySlug ? localized_route('blog.index', ['category' => $categorySlug]) : localized_route('blog.index');
 
-        return view('blog.index', compact('posts', 'categories', 'popularTags', 'featuredPost', 'sideFeatured', 'categorySlug', 'tagSlug', 'search', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
+        $isFiltered = ! empty($categorySlug) || ! empty($tagSlug) || ! empty($search) || ! empty($request->except('page'));
+        $pageRobots = $isFiltered
+            ? 'noindex, follow'
+            : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+
+        $canonical = (! $isFiltered && $posts->currentPage() > 1)
+            ? localized_route('blog.index', ['page' => $posts->currentPage()])
+            : localized_route('blog.index');
+
+        return view('blog.index', compact('posts', 'categories', 'popularTags', 'featuredPost', 'sideFeatured', 'categorySlug', 'tagSlug', 'search', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage', 'pageRobots'));
     }
 
     /**
@@ -139,13 +147,37 @@ class BlogController extends Controller
 
         $featImgPath = $post->featured_image ? asset('images/blog/'.preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $post->featured_image)) : asset('images/desert-safari-poster.avif');
         $currentLocale = app()->getLocale();
-        $canonical = $post->canonical_url ?: (($currentLocale && $currentLocale !== 'en') ? url('/'.$currentLocale.'/blog/'.$post->slug) : route('blog.show', $post->slug));
+
+        $defaultEnCanonical = url('/blog/'.$post->slug);
+        $customCanonical = (! empty($post->canonical_url) && rtrim($post->canonical_url, '/') !== rtrim($defaultEnCanonical, '/'))
+            ? $post->canonical_url
+            : null;
+
+        $canonical = ($currentLocale && $currentLocale !== 'en')
+            ? localized_route('blog.show', $post->slug)
+            : ($customCanonical ?: localized_route('blog.show', $post->slug));
+
         $ogImage = $post->og_image ?: $featImgPath;
-        $pageTitle = $post->meta_title ?: $post->title.' | Dunes Discovery';
-        $pageDesc = $post->meta_desc ?: ($post->excerpt ?: Str::limit(strip_tags($post->content), 155));
+
+        $baseTitle = $post->meta_title ?: $post->title.' | Dunes Discovery';
+        $baseDesc = $post->meta_desc ?: ($post->excerpt ?: Str::limit(strip_tags($post->content), 155));
+
+        if ($currentLocale && $currentLocale !== 'en') {
+            $hasLocTitle = method_exists($post, 'hasTranslation') && $post->hasTranslation('meta_title', $currentLocale);
+            $hasLocDesc = method_exists($post, 'hasTranslation') && $post->hasTranslation('meta_desc', $currentLocale);
+            $blogLabel = __('ui.nav.blog');
+            $pageTitle = $hasLocTitle ? $baseTitle : "{$post->title} | {$blogLabel} — Dunes Discovery";
+            $pageDesc = $hasLocDesc ? $baseDesc : "{$blogLabel}: {$baseDesc}";
+        } else {
+            $pageTitle = $baseTitle;
+            $pageDesc = $baseDesc;
+        }
+
         $pageKeys = $post->meta_keywords ?: 'dubai, desert safari, travel';
         $ogType = 'article';
-        $pageRobots = $post->robots ?: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+        $pageRobots = (! empty(request()->query()))
+            ? 'noindex, follow'
+            : ($post->robots ?: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1');
 
         // Intelligently resolve the most relevant tour for in-article conversion
         $matchedTour = $this->resolveMatchedTour($post);
@@ -160,6 +192,14 @@ class BlogController extends Controller
 
         // Inject the interactive tour card directly into post HTML content
         $processedContent = $this->injectTourCardIntoContent($post->content ?? '', $matchedTour, $post);
+
+        if ($currentLocale && $currentLocale !== 'en' && ! empty($processedContent)) {
+            $processedContent = (string) preg_replace(
+                '#href=(["\'])/(?!'.$currentLocale.'(/|$)|admin|api|ajax|images|assets|build|storage|http)#i',
+                'href=$1/'.$currentLocale.'/',
+                $processedContent
+            );
+        }
 
         return view('blog.show', compact('post', 'relatedPosts', 'matchedTour', 'recommendedTours', 'processedContent', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage', 'ogType', 'pageRobots'));
     }
@@ -183,16 +223,16 @@ class BlogController extends Controller
         $matchedSlug = null;
 
         // 1. Check if post content explicitly links to a core tour
-        $pattern = '/href=[\'"]\/(' . implode('|', $tourSlugs) . ')[\'"]/i';
+        $pattern = '/href=[\'"]\/('.implode('|', $tourSlugs).')[\'"]/i';
         if (preg_match($pattern, $post->content ?? '', $matches)) {
             $matchedSlug = $matches[1];
         }
 
         // 2. Fallback: analyze post title, slug, and tags
         if (! $matchedSlug) {
-            $text = strtolower(($post->title ?? '') . ' ' . ($post->slug ?? ''));
+            $text = strtolower(($post->title ?? '').' '.($post->slug ?? ''));
             if ($post->tags && $post->tags->count() > 0) {
-                $text .= ' ' . strtolower($post->tags->pluck('name')->implode(' '));
+                $text .= ' '.strtolower($post->tags->pluck('name')->implode(' '));
             }
 
             if (str_contains($text, 'buggy') || str_contains($text, 'can-am') || str_contains($text, 'polaris') || str_contains($text, 'rzr')) {
@@ -261,17 +301,18 @@ class BlogController extends Controller
                 $pos = $tableEnd;
             }
 
-            return substr_replace($content, "\n" . $cardHtml . "\n", $pos, 0);
+            return substr_replace($content, "\n".$cardHtml."\n", $pos, 0);
         }
 
         // 3. Fallback: inject after the second closing paragraph </p> or first </h2>
         $firstH2 = strpos($content, '</h2>');
         if ($firstH2 !== false) {
             $pos = $firstH2 + strlen('</h2>');
-            return substr_replace($content, "\n" . $cardHtml . "\n", $pos, 0);
+
+            return substr_replace($content, "\n".$cardHtml."\n", $pos, 0);
         }
 
-        return $cardHtml . "\n" . $content;
+        return $cardHtml."\n".$content;
     }
 
     /**

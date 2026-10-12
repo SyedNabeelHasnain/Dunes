@@ -3,11 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\GoogleThingsToDoFeedController;
+use App\Models\Coupon;
 use App\Models\Setting;
+use App\Models\Tour;
+use App\Services\IndexNowService;
 use App\Services\SettingsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class AdminSettingController extends Controller
@@ -79,7 +84,7 @@ class AdminSettingController extends Controller
                 'site_latitude', 'site_longitude', 'site_postal_code',
                 'company_license_number', 'site_address', 'site_name', 'site_phone',
                 'google_place_id', 'google_cid', 'google_review_url',
-                'google_business_hours', 'google_service_area', 'google_primary_category'
+                'google_business_hours', 'google_service_area', 'google_primary_category',
             ])
             ->get()
             ->pluck('setting_value', 'setting_key');
@@ -102,8 +107,8 @@ class AdminSettingController extends Controller
             ->get()
             ->pluck('setting_value', 'setting_key');
 
-        $activeToursCount = \App\Models\Tour::where('status', 'active')->count();
-        $totalTiersCount = \Illuminate\Support\Facades\DB::table('tour_tiers')->count();
+        $activeToursCount = Tour::where('status', 'active')->count();
+        $totalTiersCount = DB::table('tour_tiers')->count();
 
         $feedUrls = [
             'products_xml' => url('/feeds/google-things-to-do/products.xml'),
@@ -122,7 +127,7 @@ class AdminSettingController extends Controller
      */
     public function flushGttdCache()
     {
-        \App\Http\Controllers\GoogleThingsToDoFeedController::flushCache();
+        GoogleThingsToDoFeedController::flushCache();
 
         return back()->with('success', 'Google Things To Do feeds cache flushed successfully.');
     }
@@ -235,10 +240,11 @@ class AdminSettingController extends Controller
             // Synchronize coupon status for the banner code
             $bannerCode = strtoupper(trim($request->input('promo_top_banner_code', 'DUNESWELCOME'))) ?: 'DUNESWELCOME';
             try {
-                \App\Models\Coupon::where('code', $bannerCode)->update([
+                Coupon::where('code', $bannerCode)->update([
                     'status' => $bannerState === '1' ? 'active' : 'inactive',
                 ]);
-            } catch (\Throwable $e) {}
+            } catch (\Throwable $e) {
+            }
         }
 
         if ($request->has('promo_modal_form_submitted')) {
@@ -249,11 +255,12 @@ class AdminSettingController extends Controller
             // Synchronize welcome promo code status
             try {
                 if ($modalState === '0') {
-                    \App\Models\Coupon::whereIn('code', ['DUNESWELCOME', 'FIRST25'])->update([
+                    Coupon::whereIn('code', ['DUNESWELCOME', 'FIRST25'])->update([
                         'status' => 'inactive',
                     ]);
                 }
-            } catch (\Throwable $e) {}
+            } catch (\Throwable $e) {
+            }
         }
 
         if ($request->has('gttd_form_submitted')) {
@@ -273,8 +280,8 @@ class AdminSettingController extends Controller
 
         Cache::forget('site_settings_cache');
         Cache::forget('site_home_cache');
-        app(\App\Services\SettingsService::class)->clearCache();
-        \App\Http\Controllers\GoogleThingsToDoFeedController::flushCache();
+        app(SettingsService::class)->clearCache();
+        GoogleThingsToDoFeedController::flushCache();
 
         return back()->with('success', 'Settings updated successfully.');
     }
@@ -376,7 +383,7 @@ class AdminSettingController extends Controller
     /**
      * Submit all public URLs to search engines via IndexNow protocol on demand.
      */
-    public function pingIndexNow(\App\Services\IndexNowService $indexNow)
+    public function pingIndexNow(IndexNowService $indexNow)
     {
         $result = $indexNow->submitAll();
         $msgType = $result['success'] ? 'success' : 'error';

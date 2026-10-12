@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('pages') || !Schema::hasTable('page_sections') || !Schema::hasTable('menu_items')) {
+        if (! Schema::hasTable('pages') || ! Schema::hasTable('page_sections') || ! Schema::hasTable('menu_items')) {
             return;
         }
 
@@ -328,7 +328,7 @@ return new class extends Migration
             [
                 'location' => 'footer_desert_safaris',
                 'label' => json_encode(['en' => 'VIP Desert Safari', 'ar' => 'سفاري صحراوي لكبار الشخصيات', 'ru' => 'VIP сафари по пустыне', 'es' => 'Safari VIP por el Desierto', 'it' => 'Safari VIP nel Deserto']),
-                'url' => '/luxury-vip-desert-safari-dubai',
+                'url' => '/evening-desert-safari-dubai',
                 'route_name' => 'tours.show',
                 'order' => 5,
             ],
@@ -395,7 +395,7 @@ return new class extends Migration
             [
                 'location' => 'footer_trust_policies',
                 'label' => json_encode(['en' => 'Cancellation & Refund', 'ar' => 'سياسة الإلغاء والاسترداد', 'ru' => 'Отмена и возврат средств', 'es' => 'Cancelación y Reembolso', 'it' => 'Cancellazione e Rimborso']),
-                'url' => '/cancellation-policy',
+                'url' => '/cancellation-refund-policy',
                 'route_name' => 'cancellation',
                 'order' => 4,
             ],

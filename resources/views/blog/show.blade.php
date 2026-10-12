@@ -10,12 +10,12 @@
     
     $featImgPath = $post->featured_image ? asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $post->featured_image)) : asset('images/desert-safari-poster.avif');
     $currentLocale = $currentLocale ?? app()->getLocale() ?? 'en';
-    $canonical = $canonical ?? ($post->canonical_url ?: (($currentLocale && $currentLocale !== 'en') ? url('/'.$currentLocale.'/blog/'.$post->slug) : route('blog.show', $post->slug)));
+    $canonical = $canonical ?? localized_route('blog.show', $post->slug);
     $ogImageUrl = $post->og_image ?: $featImgPath;
     
-    $pageTitle = $post->meta_title ?: $post->title . ' | Dunes Discovery';
-    $pageDesc = $post->meta_desc ?: ($post->excerpt ?: Str::limit(strip_tags($post->content), 155));
-    $pageKeys = $post->meta_keywords ?: 'dubai, desert safari, travel';
+    $pageTitle = $pageTitle ?? ($post->meta_title ?: $post->title . ' | Dunes Discovery');
+    $pageDesc = $pageDesc ?? ($post->meta_desc ?: ($post->excerpt ?: Str::limit(strip_tags($post->content), 155)));
+    $pageKeys = $pageKeys ?? ($post->meta_keywords ?: 'dubai, desert safari, travel');
     
     // Breadcrumb Schema
     $breadcrumbItems = [
@@ -109,7 +109,7 @@
                     <li><a href="{{ localized_route('blog.index') }}" class="hover:text-white transition-colors">{{ __('ui.nav.blog') }}</a></li>
                     @if ($post->category)
                     <li><span class="text-white/40">/</span></li>
-                    <li><a href="{{ localized_route('blog.index', ['category' => $post->category?->slug]) }}" class="hover:text-white transition-colors">{{ $post->category?->name }}</a></li>
+                    <li><a href="{{ localized_route('blog.index', ['category' => $post->category?->slug]) }}" rel="nofollow" class="hover:text-white transition-colors">{{ $post->category?->name }}</a></li>
                     @endif
                     <li><span class="text-white/40">/</span></li>
                     <li class="text-white font-semibold truncate max-w-[200px] sm:max-w-none">{{ Str::limit($post->title, 40) }}</li>
@@ -117,7 +117,7 @@
             </nav>
 
             @if ($post->category)
-            <a href="{{ localized_route('blog.index', ['category' => $post->category?->slug]) }}" class="bg-primary text-white rounded-full px-3.5 py-1 text-xs font-bold mb-4 inline-block shadow-sm">{{ $post->category?->name }}</a>
+            <a href="{{ localized_route('blog.index', ['category' => $post->category?->slug]) }}" rel="nofollow" class="bg-primary text-white rounded-full px-3.5 py-1 text-xs font-bold mb-4 inline-block shadow-sm">{{ $post->category?->name }}</a>
             @endif
 
             <h1 itemprop="headline" class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4 max-w-4xl">{{ $post->title }}</h1>
@@ -166,7 +166,7 @@
                 @if ($post->tags->count() > 0)
                 <div class="flex flex-wrap gap-2 mb-6">
                     @foreach ($post->tags as $tag)
-                    <a href="{{ route('blog.index', ['search' => $tag->name]) }}" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-1 rounded-full transition-colors inline-flex items-center gap-1">
+                    <a href="{{ localized_route('blog.index', ['search' => $tag->name]) }}" rel="nofollow" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-1 rounded-full transition-colors inline-flex items-center gap-1">
                         <i class="bi bi-tag text-slate-500"></i>{{ $tag->name }}
                     </a>
                     @endforeach
@@ -284,7 +284,7 @@
                         <div class="divide-y divide-slate-200">
                             @foreach ($cats as $catItem)
                             @php $cc = \App\Models\BlogPost::where('category_id', $catItem->id)->where('status', 'published')->count(); @endphp
-                            <a href="{{ route('blog.index', ['category' => $catItem->slug]) }}" class="flex justify-between items-center px-4 py-3 text-xs text-slate-700 hover:text-primary hover:bg-slate-50 transition-colors">
+                            <a href="{{ localized_route('blog.index', ['category' => $catItem->slug]) }}" rel="nofollow" class="flex justify-between items-center px-4 py-3 text-xs text-slate-700 hover:text-primary hover:bg-slate-50 transition-colors">
                                 <span>{{ $catItem->name }}</span>
                                 <span class="bg-slate-100 text-slate-600 rounded-full px-2 py-0.5 font-semibold text-[10px]">{{ $cc }}</span>
                             </a>
@@ -304,7 +304,7 @@
                         <div class="divide-y divide-slate-200">
                             @foreach ($relatedPosts as $rp)
                             @php $rpImg = $rp->featured_image ? asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $rp->featured_image)) : asset('images/desert-safari-poster.avif'); @endphp
-                            <a href="{{ route('blog.show', $rp->slug) }}" class="flex gap-3 p-4 hover:bg-slate-50 transition-colors group">
+                            <a href="{{ localized_route('blog.show', $rp->slug) }}" class="flex gap-3 p-4 hover:bg-slate-50 transition-colors group">
                                 <img src="{{ $rpImg }}" class="w-13 h-13 object-cover rounded-xl shrink-0" loading="lazy" alt="{{ $rp->title }}">
                                 <div>
                                     <div class="font-bold text-slate-900 text-xs line-clamp-2 group-hover:text-primary transition-colors leading-snug">{{ $rp->title }}</div>
@@ -339,7 +339,7 @@
             @foreach ($relatedPosts as $rp)
             @php $rpImg = $rp->featured_image ? asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $rp->featured_image)) : asset('images/desert-safari-poster.avif'); @endphp
             <article class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-200 flex flex-col h-full group">
-                <a href="{{ route('blog.show', $rp->slug) }}" class="block relative aspect-[16/10] overflow-hidden">
+                <a href="{{ localized_route('blog.show', $rp->slug) }}" class="block relative aspect-[16/10] overflow-hidden">
                     <img src="{{ $rpImg }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $rp->featured_image_alt ?: $rp->title }}" loading="lazy">
                     @if ($rp->category)
                         <span class="absolute top-3 start-3 bg-primary text-white rounded-full px-2.5 py-0.5 text-xs font-bold shadow-sm">{{ $rp->category?->name }}</span>
@@ -347,7 +347,7 @@
                 </a>
                 <div class="p-5 flex flex-col flex-grow">
                     <h3 class="text-sm font-bold text-slate-900 mb-2 line-clamp-2 group-hover:text-primary transition-colors leading-snug">
-                        <a href="{{ route('blog.show', $rp->slug) }}">{{ $rp->title }}</a>
+                        <a href="{{ localized_route('blog.show', $rp->slug) }}">{{ $rp->title }}</a>
                     </h3>
                     @if ($rp->excerpt)
                         <p class="text-slate-500 text-xs line-clamp-2 mb-3 leading-relaxed">{{ $rp->excerpt }}</p>
@@ -375,7 +375,7 @@
                     @click="$store.modal.open('booking'{{ isset($matchedTour) && $matchedTour ? ', { tourId: ' . $matchedTour->id . ' }' : '' }})">
                 {{ __('ui.blog_journal.book_tour_name', ['name' => (isset($matchedTour) && $matchedTour ? $matchedTour->name : __('ui.home_categories.evening_title'))]) }}
             </button>
-            <a href="{{ route('tours.index') }}" class="border border-white/40 hover:border-white text-white rounded-full px-8 py-3.5 font-bold text-sm transition-colors">{{ __('ui.blog_journal.browse_all_tours') }}</a>
+            <a href="{{ localized_route('tours.index') }}" class="border border-white/40 hover:border-white text-white rounded-full px-8 py-3.5 font-bold text-sm transition-colors">{{ __('ui.blog_journal.browse_all_tours') }}</a>
         </div>
     </div>
 </section>

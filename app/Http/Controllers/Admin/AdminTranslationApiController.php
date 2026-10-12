@@ -61,6 +61,7 @@ class AdminTranslationApiController extends Controller
             foreach ($texts as $key => $val) {
                 if (empty($val) || ! is_string($val)) {
                     $results[$key] = '';
+
                     continue;
                 }
 

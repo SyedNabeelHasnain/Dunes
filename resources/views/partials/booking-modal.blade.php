@@ -381,7 +381,7 @@
                                 <label class="flex items-start gap-2.5 text-xs text-slate-600 cursor-pointer">
                                     <input class="mt-0.5 rounded border-slate-300 text-primary focus:ring-primary/20" type="checkbox" id="bookingAgreement" required>
                                     <span>
-                                        I agree to the <a href="{{ route('terms') }}" target="_blank" rel="noopener noreferrer" class="text-primary font-bold hover:underline">{{ __('ui.nav.terms') ?? 'Terms & Conditions' }}</a> and <a href="{{ route('privacy') }}" target="_blank" rel="noopener noreferrer" class="text-primary font-bold hover:underline">{{ __('ui.nav.privacy') ?? 'Privacy Policy' }}</a>.
+                                        I agree to the <a href="{{ localized_route('terms') }}" target="_blank" rel="noopener noreferrer" class="text-primary font-bold hover:underline">{{ __('ui.nav.terms') ?? 'Terms & Conditions' }}</a> and <a href="{{ localized_route('privacy') }}" target="_blank" rel="noopener noreferrer" class="text-primary font-bold hover:underline">{{ __('ui.nav.privacy') ?? 'Privacy Policy' }}</a>.
                                     </span>
                                 </label>
                                 <label class="flex items-start gap-2.5 text-xs text-slate-500 cursor-pointer">

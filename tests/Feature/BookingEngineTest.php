@@ -16,6 +16,7 @@ use App\Models\User;
 use App\Models\WhatsappInquiry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class BookingEngineTest extends TestCase
@@ -1072,7 +1073,7 @@ class BookingEngineTest extends TestCase
      */
     public function test_phone_validation_formats_and_interactive_email_otp_verification_flow(): void
     {
-        \Illuminate\Support\Facades\Mail::fake();
+        Mail::fake();
 
         // 1. Verify homepage renders DunesConfig, non-deferred intlTelInput, and interactive 6-digit OTP UI
         $home = $this->get('/');

@@ -56,6 +56,9 @@ class RateCardController extends Controller
             ->get();
 
         $autoPrint = $request->has('print') || $request->has('download');
+        $pageRobots = (! empty($request->query()))
+            ? 'noindex, follow'
+            : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
 
         return view('pages.rate-card', compact(
             'tours',
@@ -69,6 +72,7 @@ class RateCardController extends Controller
             'pageDesc',
             'pageKeys',
             'canonical',
+            'pageRobots',
             'ogImage'
         ));
     }

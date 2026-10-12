@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\Setting;
-use App\Models\Tour;
 use App\Models\User;
 use App\Models\WhatsappInquiry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -98,7 +97,7 @@ class WhatsAppLeadTest extends TestCase
     public function test_admin_can_toggle_whatsapp_form_enabled_setting(): void
     {
         $admin = User::first();
-        if (!$admin) {
+        if (! $admin) {
             $admin = User::factory()->create([
                 'email' => 'admin@dunesdiscoverytourism.com',
                 'role' => 'admin',

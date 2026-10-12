@@ -20,6 +20,7 @@ use Illuminate\Support\Str;
 class AdminTourController extends Controller
 {
     use NormalizesLocalizedInputs;
+
     /**
      * Display a listing of tours.
      */

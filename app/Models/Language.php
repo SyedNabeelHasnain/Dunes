@@ -189,7 +189,7 @@ class Language extends Model
             }
 
             $models = array_map(function ($row) {
-                $lang = new self();
+                $lang = new self;
                 $lang->forceFill($row);
                 $lang->exists = true;
 

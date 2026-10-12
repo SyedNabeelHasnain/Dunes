@@ -68,6 +68,7 @@ class TranslateCatalogCommand extends Command
         if (empty($authKey)) {
             $this->warn('DeepL Auth Key is not set in Settings or .env. Skipping automatic catalog translation.');
             Log::info('TranslateCatalogCommand: DeepL Auth Key not set; skipping execution.');
+
             return self::SUCCESS;
         }
 
@@ -175,6 +176,7 @@ class TranslateCatalogCommand extends Command
             );
             if (! $matchedKey) {
                 $this->error("Unknown model '{$specificModel}'. Available models: ".implode(', ', array_keys($modelConfigs)));
+
                 return self::FAILURE;
             }
             $modelConfigs = [$matchedKey => $modelConfigs[$matchedKey]];
@@ -193,6 +195,7 @@ class TranslateCatalogCommand extends Command
                 $recordCount = $modelClass::count();
             } catch (\Throwable $e) {
                 $this->error("Failed to query {$modelName}: ".$e->getMessage());
+
                 continue;
             }
 
@@ -228,13 +231,8 @@ class TranslateCatalogCommand extends Command
     /**
      * Translate records for a given model in high-efficiency batches.
      *
-     * @param string $modelName
-     * @param string $modelClass
-     * @param array<string> $htmlFields
-     * @param array<string> $targetLocales
-     * @param DeepLTranslationDriver $driver
-     * @param bool $force
-     * @param bool $dryRun
+     * @param  array<string>  $htmlFields
+     * @param  array<string>  $targetLocales
      * @return int Number of translated fields saved
      */
     protected function translateModelBatch(
@@ -250,6 +248,7 @@ class TranslateCatalogCommand extends Command
             $records = $modelClass::all();
         } catch (\Throwable $e) {
             $this->error("Failed to query {$modelName}: ".$e->getMessage());
+
             return 0;
         }
 

@@ -188,7 +188,7 @@ class SitemapController extends Controller
             '/gallery' => ['changefreq' => 'daily', 'priority' => '0.85'],
             '/dubai-desert-sunset-times' => ['changefreq' => 'daily', 'priority' => '0.85'],
             '/press-kit' => ['changefreq' => 'weekly', 'priority' => '0.8'],
-            '/dune-buggy-rental-dubai' => ['changefreq' => 'daily', 'priority' => '0.95'],
+            '/build-your-own-safari' => ['changefreq' => 'weekly', 'priority' => '0.85'],
             '/terms-condition' => ['changefreq' => 'monthly', 'priority' => '0.6'],
             '/privacy-policy' => ['changefreq' => 'monthly', 'priority' => '0.6'],
             '/cookie-policy' => ['changefreq' => 'monthly', 'priority' => '0.6'],
@@ -213,7 +213,7 @@ class SitemapController extends Controller
         $blogMod = $latestBlog?->updated_at ? $latestBlog->updated_at->toAtomString() : $weeklyMod;
 
         foreach ($staticPages as $page => $meta) {
-            if (in_array($page, ['', '/tours', '/dune-buggy-rental-dubai', '/rate-card'], true)) {
+            if (in_array($page, ['', '/tours', '/build-your-own-safari', '/rate-card'], true)) {
                 $pageLastmod = $tourMod;
             } elseif ($page === '/blog') {
                 $pageLastmod = $blogMod;

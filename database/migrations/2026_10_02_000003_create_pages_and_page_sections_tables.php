@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('pages')) {
+        if (! Schema::hasTable('pages')) {
             Schema::create('pages', function (Blueprint $table) {
                 $table->increments('id');
                 $table->string('slug', 100)->unique();
@@ -25,7 +25,7 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('page_sections')) {
+        if (! Schema::hasTable('page_sections')) {
             Schema::create('page_sections', function (Blueprint $table) {
                 $table->increments('id');
                 $table->unsignedInteger('page_id');

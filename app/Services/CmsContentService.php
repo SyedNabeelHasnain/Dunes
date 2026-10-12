@@ -34,7 +34,7 @@ class CmsContentService
     public function getSection(string $pageSlug, string $sectionKey): ?PageSection
     {
         $page = $this->getPage($pageSlug);
-        if (!$page) {
+        if (! $page) {
             return null;
         }
 
@@ -47,7 +47,7 @@ class CmsContentService
     public function getSectionTitle(string $pageSlug, string $sectionKey, ?string $default = null): string
     {
         $section = $this->getSection($pageSlug, $sectionKey);
-        if ($section && !empty($section->title)) {
+        if ($section && ! empty($section->title)) {
             return $section->title;
         }
 
@@ -60,7 +60,7 @@ class CmsContentService
     public function getSectionSubtitle(string $pageSlug, string $sectionKey, ?string $default = null): string
     {
         $section = $this->getSection($pageSlug, $sectionKey);
-        if ($section && !empty($section->subtitle)) {
+        if ($section && ! empty($section->subtitle)) {
             return $section->subtitle;
         }
 

@@ -68,6 +68,7 @@ class TranslationManager
     public function getActiveServiceName(): string
     {
         $settings = $this->getSettings();
+
         return strtolower(trim($settings['translation_active_service'] ?? 'none'));
     }
 
@@ -106,17 +107,14 @@ class TranslationManager
             'google' => new GoogleTranslationDriver(
                 $settings['google_translate_api_key'] ?? ''
             ),
-            default => new NullTranslationDriver(),
+            default => new NullTranslationDriver,
         };
     }
 
     /**
      * Translate text via the currently active driver.
      *
-     * @param string|array<string, string> $text
-     * @param string $targetLocale
-     * @param string $sourceLocale
-     * @param bool $isHtml
+     * @param  string|array<string, string>  $text
      * @return string|array<string, string>
      */
     public function translate(string|array $text, string $targetLocale, string $sourceLocale = 'en', bool $isHtml = false): string|array

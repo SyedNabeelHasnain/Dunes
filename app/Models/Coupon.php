@@ -309,7 +309,8 @@ class Coupon extends Model
             $bannerDisabled = false;
             try {
                 $bannerDisabled = DB::table('settings')->whereIn('setting_key', ['top_promo_banner_active', 'promo_top_banner_enabled'])->where('setting_value', '0')->exists();
-            } catch (\Throwable $e) {}
+            } catch (\Throwable $e) {
+            }
             $initialStatus = $bannerDisabled ? 'inactive' : 'active';
 
             try {
