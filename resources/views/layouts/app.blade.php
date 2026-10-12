@@ -857,10 +857,15 @@
             'SAR': {{ (float) ($settings['currency_rate_sar'] ?? 1.0210) }},
             'INR': {{ (float) ($settings['currency_rate_inr'] ?? 22.85) }}
         };
+        window.DunesConfig = {
+            email_verification_required: {{ ($settings['email_verification_required'] ?? '1') === '1' ? 'true' : 'false' }},
+            site_phone: @json($settings['site_phone'] ?? '+971 50 245 6056'),
+            site_whatsapp: @json($settings['site_whatsapp'] ?? '971502456056')
+        };
     </script>
 
     <!-- Scripts -->
-    <script src="{{ asset('assets/vendor/intl-tel-input/26.0.6/build/intlTelInput.min.js') }}" defer></script>
+    <script src="{{ asset('assets/vendor/intl-tel-input/26.0.6/build/intlTelInput.min.js') }}"></script>
 
     @stack('scripts')
 </body>

@@ -343,13 +343,21 @@
                 const name = document.getElementById('welcomeName')?.value.trim();
                 const email = document.getElementById('welcomeEmail')?.value.trim();
                 const phoneInput = document.getElementById('welcomePhone');
-                const phone = (phoneInput && phoneInput._iti && typeof phoneInput._iti.getNumber === 'function' && phoneInput._iti.getNumber())
-                    ? phoneInput._iti.getNumber()
-                    : phoneInput?.value.trim();
+                const phone = (window.App && typeof window.App.getFormattedPhone === 'function')
+                    ? window.App.getFormattedPhone(phoneInput)
+                    : ((phoneInput && phoneInput._iti && typeof phoneInput._iti.getNumber === 'function' && phoneInput._iti.getNumber())
+                        ? phoneInput._iti.getNumber()
+                        : phoneInput?.value.trim());
 
-                if (!name || !email || !phone) {
+                const phoneValid = (window.App && typeof window.App.isValidPhone === 'function')
+                    ? window.App.isValidPhone(phoneInput)
+                    : (phone && phone.replace(/\D/g, '').length >= 7);
+
+                if (!name || !email || !phone || !phoneValid) {
                     if (errorBox) {
-                        errorBox.innerText = 'Please provide your full name, email, and phone/WhatsApp number.';
+                        errorBox.innerText = !phoneValid && phone
+                            ? 'Please enter a valid phone or WhatsApp number.'
+                            : 'Please provide your full name, email, and phone/WhatsApp number.';
                         errorBox.classList.remove('hidden');
                     }
                     return;

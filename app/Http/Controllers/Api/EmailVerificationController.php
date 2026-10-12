@@ -26,6 +26,15 @@ class EmailVerificationController extends Controller
         }
 
         $sessionVerified = session()->has('email_verified_'.md5($email));
+        if (! $sessionVerified) {
+            try {
+                if (VerifiedEmail::where('email', $email)->exists()) {
+                    session(['email_verified_'.md5($email) => true]);
+                    $sessionVerified = true;
+                }
+            } catch (\Throwable $e) {
+            }
+        }
 
         return response()->json(['success' => true, 'verified' => $sessionVerified]);
     }

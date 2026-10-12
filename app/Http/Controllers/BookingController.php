@@ -197,8 +197,17 @@ class BookingController extends Controller
             $balanceDue = 0;
         }
 
-        // Email Verification check (strictly require verified session for current booking)
+        // Email Verification check (session or previously verified email in DB)
         $sessionVerified = session()->has('email_verified_'.md5($email));
+        if (! $sessionVerified) {
+            try {
+                if (\App\Models\VerifiedEmail::where('email', $email)->exists()) {
+                    session(['email_verified_'.md5($email) => true]);
+                    $sessionVerified = true;
+                }
+            } catch (\Throwable $e) {
+            }
+        }
         $isVerified = $sessionVerified ? 1 : 0;
         $requireVerification = app(SettingsService::class)->get('email_verification_required', '1') === '1';
         if ($requireVerification && ! $sessionVerified) {

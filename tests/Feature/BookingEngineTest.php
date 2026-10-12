@@ -1066,4 +1066,80 @@ class BookingEngineTest extends TestCase
         $activeResponse->assertStatus(200);
         $this->assertEquals(15.00, $activeResponse->json('coupon.discount_amount'));
     }
+
+    /**
+     * Test phone formats and interactive 6-digit email OTP verification flow end-to-end.
+     */
+    public function test_phone_validation_formats_and_interactive_email_otp_verification_flow(): void
+    {
+        \Illuminate\Support\Facades\Mail::fake();
+
+        // 1. Verify homepage renders DunesConfig, non-deferred intlTelInput, and interactive 6-digit OTP UI
+        $home = $this->get('/');
+        $home->assertStatus(200);
+        $home->assertSee('window.DunesConfig', false);
+        $home->assertSee('id="bookingEmailContainer"', false);
+        $home->assertSee('id="sendEmailOtpBtn"', false);
+        $home->assertSee('id="otpDigitsContainer"', false);
+        $home->assertSee('data-otp-index="0"', false);
+        $home->assertSee('data-otp-index="5"', false);
+        $home->assertSee('id="bookingPhoneContainer"', false);
+
+        // 2. Test Email OTP lifecycle via /ajax.php
+        $email = 'customer.otp@example.com';
+
+        // Initially unverified
+        $status1 = $this->post('/ajax.php', [
+            'action' => 'check_email_status',
+            'email' => $email,
+        ]);
+        $status1->assertStatus(200)->assertJson(['success' => true, 'verified' => false]);
+
+        // Send OTP
+        $sendResp = $this->post('/ajax.php', [
+            'action' => 'send_otp',
+            'email' => $email,
+        ]);
+        $sendResp->assertStatus(200)->assertJson(['success' => true]);
+
+        $otpCode = session('otp_code');
+        $this->assertNotEmpty($otpCode);
+        $this->assertEquals(6, strlen($otpCode));
+
+        // Verify OTP
+        $verifyResp = $this->post('/ajax.php', [
+            'action' => 'verify_otp',
+            'email' => $email,
+            'otp' => $otpCode,
+        ]);
+        $verifyResp->assertStatus(200)->assertJson(['success' => true]);
+
+        // Now verified in both session and verified_emails table
+        $this->assertDatabaseHas('verified_emails', ['email' => $email]);
+        $status2 = $this->post('/ajax.php', [
+            'action' => 'check_email_status',
+            'email' => $email,
+        ]);
+        $status2->assertStatus(200)->assertJson(['success' => true, 'verified' => true]);
+
+        // 3. Test WhatsApp lead logging with various international and local phone formats
+        $phoneSamples = [
+            '+971501234567',
+            '+971 50 123 4567',
+            '050 123 4567',
+            '+44 7911 123456',
+            '+1 (202) 555-0143',
+            '+966 50 123 4567',
+        ];
+
+        foreach ($phoneSamples as $samplePhone) {
+            $waResp = $this->post('/ajax.php', [
+                'action' => 'logWhatsApp',
+                'name' => 'Phone Test Guest',
+                'phone' => $samplePhone,
+                'tour_name' => 'Evening Desert Safari Dubai',
+            ]);
+            $waResp->assertStatus(200)->assertJson(['success' => true]);
+        }
+    }
 }

@@ -199,34 +199,111 @@
                             <div class="p-3 rounded-2xl bg-sky-50 border border-sky-200 text-sky-800 text-xs hidden mb-4" id="otpNotice"></div>
 
                             <!-- Contact Info -->
-                            <div class="mb-5 space-y-3">
+                            <div class="mb-5 space-y-3.5">
                                 <div class="text-xs font-black uppercase tracking-wider text-slate-800 mb-2">{{ __('ui.booking.step_contact') }}</div>
+                                
+                                <!-- Full Name -->
                                 <div>
-                                    <label class="block text-[11px] font-extrabold text-slate-800 uppercase tracking-wider mb-1" for="bookingName">{{ __('ui.booking.name') }}</label>
+                                    <label class="block text-[11px] font-extrabold text-slate-800 uppercase tracking-wider mb-1" for="bookingName">{{ __('ui.booking.name') }} <span class="text-rose-500">*</span></label>
                                     <input type="text" class="w-full px-4 py-3 rounded-2xl bg-white border border-slate-200 text-sm font-semibold text-slate-900 shadow-2xs focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-slate-400" id="bookingName" name="name" placeholder="{{ __('ui.booking.name_placeholder') }}" autocomplete="name" required data-form="booking" data-field="name">
                                 </div>
-                                <div>
-                                    <label class="block text-[11px] font-extrabold text-slate-800 uppercase tracking-wider mb-1" for="bookingEmail">{{ __('ui.booking.email') }}</label>
-                                    <input type="email" class="w-full px-4 py-3 rounded-2xl bg-white border border-slate-200 text-sm font-semibold text-slate-900 shadow-2xs focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-slate-400" id="bookingEmail" name="email" placeholder="{{ __('ui.booking.email_placeholder') }}" autocomplete="email" required data-form="booking" data-field="email">
-                                </div>
-                                <div>
-                                    <label class="block text-[11px] font-extrabold text-slate-800 uppercase tracking-wider mb-1" for="bookingPhone">{{ __('ui.booking.phone') }}</label>
-                                    <div class="welcome-phone-field rounded-2xl bg-white border border-slate-200 shadow-2xs focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
-                                        <input type="tel" class="w-full py-3 px-4 bg-transparent text-sm font-semibold text-slate-900 border-0 focus:outline-none placeholder:text-slate-400" id="bookingPhone" name="phone" placeholder="{{ __('ui.booking.phone_placeholder') }}" autocomplete="tel" required data-form="booking" data-field="phone">
+
+                                <!-- Email Address + Interactive Verification -->
+                                <div id="bookingEmailSection">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <label class="block text-[11px] font-extrabold text-slate-800 uppercase tracking-wider" for="bookingEmail">{{ __('ui.booking.email') }} <span class="text-rose-500">*</span></label>
+                                        <span id="emailStatusBadge" class="hidden items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold tracking-wide transition-all"></span>
+                                    </div>
+                                    <div class="relative flex items-center rounded-2xl bg-white border border-slate-200 shadow-2xs focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all" id="bookingEmailContainer">
+                                        <input type="email" class="w-full pl-4 pr-28 py-3 rounded-2xl bg-transparent text-sm font-semibold text-slate-900 border-0 focus:outline-none placeholder:text-slate-400" id="bookingEmail" name="email" placeholder="{{ __('ui.booking.email_placeholder') }}" autocomplete="email" required data-form="booking" data-field="email">
+                                        
+                                        <!-- Inline Action / Spinner / Verified Indicator -->
+                                        <div class="absolute right-1.5 inset-y-1.5 flex items-center" id="bookingEmailActionSlot">
+                                            <span id="emailCheckSpinner" class="hidden px-3 text-primary items-center">
+                                                <span class="inline-block w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
+                                            </span>
+                                            <button type="button" id="sendEmailOtpBtn" class="hidden h-full px-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-[11px] uppercase tracking-wider shadow-xs transition-all cursor-pointer items-center gap-1.5 shrink-0">
+                                                <i class="bi bi-shield-lock-fill text-xs"></i>
+                                                <span>{{ __('ui.booking.verify') }}</span>
+                                            </button>
+                                            <span id="emailVerifiedIcon" class="hidden px-3 text-emerald-500 text-lg items-center" title="Email Verified">
+                                                <i class="bi bi-patch-check-fill"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <p id="emailHelperText" class="text-[11px] font-medium text-slate-500 mt-1 hidden"></p>
+
+                                    <!-- Interactive 6-Digit OTP Verification Card -->
+                                    <div class="mt-3 hidden transition-all duration-300" id="otpFieldsWrapper">
+                                        <div class="rounded-2xl bg-gradient-to-br from-orange-50/90 via-white to-amber-50/60 border-2 border-orange-200/90 p-3.5 sm:p-4 shadow-md">
+                                            <div class="flex items-start justify-between gap-2 mb-3">
+                                                <div class="flex items-center gap-2.5 min-w-0">
+                                                    <div class="w-8 h-8 rounded-xl bg-orange-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                                                        <i class="bi bi-envelope-check-fill text-sm"></i>
+                                                    </div>
+                                                    <div class="min-w-0">
+                                                        <div class="text-xs font-black text-slate-900 uppercase tracking-wide leading-tight">{{ __('ui.booking.email_verification') }}</div>
+                                                        <div class="text-[11px] text-slate-600 truncate mt-0.5">
+                                                            6-digit code sent to <span id="otpTargetEmail" class="font-bold text-slate-900">your email</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200/80 text-[10px] font-extrabold shrink-0">Valid 5m</span>
+                                            </div>
+
+                                            <!-- Hidden master input for compatibility -->
+                                            <input type="hidden" id="bookingOtpCode" value="">
+
+                                            <!-- 6 Segmented Interactive Digit Boxes -->
+                                            <div class="grid grid-cols-6 gap-1.5 sm:gap-2.5 my-2.5" id="otpDigitsContainer" dir="ltr">
+                                                @for($d = 0; $d < 6; $d++)
+                                                <input type="text"
+                                                       inputmode="numeric"
+                                                       pattern="[0-9]*"
+                                                       maxlength="1"
+                                                       data-otp-index="{{ $d }}"
+                                                       autocomplete="{{ $d === 0 ? 'one-time-code' : 'off' }}"
+                                                       aria-label="Digit {{ $d + 1 }}"
+                                                       class="otp-digit-box w-full h-11 sm:h-12 text-center font-mono font-black text-base sm:text-lg text-slate-900 bg-white border-2 border-slate-200 rounded-xl shadow-2xs focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all">
+                                                @endfor
+                                            </div>
+
+                                            <!-- Error Alert inside OTP Card -->
+                                            <div id="otpErrorMsg" class="hidden items-center gap-1.5 text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2 my-2">
+                                                <i class="bi bi-exclamation-circle-fill shrink-0"></i>
+                                                <span id="otpErrorText">Invalid verification code.</span>
+                                            </div>
+
+                                            <!-- Actions & Countdown Footer -->
+                                            <div class="flex flex-wrap items-center justify-between gap-2 mt-3 pt-2.5 border-t border-orange-200/60">
+                                                <div class="flex items-center gap-2 text-xs">
+                                                    <span class="text-slate-500 font-semibold text-[11px]" id="otpTimer"></span>
+                                                    <button type="button" class="font-extrabold text-primary hover:text-primary-dark hover:underline text-xs cursor-pointer disabled:opacity-50 disabled:pointer-events-none" id="resendOtpBtn">
+                                                        <i class="bi bi-arrow-repeat me-0.5"></i>{{ __('ui.booking.resend_code') }}
+                                                    </button>
+                                                </div>
+                                                <button type="button" id="verifyOtpBtn" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-sm transition-all cursor-pointer inline-flex items-center gap-1.5 ms-auto">
+                                                    <i class="bi bi-check2-circle"></i>
+                                                    <span>{{ __('ui.booking.verify') }} Code</span>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- OTP Verification Fields -->
-                            <div class="mb-5 hidden" id="otpFieldsWrapper">
-                                <div class="text-xs font-black uppercase tracking-wider text-slate-800 mb-2">{{ __('ui.booking.email_verification') }}</div>
-                                <div class="flex rounded-2xl shadow-2xs border border-slate-200 bg-white overflow-hidden">
-                                    <input type="text" class="flex-1 px-4 py-3 bg-transparent text-center font-black font-mono tracking-widest text-lg text-slate-900 border-0 focus:outline-none" id="bookingOtpCode" placeholder="{{ __('ui.booking.otp_placeholder') }}">
-                                    <button class="px-5 bg-primary hover:bg-primary-dark text-white font-bold text-xs transition-colors cursor-pointer" type="button" id="verifyOtpBtn">{{ __('ui.booking.verify') }}</button>
-                                </div>
-                                <div class="flex justify-between mt-2 px-1 text-xs">
-                                    <span class="text-slate-400" id="otpTimer"></span>
-                                    <a href="#" class="font-bold text-primary hover:underline" id="resendOtpBtn">{{ __('ui.booking.resend_code') }}</a>
+                                <!-- Phone / WhatsApp Number -->
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <label class="block text-[11px] font-extrabold text-slate-800 uppercase tracking-wider" for="bookingPhone">{{ __('ui.booking.phone') }} <span class="text-rose-500">*</span></label>
+                                        <span class="text-[10px] font-semibold text-emerald-600 inline-flex items-center gap-1"><i class="bi bi-whatsapp"></i> Instant Confirmation</span>
+                                    </div>
+                                    <div class="welcome-phone-field rounded-2xl bg-white border border-slate-200 shadow-2xs focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all" id="bookingPhoneContainer">
+                                        <input type="tel" class="w-full py-3 px-4 bg-transparent text-sm font-semibold text-slate-900 border-0 focus:outline-none placeholder:text-slate-400" id="bookingPhone" name="phone" placeholder="{{ __('ui.booking.phone_placeholder') }}" autocomplete="tel" required data-form="booking" data-field="phone">
+                                    </div>
+                                    <p id="bookingPhoneError" class="text-[11px] font-semibold text-rose-600 mt-1 hidden items-center gap-1">
+                                        <i class="bi bi-exclamation-circle-fill"></i>
+                                        <span>Please enter a valid phone or WhatsApp number.</span>
+                                    </p>
                                 </div>
                             </div>
 
