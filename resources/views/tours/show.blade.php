@@ -983,7 +983,8 @@ if(window.fbq){
                     </template>
                     <template x-if="item.type !== 'video'">
                         <img :src="item.url" 
-                             :alt="item.review_title || 'Guest Safari Photo'" 
+                             :alt="item.alt || item.review_title || 'Guest Safari Photo'" 
+                             :title="item.title || item.review_title"
                              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
                              loading="lazy"
                              referrerpolicy="no-referrer"
@@ -992,6 +993,11 @@ if(window.fbq){
 
                     <!-- Top Pill -->
                     <div class="absolute top-2 inset-x-2 flex items-center justify-between pointer-events-none">
+                        <template x-if="item.source === 'ddt'">
+                            <span class="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
+                                <i class="bi bi-camera-fill text-[9px] text-white"></i> DDT Moments
+                            </span>
+                        </template>
                         <template x-if="item.source === 'google'">
                             <span class="bg-white/95 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
                                 <img src="{{ asset('images/Google-G.avif') }}" alt="Google" class="w-2.5 h-2.5 inline-block" width="10" height="10" onerror="this.onerror=null;this.src='{{ asset('images/google.svg') }}'"> Google
@@ -1002,7 +1008,7 @@ if(window.fbq){
                                 <i class="bi bi-star-fill text-[9px] text-amber-300"></i> TripAdvisor
                             </span>
                         </template>
-                        <template x-if="item.source !== 'google' && item.source !== 'tripadvisor'">
+                        <template x-if="item.source !== 'google' && item.source !== 'tripadvisor' && item.source !== 'ddt'">
                             <span class="bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
                                 Verified
                             </span>

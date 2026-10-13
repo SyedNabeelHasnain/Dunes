@@ -2841,6 +2841,9 @@ const App = {
                 let ah = '';
                 data.addons.forEach(a => {
                     const iconName = a.icon ? (a.icon.startsWith('bi-') ? a.icon : 'bi-' + a.icon) : 'bi-plus-circle';
+                    const visualHtml = a.image 
+                        ? `<img src="/images/${a.image}" alt="${a.name}" class="w-8 h-8 rounded-xl object-cover shrink-0 border border-orange-200/60 shadow-2xs" loading="lazy">`
+                        : `<div class="w-8 h-8 rounded-xl bg-orange-50 text-primary border border-orange-200/60 flex items-center justify-center shrink-0 text-sm"><i class="${iconName}"></i></div>`;
                     ah += `<div class="addon-card-horizontal group relative flex flex-col justify-between p-3.5 sm:p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-primary/60 hover:shadow-md transition-all cursor-pointer select-none shrink-0" data-addon="${a.id}" data-price="${a.price}">
                         <input type="checkbox" name="addons[]" value="${a.id}" class="sr-only">
                         <div class="addon-check-abs hidden absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-500 text-white items-center justify-center text-[10px] font-black shadow-2xs">
@@ -2848,9 +2851,7 @@ const App = {
                         </div>
                         <div>
                             <div class="flex items-center gap-2.5 mb-2 pr-6">
-                                <div class="w-8 h-8 rounded-xl bg-orange-50 text-primary border border-orange-200/60 flex items-center justify-center shrink-0 text-sm">
-                                    <i class="${iconName}"></i>
-                                </div>
+                                ${visualHtml}
                                 <h5 class="font-extrabold text-slate-900 text-xs sm:text-sm leading-tight truncate" title="${a.name}">${a.name}</h5>
                             </div>
                             <p class="text-[11px] text-slate-500 font-medium line-clamp-2 mb-3 leading-relaxed min-h-[32px]">${a.description || 'Optional safari enhancement'}</p>

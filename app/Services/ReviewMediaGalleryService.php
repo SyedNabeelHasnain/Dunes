@@ -49,6 +49,16 @@ class ReviewMediaGalleryService
             'name' => 'Sunset & Camels',
             'icon' => 'bi bi-sunset-fill',
         ],
+        'city_landmarks' => [
+            'id' => 'city_landmarks',
+            'name' => 'City Tours & Landmarks',
+            'icon' => 'bi bi-building',
+        ],
+        'marina_cruise' => [
+            'id' => 'marina_cruise',
+            'name' => 'Dhow & Marina Cruise',
+            'icon' => 'bi bi-water',
+        ],
     ];
 
     /**
@@ -178,12 +188,26 @@ class ReviewMediaGalleryService
             $tourSlug = strtolower($tour);
         }
 
+        $isCityTour = str_contains($tourSlug, 'dubai-city-tour') || str_contains($tourSlug, 'abu-dhabi') || str_contains($tourName, 'city tour') || str_contains($tourName, 'abu dhabi');
+        $isMarinaCruise = str_contains($tourSlug, 'dhow-cruise') || str_contains($tourSlug, 'catamaran') || str_contains($tourName, 'cruise') || str_contains($tourName, 'dhow') || str_contains($tourName, 'marina');
         $isBuggyOrQuad = str_contains($tourName, 'buggy') || str_contains($tourName, 'quad') || str_contains($tourSlug, 'buggy') || str_contains($tourSlug, 'quad');
         $isCampOrEvening = str_contains($tourName, 'evening') || str_contains($tourName, 'bbq') || str_contains($tourName, 'dinner') || str_contains($tourSlug, 'evening') || str_contains($tourSlug, 'overnight');
         $isMorningOrSunrise = str_contains($tourName, 'morning') || str_contains($tourName, 'sunrise') || str_contains($tourSlug, 'morning');
 
-        $matched = $collection->filter(function ($item) use ($isBuggyOrQuad, $isCampOrEvening, $isMorningOrSunrise) {
+        // First pass: Items that explicitly belong to this specific tour
+        $directMatches = $collection->filter(function ($item) use ($tourSlug) {
+            return ! empty($tourSlug) && ($item['tour_slug'] ?? '') === $tourSlug;
+        });
+
+        // Second pass: Category and theme relevance
+        $categoryMatches = $collection->filter(function ($item) use ($isCityTour, $isMarinaCruise, $isBuggyOrQuad, $isCampOrEvening, $isMorningOrSunrise) {
             $cat = $item['category'] ?? '';
+            if ($isCityTour && $cat === 'city_landmarks') {
+                return true;
+            }
+            if ($isMarinaCruise && $cat === 'marina_cruise') {
+                return true;
+            }
             if ($isBuggyOrQuad && $cat === 'buggy_quad') {
                 return true;
             }
@@ -197,6 +221,8 @@ class ReviewMediaGalleryService
             return false;
         });
 
+        $matched = $directMatches->concat($categoryMatches)->unique('id');
+
         // If specific matches are fewer than 4, backfill with top general items
         if ($matched->count() < 4) {
             $fillers = $collection->reject(fn ($i) => $matched->contains('id', $i['id']));
@@ -207,13 +233,75 @@ class ReviewMediaGalleryService
     }
 
     /**
-     * Extract raw media from approved reviews and verify each URL.
+     * Extract raw media from approved reviews and verified DDT Moments, and verify each URL.
      */
     public function loadAndVerifyAllMedia(bool $force = false): array
     {
         $rawItems = $this->extractAllReviewMedia();
+        $ddtMoments = $this->getDdtMomentsMedia();
+        $merged = array_merge($ddtMoments, $rawItems);
 
-        return $this->filterHealthyItems($rawItems, $force);
+        return $this->filterHealthyItems($merged, $force);
+    }
+
+    /**
+     * Retrieve curated, authentic DDT Moments captured across Dubai & UAE tours and add-ons.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function getDdtMomentsMedia(): array
+    {
+        $jsonPath = database_path('seeders/data/ddt_moments.json');
+        if (! file_exists($jsonPath)) {
+            return [];
+        }
+
+        $raw = json_decode(file_get_contents($jsonPath), true);
+        if (! is_array($raw)) {
+            return [];
+        }
+
+        $items = [];
+        foreach ($raw as $entry) {
+            $filename = $entry['filename'] ?? '';
+            $url = asset('images/'.$filename);
+            $cat = $entry['category'] ?? 'red_dunes';
+            $tourSlug = $entry['tour_slug'] ?? null;
+            $addonSlug = $entry['addon_slug'] ?? null;
+            $publishedDate = isset($entry['date']) ? \Carbon\Carbon::parse($entry['date']) : now();
+
+            $items[] = [
+                'id' => 'ddt_'.md5($filename),
+                'url' => $url,
+                'type' => 'image',
+                'thumbnail_url' => $url,
+                'category' => $cat,
+                'category_label' => self::CATEGORIES[$cat]['name'] ?? 'Desert Adventure',
+                'reviewer_name' => $entry['reviewer_name'] ?? 'DDT Expedition Team',
+                'reviewer_avatar_url' => asset('images/icon.png'),
+                'rating' => (float) ($entry['rating'] ?? 5.0),
+                'review_title' => $entry['title'] ?? 'DDT Desert Moment',
+                'review_text' => $entry['caption'] ?? ($entry['title'] ?? ''),
+                'full_review_text' => $entry['description'] ?? '',
+                'published_date' => $publishedDate->toDateString(),
+                'formatted_date' => $publishedDate->format('M d, Y'),
+                'source' => 'ddt',
+                'source_label' => 'DDT Moments',
+                'review_url' => $tourSlug ? url('/'.$tourSlug) : null,
+                'is_local_guide' => true,
+                'likes_count' => (int) ($entry['likes_count'] ?? 50),
+                'alt' => $entry['alt'] ?? '',
+                'caption' => $entry['caption'] ?? '',
+                'description' => $entry['description'] ?? '',
+                'keywords' => $entry['keywords'] ?? [],
+                'location' => $entry['location'] ?? 'Dubai, UAE',
+                'tour_slug' => $tourSlug,
+                'addon_slug' => $addonSlug,
+                'filename' => $filename,
+            ];
+        }
+
+        return $items;
     }
 
     /**
@@ -327,6 +415,15 @@ class ReviewMediaGalleryService
             return false;
         }
 
+        // Fast probe for local public files: check disk directly
+        $path = parse_url($url, PHP_URL_PATH);
+        if ($path) {
+            $localFile = public_path(ltrim($path, '/'));
+            if (file_exists($localFile) && is_file($localFile)) {
+                return true;
+            }
+        }
+
         $cacheKey = 'gallery_media_status_'.md5($url);
 
         if (! $force && Cache::has($cacheKey)) {
@@ -418,6 +515,8 @@ class ReviewMediaGalleryService
             'buggy_quad' => 0,
             'camp_bbq' => 0,
             'sunset_camels' => 0,
+            'city_landmarks' => 0,
+            'marina_cruise' => 0,
             'videos' => 0,
         ];
 
@@ -482,6 +581,36 @@ class ReviewMediaGalleryService
             str_contains($combined, 'falconry')
         ) {
             return 'sunset_camels';
+        }
+
+        // 4. City Tours & Landmarks
+        if (
+            str_contains($combined, 'city tour') ||
+            str_contains($combined, 'abu dhabi') ||
+            str_contains($combined, 'grand mosque') ||
+            str_contains($combined, 'sheikh zayed') ||
+            str_contains($combined, 'burj khalifa') ||
+            str_contains($combined, 'burj al arab') ||
+            str_contains($combined, 'dubai frame') ||
+            str_contains($combined, 'atlantis') ||
+            str_contains($combined, 'louvre') ||
+            str_contains($combined, 'abra') ||
+            str_contains($combined, 'creek') ||
+            str_contains($combined, 'al seef')
+        ) {
+            return 'city_landmarks';
+        }
+
+        // 5. Dhow & Marina Cruise
+        if (
+            str_contains($combined, 'cruise') ||
+            str_contains($combined, 'dhow') ||
+            str_contains($combined, 'catamaran') ||
+            str_contains($combined, 'marina') ||
+            str_contains($combined, 'boat') ||
+            str_contains($combined, 'yacht')
+        ) {
+            return 'marina_cruise';
         }
 
         // Default to Red Dunes & Safari

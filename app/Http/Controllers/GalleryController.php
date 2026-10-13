@@ -76,19 +76,34 @@ class GalleryController extends Controller
 
         // Schema.org ImageGallery Graph
         $schemaImages = [];
-        $photoItems = collect($filteredItems)->filter(fn ($i) => ($i['type'] ?? 'image') !== 'video')->take(24);
+        $photoItems = collect($filteredItems)->filter(fn ($i) => ($i['type'] ?? 'image') !== 'video')->take(34);
         foreach ($photoItems as $item) {
-            $schemaImages[] = [
+            $imageObj = [
                 '@type' => 'ImageObject',
                 'contentUrl' => $item['url'],
                 'name' => $item['review_title'] ?: 'Dubai Desert Safari Experience',
-                'caption' => $item['review_text'] ?: 'Photo by '.$item['reviewer_name'],
+                'caption' => $item['caption'] ?? ($item['review_text'] ?: 'Photo by '.$item['reviewer_name']),
                 'author' => [
-                    '@type' => 'Person',
+                    '@type' => ($item['source'] ?? '') === 'ddt' ? 'Organization' : 'Person',
                     'name' => $item['reviewer_name'],
                 ],
                 'datePublished' => $item['published_date'] ?: now()->toDateString(),
             ];
+
+            if (! empty($item['description'])) {
+                $imageObj['description'] = $item['description'];
+            }
+            if (! empty($item['location'])) {
+                $imageObj['contentLocation'] = [
+                    '@type' => 'Place',
+                    'name' => $item['location'],
+                ];
+            }
+            if (! empty($item['keywords']) && is_array($item['keywords'])) {
+                $imageObj['keywords'] = implode(', ', $item['keywords']);
+            }
+
+            $schemaImages[] = $imageObj;
         }
 
         return view('gallery.index', compact(

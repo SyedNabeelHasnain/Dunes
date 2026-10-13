@@ -318,6 +318,29 @@ class SitemapController extends Controller
                 $xml .= "  </url>\n";
             }
 
+            // Pillar 4: Verified Authentic DDT Moments Gallery & Tour Images
+            $ddtPath = database_path('seeders/data/ddt_moments.json');
+            if (file_exists($ddtPath)) {
+                $ddtItems = json_decode(file_get_contents($ddtPath), true);
+                if (is_array($ddtItems)) {
+                    foreach ($ddtItems as $item) {
+                        $tourSlug = $item['tour_slug'] ?? null;
+                        $pageUrl = $tourSlug ? url('/'.$tourSlug) : url('/gallery');
+                        $xml .= "  <url>\n";
+                        $xml .= '    <loc>'.$this->xmlEscape($pageUrl)."</loc>\n";
+                        $xml .= "    <image:image>\n";
+                        $xml .= '      <image:loc>'.$this->xmlEscape(asset('images/'.$item['filename']))."</image:loc>\n";
+                        $xml .= '      <image:title>'.$this->xmlEscape($item['title'])."</image:title>\n";
+                        $xml .= '      <image:caption>'.$this->xmlEscape($item['caption'] ?: $item['description'])."</image:caption>\n";
+                        if (! empty($item['location'])) {
+                            $xml .= '      <image:geo_location>'.$this->xmlEscape($item['location'])."</image:geo_location>\n";
+                        }
+                        $xml .= "    </image:image>\n";
+                        $xml .= "  </url>\n";
+                    }
+                }
+            }
+
             $xml .= '</urlset>';
 
             return $xml;

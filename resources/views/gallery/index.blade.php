@@ -304,6 +304,24 @@
                     <span :class="category === 'sunset_camels' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'" class="px-2 py-0.5 rounded-full text-[11px] font-semibold">{{ $categoryStats['sunset_camels'] ?? 0 }}</span>
                 </button>
 
+                <button type="button" 
+                    @click="filterCategory('city_landmarks')" 
+                    :class="category === 'city_landmarks' ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'"
+                    class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5">
+                    <i class="bi bi-building"></i>
+                    <span>City Tours & Landmarks</span>
+                    <span :class="category === 'city_landmarks' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'" class="px-2 py-0.5 rounded-full text-[11px] font-semibold">{{ $categoryStats['city_landmarks'] ?? 0 }}</span>
+                </button>
+
+                <button type="button" 
+                    @click="filterCategory('marina_cruise')" 
+                    :class="category === 'marina_cruise' ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'"
+                    class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5">
+                    <i class="bi bi-water"></i>
+                    <span>Dhow & Marina Cruise</span>
+                    <span :class="category === 'marina_cruise' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'" class="px-2 py-0.5 rounded-full text-[11px] font-semibold">{{ $categoryStats['marina_cruise'] ?? 0 }}</span>
+                </button>
+
                 @if(($categoryStats['videos'] ?? 0) > 0)
                 <button type="button" 
                     @click="filterCategory('videos')" 
@@ -323,6 +341,13 @@
                     :class="source === 'all' ? 'bg-white text-slate-900 shadow-2xs font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'"
                     class="px-3 py-1.5 rounded-full text-xs transition-all cursor-pointer">
                     All Sources
+                </button>
+                <button type="button" 
+                    @click="filterSource('ddt')"
+                    :class="source === 'ddt' ? 'bg-white text-amber-600 shadow-2xs font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'"
+                    class="px-3 py-1.5 rounded-full text-xs transition-all cursor-pointer inline-flex items-center gap-1">
+                    <i class="bi bi-camera-fill text-amber-500 text-xs"></i>
+                    DDT Moments
                 </button>
                 <button type="button" 
                     @click="filterSource('google')"
@@ -367,7 +392,8 @@
 
                         <template x-if="item.type !== 'video'">
                             <img :src="item.url" 
-                                 :alt="item.review_title || 'Guest Safari Photo'" 
+                                 :alt="item.alt || item.review_title || 'Guest Safari Photo'" 
+                                 :title="item.title || item.review_title"
                                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                                  loading="lazy"
                                  referrerpolicy="no-referrer"
@@ -382,6 +408,12 @@
                             </span>
 
                             <!-- Source Badge -->
+                            <template x-if="item.source === 'ddt'">
+                                <span class="bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full px-2.5 py-1 text-[11px] font-bold flex items-center gap-1 shadow-xs">
+                                    <i class="bi bi-camera-fill text-[10px]"></i>
+                                    <span>DDT Moments</span>
+                                </span>
+                            </template>
                             <template x-if="item.source === 'google'">
                                 <span class="bg-white/95 backdrop-blur-md text-blue-700 rounded-full px-2.5 py-1 text-[11px] font-bold flex items-center gap-1 shadow-xs">
                                     <img src="{{ asset('images/Google-G.avif') }}" alt="Google" class="w-3 h-3 inline-block" width="12" height="12" onerror="this.onerror=null;this.src='{{ asset('images/google.svg') }}'">
@@ -394,7 +426,7 @@
                                     <span>TripAdvisor</span>
                                 </span>
                             </template>
-                            <template x-if="item.source !== 'google' && item.source !== 'tripadvisor'">
+                            <template x-if="item.source !== 'google' && item.source !== 'tripadvisor' && item.source !== 'ddt'">
                                 <span class="bg-amber-500 text-white rounded-full px-2.5 py-1 text-[11px] font-bold flex items-center gap-1 shadow-xs">
                                     <i class="bi bi-patch-check-fill text-[10px]"></i>
                                     <span>{{ __('ui.reviews_section.verified_guest') ?? 'Verified' }}</span>
@@ -501,7 +533,8 @@
                 </template>
                 <template x-if="activeItem && activeItem.type !== 'video'">
                     <img :src="activeItem.url" 
-                         :alt="activeItem.review_title || 'Guest Safari Photo'" 
+                         :alt="activeItem.alt || activeItem.review_title || 'Guest Safari Photo'" 
+                         :title="activeItem.title || activeItem.review_title"
                          class="max-w-full max-h-[58vh] lg:max-h-[80vh] rounded-xl object-contain select-none"
                          referrerpolicy="no-referrer"
                          x-on:error="reportBrokenLink(activeItem.url); nextItem();">
@@ -520,6 +553,12 @@
                             <div>
                                 <h4 class="font-bold text-white text-base leading-tight" x-text="activeItem ? activeItem.reviewer_name : 'Verified Guest'"></h4>
                                 <div class="flex items-center gap-1.5 mt-0.5">
+                                    <template x-if="activeItem && activeItem.source === 'ddt'">
+                                        <span class="text-amber-400 font-bold text-xs inline-flex items-center gap-1">
+                                            <i class="bi bi-camera-fill text-xs text-amber-400"></i>
+                                            DDT Moments
+                                        </span>
+                                    </template>
                                     <template x-if="activeItem && activeItem.source === 'google'">
                                         <span class="text-blue-400 font-bold text-xs inline-flex items-center gap-1">
                                             <img src="{{ asset('images/Google-G.avif') }}" alt="Google" class="w-3 h-3 inline-block" width="12" height="12" onerror="this.onerror=null;this.src='{{ asset('images/google.svg') }}'">
@@ -535,6 +574,12 @@
                                     <span class="text-white/40 text-xs">•</span>
                                     <span class="text-xs text-white/60" x-text="activeItem ? activeItem.formatted_date : ''"></span>
                                 </div>
+                                <template x-if="activeItem && activeItem.location">
+                                    <div class="text-[11px] text-white/60 flex items-center gap-1 mt-1">
+                                        <i class="bi bi-geo-alt-fill text-amber-400 text-xs"></i>
+                                        <span x-text="activeItem.location"></span>
+                                    </div>
+                                </template>
                             </div>
                         </div>
 

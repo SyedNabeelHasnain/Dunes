@@ -129,16 +129,29 @@ class AjaxGatewayController extends Controller
                 ];
             });
 
+        $addonImages = [
+            'camel-ride' => 'addon-camel-ride-dubai-desert-running-caravan-sunset.webp',
+            'falcon-photo' => 'addon-falcon-photo-dubai-desert-safari-camp-falconer.webp',
+            'sandboarding' => 'addon-sandboarding-dubai-desert-boards-on-red-dune.webp',
+            'dubai-frame' => 'addon-dubai-frame-entry-zabeel-park-panoramic-view.webp',
+            'burj-khalifa-124' => 'addon-burj-khalifa-observation-deck-night-view-fountains.webp',
+            'burj-khalifa-148' => 'addon-burj-khalifa-observation-deck-fountain-lake-promenade.webp',
+            'louvre-abu-dhabi' => 'abu-dhabi-city-tour-louvre-abu-dhabi-floating-dome.webp',
+            'quad-biking' => 'desert-safari-quad-biking-dubai-atv-rider-safety-flag.webp',
+            'dune-buggy' => 'dune-buggy-rental-dubai-polaris-rzr-convoy-red-dunes.webp',
+        ];
+
         $addons = $tour->addons()
             ->where('status', 'active')
             ->get()
-            ->map(function ($addon) {
+            ->map(function ($addon) use ($addonImages) {
                 return [
                     'id' => $addon->id,
                     'name' => $addon->name,
                     'description' => $addon->description,
                     'icon' => $addon->icon ?: 'plus-circle',
                     'price' => (float) $addon->pivot->price,
+                    'image' => $addonImages[$addon->slug] ?? null,
                 ];
             });
 

@@ -7,7 +7,8 @@
         "icon": "bi-joystick",
         "default_price": 150,
         "status": "active",
-        "priority": 99
+        "priority": 99,
+        "image": "desert-safari-quad-biking-dubai-atv-rider-safety-flag.webp"
     },
     {
         "id": 2,
@@ -17,7 +18,8 @@
         "icon": "bi-heart",
         "default_price": 80,
         "status": "active",
-        "priority": 99
+        "priority": 99,
+        "image": "addon-camel-ride-dubai-desert-running-caravan-sunset.webp"
     },
     {
         "id": 3,
@@ -67,7 +69,8 @@
         "icon": "bi-camera2",
         "default_price": 75,
         "status": "active",
-        "priority": 99
+        "priority": 99,
+        "image": "addon-falcon-photo-dubai-desert-safari-camp-falconer.webp"
     },
     {
         "id": 8,
@@ -87,7 +90,8 @@
         "icon": "truck",
         "default_price": 280,
         "status": "active",
-        "priority": 9
+        "priority": 9,
+        "image": "dune-buggy-rental-dubai-polaris-rzr-convoy-red-dunes.webp"
     },
     {
         "id": 10,
@@ -97,7 +101,8 @@
         "icon": "activity",
         "default_price": 60,
         "status": "active",
-        "priority": 10
+        "priority": 10,
+        "image": "addon-sandboarding-dubai-desert-boards-on-red-dune.webp"
     },
     {
         "id": 11,
@@ -147,7 +152,8 @@
         "icon": "building",
         "default_price": 169,
         "status": "active",
-        "priority": 15
+        "priority": 15,
+        "image": "addon-burj-khalifa-observation-deck-night-view-fountains.webp"
     },
     {
         "id": 16,
@@ -157,7 +163,8 @@
         "icon": "building",
         "default_price": 399,
         "status": "active",
-        "priority": 16
+        "priority": 16,
+        "image": "addon-burj-khalifa-observation-deck-fountain-lake-promenade.webp"
     },
     {
         "id": 17,
@@ -167,7 +174,8 @@
         "icon": "frame",
         "default_price": 55,
         "status": "active",
-        "priority": 17
+        "priority": 17,
+        "image": "addon-dubai-frame-entry-zabeel-park-panoramic-view.webp"
     },
     {
         "id": 18,
@@ -197,7 +205,8 @@
         "icon": "image",
         "default_price": 65,
         "status": "active",
-        "priority": 20
+        "priority": 20,
+        "image": "abu-dhabi-city-tour-louvre-abu-dhabi-floating-dome.webp"
     },
     {
         "id": 21,
