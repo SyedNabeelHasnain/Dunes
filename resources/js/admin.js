@@ -47,9 +47,15 @@ Alpine.store('admin', {
     openCommandPalette() {
         this.commandPaletteOpen = true;
         this.searchQuery = '';
+        if (typeof window.resetSpotlightPalette === 'function') {
+            window.resetSpotlightPalette();
+        }
         setTimeout(() => {
             const input = document.getElementById('cmdInput');
-            if (input) input.focus();
+            if (input) {
+                input.focus();
+                input.select();
+            }
         }, 80);
     },
 
@@ -61,46 +67,348 @@ Alpine.store('admin', {
 Alpine.start();
 
 // =============================================================================
-// 2. COMMAND PALETTE KEYBOARD LISTENER (Ctrl+K, Cmd+K, Escape)
+// 2. DUNES SPOTLIGHT COMMAND PALETTE ENGINE
 // =============================================================================
 
-document.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault();
-        const store = Alpine.store('admin');
-        if (store.commandPaletteOpen) {
-            store.closeCommandPalette();
-        } else {
-            store.openCommandPalette();
+function initSpotlight() {
+    let activeCategory = 'all';
+    let activeIndex = -1;
+    let searchDebounceTimer = null;
+    let abortController = null;
+
+    const cmdInput = document.getElementById('cmdInput');
+    const dynamicContainer = document.getElementById('dynamicSpotlightResults');
+    const cmdSpinner = document.getElementById('cmdSpinner');
+    const cmdSearchIcon = document.getElementById('cmdSearchIcon');
+    const emptyState = document.getElementById('cmdEmptyState');
+    const emptyTitle = document.getElementById('cmdEmptyTitle');
+    const categoryPills = document.querySelectorAll('.cmd-pill');
+
+    function getVisibleEntries() {
+        return Array.from(document.querySelectorAll('.cmd-entry')).filter(el => {
+            return el.offsetParent !== null && window.getComputedStyle(el).display !== 'none';
+        });
+    }
+
+    function setActiveEntry(index) {
+        const visible = getVisibleEntries();
+        visible.forEach(el => {
+            el.classList.remove('cmd-active', 'bg-primary/10', 'border-primary', 'ring-1', 'ring-primary/40');
+        });
+
+        if (visible.length === 0) {
+            activeIndex = -1;
+            return;
         }
-    } else if (e.key === 'Escape') {
-        const store = Alpine.store('admin');
-        if (store && store.commandPaletteOpen) {
-            store.closeCommandPalette();
-        }
-        if (store && store.mobileSidebarOpen) {
-            store.closeMobileSidebar();
+
+        if (index < 0) index = 0;
+        if (index >= visible.length) index = visible.length - 1;
+
+        activeIndex = index;
+        const current = visible[activeIndex];
+        if (current) {
+            current.classList.add('cmd-active', 'bg-primary/10', 'border-primary', 'ring-1', 'ring-primary/40');
+            current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
         }
     }
-});
 
-// Live filtering inside Command Palette
-document.addEventListener('input', (e) => {
-    if (e.target && e.target.id === 'cmdInput') {
-        const query = e.target.value.toLowerCase().trim();
-        document.querySelectorAll('.cmd-entry').forEach((el) => {
+    function filterStaticEntries(query) {
+        let visibleCount = 0;
+        const normalizedQuery = (query || '').toLowerCase().trim();
+
+        document.querySelectorAll('#staticSpotlightSections .cmd-entry').forEach(el => {
+            const entryCategory = el.dataset.category || '';
+            const section = el.closest('.cmd-section');
+            const sectionCategory = section ? section.dataset.section : '';
+
+            const matchesCategory = (
+                activeCategory === 'all' ||
+                entryCategory === activeCategory ||
+                sectionCategory === activeCategory
+            );
+
             const text = (el.textContent + ' ' + (el.dataset.keywords || '')).toLowerCase();
-            if (!query || text.includes(query)) {
+            const matchesQuery = !normalizedQuery || text.includes(normalizedQuery);
+
+            if (matchesCategory && matchesQuery) {
                 el.style.display = '';
+                visibleCount++;
             } else {
                 el.style.display = 'none';
             }
         });
-        document.querySelectorAll('.cmd-section').forEach((sec) => {
-            const visibleEntries = sec.querySelectorAll('.cmd-entry:not([style*="display: none"])');
-            sec.style.display = visibleEntries.length > 0 ? '' : 'none';
+
+        // Hide/show static sections based on whether they have visible items
+        document.querySelectorAll('#staticSpotlightSections .cmd-section').forEach(sec => {
+            const visibleChild = sec.querySelectorAll('.cmd-entry:not([style*="display: none"])');
+            sec.style.display = visibleChild.length > 0 ? '' : 'none';
+        });
+
+        return visibleCount;
+    }
+
+    function checkEmptyState(query, staticCount, dynamicCount) {
+        if (!emptyState) return;
+        const totalVisible = staticCount + dynamicCount;
+        if (totalVisible === 0) {
+            emptyState.classList.remove('hidden');
+            emptyState.style.display = 'block';
+            if (emptyTitle) {
+                emptyTitle.textContent = query ? `No results found for "${query}"` : 'No matching items';
+            }
+        } else {
+            emptyState.classList.add('hidden');
+            emptyState.style.display = 'none';
+        }
+    }
+
+    function renderDynamicResults(categories) {
+        if (!dynamicContainer) return 0;
+        dynamicContainer.innerHTML = '';
+
+        if (!categories || categories.length === 0) {
+            return 0;
+        }
+
+        let totalDynamicItems = 0;
+
+        categories.forEach(cat => {
+            if (!cat.items || cat.items.length === 0) return;
+
+            const sectionEl = document.createElement('div');
+            sectionEl.className = 'cmd-section';
+            sectionEl.dataset.section = cat.key;
+
+            const headerEl = document.createElement('div');
+            headerEl.className = 'text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2 px-1 flex items-center justify-between';
+            headerEl.innerHTML = `
+                <span class="flex items-center gap-1.5"><i class="${cat.icon || 'bi bi-database-fill text-primary'}"></i> ${cat.label}</span>
+                <span class="text-[10px] text-emerald-600 font-mono bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">${cat.items.length} live records</span>
+            `;
+            sectionEl.appendChild(headerEl);
+
+            const listEl = document.createElement('div');
+            listEl.className = 'space-y-1.5';
+
+            cat.items.forEach(item => {
+                totalDynamicItems++;
+                const itemEl = document.createElement('div');
+                itemEl.className = 'cmd-entry rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group cursor-pointer';
+                itemEl.dataset.keywords = `${item.title} ${item.subtitle} ${item.badge || ''}`;
+                itemEl.dataset.category = cat.key;
+
+                const badgeColorClass = item.badge_color === 'emerald' ? 'bg-emerald-100 text-emerald-800'
+                    : item.badge_color === 'amber' ? 'bg-amber-100 text-amber-800'
+                    : item.badge_color === 'rose' ? 'bg-rose-100 text-rose-800'
+                    : item.badge_color === 'sky' ? 'bg-sky-100 text-sky-800'
+                    : item.badge_color === 'indigo' ? 'bg-indigo-100 text-indigo-800'
+                    : 'bg-slate-100 text-slate-800';
+
+                let previewHtml = '';
+                if (item.preview_url) {
+                    previewHtml = `
+                        <a href="${item.preview_url}" target="_blank" class="p-1.5 text-slate-400 hover:text-cyan-600 rounded-lg hover:bg-white transition" title="Preview on live website" onclick="event.stopPropagation();">
+                            <i class="bi bi-box-arrow-up-right text-xs"></i>
+                        </a>
+                    `;
+                }
+
+                itemEl.innerHTML = `
+                    <div class="flex items-center justify-between p-2.5">
+                        <a href="${item.url}" class="flex items-center gap-3 flex-1 min-w-0">
+                            <i class="${item.icon || 'bi bi-dot'} text-lg shrink-0"></i>
+                            <div class="truncate">
+                                <div class="flex items-center gap-2">
+                                    <strong class="text-xs font-bold text-slate-900 group-hover:text-primary truncate">${item.title}</strong>
+                                    ${item.badge ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${badgeColorClass} shrink-0">${item.badge}</span>` : ''}
+                                </div>
+                                <span class="text-[11px] text-slate-500 truncate block">${item.subtitle}</span>
+                            </div>
+                        </a>
+                        <div class="flex items-center gap-1 shrink-0 ms-2">
+                            ${previewHtml}
+                            <a href="${item.url}" class="p-1 text-slate-300 group-hover:text-primary transition">
+                                <i class="bi bi-chevron-right text-xs"></i>
+                            </a>
+                        </div>
+                    </div>
+                `;
+
+                listEl.appendChild(itemEl);
+            });
+
+            sectionEl.appendChild(listEl);
+            dynamicContainer.appendChild(sectionEl);
+        });
+
+        return totalDynamicItems;
+    }
+
+    async function fetchDynamicSearch(query) {
+        if (!query || query.length < 2) {
+            if (dynamicContainer) dynamicContainer.innerHTML = '';
+            if (cmdSpinner) cmdSpinner.classList.add('hidden');
+            if (cmdSearchIcon) cmdSearchIcon.classList.remove('hidden');
+            return 0;
+        }
+
+        if (abortController) {
+            abortController.abort();
+        }
+        abortController = new AbortController();
+
+        if (cmdSpinner) cmdSpinner.classList.remove('hidden');
+        if (cmdSearchIcon) cmdSearchIcon.classList.add('hidden');
+
+        try {
+            const url = `/admin/api/spotlight?q=${encodeURIComponent(query)}&category=${encodeURIComponent(activeCategory)}`;
+            const res = await fetch(url, {
+                signal: abortController.signal,
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (!res.ok) throw new Error('Search failed');
+            const data = await res.json();
+            const count = renderDynamicResults(data.categories || []);
+            return count;
+        } catch (err) {
+            if (err.name !== 'AbortError') {
+                console.debug('Spotlight fetch error:', err);
+            }
+            return 0;
+        } finally {
+            if (cmdSpinner) cmdSpinner.classList.add('hidden');
+            if (cmdSearchIcon) cmdSearchIcon.classList.remove('hidden');
+        }
+    }
+
+    // Input Handler with Debounce
+    if (cmdInput) {
+        cmdInput.addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            const staticCount = filterStaticEntries(query);
+
+            clearTimeout(searchDebounceTimer);
+            if (query.length >= 2) {
+                searchDebounceTimer = setTimeout(async () => {
+                    const dynamicCount = await fetchDynamicSearch(query);
+                    checkEmptyState(query, staticCount, dynamicCount);
+                    setActiveEntry(0);
+                }, 180);
+            } else {
+                if (dynamicContainer) dynamicContainer.innerHTML = '';
+                checkEmptyState(query, staticCount, 0);
+                setActiveEntry(0);
+            }
+        });
+
+        // Keyboard Navigation (ArrowUp, ArrowDown, Enter)
+        cmdInput.addEventListener('keydown', (e) => {
+            const visible = getVisibleEntries();
+            if (visible.length === 0) return;
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                setActiveEntry(activeIndex + 1 >= visible.length ? 0 : activeIndex + 1);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                setActiveEntry(activeIndex - 1 < 0 ? visible.length - 1 : activeIndex - 1);
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (activeIndex >= 0 && activeIndex < visible.length) {
+                    const activeEl = visible[activeIndex];
+                    const link = activeEl.querySelector('a');
+                    if (link) {
+                        link.click();
+                    } else {
+                        activeEl.click();
+                    }
+                }
+            }
         });
     }
+
+    // Category Tabs Switching
+    categoryPills.forEach(btn => {
+        btn.addEventListener('click', () => {
+            activeCategory = btn.dataset.category || 'all';
+
+            categoryPills.forEach(p => {
+                p.classList.remove('bg-primary', 'text-white', 'shadow-2xs', 'font-bold');
+                p.classList.add('text-slate-600', 'font-medium');
+            });
+            btn.classList.remove('text-slate-600', 'font-medium');
+            btn.classList.add('bg-primary', 'text-white', 'shadow-2xs', 'font-bold');
+
+            const query = cmdInput ? cmdInput.value.trim() : '';
+            const staticCount = filterStaticEntries(query);
+
+            if (query.length >= 2) {
+                fetchDynamicSearch(query).then(dynamicCount => {
+                    checkEmptyState(query, staticCount, dynamicCount);
+                    setActiveEntry(0);
+                });
+            } else {
+                checkEmptyState(query, staticCount, 0);
+                setActiveEntry(0);
+            }
+        });
+    });
+
+    // Reset when palette opens
+    window.resetSpotlightPalette = function() {
+        activeCategory = 'all';
+        activeIndex = -1;
+        if (cmdInput) {
+            cmdInput.value = '';
+        }
+        categoryPills.forEach((p, idx) => {
+            if (idx === 0) {
+                p.classList.add('bg-primary', 'text-white', 'shadow-2xs', 'font-bold');
+                p.classList.remove('text-slate-600', 'font-medium');
+            } else {
+                p.classList.remove('bg-primary', 'text-white', 'shadow-2xs', 'font-bold');
+                p.classList.add('text-slate-600', 'font-medium');
+            }
+        });
+        if (dynamicContainer) dynamicContainer.innerHTML = '';
+        filterStaticEntries('');
+        checkEmptyState('', 1, 0);
+        setTimeout(() => setActiveEntry(0), 100);
+    };
+
+    // Global Shortcut Listener (Ctrl+K, Cmd+K, Escape)
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+            e.preventDefault();
+            const store = Alpine.store('admin');
+            if (store) {
+                if (store.commandPaletteOpen) {
+                    store.closeCommandPalette();
+                } else {
+                    store.openCommandPalette();
+                }
+            }
+        } else if (e.key === 'Escape') {
+            const store = Alpine.store('admin');
+            if (store && store.commandPaletteOpen) {
+                store.closeCommandPalette();
+            }
+            if (store && store.mobileSidebarOpen) {
+                store.closeMobileSidebar();
+            }
+        }
+    });
+
+    // Initial pass to prepare state
+    filterStaticEntries('');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initSpotlight();
 });
 
 // =============================================================================

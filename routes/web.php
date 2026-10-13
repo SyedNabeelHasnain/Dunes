@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\AdminOperationsController;
 use App\Http\Controllers\Admin\AdminPageController;
 use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\AdminSettingController;
+use App\Http\Controllers\Admin\AdminSpotlightController;
 use App\Http\Controllers\Admin\AdminSubscriberController;
 use App\Http\Controllers\Admin\AdminSubscriberGroupController;
 use App\Http\Controllers\Admin\AdminTourController;
@@ -119,6 +120,7 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::get('/active-visitors', [AdminDashboardController::class, 'activeVisitors'])->name('active-visitors');
     Route::get('/api/kpis', [AdminDashboardController::class, 'liveKpis'])->name('api.kpis');
     Route::get('/api/bookings-stats', [AdminBookingController::class, 'liveStats'])->name('api.bookings.stats');
+    Route::get('/api/spotlight', [AdminSpotlightController::class, 'search'])->name('api.spotlight');
     Route::post('/quick-payment', [AdminDashboardController::class, 'createQuickPayment'])->name('quick-payment');
 
     // Tours, Tiers, Addons, and Pricing

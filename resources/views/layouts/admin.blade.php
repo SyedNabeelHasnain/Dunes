@@ -344,6 +344,9 @@
                 <button type="button" @click="$store.admin.toggleMobileSidebar()" class="lg:hidden p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition" title="Toggle Navigation Menu">
                     <i class="bi bi-list text-xl"></i>
                 </button>
+                <button type="button" @click="$store.admin.openCommandPalette()" class="sm:hidden p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition" title="Search Spotlight (Ctrl K)">
+                    <i class="bi bi-search text-primary text-base"></i>
+                </button>
                 <h1 class="text-lg md:text-xl font-extrabold text-slate-900 capitalize tracking-tight mb-0">@yield('page_title', 'Dashboard')</h1>
             </div>
 
@@ -453,7 +456,7 @@
          x-transition:leave="transition-opacity ease-in duration-150"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
-         class="fixed inset-0 z-50 flex items-start justify-center p-4 pt-16 md:pt-24 bg-slate-900/60 backdrop-blur-xs"
+         class="fixed inset-0 z-50 flex items-start justify-center p-3 sm:p-4 pt-12 md:pt-20 bg-slate-950/70 backdrop-blur-xs"
          style="display: none;">
         <div @click.outside="$store.admin.closeCommandPalette()"
              x-transition:enter="transition-all ease-out duration-200"
@@ -462,126 +465,447 @@
              x-transition:leave="transition-all ease-in duration-150"
              x-transition:leave-start="opacity-100 scale-100"
              x-transition:leave-end="opacity-0 scale-95"
-             class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[80vh]">
+             class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[85vh]">
+            
             <!-- Header Search Input -->
-            <div class="p-3 bg-slate-50 border-b border-slate-200 flex items-center gap-3">
-                <i class="bi bi-search text-primary text-lg ms-2"></i>
-                <input type="text" id="cmdInput" placeholder="Search actions, tours, bookings, or pages... (Esc to close)" class="w-full bg-transparent border-0 outline-none text-slate-800 text-base font-semibold placeholder:text-slate-400 placeholder:font-normal focus:ring-0">
+            <div class="p-3.5 bg-slate-50 border-b border-slate-200 flex items-center gap-3">
+                <div class="relative flex items-center justify-center ms-1">
+                    <i id="cmdSearchIcon" class="bi bi-search text-primary text-lg"></i>
+                    <div id="cmdSpinner" class="hidden animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
+                </div>
+                <input type="text" id="cmdInput" placeholder="Search actions, tours, bookings, guests, pages, settings... (Esc to close)" autocomplete="off" class="w-full bg-transparent border-0 outline-none text-slate-800 text-sm sm:text-base font-semibold placeholder:text-slate-400 placeholder:font-normal focus:ring-0">
                 <button type="button" @click="$store.admin.closeCommandPalette()" class="p-1 text-slate-400 hover:text-slate-600 rounded-lg">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>
+
+            <!-- Quick Filter Tabs -->
+            <div class="px-3.5 py-2 bg-slate-50/50 border-b border-slate-200/80 flex items-center gap-1.5 overflow-x-auto text-xs no-scrollbar shrink-0" id="cmdCategoryPills">
+                <button type="button" class="cmd-pill px-2.5 py-1 rounded-lg font-bold text-xs bg-primary text-white shadow-2xs transition shrink-0" data-category="all">All</button>
+                <button type="button" class="cmd-pill px-2.5 py-1 rounded-lg font-medium text-xs text-slate-600 hover:bg-slate-200/60 transition shrink-0" data-category="actions"><i class="bi bi-lightning-charge-fill text-amber-500 me-1"></i>Quick Actions</button>
+                <button type="button" class="cmd-pill px-2.5 py-1 rounded-lg font-medium text-xs text-slate-600 hover:bg-slate-200/60 transition shrink-0" data-category="navigation"><i class="bi bi-compass-fill text-primary me-1"></i>CMS Sections</button>
+                <button type="button" class="cmd-pill px-2.5 py-1 rounded-lg font-medium text-xs text-slate-600 hover:bg-slate-200/60 transition shrink-0" data-category="bookings"><i class="bi bi-calendar2-check-fill text-emerald-500 me-1"></i>Bookings</button>
+                <button type="button" class="cmd-pill px-2.5 py-1 rounded-lg font-medium text-xs text-slate-600 hover:bg-slate-200/60 transition shrink-0" data-category="tours"><i class="bi bi-sun-fill text-orange-500 me-1"></i>Tours</button>
+                <button type="button" class="cmd-pill px-2.5 py-1 rounded-lg font-medium text-xs text-slate-600 hover:bg-slate-200/60 transition shrink-0" data-category="inquiries"><i class="bi bi-chat-dots-fill text-cyan-500 me-1"></i>Leads & Inquiries</button>
+                <button type="button" class="cmd-pill px-2.5 py-1 rounded-lg font-medium text-xs text-slate-600 hover:bg-slate-200/60 transition shrink-0" data-category="marketing"><i class="bi bi-ticket-perforated-fill text-rose-500 me-1"></i>Marketing & Promos</button>
+                <button type="button" class="cmd-pill px-2.5 py-1 rounded-lg font-medium text-xs text-slate-600 hover:bg-slate-200/60 transition shrink-0" data-category="content"><i class="bi bi-journal-richtext text-emerald-600 me-1"></i>Content & Blogs</button>
+                <button type="button" class="cmd-pill px-2.5 py-1 rounded-lg font-medium text-xs text-slate-600 hover:bg-slate-200/60 transition shrink-0" data-category="settings"><i class="bi bi-sliders text-amber-500 me-1"></i>Settings & SEO</button>
+                <button type="button" class="cmd-pill px-2.5 py-1 rounded-lg font-medium text-xs text-slate-600 hover:bg-slate-200/60 transition shrink-0" data-category="preview"><i class="bi bi-box-arrow-up-right text-sky-500 me-1"></i>Live Website</button>
+            </div>
+
             <!-- Search Results Scrollable Body -->
-            <div class="p-4 overflow-y-auto space-y-4 flex-1">
-                <!-- Quick Actions Section -->
-                <div class="cmd-section" data-section="actions">
-                    <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2 px-1">Quick Actions</div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        <div class="cmd-entry" data-keywords="create booking manual reservation new order walk-in">
-                            <a href="{{ route('admin.bookings.create') }}" class="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group">
-                                <i class="bi bi-calendar-plus-fill text-primary text-xl"></i>
-                                <div>
-                                    <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Create Manual Booking</strong>
-                                    <span class="text-[11px] text-slate-500">Add a walk-in, phone, or WhatsApp booking</span>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="cmd-entry" data-keywords="add tour create new tour">
-                            <a href="{{ route('admin.tours.create') }}" class="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group">
-                                <i class="bi bi-plus-circle-fill text-primary text-xl"></i>
-                                <div>
-                                    <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Add New Tour</strong>
-                                    <span class="text-[11px] text-slate-500">Create a new safari or excursion</span>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="cmd-entry" data-keywords="add addon create add-on upgrade">
-                            <a href="{{ route('admin.addons.index') }}" class="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group">
-                                <i class="bi bi-puzzle-fill text-amber-500 text-xl"></i>
-                                <div>
-                                    <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Manage Tour Add-ons</strong>
-                                    <span class="text-[11px] text-slate-500">Quad biking, VIP seating, buggy</span>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="cmd-entry" data-keywords="write blog new article post">
-                            <a href="{{ route('admin.blogs.create') }}" class="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group">
-                                <i class="bi bi-journal-plus text-emerald-500 text-xl"></i>
-                                <div>
-                                    <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Write Blog Post</strong>
-                                    <span class="text-[11px] text-slate-500">Publish desert guides and tips</span>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="cmd-entry" data-keywords="coupon promo discount voucher code create">
-                            <a href="{{ route('admin.coupons.create') }}" class="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group">
-                                <i class="bi bi-ticket-perforated-fill text-rose-500 text-xl"></i>
-                                <div>
-                                    <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Create Promo Code</strong>
-                                    <span class="text-[11px] text-slate-500">Discounts and voucher campaigns</span>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="cmd-entry" data-keywords="export bookings csv download excel">
-                            <a href="{{ route('admin.bookings.export') }}" class="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group">
-                                <i class="bi bi-file-earmark-spreadsheet-fill text-emerald-600 text-xl"></i>
-                                <div>
-                                    <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Export Bookings (CSV)</strong>
-                                    <span class="text-[11px] text-slate-500">Download customer spreadsheet</span>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="cmd-entry" data-keywords="clear cache purge system views routes config">
-                            <a href="javascript:void(0);" class="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition clear-cache-trigger group">
-                                <i class="bi bi-arrow-repeat text-amber-500 text-xl"></i>
-                                <div>
-                                    <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Purge System Cache</strong>
-                                    <span class="text-[11px] text-slate-500">Flush views, routes, config</span>
-                                </div>
-                            </a>
-                        </div>
+            <div class="p-4 overflow-y-auto space-y-5 flex-1" id="cmdResultsBody">
+                
+                <!-- Dynamic Real-Time Database Search Results Container -->
+                <div id="dynamicSpotlightResults" class="space-y-4"></div>
+
+                <!-- Empty State Card -->
+                <div id="cmdEmptyState" class="hidden text-center py-10 px-4">
+                    <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3 text-xl">
+                        <i class="bi bi-search"></i>
                     </div>
+                    <div class="font-bold text-slate-800 text-sm mb-1" id="cmdEmptyTitle">No results found</div>
+                    <div class="text-xs text-slate-500 max-w-sm mx-auto" id="cmdEmptySubtitle">Try searching by booking reference (#DT-), customer name, email, tour name, coupon code, or page title.</div>
                 </div>
 
-                <!-- Navigation Shortcuts Section -->
-                <div class="cmd-section" data-section="navigation">
-                    <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2 px-1">Navigation Shortcuts</div>
-                    <div class="space-y-1">
-                        <a href="{{ route('admin.dashboard') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-keywords="dashboard overview revenue kpi stats">
-                            <span class="flex items-center gap-2"><i class="bi bi-grid-1x2-fill text-primary"></i> Dashboard Overview</span>
-                            <span class="text-[10px] text-slate-400 font-mono">/admin/dashboard</span>
-                        </a>
-                        <a href="{{ route('admin.bookings.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-keywords="bookings orders customers reservations payments">
-                            <span class="flex items-center gap-2"><i class="bi bi-calendar2-check-fill text-primary"></i> Bookings & Reservations</span>
-                            <span class="text-[10px] text-slate-400 font-mono">/admin/bookings</span>
-                        </a>
-                        <a href="{{ route('admin.operations.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-keywords="operations dispatch manifest drivers pickup logistics">
-                            <span class="flex items-center gap-2"><i class="bi bi-truck-flatbed text-amber-500"></i> Daily Operations Manifest</span>
-                            <span class="text-[10px] text-slate-400 font-mono">/admin/operations</span>
-                        </a>
-                        <a href="{{ route('admin.tours.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-keywords="tours inventory safari quad buggy glamping">
-                            <span class="flex items-center gap-2"><i class="bi bi-compass-fill text-primary"></i> Tours Inventory</span>
-                            <span class="text-[10px] text-slate-400 font-mono">/admin/tours</span>
-                        </a>
-                        <a href="{{ route('admin.campaigns.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-keywords="campaigns email marketing newsletters broadcasts analytics stats clicks opens">
-                            <span class="flex items-center gap-2"><i class="bi bi-megaphone-fill text-amber-500"></i> Email Campaigns</span>
-                            <span class="text-[10px] text-slate-400 font-mono">/admin/campaigns</span>
-                        </a>
-                        <a href="{{ route('admin.analytics.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-keywords="analytics traffic visitors acquisition referrers sources campaigns utm">
-                            <span class="flex items-center gap-2"><i class="bi bi-graph-up-arrow text-primary"></i> Analytics Dashboard</span>
-                            <span class="text-[10px] text-slate-400 font-mono">/admin/analytics</span>
-                        </a>
-                        <a href="{{ route('admin.settings.general') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-keywords="settings identity logo contact general">
-                            <span class="flex items-center gap-2"><i class="bi bi-sliders text-amber-500"></i> Portal Settings</span>
-                            <span class="text-[10px] text-slate-400 font-mono">/admin/settings/general</span>
-                        </a>
+                <!-- Static Categorized Catalog -->
+                <div id="staticSpotlightSections" class="space-y-5">
+                    
+                    <!-- Quick Actions Section -->
+                    <div class="cmd-section" data-section="actions">
+                        <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2 px-1 flex items-center justify-between">
+                            <span class="flex items-center gap-1.5"><i class="bi bi-lightning-charge-fill text-amber-500"></i> Quick Actions & Creators</span>
+                            <span class="text-[10px] text-slate-400 font-mono">15 actions</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <div class="cmd-entry rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group cursor-pointer" data-category="actions" data-keywords="create booking manual reservation new order walk-in phone whatsapp add reservation">
+                                <a href="{{ route('admin.bookings.create') }}" class="flex items-center gap-3 p-2.5">
+                                    <i class="bi bi-calendar-plus-fill text-primary text-xl shrink-0"></i>
+                                    <div>
+                                        <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Create Manual Booking</strong>
+                                        <span class="text-[11px] text-slate-500">Walk-in, phone, or WhatsApp reservation</span>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="cmd-entry rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group cursor-pointer" data-category="actions" data-keywords="add tour create new tour safari package inventory">
+                                <a href="{{ route('admin.tours.create') }}" class="flex items-center gap-3 p-2.5">
+                                    <i class="bi bi-plus-circle-fill text-primary text-xl shrink-0"></i>
+                                    <div>
+                                        <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Add New Tour</strong>
+                                        <span class="text-[11px] text-slate-500">Create a new safari, buggy, or excursion</span>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="cmd-entry rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group cursor-pointer" data-category="actions" data-keywords="add addon create add-on upgrade quad buggy vip seating">
+                                <a href="{{ route('admin.addons.index') }}" class="flex items-center gap-3 p-2.5">
+                                    <i class="bi bi-puzzle-fill text-amber-500 text-xl shrink-0"></i>
+                                    <div>
+                                        <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Manage Tour Add-ons</strong>
+                                        <span class="text-[11px] text-slate-500">Quad bikes, dune buggies, VIP upgrades</span>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="cmd-entry rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group cursor-pointer" data-category="actions" data-keywords="pricing tiers standard premium luxury vip rate card">
+                                <a href="{{ route('admin.tiers.index') }}" class="flex items-center gap-3 p-2.5">
+                                    <i class="bi bi-layers-fill text-sky-500 text-xl shrink-0"></i>
+                                    <div>
+                                        <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Tour Pricing Tiers</strong>
+                                        <span class="text-[11px] text-slate-500">Standard, Premium, Luxury, VIP tiers</span>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="cmd-entry rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group cursor-pointer" data-category="actions" data-keywords="pricing matrix season holiday weekend rate card bulk pricing">
+                                <a href="{{ route('admin.pricing.index') }}" class="flex items-center gap-3 p-2.5">
+                                    <i class="bi bi-cash-stack text-emerald-600 text-xl shrink-0"></i>
+                                    <div>
+                                        <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Pricing Matrix Grid</strong>
+                                        <span class="text-[11px] text-slate-500">Bulk price management across inventory</span>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="cmd-entry rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group cursor-pointer" data-category="actions" data-keywords="write blog new article post desert travel guide publish">
+                                <a href="{{ route('admin.blogs.create') }}" class="flex items-center gap-3 p-2.5">
+                                    <i class="bi bi-journal-plus text-emerald-500 text-xl shrink-0"></i>
+                                    <div>
+                                        <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Write Blog Post</strong>
+                                        <span class="text-[11px] text-slate-500">Publish desert guides and travel insights</span>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="cmd-entry rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group cursor-pointer" data-category="actions" data-keywords="coupon promo discount voucher code create gift campaign">
+                                <a href="{{ route('admin.coupons.create') }}" class="flex items-center gap-3 p-2.5">
+                                    <i class="bi bi-ticket-perforated-fill text-rose-500 text-xl shrink-0"></i>
+                                    <div>
+                                        <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Create Promo Code</strong>
+                                        <span class="text-[11px] text-slate-500">Discounts and voucher campaigns</span>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="cmd-entry rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group cursor-pointer" data-category="actions" data-keywords="popup welcome offer banner exit intent sticky bar promo discount modal">
+                                <a href="{{ route('admin.coupons.popup-settings') }}" class="flex items-center gap-3 p-2.5">
+                                    <i class="bi bi-gift-fill text-amber-500 text-xl shrink-0"></i>
+                                    <div>
+                                        <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Welcome Offer & Banner</strong>
+                                        <span class="text-[11px] text-slate-500">Configure popups & sticky top banners</span>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="cmd-entry rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group cursor-pointer" data-category="actions" data-keywords="email template create notification layout design newsletter">
+                                <a href="{{ route('admin.email-templates.create') }}" class="flex items-center gap-3 p-2.5">
+                                    <i class="bi bi-envelope-plus text-rose-500 text-xl shrink-0"></i>
+                                    <div>
+                                        <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Create Email Template</strong>
+                                        <span class="text-[11px] text-slate-500">Design automated marketing emails</span>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="cmd-entry rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group cursor-pointer" data-category="actions" data-keywords="campaign broadcast create send email marketing newsletter blast">
+                                <a href="{{ route('admin.campaigns.create') }}" class="flex items-center gap-3 p-2.5">
+                                    <i class="bi bi-megaphone-fill text-amber-500 text-xl shrink-0"></i>
+                                    <div>
+                                        <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Create Email Campaign</strong>
+                                        <span class="text-[11px] text-slate-500">Broadcast newsletters to subscribers</span>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="cmd-entry rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group cursor-pointer" data-category="actions" data-keywords="export bookings csv download excel sheet customers report">
+                                <a href="{{ route('admin.bookings.export') }}" class="flex items-center gap-3 p-2.5">
+                                    <i class="bi bi-file-earmark-spreadsheet-fill text-emerald-600 text-xl shrink-0"></i>
+                                    <div>
+                                        <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Export Bookings (CSV)</strong>
+                                        <span class="text-[11px] text-slate-500">Customer spreadsheet & revenues</span>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="cmd-entry rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group cursor-pointer" data-category="actions" data-keywords="export inquiries csv messages leads excel spreadsheet">
+                                <a href="{{ route('admin.inquiries.export') }}" class="flex items-center gap-3 p-2.5">
+                                    <i class="bi bi-envelope-arrow-down-fill text-cyan-600 text-xl shrink-0"></i>
+                                    <div>
+                                        <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Export Inquiries (CSV)</strong>
+                                        <span class="text-[11px] text-slate-500">Download customer contact messages</span>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="cmd-entry rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group cursor-pointer" data-category="actions" data-keywords="export whatsapp leads csv chat numbers phone excel spreadsheet">
+                                <a href="{{ route('admin.whatsapp.export') }}" class="flex items-center gap-3 p-2.5">
+                                    <i class="bi bi-file-earmark-arrow-down-fill text-emerald-500 text-xl shrink-0"></i>
+                                    <div>
+                                        <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Export WhatsApp Leads (CSV)</strong>
+                                        <span class="text-[11px] text-slate-500">Export chat contacts & inquiries</span>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="cmd-entry rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group cursor-pointer" data-category="actions" data-keywords="operations dispatch manifest drivers pickup logistics daily departures">
+                                <a href="{{ route('admin.operations.index') }}" class="flex items-center gap-3 p-2.5">
+                                    <i class="bi bi-truck-flatbed text-amber-500 text-xl shrink-0"></i>
+                                    <div>
+                                        <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Daily Operations Manifest</strong>
+                                        <span class="text-[11px] text-slate-500">Assign drivers & track live departures</span>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="cmd-entry rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group cursor-pointer" data-category="actions" data-keywords="clear cache purge system views routes config redis flush clean reload">
+                                <a href="javascript:void(0);" class="flex items-center gap-3 p-2.5 clear-cache-trigger">
+                                    <i class="bi bi-arrow-repeat text-amber-500 text-xl shrink-0"></i>
+                                    <div>
+                                        <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Purge System Cache</strong>
+                                        <span class="text-[11px] text-slate-500">Flush views, routes, config, and cache</span>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- Core CMS Navigation Section -->
+                    <div class="cmd-section" data-section="navigation">
+                        <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2 px-1 flex items-center justify-between">
+                            <span class="flex items-center gap-1.5"><i class="bi bi-compass-fill text-primary"></i> CMS Modules & Management</span>
+                            <span class="text-[10px] text-slate-400 font-mono">16 modules</span>
+                        </div>
+                        <div class="space-y-1">
+                            <a href="{{ route('admin.dashboard') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="dashboard overview revenue kpi stats summary realtime">
+                                <span class="flex items-center gap-2"><i class="bi bi-grid-1x2-fill text-primary"></i> Dashboard Overview & KPIs</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/dashboard</span>
+                            </a>
+                            <a href="{{ route('admin.analytics.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="analytics traffic visitors acquisition referrers sources campaigns utm">
+                                <span class="flex items-center gap-2"><i class="bi bi-graph-up-arrow text-primary"></i> Real-Time Analytics Dashboard</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/analytics</span>
+                            </a>
+                            <a href="{{ route('admin.bookings.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="bookings orders customers reservations payments guest tickets status">
+                                <span class="flex items-center gap-2"><i class="bi bi-calendar2-check-fill text-primary"></i> Bookings & Reservations</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/bookings</span>
+                            </a>
+                            <a href="{{ route('admin.operations.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="operations dispatch manifest drivers pickup logistics departures">
+                                <span class="flex items-center gap-2"><i class="bi bi-truck-flatbed text-amber-500"></i> Daily Operations Manifest & Drivers</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/operations</span>
+                            </a>
+                            <a href="{{ route('admin.inquiries.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="inquiries contact messages leads forms support questions">
+                                <span class="flex items-center gap-2"><i class="bi bi-envelope-paper-fill text-amber-500"></i> Customer Inquiries</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/inquiries</span>
+                            </a>
+                            <a href="{{ route('admin.whatsapp.leads') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="whatsapp leads chats conversations phone numbers inquiries">
+                                <span class="flex items-center gap-2"><i class="bi bi-whatsapp text-emerald-500"></i> WhatsApp Leads & Chats</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/whatsapp-leads</span>
+                            </a>
+                            <a href="{{ route('admin.tours.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="tours inventory catalog safari quad buggy glamping evening morning">
+                                <span class="flex items-center gap-2"><i class="bi bi-compass-fill text-primary"></i> Tours Inventory</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/tours</span>
+                            </a>
+                            <a href="{{ route('admin.addons.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="addons extras upgrades quad buggy vip seating">
+                                <span class="flex items-center gap-2"><i class="bi bi-puzzle-fill text-amber-500"></i> Tour Add-ons Management</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/addons</span>
+                            </a>
+                            <a href="{{ route('admin.tiers.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="tiers pricing standard vip premium luxury">
+                                <span class="flex items-center gap-2"><i class="bi bi-layers-fill text-sky-500"></i> Pricing Tiers</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/tiers</span>
+                            </a>
+                            <a href="{{ route('admin.pricing.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="pricing matrix bulk calendar rates seasonal">
+                                <span class="flex items-center gap-2"><i class="bi bi-cash-stack text-emerald-600"></i> Pricing Matrix</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/pricing</span>
+                            </a>
+                            <a href="{{ route('admin.blogs.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="blogs articles posts guides desert travel tips publishing">
+                                <span class="flex items-center gap-2"><i class="bi bi-journal-richtext text-emerald-500"></i> Blog Articles & Posts</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/blogs</span>
+                            </a>
+                            <a href="{{ route('admin.blog-categories.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="blog categories topics tags taxonomy">
+                                <span class="flex items-center gap-2"><i class="bi bi-folder-fill text-amber-500"></i> Blog Categories</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/blog-categories</span>
+                            </a>
+                            <a href="{{ route('admin.reviews.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="reviews ratings testimonials feedback google tripadvisor website">
+                                <span class="flex items-center gap-2"><i class="bi bi-star-half text-amber-400"></i> Customer Reviews & Moderation</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/reviews</span>
+                            </a>
+                            <a href="{{ route('admin.faqs.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="faqs questions answers help accordion tour faq">
+                                <span class="flex items-center gap-2"><i class="bi bi-question-circle-fill text-sky-500"></i> FAQs Management</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/faqs</span>
+                            </a>
+                            <a href="{{ route('admin.legal.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="legal policies terms condition privacy policy cancellation refund gdpr">
+                                <span class="flex items-center gap-2"><i class="bi bi-shield-check text-indigo-500"></i> Legal Policies & Terms</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/legal-pages</span>
+                            </a>
+                            <a href="{{ route('admin.pages.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="pages content home about contact sections cms builder">
+                                <span class="flex items-center gap-2"><i class="bi bi-file-earmark-richtext-fill text-amber-500"></i> Dynamic Pages & Content CMS</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/pages</span>
+                            </a>
+                            <a href="{{ route('admin.menus.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="menus navigation header footer links navbar hierarchy">
+                                <span class="flex items-center gap-2"><i class="bi bi-menu-button-wide-fill text-sky-500"></i> Navigation Menus Manager</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/menus</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Marketing & Email Marketing Section -->
+                    <div class="cmd-section" data-section="marketing">
+                        <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2 px-1 flex items-center justify-between">
+                            <span class="flex items-center gap-1.5"><i class="bi bi-ticket-perforated-fill text-rose-500"></i> Marketing & Audiences</span>
+                            <span class="text-[10px] text-slate-400 font-mono">6 modules</span>
+                        </div>
+                        <div class="space-y-1">
+                            <a href="{{ route('admin.coupons.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="marketing" data-keywords="coupons promos discount vouchers codes campaigns">
+                                <span class="flex items-center gap-2"><i class="bi bi-ticket-perforated-fill text-rose-500"></i> Coupons & Promo Codes</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/coupons</span>
+                            </a>
+                            <a href="{{ route('admin.coupons.popup-settings') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="marketing" data-keywords="welcome offer popup sticky banner discount exit intent">
+                                <span class="flex items-center gap-2"><i class="bi bi-gift-fill text-amber-500"></i> Welcome Offer Popup & Topbar</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/coupons/popup-settings</span>
+                            </a>
+                            <a href="{{ route('admin.subscribers.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="marketing" data-keywords="subscribers newsletter email audience marketing club vip contacts">
+                                <span class="flex items-center gap-2"><i class="bi bi-people-fill text-sky-500"></i> Email Subscribers & Lists</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/subscribers</span>
+                            </a>
+                            <a href="{{ route('admin.subscriber-groups.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="marketing" data-keywords="subscriber groups segments tags audiences lists">
+                                <span class="flex items-center gap-2"><i class="bi bi-diagram-3-fill text-cyan-500"></i> Subscriber Groups & Segments</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/subscriber-groups</span>
+                            </a>
+                            <a href="{{ route('admin.email-templates.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="marketing" data-keywords="email templates html responsive layouts newsletters">
+                                <span class="flex items-center gap-2"><i class="bi bi-envelope-paper-heart-fill text-rose-400"></i> Email Templates</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/email-templates</span>
+                            </a>
+                            <a href="{{ route('admin.campaigns.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="marketing" data-keywords="campaigns email broadcast blast marketing stats open click rates">
+                                <span class="flex items-center gap-2"><i class="bi bi-megaphone-fill text-amber-500"></i> Campaigns & Broadcast Analytics</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/campaigns</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Portal Settings & SEO Section -->
+                    <div class="cmd-section" data-section="settings">
+                        <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2 px-1 flex items-center justify-between">
+                            <span class="flex items-center gap-1.5"><i class="bi bi-sliders text-amber-500"></i> Portal Settings, SEO & Integrations</span>
+                            <span class="text-[10px] text-slate-400 font-mono">13 panels</span>
+                        </div>
+                        <div class="space-y-1">
+                            <a href="{{ route('admin.settings.general') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="settings" data-keywords="settings identity logo favicon brand phone email address contact copyright">
+                                <span class="flex items-center gap-2"><i class="bi bi-sliders text-amber-500"></i> General Identity & Contact</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/settings/general</span>
+                            </a>
+                            <a href="{{ route('admin.settings.seo') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="settings" data-keywords="seo metadata canonical robots meta title description sitemap search console google indexing indexnow">
+                                <span class="flex items-center gap-2"><i class="bi bi-search text-sky-500"></i> SEO & Search Engine Indexing</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/settings/seo</span>
+                            </a>
+                            <a href="{{ route('admin.settings.marketing') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="settings" data-keywords="marketing promos banner settings exit intent popups tracking">
+                                <span class="flex items-center gap-2"><i class="bi bi-megaphone text-rose-500"></i> Marketing & Promo Settings</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/settings/marketing</span>
+                            </a>
+                            <a href="{{ route('admin.settings.mail') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="settings" data-keywords="mail smtp mailer host port username password tls ssl encryption transactional">
+                                <span class="flex items-center gap-2"><i class="bi bi-envelope-gear text-sky-500"></i> SMTP & Mailer Setup</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/settings/mail</span>
+                            </a>
+                            <a href="{{ route('admin.settings.google') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="settings" data-keywords="google tag manager gtm analytics ga4 search console place id business profile maps">
+                                <span class="flex items-center gap-2"><i class="bi bi-google text-rose-500"></i> Google Integrations & Local SEO</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/settings/google</span>
+                            </a>
+                            <a href="{{ route('admin.settings.gttd') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="settings" data-keywords="google things to do gttd feed products attractions xml partner operator">
+                                <span class="flex items-center gap-2"><i class="bi bi-patch-check-fill text-emerald-500"></i> Google Things To Do (GTTD)</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/settings/gttd</span>
+                            </a>
+                            <a href="{{ route('admin.settings.meta') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="settings" data-keywords="meta facebook pixel capi conversion api access token tracking ads">
+                                <span class="flex items-center gap-2"><i class="bi bi-meta text-sky-500"></i> Meta / Facebook Pixel & CAPI</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/settings/meta</span>
+                            </a>
+                            <a href="{{ route('admin.whatsapp.settings') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="settings" data-keywords="whatsapp business number api message template float widget setup">
+                                <span class="flex items-center gap-2"><i class="bi bi-gear-wide-connected text-emerald-500"></i> WhatsApp Business Setup</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/whatsapp-settings</span>
+                            </a>
+                            <a href="{{ route('admin.settings.currency') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="settings" data-keywords="currency exchange rates aed usd eur gbp sar inr base multi currency">
+                                <span class="flex items-center gap-2"><i class="bi bi-currency-exchange text-cyan-500"></i> Currency & Exchange Rates</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/settings/currency</span>
+                            </a>
+                            <a href="{{ route('admin.settings.languages') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="settings" data-keywords="languages locales english arabic russian spanish italian rtl translation active">
+                                <span class="flex items-center gap-2"><i class="bi bi-translate text-emerald-500"></i> Multi-Language & Locales</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/settings/languages</span>
+                            </a>
+                            <a href="{{ route('admin.settings.translations') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="settings" data-keywords="translation api deepl google cloud automated catalog in-form auto translate">
+                                <span class="flex items-center gap-2"><i class="bi bi-robot text-amber-500"></i> Automated Translation APIs</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/settings/translations</span>
+                            </a>
+                            <a href="{{ route('admin.profile') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="settings" data-keywords="profile security password name email admin credentials two factor">
+                                <span class="flex items-center gap-2"><i class="bi bi-person-gear text-slate-500"></i> Administrator Profile & Security</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/profile</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Live Public Previews & Tools Section -->
+                    <div class="cmd-section" data-section="preview">
+                        <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2 px-1 flex items-center justify-between">
+                            <span class="flex items-center gap-1.5"><i class="bi bi-box-arrow-up-right text-sky-500"></i> Public Website & Feeds</span>
+                            <span class="text-[10px] text-slate-400 font-mono">14 tools</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <a href="{{ url('/') }}" target="_blank" class="cmd-entry flex items-center justify-between p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="preview" data-keywords="live website frontend homepage client landing">
+                                <span class="flex items-center gap-2"><i class="bi bi-house-door-fill text-primary"></i> Live Website Homepage</span>
+                                <i class="bi bi-box-arrow-up-right text-slate-400 text-xs"></i>
+                            </a>
+                            <a href="{{ url('/rate-card') }}" target="_blank" class="cmd-entry flex items-center justify-between p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="preview" data-keywords="rate card pricing sheet prices safari packages rates">
+                                <span class="flex items-center gap-2"><i class="bi bi-file-earmark-pdf-fill text-amber-500"></i> Official Rate Card (2026)</span>
+                                <i class="bi bi-box-arrow-up-right text-slate-400 text-xs"></i>
+                            </a>
+                            <a href="{{ url('/dubai-desert-sunset-times') }}" target="_blank" class="cmd-entry flex items-center justify-between p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="preview" data-keywords="sunset times desert guide lahbab golden hour twilight schedule">
+                                <span class="flex items-center gap-2"><i class="bi bi-sunset-fill text-orange-500"></i> Desert Sunset Times Guide</span>
+                                <i class="bi bi-box-arrow-up-right text-slate-400 text-xs"></i>
+                            </a>
+                            <a href="{{ url('/build-your-own-safari') }}" target="_blank" class="cmd-entry flex items-center justify-between p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="preview" data-keywords="custom safari builder build your own customizer package calculator">
+                                <span class="flex items-center gap-2"><i class="bi bi-sliders2-vertical text-primary"></i> Custom Safari Builder</span>
+                                <i class="bi bi-box-arrow-up-right text-slate-400 text-xs"></i>
+                            </a>
+                            <a href="{{ url('/dune-buggy-rental-dubai') }}" target="_blank" class="cmd-entry flex items-center justify-between p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="preview" data-keywords="dune buggy rental can am polaris desert off road quad">
+                                <span class="flex items-center gap-2"><i class="bi bi-ev-front-fill text-rose-500"></i> Dune Buggy Rental Dubai</span>
+                                <i class="bi bi-box-arrow-up-right text-slate-400 text-xs"></i>
+                            </a>
+                            <a href="{{ url('/gallery') }}" target="_blank" class="cmd-entry flex items-center justify-between p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="preview" data-keywords="gallery photos videos instagram reels media guests albums">
+                                <span class="flex items-center gap-2"><i class="bi bi-images text-indigo-500"></i> Media & Guest Gallery</span>
+                                <i class="bi bi-box-arrow-up-right text-slate-400 text-xs"></i>
+                            </a>
+                            <a href="{{ url('/contact') }}" target="_blank" class="cmd-entry flex items-center justify-between p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="preview" data-keywords="contact us form location bur dubai phone map">
+                                <span class="flex items-center gap-2"><i class="bi bi-geo-alt-fill text-emerald-500"></i> Contact Us Page</span>
+                                <i class="bi bi-box-arrow-up-right text-slate-400 text-xs"></i>
+                            </a>
+                            <a href="{{ url('/about') }}" target="_blank" class="cmd-entry flex items-center justify-between p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="preview" data-keywords="about company story license det tourism dunes discovery">
+                                <span class="flex items-center gap-2"><i class="bi bi-building text-slate-600"></i> About Us Page</span>
+                                <i class="bi bi-box-arrow-up-right text-slate-400 text-xs"></i>
+                            </a>
+                            <a href="{{ url('/faq') }}" target="_blank" class="cmd-entry flex items-center justify-between p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="preview" data-keywords="faq questions answers help guides info">
+                                <span class="flex items-center gap-2"><i class="bi bi-patch-question-fill text-sky-500"></i> Customer FAQs Page</span>
+                                <i class="bi bi-box-arrow-up-right text-slate-400 text-xs"></i>
+                            </a>
+                            <a href="{{ url('/press-kit') }}" target="_blank" class="cmd-entry flex items-center justify-between p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="preview" data-keywords="press kit media assets logos brand guidelines badges">
+                                <span class="flex items-center gap-2"><i class="bi bi-award-fill text-amber-500"></i> Press & Media Kit</span>
+                                <i class="bi bi-box-arrow-up-right text-slate-400 text-xs"></i>
+                            </a>
+                            <a href="{{ url('/sitemap.xml') }}" target="_blank" class="cmd-entry flex items-center justify-between p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="preview" data-keywords="sitemap xml search engines indexing googlebot">
+                                <span class="flex items-center gap-2"><i class="bi bi-diagram-2-fill text-rose-500"></i> XML Sitemap Index</span>
+                                <i class="bi bi-box-arrow-up-right text-slate-400 text-xs"></i>
+                            </a>
+                            <a href="{{ url('/feeds/google-things-to-do.xml') }}" target="_blank" class="cmd-entry flex items-center justify-between p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="preview" data-keywords="google things to do feed products attractions xml live feed">
+                                <span class="flex items-center gap-2"><i class="bi bi-patch-check text-emerald-500"></i> Google Things To Do Feed</span>
+                                <i class="bi bi-box-arrow-up-right text-slate-400 text-xs"></i>
+                            </a>
+                            <a href="{{ url('/llms.txt') }}" target="_blank" class="cmd-entry flex items-center justify-between p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="preview" data-keywords="llms txt ai knowledge base bot search agent">
+                                <span class="flex items-center gap-2"><i class="bi bi-robot text-indigo-500"></i> AI Agent Knowledge (llms.txt)</span>
+                                <i class="bi bi-box-arrow-up-right text-slate-400 text-xs"></i>
+                            </a>
+                        </div>
+                    </div>
+
                 </div>
             </div>
+
             <!-- Modal Footer -->
-            <div class="p-3 bg-slate-50 border-t border-slate-200 text-xs text-slate-500 flex items-center justify-between">
-                <span>Use <kbd class="px-1.5 py-0.5 rounded bg-white border border-slate-200 text-[10px] font-mono">Esc</kbd> to close</span>
-                <span class="font-bold text-primary">DUNES SPOTLIGHT</span>
+            <div class="p-3 bg-slate-50 border-t border-slate-200 text-xs text-slate-500 flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span><kbd class="px-1.5 py-0.5 rounded bg-white border border-slate-200 text-[10px] font-mono shadow-2xs">↑</kbd> <kbd class="px-1.5 py-0.5 rounded bg-white border border-slate-200 text-[10px] font-mono shadow-2xs">↓</kbd> to navigate</span>
+                    <span class="text-slate-300">•</span>
+                    <span><kbd class="px-1.5 py-0.5 rounded bg-white border border-slate-200 text-[10px] font-mono shadow-2xs">↵</kbd> to select</span>
+                    <span class="text-slate-300">•</span>
+                    <span><kbd class="px-1.5 py-0.5 rounded bg-white border border-slate-200 text-[10px] font-mono shadow-2xs">Esc</kbd> to close</span>
+                </div>
+                <div class="flex items-center gap-2 ms-auto">
+                    <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
+                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Live DB Search
+                    </span>
+                    <span class="font-bold text-primary tracking-wide">DUNES SPOTLIGHT</span>
+                </div>
             </div>
         </div>
     </div>
