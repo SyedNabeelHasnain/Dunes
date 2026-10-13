@@ -50,6 +50,28 @@ class IndexNowService
     }
 
     /**
+     * Ensure the static IndexNow verification key file exists physically in public/.
+     * Enables direct web server serving without PHP execution overhead.
+     */
+    public function ensureKeyFileExists(): void
+    {
+        $key = $this->getKey();
+        if (empty($key)) {
+            return;
+        }
+
+        $filePath = public_path($key . '.txt');
+
+        try {
+            if (!file_exists($filePath) || trim((string) @file_get_contents($filePath)) !== $key) {
+                @file_put_contents($filePath, $key);
+            }
+        } catch (\Throwable $e) {
+            Log::warning('IndexNow: Could not write physical verification key file: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Get the host domain (e.g. dunesdiscoverytourism.com).
      */
     public function getHost(): string
@@ -65,10 +87,11 @@ class IndexNowService
 
     /**
      * Get key location verification URL.
+     * Must be an absolute HTTPS URL hosted on the verified domain.
      */
     public function getKeyLocation(): string
     {
-        return url('/'.$this->getKey().'.txt');
+        return 'https://' . $this->getHost() . '/' . $this->getKey() . '.txt';
     }
 
     /**
@@ -76,6 +99,8 @@ class IndexNowService
      */
     public function submit(array $urls): array
     {
+        $this->ensureKeyFileExists();
+
         $urls = array_values(array_unique(array_filter($urls)));
         if (empty($urls)) {
             return [
@@ -90,14 +115,24 @@ class IndexNowService
         $key = $this->getKey();
         $keyLocation = $this->getKeyLocation();
 
-        // Ensure URLs are absolute and belong to this host
+        // Ensure URLs are absolute HTTPS URLs belonging to this host
         $cleanUrls = [];
         foreach ($urls as $url) {
             $parsedHost = parse_url($url, PHP_URL_HOST);
-            if ($parsedHost === $host || $parsedHost === 'dunesdiscoverytourism.com' || $parsedHost === 'localhost' || empty($parsedHost)) {
-                $cleanUrls[] = str_starts_with($url, 'http') ? $url : url($url);
+            $parsedPath = parse_url($url, PHP_URL_PATH) ?? '/';
+            $parsedQuery = parse_url($url, PHP_URL_QUERY);
+
+            // Re-normalize URL to canonical https://{host}{path}
+            if ($parsedHost === $host || $parsedHost === 'dunesdiscoverytourism.com' || $parsedHost === 'localhost' || $parsedHost === '127.0.0.1' || empty($parsedHost)) {
+                $fullUrl = 'https://' . $host . ($parsedPath === '/' && empty($parsedQuery) ? '' : $parsedPath);
+                if (!empty($parsedQuery)) {
+                    $fullUrl .= '?' . $parsedQuery;
+                }
+                $cleanUrls[] = $fullUrl;
             }
         }
+
+        $cleanUrls = array_values(array_unique(array_filter($cleanUrls)));
 
         if (empty($cleanUrls)) {
             return [
@@ -127,15 +162,29 @@ class IndexNowService
                 ->post(self::API_ENDPOINT, $payload);
 
             $status = $response->status();
+            $body = $response->body();
             // HTTP 200 (OK) or 202 (Accepted) signify successful submission
             $isSuccess = in_array($status, [200, 202], true);
 
+            $isVerificationPending = false;
+            if ($isSuccess) {
+                $message = 'Successfully submitted ' . count($cleanUrls) . ' URLs to search engines (Bing, Yandex, etc.) via IndexNow.';
+            } elseif ($status === 403 || str_contains($body, 'SiteVerificationNotCompleted')) {
+                $isVerificationPending = true;
+                $message = "Site verification is in progress with IndexNow / Bing. Your verification key is published at {$keyLocation}. Search engines typically take 10–30 minutes to complete initial validation. Once validated, all future submissions succeed automatically.";
+            } elseif ($status === 429) {
+                $message = 'IndexNow submission rate limit reached. Please wait a few moments before trying again.';
+            } else {
+                $decoded = json_decode($body, true);
+                $detailMsg = $decoded['message'] ?? substr($body, 0, 200);
+                $message = "IndexNow responded with status code {$status}: {$detailMsg}";
+            }
+
             $result = [
                 'success' => $isSuccess,
+                'is_verification_pending' => $isVerificationPending,
                 'status' => $status,
-                'message' => $isSuccess
-                    ? 'Successfully submitted '.count($cleanUrls).' URLs to search engines via IndexNow.'
-                    : "IndexNow responded with status code {$status}: ".substr($response->body(), 0, 200),
+                'message' => $message,
                 'count' => count($cleanUrls),
                 'submitted_at' => now()->toIso8601String(),
             ];
@@ -151,16 +200,17 @@ class IndexNowService
                 // Non-blocking
             }
 
-            Log::info('IndexNow submitted '.count($cleanUrls)." URLs (HTTP {$status}).");
+            Log::info('IndexNow submitted ' . count($cleanUrls) . " URLs (HTTP {$status}).");
 
             return $result;
         } catch (\Throwable $e) {
-            Log::warning('IndexNow submission failed: '.$e->getMessage());
+            Log::warning('IndexNow submission failed: ' . $e->getMessage());
 
             return [
                 'success' => false,
+                'is_verification_pending' => false,
                 'status' => 500,
-                'message' => 'Network error connecting to IndexNow API: '.$e->getMessage(),
+                'message' => 'Network error connecting to IndexNow API: ' . $e->getMessage(),
                 'count' => count($cleanUrls),
                 'submitted_at' => now()->toIso8601String(),
             ];
@@ -172,6 +222,8 @@ class IndexNowService
      */
     public function submitAll(): array
     {
+        $this->ensureKeyFileExists();
+
         $paths = [
             '/',
             '/about',
@@ -196,13 +248,13 @@ class IndexNowService
         ];
 
         foreach (LocationLandingService::getLocations() as $loc) {
-            $paths[] = '/'.$loc['slug'];
+            $paths[] = '/' . $loc['slug'];
         }
 
         try {
             $tourSlugs = Tour::where('status', 'active')->pluck('slug');
             foreach ($tourSlugs as $slug) {
-                $paths[] = '/'.$slug;
+                $paths[] = '/' . $slug;
             }
         } catch (\Throwable $e) {
         }
@@ -210,7 +262,7 @@ class IndexNowService
         try {
             $blogSlugs = BlogPost::where('status', 'published')->pluck('slug');
             foreach ($blogSlugs as $slug) {
-                $paths[] = '/blog/'.$slug;
+                $paths[] = '/blog/' . $slug;
             }
         } catch (\Throwable $e) {
         }
@@ -221,12 +273,17 @@ class IndexNowService
             $languages = Language::fallbackCollection();
         }
 
+        $host = $this->getHost();
+        $scheme = 'https://';
         $urls = [];
         foreach ($paths as $path) {
-            $urls[] = url($path);
+            $cleanPath = $path === '/' ? '' : $path;
+            $urls[] = $scheme . $host . $cleanPath;
             foreach ($languages as $lang) {
                 if (! $lang->is_default) {
-                    $urls[] = $path === '/' ? url('/'.$lang->code) : url('/'.$lang->code.$path);
+                    $urls[] = $path === '/'
+                        ? $scheme . $host . '/' . $lang->code
+                        : $scheme . $host . '/' . $lang->code . $path;
                 }
             }
         }

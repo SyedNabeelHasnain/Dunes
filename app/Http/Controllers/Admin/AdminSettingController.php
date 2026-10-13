@@ -281,6 +281,7 @@ class AdminSettingController extends Controller
         Cache::forget('site_settings_cache');
         Cache::forget('site_home_cache');
         app(SettingsService::class)->clearCache();
+        app(IndexNowService::class)->ensureKeyFileExists();
         GoogleThingsToDoFeedController::flushCache();
 
         return back()->with('success', 'Settings updated successfully.');
@@ -386,8 +387,15 @@ class AdminSettingController extends Controller
     public function pingIndexNow(IndexNowService $indexNow)
     {
         $result = $indexNow->submitAll();
-        $msgType = $result['success'] ? 'success' : 'error';
 
-        return back()->with($msgType, $result['message']);
+        if ($result['success']) {
+            return back()->with('success', $result['message']);
+        }
+
+        if (!empty($result['is_verification_pending'])) {
+            return back()->with('info', $result['message']);
+        }
+
+        return back()->with('error', $result['message']);
     }
 }

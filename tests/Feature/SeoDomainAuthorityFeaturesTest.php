@@ -158,6 +158,58 @@ class SeoDomainAuthorityFeaturesTest extends TestCase
     }
 
     /**
+     * Test IndexNowService handles SiteVerificationNotCompleted gracefully.
+     */
+    public function test_indexnow_service_handles_site_verification_not_completed_gracefully(): void
+    {
+        Http::fake([
+            'https://api.indexnow.org/indexnow' => Http::response([
+                'errorCode' => 'SiteVerificationNotCompleted',
+                'message' => 'Site Verification is not completed. Please wait for some time for the verification to complete and try again.',
+                'details' => null,
+            ], 403),
+        ]);
+
+        $service = app(IndexNowService::class);
+        $result = $service->submit(['https://dunesdiscoverytourism.com/tours']);
+
+        $this->assertFalse($result['success']);
+        $this->assertTrue($result['is_verification_pending']);
+        $this->assertEquals(403, $result['status']);
+        $this->assertStringContainsString('Site verification is in progress', $result['message']);
+        $this->assertStringContainsString('dunesdiscoverytourism.com', $result['message']);
+    }
+
+    /**
+     * Test IndexNowService guarantees absolute HTTPS URLs and physical verification key file.
+     */
+    public function test_indexnow_service_guarantees_https_host_and_key_file(): void
+    {
+        Http::fake([
+            'https://api.indexnow.org/indexnow' => Http::response(['message' => 'OK'], 200),
+        ]);
+
+        $service = app(IndexNowService::class);
+        $this->assertEquals('dunesdiscoverytourism.com', $service->getHost());
+        $this->assertEquals('https://dunesdiscoverytourism.com/' . $service->getKey() . '.txt', $service->getKeyLocation());
+
+        $service->ensureKeyFileExists();
+        $filePath = public_path($service->getKey() . '.txt');
+        $this->assertFileExists($filePath);
+        $this->assertEquals($service->getKey(), trim((string) file_get_contents($filePath)));
+
+        // Submit relative and localhost URLs, assert they normalize to https://dunesdiscoverytourism.com
+        $service->submit(['/about', 'http://localhost/tours']);
+
+        Http::assertSent(function ($request) {
+            return $request['host'] === 'dunesdiscoverytourism.com'
+                && $request['keyLocation'] === 'https://dunesdiscoverytourism.com/9f2b87e2467d4ab8a9b31d871e4f9b88.txt'
+                && in_array('https://dunesdiscoverytourism.com/about', $request['urlList'])
+                && in_array('https://dunesdiscoverytourism.com/tours', $request['urlList']);
+        });
+    }
+
+    /**
      * Test Gallery page includes BreadcrumbList schema and deep-link handlers.
      */
     public function test_gallery_deep_linking_and_breadcrumb_schema(): void
@@ -208,6 +260,8 @@ class SeoDomainAuthorityFeaturesTest extends TestCase
         $updateResponse->assertRedirect();
         $this->assertEquals('Custom Sunset Title', Setting::where('setting_key', 'seo_sunset_title')->value('setting_value'));
         $this->assertEquals('Custom Press Title', Setting::where('setting_key', 'seo_press_title')->value('setting_value'));
+
+        @unlink(public_path('customkey1234567890abcdef123456.txt'));
     }
 
     /**

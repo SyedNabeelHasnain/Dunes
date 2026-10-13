@@ -466,11 +466,19 @@
                             <div class="mb-4">
                                 <label for="indexnow_key" class="block text-xs font-bold text-slate-700 mb-1.5">IndexNow API &amp; Verification Key (Hex / Alphanumeric)</label>
                                 <input type="text" name="indexnow_key" id="indexnow_key" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-mono text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['indexnow_key'] ?? '9f2b87e2467d4ab8a9b31d871e4f9b88' }}">
+                                @php
+                                    $indexNowHost = app(\App\Services\IndexNowService::class)->getHost();
+                                    $indexNowCurrentKey = $settings['indexnow_key'] ?? '9f2b87e2467d4ab8a9b31d871e4f9b88';
+                                    $indexNowKeyUrl = 'https://' . $indexNowHost . '/' . $indexNowCurrentKey . '.txt';
+                                @endphp
                                 <div class="text-[11px] text-slate-500 mt-1.5 flex items-center gap-2 flex-wrap">
                                     <span>Verification File Location:</span>
-                                    <a href="{{ url('/' . ($settings['indexnow_key'] ?? '9f2b87e2467d4ab8a9b31d871e4f9b88') . '.txt') }}" target="_blank" class="text-primary hover:underline font-mono">
-                                        {{ url('/' . ($settings['indexnow_key'] ?? '9f2b87e2467d4ab8a9b31d871e4f9b88') . '.txt') }}
+                                    <a href="{{ $indexNowKeyUrl }}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline font-mono inline-flex items-center gap-1">
+                                        {{ $indexNowKeyUrl }} <i class="bi bi-box-arrow-up-right text-[10px]"></i>
                                     </a>
+                                    <span class="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 border border-emerald-200">
+                                        <i class="bi bi-check-circle-fill text-[9px]"></i> Active File Route
+                                    </span>
                                 </div>
                             </div>
 
@@ -480,15 +488,30 @@
                             @endphp
                             @if(is_array($lastSub))
                             <div class="p-4 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-700 mb-4">
-                                <div class="font-bold text-slate-900 mb-1 flex items-center gap-1.5">
-                                    <i class="bi bi-clock-history text-primary"></i> Last IndexNow Submission:
+                                <div class="font-bold text-slate-900 mb-1 flex items-center justify-between gap-2 flex-wrap">
+                                    <span class="flex items-center gap-1.5">
+                                        <i class="bi bi-clock-history text-primary"></i> Last IndexNow Submission:
+                                    </span>
+                                    @if($lastSub['success'] ?? false)
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800">
+                                            <i class="bi bi-check-circle-fill"></i> Accepted (HTTP {{ $lastSub['status'] ?? 200 }})
+                                        </span>
+                                    @elseif($lastSub['is_verification_pending'] ?? false)
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-bold text-amber-800">
+                                            <i class="bi bi-hourglass-split"></i> Ownership Verification In Progress
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-rose-100 px-2.5 py-0.5 text-[10px] font-bold text-rose-800">
+                                            <i class="bi bi-exclamation-triangle-fill"></i> Status {{ $lastSub['status'] ?? 'Error' }}
+                                        </span>
+                                    @endif
                                 </div>
                                 <div class="text-[11px] text-slate-600">
-                                    Status: <span class="font-bold {{ ($lastSub['success'] ?? false) ? 'text-emerald-600' : 'text-rose-600' }}">{{ $lastSub['status'] ?? 'N/A' }}</span> &bull; 
-                                    URLs Count: <span class="font-bold">{{ $lastSub['count'] ?? 0 }}</span> &bull; 
-                                    Timestamp: <span class="font-mono">{{ $lastSub['submitted_at'] ?? 'N/A' }}</span>
+                                    Status: <span class="font-bold {{ ($lastSub['success'] ?? false) ? 'text-emerald-600' : (($lastSub['is_verification_pending'] ?? false) ? 'text-amber-600' : 'text-rose-600') }}">{{ $lastSub['status'] ?? 'N/A' }}</span> &bull; 
+                                    URLs Submitted: <span class="font-bold">{{ $lastSub['count'] ?? 0 }}</span> &bull; 
+                                    Timestamp: <span class="font-mono">{{ !empty($lastSub['submitted_at']) ? \Carbon\Carbon::parse($lastSub['submitted_at'])->timezone('Asia/Dubai')->format('d M Y, h:i A') . ' (GST)' : 'N/A' }}</span>
                                 </div>
-                                <div class="text-[11px] text-slate-500 mt-1">{{ $lastSub['message'] ?? '' }}</div>
+                                <div class="text-[11px] text-slate-600 mt-1 leading-relaxed">{{ $lastSub['message'] ?? '' }}</div>
                             </div>
                             @endif
                             @endif

@@ -957,6 +957,24 @@
             });
         @endif
 
+        @if(session('info'))
+            Swal.fire({
+                icon: 'info',
+                title: 'Notice',
+                text: @js(session('info')),
+                confirmButtonColor: '#3B82F6'
+            });
+        @endif
+
+        @if(session('warning'))
+            Swal.fire({
+                icon: 'warning',
+                title: 'Warning',
+                text: @js(session('warning')),
+                confirmButtonColor: '#F59E0B'
+            });
+        @endif
+
         @if(session('error'))
             Swal.fire({
                 icon: 'error',
