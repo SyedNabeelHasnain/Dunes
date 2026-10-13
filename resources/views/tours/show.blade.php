@@ -41,20 +41,20 @@
       "@graph": [
         {
           "@type": ["Product", "TouristTrip"],
-          "@id": "{{ $canonical }}#trip",
-          "name": {!! json_encode($tour->name) !!},
-          "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
-          "description": {!! json_encode(Str::limit(strip_tags($tour->short_desc ?: $tour->full_desc), 300)) !!},
+          "@id": {!! json_encode($canonical . '#trip', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "name": {!! json_encode($tour->name, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "inLanguage": {!! json_encode($currentLocale ?? app()->getLocale() ?? 'en', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "description": {!! json_encode(Str::limit(strip_tags($tour->short_desc ?: $tour->full_desc), 300), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
           "image": [
-            {!! json_encode($heroAvifUrl) !!}
+            {!! json_encode($heroAvifUrl, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           ],
-          "sku": "DDT-TOUR-{{ $tour->id }}",
-          "mpn": "DDT-{{ $tour->slug }}",
+          "sku": {!! json_encode('DDT-TOUR-' . $tour->id, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "mpn": {!! json_encode('DDT-' . $tour->slug, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
           "brand": {
-            "@id": "{{ url('/') }}#organization"
+            "@id": {!! json_encode(url('/') . '#organization', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           },
           "provider": {
-            "@id": "{{ url('/') }}#organization"
+            "@id": {!! json_encode(url('/') . '#organization', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           },
           "touristType": ["Adventure Tourism", "Family Friendly", "Couples", "Solo Travelers"],
           "about": [
@@ -94,8 +94,8 @@
           @if(($tour->review_count ?? 0) > 0)
           "aggregateRating": {
             "@type": "AggregateRating",
-            "ratingValue": "{{ $tour->rating ?: '5.0' }}",
-            "reviewCount": "{{ $tour->review_count }}",
+            "ratingValue": {!! json_encode((string) ($tour->rating ?: '5.0'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+            "reviewCount": {!! json_encode((string) $tour->review_count, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
             "bestRating": "5",
             "worstRating": "1"
           },
@@ -107,30 +107,30 @@
               "@type": "Review",
               "reviewRating": {
                 "@type": "Rating",
-                "ratingValue": "{{ $rev->rating }}",
+                "ratingValue": {!! json_encode((string) $rev->rating, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
                 "bestRating": "5"
               },
               "author": {
                 "@type": "Person",
-                "name": {!! json_encode($rev->reviewer_name ?: 'Verified Traveler') !!}
+                "name": {!! json_encode($rev->reviewer_name ?: 'Verified Traveler', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
               },
-              "datePublished": "{{ $rev->published_date ? (\Carbon\Carbon::parse($rev->published_date)->format('Y-m-d')) : ($rev->created_at ? \Carbon\Carbon::parse($rev->created_at)->format('Y-m-d') : date('Y-m-d')) }}",
-              "reviewBody": {!! json_encode(Str::limit($rev->review_text, 280)) !!}
+              "datePublished": {!! json_encode($rev->published_date ? (\Carbon\Carbon::parse($rev->published_date)->format('Y-m-d')) : ($rev->created_at ? \Carbon\Carbon::parse($rev->created_at)->format('Y-m-d') : date('Y-m-d')), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+              "reviewBody": {!! json_encode(Str::limit($rev->review_text, 280), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
             }{{ $ridx < $approvedReviews->count() - 1 ? ',' : '' }}
             @endforeach
           ],
           @endif
           "offers": {
             "@type": "Offer",
-            "url": {!! json_encode(request()->fullUrl()) !!},
+            "url": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
             "priceCurrency": "AED",
-            "price": "{{ number_format($activePrice, 2, '.', '') }}",
-            "priceValidUntil": "{{ now()->addYear()->endOfYear()->format('Y-m-d') }}",
-            "validFrom": "{{ now()->startOfYear()->toIso8601String() }}",
+            "price": {!! json_encode(number_format($activePrice, 2, '.', ''), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+            "priceValidUntil": {!! json_encode(now()->addYear()->endOfYear()->format('Y-m-d'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+            "validFrom": {!! json_encode(now()->startOfYear()->toIso8601String(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
             "itemCondition": "https://schema.org/NewCondition",
             "availability": "https://schema.org/InStock",
             "seller": {
-              "@id": "{{ url('/') }}#organization"
+              "@id": {!! json_encode(url('/') . '#organization', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
             },
             "hasMerchantReturnPolicy": {
               "@type": "MerchantReturnPolicy",
@@ -142,7 +142,7 @@
             },
             "priceSpecification": {
               "@type": "PriceSpecification",
-              "price": "{{ number_format($activePrice, 2, '.', '') }}",
+              "price": {!! json_encode(number_format($activePrice, 2, '.', ''), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
               "priceCurrency": "AED",
               "valueAddedTaxIncluded": true
             }
@@ -159,8 +159,8 @@
                 "position": {{ $idx + 1 }},
                 "item": {
                   "@type": "TouristAttraction",
-                  "name": {!! json_encode($it->title) !!},
-                  "description": {!! json_encode($it->description ?: $it->title) !!}
+                  "name": {!! json_encode($it->title, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+                  "description": {!! json_encode($it->description ?: $it->title, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
                 }
               }{{ $idx < $tour->itineraries->count() - 1 ? ',' : '' }}
               @endforeach
@@ -170,25 +170,25 @@
         },
         {
           "@type": "BreadcrumbList",
-          "@id": "{{ $canonical }}#breadcrumb",
+          "@id": {!! json_encode($canonical . '#breadcrumb', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
           "itemListElement": [
             {
               "@type": "ListItem",
               "position": 1,
-              "name": "{{ __('ui.nav.home') ?? 'Home' }}",
-              "item": "{{ localized_route('home') }}"
+              "name": {!! json_encode(__('ui.nav.home') ?? 'Home', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+              "item": {!! json_encode(localized_route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
             },
             {
               "@type": "ListItem",
               "position": 2,
-              "name": "{{ __('ui.nav.tours') ?? 'Tours' }}",
-              "item": "{{ localized_route('tours.index') }}"
+              "name": {!! json_encode(__('ui.nav.tours') ?? 'Tours', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+              "item": {!! json_encode(localized_route('tours.index'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
             },
             {
               "@type": "ListItem",
               "position": 3,
-              "name": {!! json_encode($tour->name) !!},
-              "item": "{{ $canonical }}"
+              "name": {!! json_encode($tour->name, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+              "item": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
             }
           ]
         }
@@ -196,16 +196,16 @@
         ,
         {
           "@type": "FAQPage",
-          "@id": "{{ $canonical }}#faq",
-          "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
+          "@id": {!! json_encode($canonical . '#faq', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "inLanguage": {!! json_encode($currentLocale ?? app()->getLocale() ?? 'en', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
           "mainEntity": [
             @foreach($faqs as $fidx => $f)
             {
               "@type": "Question",
-              "name": {!! json_encode($f->question) !!},
+              "name": {!! json_encode($f->question, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": {!! json_encode($f->answer) !!}
+                "text": {!! json_encode($f->answer, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
               }
             }{{ $fidx < $faqs->count() - 1 ? ',' : '' }}
             @endforeach
@@ -227,9 +227,9 @@ window.dataLayer.push({
     currency: "AED",
     value: {{ $activePrice }},
     items: [{
-      item_id: "{{ $tour->id }}",
-      item_name: "{{ $tour->name }}",
-      item_category: "{{ $tour->category ? $tour->category->slug : '' }}",
+      item_id: {!! json_encode((string) $tour->id) !!},
+      item_name: @json($tour->name),
+      item_category: {!! json_encode($tour->category ? $tour->category->slug : '') !!},
       price: {{ $activePrice }}
     }]
   }
@@ -694,7 +694,7 @@ if(window.fbq){
                                 @endif
                             </ul>
 
-                            <button type="button" class="w-full rounded-full py-2.5 text-xs sm:text-sm font-bold cursor-pointer transition-colors {{ $tier->is_popular ? 'btn-desert-animated text-white' : 'border border-primary text-primary hover:bg-primary hover:text-white' }}" data-action="open-booking" data-tour="{{ $tour->id }}" data-tier="{{ $tier->id }}" @click.prevent="$store.modal.open('booking', { tourId: {{ $tour->id }}, tierId: {{ $tier->id }} })">
+                            <button type="button" class="w-full rounded-full py-2.5 text-xs sm:text-sm font-bold cursor-pointer transition-colors {{ $tier->is_popular ? 'btn-desert-animated text-white' : 'border border-primary text-primary hover:bg-primary hover:text-white' }}" data-action="open-booking" data-tour="{{ $tour->id }}" data-tier="{{ $tier->id }}" @click.prevent.stop="$store.modal.open('booking', { tourId: {{ $tour->id }}, tierId: {{ $tier->id }} })">
                                 {{ __('ui.tour_glance.select_tier', ['tier' => $tier->name]) }}
                             </button>
                         </div>
@@ -777,7 +777,7 @@ if(window.fbq){
                                     $save = ($tOldPrice > 0 && $tOldPrice > $tPrice) ? ($tOldPrice - $tPrice) : 0;
                                     $isTierActive = ($activeTier && $tier->id === $activeTier->id);
                                 @endphp
-                                <div class="package-option p-3.5 border rounded-2xl relative cursor-pointer transition-all hover:shadow-xs {{ $isTierActive ? 'border-primary ring-2 ring-primary/20 bg-primary/5 shadow-xs' : ($tier->is_popular ? 'border-primary bg-primary/5' : 'border-slate-200 bg-white hover:border-slate-300') }}" data-action="open-booking" data-tour="{{ $tour->id }}" data-tier="{{ $tier->id }}" @click="$store.modal.open('booking', { tourId: {{ $tour->id }}, tierId: {{ $tier->id }} })">
+                                <div class="package-option p-3.5 border rounded-2xl relative cursor-pointer transition-all hover:shadow-xs {{ $isTierActive ? 'border-primary ring-2 ring-primary/20 bg-primary/5 shadow-xs' : ($tier->is_popular ? 'border-primary bg-primary/5' : 'border-slate-200 bg-white hover:border-slate-300') }}" data-action="open-booking" data-tour="{{ $tour->id }}" data-tier="{{ $tier->id }}" @click.stop="$store.modal.open('booking', { tourId: {{ $tour->id }}, tierId: {{ $tier->id }} })">
                                     @if($isTierActive)
                                     <span class="bg-emerald-600 text-white text-[9px] font-black uppercase tracking-wider rounded-full px-2 py-0.5 absolute top-2 end-2 flex items-center gap-1">
                                         <i class="bi bi-check2"></i> Selected Option
@@ -825,10 +825,10 @@ if(window.fbq){
 
                         <!-- CTA Actions -->
                         <div class="space-y-2.5">
-                            <button class="w-full btn-desert-animated text-base font-bold rounded-full py-3.5 text-white shadow-lg cursor-pointer" @click.prevent="$store.modal.open('booking', { tourId: {{ $tour->id }}{{ $defaultTierId ? ', tierId: ' . $defaultTierId : '' }} })">
+                            <button class="w-full btn-desert-animated text-base font-bold rounded-full py-3.5 text-white shadow-lg cursor-pointer" @click.prevent.stop="$store.modal.open('booking', { tourId: {{ $tour->id }}{{ $defaultTierId ? ', tierId: ' . $defaultTierId : '' }} })">
                                 <i class="bi bi-calendar-check-fill me-2"></i>{{ __('ui.common.book_online_now') }}
                             </button>
-                            <button type="button" class="w-full border border-slate-300 hover:border-primary text-slate-700 hover:text-primary text-sm font-bold rounded-full py-2.5 transition-colors btn-toggle-compare cursor-pointer flex items-center justify-center gap-2" data-tour-id="{{ $tour->id }}" onclick="event.preventDefault(); window.DunesCompare && window.DunesCompare.toggle(this);">
+                            <button type="button" class="w-full border border-slate-300 hover:border-primary text-slate-700 hover:text-primary text-sm font-bold rounded-full py-2.5 transition-colors btn-toggle-compare cursor-pointer flex items-center justify-center gap-2" data-tour-id="{{ $tour->id }}">
                                 <i class="bi bi-shuffle"></i><span class="compare-btn-text">{{ __('ui.common.compare_this_safari') }}</span>
                             </button>
                             <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode('Hi! I want to book ' . $tour->name) }}" class="w-full btn-whatsapp-animated text-sm font-bold rounded-full py-3 text-white flex items-center justify-center gap-2 shadow-sm cursor-pointer" target="_blank" rel="noopener noreferrer" data-action="whatsapp" data-tour-name="{{ $tour->name }}">
@@ -1157,7 +1157,7 @@ if(window.fbq){
                 <p class="text-slate-600 text-xs sm:text-sm mt-0.5">{{ $reviewsSubtitle }}</p>
             </div>
             <div class="flex flex-wrap gap-2.5">
-                <button type="button" class="border border-slate-300 hover:border-primary text-slate-700 hover:text-primary rounded-full px-4 py-2 text-xs font-bold cursor-pointer btn-toggle-compare inline-flex items-center gap-1.5 transition-colors" data-tour-id="{{ $tour->id }}" onclick="event.preventDefault(); window.DunesCompare && window.DunesCompare.toggle(this);">
+                <button type="button" class="border border-slate-300 hover:border-primary text-slate-700 hover:text-primary rounded-full px-4 py-2 text-xs font-bold cursor-pointer btn-toggle-compare inline-flex items-center gap-1.5 transition-colors" data-tour-id="{{ $tour->id }}">
                     <i class="bi bi-shuffle"></i> {{ __('ui.reviews_section.compare_safaris') }}
                 </button>
                 <a href="{{ localized_route('review.rate', ['ref' => 'guest']) }}" class="btn-desert-animated rounded-full px-5 py-2 text-xs font-bold text-white shadow-sm inline-flex items-center gap-1.5">
@@ -1311,7 +1311,7 @@ if(window.fbq){
             <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-200 hover:border-slate-300 flex flex-col h-full group">
                 <a href="{{ localized_route('tours.show', $t->slug) }}" class="flex flex-col h-full text-inherit">
                     <div class="relative overflow-hidden aspect-[16/10]">
-                        <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy">
+                        <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image ?: ($t->hero_image ?: 'desert-safari-poster.avif'))) }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy">
                         @if($t->is_bestseller)
                         <span class="absolute top-3 start-3 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-md inline-flex items-center gap-1">
                             <i class="bi bi-fire text-amber-300"></i>{{ __('ui.common.bestseller') }}
@@ -1368,10 +1368,10 @@ if(window.fbq){
         @endif
     </div>
     <div class="flex items-center gap-2">
-        <button type="button" class="border border-slate-300 text-slate-700 text-xs font-bold rounded-full px-3.5 py-2.5 btn-toggle-compare whitespace-nowrap cursor-pointer inline-flex items-center gap-1" data-tour-id="{{ $tour->id }}" onclick="event.preventDefault(); window.DunesCompare && window.DunesCompare.toggle(this);">
+        <button type="button" class="border border-slate-300 text-slate-700 text-xs font-bold rounded-full px-3.5 py-2.5 btn-toggle-compare whitespace-nowrap cursor-pointer inline-flex items-center gap-1" data-tour-id="{{ $tour->id }}">
             <i class="bi bi-shuffle"></i><span class="compare-btn-text">{{ __('ui.common.compare') }}</span>
         </button>
-        <button class="btn-desert-animated text-xs sm:text-sm font-bold text-white rounded-full px-5 py-2.5 shadow-md whitespace-nowrap cursor-pointer inline-flex items-center gap-1" data-action="open-booking" data-tour="{{ $tour->id }}" @click.prevent="$store.modal.open('booking', { tourId: {{ $tour->id }}{{ $defaultTierId ? ', tierId: ' . $defaultTierId : '' }} })">
+        <button class="btn-desert-animated text-xs sm:text-sm font-bold text-white rounded-full px-5 py-2.5 shadow-md whitespace-nowrap cursor-pointer inline-flex items-center gap-1" data-action="open-booking" data-tour="{{ $tour->id }}" data-tier="{{ $defaultTierId }}" @click.prevent.stop="$store.modal.open('booking', { tourId: {{ $tour->id }}{{ $defaultTierId ? ', tierId: ' . $defaultTierId : '' }} })">
             <i class="bi bi-calendar-check-fill"></i>{{ __('ui.common.book_now') }}
         </button>
     </div>

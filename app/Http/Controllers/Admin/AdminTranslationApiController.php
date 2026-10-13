@@ -98,26 +98,4 @@ class AdminTranslationApiController extends Controller
             ], 500);
         }
     }
-
-    /**
-     * Test connection to a specific translation driver.
-     */
-    public function testConnection(Request $request): JsonResponse
-    {
-        $validated = $request->validate([
-            'driver' => 'required|string|in:deepl,google',
-        ]);
-
-        try {
-            $driver = $this->manager->driver($validated['driver']);
-            $result = $driver->testConnection();
-
-            return response()->json($result);
-        } catch (\Throwable $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 500);
-        }
-    }
 }

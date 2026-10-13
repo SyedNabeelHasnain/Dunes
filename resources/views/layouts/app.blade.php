@@ -47,12 +47,21 @@
     $currentYear = date('Y');
     $currentLocale = $currentLocale ?? app()->getLocale() ?? 'en';
     $activeLanguages = $activeLanguages ?? \App\Models\Language::getActive();
-    $pageTitle = $pageTitle ?? "Dunes Discovery Tourism | Dubai Desert Safari Tours ({$currentYear})";
-    $pageDesc = $pageDesc ?? 'Book Dubai best desert safari tours from AED 99. Evening safari, city tours, dhow cruises with instant confirmation.';
+    $yieldTitle = trim($__env->yieldContent('title') ?: $__env->yieldContent('page_title'));
+    $yieldDesc = trim($__env->yieldContent('meta_description'));
+    $pageTitle = $pageTitle ?? ($yieldTitle ?: "Dunes Discovery Tourism | Dubai Desert Safari Tours ({$currentYear})");
+    $pageDesc = $pageDesc ?? ($yieldDesc ?: 'Book Dubai best desert safari tours from AED 99. Evening safari, city tours, dhow cruises with instant confirmation.');
     $pageKeys = $pageKeys ?? 'dubai desert safari,desert safari dubai,evening desert safari';
     $pageRobots = $pageRobots ?? 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
     $canonical = $canonical ?? (request()->is('/') ? rtrim(url('/'), '/') . '/' : request()->url());
     $ogImage = resolve_og_image($ogImage ?? null);
+    $ogImageExt = strtolower(pathinfo((string) parse_url((string) $ogImage, PHP_URL_PATH), PATHINFO_EXTENSION));
+    $ogImageType = match ($ogImageExt) {
+        'jpg', 'jpeg' => 'image/jpeg',
+        'png' => 'image/png',
+        'webp' => 'image/webp',
+        default => 'image/avif',
+    };
     $ogType = $ogType ?? 'website';
 @endphp
 <!DOCTYPE html>
@@ -141,8 +150,10 @@
     <meta name="keywords" content="{{ $pageKeys }}">
     <meta name="robots" content="{{ $pageRobots }}">
     <meta name="author" content="Dunes Discovery Tourism">
+    @if(!($isErrorPage ?? false))
     <link rel="canonical" href="{{ $canonical }}">
-    @if(!str_contains(strtolower($pageRobots ?? ''), 'noindex'))
+    @endif
+    @if(!str_contains(strtolower($pageRobots ?? ''), 'noindex') && !($isErrorPage ?? false))
     <link rel="alternate" hreflang="x-default" href="{{ switch_locale_url('en') }}">
     @if(isset($activeLanguages) && is_iterable($activeLanguages))
         @foreach($activeLanguages as $langItem)
@@ -164,6 +175,7 @@
     <meta property="og:title" content="{{ $pageTitle }}">
     <meta property="og:description" content="{{ $pageDesc }}">
     <meta property="og:image" content="{{ $ogImage }}">
+    <meta property="og:image:type" content="{{ $ogImageType }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:site_name" content="Dunes Discovery Tourism">
@@ -262,16 +274,16 @@
       "@@graph": [
         {
           "@@type": "TravelAgency",
-          "@@id": "{{ url('/') }}#organization",
-          "name": "{{ $settings['site_name'] ?? 'Dunes Discovery Tourism LLC' }}",
+          "@@id": {!! json_encode(url('/') . '#organization', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "name": {!! json_encode($settings['site_name'] ?? 'Dunes Discovery Tourism LLC', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
           "legalName": "Dunes Discovery Tourism LLC",
           "alternateName": ["Dunes Discovery", "Dunes Discovery Tourism", "Dunes Discovery Dubai"],
-          "description": "{{ $settings['site_description'] ?? 'Licensed Dubai Destination Management Company offering premium Desert Safaris, 1000cc Dune Buggy Rentals, Quad Biking, Dhow Cruise Dinners, and Abu Dhabi City Tours.' }}",
-          "url": "{{ url('/') }}",
-          "logo": "{{ asset('images/logo.png') }}",
-          "image": "{{ asset('images/desert-safari-poster.avif') }}",
-          "telephone": "{{ $phone }}",
-          "email": "{{ $email }}",
+          "description": {!! json_encode($settings['site_description'] ?? 'Licensed Dubai Destination Management Company offering premium Desert Safaris, 1000cc Dune Buggy Rentals, Quad Biking, Dhow Cruise Dinners, and Abu Dhabi City Tours.', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "url": {!! json_encode(url('/'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "logo": {!! json_encode(asset('images/logo.png'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "image": {!! json_encode(asset('images/desert-safari-poster.avif'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "telephone": {!! json_encode($phone, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "email": {!! json_encode($email, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
           "priceRange": "AED 79 - AED 1500",
           "currenciesAccepted": "AED, USD, EUR, GBP",
           "paymentAccepted": "Cash, Credit Card, Debit Card, Ziina",
@@ -279,20 +291,20 @@
             {
               "@@type": "PropertyValue",
               "propertyID": "DET Tourism License",
-              "value": "{{ $detLicense }}"
+              "value": {!! json_encode($detLicense, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
             }
             @if(!empty($googlePlaceId))
             ,{
               "@@type": "PropertyValue",
               "propertyID": "Google Place ID",
-              "value": "{{ $googlePlaceId }}"
+              "value": {!! json_encode($googlePlaceId, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
             }
             @endif
             @if(!empty($googleCid))
             ,{
               "@@type": "PropertyValue",
               "propertyID": "Google CID",
-              "value": "{{ $googleCid }}"
+              "value": {!! json_encode($googleCid, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
             }
             @endif
           ],
@@ -339,10 +351,10 @@
           @endif
           "address": {
             "@@type": "PostalAddress",
-            "streetAddress": "{{ $siteAddress }}",
+            "streetAddress": {!! json_encode($siteAddress, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
             "addressLocality": "Dubai",
             "addressRegion": "Dubai",
-            "postalCode": "{{ $sitePostalCode }}",
+            "postalCode": {!! json_encode($sitePostalCode, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
             "addressCountry": "AE"
           },
           "geo": {
@@ -350,21 +362,21 @@
             "latitude": {{ (float)$siteLat }},
             "longitude": {{ (float)$siteLng }}
           },
-          "hasMap": "https://maps.google.com/?q={{ $siteLat }},{{ $siteLng }}",
+          "hasMap": {!! json_encode("https://maps.google.com/?q={$siteLat},{$siteLng}", JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
           "contactPoint": [
             {
               "@@type": "ContactPoint",
-              "telephone": "{{ $phone }}",
+              "telephone": {!! json_encode($phone, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
               "contactType": "customer service",
               "areaServed": "AE",
-              "availableLanguage": {!! json_encode(isset($activeLanguages) ? $activeLanguages->pluck('code')->toArray() : ['en', 'ar', 'ru', 'es', 'it']) !!}
+              "availableLanguage": {!! json_encode(isset($activeLanguages) ? $activeLanguages->pluck('code')->toArray() : ['en', 'ar', 'ru', 'es', 'it'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
             },
             {
               "@@type": "ContactPoint",
               "telephone": "+971502456056",
               "contactType": "reservations",
               "areaServed": "AE",
-              "availableLanguage": {!! json_encode(isset($activeLanguages) ? $activeLanguages->pluck('code')->toArray() : ['en', 'ar', 'ru', 'es', 'it']) !!}
+              "availableLanguage": {!! json_encode(isset($activeLanguages) ? $activeLanguages->pluck('code')->toArray() : ['en', 'ar', 'ru', 'es', 'it'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
             }
           ],
           "openingHoursSpecification": {
@@ -375,17 +387,15 @@
           },
           "sameAs": [
             @if(!empty($googleReviewUrl))
-            "{{ $googleReviewUrl }}",
+            {!! json_encode($googleReviewUrl, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
             @endif
             @if(!empty($googleCid))
-            "https://maps.google.com/?cid={{ $googleCid }}",
+            {!! json_encode("https://maps.google.com/?cid={$googleCid}", JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
             @endif
             "https://www.facebook.com/dunesdiscoverytourism",
             "https://www.instagram.com/dunesdiscoverytourism",
             "https://www.tripadvisor.com"
           ],
-          "termsOfService": "{{ localized_route('terms') }}",
-          "privacyPolicy": "{{ localized_route('privacy') }}",
           "hasMerchantReturnPolicy": {
             "@@type": "MerchantReturnPolicy",
             "applicableCountry": "AE",
@@ -397,31 +407,31 @@
         },
         {
           "@@type": "WebSite",
-          "@@id": "{{ url('/') }}#website",
-          "url": "{{ url('/') }}",
+          "@@id": {!! json_encode(url('/') . '#website', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "url": {!! json_encode(url('/'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
           "name": "Dunes Discovery Tourism",
           "publisher": {
-            "@@id": "{{ url('/') }}#organization"
+            "@@id": {!! json_encode(url('/') . '#organization', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           },
           "potentialAction": {
             "@@type": "SearchAction",
             "target": {
               "@@type": "EntryPoint",
-              "urlTemplate": "{{ localized_route('tours.search') }}?q={search_term_string}"
+              "urlTemplate": {!! json_encode(localized_route('tours.search') . '?q={search_term_string}', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
             },
             "query-input": "required name=search_term_string"
           },
-          "inLanguage": {!! json_encode(isset($activeLanguages) ? $activeLanguages->pluck('code')->toArray() : ['en', 'ar', 'ru', 'es', 'it']) !!}
+          "inLanguage": {!! json_encode(isset($activeLanguages) ? $activeLanguages->pluck('code')->toArray() : ['en', 'ar', 'ru', 'es', 'it'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
         },
         {
           "@@type": "WebPage",
-          "@@id": "{{ $canonical }}#webpage",
-          "url": "{{ $canonical }}",
-          "name": {!! json_encode($pageTitle) !!},
-          "description": {!! json_encode($pageDesc) !!},
-          "inLanguage": "{{ $currentLocale }}",
+          "@@id": {!! json_encode($canonical . '#webpage', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "url": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "name": {!! json_encode($pageTitle, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "description": {!! json_encode($pageDesc, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "inLanguage": {!! json_encode($currentLocale, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
           "isPartOf": {
-            "@@id": "{{ url('/') }}#website"
+            "@@id": {!! json_encode(url('/') . '#website', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           },
           "speakable": {
             "@@type": "SpeakableSpecification",

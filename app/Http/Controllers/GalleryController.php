@@ -76,7 +76,8 @@ class GalleryController extends Controller
 
         // Schema.org ImageGallery Graph
         $schemaImages = [];
-        foreach (array_slice($filteredItems, 0, 15) as $item) {
+        $photoItems = collect($filteredItems)->filter(fn ($i) => ($i['type'] ?? 'image') !== 'video')->take(24);
+        foreach ($photoItems as $item) {
             $schemaImages[] = [
                 '@type' => 'ImageObject',
                 'contentUrl' => $item['url'],

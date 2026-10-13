@@ -357,10 +357,10 @@ class BlogController extends Controller
             'posts' => $posts,
             'lastBuildDate' => $lastBuildDate,
             'channelTitle' => 'Dunes Discovery Tourism | Dubai Desert Safari & Adventure Blog',
-            'channelLink' => url('/blog'),
+            'channelLink' => localized_route('blog.index'),
             'channelDescription' => 'Expert insider guides, desert safari tips, dune buggy safety, and cultural Dubai travel insights by DTCM-licensed operator Dunes Discovery Tourism.',
-            'channelLanguage' => 'en-us',
-            'feedUrl' => url('/feed.xml'),
+            'channelLanguage' => app()->getLocale() ?: 'en',
+            'feedUrl' => url(request()->getPathInfo() ?: '/feed.xml'),
         ])->render();
 
         return response($content, 200, [

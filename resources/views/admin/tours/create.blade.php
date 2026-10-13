@@ -260,6 +260,46 @@
                             </label>
                         </div>
 
+                        <!-- SEO Customization -->
+                        <div class="bg-slate-50/80 rounded-2xl border border-slate-200/80 p-5 space-y-4">
+                            <h2 class="text-xs font-black uppercase tracking-wider text-primary flex items-center gap-2">
+                                <i class="bi bi-search text-base"></i> SEO Customization
+                            </h2>
+                            @foreach($languages as $lang)
+                                <div x-show="activeLocale === '{{ $lang->code }}'" x-cloak class="space-y-4">
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Meta Title ({{ $lang->name }})</label>
+                                        <input type="text"
+                                               name="meta_title[{{ $lang->code }}]"
+                                               data-locale="{{ $lang->code }}"
+                                               data-field="meta_title"
+                                               dir="{{ $lang->isRtl() ? 'rtl' : 'ltr' }}"
+                                               class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden {{ $lang->isRtl() ? 'text-right font-arabic' : '' }}"
+                                               value="{{ old('meta_title.'.$lang->code) }}">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Meta Description ({{ $lang->name }})</label>
+                                        <textarea name="meta_desc[{{ $lang->code }}]"
+                                                  data-locale="{{ $lang->code }}"
+                                                  data-field="meta_desc"
+                                                  dir="{{ $lang->isRtl() ? 'rtl' : 'ltr' }}"
+                                                  class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden {{ $lang->isRtl() ? 'text-right font-arabic' : '' }}"
+                                                  rows="3">{{ old('meta_desc.'.$lang->code) }}</textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Meta Keywords ({{ $lang->name }})</label>
+                                        <input type="text"
+                                               name="meta_keywords[{{ $lang->code }}]"
+                                               data-locale="{{ $lang->code }}"
+                                               data-field="meta_keywords"
+                                               dir="{{ $lang->isRtl() ? 'rtl' : 'ltr' }}"
+                                               class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden {{ $lang->isRtl() ? 'text-right font-arabic' : '' }}"
+                                               value="{{ old('meta_keywords.'.$lang->code) }}">
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
                         <!-- Media Uploads -->
                         <div class="bg-slate-50/80 rounded-2xl border border-slate-200/80 p-5 space-y-4">
                             <h2 class="text-xs font-black uppercase tracking-wider text-primary flex items-center gap-2">
@@ -269,13 +309,13 @@
                             <div>
                                 <label for="hero_image" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Hero Banner Image</label>
                                 <input type="file" name="hero_image" id="hero_image" class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
-                                <p class="text-[11px] text-slate-400 mt-1">1920x800 recommended. Max 4MB.</p>
+                                <p class="text-[11px] text-slate-400 mt-1">1920x800 recommended. Max 5MB.</p>
                             </div>
 
                             <div>
                                 <label for="thumb_image" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Thumbnail Image</label>
                                 <input type="file" name="thumb_image" id="thumb_image" class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
-                                <p class="text-[11px] text-slate-400 mt-1">600x400 recommended. Max 2MB.</p>
+                                <p class="text-[11px] text-slate-400 mt-1">600x400 recommended. Max 3MB.</p>
                             </div>
                         </div>
                     </div>

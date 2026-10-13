@@ -122,6 +122,23 @@
                     </div>
                 </div>
 
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Target Window</label>
+                        <select name="target" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs text-slate-800 bg-white">
+                            <option value="_self">Same Window (_self)</option>
+                            <option value="_blank">New Tab (_blank)</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center pt-5">
+                        <label class="inline-flex items-center gap-2 cursor-pointer">
+                            <input type="hidden" name="is_active" value="0">
+                            <input type="checkbox" name="is_active" value="1" checked class="rounded border-slate-300 text-primary focus:ring-primary">
+                            <span class="text-xs font-bold text-slate-700">Link is Active</span>
+                        </label>
+                    </div>
+                </div>
+
                 <div class="space-y-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
                     <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Link Labels (Multilingual)</span>
                     @foreach($languages as $lang)

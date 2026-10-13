@@ -453,6 +453,8 @@ async function sendDiagnosticTestEmail() {
 
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
+        const subjectVal = document.getElementById('campaignSubject')?.value?.trim() || '';
+        const htmlVal = editor ? editor.value : '';
         const response = await fetch('{{ route("admin.settings.mail.test") }}', {
             method: 'POST',
             headers: {
@@ -460,7 +462,11 @@ async function sendDiagnosticTestEmail() {
                 'X-CSRF-TOKEN': csrfToken,
                 'Accept': 'application/json'
             },
-            body: JSON.stringify({ test_email: email })
+            body: JSON.stringify({
+                test_email: email,
+                subject: subjectVal,
+                content_html: htmlVal
+            })
         });
 
         const data = await response.json();

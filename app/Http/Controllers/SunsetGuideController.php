@@ -80,12 +80,17 @@ class SunsetGuideController extends Controller
             $sunsetTours = collect();
         }
 
+        $pageRobots = ! empty($request->query())
+            ? 'noindex, follow'
+            : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+
         return view('pages.sunset-guide', compact(
             'pageTitle',
             'pageDesc',
             'pageKeys',
             'canonical',
             'ogImage',
+            'pageRobots',
             'monthlySchedule',
             'currentMonthData',
             'currentMonthNumber',

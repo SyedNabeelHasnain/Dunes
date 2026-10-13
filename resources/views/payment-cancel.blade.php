@@ -21,10 +21,10 @@
                 </div>
             @endif
             <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                <a href="{{ route('tours.index') }}" class="btn-desert-animated font-bold rounded-full px-6 py-3 text-white text-sm shadow-sm inline-flex items-center justify-center gap-2">
+                <a href="{{ localized_route('tours.index') }}" class="btn-desert-animated font-bold rounded-full px-6 py-3 text-white text-sm shadow-sm inline-flex items-center justify-center gap-2">
                     <i class="bi bi-compass-fill"></i> Browse Tours
                 </a>
-                <a href="{{ route('contact') }}" class="border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold rounded-full px-6 py-3 text-sm transition-colors inline-flex items-center justify-center gap-2">
+                <a href="{{ localized_route('contact') }}" class="border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold rounded-full px-6 py-3 text-sm transition-colors inline-flex items-center justify-center gap-2">
                     <i class="bi bi-envelope"></i> Contact Us
                 </a>
             </div>

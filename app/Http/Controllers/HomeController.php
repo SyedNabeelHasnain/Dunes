@@ -182,6 +182,10 @@ class HomeController extends Controller
             $galleryItems = [];
         }
 
-        return view('index', compact('categories', 'bestsellers', 'reviews', 'faqs', 'allActiveTours', 'galleryItems', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
+        $pageRobots = ! empty(request()->query())
+            ? 'noindex, follow'
+            : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+
+        return view('index', compact('categories', 'bestsellers', 'reviews', 'faqs', 'allActiveTours', 'galleryItems', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage', 'pageRobots'));
     }
 }

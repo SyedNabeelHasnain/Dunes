@@ -322,7 +322,24 @@ class AdminCouponController extends Controller
     public function exportCsv(Request $request)
     {
         $fileName = 'dunes-coupons-export-'.date('Y-m-d-His').'.csv';
-        $coupons = Coupon::with(['tour', 'tier'])->withCount('usages')->orderBy('created_at', 'desc')->get();
+        $query = Coupon::with(['tour', 'tier'])->withCount('usages');
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('type')) {
+            $query->where('discount_type', $request->type);
+        }
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('code', 'like', "%{$search}%")
+                    ->orWhere('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        $coupons = $query->orderBy('created_at', 'desc')->get();
 
         $headers = [
             'Content-type' => 'text/csv; charset=UTF-8',

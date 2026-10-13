@@ -9,6 +9,7 @@ use App\Models\LegalPage;
 use App\Models\Tour;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 
 class AjaxGatewayController extends Controller
 {
@@ -38,45 +39,7 @@ class AjaxGatewayController extends Controller
 
         switch ($action) {
             case 'getTiers':
-                $tourId = (int) $request->input('tour_id');
-                $tour = Tour::find($tourId);
-                if (! $tour) {
-                    return response()->json(['error' => 'Invalid tour'], 400);
-                }
-
-                $tiers = $tour->tiers()
-                    ->where('status', 'active')
-                    ->get()
-                    ->map(function ($tier) {
-                        return [
-                            'id' => $tier->id,
-                            'name' => $tier->name,
-                            'description' => $tier->description,
-                            'is_popular' => $tier->is_popular ? 1 : 0,
-                            'price' => $tier->pivot->price,
-                            'old_price' => $tier->pivot->old_price,
-                            'price_type' => $tier->pivot->price_type,
-                            'capacity' => (int) ($tier->vehicle_capacity ?? (preg_match('/(4|four)/i', $tier->name ?? '') ? 4 : (preg_match('/(1|single|solo)/i', $tier->name ?? '') ? 1 : 2))),
-                        ];
-                    });
-
-                $addons = $tour->addons()
-                    ->where('status', 'active')
-                    ->get()
-                    ->map(function ($addon) {
-                        return [
-                            'id' => $addon->id,
-                            'name' => $addon->name,
-                            'description' => $addon->description,
-                            'icon' => $addon->icon ?: 'plus-circle',
-                            'price' => (float) $addon->pivot->price,
-                        ];
-                    });
-
-                return response()->json([
-                    'tiers' => $tiers,
-                    'addons' => $addons,
-                ]);
+                return $this->getTiers($request);
 
             case 'get_legal_content':
                 $type = $request->input('type');
@@ -105,10 +68,11 @@ class AjaxGatewayController extends Controller
                 return $this->bookingController->checkout($request);
 
             case 'contact':
-                return $this->pageController->submitContact($request);
+                return $this->submitContact($request);
 
             case 'logWhatsApp':
-                return $this->pageController->logWhatsapp($request);
+            case 'log_whatsapp':
+                return $this->logWhatsapp($request);
 
             case 'check_email_status':
                 return $this->emailVerificationController->status($request);
@@ -134,6 +98,64 @@ class AjaxGatewayController extends Controller
             default:
                 return response()->json(['error' => 'Invalid action'], 400);
         }
+    }
+
+    public function getTiers(Request $request)
+    {
+        $tourId = (int) $request->input('tour_id');
+        $tour = Tour::find($tourId);
+        if (! $tour) {
+            return response()->json(['error' => 'Invalid tour'], 400);
+        }
+
+        $tiersQuery = $tour->tiers()->where('status', 'active');
+        if (Schema::hasColumn('tour_tiers', 'child_price')) {
+            $tiersQuery->withPivot('child_price');
+        }
+
+        $tiers = $tiersQuery
+            ->get()
+            ->map(function ($tier) {
+                return [
+                    'id' => $tier->id,
+                    'name' => $tier->name,
+                    'description' => $tier->description,
+                    'is_popular' => $tier->is_popular ? 1 : 0,
+                    'price' => $tier->pivot->price,
+                    'child_price' => $tier->pivot->child_price ?? 0,
+                    'old_price' => $tier->pivot->old_price,
+                    'price_type' => $tier->pivot->price_type,
+                    'capacity' => (int) ($tier->vehicle_capacity ?? (preg_match('/(4|four)/i', $tier->name ?? '') ? 4 : (preg_match('/(1|single|solo)/i', $tier->name ?? '') ? 1 : 2))),
+                ];
+            });
+
+        $addons = $tour->addons()
+            ->where('status', 'active')
+            ->get()
+            ->map(function ($addon) {
+                return [
+                    'id' => $addon->id,
+                    'name' => $addon->name,
+                    'description' => $addon->description,
+                    'icon' => $addon->icon ?: 'plus-circle',
+                    'price' => (float) $addon->pivot->price,
+                ];
+            });
+
+        return response()->json([
+            'tiers' => $tiers,
+            'addons' => $addons,
+        ]);
+    }
+
+    public function submitContact(Request $request)
+    {
+        return $this->pageController->submitContact($request);
+    }
+
+    public function logWhatsapp(Request $request)
+    {
+        return $this->pageController->logWhatsapp($request);
     }
 
     /**
@@ -193,10 +215,10 @@ class AjaxGatewayController extends Controller
                     $fallbacks = [
                         ['name' => 'Michael R.', 'tour' => 'Premium Evening Desert Safari Dubai', 'slug' => 'evening-desert-safari-dubai', 'img' => 'evening-desert-safari-dubai-hero.avif', 'time' => '12 minutes ago'],
                         ['name' => 'Elena S.', 'tour' => 'Self-Drive Dune Buggy Safari Dubai', 'slug' => 'dune-buggy-rental-dubai', 'img' => 'dubai-desert-safari-buggy-dune-discovery-tourism.avif', 'time' => '28 minutes ago'],
-                        ['name' => 'David L.', 'tour' => 'Dubai Marina Luxury Dhow Cruise Dinner', 'slug' => 'dhow-cruise-dubai-marina', 'img' => 'dhow-cruise-dubai-marina-dune-discovery-tourism.avif', 'time' => '45 minutes ago'],
+                        ['name' => 'David L.', 'tour' => 'Dubai Marina Luxury Dhow Cruise Dinner', 'slug' => 'dhow-cruise-marina', 'img' => 'dhow-cruise-dubai-marina-dune-discovery-tourism.avif', 'time' => '45 minutes ago'],
                         ['name' => 'Sophie M.', 'tour' => 'Sunrise Morning Desert Safari Dubai', 'slug' => 'morning-desert-safari-dubai', 'img' => 'morning-desert-safari-dubai-hero.avif', 'time' => '1 hour ago'],
                         ['name' => 'Ahmed K.', 'tour' => 'Overnight Bedouin Camp Safari Dubai', 'slug' => 'overnight-desert-safari-dubai', 'img' => 'overnight-desert-safari-dubai-hero.avif', 'time' => '2 hours ago'],
-                        ['name' => 'Emma W.', 'tour' => 'VIP Quad Bike Adventure Safari', 'slug' => 'quad-biking-desert-safari-dubai', 'img' => 'desert-safari-quad-biking-hero.avif', 'time' => '3 hours ago'],
+                        ['name' => 'Emma W.', 'tour' => 'VIP Quad Bike Adventure Safari', 'slug' => 'quad-biking-safari', 'img' => 'desert-safari-quad-biking-hero.avif', 'time' => '3 hours ago'],
                     ];
 
                     foreach ($fallbacks as $f) {

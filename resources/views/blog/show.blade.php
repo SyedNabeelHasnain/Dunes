@@ -78,15 +78,15 @@
 {
   "@@context": "https://schema.org",
   "@type": "FAQPage",
-  "inLanguage": "{{ $currentLocale }}",
+  "inLanguage": {!! json_encode($currentLocale, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
   "mainEntity": [
     @foreach($post->faqs as $fi => $faq)
     {
       "@type": "Question",
-      "name": {!! json_encode($faq->question) !!},
+      "name": {!! json_encode($faq->question, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": {!! json_encode($faq->answer) !!}
+        "text": {!! json_encode($faq->answer, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
       }
     }{{ $loop->last ? '' : ',' }}
     @endforeach
@@ -95,10 +95,10 @@
 </script>
 @endif
 
-<article itemscope itemtype="https://schema.org/{{ $post->schema_type ?? 'BlogPosting' }}" class="blog-article">
+<article class="blog-article">
     <header class="hero-subpage bg-slate-950 text-white relative overflow-hidden min-h-[420px]" style="padding-top: calc(var(--header-h, 72px) + 2.5rem);">
         @if ($post->featured_image)
-        <img src="{{ $featImgPath }}" class="absolute inset-0 w-full h-full object-cover opacity-25" alt="{{ $post->featured_image_alt ?: $post->title }}" fetchpriority="high" itemprop="image">
+        <img src="{{ $featImgPath }}" class="absolute inset-0 w-full h-full object-cover opacity-25" alt="{{ $post->featured_image_alt ?: $post->title }}" fetchpriority="high">
         @endif
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <!-- Breadcrumbs -->
@@ -120,7 +120,7 @@
             <a href="{{ localized_route('blog.index', ['category' => $post->category?->slug]) }}" rel="nofollow" class="bg-primary text-white rounded-full px-3.5 py-1 text-xs font-bold mb-4 inline-block shadow-sm">{{ $post->category?->name }}</a>
             @endif
 
-            <h1 itemprop="headline" class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4 max-w-4xl">{{ $post->title }}</h1>
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4 max-w-4xl">{{ $post->title }}</h1>
 
             @if ($post->subtitle)
             <p class="text-slate-300 text-base sm:text-lg mb-6 max-w-3xl leading-relaxed">{{ $post->subtitle }}</p>
@@ -129,10 +129,8 @@
             <!-- Author info -->
             <div class="flex items-center gap-6 flex-wrap text-white/80 text-xs sm:text-sm">
                 <div class="flex items-center gap-2.5">
-                    <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center font-black text-white shrink-0" itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center font-black text-white shrink-0">
                         <span>{{ strtoupper(substr($authorName, 0, 1)) }}</span>
-                        <meta itemprop="name" content="{{ $authorName }}">
-                        <meta itemprop="jobTitle" content="{{ $authorTitle }}">
                     </div>
                     <div>
                         <div class="text-white font-bold leading-tight">{{ $authorName }}</div>
@@ -141,7 +139,7 @@
                 </div>
                 <div class="flex gap-4 items-center">
                     @if ($publishedAt)
-                    <span itemprop="datePublished" content="{{ $publishedAt->toIso8601String() }}"><i class="bi bi-calendar3 me-1 text-primary"></i>{{ $publishedAt->format('F j, Y') }}</span>
+                    <span><i class="bi bi-calendar3 me-1 text-primary"></i>{{ $publishedAt->format('F j, Y') }}</span>
                     @endif
                     <span><i class="bi bi-clock me-1 text-primary"></i>{{ $post->read_time }} {{ __('ui.blog.read_time') }}</span>
                 </div>
@@ -174,7 +172,7 @@
                 @endif
 
                 <!-- Post HTML Content with In-Article Conversion Cards -->
-                <div class="blog-content prose max-w-none text-slate-800 leading-relaxed" itemprop="articleBody">
+                <div class="blog-content prose max-w-none text-slate-800 leading-relaxed">
                     {!! $processedContent ?? $post->content !!}
                 </div>
 

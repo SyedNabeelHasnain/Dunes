@@ -8,47 +8,47 @@
   "@graph": [
     {
       "@type": "ContactPage",
-      "@id": "{{ $canonical }}#webpage",
-      "url": "{{ $canonical }}",
-      "name": {!! json_encode($pageTitle) !!},
-      "description": {!! json_encode($pageDesc) !!},
-      "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
+      "@id": {!! json_encode($canonical . '#webpage', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "url": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "name": {!! json_encode($pageTitle, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "description": {!! json_encode($pageDesc, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "inLanguage": {!! json_encode($currentLocale ?? app()->getLocale() ?? 'en', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "breadcrumb": {
         "@type": "BreadcrumbList",
         "itemListElement": [
           {
             "@type": "ListItem",
             "position": 1,
-            "name": "{{ __('ui.nav.home') ?? 'Home' }}",
-            "item": "{{ localized_route('home') }}"
+            "name": {!! json_encode(__('ui.nav.home') ?? 'Home', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+            "item": {!! json_encode(localized_route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           },
           {
             "@type": "ListItem",
             "position": 2,
-            "name": "{{ __('ui.nav.contact') ?? 'Contact Us' }}",
-            "item": "{{ $canonical }}"
+            "name": {!! json_encode(__('ui.nav.contact') ?? 'Contact Us', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+            "item": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           }
         ]
       },
       "mainEntity": {
         "@type": "TravelAgency",
-        "@id": "{{ route('home') }}#organization",
-        "name": "{{ $settings['site_name'] ?? 'Dunes Discovery Tourism LLC' }}",
-        "telephone": "{{ $settings['site_phone'] ?? '+971 50 245 6056' }}",
-        "email": "{{ $settings['site_email'] ?? 'info@dunesdiscoverytourism.com' }}",
-        "hasMap": "https://maps.google.com/?q={{ $settings['site_latitude'] ?? '25.2048' }},{{ $settings['site_longitude'] ?? '55.2708' }}",
+        "@id": {!! json_encode(route('home') . '#organization', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        "name": {!! json_encode($settings['site_name'] ?? 'Dunes Discovery Tourism LLC', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        "telephone": {!! json_encode($settings['site_phone'] ?? '+971 50 245 6056', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        "email": {!! json_encode($settings['site_email'] ?? 'info@dunesdiscoverytourism.com', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        "hasMap": {!! json_encode('https://maps.google.com/?q=' . ($settings['site_latitude'] ?? '25.2048') . ',' . ($settings['site_longitude'] ?? '55.2708'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
         "address": {
           "@type": "PostalAddress",
-          "streetAddress": "{{ $settings['site_address'] ?? 'Al Fahidi, Bur Dubai, Dubai, United Arab Emirates' }}",
+          "streetAddress": {!! json_encode($settings['site_address'] ?? 'Al Fahidi, Bur Dubai, Dubai, United Arab Emirates', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
           "addressLocality": "Dubai",
           "addressRegion": "Dubai",
-          "postalCode": "{{ $settings['site_postal_code'] ?? '00000' }}",
+          "postalCode": {!! json_encode($settings['site_postal_code'] ?? '00000', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
           "addressCountry": "AE"
         },
         "geo": {
           "@type": "GeoCoordinates",
-          "latitude": "{{ $settings['site_latitude'] ?? '25.2048' }}",
-          "longitude": "{{ $settings['site_longitude'] ?? '55.2708' }}"
+          "latitude": {!! json_encode($settings['site_latitude'] ?? '25.2048', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "longitude": {!! json_encode($settings['site_longitude'] ?? '55.2708', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
         },
         "openingHoursSpecification": {
           "@type": "OpeningHoursSpecification",
@@ -60,13 +60,13 @@
           {
             "@type": "PropertyValue",
             "propertyID": "DET Tourism License",
-            "value": "{{ $settings['company_license_number'] ?? '1430583' }}"
+            "value": {!! json_encode($settings['company_license_number'] ?? '1430583', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           }
           @if(!empty($settings['google_place_id']))
           ,{
             "@type": "PropertyValue",
             "propertyID": "Google Place ID",
-            "value": "{{ $settings['google_place_id'] }}"
+            "value": {!! json_encode($settings['google_place_id'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           }
           @endif
         ]
@@ -258,7 +258,7 @@
                             <div class="legal-agreement-wrapper flex items-start gap-2.5">
                                 <input class="rounded text-primary focus:ring-primary w-4 h-4 mt-0.5 cursor-pointer" type="checkbox" id="contactAgreement" required>
                                 <label class="text-xs text-slate-600 leading-normal" for="contactAgreement">
-                                    I agree to the <a href="{{ route('terms') }}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline font-semibold">{{ __('ui.footer.terms') }}</a> and <a href="{{ route('privacy') }}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline font-semibold">{{ __('ui.footer.privacy') }}</a>.
+                                    I agree to the <a href="{{ localized_route('terms') }}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline font-semibold">{{ __('ui.footer.terms') }}</a> and <a href="{{ localized_route('privacy') }}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline font-semibold">{{ __('ui.footer.privacy') }}</a>.
                                 </label>
                             </div>
                         </div>
@@ -274,7 +274,7 @@
                         </div>
 
                         <div class="text-center pt-2">
-                            <button type="submit" class="btn-desert-animated text-base font-bold rounded-full px-8 py-3.5 text-white shadow-md inline-flex items-center gap-2 cursor-pointer w-full sm:w-auto justify-center" id="submitContactBtn" onclick="if(typeof gtagReportConversion==='function'){gtagReportConversion();}">
+                            <button type="submit" class="btn-desert-animated text-base font-bold rounded-full px-8 py-3.5 text-white shadow-md inline-flex items-center gap-2 cursor-pointer w-full sm:w-auto justify-center" id="submitContactBtn">
                                 <span>{{ __('ui.contact_page.send_btn') }}</span>
                                 <i class="bi bi-send"></i>
                             </button>
@@ -356,21 +356,4 @@
         </div>
     </div>
 </section>
-
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var contactForm = document.getElementById('contactForm');
-    if (contactForm) {
-        contactForm.addEventListener('submit', function() {
-            if (typeof window.gtag === 'function') {
-                window.gtag('event', 'conversion', {
-                    'send_to': '{{ (!empty($settings['google_ads_id']) && !empty($settings['google_conversion_label'])) ? ($settings['google_ads_id'] . "/" . $settings['google_conversion_label']) : "AW-17859624049/eR3SCLimtvobEPH4kMRC" }}'
-                });
-            }
-        });
-    }
-});
-</script>
-@endpush
 @endsection

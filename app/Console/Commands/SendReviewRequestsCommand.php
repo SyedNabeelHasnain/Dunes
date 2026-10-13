@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Mail\ReviewRequestMail;
 use App\Models\Booking;
+use App\Services\EmailMarketingService;
 use App\Services\SettingsService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -32,6 +33,14 @@ class SendReviewRequestsCommand extends Command
     {
         $settings = app(SettingsService::class);
         $fromEmail = $settings->getFromEmail();
+
+        if (! app()->environment('testing')) {
+            try {
+                app(EmailMarketingService::class)->applySmtpConfig();
+            } catch (\Throwable $e) {
+                // Fallback to default mail config
+            }
+        }
 
         $yesterday = now()->subDay()->format('Y-m-d');
         $this->info("Scanning completed tour bookings for date: {$yesterday}");

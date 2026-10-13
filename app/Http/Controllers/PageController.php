@@ -32,7 +32,7 @@ class PageController extends Controller
     /**
      * Show About Us page.
      */
-    public function about()
+    public function about(Request $request)
     {
         $settings = app(SettingsService::class);
         $currentLocale = app()->getLocale();
@@ -55,14 +55,15 @@ class PageController extends Controller
         $ogImageSetting = $settings->get('seo_about_og_image');
         $ogImage = resolve_og_image($ogImageSetting, 'images/dubai-desert-safar-camel-ride-dune-discovery-tourism.avif');
         $canonical = localized_route('about');
+        $pageRobots = ! empty($request->query()) ? 'noindex, follow' : 'index, follow';
 
-        return view('about', compact('pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
+        return view('about', compact('pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage', 'pageRobots'));
     }
 
     /**
      * Show Contact Us page.
      */
-    public function contact()
+    public function contact(Request $request)
     {
         session(['form_load.contact' => microtime(true)]);
 
@@ -87,14 +88,15 @@ class PageController extends Controller
         $ogImageSetting = $settings->get('seo_contact_og_image');
         $ogImage = resolve_og_image($ogImageSetting, 'images/dubai-desert-safari-camp-dune-discovery-tourism.avif');
         $canonical = localized_route('contact');
+        $pageRobots = ! empty($request->query()) ? 'noindex, follow' : 'index, follow';
 
-        return view('contact', compact('pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
+        return view('contact', compact('pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage', 'pageRobots'));
     }
 
     /**
      * Show FAQ page.
      */
-    public function faq()
+    public function faq(Request $request)
     {
         $generalFaqIds = FaqAssignment::where('entity_type', 'general')
             ->pluck('faq_id');
@@ -125,8 +127,9 @@ class PageController extends Controller
         $ogImageSetting = $settings->get('seo_faq_og_image');
         $ogImage = resolve_og_image($ogImageSetting, 'images/dubai-desert-safari-dune-bashing-dune-discovery-tourism.avif');
         $canonical = localized_route('faq');
+        $pageRobots = ! empty($request->query()) ? 'noindex, follow' : 'index, follow';
 
-        return view('faq', compact('faqs', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
+        return view('faq', compact('faqs', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage', 'pageRobots'));
     }
 
     /**
@@ -455,10 +458,10 @@ class PageController extends Controller
     public function submitFeedback(Request $request, ...$params)
     {
         $ref = (string) end($params);
-        $booking = Booking::where('reference', $ref)->firstOrFail();
+        $booking = Booking::where('reference', $ref)->first();
         $feedback = trim($request->input('feedback', ''));
 
-        if (! empty($feedback)) {
+        if ($booking && ! empty($feedback)) {
             $notes = $booking->special_requests ?: '';
             $booking->update([
                 'special_requests' => trim($notes."\n[GUEST FEEDBACK: ".$feedback.']'),
@@ -471,13 +474,14 @@ class PageController extends Controller
     /**
      * Show Official Press Kit & Partner Media Resources page.
      */
-    public function pressKit()
+    public function pressKit(Request $request)
     {
         $settings = app(SettingsService::class);
         $currentLocale = app()->getLocale();
         $currentYear = date('Y');
 
         $canonical = localized_route('press.kit');
+        $pageRobots = ! empty($request->query()) ? 'noindex, follow' : 'index, follow';
 
         $localizedPressMeta = [
             'ar' => [
@@ -579,6 +583,7 @@ class PageController extends Controller
             'pageKeys',
             'canonical',
             'ogImage',
+            'pageRobots',
             'facts',
             'badges',
             'editorialImages',

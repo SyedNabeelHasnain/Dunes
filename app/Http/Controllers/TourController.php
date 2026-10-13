@@ -29,16 +29,10 @@ class TourController extends Controller
 
         $selectedCategorySlug = $request->input('category');
         $categories = Category::orderBy('priority', 'asc')->get();
-        $query = Tour::where('status', 'active')->with(['tiers', 'category']);
-
-        if ($selectedCategorySlug) {
-            $category = Category::where('slug', $selectedCategorySlug)->first();
-            if ($category) {
-                $query->where('category_id', $category->id);
-            }
-        }
-
-        $tours = $query->orderBy('priority', 'asc')->get();
+        $tours = Tour::where('status', 'active')
+            ->with(['tiers', 'category'])
+            ->orderBy('priority', 'asc')
+            ->get();
 
         $settingsService = app(SettingsService::class);
         $currentLocale = app()->getLocale();
@@ -728,7 +722,8 @@ class TourController extends Controller
         $pageKeys = 'custom desert safari dubai, build your own safari dubai, bespoke desert safari, private land cruiser safari, vip desert safari customizer';
         $canonical = localized_route('tours.customizer');
         $ogImage = asset('images/desert-safari-poster.avif');
+        $pageRobots = ! empty($request->query()) ? 'noindex, follow' : 'index, follow';
 
-        return view('tours.customizer', compact('allTours', 'categories', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
+        return view('tours.customizer', compact('allTours', 'categories', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage', 'pageRobots'));
     }
 }

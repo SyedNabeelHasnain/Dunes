@@ -5,31 +5,31 @@
 {
   "@@context": "https://schema.org",
   "@type": "SearchResultsPage",
-  "@id": "{{ $canonical }}#webpage",
-  "name": {!! json_encode($pageTitle) !!},
-  "description": {!! json_encode($pageDesc) !!},
-  "url": "{{ $canonical }}",
-  "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
+  "@id": {!! json_encode($canonical . '#webpage', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+  "name": {!! json_encode($pageTitle, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+  "description": {!! json_encode($pageDesc, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+  "url": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+  "inLanguage": {!! json_encode($currentLocale ?? app()->getLocale() ?? 'en', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
   "breadcrumb": {
     "@type": "BreadcrumbList",
     "itemListElement": [
       {
         "@type": "ListItem",
         "position": 1,
-        "name": "{{ __('ui.nav.home') ?? 'Home' }}",
-        "item": "{{ localized_route('home') }}"
+        "name": {!! json_encode(__('ui.nav.home') ?? 'Home', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        "item": {!! json_encode(localized_route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
       },
       {
         "@type": "ListItem",
         "position": 2,
-        "name": "{{ __('ui.nav.tours') ?? 'Tours' }}",
-        "item": "{{ localized_route('tours.index') }}"
+        "name": {!! json_encode(__('ui.nav.tours') ?? 'Tours', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        "item": {!! json_encode(localized_route('tours.index'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
       },
       {
         "@type": "ListItem",
         "position": 3,
-        "name": {!! json_encode($displayQuery) !!},
-        "item": "{{ $canonical }}"
+        "name": {!! json_encode($displayQuery, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        "item": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
       }
     ]
   },
@@ -40,18 +40,22 @@
       @foreach($tours as $idx => $t)
       @php
           $tPrice = $t->tiers->min('pivot.price') ?? 0;
+          $tThumb = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image ?: $t->hero_image ?: 'desert-safari-poster.avif');
       @endphp
       {
         "@type": "ListItem",
         "position": {{ $idx + 1 }},
-        "name": {!! json_encode($t->name) !!},
-        "url": "{{ localized_route('tours.show', $t->slug) }}",
-        "image": "{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}",
-        "offers": {
-          "@type": "Offer",
-          "price": "{{ $tPrice }}",
-          "priceCurrency": "AED",
-          "availability": "https://schema.org/InStock"
+        "item": {
+          "@type": "Product",
+          "name": {!! json_encode($t->name, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "url": {!! json_encode(localized_route('tours.show', $t->slug), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "image": {!! json_encode(asset('images/' . $tThumb), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "offers": {
+            "@type": "Offer",
+            "price": {!! json_encode((string) $tPrice, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+            "priceCurrency": "AED",
+            "availability": "https://schema.org/InStock"
+          }
         }
       }@if(!$loop->last),@endif
       @endforeach
@@ -271,7 +275,7 @@
                     <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col h-full group">
                         <a href="{{ localized_route('tours.show', $t->slug) }}" class="flex flex-col h-full text-inherit">
                             <div class="relative overflow-hidden aspect-[16/10]">
-                                <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy">
+                                <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image ?: $t->hero_image ?: 'desert-safari-poster.avif')) }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy">
                                 @if($t->is_bestseller)
                                 <span class="absolute top-3 start-3 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-md inline-flex items-center gap-1">
                                     <i class="bi bi-fire text-amber-300"></i>{{ __('ui.home_popular.bestseller') }}

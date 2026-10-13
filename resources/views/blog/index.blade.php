@@ -13,10 +13,10 @@
   "@@context": "https://schema.org",
   "@type": "BreadcrumbList",
   "itemListElement": [
-    {"@type":"ListItem","position":1,"name":"{{ __('ui.nav.home') ?? 'Home' }}","item":"{{ localized_route('home') }}"},
-    {"@type":"ListItem","position":2,"name":"{{ __('ui.nav.blog') ?? 'Blog' }}","item":"{{ localized_route('blog.index') }}"}
+    {"@type":"ListItem","position":1,"name":{!! json_encode(__('ui.nav.home') ?? 'Home', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},"item":{!! json_encode(localized_route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}},
+    {"@type":"ListItem","position":2,"name":{!! json_encode(__('ui.nav.blog') ?? 'Blog', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},"item":{!! json_encode(localized_route('blog.index'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}}
     @if ($cat)
-    ,{"@type":"ListItem","position":3,"name":"{{ $cat->name }}","item":"{{ localized_route('blog.index', ['category' => $cat->slug]) }}"}
+    ,{"@type":"ListItem","position":3,"name":{!! json_encode($cat->name, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},"item":{!! json_encode(localized_route('blog.index', ['category' => $cat->slug]), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}}
     @endif
   ]
 }
@@ -26,10 +26,10 @@
 {
   "@@context": "https://schema.org",
   "@type": "CollectionPage",
-  "name": "{{ $cat ? $cat->name . ' Blog' : ($pageTitle ?? 'Dubai Travel Blog') }}",
-  "description": "{{ $cat ? $cat->description : ($pageDesc ?? 'Expert guides and travel tips.') }}",
-  "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
-  "url": "{{ $canonical }}"
+  "name": {!! json_encode($cat ? $cat->name . ' Blog' : ($pageTitle ?? 'Dubai Travel Blog'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+  "description": {!! json_encode($cat ? $cat->description : ($pageDesc ?? 'Expert guides and travel tips.'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+  "inLanguage": {!! json_encode($currentLocale ?? app()->getLocale() ?? 'en', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+  "url": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
 }
 </script>
 

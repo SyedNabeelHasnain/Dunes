@@ -594,4 +594,99 @@ class GoogleSearchConsoleRemediationTest extends TestCase
         $this->assertEquals('Artículo de safari 1', $firstPost->getTranslation('title', 'es', false));
         $this->assertEquals('Articolo safari 1', $firstPost->getTranslation('title', 'it', false));
     }
+
+    /**
+     * Test 23: All Public Pages Emit 100% Valid JSON-LD Blocks, Query Params Emit Noindex, and Feedback/Gateway Flows Work
+     */
+    public function test_all_pages_emit_100_percent_valid_json_ld_and_frontend_admin_integrations(): void
+    {
+        $tour = Tour::create([
+            'name' => 'VIP "Red Dunes" & Camel Safari',
+            'slug' => 'vip-red-dunes-camel-safari',
+            'short_desc' => 'Luxury "VIP" camp & dune bashing.',
+            'full_desc' => '<p>Complete luxury experience.</p>',
+            'hero_image' => 'evening-desert-safari-dubai-dune-discovery-tourism.avif',
+            'status' => 'active',
+            'duration' => '6 Hours',
+            'rating' => 4.9,
+            'review_count' => 85,
+        ]);
+
+        $category = BlogCategory::create([
+            'name' => 'Guides & "Tips"',
+            'slug' => 'guides-and-tips',
+            'description' => 'Expert "insider" tips & guides for Dubai.',
+        ]);
+
+        $post = BlogPost::create([
+            'title' => 'Top 10 "Must-Do" Safari Tips & Tricks',
+            'slug' => 'top-10-safari-tips',
+            'excerpt' => 'Read our "essential" tips & tricks.',
+            'content' => '<p>Detailed article content.</p>',
+            'category_id' => $category->id,
+            'status' => 'published',
+            'published_at' => now(),
+        ]);
+
+        $pagesToValidateJsonLd = [
+            '/',
+            '/about',
+            '/contact',
+            '/faq',
+            '/tours',
+            '/'.$tour->slug,
+            '/build-your-own-safari',
+            '/search?q=safari',
+            '/blog',
+            '/blog/'.$post->slug,
+            '/rate-card',
+            '/desert-safari-from-dubai-marina',
+            '/review/guest',
+            '/privacy-policy',
+            '/terms-condition',
+            '/press-kit',
+            '/gallery',
+            '/dubai-desert-sunset-times',
+        ];
+
+        foreach ($pagesToValidateJsonLd as $url) {
+            $res = $this->get($url);
+            $res->assertStatus(200);
+            $html = $res->getContent();
+
+            preg_match_all('/<script[^>]*type=["\']application\/ld\+json["\'][^>]*>(.*?)<\/script>/is', $html, $matches);
+            $this->assertNotEmpty($matches[1], "Page [{$url}] must contain at least one JSON-LD script block");
+
+            foreach ($matches[1] as $idx => $rawJson) {
+                $decoded = json_decode(trim($rawJson), true);
+                $this->assertNotNull(
+                    $decoded,
+                    "Invalid JSON-LD on [{$url}] block #{$idx}: ".json_last_error_msg()."\nRaw:\n".trim($rawJson)
+                );
+            }
+        }
+
+        // Blog detail page must not have duplicate HTML Microdata itemscope
+        $blogHtml = $this->get('/blog/'.$post->slug)->getContent();
+        $this->assertStringNotContainsString('itemtype="https://schema.org/BlogPosting"', $blogHtml);
+
+        // Query parameters on static & geo-location pages trigger noindex, follow
+        foreach (['/?utm_source=test', '/about?ref=1', '/desert-safari-from-dubai-marina?ref=1', '/privacy-policy?ref=1'] as $qUrl) {
+            $qRes = $this->get($qUrl);
+            $qRes->assertStatus(200);
+            $qRes->assertSee('<meta name="robots" content="noindex, follow">', false);
+        }
+
+        // 404 page omits canonical tag
+        $res404 = $this->get('/non-existent-route-check-404');
+        $res404->assertStatus(404);
+        $res404->assertDontSee('<link rel="canonical"', false);
+
+        // Low-score review feedback submission for 'guest' works cleanly without 404
+        $feedbackRes = $this->post('/review/guest/feedback', [
+            'feedback' => 'The pickup was 10 minutes late.',
+            'phone' => '+971500000000',
+        ]);
+        $feedbackRes->assertStatus(302);
+    }
 }

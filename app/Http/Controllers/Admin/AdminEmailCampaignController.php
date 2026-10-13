@@ -237,10 +237,20 @@ class AdminEmailCampaignController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'subject' => 'required|string|max:255',
+            'preview_text' => 'nullable|string|max:255',
+            'from_name' => 'nullable|string|max:150',
+            'from_email' => 'nullable|email:filter|max:255',
+            'reply_to' => 'nullable|email:filter|max:255',
+            'target_type' => 'nullable|in:all,group',
             'group_id' => 'nullable|integer|exists:subscriber_groups,id',
             'template_id' => 'nullable|integer|exists:email_templates,id',
             'content_html' => 'required|string',
+            'scheduled_at' => 'nullable|date',
         ]);
+
+        if (! empty($validated['scheduled_at'])) {
+            $validated['scheduled_at'] = Carbon::parse($validated['scheduled_at']);
+        }
 
         $campaign->update($validated);
 

@@ -99,7 +99,11 @@ class LegalController extends Controller
             $pageDesc = $enDesc;
         }
 
-        return view('legal.show', compact('page', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
+        $pageRobots = ! empty(request()->query())
+            ? 'noindex, follow'
+            : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+
+        return view('legal.show', compact('page', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage', 'pageRobots'));
     }
 
     /**
@@ -234,7 +238,10 @@ class LegalController extends Controller
         $currentLocale = app()->getLocale();
         $canonical = ($currentLocale && $currentLocale !== 'en') ? url('/'.$currentLocale.'/'.$page->slug) : url('/'.$page->slug);
         $ogImage = asset('images/desert-safari-poster.avif');
+        $pageRobots = ! empty(request()->query())
+            ? 'noindex, follow'
+            : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
 
-        return view('legal.show', compact('page', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage'));
+        return view('legal.show', compact('page', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage', 'pageRobots'));
     }
 }

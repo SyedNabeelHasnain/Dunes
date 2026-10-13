@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @php
+    $isErrorPage = true;
     $pageTitle = 'Page Not Found (404) | Dunes Discovery Tourism';
     $pageDesc = 'The page you are looking for does not exist or has been moved. Explore our Dubai desert safari tours or return home.';
     $pageRobots = 'noindex, follow';
@@ -18,10 +19,10 @@
             The page or tour experience you are searching for might have been relocated, renamed, or is temporarily unavailable.
         </p>
         <div class="flex flex-col sm:flex-row justify-center gap-3">
-            <a href="{{ route('home') }}" class="btn-desert-animated px-5 py-3 rounded-full font-bold text-white text-sm shadow-md inline-flex items-center justify-center gap-2">
+            <a href="{{ localized_route('home') }}" class="btn-desert-animated px-5 py-3 rounded-full font-bold text-white text-sm shadow-md inline-flex items-center justify-center gap-2">
                 <i class="bi bi-house-door-fill"></i> {{ __('ui.nav.home') }}
             </a>
-            <a href="{{ route('tours.index') }}" class="border-2 border-primary text-primary hover:bg-primary hover:text-white px-5 py-3 rounded-full font-bold text-sm transition-colors inline-flex items-center justify-center gap-2">
+            <a href="{{ localized_route('tours.index') }}" class="border-2 border-primary text-primary hover:bg-primary hover:text-white px-5 py-3 rounded-full font-bold text-sm transition-colors inline-flex items-center justify-center gap-2">
                 <i class="bi bi-grid-fill"></i> {{ __('ui.common.view_all_tours') }}
             </a>
         </div>

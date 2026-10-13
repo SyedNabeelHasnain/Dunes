@@ -59,8 +59,8 @@ class AdminTourController extends Controller
             'dropoff_time' => 'nullable|string|max:255',
             'priority' => 'required|integer',
             'status' => 'required|string|in:active,inactive',
-            'hero_image' => 'nullable|image|max:5120',
-            'thumb_image' => 'nullable|image|max:3072',
+            'hero_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:5120',
+            'thumb_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:3072',
         ]);
 
         $data = $this->normalizeLocalizedData(
@@ -159,8 +159,9 @@ class AdminTourController extends Controller
             $request->except(['tiers', 'addons', 'hero_image', 'thumb_image']),
             ['name', 'short_desc', 'full_desc', 'meta_title', 'meta_desc', 'meta_keywords']
         );
-        if ($request->has('name')) {
-            $baseSlug = Str::slug($this->extractSlugSource($request->name));
+        if ($request->filled('slug') || empty($tour->slug)) {
+            $slugSource = $request->filled('slug') ? $request->input('slug') : $this->extractSlugSource($request->name);
+            $baseSlug = Str::slug($slugSource);
             if (! empty($baseSlug)) {
                 $slug = $baseSlug;
                 $counter = 1;
@@ -170,6 +171,8 @@ class AdminTourController extends Controller
                 }
                 $data['slug'] = $slug;
             }
+        } else {
+            unset($data['slug']);
         }
         $data['is_featured'] = $request->boolean('is_featured');
         $data['is_bestseller'] = $request->boolean('is_bestseller');
@@ -208,6 +211,8 @@ class AdminTourController extends Controller
                 }
             }
             $tour->addons()->sync($addonsData);
+        } else {
+            $tour->addons()->detach();
         }
 
         $this->clearTourCaches();
@@ -269,6 +274,8 @@ class AdminTourController extends Controller
             'priority' => (int) $request->priority,
         ]);
 
+        $this->clearTourCaches();
+
         return redirect()->route('admin.tiers.index')->with('success', 'Pricing tier created successfully.');
     }
 
@@ -301,6 +308,8 @@ class AdminTourController extends Controller
             'priority' => (int) $request->priority,
         ]);
 
+        $this->clearTourCaches();
+
         return redirect()->route('admin.tiers.index')->with('success', 'Pricing tier updated successfully.');
     }
 
@@ -313,6 +322,8 @@ class AdminTourController extends Controller
         $tier->tours()->detach();
         $tier->delete();
 
+        $this->clearTourCaches();
+
         return redirect()->route('admin.tiers.index')->with('success', 'Pricing tier deleted successfully.');
     }
 
@@ -322,20 +333,37 @@ class AdminTourController extends Controller
     public function addons()
     {
         $addons = Addon::withCount('tours')->orderBy('priority', 'asc')->get();
-        $totalBookingsCount = Booking::where('status', '!=', 'draft')->count();
+        $totalBookingsCount = Booking::whereIn('status', ['confirmed', 'completed'])->count();
+
+        $addonStats = DB::table('booking_addons')
+            ->join('bookings', 'booking_addons.booking_id', '=', 'bookings.id')
+            ->whereNull('bookings.deleted_at')
+            ->whereIn('bookings.status', ['confirmed', 'completed'])
+            ->select(
+                'booking_addons.addon_id',
+                DB::raw('COUNT(*) as booked_count'),
+                DB::raw('COALESCE(SUM(booking_addons.price * COALESCE(booking_addons.quantity, 1)), 0) as booked_revenue')
+            )
+            ->groupBy('booking_addons.addon_id')
+            ->get()
+            ->keyBy('addon_id');
+
+        $totalAddonsRevenue = 0.0;
+        $totalAddonsBooked = 0;
 
         foreach ($addons as $addon) {
-            $bookedCount = DB::table('booking_addons')->where('addon_id', $addon->id)->count();
-            $bookedRevenue = (float) DB::table('booking_addons')->where('addon_id', $addon->id)->sum('price');
+            $stat = $addonStats->get($addon->id);
+            $bookedCount = $stat ? (int) $stat->booked_count : 0;
+            $bookedRevenue = $stat ? (float) $stat->booked_revenue : 0.0;
             $attachmentRate = $totalBookingsCount > 0 ? round(($bookedCount / $totalBookingsCount) * 100, 1) : 0;
 
             $addon->times_booked = $bookedCount;
             $addon->total_revenue = $bookedRevenue;
             $addon->attachment_rate = $attachmentRate;
-        }
 
-        $totalAddonsRevenue = (float) DB::table('booking_addons')->sum('price');
-        $totalAddonsBooked = DB::table('booking_addons')->count();
+            $totalAddonsBooked += $bookedCount;
+            $totalAddonsRevenue += $bookedRevenue;
+        }
 
         return view('admin.addons.index', compact('addons', 'totalAddonsRevenue', 'totalAddonsBooked'));
     }
@@ -370,6 +398,8 @@ class AdminTourController extends Controller
             'priority' => (int) $request->priority,
         ]);
 
+        $this->clearTourCaches();
+
         return redirect()->route('admin.addons.index')->with('success', 'Addon created successfully.');
     }
 
@@ -400,6 +430,8 @@ class AdminTourController extends Controller
             'priority' => (int) $request->priority,
         ]);
 
+        $this->clearTourCaches();
+
         return redirect()->route('admin.addons.index')->with('success', 'Addon updated successfully.');
     }
 
@@ -411,6 +443,8 @@ class AdminTourController extends Controller
         $addon = Addon::findOrFail($id);
         $addon->tours()->detach();
         $addon->delete();
+
+        $this->clearTourCaches();
 
         return redirect()->route('admin.addons.index')->with('success', 'Addon deleted successfully.');
     }
@@ -474,6 +508,8 @@ class AdminTourController extends Controller
         $data = $this->normalizeLocalizedData($request->all(), ['title', 'description']);
         $tour->itineraries()->create($data);
 
+        $this->clearTourCaches();
+
         return response()->json(['success' => true, 'message' => 'Itinerary item added successfully.']);
     }
 
@@ -496,6 +532,8 @@ class AdminTourController extends Controller
         $data = $this->normalizeLocalizedData($request->all(), ['title', 'description']);
         $itinerary->update($data);
 
+        $this->clearTourCaches();
+
         return response()->json(['success' => true, 'message' => 'Itinerary item updated successfully.']);
     }
 
@@ -506,6 +544,8 @@ class AdminTourController extends Controller
     {
         $itinerary = Itinerary::findOrFail($id);
         $itinerary->delete();
+
+        $this->clearTourCaches();
 
         return response()->json(['success' => true, 'message' => 'Itinerary item deleted successfully.']);
     }
@@ -525,6 +565,8 @@ class AdminTourController extends Controller
 
         $data = $this->normalizeLocalizedData($request->all(), ['title', 'description']);
         $item = ContentItem::create($data);
+
+        $this->clearTourCaches();
 
         return response()->json(['success' => true, 'message' => 'Content item created successfully.', 'item' => $item]);
     }
@@ -546,6 +588,8 @@ class AdminTourController extends Controller
         }
 
         $tour->contentItems()->sync($contentIds);
+
+        $this->clearTourCaches();
 
         return response()->json(['success' => true, 'message' => 'Tour content items assigned successfully.']);
     }

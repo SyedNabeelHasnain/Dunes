@@ -157,11 +157,11 @@
                     $tourCat = $categories->firstWhere('id', $t->category_id);
                     $tourCatSlug = $tourCat ? $tourCat->slug : '';
                 @endphp
-                <div class="tour-item flex flex-col h-full" data-category="{{ $tourCatSlug }}" data-name="{{ strtolower($t->name) }}">
+                <div class="tour-item flex flex-col h-full" data-category="{{ $tourCatSlug }}" data-name="{{ strtolower($t->name) }}" @if($selectedCategorySlug && $tourCatSlug !== $selectedCategorySlug) style="display: none;" @endif>
                     <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-200 hover:border-slate-300 flex flex-col h-full group">
                         <a href="{{ localized_route('tours.show', $t->slug) }}" class="flex flex-col h-full text-inherit">
                             <div class="relative overflow-hidden aspect-[16/10]">
-                                <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy">
+                                <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image ?: $t->hero_image ?: 'desert-safari-poster.avif')) }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy">
                                 @if($t->is_bestseller)
                                 <span class="absolute top-3 start-3 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-md inline-flex items-center gap-1">
                                     <i class="bi bi-fire text-amber-300"></i>{{ __('ui.home_popular.bestseller') }}
@@ -286,7 +286,7 @@
 
 @push('scripts')
 <script>
-let currentCategory = '';
+let currentCategory = @json($selectedCategorySlug ?? '');
 let currentSearch = '';
 
 function applyTourFilters() {
@@ -318,7 +318,7 @@ function filterTours(category) {
     currentCategory = category;
     document.querySelectorAll('.filter-btn').forEach(btn => {
         if (btn.dataset.category === category) {
-            btn.classList.remove('bg-white', 'text-slate-700', 'border', 'border-slate-200');
+            btn.classList.remove('bg-white', 'text-slate-700', 'border', 'border-slate-200', 'border-slate-300');
             btn.classList.add('bg-slate-900', 'text-white', 'shadow-xs');
         } else {
             btn.classList.remove('bg-slate-900', 'text-white', 'shadow-xs');
@@ -349,6 +349,12 @@ function resetFilters() {
     filterTours('');
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    if (currentCategory) {
+        applyTourFilters();
+    }
+});
+
 window.addEventListener('popstate', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const cat = urlParams.get('category') || '';
@@ -365,25 +371,25 @@ window.addEventListener('popstate', () => {
   "@graph": [
     {
       "@type": "CollectionPage",
-      "@id": "{{ $canonical }}#webpage",
-      "url": "{{ $canonical }}",
-      "name": {!! json_encode($pageTitle) !!},
-      "description": {!! json_encode($pageDesc) !!},
-      "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
+      "@id": {!! json_encode($canonical . '#webpage', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "url": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "name": {!! json_encode($pageTitle, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "description": {!! json_encode($pageDesc, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "inLanguage": {!! json_encode($currentLocale ?? app()->getLocale() ?? 'en', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "breadcrumb": {
         "@type": "BreadcrumbList",
         "itemListElement": [
           {
             "@type": "ListItem",
             "position": 1,
-            "name": "{{ __('ui.nav.home') ?? 'Home' }}",
-            "item": "{{ localized_route('home') }}"
+            "name": {!! json_encode(__('ui.nav.home') ?? 'Home', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+            "item": {!! json_encode(localized_route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           },
           {
             "@type": "ListItem",
             "position": 2,
-            "name": "{{ __('ui.nav.tours') ?? 'Tours' }}",
-            "item": "{{ $canonical }}"
+            "name": {!! json_encode(__('ui.nav.tours') ?? 'Tours', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+            "item": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           }
         ]
       },
@@ -395,8 +401,8 @@ window.addEventListener('popstate', () => {
           {
             "@type": "ListItem",
             "position": {{ $idx + 1 }},
-            "name": {!! json_encode($t->name) !!},
-            "url": "{{ localized_route('tours.show', ['slug' => $t->slug]) }}"
+            "name": {!! json_encode($t->name, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+            "url": {!! json_encode(localized_route('tours.show', ['slug' => $t->slug]), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           }{{ $idx < $tours->count() - 1 ? ',' : '' }}
           @endforeach
         ]

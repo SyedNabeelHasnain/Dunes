@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\BlogPost;
+use App\Models\Language;
 use App\Models\Setting;
 use App\Models\Tour;
 use Illuminate\Support\Facades\Http;
@@ -171,32 +172,37 @@ class IndexNowService
      */
     public function submitAll(): array
     {
-        $urls = [
-            url('/'),
-            url('/about'),
-            url('/contact'),
-            url('/faq'),
-            url('/tours'),
-            url('/rate-card'),
-            url('/blog'),
-            url('/gallery'),
-            url('/dune-buggy-rental-dubai'),
-            url('/dubai-desert-sunset-times'),
-            url('/press-kit'),
-            url('/terms-condition'),
-            url('/privacy-policy'),
-            url('/cookie-policy'),
-            url('/cancellation-refund-policy'),
-            url('/payment-security-policy'),
-            url('/safety-liability-waiver'),
-            url('/ai-editorial-policy'),
-            url('/responsible-tourism-policy'),
+        $paths = [
+            '/',
+            '/about',
+            '/contact',
+            '/faq',
+            '/tours',
+            '/rate-card',
+            '/blog',
+            '/gallery',
+            '/dune-buggy-rental-dubai',
+            '/dubai-desert-sunset-times',
+            '/press-kit',
+            '/build-your-own-safari',
+            '/terms-condition',
+            '/privacy-policy',
+            '/cookie-policy',
+            '/cancellation-refund-policy',
+            '/payment-security-policy',
+            '/safety-liability-waiver',
+            '/ai-editorial-policy',
+            '/responsible-tourism-policy',
         ];
+
+        foreach (LocationLandingService::getLocations() as $loc) {
+            $paths[] = '/'.$loc['slug'];
+        }
 
         try {
             $tourSlugs = Tour::where('status', 'active')->pluck('slug');
             foreach ($tourSlugs as $slug) {
-                $urls[] = url('/'.$slug);
+                $paths[] = '/'.$slug;
             }
         } catch (\Throwable $e) {
         }
@@ -204,9 +210,25 @@ class IndexNowService
         try {
             $blogSlugs = BlogPost::where('status', 'published')->pluck('slug');
             foreach ($blogSlugs as $slug) {
-                $urls[] = url('/blog/'.$slug);
+                $paths[] = '/blog/'.$slug;
             }
         } catch (\Throwable $e) {
+        }
+
+        try {
+            $languages = Language::getActive();
+        } catch (\Throwable $e) {
+            $languages = Language::fallbackCollection();
+        }
+
+        $urls = [];
+        foreach ($paths as $path) {
+            $urls[] = url($path);
+            foreach ($languages as $lang) {
+                if (! $lang->is_default) {
+                    $urls[] = $path === '/' ? url('/'.$lang->code) : url('/'.$lang->code.$path);
+                }
+            }
         }
 
         return $this->submit($urls);

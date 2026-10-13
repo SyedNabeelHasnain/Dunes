@@ -92,12 +92,21 @@ class AdminMailSettingController extends Controller
     {
         $request->validate([
             'test_email' => 'required|email:filter|max:255',
+            'subject' => 'nullable|string|max:255',
+            'content_html' => 'nullable|string',
         ]);
 
         $recipient = trim($request->input('test_email'));
         $siteName = $this->settingsService->get('site_name', 'Dunes Discovery Tourism');
 
-        $htmlContent = "
+        $customSubject = trim((string) $request->input('subject', ''));
+        $customHtml = trim((string) $request->input('content_html', ''));
+
+        $subject = $customSubject !== ''
+            ? "[TEST] {$customSubject}"
+            : "SMTP Diagnostic Test - {$siteName}";
+
+        $htmlContent = $customHtml !== '' ? $customHtml : "
         <div style='font-family: sans-serif; padding: 20px; line-height: 1.6; color: #1e293b;'>
             <h2 style='color: #F58F43;'>SMTP Connection Test Successful!</h2>
             <p>Hello,</p>
@@ -105,7 +114,7 @@ class AdminMailSettingController extends Controller
             <p style='font-size: 13px; color: #64748b;'>Timestamp: ".now()->toRfc2822String().'</p>
         </div>';
 
-        $res = $this->emailService->sendTestEmail($recipient, "SMTP Diagnostic Test - {$siteName}", $htmlContent);
+        $res = $this->emailService->sendTestEmail($recipient, $subject, $htmlContent);
 
         return response()->json($res);
     }

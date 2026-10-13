@@ -33,7 +33,7 @@ trait NormalizesLocalizedInputs
 
             $val = $data[$field];
             if (is_array($val)) {
-                if (! empty($data[$arField]) && is_string($data[$arField]) && empty($val['ar'])) {
+                if (array_key_exists($arField, $data) && is_string($data[$arField]) && ! array_key_exists('ar', $val)) {
                     $val['ar'] = $data[$arField];
                 }
                 $nonEmpty = array_filter($val, fn ($v) => $v !== null && $v !== '');
@@ -46,7 +46,7 @@ trait NormalizesLocalizedInputs
             } elseif (is_string($val)) {
                 // Backward compatibility: single string maps to English default (+ optional _ar companion)
                 $normalized = ['en' => $val];
-                if (! empty($data[$arField]) && is_string($data[$arField])) {
+                if (array_key_exists($arField, $data) && is_string($data[$arField])) {
                     $normalized['ar'] = $data[$arField];
                 }
                 $data[$field] = $normalized;

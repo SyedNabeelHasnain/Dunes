@@ -135,6 +135,7 @@ class AdminReviewController extends Controller
             'rating' => 'required|numeric|min:1|max:5',
             'review_text' => 'required|string',
             'status' => 'required|string|in:approved,pending,rejected',
+            'source' => 'nullable|string|max:50',
         ]);
 
         $review->update([
@@ -142,6 +143,7 @@ class AdminReviewController extends Controller
             'rating' => (float) $request->rating,
             'review_text' => $request->review_text,
             'review_title' => $request->review_title,
+            'source' => $request->input('source', $review->source),
             'status' => $request->status,
             'is_featured' => $request->has('is_featured'),
             'published_date' => $request->input('published_date') ?: $review->published_date,

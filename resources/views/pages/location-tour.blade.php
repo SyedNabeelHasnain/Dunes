@@ -7,16 +7,16 @@
   "@graph": [
     {
       "@type": "WebPage",
-      "@id": "{{ $canonical }}#webpage",
-      "url": "{{ $canonical }}",
+      "@id": {!! json_encode($canonical . '#webpage', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "url": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "name": {!! json_encode($pageTitle ?? $locationData['meta_title'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "description": {!! json_encode($pageDesc ?? $locationData['meta_desc'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-      "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
+      "inLanguage": {!! json_encode($currentLocale ?? app()->getLocale() ?? 'en', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "isPartOf": {
         "@type": "WebSite",
-        "@id": "{{ url('/') }}#website",
+        "@id": {!! json_encode(url('/') . '#website', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
         "name": "Dunes Discovery Tourism",
-        "url": "{{ url('/') }}"
+        "url": {!! json_encode(url('/'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
       },
       "breadcrumb": {
         "@type": "BreadcrumbList",
@@ -24,36 +24,41 @@
           {
             "@type": "ListItem",
             "position": 1,
-            "name": "{{ __('ui.nav.home') ?? 'Home' }}",
-            "item": "{{ localized_route('home') }}"
+            "name": {!! json_encode(__('ui.nav.home') ?? 'Home', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+            "item": {!! json_encode(localized_route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           },
           {
             "@type": "ListItem",
             "position": 2,
-            "name": "{{ __('ui.nav.tours') ?? 'Desert Safari Dubai' }}",
-            "item": "{{ localized_route('tours.index') }}"
+            "name": {!! json_encode(__('ui.nav.tours') ?? 'Desert Safari Dubai', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+            "item": {!! json_encode(localized_route('tours.index'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           },
           {
             "@type": "ListItem",
             "position": 3,
-            "name": "{{ $locationData['name'] }} Pickup",
-            "item": "{{ $canonical }}"
+            "name": {!! json_encode($locationData['name'] . ' Pickup', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+            "item": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           }
         ]
       }
     },
     {
       "@type": ["Product", "TouristTrip"],
-      "@id": "{{ $canonical }}#trip",
-      "name": "{{ $locationData['headline'] }}",
-      "description": "{{ $locationData['subheadline'] }}",
-      "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
+      "@id": {!! json_encode($canonical . '#trip', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "name": {!! json_encode($locationData['headline'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "description": {!! json_encode($locationData['subheadline'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "image": {!! json_encode($ogImage ?? asset('images/evening-desert-safari-dubai-dune-discovery-tourism.avif'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "inLanguage": {!! json_encode($currentLocale ?? app()->getLocale() ?? 'en', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "provider": {
         "@type": "TravelAgency",
         "name": "Dunes Discovery Tourism LLC",
-        "url": "{{ url('/') }}",
+        "url": {!! json_encode(url('/'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
         "telephone": "+971502456056",
-        "license": "DET License #1430583"
+        "identifier": {
+          "@type": "PropertyValue",
+          "name": "DET Tourism License",
+          "value": "1430583"
+        }
       },
       "touristType": ["Adventure Tourists", "Couples", "Families", "Luxury Travelers"],
       "itinerary": {
@@ -63,7 +68,7 @@
           {
             "@type": "ListItem",
             "position": 1,
-            "name": "Doorstep Pickup from {{ $locationData['name'] }} ({{ $locationData['pickup_window'] }})"
+            "name": {!! json_encode('Doorstep Pickup from ' . $locationData['name'] . ' (' . $locationData['pickup_window'] . ')', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           },
           {
             "@type": "ListItem",
@@ -88,13 +93,13 @@
           {
             "@type": "ListItem",
             "position": 6,
-            "name": "Return Drop-off to {{ $locationData['name'] }} ({{ $locationData['return_time'] }})"
+            "name": {!! json_encode('Return Drop-off to ' . $locationData['name'] . ' (' . $locationData['return_time'] . ')', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           }
         ]
       },
       "areaServed": {
         "@type": "Place",
-        "name": "{{ $locationData['district'] }}",
+        "name": {!! json_encode($locationData['district'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
         "geo": {
           "@type": "GeoCoordinates",
           "latitude": {{ $locationData['geo']['lat'] }},
@@ -126,25 +131,25 @@
           },
           "author": {
             "@type": "Person",
-            "name": {!! json_encode($rev->reviewer_name ?: 'Verified Traveler') !!}
+            "name": {!! json_encode($rev->reviewer_name ?: 'Verified Traveler', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           },
           "datePublished": "{{ $rev->published_date ? (\Carbon\Carbon::parse($rev->published_date)->format('Y-m-d')) : date('Y-m-d') }}",
-          "reviewBody": {!! json_encode(Str::limit($rev->review_text ?: 'Incredible desert safari experience with Dunes Discovery Tourism.', 200)) !!}
+          "reviewBody": {!! json_encode(Str::limit($rev->review_text ?: 'Incredible desert safari experience with Dunes Discovery Tourism.', 200), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
         }{{ $loop->last ? '' : ',' }}
         @endforeach
       ]@endif
     },
     {
       "@type": "FAQPage",
-      "@id": "{{ $canonical }}#faq",
+      "@id": {!! json_encode($canonical . '#faq', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "mainEntity": [
         @foreach($locationData['faqs'] as $index => $faq)
         {
           "@type": "Question",
-          "name": {!! json_encode($faq['q']) !!},
+          "name": {!! json_encode($faq['q'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": {!! json_encode($faq['a']) !!}
+            "text": {!! json_encode($faq['a'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           }
         }{{ $loop->last ? '' : ',' }}
         @endforeach

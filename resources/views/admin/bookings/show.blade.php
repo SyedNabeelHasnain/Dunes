@@ -129,7 +129,7 @@
                 </div>
             </div>
             <div class="pt-4 border-t border-slate-100 mt-6 text-xs text-slate-400 flex items-center justify-between">
-                <span>Booked: {{ $booking->created_at->format('M j, Y - H:i') }}</span>
+                <span>Booked: {{ $booking->created_at?->format('M j, Y - H:i') }}</span>
                 <span>IP: {{ $booking->ip_address ?? 'Local' }}</span>
             </div>
         </div>
@@ -314,7 +314,7 @@
                 <tbody class="divide-y divide-slate-100 bg-white">
                     @if($booking->ziina_payment_intent_id && $booking->payments->where('payment_intent_id', $booking->ziina_payment_intent_id)->count() === 0)
                     <tr class="hover:bg-slate-50/60 transition-colors">
-                        <td class="px-4 py-3 text-xs text-slate-600">{{ $booking->created_at->format('Y-m-d H:i') }}</td>
+                        <td class="px-4 py-3 text-xs text-slate-600">{{ $booking->created_at?->format('Y-m-d H:i') }}</td>
                         <td class="px-4 py-3 font-bold text-slate-900">AED {{ number_format($booking->payment_amount) }}</td>
                         <td class="px-4 py-3"><span class="text-slate-400 text-xs italic">Initial Booking Link</span></td>
                         <td class="px-4 py-3">
@@ -348,7 +348,7 @@
                     
                     @forelse($booking->payments as $p)
                     <tr class="hover:bg-slate-50/60 transition-colors">
-                        <td class="px-4 py-3 text-xs text-slate-600">{{ $p->created_at->format('Y-m-d H:i') }}</td>
+                        <td class="px-4 py-3 text-xs text-slate-600">{{ $p->created_at?->format('Y-m-d H:i') }}</td>
                         <td class="px-4 py-3 font-bold text-slate-900">AED {{ number_format($p->amount) }}</td>
                         <td class="px-4 py-3 text-xs text-slate-700">{{ $p->notes ?: '-' }}</td>
                         <td class="px-4 py-3">

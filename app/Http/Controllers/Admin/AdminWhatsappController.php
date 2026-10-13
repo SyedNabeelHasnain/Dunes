@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\RequestLog;
 use App\Models\Setting;
+use App\Models\WhatsappInquiry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -77,14 +78,18 @@ class AdminWhatsappController extends Controller
         ];
 
         // 2. 14-Day Acquisition Trend Chart Data
+        $dailyCounts = WhatsappInquiry::where('created_at', '>=', now()->subDays(13)->startOfDay())
+            ->selectRaw('DATE(created_at) as d, COUNT(*) as c')
+            ->groupBy('d')
+            ->pluck('c', 'd');
+
         $trendData = [];
         for ($i = 13; $i >= 0; $i--) {
             $date = now()->subDays($i)->format('Y-m-d');
             $label = now()->subDays($i)->format('M j');
-            $count = DB::table('whatsapp_inquiries')->whereDate('created_at', $date)->count();
             $trendData[] = [
                 'date' => $label,
-                'count' => $count,
+                'count' => (int) ($dailyCounts[$date] ?? 0),
             ];
         }
 

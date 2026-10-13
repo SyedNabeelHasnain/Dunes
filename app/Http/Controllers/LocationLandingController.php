@@ -84,6 +84,9 @@ class LocationLandingController extends Controller
         $pageDesc = $localizedLocMeta[$currentLocale]['desc'] ?? $locationData['meta_desc'];
         $canonical = ($currentLocale && $currentLocale !== 'en') ? url('/'.$currentLocale.'/'.$locationData['slug']) : url('/'.$locationData['slug']);
         $ogImage = asset('images/desert-safari-poster.avif');
+        $pageRobots = ! empty(request()->query())
+            ? 'noindex, follow'
+            : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
 
         return view('pages.location-tour', compact(
             'locationData',
@@ -93,7 +96,8 @@ class LocationLandingController extends Controller
             'pageTitle',
             'pageDesc',
             'canonical',
-            'ogImage'
+            'ogImage',
+            'pageRobots'
         ));
     }
 }

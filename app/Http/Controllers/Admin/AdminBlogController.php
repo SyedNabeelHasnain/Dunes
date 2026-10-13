@@ -133,8 +133,9 @@ class AdminBlogController extends Controller
             $request->except(['tags', 'featured_image']),
             ['title', 'subtitle', 'excerpt', 'content', 'meta_title', 'meta_desc', 'meta_keywords', 'author_bio', 'ai_summary']
         );
-        if ($request->has('title')) {
-            $baseSlug = Str::slug($this->extractSlugSource($request->title)) ?: 'article';
+        if ($request->filled('slug') || empty($post->slug)) {
+            $slugSource = $request->filled('slug') ? $request->input('slug') : $this->extractSlugSource($request->title);
+            $baseSlug = Str::slug($slugSource) ?: 'article';
             $slug = $baseSlug;
             $counter = 1;
             while (BlogPost::where('slug', $slug)->where('id', '!=', $post->id)->exists()) {
@@ -142,6 +143,8 @@ class AdminBlogController extends Controller
                 $counter++;
             }
             $data['slug'] = $slug;
+        } else {
+            unset($data['slug']);
         }
 
         if ($request->hasFile('featured_image')) {

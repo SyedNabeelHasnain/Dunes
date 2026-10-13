@@ -129,24 +129,19 @@ class AdminDashboardController extends Controller
                 ->limit(10)
                 ->get();
 
-            // Top Tours (by booking counts & collected/contracted revenue) - real-time fresh without cache
+            // Top Tours (by booking counts & collected revenue) - real-time fresh without cache
             $topTours = Booking::whereIn('status', ['confirmed', 'completed'])
                 ->select(
                     'tour_name',
                     DB::raw('COUNT(*) as count'),
-                    DB::raw("SUM(CASE WHEN payment_status IN ('paid', 'partial') THEN (CASE WHEN payment_amount > 0 THEN payment_amount ELSE (CASE WHEN payment_status = 'paid' THEN total ELSE 0 END) END) ELSE total END) as revenue")
+                    DB::raw("SUM(CASE WHEN payment_status IN ('paid', 'partial') THEN (CASE WHEN payment_amount > 0 THEN payment_amount ELSE (CASE WHEN payment_status = 'paid' THEN total ELSE 0 END) END) ELSE 0 END) as revenue")
                 )
                 ->groupBy('tour_name')
                 ->orderBy('count', 'desc')
                 ->limit(5)
                 ->get();
 
-            // Recent WhatsApp leads
-            $whatsappLeads = WhatsappInquiry::orderBy('created_at', 'desc')
-                ->limit(5)
-                ->get();
-
-            return view('admin.dashboard', compact('stats', 'recentBookings', 'topTours', 'whatsappLeads'));
+            return view('admin.dashboard', compact('stats', 'recentBookings', 'topTours'));
         } catch (\Throwable $e) {
             Log::error('Admin dashboard error: '.$e->getMessage());
             $stats = [
@@ -161,9 +156,8 @@ class AdminDashboardController extends Controller
             ];
             $recentBookings = collect();
             $topTours = collect();
-            $whatsappLeads = collect();
 
-            return view('admin.dashboard', compact('stats', 'recentBookings', 'topTours', 'whatsappLeads'));
+            return view('admin.dashboard', compact('stats', 'recentBookings', 'topTours'));
         }
     }
 
@@ -393,14 +387,18 @@ class AdminDashboardController extends Controller
         ];
 
         // 2. 14-Day Inquiries Acquisition Trend
+        $dailyCounts = Contact::where('created_at', '>=', now()->subDays(13)->startOfDay())
+            ->selectRaw('DATE(created_at) as d, COUNT(*) as c')
+            ->groupBy('d')
+            ->pluck('c', 'd');
+
         $trendData = [];
         for ($i = 13; $i >= 0; $i--) {
             $date = now()->subDays($i)->format('Y-m-d');
             $label = now()->subDays($i)->format('M j');
-            $count = Contact::whereDate('created_at', $date)->count();
             $trendData[] = [
                 'date' => $label,
-                'count' => $count,
+                'count' => (int) ($dailyCounts[$date] ?? 0),
             ];
         }
 

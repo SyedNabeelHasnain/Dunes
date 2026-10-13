@@ -46,38 +46,38 @@
   "@graph": [
     {
       "@type": "WebPage",
-      "@id": "{{ $canonical }}#webpage",
-      "url": "{{ $canonical }}",
-      "name": {!! json_encode($pageTitle) !!},
-      "description": {!! json_encode($pageDesc) !!},
-      "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
+      "@id": {!! json_encode($canonical . '#webpage', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "url": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "name": {!! json_encode($pageTitle, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "description": {!! json_encode($pageDesc, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "inLanguage": {!! json_encode($currentLocale ?? app()->getLocale() ?? 'en', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "isPartOf": {
         "@type": "WebSite",
-        "@id": "{{ url('/') }}#website",
-        "url": "{{ url('/') }}",
+        "@id": {!! json_encode(url('/') . '#website', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        "url": {!! json_encode(url('/'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
         "name": "Dunes Discovery Tourism LLC Dubai"
       },
       "breadcrumb": {
         "@type": "BreadcrumbList",
-        "@id": "{{ $canonical }}#breadcrumb",
+        "@id": {!! json_encode($canonical . '#breadcrumb', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
         "itemListElement": [
           {
             "@type": "ListItem",
             "position": 1,
-            "name": "{{ __('ui.nav.home') ?? 'Home' }}",
-            "item": "{{ localized_route('home') }}"
+            "name": {!! json_encode(__('ui.nav.home') ?? 'Home', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+            "item": {!! json_encode(localized_route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           },
           {
             "@type": "ListItem",
             "position": 2,
             "name": "Rate Card",
-            "item": "{{ $canonical }}"
+            "item": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           }
         ]
       },
       "publisher": {
         "@type": "TravelAgency",
-        "@id": "{{ url('/') }}#organization",
+        "@id": {!! json_encode(url('/') . '#organization', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
         "name": "Dunes Discovery Tourism L.L.C"
       }
     }
@@ -291,7 +291,7 @@
                                 <a href="{{ localized_route('tours.show', $t->slug) }}" class="flex-1 text-center border border-slate-300 hover:border-slate-800 text-slate-800 rounded-full py-2 text-xs font-bold transition-colors">
                                     {{ __('ui.rate_card.details') }} <i class="bi bi-arrow-right rtl:rotate-180"></i>
                                 </a>
-                                <button type="button" class="btn-desert-animated rounded-full px-4 py-2 text-xs font-bold text-white shadow-xs cursor-pointer" data-action="open-booking" data-tour="{{ $t->id }}" @click="$store.modal.open('booking', { tourId: {{ $t->id }} })">
+                                <button type="button" class="btn-desert-animated rounded-full px-4 py-2 text-xs font-bold text-white shadow-xs cursor-pointer" data-action="open-booking" data-tour="{{ $t->id }}" @click.stop="$store.modal.open('booking', { tourId: {{ $t->id }} })">
                                     {{ __('ui.rate_card.book_tour') }}
                                 </button>
                             </div>

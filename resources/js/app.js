@@ -49,8 +49,23 @@ Alpine.store('currency', {
         if (window.DunesRates && typeof window.DunesRates === 'object') {
             this.rates = Object.assign({}, this.rates, window.DunesRates);
         }
+        document.querySelectorAll('.currency-option[data-currency][data-rate]').forEach(btn => {
+            const c = btn.dataset.currency;
+            const r = parseFloat(btn.dataset.rate);
+            if (c && !isNaN(r) && r > 0) {
+                this.rates[c] = r;
+            }
+        });
         const saved = localStorage.getItem('dunes_currency') || 'AED';
         this.setCurrency(saved, false);
+    },
+
+    set(code) {
+        this.setCurrency(code, true);
+    },
+
+    format(aed) {
+        return this.formatDisplayPrice(aed);
     },
 
     setCurrency(code, showToast = false) {
@@ -75,6 +90,7 @@ Alpine.store('currency', {
             const check = btn.querySelector('.checkmark');
             if (check) {
                 check.classList.toggle('d-none', !isMatch);
+                check.classList.toggle('hidden', !isMatch);
             }
         });
 
@@ -333,15 +349,16 @@ Alpine.store('modal', {
 
                 if (data.promo || data.coupon) {
                     const promoCode = String(data.promo || data.coupon).trim().toUpperCase();
-                    const promoInput = document.getElementById('bookingPromoCode');
-                    if (promoInput) {
-                        promoInput.value = promoCode;
-                        setTimeout(() => {
-                            if (typeof window.validateCurrentPromo === 'function') {
-                                window.validateCurrentPromo();
-                            }
-                        }, 350);
-                    }
+                    window.pendingPromoCode = promoCode;
+                    const promoInput = document.getElementById('bookingPromoInput');
+                    const promoCodeEl = document.getElementById('bookingPromoCode');
+                    if (promoInput) promoInput.value = promoCode;
+                    if (promoCodeEl) promoCodeEl.value = promoCode;
+                    setTimeout(() => {
+                        if (typeof window.validateCurrentPromo === 'function') {
+                            window.validateCurrentPromo();
+                        }
+                    }, 350);
                 }
 
                 window.App.updateStep?.();
@@ -2786,7 +2803,7 @@ const App = {
                     } else if (/(1|single|solo)/i.test(t.name || '')) {
                         capacity = 1;
                     }
-                    h += `<div class="tier-card${t.is_popular ? ' popular' : ''}" data-tier="${t.id}" data-price="${t.price}" data-name="${t.name}" data-price-type="${pType}" data-capacity="${capacity}">
+                    h += `<div class="tier-card${t.is_popular ? ' popular' : ''}" data-tier="${t.id}" data-price="${t.price}" data-child-price="${t.child_price || 0}" data-name="${t.name}" data-price-type="${pType}" data-capacity="${capacity}">
                         ${t.is_popular ? '<div class="tier-popular-badge">Popular</div>' : ''}
                         <div class="tier-card-inner">
                             <div class="tier-card-info">
@@ -2811,6 +2828,11 @@ const App = {
                         this.selectTier(c);
                     }
                 });
+
+                const pendingCode = window.pendingPromoCode || document.getElementById('bookingPromoInput')?.value || document.getElementById('bookingPromoCode')?.value;
+                if (pendingCode && !window.appliedPromoCoupon && typeof window.validateCurrentPromo === 'function') {
+                    window.validateCurrentPromo();
+                }
             } else {
                 container.innerHTML = '<div class="tier-placeholder">No packages available for this tour.</div>';
             }
@@ -2896,6 +2918,11 @@ const App = {
         this.selectedPrice = parseFloat(card.dataset.price);
         this.updateTotal();
 
+        const pendingCode = window.pendingPromoCode || document.getElementById('bookingPromoInput')?.value || document.getElementById('bookingPromoCode')?.value;
+        if (pendingCode && !window.appliedPromoCoupon && typeof window.validateCurrentPromo === 'function') {
+            window.validateCurrentPromo();
+        }
+
         if (window.innerWidth < 992) {
             card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
         }
@@ -2916,7 +2943,6 @@ const App = {
     calculateBaseTotal() {
         const adults = parseInt(document.getElementById('bookingAdults')?.value) || 1;
         const children = parseInt(document.getElementById('bookingChildren')?.value) || 0;
-        const infants = parseInt(document.getElementById('bookingInfants')?.value) || 0;
         let price = this.selectedPrice || 0;
         const selectedTierCard = document.querySelector('.tier-card.selected');
         if (price <= 0 && selectedTierCard && selectedTierCard.dataset.price) {
@@ -2924,13 +2950,15 @@ const App = {
             this.selectedPrice = price;
         }
         const priceType = (selectedTierCard?.dataset.priceType || 'per person').toLowerCase();
+        const rawChildPrice = parseFloat(selectedTierCard?.dataset.childPrice || 0);
+        const childPrice = rawChildPrice > 0 ? rawChildPrice : (price * 0.70);
         let total = 0;
         if (['per buggy', 'per vehicle', 'per group', 'private'].includes(priceType)) {
             const capacity = parseInt(selectedTierCard?.dataset.capacity || '2', 10) || 2;
-            const vehicles = Math.ceil((adults + children + infants) / capacity);
+            const vehicles = Math.ceil(Math.max(1, adults + children) / capacity);
             total = price * vehicles;
         } else {
-            total = (price * adults) + (price * 0.70 * children);
+            total = (price * adults) + (childPrice * children);
         }
         this.selectedAddons.forEach(a => total += a.price);
         return total;
@@ -2939,17 +2967,18 @@ const App = {
     updateTotal() {
         const adults = parseInt(document.getElementById('bookingAdults')?.value) || 1;
         const children = parseInt(document.getElementById('bookingChildren')?.value) || 0;
-        const infants = parseInt(document.getElementById('bookingInfants')?.value) || 0;
         const selectedTierCard = document.querySelector('.tier-card.selected');
         const priceType = (selectedTierCard?.dataset.priceType || 'per person').toLowerCase();
+        const rawChildPrice = parseFloat(selectedTierCard?.dataset.childPrice || 0);
+        const childPrice = rawChildPrice > 0 ? rawChildPrice : (this.selectedPrice * 0.70);
 
         let baseTotal = 0;
         if (['per buggy', 'per vehicle', 'per group', 'private'].includes(priceType)) {
             const capacity = parseInt(selectedTierCard?.dataset.capacity || '2', 10) || 2;
-            const vehicles = Math.ceil((adults + children + infants) / capacity);
+            const vehicles = Math.ceil(Math.max(1, adults + children) / capacity);
             baseTotal = this.selectedPrice * vehicles;
         } else {
-            baseTotal = (this.selectedPrice * adults) + (this.selectedPrice * 0.70 * children);
+            baseTotal = (this.selectedPrice * adults) + (childPrice * children);
         }
         this.selectedAddons.forEach(a => baseTotal += a.price);
 
@@ -3189,6 +3218,10 @@ const App = {
         this.selectedPrice = 0;
         this.selectedAddons = [];
         this._pendingSubmitAfterOtp = null;
+        window.pendingPromoCode = null;
+        if (typeof window.removeCurrentPromo === 'function') {
+            window.removeCurrentPromo(true);
+        }
 
         const titleEl = document.getElementById('bookingModalTitle');
         const wrapper = document.getElementById('tourSelectWrapper');
@@ -3300,14 +3333,32 @@ const App = {
 
     initForms() {
         document.querySelectorAll('form').forEach(form => {
-            // Strictly exclude authentication, admin CMS, and logout forms from AJAX interception
+            const method = (form.getAttribute('method') || 'GET').toUpperCase();
+            const rawAction = form.getAttribute('action') || '';
+
+            // Strictly exclude GET forms, authentication, admin CMS, search, review, newsletter, and unsubscribe forms
             if (
-                form.matches('form[action*="login"], form[action*="password"], form[action*="register"], form[action*="logout"], #logout-form, .auth-form, .admin-form, #welcomeOfferForm') ||
+                method === 'GET' ||
+                form.matches('form[action*="login"], form[action*="password"], form[action*="register"], form[action*="logout"], #logout-form, .auth-form, .admin-form, #welcomeOfferForm, #globalSearchForm, #publicNewsletterForm, #reviewSubmitForm') ||
                 form.closest('.auth-card') ||
+                rawAction.includes('/search') ||
+                rawAction.includes('/review') ||
+                rawAction.includes('/unsubscribe') ||
+                rawAction.includes('/newsletter') ||
                 window.location.pathname.startsWith('/login') ||
                 window.location.pathname.startsWith('/admin') ||
                 window.location.pathname.startsWith('/password')
             ) {
+                return;
+            }
+
+            const isTargetAjaxForm =
+                form.matches('#bookingForm, #contactForm, #whatsappModalForm, #whatsappForm, #quickPaymentForm') ||
+                !!form.querySelector('input[name="action"]') ||
+                rawAction === '/ajax.php' ||
+                rawAction.endsWith('/booking/checkout');
+
+            if (!isTargetAjaxForm) {
                 return;
             }
 
@@ -4193,7 +4244,7 @@ Alpine.data('safariMatcherModal', (config = {}) => ({
     result: {
         id: '1',
         name: 'Standard Evening Desert Safari',
-        slug: 'standard-evening-desert-safari',
+        slug: 'evening-desert-safari-dubai',
         min_price: 120,
         rating: 4.9,
         duration: '6-7 Hours',
@@ -4227,12 +4278,12 @@ Alpine.data('safariMatcherModal', (config = {}) => ({
             }
             if (!catalog || catalog.length === 0) {
                 catalog = [
-                    { id: '1', name: 'Standard Evening Desert Safari', slug: 'standard-evening-desert-safari', min_price: 120, rating: 4.9, duration: '6-7 Hours', thumb: '/images/desert-safari-poster.avif' },
+                    { id: '1', name: 'Standard Evening Desert Safari', slug: 'evening-desert-safari-dubai', min_price: 120, rating: 4.9, duration: '6-7 Hours', thumb: '/images/desert-safari-poster.avif' },
                     { id: '2', name: 'VIP Luxury Desert Safari with Table Service', slug: 'vip-desert-safari', min_price: 250, rating: 4.9, duration: '6-7 Hours', thumb: '/images/desert-safari-poster.avif' },
-                    { id: '3', name: 'Evening Desert Safari with Quad Biking', slug: 'quad-bike-desert-safari', min_price: 180, rating: 4.9, duration: '6-7 Hours', thumb: '/images/desert-safari-poster.avif' },
+                    { id: '3', name: 'Evening Desert Safari with Quad Biking', slug: 'quad-biking-safari', min_price: 180, rating: 4.9, duration: '6-7 Hours', thumb: '/images/desert-safari-poster.avif' },
                     { id: '4', name: 'Morning Desert Safari with Camel Ride', slug: 'morning-desert-safari', min_price: 130, rating: 4.8, duration: '4 Hours', thumb: '/images/desert-safari-poster.avif' },
                     { id: '5', name: 'Overnight Desert Safari & Camping', slug: 'overnight-desert-safari', min_price: 350, rating: 4.9, duration: '18 Hours', thumb: '/images/desert-safari-poster.avif' },
-                    { id: '6', name: 'Dubai Marina Luxury Dhow Cruise Dinner', slug: 'marina-dhow-cruise', min_price: 150, rating: 4.8, duration: '3 Hours', thumb: '/images/desert-safari-poster.avif' }
+                    { id: '6', name: 'Dubai Marina Luxury Dhow Cruise Dinner', slug: 'dhow-cruise-marina', min_price: 150, rating: 4.8, duration: '3 Hours', thumb: '/images/desert-safari-poster.avif' }
                 ];
             }
             
@@ -4268,7 +4319,9 @@ Alpine.data('safariMatcherModal', (config = {}) => ({
                 }
             });
             
-            this.result = best;
+            const matched = Object.assign({}, best);
+            matched.thumb = matched.thumb || (matched.thumb_image ? '/images/' + matched.thumb_image : '/images/desert-safari-poster.avif');
+            this.result = matched;
             
             const bullets = [];
             if (this.answers.group === 'family') bullets.push('Optimized for families: gentle pacing, spacious camp & child-friendly activities.');
@@ -4298,7 +4351,7 @@ Alpine.data('safariMatcherModal', (config = {}) => ({
         this.result = {
             id: '1',
             name: 'Standard Evening Desert Safari',
-            slug: 'standard-evening-desert-safari',
+            slug: 'evening-desert-safari-dubai',
             min_price: 120,
             rating: 4.9,
             duration: '6-7 Hours',

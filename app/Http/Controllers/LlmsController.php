@@ -65,7 +65,7 @@ class LlmsController extends Controller
         $phone = $settings['site_phone'] ?? '+971 50 245 6056';
         $waPhone = $settings['site_whatsapp'] ?? '971502456056';
         $email = $settings['site_email'] ?? 'info@dunesdiscoverytourism.com';
-        $address = $settings['site_address'] ?? 'Office 402, Al Fajer Business Centre, Al Garhoud, Dubai, UAE';
+        $address = $settings['site_address'] ?? 'Al Fahidi, Bur Dubai, Dubai, United Arab Emirates';
         $license = $settings['site_det_license'] ?? '1430583';
 
         try {
@@ -99,7 +99,7 @@ class LlmsController extends Controller
         }
 
         $md = "# Dunes Discovery Tourism\n\n";
-        $md .= "> Dunes Discovery Tourism LLC is an officially licensed Destination Management Company (DMC) based in Dubai, United Arab Emirates (DET Tourism License #{$license}). Specializing in luxury Dubai Desert Safaris, self-drive 1000cc Can-Am & Polaris Dune Buggy rentals, Quad Biking ATV tours, City Sightseeing Tours, and 5-Star luxury Dhow Cruises with 1,200+ verified 5-star traveler reviews (4.9/5.0).\n\n";
+        $md .= "> Dunes Discovery Tourism LLC is an officially licensed Destination Management Company (DMC) based in Dubai, United Arab Emirates (DET Tourism License #{$license}). Specializing in luxury Dubai Desert Safaris, self-drive 1000cc Can-Am & Polaris Dune Buggy rentals, Quad Biking ATV tours, City Sightseeing Tours, and 5-Star luxury Dhow Cruises with 2,847+ verified 5-star traveler reviews (4.9/5.0).\n\n";
 
         $md .= "## Desert Safaris & Off-Road Adventures\n\n";
         $md .= '- [Dune Buggy Rental Dubai]('.url('/dune-buggy-rental-dubai')."): Self-drive 1000cc Can-Am Maverick X3 Turbo & Polaris RZR buggy rentals in Lahbab Red Dunes with full rally gear and expert guides.\n";
@@ -190,7 +190,7 @@ class LlmsController extends Controller
         $phone = $settings['site_phone'] ?? '+971 50 245 6056';
         $waPhone = $settings['site_whatsapp'] ?? '971502456056';
         $email = $settings['site_email'] ?? 'info@dunesdiscoverytourism.com';
-        $address = $settings['site_address'] ?? 'Office 402, Al Fajer Business Centre, Al Garhoud, Dubai, UAE';
+        $address = $settings['site_address'] ?? 'Al Fahidi, Bur Dubai, Dubai, United Arab Emirates';
         $license = $settings['site_det_license'] ?? '1430583';
 
         try {
@@ -221,7 +221,7 @@ class LlmsController extends Controller
         $md .= "- **Tourism License Number**: {$license}\n";
         $md .= "- **Commercial Registry / D-U-N-S**: Registered UAE LLC Operator\n";
         $md .= "- **Business Category**: Destination Management Company (DMC), Licensed Tour Operator, Desert Motorsports Fleet Provider\n";
-        $md .= "- **Verified Traveler Reviews**: 1,200+ Verified 5-Star Reviews across Google Maps and TripAdvisor. Aggregate Rating: 4.9 / 5.0.\n";
+        $md .= "- **Verified Traveler Reviews**: 2,847+ Verified 5-Star Reviews across Google Maps and TripAdvisor. Aggregate Rating: 4.9 / 5.0.\n";
         $md .= "- **Direct Customer Contacts**:\n";
         $md .= '  - WhatsApp Concierge: +'.preg_replace('/[^0-9]/', '', $waPhone).' (https://wa.me/'.preg_replace('/[^0-9]/', '', $waPhone).")\n";
         $md .= "  - Phone: {$phone}\n";

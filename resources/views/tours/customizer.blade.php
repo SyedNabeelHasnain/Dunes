@@ -11,13 +11,13 @@
   "@graph": [
     {
       "@type": "Service",
-      "@id": "{{ $canonical ?? localized_route('tours.customizer') }}#service",
+      "@id": {!! json_encode(($canonical ?? localized_route('tours.customizer')) . '#service', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "name": "Custom Dubai Desert Safari Builder & Configurator",
-      "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
+      "inLanguage": {!! json_encode($currentLocale ?? app()->getLocale() ?? 'en', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "provider": {
         "@type": "TravelAgency",
         "name": "Dunes Discovery Tourism LLC",
-        "url": "{{ url('/') }}",
+        "url": {!! json_encode(url('/'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
         "telephone": "+971502456056"
       },
       "serviceType": "Desert Safari Customization",
@@ -27,7 +27,8 @@
         "@type": "AggregateOffer",
         "priceCurrency": "AED",
         "lowPrice": "120",
-        "highPrice": "1500"
+        "highPrice": "1500",
+        "offerCount": "6"
       }
     },
     {
@@ -36,20 +37,20 @@
         {
           "@type": "ListItem",
           "position": 1,
-          "name": "{{ __('ui.nav.home') ?? 'Home' }}",
-          "item": "{{ localized_route('home') }}"
+          "name": {!! json_encode(__('ui.nav.home') ?? 'Home', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "item": {!! json_encode(localized_route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
         },
         {
           "@type": "ListItem",
           "position": 2,
-          "name": "{{ __('ui.nav.tours') ?? 'Tours' }}",
-          "item": "{{ localized_route('tours.index') }}"
+          "name": {!! json_encode(__('ui.nav.tours') ?? 'Tours', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "item": {!! json_encode(localized_route('tours.index'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
         },
         {
           "@type": "ListItem",
           "position": 3,
           "name": "Build Your Own Safari",
-          "item": "{{ $canonical ?? localized_route('tours.customizer') }}"
+          "item": {!! json_encode($canonical ?? localized_route('tours.customizer'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
         }
       ]
     }
@@ -479,7 +480,24 @@ document.addEventListener('DOMContentLoaded', function() {
         adults: 2,
         children: 0,
         discountPercent: 0,
+        discountType: null,
+        discountValue: 0,
+        discountAmount: 0,
+        maxDiscount: 0,
     };
+
+    function computeSubtotal() {
+        const totalGuests = state.adults + state.children;
+        const childMultiplier = 0.70;
+        const baseTotal = (state.base.price * state.adults) + (state.base.price * childMultiplier * state.children);
+        const transferTotal = (state.transfer.type === 'flat') ? state.transfer.price : (state.transfer.price * totalGuests);
+        const sportsTotal = (state.sports.type === 'flat') ? state.sports.price : (state.sports.price * state.adults);
+        let addonsTotal = 0;
+        state.addons.forEach(a => {
+            addonsTotal += (a.type === 'flat') ? a.price : (a.price * totalGuests);
+        });
+        return baseTotal + transferTotal + sportsTotal + addonsTotal;
+    }
 
     // DOM Elements
     const adultsCountEl = document.getElementById('customizerAdultsCount');
@@ -595,13 +613,17 @@ document.addEventListener('DOMContentLoaded', function() {
             const code = (promoInputEl.value || '').trim().toUpperCase();
             if (!code) {
                 state.discountPercent = 0;
+                state.discountType = null;
+                state.discountValue = 0;
+                state.discountAmount = 0;
+                state.maxDiscount = 0;
                 promoNoticeEl.classList.add('hidden');
                 updateCalculation();
                 return;
             }
 
             try {
-                const subtotal = state.base.price * (state.adults + state.children);
+                const subtotal = computeSubtotal();
                 const resp = await fetch('/api/v1/coupon/validate', {
                     method: 'POST',
                     headers: {
@@ -612,35 +634,45 @@ document.addEventListener('DOMContentLoaded', function() {
                         code: code,
                         subtotal: subtotal || 100,
                         adults: state.adults,
-                        children: state.children
+                        children: state.children,
+                        guests: Math.max(1, state.adults + state.children),
+                        tour_id: state.base.tourId ? parseInt(state.base.tourId, 10) : null
                     })
                 });
                 const data = await resp.json();
                 if (data.success && data.coupon) {
-                    state.discountPercent = parseFloat(data.coupon.discount_percent || data.coupon.discount_value || 0);
+                    state.discountType = data.coupon.discount_type || 'percentage';
+                    state.discountValue = parseFloat(data.coupon.discount_value || data.coupon.discount_percent || 0);
+                    state.discountAmount = parseFloat(data.coupon.discount_amount || 0);
+                    state.maxDiscount = parseFloat(data.coupon.max_discount || 0);
+                    state.discountPercent = state.discountType === 'percentage' ? state.discountValue : 0;
                     promoNoticeEl.classList.remove('hidden', 'text-red-400');
                     promoNoticeEl.classList.add('text-emerald-400');
-                    promoNoticeEl.innerText = `Promo ${code} applied (${state.discountPercent}% OFF)`;
+                    const label = state.discountType === 'percentage'
+                        ? `${state.discountValue}% OFF`
+                        : (state.discountType === 'per_person' ? `AED ${state.discountValue}/guest OFF` : `AED ${state.discountValue} OFF`);
+                    promoNoticeEl.innerText = `Promo ${code} applied (${label})`;
                     updateCalculation();
                 } else {
                     state.discountPercent = 0;
+                    state.discountType = null;
+                    state.discountValue = 0;
+                    state.discountAmount = 0;
+                    state.maxDiscount = 0;
                     promoNoticeEl.classList.remove('hidden', 'text-emerald-400');
                     promoNoticeEl.classList.add('text-red-400');
                     promoNoticeEl.innerText = data.message || 'Invalid or inactive promo code.';
                     updateCalculation();
                 }
             } catch (err) {
-                if (code === 'DUNESWELCOME' || code === 'FIRST25' || code.startsWith('FIRST25-')) {
-                    state.discountPercent = 25;
-                    promoNoticeEl.classList.remove('hidden', 'text-red-400');
-                    promoNoticeEl.classList.add('text-emerald-400');
-                    promoNoticeEl.innerText = `Promo ${code} applied (25% OFF)`;
-                } else {
-                    state.discountPercent = 0;
-                    promoNoticeEl.classList.remove('hidden', 'text-emerald-400');
-                    promoNoticeEl.classList.add('text-red-400');
-                    promoNoticeEl.innerText = 'Unable to validate promo code.';
-                }
+                state.discountPercent = 0;
+                state.discountType = null;
+                state.discountValue = 0;
+                state.discountAmount = 0;
+                state.maxDiscount = 0;
+                promoNoticeEl.classList.remove('hidden', 'text-emerald-400');
+                promoNoticeEl.classList.add('text-red-400');
+                promoNoticeEl.innerText = 'Unable to validate promo code.';
                 updateCalculation();
             }
         });
@@ -657,24 +689,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Calculation Engine
     function updateCalculation() {
-        const totalGuests = state.adults + state.children;
-        const childMultiplier = 0.70; // 30% discount on child base price
-
-        let baseTotal = (state.base.price * state.adults) + (state.base.price * childMultiplier * state.children);
-        let transferTotal = (state.transfer.type === 'flat') ? state.transfer.price : (state.transfer.price * totalGuests);
-        let sportsTotal = (state.sports.type === 'flat') ? state.sports.price : (state.sports.price * state.adults);
-
-        let addonsTotal = 0;
-        state.addons.forEach(a => {
-            if (a.type === 'flat') {
-                addonsTotal += a.price;
-            } else {
-                addonsTotal += (a.price * totalGuests);
+        const totalGuests = Math.max(1, state.adults + state.children);
+        const subtotal = computeSubtotal();
+        let discountAmount = 0;
+        if (state.discountType === 'percentage' && state.discountValue > 0) {
+            discountAmount = (subtotal * state.discountValue) / 100;
+            if (state.maxDiscount > 0 && discountAmount > state.maxDiscount) {
+                discountAmount = state.maxDiscount;
             }
-        });
-
-        let subtotal = baseTotal + transferTotal + sportsTotal + addonsTotal;
-        let discountAmount = (subtotal * state.discountPercent) / 100;
+        } else if (state.discountType === 'per_person' && state.discountValue > 0) {
+            discountAmount = state.discountValue * totalGuests;
+            if (state.maxDiscount > 0 && discountAmount > state.maxDiscount) {
+                discountAmount = state.maxDiscount;
+            }
+        } else if (state.discountType === 'fixed' && state.discountValue > 0) {
+            discountAmount = state.discountValue;
+        } else if (state.discountAmount > 0) {
+            discountAmount = state.discountAmount;
+        }
+        if (discountAmount > subtotal) discountAmount = subtotal;
         let finalTotal = Math.max(0, Math.round(subtotal - discountAmount));
 
         // Update Summary DOM

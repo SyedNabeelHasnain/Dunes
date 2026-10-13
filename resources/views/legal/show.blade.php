@@ -7,22 +7,22 @@
   "@graph": [
     {
       "@type": "WebPage",
-      "@id": "{{ $canonical }}#webpage",
-      "url": "{{ $canonical }}",
+      "@id": {!! json_encode($canonical . '#webpage', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "url": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "name": {!! json_encode($pageTitle ?? $page->title, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "description": {!! json_encode($pageDesc ?? $page->description, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-      "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
+      "inLanguage": {!! json_encode($currentLocale ?? app()->getLocale() ?? 'en', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "isPartOf": {
         "@type": "WebSite",
-        "@id": "{{ route('home') }}#website",
-        "url": "{{ route('home') }}",
+        "@id": {!! json_encode(route('home') . '#website', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        "url": {!! json_encode(route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
         "name": "Dunes Discovery Tourism LLC Dubai"
       },
       "publisher": {
         "@type": "TravelAgency",
-        "@id": "{{ route('home') }}#organization",
+        "@id": {!! json_encode(route('home') . '#organization', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
         "name": "Dunes Discovery Tourism L.L.C",
-        "url": "{{ route('home') }}",
+        "url": {!! json_encode(route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
         "telephone": "+971502456056",
         "email": "info@dunesdiscoverytourism.com",
         "address": {
@@ -34,25 +34,25 @@
     },
     {
       "@type": "BreadcrumbList",
-      "@id": "{{ $canonical }}#breadcrumb",
+      "@id": {!! json_encode($canonical . '#breadcrumb', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "itemListElement": [
         {
           "@type": "ListItem",
           "position": 1,
-          "name": "{{ __('ui.nav.home') ?? 'Home' }}",
-          "item": "{{ localized_route('home') }}"
+          "name": {!! json_encode(__('ui.nav.home') ?? 'Home', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "item": {!! json_encode(localized_route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
         },
         {
           "@type": "ListItem",
           "position": 2,
-          "name": "{{ __('ui.nav.legal_policies') ?? 'Legal & Trust' }}",
-          "item": "{{ localized_route('terms') }}"
+          "name": {!! json_encode(__('ui.nav.legal_policies') ?? 'Legal & Trust', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "item": {!! json_encode(localized_route('terms'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
         },
         {
           "@type": "ListItem",
           "position": 3,
-          "name": "{{ $page->title }}",
-          "item": "{{ $canonical }}"
+          "name": {!! json_encode($page->title, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "item": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
         }
       ]
     }
@@ -382,8 +382,8 @@ function switchLegalLanguage(lang) {
         if (enBox) enBox.classList.add('hidden');
         if (arBox) arBox.classList.remove('hidden');
         
-        if (titleEl) titleEl.textContent = "{{ $page->title_ar ?: $page->title }}";
-        if (subEl) subEl.textContent = "{{ $page->subtitle_ar ?: ($page->subtitle ?: 'شركة ديونز ديسكفري للسياحة ذ.م.م • دبي، الإمارات العربية المتحدة') }}";
+        if (titleEl) titleEl.textContent = @json($page->title_ar ?: $page->title);
+        if (subEl) subEl.textContent = @json($page->subtitle_ar ?: ($page->subtitle ?: 'شركة ديونز ديسكفري للسياحة ذ.م.م • دبي، الإمارات العربية المتحدة'));
         
         if (helpTitle) helpTitle.textContent = "هل لديك أي استفسار حول سياساتنا أو التراخيص الرسمية؟";
         if (helpDesc) helpDesc.textContent = "فريق الامتثال القانوني وخدمة العملاء في دبي متاح على مدار الساعة للرد على استفساراتكم أو تنسيق الحجوزات المؤسسية.";
@@ -398,8 +398,8 @@ function switchLegalLanguage(lang) {
         if (arBox) arBox.classList.add('hidden');
         if (enBox) enBox.classList.remove('hidden');
         
-        if (titleEl) titleEl.textContent = "{{ $page->title }}";
-        if (subEl) subEl.textContent = "{{ $page->subtitle ?: 'Dunes Discovery Tourism L.L.C • Dubai, United Arab Emirates' }}";
+        if (titleEl) titleEl.textContent = @json($page->title);
+        if (subEl) subEl.textContent = @json($page->subtitle ?: 'Dunes Discovery Tourism L.L.C • Dubai, United Arab Emirates');
 
         if (helpTitle) helpTitle.textContent = "Questions About Our Policies or Compliance?";
         if (helpDesc) helpDesc.textContent = "Our legal compliance desk and customer concierge team in Dubai are available 24/7 to assist with any policy questions, corporate travel agreements, or booking amendments.";

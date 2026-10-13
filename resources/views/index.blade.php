@@ -181,7 +181,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                 <span>{{ __('ui.home_concierge.quiz_btn') }}</span>
                 <span class="bg-amber-400 text-slate-950 font-bold rounded-full px-2 py-0.5 text-[10px]">5% OFF</span>
             </button>
-            <button type="button" class="btn-desert-animated-dark text-base font-bold rounded-full px-6 py-3.5 inline-flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto" data-action="open-booking" data-tour="1" data-tier="1" @click="$store.modal.open('booking', { tourId: 1, tierId: 1 })">
+            <button type="button" class="btn-desert-animated-dark text-base font-bold rounded-full px-6 py-3.5 inline-flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto" data-action="open-booking" data-tour="1" data-tier="1" @click.stop="$store.modal.open('booking', { tourId: 1, tierId: 1 })">
                 <span class="font-bold text-white text-sm">{{ __('ui.common.starting_from') }}</span>
                 <span class="text-xl font-black text-primary" data-aed="79">{{ __('ui.common.aed') }} 79</span>
             </button>
@@ -363,7 +363,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                     <button type="button" class="btn-desert-animated text-sm font-bold rounded-full px-5 py-3 text-white inline-flex items-center justify-center gap-2 cursor-pointer shadow-md" @click="$store.modal.open('safari-matcher')">
                         <i class="bi bi-compass"></i> {{ __('ui.home_concierge.quiz_btn') }}
                     </button>
-                    <a href="{{ route('tours.customizer') }}" class="border border-white/40 hover:border-white text-white text-sm font-bold rounded-full px-5 py-3 inline-flex items-center justify-center gap-2 transition-colors">
+                    <a href="{{ localized_route('tours.customizer') }}" class="border border-white/40 hover:border-white text-white text-sm font-bold rounded-full px-5 py-3 inline-flex items-center justify-center gap-2 transition-colors">
                         <i class="bi bi-sliders"></i> {{ __('ui.home_concierge.custom_btn') }}
                     </a>
                 </div>
@@ -391,9 +391,9 @@ if (!function_exists('renderReviewCardMarkup')) {
                     $category = $categories->firstWhere('id', $t->category_id);
                 @endphp
                 <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-200 hover:border-slate-300 flex flex-col h-full group">
-                    <a href="{{ route('tours.show', $t->slug) }}" class="flex flex-col h-full text-inherit">
+                    <a href="{{ localized_route('tours.show', $t->slug) }}" class="flex flex-col h-full text-inherit">
                         <div class="relative overflow-hidden aspect-[16/10]">
-                            <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy">
+                            <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image ?: ($t->hero_image ?: 'desert-safari-poster.avif'))) }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy">
                             @if($t->is_bestseller)
                             <span class="absolute top-3 start-3 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-md inline-flex items-center gap-1">
                                 <i class="bi bi-fire text-amber-300"></i>{{ __('ui.home_popular.bestseller') }}
@@ -444,7 +444,7 @@ if (!function_exists('renderReviewCardMarkup')) {
         </div>
 
         <div class="text-center">
-            <a href="{{ route('tours.index') }}" class="btn-desert-animated-dark text-base font-bold rounded-full px-8 py-3.5 inline-flex items-center gap-2 shadow-md">
+            <a href="{{ localized_route('tours.index') }}" class="btn-desert-animated-dark text-base font-bold rounded-full px-8 py-3.5 inline-flex items-center gap-2 shadow-md">
                 <span>{{ __('ui.home_popular.view_all') }}</span>
                 <i class="bi bi-arrow-right rtl:rotate-180"></i>
             </a>
@@ -549,7 +549,7 @@ if (!function_exists('renderReviewCardMarkup')) {
             this.activeItem = list[this.currentIndex];
         },
         reportBrokenLink(url, cardElement) {
-            if (cardElement) { cardElement.remove(); }
+            this.items = this.items.filter(i => i.url !== url);
             fetch('{{ route('api.gallery.report-broken') }}', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
@@ -986,7 +986,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                 <i class="bi bi-calendar-check text-lg"></i>
                 <span>{{ __('ui.home_cta.book_btn') }}</span>
             </button>
-            @php $waNumClean = preg_replace('/[^0-9]/', '', $settings['whatsapp_phone'] ?? '971502456056'); @endphp
+            @php $waNumClean = preg_replace('/[^0-9]/', '', $settings['site_whatsapp'] ?? '971502456056'); @endphp
             <a href="https://wa.me/{{ $waNumClean }}?text={{ urlencode('Hi Dunes Discovery Tourism! I would like to inquire about booking a desert safari.') }}" target="_blank" rel="noopener" class="btn-whatsapp-animated border border-slate-700 hover:border-white bg-slate-900/80 hover:bg-slate-900 text-white text-base font-bold rounded-full px-6 py-3.5 inline-flex items-center gap-2 shadow-md transition-all cursor-pointer" data-action="whatsapp">
                 <i class="bi bi-whatsapp text-emerald-400 text-lg"></i>
                 <span>{{ __('ui.home_cta.whatsapp_btn') }}</span>

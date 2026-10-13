@@ -13,6 +13,7 @@ use App\Models\CouponUsage;
 use App\Models\RequestLog;
 use App\Models\Review;
 use App\Models\Setting;
+use App\Services\EmailMarketingService;
 use App\Services\SettingsService;
 use App\Services\ZiinaPaymentService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -87,16 +88,26 @@ class AdminBookingController extends Controller
         ];
 
         // 14-Day Booking & Revenue Acquisition Trend Data
+        $dailyTrend = Booking::where('created_at', '>=', now()->subDays(13)->startOfDay())
+            ->where('status', '!=', 'draft')
+            ->selectRaw("
+                DATE(created_at) as d,
+                COUNT(*) as c,
+                SUM(CASE WHEN status IN ('confirmed', 'completed') AND payment_status IN ('paid', 'partial') THEN (CASE WHEN payment_amount > 0 THEN payment_amount ELSE (CASE WHEN payment_status = 'paid' THEN total ELSE 0 END) END) ELSE 0 END) as rev
+            ")
+            ->groupBy('d')
+            ->get()
+            ->keyBy('d');
+
         $trendData = [];
         for ($i = 13; $i >= 0; $i--) {
             $date = now()->subDays($i)->format('Y-m-d');
             $label = now()->subDays($i)->format('M j');
-            $count = Booking::whereDate('created_at', $date)->where('status', '!=', 'draft')->count();
-            $dayRev = (float) Booking::whereDate('created_at', $date)->whereIn('status', ['confirmed', 'completed'])->sum('payment_amount');
+            $row = $dailyTrend->get($date);
             $trendData[] = [
                 'date' => $label,
-                'count' => $count,
-                'revenue' => $dayRev,
+                'count' => $row ? (int) $row->c : 0,
+                'revenue' => $row ? (float) $row->rev : 0.0,
             ];
         }
 
@@ -124,6 +135,8 @@ class AdminBookingController extends Controller
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
+        } else {
+            $query->where('status', '!=', 'draft');
         }
         if ($request->filled('payment_status')) {
             $query->where('payment_status', $request->payment_status);
@@ -134,8 +147,15 @@ class AdminBookingController extends Controller
                 $q->where('reference', 'like', "%{$s}%")
                     ->orWhere('name', 'like', "%{$s}%")
                     ->orWhere('email', 'like', "%{$s}%")
-                    ->orWhere('phone', 'like', "%{$s}%");
+                    ->orWhere('phone', 'like', "%{$s}%")
+                    ->orWhere('tour_name', 'like', "%{$s}%");
             });
+        }
+        if ($request->filled('from_date')) {
+            $query->whereDate('tour_date', '>=', $request->from_date);
+        }
+        if ($request->filled('to_date')) {
+            $query->whereDate('tour_date', '<=', $request->to_date);
         }
 
         $headers = [
@@ -258,6 +278,12 @@ class AdminBookingController extends Controller
         // If status changed to confirmed or cancelled, trigger notifications
         if ($oldStatus !== $booking->status) {
             try {
+                if (! app()->environment('testing')) {
+                    try {
+                        app(EmailMarketingService::class)->applySmtpConfig();
+                    } catch (\Throwable $e) {
+                    }
+                }
                 $settings = app(SettingsService::class);
                 $fromEmail = $settings->getFromEmail();
 
@@ -457,6 +483,12 @@ class AdminBookingController extends Controller
             ]);
         } elseif ($sendMethod === 'email') {
             try {
+                if (! app()->environment('testing')) {
+                    try {
+                        app(EmailMarketingService::class)->applySmtpConfig();
+                    } catch (\Throwable $e) {
+                    }
+                }
                 $fromEmail = app(SettingsService::class)->getFromEmail();
                 Mail::to($booking->email)->send(
                     (new PaymentLinkMail($booking, $amount, $payment->payment_url, $notes))->from($fromEmail, 'Dunes Discovery Tourism')
@@ -497,6 +529,12 @@ class AdminBookingController extends Controller
         $amount = (float) $request->input('amount');
 
         try {
+            if (! app()->environment('testing')) {
+                try {
+                    app(EmailMarketingService::class)->applySmtpConfig();
+                } catch (\Throwable $e) {
+                }
+            }
             $fromEmail = app(SettingsService::class)->getFromEmail();
             Mail::to($booking->email)->send(
                 (new PaymentLinkMail($booking, $amount, $link, ''))->from($fromEmail, 'Dunes Discovery Tourism')

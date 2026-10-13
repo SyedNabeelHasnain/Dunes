@@ -8,40 +8,40 @@
   "@graph": [
     {
       "@type": "AboutPage",
-      "@id": "{{ $canonical }}#webpage",
-      "url": "{{ $canonical }}",
-      "name": {!! json_encode($pageTitle) !!},
-      "description": {!! json_encode($pageDesc) !!},
-      "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
+      "@id": {!! json_encode($canonical . '#webpage', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "url": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "name": {!! json_encode($pageTitle, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "description": {!! json_encode($pageDesc, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "inLanguage": {!! json_encode($currentLocale ?? app()->getLocale() ?? 'en', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "breadcrumb": {
         "@type": "BreadcrumbList",
         "itemListElement": [
           {
             "@type": "ListItem",
             "position": 1,
-            "name": "{{ __('ui.nav.home') ?? 'Home' }}",
-            "item": "{{ localized_route('home') }}"
+            "name": {!! json_encode(__('ui.nav.home') ?? 'Home', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+            "item": {!! json_encode(localized_route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           },
           {
             "@type": "ListItem",
             "position": 2,
-            "name": "{{ __('ui.nav.about') ?? 'About Us' }}",
-            "item": "{{ $canonical }}"
+            "name": {!! json_encode(__('ui.nav.about') ?? 'About Us', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+            "item": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           }
         ]
       },
       "mainEntity": {
         "@type": "TravelAgency",
-        "@id": "{{ route('home') }}#organization",
-        "name": "{{ $settings['site_name'] ?? 'Dunes Discovery Tourism LLC' }}",
-        "url": "{{ route('home') }}",
-        "logo": "{{ asset('images/logo.png') }}",
-        "telephone": "{{ $settings['site_phone'] ?? '+971 50 245 6056' }}",
-        "email": "{{ $settings['site_email'] ?? 'info@dunesdiscoverytourism.com' }}",
+        "@id": {!! json_encode(route('home') . '#organization', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        "name": {!! json_encode($settings['site_name'] ?? 'Dunes Discovery Tourism LLC', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        "url": {!! json_encode(route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        "logo": {!! json_encode(asset('images/logo.png'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        "telephone": {!! json_encode($settings['site_phone'] ?? '+971 50 245 6056', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        "email": {!! json_encode($settings['site_email'] ?? 'info@dunesdiscoverytourism.com', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
         "foundingDate": "2018",
         "address": {
           "@type": "PostalAddress",
-          "streetAddress": "{{ $settings['site_address'] ?? 'Al Fahidi, Bur Dubai, Dubai' }}",
+          "streetAddress": {!! json_encode($settings['site_address'] ?? 'Al Fahidi, Bur Dubai, Dubai', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
           "addressLocality": "Dubai",
           "addressRegion": "Dubai",
           "postalCode": "00000",

@@ -12,6 +12,14 @@ use Illuminate\Support\Facades\Cache;
 class SitemapController extends Controller
 {
     /**
+     * Escape a string for safe XML output.
+     */
+    protected function xmlEscape(mixed $value): string
+    {
+        return htmlspecialchars((string) $value, ENT_XML1 | ENT_QUOTES, 'UTF-8');
+    }
+
+    /**
      * Google Sitemap Index (sitemap_index.xml)
      */
     public function index(): Response
@@ -23,17 +31,21 @@ class SitemapController extends Controller
         $latestBlog = BlogPost::where('status', 'published')->latest('updated_at')->first();
         $now = now()->toAtomString();
 
+        $tourUpdatedAt = $latestTour?->updated_at;
+        $blogUpdatedAt = $latestBlog?->updated_at;
+        $latestImageDate = collect([$tourUpdatedAt, $blogUpdatedAt])->filter()->max();
+
         $subMaps = [
-            url('/sitemap-tours.xml') => $latestTour?->updated_at ? $latestTour->updated_at->toAtomString() : $now,
-            url('/sitemap-blogs.xml') => $latestBlog?->updated_at ? $latestBlog->updated_at->toAtomString() : $now,
+            url('/sitemap-tours.xml') => $tourUpdatedAt ? $tourUpdatedAt->toAtomString() : $now,
+            url('/sitemap-blogs.xml') => $blogUpdatedAt ? $blogUpdatedAt->toAtomString() : $now,
             url('/sitemap-pages.xml') => $now,
-            url('/sitemap-images.xml') => $latestTour?->updated_at ? $latestTour->updated_at->toAtomString() : $now,
+            url('/sitemap-images.xml') => $latestImageDate ? $latestImageDate->toAtomString() : $now,
         ];
 
         foreach ($subMaps as $loc => $lastmod) {
             $xml .= "  <sitemap>\n";
-            $xml .= "    <loc>{$loc}</loc>\n";
-            $xml .= "    <lastmod>{$lastmod}</lastmod>\n";
+            $xml .= '    <loc>'.$this->xmlEscape($loc)."</loc>\n";
+            $xml .= '    <lastmod>'.$this->xmlEscape($lastmod)."</lastmod>\n";
             $xml .= "  </sitemap>\n";
         }
 
@@ -77,20 +89,20 @@ class SitemapController extends Controller
                 foreach ($languages as $lang) {
                     $pageLoc = $alternates[$lang->code];
                     $xml .= "  <url>\n";
-                    $xml .= "    <loc>{$pageLoc}</loc>\n";
-                    $xml .= "    <lastmod>{$lastmod}</lastmod>\n";
+                    $xml .= '    <loc>'.$this->xmlEscape($pageLoc)."</loc>\n";
+                    $xml .= '    <lastmod>'.$this->xmlEscape($lastmod)."</lastmod>\n";
                     $xml .= "    <changefreq>daily</changefreq>\n";
                     $xml .= "    <priority>0.9</priority>\n";
 
                     foreach ($alternates as $hreflang => $altUrl) {
-                        $xml .= "    <xhtml:link rel=\"alternate\" hreflang=\"{$hreflang}\" href=\"{$altUrl}\" />\n";
+                        $xml .= '    <xhtml:link rel="alternate" hreflang="'.$this->xmlEscape($hreflang).'" href="'.$this->xmlEscape($altUrl)."\" />\n";
                     }
 
                     if (! empty($tour->hero_image) && $lang->is_default) {
                         $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image);
                         $xml .= "    <image:image>\n";
-                        $xml .= '      <image:loc>'.asset('images/'.$imgFile)."</image:loc>\n";
-                        $xml .= '      <image:title>'.htmlspecialchars($tour->name)."</image:title>\n";
+                        $xml .= '      <image:loc>'.$this->xmlEscape(asset('images/'.$imgFile))."</image:loc>\n";
+                        $xml .= '      <image:title>'.$this->xmlEscape($tour->name)."</image:title>\n";
                         $xml .= "    </image:image>\n";
                     }
                     $xml .= "  </url>\n";
@@ -135,20 +147,20 @@ class SitemapController extends Controller
                 foreach ($languages as $lang) {
                     $pageLoc = $alternates[$lang->code];
                     $xml .= "  <url>\n";
-                    $xml .= "    <loc>{$pageLoc}</loc>\n";
-                    $xml .= "    <lastmod>{$lastmod}</lastmod>\n";
+                    $xml .= '    <loc>'.$this->xmlEscape($pageLoc)."</loc>\n";
+                    $xml .= '    <lastmod>'.$this->xmlEscape($lastmod)."</lastmod>\n";
                     $xml .= "    <changefreq>weekly</changefreq>\n";
                     $xml .= "    <priority>0.8</priority>\n";
 
                     foreach ($alternates as $hreflang => $altUrl) {
-                        $xml .= "    <xhtml:link rel=\"alternate\" hreflang=\"{$hreflang}\" href=\"{$altUrl}\" />\n";
+                        $xml .= '    <xhtml:link rel="alternate" hreflang="'.$this->xmlEscape($hreflang).'" href="'.$this->xmlEscape($altUrl)."\" />\n";
                     }
 
                     if (! empty($blog->featured_image) && $lang->is_default) {
                         $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $blog->featured_image);
                         $xml .= "    <image:image>\n";
-                        $xml .= '      <image:loc>'.asset('images/blog/'.$imgFile)."</image:loc>\n";
-                        $xml .= '      <image:title>'.htmlspecialchars($blog->title)."</image:title>\n";
+                        $xml .= '      <image:loc>'.$this->xmlEscape(asset('images/blog/'.$imgFile))."</image:loc>\n";
+                        $xml .= '      <image:title>'.$this->xmlEscape($blog->title)."</image:title>\n";
                         $xml .= "    </image:image>\n";
                     }
                     $xml .= "  </url>\n";
@@ -239,13 +251,13 @@ class SitemapController extends Controller
             foreach ($languages as $lang) {
                 $loc = $alternates[$lang->code];
                 $xml .= "  <url>\n";
-                $xml .= '    <loc>'.$loc."</loc>\n";
-                $xml .= '    <lastmod>'.$pageLastmod."</lastmod>\n";
+                $xml .= '    <loc>'.$this->xmlEscape($loc)."</loc>\n";
+                $xml .= '    <lastmod>'.$this->xmlEscape($pageLastmod)."</lastmod>\n";
                 $xml .= "    <changefreq>{$meta['changefreq']}</changefreq>\n";
                 $xml .= "    <priority>{$meta['priority']}</priority>\n";
 
                 foreach ($alternates as $hreflang => $altUrl) {
-                    $xml .= "    <xhtml:link rel=\"alternate\" hreflang=\"{$hreflang}\" href=\"{$altUrl}\" />\n";
+                    $xml .= '    <xhtml:link rel="alternate" hreflang="'.$this->xmlEscape($hreflang).'" href="'.$this->xmlEscape($altUrl)."\" />\n";
                 }
 
                 $xml .= "  </url>\n";
@@ -275,11 +287,11 @@ class SitemapController extends Controller
             foreach ($tours as $tour) {
                 $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image);
                 $xml .= "  <url>\n";
-                $xml .= '    <loc>'.url('/'.$tour->slug)."</loc>\n";
+                $xml .= '    <loc>'.$this->xmlEscape(url('/'.$tour->slug))."</loc>\n";
                 $xml .= "    <image:image>\n";
-                $xml .= '      <image:loc>'.asset('images/'.$imgFile)."</image:loc>\n";
-                $xml .= '      <image:title>'.htmlspecialchars($tour->name)." - Dubai Desert Safari</image:title>\n";
-                $xml .= '      <image:caption>'.htmlspecialchars($tour->short_desc ?: $tour->name)."</image:caption>\n";
+                $xml .= '      <image:loc>'.$this->xmlEscape(asset('images/'.$imgFile))."</image:loc>\n";
+                $xml .= '      <image:title>'.$this->xmlEscape($tour->name)." - Dubai Desert Safari</image:title>\n";
+                $xml .= '      <image:caption>'.$this->xmlEscape($tour->short_desc ?: $tour->name)."</image:caption>\n";
                 $xml .= "    </image:image>\n";
                 $xml .= "  </url>\n";
             }
@@ -287,21 +299,21 @@ class SitemapController extends Controller
             foreach ($blogs as $blog) {
                 $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $blog->featured_image);
                 $xml .= "  <url>\n";
-                $xml .= '    <loc>'.url('/blog/'.$blog->slug)."</loc>\n";
+                $xml .= '    <loc>'.$this->xmlEscape(url('/blog/'.$blog->slug))."</loc>\n";
                 $xml .= "    <image:image>\n";
-                $xml .= '      <image:loc>'.asset('images/blog/'.$imgFile)."</image:loc>\n";
-                $xml .= '      <image:title>'.htmlspecialchars($blog->title)."</image:title>\n";
+                $xml .= '      <image:loc>'.$this->xmlEscape(asset('images/blog/'.$imgFile))."</image:loc>\n";
+                $xml .= '      <image:title>'.$this->xmlEscape($blog->title)."</image:title>\n";
                 $xml .= "    </image:image>\n";
                 $xml .= "  </url>\n";
             }
 
             foreach (LocationLandingService::getLocations() as $loc) {
                 $xml .= "  <url>\n";
-                $xml .= '    <loc>'.url('/'.$loc['slug'])."</loc>\n";
+                $xml .= '    <loc>'.$this->xmlEscape(url('/'.$loc['slug']))."</loc>\n";
                 $xml .= "    <image:image>\n";
-                $xml .= '      <image:loc>'.asset('images/desert-safari-poster.avif')."</image:loc>\n";
-                $xml .= '      <image:title>'.htmlspecialchars($loc['headline'])."</image:title>\n";
-                $xml .= '      <image:caption>'.htmlspecialchars($loc['subheadline'])."</image:caption>\n";
+                $xml .= '      <image:loc>'.$this->xmlEscape(asset('images/desert-safari-poster.avif'))."</image:loc>\n";
+                $xml .= '      <image:title>'.$this->xmlEscape($loc['headline'])."</image:title>\n";
+                $xml .= '      <image:caption>'.$this->xmlEscape($loc['subheadline'])."</image:caption>\n";
                 $xml .= "    </image:image>\n";
                 $xml .= "  </url>\n";
             }

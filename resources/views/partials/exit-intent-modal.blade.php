@@ -194,9 +194,16 @@ document.addEventListener('DOMContentLoaded', function() {
             if (window.Alpine && Alpine.store('modal')) {
                 Alpine.store('modal').close();
                 setTimeout(() => {
-                    Alpine.store('modal').open('booking', { promo: '{{ $exitIntentCode }}' });
-                    const promoInput = document.getElementById('bookingPromoCode');
-                    if (promoInput) promoInput.value = '{{ $exitIntentCode }}';
+                    const code = '{{ $exitIntentCode }}';
+                    Alpine.store('modal').open('booking', { promo: code });
+                    window.pendingPromoCode = code;
+                    setTimeout(() => {
+                        const promoInput = document.getElementById('bookingPromoInput');
+                        const promoCodeEl = document.getElementById('bookingPromoCode');
+                        if (promoInput) promoInput.value = code;
+                        if (promoCodeEl) promoCodeEl.value = code;
+                        window.pendingPromoCode = code;
+                    }, 50);
                     if (typeof window.validateCurrentPromo === 'function') {
                         setTimeout(() => window.validateCurrentPromo(), 400);
                     }

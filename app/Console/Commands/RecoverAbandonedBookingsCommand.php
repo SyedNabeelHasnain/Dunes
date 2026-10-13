@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Mail\AbandonedBookingRecoveryMail;
 use App\Models\Booking;
+use App\Services\EmailMarketingService;
 use App\Services\SettingsService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
@@ -33,6 +34,14 @@ class RecoverAbandonedBookingsCommand extends Command
     {
         $settings = app(SettingsService::class);
         $fromEmail = $settings->getFromEmail();
+
+        if (! app()->environment('testing')) {
+            try {
+                app(EmailMarketingService::class)->applySmtpConfig();
+            } catch (\Throwable $e) {
+                // Fallback to default mail config
+            }
+        }
 
         // Target pending & unpaid bookings created between 1 hour and 24 hours ago
         $startTime = now()->subHours(24);

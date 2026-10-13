@@ -7,32 +7,32 @@
   "@graph": [
     {
       "@type": "WebPage",
-      "@id": "{{ $canonical ?? request()->url() }}#webpage",
-      "url": "{{ $canonical ?? request()->url() }}",
+      "@id": {!! json_encode(($canonical ?? request()->url()) . '#webpage', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "url": {!! json_encode($canonical ?? request()->url(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "name": {!! json_encode($pageTitle ?? 'Guest Review & Feedback | Dunes Discovery Tourism', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "description": {!! json_encode($pageDesc ?? 'Verified guest review and rating submission for Dubai desert safaris and tours by Dunes Discovery Tourism.', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-      "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
+      "inLanguage": {!! json_encode($currentLocale ?? app()->getLocale() ?? 'en', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "isPartOf": {
         "@type": "WebSite",
-        "@id": "{{ route('home') }}#website",
-        "url": "{{ route('home') }}",
+        "@id": {!! json_encode(route('home') . '#website', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        "url": {!! json_encode(route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
         "name": "Dunes Discovery Tourism LLC Dubai"
       },
       "breadcrumb": {
         "@type": "BreadcrumbList",
-        "@id": "{{ $canonical ?? request()->url() }}#breadcrumb",
+        "@id": {!! json_encode(($canonical ?? request()->url()) . '#breadcrumb', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
         "itemListElement": [
           {
             "@type": "ListItem",
             "position": 1,
-            "name": "{{ __('ui.nav.home') ?? 'Home' }}",
-            "item": "{{ localized_route('home') }}"
+            "name": {!! json_encode(__('ui.nav.home') ?? 'Home', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+            "item": {!! json_encode(localized_route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           },
           {
             "@type": "ListItem",
             "position": 2,
-            "name": "{{ __('ui.reviews_section.submit_review') ?? 'Guest Reviews' }}",
-            "item": "{{ $canonical ?? request()->url() }}"
+            "name": {!! json_encode(__('ui.reviews_section.submit_review') ?? 'Guest Reviews', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+            "item": {!! json_encode($canonical ?? request()->url(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           }
         ]
       }
@@ -235,30 +235,39 @@ document.addEventListener('DOMContentLoaded', function () {
     // Photo Preview Logic
     const photoInput = document.getElementById('photoInput');
     const previewArea = document.getElementById('photoPreviewArea');
+    let selectedFiles = [];
+
+    function syncInputFiles() {
+        if (!photoInput || typeof DataTransfer === 'undefined') return;
+        const dt = new DataTransfer();
+        selectedFiles.forEach(f => dt.items.add(f));
+        photoInput.files = dt.files;
+    }
 
     if (photoInput && previewArea) {
         photoInput.addEventListener('change', function () {
             previewArea.innerHTML = '';
-            const files = Array.from(this.files).slice(0, 4);
+            selectedFiles = Array.from(this.files).filter(f => f.type.startsWith('image/')).slice(0, 4);
+            syncInputFiles();
 
-            files.forEach((file) => {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        const div = document.createElement('div');
-                        div.className = 'relative w-20 h-20 rounded-xl overflow-hidden border border-white/20 shadow-sm';
-                        div.innerHTML = `
-                            <img src="${e.target.result}" alt="Safari photo preview" class="w-full h-full object-cover">
-                            <button type="button" class="absolute top-1 end-1 bg-black/75 hover:bg-black text-white rounded-full w-5 h-5 flex items-center justify-center text-xs cursor-pointer" title="{{ __('ui.common.remove') }}">&times;</button>
-                        `;
-                        div.querySelector('button').addEventListener('click', function (ev) {
-                            ev.stopPropagation();
-                            div.remove();
-                        });
-                        previewArea.appendChild(div);
-                    };
-                    reader.readAsDataURL(file);
-                }
+            selectedFiles.forEach((file) => {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const div = document.createElement('div');
+                    div.className = 'relative w-20 h-20 rounded-xl overflow-hidden border border-white/20 shadow-sm';
+                    div.innerHTML = `
+                        <img src="${e.target.result}" alt="Safari photo preview" class="w-full h-full object-cover">
+                        <button type="button" class="absolute top-1 end-1 bg-black/75 hover:bg-black text-white rounded-full w-5 h-5 flex items-center justify-center text-xs cursor-pointer" title="{{ __('ui.common.remove') }}">&times;</button>
+                    `;
+                    div.querySelector('button').addEventListener('click', function (ev) {
+                        ev.stopPropagation();
+                        selectedFiles = selectedFiles.filter(f => f !== file);
+                        syncInputFiles();
+                        div.remove();
+                    });
+                    previewArea.appendChild(div);
+                };
+                reader.readAsDataURL(file);
             });
         });
     }

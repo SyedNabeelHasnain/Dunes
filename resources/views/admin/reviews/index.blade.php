@@ -133,7 +133,7 @@
     <!-- Multi-Parameter Filter Toolbar -->
     <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5">
         <form method="GET" action="{{ route('admin.reviews.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 items-end">
-            <div class="lg:col-span-4">
+            <div class="lg:col-span-3">
                 <label for="reviewSearch" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Search Reviews</label>
                 <div class="relative">
                     <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -142,7 +142,7 @@
                     <input type="text" name="search" id="reviewSearch" class="w-full rounded-xl border border-slate-200 pl-10 pr-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden focus:border-primary transition" placeholder="Reviewer, Title, Content..." value="{{ request('search') }}">
                 </div>
             </div>
-            <div class="lg:col-span-3">
+            <div class="lg:col-span-2">
                 <label for="ratingFilter" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Rating</label>
                 <select name="rating" id="ratingFilter" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden bg-white focus:border-primary">
                     <option value="">All Ratings</option>
@@ -160,6 +160,16 @@
                     <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Approved (Live)</option>
                     <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
                     <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Rejected</option>
+                </select>
+            </div>
+            <div class="lg:col-span-2">
+                <label for="sourceFilter" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Source</label>
+                <select name="source" id="sourceFilter" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden bg-white focus:border-primary">
+                    <option value="">All Sources</option>
+                    <option value="google" {{ request('source') === 'google' ? 'selected' : '' }}>Google</option>
+                    <option value="tripadvisor" {{ request('source') === 'tripadvisor' ? 'selected' : '' }}>TripAdvisor</option>
+                    <option value="website" {{ request('source') === 'website' ? 'selected' : '' }}>Website</option>
+                    <option value="direct" {{ request('source') === 'direct' ? 'selected' : '' }}>Direct</option>
                 </select>
             </div>
             <div class="lg:col-span-3 flex items-center gap-2">

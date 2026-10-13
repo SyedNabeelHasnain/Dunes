@@ -19,7 +19,7 @@
                 Dear <strong class="text-slate-700">{{ $booking->name }}</strong>, our goal is to deliver exceptional 5-star desert safari adventures. Please let us know what we could have done better on your {{ $booking->tour_name }}.
             </p>
 
-            <form action="{{ route('review.feedback', $booking->reference) }}" method="POST" class="text-start">
+            <form action="{{ localized_route('review.feedback', ['ref' => $booking->reference]) }}" method="POST" class="text-start">
                 @csrf
                 <div class="mb-5">
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Your Detailed Feedback</label>

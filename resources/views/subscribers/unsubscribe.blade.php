@@ -24,7 +24,7 @@
                 <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5 text-center">
                     <i class="bi bi-exclamation-triangle-fill text-3xl text-amber-500 block mb-2"></i>
                     <p class="font-bold text-amber-900 text-sm mb-1">{{ $message }}</p>
-                    <span class="text-amber-700 text-xs">If you need assistance managing your email, please <a href="{{ route('contact') }}" class="underline font-semibold hover:text-amber-950">contact support</a>.</span>
+                    <span class="text-amber-700 text-xs">If you need assistance managing your email, please <a href="{{ localized_route('contact') }}" class="underline font-semibold hover:text-amber-950">contact support</a>.</span>
                 </div>
             @elseif(!empty($completed))
                 <div class="text-center py-2">
@@ -40,7 +40,7 @@
                         <i class="bi bi-info-circle text-primary me-1"></i> <strong>Note:</strong> You will still receive essential transactional notifications regarding any confirmed bookings or customer service inquiries.
                     </div>
 
-                    <a href="{{ route('home') }}" class="btn-desert-animated font-bold rounded-full px-6 py-3 text-white text-sm shadow-md inline-flex items-center gap-2">
+                    <a href="{{ localized_route('home') }}" class="btn-desert-animated font-bold rounded-full px-6 py-3 text-white text-sm shadow-md inline-flex items-center gap-2">
                         <i class="bi bi-house-door-fill"></i> Return to Homepage
                     </a>
                 </div>
@@ -53,7 +53,7 @@
                     <p class="text-slate-500 text-sm mb-6 leading-relaxed">
                         The email address <strong class="text-slate-700">{{ $subscriber->email }}</strong> is already unsubscribed from our active marketing lists.
                     </p>
-                    <a href="{{ route('home') }}" class="border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold rounded-full px-6 py-3 text-sm transition-colors inline-flex items-center gap-2">
+                    <a href="{{ localized_route('home') }}" class="border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold rounded-full px-6 py-3 text-sm transition-colors inline-flex items-center gap-2">
                         <i class="bi bi-house-door-fill"></i> Return to Homepage
                     </a>
                 </div>
@@ -83,7 +83,7 @@
                         <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-full py-3.5 text-sm shadow-md transition-colors cursor-pointer inline-flex items-center justify-center gap-2">
                             <i class="bi bi-x-circle"></i> Confirm Unsubscribe
                         </button>
-                        <a href="{{ route('home') }}" class="block w-full border border-slate-200 hover:bg-slate-50 text-slate-600 font-semibold rounded-full py-3 text-xs sm:text-sm text-center transition-colors">
+                        <a href="{{ localized_route('home') }}" class="block w-full border border-slate-200 hover:bg-slate-50 text-slate-600 font-semibold rounded-full py-3 text-xs sm:text-sm text-center transition-colors">
                             Nevermind, Keep Me Subscribed
                         </a>
                     </div>

@@ -58,7 +58,7 @@ class AdminMenuController extends Controller
             'target' => $request->input('target', '_self'),
             'icon' => $request->input('icon'),
             'order' => (int) $request->input('order', 0),
-            'is_active' => true,
+            'is_active' => $request->has('is_active') ? (bool) $request->input('is_active') : true,
         ]);
 
         app(CmsContentService::class)->clearCache();

@@ -265,7 +265,7 @@
                     <div class="p-4 rounded-2xl bg-slate-900 border border-orange-500/30 mb-4">
                         <div class="flex flex-col sm:flex-row items-center gap-4">
                             <div class="w-full sm:w-32 h-24 rounded-xl overflow-hidden shrink-0 relative bg-slate-800">
-                                <img :src="result ? result.thumb : '/images/desert-safari-poster.avif'" :alt="result ? result.name : 'Dunes Discovery Tour'" class="w-full h-full object-cover">
+                                <img :src="(result && result.thumb) ? result.thumb : '{{ asset('images/desert-safari-poster.avif') }}'" :alt="result ? result.name : 'Dunes Discovery Tour'" class="w-full h-full object-cover">
                                 <span class="absolute top-1 start-1 px-1.5 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[9px]">Top Match</span>
                             </div>
                             <div class="flex-1 min-w-0 text-start">

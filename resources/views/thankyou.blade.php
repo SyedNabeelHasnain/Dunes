@@ -46,8 +46,8 @@ gtag('event', 'conversion_event_submit_lead_form', {
             value: {{ $booking->total }},
             currency: 'AED',
             items: [{
-                item_name: '{{ $booking->tour_name }}',
-                item_id: '{{ $booking->tour_id }}',
+                item_name: @json($booking->tour_name),
+                item_id: @json((string) $booking->tour_id),
                 price: {{ $booking->total }},
                 item_category: 'Tours',
                 quantity: 1
@@ -212,10 +212,10 @@ gtag('event', 'conversion_event_submit_lead_form', {
         <div class="bg-white rounded-3xl shadow-xs border border-slate-200 p-6 sm:p-10">
             <h4 class="text-lg font-extrabold text-slate-900 mb-4 text-center">What's Next?</h4>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <a href="{{ route('home') }}" class="btn-desert-animated w-full font-bold rounded-full py-3.5 text-white text-center inline-flex items-center justify-center gap-2 text-sm shadow-sm">
+                <a href="{{ localized_route('home') }}" class="btn-desert-animated w-full font-bold rounded-full py-3.5 text-white text-center inline-flex items-center justify-center gap-2 text-sm shadow-sm">
                     <i class="bi bi-house-door-fill"></i> Home
                 </a>
-                <a href="{{ route('tours.index') }}" class="btn-desert-animated-dark w-full font-bold rounded-full py-3.5 text-white text-center inline-flex items-center justify-center gap-2 text-sm shadow-sm">
+                <a href="{{ localized_route('tours.index') }}" class="btn-desert-animated-dark w-full font-bold rounded-full py-3.5 text-white text-center inline-flex items-center justify-center gap-2 text-sm shadow-sm">
                     <i class="bi bi-compass-fill"></i> Explore Tours
                 </a>
                 @php

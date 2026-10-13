@@ -8,19 +8,19 @@
   "@graph": [
     {
       "@type": "BreadcrumbList",
-      "@id": "{{ $canonical }}#breadcrumb",
+      "@id": {!! json_encode($canonical . '#breadcrumb', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "itemListElement": [
         {
           "@type": "ListItem",
           "position": 1,
-          "name": "{{ __('ui.nav.home') ?? 'Home' }}",
-          "item": "{{ localized_route('home') }}"
+          "name": {!! json_encode(__('ui.nav.home') ?? 'Home', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "item": {!! json_encode(localized_route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
         },
         {
           "@type": "ListItem",
           "position": 2,
-          "name": "{{ __('ui.nav.faq') ?? 'FAQ' }}",
-          "item": "{{ $canonical }}"
+          "name": {!! json_encode(__('ui.nav.faq') ?? 'FAQ', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "item": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
         }
       ]
     }
@@ -28,16 +28,16 @@
     ,
     {
       "@type": "FAQPage",
-      "@id": "{{ $canonical }}#faqpage",
-      "inLanguage": "{{ $currentLocale ?? app()->getLocale() ?? 'en' }}",
+      "@id": {!! json_encode($canonical . '#faqpage', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "inLanguage": {!! json_encode($currentLocale ?? app()->getLocale() ?? 'en', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "mainEntity": [
         @foreach($faqs as $index => $f)
         {
           "@type": "Question",
-          "name": {!! json_encode($f->question) !!},
+          "name": {!! json_encode($f->question, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": {!! json_encode($f->answer) !!}
+            "text": {!! json_encode($f->answer, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           }
         }{{ $index < $faqs->count() - 1 ? ',' : '' }}
         @endforeach
@@ -164,7 +164,7 @@
                     <i class="bi bi-whatsapp"></i>
                     <span>{{ __('ui.faq.whatsapp_247') }}</span>
                 </a>
-                <a href="{{ route('contact') }}" class="btn-desert-animated rounded-full px-6 py-3 font-bold text-white text-sm inline-flex items-center justify-center gap-2 shadow-sm">
+                <a href="{{ localized_route('contact') }}" class="btn-desert-animated rounded-full px-6 py-3 font-bold text-white text-sm inline-flex items-center justify-center gap-2 shadow-sm">
                     <i class="bi bi-envelope"></i>
                     <span>{{ __('ui.nav.contact') }}</span>
                 </a>

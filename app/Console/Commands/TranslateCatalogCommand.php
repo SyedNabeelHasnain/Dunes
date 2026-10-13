@@ -19,6 +19,7 @@ use App\Models\LegalSection;
 use App\Models\Setting;
 use App\Models\Tier;
 use App\Models\Tour;
+use App\Services\Translation\Contracts\TranslationDriverInterface;
 use App\Services\Translation\Drivers\DeepLTranslationDriver;
 use App\Services\Translation\TranslationManager;
 use Illuminate\Console\Command;
@@ -44,7 +45,7 @@ class TranslateCatalogCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Translate entire commercial catalog, blogs, FAQs, legal policies, and email templates into all active languages via DeepL';
+    protected $description = 'Translate entire commercial catalog, blogs, FAQs, legal policies, and email templates into all active languages via the configured translation driver';
 
     /**
      * Execute the console command.
@@ -58,21 +59,34 @@ class TranslateCatalogCommand extends Command
         $this->info('  Dunes Discovery Tourism - Global Multilingual Catalog Translator');
         $this->info('===========================================================');
 
-        // 1. Resolve Driver & API Key
-        $authKey = Setting::where('setting_key', 'deepl_auth_key')->value('setting_value')
-            ?: (env('DEEPL_AUTH_KEY') ?: '');
+        // 1. Resolve Driver & API Key via TranslationManager (with env fallback for DeepL)
+        $driver = null;
+        try {
+            if ($translationManager->isConfigured()) {
+                $driver = $translationManager->driver();
+            }
+        } catch (\Throwable $e) {
+            // Fallback below
+        }
 
-        $endpointType = Setting::where('setting_key', 'deepl_endpoint_type')->value('setting_value')
-            ?: (env('DEEPL_ENDPOINT_TYPE') ?: 'free');
+        if (! $driver) {
+            $authKey = Setting::where('setting_key', 'deepl_auth_key')->value('setting_value')
+                ?: (env('DEEPL_AUTH_KEY') ?: '');
+            $endpointType = Setting::where('setting_key', 'deepl_endpoint_type')->value('setting_value')
+                ?: (env('DEEPL_ENDPOINT_TYPE') ?: 'free');
 
-        if (empty($authKey)) {
-            $this->warn('DeepL Auth Key is not set in Settings or .env. Skipping automatic catalog translation.');
-            Log::info('TranslateCatalogCommand: DeepL Auth Key not set; skipping execution.');
+            if (! empty($authKey)) {
+                $driver = new DeepLTranslationDriver($authKey, $endpointType);
+            }
+        }
+
+        if (! $driver) {
+            $this->warn('No active translation driver (DeepL / Google) is configured in Settings or .env. Skipping automatic catalog translation.');
+            Log::info('TranslateCatalogCommand: Translation driver not configured; skipping execution.');
 
             return self::SUCCESS;
         }
 
-        $driver = new DeepLTranslationDriver($authKey, $endpointType);
         $this->info("Translation Driver: {$driver->getName()}");
 
         // 2. Resolve Target Locales
@@ -240,7 +254,7 @@ class TranslateCatalogCommand extends Command
         string $modelClass,
         array $htmlFields,
         array $targetLocales,
-        DeepLTranslationDriver $driver,
+        TranslationDriverInterface $driver,
         bool $force,
         bool $dryRun
     ): int {

@@ -147,7 +147,7 @@
                                 data-action="open-booking" 
                                 data-tour="{{ $tour->id }}" 
                                 data-tier="{{ $tier->id }}"
-                                @click.prevent="$store.modal.open('booking', { tourId: {{ $tour->id }}, tierId: {{ $tier->id }} })">
+                                @click.prevent.stop="$store.modal.open('booking', { tourId: {{ $tour->id }}, tierId: {{ $tier->id }} })">
                             Select {{ $tier->name }}
                         </button>
                     </td>

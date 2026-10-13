@@ -324,6 +324,7 @@
                                     </span>
                                 </div>
                                 <div class="flex rounded-xl border border-slate-200 bg-white overflow-hidden focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all" id="promoInputGroup">
+                                    <input type="hidden" id="bookingPromoInput" value="">
                                     <input type="text" class="flex-1 px-3.5 py-2.5 bg-transparent text-xs sm:text-sm font-semibold text-slate-800 border-0 focus:outline-none placeholder:text-slate-400 uppercase" id="bookingPromoCode" name="coupon_code" placeholder="{{ __('ui.booking.promo_placeholder') }}" autocomplete="off" spellcheck="false">
                                     <button class="px-4 bg-primary hover:bg-primary-dark text-white font-bold text-xs transition-colors cursor-pointer flex items-center gap-1" type="button" id="applyPromoBtn">
                                         <span>{{ __('ui.booking.apply') }}</span>
@@ -425,6 +426,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.appliedPromoCoupon = null;
 
     const promoInput = document.getElementById('bookingPromoCode');
+    const hiddenPromoInput = document.getElementById('bookingPromoInput');
     const applyBtn = document.getElementById('applyPromoBtn');
     const removeBtn = document.getElementById('removePromoBtn');
     const successBox = document.getElementById('promoSuccessBox');
@@ -439,12 +441,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const urlParams = new URLSearchParams(window.location.search);
     const urlPromo = urlParams.get('promo') || urlParams.get('coupon');
     if (urlPromo && promoInput) {
-        promoInput.value = urlPromo.toUpperCase().trim();
+        const cleanUrlPromo = urlPromo.toUpperCase().trim();
+        promoInput.value = cleanUrlPromo;
+        if (hiddenPromoInput) hiddenPromoInput.value = cleanUrlPromo;
+        window.pendingPromoCode = cleanUrlPromo;
     }
 
     window.validateCurrentPromo = function(isSilent = false) {
         if (!promoInput) return;
-        const code = (promoInput.value || '').trim().toUpperCase();
+        const code = (promoInput.value || hiddenPromoInput?.value || window.pendingPromoCode || '').trim().toUpperCase();
+        if (code) {
+            promoInput.value = code;
+            if (hiddenPromoInput) hiddenPromoInput.value = code;
+        }
         if (!code) {
             if (!isSilent && errorBox) {
                 if (errorMsg) errorMsg.innerText = 'Please enter a promo or voucher code.';
@@ -474,12 +483,14 @@ document.addEventListener('DOMContentLoaded', function() {
             if (selectedTierCard && selectedTierCard.dataset.price) {
                 const p = parseFloat(selectedTierCard.dataset.price) || 0;
                 const pType = (selectedTierCard.dataset.priceType || 'per person').toLowerCase();
+                const rawChildPrice = parseFloat(selectedTierCard.dataset.childPrice || 0);
+                const childPrice = rawChildPrice > 0 ? rawChildPrice : (p * 0.70);
                 if (['per buggy', 'per vehicle', 'per group', 'private'].includes(pType)) {
                     const capacity = parseInt(selectedTierCard.dataset.capacity || '2', 10) || 2;
-                    const vehicles = Math.ceil((adults + children) / capacity);
+                    const vehicles = Math.ceil(Math.max(1, adults + children) / capacity);
                     subtotal = p * vehicles;
                 } else {
-                    subtotal = (p * adults) + (p * 0.70 * children);
+                    subtotal = (p * adults) + (childPrice * children);
                 }
             }
         }
@@ -487,6 +498,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (subtotal <= 0) {
             const rawTxt = document.getElementById('bookingTotal')?.innerText?.replace(/[^0-9.]/g, '') || document.getElementById('summaryTotal')?.innerText?.replace(/[^0-9.]/g, '') || '0';
             subtotal = parseFloat(rawTxt) || 0;
+        }
+
+        if (subtotal <= 0) {
+            window.pendingPromoCode = code;
+            return;
         }
 
         const emailVal = document.getElementById('bookingEmail')?.value?.trim();
@@ -542,6 +558,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (status === 200 && body.success && body.coupon) {
                 window.appliedPromoCoupon = body.coupon;
+                window.pendingPromoCode = null;
                 if (codeLabel) codeLabel.innerText = body.coupon.code;
                 if (discountBadge) {
                     if (body.coupon.discount_type === 'percentage') {
@@ -614,7 +631,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.removeCurrentPromo = function(isSilent = false) {
         window.appliedPromoCoupon = null;
+        window.pendingPromoCode = null;
         if (promoInput) promoInput.value = '';
+        if (hiddenPromoInput) hiddenPromoInput.value = '';
         if (inputGroup) {
             inputGroup.classList.remove('hidden', 'border-red-400', 'shake-field');
         }

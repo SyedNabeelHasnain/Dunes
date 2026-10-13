@@ -380,13 +380,13 @@ class BookingController extends Controller
                     'success' => true,
                     'message' => 'Thank you! Your booking has been received.',
                     'reference' => $booking->reference,
-                    'redirect_url' => route('booking.thankyou', ['ref' => $booking->reference]),
+                    'redirect_url' => localized_route('booking.thankyou', ['ref' => $booking->reference]),
                 ]);
             }
 
             // Generate Ziina Payment Link
-            $successUrl = route('booking.thankyou', ['pi' => '{PAYMENT_INTENT_ID}']);
-            $cancelUrl = route('booking.cancel', ['pi' => '{PAYMENT_INTENT_ID}']);
+            $successUrl = localized_route('booking.thankyou', ['pi' => '{PAYMENT_INTENT_ID}']);
+            $cancelUrl = localized_route('booking.cancel', ['pi' => '{PAYMENT_INTENT_ID}']);
             $messageStr = 'Booking '.$booking->reference;
 
             $intent = $this->ziina->createPaymentIntent($payNow, 'AED', $successUrl, $cancelUrl, $messageStr);

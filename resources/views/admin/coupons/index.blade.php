@@ -11,7 +11,7 @@
             <p class="text-xs text-slate-500 mt-0.5">Create promotional codes, set discount limits, track customer redemptions, and drive tour conversions.</p>
         </div>
         <div class="flex items-center gap-2">
-            <a href="{{ route('admin.coupons.export') }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold shadow-2xs transition-all">
+            <a href="{{ route('admin.coupons.export', request()->query()) }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold shadow-2xs transition-all">
                 <i class="bi bi-file-earmark-arrow-down text-emerald-600 text-sm"></i>
                 <span>Export CSV</span>
             </a>

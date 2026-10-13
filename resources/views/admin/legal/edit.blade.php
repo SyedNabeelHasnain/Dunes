@@ -55,15 +55,15 @@
                     </div>
                     <div>
                         <label for="title_ar" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5 text-right">عنوان الصفحة (عربي)</label>
-                        <input type="text" name="title_ar" id="title_ar" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary bg-white text-right" value="{{ old('title_ar', $page->title_ar) }}">
+                        <input type="text" name="title_ar" id="title_ar" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary bg-white text-right" value="{{ old('title_ar', $page->getTranslation('title', 'ar', false) ?: $page->title_ar) }}">
                     </div>
                     <div>
                         <label for="subtitle_ar" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5 text-right">العنوان الفرعي (عربي)</label>
-                        <input type="text" name="subtitle_ar" id="subtitle_ar" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary bg-white text-right" value="{{ old('subtitle_ar', $page->subtitle_ar) }}">
+                        <input type="text" name="subtitle_ar" id="subtitle_ar" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary bg-white text-right" value="{{ old('subtitle_ar', $page->getTranslation('subtitle', 'ar', false) ?: $page->subtitle_ar) }}">
                     </div>
                     <div>
                         <label for="description_ar" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5 text-right">المقدمة والوصف (عربي)</label>
-                        <textarea name="description_ar" id="description_ar" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary bg-white text-right" rows="4">{{ old('description_ar', $page->description_ar) }}</textarea>
+                        <textarea name="description_ar" id="description_ar" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary bg-white text-right" rows="4">{{ old('description_ar', $page->getTranslation('description', 'ar', false) ?: $page->description_ar) }}</textarea>
                     </div>
                 </div>
 
@@ -88,16 +88,23 @@
             @forelse($page->sections as $sec)
             <div class="p-4 bg-slate-50/70 rounded-2xl border border-slate-200/80 space-y-3">
                 <div class="flex items-start justify-between gap-3">
+                    @php
+                        $secHeadingAr = $sec->getTranslation('heading', 'ar', false) ?: $sec->heading_ar;
+                        $secSubheadingAr = $sec->getTranslation('subheading', 'ar', false) ?: $sec->subheading_ar;
+                    @endphp
                     <div class="space-y-1">
                         <div class="flex items-center gap-2">
                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-700">Order: {{ $sec->priority }}</span>
                             <span class="text-sm font-black text-slate-900">{{ $sec->heading }}</span>
                         </div>
-                        @if($sec->heading_ar)
-                            <div class="text-xs font-semibold text-primary" dir="rtl">{{ $sec->heading_ar }}</div>
+                        @if($secHeadingAr)
+                            <div class="text-xs font-semibold text-primary" dir="rtl">{{ $secHeadingAr }}</div>
                         @endif
                         @if($sec->subheading)
                             <div class="text-xs text-slate-400">{{ $sec->subheading }}</div>
+                        @endif
+                        @if($secSubheadingAr)
+                            <div class="text-xs text-slate-400" dir="rtl">{{ $secSubheadingAr }}</div>
                         @endif
                     </div>
                     <form action="{{ route('admin.legal.section.delete', $sec->id) }}" method="POST" class="delete-form shrink-0" data-confirm="Are you sure you want to delete this section and all its items?">
@@ -112,11 +119,14 @@
                 <!-- Clauses List -->
                 <div class="border-l-2 border-primary/30 pl-3.5 space-y-2 my-2">
                     @forelse($sec->items as $item)
+                    @php
+                        $itemContentAr = $item->getTranslation('content', 'ar', false) ?: $item->content_ar;
+                    @endphp
                     <div class="flex items-start justify-between gap-2 p-2.5 bg-white rounded-xl border border-slate-200/80 shadow-2xs">
                         <div class="text-xs text-slate-800 space-y-0.5 flex-1">
                             <div>{{ $item->content }}</div>
-                            @if($item->content_ar)
-                                <div class="text-slate-500 text-[11px]" dir="rtl">{{ $item->content_ar }}</div>
+                            @if($itemContentAr)
+                                <div class="text-slate-500 text-[11px]" dir="rtl">{{ $itemContentAr }}</div>
                             @endif
                         </div>
                         <form action="{{ route('admin.legal.item.delete', $item->id) }}" method="POST" class="delete-form shrink-0" data-confirm="Are you sure you want to delete this clause item?">

@@ -238,9 +238,7 @@
             }
         },
         reportBrokenLink(url, cardElement) {
-            if (cardElement) {
-                cardElement.remove();
-            }
+            this.items = this.items.filter(i => i.url !== url);
             fetch('{{ route('api.gallery.report-broken') }}', {
                 method: 'POST',
                 headers: {
@@ -605,7 +603,7 @@
                         <span>{{ __('ui.gallery_section.book_this') ?? 'Book This Safari Adventure' }}</span>
                     </button>
 
-                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $waPhone ?? '971502456056') }}?text={{ urlencode('Hello Dunes Discovery, I saw your guest gallery photos and want to book a desert safari!') }}" 
+                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode('Hello Dunes Discovery, I saw your guest gallery photos and want to book a desert safari!') }}" 
                        target="_blank" 
                        rel="noopener"
                        class="w-full py-2.5 px-4 rounded-xl font-bold text-xs text-emerald-400 bg-emerald-950/50 hover:bg-emerald-900/50 border border-emerald-500/30 flex items-center justify-center gap-2 transition-colors">

@@ -22,10 +22,10 @@
       ],
       'aggregateRating' => [
         '@type' => 'AggregateRating',
-        'ratingValue' => '5.0',
-        'reviewCount' => '329',
-        'bestRating' => '5.0',
-        'worstRating' => '1.0',
+        'ratingValue' => '4.9',
+        'reviewCount' => '2847',
+        'bestRating' => '5',
+        'worstRating' => '1',
       ],
     ],
     [
