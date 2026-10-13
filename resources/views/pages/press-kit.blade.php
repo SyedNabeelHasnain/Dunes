@@ -349,12 +349,12 @@
                 Our operations team and desert safari specialists are available for travel journalism inquiries, TV documentary filming permits in Lahbab, and influencer partnerships.
             </p>
 
-            <div class="flex flex-wrap items-center gap-3">
-                <a href="mailto:{{ $facts['contact_press'] }}" class="btn-desert-animated text-xs font-bold rounded-xl px-5 py-3 text-white inline-flex items-center gap-2 shadow-lg">
-                    <i class="bi bi-envelope-fill"></i> Contact PR Team ({{ $facts['contact_press'] }})
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <a href="mailto:{{ $facts['contact_press'] }}" class="btn-desert-animated text-xs font-bold rounded-xl px-5 py-3 text-white inline-flex items-center justify-center gap-2 shadow-lg w-full sm:w-auto min-h-[44px] truncate">
+                    <i class="bi bi-envelope-fill shrink-0"></i> <span class="truncate">Contact PR Team ({{ $facts['contact_press'] }})</span>
                 </a>
-                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $facts['phone']) }}?text={{ urlencode('Hello Dunes Discovery Media Team, I am reaching out regarding a press / editorial feature.') }}" target="_blank" rel="noopener" class="px-5 py-3 rounded-xl bg-emerald-600/90 hover:bg-emerald-600 text-white text-xs font-bold inline-flex items-center gap-2 transition-all shadow-md">
-                    <i class="bi bi-whatsapp"></i> WhatsApp Press Desk
+                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $facts['phone']) }}?text={{ urlencode('Hello Dunes Discovery Media Team, I am reaching out regarding a press / editorial feature.') }}" target="_blank" rel="noopener" class="px-5 py-3 rounded-xl bg-emerald-600/90 hover:bg-emerald-600 text-white text-xs font-bold inline-flex items-center justify-center gap-2 transition-all shadow-md w-full sm:w-auto min-h-[44px]">
+                    <i class="bi bi-whatsapp shrink-0"></i> <span>WhatsApp Press Desk</span>
                 </a>
             </div>
         </div>

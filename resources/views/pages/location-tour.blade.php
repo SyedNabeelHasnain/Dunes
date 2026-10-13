@@ -202,10 +202,10 @@
 
                     <!-- CTA Buttons -->
                     <div class="flex flex-col sm:flex-row gap-3.5 mb-8">
-                        <a href="#safari-packages" class="btn-desert-animated font-bold rounded-full px-7 py-3.5 text-white text-center shadow-lg inline-flex items-center justify-center gap-2 text-sm sm:text-base">
+                        <a href="#safari-packages" class="btn-desert-animated font-bold rounded-full px-7 py-3.5 text-white text-center shadow-lg inline-flex items-center justify-center gap-2 text-sm sm:text-base w-full sm:w-auto min-h-[44px]">
                             <i class="bi bi-compass"></i> View Safaris & Reserve Seats
                         </a>
-                        <a href="https://wa.me/971502456056?text={{ urlencode('Hi Dunes Discovery Tourism, I am staying in ' . $locationData['name'] . ' and would like to inquire about Desert Safari hotel pickup.') }}" target="_blank" rel="noopener" class="btn-whatsapp border border-white/25 hover:bg-white/10 text-white font-bold rounded-full px-6 py-3.5 text-center transition-colors inline-flex items-center justify-center gap-2 text-sm sm:text-base cursor-pointer" data-action="whatsapp" data-tour-name="Dubai Desert Safari ({{ $locationData['name'] }})">
+                        <a href="https://wa.me/971502456056?text={{ urlencode('Hi Dunes Discovery Tourism, I am staying in ' . $locationData['name'] . ' and would like to inquire about Desert Safari hotel pickup.') }}" target="_blank" rel="noopener" class="btn-whatsapp border border-white/25 hover:bg-white/10 text-white font-bold rounded-full px-6 py-3.5 text-center transition-colors inline-flex items-center justify-center gap-2 text-sm sm:text-base cursor-pointer w-full sm:w-auto min-h-[44px]" data-action="whatsapp" data-tour-name="Dubai Desert Safari ({{ $locationData['name'] }})">
                             <i class="bi bi-whatsapp text-emerald-400"></i> WhatsApp Concierge
                         </a>
                     </div>

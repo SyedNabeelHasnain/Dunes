@@ -287,11 +287,11 @@
                                 @endif
                             </div>
 
-                            <div class="pt-4 mt-3 border-t border-slate-200 flex gap-2 rc-btn-action">
-                                <a href="{{ localized_route('tours.show', $t->slug) }}" class="flex-1 text-center border border-slate-300 hover:border-slate-800 text-slate-800 rounded-full py-2 text-xs font-bold transition-colors">
-                                    {{ __('ui.rate_card.details') }} <i class="bi bi-arrow-right rtl:rotate-180"></i>
+                            <div class="pt-4 mt-3 border-t border-slate-200 flex flex-col sm:flex-row gap-2 rc-btn-action">
+                                <a href="{{ localized_route('tours.show', $t->slug) }}" class="flex-1 text-center border border-slate-300 hover:border-slate-800 text-slate-800 rounded-full py-2.5 px-3 text-xs font-bold transition-colors min-h-[40px] inline-flex items-center justify-center">
+                                    {{ __('ui.rate_card.details') }} <i class="bi bi-arrow-right rtl:rotate-180 ms-1"></i>
                                 </a>
-                                <button type="button" class="btn-desert-animated rounded-full px-4 py-2 text-xs font-bold text-white shadow-xs cursor-pointer" data-action="open-booking" data-tour="{{ $t->id }}" @click.stop="$store.modal.open('booking', { tourId: {{ $t->id }} })">
+                                <button type="button" class="btn-desert-animated rounded-full px-4 py-2.5 text-xs font-bold text-white shadow-xs cursor-pointer min-h-[40px] inline-flex items-center justify-center" data-action="open-booking" data-tour="{{ $t->id }}" @click.stop="$store.modal.open('booking', { tourId: {{ $t->id }} })">
                                     {{ __('ui.rate_card.book_tour') }}
                                 </button>
                             </div>

@@ -33,8 +33,8 @@ if (! function_exists('renderFloatingInput')) {
         $autocomplete = $opts['autocomplete'] ?? '';
         $required = ! empty($opts['required']);
         $wrapperClass = $opts['wrapperClass'] ?? 'relative rounded-xl';
-        $inputClass = $opts['inputClass'] ?? 'w-full rounded-xl border border-slate-200 px-3.5 pt-5 pb-2 text-xs font-semibold text-slate-800 outline-hidden focus:border-primary';
-        $labelClass = $opts['labelClass'] ?? 'absolute text-[10px] uppercase font-bold text-slate-400 left-3.5 top-1.5 transition-all pointer-events-none';
+        $inputClass = $opts['inputClass'] ?? 'w-full rounded-xl border border-slate-200 px-3.5 pt-5 pb-2 text-base sm:text-xs font-semibold text-slate-800 outline-hidden focus:border-primary';
+        $labelClass = $opts['labelClass'] ?? 'absolute text-[10px] uppercase font-bold text-slate-400 start-3.5 top-1.5 transition-all pointer-events-none';
         $wrapperAttrs = $opts['wrapperAttrs'] ?? [];
         $inputAttrs = $opts['inputAttrs'] ?? [];
         $labelAttrs = $opts['labelAttrs'] ?? [];

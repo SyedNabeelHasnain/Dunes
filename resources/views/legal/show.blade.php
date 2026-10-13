@@ -189,15 +189,35 @@
                 <span class="hidden md:flex items-center gap-1.5"><i class="bi bi-translate text-primary"></i> Bilingual (EN / AR)</span>
             </div>
 
-            <div class="flex items-center gap-2">
-                <button type="button" onclick="window.print()" class="text-xs sm:text-sm border border-slate-300 hover:bg-slate-100 text-slate-700 font-medium rounded-full px-3.5 py-1.5 inline-flex items-center gap-1.5 transition-colors cursor-pointer">
+            <div class="flex items-center gap-2 flex-wrap">
+                <button type="button" onclick="window.print()" class="text-xs sm:text-sm border border-slate-300 hover:bg-slate-100 text-slate-700 font-medium rounded-full px-4 py-2 inline-flex items-center gap-1.5 transition-colors cursor-pointer min-h-[40px]">
                     <i class="bi bi-printer"></i>
                     <span>Print / Save PDF</span>
                 </button>
-                <a href="https://wa.me/{{ preg_replace('/[^0-9]/','', $waPhone ?? '971502456056') }}?text={{ urlencode('Hello Dunes Discovery Tourism, I have an inquiry regarding: ' . $page->title) }}" target="_blank" rel="noopener" class="btn-whatsapp text-xs sm:text-sm border border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white font-medium rounded-full px-3.5 py-1.5 inline-flex items-center gap-1.5 transition-colors cursor-pointer" data-action="whatsapp" data-tour-name="{{ $page->title }}">
+                <a href="https://wa.me/{{ preg_replace('/[^0-9]/','', $waPhone ?? '971502456056') }}?text={{ urlencode('Hello Dunes Discovery Tourism, I have an inquiry regarding: ' . $page->title) }}" target="_blank" rel="noopener" class="btn-whatsapp text-xs sm:text-sm border border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white font-medium rounded-full px-4 py-2 inline-flex items-center gap-1.5 transition-colors cursor-pointer min-h-[40px]" data-action="whatsapp" data-tour-name="{{ $page->title }}">
                     <i class="bi bi-whatsapp"></i>
                     <span>Inquire via WhatsApp</span>
                 </a>
+            </div>
+        </div>
+
+        <!-- Table of Contents Quick Jump (Mobile Accordion) -->
+        <div class="lg:hidden mb-6" x-data="{ openToc: false }">
+            <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
+                <button type="button" @click="openToc = !openToc" class="w-full px-5 py-3.5 flex items-center justify-between text-start font-bold text-slate-900 text-sm cursor-pointer min-h-[48px]">
+                    <span class="inline-flex items-center gap-2">
+                        <i class="bi bi-list-nested text-primary"></i>
+                        <span>{{ $isAr ? 'أقسام الوثيقة (انتقال سريع)' : 'Document Sections (Quick Jump)' }}</span>
+                    </span>
+                    <i class="bi bi-chevron-down transition-transform duration-200 text-slate-500" :class="openToc ? 'rotate-180 text-primary' : ''"></i>
+                </button>
+                <div x-show="openToc" x-collapse x-cloak class="px-5 pb-4 pt-1 border-t border-slate-100 flex flex-col gap-1">
+                    @foreach($page->sections as $sec)
+                    <a href="#{{ $isAr ? 'sec-ar-' . $sec->id : 'sec-' . $sec->id }}" @click="openToc = false" class="py-2 px-3 text-xs text-slate-700 hover:text-primary hover:bg-slate-50 rounded-lg transition-colors">
+                        {{ $isAr && $sec->heading_ar ? $sec->heading_ar : $sec->heading }}
+                    </a>
+                    @endforeach
+                </div>
             </div>
         </div>
 

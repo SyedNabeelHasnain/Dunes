@@ -34,18 +34,18 @@
                     <!-- Name Input -->
                     <div class="md:col-span-4 relative">
                         <i class="bi bi-person absolute start-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                        <input type="text" name="name" id="newsletterName" class="w-full rounded-full ps-11 pe-4 py-3 bg-white text-slate-800 text-sm font-semibold border-0 shadow-sm focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="{{ __('ui.newsletter.name_placeholder') }}" maxlength="100">
+                        <input type="text" name="name" id="newsletterName" class="w-full rounded-full ps-11 pe-4 py-3 bg-white text-slate-800 text-base sm:text-sm font-semibold border-0 shadow-sm focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="{{ __('ui.newsletter.name_placeholder') }}" maxlength="100">
                     </div>
 
                     <!-- Email Input -->
                     <div class="md:col-span-5 relative">
                         <i class="bi bi-envelope absolute start-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                        <input type="email" name="email" id="newsletterEmail" class="w-full rounded-full ps-11 pe-4 py-3 bg-white text-slate-800 text-sm font-semibold border-0 shadow-sm focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="{{ __('ui.newsletter.email_placeholder') }}" required maxlength="255">
+                        <input type="email" name="email" id="newsletterEmail" class="w-full rounded-full ps-11 pe-4 py-3 bg-white text-slate-800 text-base sm:text-sm font-semibold border-0 shadow-sm focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="{{ __('ui.newsletter.email_placeholder') }}" required maxlength="255">
                     </div>
 
                     <!-- Submit Button -->
                     <div class="md:col-span-3">
-                        <button type="submit" id="btnNewsletterSubmit" class="w-full rounded-full py-3 px-4 font-bold text-white bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 shadow-md flex items-center justify-center gap-2 text-sm transition-all cursor-pointer">
+                        <button type="submit" id="btnNewsletterSubmit" class="w-full rounded-full py-3 min-h-[48px] px-4 font-bold text-white bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 shadow-md flex items-center justify-center gap-2 text-sm transition-all cursor-pointer">
                             <span id="newsletterBtnText" class="inline-flex items-center gap-2"><span>{{ __('ui.newsletter.join_btn') }}</span><i class="bi bi-arrow-right rtl:rotate-180"></i></span>
                             <span id="newsletterBtnLoader" class="hidden items-center gap-2" style="display: none;"><svg class="animate-spin -ms-1 me-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span>{{ __('ui.newsletter.subscribing') }}</span></span>
                         </button>
@@ -53,7 +53,7 @@
                 </div>
 
                 <!-- Consent & Privacy Disclaimer -->
-                <div class="flex items-center gap-2 pt-2">
+                <div class="flex items-center gap-2 pt-2 min-h-[44px]">
                     <input class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer" type="checkbox" name="consent" id="newsletterConsent" required checked>
                     <label class="text-xs text-slate-300 cursor-pointer" for="newsletterConsent">
                         {{ __('ui.newsletter.consent_text') }}

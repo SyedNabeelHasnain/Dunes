@@ -19,10 +19,10 @@
             The page or tour experience you are searching for might have been relocated, renamed, or is temporarily unavailable.
         </p>
         <div class="flex flex-col sm:flex-row justify-center gap-3">
-            <a href="{{ localized_route('home') }}" class="btn-desert-animated px-5 py-3 rounded-full font-bold text-white text-sm shadow-md inline-flex items-center justify-center gap-2">
+            <a href="{{ localized_route('home') }}" class="btn-desert-animated px-5 py-3 rounded-full font-bold text-white text-sm shadow-md inline-flex items-center justify-center gap-2 w-full sm:w-auto min-h-[44px]">
                 <i class="bi bi-house-door-fill"></i> {{ __('ui.nav.home') }}
             </a>
-            <a href="{{ localized_route('tours.index') }}" class="border-2 border-primary text-primary hover:bg-primary hover:text-white px-5 py-3 rounded-full font-bold text-sm transition-colors inline-flex items-center justify-center gap-2">
+            <a href="{{ localized_route('tours.index') }}" class="border-2 border-primary text-primary hover:bg-primary hover:text-white px-5 py-3 rounded-full font-bold text-sm transition-colors inline-flex items-center justify-center gap-2 w-full sm:w-auto min-h-[44px]">
                 <i class="bi bi-grid-fill"></i> {{ __('ui.common.view_all_tours') }}
             </a>
         </div>

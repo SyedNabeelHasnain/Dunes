@@ -90,7 +90,7 @@
 <!-- Regulatory E-E-A-T & Trust Bar -->
 <section class="bg-slate-50 py-3.5 border-b border-slate-200 shadow-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
             <div class="flex items-center gap-2.5">
                 <i class="bi bi-patch-check-fill text-primary text-xl shrink-0"></i>
                 <div>
@@ -126,12 +126,12 @@
 <!-- Story Section -->
 <section class="py-12 sm:py-20 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             <div class="lg:col-span-6">
                 <div class="relative">
                     <img src="{{ asset('images/dubai-desert-safari-tour-dune-discovery-tourism.avif') }}" alt="Dunes Discovery Tourism Desert Safari Experience Dubai" width="800" height="600" loading="lazy" class="w-full rounded-2xl shadow-xl object-cover" onerror="this.src='https://placehold.co/800x600/F58F43/white?text=Our+Story'">
-                    <div class="hidden sm:block absolute -bottom-6 -end-6 bg-primary text-white p-5 rounded-2xl shadow-2xl">
-                        <div class="text-2xl font-black mb-0.5">{{ __('ui.about_story.years_exp') }}</div>
+                    <div class="mt-4 sm:mt-0 sm:absolute sm:-bottom-6 sm:-end-6 bg-primary text-white p-4 sm:p-5 rounded-2xl shadow-xl sm:shadow-2xl inline-block sm:block">
+                        <div class="text-xl sm:text-2xl font-black mb-0.5">{{ __('ui.about_story.years_exp') }}</div>
                         <span class="text-xs text-white/80 block">{{ __('ui.about_story.years_sub') }}</span>
                     </div>
                 </div>
@@ -221,7 +221,7 @@
 <!-- Stats Bar Section -->
 <section class="py-8 bg-slate-950">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-3 lg:grid-cols-6 gap-4 text-center">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 text-center">
             <div class="p-2">
                 <i class="bi bi-trophy text-primary text-2xl mb-1.5 block"></i>
                 <div class="text-xl font-bold text-white mb-0.5">#1</div>

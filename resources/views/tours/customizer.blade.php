@@ -139,7 +139,7 @@
 </section>
 
 <!-- Customizer Interactive Builder Section -->
-<section class="py-10 sm:py-16 bg-white">
+<section class="py-10 sm:py-16 pb-28 lg:pb-16 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
             
@@ -468,6 +468,23 @@
     </div>
 </section>
 
+<!-- Sticky Mobile Bottom Calculation Bar (visible on screens below lg) -->
+<div x-data x-show="!$store.modal.active && !$store.mobileNav.open" x-cloak class="fixed bottom-0 inset-x-0 bg-slate-950/95 backdrop-blur-md px-4 py-3 border-t border-white/15 shadow-2xl lg:hidden flex items-center justify-between z-40 pb-safe" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0.75rem));">
+    <div>
+        <span class="text-slate-400 block text-[9px] uppercase font-bold tracking-wider">Estimated Total</span>
+        <div class="text-xl font-black text-amber-400" id="customizerMobileTotalDisplay" data-aed="300">{{ __('ui.common.aed') }} 300</div>
+    </div>
+    <div class="flex items-center gap-2">
+        <a href="#" target="_blank" rel="noopener" class="w-10 h-10 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs" id="customizerMobileWhatsAppBtn" aria-label="Inquire via WhatsApp">
+            <i class="bi bi-whatsapp text-base"></i>
+        </a>
+        <button type="button" class="btn-desert-animated text-xs sm:text-sm font-bold text-white rounded-full px-5 py-2.5 shadow-md whitespace-nowrap cursor-pointer inline-flex items-center gap-1.5 min-h-[40px]" id="customizerMobileBookBtn">
+            <i class="bi bi-calendar-check-fill"></i>
+            <span>{{ __('ui.common.book_online') }}</span>
+        </button>
+    </div>
+</div>
+
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -729,6 +746,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         totalDisplayEl.setAttribute('data-aed', finalTotal);
         totalDisplayEl.innerText = `AED ${finalTotal}`;
+        const mobileTotalDisplayEl = document.getElementById('customizerMobileTotalDisplay');
+        if (mobileTotalDisplayEl) {
+            mobileTotalDisplayEl.setAttribute('data-aed', finalTotal);
+            mobileTotalDisplayEl.innerText = `AED ${finalTotal}`;
+        }
 
         // Dynamic currency conversion
         if (window.Alpine && window.Alpine.store('currency')) {
@@ -748,9 +770,18 @@ document.addEventListener('DOMContentLoaded', function() {
             `Could you please check availability for this custom setup?`;
 
         whatsAppBtn.href = `https://wa.me/{{ preg_replace('/[^0-9]/','',(string)($settings['site_whatsapp'] ?? '971502456056')) }}?text=${waMessage}`;
+        const mobileWhatsAppBtn = document.getElementById('customizerMobileWhatsAppBtn');
+        if (mobileWhatsAppBtn) {
+            mobileWhatsAppBtn.href = whatsAppBtn.href;
+        }
     }
 
     // Book Now Handler: transfer custom spec to Booking Modal
+    const mobileBookBtn = document.getElementById('customizerMobileBookBtn');
+    if (mobileBookBtn && bookNowBtn) {
+        mobileBookBtn.addEventListener('click', () => bookNowBtn.click());
+    }
+
     if (bookNowBtn) {
         bookNowBtn.addEventListener('click', function() {
             const promo = (promoInputEl ? promoInputEl.value : '').trim();

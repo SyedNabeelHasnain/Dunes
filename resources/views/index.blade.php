@@ -166,7 +166,7 @@ if (!function_exists('renderReviewCardMarkup')) {
             <i class="bi bi-star-fill text-amber-400"></i>
             <span class="font-semibold text-white">Rated 4.9/5 by 2,847+ Travelers</span>
         </div>
-        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold mb-4 text-white tracking-tight leading-tight">
+        <h1 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 text-white tracking-tight leading-tight">
             Top-Rated <span class="text-gradient-primary">Dubai Desert Safari</span> Tours & Adventures
         </h1>
         <p class="text-base sm:text-lg lg:text-xl mb-8 mx-auto text-white/90 max-w-2xl font-light leading-relaxed">
@@ -194,12 +194,12 @@ if (!function_exists('renderReviewCardMarkup')) {
             <p class="text-xs sm:text-sm text-white/80 leading-relaxed">Enjoy a premium desert safari experience with chauffeur-driven Luxury Land Cruiser hotel pickup and drop-off. Comfortable seating, professional drivers, and hassle-free transfers included with every booking.</p>
         </div>
 
-        <div class="flex justify-center items-center gap-6 sm:gap-12 opacity-85 text-center">
+        <div class="flex justify-center items-center gap-3 sm:gap-12 opacity-85 text-center">
             <div>
                 <div class="text-2xl sm:text-3xl font-black text-white">10K+</div>
                 <div class="uppercase font-semibold text-[10px] sm:text-xs tracking-wider text-slate-300">{{ __('ui.common.happy_guests') }}</div>
             </div>
-            <div class="border-s border-e border-white/25 px-6 sm:px-12">
+            <div class="border-s border-e border-white/25 px-3 sm:px-12">
                 <div class="text-2xl sm:text-3xl font-black text-white">4.9/5</div>
                 <div class="uppercase font-semibold text-[10px] sm:text-xs tracking-wider text-slate-300">{{ __('ui.trust_strip.top_rated') }}</div>
             </div>
@@ -214,7 +214,7 @@ if (!function_exists('renderReviewCardMarkup')) {
 <!-- Regulatory E-E-A-T & Trust Bar -->
 <section class="bg-slate-50 py-3.5 border-b border-slate-200 shadow-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
             <div class="flex items-center gap-2.5">
                 <i class="bi bi-patch-check-fill text-primary text-xl shrink-0"></i>
                 <div>
@@ -250,7 +250,7 @@ if (!function_exists('renderReviewCardMarkup')) {
 <!-- Stats Bar Section -->
 <div class="stats-bar bg-slate-950 py-5 shadow-lg relative z-20">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-3 lg:grid-cols-6 gap-4 text-center">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 text-center">
             <div class="p-2">
                 <i class="bi bi-trophy text-primary text-2xl mb-1.5 block"></i>
                 <div class="text-xl font-bold text-white mb-0.5">#1</div>
@@ -297,7 +297,7 @@ if (!function_exists('renderReviewCardMarkup')) {
             </p>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <div class="group bg-slate-50 hover:bg-white rounded-2xl p-6 border border-slate-200 hover:border-primary/50 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col h-full hover:-translate-y-1">
                 <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 text-2xl group-hover:scale-110 transition-transform">
                     <i class="bi bi-sunset-fill"></i>
@@ -427,14 +427,14 @@ if (!function_exists('renderReviewCardMarkup')) {
                                     <span class="block text-[10px] uppercase font-bold text-slate-500">{{ __('ui.home_popular.starting_from') }}</span>
                                     <span class="text-lg font-black text-primary" data-aed="{{ $minPrice }}">{{ __('ui.common.aed') }} {{ number_format($minPrice) }}</span>
                                 </div>
-                                <div class="flex items-center gap-1.5">
-                                    <button type="button" class="border border-slate-300 hover:border-primary text-slate-700 bg-white hover:text-primary text-xs font-semibold rounded-full px-2.5 py-1 transition-colors btn-toggle-compare inline-flex items-center gap-1 cursor-pointer" data-tour-id="{{ $t->id }}" onclick="event.preventDefault(); event.stopPropagation(); window.DunesCompare && window.DunesCompare.toggle(this);">
-                                        <i class="bi bi-shuffle"></i> <span class="compare-btn-text">{{ __('ui.home_popular.compare') }}</span>
+                                <div class="flex items-center gap-1.5 shrink-0">
+                                    <button type="button" class="border border-slate-300 hover:border-primary text-slate-700 bg-white hover:text-primary text-xs font-semibold rounded-full px-2.5 py-1 transition-colors btn-toggle-compare inline-flex items-center gap-1 cursor-pointer min-h-[36px]" data-tour-id="{{ $t->id }}" onclick="event.preventDefault(); event.stopPropagation(); window.DunesCompare && window.DunesCompare.toggle(this);">
+                                        <i class="bi bi-shuffle"></i> <span class="compare-btn-text hidden sm:inline">{{ __('ui.home_popular.compare') }}</span>
                                     </button>
-                                    <span role="button" tabindex="0" class="btn-circle-whatsapp fab-whatsapp w-8 h-8 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center cursor-pointer shadow-xs transition-transform hover:scale-105" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp" onclick="event.preventDefault(); event.stopPropagation(); if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp('{{ addslashes($t->name) }}'); }" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();if(window.App&&typeof window.App.openWhatsApp==='function'){window.App.openWhatsApp('{{ addslashes($t->name) }}');}}">
+                                    <span role="button" tabindex="0" class="btn-circle-whatsapp fab-whatsapp w-9 h-9 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center cursor-pointer shadow-xs transition-transform hover:scale-105 shrink-0" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp" onclick="event.preventDefault(); event.stopPropagation(); if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp('{{ addslashes($t->name) }}'); }" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();if(window.App&&typeof window.App.openWhatsApp==='function'){window.App.openWhatsApp('{{ addslashes($t->name) }}');}}">
                                         <i class="bi bi-whatsapp text-sm"></i>
                                     </span>
-                                    <div class="w-8 h-8 rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white flex items-center justify-center transition-colors">
+                                    <div class="w-9 h-9 rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white flex items-center justify-center transition-colors shrink-0">
                                         <i class="bi bi-arrow-right rtl:rotate-180 text-sm"></i>
                                     </div>
                                 </div>
@@ -660,8 +660,8 @@ if (!function_exists('renderReviewCardMarkup')) {
 
     <!-- Track 1: Google Verified Reviews (Forward Animation) -->
     <div class="reviews-marquee relative w-full overflow-hidden select-none py-2 mb-6">
-        <div class="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-28 bg-gradient-to-r from-[#FAF6F2] to-transparent z-10"></div>
-        <div class="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-28 bg-gradient-to-l from-[#FAF6F2] to-transparent z-10"></div>
+        <div class="pointer-events-none absolute inset-y-0 start-0 w-6 sm:w-28 bg-gradient-to-r rtl:bg-gradient-to-l from-[#FAF6F2] to-transparent z-10"></div>
+        <div class="pointer-events-none absolute inset-y-0 end-0 w-6 sm:w-28 bg-gradient-to-l rtl:bg-gradient-to-r from-[#FAF6F2] to-transparent z-10"></div>
 
         <div class="reviews-track flex gap-4 w-max shrink-0">
             <div class="reviews-group flex gap-4 shrink-0">
@@ -679,8 +679,8 @@ if (!function_exists('renderReviewCardMarkup')) {
 
     <!-- Track 2: TripAdvisor & Verified Travelers (Reverse Animation) -->
     <div class="reviews-marquee reverse relative w-full overflow-hidden select-none py-2">
-        <div class="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-28 bg-gradient-to-r from-[#FAF6F2] to-transparent z-10"></div>
-        <div class="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-28 bg-gradient-to-l from-[#FAF6F2] to-transparent z-10"></div>
+        <div class="pointer-events-none absolute inset-y-0 start-0 w-6 sm:w-28 bg-gradient-to-r rtl:bg-gradient-to-l from-[#FAF6F2] to-transparent z-10"></div>
+        <div class="pointer-events-none absolute inset-y-0 end-0 w-6 sm:w-28 bg-gradient-to-l rtl:bg-gradient-to-r from-[#FAF6F2] to-transparent z-10"></div>
 
         <div class="reviews-track flex gap-4 w-max shrink-0">
             <div class="reviews-group flex gap-4 shrink-0">
@@ -779,34 +779,34 @@ if (!function_exists('renderReviewCardMarkup')) {
         </div>
 
         <!-- Filter Tabs for Home -->
-        <div class="flex items-center gap-2 overflow-x-auto pb-4 mb-8 scrollbar-none">
+        <div class="flex items-center gap-2 overflow-x-auto pb-4 mb-8 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 snap-x">
             <button type="button" @click="category = 'all'" 
                 :class="category === 'all' ? 'bg-primary text-white shadow-sm' : 'bg-white/10 hover:bg-white/20 text-white/80'"
-                class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5">
+                class="px-4 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5 min-h-[42px] shrink-0 snap-start">
                 <i class="bi bi-grid-fill"></i>
                 <span>{{ __('ui.gallery_section.filter_all') ?? 'All Moments' }}</span>
             </button>
             <button type="button" @click="category = 'red_dunes'" 
                 :class="category === 'red_dunes' ? 'bg-primary text-white shadow-sm' : 'bg-white/10 hover:bg-white/20 text-white/80'"
-                class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5">
+                class="px-4 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5 min-h-[42px] shrink-0 snap-start">
                 <i class="bi bi-compass-fill"></i>
                 <span>{{ __('ui.gallery_section.filter_red_dunes') ?? 'Red Dunes' }}</span>
             </button>
             <button type="button" @click="category = 'buggy_quad'" 
                 :class="category === 'buggy_quad' ? 'bg-primary text-white shadow-sm' : 'bg-white/10 hover:bg-white/20 text-white/80'"
-                class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5">
+                class="px-4 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5 min-h-[42px] shrink-0 snap-start">
                 <i class="bi bi-lightning-charge-fill"></i>
                 <span>{{ __('ui.gallery_section.filter_buggy_quad') ?? 'Buggies & Quads' }}</span>
             </button>
             <button type="button" @click="category = 'camp_bbq'" 
                 :class="category === 'camp_bbq' ? 'bg-primary text-white shadow-sm' : 'bg-white/10 hover:bg-white/20 text-white/80'"
-                class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5">
+                class="px-4 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5 min-h-[42px] shrink-0 snap-start">
                 <i class="bi bi-fire"></i>
                 <span>{{ __('ui.gallery_section.filter_camp_bbq') ?? 'Camp & BBQ' }}</span>
             </button>
             <button type="button" @click="category = 'sunset_camels'" 
                 :class="category === 'sunset_camels' ? 'bg-primary text-white shadow-sm' : 'bg-white/10 hover:bg-white/20 text-white/80'"
-                class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5">
+                class="px-4 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5 min-h-[42px] shrink-0 snap-start">
                 <i class="bi bi-sunset-fill"></i>
                 <span>{{ __('ui.gallery_section.filter_sunset_camels') ?? 'Sunset & Camels' }}</span>
             </button>
@@ -903,7 +903,7 @@ if (!function_exists('renderReviewCardMarkup')) {
         <!-- Close Button Top Right -->
         <button type="button" 
                 @click.stop="closeLightbox()" 
-                class="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 w-11 h-11 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-lg hover:scale-105 active:scale-95">
+                class="absolute top-4 end-4 sm:top-6 sm:end-6 z-50 w-11 h-11 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-lg hover:scale-105 active:scale-95">
             <i class="bi bi-x-lg text-lg"></i>
             <span class="sr-only">Close</span>
         </button>
@@ -911,7 +911,7 @@ if (!function_exists('renderReviewCardMarkup')) {
         <!-- Previous Button -->
         <button type="button" 
                 @click.stop="prevItem()" 
-                class="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-50 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-lg hover:scale-105 active:scale-95">
+                class="absolute start-2 sm:start-6 top-1/2 -translate-y-1/2 z-50 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-lg hover:scale-105 active:scale-95">
             <i class="bi bi-chevron-left text-xl"></i>
             <span class="sr-only">Previous</span>
         </button>
@@ -919,7 +919,7 @@ if (!function_exists('renderReviewCardMarkup')) {
         <!-- Next Button -->
         <button type="button" 
                 @click.stop="nextItem()" 
-                class="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 z-50 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-lg hover:scale-105 active:scale-95">
+                class="absolute end-2 sm:end-6 top-1/2 -translate-y-1/2 z-50 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-lg hover:scale-105 active:scale-95">
             <i class="bi bi-chevron-right text-xl"></i>
             <span class="sr-only">Next</span>
         </button>
@@ -928,7 +928,7 @@ if (!function_exists('renderReviewCardMarkup')) {
         <div class="relative z-20 w-full max-w-5xl max-h-[92vh] flex flex-col lg:flex-row bg-slate-900 rounded-3xl overflow-hidden border border-white/10 shadow-2xl" 
              @click.stop>
 
-            <div class="relative lg:w-3/5 bg-black flex items-center justify-center min-h-[300px] sm:min-h-[420px] max-h-[60vh] lg:max-h-[85vh] p-2">
+            <div class="relative lg:w-3/5 bg-black flex items-center justify-center min-h-[220px] sm:min-h-[420px] max-h-[48vh] lg:max-h-[85vh] p-2">
                 <template x-if="activeItem && activeItem.type === 'video'">
                     <div class="w-full h-full flex items-center justify-center">
                         <video :src="activeItem.url" controls autoplay class="max-w-full max-h-[58vh] lg:max-h-[80vh] rounded-xl object-contain"></video>
@@ -1132,10 +1132,10 @@ if (!function_exists('renderReviewCardMarkup')) {
             @foreach($faqs as $index => $f)
             <div class="bg-slate-50 hover:bg-slate-50/80 rounded-2xl border border-slate-200 overflow-hidden transition-all duration-200">
                 <button type="button" 
-                        class="w-full text-start px-5 sm:px-6 py-4.5 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
+                        class="w-full text-start px-5 sm:px-6 py-4 sm:py-5 font-bold text-slate-900 flex items-start justify-between gap-4 cursor-pointer min-h-[52px]"
                         @click="activeFaq = (activeFaq === {{ $index }} ? null : {{ $index }})">
-                    <span class="text-sm sm:text-base">{{ $f->question }}</span>
-                    <i class="bi bi-chevron-down transition-transform duration-300 text-slate-500 shrink-0"
+                    <span class="text-sm sm:text-base pt-0.5">{{ $f->question }}</span>
+                    <i class="bi bi-chevron-down transition-transform duration-300 text-slate-500 shrink-0 mt-1"
                        :class="activeFaq === {{ $index }} ? 'rotate-180 text-primary' : ''"></i>
                 </button>
                 <div x-show="activeFaq === {{ $index }}" 
@@ -1173,18 +1173,18 @@ if (!function_exists('renderReviewCardMarkup')) {
         <p class="text-base sm:text-lg mb-8 text-slate-300 max-w-2xl mx-auto leading-relaxed font-normal">
             {{ __('ui.home_cta.subtitle') }}
         </p>
-        <div class="flex flex-wrap justify-center gap-4">
-            <button type="button" class="btn-desert-animated text-base sm:text-lg font-bold rounded-full px-8 py-3.5 shadow-xl inline-flex items-center gap-2 cursor-pointer text-white" @click="$store.modal.open('booking')">
+        <div class="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4 max-w-md sm:max-w-none mx-auto">
+            <button type="button" class="btn-desert-animated text-base sm:text-lg font-bold rounded-full px-8 py-3.5 shadow-xl inline-flex items-center justify-center gap-2 cursor-pointer text-white w-full sm:w-auto" @click="$store.modal.open('booking')">
                 <i class="bi bi-calendar-check text-lg"></i>
                 <span>{{ __('ui.home_cta.book_btn') }}</span>
             </button>
             @php $waNumClean = preg_replace('/[^0-9]/', '', $settings['site_whatsapp'] ?? '971502456056'); @endphp
-            <a href="https://wa.me/{{ $waNumClean }}?text={{ urlencode('Hi Dunes Discovery Tourism! I would like to inquire about booking a desert safari.') }}" target="_blank" rel="noopener" class="btn-whatsapp-animated border border-slate-700 hover:border-white bg-slate-900/80 hover:bg-slate-900 text-white text-base font-bold rounded-full px-6 py-3.5 inline-flex items-center gap-2 shadow-md transition-all cursor-pointer" data-action="whatsapp">
+            <a href="https://wa.me/{{ $waNumClean }}?text={{ urlencode('Hi Dunes Discovery Tourism! I would like to inquire about booking a desert safari.') }}" target="_blank" rel="noopener" class="btn-whatsapp-animated border border-slate-700 hover:border-white bg-slate-900/80 hover:bg-slate-900 text-white text-base font-bold rounded-full px-6 py-3.5 inline-flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer w-full sm:w-auto" data-action="whatsapp">
                 <i class="bi bi-whatsapp text-emerald-400 text-lg"></i>
                 <span>{{ __('ui.home_cta.whatsapp_btn') }}</span>
             </a>
         </div>
-        <div class="flex flex-wrap justify-center items-center gap-4 sm:gap-8 mt-10 text-slate-300 text-xs sm:text-sm font-medium">
+        <div class="grid grid-cols-2 sm:flex sm:flex-wrap justify-center items-center gap-3 sm:gap-8 mt-8 sm:mt-10 text-slate-300 text-xs sm:text-sm font-medium text-start sm:text-center">
             <div class="inline-flex items-center gap-1.5"><i class="bi bi-check-circle-fill text-amber-400"></i> {{ __('ui.home_cta.badge_cancel') }}</div>
             <div class="inline-flex items-center gap-1.5"><i class="bi bi-check-circle-fill text-amber-400"></i> {{ __('ui.home_cta.badge_transfers') }}</div>
             <div class="inline-flex items-center gap-1.5"><i class="bi bi-check-circle-fill text-amber-400"></i> {{ __('ui.home_cta.badge_payment') }}</div>

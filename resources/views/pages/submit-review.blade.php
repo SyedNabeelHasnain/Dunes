@@ -103,9 +103,11 @@
                     <!-- Rating Picker -->
                     <div class="text-center mb-6">
                         <label class="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-2.5">How was your overall experience?</label>
-                        <div class="flex justify-center items-center gap-3 text-3xl sm:text-4xl cursor-pointer" id="starRatingBox">
+                        <div class="flex justify-center items-center gap-1 sm:gap-2 cursor-pointer" id="starRatingBox">
                             @for($i = 1; $i <= 5; $i++)
-                                <i class="bi bi-star-fill text-slate-700 hover:scale-110 transition-all {{ $i <= $score ? 'text-amber-400' : '' }}" data-val="{{ $i }}"></i>
+                                <button type="button" class="w-11 h-11 flex items-center justify-center text-3xl sm:text-4xl text-slate-700 hover:scale-110 transition-all focus:outline-none cursor-pointer {{ $i <= $score ? 'text-amber-400' : '' }}" data-val="{{ $i }}" aria-label="{{ $i }} Stars">
+                                    <i class="bi bi-star-fill pointer-events-none"></i>
+                                </button>
                             @endfor
                         </div>
                         <input type="hidden" name="rating" id="ratingInput" value="{{ $score }}">
@@ -118,20 +120,20 @@
                     <!-- Guest Name -->
                     <div class="mb-4">
                         <label for="guestName" class="block text-white text-xs sm:text-sm font-bold mb-1.5">{{ __('ui.review_submit.full_name') }} <span class="text-rose-500">*</span></label>
-                        <input type="text" name="guest_name" id="guestName" required class="w-full bg-slate-950 border border-slate-700 focus:border-primary text-white rounded-xl px-4 py-3 text-sm focus:outline-none transition-colors" placeholder="{{ __('ui.booking.name_placeholder') }}" value="{{ old('guest_name') }}">
+                        <input type="text" name="guest_name" id="guestName" required class="w-full bg-slate-950 border border-slate-700 focus:border-primary text-white rounded-xl px-4 py-3 text-base sm:text-sm focus:outline-none transition-colors" placeholder="{{ __('ui.booking.name_placeholder') }}" value="{{ old('guest_name') }}">
                     </div>
                     @endif
 
                     <!-- Review Title -->
                     <div class="mb-4">
                         <label for="reviewTitle" class="block text-white text-xs sm:text-sm font-bold mb-1.5">{{ __('ui.review_submit.headline') }}</label>
-                        <input type="text" name="review_title" id="reviewTitle" class="w-full bg-slate-950 border border-slate-700 focus:border-primary text-white rounded-xl px-4 py-3 text-sm focus:outline-none transition-colors" placeholder="{{ __('ui.review_submit.headline_placeholder') }}" value="{{ old('review_title') }}">
+                        <input type="text" name="review_title" id="reviewTitle" class="w-full bg-slate-950 border border-slate-700 focus:border-primary text-white rounded-xl px-4 py-3 text-base sm:text-sm focus:outline-none transition-colors" placeholder="{{ __('ui.review_submit.headline_placeholder') }}" value="{{ old('review_title') }}">
                     </div>
 
                     <!-- Review Text -->
                     <div class="mb-6">
                         <label for="reviewText" class="block text-white text-xs sm:text-sm font-bold mb-1.5">{{ __('ui.review_submit.story') }} <span class="text-rose-500">*</span></label>
-                        <textarea name="review_text" id="reviewText" rows="4" required class="w-full bg-slate-950 border border-slate-700 focus:border-primary text-white rounded-xl p-4 text-sm focus:outline-none transition-colors leading-relaxed" placeholder="{{ __('ui.review_submit.story_placeholder') }}">{{ old('review_text') }}</textarea>
+                        <textarea name="review_text" id="reviewText" rows="4" required class="w-full bg-slate-950 border border-slate-700 focus:border-primary text-white rounded-xl p-4 text-base sm:text-sm focus:outline-none transition-colors leading-relaxed" placeholder="{{ __('ui.review_submit.story_placeholder') }}">{{ old('review_text') }}</textarea>
                         <span class="text-slate-400 text-[11px] block mt-1">{{ __('ui.review_submit.min_chars') }}</span>
                     </div>
 
@@ -148,7 +150,7 @@
                     </div>
 
                     <!-- Submit Button -->
-                    <button type="submit" class="btn-desert-animated w-full font-bold rounded-full py-4 text-white text-sm sm:text-base shadow-xl inline-flex items-center justify-center gap-2 cursor-pointer">
+                    <button type="submit" class="btn-desert-animated w-full font-bold rounded-full py-4 text-white text-sm sm:text-base shadow-xl inline-flex items-center justify-center gap-2 cursor-pointer min-h-[48px]">
                         <i class="bi bi-send-fill"></i> {{ __('ui.review_submit.submit_btn') }}
                     </button>
                 </form>
@@ -181,12 +183,13 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     if (starBox && ratingInput) {
-        const stars = starBox.querySelectorAll('i');
+        const stars = starBox.querySelectorAll('[data-val]');
 
         function setRating(val) {
             ratingInput.value = val;
-            stars.forEach((s, idx) => {
-                if (idx < val) {
+            stars.forEach((s) => {
+                const itemVal = parseInt(s.dataset.val);
+                if (itemVal <= val) {
                     s.classList.add('text-amber-400');
                     s.classList.remove('text-slate-700');
                 } else {
@@ -200,14 +203,16 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         stars.forEach(s => {
-            s.addEventListener('click', function () {
+            s.addEventListener('click', function (e) {
+                e.preventDefault();
                 const val = parseInt(this.dataset.val);
                 setRating(val);
             });
             s.addEventListener('mouseenter', function () {
                 const val = parseInt(this.dataset.val);
-                stars.forEach((star, idx) => {
-                    if (idx < val) {
+                stars.forEach((star) => {
+                    const itemVal = parseInt(star.dataset.val);
+                    if (itemVal <= val) {
                         star.classList.add('text-amber-400');
                         star.classList.remove('text-slate-700');
                     } else {
@@ -220,8 +225,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         starBox.addEventListener('mouseleave', function () {
             const current = parseInt(ratingInput.value) || 5;
-            stars.forEach((star, idx) => {
-                if (idx < current) {
+            stars.forEach((star) => {
+                const itemVal = parseInt(star.dataset.val);
+                if (itemVal <= current) {
                     star.classList.add('text-amber-400');
                     star.classList.remove('text-slate-700');
                 } else {
@@ -257,7 +263,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     div.className = 'relative w-20 h-20 rounded-xl overflow-hidden border border-white/20 shadow-sm';
                     div.innerHTML = `
                         <img src="${e.target.result}" alt="Safari photo preview" class="w-full h-full object-cover">
-                        <button type="button" class="absolute top-1 end-1 bg-black/75 hover:bg-black text-white rounded-full w-5 h-5 flex items-center justify-center text-xs cursor-pointer" title="{{ __('ui.common.remove') }}">&times;</button>
+                        <button type="button" class="absolute top-1 end-1 bg-black/80 hover:bg-black text-white rounded-full w-7 h-7 min-w-[28px] min-h-[28px] flex items-center justify-center text-sm cursor-pointer shadow-md" title="{{ __('ui.common.remove') }}">&times;</button>
                     `;
                     div.querySelector('button').addEventListener('click', function (ev) {
                         ev.stopPropagation();

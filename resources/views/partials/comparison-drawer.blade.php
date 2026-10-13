@@ -93,18 +93,18 @@
             <span id="compareCountLabel" x-text="$store.compare.items ? $store.compare.items.length : 0">0</span>/3
         </div>
         <button type="button" 
-                class="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs shadow-sm hover:shadow-md transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5" 
+                class="px-4 py-2 min-h-[44px] rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs shadow-sm hover:shadow-md transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-1.5" 
                 id="openCompareDrawerBtn" 
                 @click="$store.modal.open('compare')">
             <i class="bi bi-shuffle"></i>
             <span>{{ __('ui.common.compare_safaris') }}</span>
         </button>
         <button type="button" 
-                class="text-slate-400 hover:text-white p-0 text-xs transition-colors cursor-pointer" 
+                class="text-slate-400 hover:text-white p-2 min-w-[44px] min-h-[44px] text-xs transition-colors cursor-pointer flex items-center justify-center" 
                 id="clearCompareBtn" 
                 @click="$store.compare.clear()" 
                 title="{{ __('ui.comparison.clear') }}">
-            <i class="bi bi-x-circle-fill"></i>
+            <i class="bi bi-x-circle-fill text-base"></i>
         </button>
     </div>
 </div>
@@ -142,6 +142,9 @@
          x-transition:leave-end="translate-y-full"
          @click.stop>
 
+        <!-- Drag Handle Indicator on Mobile -->
+        <div class="w-12 h-1.5 rounded-full bg-slate-700 mx-auto mt-2.5 mb-0.5 shrink-0 sm:hidden"></div>
+
         <!-- Header -->
         <div class="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-slate-800 bg-slate-900/90 backdrop-blur-md sticky top-0 z-10">
             <div class="flex items-center gap-3">
@@ -155,17 +158,17 @@
             </div>
             <div class="flex items-center gap-2">
                 <button type="button" 
-                        class="px-3 py-1 rounded-full border border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-white text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1.5" 
+                        class="px-3.5 py-1.5 min-h-[38px] rounded-full border border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-white text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer flex items-center justify-center gap-1.5" 
                         id="drawerPresetBtn"
                         @click="$store.compare.loadBestsellers()">
                     <i class="bi bi-lightning-fill text-amber-400"></i>
                     <span>{{ __('ui.comparison.compare_top_3') }}</span>
                 </button>
                 <button type="button" 
-                        class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-colors cursor-pointer" 
+                        class="w-11 h-11 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-colors cursor-pointer" 
                         @click="$store.modal.close()" 
                         aria-label="Close">
-                    <i class="bi bi-x-lg text-xs"></i>
+                    <i class="bi bi-x-lg text-sm"></i>
                 </button>
             </div>
         </div>
@@ -182,7 +185,7 @@
                     {{ __('ui.comparison.empty_msg') }}
                 </p>
                 <button type="button" 
-                        class="px-5 py-2.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs sm:text-sm shadow-md transition-all cursor-pointer inline-flex items-center gap-2" 
+                        class="px-5 py-2.5 min-h-[44px] rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs sm:text-sm shadow-md transition-all cursor-pointer inline-flex items-center justify-center gap-2" 
                         @click="$store.compare.loadBestsellers()">
                     <i class="bi bi-stars"></i>
                     <span>{{ __('ui.comparison.compare_bestsellers') }}</span>

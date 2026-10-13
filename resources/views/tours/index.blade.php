@@ -116,17 +116,17 @@
         </div>
 
         <!-- Interactive Search & Category Filter Controls -->
-        <div class="bg-slate-50 rounded-2xl p-4 sm:p-5 mb-8 border border-slate-200/80 shadow-xs">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+        <div class="bg-slate-50/95 backdrop-blur-md rounded-2xl p-3 sm:p-5 mb-8 border border-slate-200/80 shadow-xs sticky top-[calc(var(--header-h,72px)+0.5rem)] z-20">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 items-center">
                 <div class="lg:col-span-4">
                     <div class="relative">
                         <i class="bi bi-search absolute start-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                        <input type="text" id="tourSearchInput" class="w-full rounded-full ps-11 pe-4 py-2.5 bg-white border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs" placeholder="{{ __('ui.nav.search_placeholder') }}" oninput="handleTourSearch(this.value)">
+                        <input type="text" id="tourSearchInput" class="w-full rounded-full ps-11 pe-4 py-2.5 bg-white border border-slate-200 text-base sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs" placeholder="{{ __('ui.nav.search_placeholder') }}" oninput="handleTourSearch(this.value)">
                     </div>
                 </div>
                 <div class="lg:col-span-8">
-                    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-                        <button onclick="filterTours('')" data-category="" class="filter-btn {{ !$selectedCategorySlug ? 'bg-slate-900 text-white shadow-xs' : 'bg-white text-slate-700 border border-slate-300 hover:border-primary' }} rounded-full px-4 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer transition-colors">
+                    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1 -mx-2 px-2 sm:mx-0 sm:px-0 snap-x">
+                        <button onclick="filterTours('')" data-category="" class="filter-btn {{ !$selectedCategorySlug ? 'bg-slate-900 text-white shadow-xs' : 'bg-white text-slate-700 border border-slate-300 hover:border-primary' }} rounded-full px-4 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer transition-colors min-h-[38px] snap-start">
                             <i class="bi bi-grid-fill"></i> {{ __('ui.common.view_all') }} ({{ $tours->count() }})
                         </button>
                         @foreach($categories as $cat)
@@ -140,7 +140,7 @@
                                 ];
                                 $icon = $iconMap[$cat->slug] ?? 'bi-compass-fill';
                             @endphp
-                            <button onclick="filterTours('{{ $cat->slug }}')" data-category="{{ $cat->slug }}" class="filter-btn {{ $selectedCategorySlug === $cat->slug ? 'bg-slate-900 text-white shadow-xs' : 'bg-white text-slate-700 border border-slate-200 hover:border-slate-300' }} rounded-full px-4 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer transition-colors">
+                            <button onclick="filterTours('{{ $cat->slug }}')" data-category="{{ $cat->slug }}" class="filter-btn {{ $selectedCategorySlug === $cat->slug ? 'bg-slate-900 text-white shadow-xs' : 'bg-white text-slate-700 border border-slate-200 hover:border-slate-300' }} rounded-full px-4 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer transition-colors min-h-[38px] snap-start">
                                 <i class="bi {{ $icon }}"></i> {{ $cat->name }} ({{ $catCount }})
                             </button>
                         @endforeach
@@ -207,13 +207,13 @@
                                         <span class="text-lg font-black text-primary" data-aed="{{ $minPrice }}">{{ __('ui.common.aed') }} {{ number_format($minPrice) }}</span>
                                     </div>
                                     <div class="flex items-center gap-1.5">
-                                        <button type="button" class="border border-slate-300 hover:border-primary text-slate-700 bg-white hover:text-primary text-xs font-semibold rounded-full px-2.5 py-1 transition-colors btn-toggle-compare inline-flex items-center gap-1 cursor-pointer" data-tour-id="{{ $t->id }}" onclick="event.preventDefault(); event.stopPropagation(); window.DunesCompare && window.DunesCompare.toggle(this);">
-                                            <i class="bi bi-shuffle"></i> <span class="compare-btn-text">{{ __('ui.common.compare') }}</span>
+                                        <button type="button" class="border border-slate-300 hover:border-primary text-slate-700 bg-white hover:text-primary text-xs font-semibold rounded-full px-2.5 py-1 transition-colors btn-toggle-compare inline-flex items-center gap-1 cursor-pointer min-h-[36px]" data-tour-id="{{ $t->id }}" onclick="event.preventDefault(); event.stopPropagation(); window.DunesCompare && window.DunesCompare.toggle(this);">
+                                            <i class="bi bi-shuffle"></i> <span class="compare-btn-text hidden sm:inline">{{ __('ui.common.compare') }}</span>
                                         </button>
-                                        <span role="button" tabindex="0" class="btn-circle-whatsapp fab-whatsapp w-8 h-8 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center cursor-pointer shadow-xs transition-transform hover:scale-105" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp" onclick="event.preventDefault(); event.stopPropagation(); if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp('{{ addslashes($t->name) }}'); }" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();if(window.App&&typeof window.App.openWhatsApp==='function'){window.App.openWhatsApp('{{ addslashes($t->name) }}');}}">
+                                        <span role="button" tabindex="0" class="btn-circle-whatsapp fab-whatsapp w-9 h-9 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center cursor-pointer shadow-xs transition-transform hover:scale-105 shrink-0" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp" onclick="event.preventDefault(); event.stopPropagation(); if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp('{{ addslashes($t->name) }}'); }" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();if(window.App&&typeof window.App.openWhatsApp==='function'){window.App.openWhatsApp('{{ addslashes($t->name) }}');}}">
                                             <i class="bi bi-whatsapp text-sm"></i>
                                         </span>
-                                        <div class="w-8 h-8 rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white flex items-center justify-center transition-colors">
+                                        <div class="w-9 h-9 rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white flex items-center justify-center transition-colors shrink-0">
                                             <i class="bi bi-arrow-right rtl:rotate-180 text-sm"></i>
                                         </div>
                                     </div>

@@ -78,10 +78,10 @@
 <section class="bg-white border-b border-slate-200 py-3 sticky top-[var(--header-h,72px)] z-20">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex gap-2 overflow-x-auto no-scrollbar w-full sm:w-auto pb-1">
-                <a href="{{ localized_route('blog.index') }}" class="rounded-full px-4 py-1.5 text-xs sm:text-sm font-bold whitespace-nowrap transition-colors {{ !$categorySlug && !$search ? 'bg-primary text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">{{ __('ui.common.view_all') }}</a>
+            <div class="flex gap-2 overflow-x-auto no-scrollbar w-full sm:w-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x">
+                <a href="{{ localized_route('blog.index') }}" class="rounded-full px-4 py-2 text-xs sm:text-sm font-bold whitespace-nowrap transition-colors min-h-[38px] snap-start inline-flex items-center {{ !$categorySlug && !$search ? 'bg-primary text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">{{ __('ui.common.view_all') }}</a>
                 @foreach ($categories as $c)
-                <a href="{{ localized_route('blog.index', ['category' => $c->slug]) }}" rel="nofollow" class="rounded-full px-4 py-1.5 text-xs sm:text-sm font-bold whitespace-nowrap transition-colors {{ $categorySlug === $c->slug ? 'bg-primary text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">{{ $c->name }}</a>
+                <a href="{{ localized_route('blog.index', ['category' => $c->slug]) }}" rel="nofollow" class="rounded-full px-4 py-2 text-xs sm:text-sm font-bold whitespace-nowrap transition-colors min-h-[38px] snap-start inline-flex items-center {{ $categorySlug === $c->slug ? 'bg-primary text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">{{ $c->name }}</a>
                 @endforeach
             </div>
             <form action="{{ localized_route('blog.index') }}" method="get" class="flex gap-2 w-full sm:w-auto">
@@ -89,8 +89,8 @@
                     <input type="hidden" name="category" value="{{ $categorySlug }}">
                 @endif
                 <div class="relative w-full sm:w-64">
-                    <input type="search" name="search" class="w-full rounded-full ps-4 pe-10 py-1.5 bg-slate-100 border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/40" placeholder="{{ __('ui.nav.search') }}..." value="{{ $search }}">
-                    <button type="submit" class="absolute end-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-primary transition-colors" aria-label="{{ __('ui.nav.search') }}">
+                    <input type="search" name="search" class="w-full rounded-full ps-4 pe-11 py-2 bg-slate-100 border border-slate-200 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 min-h-[44px]" placeholder="{{ __('ui.nav.search') }}..." value="{{ $search }}">
+                    <button type="submit" class="absolute end-0 top-0 bottom-0 px-3.5 flex items-center justify-center text-slate-500 hover:text-primary transition-colors min-w-[44px] min-h-[44px]" aria-label="{{ __('ui.nav.search') }}">
                         <i class="bi bi-search text-xs"></i>
                     </button>
                 </div>
@@ -243,20 +243,20 @@
     <!-- Pagination -->
     @if ($totalPages > 1)
     <nav aria-label="{{ __('ui.common.pagination') }}" class="mt-12 flex justify-center">
-        <ul class="flex items-center gap-1.5">
+        <ul class="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-center">
             @if ($page > 1)
             <li>
-                <a class="w-9 h-9 rounded-xl flex items-center justify-center font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors" href="{{ $posts->previousPageUrl() }}"><i class="bi bi-chevron-left rtl:rotate-180"></i></a>
+                <a class="w-10 h-10 sm:w-11 sm:h-11 min-w-[40px] min-h-[40px] sm:min-w-[44px] sm:min-h-[44px] rounded-xl flex items-center justify-center font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors" href="{{ $posts->previousPageUrl() }}" aria-label="Previous page"><i class="bi bi-chevron-left rtl:rotate-180"></i></a>
             </li>
             @endif
             @for ($p = max(1, $page-2); $p <= min($totalPages, $page+2); $p++)
             <li>
-                <a class="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs transition-colors {{ $p === $page ? 'bg-primary text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700' }}" href="{{ $posts->url($p) }}">{{ $p }}</a>
+                <a class="w-10 h-10 sm:w-11 sm:h-11 min-w-[40px] min-h-[40px] sm:min-w-[44px] sm:min-h-[44px] rounded-xl flex items-center justify-center font-bold text-xs sm:text-sm transition-colors {{ $p === $page ? 'bg-primary text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700' }}" href="{{ $posts->url($p) }}">{{ $p }}</a>
             </li>
             @endfor
             @if ($page < $totalPages)
             <li>
-                <a class="w-9 h-9 rounded-xl flex items-center justify-center font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors" href="{{ $posts->nextPageUrl() }}"><i class="bi bi-chevron-right rtl:rotate-180"></i></a>
+                <a class="w-10 h-10 sm:w-11 sm:h-11 min-w-[40px] min-h-[40px] sm:min-w-[44px] sm:min-h-[44px] rounded-xl flex items-center justify-center font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors" href="{{ $posts->nextPageUrl() }}" aria-label="Next page"><i class="bi bi-chevron-right rtl:rotate-180"></i></a>
             </li>
             @endif
         </ul>

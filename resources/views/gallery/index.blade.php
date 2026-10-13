@@ -258,11 +258,11 @@
         <!-- Filter Controls Bar -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-200">
             <!-- Category Pills -->
-            <div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-none">
+            <div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 snap-x">
                 <button type="button" 
                     @click="filterCategory('all')" 
                     :class="category === 'all' ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'"
-                    class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5">
+                    class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5 min-h-[38px] snap-start">
                     <i class="bi bi-grid-fill"></i>
                     <span>{{ __('ui.gallery_section.filter_all') ?? 'All Moments' }}</span>
                     <span :class="category === 'all' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'" class="px-2 py-0.5 rounded-full text-[11px] font-semibold">{{ $categoryStats['all'] ?? count($filteredItems) }}</span>
@@ -271,7 +271,7 @@
                 <button type="button" 
                     @click="filterCategory('red_dunes')" 
                     :class="category === 'red_dunes' ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'"
-                    class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5">
+                    class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5 min-h-[38px] snap-start">
                     <i class="bi bi-compass-fill"></i>
                     <span>{{ __('ui.gallery_section.filter_red_dunes') ?? 'Red Dunes & Safari' }}</span>
                     <span :class="category === 'red_dunes' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'" class="px-2 py-0.5 rounded-full text-[11px] font-semibold">{{ $categoryStats['red_dunes'] ?? 0 }}</span>
@@ -280,7 +280,7 @@
                 <button type="button" 
                     @click="filterCategory('buggy_quad')" 
                     :class="category === 'buggy_quad' ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'"
-                    class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5">
+                    class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5 min-h-[38px] snap-start">
                     <i class="bi bi-lightning-charge-fill"></i>
                     <span>{{ __('ui.gallery_section.filter_buggy_quad') ?? 'Buggies & Quads' }}</span>
                     <span :class="category === 'buggy_quad' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'" class="px-2 py-0.5 rounded-full text-[11px] font-semibold">{{ $categoryStats['buggy_quad'] ?? 0 }}</span>
@@ -289,7 +289,7 @@
                 <button type="button" 
                     @click="filterCategory('camp_bbq')" 
                     :class="category === 'camp_bbq' ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'"
-                    class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5">
+                    class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5 min-h-[38px] snap-start">
                     <i class="bi bi-fire"></i>
                     <span>{{ __('ui.gallery_section.filter_camp_bbq') ?? 'Camp & BBQ' }}</span>
                     <span :class="category === 'camp_bbq' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'" class="px-2 py-0.5 rounded-full text-[11px] font-semibold">{{ $categoryStats['camp_bbq'] ?? 0 }}</span>
@@ -298,7 +298,7 @@
                 <button type="button" 
                     @click="filterCategory('sunset_camels')" 
                     :class="category === 'sunset_camels' ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'"
-                    class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5">
+                    class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5 min-h-[38px] snap-start">
                     <i class="bi bi-sunset-fill"></i>
                     <span>{{ __('ui.gallery_section.filter_sunset_camels') ?? 'Sunset & Camels' }}</span>
                     <span :class="category === 'sunset_camels' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'" class="px-2 py-0.5 rounded-full text-[11px] font-semibold">{{ $categoryStats['sunset_camels'] ?? 0 }}</span>
@@ -307,7 +307,7 @@
                 <button type="button" 
                     @click="filterCategory('city_landmarks')" 
                     :class="category === 'city_landmarks' ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'"
-                    class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5">
+                    class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5 min-h-[38px] snap-start">
                     <i class="bi bi-building"></i>
                     <span>City Tours & Landmarks</span>
                     <span :class="category === 'city_landmarks' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'" class="px-2 py-0.5 rounded-full text-[11px] font-semibold">{{ $categoryStats['city_landmarks'] ?? 0 }}</span>
@@ -316,7 +316,7 @@
                 <button type="button" 
                     @click="filterCategory('marina_cruise')" 
                     :class="category === 'marina_cruise' ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'"
-                    class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5">
+                    class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5 min-h-[38px] snap-start">
                     <i class="bi bi-water"></i>
                     <span>Dhow & Marina Cruise</span>
                     <span :class="category === 'marina_cruise' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'" class="px-2 py-0.5 rounded-full text-[11px] font-semibold">{{ $categoryStats['marina_cruise'] ?? 0 }}</span>
@@ -326,7 +326,7 @@
                 <button type="button" 
                     @click="filterCategory('videos')" 
                     :class="category === 'videos' ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'"
-                    class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5">
+                    class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5 min-h-[38px] snap-start">
                     <i class="bi bi-camera-video-fill"></i>
                     <span>{{ __('ui.gallery_section.filter_videos') ?? 'Videos' }}</span>
                     <span :class="category === 'videos' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'" class="px-2 py-0.5 rounded-full text-[11px] font-semibold">{{ $categoryStats['videos'] }}</span>
@@ -335,31 +335,31 @@
             </div>
 
             <!-- Source Filter Segment -->
-            <div class="flex items-center gap-1.5 shrink-0 bg-slate-100 p-1 rounded-full self-start md:self-auto">
+            <div class="flex items-center gap-1.5 shrink-0 bg-slate-100 p-1 rounded-full self-start md:self-auto max-w-full overflow-x-auto scrollbar-none">
                 <button type="button" 
                     @click="filterSource('all')"
                     :class="source === 'all' ? 'bg-white text-slate-900 shadow-2xs font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'"
-                    class="px-3 py-1.5 rounded-full text-xs transition-all cursor-pointer">
+                    class="px-3 py-1.5 rounded-full text-xs transition-all cursor-pointer whitespace-nowrap min-h-[36px]">
                     All Sources
                 </button>
                 <button type="button" 
                     @click="filterSource('ddt')"
                     :class="source === 'ddt' ? 'bg-white text-amber-600 shadow-2xs font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'"
-                    class="px-3 py-1.5 rounded-full text-xs transition-all cursor-pointer inline-flex items-center gap-1">
+                    class="px-3 py-1.5 rounded-full text-xs transition-all cursor-pointer inline-flex items-center gap-1 whitespace-nowrap min-h-[36px]">
                     <i class="bi bi-camera-fill text-amber-500 text-xs"></i>
                     DDT Moments
                 </button>
                 <button type="button" 
                     @click="filterSource('google')"
                     :class="source === 'google' ? 'bg-white text-blue-600 shadow-2xs font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'"
-                    class="px-3 py-1.5 rounded-full text-xs transition-all cursor-pointer inline-flex items-center gap-1">
+                    class="px-3 py-1.5 rounded-full text-xs transition-all cursor-pointer inline-flex items-center gap-1 whitespace-nowrap min-h-[36px]">
                     <img src="{{ asset('images/Google-G.avif') }}" alt="Google" class="w-3.5 h-3.5 inline-block" width="14" height="14" onerror="this.onerror=null;this.src='{{ asset('images/google.svg') }}'">
                     Google
                 </button>
                 <button type="button" 
                     @click="filterSource('tripadvisor')"
                     :class="source === 'tripadvisor' ? 'bg-white text-emerald-700 shadow-2xs font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'"
-                    class="px-3 py-1.5 rounded-full text-xs transition-all cursor-pointer inline-flex items-center gap-1">
+                    class="px-3 py-1.5 rounded-full text-xs transition-all cursor-pointer inline-flex items-center gap-1 whitespace-nowrap min-h-[36px]">
                     <i class="bi bi-star-fill text-emerald-500 text-xs"></i>
                     TripAdvisor
                 </button>
@@ -367,7 +367,7 @@
         </div>
 
         <!-- Media Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6" id="galleryGrid">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6" id="galleryGrid">
             <template x-for="item in visibleItems" :key="item.id">
                 <div class="gallery-item-card group relative bg-slate-900 rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col cursor-pointer border border-slate-200/60"
                      @click="openLightbox(item)">
@@ -499,7 +499,7 @@
         <!-- Close Button Top Right -->
         <button type="button" 
                 @click.stop="closeLightbox()" 
-                class="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 w-11 h-11 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-lg hover:scale-105 active:scale-95">
+                class="absolute top-4 end-4 sm:top-6 sm:end-6 z-50 w-11 h-11 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-lg hover:scale-105 active:scale-95">
             <i class="bi bi-x-lg text-lg"></i>
             <span class="sr-only">Close</span>
         </button>
@@ -507,7 +507,7 @@
         <!-- Previous Button -->
         <button type="button" 
                 @click.stop="prevItem()" 
-                class="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-50 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-lg hover:scale-105 active:scale-95">
+                class="absolute start-2 sm:start-6 top-1/2 -translate-y-1/2 z-50 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-lg hover:scale-105 active:scale-95">
             <i class="bi bi-chevron-left text-xl"></i>
             <span class="sr-only">Previous</span>
         </button>
@@ -515,7 +515,7 @@
         <!-- Next Button -->
         <button type="button" 
                 @click.stop="nextItem()" 
-                class="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 z-50 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-lg hover:scale-105 active:scale-95">
+                class="absolute end-2 sm:end-6 top-1/2 -translate-y-1/2 z-50 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all cursor-pointer border border-white/20 shadow-lg hover:scale-105 active:scale-95">
             <i class="bi bi-chevron-right text-xl"></i>
             <span class="sr-only">Next</span>
         </button>
@@ -525,17 +525,17 @@
              @click.stop>
 
             <!-- Media Preview Area -->
-            <div class="relative lg:w-3/5 bg-black flex items-center justify-center min-h-[320px] sm:min-h-[440px] max-h-[60vh] lg:max-h-[85vh] p-2">
+            <div class="relative lg:w-3/5 bg-black flex items-center justify-center min-h-[240px] sm:min-h-[340px] max-h-[48vh] sm:max-h-[60vh] lg:max-h-[85vh] p-2">
                 <template x-if="activeItem && activeItem.type === 'video'">
                     <div class="w-full h-full flex items-center justify-center">
-                        <video :src="activeItem.url" controls autoplay class="max-w-full max-h-[58vh] lg:max-h-[80vh] rounded-xl object-contain"></video>
+                        <video :src="activeItem.url" controls autoplay class="max-w-full max-h-[46vh] sm:max-h-[58vh] lg:max-h-[80vh] rounded-xl object-contain"></video>
                     </div>
                 </template>
                 <template x-if="activeItem && activeItem.type !== 'video'">
                     <img :src="activeItem.url" 
                          :alt="activeItem.alt || activeItem.review_title || 'Guest Safari Photo'" 
                          :title="activeItem.title || activeItem.review_title"
-                         class="max-w-full max-h-[58vh] lg:max-h-[80vh] rounded-xl object-contain select-none"
+                         class="max-w-full max-h-[46vh] sm:max-h-[58vh] lg:max-h-[80vh] rounded-xl object-contain select-none"
                          referrerpolicy="no-referrer"
                          x-on:error="reportBrokenLink(activeItem.url); nextItem();">
                 </template>

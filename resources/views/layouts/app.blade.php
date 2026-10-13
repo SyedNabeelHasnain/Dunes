@@ -530,35 +530,27 @@
                         </button>
                     </div>
 
-                    <!-- Mobile App Bar Actions (Thumb-Friendly, uncluttered) -->
-                    <div class="flex items-center gap-1.5 sm:gap-2 lg:hidden">
-                        <!-- Review Circle Popover Triggers -->
-                        <div class="nav-review-circle w-8 h-8 rounded-full bg-white shadow-xs flex items-center justify-center cursor-pointer relative" onclick="toggleReviewPopover(this, event)" id="taCircle" title="{{ __('ui.common.tripadvisor_reviews') }}">
-                            <img src="{{ asset('images/tripadvisor-color-logo.svg') }}" alt="TripAdvisor" width="20" height="20" class="w-5 h-5 object-contain">
-                        </div>
-                        <div class="nav-review-circle w-8 h-8 rounded-full bg-white shadow-xs flex items-center justify-center cursor-pointer relative" onclick="toggleReviewPopover(this, event)" id="googleCircle" title="{{ __('ui.common.google_reviews') }}">
-                            <img src="{{ asset('images/Google-G.avif') }}" alt="Google" width="20" height="20" class="w-5 h-5 object-contain">
-                        </div>
-
-                        <!-- Quick Search Button -->
-                        <button type="button" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer text-xs" @click="$store.modal.open('search')" aria-label="{{ __('ui.nav.search_placeholder') }}">
+                    <!-- Mobile App Bar Actions (Thumb-Friendly, Uncluttered, ≥44px Tap Targets) -->
+                    <div class="flex items-center gap-1 sm:gap-2 lg:hidden">
+                        <!-- Quick Search Button (Min 44x44px Hit Target) -->
+                        <button type="button" class="w-11 h-11 rounded-full text-slate-700 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer text-sm" @click="$store.modal.open('search')" aria-label="{{ __('ui.nav.search_placeholder') }}">
                             <i class="bi bi-search"></i>
                         </button>
 
-                        <!-- WhatsApp Direct Button -->
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-100 flex items-center justify-center transition-colors cursor-pointer text-xs btn-whatsapp" aria-label="{{ __('ui.common.whatsapp') }}" target="_blank" rel="noopener" data-action="whatsapp">
+                        <!-- WhatsApp Direct Button (Min 44x44px Hit Target) -->
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" class="w-11 h-11 rounded-full text-emerald-600 hover:bg-emerald-50 flex items-center justify-center transition-colors cursor-pointer text-base btn-whatsapp" aria-label="{{ __('ui.common.whatsapp') }}" target="_blank" rel="noopener" data-action="whatsapp">
                             <i class="bi bi-whatsapp"></i>
                         </a>
 
-                        <!-- Compact Book Now Button -->
-                        <button type="button" class="px-2.5 sm:px-3.5 py-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold text-[11px] sm:text-xs shadow-xs flex items-center gap-1 cursor-pointer" data-action="open-booking" aria-label="{{ __('ui.common.book_now') }}">
+                        <!-- Compact Book Now Button (Min 44px Height) -->
+                        <button type="button" class="h-10 px-3.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold text-xs shadow-xs flex items-center gap-1.5 cursor-pointer" data-action="open-booking" aria-label="{{ __('ui.common.book_now') }}">
                             <i class="bi bi-calendar-check"></i>
-                            <span class="hidden sm:inline">{{ __('ui.common.book') }}</span>
+                            <span>{{ __('ui.common.book') }}</span>
                         </button>
 
-                        <!-- Hamburger Drawer Trigger -->
-                        <button class="p-1.5 sm:p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer focus:outline-none" type="button" @click="$store.mobileNav.toggle()" aria-label="{{ __('ui.nav.all_tours') ?? 'Menu' }}">
-                            <i class="bi bi-list text-xl sm:text-2xl"></i>
+                        <!-- Hamburger Drawer Trigger (Min 44x44px Hit Target) -->
+                        <button class="w-11 h-11 rounded-xl text-slate-800 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer focus:outline-none" type="button" @click="$store.mobileNav.toggle()" aria-label="{{ __('ui.nav.all_tours') ?? 'Menu' }}">
+                            <i class="bi bi-list text-2xl"></i>
                         </button>
                     </div>
                 </div>
@@ -584,31 +576,38 @@
              x-transition:leave="transition ease-in duration-200 transform"
              x-transition:leave-start="translate-x-0"
              x-transition:leave-end="ltr:translate-x-full rtl:-translate-x-full"
-             class="fixed inset-y-0 end-0 max-w-xs sm:max-w-sm w-full bg-white z-50 shadow-2xl p-5 flex flex-col justify-between overflow-y-auto lg:hidden"
+             class="fixed inset-y-0 end-0 max-w-xs sm:max-w-sm w-full bg-white z-50 shadow-2xl p-5 flex flex-col justify-between overflow-y-auto overscroll-contain lg:hidden"
              style="display: none;"
-             id="mainOffcanvas">
+             id="mobileSheet">
             <div>
                 <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-4">
                     <a href="{{ localized_route('home') }}" @click="$store.mobileNav.close()" class="flex items-center hover:opacity-90 transition-opacity" aria-label="Dunes Discovery Tourism">
                         <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery Tourism" width="140" height="90" class="h-9 w-auto object-contain">
                     </a>
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-1.5 sm:gap-2">
+                        <!-- Review Popover Triggers in Mobile Drawer Header -->
+                        <div class="nav-review-circle w-8 h-8 rounded-full bg-slate-50 border border-slate-200 shadow-2xs flex items-center justify-center cursor-pointer relative" onclick="toggleReviewPopover(this, event)" id="taCircle" title="{{ __('ui.common.tripadvisor_reviews') }}">
+                            <img src="{{ asset('images/tripadvisor-color-logo.svg') }}" alt="TripAdvisor" width="18" height="18" class="w-4.5 h-4.5 object-contain">
+                        </div>
+                        <div class="nav-review-circle w-8 h-8 rounded-full bg-slate-50 border border-slate-200 shadow-2xs flex items-center justify-center cursor-pointer relative" onclick="toggleReviewPopover(this, event)" id="googleCircle" title="{{ __('ui.common.google_reviews') }}">
+                            <img src="{{ asset('images/Google-G.avif') }}" alt="Google" width="18" height="18" class="w-4.5 h-4.5 object-contain">
+                        </div>
                         @include('partials.language-currency-switcher', ['switcherId' => 'mobileLangCurrencyDropdownBtn'])
-                        <button type="button" class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer" @click="$store.mobileNav.close()" aria-label="{{ __('ui.common.close') }}">
-                            <i class="bi bi-x-lg text-xs"></i>
+                        <button type="button" class="w-10 h-10 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer" @click="$store.mobileNav.close()" aria-label="{{ __('ui.common.close') }}">
+                            <i class="bi bi-x-lg text-sm"></i>
                         </button>
                     </div>
                 </div>
 
-                <!-- Search Input in Drawer -->
+                <!-- Search Input in Drawer (16px on mobile to eliminate iOS zoom) -->
                 <form action="{{ localized_route('tours.search') }}" method="GET" class="relative mb-3">
                     <i class="bi bi-search absolute start-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
-                    <input type="text" name="q" class="w-full rounded-full ps-9 pe-4 py-2 bg-slate-100 text-slate-800 text-xs font-semibold border-0 focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="{{ __('ui.nav.search_placeholder') }}" required>
+                    <input type="text" name="q" class="w-full rounded-full ps-9 pe-4 py-2.5 bg-slate-100 text-slate-800 text-base sm:text-xs font-semibold border-0 focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="{{ __('ui.nav.search_placeholder') }}" required>
                 </form>
 
                 <!-- Interactive Features CTAs -->
                 <div class="space-y-2 mb-4">
-                    <button type="button" class="w-full rounded-2xl p-3 flex items-center justify-between text-start border border-amber-400/30 shadow-xs cursor-pointer" style="background: linear-gradient(135deg, #1E293B, #0F172A);" @click="$store.mobileNav.close(); $store.modal.open('safari-matcher');">
+                    <button type="button" class="w-full rounded-2xl p-3 flex items-center justify-between text-start border border-amber-400/30 shadow-xs cursor-pointer min-h-[48px]" style="background: linear-gradient(135deg, #1E293B, #0F172A);" @click="$store.mobileNav.close(); $store.modal.open('safari-matcher');">
                         <div class="flex items-center gap-2.5">
                             <span class="text-amber-400 text-lg"><i class="bi bi-compass"></i></span>
                             <div>
@@ -620,7 +619,7 @@
                         <span class="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[9px]">{{ $conciergePromoDiscount }}% OFF</span>
                         @endif
                     </button>
-                    <a href="{{ localized_route('tours.customizer') }}" class="w-full rounded-2xl p-2.5 flex items-center justify-between text-start border border-slate-200 bg-slate-50 hover:bg-orange-50 text-slate-800 font-bold text-xs transition-colors" @click="$store.mobileNav.close()">
+                    <a href="{{ localized_route('tours.customizer') }}" class="w-full rounded-2xl p-2.5 flex items-center justify-between text-start border border-slate-200 bg-slate-50 hover:bg-orange-50 text-slate-800 font-bold text-xs transition-colors min-h-[44px]" @click="$store.mobileNav.close()">
                         <span class="flex items-center gap-2">
                             <i class="bi bi-sliders text-primary"></i>
                             <span>{{ __('ui.nav.customizer') }}</span>
@@ -629,24 +628,24 @@
                     </a>
                 </div>
 
-                <!-- Navigation Links List -->
+                <!-- Navigation Links List (≥44px Touch Targets) -->
                 <nav class="space-y-1">
-                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('tours.*', 'locale.tours.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('tours.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.all_tours') }}</a>
-                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('gallery.*', 'locale.gallery.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('gallery.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.gallery') }}</a>
-                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('about', 'locale.about') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('about') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.about') }}</a>
-                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('blog.*', 'locale.blog.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('blog.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.blog') }}</a>
-                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('faq', 'locale.faq') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('faq') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.faq') }}</a>
-                    <a class="block px-3 py-2.5 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('contact', 'locale.contact') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('contact') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.contact') }}</a>
+                    <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('tours.*', 'locale.tours.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('tours.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.all_tours') }}</a>
+                    <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('gallery.*', 'locale.gallery.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('gallery.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.gallery') }}</a>
+                    <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('about', 'locale.about') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('about') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.about') }}</a>
+                    <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('blog.*', 'locale.blog.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('blog.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.blog') }}</a>
+                    <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('faq', 'locale.faq') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('faq') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.faq') }}</a>
+                    <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('contact', 'locale.contact') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('contact') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.contact') }}</a>
                 </nav>
             </div>
 
-            <!-- Drawer Bottom Direct Contact -->
-            <div class="pt-4 border-t border-slate-200 space-y-2">
-                <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="w-full py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors btn-whatsapp" data-action="whatsapp" @click="$store.mobileNav.close();">
-                    <i class="bi bi-whatsapp"></i><span>{{ __('ui.common.whatsapp_chat') }}</span>
+            <!-- Drawer Bottom Direct Contact (Safe Area Inset Aware) -->
+            <div class="pt-4 border-t border-slate-200 space-y-2" style="padding-bottom: max(1.25rem, env(safe-area-inset-bottom, 1.25rem));">
+                <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="w-full h-11 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors btn-whatsapp" data-action="whatsapp" @click="$store.mobileNav.close();">
+                    <i class="bi bi-whatsapp text-sm"></i><span>{{ __('ui.common.whatsapp_chat') }}</span>
                 </a>
-                <button type="button" class="w-full py-2.5 rounded-full bg-primary hover:bg-primary-dark text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer" @click="$store.mobileNav.close(); $store.modal.open('booking');">
-                    <i class="bi bi-calendar-check"></i><span>{{ __('ui.common.book_online') }}</span>
+                <button type="button" class="w-full h-11 rounded-full bg-primary hover:bg-primary-dark text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer" @click="$store.mobileNav.close(); $store.modal.open('booking');">
+                    <i class="bi bi-calendar-check text-sm"></i><span>{{ __('ui.common.book_online') }}</span>
                 </button>
             </div>
         </div>
@@ -776,7 +775,7 @@
                 </div>
 
                 <!-- Col 5: Contact & Help -->
-                <div class="sm:col-span-2 lg:col-span-2">
+                <div class="col-span-1 sm:col-span-1 lg:col-span-2">
                     <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 mb-3.5">{{ __('ui.footer.contact_help') }}</h3>
                     <ul class="space-y-2 text-xs sm:text-sm">
                         <li><a href="tel:{{ preg_replace('/[^0-9+]/','',$phone) }}" class="text-slate-300 hover:text-white transition-colors inline-flex items-center gap-2"><i class="bi bi-telephone text-primary"></i><span>{{ $phone }}</span></a></li>
@@ -813,25 +812,25 @@
                 <div class="flex flex-col lg:flex-row items-center justify-between gap-4 text-center lg:text-start">
                     <div>
                         <p class="text-slate-400 text-xs mb-1">{{ __('ui.footer.license_line', ['year' => date('Y'), 'name' => $settings['site_name'] ?? 'Dunes Discovery Tourism L.L.C.', 'license' => $settings['company_license_number'] ?? '1430583']) }}</p>
-                        <div class="flex flex-wrap justify-center lg:justify-start items-center gap-x-2.5 gap-y-1 text-xs text-slate-300">
-                            <a href="{{ localized_route('terms') }}" class="hover:text-white transition-colors">{{ __('ui.footer.terms') }}</a>
+                        <div class="flex flex-wrap justify-center lg:justify-start items-center gap-x-3.5 gap-y-2 text-xs text-slate-300">
+                            <a href="{{ localized_route('terms') }}" class="hover:text-white transition-colors py-1">{{ __('ui.footer.terms') }}</a>
                             <span class="text-slate-500">&bull;</span>
-                            <a href="{{ localized_route('privacy') }}" class="hover:text-white transition-colors">{{ __('ui.footer.privacy') }}</a>
+                            <a href="{{ localized_route('privacy') }}" class="hover:text-white transition-colors py-1">{{ __('ui.footer.privacy') }}</a>
                             <span class="text-slate-500">&bull;</span>
-                            <a href="{{ localized_route('cookies') }}" class="hover:text-white transition-colors">{{ __('ui.footer.cookies') }}</a>
+                            <a href="{{ localized_route('cookies') }}" class="hover:text-white transition-colors py-1">{{ __('ui.footer.cookies') }}</a>
                             <span class="text-slate-500">&bull;</span>
-                            <a href="{{ localized_route('cancellation') }}" class="hover:text-white transition-colors">{{ __('ui.footer.refund_100') }}</a>
+                            <a href="{{ localized_route('cancellation') }}" class="hover:text-white transition-colors py-1">{{ __('ui.footer.refund_100') }}</a>
                             <span class="text-slate-500">&bull;</span>
-                            <a href="{{ localized_route('payment.security') }}" class="hover:text-white transition-colors">{{ __('ui.footer.payment_security') }}</a>
+                            <a href="{{ localized_route('payment.security') }}" class="hover:text-white transition-colors py-1">{{ __('ui.footer.payment_security') }}</a>
                             <span class="text-slate-500">&bull;</span>
-                            <a href="{{ localized_route('safety.waiver') }}" class="hover:text-white transition-colors">{{ __('ui.footer.safety_waiver') }}</a>
+                            <a href="{{ localized_route('safety.waiver') }}" class="hover:text-white transition-colors py-1">{{ __('ui.footer.safety_waiver') }}</a>
                             <span class="text-slate-500">&bull;</span>
-                            <a href="{{ localized_route('ai.editorial') }}" class="hover:text-white transition-colors">{{ __('ui.footer.ai_editorial') }}</a>
+                            <a href="{{ localized_route('ai.editorial') }}" class="hover:text-white transition-colors py-1">{{ __('ui.footer.ai_editorial') }}</a>
                             <span class="text-slate-500">&bull;</span>
-                            <a href="{{ localized_route('responsible.tourism') }}" class="hover:text-white transition-colors">{{ __('ui.footer.responsible_tourism') }}</a>
+                            <a href="{{ localized_route('responsible.tourism') }}" class="hover:text-white transition-colors py-1">{{ __('ui.footer.responsible_tourism') }}</a>
                         </div>
                     </div>
-                    <div class="inline-flex items-center gap-2 bg-slate-900 border border-slate-800 px-4 py-2 rounded-full flex-wrap justify-center">
+                    <div class="inline-flex items-center gap-2 bg-slate-900 border border-slate-800 px-4 py-2.5 rounded-2xl lg:rounded-full flex-wrap justify-center">
                         <span class="text-slate-300 text-xs inline-flex items-center gap-1 font-semibold"><i class="bi bi-shield-lock-fill text-emerald-400"></i>{{ __('ui.footer.secure_checkout') }}</span>
                         <span class="bg-white rounded px-2 py-0.5 inline-flex items-center justify-center shadow-2xs h-6"><img src="{{ asset('images/visa-card.svg') }}" alt="Visa" width="32" height="20" class="h-3.5 w-auto object-contain"></span>
                         <span class="bg-white rounded px-2 py-0.5 inline-flex items-center justify-center shadow-2xs h-6"><img src="{{ asset('images/mastercard.svg') }}" alt="Mastercard" width="28" height="20" class="h-3.5 w-auto object-contain"></span>
@@ -857,8 +856,8 @@
     @include('partials.custom-safari-modal')
     @include('partials.whatsapp-modal')
 
-    <!-- Global Toast Container for App.toast notifications -->
-    <div id="toastContainer" class="toast-container fixed bottom-5 end-5 z-[9999] flex flex-col gap-2.5 max-w-sm w-full pointer-events-none px-4 sm:px-0" aria-live="polite" aria-atomic="true"></div>
+    <!-- Global Toast Container for App.toast notifications (Elevated on mobile to prevent blocking sticky bottom bars) -->
+    <div id="toastContainer" class="toast-container fixed top-[calc(var(--header-h,72px)+0.75rem)] sm:top-auto sm:bottom-5 end-4 sm:end-5 z-[9999] flex flex-col gap-2.5 max-w-sm w-[calc(100%-2rem)] sm:w-full pointer-events-none" aria-live="polite" aria-atomic="true"></div>
 
     <script>
         window.DunesRates = {

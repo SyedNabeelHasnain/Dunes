@@ -420,10 +420,10 @@
 
 @elseif ($variant === 'mobile-sticky')
 <!-- Sticky Mobile Conversion Bar (Appears on Scroll) -->
-<aside class="fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-2.5 sm:hidden shadow-2xl transition-all duration-300"
+<aside class="fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-2.5 sm:hidden shadow-2xl transition-all duration-300 pb-safe"
      x-data="{ showStickyBar: false }"
      x-init="window.addEventListener('scroll', () => { showStickyBar = window.scrollY > 400 })"
-     x-show="showStickyBar"
+     x-show="showStickyBar && !$store.modal.active && !$store.mobileNav.open"
      x-transition:enter="transition ease-out duration-300"
      x-transition:enter-start="translate-y-full opacity-0"
      x-transition:enter-end="translate-y-0 opacity-100"
@@ -433,7 +433,7 @@
      x-cloak
      role="region"
      aria-label="Tour booking quick bar"
-     style="display: none;">
+     style="display: none; padding-bottom: max(0.625rem, env(safe-area-inset-bottom, 0.625rem));">
     <div class="flex items-center justify-between gap-3">
         <div class="min-w-0">
             <div class="flex items-center gap-1 text-[10px] font-black uppercase text-primary tracking-wider">
@@ -449,7 +449,7 @@
 
         <div class="flex items-center gap-1.5 shrink-0">
             <a href="{{ $waUrl }}" 
-               class="btn-whatsapp w-8 h-8 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center text-sm shadow-xs transition-transform active:scale-90 cursor-pointer"
+               class="btn-whatsapp w-9 h-9 min-w-[36px] min-h-[36px] rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center text-sm shadow-xs transition-transform active:scale-90 cursor-pointer"
                data-action="whatsapp"
                data-tour-name="{{ $tour->name }}"
                target="_blank" 
@@ -459,7 +459,7 @@
             </a>
 
             <button type="button" 
-                    class="btn-desert-animated text-white font-extrabold text-xs px-3.5 py-1.5 rounded-full shadow-xs cursor-pointer inline-flex items-center gap-1"
+                    class="btn-desert-animated text-white font-extrabold text-xs px-4 py-2 min-h-[36px] rounded-full shadow-xs cursor-pointer inline-flex items-center gap-1"
                     data-action="open-booking" 
                     data-tour="{{ $tour->id }}"
                     @click="$store.modal.open('booking', { tourId: {{ $tour->id }} })">

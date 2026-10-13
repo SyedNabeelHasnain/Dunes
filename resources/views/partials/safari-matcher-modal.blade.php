@@ -54,10 +54,10 @@
                     </h4>
                 </div>
                 <button type="button" 
-                        class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-colors cursor-pointer" 
+                        class="w-11 h-11 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-colors cursor-pointer" 
                         @click="$store.modal.close()" 
                         aria-label="{{ __('ui.common.close') }}">
-                    <i class="bi bi-x-lg text-xs"></i>
+                    <i class="bi bi-x-lg text-sm"></i>
                 </button>
             </div>
 
@@ -351,7 +351,7 @@
              <!-- Modal Footer Controls -->
              <div class="pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-300" x-show="step <= 3">
                  <button type="button" 
-                         class="px-3 py-1.5 rounded-full border border-slate-700 hover:border-slate-500 text-slate-300 transition-colors cursor-pointer flex items-center gap-1" 
+                         class="min-h-[44px] px-4 py-2 rounded-full border border-slate-700 hover:border-slate-500 text-slate-300 transition-colors cursor-pointer flex items-center justify-center gap-1" 
                          x-show="step > 1" 
                          @click="step--">
                      <i class="bi bi-chevron-left rtl:rotate-180"></i> Back

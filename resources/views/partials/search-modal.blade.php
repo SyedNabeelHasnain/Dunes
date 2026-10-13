@@ -94,9 +94,9 @@
                 </div>
                 <button type="button" 
                         @click="$store.modal.close()" 
-                        class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-800 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer" 
+                        class="w-11 h-11 rounded-full bg-slate-100 text-slate-400 hover:text-slate-800 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer" 
                         aria-label="{{ __('ui.common.close') }}">
-                    <i class="bi bi-x-lg text-xs"></i>
+                    <i class="bi bi-x-lg text-sm"></i>
                 </button>
             </div>
 
@@ -116,7 +116,7 @@
                                @keydown.arrow-up.prevent="navigateUp"
                                @keydown.enter="handleEnter($event)"
                                @keydown.escape.prevent="handleEscape"
-                               class="w-full ps-11 sm:ps-12 pe-28 sm:pe-32 py-3.5 sm:py-4 rounded-2xl bg-slate-50 border-2 border-slate-200 focus:border-primary focus:bg-white text-sm sm:text-base font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none transition-all shadow-2xs" 
+                               class="w-full ps-11 sm:ps-12 pe-28 sm:pe-32 py-3.5 sm:py-4 rounded-2xl bg-slate-50 border-2 border-slate-200 focus:border-primary focus:bg-white text-base sm:text-base font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none transition-all shadow-2xs" 
                                placeholder="{{ __('ui.nav.search_placeholder') }}" 
                                autocomplete="off" 
                                required>
@@ -217,7 +217,7 @@
                     </div>
 
                     <!-- Scrollable Live Results List -->
-                    <div x-ref="resultsList" class="max-h-[360px] sm:max-h-[400px] overflow-y-auto space-y-2 pe-1 divide-y divide-slate-100 scrollbar-thin">
+                    <div x-ref="resultsList" class="max-h-[50vh] sm:max-h-[400px] overflow-y-auto space-y-2 pe-1 divide-y divide-slate-100 scrollbar-thin">
                         <template x-for="(tour, index) in filteredResults" :key="tour.id || index">
                             <a :href="tour.url" 
                                :data-selected="selectedIndex === index"

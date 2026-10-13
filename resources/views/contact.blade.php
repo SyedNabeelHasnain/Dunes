@@ -154,8 +154,8 @@
             $whatsappVal = $settings['site_whatsapp'] ?? '971502456056';
         @endphp
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <a href="tel:{{ preg_replace('/[^0-9+]/','',$phoneVal) }}" class="bg-slate-50 hover:bg-white rounded-2xl p-6 text-center border border-slate-200 hover:border-primary/40 shadow-xs hover:shadow-lg transition-all duration-300 group">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 mb-8 sm:mb-12">
+            <a href="tel:{{ preg_replace('/[^0-9+]/','',$phoneVal) }}" class="bg-slate-50 hover:bg-white rounded-2xl p-5 sm:p-6 text-center border border-slate-200 hover:border-primary/40 shadow-xs hover:shadow-lg transition-all duration-300 group">
                 <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-xl mx-auto mb-3 group-hover:scale-110 transition-transform">
                     <i class="bi bi-telephone"></i>
                 </div>
@@ -255,9 +255,9 @@
                         </div>
 
                         <div>
-                            <div class="legal-agreement-wrapper flex items-start gap-2.5">
-                                <input class="rounded text-primary focus:ring-primary w-4 h-4 mt-0.5 cursor-pointer" type="checkbox" id="contactAgreement" required>
-                                <label class="text-xs text-slate-600 leading-normal" for="contactAgreement">
+                            <div class="legal-agreement-wrapper flex items-start gap-2.5 min-h-[44px]">
+                                <input class="rounded text-primary focus:ring-primary w-5 h-5 mt-0.5 cursor-pointer shrink-0" type="checkbox" id="contactAgreement" required>
+                                <label class="text-xs text-slate-600 leading-normal cursor-pointer py-1" for="contactAgreement">
                                     I agree to the <a href="{{ localized_route('terms') }}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline font-semibold">{{ __('ui.footer.terms') }}</a> and <a href="{{ localized_route('privacy') }}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline font-semibold">{{ __('ui.footer.privacy') }}</a>.
                                 </label>
                             </div>
@@ -349,8 +349,8 @@
                 </div>
 
                 <!-- Google Maps Interactive Embed -->
-                <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200 flex-grow h-full min-h-[300px]">
-                    <iframe src="{{ $settings['google_maps_embed_url'] ?? 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14439.467468694034!2d55.2707828!3d25.2048493!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f434910086b6d%3A0xc4db9db186e4e1e2!2sDunes%20Discovery%20Tourism%20LLC!5e0!3m2!1sen!2sae!4v1700000000000!5m2!1sen!2sae' }}" class="w-full h-full border-0 min-h-[320px]" allowfullscreen loading="lazy"></iframe>
+                <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200 flex-grow aspect-video sm:aspect-auto sm:h-96 min-h-[260px]">
+                    <iframe src="{{ $settings['google_maps_embed_url'] ?? 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14439.467468694034!2d55.2707828!3d25.2048493!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f434910086b6d%3A0xc4db9db186e4e1e2!2sDunes%20Discovery%20Tourism%20LLC!5e0!3m2!1sen!2sae!4v1700000000000!5m2!1sen!2sae' }}" class="w-full h-full border-0 min-h-[260px]" allowfullscreen loading="lazy"></iframe>
                 </div>
             </div>
         </div>

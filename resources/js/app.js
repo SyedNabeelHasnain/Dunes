@@ -221,6 +221,31 @@ Alpine.store('currency', {
     }
 });
 
+let _bodyScrollPos = 0;
+let _bodyScrollLocked = false;
+function lockBodyScroll() {
+    if (_bodyScrollLocked) return;
+    _bodyScrollPos = window.scrollY || window.pageYOffset || 0;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${_bodyScrollPos}px`;
+    document.body.style.width = '100%';
+    document.body.style.overflow = 'hidden';
+    document.body.classList.add('modal-open');
+    _bodyScrollLocked = true;
+}
+function unlockBodyScroll() {
+    if (!_bodyScrollLocked) return;
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.width = '';
+    document.body.style.overflow = '';
+    document.body.classList.remove('modal-open');
+    window.scrollTo(0, _bodyScrollPos);
+    _bodyScrollLocked = false;
+}
+window.lockBodyScroll = lockBodyScroll;
+window.unlockBodyScroll = unlockBodyScroll;
+
 /**
  * 1.2 Mobile Navigation Store
  */
@@ -228,14 +253,18 @@ Alpine.store('mobileNav', {
     open: false,
     toggle() {
         this.open = !this.open;
-        document.body.style.overflow = this.open ? 'hidden' : '';
-        const sheet = document.getElementById('mobileSheet');
+        if (this.open) {
+            lockBodyScroll();
+        } else {
+            unlockBodyScroll();
+        }
+        const sheet = document.getElementById('mobileSheet') || document.getElementById('mainOffcanvas');
         if (sheet) sheet.classList.toggle('active', this.open);
     },
     close() {
         this.open = false;
-        document.body.style.overflow = '';
-        const sheet = document.getElementById('mobileSheet');
+        unlockBodyScroll();
+        const sheet = document.getElementById('mobileSheet') || document.getElementById('mainOffcanvas');
         if (sheet) sheet.classList.remove('active');
     }
 });
@@ -279,8 +308,7 @@ Alpine.store('modal', {
 
         this.active = id;
         this.data = data;
-        document.body.style.overflow = 'hidden';
-        document.body.classList.add('modal-open');
+        lockBodyScroll();
 
         const isOffcanvas = el.classList.contains('offcanvas');
 
@@ -412,8 +440,7 @@ Alpine.store('modal', {
         if (resetActive) {
             this.active = null;
             this.data = {};
-            document.body.style.overflow = '';
-            document.body.classList.remove('modal-open');
+            unlockBodyScroll();
         }
         window.dispatchEvent(new CustomEvent('modal-closed', { detail: { id: closingId } }));
     },
@@ -4165,7 +4192,9 @@ window.reviewData = reviewData;
 document.addEventListener('click', function(e) {
     const trigger = e.target.closest('#taCircle, #googleCircle, .nav-review-circle');
     if (trigger) {
-        toggleReviewPopover(trigger, e);
+        if (!trigger.hasAttribute('onclick')) {
+            toggleReviewPopover(trigger, e);
+        }
         return;
     }
     if (!e.target.closest('.global-popover-overlay')) {

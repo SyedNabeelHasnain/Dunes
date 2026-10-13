@@ -212,8 +212,13 @@
                 <span class="text-xs text-slate-500 italic">*Times represent midpoint monthly averages for Lahbab Desert coordinates.</span>
             </div>
 
-            <div class="overflow-x-auto rounded-2xl border border-slate-200 shadow-sm">
-                <table class="w-full text-left text-sm text-slate-700">
+            <div class="sm:hidden flex items-center gap-1.5 text-xs text-slate-500 mb-2">
+                <i class="bi bi-arrow-left-right text-primary"></i>
+                <span>Scroll table horizontally to view all months</span>
+            </div>
+
+            <div class="overflow-x-auto rounded-2xl border border-slate-200 shadow-sm -mx-4 px-4 sm:mx-0 sm:px-0">
+                <table class="w-full text-left text-sm text-slate-700 min-w-[640px]">
                     <thead class="bg-slate-900 text-white text-xs uppercase font-bold tracking-wider">
                         <tr>
                             <th scope="col" class="py-4 px-4 sm:px-6">Month</th>
@@ -227,11 +232,13 @@
                     <tbody class="divide-y divide-slate-100 font-medium">
                         @foreach($monthlySchedule as $num => $row)
                         <tr class="{{ $num === $currentMonthNumber ? 'bg-amber-50/70 font-semibold text-slate-900' : 'hover:bg-slate-50' }} transition-colors">
-                            <td class="py-3.5 px-4 sm:px-6 flex items-center gap-2">
-                                @if($num === $currentMonthNumber)
-                                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                                @endif
-                                <span>{{ $row['month'] }}</span>
+                            <td class="py-3.5 px-4 sm:px-6">
+                                <div class="flex items-center gap-2">
+                                    @if($num === $currentMonthNumber)
+                                        <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
+                                    @endif
+                                    <span>{{ $row['month'] }}</span>
+                                </div>
                             </td>
                             <td class="py-3.5 px-4 text-amber-700 font-bold whitespace-nowrap">{{ $row['sunset'] }}</td>
                             <td class="py-3.5 px-4 whitespace-nowrap">{{ $row['golden_hour'] }}</td>
@@ -371,11 +378,11 @@
         <p class="text-white/70 text-sm max-w-xl mx-auto mb-6">
             Reserve your 4x4 Land Cruiser hotel pickup, 5-star live BBQ dinner, and front-row seat to the Lahbab Red Dunes sunset today.
         </p>
-        <div class="flex flex-wrap gap-3 justify-center items-center">
-            <button type="button" class="btn-desert-animated px-8 py-3 rounded-full text-sm font-bold shadow-lg cursor-pointer" @click="$store.modal.open('booking')">
+        <div class="flex flex-col sm:flex-row gap-3 justify-center items-center">
+            <button type="button" class="btn-desert-animated px-8 py-3 rounded-full text-sm font-bold shadow-lg cursor-pointer w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center" @click="$store.modal.open('booking')">
                 <i class="bi bi-calendar-check mr-1.5"></i> Book Evening Safari
             </button>
-            <a href="{{ localized_route('gallery.index') }}" class="border border-white/20 hover:bg-white/10 px-6 py-3 rounded-full text-sm font-bold transition-colors">
+            <a href="{{ localized_route('gallery.index') }}" class="border border-white/20 hover:bg-white/10 px-6 py-3 rounded-full text-sm font-bold transition-colors w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center">
                 <i class="bi bi-camera mr-1.5"></i> Browse Sunset Gallery
             </a>
         </div>

@@ -254,7 +254,7 @@ if(window.fbq){
 <!-- Tour Hero Section -->
 <section class="relative min-h-[50vh] flex items-end bg-cover bg-center overflow-hidden" style="background: url('{{ $heroAvifUrl }}') center/cover no-repeat;">
     <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-black/20"></div>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full pb-10 pt-36 sm:pt-40 lg:pt-44 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full pb-8 sm:pb-10 pt-28 sm:pt-40 lg:pt-44 text-white">
         <nav aria-label="{{ __('ui.common.breadcrumb') }}" class="mb-4">
             <ol class="flex items-center gap-2 text-xs sm:text-sm text-white/75 flex-wrap">
                 <li><a href="{{ localized_route('home') }}" class="hover:text-white transition-colors">{{ __('ui.nav.home') }}</a></li>
@@ -278,7 +278,7 @@ if(window.fbq){
                     <i class="bi bi-shield-check text-emerald-200"></i>{{ __('ui.trust.licensed_operator') }}
                 </span>
             </div>
-            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4 text-white tracking-tight leading-tight">{{ $tour->name }}</h1>
+            <h1 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold mb-3 sm:mb-4 text-white tracking-tight leading-tight">{{ $tour->name }}</h1>
             <div class="flex flex-wrap gap-4 sm:gap-6 items-center text-white/90 text-sm">
                 <div class="flex items-center gap-2">
                     <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-xs">
@@ -481,8 +481,8 @@ if(window.fbq){
                         <div class="relative ps-6 border-s-2 border-primary/30 space-y-6 ms-3">
                             @foreach($tour->itineraries->sortBy('priority') as $it)
                             <div class="relative pb-2">
-                                <div class="absolute -start-[31px] top-1.5 w-4 h-4 rounded-full bg-primary border-4 border-white shadow-xs"></div>
-                                <div class="flex items-center justify-between gap-3 mb-1.5">
+                                <div class="absolute -start-[33px] top-1.5 w-4 h-4 rounded-full bg-primary border-4 border-white shadow-xs"></div>
+                                <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
                                     <span class="bg-primary/10 text-primary text-xs font-bold rounded-full px-3 py-0.5">{{ $it->time }}</span>
                                     @if($it->duration)
                                     <span class="text-slate-400 text-xs font-medium"><i class="bi bi-clock me-1 text-primary"></i>{{ $it->duration }}</span>
@@ -1298,7 +1298,7 @@ if(window.fbq){
 
 <!-- You Might Also Like Section -->
 @if($relatedTours->count())
-<section class="py-12 sm:py-16 bg-white">
+<section class="py-12 sm:py-16 pb-28 lg:pb-16 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center mb-8">
             <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 flex items-center gap-3">
@@ -1311,10 +1311,10 @@ if(window.fbq){
             </a>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="flex sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 overflow-x-auto sm:overflow-x-visible no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 snap-x pb-2">
             @foreach($relatedTours as $t)
             @php $minPriceRel = $t->tiers->min('pivot.price') ?? 0; @endphp
-            <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-200 hover:border-slate-300 flex flex-col h-full group">
+            <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-200 hover:border-slate-300 flex flex-col h-full group w-[280px] sm:w-auto shrink-0 snap-start">
                 <a href="{{ localized_route('tours.show', $t->slug) }}" class="flex flex-col h-full text-inherit">
                     <div class="relative overflow-hidden aspect-[16/10]">
                         <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image ?: ($t->hero_image ?: 'desert-safari-poster.avif'))) }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy">
@@ -1345,10 +1345,10 @@ if(window.fbq){
                                 <span class="text-lg font-black text-primary" data-aed="{{ $minPriceRel }}">{{ __('ui.common.aed') }} {{ number_format($minPriceRel) }}</span>
                             </div>
                             <div class="flex items-center gap-1.5">
-                                <span role="button" tabindex="0" class="btn-circle-whatsapp fab-whatsapp w-8 h-8 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center cursor-pointer shadow-xs transition-transform hover:scale-105" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp" onclick="event.preventDefault(); event.stopPropagation(); if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp('{{ addslashes($t->name) }}'); }" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();if(window.App&&typeof window.App.openWhatsApp==='function'){window.App.openWhatsApp('{{ addslashes($t->name) }}');}}">
+                                <span role="button" tabindex="0" class="btn-circle-whatsapp fab-whatsapp w-9 h-9 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center cursor-pointer shadow-xs transition-transform hover:scale-105 shrink-0" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp" onclick="event.preventDefault(); event.stopPropagation(); if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp('{{ addslashes($t->name) }}'); }" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();if(window.App&&typeof window.App.openWhatsApp==='function'){window.App.openWhatsApp('{{ addslashes($t->name) }}');}}">
                                     <i class="bi bi-whatsapp text-sm"></i>
                                 </span>
-                                <div class="w-8 h-8 rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white flex items-center justify-center transition-colors">
+                                <div class="w-9 h-9 rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white flex items-center justify-center transition-colors shrink-0">
                                     <i class="bi bi-arrow-right rtl:rotate-180 text-sm"></i>
                                 </div>
                             </div>
@@ -1363,7 +1363,7 @@ if(window.fbq){
 @endif
 
 <!-- Mobile Book Bar Sticky bottom (visible on screens below lg) -->
-<div class="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md px-4 py-3 border-t border-slate-200 shadow-2xl lg:hidden flex items-center justify-between z-30 pb-safe">
+<div x-data x-show="!$store.modal.active && !$store.mobileNav.open" x-cloak class="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md px-4 py-3 border-t border-slate-200 shadow-2xl lg:hidden flex items-center justify-between z-40 pb-safe" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0.75rem));">
     <div>
         @if($activeTier)
         <span class="text-emerald-700 block text-[9px] uppercase font-extrabold tracking-wider truncate max-w-[140px]">{{ $activeTier->name }}</span>
@@ -1374,10 +1374,10 @@ if(window.fbq){
         @endif
     </div>
     <div class="flex items-center gap-2">
-        <button type="button" class="border border-slate-300 text-slate-700 text-xs font-bold rounded-full px-3.5 py-2.5 btn-toggle-compare whitespace-nowrap cursor-pointer inline-flex items-center gap-1" data-tour-id="{{ $tour->id }}">
-            <i class="bi bi-shuffle"></i><span class="compare-btn-text">{{ __('ui.common.compare') }}</span>
+        <button type="button" class="border border-slate-300 text-slate-700 text-xs font-bold rounded-full px-3 py-2 btn-toggle-compare whitespace-nowrap cursor-pointer inline-flex items-center gap-1 min-h-[40px]" data-tour-id="{{ $tour->id }}">
+            <i class="bi bi-shuffle"></i><span class="compare-btn-text hidden sm:inline">{{ __('ui.common.compare') }}</span>
         </button>
-        <button class="btn-desert-animated text-xs sm:text-sm font-bold text-white rounded-full px-5 py-2.5 shadow-md whitespace-nowrap cursor-pointer inline-flex items-center gap-1" data-action="open-booking" data-tour="{{ $tour->id }}" data-tier="{{ $defaultTierId }}" @click.prevent.stop="$store.modal.open('booking', { tourId: {{ $tour->id }}{{ $defaultTierId ? ', tierId: ' . $defaultTierId : '' }} })">
+        <button class="btn-desert-animated text-xs sm:text-sm font-bold text-white rounded-full px-5 py-2.5 shadow-md whitespace-nowrap cursor-pointer inline-flex items-center gap-1 min-h-[40px]" data-action="open-booking" data-tour="{{ $tour->id }}" data-tier="{{ $defaultTierId }}" @click.prevent.stop="$store.modal.open('booking', { tourId: {{ $tour->id }}{{ $defaultTierId ? ', tierId: ' . $defaultTierId : '' }} })">
             <i class="bi bi-calendar-check-fill"></i>{{ __('ui.common.book_now') }}
         </button>
     </div>

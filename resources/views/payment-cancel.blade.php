@@ -21,10 +21,13 @@
                 </div>
             @endif
             <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                <a href="{{ localized_route('tours.index') }}" class="btn-desert-animated font-bold rounded-full px-6 py-3 text-white text-sm shadow-sm inline-flex items-center justify-center gap-2">
+                <a href="{{ localized_route('tours.index') }}" class="btn-desert-animated font-bold rounded-full px-6 py-3.5 text-white text-sm shadow-sm inline-flex items-center justify-center gap-2 w-full sm:w-auto min-h-[44px]">
                     <i class="bi bi-compass-fill"></i> Browse Tours
                 </a>
-                <a href="{{ localized_route('contact') }}" class="border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold rounded-full px-6 py-3 text-sm transition-colors inline-flex items-center justify-center gap-2">
+                <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode('Hi Dunes Discovery! My booking payment was cancelled (' . ($booking ? '#' . $booking->reference : 'uncompleted') . ') and I need help.') }}" target="_blank" rel="noopener noreferrer" class="btn-whatsapp-animated font-bold rounded-full px-6 py-3.5 text-white text-sm shadow-sm inline-flex items-center justify-center gap-2 w-full sm:w-auto min-h-[44px]" data-action="whatsapp">
+                    <i class="bi bi-whatsapp"></i> Chat Concierge
+                </a>
+                <a href="{{ localized_route('contact') }}" class="border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold rounded-full px-6 py-3.5 text-sm transition-colors inline-flex items-center justify-center gap-2 w-full sm:w-auto min-h-[44px]">
                     <i class="bi bi-envelope"></i> Contact Us
                 </a>
             </div>

@@ -46,11 +46,11 @@
                     <i class="bi bi-gift-fill text-amber-400"></i> Exclusive Departure Offer
                 </span>
                 <button type="button" 
-                        class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-colors cursor-pointer" 
+                        class="w-11 h-11 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-colors cursor-pointer" 
                         @click="$store.modal.close()" 
                         aria-label="{{ __('ui.common.close') }}" 
                         id="exitIntentCloseBtn">
-                    <i class="bi bi-x-lg text-xs"></i>
+                    <i class="bi bi-x-lg text-sm"></i>
                 </button>
             </div>
 
@@ -78,7 +78,7 @@
                         {{ $exitIntentDiscount }}% Instant Savings
                     </span>
                     <button type="button" 
-                            class="px-3 py-1.5 rounded-full border border-amber-400/50 hover:bg-amber-400 hover:text-slate-950 text-amber-400 text-xs font-bold transition-all cursor-pointer flex items-center gap-1" 
+                            class="px-3.5 py-2 min-h-[44px] rounded-full border border-amber-400/50 hover:bg-amber-400 hover:text-slate-950 text-amber-400 text-xs font-bold transition-all cursor-pointer inline-flex items-center justify-center gap-1" 
                             id="exitIntentCopyBtn" 
                             title="{{ __('ui.common.copy_code') }}">
                         <i class="bi bi-clipboard"></i>
@@ -110,13 +110,13 @@
             <!-- CTAs -->
             <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
                 <button type="button" 
-                        class="sm:col-span-7 w-full py-3.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2" 
+                        class="sm:col-span-7 w-full py-3.5 min-h-[44px] rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2" 
                         id="exitIntentClaimBtn">
                     <i class="bi bi-tag-fill"></i>
                     <span>{{ __('ui.common.save') }} {{ $exitIntentDiscount }}% & {{ __('ui.common.book_now') }}</span>
                 </button>
                 <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',(string)($settings['site_whatsapp'] ?? '971502456056')) }}?text={{ urlencode('Hi Dunes Discovery, I am looking to book a desert safari with the ' . $exitIntentDiscount . '% discount code ' . $exitIntentCode . '. Could you recommend the best package for my group?') }}" 
-                   class="btn-whatsapp sm:col-span-5 w-full py-3.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer" 
+                   class="btn-whatsapp sm:col-span-5 w-full py-3.5 min-h-[44px] rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer" 
                    data-action="whatsapp"
                    data-tour-name="Exit Intent Special Offer ({{ $exitIntentCode }})"
                    target="_blank" 
@@ -128,7 +128,7 @@
 
             <div class="mt-4">
                 <button type="button" 
-                        class="text-xs text-slate-400 hover:text-slate-200 transition-colors cursor-pointer" 
+                        class="text-xs text-slate-400 hover:text-slate-200 transition-colors cursor-pointer py-2 px-3 min-h-[44px] inline-flex items-center justify-center" 
                         @click="$store.modal.close()" 
                         id="exitIntentDismissLink">
                     No thanks, I'll pay full price later

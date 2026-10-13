@@ -80,7 +80,7 @@
 <!-- Regulatory E-E-A-T & Trust Bar -->
 <section class="bg-slate-50 py-3.5 border-b border-slate-200 shadow-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
             <div class="flex items-center gap-2.5">
                 <i class="bi bi-patch-check-fill text-primary text-xl shrink-0"></i>
                 <div>
@@ -120,7 +120,7 @@
             <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 shadow-xs">
                 <div class="relative">
                     <i class="bi bi-search absolute start-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
-                    <input type="text" id="faqSearchInput" class="w-full rounded-full ps-11 pe-4 py-3 bg-white border border-slate-200 text-sm text-slate-800 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs" placeholder="{{ __('ui.faq.search_placeholder') }}" oninput="handleFaqSearch(this.value)">
+                    <input type="text" id="faqSearchInput" class="w-full rounded-full ps-11 pe-4 py-3 bg-white border border-slate-200 text-base sm:text-sm text-slate-800 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs" placeholder="{{ __('ui.faq.search_placeholder') }}" oninput="handleFaqSearch(this.value)">
                 </div>
             </div>
         </div>
@@ -129,13 +129,13 @@
             @foreach($faqs as $i => $f)
             <div class="faq-item bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden transition-all duration-200" data-question="{{ strtolower($f->question) }}" data-answer="{{ strtolower($f->answer) }}">
                 <button type="button" 
-                        class="w-full text-start px-5 sm:px-6 py-4.5 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
+                        class="w-full text-start px-5 sm:px-6 py-4 sm:py-5 min-h-[52px] font-bold text-slate-900 flex items-start justify-between gap-4 cursor-pointer"
                         @click="openFaq = (openFaq === {{ $i }} ? null : {{ $i }})">
-                    <span class="inline-flex items-center gap-3 text-sm sm:text-base">
-                        <i class="bi bi-question-circle-fill text-primary shrink-0"></i>
+                    <span class="inline-flex items-start gap-3 text-sm sm:text-base leading-snug">
+                        <i class="bi bi-question-circle-fill text-primary shrink-0 mt-0.5"></i>
                         <span>{{ $f->question }}</span>
                     </span>
-                    <i class="bi bi-chevron-down transition-transform duration-300 text-slate-500 shrink-0"
+                    <i class="bi bi-chevron-down transition-transform duration-300 text-slate-500 shrink-0 mt-1"
                        :class="openFaq === {{ $i }} ? 'rotate-180 text-primary' : ''"></i>
                 </button>
                 <div x-show="openFaq === {{ $i }}" x-collapse x-cloak class="px-5 sm:px-6 pb-5 text-slate-600 text-xs sm:text-sm leading-relaxed border-t border-slate-200 pt-3.5">
@@ -160,11 +160,11 @@
             <h2 class="text-2xl font-extrabold text-slate-900 mb-2">{{ __('ui.faq.still_have_questions') }}</h2>
             <p class="text-slate-600 text-sm mb-6 max-w-md mx-auto">{{ __('ui.faq.team_ready') }}</p>
             <div class="flex flex-col sm:flex-row justify-center gap-3">
-                <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode('Hi! I have a question about your tours.') }}" class="btn-whatsapp-animated rounded-full px-6 py-3 font-bold text-white text-sm inline-flex items-center justify-center gap-2 shadow-sm cursor-pointer" target="_blank" rel="noopener noreferrer" data-action="whatsapp">
+                <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode('Hi! I have a question about your tours.') }}" class="btn-whatsapp-animated rounded-full px-6 py-3 font-bold text-white text-sm inline-flex items-center justify-center gap-2 shadow-sm cursor-pointer w-full sm:w-auto min-h-[44px]" target="_blank" rel="noopener noreferrer" data-action="whatsapp">
                     <i class="bi bi-whatsapp"></i>
                     <span>{{ __('ui.faq.whatsapp_247') }}</span>
                 </a>
-                <a href="{{ localized_route('contact') }}" class="btn-desert-animated rounded-full px-6 py-3 font-bold text-white text-sm inline-flex items-center justify-center gap-2 shadow-sm">
+                <a href="{{ localized_route('contact') }}" class="btn-desert-animated rounded-full px-6 py-3 font-bold text-white text-sm inline-flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto min-h-[44px]">
                     <i class="bi bi-envelope"></i>
                     <span>{{ __('ui.nav.contact') }}</span>
                 </a>

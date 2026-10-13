@@ -14,12 +14,15 @@
             </span>
         </div>
     </div>
+    <div class="sm:hidden text-[11px] text-slate-500 font-medium flex items-center gap-1.5 mb-3 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+        <i class="bi bi-arrow-left-right text-primary"></i> Swipe horizontally to compare all packages
+    </div>
 
     <div class="overflow-x-auto rounded-2xl border border-slate-200">
         <table class="w-full text-center text-sm border-collapse min-w-[620px]">
             <thead class="bg-slate-50 border-b border-slate-200">
                 <tr>
-                    <th class="text-start py-4 px-4 text-slate-500 font-bold uppercase text-xs w-[28%] min-w-[180px]">Feature / Inclusion</th>
+                    <th class="text-start py-4 px-4 text-slate-500 font-bold uppercase text-xs w-[28%] min-w-[180px] sticky start-0 bg-slate-50 z-10 shadow-[1px_0_0_0_#e2e8f0]">Feature / Inclusion</th>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
                     @php
                         $isTierSelected = isset($activeTier) && $activeTier && $tier->id === $activeTier->id;
@@ -39,7 +42,7 @@
             </thead>
             <tbody class="divide-y divide-slate-200 text-xs sm:text-sm">
                 <tr>
-                    <td class="text-start py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
+                    <td class="text-start py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2 sticky start-0 bg-white z-10 shadow-[1px_0_0_0_#e2e8f0]">
                         <i class="bi bi-compass text-primary"></i> Dune Bashing & Sandboarding
                     </td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
@@ -55,7 +58,7 @@
                     @endforeach
                 </tr>
                 <tr>
-                    <td class="text-start py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
+                    <td class="text-start py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2 sticky start-0 bg-white z-10 shadow-[1px_0_0_0_#e2e8f0]">
                         <i class="bi bi-house-door text-primary"></i> Camp Seating & Service
                     </td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
@@ -71,7 +74,7 @@
                     @endforeach
                 </tr>
                 <tr>
-                    <td class="text-start py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
+                    <td class="text-start py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2 sticky start-0 bg-white z-10 shadow-[1px_0_0_0_#e2e8f0]">
                         <i class="bi bi-fire text-primary"></i> Live Desert Shows
                     </td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
@@ -82,7 +85,7 @@
                     @endforeach
                 </tr>
                 <tr>
-                    <td class="text-start py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
+                    <td class="text-start py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2 sticky start-0 bg-white z-10 shadow-[1px_0_0_0_#e2e8f0]">
                         <i class="bi bi-egg-fried text-primary"></i> BBQ Buffet Dinner
                     </td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
@@ -96,7 +99,7 @@
                     @endforeach
                 </tr>
                 <tr>
-                    <td class="text-start py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
+                    <td class="text-start py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2 sticky start-0 bg-white z-10 shadow-[1px_0_0_0_#e2e8f0]">
                         <i class="bi bi-truck text-primary"></i> Transfer Vehicle
                     </td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
@@ -110,7 +113,7 @@
                     @endforeach
                 </tr>
                 <tr>
-                    <td class="text-start py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
+                    <td class="text-start py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2 sticky start-0 bg-white z-10 shadow-[1px_0_0_0_#e2e8f0]">
                         <i class="bi bi-speedometer2 text-primary"></i> Quad Biking / Buggy
                     </td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
@@ -124,7 +127,7 @@
                     @endforeach
                 </tr>
                 <tr>
-                    <td class="text-start py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2">
+                    <td class="text-start py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2 sticky start-0 bg-white z-10 shadow-[1px_0_0_0_#e2e8f0]">
                         <i class="bi bi-heart text-primary"></i> Camel Ride & Henna
                     </td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
@@ -136,14 +139,14 @@
             </tbody>
             <tfoot class="bg-slate-50 border-t border-slate-200">
                 <tr>
-                    <td class="text-start py-3.5 px-4 font-bold text-slate-500 text-xs">Select Package:</td>
+                    <td class="text-start py-3.5 px-4 font-bold text-slate-500 text-xs sticky start-0 bg-slate-50 z-10 shadow-[1px_0_0_0_#e2e8f0]">Select Package:</td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
                     @php
                         $isTierSelected = isset($activeTier) && $activeTier && $tier->id === $activeTier->id;
                     @endphp
                     <td class="py-3.5 px-3 {{ $isTierSelected ? 'bg-orange-100/70 border-x-2 border-primary' : ($tier->is_popular ? 'bg-orange-50/60 border-x border-orange-200' : '') }}">
                         <button type="button" 
-                                class="w-full py-2.5 px-3 rounded-full text-xs font-bold transition-all shadow-xs cursor-pointer {{ ($isTierSelected || $tier->is_popular) ? 'bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-sm' : 'border border-primary text-primary hover:bg-primary hover:text-white' }}" 
+                                class="w-full py-2.5 px-3 rounded-full text-xs font-bold transition-all shadow-xs cursor-pointer min-h-[42px] inline-flex items-center justify-center {{ ($isTierSelected || $tier->is_popular) ? 'bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-sm' : 'border border-primary text-primary hover:bg-primary hover:text-white' }}" 
                                 data-action="open-booking" 
                                 data-tour="{{ $tour->id }}" 
                                 data-tier="{{ $tier->id }}"

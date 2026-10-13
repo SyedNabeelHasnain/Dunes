@@ -40,7 +40,7 @@
                         <i class="bi bi-info-circle text-primary me-1"></i> <strong>Note:</strong> You will still receive essential transactional notifications regarding any confirmed bookings or customer service inquiries.
                     </div>
 
-                    <a href="{{ localized_route('home') }}" class="btn-desert-animated font-bold rounded-full px-6 py-3 text-white text-sm shadow-md inline-flex items-center gap-2">
+                    <a href="{{ localized_route('home') }}" class="btn-desert-animated font-bold rounded-full px-6 py-3.5 text-white text-sm shadow-md inline-flex items-center justify-center gap-2 min-h-[44px] w-full sm:w-auto">
                         <i class="bi bi-house-door-fill"></i> Return to Homepage
                     </a>
                 </div>
@@ -53,7 +53,7 @@
                     <p class="text-slate-500 text-sm mb-6 leading-relaxed">
                         The email address <strong class="text-slate-700">{{ $subscriber->email }}</strong> is already unsubscribed from our active marketing lists.
                     </p>
-                    <a href="{{ localized_route('home') }}" class="border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold rounded-full px-6 py-3 text-sm transition-colors inline-flex items-center gap-2">
+                    <a href="{{ localized_route('home') }}" class="border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold rounded-full px-6 py-3.5 text-sm transition-colors inline-flex items-center justify-center gap-2 min-h-[44px] w-full sm:w-auto">
                         <i class="bi bi-house-door-fill"></i> Return to Homepage
                     </a>
                 </div>
@@ -66,7 +66,7 @@
                     @csrf
                     <div class="mb-4">
                         <label class="block text-slate-700 font-bold text-xs uppercase tracking-wider mb-2">Optional: Why are you unsubscribing?</label>
-                        <select name="reason" class="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-colors">
+                        <select name="reason" class="w-full rounded-xl border border-slate-200 bg-white p-3 text-base sm:text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-colors">
                             <option value="I receive emails too frequently">I receive emails too frequently</option>
                             <option value="Content is no longer relevant to me">Content is no longer relevant to me</option>
                             <option value="I never signed up for this newsletter">I never signed up for this newsletter</option>
@@ -76,14 +76,14 @@
                     </div>
 
                     <div class="mb-6">
-                        <input type="text" name="other_reason" class="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-colors" placeholder="{{ __('ui.review_submit.feedback_placeholder') }}" maxlength="200">
+                        <input type="text" name="other_reason" class="w-full rounded-xl border border-slate-200 bg-white p-3 text-base sm:text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-colors" placeholder="{{ __('ui.review_submit.feedback_placeholder') }}" maxlength="200">
                     </div>
 
                     <div class="space-y-2.5">
-                        <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-full py-3.5 text-sm shadow-md transition-colors cursor-pointer inline-flex items-center justify-center gap-2">
+                        <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-full py-3.5 text-sm shadow-md transition-colors cursor-pointer inline-flex items-center justify-center gap-2 min-h-[48px]">
                             <i class="bi bi-x-circle"></i> Confirm Unsubscribe
                         </button>
-                        <a href="{{ localized_route('home') }}" class="block w-full border border-slate-200 hover:bg-slate-50 text-slate-600 font-semibold rounded-full py-3 text-xs sm:text-sm text-center transition-colors">
+                        <a href="{{ localized_route('home') }}" class="block w-full border border-slate-200 hover:bg-slate-50 text-slate-600 font-semibold rounded-full py-3 text-xs sm:text-sm text-center transition-colors min-h-[44px] inline-flex items-center justify-center">
                             Nevermind, Keep Me Subscribed
                         </a>
                     </div>

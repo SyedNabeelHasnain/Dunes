@@ -50,10 +50,10 @@
                     </h5>
                 </div>
                 <button type="button" 
-                        class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-colors cursor-pointer" 
+                        class="w-11 h-11 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-colors cursor-pointer" 
                         @click="$store.modal.close()" 
                         aria-label="{{ __('ui.common.close') }}">
-                    <i class="bi bi-x-lg text-xs"></i>
+                    <i class="bi bi-x-lg text-sm"></i>
                 </button>
             </div>
 
@@ -129,7 +129,7 @@
                             <label class="block text-xs font-black uppercase tracking-wider text-slate-300 mb-2.5">
                                 2. Transfer Option
                             </label>
-                            <div class="grid grid-cols-3 gap-2">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                 <div @click="transfer = { name: 'Shared 4x4 Land Cruiser', price: 0, type: 'flat' }"
                                      class="p-2.5 rounded-xl cursor-pointer transition-all border text-start"
                                      :class="transfer.name === 'Shared 4x4 Land Cruiser' ? 'bg-orange-500/15 border-primary' : 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500'">
@@ -226,12 +226,14 @@
                                     </div>
                                     <div class="flex items-center gap-3">
                                         <button type="button" 
-                                                class="w-7 h-7 rounded-full border border-slate-700 hover:border-slate-500 bg-slate-800 text-white flex items-center justify-center text-xs font-bold transition-colors cursor-pointer"
-                                                @click="if (adults > 1) adults--">-</button>
-                                        <span class="font-black text-white text-sm w-4 text-center" x-text="adults">2</span>
+                                                class="w-11 h-11 rounded-full border border-slate-700 hover:border-slate-500 bg-slate-800 text-white flex items-center justify-center text-sm font-bold transition-colors cursor-pointer"
+                                                @click="if (adults > 1) adults--"
+                                                aria-label="Decrease guests">-</button>
+                                        <span class="font-black text-white text-base w-6 text-center" x-text="adults">2</span>
                                         <button type="button" 
-                                                class="w-7 h-7 rounded-full border border-amber-400/50 hover:bg-amber-400 hover:text-slate-950 bg-slate-800 text-amber-400 flex items-center justify-center text-xs font-bold transition-colors cursor-pointer"
-                                                @click="if (adults < 30) adults++">+</button>
+                                                class="w-11 h-11 rounded-full border border-amber-400/50 hover:bg-amber-400 hover:text-slate-950 bg-slate-800 text-amber-400 flex items-center justify-center text-sm font-bold transition-colors cursor-pointer"
+                                                @click="if (adults < 30) adults++"
+                                                aria-label="Increase guests">+</button>
                                     </div>
                                 </div>
 
@@ -266,7 +268,7 @@
 
                                 <div class="space-y-2">
                                     <button type="button" 
-                                            class="w-full py-3 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs sm:text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2" 
+                                            class="w-full py-3.5 min-h-[44px] rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs sm:text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2" 
                                             @click="book()">
                                         <i class="bi bi-calendar-check-fill"></i>
                                         <span>Book Custom Safari</span>
@@ -274,7 +276,7 @@
                                     <a :href="waUrl" 
                                        target="_blank" 
                                        rel="noopener" 
-                                       class="btn-whatsapp w-full py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                                       class="btn-whatsapp w-full py-3 min-h-[44px] rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs sm:text-sm shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
                                        data-action="whatsapp"
                                        :data-tour-name="base ? base.name : 'Custom Desert Safari'"
                                        @click.prevent="window.openWhatsApp ? window.openWhatsApp(base ? base.name : 'Custom Desert Safari', waUrl) : null">

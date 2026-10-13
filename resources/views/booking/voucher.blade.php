@@ -54,21 +54,21 @@
 
     <!-- Top Action Bar (Web Only) -->
     <div class="no-print max-w-4xl mx-auto flex justify-between items-center flex-wrap gap-3 mb-6">
-        <a href="{{ url('/') }}" class="bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 text-xs sm:text-sm font-bold rounded-full px-4 py-2 shadow-xs inline-flex items-center gap-1.5 transition-colors">
+        <a href="{{ url('/') }}" class="bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 text-xs sm:text-sm font-bold rounded-full px-4 py-2.5 shadow-xs inline-flex items-center gap-1.5 transition-colors min-h-[40px]">
             <i class="bi bi-arrow-left rtl:rotate-180 text-primary"></i> Return to Site
         </a>
         <div class="flex items-center gap-2 flex-wrap">
-            <button type="button" onclick="window.print()" class="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs sm:text-sm font-bold rounded-full px-4 py-2 shadow-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer">
+            <button type="button" onclick="window.print()" class="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs sm:text-sm font-bold rounded-full px-4 py-2.5 shadow-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer min-h-[40px]">
                 <i class="bi bi-printer"></i> Print
             </button>
-            <a href="{{ route('booking.ticket.pdf', $booking->reference) }}" class="btn-desert-animated text-xs sm:text-sm font-bold rounded-full px-5 py-2 text-white shadow-xs inline-flex items-center gap-1.5">
+            <a href="{{ route('booking.ticket.pdf', $booking->reference) }}" class="btn-desert-animated text-xs sm:text-sm font-bold rounded-full px-5 py-2.5 text-white shadow-xs inline-flex items-center gap-1.5 min-h-[40px]">
                 <i class="bi bi-file-earmark-arrow-down"></i> Download PDF Ticket
             </a>
             @php
                 $cleanPhone = preg_replace('/[^0-9]/', '', $booking->phone);
                 $waMsg = 'Hello Dunes Discovery! Regarding my booking #' . $booking->reference . ' for ' . $booking->tour_name;
             @endphp
-            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode($waMsg) }}" target="_blank" rel="noopener noreferrer" class="btn-whatsapp bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold rounded-full px-4 py-2 shadow-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer" data-action="whatsapp" data-tour-name="{{ $booking->tour_name }}">
+            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode($waMsg) }}" target="_blank" rel="noopener noreferrer" class="btn-whatsapp bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold rounded-full px-4 py-2.5 shadow-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer min-h-[40px]" data-action="whatsapp" data-tour-name="{{ $booking->tour_name }}">
                 <i class="bi bi-whatsapp"></i> Concierge
             </a>
         </div>
@@ -209,9 +209,9 @@
                 <div class="bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl p-5 text-center flex flex-col items-center justify-center">
                     <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block mb-2">Digital E-Ticket QR</span>
                     @if(!empty($qrCodeUrl))
-                        <img src="{{ $qrCodeUrl }}" width="115" height="115" class="rounded-xl shadow-xs bg-white p-1.5" alt="Verification QR">
+                        <img src="{{ $qrCodeUrl }}" width="144" height="144" class="w-36 h-36 rounded-xl shadow-xs bg-white p-1.5" alt="Verification QR">
                     @else
-                        <div class="w-24 h-24 border border-slate-300 rounded-xl bg-white text-slate-500 text-xs flex items-center justify-center font-mono">QR CODE</div>
+                        <div class="w-36 h-36 border border-slate-300 rounded-xl bg-white text-slate-500 text-xs flex items-center justify-center font-mono">QR CODE</div>
                     @endif
                     <span class="text-slate-500 text-[10px] mt-2 leading-tight">Scan with driver to verify reservation instantly</span>
                 </div>

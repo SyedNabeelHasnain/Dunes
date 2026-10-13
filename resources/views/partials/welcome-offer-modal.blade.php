@@ -73,10 +73,10 @@
             <!-- Close Button -->
             <button type="button" 
                     @click="$store.modal.close()" 
-                    class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-800 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer absolute top-4 end-4 z-10" 
+                    class="w-11 h-11 rounded-full bg-slate-100 text-slate-500 hover:text-slate-800 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer absolute top-4 end-4 z-10" 
                     id="closeWelcomeOfferBtn" 
                     aria-label="{{ __('ui.common.close') }}">
-                <i class="bi bi-x-lg text-xs"></i>
+                <i class="bi bi-x-lg text-sm"></i>
             </button>
 
             <div class="p-6 sm:p-8">
@@ -140,7 +140,7 @@
                                         <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1" for="welcomeName">{{ __('ui.booking.name') }} <span class="text-red-500">*</span></label>
                                         <div class="relative rounded-xl shadow-2xs overflow-hidden border border-slate-200 bg-white focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
                                             <span class="absolute start-3.5 top-1/2 -translate-y-1/2 text-primary"><i class="bi bi-person-fill"></i></span>
-                                            <input type="text" class="w-full ps-10 pe-3 py-2.5 bg-transparent text-xs sm:text-sm font-semibold text-slate-800 border-0 focus:outline-none placeholder:text-slate-400" id="welcomeName" name="name" placeholder="{{ __('ui.booking.name_placeholder') }}" required autocomplete="name">
+                                            <input type="text" class="w-full ps-10 pe-3 py-2.5 bg-transparent text-base sm:text-sm font-semibold text-slate-800 border-0 focus:outline-none placeholder:text-slate-400" id="welcomeName" name="name" placeholder="{{ __('ui.booking.name_placeholder') }}" required autocomplete="name">
                                         </div>
                                     </div>
 
@@ -148,21 +148,21 @@
                                         <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1" for="welcomeEmail">{{ __('ui.booking.email') }} <span class="text-red-500">*</span></label>
                                         <div class="relative rounded-xl shadow-2xs overflow-hidden border border-slate-200 bg-white focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
                                             <span class="absolute start-3.5 top-1/2 -translate-y-1/2 text-primary"><i class="bi bi-envelope-fill"></i></span>
-                                            <input type="email" class="w-full ps-10 pe-3 py-2.5 bg-transparent text-xs sm:text-sm font-semibold text-slate-800 border-0 focus:outline-none placeholder:text-slate-400" id="welcomeEmail" name="email" placeholder="{{ __('ui.booking.email_placeholder') }}" required autocomplete="email">
+                                            <input type="email" class="w-full ps-10 pe-3 py-2.5 bg-transparent text-base sm:text-sm font-semibold text-slate-800 border-0 focus:outline-none placeholder:text-slate-400" id="welcomeEmail" name="email" placeholder="{{ __('ui.booking.email_placeholder') }}" required autocomplete="email">
                                         </div>
                                     </div>
 
                                     <div>
                                         <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1" for="welcomePhone"><i class="bi bi-whatsapp text-emerald-500 me-1"></i>{{ __('ui.booking.phone') }} <span class="text-red-500">*</span></label>
                                         <div class="welcome-phone-field rounded-xl shadow-2xs bg-white border border-slate-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all relative">
-                                            <input type="tel" class="w-full py-2.5 px-3 bg-transparent text-xs sm:text-sm font-semibold text-slate-800 border-0 focus:outline-none placeholder:text-slate-400" id="welcomePhone" name="phone" placeholder="{{ __('ui.booking.phone_placeholder') }}" required autocomplete="tel">
+                                            <input type="tel" class="w-full py-2.5 px-3 bg-transparent text-base sm:text-sm font-semibold text-slate-800 border-0 focus:outline-none placeholder:text-slate-400" id="welcomePhone" name="phone" placeholder="{{ __('ui.booking.phone_placeholder') }}" required autocomplete="tel">
                                         </div>
                                         <small class="text-slate-500 block mt-1 text-[11px]"><i class="bi bi-shield-check text-emerald-500 me-1"></i>Voucher sent via Email & WhatsApp.</small>
                                     </div>
 
                                     <div class="p-2.5 rounded-xl bg-red-50 text-red-700 text-xs border border-red-200 hidden" id="welcomeOfferError"></div>
 
-                                    <button type="submit" class="w-full py-3.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2" id="claimOfferSubmitBtn">
+                                    <button type="submit" class="w-full py-3.5 min-h-[44px] rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2" id="claimOfferSubmitBtn">
                                         <span>Claim My {{ (int)$popupDiscount }}% Discount</span>
                                         <i class="bi bi-arrow-right rtl:rotate-180"></i>
                                     </button>
@@ -185,12 +185,12 @@
                                 <div class="p-4 rounded-2xl text-white mb-4 relative shadow-lg bg-gradient-to-br from-slate-900 to-slate-950 border-2 border-dashed border-orange-500">
                                     <span class="text-[10px] uppercase font-bold text-amber-400 tracking-widest block mb-1">Your Exclusive Promo Code</span>
                                     <div class="text-2xl sm:text-3xl font-black font-mono text-white my-2 tracking-widest" id="generatedVoucherCode">FIRST25-XXXXX</div>
-                                    <button type="button" class="px-3 py-1 rounded-full bg-white hover:bg-slate-100 text-slate-900 text-xs font-bold transition-colors cursor-pointer inline-flex items-center gap-1.5" id="copyVoucherBtn">
+                                    <button type="button" class="px-4 py-2 min-h-[44px] rounded-full bg-white hover:bg-slate-100 text-slate-900 text-xs font-bold transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5" id="copyVoucherBtn">
                                         <i class="bi bi-clipboard"></i> <span>Copy Code</span>
                                     </button>
                                 </div>
 
-                                <button type="button" class="w-full py-3.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 mb-2" id="applyVoucherAndBookBtn">
+                                <button type="button" class="w-full py-3.5 min-h-[44px] rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 mb-2" id="applyVoucherAndBookBtn">
                                     <i class="bi bi-cart-check-fill"></i>
                                     <span>Apply {{ (int)$popupDiscount }}% OFF & Book Safari Now</span>
                                 </button>
@@ -211,11 +211,11 @@
 
 <!-- Floating Persistent Voucher Reminder Pill (Appears when claimed) -->
 <div id="welcomeFloatingPill" 
-     class="hidden fixed bottom-6 start-6 z-40 mb-safe items-center gap-2 p-2 px-3.5 rounded-full bg-slate-950/95 text-white border border-orange-500/50 shadow-2xl backdrop-blur-md cursor-pointer hover:scale-105 transition-all">
+     class="hidden fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] start-4 sm:bottom-6 sm:start-6 z-40 mb-safe items-center gap-2 p-2 px-3.5 rounded-full bg-slate-950/95 text-white border border-orange-500/50 shadow-2xl backdrop-blur-md cursor-pointer hover:scale-105 transition-all">
     <span class="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-xs">{{ (int)$popupDiscount }}% OFF</span>
     <span class="text-xs font-bold font-mono text-white" id="floatingPillCode">FIRST25-OFF</span>
     <span class="text-xs text-slate-300 font-mono hidden sm:inline" id="floatingPillTimer">{{ sprintf('%02d', $popupTimerMins) }}:00</span>
-    <button type="button" class="px-2.5 py-1 rounded-full bg-primary hover:bg-primary-dark text-white font-bold text-xs transition-colors ms-1 cursor-pointer">
+    <button type="button" class="px-3 py-1.5 min-h-[36px] rounded-full bg-primary hover:bg-primary-dark text-white font-bold text-xs transition-colors ms-1 cursor-pointer flex items-center justify-center">
         Apply
     </button>
 </div>

@@ -56,9 +56,9 @@
                 </div>
                 <button type="button" 
                         @click="$store.modal.close()" 
-                        class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-800 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer" 
+                        class="w-11 h-11 rounded-full bg-slate-100 text-slate-400 hover:text-slate-800 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer" 
                         aria-label="{{ __('ui.common.close') }}">
-                    <i class="bi bi-x-lg text-xs"></i>
+                    <i class="bi bi-x-lg text-sm"></i>
                 </button>
             </div>
 
@@ -107,7 +107,7 @@
                                required 
                                data-form="whatsapp" 
                                data-field="name"
-                               class="w-full px-4 py-3 rounded-2xl bg-white border border-slate-200 text-sm font-semibold text-slate-900 shadow-2xs focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none transition-all placeholder:text-slate-400">
+                                class="w-full px-4 py-3 rounded-2xl bg-white border border-slate-200 text-base sm:text-sm font-semibold text-slate-900 shadow-2xs focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none transition-all placeholder:text-slate-400">
                     </div>
                 </div>
 
@@ -125,14 +125,14 @@
                                required 
                                data-form="whatsapp" 
                                data-field="phone"
-                               class="w-full py-3 px-4 bg-transparent text-sm font-semibold text-slate-900 border-0 focus:outline-none placeholder:text-slate-400">
+                               class="w-full py-3 px-4 bg-transparent text-base sm:text-sm font-semibold text-slate-900 border-0 focus:outline-none placeholder:text-slate-400">
                     </div>
                     <p class="text-[11px] text-slate-400 mt-1">Our certified safari captains will reply directly on this number.</p>
                 </div>
 
                 <!-- Terms & Privacy Agreement -->
                 <div class="pt-1">
-                    <label class="flex items-start gap-2.5 cursor-pointer select-none">
+                    <label class="flex items-start gap-2.5 cursor-pointer select-none py-1 min-h-[44px]">
                         <input type="checkbox" 
                                id="waAgreement" 
                                name="agreement" 
@@ -154,7 +154,7 @@
                     <button type="submit" 
                             id="startChatBtn" 
                             disabled 
-                            class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold text-sm shadow-md shadow-emerald-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                            class="w-full py-3.5 min-h-[48px] px-6 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold text-sm shadow-md shadow-emerald-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                         <i class="bi bi-whatsapp text-lg"></i>
                         <span>{{ __('ui.common.start_whatsapp_chat') }}</span>
                         <i class="bi bi-arrow-right rtl:rotate-180 text-xs"></i>
