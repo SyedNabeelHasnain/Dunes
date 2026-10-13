@@ -17,10 +17,98 @@
     </div>
     
     <div class="p-6">
-        <form action="{{ route('admin.settings.update') }}" method="POST">
+        <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Brand Visuals, Hero Poster & Fallback Media -->
+                <div class="col-span-1 lg:col-span-2">
+                    <div class="p-5 bg-slate-50/70 rounded-2xl border border-slate-200/80">
+                        <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                            <h6 class="text-xs font-black uppercase tracking-wider text-primary flex items-center gap-2">
+                                <i class="bi bi-image"></i> Brand Visuals, Homepage Hero Poster & Default Social Share Media
+                            </h6>
+                            <span class="rounded-full border border-primary/20 bg-amber-500/10 px-3 py-1 text-[11px] font-bold text-primary">Media Controls</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- 1. Homepage Hero Video Poster -->
+                            <div class="p-4 bg-white rounded-xl border border-slate-200 flex flex-col justify-between">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Homepage Hero Video Poster Image</label>
+                                    <p class="text-[11px] text-slate-500 mb-3">The poster image displayed on the homepage while the background video streams, on mobile devices, and in Google VideoObject rich snippet schemas.</p>
+                                    
+                                    <div class="flex items-center gap-4 mb-3">
+                                        <div class="w-24 h-16 rounded-lg overflow-hidden border border-slate-200 bg-slate-100 shrink-0 shadow-2xs">
+                                            @php
+                                                $heroPosterPreview = !empty($settings['site_hero_poster']) 
+                                                    ? (str_starts_with($settings['site_hero_poster'], 'http') ? $settings['site_hero_poster'] : asset(ltrim($settings['site_hero_poster'], '/'))) 
+                                                    : asset('images/desert-safari-poster.avif');
+                                            @endphp
+                                            <img src="{{ $heroPosterPreview }}" alt="Hero Poster Preview" class="w-full h-full object-cover">
+                                        </div>
+                                        <div class="text-[11px] text-slate-500 overflow-hidden">
+                                            <div class="font-bold text-slate-700">Active Poster</div>
+                                            <div class="truncate text-slate-400 font-mono text-[10px]">{{ $settings['site_hero_poster'] ?? '/images/desert-safari-poster.avif' }}</div>
+                                            <span class="inline-block mt-1 text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded">Native HD AVIF</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="site_hero_poster_file" class="block text-xs font-semibold text-slate-600 mb-1">Upload New Poster Image</label>
+                                        <input type="file" name="site_hero_poster_file" id="site_hero_poster_file" accept="image/jpeg,image/png,image/webp,image/avif" class="w-full text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
+                                        <div class="mt-1 text-[10px] text-slate-400">Max 8MB. Recommended: 900x600 or 1920x1080 (HD AVIF, WebP, JPG).</div>
+                                    </div>
+
+                                    <div>
+                                        <label for="site_hero_poster" class="block text-xs font-semibold text-slate-600 mb-1">Or Specify Image Path / URL</label>
+                                        <input type="text" name="site_hero_poster" id="site_hero_poster" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['site_hero_poster'] ?? '/images/desert-safari-poster.avif' }}" placeholder="/images/desert-safari-dubai-dune-discovery-tourism-HD.avif">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 2. Sitewide Default OpenGraph / Social Share Image -->
+                            <div class="p-4 bg-white rounded-xl border border-slate-200 flex flex-col justify-between">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Sitewide Default OpenGraph / Social Share Image</label>
+                                    <p class="text-[11px] text-slate-500 mb-3">The default link preview thumbnail shown when pages without specific social cards are shared across WhatsApp, iMessage, Facebook, and Twitter/X.</p>
+                                    
+                                    <div class="flex items-center gap-4 mb-3">
+                                        <div class="w-24 h-16 rounded-lg overflow-hidden border border-slate-200 bg-slate-100 shrink-0 shadow-2xs">
+                                            @php
+                                                $ogDefaultPreview = !empty($settings['seo_default_og_image']) 
+                                                    ? (str_starts_with($settings['seo_default_og_image'], 'http') ? $settings['seo_default_og_image'] : asset(ltrim($settings['seo_default_og_image'], '/'))) 
+                                                    : asset('images/desert-safari-poster.avif');
+                                            @endphp
+                                            <img src="{{ $ogDefaultPreview }}" alt="Social Share Preview" class="w-full h-full object-cover">
+                                        </div>
+                                        <div class="text-[11px] text-slate-500 overflow-hidden">
+                                            <div class="font-bold text-slate-700">Active Share Card</div>
+                                            <div class="truncate text-slate-400 font-mono text-[10px]">{{ $settings['seo_default_og_image'] ?? '/images/desert-safari-poster.avif' }}</div>
+                                            <span class="inline-block mt-1 text-[10px] text-sky-600 font-semibold bg-sky-50 px-2 py-0.5 rounded">Default OG Card</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="seo_default_og_image_file" class="block text-xs font-semibold text-slate-600 mb-1">Upload New Share Card</label>
+                                        <input type="file" name="seo_default_og_image_file" id="seo_default_og_image_file" accept="image/jpeg,image/png,image/webp,image/avif" class="w-full text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
+                                        <div class="mt-1 text-[10px] text-slate-400">Max 8MB. Recommended: 1200x630 (HD Landscape, 1.91:1 ratio).</div>
+                                    </div>
+
+                                    <div>
+                                        <label for="seo_default_og_image" class="block text-xs font-semibold text-slate-600 mb-1">Or Specify Image Path / URL</label>
+                                        <input type="text" name="seo_default_og_image" id="seo_default_og_image" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['seo_default_og_image'] ?? '/images/desert-safari-poster.avif' }}" placeholder="/images/desert-safari-poster.avif">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-t border-slate-200/60 flex items-center justify-between text-xs text-slate-500">
+                            <span><i class="bi bi-info-circle mr-1"></i>You can also customize individual per-page OpenGraph cards and search meta under <a href="{{ route('admin.settings.seo') }}" class="text-primary font-semibold hover:underline">SEO & Metadata Management</a>.</span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Brand Identity & Licensing -->
                 <div class="p-5 bg-slate-50/70 rounded-2xl border border-slate-200/80 flex flex-col justify-between">
                     <div>

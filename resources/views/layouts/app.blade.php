@@ -281,7 +281,7 @@
           "description": {!! json_encode($settings['site_description'] ?? 'Licensed Dubai Destination Management Company offering premium Desert Safaris, 1000cc Dune Buggy Rentals, Quad Biking, Dhow Cruise Dinners, and Abu Dhabi City Tours.', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
           "url": {!! json_encode(url('/'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
           "logo": {!! json_encode(asset('images/logo.png'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-          "image": {!! json_encode(asset('images/desert-safari-poster.avif'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "image": {!! json_encode(!empty($settings['site_default_image']) ? (str_starts_with($settings['site_default_image'], 'http') ? $settings['site_default_image'] : asset(ltrim($settings['site_default_image'], '/'))) : (!empty($settings['seo_default_og_image']) ? (str_starts_with($settings['seo_default_og_image'], 'http') ? $settings['seo_default_og_image'] : asset(ltrim($settings['seo_default_og_image'], '/'))) : asset('images/desert-safari-poster.avif')), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
           "telephone": {!! json_encode($phone, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
           "email": {!! json_encode($email, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
           "priceRange": "AED 79 - AED 1500",

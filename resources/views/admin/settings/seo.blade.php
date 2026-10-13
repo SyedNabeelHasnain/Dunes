@@ -17,7 +17,7 @@
     </div>
     
     <div class="p-6">
-        <form action="{{ route('admin.settings.update') }}" method="POST">
+        <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             <!-- Alpine Nav Tabs -->
@@ -91,9 +91,26 @@
                                     <label for="seo_default_keywords" class="block text-xs font-bold text-slate-700 mb-1.5">Default Meta Keywords</label>
                                     <input type="text" name="seo_default_keywords" id="seo_default_keywords" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['seo_default_keywords'] ?? '' }}" placeholder="desert safari dubai, dunes discovery, evening safari">
                                 </div>
-                                <div>
-                                    <label for="seo_default_og_image" class="block text-xs font-bold text-slate-700 mb-1.5">Default OpenGraph Image URL</label>
-                                    <input type="text" name="seo_default_og_image" id="seo_default_og_image" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['seo_default_og_image'] ?? '' }}" placeholder="/images/og-default.jpg">
+                                <div class="p-3 bg-white rounded-xl border border-slate-200">
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Default OpenGraph & Sitewide Social Share Image</label>
+                                    <div class="flex items-center gap-3 mb-2.5">
+                                        <div class="w-16 h-12 rounded-lg overflow-hidden border border-slate-200 bg-slate-100 shrink-0">
+                                            @php
+                                                $defOgPreview = !empty($settings['seo_default_og_image']) 
+                                                    ? (str_starts_with($settings['seo_default_og_image'], 'http') ? $settings['seo_default_og_image'] : asset(ltrim($settings['seo_default_og_image'], '/'))) 
+                                                    : asset('images/desert-safari-poster.avif');
+                                            @endphp
+                                            <img src="{{ $defOgPreview }}" alt="Default OG Preview" class="w-full h-full object-cover">
+                                        </div>
+                                        <div class="text-[11px] text-slate-500 overflow-hidden">
+                                            <span class="truncate block text-slate-400 font-mono text-[10px]">{{ $settings['seo_default_og_image'] ?? '/images/desert-safari-poster.avif' }}</span>
+                                            <span class="text-[10px] text-sky-600 font-semibold">1200x630px Recommended</span>
+                                        </div>
+                                    </div>
+                                    <div class="mb-2">
+                                        <input type="file" name="seo_default_og_image_file" id="seo_default_og_image_file" accept="image/jpeg,image/png,image/webp,image/avif" class="w-full text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
+                                    </div>
+                                    <input type="text" name="seo_default_og_image" id="seo_default_og_image" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['seo_default_og_image'] ?? '' }}" placeholder="/images/desert-safari-poster.avif">
                                 </div>
                             </div>
                         </div>
@@ -125,14 +142,62 @@
                                 <textarea name="seo_home_description" id="seo_home_description" rows="3" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary seo-input">{{ $settings['seo_home_description'] ?? '' }}</textarea>
                             </div>
 
+                            <div class="mb-4">
+                                <label for="seo_home_keywords" class="block text-xs font-bold text-slate-700 mb-1.5">Homepage Meta Keywords</label>
+                                <input type="text" name="seo_home_keywords" id="seo_home_keywords" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['seo_home_keywords'] ?? '' }}">
+                            </div>
+
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label for="seo_home_keywords" class="block text-xs font-bold text-slate-700 mb-1.5">Homepage Meta Keywords</label>
-                                    <input type="text" name="seo_home_keywords" id="seo_home_keywords" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['seo_home_keywords'] ?? '' }}">
+                                <!-- Homepage Hero Video Poster -->
+                                <div class="p-3 bg-white rounded-xl border border-slate-200 flex flex-col justify-between">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 mb-1">Homepage Hero Video Poster Image</label>
+                                        <p class="text-[10px] text-slate-500 mb-2">Poster displayed while the background video streams, on mobile, and in VideoObject rich snippet schemas.</p>
+                                        <div class="flex items-center gap-3 mb-2.5">
+                                            <div class="w-16 h-12 rounded-lg overflow-hidden border border-slate-200 bg-slate-100 shrink-0">
+                                                @php
+                                                    $homePosterPreview = !empty($settings['site_hero_poster']) 
+                                                        ? (str_starts_with($settings['site_hero_poster'], 'http') ? $settings['site_hero_poster'] : asset(ltrim($settings['site_hero_poster'], '/'))) 
+                                                        : asset('images/desert-safari-poster.avif');
+                                                @endphp
+                                                <img src="{{ $homePosterPreview }}" alt="Hero Poster Preview" class="w-full h-full object-cover">
+                                            </div>
+                                            <div class="text-[11px] text-slate-500 overflow-hidden">
+                                                <span class="truncate block text-slate-400 font-mono text-[10px]">{{ $settings['site_hero_poster'] ?? '/images/desert-safari-poster.avif' }}</span>
+                                                <span class="text-[10px] text-emerald-600 font-semibold">HD AVIF/WebP</span>
+                                            </div>
+                                        </div>
+                                        <div class="mb-2">
+                                            <input type="file" name="site_hero_poster_file" id="site_hero_poster_file_seo" accept="image/jpeg,image/png,image/webp,image/avif" class="w-full text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
+                                        </div>
+                                        <input type="text" name="site_hero_poster" id="site_hero_poster_seo" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['site_hero_poster'] ?? '/images/desert-safari-poster.avif' }}" placeholder="/images/desert-safari-dubai-dune-discovery-tourism-HD.avif">
+                                    </div>
                                 </div>
-                                <div>
-                                    <label for="seo_home_og_image" class="block text-xs font-bold text-slate-700 mb-1.5">Homepage OpenGraph Image</label>
-                                    <input type="text" name="seo_home_og_image" id="seo_home_og_image" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['seo_home_og_image'] ?? '' }}" placeholder="/images/og-home.jpg">
+
+                                <!-- Homepage OpenGraph Image -->
+                                <div class="p-3 bg-white rounded-xl border border-slate-200 flex flex-col justify-between">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 mb-1">Homepage OpenGraph Social Card</label>
+                                        <p class="text-[10px] text-slate-500 mb-2">Dedicated social preview card specifically for the homepage URL.</p>
+                                        <div class="flex items-center gap-3 mb-2.5">
+                                            <div class="w-16 h-12 rounded-lg overflow-hidden border border-slate-200 bg-slate-100 shrink-0">
+                                                @php
+                                                    $homeOgPreview = !empty($settings['seo_home_og_image']) 
+                                                        ? (str_starts_with($settings['seo_home_og_image'], 'http') ? $settings['seo_home_og_image'] : asset(ltrim($settings['seo_home_og_image'], '/'))) 
+                                                        : asset('images/desert-safari-poster.avif');
+                                                @endphp
+                                                <img src="{{ $homeOgPreview }}" alt="Home OG Preview" class="w-full h-full object-cover">
+                                            </div>
+                                            <div class="text-[11px] text-slate-500 overflow-hidden">
+                                                <span class="truncate block text-slate-400 font-mono text-[10px]">{{ $settings['seo_home_og_image'] ?? '/images/desert-safari-poster.avif' }}</span>
+                                                <span class="text-[10px] text-sky-600 font-semibold">1200x630px Recommended</span>
+                                            </div>
+                                        </div>
+                                        <div class="mb-2">
+                                            <input type="file" name="seo_home_og_image_file" id="seo_home_og_image_file" accept="image/jpeg,image/png,image/webp,image/avif" class="w-full text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
+                                        </div>
+                                        <input type="text" name="seo_home_og_image" id="seo_home_og_image" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['seo_home_og_image'] ?? '' }}" placeholder="/images/og-home.jpg">
+                                    </div>
                                 </div>
                             </div>
                         </div>

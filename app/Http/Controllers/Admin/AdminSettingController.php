@@ -30,6 +30,7 @@ class AdminSettingController extends Controller
             'site_latitude', 'site_longitude', 'site_postal_code',
             'google_place_id', 'google_cid', 'google_review_url',
             'tripadvisor_location_id', 'tripadvisor_api_key',
+            'site_hero_poster', 'site_default_image', 'seo_default_og_image',
         ];
 
         $settings = Setting::whereIn('setting_key', $keys)
@@ -56,6 +57,7 @@ class AdminSettingController extends Controller
             'seo_sunset_title', 'seo_sunset_description', 'seo_sunset_keywords', 'seo_sunset_og_image',
             'seo_press_title', 'seo_press_description', 'seo_press_keywords', 'seo_press_og_image',
             'indexnow_enabled', 'indexnow_key', 'indexnow_last_submission',
+            'site_hero_poster', 'site_default_image',
         ];
 
         $settings = Setting::whereIn('setting_key', $keys)
@@ -173,6 +175,7 @@ class AdminSettingController extends Controller
             'site_address', 'company_license_number', 'google_maps_embed_url',
             'social_tripadvisor', 'social_google', 'social_facebook', 'social_instagram',
             'social_youtube', 'social_tiktok', 'footer_about', 'site_copyright',
+            'site_hero_poster', 'site_default_image',
 
             // Global & Per-Page SEO
             'seo_default_title', 'seo_default_description', 'seo_default_keywords', 'seo_default_og_image',
@@ -222,6 +225,36 @@ class AdminSettingController extends Controller
         ];
 
         $settings = $request->only($allowedKeys);
+
+        // Handle uploaded image files
+        $request->validate([
+            'site_hero_poster_file' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:8192',
+            'site_default_image_file' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:8192',
+            'seo_default_og_image_file' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:8192',
+            'seo_home_og_image_file' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:8192',
+        ]);
+
+        if ($request->hasFile('site_hero_poster_file')) {
+            $file = $request->file('site_hero_poster_file');
+            $filename = 'hero-poster-' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('images'), $filename);
+            $settings['site_hero_poster'] = '/images/' . $filename;
+        }
+
+        if ($request->hasFile('seo_default_og_image_file') || $request->hasFile('site_default_image_file')) {
+            $file = $request->file('seo_default_og_image_file') ?: $request->file('site_default_image_file');
+            $filename = 'og-default-' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('images'), $filename);
+            $settings['seo_default_og_image'] = '/images/' . $filename;
+            $settings['site_default_image'] = '/images/' . $filename;
+        }
+
+        if ($request->hasFile('seo_home_og_image_file')) {
+            $file = $request->file('seo_home_og_image_file');
+            $filename = 'og-home-' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('images'), $filename);
+            $settings['seo_home_og_image'] = '/images/' . $filename;
+        }
 
         // Handle boolean switches that are omitted when unchecked
         if ($request->has('google_gtm_id') || $request->has('google_ga4_id') || $request->has('google_ads_id')) {

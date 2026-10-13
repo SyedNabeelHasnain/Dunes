@@ -102,10 +102,14 @@ if (!function_exists('renderReviewCardMarkup')) {
         </div>';
     }
 }
+
+$heroPoster = !empty($settings['site_hero_poster']) 
+    ? (str_starts_with($settings['site_hero_poster'], 'http') ? $settings['site_hero_poster'] : asset(ltrim($settings['site_hero_poster'], '/'))) 
+    : asset('images/desert-safari-poster.avif');
 @endphp
 
 @push('preloads')
-<link rel="preload" as="image" href="{{ asset('images/desert-safari-poster.avif') }}" fetchpriority="high">
+<link rel="preload" as="image" href="{{ $heroPoster }}" fetchpriority="high">
 
 <!-- Homepage-Specific Connected Schema Graph: VideoObject and FAQPage -->
 <script type="application/ld+json">
@@ -117,7 +121,7 @@ if (!function_exists('renderReviewCardMarkup')) {
       "@id": "{{ url('/') }}#video",
       "name": "Dubai Desert Safari Experience - Dunes Discovery Tourism",
       "description": "Experience thrilling dune bashing across the Lahbab Red Dunes, sandboarding, 1000cc dune buggy rentals, and 5-star live BBQ dinner under the desert stars.",
-      "thumbnailUrl": ["{{ asset('images/desert-safari-poster.avif') }}"],
+      "thumbnailUrl": [{!! json_encode($heroPoster, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}],
       "uploadDate": "2026-01-01T00:00:00+04:00",
       "contentUrl": "{{ asset('images/desert-safar-dubai-tour-short-dune-discovery-tourism.mp4') }}",
       "publisher": {
@@ -153,7 +157,7 @@ if (!function_exists('renderReviewCardMarkup')) {
 
 <!-- Modern Hero Section -->
 <section class="hero-modern relative min-h-[92vh] flex items-center justify-center overflow-hidden pt-28 sm:pt-36 pb-16 sm:pb-20">
-    <video class="hero-video absolute inset-0 w-full h-full object-cover -z-10" autoplay loop muted playsinline id="heroVideo" poster="{{ asset('images/desert-safari-poster.avif') }}" fetchpriority="high" aria-hidden="true">
+    <video class="hero-video absolute inset-0 w-full h-full object-cover -z-10" autoplay loop muted playsinline id="heroVideo" poster="{{ $heroPoster }}" fetchpriority="high" aria-hidden="true">
         <track kind="captions" src="" label="English" srclang="en">
     </video>
     <div class="absolute inset-0 w-full h-full bg-gradient-to-b from-slate-950/75 via-slate-950/65 to-slate-950/90 -z-10"></div>

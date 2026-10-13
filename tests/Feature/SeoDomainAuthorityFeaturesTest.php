@@ -320,4 +320,50 @@ class SeoDomainAuthorityFeaturesTest extends TestCase
         $viewResp->assertSee('Travel Blog Articles');
         $viewResp->assertSee('Operations & Departures', false);
     }
+
+    /**
+     * Test admin can view, update, and manage hero video poster and sitewide default OG images.
+     */
+    public function test_admin_can_manage_hero_poster_and_default_meta_images(): void
+    {
+        $admin = User::factory()->create();
+
+        // 1. Verify fields appear on General Settings and SEO Settings pages
+        $generalResp = $this->actingAs($admin)->get('/admin/settings/general');
+        $generalResp->assertStatus(200);
+        $generalResp->assertSee('site_hero_poster');
+        $generalResp->assertSee('site_hero_poster_file');
+        $generalResp->assertSee('seo_default_og_image');
+
+        $seoResp = $this->actingAs($admin)->get('/admin/settings/seo');
+        $seoResp->assertStatus(200);
+        $seoResp->assertSee('site_hero_poster');
+        $seoResp->assertSee('seo_default_og_image');
+
+        // 2. Update via text path
+        $updateResp = $this->actingAs($admin)->post('/admin/settings/update', [
+            'site_hero_poster' => '/images/desert-safari-dubai-dune-discovery-tourism-HD.avif',
+            'seo_default_og_image' => '/images/desert-safari-dubai-dune-discovery-tourism-HD.avif',
+        ]);
+        $updateResp->assertRedirect();
+        $this->assertEquals('/images/desert-safari-dubai-dune-discovery-tourism-HD.avif', Setting::where('setting_key', 'site_hero_poster')->value('setting_value'));
+        $this->assertEquals('/images/desert-safari-dubai-dune-discovery-tourism-HD.avif', Setting::where('setting_key', 'seo_default_og_image')->value('setting_value'));
+
+        // 3. Verify Homepage renders the updated hero poster in video tag and preload link
+        $homeResp = $this->get('/');
+        $homeResp->assertStatus(200);
+        $homeResp->assertSee('desert-safari-dubai-dune-discovery-tourism-HD.avif');
+
+        // 4. Update via file upload
+        $fakeFile = \Illuminate\Http\UploadedFile::fake()->image('custom_poster.jpg', 900, 600);
+        $uploadResp = $this->actingAs($admin)->post('/admin/settings/update', [
+            'site_hero_poster_file' => $fakeFile,
+        ]);
+        $uploadResp->assertRedirect();
+        $storedPoster = Setting::where('setting_key', 'site_hero_poster')->value('setting_value');
+        $this->assertStringStartsWith('/images/hero-poster-', $storedPoster);
+        if (file_exists(public_path(ltrim($storedPoster, '/')))) {
+            @unlink(public_path(ltrim($storedPoster, '/')));
+        }
+    }
 }
