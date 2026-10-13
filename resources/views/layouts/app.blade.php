@@ -461,10 +461,47 @@
         <nav class="glass-nav border-b border-slate-200/80 shadow-xs">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16 sm:h-18">
-                    <!-- Brand Logo -->
-                    <a class="flex items-center flex-shrink-0 hover:opacity-90 transition-opacity" href="{{ localized_route('home') }}" aria-label="Dunes Discovery Tourism">
-                        <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery Tourism" width="160" height="103" class="h-9 sm:h-10 w-auto object-contain" fetchpriority="high">
-                    </a>
+                    <!-- Brand Logo & Trust Badges -->
+                    <div class="flex items-center gap-3 xl:gap-4 flex-shrink-0">
+                        <a class="flex items-center hover:opacity-90 transition-opacity" href="{{ localized_route('home') }}" aria-label="Dunes Discovery Tourism">
+                            <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery Tourism" width="160" height="103" class="h-9 sm:h-10 w-auto object-contain" fetchpriority="high">
+                        </a>
+
+                        <!-- Desktop Trust Badges (Google & TripAdvisor with Live Ratings) -->
+                        <div class="hidden lg:flex items-center gap-2 border-s border-slate-200/90 ps-3">
+                            <!-- Google Reviews Badge -->
+                            <a href="{{ $settings['social_google'] ?? 'https://search.google.com/local/writereview?placeid=ChIJbWsIEIVEdEER4uHEhb2dbcQ' }}" 
+                               target="_blank" 
+                               rel="noopener" 
+                               id="desktopGoogleBadge"
+                               class="nav-review-circle inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white hover:bg-slate-50 border border-slate-200/90 shadow-2xs hover:shadow-xs transition-all cursor-pointer group"
+                               onclick="toggleReviewPopover(this, event)"
+                               title="Google Reviews: 5.0 Rating">
+                                <img src="{{ asset('images/Google-G.avif') }}" alt="Google" width="16" height="16" class="w-4 h-4 object-contain">
+                                <span class="text-xs font-black text-slate-800 group-hover:text-primary transition-colors">5.0</span>
+                                <div class="flex text-amber-400 text-[10px]">
+                                    <i class="bi bi-star-fill"></i>
+                                </div>
+                                <span class="text-[10px] text-slate-400 font-semibold hidden xl:inline">Google</span>
+                            </a>
+
+                            <!-- TripAdvisor Reviews Badge -->
+                            <a href="{{ $settings['social_tripadvisor'] ?? 'https://www.tripadvisor.com/Attraction_Review-g295424-d29026644-Reviews-Dunes_Discovery-Dubai_Emirate_of_Dubai.html' }}" 
+                               target="_blank" 
+                               rel="noopener" 
+                               id="desktopTaBadge"
+                               class="nav-review-circle inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white hover:bg-slate-50 border border-slate-200/90 shadow-2xs hover:shadow-xs transition-all cursor-pointer group"
+                               onclick="toggleReviewPopover(this, event)"
+                               title="TripAdvisor Reviews: 4.9 Rating">
+                                <img src="{{ asset('images/tripadvisor-color-logo.svg') }}" alt="TripAdvisor" width="18" height="18" class="w-4.5 h-4.5 object-contain">
+                                <span class="text-xs font-black text-slate-800 group-hover:text-emerald-600 transition-colors">4.9</span>
+                                <div class="flex text-emerald-600 text-[10px]">
+                                    <i class="bi bi-star-fill"></i>
+                                </div>
+                                <span class="text-[10px] text-slate-400 font-semibold hidden xl:inline">TripAdvisor</span>
+                            </a>
+                        </div>
+                    </div>
 
                     <!-- Desktop Nav Links (Hidden on mobile/tablet) -->
                     <ul class="hidden lg:flex items-center gap-1 xl:gap-2 text-sm font-semibold text-slate-700">
@@ -530,26 +567,46 @@
                         </button>
                     </div>
 
-                    <!-- Mobile App Bar Actions (Thumb-Friendly, Uncluttered, ≥44px Tap Targets) -->
-                    <div class="flex items-center gap-1 sm:gap-2 lg:hidden">
+                    <!-- Mobile App Bar Actions (with Google & TripAdvisor Trust Badges with Ratings) -->
+                    <div class="flex items-center gap-1 sm:gap-1.5 lg:hidden">
+                        <!-- Google Review Trust Badge (Mobile with 5.0 Rating) -->
+                        <a href="{{ $settings['social_google'] ?? 'https://search.google.com/local/writereview?placeid=ChIJbWsIEIVEdEER4uHEhb2dbcQ' }}" 
+                           target="_blank" 
+                           rel="noopener" 
+                           id="googleCircle" 
+                           class="nav-review-circle inline-flex items-center gap-1 px-2 py-1.5 rounded-full bg-white border border-slate-200/90 shadow-2xs hover:bg-slate-50 transition-all cursor-pointer min-h-[36px]"
+                           onclick="toggleReviewPopover(this, event)"
+                           title="Google Reviews: 5.0 Rating">
+                            <img src="{{ asset('images/Google-G.avif') }}" alt="Google" width="15" height="15" class="w-3.5 h-3.5 object-contain shrink-0">
+                            <span class="text-xs font-black text-slate-800 leading-none">5.0</span>
+                            <i class="bi bi-star-fill text-amber-400 text-[10px] leading-none"></i>
+                        </a>
+
+                        <!-- TripAdvisor Review Trust Badge (Mobile with 4.9 Rating) -->
+                        <a href="{{ $settings['social_tripadvisor'] ?? 'https://www.tripadvisor.com/Attraction_Review-g295424-d29026644-Reviews-Dunes_Discovery-Dubai_Emirate_of_Dubai.html' }}" 
+                           target="_blank" 
+                           rel="noopener" 
+                           id="taCircle" 
+                           class="nav-review-circle inline-flex items-center gap-1 px-2 py-1.5 rounded-full bg-white border border-slate-200/90 shadow-2xs hover:bg-slate-50 transition-all cursor-pointer min-h-[36px]"
+                           onclick="toggleReviewPopover(this, event)"
+                           title="TripAdvisor Reviews: 4.9 Rating">
+                            <img src="{{ asset('images/tripadvisor-color-logo.svg') }}" alt="TripAdvisor" width="16" height="16" class="w-4 h-4 object-contain shrink-0">
+                            <span class="text-xs font-black text-slate-800 leading-none">4.9</span>
+                            <i class="bi bi-star-fill text-emerald-600 text-[10px] leading-none"></i>
+                        </a>
+
                         <!-- Quick Search Button (Min 44x44px Hit Target) -->
-                        <button type="button" class="w-11 h-11 rounded-full text-slate-700 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer text-sm" @click="$store.modal.open('search')" aria-label="{{ __('ui.nav.search_placeholder') }}">
+                        <button type="button" class="w-10 h-10 sm:w-11 sm:h-11 rounded-full text-slate-700 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer text-sm shrink-0" @click="$store.modal.open('search')" aria-label="{{ __('ui.nav.search_placeholder') }}">
                             <i class="bi bi-search"></i>
                         </button>
 
                         <!-- WhatsApp Direct Button (Min 44x44px Hit Target) -->
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" class="w-11 h-11 rounded-full text-emerald-600 hover:bg-emerald-50 flex items-center justify-center transition-colors cursor-pointer text-base btn-whatsapp" aria-label="{{ __('ui.common.whatsapp') }}" target="_blank" rel="noopener" data-action="whatsapp">
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" class="w-10 h-10 sm:w-11 sm:h-11 rounded-full text-emerald-600 hover:bg-emerald-50 flex items-center justify-center transition-colors cursor-pointer text-base btn-whatsapp shrink-0" aria-label="{{ __('ui.common.whatsapp') }}" target="_blank" rel="noopener" data-action="whatsapp">
                             <i class="bi bi-whatsapp"></i>
                         </a>
 
-                        <!-- Compact Book Now Button (Min 44px Height) -->
-                        <button type="button" class="h-10 px-3.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold text-xs shadow-xs flex items-center gap-1.5 cursor-pointer" data-action="open-booking" aria-label="{{ __('ui.common.book_now') }}">
-                            <i class="bi bi-calendar-check"></i>
-                            <span>{{ __('ui.common.book') }}</span>
-                        </button>
-
                         <!-- Hamburger Drawer Trigger (Min 44x44px Hit Target) -->
-                        <button class="w-11 h-11 rounded-xl text-slate-800 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer focus:outline-none" type="button" @click="$store.mobileNav.toggle()" aria-label="{{ __('ui.nav.all_tours') ?? 'Menu' }}">
+                        <button class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl text-slate-800 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer focus:outline-none shrink-0" type="button" @click="$store.mobileNav.toggle()" aria-label="{{ __('ui.nav.all_tours') ?? 'Menu' }}">
                             <i class="bi bi-list text-2xl"></i>
                         </button>
                     </div>
@@ -585,13 +642,29 @@
                         <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery Tourism" width="140" height="90" class="h-9 w-auto object-contain">
                     </a>
                     <div class="flex items-center gap-1.5 sm:gap-2">
-                        <!-- Review Popover Triggers in Mobile Drawer Header -->
-                        <div class="nav-review-circle w-8 h-8 rounded-full bg-slate-50 border border-slate-200 shadow-2xs flex items-center justify-center cursor-pointer relative" onclick="toggleReviewPopover(this, event)" id="taCircle" title="{{ __('ui.common.tripadvisor_reviews') }}">
-                            <img src="{{ asset('images/tripadvisor-color-logo.svg') }}" alt="TripAdvisor" width="18" height="18" class="w-4.5 h-4.5 object-contain">
-                        </div>
-                        <div class="nav-review-circle w-8 h-8 rounded-full bg-slate-50 border border-slate-200 shadow-2xs flex items-center justify-center cursor-pointer relative" onclick="toggleReviewPopover(this, event)" id="googleCircle" title="{{ __('ui.common.google_reviews') }}">
-                            <img src="{{ asset('images/Google-G.avif') }}" alt="Google" width="18" height="18" class="w-4.5 h-4.5 object-contain">
-                        </div>
+                        <!-- Review Popover Triggers in Mobile Drawer Header with Ratings -->
+                        <a href="{{ $settings['social_tripadvisor'] ?? 'https://www.tripadvisor.com/Attraction_Review-g295424-d29026644-Reviews-Dunes_Discovery-Dubai_Emirate_of_Dubai.html' }}" 
+                           target="_blank" 
+                           rel="noopener" 
+                           id="taCircleDrawer" 
+                           class="nav-review-circle inline-flex items-center gap-1 px-2 py-1 rounded-full bg-slate-50 border border-slate-200 shadow-2xs hover:bg-slate-100 transition-all cursor-pointer" 
+                           onclick="toggleReviewPopover(this, event)" 
+                           title="{{ __('ui.common.tripadvisor_reviews') }}">
+                            <img src="{{ asset('images/tripadvisor-color-logo.svg') }}" alt="TripAdvisor" width="16" height="16" class="w-4 h-4 object-contain">
+                            <span class="text-xs font-black text-slate-800">4.9</span>
+                            <i class="bi bi-star-fill text-emerald-600 text-[10px]"></i>
+                        </a>
+                        <a href="{{ $settings['social_google'] ?? 'https://search.google.com/local/writereview?placeid=ChIJbWsIEIVEdEER4uHEhb2dbcQ' }}" 
+                           target="_blank" 
+                           rel="noopener" 
+                           id="googleCircleDrawer" 
+                           class="nav-review-circle inline-flex items-center gap-1 px-2 py-1 rounded-full bg-slate-50 border border-slate-200 shadow-2xs hover:bg-slate-100 transition-all cursor-pointer" 
+                           onclick="toggleReviewPopover(this, event)" 
+                           title="{{ __('ui.common.google_reviews') }}">
+                            <img src="{{ asset('images/Google-G.avif') }}" alt="Google" width="14" height="14" class="w-3.5 h-3.5 object-contain">
+                            <span class="text-xs font-black text-slate-800">5.0</span>
+                            <i class="bi bi-star-fill text-amber-400 text-[10px]"></i>
+                        </a>
                         @include('partials.language-currency-switcher', ['switcherId' => 'mobileLangCurrencyDropdownBtn'])
                         <button type="button" class="w-10 h-10 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer" @click="$store.mobileNav.close()" aria-label="{{ __('ui.common.close') }}">
                             <i class="bi bi-x-lg text-sm"></i>

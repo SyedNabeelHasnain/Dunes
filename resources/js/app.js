@@ -4117,6 +4117,34 @@ const reviewData = {
         score: '5.0',
         url: 'https://www.google.com/maps/search/?api=1&query=Google&query_place_id=ChIJbWsIEIVEdEER4uHEhb2dbcQ',
         btnText: 'See Reviews'
+    },
+    'desktopTaBadge': {
+        title: 'TripAdvisor',
+        logo: '/images/tripadvisor-color-logo.svg',
+        score: '4.9',
+        url: 'https://www.tripadvisor.com/Attraction_Review-g295424-d29026644-Reviews-Dunes_Discovery-Dubai_Emirate_of_Dubai.html',
+        btnText: 'Read Reviews'
+    },
+    'desktopGoogleBadge': {
+        title: 'Google Reviews',
+        logo: '/images/google-logo.png',
+        score: '5.0',
+        url: 'https://www.google.com/maps/search/?api=1&query=Google&query_place_id=ChIJbWsIEIVEdEER4uHEhb2dbcQ',
+        btnText: 'See Reviews'
+    },
+    'taCircleDrawer': {
+        title: 'TripAdvisor',
+        logo: '/images/tripadvisor-color-logo.svg',
+        score: '4.9',
+        url: 'https://www.tripadvisor.com/Attraction_Review-g295424-d29026644-Reviews-Dunes_Discovery-Dubai_Emirate_of_Dubai.html',
+        btnText: 'Read Reviews'
+    },
+    'googleCircleDrawer': {
+        title: 'Google Reviews',
+        logo: '/images/google-logo.png',
+        score: '5.0',
+        url: 'https://www.google.com/maps/search/?api=1&query=Google&query_place_id=ChIJbWsIEIVEdEER4uHEhb2dbcQ',
+        btnText: 'See Reviews'
     }
 };
 
@@ -4134,14 +4162,15 @@ function toggleReviewPopover(element, event) {
         if (existing) existing.remove();
         document.querySelectorAll('.nav-review-circle').forEach(el => el.classList.remove('active'));
 
-        if (currentTriggerId === element.id) return;
+        const elemId = element.id || '';
+        if (currentTriggerId && currentTriggerId === elemId) return;
 
-        const data = reviewData[element.id];
+        const data = reviewData[elemId] || (elemId.toLowerCase().includes('google') ? reviewData['googleCircle'] : reviewData['taCircle']);
         if (!data) return;
 
         const popover = document.createElement('div');
         popover.className = 'global-popover-overlay';
-        popover.dataset.triggerId = element.id;
+        popover.dataset.triggerId = elemId;
 
         popover.innerHTML = `
             <div class="review-popover-header">
@@ -4190,7 +4219,7 @@ window.toggleReviewPopover = toggleReviewPopover;
 window.reviewData = reviewData;
 
 document.addEventListener('click', function(e) {
-    const trigger = e.target.closest('#taCircle, #googleCircle, .nav-review-circle');
+    const trigger = e.target.closest('#taCircle, #googleCircle, #desktopTaBadge, #desktopGoogleBadge, #taCircleDrawer, #googleCircleDrawer, .nav-review-circle');
     if (trigger) {
         if (!trigger.hasAttribute('onclick')) {
             toggleReviewPopover(trigger, e);
