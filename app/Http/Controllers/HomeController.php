@@ -38,74 +38,54 @@ class HomeController extends Controller
 
         try {
             $reviews = Cache::remember('site_home_reviews_feed', 3600, function () {
-                // Primary collection: high-priority featured approved reviews
-                $featured = Review::where('status', 'approved')
-                    ->where('is_featured', true)
-                    ->whereNotNull('review_text')
-                    ->where('review_text', '!=', '')
-                    ->whereNotNull('reviewer_name')
-                    ->where('reviewer_name', '!=', '')
-                    ->orderBy('published_date', 'desc')
-                    ->limit(10)
-                    ->get();
+                $featured = collect();
 
-                $featuredIds = $featured->pluck('id')->all();
+                try {
+                    // 1. Primary DB query: approved reviews with valid text & reviewer name
+                    $dbReviews = Review::where('status', 'approved')
+                        ->whereNotNull('review_text')
+                        ->where('review_text', '!=', '')
+                        ->whereNotNull('reviewer_name')
+                        ->where('reviewer_name', '!=', '')
+                        ->where('rating', '>=', 4.0)
+                        ->orderByRaw('is_featured DESC, rating DESC, published_date DESC')
+                        ->limit(40)
+                        ->get();
+
+                    $featured = collect($dbReviews);
+                } catch (\Throwable $e) {
+                    $featured = collect();
+                }
+
                 $googleCount = $featured->where('source', 'google')->count();
                 $tripCount = $featured->where('source', 'tripadvisor')->count();
 
-                // Ensure high-quality Google reviews are prominently included even if not manually marked featured
-                if ($googleCount < 5) {
-                    $extraGoogle = Review::where('status', 'approved')
-                        ->where('source', 'google')
-                        ->whereNotNull('review_text')
-                        ->where('review_text', '!=', '')
-                        ->whereNotNull('reviewer_name')
-                        ->where('reviewer_name', '!=', '')
-                        ->whereNotIn('id', $featuredIds)
-                        ->where('rating', '>=', 4.0)
-                        ->orderBy('published_date', 'desc')
-                        ->limit(8 - $googleCount)
-                        ->get();
+                // 2. Resilient Fallback: If DB returned fewer than 12 reviews for either source, backfill from authentic reviews.json
+                if ($googleCount < 12 || $tripCount < 12 || $featured->count() < 24) {
+                    $jsonPath = database_path('seeders/data/reviews.json');
+                    if (file_exists($jsonPath)) {
+                        $rawJson = json_decode(file_get_contents($jsonPath), true) ?: [];
+                        $jsonReviews = collect($rawJson)->map(function ($item) {
+                            return (object) $item;
+                        })->filter(function ($r) {
+                            return ! empty($r->review_text) && ! empty($r->reviewer_name) && (float) ($r->rating ?? 0) >= 4.0;
+                        });
 
-                    $featured = $featured->concat($extraGoogle);
-                    $featuredIds = $featured->pluck('id')->all();
+                        if ($googleCount < 15) {
+                            $neededGoogle = 15 - $googleCount;
+                            $jsonGoogle = $jsonReviews->where('source', 'google')->take($neededGoogle);
+                            $featured = $featured->concat($jsonGoogle);
+                        }
+
+                        if ($tripCount < 15) {
+                            $neededTrip = 15 - $tripCount;
+                            $jsonTrip = $jsonReviews->where('source', 'tripadvisor')->take($neededTrip);
+                            $featured = $featured->concat($jsonTrip);
+                        }
+                    }
                 }
 
-                // Ensure TripAdvisor reviews are populated for the alternating marquee track
-                if ($tripCount < 5) {
-                    $extraTrip = Review::where('status', 'approved')
-                        ->where('source', 'tripadvisor')
-                        ->whereNotNull('review_text')
-                        ->where('review_text', '!=', '')
-                        ->whereNotNull('reviewer_name')
-                        ->where('reviewer_name', '!=', '')
-                        ->whereNotIn('id', $featuredIds)
-                        ->where('rating', '>=', 4.0)
-                        ->orderBy('published_date', 'desc')
-                        ->limit(8 - $tripCount)
-                        ->get();
-
-                    $featured = $featured->concat($extraTrip);
-                    $featuredIds = $featured->pluck('id')->all();
-                }
-
-                // If overall count is still under 8, backfill with any high-rated approved reviews
-                if ($featured->count() < 8) {
-                    $fillers = Review::where('status', 'approved')
-                        ->whereNotNull('review_text')
-                        ->where('review_text', '!=', '')
-                        ->whereNotNull('reviewer_name')
-                        ->where('reviewer_name', '!=', '')
-                        ->whereNotIn('id', $featuredIds)
-                        ->where('rating', '>=', 4.0)
-                        ->orderBy('published_date', 'desc')
-                        ->limit(12 - $featured->count())
-                        ->get();
-
-                    $featured = $featured->concat($fillers);
-                }
-
-                return $featured;
+                return $featured->unique('review_text')->values();
             });
             $reviews = collect($reviews);
         } catch (\Throwable $e) {

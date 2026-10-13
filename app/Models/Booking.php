@@ -12,7 +12,7 @@ class Booking extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'reference', 'tour_id', 'tier_id', 'tour_name', 'tier_name', 'tour_date',
+        'id', 'reference', 'tour_id', 'tier_id', 'tour_name', 'tier_name', 'tour_date',
         'adults', 'children', 'infants', 'name', 'email', 'phone', 'pickup_location',
         'special_requests', 'coupon_id', 'coupon_code', 'discount_type', 'discount_rate',
         'discount_amount', 'original_total', 'subtotal', 'addons_total', 'total', 'currency',

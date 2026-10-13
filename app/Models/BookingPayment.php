@@ -12,7 +12,7 @@ class BookingPayment extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'booking_id', 'payment_intent_id', 'amount', 'currency', 'status',
+        'id', 'booking_id', 'payment_intent_id', 'amount', 'currency', 'status',
         'payment_url', 'notes', 'customer_name', 'customer_email',
         'customer_phone', 'description',
     ];

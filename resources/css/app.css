@@ -175,19 +175,33 @@
 }
 
 @keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(calc(-50% - 0.5rem)); }
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(calc(-50% - 0.5rem), 0, 0); }
+}
+
+@keyframes marquee-reverse {
+  0% { transform: translate3d(calc(-50% - 0.5rem), 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
 }
 
 @keyframes marquee-rtl {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(calc(50% + 0.5rem)); }
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(calc(50% + 0.5rem), 0, 0); }
+}
+
+@keyframes marquee-reverse-rtl {
+  0% { transform: translate3d(calc(50% + 0.5rem), 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
 }
 
 [dir="rtl"] .animate-marquee,
 [dir="rtl"] .marquee-track,
 [dir="rtl"] .reviews-track {
   animation-name: marquee-rtl;
+}
+
+[dir="rtl"] .reviews-marquee.reverse .reviews-track {
+  animation-name: marquee-reverse-rtl;
 }
 
 @keyframes fieldShakeStrong {
@@ -206,10 +220,30 @@
   animation: whatsappPulse 1.5s infinite;
 }
 
+.reviews-marquee {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  user-select: none;
+}
+
 .animate-marquee,
 .marquee-track,
 .reviews-track {
-  animation: marquee 160s linear infinite;
+  display: flex;
+  width: max-content;
+  min-width: 100%;
+  gap: 1rem;
+  flex-shrink: 0;
+  animation: marquee 80s linear infinite;
+  will-change: transform;
+}
+
+.reviews-group {
+  display: flex;
+  gap: 1rem;
+  flex-shrink: 0;
 }
 
 .reviews-marquee:hover .reviews-track,
@@ -218,7 +252,8 @@
 }
 
 .reviews-marquee.reverse .reviews-track {
-  animation-direction: reverse;
+  animation-name: marquee-reverse;
+  animation-direction: normal;
 }
 
 .animate-field-shake-strong,
@@ -646,6 +681,7 @@
   width: 320px;
   min-width: 320px;
   max-width: 320px;
+  min-height: 220px;
   background: #ffffff;
   border-radius: 1.25rem;
   padding: 1.25rem;
@@ -653,6 +689,7 @@
   box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
   flex-shrink: 0;
   position: relative;
@@ -660,9 +697,9 @@
 }
 
 .review-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
   border-color: #f97316;
-  box-shadow: 0 12px 20px -4px rgba(246, 144, 68, 0.18), 0 4px 6px -2px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 12px 24px -4px rgba(246, 144, 68, 0.18), 0 4px 6px -2px rgba(15, 23, 42, 0.05);
 }
 
 /* Compare Safari Toggle Button (Active & Outline States) */

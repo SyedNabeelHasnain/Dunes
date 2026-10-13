@@ -10,7 +10,7 @@ class Review extends Model
     use HasFactory;
 
     protected $fillable = [
-        'source', 'source_review_id', 'booking_id', 'review_url', 'published_date',
+        'id', 'source', 'source_review_id', 'booking_id', 'review_url', 'published_date',
         'reviewer_name', 'reviewer_avatar_url', 'reviewer_profile_url',
         'rating', 'review_title', 'review_text', 'photos', 'status', 'is_featured',
         'is_local_guide', 'reviewer_reviews_count', 'likes_count',

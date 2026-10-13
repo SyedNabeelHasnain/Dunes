@@ -38,12 +38,13 @@ class BookingSeeder extends Seeder
         }
 
         // 2. Seed Bookings
+        Booking::unguard();
         $bookingsPath = database_path('seeders/data/bookings.json');
         if (File::exists($bookingsPath)) {
             $bookings = json_decode(File::get($bookingsPath), true);
             foreach ($bookings as $b) {
                 Booking::updateOrCreate(
-                    ['id' => $b['id']],
+                    ['id' => (int) $b['id']],
                     [
                         'reference' => $b['reference'],
                         'tour_id' => $b['tour_id'] ? (int) $b['tour_id'] : null,
@@ -91,16 +92,22 @@ class BookingSeeder extends Seeder
                 );
             }
         }
+        Booking::reguard();
 
         // 3. Seed Booking Payments
+        BookingPayment::unguard();
         $paymentsPath = database_path('seeders/data/booking_payments.json');
         if (File::exists($paymentsPath)) {
             $payments = json_decode(File::get($paymentsPath), true);
             foreach ($payments as $p) {
+                $targetBookingId = $p['booking_id'] ? (int) $p['booking_id'] : null;
+                if ($targetBookingId && ! Booking::where('id', $targetBookingId)->exists()) {
+                    $targetBookingId = null;
+                }
                 BookingPayment::updateOrCreate(
-                    ['id' => $p['id']],
+                    ['id' => (int) $p['id']],
                     [
-                        'booking_id' => $p['booking_id'] ? (int) $p['booking_id'] : null,
+                        'booking_id' => $targetBookingId,
                         'payment_intent_id' => $p['payment_intent_id'],
                         'amount' => (float) $p['amount'],
                         'currency' => $p['currency'] ?: 'AED',
@@ -115,6 +122,7 @@ class BookingSeeder extends Seeder
                 );
             }
         }
+        BookingPayment::reguard();
 
         // 4. Seed WhatsApp Inquiries
         $whatsappPath = database_path('seeders/data/whatsapp_inquiries.json');
