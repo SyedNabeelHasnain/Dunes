@@ -52,6 +52,10 @@
                 <input type="date" name="date" class="px-3 py-1.5 rounded-full bg-white border border-slate-200 text-xs font-semibold text-slate-700 shadow-xs outline-none focus:border-primary transition" value="{{ $selectedDate }}" onchange="this.form.submit()">
             </form>
 
+            <a href="{{ route('admin.bookings.create', ['tour_date' => $selectedDate]) }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-primary hover:bg-primary-dark text-white shadow-xs text-xs font-bold transition">
+                <i class="bi bi-plus-circle-fill"></i>
+                <span>New Booking</span>
+            </a>
             <a href="{{ route('admin.operations.export', ['date' => $selectedDate]) }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white hover:bg-slate-50 border border-slate-200 shadow-xs text-xs font-bold text-slate-700 transition">
                 <i class="bi bi-file-earmark-spreadsheet text-emerald-600"></i>
                 <span>Export Manifest</span>

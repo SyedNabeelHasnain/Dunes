@@ -14,8 +14,11 @@
         </div>
         <p class="text-xs md:text-sm text-slate-500 mb-0">Direct live counts from database transactions. Zero caching, instant precision.</p>
     </div>
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-2.5 flex-wrap">
         <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider hidden sm:inline" id="kpiSyncStatus">Live as of {{ now()->format('g:i:s A') }}</span>
+        <a href="{{ route('admin.bookings.create') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-primary hover:bg-primary-dark text-white shadow-xs text-xs font-bold transition">
+            <i class="bi bi-plus-circle-fill"></i> Create Booking
+        </a>
         <button type="button" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-slate-50 border border-slate-200 shadow-xs text-xs font-bold text-slate-800 transition cursor-pointer" id="btnRefreshDashboardKpis" title="Recount all metrics live directly from database">
             <i class="bi bi-arrow-repeat text-primary text-sm" id="kpiSyncIcon"></i>
             <span>Refresh Metrics</span>

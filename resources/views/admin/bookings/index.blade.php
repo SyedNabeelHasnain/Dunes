@@ -9,6 +9,9 @@
         <p class="text-xs md:text-sm text-slate-500 mb-0">Manage customer tour bookings, payment reconciliations, and instant WhatsApp support.</p>
     </div>
     <div class="flex items-center gap-2 flex-wrap">
+        <a href="{{ route('admin.bookings.create') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-primary hover:bg-primary-dark text-white shadow-xs text-xs font-bold transition">
+            <i class="bi bi-plus-circle-fill"></i> Create Manual Booking
+        </a>
         <button type="button" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-slate-50 border border-slate-200 shadow-xs text-xs font-bold text-slate-700 transition cursor-pointer" id="btnRefreshBookingsStats" title="Recount metrics live directly from database">
             <i class="bi bi-arrow-repeat text-primary text-sm" id="bookingsSyncIcon"></i>
             <span>Refresh Counts</span>

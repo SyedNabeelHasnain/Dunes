@@ -147,7 +147,7 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     // Bookings & WhatsApp Leads
     Route::get('/bookings/export/csv', [AdminBookingController::class, 'exportCsv'])->name('bookings.export');
     Route::post('/bookings/bulk-action', [AdminBookingController::class, 'bulkAction'])->name('bookings.bulk');
-    Route::resource('bookings', AdminBookingController::class)->only(['index', 'show', 'update', 'destroy']);
+    Route::resource('bookings', AdminBookingController::class)->only(['index', 'create', 'store', 'show', 'update', 'destroy']);
     Route::post('/bookings/{id}/payment-link', [AdminBookingController::class, 'createPaymentLink'])->name('bookings.payment-link');
     Route::post('/bookings/{id}/resend-payment', [AdminBookingController::class, 'resendPaymentEmail'])->name('bookings.resend-payment');
     Route::get('/bookings/{id}/ticket', [AdminBookingController::class, 'downloadTicket'])->name('bookings.ticket');

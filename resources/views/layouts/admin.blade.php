@@ -349,6 +349,12 @@
 
             <!-- Top Actions Toolbar -->
             <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Quick New Booking Button -->
+                <a href="{{ route('admin.bookings.create') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary hover:bg-primary-dark text-white text-xs font-bold shadow-2xs transition" title="Create Manual Booking">
+                    <i class="bi bi-calendar-plus-fill"></i>
+                    <span class="hidden sm:inline">New Booking</span>
+                </a>
+
                 <!-- Jump to Command Palette Button -->
                 <button type="button" @click="$store.admin.openCommandPalette()" class="hidden sm:inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200/80 text-xs font-semibold text-slate-600 shadow-2xs transition">
                     <i class="bi bi-search text-primary"></i>
@@ -471,6 +477,15 @@
                 <div class="cmd-section" data-section="actions">
                     <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2 px-1">Quick Actions</div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <div class="cmd-entry" data-keywords="create booking manual reservation new order walk-in">
+                            <a href="{{ route('admin.bookings.create') }}" class="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group">
+                                <i class="bi bi-calendar-plus-fill text-primary text-xl"></i>
+                                <div>
+                                    <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Create Manual Booking</strong>
+                                    <span class="text-[11px] text-slate-500">Add a walk-in, phone, or WhatsApp booking</span>
+                                </div>
+                            </a>
+                        </div>
                         <div class="cmd-entry" data-keywords="add tour create new tour">
                             <a href="{{ route('admin.tours.create') }}" class="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group">
                                 <i class="bi bi-plus-circle-fill text-primary text-xl"></i>

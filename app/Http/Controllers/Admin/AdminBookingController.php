@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Mail\BookingNotification;
 use App\Mail\PaymentLinkMail;
+use App\Models\Addon;
 use App\Models\Booking;
 use App\Models\BookingAddon;
 use App\Models\BookingPayment;
@@ -13,6 +14,9 @@ use App\Models\CouponUsage;
 use App\Models\RequestLog;
 use App\Models\Review;
 use App\Models\Setting;
+use App\Models\Tier;
+use App\Models\Tour;
+use App\Models\VerifiedEmail;
 use App\Services\EmailMarketingService;
 use App\Services\SettingsService;
 use App\Services\ZiinaPaymentService;
@@ -23,7 +27,9 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class AdminBookingController extends Controller
@@ -123,6 +129,383 @@ class AdminBookingController extends Controller
         $bookings = $query->orderBy('created_at', 'desc')->get();
 
         return view('admin.bookings.index', compact('bookings', 'status', 'search', 'paymentStatus', 'fromDate', 'toDate', 'stats', 'trendData', 'statusDistribution'));
+    }
+
+    /**
+     * Show the form for creating a manual booking in Admin CMS.
+     */
+    public function create(Request $request)
+    {
+        $hasChildPrice = Schema::hasColumn('tour_tiers', 'child_price');
+        $tours = Tour::with([
+            'tiers' => fn ($q) => $hasChildPrice ? $q->withPivot('child_price') : $q,
+            'addons',
+        ])->orderBy('priority')->orderBy('id')->get();
+
+        $allTiers = Tier::orderBy('id')->get();
+        $allAddons = Addon::orderBy('id')->get();
+        $coupons = Coupon::where('status', 'active')->orderBy('code')->get();
+
+        $toursCatalog = $tours->map(function (Tour $tour) use ($allTiers, $allAddons) {
+            $tierItems = $tour->tiers->isNotEmpty()
+                ? $tour->tiers->map(fn ($tier) => [
+                    'id' => (int) $tier->id,
+                    'name' => (string) ($tier->display_name ?: $tier->name),
+                    'code' => (string) ($tier->slug ?: $tier->code),
+                    'price' => (float) ($tier->pivot->price ?? $tour->price),
+                    'child_price' => (float) ($tier->pivot->child_price ?? 0),
+                    'price_type' => (string) ($tier->pivot->price_type ?? $tier->type ?? 'per_person'),
+                    'capacity' => max(1, (int) ($tier->capacity ?: 6)),
+                ])->values()->all()
+                : $allTiers->map(fn ($tier) => [
+                    'id' => (int) $tier->id,
+                    'name' => (string) ($tier->display_name ?: $tier->name),
+                    'code' => (string) ($tier->slug ?: $tier->code),
+                    'price' => (float) $tour->price,
+                    'child_price' => 0.0,
+                    'price_type' => (string) ($tier->type ?? 'per_person'),
+                    'capacity' => max(1, (int) ($tier->capacity ?: 6)),
+                ])->values()->all();
+
+            $tourAddonMap = $tour->addons->keyBy('id');
+            $addonItems = $allAddons->map(function ($addon) use ($tourAddonMap) {
+                $attached = $tourAddonMap->get($addon->id);
+
+                return [
+                    'id' => (int) $addon->id,
+                    'name' => (string) $addon->name,
+                    'price' => $attached ? (float) ($attached->pivot->price ?? $addon->price) : (float) $addon->price,
+                    'price_type' => (string) ($addon->price_type ?: 'per_person'),
+                    'is_tour_specific' => $attached !== null,
+                ];
+            })->values()->all();
+
+            return [
+                'id' => (int) $tour->id,
+                'name' => (string) $tour->name,
+                'price' => (float) $tour->price,
+                'tiers' => $tierItems,
+                'addons' => $addonItems,
+            ];
+        })->values()->all();
+
+        $couponsCatalog = $coupons->map(fn (Coupon $c) => [
+            'id' => (int) $c->id,
+            'code' => (string) $c->code,
+            'name' => (string) $c->name,
+            'discount_type' => (string) $c->discount_type,
+            'discount_value' => (float) $c->discount_value,
+            'max_discount' => $c->max_discount ? (float) $c->max_discount : null,
+            'min_spend' => (float) ($c->min_spend ?? 0),
+        ])->values()->all();
+
+        $prefillTourId = (string) $request->query('tour_id', '');
+        if ($prefillTourId === '' && $request->filled('tour_name')) {
+            $needle = strtolower(trim((string) $request->query('tour_name')));
+            $matchedTour = $tours->first(fn ($t) => strtolower($t->name) === $needle)
+                ?: $tours->first(fn ($t) => str_contains(strtolower($t->name), $needle) || str_contains($needle, strtolower($t->name)));
+            if ($matchedTour) {
+                $prefillTourId = (string) $matchedTour->id;
+            }
+        }
+
+        $prefill = [
+            'name' => (string) $request->query('name', ''),
+            'email' => (string) $request->query('email', ''),
+            'phone' => (string) $request->query('phone', ''),
+            'tour_id' => $prefillTourId,
+            'tier_id' => (string) $request->query('tier_id', ''),
+            'tour_date' => (string) $request->query('tour_date', now()->addDay()->format('Y-m-d')),
+            'adults' => max(1, (int) $request->query('adults', 2)),
+            'children' => max(0, (int) $request->query('children', 0)),
+            'infants' => max(0, (int) $request->query('infants', 0)),
+            'pickup_location' => (string) $request->query('pickup_location', ''),
+            'special_requests' => (string) $request->query('special_requests', ''),
+        ];
+
+        return view('admin.bookings.create', compact(
+            'tours',
+            'allTiers',
+            'allAddons',
+            'coupons',
+            'toursCatalog',
+            'couponsCatalog',
+            'prefill'
+        ));
+    }
+
+    /**
+     * Store a newly created manual booking in database.
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:120',
+            'email' => 'required|email|max:150',
+            'phone' => 'required|string|max:50',
+            'tour_id' => 'required|exists:tours,id',
+            'tier_id' => 'required|exists:tiers,id',
+            'tour_date' => 'required|date',
+            'adults' => 'required|integer|min:1|max:500',
+            'children' => 'nullable|integer|min:0|max:500',
+            'infants' => 'nullable|integer|min:0|max:500',
+            'addons' => 'nullable|array',
+            'addons.*' => 'integer|exists:addons,id',
+            'coupon_code' => 'nullable|string|max:64',
+            'discount_amount' => 'nullable|numeric|min:0',
+            'custom_total' => 'nullable|numeric|min:0',
+            'status' => 'required|string|in:pending,confirmed,completed,cancelled',
+            'payment_method' => 'required|string|max:50',
+            'payment_status' => 'required|string|in:unpaid,partial,paid',
+            'payment_amount' => 'nullable|numeric|min:0',
+            'balance_due' => 'nullable|numeric|min:0',
+            'pickup_location' => 'nullable|string|max:500',
+            'special_requests' => 'nullable|string|max:2000',
+            'send_confirmation_email' => 'nullable|boolean',
+            'generate_payment_link' => 'nullable|boolean',
+        ]);
+
+        $tour = Tour::findOrFail($request->input('tour_id'));
+        $tier = Tier::findOrFail($request->input('tier_id'));
+
+        $tourTier = DB::table('tour_tiers')
+            ->where('tour_id', $tour->id)
+            ->where('tier_id', $tier->id)
+            ->first();
+
+        $price = $tourTier ? (float) $tourTier->price : (float) $tour->price;
+        $priceType = $tourTier ? $tourTier->price_type : ($tier->type ?? 'per_person');
+
+        $adults = max(1, (int) $request->input('adults', 1));
+        $children = max(0, (int) $request->input('children', 0));
+        $infants = max(0, (int) $request->input('infants', 0));
+
+        if ($priceType === 'per_vehicle') {
+            $capacity = max(1, (int) ($tier->capacity ?: 6));
+            $billableGuests = max(1, $adults + $children);
+            $vehicles = (int) ceil($billableGuests / $capacity);
+            $subtotal = $vehicles * $price;
+        } else {
+            $childPrice = ($tourTier && isset($tourTier->child_price) && (float) $tourTier->child_price > 0)
+                ? (float) $tourTier->child_price
+                : ($price * 0.70);
+            $subtotal = ($adults * $price) + ($children * $childPrice);
+        }
+
+        $addonsTotal = 0.0;
+        $addonRecords = [];
+        $selectedAddonIds = array_unique(array_map('intval', $request->input('addons', [])));
+
+        foreach ($selectedAddonIds as $addonId) {
+            $addon = Addon::find($addonId);
+            if (! $addon) {
+                continue;
+            }
+            $tourAddon = DB::table('tour_addons')
+                ->where('tour_id', $tour->id)
+                ->where('addon_id', $addonId)
+                ->first();
+
+            $aPrice = $tourAddon ? (float) $tourAddon->price : (float) $addon->price;
+            $qty = ($addon->price_type === 'per_group') ? 1 : max(1, $adults + $children);
+            $addonsTotal += ($aPrice * $qty);
+            $addonRecords[] = [
+                'addon_id' => $addon->id,
+                'addon_name' => $addon->name,
+                'price' => $aPrice,
+                'quantity' => $qty,
+            ];
+        }
+
+        $subtotal = round($subtotal, 2);
+        $addonsTotal = round($addonsTotal, 2);
+        $originalTotal = round($subtotal + $addonsTotal, 2);
+
+        $couponCodeInput = strtoupper(trim((string) $request->input('coupon_code', '')));
+        $appliedCoupon = null;
+        $discountAmount = 0.0;
+
+        if ($couponCodeInput !== '') {
+            $appliedCoupon = Coupon::findByCode($couponCodeInput);
+            if ($appliedCoupon) {
+                $discountAmount = $appliedCoupon->calculateDiscount($originalTotal, $adults + $children);
+            }
+        }
+
+        if ($request->filled('discount_amount') && (float) $request->input('discount_amount') > 0) {
+            $discountAmount = min($originalTotal, round((float) $request->input('discount_amount'), 2));
+        }
+
+        $calculatedTotal = max(0, round($originalTotal - $discountAmount, 2));
+
+        if ($request->filled('custom_total') && $request->input('custom_total') !== '') {
+            $total = max(0, round((float) $request->input('custom_total'), 2));
+            if ($total < $originalTotal && $discountAmount == 0) {
+                $discountAmount = round($originalTotal - $total, 2);
+            }
+        } else {
+            $total = $calculatedTotal;
+        }
+
+        $paymentStatus = $request->input('payment_status', 'unpaid');
+        if ($paymentStatus === 'paid') {
+            $paymentAmount = ($request->filled('payment_amount') && (float) $request->input('payment_amount') > 0)
+                ? round((float) $request->input('payment_amount'), 2)
+                : $total;
+            $balanceDue = 0.0;
+        } elseif ($paymentStatus === 'partial') {
+            if ($request->filled('payment_amount') && (float) $request->input('payment_amount') > 0) {
+                $paymentAmount = min($total, max(0, round((float) $request->input('payment_amount'), 2)));
+            } else {
+                $paymentAmount = round($total * 0.25, 2);
+            }
+            $balanceDue = $request->filled('balance_due')
+                ? max(0, round((float) $request->input('balance_due'), 2))
+                : max(0, round($total - $paymentAmount, 2));
+        } else {
+            $paymentAmount = 0.0;
+            $balanceDue = $request->filled('balance_due')
+                ? max(0, round((float) $request->input('balance_due'), 2))
+                : $total;
+        }
+
+        do {
+            $ref = 'DDT'.date('ymd').strtoupper(Str::random(5));
+        } while (Booking::withTrashed()->where('reference', $ref)->exists());
+
+        $booking = DB::transaction(function () use (
+            $ref,
+            $tour,
+            $tier,
+            $appliedCoupon,
+            $couponCodeInput,
+            $request,
+            $adults,
+            $children,
+            $infants,
+            $subtotal,
+            $addonsTotal,
+            $originalTotal,
+            $discountAmount,
+            $total,
+            $paymentAmount,
+            $balanceDue,
+            $paymentStatus,
+            $addonRecords
+        ) {
+            $booking = Booking::create([
+                'reference' => $ref,
+                'tour_id' => $tour->id,
+                'tier_id' => $tier->id,
+                'coupon_id' => $appliedCoupon?->id,
+                'coupon_code' => $appliedCoupon ? $appliedCoupon->code : ($couponCodeInput ?: null),
+                'tour_name' => $tour->name,
+                'tier_name' => $tier->display_name ?: $tier->name,
+                'name' => trim((string) $request->input('name')),
+                'email' => strtolower(trim((string) $request->input('email'))),
+                'phone' => trim((string) $request->input('phone')),
+                'tour_date' => $request->input('tour_date'),
+                'adults' => $adults,
+                'children' => $children,
+                'infants' => $infants,
+                'subtotal' => $subtotal,
+                'addons_total' => $addonsTotal,
+                'original_total' => $originalTotal,
+                'discount_amount' => $discountAmount,
+                'total' => $total,
+                'payment_method' => $request->input('payment_method', 'cash'),
+                'payment_amount' => $paymentAmount,
+                'balance_due' => $balanceDue,
+                'payment_status' => $paymentStatus,
+                'status' => $request->input('status', 'confirmed'),
+                'pickup_location' => $request->input('pickup_location'),
+                'special_requests' => $request->input('special_requests'),
+            ]);
+
+            foreach ($addonRecords as $rec) {
+                BookingAddon::create(array_merge($rec, ['booking_id' => $booking->id]));
+            }
+
+            if ($appliedCoupon && $appliedCoupon->id && $discountAmount > 0) {
+                $appliedCoupon->increment('used_count');
+                CouponUsage::create([
+                    'coupon_id' => $appliedCoupon->id,
+                    'booking_id' => $booking->id,
+                    'booking_reference' => $booking->reference,
+                    'customer_name' => $booking->name,
+                    'customer_email' => $booking->email,
+                    'customer_phone' => $booking->phone,
+                    'discount_amount' => $discountAmount,
+                    'order_subtotal' => $originalTotal,
+                    'order_final_total' => $total,
+                    'used_at' => now(),
+                ]);
+            }
+
+            VerifiedEmail::markVerified($booking->email);
+
+            return $booking;
+        });
+
+        Cache::forget('admin_dashboard_kpis');
+
+        // Optional Ziina Payment Link Generation
+        if ($request->boolean('generate_payment_link') && $booking->balance_due > 0) {
+            try {
+                $ziina = app(ZiinaPaymentService::class);
+                $successUrl = route('booking.thankyou', ['pi' => '{PAYMENT_INTENT_ID}']);
+                $cancelUrl = route('booking.cancel', ['pi' => '{PAYMENT_INTENT_ID}']);
+                $intent = $ziina->createPaymentIntent(
+                    (float) $booking->balance_due,
+                    'AED',
+                    $successUrl,
+                    $cancelUrl,
+                    'Booking '.$booking->reference
+                );
+                if (! empty($intent['redirect_url']) && ! empty($intent['id'])) {
+                    BookingPayment::create([
+                        'booking_id' => $booking->id,
+                        'payment_intent_id' => $intent['id'],
+                        'amount' => (float) $booking->balance_due,
+                        'currency' => 'AED',
+                        'status' => $intent['status'] ?? 'pending',
+                        'payment_url' => $intent['redirect_url'],
+                        'notes' => 'Generated on manual booking creation',
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Manual booking Ziina payment link skipped: '.$e->getMessage());
+            }
+        }
+
+        // Optional Guest Confirmation Email
+        if ($request->boolean('send_confirmation_email') && ! empty($booking->email)) {
+            try {
+                if (! app()->environment('testing')) {
+                    try {
+                        app(EmailMarketingService::class)->applySmtpConfig();
+                    } catch (\Throwable $e) {
+                    }
+                }
+                $fromEmail = app(SettingsService::class)->getFromEmail();
+                $emailType = match (true) {
+                    $booking->status === 'cancelled' => 'booking_cancelled',
+                    in_array($booking->status, ['confirmed', 'completed'], true) => 'booking_confirmed',
+                    $booking->payment_status === 'paid' => 'booking_full',
+                    $booking->payment_status === 'partial' => 'booking_advance',
+                    default => 'booking_cash',
+                };
+                Mail::to($booking->email)->send(
+                    (new BookingNotification($emailType, $booking->load('addons')))->from($fromEmail, 'Dunes Discovery Tourism')
+                );
+            } catch (\Throwable $e) {
+                Log::error('Failed to send manual booking confirmation email: '.$e->getMessage());
+            }
+        }
+
+        return redirect()
+            ->route('admin.bookings.show', $booking->id)
+            ->with('success', "Booking #{$booking->reference} created successfully!");
     }
 
     /**
@@ -235,7 +618,10 @@ class AdminBookingController extends Controller
             $log = RequestLog::find($booking->request_log_id);
         }
 
-        return view('admin.bookings.show', compact('booking', 'log'));
+        $tours = Tour::orderBy('priority')->orderBy('id')->get();
+        $tiers = Tier::orderBy('id')->get();
+
+        return view('admin.bookings.show', compact('booking', 'log', 'tours', 'tiers'));
     }
 
     /**
@@ -249,31 +635,99 @@ class AdminBookingController extends Controller
             'status' => 'required|string|in:draft,pending,confirmed,completed,cancelled',
             'payment_status' => 'required|string|in:unpaid,partial,paid,failed,cancelled',
             'balance_due' => 'required|numeric|min:0',
+            'name' => 'sometimes|required|string|max:120',
+            'email' => 'sometimes|required|email|max:150',
+            'phone' => 'sometimes|required|string|max:50',
+            'tour_id' => 'nullable|exists:tours,id',
+            'tier_id' => 'nullable|exists:tiers,id',
+            'tour_date' => 'sometimes|required|date',
+            'pickup_time' => 'nullable|string|max:50',
+            'adults' => 'sometimes|required|integer|min:1|max:500',
+            'children' => 'nullable|integer|min:0|max:500',
+            'infants' => 'nullable|integer|min:0|max:500',
+            'payment_method' => 'nullable|string|max:50',
+            'total' => 'nullable|numeric|min:0',
+            'payment_amount' => 'nullable|numeric|min:0',
+            'pickup_location' => 'nullable|string|max:500',
+            'special_requests' => 'nullable|string|max:2000',
         ]);
 
+        $total = $request->filled('total') ? round((float) $request->input('total'), 2) : (float) $booking->total;
         $paymentStatus = $request->input('payment_status');
-        $balanceDue = (float) $request->input('balance_due');
-        $paymentAmount = (float) $booking->payment_amount;
+        $balanceDue = round((float) $request->input('balance_due'), 2);
+        $paymentAmount = $request->filled('payment_amount')
+            ? round((float) $request->input('payment_amount'), 2)
+            : (float) $booking->payment_amount;
 
         if ($paymentStatus === 'paid') {
             $balanceDue = 0.00;
-            $paymentAmount = (float) $booking->total;
+            $paymentAmount = $total;
         } elseif ($paymentStatus === 'unpaid') {
-            $balanceDue = (float) $booking->total;
+            $balanceDue = $total;
             $paymentAmount = 0.00;
         } else {
-            $paymentAmount = max(0, (float) $booking->total - $balanceDue);
+            if (! $request->filled('payment_amount')) {
+                $paymentAmount = max(0, round($total - $balanceDue, 2));
+            }
         }
 
         $oldStatus = $booking->status;
-        $booking->update([
+
+        $updateData = [
             'status' => $request->input('status'),
             'payment_status' => $paymentStatus,
+            'total' => $total,
             'payment_amount' => $paymentAmount,
             'balance_due' => $balanceDue,
-            'special_requests' => $request->input('special_requests'),
-            'pickup_location' => $request->input('pickup_location'),
-        ]);
+        ];
+
+        if ($request->has('name')) {
+            $updateData['name'] = trim((string) $request->input('name'));
+        }
+        if ($request->has('email')) {
+            $updateData['email'] = strtolower(trim((string) $request->input('email')));
+        }
+        if ($request->has('phone')) {
+            $updateData['phone'] = trim((string) $request->input('phone'));
+        }
+        if ($request->filled('tour_id')) {
+            $newTour = Tour::find($request->input('tour_id'));
+            if ($newTour) {
+                $updateData['tour_id'] = $newTour->id;
+                $updateData['tour_name'] = $newTour->name;
+            }
+        }
+        if ($request->filled('tier_id')) {
+            $newTier = Tier::find($request->input('tier_id'));
+            if ($newTier) {
+                $updateData['tier_id'] = $newTier->id;
+                $updateData['tier_name'] = $newTier->display_name ?: $newTier->name;
+            }
+        }
+        if ($request->has('tour_date')) {
+            $updateData['tour_date'] = $request->input('tour_date');
+        }
+        if ($request->has('adults')) {
+            $updateData['adults'] = max(1, (int) $request->input('adults'));
+        }
+        if ($request->has('children')) {
+            $updateData['children'] = max(0, (int) $request->input('children'));
+        }
+        if ($request->has('infants')) {
+            $updateData['infants'] = max(0, (int) $request->input('infants'));
+        }
+        if ($request->filled('payment_method')) {
+            $updateData['payment_method'] = $request->input('payment_method');
+        }
+        if ($request->has('pickup_location')) {
+            $updateData['pickup_location'] = $request->input('pickup_location');
+        }
+        if ($request->has('special_requests')) {
+            $updateData['special_requests'] = $request->input('special_requests');
+        }
+
+        $booking->update($updateData);
+        Cache::forget('admin_dashboard_kpis');
 
         // If status changed to confirmed or cancelled, trigger notifications
         if ($oldStatus !== $booking->status) {

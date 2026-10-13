@@ -247,6 +247,73 @@
             @method('PUT')
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
+                    <label for="edit_name" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Customer Name</label>
+                    <input type="text" name="name" id="edit_name" required class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" value="{{ old('name', $booking->name) }}">
+                </div>
+                <div>
+                    <label for="edit_email" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Customer Email</label>
+                    <input type="email" name="email" id="edit_email" required class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" value="{{ old('email', $booking->email) }}">
+                </div>
+                <div>
+                    <label for="edit_phone" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Phone / WhatsApp</label>
+                    <input type="text" name="phone" id="edit_phone" required class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" value="{{ old('phone', $booking->phone) }}">
+                </div>
+
+                @if(isset($tours) && $tours->isNotEmpty())
+                <div>
+                    <label for="edit_tour_id" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Tour Experience</label>
+                    <select name="tour_id" id="edit_tour_id" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden bg-white">
+                        @foreach($tours as $t)
+                            <option value="{{ $t->id }}" {{ (int) $booking->tour_id === (int) $t->id ? 'selected' : '' }}>{{ $t->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                @endif
+
+                @if(isset($tiers) && $tiers->isNotEmpty())
+                <div>
+                    <label for="edit_tier_id" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Package Tier</label>
+                    <select name="tier_id" id="edit_tier_id" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden bg-white">
+                        @foreach($tiers as $tierOpt)
+                            <option value="{{ $tierOpt->id }}" {{ (int) $booking->tier_id === (int) $tierOpt->id ? 'selected' : '' }}>{{ $tierOpt->display_name ?: $tierOpt->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                @endif
+
+                <div>
+                    <label for="edit_tour_date" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Tour Date</label>
+                    <input type="date" name="tour_date" id="edit_tour_date" required class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" value="{{ $booking->tour_date ? $booking->tour_date->format('Y-m-d') : '' }}">
+                </div>
+
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label for="edit_adults" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Adults</label>
+                        <input type="number" min="1" max="500" name="adults" id="edit_adults" required class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-800 focus:border-primary outline-hidden" value="{{ $booking->adults ?? 1 }}">
+                    </div>
+                    <div>
+                        <label for="edit_children" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Children</label>
+                        <input type="number" min="0" max="500" name="children" id="edit_children" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-800 focus:border-primary outline-hidden" value="{{ $booking->children ?? 0 }}">
+                    </div>
+                    <div>
+                        <label for="edit_infants" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Infants</label>
+                        <input type="number" min="0" max="500" name="infants" id="edit_infants" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-800 focus:border-primary outline-hidden" value="{{ $booking->infants ?? 0 }}">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="edit_payment_method" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Payment Method</label>
+                    <select name="payment_method" id="edit_payment_method" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden bg-white">
+                        <option value="cash" {{ $booking->payment_method === 'cash' ? 'selected' : '' }}>Cash on Pickup</option>
+                        <option value="card_pos" {{ $booking->payment_method === 'card_pos' ? 'selected' : '' }}>Card / POS Terminal</option>
+                        <option value="bank_transfer" {{ $booking->payment_method === 'bank_transfer' ? 'selected' : '' }}>Bank Transfer</option>
+                        <option value="full" {{ $booking->payment_method === 'full' ? 'selected' : '' }}>Online Full Payment (Ziina)</option>
+                        <option value="advance" {{ $booking->payment_method === 'advance' ? 'selected' : '' }}>25% Advance Deposit</option>
+                        <option value="complimentary" {{ $booking->payment_method === 'complimentary' ? 'selected' : '' }}>Complimentary / B2B</option>
+                    </select>
+                </div>
+
+                <div>
                     <label for="status" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Booking Status</label>
                     <select name="status" id="status" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden bg-white">
                         @if($booking->status === 'draft')
@@ -268,9 +335,19 @@
                         <option value="cancelled" {{ $booking->payment_status === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                     </select>
                 </div>
-                <div>
-                    <label for="balance_due" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Balance Due (AED)</label>
-                    <input type="number" name="balance_due" id="balance_due" step="0.01" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" value="{{ $booking->balance_due }}">
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label for="edit_total" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Total (AED)</label>
+                        <input type="number" name="total" id="edit_total" step="0.01" min="0" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-800 focus:border-primary outline-hidden" value="{{ $booking->total }}">
+                    </div>
+                    <div>
+                        <label for="edit_payment_amount" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Paid (AED)</label>
+                        <input type="number" name="payment_amount" id="edit_payment_amount" step="0.01" min="0" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-800 focus:border-primary outline-hidden" value="{{ $booking->payment_amount }}">
+                    </div>
+                    <div>
+                        <label for="balance_due" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Balance (AED)</label>
+                        <input type="number" name="balance_due" id="balance_due" step="0.01" min="0" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-800 focus:border-primary outline-hidden" value="{{ $booking->balance_due }}">
+                    </div>
                 </div>
                 <div class="md:col-span-1">
                     <label for="pickup_location" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Pickup Location</label>
@@ -281,7 +358,7 @@
                     <textarea name="special_requests" id="special_requests" rows="2" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden">{{ $booking->special_requests }}</textarea>
                 </div>
                 <div class="md:col-span-3 pt-2">
-                    <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-sm shadow-xs transition-all">
+                    <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-sm shadow-xs transition-all cursor-pointer">
                         <i class="bi bi-save"></i> Update Booking Details
                     </button>
                 </div>

@@ -27,6 +27,9 @@
         </div>
         
         <div class="flex flex-wrap items-center gap-2">
+            <a href="{{ route('admin.bookings.create', ['name' => $inquiry->name, 'email' => $inquiry->email, 'phone' => $inquiry->phone, 'special_requests' => 'Inquiry #' . $inquiry->id . ': ' . $inquiry->subject]) }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold shadow-xs transition-all">
+                <i class="bi bi-calendar-plus-fill"></i> Convert to Booking
+            </a>
             @if($inquiry->status !== 'replied')
                 <form action="{{ route('admin.inquiries.status', $inquiry->id) }}" method="POST" class="inline">
                     @csrf

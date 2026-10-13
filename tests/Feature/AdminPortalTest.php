@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Addon;
 use App\Models\BlogCategory;
 use App\Models\BlogPost;
 use App\Models\Booking;
@@ -13,11 +14,13 @@ use App\Models\LegalPage;
 use App\Models\Setting;
 use App\Models\Subscriber;
 use App\Models\SubscriberGroup;
+use App\Models\Tier;
 use App\Models\Tour;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class AdminPortalTest extends TestCase
@@ -150,6 +153,7 @@ class AdminPortalTest extends TestCase
             '/admin/analytics',
             '/admin/active-visitors',
             '/admin/bookings',
+            '/admin/bookings/create',
             '/admin/operations',
             '/admin/tours',
             '/admin/tours/create',
@@ -522,5 +526,187 @@ class AdminPortalTest extends TestCase
         $campaign->refresh();
         $this->assertEquals('Updated Campaign Title', $campaign->title);
         $this->assertEquals('Updated Winter Safari Deal', $campaign->subject);
+    }
+
+    /**
+     * Test admin can create a manual booking end-to-end via GET /admin/bookings/create and POST /admin/bookings.
+     */
+    public function test_admin_can_create_manual_booking_end_to_end(): void
+    {
+        $cat = Category::firstOrCreate(['slug' => 'desert-safari'], ['name' => 'Desert Safari', 'priority' => 1]);
+        $tour = Tour::create([
+            'slug' => 'vip-evening-safari',
+            'name' => 'VIP Evening Desert Safari',
+            'category_id' => $cat->id,
+            'short_desc' => 'VIP Desert Safari',
+            'full_desc' => 'Full VIP Desert Safari',
+            'duration' => '6 Hours',
+            'price' => 200,
+            'status' => 'active',
+            'priority' => 1,
+        ]);
+
+        $tier = Tier::create([
+            'slug' => 'vip_majlis',
+            'name' => 'VIP Majlis',
+            'display_name' => 'VIP Majlis Package',
+            'status' => 'active',
+        ]);
+
+        DB::table('tour_tiers')->insert([
+            'tour_id' => $tour->id,
+            'tier_id' => $tier->id,
+            'price' => 250,
+            'price_type' => 'per_person',
+        ]);
+
+        $addon = Addon::create([
+            'slug' => 'quad_bike_30m',
+            'name' => '30-Min Quad Biking',
+            'default_price' => 120,
+            'status' => 'active',
+        ]);
+
+        DB::table('tour_addons')->insert([
+            'tour_id' => $tour->id,
+            'addon_id' => $addon->id,
+            'price' => 100,
+        ]);
+
+        $coupon = Coupon::create([
+            'code' => 'WALKIN10',
+            'name' => 'Walk-in 10% Discount',
+            'discount_type' => 'percentage',
+            'discount_value' => 10,
+            'status' => 'active',
+        ]);
+
+        // 1. Verify GET /admin/bookings/create with prefill parameters renders cleanly
+        $createResponse = $this->actingAs($this->adminUser)->get('/admin/bookings/create?name=Walkin+Guest&phone=%2B971509876543&tour_name=VIP+Evening');
+        $createResponse->assertStatus(200);
+        $createResponse->assertSee('Create Manual Booking');
+        $createResponse->assertSee('Walkin Guest');
+
+        // 2. Submit POST /admin/bookings
+        // 2 adults (2 * 250 = 500) + 1 child (1 * 175 = 175) = 675 base subtotal
+        // Addon for 3 billable guests (3 * 100 = 300)
+        // Original total = 975; 10% coupon WALKIN10 = 97.50 discount -> 877.50 final total
+        $storeResponse = $this->actingAs($this->adminUser)->post('/admin/bookings', [
+            'name' => 'Walkin Guest',
+            'email' => 'walkin@example.com',
+            'phone' => '+971509876543',
+            'tour_id' => $tour->id,
+            'tier_id' => $tier->id,
+            'tour_date' => now()->addDays(2)->format('Y-m-d'),
+            'adults' => 2,
+            'children' => 1,
+            'infants' => 1,
+            'addons' => [$addon->id],
+            'coupon_code' => 'WALKIN10',
+            'status' => 'confirmed',
+            'payment_method' => 'cash',
+            'payment_status' => 'partial',
+            'payment_amount' => 277.50,
+            'balance_due' => 600,
+            'pickup_location' => 'Burj Al Arab, Suite 101',
+            'special_requests' => 'Window table at camp',
+            'send_confirmation_email' => '0',
+        ]);
+
+        $booking = Booking::where('email', 'walkin@example.com')->first();
+        $this->assertNotNull($booking);
+        $storeResponse->assertRedirect(route('admin.bookings.show', $booking->id));
+
+        $this->assertEquals(675.00, (float) $booking->subtotal);
+        $this->assertEquals(300.00, (float) $booking->addons_total);
+        $this->assertEquals(975.00, (float) $booking->original_total);
+        $this->assertEquals(97.50, (float) $booking->discount_amount);
+        $this->assertEquals(877.50, (float) $booking->total);
+        $this->assertEquals(277.50, (float) $booking->payment_amount);
+        $this->assertEquals(600.00, (float) $booking->balance_due);
+        $this->assertEquals('confirmed', $booking->status);
+        $this->assertEquals('partial', $booking->payment_status);
+        $this->assertEquals('VIP Majlis Package', $booking->tier_name);
+        $this->assertCount(1, $booking->addons);
+
+        // Verify Dashboard Realtime KPIs reflect the new manual booking and collected revenue
+        $kpiResponse = $this->actingAs($this->adminUser)->getJson('/admin/api/kpis');
+        $kpiResponse->assertStatus(200);
+        $this->assertEquals(277.50, (float) $kpiResponse->json('stats.revenue'));
+    }
+
+    /**
+     * Test admin can update both full booking details and quick status via PUT /admin/bookings/{id}.
+     */
+    public function test_admin_can_update_full_booking_details_and_quick_status(): void
+    {
+        $booking = Booking::create([
+            'reference' => 'DDT-UPD-001',
+            'tour_name' => 'Evening Desert Safari',
+            'tier_name' => 'Standard Package',
+            'name' => 'Initial Guest',
+            'email' => 'initial@example.com',
+            'phone' => '+971501112233',
+            'tour_date' => '2026-10-20',
+            'adults' => 2,
+            'children' => 0,
+            'infants' => 0,
+            'subtotal' => 300,
+            'total' => 300,
+            'status' => 'pending',
+            'payment_status' => 'unpaid',
+            'payment_method' => 'cash',
+            'payment_amount' => 0,
+            'balance_due' => 300,
+        ]);
+
+        // 1. Test full booking details edit
+        $updateResponse = $this->actingAs($this->adminUser)->put("/admin/bookings/{$booking->id}", [
+            'name' => 'Updated VIP Guest',
+            'email' => 'updated@example.com',
+            'phone' => '+971509998877',
+            'tour_date' => '2026-10-25',
+            'adults' => 4,
+            'children' => 2,
+            'infants' => 1,
+            'payment_method' => 'card_pos',
+            'status' => 'confirmed',
+            'payment_status' => 'partial',
+            'total' => 750,
+            'payment_amount' => 350,
+            'balance_due' => 400,
+            'pickup_location' => 'JW Marriott Marquis',
+            'special_requests' => 'Birthday cake requested',
+        ]);
+
+        $updateResponse->assertRedirect(route('admin.bookings.show', $booking->id));
+        $booking->refresh();
+        $this->assertEquals('Updated VIP Guest', $booking->name);
+        $this->assertEquals('updated@example.com', $booking->email);
+        $this->assertEquals('+971509998877', $booking->phone);
+        $this->assertEquals('2026-10-25', $booking->tour_date->format('Y-m-d'));
+        $this->assertEquals(4, $booking->adults);
+        $this->assertEquals(2, $booking->children);
+        $this->assertEquals(1, $booking->infants);
+        $this->assertEquals('card_pos', $booking->payment_method);
+        $this->assertEquals(750.00, (float) $booking->total);
+        $this->assertEquals(350.00, (float) $booking->payment_amount);
+        $this->assertEquals(400.00, (float) $booking->balance_due);
+
+        // 2. Test quick status button payload (only status, payment_status, balance_due) preserves guest details
+        $quickResponse = $this->actingAs($this->adminUser)->put("/admin/bookings/{$booking->id}", [
+            'status' => 'completed',
+            'payment_status' => 'paid',
+            'balance_due' => 0,
+        ]);
+
+        $quickResponse->assertRedirect(route('admin.bookings.show', $booking->id));
+        $booking->refresh();
+        $this->assertEquals('completed', $booking->status);
+        $this->assertEquals('paid', $booking->payment_status);
+        $this->assertEquals(750.00, (float) $booking->payment_amount);
+        $this->assertEquals(0.00, (float) $booking->balance_due);
+        $this->assertEquals('Updated VIP Guest', $booking->name);
+        $this->assertEquals('JW Marriott Marquis', $booking->pickup_location);
     }
 }

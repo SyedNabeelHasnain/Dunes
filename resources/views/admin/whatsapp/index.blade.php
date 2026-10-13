@@ -214,6 +214,11 @@
                         </td>
                         <td class="py-3 px-4 text-right pe-4">
                             <div class="inline-flex items-center justify-end gap-1.5">
+                                <a href="{{ route('admin.bookings.create', ['name' => $lead->name ?: '', 'phone' => $lead->phone ?: '', 'tour_name' => $lead->tour_name ?: '', 'special_requests' => $lead->message_text ?: '']) }}"
+                                   class="w-8 h-8 rounded-xl border border-emerald-200 text-emerald-600 hover:bg-emerald-50 flex items-center justify-center bg-white transition shadow-2xs"
+                                   title="Convert WhatsApp Lead to Booking">
+                                    <i class="bi bi-calendar-plus text-xs"></i>
+                                </a>
                                 <button class="w-8 h-8 rounded-xl border border-slate-200 hover:border-primary hover:text-primary flex items-center justify-center text-slate-600 bg-white transition shadow-2xs view-lead-btn cursor-pointer" 
                                         title="View Full Lead Details"
                                         data-id="{{ $lead->id }}"
