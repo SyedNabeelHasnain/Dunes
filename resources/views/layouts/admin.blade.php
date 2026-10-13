@@ -21,7 +21,7 @@
 <body class="bg-slate-50 font-sans text-slate-800 antialiased min-h-screen flex flex-col" x-data>
 
     <!-- Global Processing Loader Overlay -->
-    <div id="appLoader" class="fixed inset-0 z-50 bg-white/80 backdrop-blur-xs hidden flex-col items-center justify-center">
+    <div id="appLoader" class="fixed inset-0 z-50 bg-white/80 backdrop-blur-xs hidden flex-col items-center justify-center" style="display: none;">
         <div class="w-12 h-12 border-4 border-slate-200 border-t-primary rounded-full animate-spin mb-3"></div>
         <div class="font-bold text-primary text-sm tracking-wide">Processing...</div>
     </div>
