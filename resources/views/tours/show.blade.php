@@ -32,6 +32,20 @@
     $heroAvifUrl = $tourImages[0] ?? resolve_tour_image($tour->hero_image);
 @endphp
 
+@push('styles')
+<style>
+@keyframes heroKenBurns {
+    0% { transform: scale(1.0); }
+    50% { transform: scale(1.07); }
+    100% { transform: scale(1.03); }
+}
+.hero-slide-zoom {
+    animation: heroKenBurns 14s cubic-bezier(0.25, 1, 0.5, 1) infinite alternate;
+    will-change: transform;
+}
+</style>
+@endpush
+
 @push('preloads')
     <link rel="preload" as="image" href="{{ $heroAvifUrl }}" type="image/avif">
     
@@ -263,37 +277,46 @@ if(window.fbq){
              heroIdx: 0,
              total: {{ $totalHeroImages }},
              startX: 0,
-             prevHero() { this.heroIdx = (this.heroIdx - 1 + this.total) % this.total; },
-             nextHero() { this.heroIdx = (this.heroIdx + 1) % this.total; },
-             goHero(i) { this.heroIdx = i; },
+             timer: null,
+             prevHero() { this.resetTimer(); this.heroIdx = (this.heroIdx - 1 + this.total) % this.total; },
+             nextHero() { this.resetTimer(); this.heroIdx = (this.heroIdx + 1) % this.total; },
+             goHero(i) { this.resetTimer(); this.heroIdx = i; },
+             resetTimer() {
+                 if (this.timer) clearInterval(this.timer);
+                 this.timer = setInterval(() => { this.heroIdx = (this.heroIdx + 1) % this.total; }, 7000);
+             },
              touchStart(e) { this.startX = e.changedTouches[0].screenX; },
              touchEnd(e) {
                  const diff = e.changedTouches[0].screenX - this.startX;
                  if (diff > 40) { this.prevHero(); }
                  else if (diff < -40) { this.nextHero(); }
+             },
+             init() {
+                 this.resetTimer();
              }
          }"
+         @mouseenter="if(timer) clearInterval(timer)"
+         @mouseleave="resetTimer()"
          @touchstart.passive="touchStart($event)"
          @touchend.passive="touchEnd($event)"
          @endif>
 
     <!-- Background Slider Slides -->
-    <div class="absolute inset-0 z-0">
+    <div class="absolute inset-0 z-1 overflow-hidden pointer-events-none">
         @foreach($tourImages as $idx => $imgUrl)
-            <div class="absolute inset-0 bg-cover bg-center transition-all duration-700 ease-in-out"
-                 @if($totalHeroImages >= 2)
-                 :class="{ 'scale-100': heroIdx === {{ $idx }}, 'scale-105': heroIdx !== {{ $idx }} }"
-                 :style="heroIdx === {{ $idx }} ? 'opacity: 1; z-index: 2; pointer-events: auto;' : 'opacity: 0; z-index: 1; pointer-events: none;'"
-                 style="background-image: url('{{ $imgUrl }}'); opacity: {{ $idx === 0 ? '1' : '0' }}; z-index: {{ $idx === 0 ? '2' : '1' }}; pointer-events: {{ $idx === 0 ? 'auto' : 'none' }};"
-                 @else
-                 style="background-image: url('{{ $imgUrl }}'); opacity: 1; z-index: 2;"
-                 @endif>
-            </div>
+            <img src="{{ $imgUrl }}"
+                 alt="{{ $tour->name }} Dubai Desert Safari photo {{ $idx + 1 }}"
+                 width="1920" height="1080"
+                 loading="{{ $idx === 0 ? 'eager' : 'lazy' }}"
+                 class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out will-change-transform"
+                 :class="{ 'opacity-100 z-2 hero-slide-zoom': heroIdx === {{ $idx }}, 'opacity-0 z-1 pointer-events-none': heroIdx !== {{ $idx }} }"
+                 :style="heroIdx === {{ $idx }} ? 'opacity: 1; z-index: 2;' : 'opacity: 0; z-index: 1; pointer-events: none;'"
+                 style="opacity: {{ $idx === 0 ? '1' : '0' }}; z-index: {{ $idx === 0 ? '2' : '1' }}; pointer-events: {{ $idx === 0 ? 'auto' : 'none' }};">
         @endforeach
     </div>
 
     <!-- Gradient Overlay -->
-    <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/65 to-black/30 z-2 pointer-events-none"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/65 to-black/30 z-3 pointer-events-none"></div>
 
     @if($totalHeroImages >= 2)
         <!-- Previous / Next Navigation Arrows -->
@@ -466,8 +489,8 @@ if(window.fbq){
                             <img src="{{ $imgUrl }}"
                                  alt="{{ $tour->name }} photograph {{ $idx + 1 }}"
                                  loading="{{ $idx === 0 ? 'eager' : 'lazy' }}"
-                                 class="absolute inset-0 w-full h-full object-cover transition-all duration-500"
-                                 :class="{ 'scale-100': showIdx === {{ $idx }}, 'scale-105': showIdx !== {{ $idx }} }"
+                                 class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out will-change-transform"
+                                 :class="{ 'opacity-100 z-10 hero-slide-zoom': showIdx === {{ $idx }}, 'opacity-0 z-1 pointer-events-none': showIdx !== {{ $idx }} }"
                                  :style="showIdx === {{ $idx }} ? 'opacity: 1; z-index: 10; pointer-events: auto;' : 'opacity: 0; z-index: 1; pointer-events: none;'"
                                  style="opacity: {{ $idx === 0 ? '1' : '0' }}; z-index: {{ $idx === 0 ? '10' : '1' }}; pointer-events: {{ $idx === 0 ? 'auto' : 'none' }};">
                         @endforeach
