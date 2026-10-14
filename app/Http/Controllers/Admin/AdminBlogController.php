@@ -49,7 +49,7 @@ class AdminBlogController extends Controller
             'excerpt' => 'required',
             'category_id' => 'required|integer',
             'status' => 'required|string|in:draft,published,scheduled',
-            'featured_image' => 'nullable|image|max:4096',
+            'featured_image' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
         ]);
 
         $data = $this->normalizeLocalizedData(
@@ -126,7 +126,7 @@ class AdminBlogController extends Controller
             'excerpt' => 'required',
             'category_id' => 'required|integer',
             'status' => 'required|string|in:draft,published,scheduled',
-            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:5120',
+            'featured_image' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
         ]);
 
         $data = $this->normalizeLocalizedData(

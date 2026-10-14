@@ -228,22 +228,24 @@ class AdminSettingController extends Controller
 
         // Handle uploaded image files
         $request->validate([
-            'site_hero_poster_file' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:8192',
-            'site_default_image_file' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:8192',
-            'seo_default_og_image_file' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:8192',
-            'seo_home_og_image_file' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:8192',
+            'site_hero_poster_file' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
+            'site_default_image_file' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
+            'seo_default_og_image_file' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
+            'seo_home_og_image_file' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
         ]);
 
         if ($request->hasFile('site_hero_poster_file')) {
             $file = $request->file('site_hero_poster_file');
-            $filename = 'hero-poster-' . time() . '.' . $file->getClientOriginalExtension();
+            $ext = strtolower($file->getClientOriginalExtension() ?: ($file->guessExtension() ?: 'avif'));
+            $filename = 'hero-poster-' . time() . '.' . $ext;
             $file->move(public_path('images'), $filename);
             $settings['site_hero_poster'] = '/images/' . $filename;
         }
 
         if ($request->hasFile('seo_default_og_image_file') || $request->hasFile('site_default_image_file')) {
             $file = $request->file('seo_default_og_image_file') ?: $request->file('site_default_image_file');
-            $filename = 'og-default-' . time() . '.' . $file->getClientOriginalExtension();
+            $ext = strtolower($file->getClientOriginalExtension() ?: ($file->guessExtension() ?: 'avif'));
+            $filename = 'og-default-' . time() . '.' . $ext;
             $file->move(public_path('images'), $filename);
             $settings['seo_default_og_image'] = '/images/' . $filename;
             $settings['site_default_image'] = '/images/' . $filename;
@@ -251,7 +253,8 @@ class AdminSettingController extends Controller
 
         if ($request->hasFile('seo_home_og_image_file')) {
             $file = $request->file('seo_home_og_image_file');
-            $filename = 'og-home-' . time() . '.' . $file->getClientOriginalExtension();
+            $ext = strtolower($file->getClientOriginalExtension() ?: ($file->guessExtension() ?: 'avif'));
+            $filename = 'og-home-' . time() . '.' . $ext;
             $file->move(public_path('images'), $filename);
             $settings['seo_home_og_image'] = '/images/' . $filename;
         }

@@ -380,7 +380,7 @@ class PageController extends Controller
             'review_title' => 'nullable|string|max:255',
             'review_text' => 'required|string|min:10|max:3000',
             'photos' => 'nullable|array|max:4',
-            'photos.*' => 'image|mimes:jpeg,png,jpg,webp,avif|max:5120',
+            'photos.*' => 'file|mimes:jpeg,png,jpg,webp,avif|max:8192',
         ];
         if ($isGuestMode) {
             $rules['guest_name'] = 'required|string|min:2|max:100';
@@ -401,7 +401,7 @@ class PageController extends Controller
 
             foreach ($request->file('photos') as $photoFile) {
                 if ($photoFile->isValid()) {
-                    $ext = $photoFile->getClientOriginalExtension() ?: 'jpg';
+                    $ext = strtolower($photoFile->getClientOriginalExtension() ?: ($photoFile->guessExtension() ?: 'avif'));
                     $filename = 'rev_'.uniqid().'_'.time().'.'.$ext;
                     $photoFile->move($uploadDir, $filename);
                     $storedPhotos[] = 'uploads/reviews/'.$filename;

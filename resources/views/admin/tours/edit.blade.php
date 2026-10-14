@@ -448,7 +448,8 @@
                     @if($tour->hero_image)
                         <div class="mb-2"><img src="{{ resolve_tour_image($tour->hero_image) }}" alt="{{ $tour->name }}" class="w-full h-20 rounded-xl object-cover border border-slate-200"></div>
                     @endif
-                    <input type="file" name="hero_image" form="editTourForm" id="hero_image" class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
+                    <input type="file" name="hero_image" form="editTourForm" id="hero_image" accept="image/jpeg,image/png,image/webp,image/avif" class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
+                    <p class="text-[11px] text-slate-400 mt-1">1920x800 recommended (AVIF, WebP, JPG). Max 8MB.</p>
                 </div>
 
                 <div>
@@ -456,7 +457,8 @@
                     @if($tour->thumb_image)
                         <div class="mb-2"><img src="{{ resolve_tour_image($tour->thumb_image) }}" alt="{{ $tour->name }}" class="w-full h-20 rounded-xl object-cover border border-slate-200"></div>
                     @endif
-                    <input type="file" name="thumb_image" form="editTourForm" id="thumb_image" class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
+                    <input type="file" name="thumb_image" form="editTourForm" id="thumb_image" accept="image/jpeg,image/png,image/webp,image/avif" class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
+                    <p class="text-[11px] text-slate-400 mt-1">600x400 recommended (AVIF, WebP, JPG). Max 8MB.</p>
                 </div>
 
                 <div class="pt-3 border-t border-slate-100">
@@ -474,8 +476,8 @@
                             @endforeach
                         </div>
                     @endif
-                    <input type="file" name="gallery_images[]" multiple form="editTourForm" id="gallery_images" class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
-                    <p class="text-[11px] text-slate-400 mt-1">Select one or multiple photos (JPG, PNG, WEBP, AVIF up to 5MB each) to add to the tour slider.</p>
+                    <input type="file" name="gallery_images[]" multiple form="editTourForm" id="gallery_images" accept="image/jpeg,image/png,image/webp,image/avif" class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
+                    <p class="text-[11px] text-slate-400 mt-1">Select one or multiple photos (AVIF, WebP, JPG up to 8MB each) to add to the tour slider.</p>
                 </div>
             </div>
         </div>

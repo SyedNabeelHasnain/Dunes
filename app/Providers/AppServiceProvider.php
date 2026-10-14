@@ -5,7 +5,9 @@ namespace App\Providers;
 use App\Models\Language;
 use App\Services\Routing\LocalizedUrlGenerator;
 use App\Services\SettingsService;
+use App\Validation\AppValidator;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -55,6 +57,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Support AVIF in Laravel's built-in 'image' validator
+        Validator::resolver(function ($translator, $data, $rules, $messages, $customAttributes) {
+            return new AppValidator($translator, $data, $rules, $messages, $customAttributes);
+        });
+
         // Force HTTPS in production
         if ($this->app->environment('production')) {
             URL::forceScheme('https');

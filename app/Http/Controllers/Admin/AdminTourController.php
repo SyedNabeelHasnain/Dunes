@@ -59,9 +59,9 @@ class AdminTourController extends Controller
             'dropoff_time' => 'nullable|string|max:255',
             'priority' => 'required|integer',
             'status' => 'required|string|in:active,inactive',
-            'hero_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:5120',
-            'thumb_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:3072',
-            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:5120',
+            'hero_image' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
+            'thumb_image' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
+            'gallery_images.*' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
         ]);
 
         $data = $this->normalizeLocalizedData(
@@ -161,9 +161,9 @@ class AdminTourController extends Controller
             'dropoff_time' => 'nullable|string|max:255',
             'priority' => 'required|integer',
             'status' => 'required|string|in:active,inactive',
-            'hero_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:5120',
-            'thumb_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:3072',
-            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:5120',
+            'hero_image' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
+            'thumb_image' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
+            'gallery_images.*' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
         ]);
 
         $data = $this->normalizeLocalizedData(
