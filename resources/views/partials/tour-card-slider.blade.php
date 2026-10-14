@@ -12,10 +12,19 @@
      x-data="{
          activeIdx: 0,
          count: {{ $totalCount }},
-         prev(e) { e.preventDefault(); e.stopPropagation(); this.activeIdx = (this.activeIdx - 1 + this.count) % this.count; },
-         next(e) { e.preventDefault(); e.stopPropagation(); this.activeIdx = (this.activeIdx + 1) % this.count; },
-         go(idx, e) { e.preventDefault(); e.stopPropagation(); this.activeIdx = idx; }
+         startX: 0,
+         prev(e) { if (e) { e.preventDefault(); e.stopPropagation(); } this.activeIdx = (this.activeIdx - 1 + this.count) % this.count; },
+         next(e) { if (e) { e.preventDefault(); e.stopPropagation(); } this.activeIdx = (this.activeIdx + 1) % this.count; },
+         go(idx, e) { if (e) { e.preventDefault(); e.stopPropagation(); } this.activeIdx = idx; },
+         touchStart(e) { this.startX = e.changedTouches[0].screenX; },
+         touchEnd(e) {
+             const diff = e.changedTouches[0].screenX - this.startX;
+             if (diff > 40) { this.prev(e); }
+             else if (diff < -40) { this.next(e); }
+         }
      }"
+     @touchstart.passive="touchStart($event)"
+     @touchend.passive="touchEnd($event)"
      @endif>
 
     <!-- Images / Slides -->
@@ -24,13 +33,13 @@
             <img src="{{ $imgUrl }}"
                  width="400" height="250"
                  alt="{{ $tour->name }} Dubai Desert Safari photo {{ $idx + 1 }}"
-                 loading="{{ $idx === 0 ? 'lazy' : 'lazy' }}"
-                 class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-500 ease-out"
+                 loading="lazy"
+                 class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-opacity duration-500 ease-out"
                  @if($totalCount >= 2)
-                 :class="{ 'opacity-100 z-1 pointer-events-auto': activeIdx === {{ $idx }}, 'opacity-0 z-0 pointer-events-none': activeIdx !== {{ $idx }} }"
-                 @if($idx > 0) style="opacity: 0;" @endif
+                 :style="activeIdx === {{ $idx }} ? 'opacity: 1; z-index: 10; pointer-events: auto;' : 'opacity: 0; z-index: 1; pointer-events: none;'"
+                 style="opacity: {{ $idx === 0 ? '1' : '0' }}; z-index: {{ $idx === 0 ? '10' : '1' }}; pointer-events: {{ $idx === 0 ? 'auto' : 'none' }};"
                  @else
-                 style="opacity: 1;"
+                 style="opacity: 1; z-index: 10;"
                  @endif>
         @endforeach
     </div>

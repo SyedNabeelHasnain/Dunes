@@ -262,10 +262,19 @@ if(window.fbq){
          x-data="{
              heroIdx: 0,
              total: {{ $totalHeroImages }},
+             startX: 0,
              prevHero() { this.heroIdx = (this.heroIdx - 1 + this.total) % this.total; },
              nextHero() { this.heroIdx = (this.heroIdx + 1) % this.total; },
-             goHero(i) { this.heroIdx = i; }
+             goHero(i) { this.heroIdx = i; },
+             touchStart(e) { this.startX = e.changedTouches[0].screenX; },
+             touchEnd(e) {
+                 const diff = e.changedTouches[0].screenX - this.startX;
+                 if (diff > 40) { this.prevHero(); }
+                 else if (diff < -40) { this.nextHero(); }
+             }
          }"
+         @touchstart.passive="touchStart($event)"
+         @touchend.passive="touchEnd($event)"
          @endif>
 
     <!-- Background Slider Slides -->
@@ -273,10 +282,11 @@ if(window.fbq){
         @foreach($tourImages as $idx => $imgUrl)
             <div class="absolute inset-0 bg-cover bg-center transition-all duration-700 ease-in-out"
                  @if($totalHeroImages >= 2)
-                 :class="{ 'opacity-100 scale-100 z-1 pointer-events-auto': heroIdx === {{ $idx }}, 'opacity-0 scale-105 z-0 pointer-events-none': heroIdx !== {{ $idx }} }"
-                 @if($idx > 0) style="opacity: 0; background-image: url('{{ $imgUrl }}');" @else style="background-image: url('{{ $imgUrl }}');" @endif
+                 :class="{ 'scale-100': heroIdx === {{ $idx }}, 'scale-105': heroIdx !== {{ $idx }} }"
+                 :style="heroIdx === {{ $idx }} ? 'opacity: 1; z-index: 2; pointer-events: auto;' : 'opacity: 0; z-index: 1; pointer-events: none;'"
+                 style="background-image: url('{{ $imgUrl }}'); opacity: {{ $idx === 0 ? '1' : '0' }}; z-index: {{ $idx === 0 ? '2' : '1' }}; pointer-events: {{ $idx === 0 ? 'auto' : 'none' }};"
                  @else
-                 style="background-image: url('{{ $imgUrl }}'); opacity: 1;"
+                 style="background-image: url('{{ $imgUrl }}'); opacity: 1; z-index: 2;"
                  @endif>
             </div>
         @endforeach
@@ -422,8 +432,15 @@ if(window.fbq){
                      x-data="{
                          showIdx: 0,
                          totalPics: {{ count($tourImages) }},
+                         startX: 0,
                          prevPic() { this.showIdx = (this.showIdx - 1 + this.totalPics) % this.totalPics; },
-                         nextPic() { this.showIdx = (this.showIdx + 1) % this.totalPics; }
+                         nextPic() { this.showIdx = (this.showIdx + 1) % this.totalPics; },
+                         touchStart(e) { this.startX = e.changedTouches[0].screenX; },
+                         touchEnd(e) {
+                             const diff = e.changedTouches[0].screenX - this.startX;
+                             if (diff > 40) { this.prevPic(); }
+                             else if (diff < -40) { this.nextPic(); }
+                         }
                      }">
                     <div class="flex items-center justify-between gap-3 mb-4">
                         <div class="flex items-center gap-2">
@@ -442,14 +459,17 @@ if(window.fbq){
                     </div>
 
                     <!-- Main Showcase Frame with Nav Buttons -->
-                    <div class="relative rounded-2xl overflow-hidden aspect-[16/10] sm:aspect-[16/9] bg-slate-950 group">
+                    <div class="relative rounded-2xl overflow-hidden aspect-[16/10] sm:aspect-[16/9] bg-slate-950 group select-none"
+                         @touchstart.passive="touchStart($event)"
+                         @touchend.passive="touchEnd($event)">
                         @foreach($tourImages as $idx => $imgUrl)
                             <img src="{{ $imgUrl }}"
                                  alt="{{ $tour->name }} photograph {{ $idx + 1 }}"
                                  loading="{{ $idx === 0 ? 'eager' : 'lazy' }}"
                                  class="absolute inset-0 w-full h-full object-cover transition-all duration-500"
-                                 :class="{ 'opacity-100 scale-100 z-1': showIdx === {{ $idx }}, 'opacity-0 scale-105 z-0 pointer-events-none': showIdx !== {{ $idx }} }"
-                                 @if($idx > 0) style="opacity: 0;" @endif>
+                                 :class="{ 'scale-100': showIdx === {{ $idx }}, 'scale-105': showIdx !== {{ $idx }} }"
+                                 :style="showIdx === {{ $idx }} ? 'opacity: 1; z-index: 10; pointer-events: auto;' : 'opacity: 0; z-index: 1; pointer-events: none;'"
+                                 style="opacity: {{ $idx === 0 ? '1' : '0' }}; z-index: {{ $idx === 0 ? '10' : '1' }}; pointer-events: {{ $idx === 0 ? 'auto' : 'none' }};">
                         @endforeach
 
                         <!-- Nav Buttons -->
