@@ -7,6 +7,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
 
     steps:
     - name: Checkout Code
@@ -126,10 +127,10 @@ jobs:
         SSHPASS: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
       run: |
         SUCCESS=0
-        for i in 1 2 3 4 5; do
-          if sshpass -e ssh -4 -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 u410503041@${{ steps.ftp_server.outputs.host }} "mkdir -p /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html && find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html ! -path '*/vendor/*' -type d -exec chmod 755 {} + && find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html ! -path '*/vendor/*' -type f -exec chmod 644 {} +" && \
-             sshpass -e ssh -4 -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 u410503041@${{ steps.ftp_server.outputs.host }} "find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/public_html -mindepth 1 -maxdepth 1 ! -name 'images' -exec rm -rf {} +" && \
-             sshpass -e ssh -4 -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 u410503041@${{ steps.ftp_server.outputs.host }} "find /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel -mindepth 1 -maxdepth 1 ! -name 'storage' ! -name '.env' -exec rm -rf {} +"; then
+        for i in 1 2 3; do
+          if timeout 60s sshpass -e ssh -4 -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 -o ServerAliveInterval=15 -o ServerAliveCountMax=3 u410503041@${{ steps.ftp_server.outputs.host }} "mkdir -p /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html && find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html ! -path '*/vendor/*' -type d -exec chmod 755 {} + && find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html ! -path '*/vendor/*' -type f -exec chmod 644 {} +" && \
+             timeout 60s sshpass -e ssh -4 -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 -o ServerAliveInterval=15 -o ServerAliveCountMax=3 u410503041@${{ steps.ftp_server.outputs.host }} "find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/public_html -mindepth 1 -maxdepth 1 ! -name 'images' -exec rm -rf {} +" && \
+             timeout 60s sshpass -e ssh -4 -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 -o ServerAliveInterval=15 -o ServerAliveCountMax=3 u410503041@${{ steps.ftp_server.outputs.host }} "find /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel -mindepth 1 -maxdepth 1 ! -name 'storage' ! -name '.env' -exec rm -rf {} +"; then
             SUCCESS=1
             break
           fi
@@ -142,9 +143,9 @@ jobs:
         SSHPASS: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
       run: |
         SUCCESS=0
-        for i in 1 2 3 4 5; do
-          if sshpass -e scp -4 -O -P 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 public/.htaccess deploy/public_deploy/public.zip u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/domains/dunesdiscoverytourism.com/public_html/ && \
-             sshpass -e scp -4 -O -P 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 public/.htaccess deploy/public_deploy/public.zip u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/public_html/; then
+        for i in 1 2 3; do
+          if timeout 120s sshpass -e scp -4 -O -P 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 -o ServerAliveInterval=15 -o ServerAliveCountMax=3 public/.htaccess deploy/public_deploy/public.zip u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/domains/dunesdiscoverytourism.com/public_html/ && \
+             timeout 120s sshpass -e scp -4 -O -P 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 -o ServerAliveInterval=15 -o ServerAliveCountMax=3 public/.htaccess deploy/public_deploy/public.zip u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/public_html/; then
             SUCCESS=1
             break
           fi
@@ -157,36 +158,33 @@ jobs:
         fi
 
     - name: Package & Upload Images (Always Sync)
+      continue-on-error: true
       env:
         SSHPASS: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
       run: |
         # Package public/images
         cd public
-        zip -r ../images.zip images
+        zip -q -r ../images.zip images
         cd ..
         
         SUCCESS=0
-        for i in 1 2 3 4 5; do
-          if sshpass -e scp -4 -C -O -P 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 images.zip u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/domains/dunesdiscoverytourism.com/public_html/ && \
-             sshpass -e ssh -4 -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 u410503041@${{ steps.ftp_server.outputs.host }} "unzip -o /home/u410503041/domains/dunesdiscoverytourism.com/public_html/images.zip -d /home/u410503041/domains/dunesdiscoverytourism.com/public_html/ && unzip -o /home/u410503041/domains/dunesdiscoverytourism.com/public_html/images.zip -d /home/u410503041/public_html/ && rm -f /home/u410503041/domains/dunesdiscoverytourism.com/public_html/images.zip"; then
+        for i in 1 2 3; do
+          if timeout 180s sshpass -e scp -4 -O -P 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 -o ServerAliveInterval=15 -o ServerAliveCountMax=3 images.zip u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/domains/dunesdiscoverytourism.com/public_html/ && \
+             timeout 180s sshpass -e ssh -4 -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 -o ServerAliveInterval=15 -o ServerAliveCountMax=3 u410503041@${{ steps.ftp_server.outputs.host }} "unzip -q -o /home/u410503041/domains/dunesdiscoverytourism.com/public_html/images.zip -d /home/u410503041/domains/dunesdiscoverytourism.com/public_html/ && unzip -q -o /home/u410503041/domains/dunesdiscoverytourism.com/public_html/images.zip -d /home/u410503041/public_html/ && rm -f /home/u410503041/domains/dunesdiscoverytourism.com/public_html/images.zip"; then
             SUCCESS=1
             break
           fi
           echo "Images sync attempt $i failed, retrying in 10s..."
           sleep 10
         done
-        if [ $SUCCESS -ne 1 ]; then
-          echo "Failed to sync images."
-          exit 1
-        fi
 
     - name: Upload Core Laravel Code (SCP)
       env:
         SSHPASS: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
       run: |
         SUCCESS=0
-        for i in 1 2 3 4 5; do
-          if sshpass -e scp -4 -O -P 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 deploy/core_deploy/core.zip u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/; then
+        for i in 1 2 3; do
+          if timeout 180s sshpass -e scp -4 -O -P 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 -o ServerAliveInterval=15 -o ServerAliveCountMax=3 deploy/core_deploy/core.zip u410503041@${{ steps.ftp_server.outputs.host }}:/home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/; then
             SUCCESS=1
             break
           fi
@@ -203,8 +201,8 @@ jobs:
         SSHPASS: ${{ secrets.FTP_PASSWORD || vars.FTP_PASSWORD }}
       run: |
         SUCCESS=0
-        for i in 1 2 3 4 5; do
-          if sshpass -e ssh -4 -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 u410503041@${{ steps.ftp_server.outputs.host }} "cd /home/u410503041/domains/dunesdiscoverytourism.com/public_html && unzip -o public.zip && rm -f public.zip && cd /home/u410503041/public_html && unzip -o public.zip && rm -f public.zip && cd /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel && unzip -o core.zip && rm -f core.zip && rm -rf storage/framework/views && mkdir -p storage/framework/views && find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html ! -path '*/vendor/*' -type d -exec chmod 755 {} + && find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html ! -path '*/vendor/*' -type f -exec chmod 644 {} + && chmod -R 775 /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/storage /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/bootstrap/cache && PHP_BIN=\$(which php8.5 2>/dev/null || which php8.4 2>/dev/null || which php84 2>/dev/null || which ea-php84 2>/dev/null || which /usr/bin/php8.5 2>/dev/null || which /usr/bin/php8.4 2>/dev/null || which /opt/alt/php84/usr/bin/php 2>/dev/null || which php); echo \"Using PHP binary: \$PHP_BIN\"; \$PHP_BIN -v; \$PHP_BIN artisan migrate --force; \$PHP_BIN artisan db:seed --class=ReviewSeeder --force; \$PHP_BIN artisan db:seed --class=WikiKnowledgeSeeder --force; \$PHP_BIN artisan reviews:sync-google --force; \$PHP_BIN artisan reviews:sync-tripadvisor --force; \$PHP_BIN artisan app:translate-catalog; \$PHP_BIN artisan config:clear; \$PHP_BIN artisan cache:clear; \$PHP_BIN artisan route:clear; \$PHP_BIN artisan view:clear; \$PHP_BIN artisan event:clear; touch /home/u410503041/domains/dunesdiscoverytourism.com/public_html/.htaccess /home/u410503041/public_html/.htaccess"; then
+        for i in 1 2 3; do
+          if timeout 480s sshpass -e ssh -4 -p 65002 -o StrictHostKeyChecking=no -o ConnectTimeout=30 -o ServerAliveInterval=15 -o ServerAliveCountMax=3 u410503041@${{ steps.ftp_server.outputs.host }} "cd /home/u410503041/domains/dunesdiscoverytourism.com/public_html && unzip -q -o public.zip && rm -f public.zip && cd /home/u410503041/public_html && unzip -q -o public.zip && rm -f public.zip && cd /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel && unzip -q -o core.zip && rm -f core.zip && rm -rf storage/framework/views && mkdir -p storage/framework/views && find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html ! -path '*/vendor/*' -type d -exec chmod 755 {} + && find /home/u410503041/domains/dunesdiscoverytourism.com/public_html /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel /home/u410503041/public_html ! -path '*/vendor/*' -type f -exec chmod 644 {} + && chmod -R 775 /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/storage /home/u410503041/domains/dunesdiscoverytourism.com/dunes-laravel/bootstrap/cache && PHP_BIN=\$(which php8.5 2>/dev/null || which php8.4 2>/dev/null || which php84 2>/dev/null || which ea-php84 2>/dev/null || which /usr/bin/php8.5 2>/dev/null || which /usr/bin/php8.4 2>/dev/null || which /opt/alt/php84/usr/bin/php 2>/dev/null || which php); echo \"Using PHP binary: \$PHP_BIN\"; \$PHP_BIN -v; \$PHP_BIN artisan migrate --force; \$PHP_BIN artisan db:seed --class=ReviewSeeder --force; \$PHP_BIN artisan db:seed --class=WikiKnowledgeSeeder --force; \$PHP_BIN artisan reviews:sync-google --force; \$PHP_BIN artisan reviews:sync-tripadvisor --force; \$PHP_BIN artisan app:translate-catalog; \$PHP_BIN artisan config:clear; \$PHP_BIN artisan cache:clear; \$PHP_BIN artisan route:clear; \$PHP_BIN artisan view:clear; \$PHP_BIN artisan event:clear; touch /home/u410503041/domains/dunesdiscoverytourism.com/public_html/.htaccess /home/u410503041/public_html/.htaccess"; then
             SUCCESS=1
             break
           fi
