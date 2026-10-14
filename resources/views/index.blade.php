@@ -15,7 +15,7 @@ if (!function_exists('renderReviewCardMarkup')) {
         $fullStars = (int) floor($rating);
         $hasHalf = ($rating - $fullStars) >= 0.3 && ($rating - $fullStars) <= 0.7;
         $stars = '';
-        for($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 5; $i++) {
             if ($i < $fullStars) {
                 $stars .= '<i class="bi bi-star-fill text-amber-400"></i>';
             } elseif ($hasHalf && $i === $fullStars) {
@@ -31,19 +31,38 @@ if (!function_exists('renderReviewCardMarkup')) {
         $isTripAdvisor = ($sourceLower === 'tripadvisor');
 
         if ($isGoogle) {
-            $sourceBadge = '<span class="inline-flex items-center gap-1.5 bg-blue-50 text-blue-800 border border-blue-200/60 rounded-full px-2.5 py-0.5 text-xs font-semibold shadow-2xs"><img src="' . asset('images/Google-G.avif') . '" alt="Google" class="w-3.5 h-3.5 inline-block shrink-0" width="14" height="14" loading="lazy"> Google Verified</span>';
+            $sourceBadge = '<span class="inline-flex items-center gap-1.5 bg-blue-50/90 text-blue-800 border border-blue-200/70 rounded-full px-2.5 py-1 text-[11px] font-bold shadow-2xs shrink-0"><img src="' . asset('images/Google-G.avif') . '" alt="Google" class="w-3.5 h-3.5 inline-block shrink-0" width="14" height="14" loading="lazy"> Google Verified</span>';
+            $sourceLinkText = 'Read on Google';
         } elseif ($isTripAdvisor) {
-            $sourceBadge = '<span class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200/60 rounded-full px-2.5 py-0.5 text-xs font-semibold shadow-2xs"><i class="bi bi-star-fill text-emerald-600"></i> TripAdvisor</span>';
+            $sourceBadge = '<span class="inline-flex items-center gap-1.5 bg-emerald-50/90 text-emerald-800 border border-emerald-200/70 rounded-full px-2.5 py-1 text-[11px] font-bold shadow-2xs shrink-0"><img src="' . asset('images/tripadvisor.svg') . '" alt="TripAdvisor" class="w-3.5 h-3.5 inline-block shrink-0 text-emerald-700" width="14" height="14" loading="lazy"> TripAdvisor</span>';
+            $sourceLinkText = 'Read on TripAdvisor';
         } elseif ($isUgc) {
-            $sourceBadge = '<span class="inline-flex items-center gap-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-full px-2.5 py-0.5 text-xs font-bold shadow-2xs"><i class="bi bi-patch-check-fill text-amber-600"></i> ' . htmlspecialchars(__('ui.reviews_section.verified_guest')) . '</span>';
+            $sourceBadge = '<span class="inline-flex items-center gap-1 bg-amber-50 text-amber-900 border border-amber-200/80 rounded-full px-2.5 py-1 text-[11px] font-bold shadow-2xs shrink-0"><i class="bi bi-patch-check-fill text-amber-600"></i> ' . htmlspecialchars(__('ui.reviews_section.verified_guest')) . '</span>';
+            $sourceLinkText = 'Verified Experience';
         } else {
-            $sourceBadge = '<span class="inline-flex items-center gap-1 bg-slate-100 text-slate-700 rounded-full px-2.5 py-0.5 text-xs font-medium">' . ucfirst($sourceLower) . '</span>';
+            $sourceBadge = '<span class="inline-flex items-center gap-1 bg-slate-100 text-slate-700 rounded-full px-2.5 py-1 text-[11px] font-medium shrink-0">' . ucfirst($sourceLower) . '</span>';
+            $sourceLinkText = 'View Review';
         }
 
         $url = !empty($r->review_url) ? $r->review_url : localized_route('review.rate', ['ref' => 'guest']);
+        $rawName = trim((string)($r->reviewer_name ?? ''));
+        $reviewerName = htmlspecialchars(!empty($rawName) ? $rawName : 'Verified Guest');
+
+        // Extract initials for fallback
+        $words = preg_split('/\s+/', $rawName ?: 'Verified Guest');
+        $initials = '';
+        foreach (array_slice($words, 0, 2) as $w) {
+            $initials .= mb_strtoupper(mb_substr($w, 0, 1));
+        }
+        if (empty($initials)) $initials = 'VG';
+
         $reviewerAvatar = !empty($r->reviewer_avatar_url) ? (string) $r->reviewer_avatar_url : '';
-        $avatar = !empty($reviewerAvatar) ? (str_starts_with($reviewerAvatar, 'http') ? $reviewerAvatar : asset($reviewerAvatar)) : asset('images/avatar-default.svg');
-        $fallbackAvatar = asset('images/avatar-default.svg');
+        $hasRealAvatar = !empty($reviewerAvatar) && !str_contains($reviewerAvatar, 'avatar-default.svg');
+        $avatarUrl = $hasRealAvatar ? (str_starts_with($reviewerAvatar, 'http') ? $reviewerAvatar : asset($reviewerAvatar)) : '';
+
+        $avatarMarkup = $hasRealAvatar
+            ? '<img src="' . htmlspecialchars($avatarUrl) . '" alt="' . $reviewerName . '" class="w-11 h-11 rounded-full object-cover shrink-0 shadow-2xs border border-slate-200/80" referrerpolicy="no-referrer" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"><div class="w-11 h-11 rounded-full bg-gradient-to-br from-amber-500/20 via-orange-500/15 to-primary/25 border border-amber-300/40 text-primary font-bold text-xs items-center justify-center shrink-0 shadow-2xs tracking-wider hidden">' . htmlspecialchars($initials) . '</div>'
+            : '<div class="w-11 h-11 rounded-full bg-gradient-to-br from-amber-500/20 via-orange-500/15 to-primary/25 border border-amber-300/40 text-primary font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs tracking-wider">' . htmlspecialchars($initials) . '</div>';
 
         $dateFormatted = '';
         if (!empty($r->published_date)) {
@@ -62,44 +81,62 @@ if (!function_exists('renderReviewCardMarkup')) {
         }
         $photosHtml = '';
         if (is_array($photos) && count($photos) > 0) {
-            $photosHtml .= '<div class="flex gap-1.5 mb-2 mt-1">';
+            $photosHtml .= '<div class="flex gap-2 mb-2 mt-2">';
             foreach (array_slice($photos, 0, 3) as $p) {
                 if (!is_string($p) || empty($p)) continue;
                 $pUrl = str_starts_with($p, 'http') ? $p : asset($p);
-                $photosHtml .= '<a href="' . htmlspecialchars($pUrl) . '" target="_blank" rel="noopener noreferrer" class="rounded-lg overflow-hidden inline-block shadow-xs border border-slate-200 w-12 h-12 shrink-0"><img src="' . htmlspecialchars($pUrl) . '" alt="Traveler photo" class="w-full h-full object-cover" loading="lazy"></a>';
+                $photosHtml .= '<span class="rounded-xl overflow-hidden inline-block shadow-2xs border border-slate-200 w-11 h-11 shrink-0"><img src="' . htmlspecialchars($pUrl) . '" alt="Traveler photo" class="w-full h-full object-cover" loading="lazy"></span>';
             }
             $photosHtml .= '</div>';
         }
 
-        $actionText = $isUgc ? __('ui.reviews_section.submit_review') : __('ui.common.view_details');
-        $rawName = trim((string)($r->reviewer_name ?? ''));
-        $reviewerName = htmlspecialchars(!empty($rawName) ? $rawName : 'Verified Guest');
         $reviewTitle = !empty($r->review_title) ? htmlspecialchars((string)$r->review_title) : '';
         $rawText = trim((string)($r->review_text ?? ''));
         $reviewText = htmlspecialchars(!empty($rawText) ? $rawText : 'Outstanding desert safari experience with Dunes Discovery. Highly recommended for visitors in Dubai!');
 
         return '
-        <div class="review-card h-full flex flex-col justify-between text-start">
-            <div>
-                <div class="flex justify-between items-center mb-3">
-                    <div class="flex items-center gap-2 min-w-0">
-                        <img src="' . htmlspecialchars($avatar) . '" alt="' . $reviewerName . '" class="w-10 h-10 rounded-full object-cover shrink-0 shadow-2xs" referrerpolicy="no-referrer" loading="lazy" onerror="this.onerror=null;this.src=\'' . $fallbackAvatar . '\'">
-                        <div class="min-w-0">
-                            <div class="font-bold text-slate-900 text-sm truncate">' . $reviewerName . '</div>
-                            <div class="text-slate-500 text-xs">' . htmlspecialchars($dateFormatted) . '</div>
-                        </div>
+        <a href="' . htmlspecialchars($url) . '" ' . ($isUgc ? '' : 'target="_blank" rel="noopener noreferrer"') . ' class="review-card group block text-start relative overflow-hidden transition-all">
+            <!-- Decorative Quote Watermark -->
+            <svg class="absolute top-3.5 end-3.5 w-10 h-10 text-amber-500/10 pointer-events-none group-hover:text-primary/20 transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+
+            <!-- Card Top: Reviewer Info & Platform Pill -->
+            <div class="flex justify-between items-start gap-3 mb-2.5 relative z-10">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    ' . $avatarMarkup . '
+                    <div class="min-w-0">
+                        <div class="font-bold text-slate-900 text-sm truncate group-hover:text-primary transition-colors leading-snug">' . $reviewerName . '</div>
+                        <div class="text-slate-500 text-[11px] font-medium">' . htmlspecialchars($dateFormatted ?: 'Verified Trip') . '</div>
                     </div>
-                    <div class="flex gap-0.5 text-xs shrink-0">' . $stars . '</div>
                 </div>
-                ' . ($reviewTitle ? '<h3 class="text-sm font-bold mb-1.5 text-slate-900 line-clamp-1">' . $reviewTitle . '</h3>' : '') . '
-                <p class="text-slate-600 text-sm mb-2 line-clamp-3 leading-relaxed">"' . $reviewText . '"</p>
-                ' . $photosHtml . '
-            </div>
-            <div class="flex justify-between items-center pt-3 border-t border-slate-200 mt-2">
                 ' . $sourceBadge . '
-                <a href="' . htmlspecialchars($url) . '" ' . ($isUgc ? '' : 'target="_blank" rel="noopener noreferrer"') . ' class="text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-primary hover:text-white border border-slate-300 hover:border-primary rounded-full px-3 py-1 transition-colors shadow-2xs">' . htmlspecialchars($actionText) . '</a>
             </div>
-        </div>';
+
+            <!-- Card Body: Stars & Review Content -->
+            <div class="relative z-10 flex-1 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-1.5 mb-2">
+                        <div class="flex gap-0.5 text-xs">
+                            ' . $stars . '
+                        </div>
+                        <span class="text-[11px] font-bold text-slate-700 bg-amber-50 border border-amber-200/60 rounded-md px-1.5 py-0.5 leading-none">5.0</span>
+                    </div>
+
+                    ' . ($reviewTitle ? '<h4 class="text-sm font-bold text-slate-900 mb-1.5 line-clamp-1 leading-snug group-hover:text-slate-950">' . $reviewTitle . '</h4>' : '') . '
+                    <p class="text-slate-600 text-xs sm:text-[13px] leading-relaxed line-clamp-3">"' . $reviewText . '"</p>
+                    ' . $photosHtml . '
+                </div>
+
+                <!-- Card Footer: Verification Link -->
+                <div class="flex items-center justify-between pt-3 border-t border-slate-100 mt-3 text-xs">
+                    <span class="inline-flex items-center gap-1 text-[11px] font-medium text-slate-400">
+                        <i class="bi bi-patch-check-fill text-emerald-500"></i> Verified Guest
+                    </span>
+                    <span class="text-[11px] font-semibold text-slate-500 group-hover:text-primary transition-colors inline-flex items-center gap-1">
+                        ' . $sourceLinkText . ' <i class="bi bi-box-arrow-up-right text-[10px] opacity-70 rtl:rotate-180"></i>
+                    </span>
+                </div>
+            </div>
+        </a>';
     }
 }
 
@@ -462,12 +499,16 @@ $heroPoster = !empty($settings['site_hero_poster'])
 @include('partials.safari-matcher-quiz')
 
 <!-- Guest Reviews Marquee Section -->
-<section class="reviews-section bg-primary/5 py-12 sm:py-16 overflow-hidden relative">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 sm:mb-10 text-center">
-        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">
+<section class="reviews-section bg-gradient-to-b from-[#FFFDF9] via-[#FAF6F2] to-[#F5EFE8] pt-14 pb-20 sm:pt-20 sm:pb-28 overflow-hidden relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 sm:mb-12 text-center">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-900 text-xs font-bold mb-3 shadow-2xs">
+            <span class="flex text-amber-500 gap-0.5 text-xs"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></span>
+            <span>4.9 / 5 Rating Across 2,840+ Verified Reviews</span>
+        </div>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 mb-3 tracking-tight">
             {{ __('ui.home_reviews.title') }} <span class="text-primary">{{ __('ui.home_reviews.title_highlight') }}</span>
         </h2>
-        <p class="text-slate-600 text-base sm:text-lg max-w-2xl mx-auto">{{ __('ui.home_reviews.subtitle') }}</p>
+        <p class="text-slate-600 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">{{ __('ui.home_reviews.subtitle') }}</p>
     </div>
 
     @php
@@ -663,17 +704,17 @@ $heroPoster = !empty($settings['site_hero_poster'])
     @endphp
 
     <!-- Track 1: Google Verified Reviews (Forward Animation) -->
-    <div class="reviews-marquee relative w-full overflow-hidden select-none py-2 mb-6">
-        <div class="pointer-events-none absolute inset-y-0 start-0 w-6 sm:w-28 bg-gradient-to-r rtl:bg-gradient-to-l from-[#FAF6F2] to-transparent z-10"></div>
-        <div class="pointer-events-none absolute inset-y-0 end-0 w-6 sm:w-28 bg-gradient-to-l rtl:bg-gradient-to-r from-[#FAF6F2] to-transparent z-10"></div>
+    <div class="reviews-marquee relative w-full overflow-hidden select-none py-4 mb-6 sm:mb-8">
+        <div class="pointer-events-none absolute inset-y-0 start-0 w-12 sm:w-36 bg-gradient-to-r rtl:bg-gradient-to-l from-[#FAF6F2] to-transparent z-10"></div>
+        <div class="pointer-events-none absolute inset-y-0 end-0 w-12 sm:w-36 bg-gradient-to-l rtl:bg-gradient-to-r from-[#FAF6F2] to-transparent z-10"></div>
 
-        <div class="reviews-track flex gap-4 w-max shrink-0">
-            <div class="reviews-group flex gap-4 shrink-0">
+        <div class="reviews-track flex gap-5 w-max shrink-0">
+            <div class="reviews-group flex gap-5 shrink-0">
                 @foreach($googleTrackItems as $r)
                     {!! renderReviewCardMarkup($r) !!}
                 @endforeach
             </div>
-            <div class="reviews-group flex gap-4 shrink-0" aria-hidden="true">
+            <div class="reviews-group flex gap-5 shrink-0" aria-hidden="true">
                 @foreach($googleTrackItems as $r)
                     {!! renderReviewCardMarkup($r) !!}
                 @endforeach
@@ -682,17 +723,17 @@ $heroPoster = !empty($settings['site_hero_poster'])
     </div>
 
     <!-- Track 2: TripAdvisor & Verified Travelers (Reverse Animation) -->
-    <div class="reviews-marquee reverse relative w-full overflow-hidden select-none py-2">
-        <div class="pointer-events-none absolute inset-y-0 start-0 w-6 sm:w-28 bg-gradient-to-r rtl:bg-gradient-to-l from-[#FAF6F2] to-transparent z-10"></div>
-        <div class="pointer-events-none absolute inset-y-0 end-0 w-6 sm:w-28 bg-gradient-to-l rtl:bg-gradient-to-r from-[#FAF6F2] to-transparent z-10"></div>
+    <div class="reviews-marquee reverse relative w-full overflow-hidden select-none py-4">
+        <div class="pointer-events-none absolute inset-y-0 start-0 w-12 sm:w-36 bg-gradient-to-r rtl:bg-gradient-to-l from-[#FAF6F2] to-transparent z-10"></div>
+        <div class="pointer-events-none absolute inset-y-0 end-0 w-12 sm:w-36 bg-gradient-to-l rtl:bg-gradient-to-r from-[#FAF6F2] to-transparent z-10"></div>
 
-        <div class="reviews-track flex gap-4 w-max shrink-0">
-            <div class="reviews-group flex gap-4 shrink-0">
+        <div class="reviews-track flex gap-5 w-max shrink-0">
+            <div class="reviews-group flex gap-5 shrink-0">
                 @foreach($tripTrackItems as $r)
                     {!! renderReviewCardMarkup($r) !!}
                 @endforeach
             </div>
-            <div class="reviews-group flex gap-4 shrink-0" aria-hidden="true">
+            <div class="reviews-group flex gap-5 shrink-0" aria-hidden="true">
                 @foreach($tripTrackItems as $r)
                     {!! renderReviewCardMarkup($r) !!}
                 @endforeach

@@ -715,28 +715,29 @@ body {
 
 /* Guest Review Marquee Cards (Crisp White Card Surface + Clear Borders) */
 .review-card {
-  width: clamp(260px, 80vw, 320px);
-  min-width: clamp(260px, 80vw, 320px);
-  max-width: 320px;
-  min-height: 200px;
+  width: clamp(300px, 85vw, 380px);
+  min-width: clamp(300px, 85vw, 380px);
+  max-width: 400px;
+  min-height: 220px;
   background: #ffffff;
   border-radius: 1.25rem;
-  padding: 1rem sm:1.25rem;
-  border: 1.5px solid #cbd5e1;
-  box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  padding: 1.25rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
   flex-shrink: 0;
   position: relative;
   z-index: 1;
+  text-decoration: none;
 }
 
 .review-card:hover {
   transform: translateY(-4px);
   border-color: #f97316;
-  box-shadow: 0 12px 24px -4px rgba(246, 144, 68, 0.18), 0 4px 6px -2px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 16px 32px -6px rgba(246, 144, 68, 0.18), 0 4px 10px -2px rgba(15, 23, 42, 0.06);
 }
 
 /* Compare Safari Toggle Button (Active & Outline States) */
