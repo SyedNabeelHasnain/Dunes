@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\BlogPost;
 use App\Models\Language;
 use App\Models\Tour;
+use App\Models\WikiArticle;
+use App\Models\WikiPillar;
 use App\Services\LocationLandingService;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
@@ -29,15 +31,18 @@ class SitemapController extends Controller
 
         $latestTour = Tour::where('status', 'active')->latest('updated_at')->first();
         $latestBlog = BlogPost::where('status', 'published')->latest('updated_at')->first();
+        $latestWiki = WikiArticle::where('status', 'published')->latest('updated_at')->first();
         $now = now()->toAtomString();
 
         $tourUpdatedAt = $latestTour?->updated_at;
         $blogUpdatedAt = $latestBlog?->updated_at;
-        $latestImageDate = collect([$tourUpdatedAt, $blogUpdatedAt])->filter()->max();
+        $wikiUpdatedAt = $latestWiki?->updated_at;
+        $latestImageDate = collect([$tourUpdatedAt, $blogUpdatedAt, $wikiUpdatedAt])->filter()->max();
 
         $subMaps = [
             url('/sitemap-tours.xml') => $tourUpdatedAt ? $tourUpdatedAt->toAtomString() : $now,
             url('/sitemap-blogs.xml') => $blogUpdatedAt ? $blogUpdatedAt->toAtomString() : $now,
+            url('/sitemap-wiki.xml') => $wikiUpdatedAt ? $wikiUpdatedAt->toAtomString() : $now,
             url('/sitemap-pages.xml') => $now,
             url('/sitemap-images.xml') => $latestImageDate ? $latestImageDate->toAtomString() : $now,
         ];
@@ -336,6 +341,128 @@ class SitemapController extends Controller
                             $xml .= '      <image:geo_location>'.$this->xmlEscape($item['location'])."</image:geo_location>\n";
                         }
                         $xml .= "    </image:image>\n";
+                        $xml .= "  </url>\n";
+                    }
+                }
+            }
+
+            $xml .= '</urlset>';
+
+            return $xml;
+        });
+
+        return response($content, 200, ['Content-Type' => 'text/xml; charset=utf-8']);
+    }
+
+    /**
+     * Sub-sitemap: Knowledge Portal Pillars, Cluster Guides & Glossary
+     */
+    public function wiki(): Response
+    {
+        $content = Cache::remember('sitemap_wiki_xml', 3600, function () {
+            try {
+                $languages = Language::getActive();
+            } catch (\Throwable $e) {
+                $languages = Language::fallbackCollection();
+            }
+
+            $pillars = WikiPillar::where('status', 'active')->with(['articles' => function ($q) {
+                $q->where('status', 'published')->select('id', 'pillar_id', 'slug', 'title', 'hero_image', 'excerpt', 'updated_at');
+            }])->get();
+
+            $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+            $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml">'."\n";
+
+            $now = now()->toAtomString();
+            $latestArticle = WikiArticle::where('status', 'published')->latest('updated_at')->first();
+            $hubLastmod = $latestArticle?->updated_at ? $latestArticle->updated_at->toAtomString() : $now;
+
+            // Static Wiki Hub and Glossary pages
+            $basePages = [
+                '/wiki' => ['lastmod' => $hubLastmod, 'priority' => '0.9', 'changefreq' => 'weekly'],
+                '/wiki/glossary' => ['lastmod' => $hubLastmod, 'priority' => '0.8', 'changefreq' => 'weekly'],
+            ];
+
+            foreach ($basePages as $pagePath => $pageMeta) {
+                $enUrl = url($pagePath);
+                $alternates = ['x-default' => $enUrl];
+                foreach ($languages as $lang) {
+                    $alternates[$lang->code] = $lang->is_default ? $enUrl : url('/'.$lang->code.$pagePath);
+                }
+
+                foreach ($languages as $lang) {
+                    $pageLoc = $alternates[$lang->code];
+                    $xml .= "  <url>\n";
+                    $xml .= '    <loc>'.$this->xmlEscape($pageLoc)."</loc>\n";
+                    $xml .= '    <lastmod>'.$this->xmlEscape($pageMeta['lastmod'])."</lastmod>\n";
+                    $xml .= '    <changefreq>'.$this->xmlEscape($pageMeta['changefreq'])."</changefreq>\n";
+                    $xml .= '    <priority>'.$this->xmlEscape($pageMeta['priority'])."</priority>\n";
+
+                    foreach ($alternates as $hreflang => $altUrl) {
+                        $xml .= '    <xhtml:link rel="alternate" hreflang="'.$this->xmlEscape($hreflang).'" href="'.$this->xmlEscape($altUrl)."\" />\n";
+                    }
+                    $xml .= "  </url>\n";
+                }
+            }
+
+            // Pillars and their cluster articles
+            foreach ($pillars as $pillar) {
+                $pillarLastmod = $pillar->updated_at ? $pillar->updated_at->toAtomString() : $hubLastmod;
+                $pillarPath = '/wiki/'.$pillar->slug;
+                $enUrl = url($pillarPath);
+
+                $alternates = ['x-default' => $enUrl];
+                foreach ($languages as $lang) {
+                    $alternates[$lang->code] = $lang->is_default ? $enUrl : url('/'.$lang->code.$pillarPath);
+                }
+
+                foreach ($languages as $lang) {
+                    $pageLoc = $alternates[$lang->code];
+                    $xml .= "  <url>\n";
+                    $xml .= '    <loc>'.$this->xmlEscape($pageLoc)."</loc>\n";
+                    $xml .= '    <lastmod>'.$this->xmlEscape($pillarLastmod)."</lastmod>\n";
+                    $xml .= "    <changefreq>weekly</changefreq>\n";
+                    $xml .= "    <priority>0.85</priority>\n";
+
+                    foreach ($alternates as $hreflang => $altUrl) {
+                        $xml .= '    <xhtml:link rel="alternate" hreflang="'.$this->xmlEscape($hreflang).'" href="'.$this->xmlEscape($altUrl)."\" />\n";
+                    }
+                    $xml .= "  </url>\n";
+                }
+
+                foreach ($pillar->articles as $article) {
+                    $artLastmod = $article->updated_at ? $article->updated_at->toAtomString() : $now;
+                    $artPath = '/wiki/'.$pillar->slug.'/'.$article->slug;
+                    $artEnUrl = url($artPath);
+
+                    $artAlternates = ['x-default' => $artEnUrl];
+                    foreach ($languages as $lang) {
+                        $artAlternates[$lang->code] = $lang->is_default ? $artEnUrl : url('/'.$lang->code.$artPath);
+                    }
+
+                    foreach ($languages as $lang) {
+                        $pageLoc = $artAlternates[$lang->code];
+                        $xml .= "  <url>\n";
+                        $xml .= '    <loc>'.$this->xmlEscape($pageLoc)."</loc>\n";
+                        $xml .= '    <lastmod>'.$this->xmlEscape($artLastmod)."</lastmod>\n";
+                        $xml .= "    <changefreq>weekly</changefreq>\n";
+                        $xml .= "    <priority>0.85</priority>\n";
+
+                        foreach ($artAlternates as $hreflang => $altUrl) {
+                            $xml .= '    <xhtml:link rel="alternate" hreflang="'.$this->xmlEscape($hreflang).'" href="'.$this->xmlEscape($altUrl)."\" />\n";
+                        }
+
+                        if (! empty($article->hero_image) && $lang->is_default) {
+                            $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $article->hero_image);
+                            $xml .= "    <image:image>\n";
+                            $xml .= '      <image:loc>'.$this->xmlEscape(asset('images/'.$imgFile))."</image:loc>\n";
+                            $xml .= '      <image:title>'.$this->xmlEscape($article->title)."</image:title>\n";
+                            if (! empty($article->excerpt)) {
+                                $xml .= '      <image:caption>'.$this->xmlEscape($article->excerpt)."</image:caption>\n";
+                            }
+                            $xml .= "    </image:image>\n";
+                        }
+
                         $xml .= "  </url>\n";
                     }
                 }

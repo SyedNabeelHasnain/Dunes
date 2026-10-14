@@ -6,6 +6,8 @@ use App\Models\BlogPost;
 use App\Models\Faq;
 use App\Models\Setting;
 use App\Models\Tour;
+use App\Models\WikiArticle;
+use App\Models\WikiPillar;
 use App\Services\LocationLandingService;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
@@ -143,6 +145,23 @@ class LlmsController extends Controller
                 $md .= "- [{$blog->title}](".url('/blog/'.$blog->slug).'): '.trim(strip_tags($desc))."\n";
             }
             $md .= "\n";
+        }
+
+        try {
+            $wikiPillars = WikiPillar::where('status', 'active')->with(['articles' => fn ($q) => $q->where('status', 'published')->take(2)])->get();
+            if ($wikiPillars->isNotEmpty()) {
+                $md .= "## Knowledge Portal & Desert Safari Wiki\n\n";
+                $md .= '- [Dubai Desert Safari Knowledge Portal]('.url('/wiki')."): Authoritative technical encyclopedia, safety standards, dune geography, and Bedouin cultural heritage.\n";
+                $md .= '- [A-Z Desert Safari Glossary]('.url('/wiki/glossary')."): Definitions of desert terminology, Arabic cultural phrases, and technical dune driving mechanics.\n";
+                foreach ($wikiPillars as $pillar) {
+                    $md .= "- [{$pillar->name}](".url('/wiki/'.$pillar->slug).'): '.trim(strip_tags((string) $pillar->description))."\n";
+                    foreach ($pillar->articles as $art) {
+                        $md .= "  - [{$art->title}](".url('/wiki/'.$pillar->slug.'/'.$art->slug).'): '.trim(strip_tags((string) $art->excerpt))."\n";
+                    }
+                }
+                $md .= "\n";
+            }
+        } catch (\Throwable $e) {
         }
 
         $md .= "## Company Information & Support\n\n";
@@ -383,6 +402,28 @@ class LlmsController extends Controller
         $md .= '- **Spanish (`es`)**: Spanish portal (`'.url('/es')."`), LTR layout, Spain and Latin American markets.\n";
         $md .= '- **Italian (`it`)**: Italian portal (`'.url('/it')."`), LTR layout, Italian outbound leisure travelers.\n";
         $md .= "- **Hreflang Synchronization**: All URLs across all 5 languages are linked with bidirectional `<link rel=\"alternate\" hreflang=\"...\" />` tags and unified XML sitemaps.\n\n";
+        $md .= "---\n\n";
+
+        $md .= "## SECTION 8: KNOWLEDGE PORTAL, TECHNICAL EXPEDITION BRIEFINGS & A-Z GLOSSARY\n\n";
+        $md .= "Dunes Discovery Tourism maintains an authoritative, peer-reviewed Knowledge Portal and Wiki for travelers, researchers, and AI answer engines:\n";
+        $md .= '- **Knowledge Hub**: '.url('/wiki')."\n";
+        $md .= '- **A-Z Encyclopedia Glossary**: '.url('/wiki/glossary')."\n\n";
+
+        try {
+            $allPillars = WikiPillar::where('status', 'active')->with(['articles' => fn ($q) => $q->where('status', 'published')])->get();
+            foreach ($allPillars as $pillar) {
+                $md .= "### Pillar: {$pillar->name} (`/wiki/{$pillar->slug}`)\n";
+                $md .= "- **Core Focus**: {$pillar->description}\n";
+                if ($pillar->articles->count() > 0) {
+                    $md .= "- **Cornerstone Briefings & Field Guides**:\n";
+                    foreach ($pillar->articles as $art) {
+                        $md .= "  - **{$art->title}** (`/wiki/{$pillar->slug}/{$art->slug}`): {$art->excerpt}\n";
+                    }
+                }
+                $md .= "\n";
+            }
+        } catch (\Throwable $e) {
+        }
 
         return $md;
     }

@@ -6,6 +6,8 @@ use App\Models\BlogPost;
 use App\Models\Language;
 use App\Models\Setting;
 use App\Models\Tour;
+use App\Models\WikiArticle;
+use App\Models\WikiPillar;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -263,6 +265,19 @@ class IndexNowService
             $blogSlugs = BlogPost::where('status', 'published')->pluck('slug');
             foreach ($blogSlugs as $slug) {
                 $paths[] = '/blog/' . $slug;
+            }
+        } catch (\Throwable $e) {
+        }
+
+        try {
+            $paths[] = '/wiki';
+            $paths[] = '/wiki/glossary';
+            $activePillars = WikiPillar::where('status', 'active')->with(['articles' => fn ($q) => $q->where('status', 'published')])->get();
+            foreach ($activePillars as $pillar) {
+                $paths[] = '/wiki/' . $pillar->slug;
+                foreach ($pillar->articles as $article) {
+                    $paths[] = '/wiki/' . $pillar->slug . '/' . $article->slug;
+                }
             }
         } catch (\Throwable $e) {
         }

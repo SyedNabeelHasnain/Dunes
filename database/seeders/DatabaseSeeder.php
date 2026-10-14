@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             BookingSeeder::class,
             BlogSeeder::class,
             UserSeeder::class,
+            WikiKnowledgeSeeder::class,
         ]);
     }
 }

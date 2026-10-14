@@ -100,6 +100,9 @@
             <a href="{{ route('admin.blogs.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.blogs*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
                 <i class="bi bi-journal-richtext text-base"></i> <span>Blog Articles</span>
             </a>
+            <a href="{{ route('admin.wiki.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.wiki*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-book-half text-base text-emerald-400"></i> <span>Knowledge Portal / Wiki</span>
+            </a>
             <a href="{{ route('admin.reviews.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.reviews*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
                 <i class="bi bi-star-half text-base"></i> <span>Customer Reviews</span>
             </a>
@@ -243,6 +246,9 @@
             </a>
             <a href="{{ route('admin.blogs.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.blogs*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Blog Articles' : ''">
                 <i class="bi bi-journal-richtext text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Blog Articles</span>
+            </a>
+            <a href="{{ route('admin.wiki.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.wiki*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Knowledge Portal / Wiki' : ''">
+                <i class="bi bi-book-half text-base shrink-0 text-emerald-400"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Knowledge Portal / Wiki</span>
             </a>
             <a href="{{ route('admin.reviews.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.reviews*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Customer Reviews' : ''">
                 <i class="bi bi-star-half text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Customer Reviews</span>

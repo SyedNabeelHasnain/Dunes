@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\AdminTourController;
 use App\Http\Controllers\Admin\AdminTranslationApiController;
 use App\Http\Controllers\Admin\AdminTranslationSettingController;
 use App\Http\Controllers\Admin\AdminWhatsappController;
+use App\Http\Controllers\Admin\AdminWikiController;
 use App\Http\Controllers\AjaxGatewayController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BookingController;
@@ -41,6 +42,7 @@ use App\Http\Controllers\SubscriberController;
 use App\Http\Controllers\SunsetGuideController;
 use App\Http\Controllers\TourController;
 use App\Http\Controllers\VoucherController;
+use App\Http\Controllers\WikiController;
 use App\Http\Middleware\AdminNoCacheMiddleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -101,6 +103,13 @@ Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/feed.xml', [BlogController::class, 'feed'])->name('blog.feed');
 Route::get('/feed.xml', [BlogController::class, 'feed'])->name('feed.unified');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
+
+// Knowledge Portal & Wiki
+Route::get('/wiki', [WikiController::class, 'index'])->name('wiki.index');
+Route::get('/wiki/glossary', [WikiController::class, 'glossary'])->name('wiki.glossary');
+Route::get('/wiki/search', [WikiController::class, 'search'])->name('wiki.search');
+Route::get('/wiki/{pillarSlug}', [WikiController::class, 'pillar'])->name('wiki.pillar');
+Route::get('/wiki/{pillarSlug}/{articleSlug}', [WikiController::class, 'article'])->name('wiki.article');
 
 Route::get('/thankyou', [BookingController::class, 'thankyou'])->name('booking.thankyou');
 Route::get('/payment-cancel', [BookingController::class, 'paymentCancel'])->name('booking.cancel');
@@ -186,6 +195,22 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::resource('blogs', AdminBlogController::class)->except(['show']);
     Route::post('/blogs/{id}/toggle-status', [AdminBlogController::class, 'toggleStatus'])->name('blogs.toggle-status');
     Route::resource('blog-categories', AdminBlogCategoryController::class)->except(['create', 'show', 'edit']);
+
+    // Wiki & Knowledge Portal CMS
+    Route::get('/wiki', [AdminWikiController::class, 'index'])->name('wiki.index');
+    Route::get('/wiki/pillars', [AdminWikiController::class, 'pillars'])->name('wiki.pillars');
+    Route::post('/wiki/pillars', [AdminWikiController::class, 'storePillar'])->name('wiki.pillars.store');
+    Route::put('/wiki/pillars/{id}', [AdminWikiController::class, 'updatePillar'])->name('wiki.pillars.update');
+    Route::delete('/wiki/pillars/{id}', [AdminWikiController::class, 'deletePillar'])->name('wiki.pillars.delete');
+    Route::get('/wiki/articles/create', [AdminWikiController::class, 'createArticle'])->name('wiki.articles.create');
+    Route::post('/wiki/articles', [AdminWikiController::class, 'storeArticle'])->name('wiki.articles.store');
+    Route::get('/wiki/articles/{id}/edit', [AdminWikiController::class, 'editArticle'])->name('wiki.articles.edit');
+    Route::put('/wiki/articles/{id}', [AdminWikiController::class, 'updateArticle'])->name('wiki.articles.update');
+    Route::delete('/wiki/articles/{id}', [AdminWikiController::class, 'deleteArticle'])->name('wiki.articles.delete');
+    Route::get('/wiki/glossary', [AdminWikiController::class, 'glossary'])->name('wiki.glossary');
+    Route::post('/wiki/glossary', [AdminWikiController::class, 'storeGlossaryTerm'])->name('wiki.glossary.store');
+    Route::put('/wiki/glossary/{id}', [AdminWikiController::class, 'updateGlossaryTerm'])->name('wiki.glossary.update');
+    Route::delete('/wiki/glossary/{id}', [AdminWikiController::class, 'deleteGlossaryTerm'])->name('wiki.glossary.delete');
 
     // Coupons & Promo Codes
     Route::get('/coupons/popup-settings', [AdminCouponController::class, 'popupSettings'])->name('coupons.popup-settings');
@@ -307,6 +332,7 @@ Route::get('/sitemap_index.xml', [SitemapController::class, 'index'])->name('sit
 Route::get('/sitemap.xml', [SitemapController::class, 'unified'])->name('sitemap');
 Route::get('/sitemap-tours.xml', [SitemapController::class, 'tours'])->name('sitemap.tours');
 Route::get('/sitemap-blogs.xml', [SitemapController::class, 'blogs'])->name('sitemap.blogs');
+Route::get('/sitemap-wiki.xml', [SitemapController::class, 'wiki'])->name('sitemap.wiki');
 Route::get('/sitemap-pages.xml', [SitemapController::class, 'pages'])->name('sitemap.pages');
 Route::get('/sitemap-images.xml', [SitemapController::class, 'images'])->name('sitemap.images');
 
@@ -409,6 +435,13 @@ Route::prefix('{locale}')
             return redirect('/images/'.ltrim($path, '/'), 301);
         })->where('path', '.*');
         Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('locale.blog.show');
+
+        // Localized Knowledge Portal & Wiki
+        Route::get('/wiki', [WikiController::class, 'index'])->name('locale.wiki.index');
+        Route::get('/wiki/glossary', [WikiController::class, 'glossary'])->name('locale.wiki.glossary');
+        Route::get('/wiki/search', [WikiController::class, 'search'])->name('locale.wiki.search');
+        Route::get('/wiki/{pillarSlug}', [WikiController::class, 'pillar'])->name('locale.wiki.pillar');
+        Route::get('/wiki/{pillarSlug}/{articleSlug}', [WikiController::class, 'article'])->name('locale.wiki.article');
 
         // Booking confirmation & Reviews
         Route::get('/thankyou', [BookingController::class, 'thankyou'])->name('locale.booking.thankyou');
