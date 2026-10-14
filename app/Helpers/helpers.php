@@ -246,3 +246,43 @@ if (! function_exists('resolve_og_image')) {
         return asset($clean);
     }
 }
+
+if (! function_exists('resolve_tour_image')) {
+    /**
+     * Resolve a tour image path (seeded filename, storage upload, or absolute URL) to a valid web URL.
+     */
+    function resolve_tour_image(?string $raw, string $fallback = 'images/desert-safari-poster.avif'): string
+    {
+        if (empty($raw)) {
+            return asset($fallback);
+        }
+
+        if (str_starts_with($raw, 'http://') || str_starts_with($raw, 'https://')) {
+            return $raw;
+        }
+
+        $clean = ltrim($raw, '/');
+
+        if (str_starts_with($clean, 'storage/')) {
+            return asset($clean);
+        }
+
+        if (str_starts_with($clean, 'tours/') || str_starts_with($clean, 'uploads/')) {
+            return asset('storage/'.$clean);
+        }
+
+        if (str_starts_with($clean, 'images/')) {
+            return asset($clean);
+        }
+
+        if (file_exists(public_path('images/'.$clean))) {
+            return asset('images/'.$clean);
+        }
+
+        if (file_exists(storage_path('app/public/'.$clean))) {
+            return asset('storage/'.$clean);
+        }
+
+        return asset('images/'.$clean);
+    }
+}

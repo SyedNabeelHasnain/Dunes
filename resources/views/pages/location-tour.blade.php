@@ -364,23 +364,8 @@
                         $heroImg = $tour->hero_image ? asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image)) : asset('images/desert-safari-poster.avif');
                     @endphp
                     <div class="bg-slate-900 border border-white/10 rounded-2xl overflow-hidden flex flex-col h-full transition-all duration-300 hover:-translate-y-1 hover:border-primary hover:shadow-2xl">
-                        <!-- Image Wrap -->
-                        <div class="relative h-56 overflow-hidden">
-                            <img src="{{ $heroImg }}" width="400" height="224" alt="{{ $tour->name }} from {{ $locationData['name'] }}" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
-                            <div class="absolute top-3 start-3">
-                                <span class="inline-flex items-center gap-1 bg-slate-950/80 text-amber-400 border border-amber-400/30 backdrop-blur-md rounded-full px-2.5 py-1 text-xs font-bold">
-                                    <i class="bi bi-star-fill text-amber-400"></i> {{ $tour->rating ?: '4.9' }} ({{ $tour->review_count ?: '480+' }})
-                                </span>
-                            </div>
-                            <div class="absolute top-3 end-3">
-                                <span class="bg-primary text-white text-xs font-bold rounded-full px-3 py-1 shadow-md">
-                                    {{ $locationData['name'] }} Pickup
-                                </span>
-                            </div>
-                            <div class="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent">
-                                <span class="text-white/75 text-xs inline-flex items-center gap-1"><i class="bi bi-clock"></i> {{ $tour->duration ?: '6-7 Hours' }} &bull; Evening</span>
-                            </div>
-                        </div>
+                        <!-- Image Slider Wrap -->
+                        @include('partials.tour-card-slider', ['tour' => $tour, 'aspectClass' => 'h-56', 'categoryName' => $locationData['name'] . ' Pickup'])
 
                         <div class="p-6 flex flex-col flex-grow">
                             <h3 class="font-bold text-white text-lg mb-2 leading-snug">{{ $tour->name }}</h3>

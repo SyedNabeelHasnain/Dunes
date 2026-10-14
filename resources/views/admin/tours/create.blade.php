@@ -313,9 +313,15 @@
                             </div>
 
                             <div>
-                                <label for="thumb_image" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Thumbnail Image</label>
+                                <label for="thumb_image" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Thumbnail Image (Fixed Card Slide 1)</label>
                                 <input type="file" name="thumb_image" id="thumb_image" class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
                                 <p class="text-[11px] text-slate-400 mt-1">600x400 recommended. Max 3MB.</p>
+                            </div>
+
+                            <div>
+                                <label for="gallery_images" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Additional Gallery Images (Sliders)</label>
+                                <input type="file" name="gallery_images[]" multiple id="gallery_images" class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
+                                <p class="text-[11px] text-slate-400 mt-1">Select one or multiple images to add to the tour slider. Max 5MB each.</p>
                             </div>
                         </div>
                     </div>

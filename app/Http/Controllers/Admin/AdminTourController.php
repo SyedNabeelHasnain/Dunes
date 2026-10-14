@@ -61,10 +61,11 @@ class AdminTourController extends Controller
             'status' => 'required|string|in:active,inactive',
             'hero_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:5120',
             'thumb_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:3072',
+            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:5120',
         ]);
 
         $data = $this->normalizeLocalizedData(
-            $request->except(['tiers', 'addons', 'hero_image', 'thumb_image']),
+            $request->except(['tiers', 'addons', 'hero_image', 'thumb_image', 'gallery_images', 'remove_gallery_images']),
             ['name', 'short_desc', 'full_desc', 'meta_title', 'meta_desc', 'meta_keywords']
         );
         $baseSlug = Str::slug($this->extractSlugSource($request->name));
@@ -84,6 +85,15 @@ class AdminTourController extends Controller
         }
         if ($request->hasFile('thumb_image')) {
             $data['thumb_image'] = $request->file('thumb_image')->store('tours/thumb', 'public');
+        }
+        if ($request->hasFile('gallery_images')) {
+            $galleryPaths = [];
+            foreach ($request->file('gallery_images') as $gFile) {
+                if ($gFile->isValid()) {
+                    $galleryPaths[] = $gFile->store('tours/gallery', 'public');
+                }
+            }
+            $data['gallery_images'] = $galleryPaths;
         }
 
         $tour = Tour::create($data);
@@ -153,10 +163,11 @@ class AdminTourController extends Controller
             'status' => 'required|string|in:active,inactive',
             'hero_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:5120',
             'thumb_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:3072',
+            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:5120',
         ]);
 
         $data = $this->normalizeLocalizedData(
-            $request->except(['tiers', 'addons', 'hero_image', 'thumb_image']),
+            $request->except(['tiers', 'addons', 'hero_image', 'thumb_image', 'gallery_images', 'remove_gallery_images']),
             ['name', 'short_desc', 'full_desc', 'meta_title', 'meta_desc', 'meta_keywords']
         );
         if ($request->filled('slug') || empty($tour->slug)) {
@@ -183,6 +194,20 @@ class AdminTourController extends Controller
         if ($request->hasFile('thumb_image')) {
             $data['thumb_image'] = $request->file('thumb_image')->store('tours/thumb', 'public');
         }
+
+        // Manage gallery images
+        $currentGallery = is_array($tour->gallery_images) ? $tour->gallery_images : [];
+        if ($request->has('remove_gallery_images') && is_array($request->remove_gallery_images)) {
+            $currentGallery = array_values(array_diff($currentGallery, $request->remove_gallery_images));
+        }
+        if ($request->hasFile('gallery_images')) {
+            foreach ($request->file('gallery_images') as $gFile) {
+                if ($gFile->isValid()) {
+                    $currentGallery[] = $gFile->store('tours/gallery', 'public');
+                }
+            }
+        }
+        $data['gallery_images'] = array_values(array_unique($currentGallery));
 
         $tour->update($data);
 

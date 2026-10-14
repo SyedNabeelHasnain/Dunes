@@ -200,8 +200,7 @@ class GoogleThingsToDoFeedController extends Controller
             $poi = $this->resolvePoiForTour($tour);
             $landingUrl = url('/'.$tour->slug).'?utm_source=google&utm_medium=things_to_do&utm_campaign=gttd_free';
 
-            $heroImage = $tour->hero_image ?: $tour->thumb_image;
-            $imageUrl = $heroImage ? (str_starts_with($heroImage, 'http') ? $heroImage : asset('images/'.ltrim($heroImage, '/'))) : asset('images/desert-safari-poster.avif');
+            $imageUrl = resolve_tour_image($tour->hero_image ?: $tour->thumb_image);
 
             // Format duration
             $isoDuration = $this->toIsoDuration($tour->duration);
@@ -380,8 +379,7 @@ class GoogleThingsToDoFeedController extends Controller
             $poi = $this->resolvePoiForTour($tour);
             $landingUrl = url('/'.$tour->slug).'?utm_source=google&utm_medium=things_to_do&utm_campaign=gttd_free';
 
-            $heroImage = $tour->hero_image ?: $tour->thumb_image;
-            $imageUrl = $heroImage ? (str_starts_with($heroImage, 'http') ? $heroImage : asset('images/'.ltrim($heroImage, '/'))) : asset('images/desert-safari-poster.avif');
+            $imageUrl = resolve_tour_image($tour->hero_image ?: $tour->thumb_image);
 
             $isoDuration = $this->toIsoDuration($tour->duration);
 

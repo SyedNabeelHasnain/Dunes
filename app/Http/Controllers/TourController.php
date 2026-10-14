@@ -204,8 +204,7 @@ class TourController extends Controller
             ? 'noindex, follow'
             : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
 
-        $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image ?: 'evening-desert-safari-dubai-dune-discovery-tourism.avif');
-        $ogImage = asset('images/'.$imgFile);
+        $ogImage = resolve_tour_image($tour->og_image ?: ($tour->hero_image ?: 'evening-desert-safari-dubai-dune-discovery-tourism.avif'));
 
         // Top verified reviews for Schema.org review rich snippets
         $approvedReviews = Review::where('status', 'approved')

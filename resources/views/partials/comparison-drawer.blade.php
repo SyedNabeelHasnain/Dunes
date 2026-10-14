@@ -55,7 +55,7 @@
             $inclusions = 'Camel Riding, Sandboarding, Henna, Arabic Coffee, BBQ';
         }
 
-        $thumb = $t->thumb_image ? asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image)) : asset('images/desert-safari-poster.avif');
+        $thumb = resolve_tour_image($t->thumb_image ?: $t->hero_image);
 
         return [
             'id' => (string)$t->id,

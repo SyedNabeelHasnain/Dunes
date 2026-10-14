@@ -28,7 +28,8 @@
     if($inclusions->count() || $exclusions->count()) $tabs['inex'] = __('ui.tour_tabs.inex');
     if($notAllowed->count()) $tabs['info'] = __('ui.tour_tabs.info');
     if($faqs->count()) $tabs['faqs'] = __('ui.tour_tabs.faqs');
-    $heroAvifUrl = asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image ?: 'evening-desert-safari-dubai-dune-discovery-tourism.avif'));
+    $tourImages = $tour->getImageList();
+    $heroAvifUrl = $tourImages[0] ?? resolve_tour_image($tour->hero_image);
 @endphp
 
 @push('preloads')
@@ -251,9 +252,64 @@ if(window.fbq){
 </script>
 @endif
 
-<!-- Tour Hero Section -->
-<section class="relative min-h-[50vh] flex items-end bg-cover bg-center overflow-hidden" style="background: url('{{ $heroAvifUrl }}') center/cover no-repeat;">
-    <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-black/20"></div>
+@php
+    $totalHeroImages = count($tourImages);
+@endphp
+
+<section class="relative min-h-[52vh] sm:min-h-[58vh] lg:min-h-[64vh] flex items-end overflow-hidden select-none bg-cover bg-center"
+         style="background: url('{{ $heroAvifUrl }}') center/cover no-repeat;"
+         @if($totalHeroImages >= 2)
+         x-data="{
+             heroIdx: 0,
+             total: {{ $totalHeroImages }},
+             prevHero() { this.heroIdx = (this.heroIdx - 1 + this.total) % this.total; },
+             nextHero() { this.heroIdx = (this.heroIdx + 1) % this.total; },
+             goHero(i) { this.heroIdx = i; }
+         }"
+         @endif>
+
+    <!-- Background Slider Slides -->
+    <div class="absolute inset-0 z-0">
+        @foreach($tourImages as $idx => $imgUrl)
+            <div class="absolute inset-0 bg-cover bg-center transition-all duration-700 ease-in-out"
+                 @if($totalHeroImages >= 2)
+                 :class="{ 'opacity-100 scale-100 z-1 pointer-events-auto': heroIdx === {{ $idx }}, 'opacity-0 scale-105 z-0 pointer-events-none': heroIdx !== {{ $idx }} }"
+                 @if($idx > 0) style="opacity: 0; background-image: url('{{ $imgUrl }}');" @else style="background-image: url('{{ $imgUrl }}');" @endif
+                 @else
+                 style="background-image: url('{{ $imgUrl }}'); opacity: 1;"
+                 @endif>
+            </div>
+        @endforeach
+    </div>
+
+    <!-- Gradient Overlay -->
+    <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/65 to-black/30 z-2 pointer-events-none"></div>
+
+    @if($totalHeroImages >= 2)
+        <!-- Previous / Next Navigation Arrows -->
+        <button type="button"
+                @click="prevHero()"
+                aria-label="Previous photo"
+                class="absolute start-3 sm:start-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full glass-dark hover:bg-primary text-white flex items-center justify-center transition-all duration-200 shadow-xl cursor-pointer hover:scale-110 active:scale-95 group focus:outline-hidden">
+            <i class="bi bi-chevron-left text-sm sm:text-base group-hover:-translate-x-0.5 transition-transform rtl:rotate-180"></i>
+        </button>
+        <button type="button"
+                @click="nextHero()"
+                aria-label="Next photo"
+                class="absolute end-3 sm:end-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full glass-dark hover:bg-primary text-white flex items-center justify-center transition-all duration-200 shadow-xl cursor-pointer hover:scale-110 active:scale-95 group focus:outline-hidden">
+            <i class="bi bi-chevron-right text-sm sm:text-base group-hover:translate-x-0.5 transition-transform rtl:rotate-180"></i>
+        </button>
+
+        <!-- Top-Right Photo Count Pill -->
+        <div class="absolute top-24 sm:top-28 end-4 sm:end-8 z-20 pointer-events-none">
+            <span class="glass-dark text-white text-xs font-bold px-3.5 py-1.5 rounded-full inline-flex items-center gap-1.5 shadow-lg border border-white/20">
+                <i class="bi bi-images text-amber-400"></i>
+                <span x-text="(heroIdx + 1) + ' / ' + total">1 / {{ $totalHeroImages }}</span>
+                <span class="text-white/70 hidden sm:inline">Photos</span>
+            </span>
+        </div>
+    @endif
+
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full pb-8 sm:pb-10 pt-28 sm:pt-40 lg:pt-44 text-white">
         <nav aria-label="{{ __('ui.common.breadcrumb') }}" class="mb-4">
             <ol class="flex items-center gap-2 text-xs sm:text-sm text-white/75 flex-wrap">
@@ -301,6 +357,19 @@ if(window.fbq){
                     <span class="font-medium">{{ __('ui.trust_strip.hotel_pickup') }}</span>
                 </div>
             </div>
+
+            @if($totalHeroImages >= 2)
+                <!-- Hero Pagination Dots -->
+                <div class="flex items-center gap-1.5 mt-5 z-20 relative">
+                    @foreach($tourImages as $idx => $imgUrl)
+                        <button type="button"
+                                @click="goHero({{ $idx }})"
+                                aria-label="Photo {{ $idx + 1 }}"
+                                class="h-2 rounded-full transition-all duration-300 cursor-pointer"
+                                :class="heroIdx === {{ $idx }} ? 'w-8 bg-amber-400 shadow-md' : 'w-2 bg-white/40 hover:bg-white/80'"></button>
+                    @endforeach
+                </div>
+            @endif
         </div>
     </div>
 </section>
@@ -347,6 +416,71 @@ if(window.fbq){
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
             <!-- Main Details (Left 8 Cols) -->
             <div class="lg:col-span-8">
+                <!-- Tour Media Gallery & Visual Slider -->
+                @if(count($tourImages) >= 2)
+                <div class="mb-8 bg-white rounded-3xl border border-slate-200/80 shadow-xs p-4 sm:p-6"
+                     x-data="{
+                         showIdx: 0,
+                         totalPics: {{ count($tourImages) }},
+                         prevPic() { this.showIdx = (this.showIdx - 1 + this.totalPics) % this.totalPics; },
+                         nextPic() { this.showIdx = (this.showIdx + 1) % this.totalPics; }
+                     }">
+                    <div class="flex items-center justify-between gap-3 mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-sm font-bold">
+                                <i class="bi bi-camera"></i>
+                            </span>
+                            <div>
+                                <h2 class="text-sm sm:text-base font-extrabold text-slate-900 leading-snug">Tour Visual Showcase</h2>
+                                <p class="text-slate-500 text-[11px]">Explore photos from this desert safari & tour</p>
+                            </div>
+                        </div>
+                        <span class="text-xs font-bold text-slate-600 bg-slate-100 rounded-full px-3 py-1 inline-flex items-center gap-1">
+                            <i class="bi bi-images text-amber-500"></i>
+                            <span x-text="(showIdx + 1) + ' of ' + totalPics">1 of {{ count($tourImages) }}</span>
+                        </span>
+                    </div>
+
+                    <!-- Main Showcase Frame with Nav Buttons -->
+                    <div class="relative rounded-2xl overflow-hidden aspect-[16/10] sm:aspect-[16/9] bg-slate-950 group">
+                        @foreach($tourImages as $idx => $imgUrl)
+                            <img src="{{ $imgUrl }}"
+                                 alt="{{ $tour->name }} photograph {{ $idx + 1 }}"
+                                 loading="{{ $idx === 0 ? 'eager' : 'lazy' }}"
+                                 class="absolute inset-0 w-full h-full object-cover transition-all duration-500"
+                                 :class="{ 'opacity-100 scale-100 z-1': showIdx === {{ $idx }}, 'opacity-0 scale-105 z-0 pointer-events-none': showIdx !== {{ $idx }} }"
+                                 @if($idx > 0) style="opacity: 0;" @endif>
+                        @endforeach
+
+                        <!-- Nav Buttons -->
+                        <button type="button"
+                                @click="prevPic()"
+                                aria-label="Previous photograph"
+                                class="absolute start-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-slate-950/70 hover:bg-primary text-white flex items-center justify-center transition-all duration-200 shadow-md cursor-pointer hover:scale-105 active:scale-95">
+                            <i class="bi bi-chevron-left text-xs sm:text-sm rtl:rotate-180"></i>
+                        </button>
+                        <button type="button"
+                                @click="nextPic()"
+                                aria-label="Next photograph"
+                                class="absolute end-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-slate-950/70 hover:bg-primary text-white flex items-center justify-center transition-all duration-200 shadow-md cursor-pointer hover:scale-105 active:scale-95">
+                            <i class="bi bi-chevron-right text-xs sm:text-sm rtl:rotate-180"></i>
+                        </button>
+                    </div>
+
+                    <!-- Thumbnail Strip -->
+                    <div class="flex items-center gap-2 mt-3 overflow-x-auto no-scrollbar pb-1">
+                        @foreach($tourImages as $idx => $imgUrl)
+                            <button type="button"
+                                    @click="showIdx = {{ $idx }}"
+                                    class="relative shrink-0 w-16 h-12 sm:w-20 sm:h-14 rounded-xl overflow-hidden border-2 transition-all duration-200 cursor-pointer"
+                                    :class="showIdx === {{ $idx }} ? 'border-primary ring-2 ring-primary/30 scale-102' : 'border-slate-200 opacity-60 hover:opacity-100'">
+                                <img src="{{ $imgUrl }}" class="w-full h-full object-cover" loading="lazy">
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
                 <!-- GEO & AI Search "Tour at a Glance" Quick Facts Card -->
                 <div class="bg-primary/5 rounded-2xl p-6 mb-8 border-s-4 border-primary shadow-xs">
                     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
@@ -1316,19 +1450,7 @@ if(window.fbq){
             @php $minPriceRel = $t->tiers->min('pivot.price') ?? 0; @endphp
             <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-200 hover:border-slate-300 flex flex-col h-full group w-[280px] sm:w-auto shrink-0 snap-start">
                 <a href="{{ localized_route('tours.show', $t->slug) }}" class="flex flex-col h-full text-inherit">
-                    <div class="relative overflow-hidden aspect-[16/10]">
-                        <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image ?: ($t->hero_image ?: 'desert-safari-poster.avif'))) }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy">
-                        @if($t->is_bestseller)
-                        <span class="absolute top-3 start-3 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-md inline-flex items-center gap-1">
-                            <i class="bi bi-fire text-amber-300"></i>{{ __('ui.common.bestseller') }}
-                        </span>
-                        @endif
-                        <div class="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
-                            <span class="glass-dark text-white text-xs font-semibold px-2.5 py-1 rounded-full inline-flex items-center gap-1">
-                                <i class="bi bi-tag-fill text-primary"></i>{{ $t->category ? $t->category->name : 'Tour' }}
-                            </span>
-                        </div>
-                    </div>
+                    @include('partials.tour-card-slider', ['tour' => $t, 'categoryName' => $t->category ? $t->category->name : 'Tour'])
                     <div class="p-5 flex flex-col flex-grow">
                         <div class="flex justify-between items-center text-xs mb-2">
                             <div class="text-slate-500 inline-flex items-center gap-1">

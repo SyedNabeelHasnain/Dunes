@@ -160,19 +160,7 @@
                 <div class="tour-item flex flex-col h-full" data-category="{{ $tourCatSlug }}" data-name="{{ strtolower($t->name) }}" @if($selectedCategorySlug && $tourCatSlug !== $selectedCategorySlug) style="display: none;" @endif>
                     <article class="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-slate-200 hover:border-slate-300 flex flex-col h-full group">
                         <a href="{{ localized_route('tours.show', $t->slug) }}" class="flex flex-col h-full text-inherit">
-                            <div class="relative overflow-hidden aspect-[16/10]">
-                                <img src="{{ asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $t->thumb_image ?: $t->hero_image ?: 'desert-safari-poster.avif')) }}" width="400" height="250" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $t->name }} Dubai Desert Safari" loading="lazy">
-                                @if($t->is_bestseller)
-                                <span class="absolute top-3 start-3 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-md inline-flex items-center gap-1">
-                                    <i class="bi bi-fire text-amber-300"></i>{{ __('ui.home_popular.bestseller') }}
-                                </span>
-                                @endif
-                                <div class="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
-                                    <span class="glass-dark text-white text-xs font-semibold px-2.5 py-1 rounded-full inline-flex items-center gap-1">
-                                        <i class="bi bi-tag-fill text-primary"></i>{{ $tourCat ? $tourCat->name : 'Tours' }}
-                                    </span>
-                                </div>
-                            </div>
+                        @include('partials.tour-card-slider', ['tour' => $t, 'categoryName' => $tourCat ? $tourCat->name : 'Tours'])
                             <div class="p-5 flex flex-col flex-grow">
                                 <div class="flex justify-between items-center text-xs mb-2">
                                     <div class="text-slate-500 inline-flex items-center gap-1">

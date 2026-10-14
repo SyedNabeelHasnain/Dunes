@@ -7,8 +7,7 @@
                 ->get()
                 ->map(function($t) {
                     $minPrice = $t->tiers->min('pivot.price') ?? 0;
-                    $thumb = $t->thumb_image ?: $t->hero_image ?: 'desert-safari-poster.avif';
-                    $thumb = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $thumb);
+                    $thumb = resolve_tour_image($t->thumb_image ?: $t->hero_image);
                     return [
                         'id' => (int) $t->id,
                         'name' => (string) $t->name,
@@ -21,7 +20,7 @@
                         'reviews_count' => (int) ($t->review_count ?: 850),
                         'price' => (float) $minPrice,
                         'price_formatted' => $minPrice > 0 ? 'From AED ' . number_format($minPrice) : 'Best Rates',
-                        'image' => asset('images/' . $thumb),
+                        'image' => $thumb,
                         'is_bestseller' => (bool) $t->is_bestseller,
                         'is_featured' => (bool) $t->is_featured,
                         'badge' => $t->is_bestseller ? 'Bestseller' : ($t->is_featured ? 'Popular' : ($t->category ? (string) $t->category->name : 'Safari')),

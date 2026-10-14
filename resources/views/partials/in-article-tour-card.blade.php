@@ -25,7 +25,7 @@
     }
 
     $tourImg = $tour->thumb_image ?: $tour->hero_image;
-    $tourImgUrl = $tourImg ? asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tourImg)) : asset('images/desert-safari-poster.avif');
+    $tourImgUrl = resolve_tour_image($tourImg);
 
     $whatsappNum = preg_replace('/[^0-9]/', '', $settings['site_whatsapp'] ?? '971502456056');
     $postTitle = isset($post) && $post ? $post->title : 'Dubai Desert Safari';
