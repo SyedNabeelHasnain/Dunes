@@ -283,6 +283,16 @@ if (! function_exists('resolve_tour_image')) {
             return asset('storage/'.$clean);
         }
 
+        $base = preg_replace('/\.(jpe?g|png|webp|avif)$/i', '', $clean);
+        foreach (['.avif', '.webp', '.jpg', '.jpeg', '.png'] as $ext) {
+            if (file_exists(public_path('images/'.$base.$ext))) {
+                return asset('images/'.$base.$ext);
+            }
+            if (file_exists(storage_path('app/public/'.$base.$ext))) {
+                return asset('storage/'.$base.$ext);
+            }
+        }
+
         return asset('images/'.$clean);
     }
 }
