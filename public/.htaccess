@@ -16,6 +16,8 @@ RewriteRule ^ %1 [L,R=301]
 # Send Requests To Front Controller...
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [L]
+
 # MIME Types for Modern Formats
 <IfModule mod_mime.c>
     AddType image/avif .avif
