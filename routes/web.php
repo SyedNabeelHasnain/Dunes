@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AdminCouponController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminEmailCampaignController;
 use App\Http\Controllers\Admin\AdminEmailTemplateController;
+use App\Http\Controllers\Admin\AdminDriverController;
 use App\Http\Controllers\Admin\AdminFaqController;
 use App\Http\Controllers\Admin\AdminLanguageController;
 use App\Http\Controllers\Admin\AdminLegalController;
@@ -22,11 +23,13 @@ use App\Http\Controllers\Admin\AdminSubscriberGroupController;
 use App\Http\Controllers\Admin\AdminTourController;
 use App\Http\Controllers\Admin\AdminTranslationApiController;
 use App\Http\Controllers\Admin\AdminTranslationSettingController;
+use App\Http\Controllers\Admin\AdminVehicleController;
 use App\Http\Controllers\Admin\AdminWhatsappController;
 use App\Http\Controllers\Admin\AdminWikiController;
 use App\Http\Controllers\AjaxGatewayController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\DriverPortalController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\GoogleThingsToDoFeedController;
 use App\Http\Controllers\HomeController;
@@ -59,6 +62,11 @@ Route::redirect('/pricing-guide', '/rate-card', 301);
 Route::get('/dubai-desert-sunset-times', [SunsetGuideController::class, 'index'])->name('sunset.guide');
 Route::get('/press-kit', [PageController::class, 'pressKit'])->name('press.kit');
 Route::redirect('/cron-status', '/api/v1/cron/status', 302);
+
+// ── Driver Mobile Portal (Token-Based Run Sheet) ───────────────────────────
+Route::get('/driver/run-sheet/{token}', [DriverPortalController::class, 'showRunSheet'])->name('driver.run-sheet');
+Route::post('/driver/run-sheet/{token}/update-status/{bookingId}', [DriverPortalController::class, 'updateStatus'])->name('driver.update-status');
+
 // ── Legal, Privacy & Compliance Policies ──────────────────────────────────
 Route::get('/terms-condition', [LegalController::class, 'terms'])->name('terms');
 Route::get('/privacy-policy', [LegalController::class, 'privacy'])->name('privacy');
@@ -167,7 +175,20 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     // Daily Tour Operations & Driver Dispatch Manifest
     Route::get('/operations', [AdminOperationsController::class, 'index'])->name('operations.index');
     Route::post('/operations/{id}/assign-driver', [AdminOperationsController::class, 'assignDriver'])->name('operations.assign-driver');
+    Route::post('/operations/batch-assign', [AdminOperationsController::class, 'batchAssign'])->name('operations.batch-assign');
+    Route::post('/operations/{id}/update-status', [AdminOperationsController::class, 'updatePickupStatus'])->name('operations.update-status');
+    Route::get('/operations/reports', [AdminOperationsController::class, 'reports'])->name('operations.reports');
+    Route::get('/operations/reports/export', [AdminOperationsController::class, 'exportReportsCsv'])->name('operations.reports.export');
     Route::get('/operations/export/csv', [AdminOperationsController::class, 'exportManifest'])->name('operations.export');
+
+    // Safari Drivers Management
+    Route::resource('drivers', AdminDriverController::class);
+    Route::post('/drivers/{id}/toggle-status', [AdminDriverController::class, 'toggleStatus'])->name('drivers.toggle-status');
+    Route::get('/drivers/{id}/run-sheet', [AdminDriverController::class, 'runSheet'])->name('drivers.run-sheet');
+
+    // Safari Fleet & Vehicles Management
+    Route::resource('vehicles', AdminVehicleController::class);
+    Route::post('/vehicles/{id}/toggle-status', [AdminVehicleController::class, 'toggleStatus'])->name('vehicles.toggle-status');
 
     Route::get('/whatsapp-leads/export/csv', [AdminWhatsappController::class, 'exportCsv'])->name('whatsapp.export');
     Route::post('/whatsapp-leads/bulk-action', [AdminWhatsappController::class, 'bulkAction'])->name('whatsapp.bulk');

@@ -145,6 +145,48 @@
                 </div>
             </div>
 
+            @php
+                $driverObj = $booking->driver;
+                $vehicleObj = $booking->vehicle ?: $driverObj?->defaultVehicle;
+                $driverName = $driverObj?->name ?: ($booking->assigned_driver_name ?: null);
+                $driverPhone = $driverObj?->phone ?: null;
+                $plateNum = $vehicleObj?->short_plate ?: ($booking->assigned_vehicle_plate ?: null);
+                $pickupStatus = $booking->pickup_status ?: 'scheduled';
+            @endphp
+            @if($driverName || $plateNum)
+            <div class="bg-gradient-to-r from-orange-50/80 via-white to-amber-50/60 rounded-2xl p-5 border border-primary/20 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3.5">
+                    <span class="w-12 h-12 rounded-2xl bg-slate-900 text-amber-400 font-black text-sm flex items-center justify-center shrink-0 shadow-xs">
+                        <i class="bi bi-person-badge text-xl"></i>
+                    </span>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="text-[10px] font-extrabold uppercase tracking-wider text-primary">Your Dedicated Safari Captain</span>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800">DTCM Certified</span>
+                        </div>
+                        <h4 class="text-base font-extrabold text-slate-900 mb-0.5">Captain {{ $driverName }}</h4>
+                        <div class="text-xs text-slate-600 flex items-center gap-3 flex-wrap">
+                            <span><i class="bi bi-truck text-primary me-1"></i><strong>Vehicle:</strong> {{ $vehicleObj?->model_name ?: 'Toyota Land Cruiser 300' }} (Plate: <strong class="text-slate-900 font-mono">{{ $plateNum ?: 'Confirmed' }}</strong>)</span>
+                            @if($driverObj && $driverObj->rating > 0)
+                                <span><i class="bi bi-star-fill text-amber-500 me-0.5"></i> {{ number_format($driverObj->rating, 1) }} / 5.0</span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                @if($driverPhone)
+                @php $cleanPhone = preg_replace('/[^0-9]/', '', $driverPhone); @endphp
+                <div class="flex items-center gap-2 shrink-0">
+                    <a href="tel:{{ $driverPhone }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-800 text-xs font-bold shadow-2xs hover:bg-slate-50 transition">
+                        <i class="bi bi-telephone text-primary"></i> Call Captain
+                    </a>
+                    <a href="https://wa.me/{{ $cleanPhone }}" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-2xs transition">
+                        <i class="bi bi-whatsapp"></i> WhatsApp
+                    </a>
+                </div>
+                @endif
+            </div>
+            @endif
+
             <!-- Row 2: Schedule & Financials & QR -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Schedule -->

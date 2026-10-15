@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             BlogSeeder::class,
             UserSeeder::class,
             WikiKnowledgeSeeder::class,
+            FleetAndDriverSeeder::class,
         ]);
     }
 }

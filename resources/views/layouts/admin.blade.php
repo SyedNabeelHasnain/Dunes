@@ -66,8 +66,18 @@
             <a href="{{ route('admin.bookings.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.bookings*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
                 <i class="bi bi-calendar2-check-fill text-base"></i> <span>Bookings</span>
             </a>
-            <a href="{{ route('admin.operations.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.operations*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
-                <i class="bi bi-truck-flatbed text-amber-400 text-base"></i> <span>Daily Operations</span>
+            <div class="pt-4 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">Fleet & Logistics</div>
+            <a href="{{ route('admin.operations.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.operations.index') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-truck-flatbed text-amber-400 text-base"></i> <span>Daily Operations Hub</span>
+            </a>
+            <a href="{{ route('admin.drivers.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.drivers*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-person-badge text-sky-400 text-base"></i> <span>Safari Drivers</span>
+            </a>
+            <a href="{{ route('admin.vehicles.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.vehicles*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-truck text-emerald-400 text-base"></i> <span>Vehicle Fleet</span>
+            </a>
+            <a href="{{ route('admin.operations.reports') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.operations.reports*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-cash-stack text-rose-400 text-base"></i> <span>Driver Reports</span>
             </a>
             <a href="{{ route('admin.inquiries.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.inquiries*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
                 <i class="bi bi-envelope-paper-fill text-base"></i> <span>Inquiries</span>
@@ -213,8 +223,18 @@
             <a href="{{ route('admin.bookings.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.bookings*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Bookings' : ''">
                 <i class="bi bi-calendar2-check-fill text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Bookings</span>
             </a>
-            <a href="{{ route('admin.operations.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.operations*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Daily Operations' : ''">
-                <i class="bi bi-truck-flatbed text-amber-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Daily Operations</span>
+            <div x-show="!$store.admin.sidebarCollapsed" class="pt-4 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Fleet & Logistics</div>
+            <a href="{{ route('admin.operations.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.operations.index') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Daily Operations Hub' : ''">
+                <i class="bi bi-truck-flatbed text-amber-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Daily Operations Hub</span>
+            </a>
+            <a href="{{ route('admin.drivers.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.drivers*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Safari Drivers' : ''">
+                <i class="bi bi-person-badge text-sky-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Safari Drivers</span>
+            </a>
+            <a href="{{ route('admin.vehicles.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.vehicles*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Vehicle Fleet' : ''">
+                <i class="bi bi-truck text-emerald-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Vehicle Fleet</span>
+            </a>
+            <a href="{{ route('admin.operations.reports') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.operations.reports*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Driver Reports' : ''">
+                <i class="bi bi-cash-stack text-rose-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Driver Reports</span>
             </a>
             <a href="{{ route('admin.inquiries.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.inquiries*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Inquiries' : ''">
                 <i class="bi bi-envelope-paper-fill text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Inquiries</span>
@@ -647,6 +667,33 @@
                                     <div>
                                         <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Daily Operations Manifest</strong>
                                         <span class="text-[11px] text-slate-500">Assign drivers & track live departures</span>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="cmd-entry rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group cursor-pointer" data-category="actions" data-keywords="safari drivers captains driver license phone fleet logistics">
+                                <a href="{{ route('admin.drivers.index') }}" class="flex items-center gap-3 p-2.5">
+                                    <i class="bi bi-person-badge text-sky-500 text-xl shrink-0"></i>
+                                    <div>
+                                        <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Safari Drivers & Captains</strong>
+                                        <span class="text-[11px] text-slate-500">Manage safari captains, ratings, and licenses</span>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="cmd-entry rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group cursor-pointer" data-category="actions" data-keywords="vehicles fleet 4x4 land cruiser patrol cars plate mulkiya capacity">
+                                <a href="{{ route('admin.vehicles.index') }}" class="flex items-center gap-3 p-2.5">
+                                    <i class="bi bi-truck text-emerald-500 text-xl shrink-0"></i>
+                                    <div>
+                                        <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">4x4 Vehicle Fleet</strong>
+                                        <span class="text-[11px] text-slate-500">Manage Land Cruisers, Patrols, and capacities</span>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="cmd-entry rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group cursor-pointer" data-category="actions" data-keywords="driver reports cash reconciliation settlement passenger trips accounting">
+                                <a href="{{ route('admin.operations.reports') }}" class="flex items-center gap-3 p-2.5">
+                                    <i class="bi bi-cash-stack text-rose-500 text-xl shrink-0"></i>
+                                    <div>
+                                        <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Driver Performance & Cash Settlement</strong>
+                                        <span class="text-[11px] text-slate-500">Reconcile cash collected and trip totals</span>
                                     </div>
                                 </a>
                             </div>

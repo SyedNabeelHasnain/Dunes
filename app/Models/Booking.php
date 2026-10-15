@@ -12,8 +12,11 @@ class Booking extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'id', 'reference', 'tour_id', 'tier_id', 'tour_name', 'tier_name', 'tour_date',
+        'id', 'reference', 'tour_id', 'tier_id', 'tour_name', 'tier_name',
+        'driver_id', 'vehicle_id', 'tour_date',
         'adults', 'children', 'infants', 'name', 'email', 'phone', 'pickup_location',
+        'pickup_time_slot', 'pickup_status', 'driver_assigned_at', 'driver_notified_at',
+        'guest_notified_at', 'driver_notes',
         'special_requests', 'coupon_id', 'coupon_code', 'discount_type', 'discount_rate',
         'discount_amount', 'original_total', 'subtotal', 'addons_total', 'total', 'currency',
         'status', 'payment_method', 'payment_status', 'payment_amount',
@@ -26,6 +29,9 @@ class Booking extends Model
 
     protected $casts = [
         'tour_date' => 'date',
+        'driver_assigned_at' => 'datetime',
+        'driver_notified_at' => 'datetime',
+        'guest_notified_at' => 'datetime',
         'adults' => 'integer',
         'children' => 'integer',
         'infants' => 'integer',
@@ -57,11 +63,59 @@ class Booking extends Model
     }
 
     /**
-     * Accessor for pickup_time from tour relationship.
+     * Accessor for pickup_time prioritizing assigned pickup_time_slot over tour default.
      */
     public function getPickupTimeAttribute(): ?string
     {
-        return $this->tour?->pickup_time;
+        return $this->pickup_time_slot ?: $this->tour?->pickup_time;
+    }
+
+    /**
+     * Driver relationship.
+     */
+    public function driver()
+    {
+        return $this->belongsTo(Driver::class, 'driver_id');
+    }
+
+    /**
+     * Vehicle relationship.
+     */
+    public function vehicle()
+    {
+        return $this->belongsTo(Vehicle::class, 'vehicle_id');
+    }
+
+    /**
+     * Resolved driver name with backward compatibility for legacy DISPATCH notes.
+     */
+    public function getAssignedDriverNameAttribute(): ?string
+    {
+        if ($this->driver) {
+            return $this->driver->name;
+        }
+
+        if ($this->special_requests && preg_match('/\[DISPATCH:\s*Driver:\s*([^\|]+)/i', $this->special_requests, $m)) {
+            return trim($m[1]);
+        }
+
+        return null;
+    }
+
+    /**
+     * Resolved vehicle plate with backward compatibility for legacy DISPATCH notes.
+     */
+    public function getAssignedVehiclePlateAttribute(): ?string
+    {
+        if ($this->vehicle) {
+            return $this->vehicle->short_plate;
+        }
+
+        if ($this->special_requests && preg_match('/Plate:\s*([^\]]+)\]/i', $this->special_requests, $m)) {
+            return trim($m[1]);
+        }
+
+        return null;
     }
 
     public function tour()

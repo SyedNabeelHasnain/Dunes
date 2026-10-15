@@ -11,6 +11,8 @@ use App\Models\BookingAddon;
 use App\Models\BookingPayment;
 use App\Models\Coupon;
 use App\Models\CouponUsage;
+use App\Models\Driver;
+use App\Models\Vehicle;
 use App\Models\RequestLog;
 use App\Models\Review;
 use App\Models\Setting;
@@ -611,7 +613,7 @@ class AdminBookingController extends Controller
      */
     public function show(string $id)
     {
-        $booking = Booking::with(['tour', 'tier', 'addons', 'payments'])->findOrFail($id);
+        $booking = Booking::with(['tour', 'tier', 'addons', 'payments', 'driver.defaultVehicle', 'vehicle'])->findOrFail($id);
 
         $log = null;
         if ($booking->request_log_id) {
@@ -620,8 +622,10 @@ class AdminBookingController extends Controller
 
         $tours = Tour::orderBy('priority')->orderBy('id')->get();
         $tiers = Tier::orderBy('id')->get();
+        $drivers = Driver::where('status', 'active')->orderBy('name')->get();
+        $vehicles = Vehicle::where('status', 'active')->orderBy('model_name')->get();
 
-        return view('admin.bookings.show', compact('booking', 'log', 'tours', 'tiers'));
+        return view('admin.bookings.show', compact('booking', 'log', 'tours', 'tiers', 'drivers', 'vehicles'));
     }
 
     /**
@@ -650,6 +654,11 @@ class AdminBookingController extends Controller
             'payment_amount' => 'nullable|numeric|min:0',
             'pickup_location' => 'nullable|string|max:500',
             'special_requests' => 'nullable|string|max:2000',
+            'driver_id' => 'nullable|exists:drivers,id',
+            'vehicle_id' => 'nullable|exists:vehicles,id',
+            'pickup_time_slot' => 'nullable|string|max:100',
+            'pickup_status' => 'nullable|in:scheduled,en_route,arrived,picked_up,completed,no_show',
+            'driver_notes' => 'nullable|string|max:1000',
         ]);
 
         $total = $request->filled('total') ? round((float) $request->input('total'), 2) : (float) $booking->total;
@@ -724,6 +733,49 @@ class AdminBookingController extends Controller
         }
         if ($request->has('special_requests')) {
             $updateData['special_requests'] = $request->input('special_requests');
+        }
+
+        if ($request->has('driver_id')) {
+            $updateData['driver_id'] = $request->input('driver_id') ?: null;
+            if ($request->filled('driver_id') && empty($booking->driver_assigned_at)) {
+                $updateData['driver_assigned_at'] = now();
+            }
+        }
+        if ($request->has('vehicle_id')) {
+            $updateData['vehicle_id'] = $request->input('vehicle_id') ?: null;
+        } elseif ($request->filled('driver_id')) {
+            $assignedDriver = Driver::find($request->input('driver_id'));
+            if ($assignedDriver && $assignedDriver->default_vehicle_id) {
+                $updateData['vehicle_id'] = $assignedDriver->default_vehicle_id;
+            }
+        }
+        if ($request->filled('pickup_time_slot')) {
+            $updateData['pickup_time_slot'] = $request->input('pickup_time_slot');
+        }
+        if ($request->filled('pickup_status')) {
+            $updateData['pickup_status'] = $request->input('pickup_status');
+        }
+        if ($request->has('driver_notes')) {
+            $updateData['driver_notes'] = $request->input('driver_notes');
+        }
+
+        // Keep [DISPATCH: ...] synchronized if driver is assigned
+        $effectiveDriverId = array_key_exists('driver_id', $updateData) ? $updateData['driver_id'] : $booking->driver_id;
+        $effectiveVehicleId = array_key_exists('vehicle_id', $updateData) ? $updateData['vehicle_id'] : $booking->vehicle_id;
+        $effectivePickupTime = array_key_exists('pickup_time_slot', $updateData) ? $updateData['pickup_time_slot'] : ($booking->pickup_time_slot ?: $booking->pickup_time);
+        
+        if ($effectiveDriverId) {
+            $drv = Driver::find($effectiveDriverId);
+            $veh = $effectiveVehicleId ? Vehicle::find($effectiveVehicleId) : null;
+            $dispInfo = array_filter([
+                $effectivePickupTime ? 'Pickup: ' . $effectivePickupTime : null,
+                $drv ? 'Driver: ' . $drv->name : null,
+                $drv ? 'Phone: ' . $drv->phone : null,
+                $veh ? 'Plate: ' . $veh->short_plate : null,
+            ]);
+            $baseNotes = array_key_exists('special_requests', $updateData) ? ($updateData['special_requests'] ?? '') : ($booking->special_requests ?? '');
+            $cleanNotes = preg_replace('/\[DISPATCH:.*?\]/s', '', $baseNotes);
+            $updateData['special_requests'] = trim($cleanNotes . "\n[DISPATCH: " . implode(' | ', $dispInfo) . ']');
         }
 
         $booking->update($updateData);

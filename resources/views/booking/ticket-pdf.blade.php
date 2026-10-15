@@ -269,6 +269,29 @@
                         <td class="label-cell">Pickup Location:</td>
                         <td class="val-cell">{{ $booking->pickup_location ?: 'Hotel Lobby / Residence in Dubai / Sharjah' }}</td>
                     </tr>
+                    @php
+                        $driverObj = $booking->driver;
+                        $vehicleObj = $booking->vehicle ?: $driverObj?->defaultVehicle;
+                        $driverName = $driverObj?->name ?: ($booking->assigned_driver_name ?: null);
+                        $driverPhone = $driverObj?->phone ?: null;
+                        $plateNum = $vehicleObj?->short_plate ?: ($booking->assigned_vehicle_plate ?: null);
+                    @endphp
+                    @if($driverName || $plateNum)
+                    <tr>
+                        <td class="label-cell">Safari Captain:</td>
+                        <td class="val-cell">
+                            <strong>{{ $driverName ?: 'Assigned Captain' }}</strong>
+                            @if($driverPhone) &bull; Tel: {{ $driverPhone }} @endif
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label-cell">Vehicle Fleet:</td>
+                        <td class="val-cell">
+                            {{ $vehicleObj?->model_name ?: 'Toyota Land Cruiser 300' }}
+                            @if($plateNum) - Plate: <strong>{{ $plateNum }}</strong> @endif
+                        </td>
+                    </tr>
+                    @endif
                     @if(!empty($booking->notes))
                     <tr>
                         <td class="label-cell">Special Requests:</td>

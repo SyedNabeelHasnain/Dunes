@@ -237,6 +237,221 @@
         </div>
     </div>
 
+    <!-- Logistics & Safari Captain Dispatch Card -->
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6" x-data="{ assignModalOpen: false }">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3 mb-5">
+            <div>
+                <h2 class="text-xs font-black uppercase tracking-wider text-primary flex items-center gap-2">
+                    <i class="bi bi-truck-flatbed text-base"></i> Logistics & Safari Captain Dispatch
+                </h2>
+                <p class="text-xs text-slate-500 mb-0">Driver assignment, vehicle allocation, real-time pickup status, and guest dispatch broadcast.</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <button type="button" @click="assignModalOpen = true" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 text-slate-700 bg-slate-50 hover:bg-slate-100 text-xs font-bold transition cursor-pointer">
+                    <i class="bi bi-person-gear text-primary"></i>
+                    <span>{{ $booking->driver_id ? 'Change Assignment' : 'Assign Captain' }}</span>
+                </button>
+            </div>
+        </div>
+
+        @php
+            $driverObj = $booking->driver;
+            $vehicleObj = $booking->vehicle ?: $driverObj?->defaultVehicle;
+            $driverName = $driverObj?->name ?: ($booking->assigned_driver_name ?: null);
+            $driverPhone = $driverObj?->phone ?: null;
+            $plateNum = $vehicleObj?->short_plate ?: ($booking->assigned_vehicle_plate ?: null);
+            $pickupTime = $booking->pickup_time_slot ?: ($booking->pickup_time ?: '3:00 PM - 3:30 PM');
+            $pickupStatus = $booking->pickup_status ?: 'scheduled';
+            
+            $statusBadgeClass = match($pickupStatus) {
+                'en_route' => 'bg-sky-50 text-sky-700 border-sky-200',
+                'arrived' => 'bg-amber-50 text-amber-700 border-amber-200',
+                'picked_up' => 'bg-orange-50 text-primary border-orange-200',
+                'completed' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                'no_show' => 'bg-rose-50 text-rose-700 border-rose-200',
+                default => 'bg-slate-100 text-slate-700 border-slate-200',
+            };
+
+            $waVal = preg_replace('/[^0-9]/', '', $booking->phone);
+            $dispatchCaptain = $driverName ?: 'Our Dunes Discovery Safari Captain';
+            $dispatchPlate = $plateNum ? "in vehicle {$plateNum}" : 'in our licensed 4x4 Land Cruiser';
+            $dispatchMsg = "Hi {$booking->name}! Your Dunes Discovery safari captain {$dispatchCaptain} {$dispatchPlate} will pick you up at {$booking->pickup_location} around {$pickupTime} on " . ($booking->tour_date ? $booking->tour_date->format('M j') : 'your safari date') . ". See you in the dunes!";
+        @endphp
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <!-- Assigned Captain -->
+            <div class="p-4 rounded-xl border border-slate-100 bg-slate-50/60">
+                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Safari Captain</div>
+                @if($driverObj || $driverName)
+                    <div class="flex items-center gap-2.5 mb-2">
+                        <span class="w-9 h-9 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center shrink-0">
+                            {{ strtoupper(substr($driverName, 0, 2)) }}
+                        </span>
+                        <div>
+                            <div class="font-extrabold text-sm text-slate-900">{{ $driverName }}</div>
+                            @if($driverObj)
+                                <div class="text-[11px] text-amber-600 font-bold flex items-center gap-1">
+                                    <i class="bi bi-star-fill text-[10px]"></i> {{ number_format($driverObj->rating, 1) }} &bull; DTCM Certified
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                    @if($driverPhone)
+                    <div class="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                        <i class="bi bi-telephone text-slate-400"></i>
+                        <a href="tel:{{ $driverPhone }}" class="hover:underline">{{ $driverPhone }}</a>
+                        @php $cleanDrvPhone = preg_replace('/[^0-9]/', '', $driverPhone); @endphp
+                        <a href="https://wa.me/{{ $cleanDrvPhone }}" target="_blank" rel="noopener" class="text-emerald-600 hover:text-emerald-700">
+                            <i class="bi bi-whatsapp"></i>
+                        </a>
+                    </div>
+                    @endif
+                @else
+                    <div class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-2.5">
+                        <i class="bi bi-exclamation-triangle me-1"></i> No Captain Assigned Yet
+                    </div>
+                @endif
+            </div>
+
+            <!-- 4x4 Fleet Vehicle -->
+            <div class="p-4 rounded-xl border border-slate-100 bg-slate-50/60">
+                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">4x4 Vehicle</div>
+                @if($vehicleObj || $plateNum)
+                    <div class="font-extrabold text-sm text-slate-900 mb-1 flex items-center gap-1.5">
+                        <i class="bi bi-truck text-primary"></i>
+                        {{ $vehicleObj?->model_name ?: 'Toyota Land Cruiser' }}
+                    </div>
+                    <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white border border-slate-200 font-mono text-xs font-bold text-slate-800 mb-1">
+                        Plate: {{ $plateNum ?: $vehicleObj?->short_plate }}
+                    </div>
+                    <div class="text-[11px] text-slate-500">
+                        Capacity: {{ $vehicleObj?->passenger_capacity ?: 6 }} Passengers
+                    </div>
+                @else
+                    <div class="text-xs text-slate-500 bg-slate-100 rounded-lg p-2.5">
+                        Vehicle will auto-allocate with Captain
+                    </div>
+                @endif
+            </div>
+
+            <!-- Schedule & Status -->
+            <div class="p-4 rounded-xl border border-slate-100 bg-slate-50/60">
+                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Schedule & Status</div>
+                <div class="text-xs text-slate-600 mb-1.5">
+                    Pickup Window: <strong class="text-slate-900">{{ $pickupTime }}</strong>
+                </div>
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border capitalize {{ $statusBadgeClass }}">
+                        {{ str_replace('_', ' ', $pickupStatus) }}
+                    </span>
+                </div>
+                @if($booking->driver_assigned_at)
+                    <div class="text-[10px] text-slate-400">
+                        Assigned: {{ $booking->driver_assigned_at->format('M j, H:i') }}
+                    </div>
+                @endif
+            </div>
+
+            <!-- Quick Dispatch Actions -->
+            <div class="p-4 rounded-xl border border-slate-100 bg-slate-50/60 flex flex-col justify-between">
+                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Broadcast Actions</div>
+                <div class="space-y-1.5">
+                    @if($waVal)
+                    <a href="https://wa.me/{{ $waVal }}?text={{ urlencode($dispatchMsg) }}" target="_blank" rel="noopener noreferrer" class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-2xs transition" title="Broadcast Pickup Notice to Guest">
+                        <i class="bi bi-whatsapp"></i> Broadcast to Guest
+                    </a>
+                    @endif
+                    @if($driverObj)
+                    <a href="{{ route('driver.run-sheet', $driverObj->access_token) }}" target="_blank" class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-2xs transition">
+                        <i class="bi bi-phone"></i> Driver Run Sheet
+                    </a>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        @if($booking->driver_notes)
+        <div class="mt-4 p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700">
+            <strong class="text-slate-900 font-bold">Dispatcher Notes:</strong> {{ $booking->driver_notes }}
+        </div>
+        @endif
+
+        <!-- Inline Assignment Modal -->
+        <div x-show="assignModalOpen"
+             x-transition:enter="transition-opacity ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition-opacity ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
+             style="display: none;">
+            <div @click.outside="assignModalOpen = false"
+                 class="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden text-left">
+                <form action="{{ route('admin.operations.assign-driver', $booking->id) }}" method="POST">
+                    @csrf
+                    <div class="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                        <h5 class="text-sm font-extrabold text-slate-900 mb-0 flex items-center gap-2">
+                            <i class="bi bi-truck-flatbed text-primary"></i> Assign Captain & Fleet Vehicle
+                        </h5>
+                        <button type="button" @click="assignModalOpen = false" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                    <div class="p-5 space-y-4 text-xs">
+                        <div>
+                            <label class="block font-bold text-slate-600 uppercase tracking-wider mb-1.5">Safari Captain</label>
+                            <select name="driver_id" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold text-slate-800 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
+                                <option value="">-- No Captain (Clear) --</option>
+                                @foreach($drivers as $d)
+                                    <option value="{{ $d->id }}" {{ (int)$booking->driver_id === (int)$d->id ? 'selected' : '' }}>
+                                        Captain {{ $d->name }} ({{ $d->phone }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-600 uppercase tracking-wider mb-1.5">4x4 Fleet Vehicle</label>
+                            <select name="vehicle_id" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold text-slate-800 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
+                                <option value="">-- Captain Default Vehicle --</option>
+                                @foreach($vehicles as $v)
+                                    <option value="{{ $v->id }}" {{ (int)$booking->vehicle_id === (int)$v->id ? 'selected' : '' }}>
+                                        {{ $v->display_name }} ({{ $v->passenger_capacity }} seats)
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-600 uppercase tracking-wider mb-1.5">Pickup Time Window</label>
+                            <input type="text" name="pickup_time_slot" value="{{ $pickupTime }}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold text-slate-800 placeholder:text-slate-400 focus:border-primary outline-none transition" placeholder="e.g. 3:00 PM - 3:30 PM">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-bold text-slate-600 uppercase tracking-wider mb-1.5">Pickup Status</label>
+                                <select name="pickup_status" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold text-slate-800 bg-white focus:border-primary outline-none transition">
+                                    <option value="scheduled" {{ $pickupStatus === 'scheduled' ? 'selected' : '' }}>Scheduled</option>
+                                    <option value="en_route" {{ $pickupStatus === 'en_route' ? 'selected' : '' }}>En Route</option>
+                                    <option value="arrived" {{ $pickupStatus === 'arrived' ? 'selected' : '' }}>Arrived</option>
+                                    <option value="picked_up" {{ $pickupStatus === 'picked_up' ? 'selected' : '' }}>Picked Up</option>
+                                    <option value="completed" {{ $pickupStatus === 'completed' ? 'selected' : '' }}>Completed</option>
+                                    <option value="no_show" {{ $pickupStatus === 'no_show' ? 'selected' : '' }}>No Show</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-600 uppercase tracking-wider mb-1.5">Driver Notes</label>
+                                <input type="text" name="driver_notes" value="{{ $booking->driver_notes }}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold text-slate-800 placeholder:text-slate-400 focus:border-primary outline-none transition" placeholder="e.g. Call concierge on arrival">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-2">
+                        <button type="button" @click="assignModalOpen = false" class="px-4 py-2 rounded-full border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer">Cancel</button>
+                        <button type="submit" class="px-5 py-2 rounded-full bg-primary hover:bg-primary-dark text-white text-xs font-extrabold shadow-xs transition cursor-pointer">Save Assignment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Detailed Settings Update Form -->
     <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6">
         <h2 class="text-xs font-black uppercase tracking-wider text-primary mb-5 flex items-center gap-2">
@@ -356,6 +571,43 @@
                 <div class="md:col-span-2">
                     <label for="special_requests" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Special Requests</label>
                     <textarea name="special_requests" id="special_requests" rows="2" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden">{{ $booking->special_requests }}</textarea>
+                </div>
+                <div class="md:col-span-1">
+                    <label for="driver_id" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Safari Captain</label>
+                    <select name="driver_id" id="driver_id" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden bg-white">
+                        <option value="">-- No Captain Assigned --</option>
+                        @foreach($drivers as $d)
+                            <option value="{{ $d->id }}" {{ (int) $booking->driver_id === (int) $d->id ? 'selected' : '' }}>Captain {{ $d->name }} ({{ $d->phone }})</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="md:col-span-1">
+                    <label for="vehicle_id" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">4x4 Vehicle</label>
+                    <select name="vehicle_id" id="vehicle_id" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden bg-white">
+                        <option value="">-- Auto Default Vehicle --</option>
+                        @foreach($vehicles as $v)
+                            <option value="{{ $v->id }}" {{ (int) $booking->vehicle_id === (int) $v->id ? 'selected' : '' }}>{{ $v->display_name }} ({{ $v->passenger_capacity }} seats)</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="md:col-span-1">
+                    <label for="pickup_time_slot" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Pickup Time Slot</label>
+                    <input type="text" name="pickup_time_slot" id="pickup_time_slot" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" value="{{ $booking->pickup_time_slot ?: $booking->pickup_time }}" placeholder="e.g. 3:00 PM - 3:30 PM">
+                </div>
+                <div class="md:col-span-1">
+                    <label for="pickup_status" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Pickup Dispatch Status</label>
+                    <select name="pickup_status" id="pickup_status" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden bg-white">
+                        <option value="scheduled" {{ $booking->pickup_status === 'scheduled' ? 'selected' : '' }}>Scheduled</option>
+                        <option value="en_route" {{ $booking->pickup_status === 'en_route' ? 'selected' : '' }}>En Route</option>
+                        <option value="arrived" {{ $booking->pickup_status === 'arrived' ? 'selected' : '' }}>Arrived</option>
+                        <option value="picked_up" {{ $booking->pickup_status === 'picked_up' ? 'selected' : '' }}>Picked Up</option>
+                        <option value="completed" {{ $booking->pickup_status === 'completed' ? 'selected' : '' }}>Completed</option>
+                        <option value="no_show" {{ $booking->pickup_status === 'no_show' ? 'selected' : '' }}>No Show</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2">
+                    <label for="driver_notes" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Driver / Dispatcher Notes</label>
+                    <input type="text" name="driver_notes" id="driver_notes" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" value="{{ $booking->driver_notes }}" placeholder="e.g. Guest requested front passenger seat, baby booster provided">
                 </div>
                 <div class="md:col-span-3 pt-2">
                     <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-sm shadow-xs transition-all cursor-pointer">
