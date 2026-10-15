@@ -58,6 +58,7 @@ Route::get('/rate-card', [RateCardController::class, 'index'])->name('rate-card'
 Route::redirect('/pricing-guide', '/rate-card', 301);
 Route::get('/dubai-desert-sunset-times', [SunsetGuideController::class, 'index'])->name('sunset.guide');
 Route::get('/press-kit', [PageController::class, 'pressKit'])->name('press.kit');
+Route::redirect('/cron-status', '/api/v1/cron/status', 302);
 // ── Legal, Privacy & Compliance Policies ──────────────────────────────────
 Route::get('/terms-condition', [LegalController::class, 'terms'])->name('terms');
 Route::get('/privacy-policy', [LegalController::class, 'privacy'])->name('privacy');

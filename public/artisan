@@ -1,0 +1,18 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * Dunes Discovery Tourism - Public Artisan Forwarder
+ * Enables artisan CLI execution when invoked from public_html on Hostinger web hosting.
+ */
+
+$coreArtisan = file_exists(__DIR__ . '/../dunes-laravel/artisan')
+    ? __DIR__ . '/../dunes-laravel/artisan'
+    : (file_exists(__DIR__ . '/../artisan') ? __DIR__ . '/../artisan' : null);
+
+if ($coreArtisan) {
+    require $coreArtisan;
+} else {
+    fwrite(STDERR, "Error: Unable to locate core artisan script.\n");
+    exit(1);
+}

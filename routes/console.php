@@ -8,6 +8,11 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
+// Record scheduler heartbeat timestamp every minute so health checks can confirm active cron execution
+Schedule::call(function () {
+    \Illuminate\Support\Facades\Cache::put('scheduler_last_heartbeat', now()->toIso8601String(), 86400);
+})->everyMinute()->name('scheduler:heartbeat');
+
 // Dispatch post-tour review collection requests to yesterday's completed safari guests daily at 10:00 AM
 Schedule::command('tours:send-review-requests')->dailyAt('10:00');
 

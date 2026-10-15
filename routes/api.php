@@ -54,4 +54,21 @@ Route::prefix('v1')->group(function () {
 
     // Admin Real-time Active Visitors tracking
     Route::middleware('auth:sanctum')->get('/visitors/active', [AdminDashboardController::class, 'activeVisitors']);
+
+    // Scheduler Crontab Health Check Endpoint
+    Route::get('/cron/status', function () {
+        $lastHeartbeat = \Illuminate\Support\Facades\Cache::get('scheduler_last_heartbeat');
+        $isRecent = $lastHeartbeat && \Carbon\Carbon::parse($lastHeartbeat)->diffInMinutes(now()) <= 3;
+
+        return response()->json([
+            'status' => $isRecent ? 'active' : ($lastHeartbeat ? 'stale' : 'pending'),
+            'cron_active' => (bool) $isRecent,
+            'last_heartbeat' => $lastHeartbeat,
+            'server_time' => now()->toIso8601String(),
+            'minutes_ago' => $lastHeartbeat ? \Carbon\Carbon::parse($lastHeartbeat)->diffInMinutes(now()) : null,
+            'message' => $isRecent
+                ? 'Hostinger crontab is active and executing successfully.'
+                : ($lastHeartbeat ? 'Hostinger crontab was seen earlier but heartbeat is stale.' : 'No scheduler heartbeat recorded yet. Ensure cron is running with proper directory and PHP path.')
+        ]);
+    });
 });
