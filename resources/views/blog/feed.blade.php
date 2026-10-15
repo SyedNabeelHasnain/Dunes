@@ -1,6 +1,11 @@
 {!! '<' . '?xml version="1.0" encoding="UTF-8"?' . '>' !!}
 @php
-    $escapeCdata = static fn (?string $text): string => str_replace(']]>', ']]]]><![CDATA[>', (string) $text);
+    $escapeCdata = static function ($text): string {
+        if (is_array($text)) {
+            $text = reset($text) ?: '';
+        }
+        return str_replace(']]>', ']]]]><![CDATA[>', (string) $text);
+    };
 @endphp
 <rss version="2.0" 
      xmlns:content="http://purl.org/rss/1.0/modules/content/"
@@ -16,7 +21,7 @@
     <link>{{ localized_route('blog.index') }}</link>
     <description>{{ $channelDescription }}</description>
     <lastBuildDate>{{ $lastBuildDate }}</lastBuildDate>
-    <language>{{ app()->getLocale() }}</language>
+    <language>{{ app()->getLocale() ?: 'en' }}</language>
     <sy:updatePeriod>hourly</sy:updatePeriod>
     <sy:updateFrequency>1</sy:updateFrequency>
     <generator>Dunes Discovery Tourism CMS Engine</generator>
@@ -29,29 +34,46 @@
     </image>
 
     @foreach($posts as $post)
+    @php
+        $postTitle = is_array($post->title) ? (reset($post->title) ?: '') : (string) ($post->title ?? '');
+        $postAuthor = is_array($post->author_name) ? (reset($post->author_name) ?: '') : (string) ($post->author_name ?? '');
+        $postContent = is_array($post->content) ? (reset($post->content) ?: '') : (string) ($post->content ?? '');
+        $postExcerpt = is_array($post->excerpt) ? (reset($post->excerpt) ?: '') : (string) ($post->excerpt ?? '');
+        $cleanDesc = $postExcerpt ?: \Illuminate\Support\Str::limit(strip_tags($postContent), 240);
+        $pubDate = ($post->published_at instanceof \Carbon\CarbonInterface)
+            ? $post->published_at->toRfc2822String()
+            : (is_string($post->published_at) && !empty($post->published_at) ? \Carbon\Carbon::parse($post->published_at)->toRfc2822String() : now()->toRfc2822String());
+    @endphp
     <item>
-      <title><![CDATA[{!! $escapeCdata($post->title) !!}]]></title>
+      <title><![CDATA[{!! $escapeCdata($postTitle) !!}]]></title>
       <link>{{ localized_route('blog.show', $post->slug) }}</link>
-      <pubDate>{{ $post->published_at ? $post->published_at->toRfc2822String() : now()->toRfc2822String() }}</pubDate>
-      <dc:creator><![CDATA[{!! $escapeCdata($post->author_name ?: 'Dunes Discovery Editorial Team') !!}]]></dc:creator>
+      <pubDate>{{ $pubDate }}</pubDate>
+      <dc:creator><![CDATA[{!! $escapeCdata($postAuthor ?: 'Dunes Discovery Editorial Team') !!}]]></dc:creator>
       @if($post->category)
-      <category><![CDATA[{!! $escapeCdata($post->category->name) !!}]]></category>
+      @php
+          $catName = is_array($post->category->name) ? (reset($post->category->name) ?: '') : (string) ($post->category->name ?? '');
+      @endphp
+      <category><![CDATA[{!! $escapeCdata($catName) !!}]]></category>
       @endif
       @if($post->tags)
         @foreach($post->tags as $tag)
-        <category><![CDATA[{!! $escapeCdata($tag->name) !!}]]></category>
+        @php
+            $tagName = is_array($tag->name) ? (reset($tag->name) ?: '') : (string) ($tag->name ?? '');
+        @endphp
+        <category><![CDATA[{!! $escapeCdata($tagName) !!}]]></category>
         @endforeach
       @endif
       <guid isPermaLink="true">{{ localized_route('blog.show', $post->slug) }}</guid>
-      <description><![CDATA[{!! $escapeCdata($post->excerpt ?: Str::limit(strip_tags($post->content), 240)) !!}]]></description>
-      <content:encoded><![CDATA[{!! $escapeCdata($post->content) !!}]]></content:encoded>
+      <description><![CDATA[{!! $escapeCdata($cleanDesc) !!}]]></description>
+      <content:encoded><![CDATA[{!! $escapeCdata($postContent) !!}]]></content:encoded>
       @if(!empty($post->featured_image))
       @php
           $imagePath = 'images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $post->featured_image);
           $imageUrl = asset($imagePath);
+          $imageAlt = is_array($post->featured_image_alt) ? (reset($post->featured_image_alt) ?: '') : (string) ($post->featured_image_alt ?? '');
       @endphp
       <media:content url="{{ $imageUrl }}" medium="image">
-        <media:title><![CDATA[{!! $escapeCdata($post->featured_image_alt ?: $post->title) !!}]]></media:title>
+        <media:title><![CDATA[{!! $escapeCdata($imageAlt ?: $postTitle) !!}]]></media:title>
       </media:content>
       <enclosure url="{{ $imageUrl }}" type="image/avif" length="0" />
       @endif

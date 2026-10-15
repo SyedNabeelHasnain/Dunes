@@ -338,34 +338,45 @@ class BlogController extends Controller
     /**
      * Generate official RSS 2.0 / Atom syndication feed for travel publications and news readers.
      */
-    public function feed()
+    public function feed(...$params)
     {
-        $posts = Cache::remember('site_blog_rss_feed', 3600, function () {
-            return BlogPost::where('status', 'published')
-                ->with(['category', 'tags'])
-                ->orderBy('published_at', 'desc')
-                ->limit(30)
-                ->get();
-        });
+        try {
+            $posts = Cache::remember('site_blog_rss_feed', 3600, function () {
+                return BlogPost::where('status', 'published')
+                    ->with(['category', 'tags'])
+                    ->orderBy('published_at', 'desc')
+                    ->limit(30)
+                    ->get();
+            });
 
-        $latestPost = $posts->first();
-        $lastBuildDate = $latestPost && $latestPost->published_at
-            ? $latestPost->published_at->toRfc2822String()
-            : now()->toRfc2822String();
+            $latestPost = $posts->first();
+            $lastBuildDate = $latestPost && $latestPost->published_at
+                ? ($latestPost->published_at instanceof \Carbon\CarbonInterface
+                    ? $latestPost->published_at->toRfc2822String()
+                    : \Carbon\Carbon::parse($latestPost->published_at)->toRfc2822String())
+                : now()->toRfc2822String();
 
-        $content = view('blog.feed', [
-            'posts' => $posts,
-            'lastBuildDate' => $lastBuildDate,
-            'channelTitle' => 'Dunes Discovery Tourism | Dubai Desert Safari & Adventure Blog',
-            'channelLink' => localized_route('blog.index'),
-            'channelDescription' => 'Expert insider guides, desert safari tips, dune buggy safety, and cultural Dubai travel insights by DTCM-licensed operator Dunes Discovery Tourism.',
-            'channelLanguage' => app()->getLocale() ?: 'en',
-            'feedUrl' => url(request()->getPathInfo() ?: '/feed.xml'),
-        ])->render();
+            $content = view('blog.feed', [
+                'posts' => $posts,
+                'lastBuildDate' => $lastBuildDate,
+                'channelTitle' => 'Dunes Discovery Tourism | Dubai Desert Safari & Adventure Blog',
+                'channelLink' => localized_route('blog.index'),
+                'channelDescription' => 'Expert insider guides, desert safari tips, dune buggy safety, and cultural Dubai travel insights by DTCM-licensed operator Dunes Discovery Tourism.',
+                'channelLanguage' => app()->getLocale() ?: 'en',
+                'feedUrl' => url(request()->getPathInfo() ?: '/feed.xml'),
+            ])->render();
 
-        return response($content, 200, [
-            'Content-Type' => 'application/rss+xml; charset=utf-8',
-            'Cache-Control' => 'public, max-age=3600',
-        ]);
+            return response($content, 200, [
+                'Content-Type' => 'application/rss+xml; charset=utf-8',
+                'Cache-Control' => 'public, max-age=3600',
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('RSS feed generation error: ' . $e->getMessage());
+
+            $fallback = '<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>Dunes Discovery Tourism | Blog Feed</title><link>' . url('/blog') . '</link><description>Dubai Desert Safari and Travel Blog</description><lastBuildDate>' . now()->toRfc2822String() . '</lastBuildDate></channel></rss>';
+            return response($fallback, 200, [
+                'Content-Type' => 'application/rss+xml; charset=utf-8',
+            ]);
+        }
     }
 }
