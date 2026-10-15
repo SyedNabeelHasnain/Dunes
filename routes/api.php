@@ -71,4 +71,29 @@ Route::prefix('v1')->group(function () {
                 : ($lastHeartbeat ? 'Hostinger crontab was seen earlier but heartbeat is stale.' : 'No scheduler heartbeat recorded yet. Ensure cron is running with proper directory and PHP path.')
         ]);
     });
+
+    // Trigger scheduler runner via Web / Cron HTTP request
+    Route::match(['get', 'post'], '/cron/run', function (\Illuminate\Http\Request $request) {
+        $token = $request->input('token', $request->bearerToken());
+        $validToken = env('CRON_SECRET_TOKEN', 'dunes_cron_2026');
+
+        if (empty($token) || !hash_equals((string) $validToken, (string) $token)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized cron token.',
+            ], 403);
+        }
+
+        \Illuminate\Support\Facades\Artisan::call('schedule:run');
+        \Illuminate\Support\Facades\Cache::put('scheduler_last_heartbeat', now()->toIso8601String(), 86400);
+
+        return response()->json([
+            'status' => 'success',
+            'cron_active' => true,
+            'server_time' => now()->toIso8601String(),
+            'heartbeat' => now()->toIso8601String(),
+            'output' => trim(\Illuminate\Support\Facades\Artisan::output()) ?: 'No scheduled tasks needed to run right now.',
+            'message' => 'Scheduler executed successfully.',
+        ]);
+    });
 });

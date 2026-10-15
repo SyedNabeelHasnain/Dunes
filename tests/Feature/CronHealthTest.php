@@ -39,4 +39,25 @@ class CronHealthTest extends TestCase
         $response = $this->get('/cron-status');
         $response->assertRedirect('/api/v1/cron/status');
     }
+
+    public function test_cron_run_rejects_invalid_token(): void
+    {
+        $response = $this->getJson('/api/v1/cron/run?token=invalid_token');
+        $response->assertStatus(403)
+            ->assertJson(['status' => 'error']);
+    }
+
+    public function test_cron_run_succeeds_with_valid_token(): void
+    {
+        Cache::forget('scheduler_last_heartbeat');
+
+        $response = $this->getJson('/api/v1/cron/run?token=dunes_cron_2026');
+        $response->assertStatus(200)
+            ->assertJson([
+                'status' => 'success',
+                'cron_active' => true,
+            ]);
+
+        $this->assertNotNull(Cache::get('scheduler_last_heartbeat'));
+    }
 }
