@@ -79,7 +79,7 @@
                 <i class="bi bi-x-lg text-sm"></i>
             </button>
 
-            <div class="p-6 sm:p-8">
+            <div class="p-6 sm:p-8 max-h-[90vh] overflow-y-auto">
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
                     
                     <!-- Left Visual & Highlights Column -->

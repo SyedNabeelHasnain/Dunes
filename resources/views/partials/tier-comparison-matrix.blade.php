@@ -146,7 +146,7 @@
                     @endphp
                     <td class="py-3.5 px-3 {{ $isTierSelected ? 'bg-orange-100/70 border-x-2 border-primary' : ($tier->is_popular ? 'bg-orange-50/60 border-x border-orange-200' : '') }}">
                         <button type="button" 
-                                class="w-full py-2.5 px-3 rounded-full text-xs font-bold transition-all shadow-xs cursor-pointer min-h-[42px] inline-flex items-center justify-center {{ ($isTierSelected || $tier->is_popular) ? 'bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-sm' : 'border border-primary text-primary hover:bg-primary hover:text-white' }}" 
+                                class="w-full py-2.5 px-3 rounded-full text-xs font-bold transition-all shadow-xs cursor-pointer min-h-[44px] inline-flex items-center justify-center {{ ($isTierSelected || $tier->is_popular) ? 'bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-sm' : 'border border-primary text-primary hover:bg-primary hover:text-white' }}" 
                                 data-action="open-booking" 
                                 data-tour="{{ $tour->id }}" 
                                 data-tier="{{ $tier->id }}"

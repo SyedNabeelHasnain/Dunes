@@ -1539,10 +1539,10 @@ if(window.fbq){
         @endif
     </div>
     <div class="flex items-center gap-2">
-        <button type="button" class="border border-slate-300 text-slate-700 text-xs font-bold rounded-full px-3 py-2 btn-toggle-compare whitespace-nowrap cursor-pointer inline-flex items-center gap-1 min-h-[40px]" data-tour-id="{{ $tour->id }}">
+        <button type="button" class="border border-slate-300 text-slate-700 text-xs font-bold rounded-full px-3.5 py-2 btn-toggle-compare whitespace-nowrap cursor-pointer inline-flex items-center justify-center gap-1 min-h-[44px] h-11" data-tour-id="{{ $tour->id }}">
             <i class="bi bi-shuffle"></i><span class="compare-btn-text hidden sm:inline">{{ __('ui.common.compare') }}</span>
         </button>
-        <button class="btn-desert-animated text-xs sm:text-sm font-bold text-white rounded-full px-5 py-2.5 shadow-md whitespace-nowrap cursor-pointer inline-flex items-center gap-1 min-h-[40px]" data-action="open-booking" data-tour="{{ $tour->id }}" data-tier="{{ $defaultTierId }}" @click.prevent.stop="$store.modal.open('booking', { tourId: {{ $tour->id }}{{ $defaultTierId ? ', tierId: ' . $defaultTierId : '' }} })">
+        <button class="btn-desert-animated text-xs sm:text-sm font-bold text-white rounded-full px-5 py-2.5 shadow-md whitespace-nowrap cursor-pointer inline-flex items-center justify-center gap-1.5 min-h-[44px] h-11" data-action="open-booking" data-tour="{{ $tour->id }}" data-tier="{{ $defaultTierId }}" @click.prevent.stop="$store.modal.open('booking', { tourId: {{ $tour->id }}{{ $defaultTierId ? ', tierId: ' . $defaultTierId : '' }} })">
             <i class="bi bi-calendar-check-fill"></i>{{ __('ui.common.book_now') }}
         </button>
     </div>

@@ -145,9 +145,33 @@
             
             <!-- Left Column: Customizer Steps (8 Cols) -->
             <div class="lg:col-span-8 space-y-6">
+
+                <!-- Mobile 5-Step Sticky Progress Bar -->
+                <div class="lg:hidden sticky top-[calc(var(--header-h,72px)+0.25rem)] z-20 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200 p-2 shadow-sm overflow-x-auto scrollbar-none flex items-center gap-1.5 snap-x">
+                    <a href="#step-1" class="snap-start shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-orange-50 text-primary text-xs font-bold border border-orange-200/80">
+                        <span class="w-5 h-5 rounded-full bg-primary text-white text-[10px] font-black flex items-center justify-center">1</span>
+                        <span>Base</span>
+                    </a>
+                    <a href="#step-2" class="snap-start shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 text-slate-700 hover:text-primary text-xs font-semibold border border-slate-200">
+                        <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] font-bold flex items-center justify-center">2</span>
+                        <span>Vehicle</span>
+                    </a>
+                    <a href="#step-3" class="snap-start shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 text-slate-700 hover:text-primary text-xs font-semibold border border-slate-200">
+                        <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] font-bold flex items-center justify-center">3</span>
+                        <span>Motorsport</span>
+                    </a>
+                    <a href="#step-4" class="snap-start shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 text-slate-700 hover:text-primary text-xs font-semibold border border-slate-200">
+                        <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] font-bold flex items-center justify-center">4</span>
+                        <span>Add-ons</span>
+                    </a>
+                    <a href="#step-5" class="snap-start shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 text-slate-700 hover:text-primary text-xs font-semibold border border-slate-200">
+                        <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] font-bold flex items-center justify-center">5</span>
+                        <span>Guests</span>
+                    </a>
+                </div>
                 
                 <!-- Step 1: Base Safari -->
-                <div class="bg-amber-50/30 rounded-2xl p-6 border border-primary/20 shadow-xs">
+                <div id="step-1" class="scroll-mt-32 bg-amber-50/30 rounded-2xl p-6 border border-primary/20 shadow-xs">
                     <div class="flex items-center gap-3 mb-4">
                         <span class="w-7 h-7 rounded-full bg-primary text-white font-bold text-sm flex items-center justify-center shrink-0">1</span>
                         <h4 class="font-bold text-slate-900 text-base sm:text-lg">Select Base Safari Experience</h4>
@@ -204,7 +228,7 @@
                 </div>
 
                 <!-- Step 2: Transfer Logistics -->
-                <div class="bg-amber-50/30 rounded-2xl p-6 border border-primary/20 shadow-xs">
+                <div id="step-2" class="scroll-mt-32 bg-amber-50/30 rounded-2xl p-6 border border-primary/20 shadow-xs">
                     <div class="flex items-center gap-3 mb-4">
                         <span class="w-7 h-7 rounded-full bg-primary text-white font-bold text-sm flex items-center justify-center shrink-0">2</span>
                         <h4 class="font-bold text-slate-900 text-base sm:text-lg">Choose Vehicle & Transfer Logistics</h4>
@@ -240,7 +264,7 @@
                 </div>
 
                 <!-- Step 3: Desert Adrenaline & Motorized Sports -->
-                <div class="bg-amber-50/30 rounded-2xl p-6 border border-primary/20 shadow-xs">
+                <div id="step-3" class="scroll-mt-32 bg-amber-50/30 rounded-2xl p-6 border border-primary/20 shadow-xs">
                     <div class="flex items-center gap-3 mb-4">
                         <span class="w-7 h-7 rounded-full bg-primary text-white font-bold text-sm flex items-center justify-center shrink-0">3</span>
                         <h4 class="font-bold text-slate-900 text-base sm:text-lg">Add Desert Adrenaline & Self-Drive</h4>
@@ -285,7 +309,7 @@
                 </div>
 
                 <!-- Step 4: Dining & Camp Upgrades (Multi-Select) -->
-                <div class="bg-amber-50/30 rounded-2xl p-6 border border-primary/20 shadow-xs">
+                <div id="step-4" class="scroll-mt-32 bg-amber-50/30 rounded-2xl p-6 border border-primary/20 shadow-xs">
                     <div class="flex items-center gap-3 mb-4">
                         <span class="w-7 h-7 rounded-full bg-primary text-white font-bold text-sm flex items-center justify-center shrink-0">4</span>
                         <h4 class="font-bold text-slate-900 text-base sm:text-lg">Dining & Luxury Camp Additions</h4>
@@ -338,7 +362,7 @@
                 </div>
 
                 <!-- Step 5: Party Size -->
-                <div class="bg-amber-50/30 rounded-2xl p-6 border border-primary/20 shadow-xs">
+                <div id="step-5" class="scroll-mt-32 bg-amber-50/30 rounded-2xl p-6 border border-primary/20 shadow-xs">
                     <div class="flex items-center gap-3 mb-4">
                         <span class="w-7 h-7 rounded-full bg-primary text-white font-bold text-sm flex items-center justify-center shrink-0">5</span>
                         <h4 class="font-bold text-slate-900 text-base sm:text-lg">Set Number of Guests</h4>
@@ -350,12 +374,12 @@
                                 <span class="text-slate-500 text-[11px]">Full activity & dinner access</span>
                             </div>
                             <div class="flex items-center gap-2">
-                                <button type="button" class="w-9 h-9 rounded-full border border-slate-300 hover:border-slate-400 flex items-center justify-center text-slate-700 cursor-pointer" id="customizerAdultsMinus">
-                                    <i class="bi bi-dash text-base"></i>
+                                <button type="button" class="w-11 h-11 rounded-full border border-slate-300 hover:border-slate-400 flex items-center justify-center text-slate-700 cursor-pointer min-h-[44px]" id="customizerAdultsMinus" aria-label="Decrease Adults">
+                                    <i class="bi bi-dash text-lg"></i>
                                 </button>
                                 <span class="font-black text-lg px-2 text-slate-900" id="customizerAdultsCount">2</span>
-                                <button type="button" class="w-9 h-9 rounded-full border border-primary bg-primary text-white hover:bg-primary-hover flex items-center justify-center cursor-pointer" id="customizerAdultsPlus">
-                                    <i class="bi bi-plus text-base"></i>
+                                <button type="button" class="w-11 h-11 rounded-full border border-primary bg-primary text-white hover:bg-primary-hover flex items-center justify-center cursor-pointer min-h-[44px]" id="customizerAdultsPlus" aria-label="Increase Adults">
+                                    <i class="bi bi-plus text-lg"></i>
                                 </button>
                             </div>
                         </div>
@@ -366,12 +390,12 @@
                                 <span class="text-slate-500 text-[11px]">30% discount on base package</span>
                             </div>
                             <div class="flex items-center gap-2">
-                                <button type="button" class="w-9 h-9 rounded-full border border-slate-300 hover:border-slate-400 flex items-center justify-center text-slate-700 cursor-pointer" id="customizerChildrenMinus">
-                                    <i class="bi bi-dash text-base"></i>
+                                <button type="button" class="w-11 h-11 rounded-full border border-slate-300 hover:border-slate-400 flex items-center justify-center text-slate-700 cursor-pointer min-h-[44px]" id="customizerChildrenMinus" aria-label="Decrease Children">
+                                    <i class="bi bi-dash text-lg"></i>
                                 </button>
                                 <span class="font-black text-lg px-2 text-slate-900" id="customizerChildrenCount">0</span>
-                                <button type="button" class="w-9 h-9 rounded-full border border-primary bg-primary text-white hover:bg-primary-hover flex items-center justify-center cursor-pointer" id="customizerChildrenPlus">
-                                    <i class="bi bi-plus text-base"></i>
+                                <button type="button" class="w-11 h-11 rounded-full border border-primary bg-primary text-white hover:bg-primary-hover flex items-center justify-center cursor-pointer min-h-[44px]" id="customizerChildrenPlus" aria-label="Increase Children">
+                                    <i class="bi bi-plus text-lg"></i>
                                 </button>
                             </div>
                         </div>
@@ -475,10 +499,10 @@
         <div class="text-xl font-black text-amber-400" id="customizerMobileTotalDisplay" data-aed="300">{{ __('ui.common.aed') }} 300</div>
     </div>
     <div class="flex items-center gap-2">
-        <a href="#" target="_blank" rel="noopener" class="w-10 h-10 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs" id="customizerMobileWhatsAppBtn" aria-label="Inquire via WhatsApp">
-            <i class="bi bi-whatsapp text-base"></i>
+        <a href="#" target="_blank" rel="noopener" class="w-11 h-11 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs cursor-pointer" id="customizerMobileWhatsAppBtn" aria-label="Inquire via WhatsApp">
+            <i class="bi bi-whatsapp text-lg"></i>
         </a>
-        <button type="button" class="btn-desert-animated text-xs sm:text-sm font-bold text-white rounded-full px-5 py-2.5 shadow-md whitespace-nowrap cursor-pointer inline-flex items-center gap-1.5 min-h-[40px]" id="customizerMobileBookBtn">
+        <button type="button" class="btn-desert-animated text-xs sm:text-sm font-bold text-white rounded-full px-5 py-2.5 shadow-md whitespace-nowrap cursor-pointer inline-flex items-center justify-center gap-1.5 min-h-[44px] h-11" id="customizerMobileBookBtn">
             <i class="bi bi-calendar-check-fill"></i>
             <span>{{ __('ui.common.book_online') }}</span>
         </button>

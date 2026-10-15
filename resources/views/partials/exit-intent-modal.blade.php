@@ -37,7 +37,7 @@
              x-transition:leave="ease-in duration-150"
              x-transition:leave-start="opacity-100 scale-100 translate-y-0"
              x-transition:leave-end="opacity-0 scale-95 translate-y-4"
-             class="relative z-10 w-full max-w-lg transform overflow-hidden rounded-3xl bg-slate-950 p-6 sm:p-8 text-center align-middle shadow-2xl transition-all border border-orange-500/40 text-white"
+             class="relative z-10 w-full max-w-lg transform overflow-hidden rounded-3xl bg-slate-950 p-6 sm:p-8 text-center align-middle shadow-2xl transition-all border border-orange-500/40 text-white max-h-[92vh] overflow-y-auto"
              @click.stop>
             
             <!-- Header Badge & Close Button -->

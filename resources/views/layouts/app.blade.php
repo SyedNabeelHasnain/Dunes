@@ -574,7 +574,7 @@
                            target="_blank" 
                            rel="noopener" 
                            id="googleCircle" 
-                           class="nav-review-circle inline-flex items-center gap-1 px-2 py-1.5 rounded-full bg-white border border-slate-200/90 shadow-2xs hover:bg-slate-50 transition-all cursor-pointer min-h-[36px]"
+                           class="nav-review-circle hidden sm:inline-flex items-center gap-1 px-2 py-1.5 rounded-full bg-white border border-slate-200/90 shadow-2xs hover:bg-slate-50 transition-all cursor-pointer min-h-[36px]"
                            onclick="toggleReviewPopover(this, event)"
                            title="Google Reviews: 5.0 Rating">
                             <img src="{{ asset('images/Google-G.avif') }}" alt="Google" width="15" height="15" class="w-3.5 h-3.5 object-contain shrink-0">
@@ -587,7 +587,7 @@
                            target="_blank" 
                            rel="noopener" 
                            id="taCircle" 
-                           class="nav-review-circle inline-flex items-center gap-1 px-2 py-1.5 rounded-full bg-white border border-slate-200/90 shadow-2xs hover:bg-slate-50 transition-all cursor-pointer min-h-[36px]"
+                           class="nav-review-circle hidden sm:inline-flex items-center gap-1 px-2 py-1.5 rounded-full bg-white border border-slate-200/90 shadow-2xs hover:bg-slate-50 transition-all cursor-pointer min-h-[36px]"
                            onclick="toggleReviewPopover(this, event)"
                            title="TripAdvisor Reviews: 4.9 Rating">
                             <img src="{{ asset('images/tripadvisor-color-logo.svg') }}" alt="TripAdvisor" width="16" height="16" class="w-4 h-4 object-contain shrink-0">

@@ -19,6 +19,9 @@ use App\Models\LegalSection;
 use App\Models\Setting;
 use App\Models\Tier;
 use App\Models\Tour;
+use App\Models\WikiArticle;
+use App\Models\WikiGlossaryTerm;
+use App\Models\WikiPillar;
 use App\Services\Translation\Contracts\TranslationDriverInterface;
 use App\Services\Translation\Drivers\DeepLTranslationDriver;
 use App\Services\Translation\TranslationManager;
@@ -181,6 +184,18 @@ class TranslateCatalogCommand extends Command
                 'class' => EmailTemplate::class,
                 'html_fields' => ['content_html'],
             ],
+            'WikiPillar' => [
+                'class' => WikiPillar::class,
+                'html_fields' => ['description'],
+            ],
+            'WikiArticle' => [
+                'class' => WikiArticle::class,
+                'html_fields' => ['content'],
+            ],
+            'WikiGlossaryTerm' => [
+                'class' => WikiGlossaryTerm::class,
+                'html_fields' => ['definition'],
+            ],
         ];
 
         $specificModel = $this->option('model');
@@ -230,6 +245,7 @@ class TranslateCatalogCommand extends Command
             Cache::forget('sitemap_tours_xml');
             Cache::forget('sitemap_blogs_xml');
             Cache::forget('sitemap_images_xml');
+            Cache::forget('sitemap_wiki_xml');
             Cache::forget('site_llms_txt');
             Cache::forget('site_llms_full_txt');
         } catch (\Throwable $e) {

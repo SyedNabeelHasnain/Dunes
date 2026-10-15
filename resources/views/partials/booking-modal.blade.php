@@ -395,7 +395,7 @@
 
                 <!-- Modal Static Fixed Footer with Live Total & Action Buttons -->
                 <div class="border-t border-slate-200/90 bg-white py-4 px-5 sm:px-7 shrink-0 shadow-xs z-10">
-                    <div class="flex items-center justify-between w-full gap-4">
+                    <div class="flex items-center justify-between w-full gap-4 pb-safe" style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0.5rem));">
                         <div class="text-start">
                             <small class="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-slate-500 block mb-0.5">{{ __('ui.booking.total') }}</small>
                             <div class="font-black text-primary font-mono text-xl sm:text-2xl leading-none" id="bookingTotal" data-aed="0">AED 0.00</div>

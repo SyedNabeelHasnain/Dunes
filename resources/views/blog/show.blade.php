@@ -171,6 +171,46 @@
                 </div>
                 @endif
 
+                <!-- Table of Contents Quick Jump (Mobile Drawer) -->
+                <div class="lg:hidden mb-6" id="blogMobileToc" x-data="{ openToc: false, headings: [] }" x-init="
+                    $nextTick(() => {
+                        const hElements = document.querySelectorAll('.blog-content h2, .blog-content h3');
+                        if (hElements.length >= 2) {
+                            hElements.forEach((h, idx) => {
+                                if (!h.id) {
+                                    h.id = 'heading-' + idx;
+                                }
+                                headings.push({
+                                    id: h.id,
+                                    text: h.textContent.trim(),
+                                    level: h.tagName.toLowerCase()
+                                });
+                            });
+                        }
+                    })
+                " x-show="headings.length >= 2" x-cloak>
+                    <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
+                        <button type="button" @click="openToc = !openToc" class="w-full px-5 py-3.5 flex items-center justify-between text-start font-bold text-slate-900 text-sm cursor-pointer min-h-[48px]">
+                            <span class="inline-flex items-center gap-2">
+                                <i class="bi bi-list-nested text-primary"></i>
+                                <span>Article Table of Contents</span>
+                            </span>
+                            <i class="bi bi-chevron-down transition-transform duration-200 text-slate-500" :class="openToc ? 'rotate-180 text-primary' : ''"></i>
+                        </button>
+                        <div x-show="openToc" x-collapse x-cloak class="px-5 pb-4 pt-1 border-t border-slate-100 flex flex-col gap-1 max-h-60 overflow-y-auto">
+                            <template x-for="item in headings" :key="item.id">
+                                <a :href="'#' + item.id" 
+                                   @click="openToc = false" 
+                                   class="py-1.5 px-2.5 text-xs text-slate-700 hover:text-primary hover:bg-slate-50 rounded-lg transition-colors flex items-center gap-1.5"
+                                   :class="item.level === 'h3' ? 'ps-6 text-slate-500' : 'font-medium'">
+                                    <i class="bi bi-chevron-right text-[10px] text-primary/70 shrink-0"></i>
+                                    <span x-text="item.text"></span>
+                                </a>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Post HTML Content with In-Article Conversion Cards -->
                 <div class="blog-content prose max-w-none text-slate-800 leading-relaxed">
                     {!! $processedContent ?? $post->content !!}
@@ -380,9 +420,9 @@
 
 <style>
 .blog-content { font-size: 1.05rem; line-height: 1.85; color: #334155; }
-.blog-content h2 { font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.5rem; color: #0f172a; }
-.blog-content h3 { font-weight: 700; margin-top: 1.75rem; margin-bottom: .75rem; font-size: 1.25rem; color: #0f172a; }
-.blog-content h4 { font-weight: 700; margin-top: 1.5rem; margin-bottom: .5rem; color: #0f172a; }
+.blog-content h2 { font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.5rem; color: #0f172a; scroll-margin-top: 6rem; }
+.blog-content h3 { font-weight: 700; margin-top: 1.75rem; margin-bottom: .75rem; font-size: 1.25rem; color: #0f172a; scroll-margin-top: 6rem; }
+.blog-content h4 { font-weight: 700; margin-top: 1.5rem; margin-bottom: .5rem; color: #0f172a; scroll-margin-top: 6rem; }
 .blog-content p  { margin-bottom: 1.25rem; }
 .blog-content ul, .blog-content ol { padding-left: 1.5rem; margin-bottom: 1.25rem; }
 .blog-content li { margin-bottom: .4rem; }

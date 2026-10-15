@@ -74,7 +74,7 @@
             </div>
 
             <!-- Modal Content Area -->
-            <div class="flex-1 py-4">
+            <div class="flex-1 py-4 overflow-y-auto max-h-[75vh]">
                 
                 <!-- Step 1: Group Style -->
                 <div x-show="step === 1">
