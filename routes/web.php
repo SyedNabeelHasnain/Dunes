@@ -108,6 +108,7 @@ Route::get('/tours/{slug}', function (Request $request, $slug) {
 
     return redirect('/'.$slug.($queryString ? '?'.$queryString : ''), 301);
 });
+Route::redirect('/blogs', '/blog', 301);
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/feed.xml', [BlogController::class, 'feed'])->name('blog.feed');
 Route::get('/feed.xml', [BlogController::class, 'feed'])->name('feed.unified');
@@ -460,6 +461,9 @@ Route::prefix('{locale}')
         Route::get('/build-your-own-safari', [TourController::class, 'customizer'])->name('locale.tours.customizer');
 
         // Blog & Feeds
+        Route::get('/blogs', function (string $locale) {
+            return redirect('/'.$locale.'/blog', 301);
+        });
         Route::get('/blog', [BlogController::class, 'index'])->name('locale.blog.index');
         Route::get('/blog/feed.xml', [BlogController::class, 'feed'])->name('locale.blog.feed');
         Route::get('/feed.xml', [BlogController::class, 'feed'])->name('locale.feed.unified');

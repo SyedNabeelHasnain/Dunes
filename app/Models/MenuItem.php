@@ -56,6 +56,8 @@ class MenuItem extends Model
             '/cookies' => '/cookie-policy',
             '/custom-safari' => '/build-your-own-safari',
             '/pricing-guide' => '/rate-card',
+            '/blogs' => '/blog',
+            '/all-experiences' => '/tours',
         ];
         if (isset($legacyMap[$rawUrl])) {
             $rawUrl = $legacyMap[$rawUrl];
