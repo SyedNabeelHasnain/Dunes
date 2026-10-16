@@ -74,23 +74,23 @@
     </div>
 </section>
 
-<!-- Category Filter + Search -->
-<section class="bg-white border-b border-slate-200 py-3 sticky top-[var(--header-h,72px)] z-20">
+<!-- Category Filter + Search (In-Flow, Zero-Collision) -->
+<section class="bg-white border-b border-slate-200/90 py-3.5 relative z-10 shadow-2xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex gap-2 overflow-x-auto no-scrollbar w-full sm:w-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
+            <div class="flex gap-2 overflow-x-auto no-scrollbar scrollbar-none w-full sm:w-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x flex-grow">
                 <a href="{{ localized_route('blog.index') }}" class="rounded-full px-4 py-2 text-xs sm:text-sm font-bold whitespace-nowrap transition-colors min-h-[38px] snap-start inline-flex items-center {{ !$categorySlug && !$search ? 'bg-primary text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">{{ __('ui.common.view_all') }}</a>
                 @foreach ($categories as $c)
                 <a href="{{ localized_route('blog.index', ['category' => $c->slug]) }}" rel="nofollow" class="rounded-full px-4 py-2 text-xs sm:text-sm font-bold whitespace-nowrap transition-colors min-h-[38px] snap-start inline-flex items-center {{ $categorySlug === $c->slug ? 'bg-primary text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">{{ $c->name }}</a>
                 @endforeach
             </div>
-            <form action="{{ localized_route('blog.index') }}" method="get" class="flex gap-2 w-full sm:w-auto">
+            <form action="{{ localized_route('blog.index') }}" method="get" class="flex gap-2 w-full sm:w-72 shrink-0 m-0">
                 @if ($categorySlug)
                     <input type="hidden" name="category" value="{{ $categorySlug }}">
                 @endif
-                <div class="relative w-full sm:w-64">
-                    <input type="search" name="search" class="w-full rounded-full ps-4 pe-11 py-2 bg-slate-100 border border-slate-200 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 min-h-[44px]" placeholder="{{ __('ui.nav.search') }}..." value="{{ $search }}">
-                    <button type="submit" class="absolute end-0 top-0 bottom-0 px-3.5 flex items-center justify-center text-slate-500 hover:text-primary transition-colors min-w-[44px] min-h-[44px]" aria-label="{{ __('ui.nav.search') }}">
+                <div class="relative w-full">
+                    <input type="search" name="search" class="w-full rounded-full ps-4 pe-11 py-2 bg-slate-50 border border-slate-200 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:bg-white min-h-[42px] transition-colors" placeholder="{{ __('ui.nav.search') }}..." value="{{ $search }}">
+                    <button type="submit" class="absolute end-0 top-0 bottom-0 px-3.5 flex items-center justify-center text-slate-500 hover:text-primary transition-colors min-w-[42px] min-h-[42px] cursor-pointer" aria-label="{{ __('ui.nav.search') }}">
                         <i class="bi bi-search text-xs"></i>
                     </button>
                 </div>

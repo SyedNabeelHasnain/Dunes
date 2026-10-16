@@ -87,8 +87,8 @@
 <div class="rc-page page-standalone-clearance bg-slate-50 min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        <!-- Top Floating Toolbar -->
-        <div class="rc-floating-bar sticky top-[calc(var(--header-h,72px)+1rem)] z-30 p-3 sm:p-4 mb-6 flex flex-wrap items-center justify-between gap-3 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/80 shadow-md">
+        <!-- Top Action Toolbar (In-Flow, Zero-Collision) -->
+        <div class="rc-floating-bar relative z-10 p-3 sm:p-4 mb-6 flex flex-wrap items-center justify-between gap-3 bg-white rounded-2xl border border-slate-200/90 shadow-xs">
             <div class="flex items-center gap-2.5">
                 <a href="{{ localized_route('tours.index') }}" class="border border-slate-300 hover:border-primary text-slate-700 hover:text-primary rounded-full px-3.5 py-1.5 text-xs font-bold inline-flex items-center gap-1 transition-colors">
                     <i class="bi bi-arrow-left rtl:rotate-180"></i> {{ __('ui.rate_card.back_to_tours') }}

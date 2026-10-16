@@ -146,8 +146,8 @@
             <!-- Left Column: Customizer Steps (8 Cols) -->
             <div class="lg:col-span-8 space-y-6">
 
-                <!-- Mobile 5-Step Sticky Progress Bar -->
-                <div class="lg:hidden sticky top-[calc(var(--header-h,72px)+0.25rem)] z-20 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200 p-2 shadow-sm overflow-x-auto scrollbar-none flex items-center gap-1.5 snap-x">
+                <!-- Mobile 5-Step Progress Bar (In-Flow, Zero-Collision) -->
+                <div class="lg:hidden relative z-10 bg-white rounded-2xl border border-slate-200 p-2 shadow-xs overflow-x-auto scrollbar-none flex items-center gap-1.5 snap-x mb-2">
                     <a href="#step-1" class="snap-start shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-orange-50 text-primary text-xs font-bold border border-orange-200/80">
                         <span class="w-5 h-5 rounded-full bg-primary text-white text-[10px] font-black flex items-center justify-center">1</span>
                         <span>Base</span>

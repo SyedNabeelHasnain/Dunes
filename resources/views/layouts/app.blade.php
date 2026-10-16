@@ -592,12 +592,12 @@
                             <i class="bi bi-star-fill text-amber-400 text-[9px] sm:text-[10px] leading-none"></i>
                         </a>
 
-                        <!-- TripAdvisor Review Trust Badge (Mobile with 4.9 Rating) -->
+                        <!-- TripAdvisor Review Trust Badge (Mobile with 4.9 Rating - Responsive on >=400px screens) -->
                         <a href="{{ $settings['social_tripadvisor'] ?? 'https://www.tripadvisor.com/Attraction_Review-g295424-d29026644-Reviews-Dunes_Discovery-Dubai_Emirate_of_Dubai.html' }}" 
                            target="_blank" 
                            rel="noopener" 
                            id="taCircle" 
-                           class="nav-review-circle inline-flex items-center gap-1 px-1.5 sm:px-2 py-1 sm:py-1.5 rounded-full bg-white border border-slate-200/90 shadow-2xs hover:bg-slate-50 transition-all cursor-pointer min-h-[32px] sm:min-h-[36px] shrink-0"
+                           class="nav-review-circle hidden min-[400px]:inline-flex items-center gap-1 px-1.5 sm:px-2 py-1 sm:py-1.5 rounded-full bg-white border border-slate-200/90 shadow-2xs hover:bg-slate-50 transition-all cursor-pointer min-h-[32px] sm:min-h-[36px] shrink-0"
                            onclick="toggleReviewPopover(this, event)"
                            title="{{ __('ui.common.tripadvisor_reviews') }}">
                             <img src="{{ asset('images/tripadvisor-color-logo.svg') }}" alt="TripAdvisor" width="16" height="16" class="w-3.5 h-3.5 sm:w-4 sm:h-4 object-contain shrink-0">

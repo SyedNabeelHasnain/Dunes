@@ -115,36 +115,51 @@
             </div>
         </div>
 
-        <!-- Interactive Search & Category Filter Controls -->
-        <div class="bg-slate-50/95 backdrop-blur-md rounded-2xl p-3 sm:p-5 mb-8 border border-slate-200/80 shadow-xs sticky top-[calc(var(--header-h,72px)+0.5rem)] z-20">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 items-center">
-                <div class="lg:col-span-4">
-                    <div class="relative">
-                        <i class="bi bi-search absolute start-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                        <input type="text" id="tourSearchInput" class="w-full rounded-full ps-11 pe-4 py-2.5 bg-white border border-slate-200 text-base sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs" placeholder="{{ __('ui.nav.search_placeholder') }}" oninput="handleTourSearch(this.value)">
+        <!-- Interactive Search & Category Filter Controls (In-Flow, Zero-Collision, Responsive) -->
+        <div class="bg-slate-50/90 rounded-2xl sm:rounded-3xl p-3 sm:p-4 mb-8 border border-slate-200/90 shadow-xs relative z-10">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
+                <!-- Search Input with Focus Ring and Interactive Clear Button -->
+                <div class="w-full lg:w-72 xl:w-80 shrink-0">
+                    <div class="relative flex items-center bg-white rounded-full border border-slate-200 shadow-2xs hover:border-slate-300 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all p-1.5 ps-4">
+                        <i class="bi bi-search text-slate-400 text-sm shrink-0 me-2.5"></i>
+                        <input type="text" 
+                               id="tourSearchInput" 
+                               class="w-full bg-transparent border-none text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-0 p-0" 
+                               placeholder="{{ __('ui.nav.search_placeholder') }}" 
+                               oninput="handleTourSearch(this.value)">
+                        <button type="button" 
+                                id="tourSearchClearBtn"
+                                onclick="resetFilters()" 
+                                title="{{ __('ui.common.clear_search') ?? 'Clear search' }}"
+                                class="text-slate-300 hover:text-slate-500 p-1 mx-1 transition-colors text-xs items-center justify-center shrink-0 cursor-pointer hidden">
+                            <i class="bi bi-x-circle-fill"></i>
+                        </button>
                     </div>
                 </div>
-                <div class="lg:col-span-8">
-                    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1 -mx-2 px-2 sm:mx-0 sm:px-0 snap-x">
-                        <button onclick="filterTours('')" data-category="" class="filter-btn {{ !$selectedCategorySlug ? 'bg-slate-900 text-white shadow-xs' : 'bg-white text-slate-700 border border-slate-300 hover:border-primary' }} rounded-full px-4 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer transition-colors min-h-[38px] snap-start">
-                            <i class="bi bi-grid-fill"></i> {{ __('ui.common.view_all') }} ({{ $tours->count() }})
+
+                <!-- Desktop Divider -->
+                <div class="hidden lg:block h-7 w-px bg-slate-200/90 shrink-0"></div>
+
+                <!-- Category Filter Pills with Smooth Snap Scroll -->
+                <div class="flex-1 min-w-0 flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar scrollbar-none pb-1 -mx-2 px-2 sm:mx-0 sm:px-0 snap-x justify-start lg:justify-end">
+                    <button type="button" onclick="filterTours('')" data-category="" class="filter-btn {{ !$selectedCategorySlug ? 'bg-slate-900 text-white shadow-xs' : 'bg-white text-slate-700 border border-slate-200 hover:border-slate-300' }} rounded-full px-4 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer transition-colors min-h-[38px] snap-start">
+                        <i class="bi bi-grid-fill"></i> {{ __('ui.common.view_all') }} ({{ $tours->count() }})
+                    </button>
+                    @foreach($categories as $cat)
+                        @php
+                            $catCount = $tours->where('category_id', $cat->id)->count();
+                            $iconMap = [
+                                'desert-safari' => 'bi-sun-fill',
+                                'city-tour' => 'bi-building-fill',
+                                'water-activity' => 'bi-water',
+                                'day-trip' => 'bi-map-fill'
+                            ];
+                            $icon = $iconMap[$cat->slug] ?? 'bi-compass-fill';
+                        @endphp
+                        <button type="button" onclick="filterTours('{{ $cat->slug }}')" data-category="{{ $cat->slug }}" class="filter-btn {{ $selectedCategorySlug === $cat->slug ? 'bg-slate-900 text-white shadow-xs' : 'bg-white text-slate-700 border border-slate-200 hover:border-slate-300' }} rounded-full px-4 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer transition-colors min-h-[38px] snap-start">
+                            <i class="bi {{ $icon }}"></i> {{ $cat->name }} ({{ $catCount }})
                         </button>
-                        @foreach($categories as $cat)
-                            @php
-                                $catCount = $tours->where('category_id', $cat->id)->count();
-                                $iconMap = [
-                                    'desert-safari' => 'bi-sun-fill',
-                                    'city-tour' => 'bi-building-fill',
-                                    'water-activity' => 'bi-water',
-                                    'day-trip' => 'bi-map-fill'
-                                ];
-                                $icon = $iconMap[$cat->slug] ?? 'bi-compass-fill';
-                            @endphp
-                            <button onclick="filterTours('{{ $cat->slug }}')" data-category="{{ $cat->slug }}" class="filter-btn {{ $selectedCategorySlug === $cat->slug ? 'bg-slate-900 text-white shadow-xs' : 'bg-white text-slate-700 border border-slate-200 hover:border-slate-300' }} rounded-full px-4 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer transition-colors min-h-[38px] snap-start">
-                                <i class="bi {{ $icon }}"></i> {{ $cat->name }} ({{ $catCount }})
-                            </button>
-                        @endforeach
-                    </div>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -327,12 +342,27 @@ function filterTours(category) {
 
 function handleTourSearch(val) {
     currentSearch = (val || '').trim();
+    const clearBtn = document.getElementById('tourSearchClearBtn');
+    if (clearBtn) {
+        if (currentSearch.length > 0) {
+            clearBtn.classList.remove('hidden');
+            clearBtn.classList.add('inline-flex');
+        } else {
+            clearBtn.classList.add('hidden');
+            clearBtn.classList.remove('inline-flex');
+        }
+    }
     applyTourFilters();
 }
 
 function resetFilters() {
     const input = document.getElementById('tourSearchInput');
     if (input) input.value = '';
+    const clearBtn = document.getElementById('tourSearchClearBtn');
+    if (clearBtn) {
+        clearBtn.classList.add('hidden');
+        clearBtn.classList.remove('inline-flex');
+    }
     currentSearch = '';
     filterTours('');
 }
