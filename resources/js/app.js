@@ -2187,17 +2187,19 @@ const App = {
             fd.append('message_text', prefillMsg);
 
             if (typeof window.gtag === 'function') {
-                window.gtag('event', 'conversion', { 'send_to': 'AW-17859624049/eR3SCLimtvobEPH4kMRC' });
+                window.gtag('event', 'contact', {
+                    method: 'whatsapp',
+                    tour_name: tourName || 'General Inquiry'
+                });
             }
             if (window.dataLayer) {
                 window.dataLayer.push({
-                    event: 'generate_lead',
-                    conversion_type: 'whatsapp',
-                    conversion_label: 'eR3SCLimtvobEPH4kMRC'
+                    event: 'whatsapp_click',
+                    tour_name: tourName || 'General Inquiry'
                 });
             }
             if (typeof window.fbq === 'function') {
-                window.fbq('track', 'Lead', { content_name: 'WhatsApp Click' });
+                window.fbq('track', 'Contact', { content_name: 'WhatsApp Click' });
             }
 
             // Open WhatsApp synchronously inside user click gesture to prevent popup blockers
@@ -3602,37 +3604,35 @@ const App = {
                     }
 
                     if (data.success) {
-                        const totalVal = parseFloat(document.getElementById('bookingTotal')?.textContent?.replace(/[^0-9.]/g, '') || 1.0) || 1.0;
                         const targetUrl = data.redirect_url || (data.reference ? ('/thankyou?ref=' + encodeURIComponent(data.reference)) : null);
 
-                        const eventParams = {
-                            'send_to': 'AW-17859624049/eR3SCLimtvobEPH4kMRC',
-                            'value': totalVal,
-                            'currency': 'AED',
-                            'transaction_id': data.reference || ('REF-' + Date.now())
-                        };
-
-                        // Google Tag & Meta Pixel Conversion Events
-                        if (typeof window.gtag === 'function') {
-                            window.gtag('event', 'conversion', eventParams);
-                            window.gtag('event', 'conversion_event_submit_lead_form', eventParams);
-                        }
-                        if (window.dataLayer) {
-                            window.dataLayer.push({
-                                event: 'generate_lead',
-                                form_name: action || 'lead_form',
-                                conversion_label: 'eR3SCLimtvobEPH4kMRC',
-                                transaction_id: data.reference || '',
-                                value: totalVal,
-                                currency: 'AED'
-                            });
-                        }
-                        if (typeof window.fbq === 'function') {
-                            window.fbq('track', 'Lead', {
-                                value: totalVal,
-                                currency: 'AED',
-                                content_name: action || 'Booking Lead'
-                            });
+                        // Engagement & Lead tracking for contact / lead forms (NEVER Google Ads booking conversion)
+                        if (action === 'logWhatsApp') {
+                            if (typeof window.gtag === 'function') {
+                                window.gtag('event', 'generate_lead', { form_name: 'whatsapp_lead_form' });
+                            }
+                            if (window.dataLayer) {
+                                window.dataLayer.push({
+                                    event: 'generate_lead',
+                                    form_name: 'whatsapp_lead_form'
+                                });
+                            }
+                            if (typeof window.fbq === 'function') {
+                                window.fbq('track', 'Lead', { content_name: 'WhatsApp Lead Form' });
+                            }
+                        } else if (action === 'contact' || action === 'submit_contact') {
+                            if (typeof window.gtag === 'function') {
+                                window.gtag('event', 'generate_lead', { form_name: 'contact_form' });
+                            }
+                            if (window.dataLayer) {
+                                window.dataLayer.push({
+                                    event: 'generate_lead',
+                                    form_name: 'contact_form'
+                                });
+                            }
+                            if (typeof window.fbq === 'function') {
+                                window.fbq('track', 'Lead', { content_name: 'Contact Form' });
+                            }
                         }
 
                         if (targetUrl) {
@@ -3645,11 +3645,7 @@ const App = {
                                 }
                                 return;
                             }
-                            if (typeof window.gtagSendEvent === 'function') {
-                                window.gtagSendEvent(targetUrl, eventParams);
-                            } else {
-                                window.location.href = targetUrl;
-                            }
+                            window.location.href = targetUrl;
                             return;
                         }
 

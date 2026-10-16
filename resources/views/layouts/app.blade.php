@@ -105,8 +105,8 @@
       gtag('config', '{{ $ga4Id }}');
       @endif
 
-      // Helper function to delay opening a URL until a gtag event is sent.
-      function gtagSendEvent(url, params) {
+      // Helper function to delay opening a URL until an event callback fires (without sending unwanted conversions)
+      function gtagSendEvent(url, eventName, params) {
         var navigated = false;
         var callback = function () {
           if (!navigated && typeof url === 'string' && url) {
@@ -118,17 +118,18 @@
         // Fallback safety timeout (1.5s) in case beacon takes too long
         setTimeout(callback, 1500);
 
+        if (typeof eventName === 'object' && eventName !== null && !params) {
+          params = eventName;
+          eventName = null;
+        }
+
         var eventData = Object.assign({
           'event_callback': callback,
-          'event_timeout': 2000,
-          @if(!empty($conversionSendTo))
-          'send_to': '{{ $conversionSendTo }}'
-          @endif
+          'event_timeout': 1500
         }, params || {});
 
-        if (typeof gtag === 'function') {
-          gtag('event', 'conversion', eventData);
-          gtag('event', 'conversion_event_submit_lead_form', eventData);
+        if (typeof gtag === 'function' && eventName && eventName !== 'conversion') {
+          gtag('event', eventName, eventData);
         } else {
           callback();
         }
@@ -136,8 +137,11 @@
       }
       window.gtagSendEvent = gtagSendEvent;
 
-      function gtagReportConversion(url, params) {
-        return gtagSendEvent(url, params);
+      function gtagReportConversion(url) {
+        if (typeof url === 'string' && url) {
+          window.location = url;
+        }
+        return false;
       }
       window.gtagReportConversion = gtagReportConversion;
     </script>

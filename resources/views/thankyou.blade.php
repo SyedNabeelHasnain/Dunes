@@ -8,68 +8,88 @@
     $googleActive = ($settings['google_active'] ?? '0') === '1';
     $metaActive = ($settings['meta_active'] ?? '0') === '1';
     $metaPixelId = $settings['meta_pixel_id'] ?? null;
-    $adsIdSetting = $settings['google_ads_id'] ?? null;
+    $adsIdSetting = $settings['google_ads_id'] ?? 'AW-17859624049';
+    $conversionLabel = $settings['google_conversion_label'] ?? 'eR3SCLimtvobEPH4kMRC';
+    $conversionSendTo = (!empty($adsIdSetting) && !empty($conversionLabel)) ? "{$adsIdSetting}/{$conversionLabel}" : 'AW-17859624049/eR3SCLimtvobEPH4kMRC';
     $whatsappVal = $settings['site_whatsapp'] ?? '971502456056';
+
+    // Strict booking verification: must be a verified booking that is confirmed, completed, or cash-on-arrival
+    $isBookingConfirmed = $booking &&
+        in_array($booking->status, ['confirmed', 'completed', 'pending']) &&
+        ($paymentStatus === 'completed' || $method === 'cash' || in_array($booking->payment_status ?? '', ['paid', 'partial']));
 @endphp
 
-<!-- Google Ads Conversion Tag: Submit lead form (AW-17859624049/eR3SCLimtvobEPH4kMRC) -->
-<script>
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('event', 'conversion', {
-    'send_to': 'AW-17859624049/eR3SCLimtvobEPH4kMRC'
-    @if($booking && $booking->total)
-    , 'value': {{ (float)$booking->total }},
-    'currency': 'AED',
-    'transaction_id': '{{ $booking->reference }}'
-    @endif
-});
-gtag('event', 'conversion_event_submit_lead_form', {
-    'send_to': 'AW-17859624049/eR3SCLimtvobEPH4kMRC'
-    @if($booking && $booking->total)
-    , 'value': {{ (float)$booking->total }},
-    'currency': 'AED',
-    'transaction_id': '{{ $booking->reference }}'
-    @endif
-});
-</script>
+@if($isBookingConfirmed)
+    <!-- Google Ads Conversion Tag: ONLY for verified, successful bookings with client-side deduplication -->
+    <script>
+    (function() {
+        var txnId = '{{ $booking->reference }}';
+        var storageKey = 'dunes_gads_conv_' + txnId;
+        if (!sessionStorage.getItem(storageKey)) {
+            sessionStorage.setItem(storageKey, '1');
+            window.dataLayer = window.dataLayer || [];
+            if (typeof window.gtag === 'function') {
+                window.gtag('event', 'conversion', {
+                    'send_to': '{{ $conversionSendTo }}',
+                    'value': {{ (float)$booking->total }},
+                    'currency': 'AED',
+                    'transaction_id': txnId
+                });
+            }
+        }
+    })();
+    </script>
 
-@if($booking && ($paymentStatus === 'completed' || $method === 'cash'))
-    <!-- Google Ecommerce Purchase Conversion -->
+    <!-- Google Ecommerce Purchase Conversion (Deduplicated) -->
     @if($googleActive)
     <script>
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
-        event: 'purchase',
-        ecommerce: {
-            transaction_id: '{{ $booking->reference }}',
-            value: {{ $booking->total }},
-            currency: 'AED',
-            items: [{
-                item_name: @json($booking->tour_name),
-                item_id: @json((string) $booking->tour_id),
-                price: {{ $booking->total }},
-                item_category: 'Tours',
-                quantity: 1
-            }]
+    (function() {
+        var txnId = '{{ $booking->reference }}';
+        var storageKey = 'dunes_ga4_purch_' + txnId;
+        if (!sessionStorage.getItem(storageKey)) {
+            sessionStorage.setItem(storageKey, '1');
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({ ecommerce: null });
+            window.dataLayer.push({
+                event: 'purchase',
+                ecommerce: {
+                    transaction_id: txnId,
+                    value: {{ (float)$booking->total }},
+                    currency: 'AED',
+                    items: [{
+                        item_name: @json($booking->tour_name),
+                        item_id: @json((string) $booking->tour_id),
+                        price: {{ (float)$booking->total }},
+                        item_category: 'Tours',
+                        quantity: 1
+                    }]
+                }
+            });
         }
-    });
+    })();
     </script>
     @endif
 
-    <!-- Meta Pixel Purchase Conversion -->
+    <!-- Meta Pixel Purchase Conversion (Deduplicated) -->
     @if($metaActive && !empty($metaPixelId))
     <script>
-    if(window.fbq){
-        fbq('track', 'Purchase', {
-            value: {{ $booking->total }},
-            currency: 'AED',
-            content_ids: ['TOUR-{{ $booking->tour_id }}'],
-            content_type: 'product'
-        }, {
-            eventID: 'BOOK-{{ $booking->reference }}'
-        });
-    }
+    (function() {
+        var txnId = '{{ $booking->reference }}';
+        var storageKey = 'dunes_meta_purch_' + txnId;
+        if (!sessionStorage.getItem(storageKey)) {
+            sessionStorage.setItem(storageKey, '1');
+            if (window.fbq) {
+                fbq('track', 'Purchase', {
+                    value: {{ (float)$booking->total }},
+                    currency: 'AED',
+                    content_ids: ['TOUR-{{ $booking->tour_id }}'],
+                    content_type: 'product'
+                }, {
+                    eventID: 'BOOK-' + txnId
+                });
+            }
+        }
+    })();
     </script>
     @endif
 @endif

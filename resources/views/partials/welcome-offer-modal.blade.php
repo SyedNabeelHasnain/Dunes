@@ -387,7 +387,7 @@
                         localStorage.removeItem('dunes_welcome_dismissed_until');
 
                         if (typeof gtag === 'function') {
-                            gtag('event', 'conversion_event_submit_lead_form', {
+                            gtag('event', 'generate_lead', {
                                 'event_category': 'Welcome Offer',
                                 'event_label': code
                             });
