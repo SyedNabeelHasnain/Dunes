@@ -31,11 +31,15 @@ return new class extends Migration
             }
         }
 
-        // Add index on addons (tour_id, status) if table exists
+        // Add index on addons (status) if table exists
         if (Schema::hasTable('addons')) {
             try {
                 Schema::table('addons', function (Blueprint $table) {
-                    $table->index(['tour_id', 'status'], 'addons_tour_status_idx');
+                    if (Schema::hasColumn('addons', 'tour_id')) {
+                        $table->index(['tour_id', 'status'], 'addons_tour_status_idx');
+                    } elseif (Schema::hasColumn('addons', 'status')) {
+                        $table->index('status', 'addons_status_idx');
+                    }
                 });
             } catch (Throwable $e) {
             }

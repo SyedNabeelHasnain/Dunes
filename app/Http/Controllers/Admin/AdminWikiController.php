@@ -9,11 +9,20 @@ use App\Models\WikiGlossaryTerm;
 use App\Models\WikiPillar;
 use App\Traits\NormalizesLocalizedInputs;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class AdminWikiController extends Controller
 {
     use NormalizesLocalizedInputs;
+
+    protected function clearWikiCaches(): void
+    {
+        Cache::forget('sitemap_wiki_xml');
+        Cache::forget('sitemap_images_xml');
+        Cache::forget('site_wiki_hub_pillars');
+        Cache::forget('site_wiki_glossary_all');
+    }
 
     /**
      * Display all articles, pillars, and glossary counts.
@@ -89,6 +98,7 @@ class AdminWikiController extends Controller
         $data['icon'] = $request->input('icon', 'bi-compass');
 
         WikiPillar::create($data);
+        $this->clearWikiCaches();
 
         return redirect()->route('admin.wiki.pillars')->with('success', 'Knowledge Pillar created successfully.');
     }
@@ -120,6 +130,7 @@ class AdminWikiController extends Controller
         $data['icon'] = $request->input('icon', $pillar->icon ?: 'bi-compass');
 
         $pillar->update($data);
+        $this->clearWikiCaches();
 
         return redirect()->route('admin.wiki.pillars')->with('success', 'Knowledge Pillar updated successfully.');
     }
@@ -132,6 +143,7 @@ class AdminWikiController extends Controller
         }
 
         $pillar->delete();
+        $this->clearWikiCaches();
         return redirect()->route('admin.wiki.pillars')->with('success', 'Pillar deleted successfully.');
     }
 
@@ -186,6 +198,8 @@ class AdminWikiController extends Controller
         if ($request->has('tours')) {
             $article->tours()->sync($request->input('tours'));
         }
+
+        $this->clearWikiCaches();
 
         return redirect()->route('admin.wiki.index')->with('success', 'Knowledge Article published successfully.');
     }
@@ -251,6 +265,8 @@ class AdminWikiController extends Controller
             $article->tours()->detach();
         }
 
+        $this->clearWikiCaches();
+
         return redirect()->route('admin.wiki.index')->with('success', 'Knowledge Article updated successfully.');
     }
 
@@ -261,6 +277,7 @@ class AdminWikiController extends Controller
     {
         $article = WikiArticle::findOrFail($id);
         $article->delete();
+        $this->clearWikiCaches();
 
         return redirect()->route('admin.wiki.index')->with('success', 'Article deleted successfully.');
     }
@@ -295,6 +312,7 @@ class AdminWikiController extends Controller
         $data['wiki_article_id'] = $request->filled('wiki_article_id') ? (int) $request->input('wiki_article_id') : null;
 
         WikiGlossaryTerm::create($data);
+        $this->clearWikiCaches();
 
         return redirect()->route('admin.wiki.glossary')->with('success', 'Glossary Term created successfully.');
     }
@@ -321,6 +339,7 @@ class AdminWikiController extends Controller
         $data['wiki_article_id'] = $request->filled('wiki_article_id') ? (int) $request->input('wiki_article_id') : null;
 
         $term->update($data);
+        $this->clearWikiCaches();
 
         return redirect()->route('admin.wiki.glossary')->with('success', 'Glossary Term updated successfully.');
     }
@@ -329,6 +348,7 @@ class AdminWikiController extends Controller
     {
         $term = WikiGlossaryTerm::findOrFail($id);
         $term->delete();
+        $this->clearWikiCaches();
 
         return redirect()->route('admin.wiki.glossary')->with('success', 'Glossary Term deleted successfully.');
     }

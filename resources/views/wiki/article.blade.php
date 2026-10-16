@@ -39,15 +39,17 @@
           "value": "1430583"
         }
       },
+      @if(!empty($article->reviewed_by_name))
       "reviewedBy": {
         "@type": "Person",
         "name": {!! json_encode($article->reviewed_by_name, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-        "jobTitle": {!! json_encode($article->reviewed_by_title, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        "jobTitle": {!! json_encode($article->reviewed_by_title ?: 'Operations Lead (DET #1430583)', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
         "worksFor": {
           "@type": "TravelAgency",
           "name": "Dunes Discovery Tourism LLC"
         }
       },
+      @endif
       "publisher": {
         "@type": "TravelAgency",
         "name": "Dunes Discovery Tourism LLC",

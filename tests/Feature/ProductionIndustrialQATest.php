@@ -211,4 +211,80 @@ class ProductionIndustrialQATest extends TestCase
             ],
         ]);
     }
+
+    public function test_booking_dispatch_accessors_parse_driver_and_plate_regardless_of_order(): void
+    {
+        $booking = new \App\Models\Booking();
+        $booking->special_requests = "Special Request: Vegetarian food\n[DISPATCH: Pickup: 3:00 PM | Driver: Tariq Mahmood | Phone: 0501112233 | Plate: A 14285 | Notes: VIP Client]";
+
+        $this->assertEquals('Tariq Mahmood', $booking->assigned_driver_name);
+        $this->assertEquals('A 14285', $booking->assigned_vehicle_plate);
+    }
+
+    public function test_addon_model_has_price_type_fillable_and_defaults(): void
+    {
+        $addon = new \App\Models\Addon();
+        $this->assertContains('price_type', $addon->getFillable());
+
+        $addon = \App\Models\Addon::create([
+            'slug' => 'test-group-addon-' . time(),
+            'name' => 'Private Dune Setup',
+            'default_price' => 250,
+            'price_type' => 'per_group',
+            'status' => 'active',
+        ]);
+
+        $this->assertEquals('per_group', $addon->price_type);
+    }
+
+    public function test_booking_modal_renders_interactive_children_and_infants_counters(): void
+    {
+        $response = $this->get('/');
+        $response->assertStatus(200);
+
+        $content = $response->getContent();
+        $this->assertStringContainsString('id="bookingChildren"', $content);
+        $this->assertStringContainsString('id="bookingInfants"', $content);
+        $this->assertStringContainsString('data-target="children"', $content);
+        $this->assertStringContainsString('data-target="infants"', $content);
+    }
+
+    public function test_whatsapp_modal_close_button_has_wcag_standard_44px_size(): void
+    {
+        \App\Models\Setting::updateOrCreate(['setting_key' => 'whatsapp_form_enabled'], ['setting_value' => '1']);
+        Cache::forget('site_settings_cache');
+
+        $response = $this->get('/');
+        $response->assertStatus(200);
+
+        $content = $response->getContent();
+        $this->assertStringContainsString('w-11 h-11 rounded-full bg-slate-100 text-slate-500', $content);
+    }
+
+    public function test_admin_wiki_controller_clears_wiki_sitemap_cache_on_updates(): void
+    {
+        $admin = User::first();
+        $this->actingAs($admin);
+
+        Cache::put('sitemap_wiki_xml', '<cached-sitemap>', 3600);
+        $this->assertTrue(Cache::has('sitemap_wiki_xml'));
+
+        $pillar = \App\Models\WikiPillar::first();
+        if (! $pillar) {
+            $pillar = \App\Models\WikiPillar::create([
+                'slug' => 'test-pillar',
+                'name' => 'Test Pillar',
+                'status' => 'active',
+            ]);
+        }
+
+        $response = $this->put(route('admin.wiki.pillars.update', $pillar->id), [
+            'name' => 'Updated Pillar Title',
+            'status' => 'active',
+        ]);
+
+        $response->assertRedirect(route('admin.wiki.pillars'));
+        $this->assertFalse(Cache::has('sitemap_wiki_xml'));
+    }
 }
+

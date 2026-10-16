@@ -430,8 +430,9 @@ class GoogleThingsToDoFeedController extends Controller
                     ];
 
                     if ($oldPriceNum > $priceNum) {
-                        $oldUnits = (int) floor($oldPriceNum);
-                        $oldNanos = (int) round(($oldPriceNum - $oldUnits) * 1000000000);
+                        $oldCents = (int) round($oldPriceNum * 100);
+                        $oldUnits = intdiv($oldCents, 100);
+                        $oldNanos = ($oldCents % 100) * 10000000;
                         $priceOption['original_price'] = [
                             'currency_code' => 'AED',
                             'units' => $oldUnits,

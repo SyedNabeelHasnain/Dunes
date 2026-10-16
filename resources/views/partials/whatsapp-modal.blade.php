@@ -74,7 +74,7 @@
                 </div>
                 <button type="button" 
                         @click="$store.modal.close()" 
-                        class="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:text-slate-900 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer shrink-0" 
+                        class="w-11 h-11 rounded-full bg-slate-100 text-slate-500 hover:text-slate-900 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer shrink-0" 
                         aria-label="{{ __('ui.common.close') }}">
                     <i class="bi bi-x-lg text-xs"></i>
                 </button>

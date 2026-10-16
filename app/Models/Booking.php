@@ -95,7 +95,7 @@ class Booking extends Model
             return $this->driver->name;
         }
 
-        if ($this->special_requests && preg_match('/\[DISPATCH:\s*Driver:\s*([^\|]+)/i', $this->special_requests, $m)) {
+        if ($this->special_requests && preg_match('/Driver:\s*([^\|\]]+)/i', $this->special_requests, $m)) {
             return trim($m[1]);
         }
 
@@ -111,7 +111,7 @@ class Booking extends Model
             return $this->vehicle->short_plate;
         }
 
-        if ($this->special_requests && preg_match('/Plate:\s*([^\]]+)\]/i', $this->special_requests, $m)) {
+        if ($this->special_requests && preg_match('/Plate:\s*([^\|\]]+)/i', $this->special_requests, $m)) {
             return trim($m[1]);
         }
 

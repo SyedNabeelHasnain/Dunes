@@ -35,10 +35,11 @@
 
     @foreach($posts as $post)
     @php
-        $postTitle = is_array($post->title) ? (reset($post->title) ?: '') : (string) ($post->title ?? '');
-        $postAuthor = is_array($post->author_name) ? (reset($post->author_name) ?: '') : (string) ($post->author_name ?? '');
-        $postContent = is_array($post->content) ? (reset($post->content) ?: '') : (string) ($post->content ?? '');
-        $postExcerpt = is_array($post->excerpt) ? (reset($post->excerpt) ?: '') : (string) ($post->excerpt ?? '');
+        $curLocale = app()->getLocale() ?: 'en';
+        $postTitle = is_array($post->title) ? ($post->title[$curLocale] ?? reset($post->title) ?: '') : (string) ($post->title ?? '');
+        $postAuthor = is_array($post->author_name) ? ($post->author_name[$curLocale] ?? reset($post->author_name) ?: '') : (string) ($post->author_name ?? '');
+        $postContent = is_array($post->content) ? ($post->content[$curLocale] ?? reset($post->content) ?: '') : (string) ($post->content ?? '');
+        $postExcerpt = is_array($post->excerpt) ? ($post->excerpt[$curLocale] ?? reset($post->excerpt) ?: '') : (string) ($post->excerpt ?? '');
         $cleanDesc = $postExcerpt ?: \Illuminate\Support\Str::limit(strip_tags($postContent), 240);
         $pubDate = ($post->published_at instanceof \Carbon\CarbonInterface)
             ? $post->published_at->toRfc2822String()
@@ -51,7 +52,7 @@
       <dc:creator><![CDATA[{!! $escapeCdata($postAuthor ?: 'Dunes Discovery Editorial Team') !!}]]></dc:creator>
       @if($post->category)
       @php
-          $catName = is_array($post->category->name) ? (reset($post->category->name) ?: '') : (string) ($post->category->name ?? '');
+          $catName = is_array($post->category->name) ? ($post->category->name[$curLocale] ?? reset($post->category->name) ?: '') : (string) ($post->category->name ?? '');
       @endphp
       <category><![CDATA[{!! $escapeCdata($catName) !!}]]></category>
       @endif

@@ -15,7 +15,7 @@ class Addon extends Model
         'description',
     ];
 
-    protected $fillable = ['slug', 'name', 'description', 'icon', 'default_price', 'status', 'priority'];
+    protected $fillable = ['slug', 'name', 'description', 'icon', 'default_price', 'price_type', 'status', 'priority'];
 
     protected $casts = [
         'default_price' => 'float',

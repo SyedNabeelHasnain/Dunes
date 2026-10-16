@@ -149,8 +149,6 @@
                                             <i class="bi bi-plus-circle-fill text-xl"></i>
                                         </button>
                                     </div>
-                                    <input type="hidden" name="children" id="bookingChildren" value="0">
-                                    <input type="hidden" name="infants" id="bookingInfants" value="0">
                                 </div>
                                 <div class="sm:col-span-8 lg:col-span-9 booking-location-wrapper relative">
                                     <label class="block text-xs font-black uppercase tracking-wider text-slate-800 mb-2" for="bookingLocation">{{ __('ui.booking.pickup_location_label') }}</label>
@@ -159,6 +157,40 @@
                                         <input type="text" class="flex-1 bg-transparent font-bold text-slate-900 text-base sm:text-sm border-0 focus:outline-none placeholder:text-slate-400 min-w-0" name="location" id="bookingLocation" required placeholder="{{ __('ui.booking.pickup_placeholder') }}" autocomplete="off">
                                         <button class="px-3.5 h-full min-w-[44px] text-slate-400 hover:text-primary hover:bg-slate-50 border-s border-slate-100 transition-colors cursor-pointer rounded-e-2xl shrink-0 flex items-center justify-center" type="button" id="detectLocation" aria-label="{{ __('ui.common.detect_location') }}" title="{{ __('ui.common.detect_location') }}">
                                             <i class="bi bi-crosshair"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Optional Children & Infants Row -->
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <div class="bg-slate-50/80 p-2.5 rounded-2xl border border-slate-200/80">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <label class="block text-[11px] font-black uppercase tracking-wider text-slate-800" for="bookingChildren">Children <span class="text-[10px] text-slate-400 font-semibold lowercase">(3–10 yrs)</span></label>
+                                        <span class="text-[9px] font-black text-emerald-700 bg-emerald-100/80 px-1.5 py-0.5 rounded-full">30% OFF</span>
+                                    </div>
+                                    <div class="flex items-center justify-between bg-white shadow-2xs rounded-xl border border-slate-200 p-0.5 h-[44px]">
+                                        <button type="button" class="w-10 h-10 flex items-center justify-center text-primary hover:bg-orange-50 rounded-lg transition-colors cursor-pointer" data-action="minus" data-target="children" aria-label="Decrease children">
+                                            <i class="bi bi-dash-circle-fill text-lg"></i>
+                                        </button>
+                                        <input type="number" class="w-8 text-center font-black text-slate-900 border-0 bg-transparent p-0 text-sm focus:outline-none" name="children" id="bookingChildren" value="0" min="0" max="30" readonly autocomplete="off">
+                                        <button type="button" class="w-10 h-10 flex items-center justify-center text-primary hover:bg-orange-50 rounded-lg transition-colors cursor-pointer" data-action="plus" data-target="children" aria-label="Increase children">
+                                            <i class="bi bi-plus-circle-fill text-lg"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="bg-slate-50/80 p-2.5 rounded-2xl border border-slate-200/80">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <label class="block text-[11px] font-black uppercase tracking-wider text-slate-800" for="bookingInfants">Infants <span class="text-[10px] text-slate-400 font-semibold lowercase">(&lt;3 yrs)</span></label>
+                                        <span class="text-[9px] font-black text-primary bg-orange-100/80 px-1.5 py-0.5 rounded-full">FREE</span>
+                                    </div>
+                                    <div class="flex items-center justify-between bg-white shadow-2xs rounded-xl border border-slate-200 p-0.5 h-[44px]">
+                                        <button type="button" class="w-10 h-10 flex items-center justify-center text-primary hover:bg-orange-50 rounded-lg transition-colors cursor-pointer" data-action="minus" data-target="infants" aria-label="Decrease infants">
+                                            <i class="bi bi-dash-circle-fill text-lg"></i>
+                                        </button>
+                                        <input type="number" class="w-8 text-center font-black text-slate-900 border-0 bg-transparent p-0 text-sm focus:outline-none" name="infants" id="bookingInfants" value="0" min="0" max="15" readonly autocomplete="off">
+                                        <button type="button" class="w-10 h-10 flex items-center justify-center text-primary hover:bg-orange-50 rounded-lg transition-colors cursor-pointer" data-action="plus" data-target="infants" aria-label="Increase infants">
+                                            <i class="bi bi-plus-circle-fill text-lg"></i>
                                         </button>
                                     </div>
                                 </div>
