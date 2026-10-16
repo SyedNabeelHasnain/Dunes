@@ -61,6 +61,9 @@ class AdminDashboardController extends Controller
         $newInquiries = Contact::where('status', 'new')->count();
         $totalInquiries = Contact::count();
         $totalWhatsappLeads = WhatsappInquiry::count();
+        $unreadWhatsappLeads = WhatsappInquiry::where(function ($q) {
+            $q->where('is_read', false)->orWhereNull('is_read');
+        })->count();
 
         // 6. Audience & Email Marketing
         $subscribersCount = Subscriber::where('status', 'subscribed')->count();
@@ -99,6 +102,7 @@ class AdminDashboardController extends Controller
             'new_inquiries' => (int) $newInquiries,
             'total_inquiries' => (int) $totalInquiries,
             'whatsapp_leads' => (int) $totalWhatsappLeads,
+            'unread_whatsapp_leads' => (int) $unreadWhatsappLeads,
             'subscribers_count' => (int) $subscribersCount,
             'campaigns_count' => (int) $campaignsCount,
             'campaigns_sent' => (int) $campaignsSent,
@@ -515,7 +519,37 @@ class AdminDashboardController extends Controller
         $inquiry = Contact::findOrFail($id);
         $inquiry->update(['status' => $request->input('status')]);
 
+        if ($request->ajax() || $request->wantsJson()) {
+            $unreadCount = Contact::where('status', 'new')->count();
+            return response()->json([
+                'success' => true,
+                'message' => 'Inquiry status updated successfully.',
+                'status' => $inquiry->status,
+                'unread_count' => $unreadCount,
+            ]);
+        }
+
         return redirect()->route('admin.inquiries.index')->with('success', 'Inquiry status updated successfully.');
+    }
+
+    /**
+     * Mark inquiry as read directly (e.g. from table row click or quick view).
+     */
+    public function markInquiryRead(Request $request, int $id): JsonResponse
+    {
+        $inquiry = Contact::findOrFail($id);
+        if ($inquiry->status === 'new') {
+            $inquiry->update(['status' => 'read']);
+        }
+
+        $unreadCount = Contact::where('status', 'new')->count();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Inquiry marked as read.',
+            'status' => $inquiry->status,
+            'unread_count' => $unreadCount,
+        ]);
     }
 
     /**

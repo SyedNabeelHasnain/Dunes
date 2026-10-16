@@ -2,6 +2,14 @@
 
 @section('page_title', 'Inquiries & Messages')
 
+@section('breadcrumbs')
+    <a href="{{ route('admin.dashboard') }}" class="hover:text-primary transition flex items-center gap-1">
+        <i class="bi bi-house-door-fill text-xs"></i> <span>Dashboard</span>
+    </a>
+    <i class="bi bi-chevron-right text-[10px] text-slate-400"></i>
+    <span class="text-slate-800 font-semibold">Contact Inquiries</span>
+@endsection
+
 @section('content')
 <div class="space-y-6">
     <!-- Top Header -->
@@ -157,13 +165,16 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100 bg-white">
                     @forelse($inquiries as $c)
-                    <tr class="hover:bg-slate-50/60 transition-colors">
+                    <tr id="inquiry-row-{{ $c->id }}" class="transition-colors {{ $c->status === 'new' ? 'is-unread-inquiry bg-amber-50/70 hover:bg-amber-100/70 border-l-4 border-l-amber-500 font-semibold' : 'hover:bg-slate-50/60' }} inquiry-row" data-id="{{ $c->id }}" data-status="{{ $c->status }}">
                         <td class="py-3 px-4 no-export">
                             <input type="checkbox" class="rounded border-slate-300 text-primary focus:ring-primary inquiries-row-select" value="{{ $c->id }}">
                         </td>
                         <td class="py-3 px-4" data-order="{{ $c->created_at ? $c->created_at->timestamp : 0 }}">
-                            <div class="text-xs font-bold text-slate-900">
-                                {{ $c->created_at ? $c->created_at->format('M j, Y') : '' }}
+                            <div class="flex items-center gap-1.5">
+                                @if($c->status === 'new')
+                                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0 unread-dot" title="Action Needed / Unread"></span>
+                                @endif
+                                <span class="text-xs font-bold text-slate-900">{{ $c->created_at ? $c->created_at->format('M j, Y') : '' }}</span>
                             </div>
                             <div class="text-[11px] text-slate-400 mt-0.5">
                                 {{ $c->created_at ? $c->created_at->format('g:ia') : '' }}
@@ -177,7 +188,7 @@
                             <div class="text-xs font-semibold text-slate-800 line-clamp-1">{{ $c->subject }}</div>
                             <div class="text-[11px] text-slate-400 line-clamp-1">{{ Str::limit($c->message, 60) }}</div>
                         </td>
-                        <td class="py-3 px-4 text-center" data-order="{{ $c->status }}">
+                        <td class="py-3 px-4 text-center status-col" data-order="{{ $c->status }}">
                             @php
                                 $badgeClass = match($c->status) {
                                     'new' => 'bg-rose-50 text-rose-700 border-rose-200',
@@ -186,15 +197,23 @@
                                     default => 'bg-slate-100 text-slate-700 border-slate-200',
                                 };
                             @endphp
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border capitalize {{ $badgeClass }}">
+                            <span class="status-badge inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border capitalize {{ $badgeClass }}">
                                 {{ $c->status === 'new' ? 'Action Needed' : ($c->status === 'read' ? 'In Review' : 'Replied') }}
                             </span>
                         </td>
                         <td class="py-3 px-4 text-right pe-4">
                             <div class="inline-flex items-center justify-end gap-1.5">
-                                <a href="{{ route('admin.inquiries.show', $c->id) }}" class="w-8 h-8 rounded-xl border border-slate-200 hover:border-primary hover:text-primary flex items-center justify-center text-slate-600 bg-white transition shadow-2xs" title="View Detail">
+                                <a href="{{ route('admin.inquiries.show', $c->id) }}" class="w-8 h-8 rounded-xl border border-slate-200 hover:border-primary hover:text-primary flex items-center justify-center text-slate-600 bg-white transition shadow-2xs btn-view-inquiry" title="View Detail">
                                     <i class="bi bi-eye-fill text-xs"></i>
                                 </a>
+
+                                <button type="button" 
+                                        class="w-8 h-8 rounded-xl border border-slate-200 hover:border-amber-400 text-slate-500 hover:text-amber-600 flex items-center justify-center bg-white transition shadow-2xs btn-toggle-inquiry-read cursor-pointer" 
+                                        title="{{ $c->status === 'new' ? 'Mark as Read' : 'Mark as Action Needed' }}"
+                                        data-id="{{ $c->id }}"
+                                        data-status="{{ $c->status }}">
+                                    <i class="bi {{ $c->status === 'new' ? 'bi-envelope' : 'bi-envelope-open' }} text-xs"></i>
+                                </button>
 
                                 <form action="{{ route('admin.inquiries.status', $c->id) }}" method="POST" class="inline">
                                     @csrf
@@ -611,6 +630,59 @@ window.promptPermanentDeleteInquiry = function(id, name, email, subject) {
                 }).then(() => {
                     window.location.reload();
                 });
+            }
+        });
+    // Toggle Inquiry Read/Unread Status
+    $(document).on('click', '.btn-toggle-inquiry-read', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const btn = $(this);
+        const id = btn.data('id');
+        const currentStatus = btn.attr('data-status') || 'new';
+        const targetStatus = currentStatus === 'new' ? 'read' : 'new';
+
+        btn.prop('disabled', true);
+        $.ajax({
+            url: `/admin/inquiries/${id}/status`,
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                status: targetStatus
+            },
+            headers: { 'Accept': 'application/json' },
+            success: function(res) {
+                if (res.success) {
+                    const row = $(`#inquiry-row-${id}`);
+                    btn.attr('data-status', targetStatus);
+                    if (targetStatus === 'read') {
+                        row.removeClass('is-unread-inquiry bg-amber-50/70 hover:bg-amber-100/70 border-l-4 border-l-amber-500 font-semibold');
+                        row.find('.unread-dot').remove();
+                        btn.attr('title', 'Mark as Action Needed');
+                        btn.find('i').removeClass('bi-envelope').addClass('bi-envelope-open');
+                        row.find('.status-col').attr('data-order', 'read');
+                        row.find('.status-badge').removeClass('bg-rose-50 text-rose-700 border-rose-200').addClass('bg-amber-50 text-amber-700 border-amber-200').text('In Review');
+                    } else {
+                        row.addClass('is-unread-inquiry bg-amber-50/70 hover:bg-amber-100/70 border-l-4 border-l-amber-500 font-semibold');
+                        if (!row.find('.unread-dot').length) {
+                            row.find('td:eq(1) .flex').prepend('<span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0 unread-dot" title="Action Needed / Unread"></span>');
+                        }
+                        btn.attr('title', 'Mark as Read');
+                        btn.find('i').removeClass('bi-envelope-open').addClass('bi-envelope');
+                        row.find('.status-col').attr('data-order', 'new');
+                        row.find('.status-badge').removeClass('bg-amber-50 text-amber-700 border-amber-200').addClass('bg-rose-50 text-rose-700 border-rose-200').text('Action Needed');
+                    }
+                    if (res.unread_count !== undefined) {
+                        $('.inquiry-unread-count').text(res.unread_count);
+                        if (res.unread_count === 0) {
+                            $('.inquiry-unread-count').hide();
+                        } else {
+                            $('.inquiry-unread-count').show();
+                        }
+                    }
+                }
+            },
+            complete: function() {
+                btn.prop('disabled', false);
             }
         });
     });

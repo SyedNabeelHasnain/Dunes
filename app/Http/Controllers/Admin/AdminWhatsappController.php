@@ -23,6 +23,7 @@ class AdminWhatsappController extends Controller
         $tourName = $request->input('tour_name');
         $deviceType = $request->input('device_type');
         $search = $request->input('search');
+        $status = $request->input('status');
 
         $query = DB::table('whatsapp_inquiries')
             ->leftJoin('request_logs', 'whatsapp_inquiries.request_log_id', '=', 'request_logs.id')
@@ -48,6 +49,15 @@ class AdminWhatsappController extends Controller
         if ($deviceType) {
             $query->where('request_logs.device_type', $deviceType);
         }
+        if ($status === 'new' || $status === 'unread') {
+            $query->where(function ($q) {
+                $q->where('whatsapp_inquiries.is_read', false)
+                    ->orWhereNull('whatsapp_inquiries.is_read')
+                    ->orWhere('whatsapp_inquiries.status', 'new');
+            });
+        } elseif ($status === 'read') {
+            $query->where('whatsapp_inquiries.is_read', true);
+        }
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('whatsapp_inquiries.name', 'like', "%{$search}%")
@@ -63,6 +73,11 @@ class AdminWhatsappController extends Controller
         $totalLeads = DB::table('whatsapp_inquiries')->count();
         $todayLeads = DB::table('whatsapp_inquiries')->whereDate('created_at', today())->count();
         $monthLeads = DB::table('whatsapp_inquiries')->where('created_at', '>=', now()->startOfMonth())->count();
+        $unreadLeads = DB::table('whatsapp_inquiries')
+            ->where(function ($q) {
+                $q->where('is_read', false)->orWhereNull('is_read');
+            })
+            ->count();
 
         $mobileCount = DB::table('whatsapp_inquiries')
             ->leftJoin('request_logs', 'whatsapp_inquiries.request_log_id', '=', 'request_logs.id')
@@ -75,6 +90,7 @@ class AdminWhatsappController extends Controller
             'today' => $todayLeads,
             'this_month' => $monthLeads,
             'mobile_pct' => $mobilePct,
+            'unread' => $unreadLeads,
         ];
 
         // 2. 14-Day Acquisition Trend Chart Data
@@ -126,7 +142,8 @@ class AdminWhatsappController extends Controller
             'toDate',
             'tourName',
             'deviceType',
-            'search'
+            'search',
+            'status'
         ));
     }
 
@@ -331,6 +348,68 @@ class AdminWhatsappController extends Controller
     }
 
     /**
+     * Mark a WhatsApp lead as read (AJAX or direct).
+     */
+    public function markRead(Request $request, int $id)
+    {
+        $lead = WhatsappInquiry::find($id);
+        if (! $lead) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Lead not found.'], 404);
+            }
+
+            return redirect()->back()->with('error', 'Lead not found.');
+        }
+
+        $lead->markAsRead();
+
+        $unreadCount = WhatsappInquiry::where(function ($q) {
+            $q->where('is_read', false)->orWhereNull('is_read');
+        })->count();
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'WhatsApp lead marked as read.',
+                'is_read' => true,
+                'status' => $lead->status,
+                'unread_count' => $unreadCount,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'WhatsApp lead marked as read.');
+    }
+
+    /**
+     * Toggle read/unread status for a WhatsApp lead.
+     */
+    public function toggleRead(Request $request, int $id)
+    {
+        $lead = WhatsappInquiry::findOrFail($id);
+        $newRead = ! (bool) $lead->is_read;
+        $lead->is_read = $newRead;
+        $lead->status = $newRead ? 'read' : 'new';
+        $lead->read_at = $newRead ? now() : null;
+        $lead->save();
+
+        $unreadCount = WhatsappInquiry::where(function ($q) {
+            $q->where('is_read', false)->orWhereNull('is_read');
+        })->count();
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $newRead ? 'Lead marked as read.' : 'Lead marked as unread.',
+                'is_read' => $newRead,
+                'status' => $lead->status,
+                'unread_count' => $unreadCount,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Lead status updated.');
+    }
+
+    /**
      * Perform batch operations across multiple WhatsApp inquiries.
      */
     public function bulkAction(Request $request)
@@ -338,7 +417,7 @@ class AdminWhatsappController extends Controller
         $request->validate([
             'ids' => 'required|array|min:1',
             'ids.*' => 'required|integer',
-            'action' => 'required|string|in:delete',
+            'action' => 'required|string|in:delete,mark_read,mark_unread',
         ]);
 
         $ids = $request->input('ids');
@@ -358,6 +437,42 @@ class AdminWhatsappController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => "{$count} lead(s) and all associated analytics permanently purged.",
+                ]);
+            }
+
+            if ($action === 'mark_read') {
+                WhatsappInquiry::whereIn('id', $ids)->update([
+                    'is_read' => true,
+                    'status' => 'read',
+                    'read_at' => now(),
+                ]);
+
+                $unreadCount = WhatsappInquiry::where(function ($q) {
+                    $q->where('is_read', false)->orWhereNull('is_read');
+                })->count();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => count($ids).' lead(s) marked as read.',
+                    'unread_count' => $unreadCount,
+                ]);
+            }
+
+            if ($action === 'mark_unread') {
+                WhatsappInquiry::whereIn('id', $ids)->update([
+                    'is_read' => false,
+                    'status' => 'new',
+                    'read_at' => null,
+                ]);
+
+                $unreadCount = WhatsappInquiry::where(function ($q) {
+                    $q->where('is_read', false)->orWhereNull('is_read');
+                })->count();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => count($ids).' lead(s) marked as unread.',
+                    'unread_count' => $unreadCount,
                 ]);
             }
 

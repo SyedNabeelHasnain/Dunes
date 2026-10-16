@@ -2,6 +2,14 @@
 
 @section('page_title', 'Bookings & Orders')
 
+@section('breadcrumbs')
+    <a href="{{ route('admin.dashboard') }}" class="hover:text-primary transition flex items-center gap-1">
+        <i class="bi bi-house-door-fill text-xs"></i> <span>Dashboard</span>
+    </a>
+    <i class="bi bi-chevron-right text-[10px] text-slate-400"></i>
+    <span class="text-slate-800 font-semibold">Bookings</span>
+@endsection
+
 @section('content')
 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
     <div>
@@ -9,6 +17,9 @@
         <p class="text-xs md:text-sm text-slate-500 mb-0">Manage customer tour bookings, payment reconciliations, and instant WhatsApp support.</p>
     </div>
     <div class="flex items-center gap-2 flex-wrap">
+        <a href="{{ route('admin.bookings.drafts') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-800 shadow-xs text-xs font-bold transition">
+            <i class="bi bi-cart-x-fill text-amber-600"></i> Incomplete Drafts ({{ number_format($stats['drafts'] ?? 0) }})
+        </a>
         <a href="{{ route('admin.bookings.create') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-primary hover:bg-primary-dark text-white shadow-xs text-xs font-bold transition">
             <i class="bi bi-plus-circle-fill"></i> Create Manual Booking
         </a>
@@ -169,12 +180,17 @@
             </thead>
             <tbody class="divide-y divide-slate-100 text-xs">
                 @forelse($bookings as $b)
-                <tr class="hover:bg-slate-50/80 transition">
+                <tr class="transition {{ $b->status === 'pending' ? 'bg-amber-50/50 hover:bg-amber-100/60 border-l-4 border-l-amber-500 font-semibold' : 'hover:bg-slate-50/80' }} booking-row" id="booking-row-{{ $b->id }}">
                     <td class="py-3.5 px-4 no-export">
                         <input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary bulk-row-select cursor-pointer" value="{{ $b->id }}">
                     </td>
                     <td class="py-3.5 px-4" data-order="{{ $b->created_at ? $b->created_at->timestamp : 0 }}">
-                        <div class="font-black text-slate-900">#{{ $b->reference }}</div>
+                        <div class="flex items-center gap-1.5">
+                            @if($b->status === 'pending')
+                                <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0" title="Pending Confirmation"></span>
+                            @endif
+                            <span class="font-black text-slate-900">#{{ $b->reference }}</span>
+                        </div>
                         <div class="text-[11px] text-slate-400">{{ $b->created_at ? $b->created_at->format('M j, Y g:ia') : '' }}</div>
                     </td>
                     <td class="py-3.5 px-4">

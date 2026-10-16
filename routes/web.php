@@ -165,6 +165,12 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::post('/pricing/update', [AdminTourController::class, 'updatePricing'])->name('pricing.update');
 
     // Bookings & WhatsApp Leads
+    Route::get('/bookings/drafts', [AdminBookingController::class, 'drafts'])->name('bookings.drafts');
+    Route::get('/bookings/drafts/export', [AdminBookingController::class, 'exportDraftsCsv'])->name('bookings.drafts.export');
+    Route::post('/bookings/drafts/{id}/convert', [AdminBookingController::class, 'convertDraft'])->name('bookings.drafts.convert');
+    Route::post('/bookings/drafts/{id}/send-recovery', [AdminBookingController::class, 'sendDraftRecovery'])->name('bookings.drafts.send-recovery');
+    Route::delete('/bookings/drafts/{id}', [AdminBookingController::class, 'destroyDraft'])->name('bookings.drafts.destroy');
+    Route::post('/bookings/drafts/bulk-action', [AdminBookingController::class, 'bulkDraftsAction'])->name('bookings.drafts.bulk');
     Route::get('/bookings/export/csv', [AdminBookingController::class, 'exportCsv'])->name('bookings.export');
     Route::post('/bookings/bulk-action', [AdminBookingController::class, 'bulkAction'])->name('bookings.bulk');
     Route::resource('bookings', AdminBookingController::class)->only(['index', 'create', 'store', 'show', 'update', 'destroy']);
@@ -193,6 +199,8 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
 
     Route::get('/whatsapp-leads/export/csv', [AdminWhatsappController::class, 'exportCsv'])->name('whatsapp.export');
     Route::post('/whatsapp-leads/bulk-action', [AdminWhatsappController::class, 'bulkAction'])->name('whatsapp.bulk');
+    Route::post('/whatsapp-leads/{id}/mark-read', [AdminWhatsappController::class, 'markRead'])->name('whatsapp.mark-read');
+    Route::post('/whatsapp-leads/{id}/toggle-read', [AdminWhatsappController::class, 'toggleRead'])->name('whatsapp.toggle-read');
     Route::delete('/whatsapp-leads/{id}', [AdminWhatsappController::class, 'destroy'])->name('whatsapp.destroy');
     Route::get('/whatsapp-leads', [AdminWhatsappController::class, 'index'])->name('whatsapp.leads');
     Route::get('/whatsapp', [AdminWhatsappController::class, 'index'])->name('whatsapp.index');
@@ -211,6 +219,7 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::post('/inquiries/bulk-action', [AdminDashboardController::class, 'bulkInquiriesAction'])->name('inquiries.bulk');
     Route::get('/inquiries', [AdminDashboardController::class, 'inquiries'])->name('inquiries.index');
     Route::get('/inquiries/{id}', [AdminDashboardController::class, 'viewInquiry'])->name('inquiries.show');
+    Route::post('/inquiries/{id}/mark-read', [AdminDashboardController::class, 'markInquiryRead'])->name('inquiries.mark-read');
     Route::post('/inquiries/{id}/status', [AdminDashboardController::class, 'updateInquiryStatus'])->name('inquiries.status');
     Route::delete('/inquiries/{id}', [AdminDashboardController::class, 'deleteInquiry'])->name('inquiries.destroy');
 

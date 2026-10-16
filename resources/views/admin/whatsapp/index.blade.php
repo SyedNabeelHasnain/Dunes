@@ -2,6 +2,14 @@
 
 @section('page_title', 'WhatsApp Leads & Analytics')
 
+@section('breadcrumbs')
+    <a href="{{ route('admin.dashboard') }}" class="hover:text-primary transition flex items-center gap-1">
+        <i class="bi bi-house-door-fill text-xs"></i> <span>Dashboard</span>
+    </a>
+    <i class="bi bi-chevron-right text-[10px] text-slate-400"></i>
+    <span class="text-slate-800 font-semibold">WhatsApp Leads</span>
+@endsection
+
 @section('content')
 <div class="space-y-6" x-data>
     <!-- Top Header -->
@@ -121,9 +129,17 @@
                     <input type="text" name="search" id="leadSearch" class="w-full rounded-xl border border-slate-200 pl-10 pr-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden focus:border-primary transition" placeholder="Name, Phone, Tour..." value="{{ request('search') }}">
                 </div>
             </div>
-            <div class="lg:col-span-3">
+            <div class="lg:col-span-2">
+                <label for="statusFilter" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Status</label>
+                <select name="status" id="statusFilter" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-xs text-slate-800 outline-hidden bg-white focus:border-primary">
+                    <option value="">All Leads</option>
+                    <option value="new" {{ request('status') === 'new' ? 'selected' : '' }}>Action Needed (New)</option>
+                    <option value="read" {{ request('status') === 'read' ? 'selected' : '' }}>Read</option>
+                </select>
+            </div>
+            <div class="lg:col-span-2">
                 <label for="tourFilter" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Tour Package</label>
-                <select name="tour_name" id="tourFilter" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden bg-white focus:border-primary">
+                <select name="tour_name" id="tourFilter" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-xs text-slate-800 outline-hidden bg-white focus:border-primary">
                     <option value="">All Tours</option>
                     @foreach($availableTours as $tName)
                         <option value="{{ $tName }}" {{ request('tour_name') === $tName ? 'selected' : '' }}>{{ $tName }}</option>
@@ -132,16 +148,16 @@
             </div>
             <div class="lg:col-span-2">
                 <label for="deviceFilter" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Device Type</label>
-                <select name="device_type" id="deviceFilter" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden bg-white focus:border-primary">
+                <select name="device_type" id="deviceFilter" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-xs text-slate-800 outline-hidden bg-white focus:border-primary">
                     <option value="">All Devices</option>
                     <option value="mobile" {{ request('device_type') === 'mobile' ? 'selected' : '' }}>Mobile</option>
                     <option value="desktop" {{ request('device_type') === 'desktop' ? 'selected' : '' }}>Desktop</option>
                     <option value="tablet" {{ request('device_type') === 'tablet' ? 'selected' : '' }}>Tablet</option>
                 </select>
             </div>
-            <div class="lg:col-span-2">
+            <div class="lg:col-span-1">
                 <label for="fromDate" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">From Date</label>
-                <input type="date" name="from_date" id="fromDate" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary" value="{{ request('from_date') }}">
+                <input type="date" name="from_date" id="fromDate" class="w-full rounded-xl border border-slate-200 px-2.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary" value="{{ request('from_date') }}">
             </div>
             <div class="lg:col-span-2 flex items-center gap-2">
                 <button type="submit" class="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-xs shadow-xs transition cursor-pointer">
@@ -174,7 +190,10 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100 bg-white">
                     @forelse($leads as $lead)
-                    <tr class="hover:bg-slate-50/60 transition-colors">
+                    @php
+                        $isUnread = empty($lead->is_read) || $lead->status === 'new';
+                    @endphp
+                    <tr id="whatsapp-row-{{ $lead->id }}" class="transition-colors {{ $isUnread ? 'is-unread-lead bg-emerald-50/50 hover:bg-emerald-100/50 border-l-4 border-l-emerald-500 font-semibold' : 'hover:bg-slate-50/60' }} whatsapp-row" data-id="{{ $lead->id }}">
                         <td class="py-3 px-4 no-export">
                             <input type="checkbox" class="rounded border-slate-300 text-primary focus:ring-primary w-4 h-4 whatsapp-row-select" value="{{ $lead->id }}">
                         </td>
@@ -187,7 +206,14 @@
                             </div>
                         </td>
                         <td class="py-3 px-4">
-                            <div class="font-bold text-slate-900 text-xs">{{ $lead->name ?: 'Visitor' }}</div>
+                            <div class="flex items-center gap-1.5">
+                                @if($isUnread)
+                                    <span class="unread-badge inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300 uppercase tracking-wide">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> New
+                                    </span>
+                                @endif
+                                <span class="font-bold text-slate-900 text-xs">{{ $lead->name ?: 'Visitor' }}</span>
+                            </div>
                             <div class="text-emerald-600 font-mono font-bold text-xs mt-0.5">
                                 {{ $lead->phone }}
                             </div>
@@ -219,6 +245,12 @@
                                    title="Convert WhatsApp Lead to Booking">
                                     <i class="bi bi-calendar-plus text-xs"></i>
                                 </a>
+                                <button type="button" 
+                                        class="w-8 h-8 rounded-xl border border-slate-200 hover:border-emerald-500 text-slate-500 hover:text-emerald-600 flex items-center justify-center bg-white transition shadow-2xs btn-toggle-lead-read cursor-pointer" 
+                                        title="{{ $isUnread ? 'Mark as Read' : 'Mark as Unread' }}"
+                                        data-id="{{ $lead->id }}">
+                                    <i class="bi {{ $isUnread ? 'bi-envelope' : 'bi-envelope-open' }} text-xs"></i>
+                                </button>
                                 <button class="w-8 h-8 rounded-xl border border-slate-200 hover:border-primary hover:text-primary flex items-center justify-center text-slate-600 bg-white transition shadow-2xs view-lead-btn cursor-pointer" 
                                         title="View Full Lead Details"
                                         data-id="{{ $lead->id }}"
@@ -260,6 +292,12 @@
             <span class="text-xs font-semibold text-white">leads selected</span>
         </div>
         <div class="w-px h-5 bg-slate-700"></div>
+        <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition cursor-pointer btn-whatsapp-bulk-read" data-action="mark_read">
+            <i class="bi bi-eye text-emerald-400"></i> Mark Read
+        </button>
+        <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition cursor-pointer btn-whatsapp-bulk-read" data-action="mark_unread">
+            <i class="bi bi-bell text-amber-400"></i> Mark Unread
+        </button>
         <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition cursor-pointer" id="whatsappBulkDelete">
             <i class="bi bi-trash3"></i> Delete Selected
         </button>
@@ -454,7 +492,134 @@ $(document).ready(function() {
             promptPermanentDeleteLead(id, name, phone);
         });
 
+        // Auto mark as read on view details
+        const row = $(`#whatsapp-row-${id}`);
+        if (row.hasClass('is-unread-lead')) {
+            $.ajax({
+                url: `/admin/whatsapp-leads/${id}/mark-read`,
+                method: 'POST',
+                data: { _token: '{{ csrf_token() }}' },
+                headers: { 'Accept': 'application/json' },
+                success: function(res) {
+                    if (res.success) {
+                        row.removeClass('is-unread-lead bg-emerald-50/50 hover:bg-emerald-100/50 border-l-4 border-l-emerald-500 font-semibold');
+                        row.find('.unread-badge').remove();
+                        row.find('.btn-toggle-lead-read').attr('title', 'Mark as Unread');
+                        row.find('.btn-toggle-lead-read i').removeClass('bi-envelope').addClass('bi-envelope-open');
+                        if (res.unread_count !== undefined) {
+                            $('.whatsapp-unread-count').text(res.unread_count);
+                            if (res.unread_count === 0) {
+                                $('.whatsapp-unread-count').hide();
+                            } else {
+                                $('.whatsapp-unread-count').show();
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
         window.dispatchEvent(new CustomEvent('open-lead-modal'));
+    });
+
+    // Toggle Lead Read / Unread Status
+    $(document).on('click', '.btn-toggle-lead-read', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const btn = $(this);
+        const id = btn.data('id');
+        btn.prop('disabled', true);
+        $.ajax({
+            url: `/admin/whatsapp-leads/${id}/toggle-read`,
+            method: 'POST',
+            data: { _token: '{{ csrf_token() }}' },
+            headers: { 'Accept': 'application/json' },
+            success: function(res) {
+                if (res.success) {
+                    const row = $(`#whatsapp-row-${id}`);
+                    if (res.is_read) {
+                        row.removeClass('is-unread-lead bg-emerald-50/50 hover:bg-emerald-100/50 border-l-4 border-l-emerald-500 font-semibold');
+                        row.find('.unread-badge').remove();
+                        btn.attr('title', 'Mark as Unread');
+                        btn.find('i').removeClass('bi-envelope').addClass('bi-envelope-open');
+                    } else {
+                        row.addClass('is-unread-lead bg-emerald-50/50 hover:bg-emerald-100/50 border-l-4 border-l-emerald-500 font-semibold');
+                        if (!row.find('.unread-badge').length) {
+                            row.find('td:eq(2) .flex').prepend('<span class="unread-badge inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300 uppercase tracking-wide"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> New</span>');
+                        }
+                        btn.attr('title', 'Mark as Read');
+                        btn.find('i').removeClass('bi-envelope-open').addClass('bi-envelope');
+                    }
+                    if (res.unread_count !== undefined) {
+                        $('.whatsapp-unread-count').text(res.unread_count);
+                        if (res.unread_count === 0) {
+                            $('.whatsapp-unread-count').hide();
+                        } else {
+                            $('.whatsapp-unread-count').show();
+                        }
+                    }
+                }
+            },
+            complete: function() {
+                btn.prop('disabled', false);
+            }
+        });
+    });
+
+    // Bulk Mark Read / Unread
+    $(document).on('click', '.btn-whatsapp-bulk-read', function() {
+        const action = $(this).data('action');
+        const selectedIds = $('.whatsapp-row-select:checked').map(function() {
+            return $(this).val();
+        }).get();
+
+        if (selectedIds.length === 0) return;
+
+        $.ajax({
+            url: '{{ route("admin.whatsapp.bulk") }}',
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                ids: selectedIds,
+                action: action
+            },
+            headers: { 'Accept': 'application/json' },
+            success: function(res) {
+                if (res.success) {
+                    selectedIds.forEach(id => {
+                        const row = $(`#whatsapp-row-${id}`);
+                        const toggleBtn = row.find('.btn-toggle-lead-read');
+                        if (action === 'mark_read') {
+                            row.removeClass('is-unread-lead bg-emerald-50/50 hover:bg-emerald-100/50 border-l-4 border-l-emerald-500 font-semibold');
+                            row.find('.unread-badge').remove();
+                            toggleBtn.attr('title', 'Mark as Unread');
+                            toggleBtn.find('i').removeClass('bi-envelope').addClass('bi-envelope-open');
+                        } else {
+                            row.addClass('is-unread-lead bg-emerald-50/50 hover:bg-emerald-100/50 border-l-4 border-l-emerald-500 font-semibold');
+                            if (!row.find('.unread-badge').length) {
+                                row.find('td:eq(2) .flex').prepend('<span class="unread-badge inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300 uppercase tracking-wide"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> New</span>');
+                            }
+                            toggleBtn.attr('title', 'Mark as Read');
+                            toggleBtn.find('i').removeClass('bi-envelope-open').addClass('bi-envelope');
+                        }
+                    });
+                    if (res.unread_count !== undefined) {
+                        $('.whatsapp-unread-count').text(res.unread_count);
+                        if (res.unread_count === 0) {
+                            $('.whatsapp-unread-count').hide();
+                        } else {
+                            $('.whatsapp-unread-count').show();
+                        }
+                    }
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({ icon: 'success', title: 'Updated!', text: res.message, timer: 1500, showConfirmButton: false });
+                    }
+                    $waBulkBar.addClass('hidden');
+                    $waSelectAll.prop('checked', false);
+                    $('.whatsapp-row-select').prop('checked', false);
+                }
+            }
+        });
     });
 
     // WhatsApp Batch Bulk Selection & Processing

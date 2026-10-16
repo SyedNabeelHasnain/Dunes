@@ -88,5 +88,44 @@ class AppServiceProvider extends ServiceProvider
                 $view->with('activeLanguages', Language::fallbackCollection());
             }
         });
+
+        View::composer(['layouts.admin', 'admin.*'], function ($view) {
+            try {
+                $sidebarCounts = \Illuminate\Support\Facades\Cache::remember('admin_sidebar_counts', 15, function () {
+                    $pendingBookings = \App\Models\Booking::where('status', 'pending')->whereNull('deleted_at')->count();
+                    $draftBookings = \App\Models\Booking::where('status', 'draft')->whereNull('deleted_at')->count();
+                    $newInquiries = \App\Models\Contact::where('status', 'new')->whereNull('deleted_at')->count();
+
+                    $unreadWhatsapp = 0;
+                    try {
+                        $unreadWhatsapp = \App\Models\WhatsappInquiry::where(function ($q) {
+                            $q->where('is_read', false)->orWhereNull('is_read');
+                        })->count();
+                    } catch (\Throwable $ex) {}
+
+                    $pendingReviews = 0;
+                    try {
+                        $pendingReviews = \App\Models\Review::where('status', 'pending')->count();
+                    } catch (\Throwable $ex) {}
+
+                    return [
+                        'pending_bookings' => $pendingBookings,
+                        'draft_bookings' => $draftBookings,
+                        'new_inquiries' => $newInquiries,
+                        'unread_whatsapp' => $unreadWhatsapp,
+                        'pending_reviews' => $pendingReviews,
+                    ];
+                });
+                $view->with('sidebarCounts', $sidebarCounts);
+            } catch (\Throwable $e) {
+                $view->with('sidebarCounts', [
+                    'pending_bookings' => 0,
+                    'draft_bookings' => 0,
+                    'new_inquiries' => 0,
+                    'unread_whatsapp' => 0,
+                    'pending_reviews' => 0,
+                ]);
+            }
+        });
     }
 }

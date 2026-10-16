@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\AbandonedBookingRecoveryMail;
 use App\Mail\BookingNotification;
 use App\Mail\PaymentLinkMail;
 use App\Models\Addon;
@@ -131,6 +132,349 @@ class AdminBookingController extends Controller
         $bookings = $query->orderBy('created_at', 'desc')->get();
 
         return view('admin.bookings.index', compact('bookings', 'status', 'search', 'paymentStatus', 'fromDate', 'toDate', 'stats', 'trendData', 'statusDistribution'));
+    }
+
+    /**
+     * Display a comprehensive listing and recovery hub for Incomplete Drafts & Abandoned Checkouts.
+     */
+    public function drafts(Request $request)
+    {
+        $search = $request->input('search');
+        $tourId = $request->input('tour_id');
+        $contactType = $request->input('contact_type');
+        $fromDate = $request->input('from_date');
+        $toDate = $request->input('to_date');
+
+        $query = Booking::with(['tour', 'tier'])
+            ->where('status', 'draft');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('reference', 'like', "%{$search}%")
+                    ->orWhere('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('tour_name', 'like', "%{$search}%");
+            });
+        }
+
+        if ($tourId) {
+            $query->where('tour_id', $tourId);
+        }
+
+        if ($contactType === 'has_phone') {
+            $query->whereNotNull('phone')->where('phone', '!=', '');
+        } elseif ($contactType === 'has_email') {
+            $query->whereNotNull('email')->where('email', '!=', '')->where('email', 'not like', '%@guest.local');
+        } elseif ($contactType === 'both') {
+            $query->whereNotNull('phone')->where('phone', '!=', '')
+                ->whereNotNull('email')->where('email', '!=', '')->where('email', 'not like', '%@guest.local');
+        }
+
+        if ($fromDate) {
+            $query->whereDate('created_at', '>=', $fromDate);
+        }
+        if ($toDate) {
+            $query->whereDate('created_at', '<=', $toDate);
+        }
+
+        // Analytics KPIs for Drafts
+        $totalDrafts = Booking::where('status', 'draft')->count();
+        $todayDrafts = Booking::where('status', 'draft')->whereDate('created_at', today())->count();
+        $recoverableValue = (float) Booking::where('status', 'draft')->sum('total');
+
+        $contactableCount = Booking::where('status', 'draft')
+            ->where(function ($q) {
+                $q->where(function ($sq) {
+                    $sq->whereNotNull('phone')->where('phone', '!=', '');
+                })->orWhere(function ($sq) {
+                    $sq->whereNotNull('email')->where('email', '!=', '')->where('email', 'not like', '%@guest.local');
+                });
+            })
+            ->count();
+        $contactableRate = $totalDrafts > 0 ? round(($contactableCount / $totalDrafts) * 100, 1) : 0;
+
+        $stats = [
+            'total' => $totalDrafts,
+            'today' => $todayDrafts,
+            'recoverable_value' => $recoverableValue,
+            'contactable_count' => $contactableCount,
+            'contactable_rate' => $contactableRate,
+        ];
+
+        // 14-Day Abandonment Trend
+        $dailyTrend = Booking::where('status', 'draft')
+            ->where('created_at', '>=', now()->subDays(13)->startOfDay())
+            ->selectRaw('DATE(created_at) as d, COUNT(*) as c, SUM(total) as val')
+            ->groupBy('d')
+            ->get()
+            ->keyBy('d');
+
+        $trendData = [];
+        for ($i = 13; $i >= 0; $i--) {
+            $date = now()->subDays($i)->format('Y-m-d');
+            $label = now()->subDays($i)->format('M j');
+            $row = $dailyTrend->get($date);
+            $trendData[] = [
+                'date' => $label,
+                'count' => $row ? (int) $row->c : 0,
+                'value' => $row ? (float) $row->val : 0.0,
+            ];
+        }
+
+        $availableTours = Tour::select('id', 'name')->orderBy('name')->get();
+
+        $drafts = $query->orderBy('created_at', 'desc')->paginate(25)->withQueryString();
+
+        return view('admin.bookings.drafts', compact(
+            'drafts',
+            'stats',
+            'trendData',
+            'availableTours',
+            'search',
+            'tourId',
+            'contactType',
+            'fromDate',
+            'toDate'
+        ));
+    }
+
+    /**
+     * Convert an abandoned checkout draft to a full booking.
+     */
+    public function convertDraft(Request $request, int $id)
+    {
+        $draft = Booking::where('id', $id)->where('status', 'draft')->firstOrFail();
+
+        $targetStatus = $request->input('target_status', $request->input('status', 'pending'));
+        if (! in_array($targetStatus, ['pending', 'confirmed'])) {
+            $targetStatus = 'pending';
+        }
+
+        $newReference = str_starts_with($draft->reference, 'DFT')
+            ? 'DDT'.date('ymd').strtoupper(Str::random(5))
+            : $draft->reference;
+
+        $updateData = [
+            'reference' => $newReference,
+            'status' => $targetStatus,
+            'payment_status' => $request->input('payment_status', $draft->payment_status ?: 'unpaid'),
+        ];
+        if ($request->filled('notes')) {
+            $updateData['special_requests'] = $request->input('notes');
+        }
+
+        $draft->update($updateData);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Draft successfully converted to booking #{$draft->reference}!",
+                'redirect_url' => route('admin.bookings.show', $draft->id),
+            ]);
+        }
+
+        return redirect()->route('admin.bookings.show', $draft->id)
+            ->with('success', "Draft converted to booking #{$draft->reference} successfully.");
+    }
+
+    /**
+     * Send direct recovery email to the abandoned draft guest.
+     */
+    public function sendDraftRecovery(Request $request, int $id)
+    {
+        $draft = Booking::where('id', $id)->where('status', 'draft')->firstOrFail();
+
+        if (empty($draft->email) || str_ends_with($draft->email, '@guest.local') || ! filter_var($draft->email, FILTER_VALIDATE_EMAIL)) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This draft has no valid customer email address to send recovery email.',
+                ], 422);
+            }
+
+            return redirect()->back()->with('error', 'No valid email found on this draft.');
+        }
+
+        try {
+            if (! app()->environment('testing')) {
+                try {
+                    app(EmailMarketingService::class)->applySmtpConfig();
+                } catch (\Throwable $e) {}
+            }
+
+            Mail::to($draft->email)->send(new AbandonedBookingRecoveryMail($draft));
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => "Recovery email dispatched to {$draft->email} successfully!",
+                ]);
+            }
+
+            return redirect()->back()->with('success', "Recovery email sent to {$draft->email}.");
+        } catch (\Throwable $e) {
+            Log::error("Failed to send draft recovery email for draft #{$draft->id}: ".$e->getMessage());
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to send recovery email: '.$e->getMessage(),
+                ], 500);
+            }
+
+            return redirect()->back()->with('error', 'Error sending recovery email: '.$e->getMessage());
+        }
+    }
+
+    /**
+     * Delete an abandoned draft permanently.
+     */
+    public function destroyDraft(Request $request, int $id)
+    {
+        try {
+            $draft = Booking::where('id', $id)->where('status', 'draft')->firstOrFail();
+            $ref = $draft->reference;
+
+            // Delete associated addons if any
+            BookingAddon::where('booking_id', $draft->id)->delete();
+            $draft->forceDelete();
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => "Draft #{$ref} permanently removed.",
+                ]);
+            }
+
+            return redirect()->route('admin.bookings.drafts')
+                ->with('success', "Draft #{$ref} permanently removed.");
+        } catch (\Throwable $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to delete draft: '.$e->getMessage(),
+                ], 500);
+            }
+
+            return redirect()->back()->with('error', 'Failed to delete draft.');
+        }
+    }
+
+    /**
+     * Batch bulk actions for drafts.
+     */
+    public function bulkDraftsAction(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'required|integer',
+            'action' => 'required|string|in:delete',
+        ]);
+
+        $ids = $request->input('ids');
+        $action = $request->input('action');
+
+        if ($action === 'delete') {
+            BookingAddon::whereIn('booking_id', $ids)->delete();
+            $deleted = Booking::whereIn('id', $ids)->where('status', 'draft')->forceDelete();
+
+            return response()->json([
+                'success' => true,
+                'message' => "{$deleted} draft(s) permanently removed.",
+            ]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Invalid action.'], 400);
+    }
+
+    /**
+     * Export abandoned checkout drafts to CSV.
+     */
+    public function exportDraftsCsv(Request $request)
+    {
+        $fileName = 'dunes-abandoned-drafts-'.date('Y-m-d-His').'.csv';
+
+        $query = Booking::with(['tour', 'tier'])
+            ->where('status', 'draft');
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('reference', 'like', "%{$search}%")
+                    ->orWhere('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('tour_name', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('tour_id')) {
+            $query->where('tour_id', $request->input('tour_id'));
+        }
+
+        if ($request->filled('contact_type')) {
+            $ct = $request->input('contact_type');
+            if ($ct === 'has_phone') {
+                $query->whereNotNull('phone')->where('phone', '!=', '');
+            } elseif ($ct === 'has_email') {
+                $query->whereNotNull('email')->where('email', '!=', '')->where('email', 'not like', '%@guest.local');
+            } elseif ($ct === 'both') {
+                $query->whereNotNull('phone')->where('phone', '!=', '')
+                    ->whereNotNull('email')->where('email', '!=', '')->where('email', 'not like', '%@guest.local');
+            }
+        }
+
+        if ($request->filled('from_date')) {
+            $query->whereDate('created_at', '>=', $request->input('from_date'));
+        }
+        if ($request->filled('to_date')) {
+            $query->whereDate('created_at', '<=', $request->input('to_date'));
+        }
+
+        $drafts = $query->orderBy('created_at', 'desc')->get();
+
+        $headers = [
+            'Content-type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename={$fileName}",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+
+        $columns = [
+            'Draft Ref', 'Date Dropped', 'Guest Name', 'Phone', 'Email',
+            'Tour Name', 'Package Tier', 'Target Tour Date', 'Adults', 'Children', 'Infants',
+            'Cart Total AED', 'Pickup Location', 'IP Address',
+        ];
+
+        $callback = function () use ($drafts, $columns) {
+            $file = fopen('php://output', 'w');
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+            fputcsv($file, $columns);
+
+            foreach ($drafts as $d) {
+                fputcsv($file, [
+                    $d->reference,
+                    $d->created_at?->format('Y-m-d H:i:s') ?? '',
+                    $d->name,
+                    $d->phone ?: '',
+                    str_ends_with((string) $d->email, '@guest.local') ? '' : $d->email,
+                    $d->tour_name,
+                    $d->tier_name,
+                    $d->tour_date ? $d->tour_date->format('Y-m-d') : '',
+                    $d->adults,
+                    $d->children,
+                    $d->infants,
+                    number_format((float) $d->total, 2, '.', ''),
+                    $d->pickup_location ?: '',
+                    $d->ip_address ?: '',
+                ]);
+            }
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
     /**
