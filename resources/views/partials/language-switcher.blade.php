@@ -6,7 +6,7 @@
 @endphp
 <div class="relative inline-block text-start" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">
     <button @click="open = !open" :aria-expanded="open" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-slate-800 bg-white border border-slate-200/90 shadow-sm hover:border-primary/50 transition-all cursor-pointer min-h-[38px]" type="button" id="{{ $dropdownId }}">
-        <span class="text-base leading-none">{{ $curLang ? $curLang->flag_emoji : '🌐' }}</span>
+        <i class="bi bi-globe2 text-xs text-primary leading-none"></i>
         <span class="font-extrabold uppercase text-[11px]">{{ strtoupper($curLocale) }}</span>
         <i class="bi bi-chevron-down text-[10px] text-slate-500 transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
     </button>
@@ -20,7 +20,7 @@
          class="absolute end-0 mt-2 w-52 rounded-2xl bg-white p-2 shadow-xl border border-slate-200 z-50 focus:outline-none"
          style="display: none;">
         <div class="px-2 py-1 text-[11px] font-extrabold uppercase tracking-wider text-slate-500">
-            Select Language
+            {{ __('ui.common.language') }}
         </div>
         <div class="space-y-1 mt-1">
             @foreach($langs as $language)
@@ -29,9 +29,8 @@
                     $switchUrl = switch_locale_url($language->code);
                 @endphp
                 <a href="{{ $switchUrl }}"
-                   class="w-full rounded-xl px-2.5 py-2 text-xs font-semibold {{ $isCur ? 'bg-orange-50/80 text-primary font-bold' : 'text-slate-700 hover:bg-slate-50 hover:text-primary' }} flex items-center justify-between transition-colors">
-                    <span class="flex items-center gap-2">
-                        <span class="text-base leading-none">{{ $language->flag_emoji }}</span>
+                   class="w-full rounded-xl px-3 py-2 text-xs font-semibold {{ $isCur ? 'bg-orange-50/80 text-primary font-bold' : 'text-slate-700 hover:bg-slate-50 hover:text-primary' }} flex items-center justify-between transition-colors">
+                    <span class="flex items-center gap-1.5">
                         <span>{{ $language->name }}</span>
                         @if($language->native_name && $language->native_name !== $language->name)
                             <small class="text-slate-400 font-normal">({{ $language->native_name }})</small>

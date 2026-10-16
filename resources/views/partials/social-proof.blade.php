@@ -1,6 +1,14 @@
 <!-- Real-Time Social Proof & Urgency Toast Component (Tailwind v4) -->
+@php
+    $spEnabled = (string) ($settings['social_proof_enabled'] ?? '1') === '1';
+    $spMobileEnabled = (string) ($settings['social_proof_mobile_enabled'] ?? '1') === '1';
+    $spInitialDelayMs = max(1, (int) ($settings['social_proof_initial_delay'] ?? 8)) * 1000;
+    $spDurationMs = max(2, (int) ($settings['social_proof_duration'] ?? 6)) * 1000;
+    $spIntervalMs = max(5, (int) ($settings['social_proof_interval'] ?? 24)) * 1000;
+@endphp
+@if($spEnabled)
 <div id="dunesSocialProofToast" 
-     class="fixed bottom-24 sm:bottom-6 start-4 sm:start-6 z-40 max-w-sm w-[calc(100%-2rem)] pb-safe opacity-0 translate-y-6 scale-95 pointer-events-none transition-all duration-500 ease-out" 
+     class="fixed bottom-24 sm:bottom-6 start-4 sm:start-6 z-40 max-w-sm w-[calc(100%-2rem)] pb-safe opacity-0 translate-y-6 scale-95 pointer-events-none transition-all duration-500 ease-out {{ $spMobileEnabled ? '' : 'hidden sm:block' }}" 
      aria-live="polite" 
      role="status" 
      style="display: none;">
@@ -37,6 +45,15 @@
 <script>
 (function() {
     'use strict';
+
+    const MOBILE_ENABLED = {{ $spMobileEnabled ? 'true' : 'false' }};
+    const INITIAL_DELAY_MS = {{ $spInitialDelayMs }};
+    const DISPLAY_DURATION_MS = {{ $spDurationMs }};
+    const INTERVAL_MS = {{ $spIntervalMs }};
+
+    if (!MOBILE_ENABLED && window.innerWidth < 640) {
+        return;
+    }
 
     if (sessionStorage.getItem('dunes_sp_dismissed') === '1') {
         return;
@@ -79,8 +96,11 @@
     });
 
     function showToast() {
+        if (!MOBILE_ENABLED && window.innerWidth < 640) {
+            return;
+        }
         if (sessionStorage.getItem('dunes_sp_dismissed') === '1' || document.hidden) {
-            nextTimeout = setTimeout(showToast, 15000);
+            nextTimeout = setTimeout(showToast, INTERVAL_MS);
             return;
         }
 
@@ -110,7 +130,7 @@
             if (!isHovered) {
                 hideToast();
             }
-        }, 6000);
+        }, DISPLAY_DURATION_MS);
     }
 
     function hideToast() {
@@ -122,8 +142,8 @@
             }
         }, 500);
 
-        const delay = Math.floor(Math.random() * 8000) + 20000;
-        nextTimeout = setTimeout(showToast, delay);
+        const jitter = Math.floor(Math.random() * 4000);
+        nextTimeout = setTimeout(showToast, INTERVAL_MS + jitter);
     }
 
     document.addEventListener('visibilitychange', function() {
@@ -131,7 +151,7 @@
             clearTimeout(hideTimeout);
             clearTimeout(nextTimeout);
         } else if (sessionStorage.getItem('dunes_sp_dismissed') !== '1') {
-            nextTimeout = setTimeout(showToast, 8000);
+            nextTimeout = setTimeout(showToast, INITIAL_DELAY_MS);
         }
     });
 
@@ -145,11 +165,12 @@
                 if (data && data.success && Array.isArray(data.items) && data.items.length) {
                     items = data.items;
                     items.sort(function() { return 0.5 - Math.random(); });
-                    nextTimeout = setTimeout(showToast, 7500);
+                    nextTimeout = setTimeout(showToast, INITIAL_DELAY_MS);
                 }
             })
             .catch(function(e) {});
-        }, 1500);
+        }, 1200);
     });
 })();
 </script>
+@endif

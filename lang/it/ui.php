@@ -18,6 +18,8 @@ return [
         'search_placeholder' => 'Cerca safari nel deserto, tour in buggy, dune bashing...',
         'tours' => 'Tour ed Esperienze',
         'legal_policies' => 'Termini e Politiche Legali',
+        'terms' => 'Termini e Condizioni',
+        'privacy' => 'Informativa sulla Privacy',
     ],
 
     // Guest Experience Gallery Section
@@ -28,6 +30,8 @@ return [
         'view_all' => 'Esplora Galleria Completa',
         'all_moments' => 'Tutti i Momenti',
         'verified_review' => 'Recensione Verificata',
+        'verified_reviews' => 'Recensioni Verificate',
+        'guest_rating' => 'Valutazione Ospiti',
         'book_this' => 'Prenota Questo Safari',
         'close' => 'Chiudi',
         'prev' => 'Precedente',
@@ -38,6 +42,8 @@ return [
         'filter_buggy_quad' => 'Buggy e Quad',
         'filter_camp_bbq' => 'Accampamento e Barbecue',
         'filter_sunset_camels' => 'Tramonto e Cammelli',
+        'filter_city_landmarks' => 'Tour della Città',
+        'filter_marina_cruise' => 'Crociera Dhow e Marina',
         'filter_videos' => 'Video Clip',
     ],
 
@@ -88,6 +94,9 @@ return [
         'happy_guests' => 'Ospiti Felici',
         'breadcrumb' => 'Percorso di navigazione',
         'close' => 'Chiudi',
+        'back' => 'Indietro',
+        'language' => 'Lingua',
+        'currency' => 'Valuta',
         'remove' => 'Rimuovi',
         'detect_location' => 'Rileva posizione attuale',
         'copy_code' => 'Copia codice',
@@ -649,5 +658,16 @@ return [
         'feedback_title' => 'Apprezziamo la tua sincerità',
         'feedback_placeholder' => 'Spiega al nostro team operativo cosa possiamo migliorare (autista, cibo, campo, orari)...',
         'submit_feedback' => 'Invia Feedback Privato',
+    ],
+
+    // WhatsApp Concierge Modal
+    'whatsapp_modal' => [
+        'title' => 'Concierge Safari 24/7',
+        'subtitle' => 'Chatta direttamente con i nostri specialisti di safari nel deserto di Dubai.',
+        'online' => 'Concierge Online',
+        'inquiring_about' => 'Esperienza Selezionata',
+        'privacy_note' => 'Il nostro concierge certificato risponderà direttamente sul tuo WhatsApp.',
+        'no_spam' => 'Garanzia Zero Spam',
+        'fast_response' => 'Risposta < 2 Min',
     ],
 ];

@@ -161,18 +161,26 @@
                                 <i class="bi bi-compass-fill text-base"></i>
                             </div>
                             <div>
-                                <h2 class="text-sm font-black text-slate-900">Safari Match Concierge Promo Controls</h2>
-                                <p class="text-xs text-slate-400">Interactive 3-step quiz recommendation reward code (MATCH5)</p>
+                                <h2 class="text-sm font-black text-slate-900">Safari Match Concierge Quiz & Promo Controls</h2>
+                                <p class="text-xs text-slate-400">Interactive 3-step quiz recommendation widget & reward code (MATCH5)</p>
                             </div>
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" class="sr-only peer" id="concierge_promo_active" name="concierge_promo_active" value="1" {{ ($settings->get('concierge_promo_active', '0') == '1') ? 'checked' : '' }}>
+                        <label class="relative inline-flex items-center cursor-pointer" title="Enable/Disable Safari Match Concierge Quiz Modal">
+                            <input type="checkbox" class="sr-only peer" id="safari_matcher_enabled" name="safari_matcher_enabled" value="1" {{ ($settings->get('safari_matcher_enabled', '1') == '1') ? 'checked' : '' }}>
                             <div class="w-9 h-5 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
-                            <span class="ml-2 text-xs font-bold text-slate-500">Active</span>
+                            <span class="ml-2 text-xs font-bold text-slate-500">Quiz Enabled</span>
                         </label>
                     </div>
 
                     <div class="p-6 space-y-4">
+                        <label class="flex items-center justify-between gap-2.5 p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 cursor-pointer">
+                            <div>
+                                <span class="text-xs font-bold text-slate-900 block">Attach Promo Discount Reward to Quiz Completion</span>
+                                <span class="text-[11px] text-slate-500">When unchecked, the quiz runs in Pure Curation Mode without discount codes</span>
+                            </div>
+                            <input class="rounded border-slate-300 text-primary focus:ring-primary w-4 h-4" type="checkbox" id="concierge_promo_active" name="concierge_promo_active" value="1" {{ ($settings->get('concierge_promo_active', '0') == '1') ? 'checked' : '' }}>
+                        </label>
+
                         @if($settings->get('concierge_promo_active', '0') == '1')
                         <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-start gap-2">
                             <i class="bi bi-check-circle-fill text-emerald-600 mt-0.5"></i>
@@ -251,9 +259,87 @@
                     </div>
                 </div>
 
+                <!-- Card 5: Live Social Proof & Urgency Toast (dunesSocialProofToast) -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden" id="socialProofSettingsCard">
+                    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                <i class="bi bi-patch-check-fill text-base"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-sm font-black text-slate-900">Live Social Proof Toast (<code class="text-xs font-mono text-primary">dunesSocialProofToast</code>)</h2>
+                                <p class="text-xs text-slate-400">Real-time bottom-left booking notification toast ("Michael R. booked...")</p>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only peer" id="social_proof_enabled" name="social_proof_enabled" value="1" {{ ($settings->get('social_proof_enabled', '1') == '1') ? 'checked' : '' }}>
+                            <div class="w-9 h-5 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+                            <span class="ml-2 text-xs font-bold text-slate-500">Active</span>
+                        </label>
+                    </div>
+
+                    <div class="p-6 space-y-4">
+                        @if($settings->get('social_proof_enabled', '1') == '1')
+                        <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-start gap-2">
+                            <i class="bi bi-broadcast-pin text-emerald-600 mt-0.5"></i>
+                            <div><strong>Live Social Proof Toast is Active:</strong> Visitors see non-intrusive recent booking notifications in the bottom-left corner with verified badges and direct links to the booked safari.</div>
+                        </div>
+                        @else
+                        <div class="p-3.5 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-700 flex items-start gap-2">
+                            <i class="bi bi-eye-slash-fill text-slate-500 mt-0.5"></i>
+                            <div><strong>Live Social Proof Toast is Disabled:</strong> No floating booking notifications (<code class="font-mono">dunesSocialProofToast</code>) will appear on any page.</div>
+                        </div>
+                        @endif
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5" for="social_proof_source">Feed Data Source</label>
+                                <select id="social_proof_source" name="social_proof_source" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:border-primary outline-hidden bg-white">
+                                    <option value="all" {{ $settings->get('social_proof_source', 'all') === 'all' ? 'selected' : '' }}>Real Bookings + Curated Fallback (Recommended)</option>
+                                    <option value="bookings_only" {{ $settings->get('social_proof_source', 'all') === 'bookings_only' ? 'selected' : '' }}>Real Database Bookings Only</option>
+                                    <option value="custom_only" {{ $settings->get('social_proof_source', 'all') === 'custom_only' ? 'selected' : '' }}>Curated Showcase Feed Only</option>
+                                </select>
+                            </div>
+
+                            <div class="flex items-end">
+                                <label class="w-full flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 bg-slate-50/60 cursor-pointer">
+                                    <input class="rounded border-slate-300 text-primary focus:ring-primary" type="checkbox" id="social_proof_mobile_enabled" name="social_proof_mobile_enabled" value="1" {{ ($settings->get('social_proof_mobile_enabled', '1') == '1') ? 'checked' : '' }}>
+                                    <span class="text-xs font-bold text-slate-800">Display on Mobile Devices (&lt;640px)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5" for="social_proof_initial_delay">Initial Delay</label>
+                                <div class="relative">
+                                    <input type="number" step="1" min="2" max="120" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 pr-14 text-sm font-bold text-slate-800 focus:border-primary outline-hidden" id="social_proof_initial_delay" name="social_proof_initial_delay" value="{{ $settings->get('social_proof_initial_delay', '8') }}">
+                                    <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-xs font-bold text-slate-400">Secs</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5" for="social_proof_duration">Display Duration</label>
+                                <div class="relative">
+                                    <input type="number" step="1" min="3" max="30" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 pr-14 text-sm font-bold text-slate-800 focus:border-primary outline-hidden" id="social_proof_duration" name="social_proof_duration" value="{{ $settings->get('social_proof_duration', '6') }}">
+                                    <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-xs font-bold text-slate-400">Secs</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5" for="social_proof_interval">Repeat Interval</label>
+                                <div class="relative">
+                                    <input type="number" step="1" min="10" max="180" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 pr-14 text-sm font-bold text-slate-800 focus:border-primary outline-hidden" id="social_proof_interval" name="social_proof_interval" value="{{ $settings->get('social_proof_interval', '24') }}">
+                                    <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-xs font-bold text-slate-400">Secs</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="flex justify-end">
-                    <button type="submit" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-sm shadow-xs transition-all">
-                        <i class="bi bi-save"></i> Save Promotion Settings
+                    <button type="submit" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-sm shadow-xs transition-all cursor-pointer">
+                        <i class="bi bi-save"></i> Save Promotion & Widget Settings
                     </button>
                 </div>
             </div>
@@ -303,6 +389,36 @@
                         </div>
                     </div>
 
+                    <!-- Live Social Proof Toast Preview -->
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Live Social Proof Toast:</span>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ ($settings->get('social_proof_enabled', '1') == '1') ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-500 border border-slate-200' }}">
+                                {{ ($settings->get('social_proof_enabled', '1') == '1') ? 'Enabled' : 'Disabled' }}
+                            </span>
+                        </div>
+                        <div class="p-3 bg-white rounded-2xl shadow-md border border-slate-200/90 flex items-center gap-3 relative {{ ($settings->get('social_proof_enabled', '1') == '1') ? '' : 'opacity-50 grayscale' }}">
+                            <div class="relative shrink-0 w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shadow-2xs">
+                                <img src="{{ asset('images/evening-desert-safari-dubai-hero.avif') }}" alt="Tour" class="w-full h-full object-cover">
+                                <span class="absolute -bottom-1 -end-1 bg-white rounded-full p-0.5 shadow-2xs text-emerald-500 text-xs flex items-center justify-center">
+                                    <i class="bi bi-patch-check-fill"></i>
+                                </span>
+                            </div>
+                            <div class="flex-1 min-w-0 pe-4">
+                                <div class="flex items-center gap-1 mb-0.5">
+                                    <span class="font-bold text-slate-900 text-xs truncate">Michael R.</span>
+                                    <span class="text-slate-500 text-[11px]">booked</span>
+                                </div>
+                                <span class="block font-bold text-xs text-primary truncate">Premium Evening Desert Safari</span>
+                                <div class="flex items-center gap-1.5 text-slate-500 text-[10px] mt-0.5">
+                                    <span class="flex items-center gap-1"><i class="bi bi-clock"></i>12m ago</span>
+                                    <span>&bull;</span>
+                                    <span class="text-emerald-600 font-semibold flex items-center gap-0.5"><i class="bi bi-shield-check"></i> Verified</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Concierge Mode Preview -->
                     <div>
                         <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Safari Match Concierge Mode:</span>
@@ -330,8 +446,8 @@
                         </div>
                         <ul class="list-disc pl-4 text-[11px] text-slate-500 space-y-1">
                             <li>The 25% First-Time Visitor offer provides maximum incentive for new travelers.</li>
+                            <li>The Live Social Proof Toast builds instant trust using real recent bookings.</li>
                             <li>The Safari Match Concierge provides 1-on-1 advisor curation without diluting margins when promo is off.</li>
-                            <li>All coupon redemptions and leads are tracked in real-time in the admin analytics.</li>
                         </ul>
                     </div>
                 </div>

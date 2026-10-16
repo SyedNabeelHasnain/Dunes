@@ -1,6 +1,16 @@
 @php
-    if (!isset($settings) || !is_array($settings)) {
-        $settings = [];
+    if (!isset($settings) || (!is_array($settings) && !($settings instanceof \ArrayAccess))) {
+        try {
+            $settings = app(\App\Services\SettingsService::class)->all();
+        } catch (\Throwable $e) {
+            $settings = [];
+        }
+    } elseif (is_countable($settings) && count($settings) === 0) {
+        try {
+            $settings = app(\App\Services\SettingsService::class)->all();
+        } catch (\Throwable $e) {
+            $settings = [];
+        }
     }
 
     try {
@@ -574,12 +584,12 @@
                            target="_blank" 
                            rel="noopener" 
                            id="googleCircle" 
-                           class="nav-review-circle hidden sm:inline-flex items-center gap-1 px-2 py-1.5 rounded-full bg-white border border-slate-200/90 shadow-2xs hover:bg-slate-50 transition-all cursor-pointer min-h-[36px]"
+                           class="nav-review-circle inline-flex items-center gap-1 px-1.5 sm:px-2 py-1 sm:py-1.5 rounded-full bg-white border border-slate-200/90 shadow-2xs hover:bg-slate-50 transition-all cursor-pointer min-h-[32px] sm:min-h-[36px] shrink-0"
                            onclick="toggleReviewPopover(this, event)"
-                           title="Google Reviews: 5.0 Rating">
+                           title="{{ __('ui.common.google_reviews') }}">
                             <img src="{{ asset('images/Google-G.avif') }}" alt="Google" width="15" height="15" class="w-3.5 h-3.5 object-contain shrink-0">
-                            <span class="text-xs font-black text-slate-800 leading-none">5.0</span>
-                            <i class="bi bi-star-fill text-amber-400 text-[10px] leading-none"></i>
+                            <span class="text-[11px] sm:text-xs font-black text-slate-800 leading-none">5.0</span>
+                            <i class="bi bi-star-fill text-amber-400 text-[9px] sm:text-[10px] leading-none"></i>
                         </a>
 
                         <!-- TripAdvisor Review Trust Badge (Mobile with 4.9 Rating) -->
@@ -587,26 +597,26 @@
                            target="_blank" 
                            rel="noopener" 
                            id="taCircle" 
-                           class="nav-review-circle hidden sm:inline-flex items-center gap-1 px-2 py-1.5 rounded-full bg-white border border-slate-200/90 shadow-2xs hover:bg-slate-50 transition-all cursor-pointer min-h-[36px]"
+                           class="nav-review-circle inline-flex items-center gap-1 px-1.5 sm:px-2 py-1 sm:py-1.5 rounded-full bg-white border border-slate-200/90 shadow-2xs hover:bg-slate-50 transition-all cursor-pointer min-h-[32px] sm:min-h-[36px] shrink-0"
                            onclick="toggleReviewPopover(this, event)"
-                           title="TripAdvisor Reviews: 4.9 Rating">
-                            <img src="{{ asset('images/tripadvisor-color-logo.svg') }}" alt="TripAdvisor" width="16" height="16" class="w-4 h-4 object-contain shrink-0">
-                            <span class="text-xs font-black text-slate-800 leading-none">4.9</span>
-                            <i class="bi bi-star-fill text-emerald-600 text-[10px] leading-none"></i>
+                           title="{{ __('ui.common.tripadvisor_reviews') }}">
+                            <img src="{{ asset('images/tripadvisor-color-logo.svg') }}" alt="TripAdvisor" width="16" height="16" class="w-3.5 h-3.5 sm:w-4 sm:h-4 object-contain shrink-0">
+                            <span class="text-[11px] sm:text-xs font-black text-slate-800 leading-none">4.9</span>
+                            <i class="bi bi-star-fill text-emerald-600 text-[9px] sm:text-[10px] leading-none"></i>
                         </a>
 
                         <!-- Quick Search Button (Min 44x44px Hit Target) -->
-                        <button type="button" class="w-10 h-10 sm:w-11 sm:h-11 rounded-full text-slate-700 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer text-sm shrink-0" @click="$store.modal.open('search')" aria-label="{{ __('ui.nav.search_placeholder') }}">
+                        <button type="button" class="w-9 h-9 sm:w-11 sm:h-11 rounded-full text-slate-700 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer text-sm shrink-0" @click="$store.modal.open('search')" aria-label="{{ __('ui.nav.search_placeholder') }}">
                             <i class="bi bi-search"></i>
                         </button>
 
                         <!-- WhatsApp Direct Button (Min 44x44px Hit Target) -->
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" class="w-10 h-10 sm:w-11 sm:h-11 rounded-full text-emerald-600 hover:bg-emerald-50 flex items-center justify-center transition-colors cursor-pointer text-base btn-whatsapp shrink-0" aria-label="{{ __('ui.common.whatsapp') }}" target="_blank" rel="noopener" data-action="whatsapp">
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" class="w-9 h-9 sm:w-11 sm:h-11 rounded-full text-emerald-600 hover:bg-emerald-50 flex items-center justify-center transition-colors cursor-pointer text-base btn-whatsapp shrink-0" aria-label="{{ __('ui.common.whatsapp') }}" target="_blank" rel="noopener" data-action="whatsapp">
                             <i class="bi bi-whatsapp"></i>
                         </a>
 
                         <!-- Hamburger Drawer Trigger (Min 44x44px Hit Target) -->
-                        <button class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl text-slate-800 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer focus:outline-none shrink-0" type="button" @click="$store.mobileNav.toggle()" aria-label="{{ __('ui.nav.all_tours') ?? 'Menu' }}">
+                        <button class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl text-slate-800 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer focus:outline-none shrink-0" type="button" @click="$store.mobileNav.toggle()" aria-label="{{ __('ui.nav.all_tours') ?? 'Menu' }}">
                             <i class="bi bi-list text-2xl"></i>
                         </button>
                     </div>
@@ -919,10 +929,14 @@
 
     @include('partials.booking-modal')
     @include('partials.welcome-offer-modal')
-    @include('partials.social-proof')
+    @if(($settings['social_proof_enabled'] ?? '1') === '1')
+        @include('partials.social-proof')
+    @endif
     @include('partials.comparison-drawer')
     @include('partials.search-modal')
-    @include('partials.safari-matcher-modal')
+    @if(($settings['safari_matcher_enabled'] ?? '1') === '1')
+        @include('partials.safari-matcher-modal')
+    @endif
     @if(($settings['exit_intent_promo_active'] ?? '0') === '1')
         @include('partials.exit-intent-modal')
     @endif

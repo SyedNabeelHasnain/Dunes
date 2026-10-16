@@ -74,16 +74,16 @@
             <!-- Stats Mini Bar -->
             <div class="grid grid-cols-3 gap-3 sm:gap-4 shrink-0 bg-white/5 border border-white/10 rounded-2xl p-3 sm:p-4 backdrop-blur-md">
                 <div class="text-center px-2">
-                    <div class="text-xl sm:text-2xl font-black text-amber-400">{{ count($filteredItems) }}+</div>
-                    <div class="text-[10px] sm:text-xs text-white/70 uppercase tracking-wider font-semibold">Media Items</div>
+                    <div class="text-xl sm:text-2xl font-black text-amber-400">10,000+</div>
+                    <div class="text-[10px] sm:text-xs text-white/70 uppercase tracking-wider font-semibold">{{ __('ui.common.happy_guests') ?? 'Happy Guests' }}</div>
                 </div>
                 <div class="text-center px-2 border-x border-white/10">
                     <div class="text-xl sm:text-2xl font-black text-white">4.9/5</div>
-                    <div class="text-[10px] sm:text-xs text-white/70 uppercase tracking-wider font-semibold">Guest Rating</div>
+                    <div class="text-[10px] sm:text-xs text-white/70 uppercase tracking-wider font-semibold">{{ __('ui.gallery_section.guest_rating') ?? 'Guest Rating' }}</div>
                 </div>
                 <div class="text-center px-2">
-                    <div class="text-xl sm:text-2xl font-black text-emerald-400">100%</div>
-                    <div class="text-[10px] sm:text-xs text-white/70 uppercase tracking-wider font-semibold">Verified</div>
+                    <div class="text-xl sm:text-2xl font-black text-emerald-400">2,847+</div>
+                    <div class="text-[10px] sm:text-xs text-white/70 uppercase tracking-wider font-semibold">{{ __('ui.gallery_section.verified_reviews') ?? 'Verified Reviews' }}</div>
                 </div>
             </div>
         </div>
@@ -137,6 +137,12 @@
         currentIndex: 0,
         touchStartX: 0,
         copiedShare: false,
+        canScrollLeft: false,
+        canScrollRight: false,
+        isDraggingPills: false,
+        hasDraggedPills: false,
+        dragStartX: 0,
+        dragScrollLeft: 0,
         init() {
             try {
                 const params = new URLSearchParams(window.location.search);
@@ -148,6 +154,58 @@
                     }
                 }
             } catch (e) {}
+            this.$nextTick(() => {
+                this.updatePillScrollState();
+                setTimeout(() => this.updatePillScrollState(), 150);
+            });
+            window.addEventListener('resize', () => this.updatePillScrollState(), { passive: true });
+        },
+        updatePillScrollState() {
+            const el = this.$refs.categoryPills;
+            if (!el) return;
+            this.canScrollLeft = el.scrollLeft > 6;
+            this.canScrollRight = (el.scrollLeft + el.clientWidth) < (el.scrollWidth - 6);
+        },
+        scrollCategories(delta) {
+            const el = this.$refs.categoryPills;
+            if (!el) return;
+            el.scrollBy({ left: delta, behavior: 'smooth' });
+            setTimeout(() => this.updatePillScrollState(), 250);
+            setTimeout(() => this.updatePillScrollState(), 500);
+        },
+        onPillWheel(e) {
+            const el = this.$refs.categoryPills;
+            if (!el || el.scrollWidth <= el.clientWidth) return;
+            if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                e.preventDefault();
+                el.scrollLeft += e.deltaY;
+                this.updatePillScrollState();
+            }
+        },
+        startPillDrag(e) {
+            const el = this.$refs.categoryPills;
+            if (!el) return;
+            this.isDraggingPills = true;
+            this.hasDraggedPills = false;
+            this.dragStartX = e.pageX - el.offsetLeft;
+            this.dragScrollLeft = el.scrollLeft;
+        },
+        movePillDrag(e) {
+            if (!this.isDraggingPills) return;
+            const el = this.$refs.categoryPills;
+            if (!el) return;
+            const x = e.pageX - el.offsetLeft;
+            const walk = (x - this.dragStartX) * 1.4;
+            if (Math.abs(walk) > 6) {
+                this.hasDraggedPills = true;
+                e.preventDefault();
+                el.scrollLeft = this.dragScrollLeft - walk;
+                this.updatePillScrollState();
+            }
+        },
+        endPillDrag() {
+            this.isDraggingPills = false;
+            setTimeout(() => { this.hasDraggedPills = false; }, 50);
         },
         updateUrl(itemId = null) {
             try {
@@ -187,8 +245,13 @@
                 this.copyShareLink();
             }
         },
-        filterCategory(cat) {
+        filterCategory(cat, evt = null) {
+            if (this.hasDraggedPills) return;
             this.category = cat;
+            if (evt && evt.currentTarget && evt.currentTarget.scrollIntoView) {
+                evt.currentTarget.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                setTimeout(() => this.updatePillScrollState(), 350);
+            }
         },
         filterSource(src) {
             this.source = src;
@@ -256,86 +319,125 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <!-- Filter Controls Bar -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-200">
-            <!-- Category Pills -->
-            <div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 snap-x">
-                <button type="button" 
-                    @click="filterCategory('all')" 
-                    :class="category === 'all' ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'"
-                    class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5 min-h-[38px] snap-start">
-                    <i class="bi bi-grid-fill"></i>
-                    <span>{{ __('ui.gallery_section.filter_all') ?? 'All Moments' }}</span>
-                    <span :class="category === 'all' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'" class="px-2 py-0.5 rounded-full text-[11px] font-semibold">{{ $categoryStats['all'] ?? count($filteredItems) }}</span>
-                </button>
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-200">
+            <!-- Category Pills with Desktop & Mobile Scrollable Reveal Container -->
+            <div class="relative flex-1 min-w-0 flex items-center">
+                <!-- Left Reveal Gradient & Scroll Button -->
+                <div x-show="canScrollLeft"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 -translate-x-2"
+                     x-transition:enter-end="opacity-100 translate-x-0"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 translate-x-0"
+                     x-transition:leave-end="opacity-0 -translate-x-2"
+                     class="absolute start-0 inset-y-0 z-10 flex items-center pe-6 bg-gradient-to-r rtl:bg-gradient-to-l from-white via-white/95 to-transparent pointer-events-none"
+                     style="display: none;">
+                    <button type="button"
+                            @click="scrollCategories(-260)"
+                            class="pointer-events-auto w-9 h-9 rounded-full bg-white border border-slate-200/90 text-slate-700 hover:text-primary hover:border-primary/40 shadow-md hover:shadow-lg flex items-center justify-center transition-all cursor-pointer active:scale-95"
+                            aria-label="{{ __('ui.gallery_section.prev') ?? 'Scroll left' }}">
+                        <i class="bi bi-chevron-left rtl:rotate-180 text-xs font-bold"></i>
+                    </button>
+                </div>
 
-                <button type="button" 
-                    @click="filterCategory('red_dunes')" 
-                    :class="category === 'red_dunes' ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'"
-                    class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5 min-h-[38px] snap-start">
-                    <i class="bi bi-compass-fill"></i>
-                    <span>{{ __('ui.gallery_section.filter_red_dunes') ?? 'Red Dunes & Safari' }}</span>
-                    <span :class="category === 'red_dunes' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'" class="px-2 py-0.5 rounded-full text-[11px] font-semibold">{{ $categoryStats['red_dunes'] ?? 0 }}</span>
-                </button>
+                <!-- Scrollable Category Pills Strip -->
+                <div x-ref="categoryPills"
+                     @scroll.passive="updatePillScrollState()"
+                     @wheel="onPillWheel($event)"
+                     @mousedown="startPillDrag($event)"
+                     @mousemove="movePillDrag($event)"
+                     @mouseup="endPillDrag()"
+                     @mouseleave="endPillDrag()"
+                     :class="isDraggingPills ? 'cursor-grabbing select-none' : 'cursor-grab'"
+                     class="flex items-center gap-2 overflow-x-auto py-1 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-1 snap-x scroll-smooth w-full">
+                    <button type="button" 
+                        @click="filterCategory('all', $event)" 
+                        :class="category === 'all' ? 'bg-primary text-white shadow-sm ring-2 ring-primary/20' : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 hover:text-slate-900'"
+                        class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-200 cursor-pointer inline-flex items-center gap-2 min-h-[40px] snap-start shrink-0">
+                        <i class="bi bi-grid-fill"></i>
+                        <span>{{ __('ui.gallery_section.filter_all') ?? 'All Moments' }}</span>
+                    </button>
 
-                <button type="button" 
-                    @click="filterCategory('buggy_quad')" 
-                    :class="category === 'buggy_quad' ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'"
-                    class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5 min-h-[38px] snap-start">
-                    <i class="bi bi-lightning-charge-fill"></i>
-                    <span>{{ __('ui.gallery_section.filter_buggy_quad') ?? 'Buggies & Quads' }}</span>
-                    <span :class="category === 'buggy_quad' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'" class="px-2 py-0.5 rounded-full text-[11px] font-semibold">{{ $categoryStats['buggy_quad'] ?? 0 }}</span>
-                </button>
+                    <button type="button" 
+                        @click="filterCategory('red_dunes', $event)" 
+                        :class="category === 'red_dunes' ? 'bg-primary text-white shadow-sm ring-2 ring-primary/20' : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 hover:text-slate-900'"
+                        class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-200 cursor-pointer inline-flex items-center gap-2 min-h-[40px] snap-start shrink-0">
+                        <i class="bi bi-compass-fill"></i>
+                        <span>{{ __('ui.gallery_section.filter_red_dunes') ?? 'Red Dunes & Safari' }}</span>
+                    </button>
 
-                <button type="button" 
-                    @click="filterCategory('camp_bbq')" 
-                    :class="category === 'camp_bbq' ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'"
-                    class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5 min-h-[38px] snap-start">
-                    <i class="bi bi-fire"></i>
-                    <span>{{ __('ui.gallery_section.filter_camp_bbq') ?? 'Camp & BBQ' }}</span>
-                    <span :class="category === 'camp_bbq' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'" class="px-2 py-0.5 rounded-full text-[11px] font-semibold">{{ $categoryStats['camp_bbq'] ?? 0 }}</span>
-                </button>
+                    <button type="button" 
+                        @click="filterCategory('buggy_quad', $event)" 
+                        :class="category === 'buggy_quad' ? 'bg-primary text-white shadow-sm ring-2 ring-primary/20' : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 hover:text-slate-900'"
+                        class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-200 cursor-pointer inline-flex items-center gap-2 min-h-[40px] snap-start shrink-0">
+                        <i class="bi bi-lightning-charge-fill"></i>
+                        <span>{{ __('ui.gallery_section.filter_buggy_quad') ?? 'Buggies & Quads' }}</span>
+                    </button>
 
-                <button type="button" 
-                    @click="filterCategory('sunset_camels')" 
-                    :class="category === 'sunset_camels' ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'"
-                    class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5 min-h-[38px] snap-start">
-                    <i class="bi bi-sunset-fill"></i>
-                    <span>{{ __('ui.gallery_section.filter_sunset_camels') ?? 'Sunset & Camels' }}</span>
-                    <span :class="category === 'sunset_camels' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'" class="px-2 py-0.5 rounded-full text-[11px] font-semibold">{{ $categoryStats['sunset_camels'] ?? 0 }}</span>
-                </button>
+                    <button type="button" 
+                        @click="filterCategory('camp_bbq', $event)" 
+                        :class="category === 'camp_bbq' ? 'bg-primary text-white shadow-sm ring-2 ring-primary/20' : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 hover:text-slate-900'"
+                        class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-200 cursor-pointer inline-flex items-center gap-2 min-h-[40px] snap-start shrink-0">
+                        <i class="bi bi-fire"></i>
+                        <span>{{ __('ui.gallery_section.filter_camp_bbq') ?? 'Camp & BBQ' }}</span>
+                    </button>
 
-                <button type="button" 
-                    @click="filterCategory('city_landmarks')" 
-                    :class="category === 'city_landmarks' ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'"
-                    class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5 min-h-[38px] snap-start">
-                    <i class="bi bi-building"></i>
-                    <span>City Tours & Landmarks</span>
-                    <span :class="category === 'city_landmarks' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'" class="px-2 py-0.5 rounded-full text-[11px] font-semibold">{{ $categoryStats['city_landmarks'] ?? 0 }}</span>
-                </button>
+                    <button type="button" 
+                        @click="filterCategory('sunset_camels', $event)" 
+                        :class="category === 'sunset_camels' ? 'bg-primary text-white shadow-sm ring-2 ring-primary/20' : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 hover:text-slate-900'"
+                        class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-200 cursor-pointer inline-flex items-center gap-2 min-h-[40px] snap-start shrink-0">
+                        <i class="bi bi-sunset-fill"></i>
+                        <span>{{ __('ui.gallery_section.filter_sunset_camels') ?? 'Sunset & Camels' }}</span>
+                    </button>
 
-                <button type="button" 
-                    @click="filterCategory('marina_cruise')" 
-                    :class="category === 'marina_cruise' ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'"
-                    class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5 min-h-[38px] snap-start">
-                    <i class="bi bi-water"></i>
-                    <span>Dhow & Marina Cruise</span>
-                    <span :class="category === 'marina_cruise' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'" class="px-2 py-0.5 rounded-full text-[11px] font-semibold">{{ $categoryStats['marina_cruise'] ?? 0 }}</span>
-                </button>
+                    <button type="button" 
+                        @click="filterCategory('city_landmarks', $event)" 
+                        :class="category === 'city_landmarks' ? 'bg-primary text-white shadow-sm ring-2 ring-primary/20' : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 hover:text-slate-900'"
+                        class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-200 cursor-pointer inline-flex items-center gap-2 min-h-[40px] snap-start shrink-0">
+                        <i class="bi bi-building"></i>
+                        <span>{{ __('ui.gallery_section.filter_city_landmarks') ?? 'City Tours & Landmarks' }}</span>
+                    </button>
 
-                @if(($categoryStats['videos'] ?? 0) > 0)
-                <button type="button" 
-                    @click="filterCategory('videos')" 
-                    :class="category === 'videos' ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'"
-                    class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5 min-h-[38px] snap-start">
-                    <i class="bi bi-camera-video-fill"></i>
-                    <span>{{ __('ui.gallery_section.filter_videos') ?? 'Videos' }}</span>
-                    <span :class="category === 'videos' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'" class="px-2 py-0.5 rounded-full text-[11px] font-semibold">{{ $categoryStats['videos'] }}</span>
-                </button>
-                @endif
+                    <button type="button" 
+                        @click="filterCategory('marina_cruise', $event)" 
+                        :class="category === 'marina_cruise' ? 'bg-primary text-white shadow-sm ring-2 ring-primary/20' : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 hover:text-slate-900'"
+                        class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-200 cursor-pointer inline-flex items-center gap-2 min-h-[40px] snap-start shrink-0">
+                        <i class="bi bi-water"></i>
+                        <span>{{ __('ui.gallery_section.filter_marina_cruise') ?? 'Dhow & Marina Cruise' }}</span>
+                    </button>
+
+                    @if(($categoryStats['videos'] ?? 0) > 0)
+                    <button type="button" 
+                        @click="filterCategory('videos', $event)" 
+                        :class="category === 'videos' ? 'bg-primary text-white shadow-sm ring-2 ring-primary/20' : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 hover:text-slate-900'"
+                        class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-200 cursor-pointer inline-flex items-center gap-2 min-h-[40px] snap-start shrink-0">
+                        <i class="bi bi-camera-video-fill"></i>
+                        <span>{{ __('ui.gallery_section.filter_videos') ?? 'Video Clips' }}</span>
+                    </button>
+                    @endif
+                </div>
+
+                <!-- Right Reveal Gradient & Scroll Button -->
+                <div x-show="canScrollRight"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 translate-x-2"
+                     x-transition:enter-end="opacity-100 translate-x-0"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 translate-x-0"
+                     x-transition:leave-end="opacity-0 translate-x-2"
+                     class="absolute end-0 inset-y-0 z-10 flex items-center ps-8 bg-gradient-to-l rtl:bg-gradient-to-r from-white via-white/95 to-transparent pointer-events-none"
+                     style="display: none;">
+                    <button type="button"
+                            @click="scrollCategories(260)"
+                            class="pointer-events-auto w-9 h-9 rounded-full bg-white border border-slate-200/90 text-slate-700 hover:text-primary hover:border-primary/40 shadow-md hover:shadow-lg flex items-center justify-center transition-all cursor-pointer active:scale-95"
+                            aria-label="{{ __('ui.gallery_section.next') ?? 'Scroll right' }}">
+                        <i class="bi bi-chevron-right rtl:rotate-180 text-xs font-bold"></i>
+                    </button>
+                </div>
             </div>
 
             <!-- Source Filter Segment -->
-            <div class="flex items-center gap-1.5 shrink-0 bg-slate-100 p-1 rounded-full self-start md:self-auto max-w-full overflow-x-auto scrollbar-none">
+            <div class="flex items-center gap-1.5 shrink-0 bg-slate-100 p-1 rounded-full self-start lg:self-auto max-w-full overflow-x-auto scrollbar-none">
                 <button type="button" 
                     @click="filterSource('all')"
                     :class="source === 'all' ? 'bg-white text-slate-900 shadow-2xs font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'"

@@ -18,6 +18,8 @@ return [
         'search_placeholder' => 'Поиск сафари, аренда багги, катание по дюнам...',
         'tours' => 'Экскурсии и туры',
         'legal_policies' => 'Юридические условия и правила',
+        'terms' => 'Условия использования',
+        'privacy' => 'Политика конфиденциальности',
     ],
 
     // Guest Experience Gallery Section
@@ -28,6 +30,8 @@ return [
         'view_all' => 'Смотреть всю галерею',
         'all_moments' => 'Все моменты',
         'verified_review' => 'Подтвержденный отзыв',
+        'verified_reviews' => 'Подтвержденных отзывов',
+        'guest_rating' => 'Оценка гостей',
         'book_this' => 'Забронировать это сафари',
         'close' => 'Закрыть',
         'prev' => 'Назад',
@@ -38,6 +42,8 @@ return [
         'filter_buggy_quad' => 'Багги и квадроциклы',
         'filter_camp_bbq' => 'Лагерь и барбекю',
         'filter_sunset_camels' => 'Закат и верблюды',
+        'filter_city_landmarks' => 'Экскурсии по городу',
+        'filter_marina_cruise' => 'Круизы по Марине',
         'filter_videos' => 'Видеоклипы',
     ],
 
@@ -88,6 +94,9 @@ return [
         'happy_guests' => 'Довольных гостей',
         'breadcrumb' => 'Навигационная цепочка',
         'close' => 'Закрыть',
+        'back' => 'Назад',
+        'language' => 'Язык',
+        'currency' => 'Валюта',
         'remove' => 'Удалить',
         'detect_location' => 'Определить текущее местоположение',
         'copy_code' => 'Скопировать код',
@@ -649,5 +658,16 @@ return [
         'feedback_title' => 'Мы ценим вашу честность',
         'feedback_placeholder' => 'Расскажите нашей команде, что мы можем улучшить (водитель, еда, лагерь, расписание)...',
         'submit_feedback' => 'Отправить приватный отзыв',
+    ],
+
+    // WhatsApp Concierge Modal
+    'whatsapp_modal' => [
+        'title' => 'Сафари-консьерж 24/7',
+        'subtitle' => 'Напишите напрямую нашим специалистам по сафари в Дубае.',
+        'online' => 'Консьерж онлайн',
+        'inquiring_about' => 'Выбранная экскурсия',
+        'privacy_note' => 'Наш сертифицированный консьерж ответит вам напрямую в WhatsApp.',
+        'no_spam' => 'Гарантия без спама',
+        'fast_response' => 'Ответ < 2 мин',
     ],
 ];

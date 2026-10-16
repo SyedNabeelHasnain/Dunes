@@ -80,6 +80,7 @@ class AdminMailSettingController extends Controller
         );
 
         Cache::forget('site_settings_cache');
+        $this->settingsService->clearCache();
 
         return redirect()->route('admin.settings.mail')
             ->with('success', 'SMTP and Mailer settings saved successfully.');

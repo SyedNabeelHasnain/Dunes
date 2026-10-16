@@ -18,6 +18,8 @@ return [
         'search_placeholder' => 'Search desert safaris, buggy tours, dune bashing...',
         'tours' => 'Tours',
         'legal_policies' => 'Legal & Policies',
+        'terms' => 'Terms & Conditions',
+        'privacy' => 'Privacy Policy',
     ],
 
     // Guest Experience Gallery Section
@@ -28,6 +30,8 @@ return [
         'view_all' => 'Explore Full Gallery',
         'all_moments' => 'All Moments',
         'verified_review' => 'Verified Review',
+        'verified_reviews' => 'Verified Reviews',
+        'guest_rating' => 'Guest Rating',
         'book_this' => 'Book This Safari',
         'close' => 'Close',
         'prev' => 'Previous',
@@ -38,6 +42,8 @@ return [
         'filter_buggy_quad' => 'Buggies & Quads',
         'filter_camp_bbq' => 'Camp & BBQ',
         'filter_sunset_camels' => 'Sunset & Camels',
+        'filter_city_landmarks' => 'City Tours & Landmarks',
+        'filter_marina_cruise' => 'Dhow & Marina Cruise',
         'filter_videos' => 'Video Clips',
     ],
 
@@ -88,6 +94,9 @@ return [
         'happy_guests' => 'Happy Guests',
         'breadcrumb' => 'Breadcrumb',
         'close' => 'Close',
+        'back' => 'Back',
+        'language' => 'Language',
+        'currency' => 'Currency',
         'remove' => 'Remove',
         'detect_location' => 'Detect current location',
         'copy_code' => 'Copy Code',
@@ -649,5 +658,16 @@ return [
         'feedback_title' => 'We value your honesty',
         'feedback_placeholder' => 'Tell our operations team what we can improve (driver, food, camp, timing)...',
         'submit_feedback' => 'Submit Private Feedback',
+    ],
+
+    // WhatsApp Concierge Modal
+    'whatsapp_modal' => [
+        'title' => '24/7 Safari Concierge',
+        'subtitle' => 'Chat directly with our Dubai desert safari specialists.',
+        'online' => 'Concierge Online',
+        'inquiring_about' => 'Selected Experience',
+        'privacy_note' => 'Our certified safari concierge will reply directly to your WhatsApp.',
+        'no_spam' => 'No Spam Guarantee',
+        'fast_response' => '< 2 Min Response',
     ],
 ];

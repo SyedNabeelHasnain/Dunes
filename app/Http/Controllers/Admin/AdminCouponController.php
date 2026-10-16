@@ -428,18 +428,35 @@ class AdminCouponController extends Controller
             'top_promo_banner_text',
             'top_promo_banner_code',
             'top_promo_banner_badge',
+            'safari_matcher_enabled',
             'concierge_promo_active',
             'concierge_promo_discount',
             'concierge_promo_code',
             'exit_intent_promo_active',
             'exit_intent_promo_discount',
             'exit_intent_promo_code',
+            'social_proof_enabled',
+            'social_proof_mobile_enabled',
+            'social_proof_source',
+            'social_proof_initial_delay',
+            'social_proof_duration',
+            'social_proof_interval',
         ];
 
         $data = $request->only($allowed);
 
         // Checkbox fields handling
-        $checkboxes = ['welcome_popup_active', 'welcome_popup_scroll_trigger', 'welcome_popup_exit_trigger', 'top_promo_banner_active', 'concierge_promo_active', 'exit_intent_promo_active'];
+        $checkboxes = [
+            'welcome_popup_active',
+            'welcome_popup_scroll_trigger',
+            'welcome_popup_exit_trigger',
+            'top_promo_banner_active',
+            'safari_matcher_enabled',
+            'concierge_promo_active',
+            'exit_intent_promo_active',
+            'social_proof_enabled',
+            'social_proof_mobile_enabled',
+        ];
         foreach ($checkboxes as $cb) {
             $data[$cb] = $request->has($cb) ? '1' : '0';
         }
@@ -536,8 +553,12 @@ class AdminCouponController extends Controller
 
         Cache::forget('site_settings_cache');
         Cache::forget('site_home_cache');
+        Cache::forget('site_social_proof_feed');
+        Cache::forget('site_social_proof_feed_all');
+        Cache::forget('site_social_proof_feed_bookings_only');
+        Cache::forget('site_social_proof_feed_custom_only');
         app(SettingsService::class)->clearCache();
 
-        return redirect()->route('admin.coupons.popup-settings')->with('success', 'Promotion campaigns, welcome popup, and Concierge promo settings updated successfully!');
+        return redirect()->route('admin.coupons.popup-settings')->with('success', 'Promotion campaigns, popups, Concierge, and Live Social Proof Toast settings updated successfully!');
     }
 }

@@ -29,6 +29,20 @@
                     <p class="text-[11px] text-slate-400 mt-1">Used to format phone numbers when users do not provide a country prefix.</p>
                 </div>
 
+                <!-- Default Greeting & Prefill Message -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="whatsapp_greeting" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Modal Welcome Greeting</label>
+                        <input type="text" name="whatsapp_greeting" id="whatsapp_greeting" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary" value="{{ $settings['whatsapp_greeting'] ?? 'Chat with our Desert Safari Concierge' }}" placeholder="Chat with our Desert Safari Concierge">
+                        <p class="text-[11px] text-slate-400 mt-1">Headline greeting shown in the WhatsApp Concierge modal.</p>
+                    </div>
+                    <div>
+                        <label for="whatsapp_prefill_message" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Default Pre-filled WhatsApp Message</label>
+                        <input type="text" name="whatsapp_prefill_message" id="whatsapp_prefill_message" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary" value="{{ $settings['whatsapp_prefill_message'] ?? 'Hello Dunes Discovery! I would like to inquire about booking a Dubai Desert Safari.' }}" placeholder="Hello Dunes Discovery! I would like to inquire about...">
+                        <p class="text-[11px] text-slate-400 mt-1">Default message pre-populated when a visitor clicks a general WhatsApp button.</p>
+                    </div>
+                </div>
+
                 <!-- WhatsApp Lead Form Field Toggle -->
                 <div class="p-5 bg-slate-50/70 border border-slate-200/80 rounded-2xl space-y-3">
                     <div>
@@ -38,14 +52,14 @@
                     <div class="flex items-center gap-6 pt-1">
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input class="rounded-full border-slate-300 text-primary focus:ring-primary w-4 h-4" type="radio" name="whatsapp_form_enabled" id="waFormYes" value="1" {{ ($settings['whatsapp_form_enabled'] ?? '1') === '1' ? 'checked' : '' }}>
-                            <span class="text-xs font-bold text-slate-800">Yes (Enabled)</span>
+                            <span class="text-xs font-bold text-slate-800">Yes (Enabled — Open Branded Lead Modal)</span>
                         </label>
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input class="rounded-full border-slate-300 text-primary focus:ring-primary w-4 h-4" type="radio" name="whatsapp_form_enabled" id="waFormNo" value="0" {{ ($settings['whatsapp_form_enabled'] ?? '1') === '0' ? 'checked' : '' }}>
-                            <span class="text-xs font-bold text-slate-800">No (Disabled)</span>
+                            <span class="text-xs font-bold text-slate-800">No (Disabled — Direct Instant Redirect to WhatsApp)</span>
                         </label>
                     </div>
-                    <p class="text-[11px] text-slate-400">If set to "No", visitors will be redirected to WhatsApp instantly. Clicks are logged with default name "WhatsApp Visitor" and no phone detail.</p>
+                    <p class="text-[11px] text-slate-400">If set to "No", visitors are redirected directly to WhatsApp (`wa.me`) without opening any modal popup, while still logging the click in WhatsApp Leads.</p>
                 </div>
 
                 <div class="p-4 bg-sky-50 rounded-2xl border border-sky-200 flex items-start gap-3">

@@ -13,7 +13,7 @@
 @endphp
 <div class="relative inline-block text-start" x-data="{ open: false, activeTab: 'lang' }" @click.outside="open = false" @keydown.escape.window="open = false">
     <button @click="open = !open" :aria-expanded="open" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-slate-800 bg-white border border-slate-200/90 shadow-2xs hover:border-primary/50 transition-all cursor-pointer min-h-[38px]" type="button" id="{{ $dropdownId }}" aria-label="{{ __('ui.common.language_currency_switcher') }}">
-        <span class="text-sm leading-none">{{ $curLang ? $curLang->flag_emoji : '🌐' }}</span>
+        <i class="bi bi-globe2 text-xs text-primary leading-none"></i>
         <span class="font-extrabold uppercase text-[11px]">{{ strtoupper($curLocale) }}</span>
         <span class="text-slate-300">/</span>
         <span class="current-currency-code font-extrabold text-[11px]">AED</span>
@@ -34,20 +34,20 @@
                     :class="activeTab === 'lang' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'"
                     class="flex-1 py-1.5 rounded-lg text-center transition-all cursor-pointer flex items-center justify-center gap-1.5">
                 <i class="bi bi-globe2 text-xs text-primary"></i>
-                <span>Language</span>
+                <span>{{ __('ui.common.language') }}</span>
             </button>
             <button type="button" @click="activeTab = 'curr'" 
                     :class="activeTab === 'curr' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'"
                     class="flex-1 py-1.5 rounded-lg text-center transition-all cursor-pointer flex items-center justify-center gap-1.5">
                 <i class="bi bi-currency-exchange text-xs text-amber-500"></i>
-                <span>Currency</span>
+                <span>{{ __('ui.common.currency') }}</span>
             </button>
         </div>
 
         <!-- Language Tab Content -->
         <div x-show="activeTab === 'lang'" class="space-y-1">
             <div class="px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
-                Select Language
+                {{ __('ui.common.language') }}
             </div>
             @foreach($langs as $language)
                 @php
@@ -55,9 +55,8 @@
                     $switchUrl = switch_locale_url($language->code);
                 @endphp
                 <a href="{{ $switchUrl }}"
-                   class="w-full rounded-xl px-2.5 py-2 text-xs font-semibold {{ $isCur ? 'bg-orange-50/80 text-primary font-bold' : 'text-slate-700 hover:bg-slate-50 hover:text-primary' }} flex items-center justify-between transition-colors">
-                    <span class="flex items-center gap-2">
-                        <span class="text-base leading-none">{{ $language->flag_emoji }}</span>
+                   class="w-full rounded-xl px-3 py-2 text-xs font-semibold {{ $isCur ? 'bg-orange-50/80 text-primary font-bold' : 'text-slate-700 hover:bg-slate-50 hover:text-primary' }} flex items-center justify-between transition-colors">
+                    <span class="flex items-center gap-1.5">
                         <span>{{ $language->name }}</span>
                         @if($language->native_name && $language->native_name !== $language->name)
                             <small class="text-slate-400 font-normal">({{ $language->native_name }})</small>
@@ -73,30 +72,30 @@
         <!-- Currency Tab Content -->
         <div x-show="activeTab === 'curr'" class="space-y-1" style="display: none;">
             <div class="px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
-                Display Currency
+                {{ __('ui.common.currency') }}
             </div>
-            <button type="button" @click="open = false" class="w-full rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 hover:bg-orange-50 hover:text-primary flex items-center justify-between transition-colors currency-option active cursor-pointer" data-currency="AED" data-flag="&#x1F1E6;&#x1F1EA;" data-symbol="AED" data-rate="1">
-                <span class="flex items-center gap-2"><span class="text-base">&#x1F1E6;&#x1F1EA;</span><span>AED <small class="text-slate-500">(د.إ)</small></span></span>
+            <button type="button" @click="open = false" class="w-full rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 hover:bg-orange-50 hover:text-primary flex items-center justify-between transition-colors currency-option active cursor-pointer" data-currency="AED" data-flag="د.إ" data-symbol="AED" data-rate="1">
+                <span class="flex items-center gap-2"><span class="w-6 h-5 rounded-md bg-slate-100 text-slate-700 font-bold text-[10px] inline-flex items-center justify-center shrink-0">د.إ</span><span>AED <small class="text-slate-400 font-normal">(UAE Dirham)</small></span></span>
                 <i class="bi bi-check2 text-primary font-bold checkmark"></i>
             </button>
-            <button type="button" @click="open = false" class="w-full rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 hover:bg-orange-50 hover:text-primary flex items-center justify-between transition-colors currency-option cursor-pointer" data-currency="USD" data-flag="&#x1F1FA;&#x1F1F8;" data-symbol="$" data-rate="{{ $rateUsd }}">
-                <span class="flex items-center gap-2"><span class="text-base">&#x1F1FA;&#x1F1F8;</span><span>USD <small class="text-slate-500">($)</small></span></span>
+            <button type="button" @click="open = false" class="w-full rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 hover:bg-orange-50 hover:text-primary flex items-center justify-between transition-colors currency-option cursor-pointer" data-currency="USD" data-flag="$" data-symbol="$" data-rate="{{ $rateUsd }}">
+                <span class="flex items-center gap-2"><span class="w-6 h-5 rounded-md bg-slate-100 text-slate-700 font-bold text-[11px] inline-flex items-center justify-center shrink-0">$</span><span>USD <small class="text-slate-400 font-normal">(US Dollar)</small></span></span>
                 <i class="bi bi-check2 text-primary font-bold checkmark hidden d-none"></i>
             </button>
-            <button type="button" @click="open = false" class="w-full rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 hover:bg-orange-50 hover:text-primary flex items-center justify-between transition-colors currency-option cursor-pointer" data-currency="EUR" data-flag="&#x1F1EA;&#x1F1FA;" data-symbol="€" data-rate="{{ $rateEur }}">
-                <span class="flex items-center gap-2"><span class="text-base">&#x1F1EA;&#x1F1FA;</span><span>EUR <small class="text-slate-500">(€)</small></span></span>
+            <button type="button" @click="open = false" class="w-full rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 hover:bg-orange-50 hover:text-primary flex items-center justify-between transition-colors currency-option cursor-pointer" data-currency="EUR" data-flag="€" data-symbol="€" data-rate="{{ $rateEur }}">
+                <span class="flex items-center gap-2"><span class="w-6 h-5 rounded-md bg-slate-100 text-slate-700 font-bold text-[11px] inline-flex items-center justify-center shrink-0">€</span><span>EUR <small class="text-slate-400 font-normal">(Euro)</small></span></span>
                 <i class="bi bi-check2 text-primary font-bold checkmark hidden d-none"></i>
             </button>
-            <button type="button" @click="open = false" class="w-full rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 hover:bg-orange-50 hover:text-primary flex items-center justify-between transition-colors currency-option cursor-pointer" data-currency="GBP" data-flag="&#x1F1EC;&#x1F1E7;" data-symbol="£" data-rate="{{ $rateGbp }}">
-                <span class="flex items-center gap-2"><span class="text-base">&#x1F1EC;&#x1F1E7;</span><span>GBP <small class="text-slate-500">(£)</small></span></span>
+            <button type="button" @click="open = false" class="w-full rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 hover:bg-orange-50 hover:text-primary flex items-center justify-between transition-colors currency-option cursor-pointer" data-currency="GBP" data-flag="£" data-symbol="£" data-rate="{{ $rateGbp }}">
+                <span class="flex items-center gap-2"><span class="w-6 h-5 rounded-md bg-slate-100 text-slate-700 font-bold text-[11px] inline-flex items-center justify-center shrink-0">£</span><span>GBP <small class="text-slate-400 font-normal">(British Pound)</small></span></span>
                 <i class="bi bi-check2 text-primary font-bold checkmark hidden d-none"></i>
             </button>
-            <button type="button" @click="open = false" class="w-full rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 hover:bg-orange-50 hover:text-primary flex items-center justify-between transition-colors currency-option cursor-pointer" data-currency="SAR" data-flag="&#x1F1F8;&#x1F1E6;" data-symbol="SAR" data-rate="{{ $rateSar }}">
-                <span class="flex items-center gap-2"><span class="text-base">&#x1F1F8;&#x1F1E6;</span><span>SAR <small class="text-slate-500">(﷼)</small></span></span>
+            <button type="button" @click="open = false" class="w-full rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 hover:bg-orange-50 hover:text-primary flex items-center justify-between transition-colors currency-option cursor-pointer" data-currency="SAR" data-flag="﷼" data-symbol="SAR" data-rate="{{ $rateSar }}">
+                <span class="flex items-center gap-2"><span class="w-6 h-5 rounded-md bg-slate-100 text-slate-700 font-bold text-[11px] inline-flex items-center justify-center shrink-0">﷼</span><span>SAR <small class="text-slate-400 font-normal">(Saudi Riyal)</small></span></span>
                 <i class="bi bi-check2 text-primary font-bold checkmark hidden d-none"></i>
             </button>
-            <button type="button" @click="open = false" class="w-full rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 hover:bg-orange-50 hover:text-primary flex items-center justify-between transition-colors currency-option cursor-pointer" data-currency="INR" data-flag="&#x1F1EE;&#x1F1F3;" data-symbol="₹" data-rate="{{ $rateInr }}">
-                <span class="flex items-center gap-2"><span class="text-base">&#x1F1EE;&#x1F1F3;</span><span>INR <small class="text-slate-500">(₹)</small></span></span>
+            <button type="button" @click="open = false" class="w-full rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 hover:bg-orange-50 hover:text-primary flex items-center justify-between transition-colors currency-option cursor-pointer" data-currency="INR" data-flag="₹" data-symbol="₹" data-rate="{{ $rateInr }}">
+                <span class="flex items-center gap-2"><span class="w-6 h-5 rounded-md bg-slate-100 text-slate-700 font-bold text-[11px] inline-flex items-center justify-center shrink-0">₹</span><span>INR <small class="text-slate-400 font-normal">(Indian Rupee)</small></span></span>
                 <i class="bi bi-check2 text-primary font-bold checkmark hidden d-none"></i>
             </button>
         </div>

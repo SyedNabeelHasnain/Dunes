@@ -104,14 +104,23 @@
             <a href="{{ route('admin.coupons.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.coupons.index') || request()->routeIs('admin.coupons.create') || request()->routeIs('admin.coupons.edit') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
                 <i class="bi bi-ticket-perforated-fill text-base"></i> <span>Coupons & Promos</span>
             </a>
-            <a href="{{ route('admin.coupons.popup-settings') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.coupons.popup-settings*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
-                <i class="bi bi-gift-fill text-amber-400 text-base"></i> <span>Welcome Offer & Banner</span>
+            <a href="{{ route('admin.coupons.popup-settings') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.coupons.popup-settings*') || request()->routeIs('admin.settings.marketing*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-gift-fill text-amber-400 text-base"></i> <span>Popups & Social Proof</span>
             </a>
             <a href="{{ route('admin.blogs.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.blogs*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
                 <i class="bi bi-journal-richtext text-base"></i> <span>Blog Articles</span>
             </a>
-            <a href="{{ route('admin.wiki.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.wiki*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
-                <i class="bi bi-book-half text-base text-emerald-400"></i> <span>Knowledge Portal / Wiki</span>
+            <a href="{{ route('admin.blog-categories.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.blog-categories*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-folder-fill text-amber-400 text-base"></i> <span>Blog Categories</span>
+            </a>
+            <a href="{{ route('admin.wiki.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.wiki.index') || request()->routeIs('admin.wiki.create') || request()->routeIs('admin.wiki.edit') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-book-half text-base text-emerald-400"></i> <span>Wiki Articles</span>
+            </a>
+            <a href="{{ route('admin.wiki.pillars') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.wiki.pillars*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-columns-gap text-base text-teal-400"></i> <span>Wiki Pillars</span>
+            </a>
+            <a href="{{ route('admin.wiki.glossary') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.wiki.glossary*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
+                <i class="bi bi-alphabet-uppercase text-base text-cyan-400"></i> <span>Wiki Glossary</span>
             </a>
             <a href="{{ route('admin.reviews.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.reviews*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
                 <i class="bi bi-star-half text-base"></i> <span>Customer Reviews</span>
@@ -149,9 +158,6 @@
             </a>
             <a href="{{ route('admin.settings.seo') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.seo*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
                 <i class="bi bi-search text-sky-400 text-base"></i> <span>SEO & Metadata</span>
-            </a>
-            <a href="{{ route('admin.settings.marketing') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.marketing*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
-                <i class="bi bi-megaphone text-rose-400 text-base"></i> <span>Marketing & Promos</span>
             </a>
             <a href="{{ route('admin.settings.mail') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.mail*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
                 <i class="bi bi-envelope-gear text-sky-400 text-base"></i> <span>SMTP & Mailer</span>
@@ -261,14 +267,23 @@
             <a href="{{ route('admin.coupons.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.coupons.index') || request()->routeIs('admin.coupons.create') || request()->routeIs('admin.coupons.edit') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Coupons & Promos' : ''">
                 <i class="bi bi-ticket-perforated-fill text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Coupons & Promos</span>
             </a>
-            <a href="{{ route('admin.coupons.popup-settings') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.coupons.popup-settings*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Welcome Offer & Banner' : ''">
-                <i class="bi bi-gift-fill text-amber-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Welcome Offer</span>
+            <a href="{{ route('admin.coupons.popup-settings') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.coupons.popup-settings*') || request()->routeIs('admin.settings.marketing*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Popups, Banners & Social Proof' : ''">
+                <i class="bi bi-gift-fill text-amber-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Popups & Social Proof</span>
             </a>
             <a href="{{ route('admin.blogs.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.blogs*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Blog Articles' : ''">
                 <i class="bi bi-journal-richtext text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Blog Articles</span>
             </a>
-            <a href="{{ route('admin.wiki.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.wiki*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Knowledge Portal / Wiki' : ''">
-                <i class="bi bi-book-half text-base shrink-0 text-emerald-400"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Knowledge Portal / Wiki</span>
+            <a href="{{ route('admin.blog-categories.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.blog-categories*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Blog Categories' : ''">
+                <i class="bi bi-folder-fill text-amber-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Blog Categories</span>
+            </a>
+            <a href="{{ route('admin.wiki.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.wiki.index') || request()->routeIs('admin.wiki.create') || request()->routeIs('admin.wiki.edit') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Wiki Articles' : ''">
+                <i class="bi bi-book-half text-base shrink-0 text-emerald-400"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Wiki Articles</span>
+            </a>
+            <a href="{{ route('admin.wiki.pillars') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.wiki.pillars*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Wiki Pillars' : ''">
+                <i class="bi bi-columns-gap text-base shrink-0 text-teal-400"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Wiki Pillars</span>
+            </a>
+            <a href="{{ route('admin.wiki.glossary') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.wiki.glossary*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Wiki Glossary' : ''">
+                <i class="bi bi-alphabet-uppercase text-base shrink-0 text-cyan-400"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Wiki Glossary</span>
             </a>
             <a href="{{ route('admin.reviews.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.reviews*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Customer Reviews' : ''">
                 <i class="bi bi-star-half text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Customer Reviews</span>
@@ -306,9 +321,6 @@
             </a>
             <a href="{{ route('admin.settings.seo') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.seo*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'SEO & Metadata' : ''">
                 <i class="bi bi-search text-sky-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">SEO & Metadata</span>
-            </a>
-            <a href="{{ route('admin.settings.marketing') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.marketing*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Marketing' : ''">
-                <i class="bi bi-megaphone text-rose-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">Marketing</span>
             </a>
             <a href="{{ route('admin.settings.mail') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.settings.mail*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}" :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'SMTP Mailer' : ''">
                 <i class="bi bi-envelope-gear text-sky-400 text-base shrink-0"></i> <span x-show="!$store.admin.sidebarCollapsed" class="whitespace-nowrap">SMTP & Mailer</span>
@@ -607,12 +619,12 @@
                                     </div>
                                 </a>
                             </div>
-                            <div class="cmd-entry rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group cursor-pointer" data-category="actions" data-keywords="popup welcome offer banner exit intent sticky bar promo discount modal">
+                            <div class="cmd-entry rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group cursor-pointer" data-category="actions" data-keywords="popup welcome offer banner exit intent sticky bar promo discount modal social proof toast dunessocialprooftoast concierge quiz">
                                 <a href="{{ route('admin.coupons.popup-settings') }}" class="flex items-center gap-3 p-2.5">
                                     <i class="bi bi-gift-fill text-amber-500 text-xl shrink-0"></i>
                                     <div>
-                                        <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Welcome Offer & Banner</strong>
-                                        <span class="text-[11px] text-slate-500">Configure popups & sticky top banners</span>
+                                        <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Popups, Banners & Social Proof Toast</strong>
+                                        <span class="text-[11px] text-slate-500">Welcome offer, top bar, Concierge &amp; <code>dunesSocialProofToast</code></span>
                                     </div>
                                 </a>
                             </div>

@@ -19,7 +19,7 @@ class LocalSeoGoogleBusinessProfileTest extends TestCase
         Setting::updateOrCreate(['setting_key' => 'site_name'], ['setting_value' => 'Dunes Discovery Tourism LLC']);
         Setting::updateOrCreate(['setting_key' => 'company_license_number'], ['setting_value' => '1430583']);
         Setting::updateOrCreate(['setting_key' => 'google_place_id'], ['setting_value' => 'ChIJbWsIEIVEdEER4uHEhb2dbcQ']);
-        Setting::updateOrCreate(['setting_key' => 'google_cid'], ['setting_value' => '14185012580795441634']);
+        Setting::updateOrCreate(['setting_key' => 'google_cid'], ['setting_value' => '14154142641213989346']);
         Setting::updateOrCreate(['setting_key' => 'google_review_url'], ['setting_value' => 'https://search.google.com/local/writereview?placeid=ChIJbWsIEIVEdEER4uHEhb2dbcQ']);
         Setting::updateOrCreate(['setting_key' => 'site_latitude'], ['setting_value' => '25.2048']);
         Setting::updateOrCreate(['setting_key' => 'site_longitude'], ['setting_value' => '55.2708']);

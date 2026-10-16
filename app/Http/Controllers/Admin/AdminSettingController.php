@@ -31,6 +31,9 @@ class AdminSettingController extends Controller
             'google_place_id', 'google_cid', 'google_review_url',
             'tripadvisor_location_id', 'tripadvisor_api_key',
             'site_hero_poster', 'site_default_image', 'seo_default_og_image',
+            'admin_email', 'admin_email_cc', 'admin_email_bcc',
+            'email_verification_required',
+            'ziina_active', 'ziina_access_token', 'ziina_webhook_secret', 'ziina_test_mode', 'ziina_advance_percent',
         ];
 
         $settings = Setting::whereIn('setting_key', $keys)
@@ -216,8 +219,14 @@ class AdminSettingController extends Controller
 
             // Email & Payment Settings
             'admin_email', 'admin_email_cc', 'admin_email_bcc',
+            'email_verification_required',
             'ziina_active', 'ziina_access_token', 'ziina_webhook_secret', 'ziina_test_mode', 'ziina_advance_percent',
             'cache_version',
+
+            // Social Proof & Concierge Widget Controls
+            'safari_matcher_enabled',
+            'social_proof_enabled', 'social_proof_mobile_enabled', 'social_proof_source',
+            'social_proof_initial_delay', 'social_proof_duration', 'social_proof_interval',
 
             // Multi-Currency Exchange Rates
             'currency_rate_usd', 'currency_rate_eur', 'currency_rate_gbp', 'currency_rate_sar', 'currency_rate_inr',

@@ -296,6 +296,21 @@ Alpine.store('modal', {
     },
 
     open(id, data = {}) {
+        if (id === 'whatsapp') {
+            const formEnabled = (
+                typeof window.WHATSAPP_FORM_ENABLED === 'undefined' ||
+                window.WHATSAPP_FORM_ENABLED === '1' ||
+                window.WHATSAPP_FORM_ENABLED === 1 ||
+                window.WHATSAPP_FORM_ENABLED === true ||
+                window.WHATSAPP_FORM_ENABLED === 'true' ||
+                window.WHATSAPP_FORM_ENABLED === 'yes'
+            );
+            if (!formEnabled && window.App && typeof window.App.openWhatsApp === 'function') {
+                window.App.openWhatsApp(data?.tourName || '', data?.href || '');
+                return;
+            }
+        }
+
         const el = this.getModalElement(id);
         if (!el) {
             console.warn(`[Alpine.modal] Element for "${id}" not found.`);
@@ -819,7 +834,7 @@ document.addEventListener('click', (e) => {
             }
             if (target === '#whatsappModal') {
                 e.preventDefault();
-                Alpine.store('modal').open('whatsapp');
+                this.openWhatsApp(trigger.dataset?.tourName || '', '');
                 return;
             }
             if (target === '#legalModal') {
@@ -2152,7 +2167,8 @@ const App = {
             } catch (e) {}
         }
         if (!prefillMsg) {
-            prefillMsg = tourName ? `Hello, I would like to inquire about ${tourName}.` : 'Hello, I would like to inquire about Dubai desert safaris.';
+            const customDefault = window.WHATSAPP_PREFILL_MESSAGE || 'Hello, I would like to inquire about Dubai desert safaris.';
+            prefillMsg = tourName ? `Hello, I would like to inquire about ${tourName}.` : customDefault;
         }
         const defaultMsgEncoded = encodeURIComponent(prefillMsg);
         const fallbackUrl = directHref || `https://wa.me/${defaultNum}?text=${defaultMsgEncoded}`;
@@ -2183,19 +2199,15 @@ const App = {
                 window.fbq('track', 'Lead', { content_name: 'WhatsApp Click' });
             }
 
+            // Open WhatsApp synchronously inside user click gesture to prevent popup blockers
+            window.open(fallbackUrl, '_blank', 'noopener,noreferrer');
+
             fetch('/ajax.php', {
                 method: 'POST',
                 headers: { 'X-CSRF-TOKEN': csrfToken },
-                body: fd
-            })
-            .then(r => r.text())
-            .then(t => { try { return JSON.parse(t.replace(/^\uFEFF+/, '').trim()); } catch (e) { throw e; } })
-            .then(d => {
-                const url = d.redirect_url || fallbackUrl;
-                window.open(url, '_blank');
-            }).catch(() => {
-                window.open(fallbackUrl, '_blank');
-            });
+                body: fd,
+                keepalive: true
+            }).catch(() => {});
             return;
         }
 

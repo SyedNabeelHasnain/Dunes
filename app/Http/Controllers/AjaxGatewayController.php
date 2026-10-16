@@ -177,54 +177,66 @@ class AjaxGatewayController extends Controller
     public function getSocialProof()
     {
         try {
-            $proofs = Cache::remember('site_social_proof_feed', 600, function () {
+            $settings = app(\App\Services\SettingsService::class)->all();
+            if ((string) ($settings->get('social_proof_enabled', '1')) === '0') {
+                return response()->json([
+                    'success' => true,
+                    'items' => [],
+                ]);
+            }
+
+            $source = (string) ($settings->get('social_proof_source', 'all'));
+
+            $proofs = Cache::remember('site_social_proof_feed_' . $source, 600, function () use ($source) {
                 $list = [];
 
-                try {
-                    $recentBookings = Booking::whereIn('status', ['confirmed', 'paid', 'advance_paid', 'pending'])
-                        ->whereNotNull('tour_id')
-                        ->with('tour:id,name,slug,hero_image')
-                        ->latest()
-                        ->take(12)
-                        ->get();
+                if ($source !== 'custom_only') {
+                    try {
+                        $recentBookings = Booking::whereIn('status', ['confirmed', 'completed', 'paid', 'advance_paid', 'pending'])
+                            ->whereNotNull('tour_id')
+                            ->with('tour:id,name,slug,hero_image')
+                            ->latest()
+                            ->take(12)
+                            ->get();
 
-                    foreach ($recentBookings as $b) {
-                        $tourName = $b->tour ? $b->tour->name : ($b->tour_name ?: 'Premium Desert Safari Dubai');
-                        $tourSlug = $b->tour ? $b->tour->slug : 'tours';
-                        $heroImage = ($b->tour && $b->tour->hero_image) ? $b->tour->hero_image : 'evening-desert-safari-dubai-hero.avif';
+                        foreach ($recentBookings as $b) {
+                            $tourName = $b->tour ? $b->tour->name : ($b->tour_name ?: 'Premium Desert Safari Dubai');
+                            $tourSlug = $b->tour ? $b->tour->slug : 'tours';
+                            $heroImage = ($b->tour && $b->tour->hero_image) ? $b->tour->hero_image : 'evening-desert-safari-dubai-hero.avif';
 
-                        $nameParts = preg_split('/\s+/', trim((string) ($b->name ?: 'Guest')));
-                        $firstName = $nameParts[0] ?: 'Guest';
-                        $initial = isset($nameParts[1]) && ! empty($nameParts[1]) ? strtoupper(substr($nameParts[1], 0, 1)).'.' : '';
-                        $displayName = $initial ? "{$firstName} {$initial}" : $firstName;
+                            $nameParts = preg_split('/\s+/', trim((string) ($b->name ?: 'Guest')));
+                            $firstName = $nameParts[0] ?: 'Guest';
+                            $initial = isset($nameParts[1]) && ! empty($nameParts[1]) ? strtoupper(substr($nameParts[1], 0, 1)).'.' : '';
+                            $displayName = $initial ? "{$firstName} {$initial}" : $firstName;
 
-                        $diffMins = max(6, $b->created_at ? $b->created_at->diffInMinutes() : 18);
-                        if ($diffMins < 60) {
-                            $timeAgo = "{$diffMins} minutes ago";
-                        } elseif ($diffMins < 1440) {
-                            $hrs = floor($diffMins / 60);
-                            $timeAgo = "{$hrs} ".($hrs == 1 ? 'hour' : 'hours').' ago';
-                        } else {
-                            $days = min(3, floor($diffMins / 1440));
-                            $timeAgo = "{$days} ".($days == 1 ? 'day' : 'days').' ago';
+                            $diffMins = max(6, $b->created_at ? $b->created_at->diffInMinutes() : 18);
+                            if ($diffMins < 60) {
+                                $timeAgo = "{$diffMins} minutes ago";
+                            } elseif ($diffMins < 1440) {
+                                $hrs = floor($diffMins / 60);
+                                $timeAgo = "{$hrs} ".($hrs == 1 ? 'hour' : 'hours').' ago';
+                            } else {
+                                $days = min(3, floor($diffMins / 1440));
+                                $timeAgo = "{$days} ".($days == 1 ? 'day' : 'days').' ago';
+                            }
+
+                            $cleanImage = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $heroImage);
+
+                            $list[] = [
+                                'name' => $displayName,
+                                'tour' => $tourName,
+                                'url' => url('/'.$tourSlug),
+                                'image' => asset('images/'.$cleanImage),
+                                'time_ago' => $timeAgo,
+                                'location' => 'Dubai',
+                            ];
                         }
-
-                        $cleanImage = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $heroImage);
-
-                        $list[] = [
-                            'name' => $displayName,
-                            'tour' => $tourName,
-                            'url' => url('/'.$tourSlug),
-                            'image' => asset('images/'.$cleanImage),
-                            'time_ago' => $timeAgo,
-                            'location' => 'Dubai',
-                        ];
+                    } catch (\Throwable $e) {
+                        // DB query failed or remote host unreachable
                     }
-                } catch (\Throwable $e) {
-                    // DB query failed or remote host unreachable
                 }
 
-                if (empty($list)) {
+                if (($source === 'all' && empty($list)) || $source === 'custom_only') {
                     $fallbacks = [
                         ['name' => 'Michael R.', 'tour' => 'Premium Evening Desert Safari Dubai', 'slug' => 'evening-desert-safari-dubai', 'img' => 'evening-desert-safari-dubai-hero.avif', 'time' => '12 minutes ago'],
                         ['name' => 'Elena S.', 'tour' => 'Self-Drive Dune Buggy Safari Dubai', 'slug' => 'dune-buggy-rental-dubai', 'img' => 'dubai-desert-safari-buggy-dune-discovery-tourism.avif', 'time' => '28 minutes ago'],

@@ -18,6 +18,8 @@ return [
         'search_placeholder' => 'ابحث عن رحلات السفاري، تأجير سيارات الباجي، ركوب الكثبان...',
         'tours' => 'الجولات والرحلات',
         'legal_policies' => 'السياسات والشروط القانونية',
+        'terms' => 'الشروط والأحكام',
+        'privacy' => 'سياسة الخصوصية',
     ],
 
     // Guest Experience Gallery Section
@@ -28,6 +30,8 @@ return [
         'view_all' => 'استكشف المعرض بالكامل',
         'all_moments' => 'كل اللحظات',
         'verified_review' => 'تقييم موثق',
+        'verified_reviews' => 'تقييمات موثقة',
+        'guest_rating' => 'تقييم الضيوف',
         'book_this' => 'احجز هذه المغامرة الآن',
         'close' => 'إغلاق',
         'prev' => 'السابق',
@@ -38,6 +42,8 @@ return [
         'filter_buggy_quad' => 'الباجي والدراجات الصحراوية',
         'filter_camp_bbq' => 'المخيم وعشاء الشواء',
         'filter_sunset_camels' => 'الغروب وركوب الجمال',
+        'filter_city_landmarks' => 'جولات ومعالم المدينة',
+        'filter_marina_cruise' => 'رحلات الداو والمارينا',
         'filter_videos' => 'مقاطع الفيديو',
     ],
 
@@ -88,6 +94,9 @@ return [
         'happy_guests' => 'ضيوف سعداء',
         'breadcrumb' => 'مسار التنقل',
         'close' => 'إغلاق',
+        'back' => 'رجوع',
+        'language' => 'اللغة',
+        'currency' => 'العملة',
         'remove' => 'إزالة',
         'detect_location' => 'تحديد الموقع الحالي',
         'copy_code' => 'نسخ الرمز',
@@ -649,5 +658,16 @@ return [
         'feedback_title' => 'نقدر ملاحظاتك الصادقة',
         'feedback_placeholder' => 'أخبر فريق العمل بما يمكن تحسينه (السائق، الطعام، المخيم، التوقيت)...',
         'submit_feedback' => 'إرسال الملاحظات الخاصة',
+    ],
+
+    // WhatsApp Concierge Modal
+    'whatsapp_modal' => [
+        'title' => 'خدمة كونسيرج السفاري 24/7',
+        'subtitle' => 'تواصل مباشرة مع خبراء رحلات السفاري الصحراوية في دبي.',
+        'online' => 'متصل الآن',
+        'inquiring_about' => 'التجربة المختارة',
+        'privacy_note' => 'سيرد مستشارو السفاري المعتمدون لدينا مباشرة على رقم واتساب الخاص بك.',
+        'no_spam' => 'خصوصية تامة بدون إزعاج',
+        'fast_response' => 'رد خلال أقل من دقيقتين',
     ],
 ];

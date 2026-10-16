@@ -247,11 +247,80 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Checkout Security, Admin Alert Routing & Ziina Payment Gateway -->
+                <div class="col-span-1 lg:col-span-2">
+                    <div class="p-5 bg-slate-50/70 rounded-2xl border border-slate-200/80 space-y-5">
+                        <div class="flex items-center justify-between flex-wrap gap-2">
+                            <h6 class="text-xs font-black uppercase tracking-wider text-primary flex items-center gap-2">
+                                <i class="bi bi-credit-card-2-front-fill"></i> Checkout Security, Admin Booking Alerts & Payment Gateway (Ziina UAE)
+                            </h6>
+                            <span class="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-[11px] font-bold text-emerald-700">Checkout & Payments</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label for="admin_email" class="block text-xs font-bold text-slate-700 mb-1.5">Primary Admin Booking Alert Email</label>
+                                <input type="email" name="admin_email" id="admin_email" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['admin_email'] ?? ($settings['site_email'] ?? 'info@dunesdiscoverytourism.com') }}" placeholder="info@dunesdiscoverytourism.com">
+                                <div class="mt-1 text-[11px] text-slate-500">Receives instant new booking, inquiry, and WhatsApp lead notifications.</div>
+                            </div>
+                            <div>
+                                <label for="admin_email_cc" class="block text-xs font-bold text-slate-700 mb-1.5">Admin Alert CC Email (Optional)</label>
+                                <input type="email" name="admin_email_cc" id="admin_email_cc" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['admin_email_cc'] ?? '' }}" placeholder="operations@dunesdiscoverytourism.com">
+                                <div class="mt-1 text-[11px] text-slate-500">Secondary recipient copied on all admin booking notifications.</div>
+                            </div>
+                            <div>
+                                <label for="email_verification_required" class="block text-xs font-bold text-slate-700 mb-1.5">Checkout Email OTP Verification</label>
+                                <input type="hidden" name="email_verification_required" value="0">
+                                <label class="flex items-center justify-between p-2.5 rounded-xl border border-slate-200 bg-white cursor-pointer">
+                                    <span class="text-xs font-bold text-slate-700">Require OTP Before Checkout</span>
+                                    <input type="checkbox" name="email_verification_required" id="email_verification_required" value="1" class="rounded border-slate-300 text-primary focus:ring-primary w-4 h-4" {{ ($settings['email_verification_required'] ?? '0') === '1' ? 'checked' : '' }}>
+                                </label>
+                                <div class="mt-1 text-[11px] text-slate-500">When off, guests can complete bookings immediately without waiting for an email OTP code.</div>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t border-slate-200/60">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Ziina Online Payment Gateway</label>
+                                    <input type="hidden" name="ziina_active" value="0">
+                                    <label class="flex items-center justify-between p-2.5 rounded-xl border border-slate-200 bg-white cursor-pointer">
+                                        <span class="text-xs font-bold text-slate-700">Enable Online Card / Apple Pay</span>
+                                        <input type="checkbox" name="ziina_active" id="ziina_active" value="1" class="rounded border-slate-300 text-primary focus:ring-primary w-4 h-4" {{ ($settings['ziina_active'] ?? '1') === '1' ? 'checked' : '' }}>
+                                    </label>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Ziina Sandbox / Test Mode</label>
+                                    <input type="hidden" name="ziina_test_mode" value="0">
+                                    <label class="flex items-center justify-between p-2.5 rounded-xl border border-slate-200 bg-white cursor-pointer">
+                                        <span class="text-xs font-bold text-slate-700">Use Test Mode (Sandbox)</span>
+                                        <input type="checkbox" name="ziina_test_mode" id="ziina_test_mode" value="1" class="rounded border-slate-300 text-primary focus:ring-primary w-4 h-4" {{ ($settings['ziina_test_mode'] ?? '0') === '1' ? 'checked' : '' }}>
+                                    </label>
+                                </div>
+                                <div>
+                                    <label for="ziina_advance_percent" class="block text-xs font-bold text-slate-700 mb-1.5">Partial Advance Deposit (%)</label>
+                                    <input type="number" min="5" max="100" name="ziina_advance_percent" id="ziina_advance_percent" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-800 outline-hidden transition focus:border-primary" value="{{ $settings['ziina_advance_percent'] ?? '20' }}">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="ziina_access_token" class="block text-xs font-bold text-slate-700 mb-1.5">Ziina API Access Token</label>
+                                    <input type="password" name="ziina_access_token" id="ziina_access_token" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary" value="{{ $settings['ziina_access_token'] ?? '' }}" placeholder="Bearer token from Ziina Business Portal">
+                                </div>
+                                <div>
+                                    <label for="ziina_webhook_secret" class="block text-xs font-bold text-slate-700 mb-1.5">Ziina Webhook Secret</label>
+                                    <input type="password" name="ziina_webhook_secret" id="ziina_webhook_secret" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary" value="{{ $settings['ziina_webhook_secret'] ?? '' }}" placeholder="HMAC secret for verifying payment webhooks">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="flex items-center justify-end gap-3 mt-6 pt-5 border-t border-slate-100">
                 <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition">Cancel</a>
-                <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-[#e07b32] transition">
+                <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-[#e07b32] transition cursor-pointer">
                     <i class="bi bi-check2-circle"></i> Save General Settings
                 </button>
             </div>

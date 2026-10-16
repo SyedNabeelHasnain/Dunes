@@ -159,6 +159,10 @@ class AdminWhatsappController extends Controller
             $settings['whatsapp_form_enabled'] = $request->input('whatsapp_form_enabled') == '1' ? '1' : '0';
         }
 
+        if (!empty($settings['site_whatsapp']) && empty($settings['whatsapp_number'])) {
+            $settings['whatsapp_number'] = $settings['site_whatsapp'];
+        }
+
         foreach ($settings as $key => $value) {
             Setting::updateOrCreate(
                 ['setting_key' => $key],
@@ -167,6 +171,8 @@ class AdminWhatsappController extends Controller
         }
 
         Cache::forget('site_settings_cache');
+        Cache::forget('site_home_cache');
+        app(\App\Services\SettingsService::class)->clearCache();
 
         return redirect()->route('admin.whatsapp.settings')->with('success', 'WhatsApp settings updated successfully.');
     }
