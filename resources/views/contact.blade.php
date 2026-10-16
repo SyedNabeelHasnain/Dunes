@@ -184,7 +184,7 @@
             <div class="lg:col-span-7">
                 <div class="bg-white rounded-2xl p-6 sm:p-10 border border-slate-200 shadow-md">
                     <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-6">{{ __('ui.contact_page.send_message') }}</h2>
-                    <form id="contactForm" autocomplete="off" class="needs-validation space-y-5" novalidate>
+                    <form id="contactForm" method="POST" action="/ajax.php" autocomplete="off" class="needs-validation space-y-5" novalidate>
                         @csrf
                         <!-- Honeypot field -->
                         <div style="position:absolute;left:-9999px">

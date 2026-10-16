@@ -170,6 +170,7 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::resource('bookings', AdminBookingController::class)->only(['index', 'create', 'store', 'show', 'update', 'destroy']);
     Route::post('/bookings/{id}/payment-link', [AdminBookingController::class, 'createPaymentLink'])->name('bookings.payment-link');
     Route::post('/bookings/{id}/resend-payment', [AdminBookingController::class, 'resendPaymentEmail'])->name('bookings.resend-payment');
+    Route::post('/bookings/{id}/resend-confirmation', [AdminBookingController::class, 'resendConfirmationEmail'])->name('bookings.resend-confirmation');
     Route::get('/bookings/{id}/ticket', [AdminBookingController::class, 'downloadTicket'])->name('bookings.ticket');
 
     // Daily Tour Operations & Driver Dispatch Manifest

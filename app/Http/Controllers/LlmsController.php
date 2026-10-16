@@ -68,7 +68,7 @@ class LlmsController extends Controller
         $waPhone = $settings['site_whatsapp'] ?? '971502456056';
         $email = $settings['site_email'] ?? 'info@dunesdiscoverytourism.com';
         $address = $settings['site_address'] ?? 'Al Fahidi, Bur Dubai, Dubai, United Arab Emirates';
-        $license = $settings['site_det_license'] ?? '1430583';
+        $license = $settings['company_license_number'] ?? ($settings['site_det_license'] ?? '1430583');
 
         try {
             $safariTours = Tour::where('status', 'active')
@@ -210,7 +210,7 @@ class LlmsController extends Controller
         $waPhone = $settings['site_whatsapp'] ?? '971502456056';
         $email = $settings['site_email'] ?? 'info@dunesdiscoverytourism.com';
         $address = $settings['site_address'] ?? 'Al Fahidi, Bur Dubai, Dubai, United Arab Emirates';
-        $license = $settings['site_det_license'] ?? '1430583';
+        $license = $settings['company_license_number'] ?? ($settings['site_det_license'] ?? '1430583');
 
         try {
             $tours = Tour::where('status', 'active')

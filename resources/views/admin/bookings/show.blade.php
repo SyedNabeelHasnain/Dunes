@@ -33,6 +33,11 @@
             <a href="{{ route('booking.voucher', $booking->reference) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 text-xs font-bold shadow-2xs transition-all" title="Open Digital Boarding Pass">
                 <i class="bi bi-box-arrow-up-right"></i> View Voucher
             </a>
+            @if(!empty($booking->email))
+                <button type="button" onclick="resendConfirmationVoucher('{{ $booking->id }}')" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-indigo-200 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 text-xs font-bold shadow-2xs transition-all" title="Resend Booking Confirmation Email">
+                    <i class="bi bi-send"></i> Resend Email
+                </button>
+            @endif
             @if($booking->status === 'pending')
                 <form action="{{ route('admin.bookings.update', $booking->id) }}" method="POST" class="inline">
                     @csrf
@@ -947,6 +952,48 @@ function promptPermanentDeleteShow(id, reference, name) {
                 });
             }
         });
+    });
+}
+
+function resendConfirmationVoucher(id) {
+    Swal.fire({
+        title: 'Resend Confirmation Email?',
+        text: 'This will re-dispatch the official booking confirmation and voucher email to {{ $booking->email }}.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#6366f1',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Yes, Send Now',
+        showLoaderOnConfirm: true,
+        preConfirm: () => {
+            return $.ajax({
+                url: `/admin/bookings/${id}/resend-confirmation`,
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}'
+                },
+                headers: { 'Accept': 'application/json' }
+            }).then(response => {
+                if (!response.success) {
+                    throw new Error(response.message || 'Failed to resend confirmation email.');
+                }
+                return response;
+            }).catch(error => {
+                const msg = error.responseJSON ? error.responseJSON.message : error.message;
+                Swal.showValidationMessage(`Email Failed: ${msg}`);
+            });
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+    }).then((result) => {
+        if (result.isConfirmed && result.value) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Sent!',
+                text: result.value.message || 'Confirmation email dispatched successfully.',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
     });
 }
 </script>

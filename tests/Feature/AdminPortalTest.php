@@ -709,4 +709,41 @@ class AdminPortalTest extends TestCase
         $this->assertEquals('Updated VIP Guest', $booking->name);
         $this->assertEquals('JW Marriott Marquis', $booking->pickup_location);
     }
+
+    /**
+     * Test admin can resend booking confirmation email.
+     */
+    public function test_admin_can_resend_booking_confirmation_email(): void
+    {
+        \Illuminate\Support\Facades\Mail::fake();
+
+        $booking = Booking::create([
+            'reference' => 'DDT-RESEND-001',
+            'tour_name' => 'Evening Desert Safari',
+            'tier_name' => 'Standard Package',
+            'name' => 'Resend Test Guest',
+            'email' => 'resend-guest@example.com',
+            'phone' => '+971501112233',
+            'tour_date' => '2026-10-20',
+            'adults' => 2,
+            'children' => 0,
+            'infants' => 0,
+            'subtotal' => 300,
+            'total' => 300,
+            'status' => 'confirmed',
+            'payment_status' => 'paid',
+            'payment_method' => 'card',
+            'payment_amount' => 300,
+            'balance_due' => 0,
+        ]);
+
+        $response = $this->actingAs($this->adminUser)->postJson("/admin/bookings/{$booking->id}/resend-confirmation");
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        \Illuminate\Support\Facades\Mail::assertQueued(\App\Mail\BookingNotification::class, function ($mail) use ($booking) {
+            return $mail->hasTo($booking->email);
+        });
+    }
 }

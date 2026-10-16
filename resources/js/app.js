@@ -285,6 +285,7 @@ Alpine.store('modal', {
             'safari-matcher': 'safariMatcherModal',
             'search': 'globalSearchModal',
             'welcome-offer': 'welcomeOfferModal',
+            'exit-intent': 'exitIntentModal',
             'custom-safari': 'customSafariModal',
             'compare': 'compareDrawer',
             'whatsapp': 'whatsappModal',

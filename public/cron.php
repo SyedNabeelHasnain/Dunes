@@ -13,7 +13,7 @@ $isCli = (php_sapi_name() === 'cli');
 
 if (!$isCli) {
     $token = $_GET['token'] ?? $_POST['token'] ?? '';
-    $validToken = 'dunes_cron_2026';
+    $validToken = getenv('CRON_SECRET_TOKEN') ?: 'dunes_cron_2026';
 
     if (empty($token) || !hash_equals($validToken, (string) $token)) {
         http_response_code(403);

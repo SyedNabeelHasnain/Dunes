@@ -68,8 +68,7 @@
       <content:encoded><![CDATA[{!! $escapeCdata($postContent) !!}]]></content:encoded>
       @if(!empty($post->featured_image))
       @php
-          $imagePath = 'images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $post->featured_image);
-          $imageUrl = asset($imagePath);
+          $imageUrl = $post->featured_image_url;
           $imageAlt = is_array($post->featured_image_alt) ? (reset($post->featured_image_alt) ?: '') : (string) ($post->featured_image_alt ?? '');
       @endphp
       <media:content url="{{ $imageUrl }}" medium="image">

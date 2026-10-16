@@ -716,9 +716,7 @@ class AdminTourController extends Controller
         }
         Cache::forget('sitemap_tours_xml');
         Cache::forget('sitemap_images_xml');
-        Cache::forget('gttd_products_xml');
-        Cache::forget('gttd_options_xml');
-        Cache::forget('gttd_feed_xml');
-        Cache::forget('gttd_feed_json');
+        Cache::forget('sitemap_pages_xml');
+        \App\Http\Controllers\GoogleThingsToDoFeedController::flushCache();
     }
 }

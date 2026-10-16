@@ -185,93 +185,97 @@ class SitemapController extends Controller
      */
     public function pages(): Response
     {
-        try {
-            $languages = Language::getActive();
-        } catch (\Throwable $e) {
-            $languages = Language::fallbackCollection();
-        }
-
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
-        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'."\n";
-
-        $staticPages = [
-            '' => ['changefreq' => 'weekly', 'priority' => '1.0'],
-            '/about' => ['changefreq' => 'weekly', 'priority' => '0.8'],
-            '/contact' => ['changefreq' => 'weekly', 'priority' => '0.8'],
-            '/faq' => ['changefreq' => 'weekly', 'priority' => '0.8'],
-            '/tours' => ['changefreq' => 'weekly', 'priority' => '0.9'],
-            '/rate-card' => ['changefreq' => 'weekly', 'priority' => '0.8'],
-            '/blog' => ['changefreq' => 'weekly', 'priority' => '0.8'],
-            '/gallery' => ['changefreq' => 'daily', 'priority' => '0.85'],
-            '/dubai-desert-sunset-times' => ['changefreq' => 'daily', 'priority' => '0.85'],
-            '/press-kit' => ['changefreq' => 'weekly', 'priority' => '0.8'],
-            '/build-your-own-safari' => ['changefreq' => 'weekly', 'priority' => '0.85'],
-            '/terms-condition' => ['changefreq' => 'monthly', 'priority' => '0.6'],
-            '/privacy-policy' => ['changefreq' => 'monthly', 'priority' => '0.6'],
-            '/cookie-policy' => ['changefreq' => 'monthly', 'priority' => '0.6'],
-            '/cancellation-refund-policy' => ['changefreq' => 'monthly', 'priority' => '0.6'],
-            '/payment-security-policy' => ['changefreq' => 'monthly', 'priority' => '0.6'],
-            '/safety-liability-waiver' => ['changefreq' => 'monthly', 'priority' => '0.6'],
-            '/ai-editorial-policy' => ['changefreq' => 'monthly', 'priority' => '0.6'],
-            '/responsible-tourism-policy' => ['changefreq' => 'monthly', 'priority' => '0.6'],
-            '/review/guest' => ['changefreq' => 'weekly', 'priority' => '0.7'],
-        ];
-
-        // Pillar 2: Programmatic Geo-Location Pickup Pages
-        foreach (LocationLandingService::getLocations() as $loc) {
-            $staticPages['/'.$loc['slug']] = ['changefreq' => 'weekly', 'priority' => '0.9'];
-        }
-
-        $latestTour = Tour::where('status', 'active')->latest('updated_at')->first();
-        $latestBlog = BlogPost::where('status', 'published')->latest('updated_at')->first();
-        $weeklyMod = now()->startOfWeek()->toAtomString();
-        $monthlyMod = now()->startOfMonth()->toAtomString();
-        $tourMod = $latestTour?->updated_at ? $latestTour->updated_at->toAtomString() : $weeklyMod;
-        $blogMod = $latestBlog?->updated_at ? $latestBlog->updated_at->toAtomString() : $weeklyMod;
-
-        foreach ($staticPages as $page => $meta) {
-            if (in_array($page, ['', '/tours', '/build-your-own-safari', '/rate-card'], true)) {
-                $pageLastmod = $tourMod;
-            } elseif ($page === '/blog') {
-                $pageLastmod = $blogMod;
-            } elseif ($meta['changefreq'] === 'monthly') {
-                $pageLastmod = $monthlyMod;
-            } else {
-                $pageLastmod = $weeklyMod;
+        $content = Cache::remember('sitemap_pages_xml', 3600, function () {
+            try {
+                $languages = Language::getActive();
+            } catch (\Throwable $e) {
+                $languages = Language::fallbackCollection();
             }
 
-            // Alternates
-            $enUrl = ($page === '' || $page === '/') ? (rtrim(url('/'), '/').'/') : url($page);
-            $alternates = [
-                'x-default' => $enUrl,
+            $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+            $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'."\n";
+
+            $staticPages = [
+                '' => ['changefreq' => 'weekly', 'priority' => '1.0'],
+                '/about' => ['changefreq' => 'weekly', 'priority' => '0.8'],
+                '/contact' => ['changefreq' => 'weekly', 'priority' => '0.8'],
+                '/faq' => ['changefreq' => 'weekly', 'priority' => '0.8'],
+                '/tours' => ['changefreq' => 'weekly', 'priority' => '0.9'],
+                '/rate-card' => ['changefreq' => 'weekly', 'priority' => '0.8'],
+                '/blog' => ['changefreq' => 'weekly', 'priority' => '0.8'],
+                '/gallery' => ['changefreq' => 'daily', 'priority' => '0.85'],
+                '/dubai-desert-sunset-times' => ['changefreq' => 'daily', 'priority' => '0.85'],
+                '/press-kit' => ['changefreq' => 'weekly', 'priority' => '0.8'],
+                '/build-your-own-safari' => ['changefreq' => 'weekly', 'priority' => '0.85'],
+                '/terms-condition' => ['changefreq' => 'monthly', 'priority' => '0.6'],
+                '/privacy-policy' => ['changefreq' => 'monthly', 'priority' => '0.6'],
+                '/cookie-policy' => ['changefreq' => 'monthly', 'priority' => '0.6'],
+                '/cancellation-refund-policy' => ['changefreq' => 'monthly', 'priority' => '0.6'],
+                '/payment-security-policy' => ['changefreq' => 'monthly', 'priority' => '0.6'],
+                '/safety-liability-waiver' => ['changefreq' => 'monthly', 'priority' => '0.6'],
+                '/ai-editorial-policy' => ['changefreq' => 'monthly', 'priority' => '0.6'],
+                '/responsible-tourism-policy' => ['changefreq' => 'monthly', 'priority' => '0.6'],
+                '/review/guest' => ['changefreq' => 'weekly', 'priority' => '0.7'],
             ];
-            foreach ($languages as $lang) {
-                if ($lang->is_default) {
-                    $alternates[$lang->code] = $enUrl;
+
+            // Pillar 2: Programmatic Geo-Location Pickup Pages
+            foreach (LocationLandingService::getLocations() as $loc) {
+                $staticPages['/'.$loc['slug']] = ['changefreq' => 'weekly', 'priority' => '0.9'];
+            }
+
+            $latestTour = Tour::where('status', 'active')->latest('updated_at')->first();
+            $latestBlog = BlogPost::where('status', 'published')->latest('updated_at')->first();
+            $weeklyMod = now()->startOfWeek()->toAtomString();
+            $monthlyMod = now()->startOfMonth()->toAtomString();
+            $tourMod = $latestTour?->updated_at ? $latestTour->updated_at->toAtomString() : $weeklyMod;
+            $blogMod = $latestBlog?->updated_at ? $latestBlog->updated_at->toAtomString() : $weeklyMod;
+
+            foreach ($staticPages as $page => $meta) {
+                if (in_array($page, ['', '/tours', '/build-your-own-safari', '/rate-card'], true)) {
+                    $pageLastmod = $tourMod;
+                } elseif ($page === '/blog') {
+                    $pageLastmod = $blogMod;
+                } elseif ($meta['changefreq'] === 'monthly') {
+                    $pageLastmod = $monthlyMod;
                 } else {
-                    $alternates[$lang->code] = ($page === '' || $page === '/') ? url('/'.$lang->code) : url('/'.$lang->code.$page);
+                    $pageLastmod = $weeklyMod;
+                }
+
+                // Alternates
+                $enUrl = ($page === '' || $page === '/') ? (rtrim(url('/'), '/').'/') : url($page);
+                $alternates = [
+                    'x-default' => $enUrl,
+                ];
+                foreach ($languages as $lang) {
+                    if ($lang->is_default) {
+                        $alternates[$lang->code] = $enUrl;
+                    } else {
+                        $alternates[$lang->code] = ($page === '' || $page === '/') ? url('/'.$lang->code) : url('/'.$lang->code.$page);
+                    }
+                }
+
+                foreach ($languages as $lang) {
+                    $loc = $alternates[$lang->code];
+                    $xml .= "  <url>\n";
+                    $xml .= '    <loc>'.$this->xmlEscape($loc)."</loc>\n";
+                    $xml .= '    <lastmod>'.$this->xmlEscape($pageLastmod)."</lastmod>\n";
+                    $xml .= "    <changefreq>{$meta['changefreq']}</changefreq>\n";
+                    $xml .= "    <priority>{$meta['priority']}</priority>\n";
+
+                    foreach ($alternates as $hreflang => $altUrl) {
+                        $xml .= '    <xhtml:link rel="alternate" hreflang="'.$this->xmlEscape($hreflang).'" href="'.$this->xmlEscape($altUrl)."\" />\n";
+                    }
+
+                    $xml .= "  </url>\n";
                 }
             }
 
-            foreach ($languages as $lang) {
-                $loc = $alternates[$lang->code];
-                $xml .= "  <url>\n";
-                $xml .= '    <loc>'.$this->xmlEscape($loc)."</loc>\n";
-                $xml .= '    <lastmod>'.$this->xmlEscape($pageLastmod)."</lastmod>\n";
-                $xml .= "    <changefreq>{$meta['changefreq']}</changefreq>\n";
-                $xml .= "    <priority>{$meta['priority']}</priority>\n";
+            $xml .= '</urlset>';
 
-                foreach ($alternates as $hreflang => $altUrl) {
-                    $xml .= '    <xhtml:link rel="alternate" hreflang="'.$this->xmlEscape($hreflang).'" href="'.$this->xmlEscape($altUrl)."\" />\n";
-                }
+            return $xml;
+        });
 
-                $xml .= "  </url>\n";
-            }
-        }
-
-        $xml .= '</urlset>';
-
-        return response($xml, 200, [
+        return response($content, 200, [
             'Content-Type' => 'text/xml; charset=utf-8',
             'Cache-Control' => 'public, max-age=86400',
         ]);
@@ -454,8 +458,9 @@ class SitemapController extends Controller
 
                         if (! empty($article->hero_image) && $lang->is_default) {
                             $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $article->hero_image);
+                            $cleanImg = ltrim(preg_replace('#^images/#i', '', $imgFile), '/');
                             $xml .= "    <image:image>\n";
-                            $xml .= '      <image:loc>'.$this->xmlEscape(asset('images/'.$imgFile))."</image:loc>\n";
+                            $xml .= '      <image:loc>'.$this->xmlEscape(asset('images/'.$cleanImg))."</image:loc>\n";
                             $xml .= '      <image:title>'.$this->xmlEscape($article->title)."</image:title>\n";
                             if (! empty($article->excerpt)) {
                                 $xml .= '      <image:caption>'.$this->xmlEscape($article->excerpt)."</image:caption>\n";

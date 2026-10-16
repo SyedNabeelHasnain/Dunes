@@ -1055,6 +1055,40 @@ class AdminBookingController extends Controller
     }
 
     /**
+     * Resend the booking confirmation / voucher email to the customer.
+     */
+    public function resendConfirmationEmail(Request $request, string $id)
+    {
+        $booking = Booking::with('addons')->findOrFail($id);
+
+        if (empty($booking->email)) {
+            return response()->json(['success' => false, 'message' => 'No customer email address on file.'], 422);
+        }
+
+        try {
+            try {
+                app(EmailMarketingService::class)->applySmtpConfig();
+            } catch (\Throwable $e) {}
+
+            $fromEmail = app(SettingsService::class)->getFromEmail();
+            $emailType = ($booking->status === 'cancelled') ? 'booking_cancelled' : 'booking_confirmed';
+
+            Mail::to($booking->email)->send(
+                (new BookingNotification($emailType, $booking))->from($fromEmail, 'Dunes Discovery Tourism')
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Booking confirmation email resent successfully to '.$booking->email,
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('Failed to resend confirmation email: '.$e->getMessage());
+
+            return response()->json(['success' => false, 'message' => 'Failed to send confirmation email: '.$e->getMessage()], 500);
+        }
+    }
+
+    /**
      * Perform batch operations across multiple bookings.
      */
     public function bulkAction(Request $request)

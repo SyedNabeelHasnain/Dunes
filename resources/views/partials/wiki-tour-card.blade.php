@@ -23,7 +23,7 @@
         </div>
         <div class="shrink-0 flex flex-col items-center md:items-end w-full md:w-auto pt-3 md:pt-0 border-t md:border-t-0 border-white/10">
             @php
-                $startingPrice = $tour->tiers->min('price') ?: 150;
+                $startingPrice = $tour->tiers->min('pivot.price') ?: ($tour->price ?: 150);
             @endphp
             <div class="text-[11px] text-slate-400 uppercase tracking-wider">Starting From</div>
             <div class="text-2xl font-black text-amber-400 font-mono mb-2" x-data x-text="$store.currency.format({{ $startingPrice }})">
