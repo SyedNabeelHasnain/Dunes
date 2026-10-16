@@ -73,12 +73,22 @@ class CmsContentService
     public function getMenuItems(string $location): Collection
     {
         try {
-            return Cache::remember("cms_menu_{$location}_cache", 3600, function () use ($location) {
+            $items = Cache::remember("cms_menu_{$location}_cache", 3600, function () use ($location) {
                 return MenuItem::where('location', $location)
                     ->where('is_active', true)
                     ->orderBy('order', 'asc')
                     ->get();
             });
+
+            if (! is_iterable($items) || $items instanceof \__PHP_Incomplete_Class) {
+                Cache::forget("cms_menu_{$location}_cache");
+                $items = MenuItem::where('location', $location)
+                    ->where('is_active', true)
+                    ->orderBy('order', 'asc')
+                    ->get();
+            }
+
+            return $items instanceof Collection ? $items : collect($items);
         } catch (\Throwable $e) {
             return collect();
         }

@@ -257,4 +257,34 @@ class CmsPagesAndMenusTest extends TestCase
         // Header menu starts with All Tours, not a standalone Home button
         $response->assertDontSee('>Home</a>', false);
     }
+
+    public function test_dynamic_cms_header_renders_shortened_navigation_and_enlarged_logo(): void
+    {
+        $response = $this->get('/');
+        $response->assertStatus(200);
+
+        // Logo sizing classes are present and prominent
+        $response->assertSee('h-10 sm:h-12 lg:h-14 xl:h-16', false);
+        $response->assertSee('h-16 sm:h-18 lg:h-20 xl:h-22', false);
+
+        // The 5 shortened links are present
+        $response->assertSee('Tours');
+        $response->assertSee('About');
+        $response->assertSee('Blogs');
+        $response->assertSee('FAQs');
+        $response->assertSee('Contact');
+    }
+
+    public function test_header_navigation_renders_arabic_labels_on_localized_route(): void
+    {
+        $response = $this->get('/ar');
+        $response->assertStatus(200);
+
+        // Arabic shortened menu items
+        $response->assertSee('جولات');
+        $response->assertSee('عن');
+        $response->assertSee('مدونات');
+        $response->assertSee('الأسئلة الشائعة');
+        $response->assertSee('تواصل معنا');
+    }
 }

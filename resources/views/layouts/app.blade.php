@@ -472,15 +472,15 @@
         @include('partials.top-banner')
         <nav class="glass-nav border-b border-slate-200/80 shadow-xs">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between h-16 sm:h-18 lg:h-20">
+                <div class="flex items-center justify-between h-16 sm:h-18 lg:h-20 xl:h-22">
                     <!-- Brand Logo & Trust Badges -->
                     <div class="flex items-center gap-3 xl:gap-4 flex-shrink-0">
                         <a class="flex items-center hover:opacity-90 transition-opacity" href="{{ localized_route('home') }}" aria-label="Dunes Discovery Tourism">
-                            <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery Tourism" width="180" height="116" class="h-10 sm:h-11 lg:h-13 xl:h-14 w-auto object-contain" fetchpriority="high">
+                            <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery Tourism" width="180" height="116" class="h-10 sm:h-12 lg:h-14 xl:h-16 w-auto object-contain transition-all" fetchpriority="high">
                         </a>
 
                         <!-- Desktop Trust Badges (Google & TripAdvisor with Live Ratings) -->
-                        <div class="hidden lg:flex items-center gap-2 border-s border-slate-200/90 ps-3">
+                        <div class="hidden xl:flex items-center gap-2 border-s border-slate-200/90 ps-3">
                             <!-- Google Reviews Badge -->
                             <a href="{{ $settings['social_google'] ?? 'https://search.google.com/local/writereview?placeid=ChIJbWsIEIVEdEER4uHEhb2dbcQ' }}" 
                                target="_blank" 
@@ -574,8 +574,8 @@
                             {{-- Fallback default links if no header items in DB --}}
                             <li class="relative" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">
                                 <div class="inline-flex items-center rounded-xl {{ request()->routeIs('tours.*', 'locale.tours.*') ? 'bg-slate-900 text-white font-bold shadow-xs' : '' }}">
-                                    <a class="px-3 py-2 rounded-s-xl transition-all {{ request()->routeIs('tours.*', 'locale.tours.*') ? 'text-white' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ localized_route('tours.index') }}">{{ __('ui.nav.all_tours') }}</a>
-                                    <button type="button" @click="open = !open" :aria-expanded="open" class="px-1.5 py-2 rounded-e-xl transition-all hover:opacity-80 cursor-pointer" aria-label="{{ __('ui.nav.all_tours') }}">
+                                    <a class="px-3 py-2 rounded-s-xl transition-all {{ request()->routeIs('tours.*', 'locale.tours.*') ? 'text-white' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ localized_route('tours.index') }}">{{ __('ui.nav.tours_short') ?? __('ui.nav.tours') }}</a>
+                                    <button type="button" @click="open = !open" :aria-expanded="open" class="px-1.5 py-2 rounded-e-xl transition-all hover:opacity-80 cursor-pointer" aria-label="{{ __('ui.nav.tours_short') ?? __('ui.nav.tours') }}">
                                         <i class="bi bi-chevron-down text-[10px] transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
                                     </button>
                                 </div>
@@ -603,13 +603,10 @@
                                 </div>
                             </li>
                             <li>
-                                <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('gallery.*', 'locale.gallery.*') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ localized_route('gallery.index') }}">{{ __('ui.nav.gallery') }}</a>
+                                <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('about', 'locale.about') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ localized_route('about') }}">{{ __('ui.nav.about_short') ?? __('ui.nav.about') }}</a>
                             </li>
                             <li>
-                                <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('about', 'locale.about') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ localized_route('about') }}">{{ __('ui.nav.about') }}</a>
-                            </li>
-                            <li>
-                                <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('blog.*', 'locale.blog.*') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ localized_route('blog.index') }}">{{ __('ui.nav.blog') }}</a>
+                                <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('blog.*', 'locale.blog.*') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ localized_route('blog.index') }}">{{ __('ui.nav.blogs') ?? __('ui.nav.blog') }}</a>
                             </li>
                             <li>
                                 <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('faq', 'locale.faq') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ localized_route('faq') }}">{{ __('ui.nav.faq') }}</a>
@@ -789,10 +786,9 @@
                         <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ $isActive ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ $mItem->resolved_url }}" target="{{ $mItem->target ?? '_self' }}" @click="$store.mobileNav.close()">{{ $mItem->label }}</a>
                     @endforeach
                 @else
-                    <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('tours.*', 'locale.tours.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('tours.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.all_tours') }}</a>
-                    <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('gallery.*', 'locale.gallery.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('gallery.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.gallery') }}</a>
-                    <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('about', 'locale.about') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('about') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.about') }}</a>
-                    <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('blog.*', 'locale.blog.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('blog.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.blog') }}</a>
+                    <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('tours.*', 'locale.tours.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('tours.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.tours_short') ?? __('ui.nav.tours') }}</a>
+                    <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('about', 'locale.about') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('about') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.about_short') ?? __('ui.nav.about') }}</a>
+                    <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('blog.*', 'locale.blog.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('blog.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.blogs') ?? __('ui.nav.blog') }}</a>
                     <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('faq', 'locale.faq') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('faq') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.faq') }}</a>
                     <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('contact', 'locale.contact') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('contact') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.contact') }}</a>
                 @endif
