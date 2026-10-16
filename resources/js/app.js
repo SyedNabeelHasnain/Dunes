@@ -881,7 +881,8 @@ document.addEventListener('click', (e) => {
         Alpine.store('mobileNav').close();
         return;
     }
-    if (e.target.closest('#mobileSheet a')) {
+    const sheetLink = e.target.closest('#mobileSheet a');
+    if (sheetLink && !sheetLink.classList.contains('nav-review-circle') && !sheetLink.closest('.nav-review-circle')) {
         Alpine.store('mobileNav').close();
     }
 });

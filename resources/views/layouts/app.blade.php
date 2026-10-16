@@ -616,123 +616,124 @@
                         </a>
 
                         <!-- Hamburger Drawer Trigger (Min 44x44px Hit Target) -->
-                        <button class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl text-slate-800 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer focus:outline-none shrink-0" type="button" @click="$store.mobileNav.toggle()" aria-label="{{ __('ui.nav.all_tours') ?? 'Menu' }}">
+                        <button id="menuToggle" class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl text-slate-800 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer focus:outline-none shrink-0" type="button" @click="$store.mobileNav.toggle()" aria-label="{{ __('ui.nav.all_tours') ?? 'Menu' }}">
                             <i class="bi bi-list text-2xl"></i>
                         </button>
                     </div>
                 </div>
             </div>
         </nav>
-
-        <!-- Alpine-Powered Mobile Offcanvas Drawer -->
-        <div x-show="$store.mobileNav.open" 
-             x-transition:enter="transition-opacity ease-out duration-300"
-             x-transition:enter-start="opacity-0"
-             x-transition:enter-end="opacity-100"
-             x-transition:leave="transition-opacity ease-in duration-200"
-             x-transition:leave-start="opacity-100"
-             x-transition:leave-end="opacity-0"
-             class="fixed inset-0 bg-black/60 z-50 backdrop-blur-xs lg:hidden"
-             @click="$store.mobileNav.close()"
-             style="display: none;"></div>
-
-        <div x-show="$store.mobileNav.open"
-             x-transition:enter="transition ease-out duration-300 transform"
-             x-transition:enter-start="ltr:translate-x-full rtl:-translate-x-full"
-             x-transition:enter-end="translate-x-0"
-             x-transition:leave="transition ease-in duration-200 transform"
-             x-transition:leave-start="translate-x-0"
-             x-transition:leave-end="ltr:translate-x-full rtl:-translate-x-full"
-             class="fixed inset-y-0 end-0 max-w-xs sm:max-w-sm w-full bg-white z-50 shadow-2xl p-5 flex flex-col justify-between overflow-y-auto overscroll-contain lg:hidden"
-             style="display: none;"
-             id="mobileSheet">
-            <div>
-                <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-4">
-                    <a href="{{ localized_route('home') }}" @click="$store.mobileNav.close()" class="flex items-center hover:opacity-90 transition-opacity" aria-label="Dunes Discovery Tourism">
-                        <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery Tourism" width="140" height="90" class="h-9 w-auto object-contain">
-                    </a>
-                    <div class="flex items-center gap-1.5 sm:gap-2">
-                        <!-- Review Popover Triggers in Mobile Drawer Header with Ratings -->
-                        <a href="{{ $settings['social_tripadvisor'] ?? 'https://www.tripadvisor.com/Attraction_Review-g295424-d29026644-Reviews-Dunes_Discovery-Dubai_Emirate_of_Dubai.html' }}" 
-                           target="_blank" 
-                           rel="noopener" 
-                           id="taCircleDrawer" 
-                           class="nav-review-circle inline-flex items-center gap-1 px-2 py-1 rounded-full bg-slate-50 border border-slate-200 shadow-2xs hover:bg-slate-100 transition-all cursor-pointer" 
-                           onclick="toggleReviewPopover(this, event)" 
-                           title="{{ __('ui.common.tripadvisor_reviews') }}">
-                            <img src="{{ asset('images/tripadvisor-color-logo.svg') }}" alt="TripAdvisor" width="16" height="16" class="w-4 h-4 object-contain">
-                            <span class="text-xs font-black text-slate-800">4.9</span>
-                            <i class="bi bi-star-fill text-emerald-600 text-[10px]"></i>
-                        </a>
-                        <a href="{{ $settings['social_google'] ?? 'https://search.google.com/local/writereview?placeid=ChIJbWsIEIVEdEER4uHEhb2dbcQ' }}" 
-                           target="_blank" 
-                           rel="noopener" 
-                           id="googleCircleDrawer" 
-                           class="nav-review-circle inline-flex items-center gap-1 px-2 py-1 rounded-full bg-slate-50 border border-slate-200 shadow-2xs hover:bg-slate-100 transition-all cursor-pointer" 
-                           onclick="toggleReviewPopover(this, event)" 
-                           title="{{ __('ui.common.google_reviews') }}">
-                            <img src="{{ asset('images/Google-G.avif') }}" alt="Google" width="14" height="14" class="w-3.5 h-3.5 object-contain">
-                            <span class="text-xs font-black text-slate-800">5.0</span>
-                            <i class="bi bi-star-fill text-amber-400 text-[10px]"></i>
-                        </a>
-                        @include('partials.language-currency-switcher', ['switcherId' => 'mobileLangCurrencyDropdownBtn'])
-                        <button type="button" class="w-10 h-10 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer" @click="$store.mobileNav.close()" aria-label="{{ __('ui.common.close') }}">
-                            <i class="bi bi-x-lg text-sm"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Search Input in Drawer (16px on mobile to eliminate iOS zoom) -->
-                <form action="{{ localized_route('tours.search') }}" method="GET" class="relative mb-3">
-                    <i class="bi bi-search absolute start-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
-                    <input type="text" name="q" class="w-full rounded-full ps-9 pe-4 py-2.5 bg-slate-100 text-slate-800 text-base sm:text-xs font-semibold border-0 focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="{{ __('ui.nav.search_placeholder') }}" required>
-                </form>
-
-                <!-- Interactive Features CTAs -->
-                <div class="space-y-2 mb-4">
-                    <button type="button" class="w-full rounded-2xl p-3 flex items-center justify-between text-start border border-amber-400/30 shadow-xs cursor-pointer min-h-[48px]" style="background: linear-gradient(135deg, #1E293B, #0F172A);" @click="$store.mobileNav.close(); $store.modal.open('safari-matcher');">
-                        <div class="flex items-center gap-2.5">
-                            <span class="text-amber-400 text-lg"><i class="bi bi-compass"></i></span>
-                            <div>
-                                <div class="font-bold text-white text-xs leading-none">{{ __('ui.footer.safari_concierge_btn') }}</div>
-                                <small class="text-white/60 text-[10px]">{{ __('ui.footer.safari_concierge_desc') }}</small>
-                            </div>
-                        </div>
-                        @if($conciergePromoActive)
-                        <span class="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[9px]">{{ $conciergePromoDiscount }}% OFF</span>
-                        @endif
-                    </button>
-                    <a href="{{ localized_route('tours.customizer') }}" class="w-full rounded-2xl p-2.5 flex items-center justify-between text-start border border-slate-200 bg-slate-50 hover:bg-orange-50 text-slate-800 font-bold text-xs transition-colors min-h-[44px]" @click="$store.mobileNav.close()">
-                        <span class="flex items-center gap-2">
-                            <i class="bi bi-sliders text-primary"></i>
-                            <span>{{ __('ui.nav.customizer') }}</span>
-                        </span>
-                        <i class="bi bi-chevron-right text-slate-500 text-[10px] rtl:rotate-180"></i>
-                    </a>
-                </div>
-
-                <!-- Navigation Links List (≥44px Touch Targets) -->
-                <nav class="space-y-1">
-                    <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('tours.*', 'locale.tours.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('tours.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.all_tours') }}</a>
-                    <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('gallery.*', 'locale.gallery.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('gallery.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.gallery') }}</a>
-                    <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('about', 'locale.about') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('about') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.about') }}</a>
-                    <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('blog.*', 'locale.blog.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('blog.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.blog') }}</a>
-                    <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('faq', 'locale.faq') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('faq') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.faq') }}</a>
-                    <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('contact', 'locale.contact') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('contact') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.contact') }}</a>
-                </nav>
-            </div>
-
-            <!-- Drawer Bottom Direct Contact (Safe Area Inset Aware) -->
-            <div class="pt-4 border-t border-slate-200 space-y-2" style="padding-bottom: max(1.25rem, env(safe-area-inset-bottom, 1.25rem));">
-                <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="w-full h-11 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors btn-whatsapp" data-action="whatsapp" @click="$store.mobileNav.close();">
-                    <i class="bi bi-whatsapp text-sm"></i><span>{{ __('ui.common.whatsapp_chat') }}</span>
-                </a>
-                <button type="button" class="w-full h-11 rounded-full bg-primary hover:bg-primary-dark text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer" @click="$store.mobileNav.close(); $store.modal.open('booking');">
-                    <i class="bi bi-calendar-check text-sm"></i><span>{{ __('ui.common.book_online') }}</span>
-                </button>
-            </div>
-        </div>
     </header>
+
+    <!-- Alpine-Powered Mobile Offcanvas Drawer (Direct child of body to prevent CSS transform containing-block clipping) -->
+    <div x-show="$store.mobileNav.open" 
+         id="sheetOverlay"
+         x-transition:enter="transition-opacity ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition-opacity ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 bg-black/60 z-[60] backdrop-blur-xs lg:hidden"
+         @click="$store.mobileNav.close()"
+         style="display: none;"></div>
+
+    <div x-show="$store.mobileNav.open"
+         x-transition:enter="transition ease-out duration-300 transform"
+         x-transition:enter-start="ltr:translate-x-full rtl:-translate-x-full"
+         x-transition:enter-end="translate-x-0"
+         x-transition:leave="transition ease-in duration-200 transform"
+         x-transition:leave-start="translate-x-0"
+         x-transition:leave-end="ltr:translate-x-full rtl:-translate-x-full"
+         class="fixed inset-y-0 end-0 max-w-xs sm:max-w-sm w-full bg-white z-[65] shadow-2xl p-5 flex flex-col justify-between overflow-y-auto overscroll-contain lg:hidden"
+         style="display: none;"
+         id="mobileSheet">
+        <div>
+            <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-4">
+                <a href="{{ localized_route('home') }}" @click="$store.mobileNav.close()" class="flex items-center hover:opacity-90 transition-opacity" aria-label="Dunes Discovery Tourism">
+                    <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery Tourism" width="140" height="90" class="h-9 w-auto object-contain">
+                </a>
+                <div class="flex items-center gap-1.5 sm:gap-2">
+                    <!-- Review Popover Triggers in Mobile Drawer Header with Ratings -->
+                    <a href="{{ $settings['social_tripadvisor'] ?? 'https://www.tripadvisor.com/Attraction_Review-g295424-d29026644-Reviews-Dunes_Discovery-Dubai_Emirate_of_Dubai.html' }}" 
+                       target="_blank" 
+                       rel="noopener" 
+                       id="taCircleDrawer" 
+                       class="nav-review-circle inline-flex items-center gap-1 px-2 py-1 rounded-full bg-slate-50 border border-slate-200 shadow-2xs hover:bg-slate-100 transition-all cursor-pointer" 
+                       onclick="toggleReviewPopover(this, event)" 
+                       title="{{ __('ui.common.tripadvisor_reviews') }}">
+                        <img src="{{ asset('images/tripadvisor-color-logo.svg') }}" alt="TripAdvisor" width="16" height="16" class="w-4 h-4 object-contain">
+                        <span class="text-xs font-black text-slate-800">4.9</span>
+                        <i class="bi bi-star-fill text-emerald-600 text-[10px]"></i>
+                    </a>
+                    <a href="{{ $settings['social_google'] ?? 'https://search.google.com/local/writereview?placeid=ChIJbWsIEIVEdEER4uHEhb2dbcQ' }}" 
+                       target="_blank" 
+                       rel="noopener" 
+                       id="googleCircleDrawer" 
+                       class="nav-review-circle inline-flex items-center gap-1 px-2 py-1 rounded-full bg-slate-50 border border-slate-200 shadow-2xs hover:bg-slate-100 transition-all cursor-pointer" 
+                       onclick="toggleReviewPopover(this, event)" 
+                       title="{{ __('ui.common.google_reviews') }}">
+                        <img src="{{ asset('images/Google-G.avif') }}" alt="Google" width="14" height="14" class="w-3.5 h-3.5 object-contain">
+                        <span class="text-xs font-black text-slate-800">5.0</span>
+                        <i class="bi bi-star-fill text-amber-400 text-[10px]"></i>
+                    </a>
+                    @include('partials.language-currency-switcher', ['switcherId' => 'mobileLangCurrencyDropdownBtn'])
+                    <button id="sheetClose" type="button" class="w-10 h-10 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer" @click="$store.mobileNav.close()" aria-label="{{ __('ui.common.close') }}">
+                        <i class="bi bi-x-lg text-sm"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search Input in Drawer (16px on mobile to eliminate iOS zoom) -->
+            <form action="{{ localized_route('tours.search') }}" method="GET" class="relative mb-3">
+                <i class="bi bi-search absolute start-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                <input type="text" name="q" class="w-full rounded-full ps-9 pe-4 py-2.5 bg-slate-100 text-slate-800 text-base sm:text-xs font-semibold border-0 focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="{{ __('ui.nav.search_placeholder') }}" required>
+            </form>
+
+            <!-- Interactive Features CTAs -->
+            <div class="space-y-2 mb-4">
+                <button type="button" class="w-full rounded-2xl p-3 flex items-center justify-between text-start border border-amber-400/30 shadow-xs cursor-pointer min-h-[48px]" style="background: linear-gradient(135deg, #1E293B, #0F172A);" @click="$store.mobileNav.close(); $store.modal.open('safari-matcher');">
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-amber-400 text-lg"><i class="bi bi-compass"></i></span>
+                        <div>
+                            <div class="font-bold text-white text-xs leading-none">{{ __('ui.footer.safari_concierge_btn') }}</div>
+                            <small class="text-white/60 text-[10px]">{{ __('ui.footer.safari_concierge_desc') }}</small>
+                        </div>
+                    </div>
+                    @if($conciergePromoActive)
+                    <span class="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[9px]">{{ $conciergePromoDiscount }}% OFF</span>
+                    @endif
+                </button>
+                <a href="{{ localized_route('tours.customizer') }}" class="w-full rounded-2xl p-2.5 flex items-center justify-between text-start border border-slate-200 bg-slate-50 hover:bg-orange-50 text-slate-800 font-bold text-xs transition-colors min-h-[44px]" @click="$store.mobileNav.close()">
+                    <span class="flex items-center gap-2">
+                        <i class="bi bi-sliders text-primary"></i>
+                        <span>{{ __('ui.nav.customizer') }}</span>
+                    </span>
+                    <i class="bi bi-chevron-right text-slate-500 text-[10px] rtl:rotate-180"></i>
+                </a>
+            </div>
+
+            <!-- Navigation Links List (≥44px Touch Targets) -->
+            <nav class="space-y-1">
+                <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('tours.*', 'locale.tours.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('tours.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.all_tours') }}</a>
+                <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('gallery.*', 'locale.gallery.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('gallery.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.gallery') }}</a>
+                <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('about', 'locale.about') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('about') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.about') }}</a>
+                <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('blog.*', 'locale.blog.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('blog.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.blog') }}</a>
+                <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('faq', 'locale.faq') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('faq') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.faq') }}</a>
+                <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('contact', 'locale.contact') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('contact') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.contact') }}</a>
+            </nav>
+        </div>
+
+        <!-- Drawer Bottom Direct Contact (Safe Area Inset Aware) -->
+        <div class="pt-4 border-t border-slate-200 space-y-2" style="padding-bottom: max(1.25rem, env(safe-area-inset-bottom, 1.25rem));">
+            <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" class="w-full h-11 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors btn-whatsapp" data-action="whatsapp" @click="$store.mobileNav.close();">
+                <i class="bi bi-whatsapp text-sm"></i><span>{{ __('ui.common.whatsapp_chat') }}</span>
+            </a>
+            <button type="button" class="w-full h-11 rounded-full bg-primary hover:bg-primary-dark text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer" @click="$store.mobileNav.close(); $store.modal.open('booking');">
+                <i class="bi bi-calendar-check text-sm"></i><span>{{ __('ui.common.book_online') }}</span>
+            </button>
+        </div>
+    </div>
 
     <script>
         function syncHeaderHeight() {
