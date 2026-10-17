@@ -89,12 +89,31 @@
                 <input type="hidden" name="gps_source" id="gpsSource" value="Not Available">
                 <input type="hidden" name="payment_method" id="paymentMethod" value="cash">
                 <input type="hidden" name="payment_amount" id="paymentAmount" value="0">
+                <input type="hidden" name="is_custom_builder" id="bookingIsCustomBuilder" value="0">
+                <input type="hidden" name="custom_quote_data" id="bookingCustomQuoteData" value="">
 
                 <!-- Scrollable Body ONLY -->
                 <div class="booking-scroll-area flex-1 overflow-y-auto bg-slate-50 min-h-0 p-4 sm:p-6 lg:p-7">
 
                     <!-- Step 1: Select Tour, Package and Date -->
                     <div class="step-content active" data-step="1">
+                            <!-- Dedicated Custom Safari Builder Spec Card -->
+                            <div id="customBuilderCard" class="hidden mb-5 p-4 rounded-2xl bg-amber-50/80 border-2 border-primary shadow-xs">
+                                <div class="flex items-center justify-between mb-2.5">
+                                    <span class="rounded-full px-3 py-1 text-xs font-bold bg-primary text-white inline-flex items-center gap-1.5 shadow-2xs">
+                                        <i class="bi bi-sliders"></i> Custom Safari Configurator
+                                    </span>
+                                    <span class="text-[11px] font-extrabold text-emerald-700 bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                                        <i class="bi bi-patch-check-fill"></i> Quote Guaranteed
+                                    </span>
+                                </div>
+                                <div class="space-y-1 text-xs text-slate-700" id="customBuilderSummaryItems"></div>
+                                <div class="mt-3 pt-2.5 border-t border-primary/20 flex items-center justify-between">
+                                    <span class="text-xs font-bold text-slate-600">Authoritative Builder Total:</span>
+                                    <span class="text-base font-black text-primary font-mono" id="customBuilderSummaryPrice">AED 0.00</span>
+                                </div>
+                            </div>
+
                             <div class="mb-5" id="tourSelectWrapper">
                                 <label class="block text-xs font-black uppercase tracking-wider text-slate-800 mb-2" for="bookingTour">{{ __('ui.booking.choose_tour') }}</label>
                                 <div class="relative">

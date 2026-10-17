@@ -222,4 +222,102 @@ class CommercialCatalogueAndDepositTest extends TestCase
         $response->assertSee('data-advance-percent="25"', false);
         $response->assertSee('(25%)', false);
     }
+
+    public function test_custom_safari_builder_quote_survives_checkout_with_server_authoritative_rates(): void
+    {
+        $ziinaMock = \Mockery::mock(\App\Services\ZiinaPaymentService::class)->makePartial();
+        $ziinaMock->shouldReceive('isActive')->andReturn(true);
+        $ziinaMock->shouldReceive('getAdvancePercent')->andReturn(25);
+        $ziinaMock->shouldReceive('createPaymentIntent')->andReturn([
+            'id' => 'ziina_test_intent_123',
+            'status' => 'pending',
+            'redirect_url' => 'https://checkout.ziina.com/pay/ziina_test_intent_123',
+        ]);
+        $this->app->instance(\App\Services\ZiinaPaymentService::class, $ziinaMock);
+
+        \App\Models\VerifiedEmail::create([
+            'email' => 'custombuilder@example.com',
+            'verified_at' => now(),
+        ]);
+
+        $customQuote = [
+            'is_custom_builder' => 1,
+            'base_tour_id' => 2,
+            'base_name' => 'Fresh Morning Desert Adventure',
+            'base_price' => 140,
+            'transfer_name' => 'Private 7-Seater 4x4',
+            'transfer_price' => 350,
+            'transfer_type' => 'flat',
+            'sports_name' => '30-Min 250cc Quad',
+            'sports_price' => 120,
+            'sports_type' => 'per_person',
+            'addons' => [],
+            'adults' => 2,
+            'children' => 0,
+            'subtotal' => 870,
+            'total' => 870,
+            'spec_text' => "[CUSTOM SAFARI BUILDER SPEC]\n• Base Safari: Fresh Morning Desert Adventure (AED 140/guest)\n• Transfer Vehicle: Private 7-Seater 4x4 (+AED 350)\n• Motorsports: 30-Min 250cc Quad (+AED 120/guest)\n• Guaranteed Total: AED 870",
+        ];
+
+        $response = $this->postJson('/api/v1/booking/checkout', [
+            'tour_id' => 2,
+            'tier_id' => 1,
+            'date' => now()->addDays(2)->format('Y-m-d'),
+            'adults' => 2,
+            'children' => 0,
+            'location' => 'Burj Al Arab, Dubai',
+            'name' => 'Alex Morgan',
+            'email' => 'custombuilder@example.com',
+            'phone' => '+971501112233',
+            'payment_method' => 'advance',
+            'is_custom_builder' => 1,
+            'custom_quote_data' => $customQuote,
+        ]);
+
+        $response->assertOk();
+        $response->assertJson([
+            'success' => true,
+        ]);
+
+        $this->assertDatabaseHas('bookings', [
+            'tour_id' => 2,
+            'adults' => 2,
+            'subtotal' => 870.00,
+            'total' => 870.00,
+            'payment_method' => 'advance',
+            'tier_name' => 'Custom Safari Configurator: Fresh Morning Desert Adventure',
+        ]);
+
+        $this->assertDatabaseHas('booking_payments', [
+            'amount' => 217.50,
+        ]);
+    }
+
+    public function test_quad_safari_tour_content_does_not_contain_overnight_items(): void
+    {
+        $bleedCount = DB::table('tour_content')
+            ->where('tour_id', 4)
+            ->whereIn('content_id', [27, 28, 29])
+            ->count();
+
+        $this->assertEquals(0, $bleedCount);
+    }
+
+    public function test_overnight_safari_metadata_displays_from_798(): void
+    {
+        $response = $this->get('/overnight-desert-safari-dubai');
+        $response->assertOk();
+        $response->assertSee('From AED 798 (2 Guests)');
+        $response->assertDontSee('From AED 350');
+    }
+
+    public function test_buggy_tour_renders_dedicated_model_and_specs_matrix(): void
+    {
+        $response = $this->get('/dune-buggy-rental-dubai');
+        $response->assertOk();
+        $response->assertSee('Buggy Model & Engine', false);
+        $response->assertSee('Seating Capacity', false);
+        $response->assertSee('FIA Roll Cage', false);
+    }
 }
+

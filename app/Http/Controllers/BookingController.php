@@ -93,71 +93,146 @@ class BookingController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid tour or package selection'], 400);
         }
 
-        if ($tourId === 3 || str_contains($tour->slug, 'overnight')) {
-            if ($adults < 2 || $adults % 2 !== 0) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Overnight safari requires at least 2 adult guests (1 private tent) and bookings must be in multiples of 2 (2, 4, 6... guests).',
-                ], 422);
+        $isCustomBuilder = $request->boolean('is_custom_builder') || $request->input('is_custom_builder') == '1';
+        $customQuoteData = null;
+        if ($isCustomBuilder) {
+            $rawQuote = $request->input('custom_quote_data');
+            if (is_string($rawQuote)) {
+                $customQuoteData = json_decode($rawQuote, true);
+            } elseif (is_array($rawQuote)) {
+                $customQuoteData = $rawQuote;
             }
         }
 
-        $pricing = DB::table('tour_tiers')
-            ->where('tour_id', $tourId)
-            ->where('tier_id', $tierId)
-            ->first();
+        if ($isCustomBuilder && is_array($customQuoteData)) {
+            $baseName = $customQuoteData['base_name'] ?? '';
+            $basePrice = 79.0;
+            if (stripos($baseName, 'VIP') !== false) {
+                $basePrice = 130.0;
+            } elseif (stripos($baseName, 'Morning') !== false || $tourId === 2) {
+                $basePrice = 140.0;
+            } elseif (stripos($baseName, 'Overnight') !== false || $tourId === 3) {
+                $basePrice = 399.0;
+            } elseif (isset($customQuoteData['base_price']) && is_numeric($customQuoteData['base_price'])) {
+                $basePrice = (float) $customQuoteData['base_price'];
+            }
 
-        if (! $pricing) {
-            return response()->json(['success' => false, 'message' => 'Pricing configuration not found for selected package'], 400);
-        }
+            $childMultiplier = 0.70;
+            $baseSubtotal = ($basePrice * $adults) + round($basePrice * $childMultiplier * $children, 2);
 
-        $price = (float) $pricing->price;
-        $priceType = strtolower($pricing->price_type ?? 'per person');
-        $childPrice = (isset($pricing->child_price) && (float) $pricing->child_price > 0)
-            ? (float) $pricing->child_price
-            : round($price * 0.70, 2);
+            $transferPrice = 0.0;
+            $transferName = $customQuoteData['transfer_name'] ?? '';
+            if (stripos($transferName, 'Private') !== false || stripos($transferName, '7-Seater') !== false) {
+                $transferPrice = 350.0;
+            } elseif (stripos($transferName, 'Range Rover') !== false || stripos($transferName, 'VIP Luxury') !== false) {
+                $transferPrice = 750.0;
+            } elseif (isset($customQuoteData['transfer_price']) && is_numeric($customQuoteData['transfer_price'])) {
+                $transferPrice = (float) $customQuoteData['transfer_price'];
+            }
 
-        if (in_array($priceType, ['per buggy', 'per vehicle', 'per group', 'private', 'per tent', 'per package'])) {
-            $capacity = (int) ($pricing->guest_count ?? ($tier->guest_count ?? 0));
-            if ($capacity <= 0) {
-                if (preg_match('/(6|six)/i', $tier->name ?? '')) {
-                    $capacity = 6;
-                } elseif (preg_match('/(4|four)/i', $tier->name ?? '')) {
-                    $capacity = 4;
-                } elseif (preg_match('/(2|two)/i', $tier->name ?? '')) {
-                    $capacity = 2;
-                } elseif (preg_match('/(1|single|solo)/i', $tier->name ?? '')) {
-                    $capacity = 1;
-                } else {
-                    $capacity = 2;
+            $sportsPrice = 0.0;
+            $sportsType = $customQuoteData['sports_type'] ?? 'per_person';
+            $sportsName = $customQuoteData['sports_name'] ?? '';
+            if (stripos($sportsName, '30-Min') !== false || stripos($sportsName, '250cc') !== false) {
+                $sportsPrice = 120.0 * $adults;
+            } elseif (stripos($sportsName, '60-Min') !== false || stripos($sportsName, '400cc') !== false) {
+                $sportsPrice = 220.0 * $adults;
+            } elseif (stripos($sportsName, 'Buggy') !== false || stripos($sportsName, '1000cc') !== false) {
+                $sportsPrice = 550.0;
+            } elseif (isset($customQuoteData['sports_price']) && is_numeric($customQuoteData['sports_price'])) {
+                $sportsPrice = ($sportsType === 'flat') ? (float) $customQuoteData['sports_price'] : ((float) $customQuoteData['sports_price'] * $adults);
+            }
+
+            $customAddonsTotal = 0.0;
+            $totalGuests = $adults + $children;
+            if (! empty($customQuoteData['addons']) && is_array($customQuoteData['addons'])) {
+                foreach ($customQuoteData['addons'] as $ca) {
+                    $cPrice = (float) ($ca['price'] ?? 0);
+                    $cType = $ca['type'] ?? 'per_person';
+                    $customAddonsTotal += ($cType === 'flat') ? $cPrice : ($cPrice * $totalGuests);
                 }
             }
-            $vehicles = (int) ceil(($adults + $children) / max(1, $capacity));
-            $subtotal = $vehicles * $price;
+
+            $subtotal = $baseSubtotal + $transferPrice + $sportsPrice + $customAddonsTotal;
+            $addonsTotal = 0;
+            $selectedAddons = [];
+
+            if (! empty($customQuoteData['spec_text']) && ! str_contains($requests, '[CUSTOM SAFARI BUILDER SPEC]')) {
+                $requests = trim($customQuoteData['spec_text']."\n\n".$requests);
+            }
         } else {
-            $subtotal = ($price * $adults) + ($childPrice * $children);
-        }
+            if ($tourId === 3 || str_contains($tour->slug, 'overnight')) {
+                if ($adults < 2 || $adults % 2 !== 0) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Overnight safari requires at least 2 adult guests (1 private tent) and bookings must be in multiples of 2 (2, 4, 6... guests).',
+                    ], 422);
+                }
+            }
 
-        // Addons total
-        $addonsTotal = 0;
-        $selectedAddons = [];
-        $addonsInput = $request->input('addons', []);
+            $pricing = DB::table('tour_tiers')
+                ->where('tour_id', $tourId)
+                ->where('tier_id', $tierId)
+                ->first();
 
-        if (! empty($addonsInput)) {
-            $addonsData = DB::table('addons')
-                ->join('tour_addons', 'addons.id', '=', 'tour_addons.addon_id')
-                ->where('tour_addons.tour_id', $tourId)
-                ->whereIn('addons.id', $addonsInput)
-                ->select('addons.id', 'addons.name', 'tour_addons.price')
-                ->get();
+            if (! $pricing) {
+                return response()->json(['success' => false, 'message' => 'Pricing configuration not found for selected package'], 400);
+            }
 
-            foreach ($addonsData as $addon) {
-                $selectedAddons[] = [
-                    'id' => $addon->id,
-                    'name' => $addon->name,
-                    'price' => (float) $addon->price,
-                ];
-                $addonsTotal += (float) $addon->price;
+            $price = (float) $pricing->price;
+            $priceType = strtolower($pricing->price_type ?? 'per person');
+            if ($tourId === 3 || str_contains($tour->slug, 'overnight')) {
+                $priceType = 'per tent';
+            } elseif ($tourId === 8 || str_contains($tour->slug, 'buggy')) {
+                $priceType = 'per buggy';
+            }
+
+            $childPrice = (isset($pricing->child_price) && (float) $pricing->child_price > 0)
+                ? (float) $pricing->child_price
+                : round($price * 0.70, 2);
+
+            if (in_array($priceType, ['per buggy', 'per vehicle', 'per group', 'private', 'per tent', 'per package'])) {
+                $capacity = (int) ($pricing->guest_count ?? ($tier->guest_count ?? 0));
+                if ($capacity <= 0) {
+                    if (preg_match('/(6|six)/i', $tier->name ?? '')) {
+                        $capacity = 6;
+                    } elseif (preg_match('/(4|four)/i', $tier->name ?? '')) {
+                        $capacity = 4;
+                    } elseif (preg_match('/(2|two)/i', $tier->name ?? '')) {
+                        $capacity = 2;
+                    } elseif (preg_match('/(1|single|solo)/i', $tier->name ?? '')) {
+                        $capacity = 1;
+                    } else {
+                        $capacity = 2;
+                    }
+                }
+                $vehicles = (int) ceil(($adults + $children) / max(1, $capacity));
+                $subtotal = $vehicles * $price;
+            } else {
+                $subtotal = ($price * $adults) + ($childPrice * $children);
+            }
+
+            // Addons total
+            $addonsTotal = 0;
+            $selectedAddons = [];
+            $addonsInput = $request->input('addons', []);
+
+            if (! empty($addonsInput)) {
+                $addonsData = DB::table('addons')
+                    ->join('tour_addons', 'addons.id', '=', 'tour_addons.addon_id')
+                    ->where('tour_addons.tour_id', $tourId)
+                    ->whereIn('addons.id', $addonsInput)
+                    ->select('addons.id', 'addons.name', 'tour_addons.price')
+                    ->get();
+
+                foreach ($addonsData as $addon) {
+                    $selectedAddons[] = [
+                        'id' => $addon->id,
+                        'name' => $addon->name,
+                        'price' => (float) $addon->price,
+                    ];
+                    $addonsTotal += (float) $addon->price;
+                }
             }
         }
 
@@ -252,14 +327,16 @@ class BookingController extends Controller
                 $ref, $tourId, $tierId, $tour, $tier, $date, $adults, $children, $infants,
                 $name, $email, $phone, $location, $requests, $appliedCoupon, $discountAmount,
                 $originalTotal, $subtotal, $addonsTotal, $total, $paymentMethod, $ctx,
-                $isVerified, $selectedAddons
+                $isVerified, $selectedAddons, $isCustomBuilder, $customQuoteData
             ) {
                 $b = Booking::create([
                     'reference' => $ref,
                     'tour_id' => $tourId,
                     'tier_id' => $tierId,
                     'tour_name' => $tour->name,
-                    'tier_name' => $tier->display_name ?: $tier->name,
+                    'tier_name' => ($isCustomBuilder && $customQuoteData)
+                        ? ('Custom Safari Configurator: '.($customQuoteData['base_name'] ?? 'Tailored Package'))
+                        : ($tier->display_name ?: $tier->name),
                     'tour_date' => $date,
                     'adults' => $adults,
                     'children' => $children,

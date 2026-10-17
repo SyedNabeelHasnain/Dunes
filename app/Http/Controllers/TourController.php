@@ -198,6 +198,13 @@ class TourController extends Controller
             $pageDesc = $tour->meta_desc ?: (strlen($tour->short_desc ?? '') > 50 ? strip_tags($tour->short_desc) : $defaultDesc);
         }
 
+        if ($tour->id === 3 || str_contains($tour->slug, 'overnight')) {
+            $pageTitle = str_ireplace('From AED 350', 'From AED 798 (2 Guests)', $pageTitle);
+            $pageTitle = str_ireplace('AED 350', 'AED 798 (2 Guests)', $pageTitle);
+            $pageDesc = str_ireplace('From AED 350', 'From AED 798 (2 Guests)', $pageDesc);
+            $pageDesc = str_ireplace('AED 350', 'AED 798 (2 Guests)', $pageDesc);
+        }
+
         $pageKeys = $tour->meta_keywords ?: strtolower("{$tour->name}, {$tour->name} dubai, book {$tour->name}, desert safari dubai, dubai tours {$currentYear}");
         $canonical = ($currentLocale && $currentLocale !== 'en') ? url('/'.$currentLocale.'/'.$tour->slug) : url('/'.$tour->slug);
         $pageRobots = (! empty(request()->query()))

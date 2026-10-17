@@ -347,22 +347,83 @@ Alpine.store('modal', {
                 const titleEl = document.getElementById('bookingModalTitle');
                 const wrapper = document.getElementById('tourSelectWrapper');
 
-                if (data.tourId) {
-                    window.App.preselectedTourId = String(data.tourId);
-                    window.App.preselectedTierId = data.tierId ? String(data.tierId) : null;
-                    if (tourSel) {
-                        tourSel.value = String(data.tourId);
-                        window.App.loadTiers?.(String(data.tourId));
-                        if (titleEl && tourSel.selectedIndex >= 0 && tourSel.options[tourSel.selectedIndex]) {
-                            titleEl.textContent = tourSel.options[tourSel.selectedIndex].text;
+                const isCustomInp = document.getElementById('bookingIsCustomBuilder');
+                const customDataInp = document.getElementById('bookingCustomQuoteData');
+                const customCard = document.getElementById('customBuilderCard');
+
+                if (data.customQuote) {
+                    window.customBuilderQuote = data.customQuote;
+                    if (isCustomInp) isCustomInp.value = '1';
+                    if (customDataInp) customDataInp.value = JSON.stringify(data.customQuote);
+
+                    if (customCard) {
+                        customCard.classList.remove('hidden', 'd-none');
+                        const itemsEl = document.getElementById('customBuilderSummaryItems');
+                        if (itemsEl) {
+                            itemsEl.innerHTML = `
+                                <div><strong>Base Safari:</strong> ${data.customQuote.base_name} (AED ${data.customQuote.base_price}/guest)</div>
+                                <div><strong>Vehicle Transfer:</strong> ${data.customQuote.transfer_name} (${data.customQuote.transfer_price > 0 ? '+AED ' + data.customQuote.transfer_price : 'Included'})</div>
+                                <div><strong>Motorsports:</strong> ${data.customQuote.sports_name} (${data.customQuote.sports_price > 0 ? '+AED ' + data.customQuote.sports_price + (data.customQuote.sports_type === 'per_person' ? '/guest' : '') : 'Included'})</div>
+                                <div><strong>Addons:</strong> ${data.customQuote.addons?.length ? data.customQuote.addons.map(a => a.name + ' (+AED ' + a.price + ')').join(', ') : 'None'}</div>
+                            `;
                         }
+                        const priceEl = document.getElementById('customBuilderSummaryPrice');
+                        if (priceEl) priceEl.innerText = `AED ${data.customQuote.total.toFixed(2)}`;
                     }
+
                     if (wrapper) wrapper.classList.add('hidden', 'd-none');
+                    if (titleEl) titleEl.textContent = 'Custom Safari Configurator';
+
+                    const tierCardsEl = document.getElementById('tierCards');
+                    if (tierCardsEl) {
+                        tierCardsEl.innerHTML = `
+                            <div class="tier-card selected" data-tier="1" data-price="${data.customQuote.total}" data-price-type="per package" data-guest-count="${data.customQuote.adults + data.customQuote.children}" data-capacity="${data.customQuote.adults + data.customQuote.children}">
+                                <div class="tier-popular-badge">Configured Spec</div>
+                                <div class="tier-card-inner">
+                                    <div class="tier-card-info">
+                                        <h4>${data.customQuote.base_name}</h4>
+                                        <p>${data.customQuote.transfer_name} &bull; ${data.customQuote.sports_name}</p>
+                                    </div>
+                                    <div class="tier-card-right">
+                                        <div class="tier-card-price">
+                                            <div class="current" data-aed="${data.customQuote.total}">AED ${data.customQuote.total}</div>
+                                        </div>
+                                        <div class="tier-card-check"><i class="bi bi-check-lg"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    const selectedTier = document.getElementById('selectedTier');
+                    if (selectedTier) selectedTier.value = '1';
+                    window.App.selectedTier = '1';
+                    window.App.selectedPrice = data.customQuote.total;
+
+                    const requestsInput = document.getElementById('bookingRequests');
+                    if (requestsInput) requestsInput.value = data.customQuote.spec_text;
                 } else {
-                    window.App.preselectedTourId = null;
-                    window.App.preselectedTierId = null;
-                    if (titleEl) titleEl.textContent = 'Book Your Adventure';
-                    if (wrapper) wrapper.classList.remove('hidden', 'd-none');
+                    window.customBuilderQuote = null;
+                    if (isCustomInp) isCustomInp.value = '0';
+                    if (customDataInp) customDataInp.value = '';
+                    if (customCard) customCard.classList.add('hidden', 'd-none');
+
+                    if (data.tourId) {
+                        window.App.preselectedTourId = String(data.tourId);
+                        window.App.preselectedTierId = data.tierId ? String(data.tierId) : null;
+                        if (tourSel) {
+                            tourSel.value = String(data.tourId);
+                            window.App.loadTiers?.(String(data.tourId));
+                            if (titleEl && tourSel.selectedIndex >= 0 && tourSel.options[tourSel.selectedIndex]) {
+                                titleEl.textContent = tourSel.options[tourSel.selectedIndex].text;
+                            }
+                        }
+                        if (wrapper) wrapper.classList.add('hidden', 'd-none');
+                    } else {
+                        window.App.preselectedTourId = null;
+                        window.App.preselectedTierId = null;
+                        if (titleEl) titleEl.textContent = 'Book Your Adventure';
+                        if (wrapper) wrapper.classList.remove('hidden', 'd-none');
+                    }
                 }
 
                 if (data.adults) {
@@ -3029,6 +3090,9 @@ const App = {
     },
 
     calculateBaseTotal() {
+        if (window.customBuilderQuote) {
+            return parseFloat(window.customBuilderQuote.total) || 0;
+        }
         const adults = parseInt(document.getElementById('bookingAdults')?.value) || 1;
         const children = parseInt(document.getElementById('bookingChildren')?.value) || 0;
         let price = this.selectedPrice || 0;
@@ -3037,18 +3101,29 @@ const App = {
             price = parseFloat(selectedTierCard.dataset.price) || 0;
             this.selectedPrice = price;
         }
-        const priceType = (selectedTierCard?.dataset.priceType || 'per person').toLowerCase();
+        const tourSelect = document.getElementById('bookingTour');
+        const tourId = tourSelect?.value || '';
+        const tourSlug = tourSelect?.options[tourSelect.selectedIndex]?.dataset.slug || '';
+        const tierName = selectedTierCard?.dataset.name || '';
+        let priceType = (selectedTierCard?.dataset.priceType || 'per person').toLowerCase();
+
+        if (tourId === '3' || tourSlug.includes('overnight') || /(2|4|6)\s*adults/i.test(tierName)) {
+            priceType = 'per tent';
+        } else if (tourId === '8' || tourSlug.includes('buggy')) {
+            priceType = 'per buggy';
+        }
+
         const rawChildPrice = parseFloat(selectedTierCard?.dataset.childPrice || 0);
         const childPrice = rawChildPrice > 0 ? rawChildPrice : (price * 0.70);
         let total = 0;
         if (['per buggy', 'per vehicle', 'per group', 'private', 'per tent', 'per package'].includes(priceType)) {
             let capacity = parseInt(selectedTierCard?.dataset.capacity || selectedTierCard?.dataset.guestCount, 10) || 0;
             if (capacity <= 0) {
-                if (/(6|six)/i.test(selectedTierCard?.dataset.name || '')) capacity = 6;
-                else if (/(4|four)/i.test(selectedTierCard?.dataset.name || '')) capacity = 4;
-                else if (/(2|two)/i.test(selectedTierCard?.dataset.name || '')) capacity = 2;
-                else if (/(1|single|solo)/i.test(selectedTierCard?.dataset.name || '')) capacity = 1;
-                else capacity = 2;
+                if (/(6|six)/i.test(tierName)) capacity = 6;
+                else if (/(4|four)/i.test(tierName)) capacity = 4;
+                else if (/(2|two)/i.test(tierName)) capacity = 2;
+                else if (/(1|single|solo)/i.test(tierName)) capacity = 1;
+                else capacity = (priceType === 'per tent') ? 2 : 1;
             }
             const vehicles = Math.ceil(Math.max(1, adults + children) / capacity);
             total = price * vehicles;
@@ -3063,26 +3138,41 @@ const App = {
         const adults = parseInt(document.getElementById('bookingAdults')?.value) || 1;
         const children = parseInt(document.getElementById('bookingChildren')?.value) || 0;
         const selectedTierCard = document.querySelector('.tier-card.selected');
-        const priceType = (selectedTierCard?.dataset.priceType || 'per person').toLowerCase();
+        const tourSelect = document.getElementById('bookingTour');
+        const tourId = tourSelect?.value || '';
+        const tourSlug = tourSelect?.options[tourSelect.selectedIndex]?.dataset.slug || '';
+        const tierName = selectedTierCard?.dataset.name || '';
+        let priceType = (selectedTierCard?.dataset.priceType || 'per person').toLowerCase();
+
+        if (tourId === '3' || tourSlug.includes('overnight') || /(2|4|6)\s*adults/i.test(tierName)) {
+            priceType = 'per tent';
+        } else if (tourId === '8' || tourSlug.includes('buggy')) {
+            priceType = 'per buggy';
+        }
+
         const rawChildPrice = parseFloat(selectedTierCard?.dataset.childPrice || 0);
         const childPrice = rawChildPrice > 0 ? rawChildPrice : (this.selectedPrice * 0.70);
 
         let baseTotal = 0;
-        if (['per buggy', 'per vehicle', 'per group', 'private', 'per tent', 'per package'].includes(priceType)) {
+        if (window.customBuilderQuote) {
+            baseTotal = parseFloat(window.customBuilderQuote.total) || 0;
+        } else if (['per buggy', 'per vehicle', 'per group', 'private', 'per tent', 'per package'].includes(priceType)) {
             let capacity = parseInt(selectedTierCard?.dataset.capacity || selectedTierCard?.dataset.guestCount, 10) || 0;
             if (capacity <= 0) {
-                if (/(6|six)/i.test(selectedTierCard?.dataset.name || '')) capacity = 6;
-                else if (/(4|four)/i.test(selectedTierCard?.dataset.name || '')) capacity = 4;
-                else if (/(2|two)/i.test(selectedTierCard?.dataset.name || '')) capacity = 2;
-                else if (/(1|single|solo)/i.test(selectedTierCard?.dataset.name || '')) capacity = 1;
-                else capacity = 2;
+                if (/(6|six)/i.test(tierName)) capacity = 6;
+                else if (/(4|four)/i.test(tierName)) capacity = 4;
+                else if (/(2|two)/i.test(tierName)) capacity = 2;
+                else if (/(1|single|solo)/i.test(tierName)) capacity = 1;
+                else capacity = (priceType === 'per tent') ? 2 : 1;
             }
             const vehicles = Math.ceil(Math.max(1, adults + children) / capacity);
             baseTotal = this.selectedPrice * vehicles;
         } else {
             baseTotal = (this.selectedPrice * adults) + (childPrice * children);
         }
-        this.selectedAddons.forEach(a => baseTotal += a.price);
+        if (!window.customBuilderQuote) {
+            this.selectedAddons.forEach(a => baseTotal += a.price);
+        }
 
         // Apply promo coupon if active
         let discount = 0;
@@ -3116,7 +3206,8 @@ const App = {
         const advancePercent = parseFloat(container?.dataset.advancePercent) || 0;
         let payNow = 0;
         if (method === 'advance') payNow = (total * advancePercent) / 100;
-        else if (method === 'full' || method === 'cash') payNow = total;
+        else if (method === 'full') payNow = total;
+        else if (method === 'cash') payNow = 0;
 
         const formatMoney = (v) => Alpine.store('currency').formatDisplayPrice(v);
         if (totalEl) {
@@ -3257,13 +3348,19 @@ const App = {
     },
 
     updateSummary() {
+        const sTour = document.getElementById('summaryTourName');
+        const sTier = document.getElementById('summaryTierName');
+
+        if (window.customBuilderQuote) {
+            if (sTour) sTour.textContent = window.customBuilderQuote.base_name + ' (Custom Configurator)';
+            if (sTier) sTier.textContent = window.customBuilderQuote.transfer_name + ' • ' + window.customBuilderQuote.sports_name;
+            return;
+        }
+
         const tourSel = document.getElementById('bookingTour');
         const tierCard = document.querySelector('.tier-card.selected');
         const tourName = tourSel ? tourSel.options[tourSel.selectedIndex]?.text : '-';
         const tierName = tierCard ? tierCard.dataset.name : '-';
-
-        const sTour = document.getElementById('summaryTourName');
-        const sTier = document.getElementById('summaryTierName');
 
         if (sTour) sTour.textContent = tourName;
         if (sTier) sTier.textContent = tierName;
@@ -3283,6 +3380,16 @@ const App = {
     },
 
     resetForm() {
+        window.customBuilderQuote = null;
+        const isCustomInp = document.getElementById('bookingIsCustomBuilder');
+        if (isCustomInp) isCustomInp.value = '0';
+        const customDataInp = document.getElementById('bookingCustomQuoteData');
+        if (customDataInp) customDataInp.value = '';
+        const customCard = document.getElementById('customBuilderCard');
+        if (customCard) customCard.classList.add('hidden', 'd-none');
+        const wrapper = document.getElementById('tourSelectWrapper');
+        if (wrapper) wrapper.classList.remove('hidden', 'd-none');
+
         document.getElementById('bookingForm')?.reset();
         const emailInput = document.getElementById('bookingEmail');
         if (emailInput) this.resetFieldState(emailInput);
@@ -3327,7 +3434,6 @@ const App = {
         }
 
         const titleEl = document.getElementById('bookingModalTitle');
-        const wrapper = document.getElementById('tourSelectWrapper');
         if (titleEl) titleEl.textContent = 'Book Your Adventure';
         if (wrapper) wrapper.classList.remove('hidden', 'd-none');
 

@@ -828,8 +828,8 @@
     {
         "id": 119,
         "section_id": 28,
-        "content": "Cash on Pickup Option: Guests may reserve with an advance deposit online and pay the balance in cash (AED, USD, EUR, GBP) upon hotel collection.",
-        "content_ar": "خيار الدفع نقداً عند الحضور: يمكن للضيوف الحجز بعربون إلكتروني وسداد الرصيد المتبقي نقداً (بالدرهم أو الدولار أو اليورو) عند الاستقبال.",
+        "content": "Cash on Pickup Option: Guests selecting Cash on Pickup pay AED 0.00 online at checkout; 100% of the tour total is collected in cash (AED, USD, EUR, GBP) by your licensed safari captain upon hotel pickup. Guests choosing Advance Deposit pay 25% online and settle the remaining 75% in cash at pickup.",
+        "content_ar": "خيار الدفع نقداً عند الحضور: عند اختيار الدفع نقداً عند الاستقبال، لا يُدفع أي مبلغ إلكترونياً عند إتمام الحجز (0.00 درهم)، ويتم سداد 100% من المبلغ نقداً للمرشد السياحي عند الوصول إلى الفندق. أو يمكن للضيوف دفع عربون إلكتروني بنسبة 25% وسداد المتبقي 75% نقداً.",
         "priority": 3
     },
     {
@@ -1038,8 +1038,8 @@
     {
         "id": 149,
         "section_id": 36,
-        "content": "Minimum Operating Age: Drivers of quad bikes and buggies must be at least 16 years old. Minors aged 12-15 may ride exclusively as passengers with an adult driver.",
-        "content_ar": "السن الأدنى للقيادة: يجب ألا يقل عمر سائق الدراجة أو البجي عن 16 عاماً، ويجوز للناشئين (12-15 عاماً) الركوب كمرافقين فقط مع سائق بالغ.",
+        "content": "Minimum Operating Age: Drivers of quad bikes and buggies must be at least 16 years old. No road driving licence is required on our designated off-road desert tracks. Children aged 6 and older may ride as passengers in 2-seater and 4-seater buggies or designated quad tours with an adult driver.",
+        "content_ar": "السن الأدنى للقيادة: يجب ألا يقل عمر سائق الدراجة أو البجي عن 16 عاماً، ولا يلزم وجود رخصة قيادة على المسارات الصحراوية المغلقة. ويجوز للأطفال من سن 6 سنوات فأكثر الركوب كمرافقين في عربات البجي ذات المقعدين أو 4 مقاعد أو جولات الكواد المزدوجة مع سائق بالغ.",
         "priority": 2
     },
     {

@@ -316,8 +316,9 @@ For travelers concerned about safety, the **dune buggy is substantially safer** 
 ## Age and License Requirements in Dubai
 Under Dubai Department of Economy and Tourism (DET) and RTA guidelines:
 * No conventional road driver’s license is mandatory because the tours operate inside designated off-road desert tracks.
-* Drivers for dune buggies must typically be 16 to 18 years of age.
-* Children aged 5 and older can safely ride as passengers in 2-seater and 4-seater buggies when strapped into 4-point safety harnesses.',
+* Drivers for dune buggies and quad bikes must be at least 16 years of age.
+* Children aged 6 and older can safely ride as passengers in 2-seater and 4-seater buggies when strapped into 4-point safety harnesses (and as passengers on designated quad tours with adult drivers).
+* Dune bashing passengers in 4x4 vehicles must be at least 3 years of age.',
                 ],
                 'hero_image' => 'images/evening-desert-safari-dubai-hero.avif',
                 'reading_time_minutes' => 6,

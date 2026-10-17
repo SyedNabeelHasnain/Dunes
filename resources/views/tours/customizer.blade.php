@@ -208,7 +208,7 @@
                             </div>
                             <h6 class="font-bold text-slate-900 text-sm mb-1">Fresh Morning Desert Adventure</h6>
                             <p class="text-slate-500 text-xs mb-3 leading-relaxed">
-                                Crisp morning air, 40-min high dune drive, sunrise photos, camel ride & sandboarding. Back by 12:30 PM.
+                                Crisp morning air, 25-30 min red dune drive, pristine desert photography, camel ride & sandboarding. Back by 12:30 PM.
                             </p>
                             <div class="font-black text-primary text-base" data-aed="140">{{ __('ui.common.aed') }} 140 <span class="text-slate-400 font-normal text-xs">/ guest</span></div>
                         </div>
@@ -809,12 +809,40 @@ document.addEventListener('DOMContentLoaded', function() {
     if (bookNowBtn) {
         bookNowBtn.addEventListener('click', function() {
             const promo = (promoInputEl ? promoInputEl.value : '').trim();
+            const calcAed = parseInt(totalDisplayEl.getAttribute('data-aed') || totalDisplayEl.innerText.replace(/[^0-9]/g, ''), 10) || computeSubtotal();
+            const customQuote = {
+                is_custom_builder: 1,
+                base_tour_id: state.base.tourId,
+                base_name: state.base.name,
+                base_price: state.base.price,
+                transfer_name: state.transfer.name,
+                transfer_price: state.transfer.price,
+                transfer_type: state.transfer.type,
+                sports_name: state.sports.name,
+                sports_price: state.sports.price,
+                sports_type: state.sports.type,
+                addons: state.addons.map(a => ({ key: a.key, name: a.name, price: a.price, type: a.type })),
+                adults: state.adults,
+                children: state.children,
+                subtotal: computeSubtotal(),
+                total: calcAed,
+                promo: promo || undefined,
+                spec_text: `[CUSTOM SAFARI BUILDER SPEC]\n` +
+                    `• Base Safari: ${state.base.name} (AED ${state.base.price}/guest)\n` +
+                    `• Transfer Vehicle: ${state.transfer.name} (${state.transfer.price > 0 ? '+AED ' + state.transfer.price : 'Included'})\n` +
+                    `• Motorsports: ${state.sports.name} (${state.sports.price > 0 ? '+AED ' + state.sports.price + (state.sports.type === 'per_person' ? '/guest' : '') : 'Included'})\n` +
+                    `• Camp Addons: ${state.addons.length > 0 ? state.addons.map(a => a.name + ' (+AED ' + a.price + ')').join(', ') : 'None'}\n` +
+                    `• Party Size: ${state.adults} Adults${state.children > 0 ? ', ' + state.children + ' Children' : ''}\n` +
+                    `• Guaranteed Total: AED ${calcAed}`
+            };
+
             if (window.Alpine && window.Alpine.store('modal')) {
                 window.Alpine.store('modal').open('booking', { 
                     tourId: state.base.tourId,
                     adults: state.adults,
                     children: state.children,
-                    promo: promo || undefined
+                    promo: promo || undefined,
+                    customQuote: customQuote
                 });
             }
 
@@ -822,31 +850,25 @@ document.addEventListener('DOMContentLoaded', function() {
             const tourSelect = document.getElementById('bookingTour');
             if (tourSelect && state.base.tourId) {
                 tourSelect.value = state.base.tourId;
-                tourSelect.dispatchEvent(new Event('change'));
             }
 
-            // Set Adults
+            // Set Adults & Children
             const adultsInput = document.getElementById('bookingAdults');
-            if (adultsInput) {
-                adultsInput.value = state.adults;
-            }
-
-            // Set Children
+            if (adultsInput) adultsInput.value = state.adults;
             const childrenInput = document.getElementById('bookingChildren');
-            if (childrenInput) {
-                childrenInput.value = state.children;
-            }
+            if (childrenInput) childrenInput.value = state.children;
 
             // Populate Special Requests with full custom spec
             const requestsInput = document.getElementById('bookingRequests');
             if (requestsInput) {
-                const customSpec = `[CUSTOM SAFARI BUILDER SPEC]\n` +
-                    `Vehicle: ${state.transfer.name}\n` +
-                    `Motorsports: ${state.sports.name}\n` +
-                    `Addons: ${summaryAddonsEl.innerText}\n` +
-                    `Calculated Total: AED ${totalDisplayEl.getAttribute('data-aed') || totalDisplayEl.innerText}`;
-                requestsInput.value = customSpec;
+                requestsInput.value = customQuote.spec_text;
             }
+
+            // Set custom quote inputs in form
+            const isCustomInp = document.getElementById('bookingIsCustomBuilder');
+            if (isCustomInp) isCustomInp.value = '1';
+            const customDataInp = document.getElementById('bookingCustomQuoteData');
+            if (customDataInp) customDataInp.value = JSON.stringify(customQuote);
 
             // Apply promo code if entered
             if (promo) {

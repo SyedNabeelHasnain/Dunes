@@ -836,7 +836,21 @@ if(window.fbq){
                                     <span class="text-xs text-slate-500 line-through" data-aed="{{ $tOldPrice }}">{{ __('ui.common.aed') }} {{ number_format($tOldPrice) }}</span>
                                     @endif
                                 </div>
-                                <span class="text-[11px] text-slate-500 block mt-0.5">{{ __('ui.tour_glance.per_person_all_inclusive') }}</span>
+                                @php
+                                    $isOvernight = ($tour->id === 3 || str_contains($tour->slug, 'overnight'));
+                                    $isBuggy = ($tour->id === 8 || str_contains($tour->slug, 'buggy'));
+                                    $tierPriceType = strtolower($tier->pivot?->price_type ?? ($tier->price_type ?? ''));
+                                    $guestCap = (int) ($tier->pivot?->guest_count ?? ($tier->guest_count ?? 2));
+                                @endphp
+                                @if($isOvernight || $tierPriceType === 'per tent')
+                                    <span class="text-[11px] text-slate-500 block mt-0.5 font-medium">Per Tent (for {{ $guestCap }} Guests) &bull; AED {{ number_format($tPrice / max(1, $guestCap)) }}/guest</span>
+                                @elseif($isBuggy || $tierPriceType === 'per buggy')
+                                    <span class="text-[11px] text-slate-500 block mt-0.5 font-medium">Per Buggy ({{ $guestCap }}-Seater Vehicle)</span>
+                                @elseif($tierPriceType === 'per package' || $tierPriceType === 'per group')
+                                    <span class="text-[11px] text-slate-500 block mt-0.5 font-medium">Per Private Package (up to {{ $guestCap }} Guests)</span>
+                                @else
+                                    <span class="text-[11px] text-slate-500 block mt-0.5">{{ __('ui.tour_glance.per_person_all_inclusive') }}</span>
+                                @endif
                             </div>
 
                             <ul class="space-y-2 mb-5 flex-grow text-xs text-slate-700">
