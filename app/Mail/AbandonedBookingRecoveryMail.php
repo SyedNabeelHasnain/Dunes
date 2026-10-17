@@ -34,8 +34,7 @@ class AbandonedBookingRecoveryMail extends Mailable
         $this->customSubject = $customSubject;
         $this->customMessage = $customMessage;
 
-        // If booking already has a direct payment redirect url (Ziina), use it; otherwise link to online checkout
-        $this->recoveryUrl = $booking->ziina_redirect_url ?: url("/?ref={$booking->reference}&action=checkout");
+        $this->recoveryUrl = localized_route('booking.recover', ['reference' => $booking->reference]);
 
         $waPhone = '971502456056';
         $waMsg = rawurlencode("Hi Dunes Discovery, I have an incomplete booking #{$booking->reference} for {$booking->tour_name} on {$booking->tour_date}. Can you help me confirm it?");

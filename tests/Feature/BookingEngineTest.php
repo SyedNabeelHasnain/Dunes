@@ -1163,4 +1163,135 @@ class BookingEngineTest extends TestCase
             $waResp->assertStatus(200)->assertJson(['success' => true]);
         }
     }
+
+    /**
+     * Test legacy recovery URL redirects to dedicated checkout recovery page.
+     */
+    public function test_abandoned_booking_recovery_redirect_from_legacy_url(): void
+    {
+        $response = $this->get('/?ref=DFT261017RECOV&action=checkout');
+        $response->assertStatus(302);
+        $response->assertRedirect('/checkout/DFT261017RECOV');
+    }
+
+    /**
+     * Test dedicated recovery page renders with prefilled draft details and GA4 begin_checkout event.
+     */
+    public function test_abandoned_booking_recovery_page_renders_with_prefilled_draft_details(): void
+    {
+        $tour = Tour::first() ?? Tour::create([
+            'name' => 'Evening Red Dunes Safari',
+            'slug' => 'evening-red-dunes-safari-recov',
+            'status' => 'active',
+            'base_price' => 150.00,
+        ]);
+
+        $booking = Booking::create([
+            'reference' => 'DFTRECOV100',
+            'tour_id' => $tour->id,
+            'tour_name' => $tour->name,
+            'tour_date' => now()->addDays(2)->toDateString(),
+            'status' => 'draft',
+            'payment_status' => 'unpaid',
+            'payment_method' => 'cash',
+            'subtotal' => 300.00,
+            'total' => 300.00,
+            'adults' => 2,
+            'children' => 0,
+            'infants' => 0,
+            'name' => 'Syed Recovery Guest',
+            'email' => 'recovery@example.com',
+            'phone' => '+971501234567',
+            'pickup_location' => 'Burj Al Arab, Dubai',
+            'utm_source' => 'google_ads',
+            'utm_medium' => 'cpc',
+            'utm_campaign' => 'desert_safari_dubai',
+        ]);
+
+        $response = $this->get('/checkout/'.$booking->reference);
+        $response->assertStatus(200);
+        $response->assertSee('Syed Recovery Guest');
+        $response->assertSee('recovery@example.com');
+        $response->assertSee('+971501234567');
+        $response->assertSee('Burj Al Arab, Dubai');
+        $response->assertSee('DFTRECOV100');
+        $response->assertSee('begin_checkout');
+        $response->assertSee('google_ads');
+    }
+
+    /**
+     * Test dedicated recovery page redirects to digital voucher if booking is already confirmed.
+     */
+    public function test_abandoned_booking_recovery_page_redirects_if_booking_already_confirmed(): void
+    {
+        $booking = Booking::create([
+            'reference' => 'DFTRECOV200',
+            'tour_name' => 'Desert Safari Confirmed',
+            'tour_date' => now()->addDays(2)->toDateString(),
+            'status' => 'confirmed',
+            'payment_status' => 'paid',
+            'payment_amount' => 300.00,
+            'subtotal' => 300.00,
+            'total' => 300.00,
+            'adults' => 2,
+            'name' => 'Confirmed Guest',
+            'email' => 'confirmed@example.com',
+            'phone' => '+971509999999',
+        ]);
+
+        $response = $this->get('/checkout/'.$booking->reference);
+        $response->assertStatus(302);
+        $response->assertRedirect('/booking/'.$booking->reference.'/voucher');
+    }
+
+    /**
+     * Test checkout recovery submission successfully confirms cash booking.
+     */
+    public function test_abandoned_booking_recovery_process_confirms_cash_booking(): void
+    {
+        $tour = Tour::first();
+
+        $booking = Booking::create([
+            'reference' => 'DFTRECOV300',
+            'tour_id' => $tour?->id,
+            'tour_name' => $tour?->name ?? 'Desert Safari',
+            'tour_date' => now()->addDays(3)->toDateString(),
+            'status' => 'draft',
+            'payment_status' => 'unpaid',
+            'subtotal' => 250.00,
+            'total' => 250.00,
+            'adults' => 1,
+            'name' => 'Pre-fill Name',
+            'email' => 'prefill@example.com',
+            'phone' => '+971500000000',
+            'pickup_location' => 'Hotel Lobby',
+        ]);
+
+        $postData = [
+            'name' => 'Updated Recovery Name',
+            'email' => 'updated@example.com',
+            'phone' => '+971501112233',
+            'location' => 'Atlantis The Palm, Dubai',
+            'requests' => 'Vegetarian meal requested',
+            'payment_method' => 'cash',
+        ];
+
+        $response = $this->postJson('/checkout/'.$booking->reference, $postData);
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'redirect_url' => localized_route('booking.thankyou', ['ref' => $booking->reference]),
+        ]);
+
+        $booking->refresh();
+        $this->assertEquals('confirmed', $booking->status);
+        $this->assertEquals('unpaid', $booking->payment_status);
+        $this->assertEquals('Updated Recovery Name', $booking->name);
+        $this->assertEquals('updated@example.com', $booking->email);
+        $this->assertEquals('+971501112233', $booking->phone);
+        $this->assertEquals('Atlantis The Palm, Dubai', $booking->pickup_location);
+        $this->assertStringContainsString('Vegetarian meal requested', $booking->special_requests);
+        $this->assertStringContainsString('[RECOVERED_CHECKOUT:', $booking->special_requests);
+    }
 }
+

@@ -910,4 +910,216 @@ class BookingController extends Controller
             'reference' => $draft->reference,
         ]);
     }
+
+    /**
+     * Dedicated Abandoned Cart Checkout Recovery Page.
+     */
+    public function recoverCheckout(Request $request, string $reference)
+    {
+        $booking = Booking::with(['tour.tiers', 'tier', 'addons', 'coupon'])->where('reference', $reference)->first();
+
+        if (! $booking) {
+            return redirect()->route('home')->with('error', 'Booking reservation not found.');
+        }
+
+        if (in_array($booking->status, ['confirmed', 'completed']) || in_array($booking->payment_status, ['paid', 'completed'])) {
+            return redirect()->to(localized_route('booking.voucher', ['reference' => $booking->reference]))
+                ->with('info', "Your reservation #{$booking->reference} is already confirmed!");
+        }
+
+        $tour = $booking->tour ?: Tour::find($booking->tour_id);
+        $tier = $booking->tier ?: Tier::find($booking->tier_id);
+
+        $subtotal = (float) $booking->subtotal ?: ((float) $booking->total ?: 0);
+        $addonsTotal = (float) $booking->addons_total;
+        $discount = (float) $booking->discount_amount;
+        $total = (float) $booking->total;
+
+        $ziinaActive = $this->ziina->isActive();
+        $advancePercent = $this->ziina->getAdvancePercent();
+        $advanceAmount = round(($total * $advancePercent) / 100, 2);
+        $fullAmount = round($total, 2);
+
+        $pageRobots = 'noindex, follow';
+
+        return view('booking.recover', compact(
+            'booking',
+            'tour',
+            'tier',
+            'subtotal',
+            'addonsTotal',
+            'discount',
+            'total',
+            'ziinaActive',
+            'advancePercent',
+            'advanceAmount',
+            'fullAmount',
+            'pageRobots'
+        ));
+    }
+
+    /**
+     * Process checkout submission from the dedicated recovery page.
+     */
+    public function processRecoverCheckout(Request $request, string $reference)
+    {
+        $booking = Booking::with(['tour', 'tier', 'addons', 'coupon'])->where('reference', $reference)->first();
+
+        if (! $booking) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Reservation record not found.'], 404);
+            }
+
+            return redirect()->route('home')->with('error', 'Reservation record not found.');
+        }
+
+        if (in_array($booking->status, ['confirmed', 'completed']) || in_array($booking->payment_status, ['paid', 'completed'])) {
+            $redirectUrl = localized_route('booking.voucher', ['reference' => $booking->reference]);
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => true, 'redirect_url' => $redirectUrl]);
+            }
+
+            return redirect()->to($redirectUrl);
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:50',
+            'location' => 'required|string|max:500',
+            'requests' => 'nullable|string',
+            'payment_method' => 'required|string|in:cash,advance,full',
+        ]);
+
+        $paymentMethod = $request->input('payment_method');
+        $name = trim($request->input('name'));
+        $email = trim($request->input('email'));
+        $phone = trim($request->input('phone'));
+        $location = trim($request->input('location'));
+        $requests = trim($request->input('requests', ''));
+
+        $existingNotes = (string) $booking->special_requests;
+        $recoveryTag = '[RECOVERED_CHECKOUT: '.now()->format('Y-m-d H:i:s').' ('.$paymentMethod.')]';
+        $updatedNotes = $requests;
+        if (! empty($existingNotes) && ! str_contains($existingNotes, '[RECOVERED_CHECKOUT')) {
+            $updatedNotes = trim($updatedNotes."\n".$existingNotes);
+        }
+        $updatedNotes = trim($updatedNotes."\n".$recoveryTag);
+
+        $booking->update([
+            'name' => $name,
+            'email' => $email,
+            'phone' => $phone,
+            'pickup_location' => $location,
+            'special_requests' => $updatedNotes,
+            'payment_method' => $paymentMethod,
+        ]);
+
+        $total = (float) $booking->total;
+
+        if ($paymentMethod === 'cash') {
+            $booking->update([
+                'status' => 'confirmed',
+                'payment_status' => 'unpaid',
+                'payment_amount' => 0.00,
+                'balance_due' => $total,
+            ]);
+
+            $this->recordCouponUsage($booking);
+            $this->sendEmailNotification('booking_cash', $booking);
+
+            $custom = [
+                'value' => (float) $booking->total,
+                'currency' => 'AED',
+                'content_ids' => ['TOUR-'.$booking->tour_id],
+                'content_type' => 'product',
+                'contents' => [['id' => 'TOUR-'.$booking->tour_id, 'quantity' => 1]],
+                'coupon' => $booking->coupon_code,
+                'discount_amount' => (float) $booking->discount_amount,
+            ];
+            $this->metaCapi->dispatchEvent('Purchase', [
+                'event_id' => 'BOOK-'.$booking->reference,
+                'email' => $booking->email,
+                'phone' => $booking->phone,
+                'custom_data' => $custom,
+            ]);
+
+            $redirectUrl = localized_route('booking.thankyou', ['ref' => $booking->reference]);
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Thank you! Your reservation has been confirmed.',
+                    'redirect_url' => $redirectUrl,
+                ]);
+            }
+
+            return redirect()->to($redirectUrl);
+        }
+
+        $advancePercent = $this->ziina->getAdvancePercent();
+        $payNow = ($paymentMethod === 'advance') ? round(($total * $advancePercent) / 100, 2) : round($total, 2);
+
+        if ($payNow < 0.50) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Minimum online payment amount is AED 0.50'], 400);
+            }
+
+            return redirect()->back()->with('error', 'Minimum online payment amount is AED 0.50');
+        }
+
+        $successUrl = localized_route('booking.thankyou', ['pi' => '{PAYMENT_INTENT_ID}']);
+        $cancelUrl = localized_route('booking.cancel', ['pi' => '{PAYMENT_INTENT_ID}']);
+        $messageStr = 'Booking '.$booking->reference;
+
+        $intent = $this->ziina->createPaymentIntent($payNow, 'AED', $successUrl, $cancelUrl, $messageStr);
+
+        if (isset($intent['error'])) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Online payment could not be initiated at this moment: '.($intent['error']),
+                ], 400);
+            }
+
+            return redirect()->back()->with('error', 'Online payment could not be initiated: '.($intent['error']));
+        }
+
+        $booking->update([
+            'ziina_payment_intent_id' => $intent['id'] ?? null,
+            'ziina_status' => $intent['status'] ?? null,
+            'ziina_redirect_url' => $intent['redirect_url'] ?? null,
+        ]);
+
+        BookingPayment::create([
+            'booking_id' => $booking->id,
+            'payment_intent_id' => $intent['id'],
+            'amount' => $payNow,
+            'currency' => 'AED',
+            'status' => $intent['status'] ?? 'pending',
+            'payment_url' => $intent['redirect_url'],
+        ]);
+
+        $custom = [
+            'value' => (float) $booking->total,
+            'currency' => 'AED',
+            'content_ids' => ['TOUR-'.$booking->tour_id],
+            'content_type' => 'product',
+            'contents' => [['id' => 'TOUR-'.$booking->tour_id, 'quantity' => 1]],
+        ];
+        $this->metaCapi->dispatchEvent('InitiateCheckout', [
+            'event_id' => 'INIT-'.$booking->reference,
+            'email' => $booking->email,
+            'phone' => $booking->phone,
+            'custom_data' => $custom,
+        ]);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'redirect_url' => $intent['redirect_url'],
+            ]);
+        }
+
+        return redirect()->away($intent['redirect_url']);
+    }
 }

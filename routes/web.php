@@ -124,6 +124,8 @@ Route::get('/wiki/{pillarSlug}/{articleSlug}', [WikiController::class, 'article'
 Route::get('/thankyou', [BookingController::class, 'thankyou'])->name('booking.thankyou');
 Route::get('/payment-cancel', [BookingController::class, 'paymentCancel'])->name('booking.cancel');
 Route::post('/booking/draft', [BookingController::class, 'saveDraft'])->name('booking.draft');
+Route::get('/checkout/{reference}', [BookingController::class, 'recoverCheckout'])->name('booking.recover');
+Route::post('/checkout/{reference}', [BookingController::class, 'processRecoverCheckout'])->name('booking.recover.process');
 Route::get('/booking/{reference}/voucher', [VoucherController::class, 'show'])->name('booking.voucher');
 Route::get('/booking/{reference}/ticket-pdf', [VoucherController::class, 'downloadPdf'])->name('booking.ticket.pdf');
 Route::get('/booking/{reference}/voucher-pdf', [VoucherController::class, 'downloadPdf'])->name('booking.voucher.pdf');
@@ -484,6 +486,8 @@ Route::prefix('{locale}')
         // Booking confirmation & Reviews
         Route::get('/thankyou', [BookingController::class, 'thankyou'])->name('locale.booking.thankyou');
         Route::get('/payment-cancel', [BookingController::class, 'paymentCancel'])->name('locale.booking.cancel');
+        Route::get('/checkout/{reference}', [BookingController::class, 'recoverCheckout'])->name('locale.booking.recover');
+        Route::post('/checkout/{reference}', [BookingController::class, 'processRecoverCheckout'])->name('locale.booking.recover.process');
         Route::get('/review/{ref}', [PageController::class, 'reviewRate'])->name('locale.review.rate');
         Route::post('/review/{ref}', [PageController::class, 'submitReview'])->name('locale.review.submit');
         Route::post('/review/{ref}/feedback', [PageController::class, 'submitFeedback'])->name('locale.review.feedback');

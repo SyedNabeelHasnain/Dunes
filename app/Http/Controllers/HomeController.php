@@ -18,6 +18,10 @@ class HomeController extends Controller
      */
     public function index()
     {
+        if (request()->filled('ref') && request()->input('action') === 'checkout') {
+            return redirect()->to(localized_route('booking.recover', ['reference' => request()->input('ref')]), 302);
+        }
+
         try {
             $categories = Category::with(['tours' => function ($query) {
                 $query->where('status', 'active')->with(['tiers', 'category'])->orderBy('priority', 'asc');
