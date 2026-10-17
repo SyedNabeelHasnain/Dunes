@@ -20,9 +20,10 @@ class ZiinaPaymentService
      */
     public function getAdvancePercent(): int
     {
-        $percent = app(SettingsService::class)->get('ziina_advance_percent', '10');
+        $percent = app(SettingsService::class)->get('deposit_percentage')
+            ?? app(SettingsService::class)->get('ziina_advance_percent', '25');
 
-        return is_numeric($percent) ? (int) $percent : 10;
+        return is_numeric($percent) ? (int) $percent : 25;
     }
 
     /**

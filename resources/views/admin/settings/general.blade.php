@@ -299,8 +299,9 @@
                                     </label>
                                 </div>
                                 <div>
-                                    <label for="ziina_advance_percent" class="block text-xs font-bold text-slate-700 mb-1.5">Partial Advance Deposit (%)</label>
-                                    <input type="number" min="5" max="100" name="ziina_advance_percent" id="ziina_advance_percent" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-800 outline-hidden transition focus:border-primary" value="{{ $settings['ziina_advance_percent'] ?? '20' }}">
+                                    <label for="ziina_advance_percent" class="block text-xs font-bold text-slate-700 mb-1.5">Online Advance Deposit (%)</label>
+                                    <input type="number" min="5" max="100" name="ziina_advance_percent" id="ziina_advance_percent" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-800 outline-hidden transition focus:border-primary" value="{{ $settings['deposit_percentage'] ?? ($settings['ziina_advance_percent'] ?? '25') }}">
+                                    <p class="text-[11px] text-slate-400 mt-1">Configurable online deposit percentage (default 25%). Customers can choose to pay this deposit, pay in full online, or pay cash on pickup.</p>
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

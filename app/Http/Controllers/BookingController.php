@@ -93,7 +93,15 @@ class BookingController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid tour or package selection'], 400);
         }
 
-        // Fetch price for this specific tour tier
+        if ($tourId === 3 || str_contains($tour->slug, 'overnight')) {
+            if ($adults < 2 || $adults % 2 !== 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Overnight safari requires at least 2 adult guests (1 private tent) and bookings must be in multiples of 2 (2, 4, 6... guests).',
+                ], 422);
+            }
+        }
+
         $pricing = DB::table('tour_tiers')
             ->where('tour_id', $tourId)
             ->where('tier_id', $tierId)
@@ -109,10 +117,12 @@ class BookingController extends Controller
             ? (float) $pricing->child_price
             : round($price * 0.70, 2);
 
-        if (in_array($priceType, ['per buggy', 'per vehicle', 'per group', 'private'])) {
+        if (in_array($priceType, ['per buggy', 'per vehicle', 'per group', 'private', 'per tent'])) {
             $capacity = 2;
             if (isset($tier->vehicle_capacity) && (int) $tier->vehicle_capacity > 0) {
                 $capacity = (int) $tier->vehicle_capacity;
+            } elseif (preg_match('/(6|six)/i', $tier->name ?? '')) {
+                $capacity = 6;
             } elseif (preg_match('/(4|four)/i', $tier->name ?? '')) {
                 $capacity = 4;
             } elseif (preg_match('/(1|single|solo)/i', $tier->name ?? '')) {
@@ -121,7 +131,6 @@ class BookingController extends Controller
             $vehicles = (int) ceil(($adults + $children) / max(1, $capacity));
             $subtotal = $vehicles * $price;
         } else {
-            // Children get configured child_price or 30% discount (they pay 70% of the adult price)
             $subtotal = ($price * $adults) + ($childPrice * $children);
         }
 

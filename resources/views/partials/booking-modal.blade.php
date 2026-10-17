@@ -13,7 +13,7 @@
     $canBookToday = $dubaiNow->format('H:i') < '13:30';
     $minDate = $canBookToday ? $dubaiNow->format('Y-m-d') : $dubaiNow->copy()->addDay()->format('Y-m-d');
     $ziinaActive = isset($settings['ziina_active']) ? ($settings['ziina_active'] === '1') : false;
-    $advancePercent = (int)($settings['ziina_advance_percent'] ?? 10);
+    $advancePercent = (int)($settings['deposit_percentage'] ?? ($settings['ziina_advance_percent'] ?? 25));
 @endphp
 
 <!-- Global Interactive Booking Modal (Tailwind v4 + Alpine.js) -->
@@ -101,7 +101,7 @@
                                     <select class="w-full h-[52px] appearance-none rounded-2xl bg-white px-4 pe-11 font-bold text-slate-900 text-sm border-2 border-slate-200 shadow-2xs hover:border-slate-300 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all cursor-pointer" id="bookingTour" name="tour_id" required autocomplete="off">
                                         <option value="">{{ __('ui.booking.select_tier') }}</option>
                                         @foreach($modalTours as $t)
-                                            <option value="{{ $t->id }}">{{ $t->name }}</option>
+                                            <option value="{{ $t->id }}" data-slug="{{ $t->slug }}">{{ $t->name }}</option>
                                         @endforeach
                                     </select>
                                     <div class="pointer-events-none absolute end-4 top-1/2 -translate-y-1/2 text-slate-400 flex items-center justify-center">
@@ -146,11 +146,12 @@
                                         <button type="button" class="w-11 h-11 flex items-center justify-center text-primary hover:bg-orange-50 rounded-xl transition-colors cursor-pointer" data-action="minus" data-target="adults" aria-label="{{ __('ui.booking.decrease_guests') }}">
                                             <i class="bi bi-dash-circle-fill text-xl"></i>
                                         </button>
-                                        <input type="number" class="w-10 text-center font-black text-slate-900 border-0 bg-transparent p-0 text-base focus:outline-none" name="adults" id="bookingAdults" value="1" min="1" max="50" readonly autocomplete="off">
+                                        <input type="number" class="w-10 text-center font-black text-slate-900 border-0 bg-transparent p-0 text-base focus:outline-none" name="adults" id="bookingAdults" value="1" min="1" max="50" step="1" readonly autocomplete="off">
                                         <button type="button" class="w-11 h-11 flex items-center justify-center text-primary hover:bg-orange-50 rounded-xl transition-colors cursor-pointer" data-action="plus" data-target="adults" aria-label="{{ __('ui.booking.increase_guests') }}">
                                             <i class="bi bi-plus-circle-fill text-xl"></i>
                                         </button>
                                     </div>
+                                    <p id="overnightAdultsHelper" class="hidden text-[10px] font-bold text-amber-700 bg-amber-50 rounded-lg px-2 py-1 mt-1 border border-amber-200"><i class="bi bi-info-circle me-1"></i>Overnight safari requires at least 2 guests (1 private tent). Bookings step in pairs (2, 4, 6... guests).</p>
                                 </div>
                                 <div class="sm:col-span-8 lg:col-span-9 booking-location-wrapper relative">
                                     <label class="block text-xs font-black uppercase tracking-wider text-slate-800 mb-2" for="bookingLocation">{{ __('ui.booking.pickup_location_label') }}</label>
@@ -403,11 +404,11 @@
                                     </div>
                                     @if($ziinaActive)
                                     <div class="payment-option p-3 rounded-2xl border border-slate-200 bg-white hover:border-primary/50 cursor-pointer text-start transition-all" data-value="advance">
-                                        <div class="payment-option-title font-bold text-slate-900 text-xs sm:text-sm">{{ __('ui.booking.advance') }}</div>
+                                        <div class="payment-option-title font-bold text-slate-900 text-xs sm:text-sm">{{ __('ui.booking.advance') }} ({{ $advancePercent }}%)</div>
                                         <div class="payment-option-sub text-slate-500 text-[11px]">{{ __('ui.booking.hold_slot', ['percent' => $advancePercent]) }}</div>
                                     </div>
                                     <div class="payment-option p-3 rounded-2xl border border-slate-200 bg-white hover:border-primary/50 cursor-pointer text-start transition-all" data-value="full">
-                                        <div class="payment-option-title font-bold text-slate-900 text-xs sm:text-sm">{{ __('ui.booking.full_payment') }}</div>
+                                        <div class="payment-option-title font-bold text-slate-900 text-xs sm:text-sm">{{ __('ui.booking.full_payment') }} (100%)</div>
                                         <div class="payment-option-sub text-slate-500 text-[11px]">{{ __('ui.booking.instant_confirmation') }}</div>
                                     </div>
                                     @endif

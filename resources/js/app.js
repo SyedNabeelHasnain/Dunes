@@ -378,6 +378,7 @@ Alpine.store('modal', {
                     const adultsInput = document.getElementById('bookingAdults');
                     if (adultsInput) adultsInput.value = data.adults;
                 }
+                window.App.syncTourGuestRules?.(data.tourId || (tourSel ? tourSel.value : null));
                 if (data.children !== undefined) {
                     const childrenInput = document.getElementById('bookingChildren');
                     if (childrenInput) childrenInput.value = data.children;
@@ -2388,6 +2389,13 @@ const App = {
                 missingElements.push(locBox || locationInput);
             }
 
+            const adultsVal = parseInt(document.getElementById('bookingAdults')?.value, 10) || 1;
+            const isOvernightTour = (tour === '3') || (tourSelect?.options[tourSelect.selectedIndex]?.dataset?.slug || '').includes('overnight');
+            if (isOvernightTour && (adultsVal < 2 || adultsVal % 2 !== 0)) {
+                missing.push('Guests (min 2, multiples of 2)');
+                missingElements.push(document.getElementById('bookingAdults')?.parentElement);
+            }
+
             if (missing.length === 0) {
                 next.classList.remove('btn-disabled-visual', 'opacity-50');
                 if (btnWrapper) btnWrapper.removeAttribute('title');
@@ -2412,6 +2420,7 @@ const App = {
         validateStep1(false);
 
         tourSelect?.addEventListener('change', () => {
+            this.syncTourGuestRules(tourSelect.value);
             this.loadTiers(tourSelect.value);
             validateStep1(false);
         });
@@ -2802,7 +2811,49 @@ const App = {
         select(methodInput?.value || options[0]?.dataset.value || 'cash');
     },
 
+    syncTourGuestRules(tourId) {
+        const adultsInput = document.getElementById('bookingAdults');
+        const helper = document.getElementById('overnightAdultsHelper');
+        const tourSelect = document.getElementById('bookingTour');
+        if (!adultsInput) return;
+
+        let isOvernight = false;
+        if (tourId) {
+            const sTourId = String(tourId);
+            if (sTourId === '3') {
+                isOvernight = true;
+            } else if (tourSelect && tourSelect.selectedIndex >= 0) {
+                const opt = tourSelect.options[tourSelect.selectedIndex];
+                const slug = opt?.dataset?.slug || '';
+                if (slug.includes('overnight')) {
+                    isOvernight = true;
+                }
+            }
+        }
+
+        if (isOvernight) {
+            adultsInput.min = '2';
+            adultsInput.step = '2';
+            let v = parseInt(adultsInput.value, 10) || 2;
+            if (v < 2) v = 2;
+            else if (v % 2 !== 0) v += 1;
+            adultsInput.value = v;
+            if (helper) helper.classList.remove('hidden');
+        } else {
+            adultsInput.min = '1';
+            adultsInput.step = '1';
+            let v = parseInt(adultsInput.value, 10) || 1;
+            if (v < 1) v = 1;
+            adultsInput.value = v;
+            if (helper) helper.classList.add('hidden');
+        }
+        if (typeof this.updateTotal === 'function') {
+            this.updateTotal();
+        }
+    },
+
     async loadTiers(tourId) {
+        this.syncTourGuestRules(tourId);
         const container = document.getElementById('tierCards');
         const addons = document.getElementById('addonsSection');
         const addonList = document.getElementById('addonList');
@@ -3005,8 +3056,14 @@ const App = {
         const rawChildPrice = parseFloat(selectedTierCard?.dataset.childPrice || 0);
         const childPrice = rawChildPrice > 0 ? rawChildPrice : (price * 0.70);
         let total = 0;
-        if (['per buggy', 'per vehicle', 'per group', 'private'].includes(priceType)) {
-            const capacity = parseInt(selectedTierCard?.dataset.capacity || '2', 10) || 2;
+        if (['per buggy', 'per vehicle', 'per group', 'private', 'per tent'].includes(priceType)) {
+            let capacity = 2;
+            if (/(6|six)/i.test(selectedTierCard?.dataset.name || '')) capacity = 6;
+            else if (/(4|four)/i.test(selectedTierCard?.dataset.name || '')) capacity = 4;
+            else if (/(1|single|solo)/i.test(selectedTierCard?.dataset.name || '')) capacity = 1;
+            else if (selectedTierCard?.dataset.capacity && parseInt(selectedTierCard.dataset.capacity, 10) > 0) {
+                capacity = parseInt(selectedTierCard.dataset.capacity, 10);
+            }
             const vehicles = Math.ceil(Math.max(1, adults + children) / capacity);
             total = price * vehicles;
         } else {
@@ -3025,8 +3082,14 @@ const App = {
         const childPrice = rawChildPrice > 0 ? rawChildPrice : (this.selectedPrice * 0.70);
 
         let baseTotal = 0;
-        if (['per buggy', 'per vehicle', 'per group', 'private'].includes(priceType)) {
-            const capacity = parseInt(selectedTierCard?.dataset.capacity || '2', 10) || 2;
+        if (['per buggy', 'per vehicle', 'per group', 'private', 'per tent'].includes(priceType)) {
+            let capacity = 2;
+            if (/(6|six)/i.test(selectedTierCard?.dataset.name || '')) capacity = 6;
+            else if (/(4|four)/i.test(selectedTierCard?.dataset.name || '')) capacity = 4;
+            else if (/(1|single|solo)/i.test(selectedTierCard?.dataset.name || '')) capacity = 1;
+            else if (selectedTierCard?.dataset.capacity && parseInt(selectedTierCard.dataset.capacity, 10) > 0) {
+                capacity = parseInt(selectedTierCard.dataset.capacity, 10);
+            }
             const vehicles = Math.ceil(Math.max(1, adults + children) / capacity);
             baseTotal = this.selectedPrice * vehicles;
         } else {
@@ -3269,6 +3332,7 @@ const App = {
         this.selectedTier = null;
         this.selectedPrice = 0;
         this.selectedAddons = [];
+        this.syncTourGuestRules(null);
         this._pendingSubmitAfterOtp = null;
         window.pendingPromoCode = null;
         if (typeof window.removeCurrentPromo === 'function') {
@@ -3714,12 +3778,16 @@ const App = {
                 let v = parseInt(inp.value) || 0;
                 const min = parseInt(inp.min) || 0;
                 const max = parseInt(inp.max) || 99;
+                const step = parseInt(inp.step) || 1;
 
-                if (btn.dataset.action === 'minus') v = Math.max(min, v - 1);
-                else if (btn.dataset.action === 'plus') v = Math.min(max, v + 1);
+                if (btn.dataset.action === 'minus') v = Math.max(min, v - step);
+                else if (btn.dataset.action === 'plus') v = Math.min(max, v + step);
 
                 inp.value = v;
                 this.updateTotal();
+                if (typeof this.validateStep1 === 'function') {
+                    this.validateStep1(false);
+                }
             });
         });
 

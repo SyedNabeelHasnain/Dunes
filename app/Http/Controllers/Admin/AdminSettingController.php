@@ -33,7 +33,7 @@ class AdminSettingController extends Controller
             'site_hero_poster', 'site_default_image', 'seo_default_og_image',
             'admin_email', 'admin_email_cc', 'admin_email_bcc',
             'email_verification_required',
-            'ziina_active', 'ziina_access_token', 'ziina_webhook_secret', 'ziina_test_mode', 'ziina_advance_percent',
+            'ziina_active', 'ziina_access_token', 'ziina_webhook_secret', 'ziina_test_mode', 'ziina_advance_percent', 'deposit_percentage',
         ];
 
         $settings = Setting::whereIn('setting_key', $keys)
@@ -220,7 +220,7 @@ class AdminSettingController extends Controller
             // Email & Payment Settings
             'admin_email', 'admin_email_cc', 'admin_email_bcc',
             'email_verification_required',
-            'ziina_active', 'ziina_access_token', 'ziina_webhook_secret', 'ziina_test_mode', 'ziina_advance_percent',
+            'ziina_active', 'ziina_access_token', 'ziina_webhook_secret', 'ziina_test_mode', 'ziina_advance_percent', 'deposit_percentage',
             'cache_version',
 
             // Social Proof & Concierge Widget Controls
@@ -234,6 +234,12 @@ class AdminSettingController extends Controller
         ];
 
         $settings = $request->only($allowedKeys);
+
+        if (isset($settings['ziina_advance_percent']) && !isset($settings['deposit_percentage'])) {
+            $settings['deposit_percentage'] = $settings['ziina_advance_percent'];
+        } elseif (isset($settings['deposit_percentage']) && !isset($settings['ziina_advance_percent'])) {
+            $settings['ziina_advance_percent'] = $settings['deposit_percentage'];
+        }
 
         // Handle uploaded image files
         $request->validate([
