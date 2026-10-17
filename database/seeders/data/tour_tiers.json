@@ -45,7 +45,7 @@
         "tier_id": 5,
         "price": 798,
         "old_price": 999,
-        "price_type": "per person"
+        "price_type": "per tent"
     },
     {
         "id": 27,
@@ -53,7 +53,7 @@
         "tier_id": 6,
         "price": 1596,
         "old_price": 1750,
-        "price_type": "per person"
+        "price_type": "per tent"
     },
     {
         "id": 28,
@@ -61,7 +61,7 @@
         "tier_id": 7,
         "price": 2394,
         "old_price": 2650,
-        "price_type": "per person"
+        "price_type": "per tent"
     },
     {
         "id": 29,

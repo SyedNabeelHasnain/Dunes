@@ -126,8 +126,8 @@ class LocationLandingService
                 'name' => 'Deira, Bur Dubai & Dubai Creek',
                 'district' => 'Deira, Bur Dubai, Al Rigga, Al Fahidi & Dubai Creek Harbour',
                 'slug' => 'desert-safari-from-deira',
-                'meta_title' => 'Desert Safari from Deira & Bur Dubai (2026): Best Value Pickup',
-                'meta_desc' => 'Affordable & luxury desert safaris with pickup from Deira, Bur Dubai, Al Rigga & Old Dubai hotels. Red dune bashing, camel ride & BBQ buffet from AED 99.',
+                'meta_title' => 'Desert Safari from Deira & Bur Dubai (2026): Doorstep 4x4 Pickup',
+                'meta_desc' => 'Affordable & luxury desert safaris with complimentary 4x4 pickup from Deira, Bur Dubai, Al Rigga & Old Dubai hotels. Red dune bashing, camel ride & BBQ buffet from AED 79.',
                 'headline' => 'Desert Safari from Deira & Bur Dubai',
                 'subheadline' => 'Convenient doorstep pickup across historic Deira, Bur Dubai, Al Seef, and Dubai International Airport (DXB) transit hotels.',
                 'pickup_window' => '02:45 PM – 03:15 PM',
@@ -144,8 +144,8 @@ class LocationLandingService
                         'a' => 'Yes! We pick up from all hotels around Dubai International Airport (Terminal 1, 2, 3), Holiday Inn Express, Le Meridien, and Premier Inn.',
                     ],
                     [
-                        'q' => 'Are bus pickup meeting points available in Deira for budget travelers?',
-                        'a' => 'Yes, in addition to direct 4x4 hotel pickup, our AED 99 Standard Package offers centralized meeting points near major Deira metro stations.',
+                        'q' => 'Is doorstep 4x4 pickup available from Deira hotels and residences?',
+                        'a' => 'Yes! We provide complimentary door-to-door 4x4 Land Cruiser pickup from all hotels, apartments, and residential buildings across Deira and Bur Dubai.',
                     ],
                     [
                         'q' => 'How far is the desert from Deira and Bur Dubai?',

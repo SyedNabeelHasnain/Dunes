@@ -35,7 +35,7 @@
                         @endif
                         <div class="font-extrabold text-slate-900 text-sm">{{ $tier->name }}</div>
                         <div class="text-lg font-black text-primary font-mono mt-0.5" data-aed="{{ $tier->pivot?->price ?? 0 }}">AED {{ number_format($tier->pivot?->price ?? 0) }}</div>
-                        <small class="text-slate-500 block text-[10px] font-normal">per person</small>
+                        <small class="text-slate-500 block text-[10px] font-normal">{{ ($tier->pivot?->price_type && !in_array($tier->pivot->price_type, ['person', 'per person'])) ? $tier->pivot->price_type : __('ui.rate_card.per_person') }}</small>
                     </th>
                     @endforeach
                 </tr>

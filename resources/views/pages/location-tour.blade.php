@@ -259,7 +259,7 @@
                             </li>
                             <li class="flex items-start gap-2.5">
                                 <i class="bi bi-check2-circle text-emerald-400 text-base shrink-0 mt-0.5"></i>
-                                <span><strong class="text-white">Pay on Pickup:</strong> Reserve with 20% advance or full payment via Ziina, or cash on departure.</span>
+                                <span><strong class="text-white">Pay on Pickup:</strong> Reserve with 25% advance or full payment via Ziina, or cash on departure.</span>
                             </li>
                         </ul>
 
@@ -382,10 +382,32 @@
                                     <i class="bi bi-check-circle-fill text-amber-400 shrink-0"></i>
                                     <span>Red dune bashing (Lahbab Desert)</span>
                                 </li>
+                                @if(stripos($tour->slug, 'morning') !== false)
+                                <li class="flex items-center gap-2">
+                                    <i class="bi bi-check-circle-fill text-amber-400 shrink-0"></i>
+                                    <span>Sandboarding, Camel Ride & Arabic Refreshments</span>
+                                </li>
+                                @elseif(stripos($tour->slug, 'quad') !== false)
+                                <li class="flex items-center gap-2">
+                                    <i class="bi bi-check-circle-fill text-amber-400 shrink-0"></i>
+                                    <span>Included 30-min Quad Bike, BBQ Dinner & Shows</span>
+                                </li>
+                                @elseif(stripos($tour->slug, 'buggy') !== false)
+                                <li class="flex items-center gap-2">
+                                    <i class="bi bi-check-circle-fill text-amber-400 shrink-0"></i>
+                                    <span>1000cc Buggy Self-Drive & Instructor Escort</span>
+                                </li>
+                                @elseif(stripos($tour->slug, 'overnight') !== false)
+                                <li class="flex items-center gap-2">
+                                    <i class="bi bi-check-circle-fill text-amber-400 shrink-0"></i>
+                                    <span>BBQ Dinner, Bedouin Tent Stay & Sunrise Breakfast</span>
+                                </li>
+                                @else
                                 <li class="flex items-center gap-2">
                                     <i class="bi bi-check-circle-fill text-amber-400 shrink-0"></i>
                                     <span>Live 5-star BBQ dinner & 3 cultural shows</span>
                                 </li>
+                                @endif
                             </ul>
 
                             <div class="flex items-center justify-between mb-4">
@@ -629,7 +651,7 @@
                 Ready for the High Red Dunes from {{ $locationData['name'] }}?
             </h2>
             <p class="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed mb-8">
-                Reserve your seats in 60 seconds with 20% advance or pay cash on pickup. Instant WhatsApp confirmation with full driver credentials.
+                Reserve your seats in 60 seconds with 25% advance or pay cash on pickup. Instant WhatsApp confirmation with full driver credentials.
             </p>
             <div class="flex flex-col sm:flex-row justify-center gap-3.5">
                 <button type="button" class="btn-desert-animated font-bold rounded-full px-8 py-4 text-white text-sm sm:text-base shadow-xl btn-book-location cursor-pointer inline-flex items-center justify-center gap-2"

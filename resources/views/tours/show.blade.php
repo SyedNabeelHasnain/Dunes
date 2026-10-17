@@ -79,11 +79,6 @@
               "sameAs": "https://www.wikidata.org/wiki/Q6473133"
             },
             {
-              "@type": "Place",
-              "name": "Dubai Desert Conservation Reserve",
-              "sameAs": "https://www.wikidata.org/wiki/Q5310543"
-            },
-            {
               "@type": "Thing",
               "name": "Dune Bashing",
               "sameAs": "https://www.wikidata.org/wiki/Q5315003"

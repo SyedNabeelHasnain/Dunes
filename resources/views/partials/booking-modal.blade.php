@@ -9,7 +9,9 @@
         }
     }
     $modalTours = isset($allTours) && count($allTours) ? $allTours : try_get_modal_tours();
-    $minDate = date('Y-m-d', strtotime('+1 day'));
+    $dubaiNow = now('Asia/Dubai');
+    $canBookToday = $dubaiNow->format('H:i') < '13:30';
+    $minDate = $canBookToday ? $dubaiNow->format('Y-m-d') : $dubaiNow->copy()->addDay()->format('Y-m-d');
     $ziinaActive = isset($settings['ziina_active']) ? ($settings['ziina_active'] === '1') : false;
     $advancePercent = (int)($settings['ziina_advance_percent'] ?? 10);
 @endphp
@@ -194,6 +196,10 @@
                                         </button>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="mb-3 px-1 text-[11px] text-slate-500 leading-snug flex items-center gap-1.5">
+                                <i class="bi bi-shield-check text-emerald-600 shrink-0"></i>
+                                <span>Infants (&lt;3 yrs) join free. Under UAE tourism safety rules, infants bypass rough dune bashing via direct-to-camp transfer or scenic gentle drive.</span>
                             </div>
                         </div>
 

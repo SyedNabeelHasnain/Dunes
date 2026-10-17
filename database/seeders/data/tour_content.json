@@ -96,18 +96,6 @@
         "content_id": 22
     },
     {
-        "id": 361,
-        "tour_id": 1,
-        "tier_id": null,
-        "content_id": 30
-    },
-    {
-        "id": 362,
-        "tour_id": 1,
-        "tier_id": null,
-        "content_id": 31
-    },
-    {
         "id": 363,
         "tour_id": 1,
         "tier_id": null,
@@ -118,18 +106,6 @@
         "tour_id": 1,
         "tier_id": null,
         "content_id": 10
-    },
-    {
-        "id": 365,
-        "tour_id": 1,
-        "tier_id": null,
-        "content_id": 65
-    },
-    {
-        "id": 366,
-        "tour_id": 1,
-        "tier_id": null,
-        "content_id": 66
     },
     {
         "id": 367,
@@ -234,12 +210,6 @@
         "content_id": 108
     },
     {
-        "id": 384,
-        "tour_id": 1,
-        "tier_id": null,
-        "content_id": 109
-    },
-    {
         "id": 385,
         "tour_id": 2,
         "tier_id": null,
@@ -288,18 +258,6 @@
         "content_id": 24
     },
     {
-        "id": 393,
-        "tour_id": 2,
-        "tier_id": null,
-        "content_id": 30
-    },
-    {
-        "id": 394,
-        "tour_id": 2,
-        "tier_id": null,
-        "content_id": 31
-    },
-    {
         "id": 395,
         "tour_id": 2,
         "tier_id": null,
@@ -310,18 +268,6 @@
         "tour_id": 2,
         "tier_id": null,
         "content_id": 10
-    },
-    {
-        "id": 397,
-        "tour_id": 2,
-        "tier_id": null,
-        "content_id": 65
-    },
-    {
-        "id": 398,
-        "tour_id": 2,
-        "tier_id": null,
-        "content_id": 66
     },
     {
         "id": 399,
@@ -352,12 +298,6 @@
         "tour_id": 2,
         "tier_id": null,
         "content_id": 12
-    },
-    {
-        "id": 404,
-        "tour_id": 2,
-        "tier_id": null,
-        "content_id": 81
     },
     {
         "id": 405,
@@ -430,12 +370,6 @@
         "tour_id": 2,
         "tier_id": null,
         "content_id": 108
-    },
-    {
-        "id": 417,
-        "tour_id": 2,
-        "tier_id": null,
-        "content_id": 109
     },
     {
         "id": 418,
@@ -558,18 +492,6 @@
         "content_id": 26
     },
     {
-        "id": 438,
-        "tour_id": 3,
-        "tier_id": null,
-        "content_id": 30
-    },
-    {
-        "id": 439,
-        "tour_id": 3,
-        "tier_id": null,
-        "content_id": 31
-    },
-    {
         "id": 440,
         "tour_id": 3,
         "tier_id": null,
@@ -580,18 +502,6 @@
         "tour_id": 3,
         "tier_id": null,
         "content_id": 10
-    },
-    {
-        "id": 442,
-        "tour_id": 3,
-        "tier_id": null,
-        "content_id": 65
-    },
-    {
-        "id": 443,
-        "tour_id": 3,
-        "tier_id": null,
-        "content_id": 66
     },
     {
         "id": 444,
@@ -706,12 +616,6 @@
         "tour_id": 3,
         "tier_id": null,
         "content_id": 108
-    },
-    {
-        "id": 463,
-        "tour_id": 3,
-        "tier_id": null,
-        "content_id": 109
     },
     {
         "id": 464,
@@ -852,22 +756,10 @@
         "content_id": 10
     },
     {
-        "id": 487,
-        "tour_id": 4,
-        "tier_id": null,
-        "content_id": 66
-    },
-    {
         "id": 488,
         "tour_id": 4,
         "tier_id": null,
         "content_id": 67
-    },
-    {
-        "id": 489,
-        "tour_id": 4,
-        "tier_id": null,
-        "content_id": 68
     },
     {
         "id": 490,
@@ -960,22 +852,10 @@
         "content_id": 108
     },
     {
-        "id": 505,
-        "tour_id": 4,
-        "tier_id": null,
-        "content_id": 109
-    },
-    {
         "id": 506,
         "tour_id": 5,
         "tier_id": null,
         "content_id": 1
-    },
-    {
-        "id": 507,
-        "tour_id": 5,
-        "tier_id": null,
-        "content_id": 31
     },
     {
         "id": 508,
@@ -1024,12 +904,6 @@
         "tour_id": 5,
         "tier_id": null,
         "content_id": 39
-    },
-    {
-        "id": 516,
-        "tour_id": 5,
-        "tier_id": null,
-        "content_id": 30
     },
     {
         "id": 517,
@@ -1116,12 +990,6 @@
         "content_id": 97
     },
     {
-        "id": 531,
-        "tour_id": 5,
-        "tier_id": null,
-        "content_id": 109
-    },
-    {
         "id": 532,
         "tour_id": 6,
         "tier_id": null,
@@ -1186,18 +1054,6 @@
         "tour_id": 6,
         "tier_id": null,
         "content_id": 49
-    },
-    {
-        "id": 543,
-        "tour_id": 6,
-        "tier_id": null,
-        "content_id": 30
-    },
-    {
-        "id": 544,
-        "tour_id": 6,
-        "tier_id": null,
-        "content_id": 31
     },
     {
         "id": 545,

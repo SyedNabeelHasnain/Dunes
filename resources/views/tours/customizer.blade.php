@@ -177,7 +177,7 @@
                         <h4 class="font-bold text-slate-900 text-base sm:text-lg">Select Base Safari Experience</h4>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="custom-card p-4 rounded-2xl cursor-pointer transition-all bg-white border-2 border-primary bg-primary/5 shadow-xs selected" data-group="base" data-name="Standard Evening Safari" data-price="150" data-tour-id="1">
+                        <div class="custom-card p-4 rounded-2xl cursor-pointer transition-all bg-white border-2 border-primary bg-primary/5 shadow-xs selected" data-group="base" data-name="Standard Evening Safari" data-price="79" data-tour-id="1">
                             <div class="flex justify-between items-start mb-2">
                                 <span class="text-2xl text-amber-500"><i class="bi bi-sunset"></i></span>
                                 <span class="bg-amber-400 text-slate-950 font-bold rounded-full px-2.5 py-0.5 text-xs">Popular</span>
@@ -186,10 +186,10 @@
                             <p class="text-slate-500 text-xs mb-3 leading-relaxed">
                                 Dune bashing, sunset photo stop, camel ride, sandboarding, 5-star live BBQ dinner & 3 cultural shows.
                             </p>
-                            <div class="font-black text-primary text-base" data-aed="150">{{ __('ui.common.aed') }} 150 <span class="text-slate-400 font-normal text-xs">/ guest</span></div>
+                            <div class="font-black text-primary text-base" data-aed="79">{{ __('ui.common.aed') }} 79 <span class="text-slate-400 font-normal text-xs">/ guest</span></div>
                         </div>
 
-                        <div class="custom-card p-4 rounded-2xl cursor-pointer transition-all bg-white border-2 border-slate-200 hover:border-primary/50 shadow-xs" data-group="base" data-name="VIP Luxury Evening Safari" data-price="250" data-tour-id="2">
+                        <div class="custom-card p-4 rounded-2xl cursor-pointer transition-all bg-white border-2 border-slate-200 hover:border-primary/50 shadow-xs" data-group="base" data-name="VIP Luxury Evening Safari" data-price="130" data-tour-id="1">
                             <div class="flex justify-between items-start mb-2">
                                 <span class="text-2xl text-amber-500"><i class="bi bi-award"></i></span>
                                 <span class="bg-slate-900 text-amber-400 font-bold rounded-full px-2.5 py-0.5 text-xs">VIP Perks</span>
@@ -198,10 +198,10 @@
                             <p class="text-slate-500 text-xs mb-3 leading-relaxed">
                                 Extreme Lahbab dune bashing, reserved elevated VIP table with private dedicated waiter & table service.
                             </p>
-                            <div class="font-black text-primary text-base" data-aed="250">{{ __('ui.common.aed') }} 250 <span class="text-slate-400 font-normal text-xs">/ guest</span></div>
+                            <div class="font-black text-primary text-base" data-aed="130">{{ __('ui.common.aed') }} 130 <span class="text-slate-400 font-normal text-xs">/ guest</span></div>
                         </div>
 
-                        <div class="custom-card p-4 rounded-2xl cursor-pointer transition-all bg-white border-2 border-slate-200 hover:border-primary/50 shadow-xs" data-group="base" data-name="Morning Desert Safari" data-price="120" data-tour-id="4">
+                        <div class="custom-card p-4 rounded-2xl cursor-pointer transition-all bg-white border-2 border-slate-200 hover:border-primary/50 shadow-xs" data-group="base" data-name="Morning Desert Safari" data-price="140" data-tour-id="2">
                             <div class="flex justify-between items-start mb-2">
                                 <span class="text-2xl text-amber-500"><i class="bi bi-sunrise"></i></span>
                                 <span class="bg-cyan-600 text-white font-bold rounded-full px-2.5 py-0.5 text-xs">Cooler</span>
@@ -210,10 +210,10 @@
                             <p class="text-slate-500 text-xs mb-3 leading-relaxed">
                                 Crisp morning air, 40-min high dune drive, sunrise photos, camel ride & sandboarding. Back by 12:30 PM.
                             </p>
-                            <div class="font-black text-primary text-base" data-aed="120">{{ __('ui.common.aed') }} 120 <span class="text-slate-400 font-normal text-xs">/ guest</span></div>
+                            <div class="font-black text-primary text-base" data-aed="140">{{ __('ui.common.aed') }} 140 <span class="text-slate-400 font-normal text-xs">/ guest</span></div>
                         </div>
 
-                        <div class="custom-card p-4 rounded-2xl cursor-pointer transition-all bg-white border-2 border-slate-200 hover:border-primary/50 shadow-xs" data-group="base" data-name="Overnight Stargazing Safari" data-price="350" data-tour-id="5">
+                        <div class="custom-card p-4 rounded-2xl cursor-pointer transition-all bg-white border-2 border-slate-200 hover:border-primary/50 shadow-xs" data-group="base" data-name="Overnight Stargazing Safari" data-price="399" data-tour-id="3">
                             <div class="flex justify-between items-start mb-2">
                                 <span class="text-2xl text-amber-500"><i class="bi bi-moon-stars"></i></span>
                                 <span class="bg-emerald-600 text-white font-bold rounded-full px-2.5 py-0.5 text-xs">Glamping</span>
@@ -222,7 +222,7 @@
                             <p class="text-slate-500 text-xs mb-3 leading-relaxed">
                                 Full evening safari + private overnight Bedouin tent, campfire stargazing & freshly cooked sunrise breakfast.
                             </p>
-                            <div class="font-black text-primary text-base" data-aed="350">{{ __('ui.common.aed') }} 350 <span class="text-slate-400 font-normal text-xs">/ guest</span></div>
+                            <div class="font-black text-primary text-base" data-aed="399">{{ __('ui.common.aed') }} 399 <span class="text-slate-400 font-normal text-xs">/ guest</span></div>
                         </div>
                     </div>
                 </div>
@@ -514,7 +514,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     // State
     const state = {
-        base: { name: 'Sunset Evening Red Dunes', price: 150, tourId: 1 },
+        base: { name: 'Sunset Evening Red Dunes', price: 79, tourId: 1 },
         transfer: { name: 'Shared 4x4 Pickup', price: 0, type: 'flat' },
         sports: { name: 'Scenic Only', price: 0, type: 'per_person' },
         addons: [],

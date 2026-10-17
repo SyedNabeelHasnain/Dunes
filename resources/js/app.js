@@ -1844,20 +1844,28 @@ const App = {
         const input = document.getElementById('bookingDate');
         if (!wrapper || !input) return;
 
-        const today = new Date();
+        // Calculate Dubai local time (GST = UTC+4)
+        const now = new Date();
+        const utcMs = now.getTime() + (now.getTimezoneOffset() * 60000);
+        const dubaiNow = new Date(utcMs + (3600000 * 4));
+        const dubaiHour = dubaiNow.getHours() + (dubaiNow.getMinutes() / 60);
+        const canBookToday = dubaiHour < 13.5; // Cutoff at 1:30 PM (13:30) Asia/Dubai
+        const startDay = canBookToday ? 0 : 1;
+
         let html = '';
         const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
         const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-        for (let i = 1; i <= 30; i++) {
-            const d = new Date(today);
-            d.setDate(today.getDate() + i);
+        for (let i = startDay; i <= (startDay + 30); i++) {
+            const d = new Date(dubaiNow);
+            d.setDate(dubaiNow.getDate() + (canBookToday ? i : (i - 1 + 1)));
 
-            const offset = d.getTimezoneOffset();
-            const localDate = new Date(d.getTime() - (offset * 60 * 1000));
-            const dateStr = localDate.toISOString().split('T')[0];
+            const year = d.getFullYear();
+            const monthStr = String(d.getMonth() + 1).padStart(2, '0');
+            const dayStr = String(d.getDate()).padStart(2, '0');
+            const dateStr = `${year}-${monthStr}-${dayStr}`;
 
-            const dayName = days[d.getDay()];
+            const dayName = (i === 0 && canBookToday) ? 'Today' : days[d.getDay()];
             const dayNum = d.getDate();
             const monthName = months[d.getMonth()];
 

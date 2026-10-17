@@ -70,8 +70,9 @@ class WikiController extends Controller
     /**
      * Display a specific Knowledge Pillar cornerstone hub.
      */
-    public function pillar(Request $request, string $pillarSlug)
+    public function pillar(Request $request, ...$params)
     {
+        $pillarSlug = (string) end($params);
         $currentLocale = app()->getLocale();
         $pillar = WikiPillar::where('slug', $pillarSlug)->active()->firstOrFail();
 
@@ -109,8 +110,10 @@ class WikiController extends Controller
     /**
      * Display a single in-depth Cluster Knowledge Article.
      */
-    public function article(Request $request, string $pillarSlug, string $articleSlug)
+    public function article(Request $request, ...$params)
     {
+        $articleSlug = (string) end($params);
+        $pillarSlug = (string) (count($params) >= 2 ? $params[count($params) - 2] : reset($params));
         $pillar = WikiPillar::where('slug', $pillarSlug)->active()->firstOrFail();
 
         $article = WikiArticle::where('pillar_id', $pillar->id)
