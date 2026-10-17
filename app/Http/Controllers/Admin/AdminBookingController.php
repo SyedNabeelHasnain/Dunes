@@ -847,8 +847,8 @@ class AdminBookingController extends Controller
         if ($request->boolean('generate_payment_link') && $booking->balance_due > 0) {
             try {
                 $ziina = app(ZiinaPaymentService::class);
-                $successUrl = route('booking.thankyou', ['pi' => '{PAYMENT_INTENT_ID}']);
-                $cancelUrl = route('booking.cancel', ['pi' => '{PAYMENT_INTENT_ID}']);
+                $successUrl = route('booking.thankyou', ['ref' => $booking->reference]);
+                $cancelUrl = route('booking.cancel', ['ref' => $booking->reference]);
                 $intent = $ziina->createPaymentIntent(
                     (float) $booking->balance_due,
                     'AED',
@@ -1328,8 +1328,8 @@ class AdminBookingController extends Controller
 
         $ziina = app(ZiinaPaymentService::class);
 
-        $successUrl = route('booking.thankyou', ['pi' => '{PAYMENT_INTENT_ID}']);
-        $cancelUrl = route('booking.cancel', ['pi' => '{PAYMENT_INTENT_ID}']);
+        $successUrl = route('booking.thankyou', ['ref' => $booking->reference]);
+        $cancelUrl = route('booking.cancel', ['ref' => $booking->reference]);
 
         $description = 'Booking '.$booking->reference;
         if (! empty($notes)) {

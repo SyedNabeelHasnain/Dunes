@@ -18,6 +18,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class AdminDashboardController extends Controller
 {
@@ -467,8 +468,9 @@ class AdminDashboardController extends Controller
 
         $ziina = app(ZiinaPaymentService::class);
 
-        $successUrl = route('booking.thankyou', ['pi' => '{PAYMENT_INTENT_ID}']);
-        $cancelUrl = route('booking.cancel', ['pi' => '{PAYMENT_INTENT_ID}']);
+        $paymentRef = 'QP-'.strtoupper(Str::random(10));
+        $successUrl = route('booking.thankyou', ['ref' => $paymentRef]);
+        $cancelUrl = route('booking.cancel', ['ref' => $paymentRef]);
         $fullDescription = $description ?: 'Quick Payment for '.$name;
 
         $intent = $ziina->createPaymentIntent($amount, 'AED', $successUrl, $cancelUrl, $fullDescription);
@@ -484,7 +486,7 @@ class AdminDashboardController extends Controller
             'currency' => 'AED',
             'status' => $intent['status'] ?? 'pending',
             'payment_url' => $intent['redirect_url'],
-            'notes' => $description,
+            'notes' => $paymentRef.($description ? ' - '.$description : ''),
             'customer_name' => $name,
             'customer_email' => $email,
             'customer_phone' => $phone,

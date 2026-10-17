@@ -475,9 +475,15 @@ class BookingController extends Controller
             }
 
             // Generate Ziina Payment Link
-            $successUrl = localized_route('booking.thankyou', ['pi' => '{PAYMENT_INTENT_ID}']);
-            $cancelUrl = localized_route('booking.cancel', ['pi' => '{PAYMENT_INTENT_ID}']);
+            $successUrl = localized_route('booking.thankyou', ['ref' => $booking->reference]);
+            $cancelUrl = localized_route('booking.cancel', ['ref' => $booking->reference]);
             $messageStr = 'Booking '.$booking->reference;
+
+            session([
+                'active_booking_draft_id' => $booking->id,
+                'active_booking_reference' => $booking->reference,
+                'last_booking_reference' => $booking->reference,
+            ]);
 
             $intent = $this->ziina->createPaymentIntent($payNow, 'AED', $successUrl, $cancelUrl, $messageStr);
 
@@ -543,33 +549,146 @@ class BookingController extends Controller
      */
     public function thankyou(Request $request)
     {
-        $pi = $request->input('pi', '');
-        $ref = $request->input('ref', '');
+        $pi = trim((string) $request->input('pi', ''));
+        $ref = trim((string) $request->input('ref', ''));
+
+        // Sanitize literal template placeholder if passed by gateway
+        if ($pi === '{PAYMENT_INTENT_ID}' || $pi === '%7BPAYMENT_INTENT_ID%7D') {
+            $pi = '';
+        }
+
+        // Session fallbacks for booking reference
+        if (empty($ref)) {
+            $ref = (string) session('active_booking_reference', '');
+            if (empty($ref)) {
+                $ref = (string) session('last_booking_reference', '');
+            }
+        }
+
+        if (empty($ref) && empty($pi)) {
+            $recentBooking = Booking::where('ip_address', $request->ip())
+                ->where('created_at', '>=', now()->subHours(2))
+                ->latest()
+                ->first();
+            if ($recentBooking) {
+                $ref = $recentBooking->reference;
+                if (! empty($recentBooking->ziina_payment_intent_id)) {
+                    $pi = $recentBooking->ziina_payment_intent_id;
+                }
+            }
+        }
+        if (empty($ref)) {
+            $ref = (string) session('last_booking_reference', '');
+        }
+        if (empty($ref) && session()->has('active_booking_draft_id')) {
+            $draftBooking = Booking::find(session('active_booking_draft_id'));
+            if ($draftBooking) {
+                $ref = $draftBooking->reference;
+            }
+        }
+
+        // IP-based fallback if client just completed online payment without ref or pi
+        if (empty($ref) && empty($pi)) {
+            $recentBooking = Booking::whereNotNull('ziina_payment_intent_id')
+                ->where('ip_address', $request->ip())
+                ->where('created_at', '>=', now()->subHours(3))
+                ->latest()
+                ->first();
+
+            if (! $recentBooking) {
+                $recentBooking = Booking::where('ip_address', $request->ip())
+                    ->where('created_at', '>=', now()->subHours(2))
+                    ->latest()
+                    ->first();
+            }
+
+            if ($recentBooking) {
+                $ref = $recentBooking->reference;
+                if (! empty($recentBooking->ziina_payment_intent_id)) {
+                    $pi = $recentBooking->ziina_payment_intent_id;
+                }
+            }
+        }
 
         $booking = null;
+        $paymentRecord = null;
         $paymentStatus = 'pending';
         $method = 'cash';
 
-        if (! empty($pi)) {
-            $paymentRecord = BookingPayment::where('payment_intent_id', $pi)->first();
-            if ($paymentRecord && $paymentRecord->booking_id) {
-                $booking = Booking::with(['addons'])->find($paymentRecord->booking_id);
+        // 1. Locate Booking by reference
+        if (! empty($ref)) {
+            $booking = Booking::with(['addons'])->where('reference', $ref)->first();
+            if ($booking) {
+                $method = $booking->payment_method;
+                if (empty($pi) && ! empty($booking->ziina_payment_intent_id)) {
+                    $pi = $booking->ziina_payment_intent_id;
+                }
+            }
+        }
+
+        // 2. Locate Booking or Payment Record by Payment Intent or Reference
+        if (! $booking && (! empty($pi) || ! empty($ref))) {
+            $paymentRecord = null;
+            if (! empty($pi)) {
+                $paymentRecord = BookingPayment::where('payment_intent_id', $pi)->first();
+            }
+            if (! $paymentRecord && ! empty($ref)) {
+                $paymentRecord = BookingPayment::where('notes', 'like', "{$ref}%")
+                    ->orWhere('payment_intent_id', $ref)
+                    ->first();
+            }
+
+            if ($paymentRecord) {
+                if ($paymentRecord->booking_id) {
+                    $booking = Booking::with(['addons'])->find($paymentRecord->booking_id);
+                }
+                if (empty($pi) && ! empty($paymentRecord->payment_intent_id)) {
+                    $pi = $paymentRecord->payment_intent_id;
+                }
+            }
+
+            if (! $booking && ! empty($pi)) {
+                $booking = Booking::with(['addons'])->where('ziina_payment_intent_id', $pi)->first();
             }
 
             if ($booking) {
                 $method = $booking->payment_method;
-                $intent = $this->ziina->fetchPaymentIntent($pi);
-                $intentStatus = $intent['status'] ?? '';
+            }
+        }
 
-                if ($intentStatus === 'completed') {
-                    $shouldNotify = false;
-                    $newStatus = 'paid';
+        // If booking was found, locate matching payment record
+        if ($booking && ! $paymentRecord && ! empty($pi)) {
+            $paymentRecord = BookingPayment::where('booking_id', $booking->id)
+                ->where('payment_intent_id', $pi)
+                ->first();
+        }
+        if ($booking && ! $paymentRecord) {
+            $paymentRecord = BookingPayment::where('booking_id', $booking->id)
+                ->latest()
+                ->first();
+        }
+
+        // 3. Process & verify payment with Ziina if payment intent exists
+        $intentId = ! empty($pi) ? $pi : ($booking?->ziina_payment_intent_id);
+
+        if (! empty($intentId)) {
+            $intent = $this->ziina->fetchPaymentIntent($intentId);
+            $intentStatus = $intent['status'] ?? '';
+
+            if ($intentStatus === 'completed') {
+                $shouldNotify = false;
+                $newStatus = 'paid';
+
+                if ($booking) {
+                    $method = $booking->payment_method;
 
                     DB::transaction(function () use (
-                        $booking, $paymentRecord, $intent, $intentStatus, $method, &$shouldNotify, &$newStatus
+                        $booking, $paymentRecord, $intent, $intentStatus, $method, &$shouldNotify, &$newStatus, $intentId
                     ) {
                         $lockedBooking = Booking::where('id', $booking->id)->lockForUpdate()->first();
-                        $lockedPayment = $paymentRecord ? BookingPayment::where('id', $paymentRecord->id)->lockForUpdate()->first() : null;
+                        $lockedPayment = $paymentRecord
+                            ? BookingPayment::where('id', $paymentRecord->id)->lockForUpdate()->first()
+                            : BookingPayment::where('booking_id', $lockedBooking->id)->where('payment_intent_id', $intentId)->lockForUpdate()->first();
 
                         $wasCompleted = ($lockedPayment && $lockedPayment->status === 'completed')
                             || ($lockedBooking && $lockedBooking->status === 'confirmed' && in_array($lockedBooking->payment_status, ['paid', 'partial']));
@@ -589,7 +708,7 @@ class BookingController extends Controller
                         $remBalance = max(0, (float) $lockedBooking->total - (float) $totalPaid);
                         $newStatus = ($remBalance <= 0) ? 'paid' : (($method === 'advance' || $totalPaid > 0) ? 'partial' : 'paid');
 
-                        if ($lockedBooking->payment_status !== $newStatus || $lockedBooking->balance_due != $remBalance) {
+                        if ($lockedBooking->payment_status !== $newStatus || $lockedBooking->balance_due != $remBalance || $lockedBooking->status !== 'confirmed') {
                             $lockedBooking->update([
                                 'payment_status' => $newStatus,
                                 'ziina_status' => $intentStatus,
@@ -631,71 +750,80 @@ class BookingController extends Controller
                             'custom_data' => $custom,
                         ]);
                     }
+
                     $paymentStatus = 'completed';
-                } elseif ($intentStatus === 'failed') {
-                    $alreadyCompleted = ($paymentRecord && $paymentRecord->status === 'completed') ||
-                                        ($booking && in_array($booking->payment_status, ['paid', 'partial']) && $booking->status === 'confirmed');
-                    if (! $alreadyCompleted) {
+                } elseif ($paymentRecord) {
+                    $paymentRecord->update(['status' => 'completed']);
+                    $paymentStatus = 'completed';
+                    $booking = (object) [
+                        'id' => null,
+                        'reference' => ! empty($ref) ? $ref : ('PAY-'.strtoupper(substr(preg_replace('/[^a-zA-Z0-9]/', '', $intentId), -8))),
+                        'tour_id' => 0,
+                        'tour_name' => 'Direct / Quick Payment',
+                        'tier_name' => 'Confirmed Payment',
+                        'name' => $paymentRecord->customer_name ?? 'Valued Guest',
+                        'email' => $paymentRecord->customer_email ?? null,
+                        'phone' => $paymentRecord->customer_phone ?? null,
+                        'status' => 'confirmed',
+                        'adults' => 1,
+                        'children' => 0,
+                        'infants' => 0,
+                        'tour_date' => null,
+                        'total' => (float) $paymentRecord->amount,
+                        'payment_amount' => (float) $paymentRecord->amount,
+                        'balance_due' => 0.00,
+                        'subtotal' => (float) $paymentRecord->amount,
+                        'addons_total' => 0.00,
+                        'coupon_code' => null,
+                        'discount_amount' => 0.00,
+                        'original_total' => (float) $paymentRecord->amount,
+                        'payment_method' => 'card',
+                        'payment_status' => 'completed',
+                    ];
+                    $method = 'card';
+                }
+            } elseif ($intentStatus === 'failed') {
+                $alreadyCompleted = ($paymentRecord && $paymentRecord->status === 'completed') ||
+                                    ($booking && in_array($booking->payment_status, ['paid', 'partial']) && $booking->status === 'confirmed');
+                if (! $alreadyCompleted && $booking) {
+                    $booking->update([
+                        'payment_status' => 'failed',
+                        'ziina_status' => $intentStatus,
+                    ]);
+
+                    if ($paymentRecord) {
+                        $paymentRecord->update(['status' => $intentStatus]);
+                    }
+                }
+                $paymentStatus = $alreadyCompleted ? 'completed' : 'failed';
+            } else {
+                $alreadyCompleted = ($paymentRecord && $paymentRecord->status === 'completed') ||
+                                    ($booking && in_array($booking->payment_status, ['paid', 'partial']) && $booking->status === 'confirmed');
+                if ($alreadyCompleted) {
+                    $paymentStatus = 'completed';
+                } else {
+                    if (! empty($intentStatus) && $booking) {
                         $booking->update([
-                            'payment_status' => 'failed',
                             'ziina_status' => $intentStatus,
                         ]);
 
-                        BookingPayment::where('payment_intent_id', $pi)->update([
-                            'status' => $intentStatus,
-                        ]);
-                    }
-                    $paymentStatus = $alreadyCompleted ? 'completed' : 'failed';
-                } else {
-                    $alreadyCompleted = ($paymentRecord && $paymentRecord->status === 'completed') ||
-                                        ($booking && in_array($booking->payment_status, ['paid', 'partial']) && $booking->status === 'confirmed');
-                    if ($alreadyCompleted) {
-                        $paymentStatus = 'completed';
-                    } else {
-                        if (! empty($intentStatus)) {
-                            $booking->update([
-                                'ziina_status' => $intentStatus,
-                            ]);
-
-                            BookingPayment::where('payment_intent_id', $pi)->update([
-                                'status' => $intentStatus,
-                            ]);
+                        if ($paymentRecord) {
+                            $paymentRecord->update(['status' => $intentStatus]);
                         }
-                        $paymentStatus = 'pending';
                     }
+                    $paymentStatus = 'pending';
                 }
-            } elseif (! $booking && $paymentRecord) {
-                $intent = $this->ziina->fetchPaymentIntent($pi);
-                $intentStatus = $intent['status'] ?? '';
-                if ($intentStatus === 'completed') {
-                    $paymentRecord->update(['status' => 'completed']);
-                    $paymentStatus = 'completed';
-                } else {
-                    $paymentStatus = $intentStatus;
-                }
-                $booking = (object) [
-                    'reference' => 'PAY-'.strtoupper(substr(preg_replace('/[^a-zA-Z0-9]/', '', $pi), -8)),
-                    'tour_name' => 'Direct / Quick Payment',
-                    'tier_name' => 'Confirmed Payment',
-                    'adults' => 1,
-                    'children' => 0,
-                    'infants' => 0,
-                    'tour_date' => null,
-                    'total' => (float) $paymentRecord->amount,
-                    'payment_amount' => (float) $paymentRecord->amount,
-                    'balance_due' => 0.00,
-                    'subtotal' => (float) $paymentRecord->amount,
-                    'addons_total' => 0.00,
-                    'payment_method' => 'card',
-                    'payment_status' => $paymentStatus ?: 'completed',
-                ];
-                $method = 'card';
             }
-        } elseif (! empty($ref)) {
-            $booking = Booking::where('reference', $ref)->first();
-            if ($booking) {
-                $method = $booking->payment_method;
+        } elseif ($booking) {
+            $method = $booking->payment_method ?: 'cash';
+            if ($method === 'cash' || in_array($booking->payment_status, ['paid', 'partial'])) {
+                $paymentStatus = 'completed';
             }
+        }
+
+        // Clean redirect if landing on placeholder URL or missing reference in query string
+        if ($booking && is_object($booking) && isset($booking->reference) && (! $request->filled('ref') || $request->input('pi') === '{PAYMENT_INTENT_ID}' || $request->input('pi') === '%7BPAYMENT_INTENT_ID%7D')) {
+            return redirect()->to(localized_route('booking.thankyou', ['ref' => $booking->reference]));
         }
 
         $pageRobots = 'noindex, nofollow';
@@ -708,46 +836,67 @@ class BookingController extends Controller
      */
     public function paymentCancel(Request $request)
     {
-        $pi = $request->input('pi', '');
+        $pi = trim((string) $request->input('pi', ''));
+        $ref = trim((string) $request->input('ref', ''));
+
+        if ($pi === '{PAYMENT_INTENT_ID}' || $pi === '%7BPAYMENT_INTENT_ID%7D') {
+            $pi = '';
+        }
+
+        if (empty($ref)) {
+            $ref = (string) session('active_booking_reference', '');
+        }
+
         $booking = null;
-
-        if (! empty($pi)) {
+        if (! empty($ref)) {
+            $booking = Booking::where('reference', $ref)->first();
+        }
+        if (! $booking && ! empty($pi)) {
             $booking = Booking::where('ziina_payment_intent_id', $pi)->first();
+        }
 
-            // Only allow cancellation if booking exists and is not already confirmed/paid
-            if ($booking && in_array($booking->status, ['pending', 'draft']) && ! in_array($booking->payment_status, ['paid', 'completed'])) {
-                $ziinaData = $this->ziina->fetchPaymentIntent($pi);
+        if ($booking && in_array($booking->status, ['pending', 'draft']) && ! in_array($booking->payment_status, ['paid', 'completed'])) {
+            $gatewayStatus = 'cancelled';
+            $intentId = $pi ?: $booking->ziina_payment_intent_id;
+            if (! empty($intentId)) {
+                $ziinaData = $this->ziina->fetchPaymentIntent($intentId);
                 $gatewayStatus = $ziinaData['status'] ?? 'cancelled';
+            }
 
-                // Do not cancel if the payment was actually completed
-                if ($gatewayStatus !== 'completed') {
-                    // Release any coupon reservation if present
-                    if ($booking->coupon_id) {
-                        try {
-                            $usage = CouponUsage::where('booking_id', $booking->id)->first();
-                            if ($usage) {
-                                $coupon = Coupon::find($booking->coupon_id);
-                                if ($coupon && $coupon->used_count > 0) {
-                                    $coupon->decrement('used_count');
-                                }
-                                $usage->delete();
+            // Do not cancel if the payment was actually completed
+            if ($gatewayStatus !== 'completed') {
+                // Release any coupon reservation if present
+                if ($booking->coupon_id) {
+                    try {
+                        $usage = CouponUsage::where('booking_id', $booking->id)->first();
+                        if ($usage) {
+                            $coupon = Coupon::find($booking->coupon_id);
+                            if ($coupon && $coupon->used_count > 0) {
+                                $coupon->decrement('used_count');
                             }
-                        } catch (\Throwable $e) {
-                            Log::error('Failed to release coupon on cancellation: '.$e->getMessage());
+                            $usage->delete();
                         }
+                    } catch (\Throwable $e) {
+                        Log::error('Failed to release coupon on cancellation: '.$e->getMessage());
                     }
+                }
 
-                    $booking->update([
-                        'status' => 'cancelled',
-                        'payment_status' => 'cancelled',
-                        'ziina_status' => 'cancelled',
-                    ]);
+                $booking->update([
+                    'status' => 'cancelled',
+                    'payment_status' => 'cancelled',
+                    'ziina_status' => 'cancelled',
+                ]);
 
-                    BookingPayment::where('payment_intent_id', $pi)->update([
+                if (! empty($intentId)) {
+                    BookingPayment::where('payment_intent_id', $intentId)->update([
                         'status' => 'cancelled',
                     ]);
                 }
             }
+        }
+
+        if ($booking && (! $request->filled('ref') || $request->input('pi') === '{PAYMENT_INTENT_ID}' || $request->input('pi') === '%7BPAYMENT_INTENT_ID%7D')) {
+            return redirect()->to(localized_route('booking.cancel', ['ref' => $booking->reference]));
         }
 
         $pageRobots = 'noindex, nofollow';
@@ -1067,9 +1216,15 @@ class BookingController extends Controller
             return redirect()->back()->with('error', 'Minimum online payment amount is AED 0.50');
         }
 
-        $successUrl = localized_route('booking.thankyou', ['pi' => '{PAYMENT_INTENT_ID}']);
-        $cancelUrl = localized_route('booking.cancel', ['pi' => '{PAYMENT_INTENT_ID}']);
+        $successUrl = localized_route('booking.thankyou', ['ref' => $booking->reference]);
+        $cancelUrl = localized_route('booking.cancel', ['ref' => $booking->reference]);
         $messageStr = 'Booking '.$booking->reference;
+
+        session([
+            'active_booking_draft_id' => $booking->id,
+            'active_booking_reference' => $booking->reference,
+            'last_booking_reference' => $booking->reference,
+        ]);
 
         $intent = $this->ziina->createPaymentIntent($payNow, 'AED', $successUrl, $cancelUrl, $messageStr);
 

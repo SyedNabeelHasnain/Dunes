@@ -14,6 +14,7 @@ use App\Models\Setting;
 use App\Models\Tour;
 use App\Models\User;
 use App\Models\WhatsappInquiry;
+use App\Services\ZiinaPaymentService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
@@ -1293,5 +1294,168 @@ class BookingEngineTest extends TestCase
         $this->assertStringContainsString('Vegetarian meal requested', $booking->special_requests);
         $this->assertStringContainsString('[RECOVERED_CHECKOUT:', $booking->special_requests);
     }
-}
 
+    /**
+     * Test thankyou recovers booking from payment intent placeholder and confirms via Ziina.
+     */
+    public function test_thankyou_recovers_booking_from_payment_intent_placeholder_and_confirms_via_ziina(): void
+    {
+        Mail::fake();
+
+        $this->mock(ZiinaPaymentService::class, function ($mock) {
+            $mock->shouldReceive('fetchPaymentIntent')
+                ->with('pi_test_live_placeholder')
+                ->andReturn([
+                    'id' => 'pi_test_live_placeholder',
+                    'status' => 'completed',
+                    'amount' => 35000,
+                    'currency' => 'AED',
+                ]);
+        });
+
+        $booking = Booking::create([
+            'reference' => 'DFT261017BZFOH',
+            'tour_name' => 'Premium Evening Desert Safari',
+            'tour_date' => now()->addDays(2)->toDateString(),
+            'status' => 'pending',
+            'payment_status' => 'unpaid',
+            'payment_method' => 'card',
+            'subtotal' => 350.00,
+            'total' => 350.00,
+            'balance_due' => 350.00,
+            'payment_amount' => 0.00,
+            'adults' => 2,
+            'name' => 'Syed Real Payer',
+            'email' => 'payer@example.com',
+            'phone' => '+971501234567',
+            'ziina_payment_intent_id' => 'pi_test_live_placeholder',
+        ]);
+
+        BookingPayment::create([
+            'booking_id' => $booking->id,
+            'payment_intent_id' => 'pi_test_live_placeholder',
+            'amount' => 350.00,
+            'currency' => 'AED',
+            'status' => 'pending',
+        ]);
+
+        // Simulating the user landing on ?pi=%7BPAYMENT_INTENT_ID%7D with active session
+        $response = $this->withSession([
+            'active_booking_reference' => 'DFT261017BZFOH',
+            'active_booking_draft_id' => $booking->id,
+        ])->get('/thankyou?pi=%7BPAYMENT_INTENT_ID%7D');
+
+        // It should sanitize the placeholder and redirect cleanly to /thankyou?ref=DFT261017BZFOH
+        $response->assertStatus(302);
+        $response->assertRedirect(localized_route('booking.thankyou', ['ref' => 'DFT261017BZFOH']));
+
+        $booking->refresh();
+        $this->assertEquals('confirmed', $booking->status);
+        $this->assertEquals('paid', $booking->payment_status);
+        $this->assertEquals(0.00, (float) $booking->balance_due);
+        $this->assertEquals(350.00, (float) $booking->payment_amount);
+
+        // Following the redirect renders the Thank You page with confirmed details
+        $followResponse = $this->get(localized_route('booking.thankyou', ['ref' => 'DFT261017BZFOH']));
+        $followResponse->assertStatus(200);
+        $followResponse->assertSee('DFT261017BZFOH');
+        $followResponse->assertSee('Syed Real Payer');
+        $followResponse->assertDontSee('Booking Not Found');
+    }
+
+    /**
+     * Test thankyou recovers booking via IP address when session is missing.
+     */
+    public function test_thankyou_recovers_booking_via_ip_when_session_is_missing(): void
+    {
+        Mail::fake();
+
+        $this->mock(ZiinaPaymentService::class, function ($mock) {
+            $mock->shouldReceive('fetchPaymentIntent')
+                ->with('pi_test_ip_recover')
+                ->andReturn([
+                    'id' => 'pi_test_ip_recover',
+                    'status' => 'completed',
+                    'amount' => 45000,
+                    'currency' => 'AED',
+                ]);
+        });
+
+        $booking = Booking::create([
+            'reference' => 'DFTIPRECOVER777',
+            'tour_name' => 'VIP Desert Safari',
+            'tour_date' => now()->addDays(1)->toDateString(),
+            'status' => 'pending',
+            'payment_status' => 'unpaid',
+            'payment_method' => 'card',
+            'subtotal' => 450.00,
+            'total' => 450.00,
+            'balance_due' => 450.00,
+            'payment_amount' => 0.00,
+            'adults' => 2,
+            'name' => 'IP Fallback Guest',
+            'email' => 'ipguest@example.com',
+            'phone' => '+971509998811',
+            'ip_address' => '192.0.2.100',
+            'ziina_payment_intent_id' => 'pi_test_ip_recover',
+        ]);
+
+        BookingPayment::create([
+            'booking_id' => $booking->id,
+            'payment_intent_id' => 'pi_test_ip_recover',
+            'amount' => 450.00,
+            'currency' => 'AED',
+            'status' => 'pending',
+        ]);
+
+        // Simulating the user landing on ?pi=%7BPAYMENT_INTENT_ID%7D with stripped session but matching IP
+        $response = $this->withServerVariables(['REMOTE_ADDR' => '192.0.2.100'])
+            ->get('/thankyou?pi=%7BPAYMENT_INTENT_ID%7D');
+
+        $response->assertStatus(302);
+        $response->assertRedirect(localized_route('booking.thankyou', ['ref' => 'DFTIPRECOVER777']));
+
+        $booking->refresh();
+        $this->assertEquals('confirmed', $booking->status);
+        $this->assertEquals('paid', $booking->payment_status);
+        $this->assertEquals(0.00, (float) $booking->balance_due);
+    }
+
+    /**
+     * Test thankyou recovers quick payment by reference.
+     */
+    public function test_thankyou_recovers_quick_payment_by_reference(): void
+    {
+        $this->mock(ZiinaPaymentService::class, function ($mock) {
+            $mock->shouldReceive('fetchPaymentIntent')
+                ->with('pi_quick_payment_test')
+                ->andReturn([
+                    'id' => 'pi_quick_payment_test',
+                    'status' => 'completed',
+                    'amount' => 60000,
+                    'currency' => 'AED',
+                ]);
+        });
+
+        $payment = BookingPayment::create([
+            'booking_id' => null,
+            'payment_intent_id' => 'pi_quick_payment_test',
+            'amount' => 600.00,
+            'currency' => 'AED',
+            'status' => 'pending',
+            'notes' => 'QP-TESTABC123 - Custom VIP Experience',
+            'customer_name' => 'Direct Payer',
+            'customer_email' => 'direct@example.com',
+        ]);
+
+        $response = $this->get(localized_route('booking.thankyou', ['ref' => 'QP-TESTABC123']));
+        $response->assertStatus(200);
+        $response->assertSee('QP-TESTABC123');
+        $response->assertSee('Direct / Quick Payment');
+        $response->assertSee('Payment Successful');
+        $response->assertDontSee('Booking Not Found');
+
+        $payment->refresh();
+        $this->assertEquals('completed', $payment->status);
+    }
+}

@@ -15,7 +15,7 @@
 
     // Strict booking verification: must be a verified booking that is confirmed, completed, or cash-on-arrival
     $isBookingConfirmed = $booking &&
-        in_array($booking->status, ['confirmed', 'completed', 'pending']) &&
+        in_array($booking->status ?? 'confirmed', ['confirmed', 'completed', 'pending']) &&
         ($paymentStatus === 'completed' || $method === 'cash' || in_array($booking->payment_status ?? '', ['paid', 'partial']));
 @endphp
 
@@ -119,12 +119,14 @@
                 @php
                     $title = 'Booking Received';
                     $subtitle = 'We have received your booking request.';
-                    if($method === 'advance' && $paymentStatus === 'completed'){
-                        $title = 'Advance Payment Received';
-                        $subtitle = 'Your booking slot is held and confirmed for your selected date.';
-                    } elseif($method === 'full' && $paymentStatus === 'completed'){
-                        $title = 'Payment Successful';
-                        $subtitle = 'Your booking is confirmed.';
+                    if($paymentStatus === 'completed'){
+                        if ($method === 'advance') {
+                            $title = 'Advance Payment Received';
+                            $subtitle = 'Your booking slot is held and confirmed for your selected date.';
+                        } else {
+                            $title = 'Payment Successful';
+                            $subtitle = 'Your booking is confirmed.';
+                        }
                     } elseif($method !== 'cash' && $paymentStatus === 'pending'){
                         $title = 'Payment Processing';
                         $subtitle = 'We are verifying your payment status.';
@@ -148,6 +150,12 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Left: Tour Details -->
                     <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3.5">
+                        @if(!empty($booking->name))
+                        <div>
+                            <div class="text-slate-500 text-xs font-bold uppercase tracking-wider">Lead Guest</div>
+                            <div class="font-semibold text-slate-800 text-sm sm:text-base">{{ $booking->name }}</div>
+                        </div>
+                        @endif
                         <div>
                             <div class="text-slate-500 text-xs font-bold uppercase tracking-wider">Reference</div>
                             <div class="font-extrabold text-slate-900 text-lg sm:text-xl font-mono">#{{ $booking->reference }}</div>
