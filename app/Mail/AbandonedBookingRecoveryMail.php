@@ -4,13 +4,12 @@ namespace App\Mail;
 
 use App\Models\Booking;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class AbandonedBookingRecoveryMail extends Mailable implements ShouldQueue
+class AbandonedBookingRecoveryMail extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -22,12 +21,18 @@ class AbandonedBookingRecoveryMail extends Mailable implements ShouldQueue
 
     public string $whatsappUrl;
 
+    public ?string $customSubject;
+
+    public ?string $customMessage;
+
     /**
      * Create a new message instance.
      */
-    public function __construct(Booking $booking)
+    public function __construct(Booking $booking, ?string $customSubject = null, ?string $customMessage = null)
     {
         $this->booking = $booking;
+        $this->customSubject = $customSubject;
+        $this->customMessage = $customMessage;
 
         // If booking already has a direct payment redirect url (Ziina), use it; otherwise link to online checkout
         $this->recoveryUrl = $booking->ziina_redirect_url ?: url("/?ref={$booking->reference}&action=checkout");
@@ -43,7 +48,7 @@ class AbandonedBookingRecoveryMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "Complete Your Dubai Desert Safari Reservation - Ref: #{$this->booking->reference}"
+            subject: $this->customSubject ?: "Complete Your Dubai Desert Safari Reservation - Ref: #{$this->booking->reference}"
         );
     }
 
@@ -54,6 +59,9 @@ class AbandonedBookingRecoveryMail extends Mailable implements ShouldQueue
     {
         return new Content(
             view: 'emails.abandoned-booking',
+            with: [
+                'customMessage' => $this->customMessage,
+            ],
         );
     }
 }

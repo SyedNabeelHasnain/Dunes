@@ -170,6 +170,7 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::get('/bookings/drafts', [AdminBookingController::class, 'drafts'])->name('bookings.drafts');
     Route::get('/bookings/drafts/export', [AdminBookingController::class, 'exportDraftsCsv'])->name('bookings.drafts.export');
     Route::post('/bookings/drafts/{id}/convert', [AdminBookingController::class, 'convertDraft'])->name('bookings.drafts.convert');
+    Route::get('/bookings/drafts/{id}/preview-recovery', [AdminBookingController::class, 'previewDraftRecovery'])->name('bookings.drafts.preview-recovery');
     Route::post('/bookings/drafts/{id}/send-recovery', [AdminBookingController::class, 'sendDraftRecovery'])->name('bookings.drafts.send-recovery');
     Route::delete('/bookings/drafts/{id}', [AdminBookingController::class, 'destroyDraft'])->name('bookings.drafts.destroy');
     Route::post('/bookings/drafts/bulk-action', [AdminBookingController::class, 'bulkDraftsAction'])->name('bookings.drafts.bulk');

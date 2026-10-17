@@ -415,6 +415,120 @@
         </div>
     </div>
 </div>
+
+<!-- Review & Send Recovery Email Modal -->
+<div id="reviewRecoveryModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-xs hidden">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <!-- Header -->
+        <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/80 shrink-0">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center text-lg font-bold shrink-0">
+                    <i class="bi bi-envelope-paper-heart-fill"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm sm:text-base font-extrabold text-slate-900 leading-tight">Review & Send Recovery Email</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">
+                        Draft <span id="recoveryDraftRef" class="font-mono font-bold text-slate-800"></span> &bull; <span id="recoveryGuestName" class="font-semibold text-slate-700"></span>
+                    </p>
+                </div>
+            </div>
+            <button type="button" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition close-recovery-modal">
+                <i class="bi bi-x-lg text-sm"></i>
+            </button>
+        </div>
+
+        <!-- Body / Content -->
+        <div class="p-5 overflow-y-auto space-y-4 flex-1">
+            <!-- Loading State -->
+            <div id="recoveryModalLoading" class="py-12 flex flex-col items-center justify-center space-y-3">
+                <span class="inline-block animate-spin w-8 h-8 border-3 border-purple-600 border-t-transparent rounded-full"></span>
+                <span class="text-xs font-bold text-slate-500">Generating live email preview & cart details...</span>
+            </div>
+
+            <!-- Content Container -->
+            <div id="recoveryModalBody" class="space-y-4 hidden">
+                <!-- Cart Quick Summary Banner -->
+                <div class="p-3 rounded-xl bg-purple-50/60 border border-purple-100 flex items-center justify-between gap-3 flex-wrap text-xs">
+                    <div>
+                        <div class="font-bold text-slate-900" id="recoveryTourTitle">-</div>
+                        <div class="text-[11px] text-slate-500 mt-0.5" id="recoveryTourMeta">-</div>
+                    </div>
+                    <div class="text-end">
+                        <div class="text-[10px] uppercase font-bold text-purple-700 tracking-wider">Cart Total</div>
+                        <div class="font-mono font-extrabold text-sm text-slate-900" id="recoveryCartTotal">AED 0.00</div>
+                    </div>
+                </div>
+
+                <!-- Recipient & Subject Form Fields -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label for="recoveryRecipientEmail" class="block text-xs font-bold uppercase text-slate-600 tracking-wider mb-1">
+                            Recipient Email <span class="text-rose-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 text-xs">
+                                <i class="bi bi-envelope"></i>
+                            </span>
+                            <input type="email" id="recoveryRecipientEmail" class="w-full pl-8 pr-3 py-2 text-xs rounded-xl border border-slate-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-hidden font-medium text-slate-800" required>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="recoverySubject" class="block text-xs font-bold uppercase text-slate-600 tracking-wider mb-1">
+                            Subject Line <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="text" id="recoverySubject" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-hidden font-medium text-slate-800" required>
+                    </div>
+                </div>
+
+                <!-- Preview Mode Tabs -->
+                <div class="border-b border-slate-200 flex items-center gap-4 text-xs font-bold">
+                    <button type="button" id="tabLivePreviewBtn" class="py-2 border-b-2 border-purple-600 text-purple-700 transition flex items-center gap-1.5 cursor-pointer">
+                        <i class="bi bi-eye-fill"></i> Live Rendered Email
+                    </button>
+                    <button type="button" id="tabCustomMessageBtn" class="py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-1.5 cursor-pointer">
+                        <i class="bi bi-pencil-square"></i> Customize Message
+                    </button>
+                </div>
+
+                <!-- Tab 1: Live Rendered Iframe -->
+                <div id="tabLivePreviewContainer" class="rounded-xl border border-slate-200 overflow-hidden bg-slate-100 shadow-inner">
+                    <div class="bg-slate-200/70 px-3 py-1.5 text-[11px] font-mono text-slate-600 flex items-center justify-between border-b border-slate-200">
+                        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> HTML Email Preview (Responsive)</span>
+                        <span class="text-[10px] text-slate-400">Direct SMTP Delivery</span>
+                    </div>
+                    <iframe id="recoveryEmailIframe" class="w-full h-80 border-0 bg-white" sandbox="allow-same-origin"></iframe>
+                </div>
+
+                <!-- Tab 2: Customize Message Textarea -->
+                <div id="tabCustomMessageContainer" class="space-y-2 hidden">
+                    <label for="recoveryCustomMessage" class="block text-xs font-bold uppercase text-slate-600 tracking-wider">
+                        Personalized Introduction / Note (Optional)
+                    </label>
+                    <textarea id="recoveryCustomMessage" rows="5" class="w-full px-3 py-2.5 text-xs rounded-xl border border-slate-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-hidden font-normal text-slate-800 leading-relaxed" placeholder="Write a customized message to this prospective guest, offering special assistance, answering queries, or offering an exclusive coupon..."></textarea>
+                    <p class="text-[11px] text-slate-400">
+                        When provided, this message will replace the standard opening greeting while retaining the full reservation summary, recovery link, and WhatsApp concierge buttons.
+                    </p>
+                </div>
+
+                <!-- Direct Delivery Notice -->
+                <div class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 text-[11px] text-slate-600">
+                    <i class="bi bi-shield-check text-emerald-600 text-sm"></i>
+                    <span>This email will be delivered immediately through your configured SMTP mail server with genuine bounce & delivery tracking.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="px-5 py-3.5 border-t border-slate-100 bg-slate-50 flex items-center justify-between gap-2 shrink-0">
+            <button type="button" class="px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-600 text-xs font-bold transition close-recovery-modal">
+                Cancel
+            </button>
+            <button type="button" id="confirmSendRecoveryBtn" class="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50">
+                <i class="bi bi-send-fill text-xs"></i> <span>Send Recovery Email Now</span>
+            </button>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -461,18 +575,219 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    const showAdminToast = (message, icon = 'success') => {
+        if (window.Swal) {
+            window.Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: icon,
+                title: message,
+                showConfirmButton: false,
+                timer: 4000,
+                timerProgressBar: true
+            });
+        } else if (window.adminToast) {
+            window.adminToast(message, icon);
+        } else {
+            alert(message);
+        }
+    };
+
     // Bulk Delete Action
     document.querySelectorAll('.drafts-bulk-action').forEach(btn => {
         btn.addEventListener('click', async function() {
             const selected = Array.from(rowCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
             if (!selected.length) return;
 
-            if (!confirm(`Are you sure you want to permanently discard ${selected.length} selected draft(s)?`)) {
+            const executeBulk = async () => {
+                try {
+                    const res = await fetch("{{ route('admin.bookings.drafts.bulk') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            ids: selected,
+                            action: 'delete'
+                        })
+                    });
+
+                    const data = await res.json();
+                    if (data.success) {
+                        selected.forEach(id => {
+                            const row = document.getElementById(`draft-row-${id}`);
+                            if (row) row.remove();
+                        });
+                        bulkBar.style.display = 'none';
+                        showAdminToast(data.message, 'success');
+                    } else {
+                        if (window.Swal) {
+                            window.Swal.fire({ icon: 'error', title: 'Bulk Action Failed', text: data.message || 'Operation failed.' });
+                        } else {
+                            alert(data.message || 'Bulk action failed.');
+                        }
+                    }
+                } catch (err) {
+                    if (window.Swal) {
+                        window.Swal.fire({ icon: 'error', title: 'Network Error', text: 'An error occurred while executing bulk action.' });
+                    } else {
+                        alert('An error occurred while executing bulk action.');
+                    }
+                }
+            };
+
+            if (window.Swal) {
+                window.Swal.fire({
+                    title: 'Discard Selected Drafts?',
+                    text: `Are you sure you want to permanently discard ${selected.length} selected checkout draft(s)? This action cannot be undone.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: `Yes, discard ${selected.length} drafts`,
+                    cancelButtonText: 'Cancel'
+                }).then(result => {
+                    if (result.isConfirmed) executeBulk();
+                });
+            } else {
+                if (confirm(`Are you sure you want to permanently discard ${selected.length} selected draft(s)?`)) {
+                    executeBulk();
+                }
+            }
+        });
+    });
+
+    // 2. Review & Send Recovery Email Hub
+    const reviewModal = document.getElementById('reviewRecoveryModal');
+    const modalLoading = document.getElementById('recoveryModalLoading');
+    const modalBody = document.getElementById('recoveryModalBody');
+    const draftRefSpan = document.getElementById('recoveryDraftRef');
+    const guestNameSpan = document.getElementById('recoveryGuestName');
+    const tourTitleEl = document.getElementById('recoveryTourTitle');
+    const tourMetaEl = document.getElementById('recoveryTourMeta');
+    const cartTotalEl = document.getElementById('recoveryCartTotal');
+    const recipientEmailInput = document.getElementById('recoveryRecipientEmail');
+    const subjectInput = document.getElementById('recoverySubject');
+    const customMessageInput = document.getElementById('recoveryCustomMessage');
+    const emailIframe = document.getElementById('recoveryEmailIframe');
+    const tabLivePreviewBtn = document.getElementById('tabLivePreviewBtn');
+    const tabCustomMessageBtn = document.getElementById('tabCustomMessageBtn');
+    const tabLivePreviewContainer = document.getElementById('tabLivePreviewContainer');
+    const tabCustomMessageContainer = document.getElementById('tabCustomMessageContainer');
+    const confirmSendBtn = document.getElementById('confirmSendRecoveryBtn');
+    let activeRecoveryDraftId = null;
+
+    const closeRecoveryModal = () => {
+        if (reviewModal) reviewModal.classList.add('hidden');
+        activeRecoveryDraftId = null;
+    };
+
+    document.querySelectorAll('.close-recovery-modal').forEach(btn => {
+        btn.addEventListener('click', closeRecoveryModal);
+    });
+
+    if (reviewModal) {
+        reviewModal.addEventListener('click', e => {
+            if (e.target === reviewModal) closeRecoveryModal();
+        });
+    }
+
+    if (tabLivePreviewBtn && tabCustomMessageBtn) {
+        tabLivePreviewBtn.addEventListener('click', () => {
+            tabLivePreviewBtn.className = 'py-2 border-b-2 border-purple-600 text-purple-700 transition flex items-center gap-1.5 cursor-pointer';
+            tabCustomMessageBtn.className = 'py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-1.5 cursor-pointer';
+            tabLivePreviewContainer.classList.remove('hidden');
+            tabCustomMessageContainer.classList.add('hidden');
+        });
+
+        tabCustomMessageBtn.addEventListener('click', () => {
+            tabCustomMessageBtn.className = 'py-2 border-b-2 border-purple-600 text-purple-700 transition flex items-center gap-1.5 cursor-pointer';
+            tabLivePreviewBtn.className = 'py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-1.5 cursor-pointer';
+            tabCustomMessageContainer.classList.remove('hidden');
+            tabLivePreviewContainer.classList.add('hidden');
+        });
+    }
+
+    document.querySelectorAll('.btn-send-recovery').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const id = this.dataset.id;
+            activeRecoveryDraftId = id;
+
+            if (reviewModal) reviewModal.classList.remove('hidden');
+            if (modalLoading) modalLoading.classList.remove('hidden');
+            if (modalBody) modalBody.classList.add('hidden');
+
+            try {
+                const res = await fetch(`/admin/bookings/drafts/${id}/preview-recovery`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+                const data = await res.json();
+
+                if (data.success && data.draft) {
+                    const d = data.draft;
+                    if (draftRefSpan) draftRefSpan.textContent = '#' + d.reference;
+                    if (guestNameSpan) guestNameSpan.textContent = d.name;
+                    if (tourTitleEl) tourTitleEl.textContent = d.tour_name || 'Desert Safari Tour';
+                    if (tourMetaEl) tourMetaEl.textContent = `${d.tier_name ? d.tier_name + ' • ' : ''}${d.tour_date} • ${d.email}`;
+                    if (cartTotalEl) cartTotalEl.textContent = 'AED ' + d.total;
+
+                    if (recipientEmailInput) recipientEmailInput.value = d.email || '';
+                    if (subjectInput) subjectInput.value = data.subject || `Complete Your Dubai Desert Safari Reservation - Ref: #${d.reference}`;
+                    if (customMessageInput) customMessageInput.value = '';
+
+                    if (emailIframe) {
+                        emailIframe.srcdoc = data.html || '';
+                    }
+
+                    if (modalLoading) modalLoading.classList.add('hidden');
+                    if (modalBody) modalBody.classList.remove('hidden');
+                } else {
+                    closeRecoveryModal();
+                    if (window.Swal) {
+                        window.Swal.fire({ icon: 'error', title: 'Preview Failed', text: data.message || 'Could not load recovery draft.' });
+                    } else {
+                        alert(data.message || 'Could not load recovery draft.');
+                    }
+                }
+            } catch (err) {
+                closeRecoveryModal();
+                if (window.Swal) {
+                    window.Swal.fire({ icon: 'error', title: 'Network Error', text: 'Failed to load draft preview from server.' });
+                } else {
+                    alert('Failed to load draft preview from server.');
+                }
+            }
+        });
+    });
+
+    if (confirmSendBtn) {
+        confirmSendBtn.addEventListener('click', async function() {
+            if (!activeRecoveryDraftId) return;
+
+            const toEmail = recipientEmailInput?.value?.trim() || '';
+            const subject = subjectInput?.value?.trim() || '';
+            const customMessage = customMessageInput?.value?.trim() || '';
+
+            if (!toEmail || !toEmail.includes('@')) {
+                recipientEmailInput?.focus();
+                showAdminToast('Please provide a valid recipient email address.', 'error');
                 return;
             }
 
+            if (!subject) {
+                subjectInput?.focus();
+                showAdminToast('Please provide an email subject line.', 'error');
+                return;
+            }
+
+            const origHtml = confirmSendBtn.innerHTML;
+            confirmSendBtn.disabled = true;
+            confirmSendBtn.innerHTML = '<span class="inline-block animate-spin w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full me-1.5"></span> Dispatching via SMTP...';
+
             try {
-                const res = await fetch("{{ route('admin.bookings.drafts.bulk') }}", {
+                const res = await fetch(`/admin/bookings/drafts/${activeRecoveryDraftId}/send-recovery`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -480,75 +795,61 @@ document.addEventListener('DOMContentLoaded', function() {
                         'Accept': 'application/json'
                     },
                     body: JSON.stringify({
-                        ids: selected,
-                        action: 'delete'
+                        to_email: toEmail,
+                        subject: subject,
+                        custom_message: customMessage
                     })
                 });
 
                 const data = await res.json();
                 if (data.success) {
-                    selected.forEach(id => {
-                        const row = document.getElementById(`draft-row-${id}`);
-                        if (row) row.remove();
+                    const sentDraftId = activeRecoveryDraftId;
+                    closeRecoveryModal();
+                    showAdminToast(data.message || 'Recovery email dispatched via SMTP successfully!', 'success');
+
+                    const draftRow = document.getElementById(`draft-row-${sentDraftId}`);
+                    if (draftRow) {
+                        const recBtn = draftRow.querySelector('.btn-send-recovery');
+                        if (recBtn) {
+                            recBtn.classList.remove('bg-purple-50', 'text-purple-600', 'border-purple-300');
+                            recBtn.classList.add('bg-emerald-50', 'text-emerald-700', 'border-emerald-300');
+                            recBtn.title = 'Recovery Email Dispatched via SMTP';
+                        }
+                        const profileTd = draftRow.querySelector('td:nth-child(3)');
+                        if (profileTd && !profileTd.querySelector('.badge-recovery-sent')) {
+                            const badge = document.createElement('div');
+                            badge.className = 'badge-recovery-sent mt-1 inline-flex items-center gap-1 px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-purple-100 text-purple-800';
+                            badge.innerHTML = '<i class="bi bi-check-all"></i> Recovery Sent Just Now';
+                            profileTd.appendChild(badge);
+                        }
+                    }
+                } else {
+                    if (window.Swal) {
+                        window.Swal.fire({
+                            icon: 'error',
+                            title: 'Dispatch Failed',
+                            text: data.message || 'Failed to dispatch recovery email over SMTP.'
+                        });
+                    } else {
+                        alert(data.message || 'Failed to dispatch recovery email over SMTP.');
+                    }
+                }
+            } catch (err) {
+                if (window.Swal) {
+                    window.Swal.fire({
+                        icon: 'error',
+                        title: 'Network / Mail Server Error',
+                        text: 'An error occurred while connecting to the mail server. Please verify SMTP settings.'
                     });
-                    bulkBar.style.display = 'none';
-                    if (window.adminToast) {
-                        window.adminToast(data.message, 'success');
-                    } else {
-                        alert(data.message);
-                    }
                 } else {
-                    alert(data.message || 'Bulk action failed.');
+                    alert('Network error while dispatching recovery email.');
                 }
-            } catch (err) {
-                alert('An error occurred while executing bulk action.');
-            }
-        });
-    });
-
-    // 2. 1-Click Send Recovery Email
-    document.querySelectorAll('.btn-send-recovery').forEach(btn => {
-        btn.addEventListener('click', async function() {
-            const id = this.dataset.id;
-            const email = this.dataset.email;
-            const ref = this.dataset.ref;
-
-            if (!confirm(`Send recovery checkout email to ${email} for draft #${ref}?`)) {
-                return;
-            }
-
-            const origHtml = this.innerHTML;
-            this.disabled = true;
-            this.innerHTML = '<span class="inline-block animate-spin w-3 h-3 border-2 border-purple-600 border-t-transparent rounded-full"></span>';
-
-            try {
-                const res = await fetch(`/admin/bookings/drafts/${id}/send-recovery`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Accept': 'application/json'
-                    }
-                });
-
-                const data = await res.json();
-                if (data.success) {
-                    if (window.adminToast) {
-                        window.adminToast(data.message, 'success');
-                    } else {
-                        alert(data.message);
-                    }
-                } else {
-                    alert(data.message || 'Failed to send recovery email.');
-                }
-            } catch (err) {
-                alert('Network error while dispatching recovery email.');
             } finally {
-                this.disabled = false;
-                this.innerHTML = origHtml;
+                confirmSendBtn.disabled = false;
+                confirmSendBtn.innerHTML = origHtml;
             }
         });
-    });
+    }
 
     // 3. 1-Click Convert Draft to Booking Modal
     const convertModal = document.getElementById('convertDraftModal');
@@ -599,12 +900,20 @@ document.addEventListener('DOMContentLoaded', function() {
                         window.location.reload();
                     }
                 } else {
-                    alert(data.message || 'Failed to convert draft.');
+                    if (window.Swal) {
+                        window.Swal.fire({ icon: 'error', title: 'Conversion Failed', text: data.message || 'Failed to convert draft.' });
+                    } else {
+                        alert(data.message || 'Failed to convert draft.');
+                    }
                     this.disabled = false;
                     this.innerHTML = origHtml;
                 }
             } catch (err) {
-                alert('Network error while converting draft.');
+                if (window.Swal) {
+                    window.Swal.fire({ icon: 'error', title: 'Network Error', text: 'Network error while converting draft.' });
+                } else {
+                    alert('Network error while converting draft.');
+                }
                 this.disabled = false;
                 this.innerHTML = origHtml;
             }
@@ -613,38 +922,59 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 4. Single Delete Draft
     document.querySelectorAll('.btn-delete-draft').forEach(btn => {
-        btn.addEventListener('click', async function() {
+        btn.addEventListener('click', function() {
             const id = this.dataset.id;
             const ref = this.dataset.ref;
 
-            if (!confirm(`Are you sure you want to permanently discard draft #${ref}? This action cannot be undone.`)) {
-                return;
-            }
+            const executeDelete = async () => {
+                try {
+                    const res = await fetch(`/admin/bookings/drafts/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json'
+                        }
+                    });
 
-            try {
-                const res = await fetch(`/admin/bookings/drafts/${id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Accept': 'application/json'
-                    }
-                });
-
-                const data = await res.json();
-                if (data.success) {
-                    const row = document.getElementById(`draft-row-${id}`);
-                    if (row) row.remove();
-                    if (window.adminToast) {
-                        window.adminToast(data.message, 'success');
+                    const data = await res.json();
+                    if (data.success) {
+                        const row = document.getElementById(`draft-row-${id}`);
+                        if (row) row.remove();
+                        showAdminToast(data.message, 'success');
                     } else {
-                        alert(data.message);
+                        if (window.Swal) {
+                            window.Swal.fire({ icon: 'error', title: 'Error', text: data.message || 'Failed to discard draft.' });
+                        } else {
+                            alert(data.message || 'Failed to discard draft.');
+                        }
                     }
-                } else {
-                    alert(data.message || 'Failed to discard draft.');
+                } catch (err) {
+                    if (window.Swal) {
+                        window.Swal.fire({ icon: 'error', title: 'Network Error', text: 'Network error while discarding draft.' });
+                    } else {
+                        alert('Network error while discarding draft.');
+                    }
                 }
-            } catch (err) {
-                alert('Network error while discarding draft.');
+            };
+
+            if (window.Swal) {
+                window.Swal.fire({
+                    title: 'Discard Draft?',
+                    text: `Are you sure you want to permanently discard draft #${ref}? This action cannot be undone.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Yes, discard it',
+                    cancelButtonText: 'Keep draft'
+                }).then(result => {
+                    if (result.isConfirmed) executeDelete();
+                });
+            } else {
+                if (confirm(`Are you sure you want to permanently discard draft #${ref}? This action cannot be undone.`)) {
+                    executeDelete();
+                }
             }
         });
     });

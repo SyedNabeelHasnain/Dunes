@@ -1186,6 +1186,27 @@ body {
   font-size: 0.85rem;
 }
 
+/* Payment Option Cards */
+.payment-option {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.payment-option:hover {
+  border-color: rgba(246, 144, 68, 0.6);
+}
+.payment-option.selected {
+  border-color: var(--color-primary, #F69044) !important;
+  border-width: 2px !important;
+  background-color: rgba(246, 144, 68, 0.08) !important;
+  box-shadow: 0 0 0 2px rgba(246, 144, 68, 0.25) !important;
+}
+.payment-option.selected .payment-radio-indicator {
+  border-color: var(--color-primary, #F69044) !important;
+  background-color: var(--color-primary, #F69044) !important;
+}
+.payment-option.selected .payment-radio-indicator span {
+  display: block !important;
+}
+
 /* Horizontal Addon Cards */
 .addon-card-horizontal {
   position: relative;

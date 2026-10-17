@@ -415,18 +415,29 @@
                             <!-- Payment Options -->
                             <div class="mb-5" id="paymentOptions" data-ziina-active="{{ $ziinaActive ? '1' : '0' }}" data-advance-percent="{{ $advancePercent }}">
                                 <div class="text-xs font-black uppercase tracking-wider text-slate-800 mb-2">{{ __('ui.booking.payment_options') }}</div>
-                                <div class="payment-options grid grid-cols-1 sm:grid-cols-3 gap-2">
-                                    <div class="payment-option selected p-3 rounded-2xl border-2 border-primary bg-orange-50/40 cursor-pointer text-start transition-all" data-value="cash">
-                                        <div class="payment-option-title font-bold text-slate-900 text-xs sm:text-sm">{{ __('ui.booking.cash') }}</div>
+                                <div class="payment-options grid grid-cols-1 sm:grid-cols-3 gap-2" role="radiogroup" aria-label="Payment Options">
+                                    <div class="payment-option selected p-3 rounded-2xl border-2 border-primary bg-orange-50/70 shadow-xs ring-2 ring-primary/20 cursor-pointer text-start transition-all relative flex flex-col justify-between" data-value="cash" role="radio" aria-checked="true" tabindex="0">
+                                        <div class="flex items-center justify-between gap-1 mb-1">
+                                            <div class="payment-option-title font-bold text-slate-900 text-xs sm:text-sm">{{ __('ui.booking.cash') }}</div>
+                                            <div class="payment-radio-indicator w-4 h-4 rounded-full border border-primary bg-primary flex items-center justify-center shrink-0">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+                                            </div>
+                                        </div>
                                         <div class="payment-option-sub text-slate-500 text-[11px]">{{ __('ui.booking.pay_on_pickup') }}</div>
                                     </div>
                                     @if($ziinaActive)
-                                    <div class="payment-option p-3 rounded-2xl border border-slate-200 bg-white hover:border-primary/50 cursor-pointer text-start transition-all" data-value="advance">
-                                        <div class="payment-option-title font-bold text-slate-900 text-xs sm:text-sm">{{ __('ui.booking.advance') }} ({{ $advancePercent }}%)</div>
+                                    <div class="payment-option p-3 rounded-2xl border border-slate-200 bg-white hover:border-primary/50 cursor-pointer text-start transition-all relative flex flex-col justify-between" data-value="advance" role="radio" aria-checked="false" tabindex="0">
+                                        <div class="flex items-center justify-between gap-1 mb-1">
+                                            <div class="payment-option-title font-bold text-slate-900 text-xs sm:text-sm">{{ __('ui.booking.advance') }} ({{ $advancePercent }}%)</div>
+                                            <div class="payment-radio-indicator w-4 h-4 rounded-full border border-slate-300 bg-white flex items-center justify-center shrink-0"></div>
+                                        </div>
                                         <div class="payment-option-sub text-slate-500 text-[11px]">{{ __('ui.booking.hold_slot', ['percent' => $advancePercent]) }}</div>
                                     </div>
-                                    <div class="payment-option p-3 rounded-2xl border border-slate-200 bg-white hover:border-primary/50 cursor-pointer text-start transition-all" data-value="full">
-                                        <div class="payment-option-title font-bold text-slate-900 text-xs sm:text-sm">{{ __('ui.booking.full_payment') }} (100%)</div>
+                                    <div class="payment-option p-3 rounded-2xl border border-slate-200 bg-white hover:border-primary/50 cursor-pointer text-start transition-all relative flex flex-col justify-between" data-value="full" role="radio" aria-checked="false" tabindex="0">
+                                        <div class="flex items-center justify-between gap-1 mb-1">
+                                            <div class="payment-option-title font-bold text-slate-900 text-xs sm:text-sm">{{ __('ui.booking.full_payment') }} (100%)</div>
+                                            <div class="payment-radio-indicator w-4 h-4 rounded-full border border-slate-300 bg-white flex items-center justify-center shrink-0"></div>
+                                        </div>
                                         <div class="payment-option-sub text-slate-500 text-[11px]">{{ __('ui.booking.instant_confirmation') }}</div>
                                     </div>
                                     @endif

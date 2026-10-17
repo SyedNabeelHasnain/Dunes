@@ -279,17 +279,51 @@ class AdminBookingController extends Controller
     }
 
     /**
+     * Preview abandoned draft recovery email for admin review before dispatch.
+     */
+    public function previewDraftRecovery(Request $request, int $id)
+    {
+        $draft = Booking::with(['tour', 'tier'])->where('id', $id)->where('status', 'draft')->firstOrFail();
+
+        $defaultSubject = "Complete Your Dubai Desert Safari Reservation - Ref: #{$draft->reference}";
+        $mailable = new AbandonedBookingRecoveryMail($draft);
+        $renderedHtml = $mailable->render();
+
+        return response()->json([
+            'success' => true,
+            'draft' => [
+                'id' => $draft->id,
+                'reference' => $draft->reference,
+                'name' => $draft->name ?: 'Prospective Guest',
+                'email' => $draft->email,
+                'phone' => $draft->phone,
+                'tour_name' => $draft->tour_name,
+                'tier_name' => $draft->tier_name,
+                'tour_date' => $draft->tour_date ? $draft->tour_date->format('M j, Y') : 'Upcoming',
+                'total' => number_format((float) $draft->total, 2),
+                'recovery_url' => $mailable->recoveryUrl,
+            ],
+            'subject' => $defaultSubject,
+            'html' => $renderedHtml,
+        ]);
+    }
+
+    /**
      * Send direct recovery email to the abandoned draft guest.
      */
     public function sendDraftRecovery(Request $request, int $id)
     {
         $draft = Booking::where('id', $id)->where('status', 'draft')->firstOrFail();
 
-        if (empty($draft->email) || str_ends_with($draft->email, '@guest.local') || ! filter_var($draft->email, FILTER_VALIDATE_EMAIL)) {
+        $toEmail = trim($request->input('to_email', $draft->email));
+        $subject = trim($request->input('subject', ''));
+        $customMessage = trim($request->input('custom_message', ''));
+
+        if (empty($toEmail) || str_ends_with($toEmail, '@guest.local') || ! filter_var($toEmail, FILTER_VALIDATE_EMAIL)) {
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'This draft has no valid customer email address to send recovery email.',
+                    'message' => 'Please provide a valid customer email address to send the recovery email.',
                 ], 422);
             }
 
@@ -303,16 +337,30 @@ class AdminBookingController extends Controller
                 } catch (\Throwable $e) {}
             }
 
-            Mail::to($draft->email)->send(new AbandonedBookingRecoveryMail($draft));
+            $mailable = new AbandonedBookingRecoveryMail(
+                $draft,
+                ! empty($subject) ? $subject : null,
+                ! empty($customMessage) ? $customMessage : null
+            );
+
+            Mail::to($toEmail)->send($mailable);
+
+            $existingRequests = (string) $draft->special_requests;
+            $dispatchTag = '[RECOVERY_DISPATCHED: '.now()->format('Y-m-d H:i:s').' to '.$toEmail.']';
+            if (! str_contains($existingRequests, '[RECOVERY_DISPATCHED')) {
+                $draft->update([
+                    'special_requests' => trim($existingRequests."\n".$dispatchTag),
+                ]);
+            }
 
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => true,
-                    'message' => "Recovery email dispatched to {$draft->email} successfully!",
+                    'message' => "Recovery email dispatched to {$toEmail} via SMTP successfully!",
                 ]);
             }
 
-            return redirect()->back()->with('success', "Recovery email sent to {$draft->email}.");
+            return redirect()->back()->with('success', "Recovery email sent to {$toEmail}.");
         } catch (\Throwable $e) {
             Log::error("Failed to send draft recovery email for draft #{$draft->id}: ".$e->getMessage());
 

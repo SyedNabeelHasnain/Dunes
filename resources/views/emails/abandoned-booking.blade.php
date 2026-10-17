@@ -5,7 +5,13 @@
 @section('content')
     <p>Dear {{ $booking->name }},</p>
     
-    <p>We noticed you started reserving your Dubai desert adventure but haven't finalized your booking yet.</p>
+    @if(!empty($customMessage))
+        <div style="margin: 16px 0; color: #333333; line-height: 1.6;">
+            {!! nl2br(e($customMessage)) !!}
+        </div>
+    @else
+        <p>We noticed you started reserving your Dubai desert adventure but haven't finalized your booking yet.</p>
+    @endif
 
     <div style="background-color: #fff8f0; border-left: 4px solid #F58F43; padding: 16px 20px; border-radius: 4px; margin: 20px 0;">
         <h3 style="margin: 0 0 10px 0; color: #333333; font-size: 18px;">Reservation Summary:</h3>

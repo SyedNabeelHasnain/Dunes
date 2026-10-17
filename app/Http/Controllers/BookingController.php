@@ -299,8 +299,8 @@ class BookingController extends Controller
         }
 
         if ($paymentMethod !== 'cash') {
-            if ($payNow < 2.00) {
-                return response()->json(['success' => false, 'message' => 'Minimum online payment amount is AED 2.00'], 400);
+            if ($payNow < 0.50) {
+                return response()->json(['success' => false, 'message' => 'Minimum online payment amount is AED 0.50'], 400);
             }
         }
 

@@ -2845,11 +2845,41 @@ const App = {
         const options = container.querySelectorAll('.payment-option');
         const methodInput = document.getElementById('paymentMethod');
         const select = (val) => {
-            options.forEach(o => o.classList.toggle('selected', o.dataset.value === val));
+            options.forEach(o => {
+                const isSelected = o.dataset.value === val;
+                o.classList.toggle('selected', isSelected);
+                o.setAttribute('aria-checked', isSelected ? 'true' : 'false');
+                if (isSelected) {
+                    o.classList.remove('border-slate-200', 'bg-white');
+                    o.classList.add('border-2', 'border-primary', 'bg-orange-50/70', 'shadow-xs', 'ring-2', 'ring-primary/20');
+                } else {
+                    o.classList.remove('border-2', 'border-primary', 'bg-orange-50/70', 'shadow-xs', 'ring-2', 'ring-primary/20');
+                    o.classList.add('border', 'border-slate-200', 'bg-white');
+                }
+                const indicator = o.querySelector('.payment-radio-indicator');
+                if (indicator) {
+                    if (isSelected) {
+                        indicator.className = 'payment-radio-indicator w-4 h-4 rounded-full border border-primary bg-primary flex items-center justify-center shrink-0';
+                        indicator.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-white"></span>';
+                    } else {
+                        indicator.className = 'payment-radio-indicator w-4 h-4 rounded-full border border-slate-300 bg-white flex items-center justify-center shrink-0';
+                        indicator.innerHTML = '';
+                    }
+                }
+            });
             if (methodInput) methodInput.value = val;
             this.updateTotal();
         };
-        options.forEach(o => o.addEventListener('click', () => select(o.dataset.value)));
+        this.selectPaymentOption = select;
+        options.forEach(o => {
+            o.addEventListener('click', () => select(o.dataset.value));
+            o.addEventListener('keydown', (e) => {
+                if (e.key === ' ' || e.key === 'Enter') {
+                    e.preventDefault();
+                    select(o.dataset.value);
+                }
+            });
+        });
         select(methodInput?.value || options[0]?.dataset.value || 'cash');
     },
 
@@ -3417,7 +3447,11 @@ const App = {
 
         const paymentContainer = document.getElementById('paymentOptions');
         if (paymentContainer) {
-            paymentContainer.querySelectorAll('.payment-option').forEach(o => o.classList.toggle('selected', o.dataset.value === 'cash'));
+            if (typeof this.selectPaymentOption === 'function') {
+                this.selectPaymentOption('cash');
+            } else {
+                paymentContainer.querySelectorAll('.payment-option').forEach(o => o.classList.toggle('selected', o.dataset.value === 'cash'));
+            }
         }
         const addons = document.getElementById('addonsSection');
         if (addons) addons.style.display = 'none';
@@ -3542,33 +3576,31 @@ const App = {
 
     initForms() {
         document.querySelectorAll('form').forEach(form => {
-            const method = (form.getAttribute('method') || 'GET').toUpperCase();
             const rawAction = form.getAttribute('action') || '';
-
-            // Strictly exclude GET forms, authentication, admin CMS, search, review, newsletter, and unsubscribe forms
-            if (
-                method === 'GET' ||
-                form.matches('form[action*="login"], form[action*="password"], form[action*="register"], form[action*="logout"], #logout-form, .auth-form, .admin-form, #welcomeOfferForm, #globalSearchForm, #publicNewsletterForm, #reviewSubmitForm') ||
-                form.closest('.auth-card') ||
-                rawAction.includes('/search') ||
-                rawAction.includes('/review') ||
-                rawAction.includes('/unsubscribe') ||
-                rawAction.includes('/newsletter') ||
-                window.location.pathname.startsWith('/login') ||
-                window.location.pathname.startsWith('/admin') ||
-                window.location.pathname.startsWith('/password')
-            ) {
-                return;
-            }
-
             const isTargetAjaxForm =
                 form.matches('#bookingForm, #contactForm, #whatsappModalForm, #whatsappForm, #quickPaymentForm') ||
                 !!form.querySelector('input[name="action"]') ||
                 rawAction === '/ajax.php' ||
                 rawAction.endsWith('/booking/checkout');
 
+            const method = (form.getAttribute('method') || (isTargetAjaxForm ? 'POST' : 'GET')).toUpperCase();
+
+            // Strictly exclude non-target forms, GET forms, authentication, admin CMS, search, review, newsletter, and unsubscribe forms
             if (!isTargetAjaxForm) {
-                return;
+                if (
+                    method === 'GET' ||
+                    form.matches('form[action*="login"], form[action*="password"], form[action*="register"], form[action*="logout"], #logout-form, .auth-form, .admin-form, #welcomeOfferForm, #globalSearchForm, #publicNewsletterForm, #reviewSubmitForm') ||
+                    form.closest('.auth-card') ||
+                    rawAction.includes('/search') ||
+                    rawAction.includes('/review') ||
+                    rawAction.includes('/unsubscribe') ||
+                    rawAction.includes('/newsletter') ||
+                    window.location.pathname.startsWith('/login') ||
+                    window.location.pathname.startsWith('/admin') ||
+                    window.location.pathname.startsWith('/password')
+                ) {
+                    return;
+                }
             }
 
             form.addEventListener('submit', async e => {

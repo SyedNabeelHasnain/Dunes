@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Mail\AbandonedBookingRecoveryMail;
 use App\Models\Booking;
 use App\Models\Contact;
 use App\Models\User;
@@ -116,10 +117,54 @@ class AdminCmsEnhancementsTest extends TestCase
             'infants' => 0,
         ]);
 
-        $response = $this->actingAs($this->adminUser)->postJson("/admin/bookings/drafts/{$draft->id}/send-recovery");
+        $response = $this->actingAs($this->adminUser)->postJson("/admin/bookings/drafts/{$draft->id}/send-recovery", [
+            'to_email' => 'elena.custom@example.com',
+            'subject' => 'Special VIP Safari Offer For You',
+            'custom_message' => 'We have reserved your dune buggy with complimentary refreshments.',
+        ]);
 
         $response->assertStatus(200);
         $response->assertJson(['success' => true]);
+        Mail::assertSent(AbandonedBookingRecoveryMail::class, function ($mail) {
+            return $mail->hasTo('elena.custom@example.com') &&
+                   $mail->envelope()->subject === 'Special VIP Safari Offer For You';
+        });
+    }
+
+    /**
+     * Test admin can preview recovery email with rendered HTML for draft checkout.
+     */
+    public function test_admin_can_preview_draft_recovery_email(): void
+    {
+        $draft = Booking::create([
+            'reference' => 'DFT-PREV-001',
+            'name' => 'Elena Rostova',
+            'email' => 'elena@example.com',
+            'phone' => '+971504445555',
+            'tour_name' => 'Quad Biking Safari',
+            'status' => 'draft',
+            'payment_status' => 'unpaid',
+            'subtotal' => 350.00,
+            'total' => 350.00,
+            'tour_date' => now()->addDays(2)->toDateString(),
+            'adults' => 1,
+            'children' => 0,
+            'infants' => 0,
+        ]);
+
+        $response = $this->actingAs($this->adminUser)->getJson("/admin/bookings/drafts/{$draft->id}/preview-recovery");
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'draft' => [
+                'reference' => 'DFT-PREV-001',
+                'name' => 'Elena Rostova',
+                'email' => 'elena@example.com',
+            ],
+        ]);
+        $this->assertNotEmpty($response->json('html'));
+        $this->assertStringContainsString('DFT-PREV-001', $response->json('html'));
     }
 
     /**
