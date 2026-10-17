@@ -117,16 +117,20 @@ class BookingController extends Controller
             ? (float) $pricing->child_price
             : round($price * 0.70, 2);
 
-        if (in_array($priceType, ['per buggy', 'per vehicle', 'per group', 'private', 'per tent'])) {
-            $capacity = 2;
-            if (isset($tier->vehicle_capacity) && (int) $tier->vehicle_capacity > 0) {
-                $capacity = (int) $tier->vehicle_capacity;
-            } elseif (preg_match('/(6|six)/i', $tier->name ?? '')) {
-                $capacity = 6;
-            } elseif (preg_match('/(4|four)/i', $tier->name ?? '')) {
-                $capacity = 4;
-            } elseif (preg_match('/(1|single|solo)/i', $tier->name ?? '')) {
-                $capacity = 1;
+        if (in_array($priceType, ['per buggy', 'per vehicle', 'per group', 'private', 'per tent', 'per package'])) {
+            $capacity = (int) ($pricing->guest_count ?? ($tier->guest_count ?? 0));
+            if ($capacity <= 0) {
+                if (preg_match('/(6|six)/i', $tier->name ?? '')) {
+                    $capacity = 6;
+                } elseif (preg_match('/(4|four)/i', $tier->name ?? '')) {
+                    $capacity = 4;
+                } elseif (preg_match('/(2|two)/i', $tier->name ?? '')) {
+                    $capacity = 2;
+                } elseif (preg_match('/(1|single|solo)/i', $tier->name ?? '')) {
+                    $capacity = 1;
+                } else {
+                    $capacity = 2;
+                }
             }
             $vehicles = (int) ceil(($adults + $children) / max(1, $capacity));
             $subtotal = $vehicles * $price;

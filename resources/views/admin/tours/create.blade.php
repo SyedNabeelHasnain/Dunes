@@ -130,31 +130,39 @@
                                 @foreach($tiers as $tier)
                                 <div class="bg-white rounded-xl border border-slate-200 p-4">
                                     <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
-                                        <div class="sm:col-span-4">
+                                        <div class="sm:col-span-3">
                                             <div class="text-sm font-bold text-slate-900">{{ $tier->display_name }}</div>
                                             <div class="text-xs text-slate-400 font-mono">{{ $tier->name }}</div>
                                         </div>
-                                        <div class="sm:col-span-3">
+                                        <div class="sm:col-span-2">
                                             <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Price (AED)</label>
                                             <div class="relative">
                                                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-xs font-bold text-slate-400">AED</span>
                                                 <input type="number" name="tiers[{{ $tier->id }}][price]" step="0.01" class="w-full rounded-xl border border-slate-200 pl-11 pr-3 py-1.5 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" placeholder="0.00">
                                             </div>
                                         </div>
-                                        <div class="sm:col-span-3">
+                                        <div class="sm:col-span-2">
                                             <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Original Price (AED)</label>
                                             <div class="relative">
                                                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-xs font-bold text-slate-400">AED</span>
                                                 <input type="number" name="tiers[{{ $tier->id }}][old_price]" step="0.01" class="w-full rounded-xl border border-slate-200 pl-11 pr-3 py-1.5 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" placeholder="Original">
                                             </div>
                                         </div>
-                                        <div class="sm:col-span-2">
+                                        <div class="sm:col-span-3">
                                             <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Price Type</label>
                                             <select name="tiers[{{ $tier->id }}][price_type]" class="w-full rounded-xl border border-slate-200 px-2 py-1.5 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden bg-white">
                                                 <option value="per person">Per Person</option>
+                                                <option value="per tent">Per Tent</option>
+                                                <option value="per buggy">Per Buggy</option>
                                                 <option value="per group">Per Group</option>
+                                                <option value="per vehicle">Per Vehicle</option>
                                                 <option value="per car">Per Car</option>
+                                                <option value="per package">Per Package</option>
                                             </select>
+                                        </div>
+                                        <div class="sm:col-span-2">
+                                            <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Guests</label>
+                                            <input type="number" name="tiers[{{ $tier->id }}][guest_count]" min="1" max="100" class="w-full rounded-xl border border-slate-200 px-2 py-1.5 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden bg-white" value="{{ $tier->guest_count ?? 1 }}" placeholder="Guests">
                                         </div>
                                     </div>
                                 </div>

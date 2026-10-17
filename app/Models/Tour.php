@@ -207,7 +207,7 @@ class Tour extends Model
     public function tiers()
     {
         return $this->belongsToMany(Tier::class, 'tour_tiers')
-            ->withPivot('price', 'old_price', 'price_type')
+            ->withPivot('price', 'old_price', 'price_type', 'guest_count')
             ->orderBy('tiers.priority', 'asc');
     }
 

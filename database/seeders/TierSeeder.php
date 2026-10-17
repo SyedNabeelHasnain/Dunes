@@ -26,6 +26,7 @@ class TierSeeder extends Seeder
                 'name' => $t['name'],
                 'display_name' => $t['display_name'],
                 'description' => $t['description'],
+                'guest_count' => isset($t['guest_count']) ? (int) $t['guest_count'] : 1,
                 'icon' => $t['icon'],
                 'badge' => $t['badge'],
                 'color' => $t['color'],

@@ -17,18 +17,19 @@ class Tier extends Model
     ];
 
     protected $fillable = [
-        'slug', 'name', 'display_name', 'description', 'icon', 'badge', 'color',
+        'slug', 'name', 'display_name', 'description', 'guest_count', 'icon', 'badge', 'color',
         'is_popular', 'priority', 'status',
     ];
 
     protected $casts = [
         'is_popular' => 'boolean',
         'priority' => 'integer',
+        'guest_count' => 'integer',
     ];
 
     public function tours()
     {
         return $this->belongsToMany(Tour::class, 'tour_tiers')
-            ->withPivot('price', 'old_price', 'price_type');
+            ->withPivot('price', 'old_price', 'price_type', 'guest_count');
     }
 }

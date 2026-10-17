@@ -130,24 +130,31 @@
                                                 <div class="text-xs font-bold text-slate-900">{{ $tier->display_name }}</div>
                                                 <div class="text-[10px] text-slate-400 font-mono">{{ $tier->name }}</div>
                                             </div>
-                                            <div class="sm:col-span-3">
+                                            <div class="sm:col-span-2">
                                                 <div class="relative">
-                                                    <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-xs font-bold text-slate-400">AED</span>
-                                                    <input type="number" name="tiers[{{ $tier->id }}][price]" step="0.01" class="w-full rounded-xl border border-slate-200 bg-white pl-11 pr-2.5 py-1.5 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" value="{{ $pivot ? $pivot->price : '' }}" placeholder="Price">
+                                                    <span class="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none text-xs font-bold text-slate-400">AED</span>
+                                                    <input type="number" name="tiers[{{ $tier->id }}][price]" step="0.01" class="w-full rounded-xl border border-slate-200 bg-white pl-10 pr-2 py-1.5 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" value="{{ $pivot ? $pivot->price : '' }}" placeholder="Price">
                                                 </div>
                                             </div>
-                                            <div class="sm:col-span-3">
+                                            <div class="sm:col-span-2">
                                                 <div class="relative">
-                                                    <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-xs font-bold text-slate-400">AED</span>
-                                                    <input type="number" name="tiers[{{ $tier->id }}][old_price]" step="0.01" class="w-full rounded-xl border border-slate-200 bg-white pl-11 pr-2.5 py-1.5 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" value="{{ $pivot ? $pivot->old_price : '' }}" placeholder="Original">
+                                                    <span class="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none text-xs font-bold text-slate-400">AED</span>
+                                                    <input type="number" name="tiers[{{ $tier->id }}][old_price]" step="0.01" class="w-full rounded-xl border border-slate-200 bg-white pl-10 pr-2 py-1.5 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" value="{{ $pivot ? $pivot->old_price : '' }}" placeholder="Original">
                                                 </div>
                                             </div>
                                             <div class="sm:col-span-3">
                                                 <select name="tiers[{{ $tier->id }}][price_type]" class="w-full rounded-xl border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden">
                                                     <option value="per person" {{ $pivot && $pivot->price_type === 'per person' ? 'selected' : '' }}>Per Person</option>
+                                                    <option value="per tent" {{ $pivot && $pivot->price_type === 'per tent' ? 'selected' : '' }}>Per Tent</option>
+                                                    <option value="per buggy" {{ $pivot && $pivot->price_type === 'per buggy' ? 'selected' : '' }}>Per Buggy</option>
                                                     <option value="per group" {{ $pivot && $pivot->price_type === 'per group' ? 'selected' : '' }}>Per Group</option>
+                                                    <option value="per vehicle" {{ $pivot && $pivot->price_type === 'per vehicle' ? 'selected' : '' }}>Per Vehicle</option>
                                                     <option value="per car" {{ $pivot && $pivot->price_type === 'per car' ? 'selected' : '' }}>Per Car</option>
+                                                    <option value="per package" {{ $pivot && $pivot->price_type === 'per package' ? 'selected' : '' }}>Per Package</option>
                                                 </select>
+                                            </div>
+                                            <div class="sm:col-span-2">
+                                                <input type="number" name="tiers[{{ $tier->id }}][guest_count]" min="1" max="100" class="w-full rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" value="{{ $pivot ? ($pivot->guest_count ?? $tier->guest_count) : ($tier->guest_count ?? 1) }}" placeholder="Guests (e.g. 2, 4, 6)">
                                             </div>
                                         </div>
                                     </div>

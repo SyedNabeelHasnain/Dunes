@@ -109,13 +109,25 @@ class AjaxGatewayController extends Controller
         }
 
         $tiersQuery = $tour->tiers()->where('status', 'active');
+        $withPivot = ['price', 'old_price', 'price_type'];
         if (Schema::hasColumn('tour_tiers', 'child_price')) {
-            $tiersQuery->withPivot('child_price');
+            $withPivot[] = 'child_price';
         }
+        if (Schema::hasColumn('tour_tiers', 'guest_count')) {
+            $withPivot[] = 'guest_count';
+        }
+        $tiersQuery->withPivot($withPivot);
 
         $tiers = $tiersQuery
             ->get()
             ->map(function ($tier) {
+                $guestCount = (int) ($tier->pivot->guest_count ?: ($tier->guest_count ?: 1));
+                if ($guestCount <= 0) {
+                    if (preg_match('/(6|six)/i', $tier->name ?? '')) $guestCount = 6;
+                    elseif (preg_match('/(4|four)/i', $tier->name ?? '')) $guestCount = 4;
+                    elseif (preg_match('/(2|two)/i', $tier->name ?? '')) $guestCount = 2;
+                    else $guestCount = 1;
+                }
                 return [
                     'id' => $tier->id,
                     'name' => $tier->name,
@@ -125,7 +137,8 @@ class AjaxGatewayController extends Controller
                     'child_price' => $tier->pivot->child_price ?? 0,
                     'old_price' => $tier->pivot->old_price,
                     'price_type' => $tier->pivot->price_type,
-                    'capacity' => (int) ($tier->vehicle_capacity ?? (preg_match('/(4|four)/i', $tier->name ?? '') ? 4 : (preg_match('/(1|single|solo)/i', $tier->name ?? '') ? 1 : 2))),
+                    'guest_count' => $guestCount,
+                    'capacity' => $guestCount,
                 ];
             });
 

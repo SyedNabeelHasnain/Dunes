@@ -103,11 +103,15 @@ class AdminTourController extends Controller
             $tiersData = [];
             foreach ($request->input('tiers') as $tierId => $pivot) {
                 if (isset($pivot['price']) && $pivot['price'] !== '' && $pivot['price'] !== null) {
-                    $tiersData[$tierId] = [
+                    $tierRow = [
                         'price' => (float) $pivot['price'],
                         'old_price' => ! empty($pivot['old_price']) ? (float) $pivot['old_price'] : null,
                         'price_type' => $pivot['price_type'] ?? 'per person',
                     ];
+                    if (isset($pivot['guest_count']) && $pivot['guest_count'] !== '') {
+                        $tierRow['guest_count'] = (int) $pivot['guest_count'];
+                    }
+                    $tiersData[$tierId] = $tierRow;
                 }
             }
             $tour->tiers()->sync($tiersData);
@@ -216,11 +220,15 @@ class AdminTourController extends Controller
             $tiersData = [];
             foreach ($request->input('tiers') as $tierId => $pivot) {
                 if (isset($pivot['price']) && $pivot['price'] !== '' && $pivot['price'] !== null) {
-                    $tiersData[$tierId] = [
+                    $tierRow = [
                         'price' => (float) $pivot['price'],
                         'old_price' => ! empty($pivot['old_price']) ? (float) $pivot['old_price'] : null,
                         'price_type' => $pivot['price_type'] ?? 'per person',
                     ];
+                    if (isset($pivot['guest_count']) && $pivot['guest_count'] !== '') {
+                        $tierRow['guest_count'] = (int) $pivot['guest_count'];
+                    }
+                    $tiersData[$tierId] = $tierRow;
                 }
             }
             $tour->tiers()->sync($tiersData);
@@ -277,6 +285,7 @@ class AdminTourController extends Controller
             'display_name' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:tiers,slug',
             'description' => 'nullable|string',
+            'guest_count' => 'nullable|integer|min:1|max:100',
             'icon' => 'nullable|string|max:100',
             'is_popular' => 'nullable',
             'status' => 'required|string|in:active,inactive',
@@ -293,6 +302,7 @@ class AdminTourController extends Controller
             'display_name' => $request->display_name,
             'slug' => $slug,
             'description' => $request->description,
+            'guest_count' => $request->filled('guest_count') ? (int) $request->guest_count : 1,
             'icon' => $request->icon ?: 'star-fill',
             'is_popular' => $request->has('is_popular') ? 1 : 0,
             'status' => $request->status,
@@ -316,6 +326,7 @@ class AdminTourController extends Controller
             'display_name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:tiers,slug,'.$tier->id,
             'description' => 'nullable|string',
+            'guest_count' => 'nullable|integer|min:1|max:100',
             'icon' => 'nullable|string|max:100',
             'is_popular' => 'nullable',
             'status' => 'required|string|in:active,inactive',
@@ -327,6 +338,7 @@ class AdminTourController extends Controller
             'display_name' => $request->display_name,
             'slug' => Str::slug($request->slug),
             'description' => $request->description,
+            'guest_count' => $request->filled('guest_count') ? (int) $request->guest_count : 1,
             'icon' => $request->icon ?: 'star-fill',
             'is_popular' => $request->has('is_popular') ? 1 : 0,
             'status' => $request->status,
@@ -498,11 +510,15 @@ class AdminTourController extends Controller
                 $syncData = [];
                 foreach ($tiers as $tierId => $prices) {
                     if (isset($prices['price']) && $prices['price'] !== '') {
-                        $syncData[$tierId] = [
+                        $tierRow = [
                             'price' => (float) $prices['price'],
                             'old_price' => ! empty($prices['old_price']) ? (float) $prices['old_price'] : null,
                             'price_type' => $prices['price_type'] ?? 'per person',
                         ];
+                        if (isset($prices['guest_count']) && $prices['guest_count'] !== '') {
+                            $tierRow['guest_count'] = (int) $prices['guest_count'];
+                        }
+                        $syncData[$tierId] = $tierRow;
                     }
                 }
                 $tour->tiers()->syncWithoutDetaching($syncData);

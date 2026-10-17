@@ -154,7 +154,8 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::post('/categories/rename', [AdminTourController::class, 'renameCategory'])->name('categories.rename');
     Route::get('/tiers', [AdminTourController::class, 'tiers'])->name('tiers.index');
     Route::post('/tiers', [AdminTourController::class, 'storeTier'])->name('tiers.store');
-    Route::post('/tiers/{id}/update', [AdminTourController::class, 'updateTier'])->name('tiers.update');
+    Route::match(['post', 'put'], '/tiers/{id}/update', [AdminTourController::class, 'updateTier'])->name('tiers.update');
+    Route::put('/tiers/{id}', [AdminTourController::class, 'updateTier']);
     Route::delete('/tiers/{id}', [AdminTourController::class, 'deleteTier'])->name('tiers.destroy');
 
     Route::get('/addons', [AdminTourController::class, 'addons'])->name('addons.index');

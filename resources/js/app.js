@@ -2813,7 +2813,6 @@ const App = {
 
     syncTourGuestRules(tourId) {
         const adultsInput = document.getElementById('bookingAdults');
-        const helper = document.getElementById('overnightAdultsHelper');
         const tourSelect = document.getElementById('bookingTour');
         if (!adultsInput) return;
 
@@ -2838,14 +2837,12 @@ const App = {
             if (v < 2) v = 2;
             else if (v % 2 !== 0) v += 1;
             adultsInput.value = v;
-            if (helper) helper.classList.remove('hidden');
         } else {
             adultsInput.min = '1';
             adultsInput.step = '1';
             let v = parseInt(adultsInput.value, 10) || 1;
             if (v < 1) v = 1;
             adultsInput.value = v;
-            if (helper) helper.classList.add('hidden');
         }
         if (typeof this.updateTotal === 'function') {
             this.updateTotal();
@@ -2897,15 +2894,15 @@ const App = {
                 data.tiers.forEach(t => {
                     const save = t.old_price > t.price ? Math.round(((t.old_price - t.price) / t.old_price) * 100) : 0;
                     const pType = (t.price_type || 'per person').toLowerCase();
-                    let capacity = 2;
-                    if (t.capacity && parseInt(t.capacity, 10) > 0) {
-                        capacity = parseInt(t.capacity, 10);
-                    } else if (/(4|four)/i.test(t.name || '')) {
-                        capacity = 4;
-                    } else if (/(1|single|solo)/i.test(t.name || '')) {
-                        capacity = 1;
+                    let guestCount = parseInt(t.guest_count || t.capacity || 0, 10);
+                    if (guestCount <= 0) {
+                        if (/(6|six)/i.test(t.name || '')) guestCount = 6;
+                        else if (/(4|four)/i.test(t.name || '')) guestCount = 4;
+                        else if (/(2|two)/i.test(t.name || '')) guestCount = 2;
+                        else if (/(1|single|solo)/i.test(t.name || '')) guestCount = 1;
+                        else guestCount = 1;
                     }
-                    h += `<div class="tier-card${t.is_popular ? ' popular' : ''}" data-tier="${t.id}" data-price="${t.price}" data-child-price="${t.child_price || 0}" data-name="${t.name}" data-price-type="${pType}" data-capacity="${capacity}">
+                    h += `<div class="tier-card${t.is_popular ? ' popular' : ''}" data-tier="${t.id}" data-price="${t.price}" data-child-price="${t.child_price || 0}" data-name="${t.name}" data-price-type="${pType}" data-guest-count="${guestCount}" data-capacity="${guestCount}">
                         ${t.is_popular ? '<div class="tier-popular-badge">Popular</div>' : ''}
                         <div class="tier-card-inner">
                             <div class="tier-card-info">
@@ -3019,6 +3016,13 @@ const App = {
         }
         this.selectedTier = card.dataset.tier;
         this.selectedPrice = parseFloat(card.dataset.price);
+
+        const targetGuests = parseInt(card.dataset.guestCount || card.dataset.capacity, 10);
+        const bookingAdults = document.getElementById('bookingAdults');
+        if (bookingAdults && targetGuests > 0) {
+            bookingAdults.value = targetGuests;
+        }
+
         this.updateTotal();
 
         const pendingCode = window.pendingPromoCode || document.getElementById('bookingPromoInput')?.value || document.getElementById('bookingPromoCode')?.value;
@@ -3056,13 +3060,14 @@ const App = {
         const rawChildPrice = parseFloat(selectedTierCard?.dataset.childPrice || 0);
         const childPrice = rawChildPrice > 0 ? rawChildPrice : (price * 0.70);
         let total = 0;
-        if (['per buggy', 'per vehicle', 'per group', 'private', 'per tent'].includes(priceType)) {
-            let capacity = 2;
-            if (/(6|six)/i.test(selectedTierCard?.dataset.name || '')) capacity = 6;
-            else if (/(4|four)/i.test(selectedTierCard?.dataset.name || '')) capacity = 4;
-            else if (/(1|single|solo)/i.test(selectedTierCard?.dataset.name || '')) capacity = 1;
-            else if (selectedTierCard?.dataset.capacity && parseInt(selectedTierCard.dataset.capacity, 10) > 0) {
-                capacity = parseInt(selectedTierCard.dataset.capacity, 10);
+        if (['per buggy', 'per vehicle', 'per group', 'private', 'per tent', 'per package'].includes(priceType)) {
+            let capacity = parseInt(selectedTierCard?.dataset.capacity || selectedTierCard?.dataset.guestCount, 10) || 0;
+            if (capacity <= 0) {
+                if (/(6|six)/i.test(selectedTierCard?.dataset.name || '')) capacity = 6;
+                else if (/(4|four)/i.test(selectedTierCard?.dataset.name || '')) capacity = 4;
+                else if (/(2|two)/i.test(selectedTierCard?.dataset.name || '')) capacity = 2;
+                else if (/(1|single|solo)/i.test(selectedTierCard?.dataset.name || '')) capacity = 1;
+                else capacity = 2;
             }
             const vehicles = Math.ceil(Math.max(1, adults + children) / capacity);
             total = price * vehicles;
@@ -3082,13 +3087,14 @@ const App = {
         const childPrice = rawChildPrice > 0 ? rawChildPrice : (this.selectedPrice * 0.70);
 
         let baseTotal = 0;
-        if (['per buggy', 'per vehicle', 'per group', 'private', 'per tent'].includes(priceType)) {
-            let capacity = 2;
-            if (/(6|six)/i.test(selectedTierCard?.dataset.name || '')) capacity = 6;
-            else if (/(4|four)/i.test(selectedTierCard?.dataset.name || '')) capacity = 4;
-            else if (/(1|single|solo)/i.test(selectedTierCard?.dataset.name || '')) capacity = 1;
-            else if (selectedTierCard?.dataset.capacity && parseInt(selectedTierCard.dataset.capacity, 10) > 0) {
-                capacity = parseInt(selectedTierCard.dataset.capacity, 10);
+        if (['per buggy', 'per vehicle', 'per group', 'private', 'per tent', 'per package'].includes(priceType)) {
+            let capacity = parseInt(selectedTierCard?.dataset.capacity || selectedTierCard?.dataset.guestCount, 10) || 0;
+            if (capacity <= 0) {
+                if (/(6|six)/i.test(selectedTierCard?.dataset.name || '')) capacity = 6;
+                else if (/(4|four)/i.test(selectedTierCard?.dataset.name || '')) capacity = 4;
+                else if (/(2|two)/i.test(selectedTierCard?.dataset.name || '')) capacity = 2;
+                else if (/(1|single|solo)/i.test(selectedTierCard?.dataset.name || '')) capacity = 1;
+                else capacity = 2;
             }
             const vehicles = Math.ceil(Math.max(1, adults + children) / capacity);
             baseTotal = this.selectedPrice * vehicles;
@@ -3784,6 +3790,16 @@ const App = {
                 else if (btn.dataset.action === 'plus') v = Math.min(max, v + step);
 
                 inp.value = v;
+
+                if (target === 'adults') {
+                    const cards = Array.from(document.querySelectorAll('#tierCards .tier-card'));
+                    const matchingCard = cards.find(c => parseInt(c.dataset.guestCount || c.dataset.capacity, 10) === v);
+                    if (matchingCard && !matchingCard.classList.contains('selected')) {
+                        this.selectTier(matchingCard);
+                        return;
+                    }
+                }
+
                 this.updateTotal();
                 if (typeof this.validateStep1 === 'function') {
                     this.validateStep1(false);

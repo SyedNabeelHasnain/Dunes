@@ -73,6 +73,7 @@ class TourSeeder extends Seeder
                     'price' => (float) $tt['price'],
                     'old_price' => $tt['old_price'] ? (float) $tt['old_price'] : null,
                     'price_type' => $tt['price_type'] ?: 'per person',
+                    'guest_count' => isset($tt['guest_count']) ? (int) $tt['guest_count'] : null,
                 ]);
             }
         }

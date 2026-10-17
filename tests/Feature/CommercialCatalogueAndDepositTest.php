@@ -155,11 +155,70 @@ class CommercialCatalogueAndDepositTest extends TestCase
         ]);
     }
 
+    public function test_overnight_safari_calculates_exact_package_pricing_for_higher_tiers(): void
+    {
+        $tour = Tour::find(3);
+        $this->assertNotNull($tour);
+        $tier6 = DB::table('tour_tiers')->where('tour_id', 3)->where('tier_id', 7)->first();
+        $this->assertNotNull($tier6);
+
+        \App\Models\VerifiedEmail::create([
+            'email' => 'premium6@example.com',
+            'verified_at' => now(),
+        ]);
+
+        $response = $this->postJson('/api/v1/booking/checkout', [
+            'tour_id' => 3,
+            'tier_id' => 7,
+            'date' => now()->addDays(3)->format('Y-m-d'),
+            'adults' => 6,
+            'children' => 0,
+            'location' => 'Palm Jumeirah',
+            'name' => 'Sara Connor',
+            'email' => 'premium6@example.com',
+            'phone' => '+971509998888',
+            'payment_method' => 'cash',
+        ]);
+
+        $response->assertOk();
+        $response->assertJson([
+            'success' => true,
+        ]);
+
+        $this->assertDatabaseHas('bookings', [
+            'tour_id' => 3,
+            'adults' => 6,
+            'total' => 2394.00,
+        ]);
+    }
+
+    public function test_admin_can_update_tier_guest_count_via_cms(): void
+    {
+        $admin = User::factory()->create();
+        $tier = \App\Models\Tier::find(5);
+        $this->assertNotNull($tier);
+
+        $response = $this->actingAs($admin)->post(route('admin.tiers.update', $tier->id), [
+            'name' => $tier->name,
+            'display_name' => $tier->display_name,
+            'slug' => $tier->slug,
+            'guest_count' => 2,
+            'status' => 'active',
+            'priority' => $tier->priority,
+        ]);
+
+        $response->assertRedirect(route('admin.tiers.index'));
+        $this->assertDatabaseHas('tiers', [
+            'id' => 5,
+            'guest_count' => 2,
+        ]);
+    }
+
     public function test_booking_modal_renders_overnight_rules_and_deposit_markup(): void
     {
         $response = $this->get(route('home'));
         $response->assertOk();
-        $response->assertSee('id="overnightAdultsHelper"', false);
+        $response->assertDontSee('id="overnightAdultsHelper"', false);
         $response->assertSee('data-advance-percent="25"', false);
         $response->assertSee('(25%)', false);
     }

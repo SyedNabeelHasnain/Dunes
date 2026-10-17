@@ -151,7 +151,6 @@
                                             <i class="bi bi-plus-circle-fill text-xl"></i>
                                         </button>
                                     </div>
-                                    <p id="overnightAdultsHelper" class="hidden text-[10px] font-bold text-amber-700 bg-amber-50 rounded-lg px-2 py-1 mt-1 border border-amber-200"><i class="bi bi-info-circle me-1"></i>Overnight safari requires at least 2 guests (1 private tent). Bookings step in pairs (2, 4, 6... guests).</p>
                                 </div>
                                 <div class="sm:col-span-8 lg:col-span-9 booking-location-wrapper relative">
                                     <label class="block text-xs font-black uppercase tracking-wider text-slate-800 mb-2" for="bookingLocation">{{ __('ui.booking.pickup_location_label') }}</label>

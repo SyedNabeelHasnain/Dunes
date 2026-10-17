@@ -24,6 +24,7 @@
                         <th class="py-3 px-4">Tier Identity</th>
                         <th class="py-3 px-4">Internal Name</th>
                         <th class="py-3 px-4">Slug</th>
+                        <th class="py-3 px-4">Guests / Capacity</th>
                         <th class="py-3 px-4">Tour Adoption</th>
                         <th class="py-3 px-4">Status</th>
                         <th class="py-3 px-4">Priority</th>
@@ -54,6 +55,11 @@
                         <td class="py-3 px-4 text-xs font-medium text-slate-800">{{ $tier->name }}</td>
                         <td class="py-3 px-4"><code class="text-xs font-mono text-primary bg-primary/5 px-2 py-0.5 rounded-md border border-primary/15">{{ $tier->slug }}</code></td>
                         <td class="py-3 px-4">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                                <i class="bi bi-people-fill text-slate-500"></i> {{ $tier->guest_count ?? 1 }} {{ \Illuminate\Support\Str::plural('Guest', $tier->guest_count ?? 1) }}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4">
                             <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
                                 <i class="bi bi-link-45deg"></i> {{ $tier->tours_count ?? $tier->tours->count() }} Tours
                             </span>
@@ -77,6 +83,7 @@
                                     data-display-name="{{ $tier->display_name }}"
                                     data-slug="{{ $tier->slug }}"
                                     data-description="{{ $tier->description }}"
+                                    data-guest-count="{{ $tier->guest_count ?? 1 }}"
                                     data-icon="{{ $tier->icon }}"
                                     data-popular="{{ $tier->is_popular ? '1' : '0' }}"
                                     data-status="{{ $tier->status }}"
@@ -97,7 +104,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="text-center py-10 text-slate-400">No pricing tiers defined.</td>
+                        <td colspan="8" class="text-center py-10 text-slate-400">No pricing tiers defined.</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -142,7 +149,11 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label for="tierGuestCount" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Guests / Capacity</label>
+                        <input type="number" name="guest_count" id="tierGuestCount" min="1" max="100" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden focus:border-primary" value="1" placeholder="e.g. 1, 2, 4, 6">
+                    </div>
                     <div>
                         <label for="tierStatus" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Status</label>
                         <select name="status" id="tierStatus" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden bg-white">
@@ -211,7 +222,11 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label for="editTierGuestCount" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Guests / Capacity</label>
+                        <input type="number" name="guest_count" id="editTierGuestCount" min="1" max="100" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden focus:border-primary" placeholder="e.g. 1, 2, 4, 6">
+                    </div>
                     <div>
                         <label for="editTierStatus" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Status</label>
                         <select name="status" id="editTierStatus" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden bg-white">
@@ -253,6 +268,7 @@ $(document).ready(function() {
         $('#editTierDisplayName').val(btn.data('display-name'));
         $('#editTierSlug').val(btn.data('slug'));
         $('#editTierIcon').val(btn.data('icon'));
+        $('#editTierGuestCount').val(btn.data('guest-count') || 1);
         $('#editTierStatus').val(btn.data('status'));
         $('#editTierPriority').val(btn.data('priority'));
         $('#editTierDesc').val(btn.data('description'));
