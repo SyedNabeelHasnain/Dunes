@@ -650,12 +650,12 @@
                             <i class="bi bi-star-fill text-amber-400 text-[9px] sm:text-[10px] leading-none"></i>
                         </a>
 
-                        <!-- TripAdvisor Review Trust Badge (Mobile with 4.9 Rating - Responsive on >=400px screens) -->
+                        <!-- TripAdvisor Review Trust Badge (Mobile with 4.9 Rating) -->
                         <a href="{{ $settings['social_tripadvisor'] ?? 'https://www.tripadvisor.com/Attraction_Review-g295424-d29026644-Reviews-Dunes_Discovery-Dubai_Emirate_of_Dubai.html' }}" 
                            target="_blank" 
                            rel="noopener" 
                            id="taCircle" 
-                           class="nav-review-circle hidden min-[400px]:inline-flex items-center gap-1 px-1.5 sm:px-2 py-1 sm:py-1.5 rounded-full bg-white border border-slate-200/90 shadow-2xs hover:bg-slate-50 transition-all cursor-pointer min-h-[32px] sm:min-h-[36px] shrink-0"
+                           class="nav-review-circle inline-flex items-center gap-1 px-1.5 sm:px-2 py-1 sm:py-1.5 rounded-full bg-white border border-slate-200/90 shadow-2xs hover:bg-slate-50 transition-all cursor-pointer min-h-[32px] sm:min-h-[36px] shrink-0"
                            onclick="toggleReviewPopover(this, event)"
                            title="{{ __('ui.common.tripadvisor_reviews') }}">
                             <img src="{{ asset('images/tripadvisor-color-logo.svg') }}" alt="TripAdvisor" width="16" height="16" class="w-3.5 h-3.5 sm:w-4 sm:h-4 object-contain shrink-0">
@@ -674,7 +674,7 @@
                         </a>
 
                         <!-- Hamburger Drawer Trigger (Min 44x44px Hit Target) -->
-                        <button id="menuToggle" class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl text-slate-800 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer focus:outline-none shrink-0" type="button" @click="$store.mobileNav.toggle()" aria-label="{{ __('ui.nav.all_tours') ?? 'Menu' }}">
+                        <button id="menuToggle" class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl text-slate-800 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer focus:outline-none shrink-0" type="button" @click.stop.prevent="$store.mobileNav.toggle()" aria-label="{{ __('ui.nav.all_tours') ?? 'Menu' }}">
                             <i class="bi bi-list text-2xl"></i>
                         </button>
                     </div>
@@ -686,6 +686,7 @@
     <!-- Alpine-Powered Mobile Offcanvas Drawer (Direct child of body to prevent CSS transform containing-block clipping) -->
     <div x-show="$store.mobileNav.open" 
          id="sheetOverlay"
+         x-cloak
          x-transition:enter="transition-opacity ease-out duration-300"
          x-transition:enter-start="opacity-0"
          x-transition:enter-end="opacity-100"
@@ -693,10 +694,11 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
          class="fixed inset-0 bg-black/60 z-[60] backdrop-blur-xs lg:hidden"
-         @click="$store.mobileNav.close()"
+         @click.stop.prevent="$store.mobileNav.close()"
          style="display: none;"></div>
 
     <div x-show="$store.mobileNav.open"
+         x-cloak
          x-transition:enter="transition ease-out duration-300 transform"
          x-transition:enter-start="ltr:translate-x-full rtl:-translate-x-full"
          x-transition:enter-end="translate-x-0"
@@ -736,7 +738,7 @@
                         <i class="bi bi-star-fill text-amber-400 text-[10px]"></i>
                     </a>
                     @include('partials.language-currency-switcher', ['switcherId' => 'mobileLangCurrencyDropdownBtn'])
-                    <button id="sheetClose" type="button" class="w-10 h-10 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer" @click="$store.mobileNav.close()" aria-label="{{ __('ui.common.close') }}">
+                    <button id="sheetClose" type="button" class="w-10 h-10 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer" @click.stop.prevent="$store.mobileNav.close()" aria-label="{{ __('ui.common.close') }}">
                         <i class="bi bi-x-lg text-sm"></i>
                     </button>
                 </div>

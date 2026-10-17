@@ -221,27 +221,18 @@ Alpine.store('currency', {
     }
 });
 
-let _bodyScrollPos = 0;
-let _bodyScrollLocked = false;
+let _bodyScrollLocked = 0;
 function lockBodyScroll() {
-    if (_bodyScrollLocked) return;
-    _bodyScrollPos = window.scrollY || window.pageYOffset || 0;
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${_bodyScrollPos}px`;
-    document.body.style.width = '100%';
-    document.body.style.overflow = 'hidden';
-    document.body.classList.add('modal-open');
-    _bodyScrollLocked = true;
+    _bodyScrollLocked++;
+    if (_bodyScrollLocked > 1) return;
+    document.documentElement.classList.add('overflow-hidden');
+    document.body.classList.add('overflow-hidden', 'modal-open');
 }
 function unlockBodyScroll() {
-    if (!_bodyScrollLocked) return;
-    document.body.style.position = '';
-    document.body.style.top = '';
-    document.body.style.width = '';
-    document.body.style.overflow = '';
-    document.body.classList.remove('modal-open');
-    window.scrollTo(0, _bodyScrollPos);
-    _bodyScrollLocked = false;
+    _bodyScrollLocked = Math.max(0, _bodyScrollLocked - 1);
+    if (_bodyScrollLocked > 0) return;
+    document.documentElement.classList.remove('overflow-hidden');
+    document.body.classList.remove('overflow-hidden', 'modal-open');
 }
 window.lockBodyScroll = lockBodyScroll;
 window.unlockBodyScroll = unlockBodyScroll;
@@ -871,17 +862,7 @@ document.addEventListener('click', (e) => {
         return;
     }
 
-    // 2.6 Mobile Navigation toggles
-    if (e.target.closest('#menuToggle')) {
-        e.preventDefault();
-        Alpine.store('mobileNav').toggle();
-        return;
-    }
-    if (e.target.closest('#sheetClose, #sheetOverlay')) {
-        e.preventDefault();
-        Alpine.store('mobileNav').close();
-        return;
-    }
+    // 2.6 Mobile Navigation link navigation
     const sheetLink = e.target.closest('#mobileSheet a');
     if (sheetLink && !sheetLink.classList.contains('nav-review-circle') && !sheetLink.closest('.nav-review-circle')) {
         Alpine.store('mobileNav').close();
