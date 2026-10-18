@@ -439,9 +439,13 @@ Alpine.store('modal', {
                     const infantsInput = document.getElementById('bookingInfants');
                     if (infantsInput) infantsInput.value = data.infants;
                 }
+                window.App.initDateCards?.();
                 if (data.date) {
                     const dateInput = document.getElementById('bookingDate');
-                    if (dateInput) dateInput.value = data.date;
+                    if (dateInput) {
+                        dateInput.value = data.date;
+                        dateInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
                 }
 
                 if (data.promo || data.coupon) {
@@ -1891,24 +1895,27 @@ const App = {
         const now = new Date();
         const utcMs = now.getTime() + (now.getTimezoneOffset() * 60000);
         const dubaiNow = new Date(utcMs + (3600000 * 4));
-        const dubaiHour = dubaiNow.getHours() + (dubaiNow.getMinutes() / 60);
-        const canBookToday = dubaiHour < 13.5; // Cutoff at 1:30 PM (13:30) Asia/Dubai
-        const startDay = canBookToday ? 0 : 1;
+
+        const todayYear = dubaiNow.getFullYear();
+        const todayMonth = String(dubaiNow.getMonth() + 1).padStart(2, '0');
+        const todayDay = String(dubaiNow.getDate()).padStart(2, '0');
+        const todayStr = `${todayYear}-${todayMonth}-${todayDay}`;
+        input.min = todayStr;
 
         let html = '';
         const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
         const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-        for (let i = startDay; i <= (startDay + 30); i++) {
+        for (let i = 0; i <= 30; i++) {
             const d = new Date(dubaiNow);
-            d.setDate(dubaiNow.getDate() + (canBookToday ? i : (i - 1 + 1)));
+            d.setDate(dubaiNow.getDate() + i);
 
             const year = d.getFullYear();
             const monthStr = String(d.getMonth() + 1).padStart(2, '0');
             const dayStr = String(d.getDate()).padStart(2, '0');
             const dateStr = `${year}-${monthStr}-${dayStr}`;
 
-            const dayName = (i === 0 && canBookToday) ? 'Today' : days[d.getDay()];
+            const dayName = (i === 0) ? 'Today' : days[d.getDay()];
             const dayNum = d.getDate();
             const monthName = months[d.getMonth()];
 

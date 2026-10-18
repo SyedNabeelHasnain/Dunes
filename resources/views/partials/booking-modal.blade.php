@@ -10,8 +10,7 @@
     }
     $modalTours = isset($allTours) && count($allTours) ? $allTours : try_get_modal_tours();
     $dubaiNow = now('Asia/Dubai');
-    $canBookToday = $dubaiNow->format('H:i') < '13:30';
-    $minDate = $canBookToday ? $dubaiNow->format('Y-m-d') : $dubaiNow->copy()->addDay()->format('Y-m-d');
+    $minDate = $dubaiNow->format('Y-m-d');
     $ziinaActive = isset($settings['ziina_active']) ? ($settings['ziina_active'] === '1') : false;
     $advancePercent = (int)($settings['deposit_percentage'] ?? ($settings['ziina_advance_percent'] ?? 25));
 @endphp

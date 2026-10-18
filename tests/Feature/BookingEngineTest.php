@@ -11,6 +11,7 @@ use App\Models\CouponUsage;
 use App\Models\RequestLog;
 use App\Models\Review;
 use App\Models\Setting;
+use App\Models\Tier;
 use App\Models\Tour;
 use App\Models\User;
 use App\Models\WhatsappInquiry;
@@ -1457,5 +1458,65 @@ class BookingEngineTest extends TestCase
 
         $payment->refresh();
         $this->assertEquals('completed', $payment->status);
+    }
+
+    /**
+     * Test booking modal and date selection starts from today in Dubai.
+     */
+    public function test_booking_modal_date_picker_starts_from_today_in_dubai(): void
+    {
+        $todayDubai = now('Asia/Dubai')->format('Y-m-d');
+
+        $view = $this->blade('@include("partials.booking-modal")');
+        $view->assertSee('min="'.$todayDubai.'"', false);
+
+        // Verify that submitting a checkout booking for today succeeds
+        $tour = Tour::first() ?? Tour::create([
+            'name' => 'Evening Red Dunes Safari',
+            'slug' => 'evening-red-dunes-safari-today-test',
+            'status' => 'active',
+            'base_price' => 150.00,
+        ]);
+        $tier = $tour->tiers()->first();
+        if (! $tier) {
+            $tier = Tier::create([
+                'name' => 'Standard Package',
+                'slug' => 'standard-package-today-test',
+                'priority' => 1,
+            ]);
+            $tour->tiers()->attach($tier->id, [
+                'price' => 150.00,
+            ]);
+        }
+
+        \App\Models\VerifiedEmail::create([
+            'email' => 'todayguest@example.com',
+            'verified_at' => now(),
+        ]);
+
+        $payload = [
+            'tour_id' => $tour->id,
+            'tier_id' => $tier->id,
+            'date' => $todayDubai,
+            'adults' => 2,
+            'children' => 0,
+            'infants' => 0,
+            'location' => 'Dubai Marina Mall, Dubai',
+            'name' => 'Today Guest',
+            'email' => 'todayguest@example.com',
+            'phone' => '+971501234567',
+            'payment_method' => 'cash',
+        ];
+
+        $response = $this->postJson('/api/v1/booking/checkout', $payload);
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+        ]);
+
+        $created = Booking::where('email', 'todayguest@example.com')->latest()->first();
+        $this->assertNotNull($created);
+        $this->assertEquals($todayDubai, $created->tour_date?->format('Y-m-d'));
+        $this->assertEquals('pending', $created->status);
     }
 }

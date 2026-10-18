@@ -46,11 +46,12 @@ class BookingController extends Controller
      */
     public function checkout(Request $request): JsonResponse
     {
+        $minValidDate = min(now('Asia/Dubai')->toDateString(), now('UTC')->toDateString());
         try {
             $request->validate([
                 'tour_id' => 'required|integer',
                 'tier_id' => 'required|integer',
-                'date' => 'required|date|after_or_equal:today',
+                'date' => 'required|date|after_or_equal:'.$minValidDate,
                 'adults' => 'required|integer|min:1',
                 'children' => 'nullable|integer|min:0',
                 'infants' => 'nullable|integer|min:0',
