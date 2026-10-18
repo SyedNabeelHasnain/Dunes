@@ -212,11 +212,28 @@ window.openWhatsApp = function(tourName, directHref) {
         window.WHATSAPP_FORM_ENABLED === 'true'
     );
     var defaultNum = String(window.WHATSAPP_NUMBER || '971502456056').replace(/[^0-9]/g, '');
-    var msg = tourName ? ('Hello, I would like to inquire about ' + tourName + '.') : 'Hello, I would like to inquire about Dubai desert safaris.';
-    var targetUrl = directHref || ('https://wa.me/' + defaultNum + '?text=' + encodeURIComponent(msg));
+    var refCode = 'WA-' + Math.floor(1000 + Math.random() * 9000);
+    var msg = (tourName ? ('Hello, I would like to inquire about ' + tourName + '.') : 'Hello, I would like to inquire about Dubai desert safaris.') + ' [Ref: #' + refCode + ']';
+    var targetUrl = directHref 
+        ? (directHref.includes('?') ? (directHref.includes('text=') ? directHref : directHref + '&text=' + encodeURIComponent(msg)) : directHref + '?text=' + encodeURIComponent(msg))
+        : ('https://wa.me/' + defaultNum + '?text=' + encodeURIComponent(msg));
 
     if (!formEnabled) {
         window.open(targetUrl, '_blank', 'noopener,noreferrer');
+        try {
+            var csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            var fd = new FormData();
+            fd.append('action', 'logWhatsApp');
+            fd.append('csrf_token', csrf);
+            fd.append('_token', csrf);
+            fd.append('name', 'N/A');
+            fd.append('phone', 'N/A');
+            fd.append('tour_name', tourName || 'General Inquiry');
+            fd.append('page_url', window.location.href);
+            fd.append('message_text', msg);
+            fd.append('ref_code', refCode);
+            fetch('/ajax.php', { method: 'POST', body: fd, keepalive: true }).catch(function(){});
+        } catch (e) {}
         return;
     }
     if (window.Alpine && Alpine.store('modal')) {

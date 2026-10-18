@@ -12,6 +12,396 @@ Alpine.plugin(collapse);
 window.Alpine = Alpine;
 
 // =============================================================================
+// FIRST-PARTY PROSPECT IDENTITY RESOLUTION (Cross-Form & Session Graph)
+// =============================================================================
+window.DunesProspect = {
+    save(data) {
+        try {
+            if (!data || typeof data !== 'object') return;
+            const current = this.get() || {};
+            const cleanName = (data.name && String(data.name).trim() !== '' && data.name !== 'N/A' && data.name !== 'Anonymous') ? String(data.name).trim() : (current.name || '');
+            const cleanPhone = (data.phone && String(data.phone).trim() !== '' && data.phone !== 'N/A') ? String(data.phone).trim() : (current.phone || '');
+            const cleanEmail = (data.email && String(data.email).trim() !== '' && data.email.includes('@')) ? String(data.email).trim() : (current.email || '');
+
+            const updated = {
+                name: cleanName,
+                phone: cleanPhone,
+                email: cleanEmail,
+                ts: Date.now()
+            };
+            if (updated.name || updated.phone || updated.email) {
+                localStorage.setItem('dunes_prospect_profile', JSON.stringify(updated));
+            }
+        } catch (e) {}
+    },
+    get() {
+        try {
+            const raw = localStorage.getItem('dunes_prospect_profile');
+            let data = null;
+            if (raw) {
+                data = JSON.parse(raw);
+                if (data && data.ts && (Date.now() - data.ts > 90 * 86400 * 1000)) {
+                    data = null;
+                }
+            }
+            if (!data) data = {};
+            // Also merge legacy guest items if available
+            const legacyName = localStorage.getItem('dunes_guest_name');
+            const legacyPhone = localStorage.getItem('dunes_guest_phone');
+            const legacyEmail = localStorage.getItem('dunes_guest_email');
+            if (!data.name && legacyName && legacyName !== 'N/A' && legacyName !== 'Anonymous') data.name = legacyName;
+            if (!data.phone && legacyPhone && legacyPhone !== 'N/A') data.phone = legacyPhone;
+            if (!data.email && legacyEmail && legacyEmail.includes('@')) data.email = legacyEmail;
+
+            return (data.name || data.phone || data.email) ? data : null;
+        } catch (e) {}
+        return null;
+    }
+};
+
+// Global listener to passively capture prospect identity whenever forms or inputs are filled
+document.addEventListener('change', function(e) {
+    const el = e.target;
+    if (!el || !el.tagName || el.tagName.toLowerCase() !== 'input') return;
+    const nameAttr = (el.name || '').toLowerCase();
+    const idAttr = (el.id || '').toLowerCase();
+    const val = (el.value || '').trim();
+    if (!val) return;
+
+    if (el.type === 'email' || nameAttr.includes('email') || idAttr.includes('email')) {
+        if (val.includes('@')) window.DunesProspect.save({ email: val });
+    } else if (el.type === 'tel' || nameAttr.includes('phone') || idAttr.includes('phone')) {
+        if (val.length >= 6) window.DunesProspect.save({ phone: val });
+    } else if (nameAttr === 'name' || nameAttr === 'first_name' || idAttr === 'bookingname' || idAttr === 'waname' || idAttr === 'contactname') {
+        if (val.length >= 2 && !val.includes('@')) window.DunesProspect.save({ name: val });
+    }
+}, true);
+
+// =============================================================================
+// MARKETING ACQUISITION & MULTI-PAGE BREADCRUMB JOURNEY ENGINE
+// =============================================================================
+window.DunesJourneyTracker = {
+    _startTime: Date.now(),
+    _activeDuration: 0,
+    _lastActiveTick: Date.now(),
+    _isTabVisible: true,
+    _sectionsSeen: new Set(),
+    _initialized: false,
+    _currentStepIndex: 0,
+
+    init() {
+        if (this._initialized) return;
+        this._initialized = true;
+
+        this._resolveAttribution();
+        this._recordCurrentPage();
+        this._setupDwellTimer();
+        this._setupSectionObserver();
+        this._bindPageLifecycle();
+    },
+
+    // 1. First-Touch Marketing Attribution Resolution
+    _resolveAttribution() {
+        try {
+            let attribution = null;
+            const sessionRaw = sessionStorage.getItem('dunes_attribution');
+            if (sessionRaw) {
+                try { attribution = JSON.parse(sessionRaw); } catch (e) {}
+            }
+
+            if (!attribution) {
+                const url = new URL(window.location.href);
+                const sp = url.searchParams;
+
+                const gclid = sp.get('gclid') || sp.get('gbraid') || sp.get('wbraid');
+                const fbclid = sp.get('fbclid');
+                const ttclid = sp.get('ttclid');
+                const twclid = sp.get('twclid');
+                const msclkid = sp.get('msclkid');
+                const gadSource = sp.get('gad_source');
+
+                const utmSource = sp.get('utm_source') || '';
+                const utmMedium = sp.get('utm_medium') || '';
+                const utmCampaign = sp.get('utm_campaign') || '';
+                const utmTerm = sp.get('utm_term') || '';
+                const utmContent = sp.get('utm_content') || '';
+
+                // Raw external referrer
+                let rawRef = document.referrer ? String(document.referrer).trim() : '';
+                let refHost = '';
+                if (rawRef) {
+                    try {
+                        const parsedRef = new URL(rawRef);
+                        refHost = parsedRef.hostname.replace(/^www\./, '');
+                        // If internal referrer from the same domain, discard as external referrer
+                        if (parsedRef.hostname === window.location.hostname || refHost === window.location.hostname.replace(/^www\./, '')) {
+                            rawRef = '';
+                            refHost = '';
+                        }
+                    } catch (e) {
+                        refHost = '';
+                    }
+                }
+
+                // Channel Classification Hierarchy
+                let channel = 'Direct';
+                const lowerMed = utmMedium.toLowerCase();
+                const lowerSrc = utmSource.toLowerCase();
+
+                if (gclid || gadSource || lowerMed === 'cpc' || lowerMed === 'ppc' || lowerSrc === 'google_ads' || lowerSrc.includes('google ads')) {
+                    channel = utmCampaign ? `Google Ads (${utmCampaign})` : 'Google Ads';
+                } else if (fbclid || ((refHost.includes('facebook.com') || refHost.includes('fb.com')) && (lowerMed === 'cpc' || lowerMed === 'paid'))) {
+                    channel = 'Facebook Ads';
+                } else if (fbclid || refHost.includes('facebook.com') || refHost.includes('fb.com')) {
+                    channel = 'Facebook';
+                } else if (refHost.includes('instagram.com') || sp.has('igshid') || lowerSrc.includes('instagram')) {
+                    channel = 'Instagram';
+                } else if (ttclid || refHost.includes('tiktok.com') || lowerSrc.includes('tiktok')) {
+                    channel = 'TikTok';
+                } else if (refHost.includes('youtube.com') || refHost.includes('youtu.be') || lowerSrc.includes('youtube')) {
+                    channel = 'YouTube';
+                } else if (twclid || refHost.includes('twitter.com') || refHost.includes('x.com') || refHost.includes('t.co') || lowerSrc.includes('twitter')) {
+                    channel = 'X (Twitter)';
+                } else if (refHost.includes('linkedin.com') || refHost.includes('lnkd.in') || sp.has('li_fat_id') || lowerSrc.includes('linkedin')) {
+                    channel = 'LinkedIn';
+                } else if (refHost.includes('tripadvisor.') || lowerSrc.includes('tripadvisor')) {
+                    channel = 'TripAdvisor';
+                } else if (msclkid || (refHost.includes('bing.') && (lowerMed === 'cpc' || lowerMed === 'paid'))) {
+                    channel = 'Bing Ads';
+                } else if (refHost.includes('bing.')) {
+                    channel = 'Bing Organic';
+                } else if (refHost.includes('google.')) {
+                    channel = 'Google Organic';
+                } else if (refHost.includes('yahoo.')) {
+                    channel = 'Yahoo Search';
+                } else if (lowerMed === 'email' || lowerSrc.includes('newsletter') || lowerSrc.includes('email')) {
+                    channel = utmCampaign ? `Email (${utmCampaign})` : 'Email Campaign';
+                } else if (refHost) {
+                    channel = `Referral: ${refHost}`;
+                } else {
+                    channel = 'Direct';
+                }
+
+                attribution = {
+                    traffic_channel: channel,
+                    initial_referrer: rawRef || 'Direct / None',
+                    landing_page: window.location.pathname + window.location.search,
+                    landing_full_url: window.location.href,
+                    gclid: gclid || null,
+                    fbclid: fbclid || null,
+                    utm_source: utmSource || null,
+                    utm_medium: utmMedium || null,
+                    utm_campaign: utmCampaign || null,
+                    utm_term: utmTerm || null,
+                    utm_content: utmContent || null,
+                    first_visited_at: new Date().toISOString()
+                };
+
+                sessionStorage.setItem('dunes_attribution', JSON.stringify(attribution));
+                try {
+                    if (!localStorage.getItem('dunes_first_touch')) {
+                        localStorage.setItem('dunes_first_touch', JSON.stringify(attribution));
+                    }
+                } catch (e) {}
+            }
+        } catch (e) {}
+    },
+
+    // 2. Multi-Page Breadcrumb Journey Timeline
+    _recordCurrentPage() {
+        try {
+            let timeline = [];
+            const rawTimeline = sessionStorage.getItem('dunes_journey_timeline');
+            if (rawTimeline) {
+                try { timeline = JSON.parse(rawTimeline); } catch (e) { timeline = []; }
+            }
+            if (!Array.isArray(timeline)) timeline = [];
+
+            const currentPath = window.location.pathname || '/';
+            const pageTitle = (document.title || 'Desert Safari Dubai').split('|')[0].trim();
+
+            this._currentStepIndex = timeline.length;
+            timeline.push({
+                step: timeline.length + 1,
+                url: currentPath,
+                title: pageTitle,
+                duration_seconds: 0,
+                sections: [],
+                timestamp: new Date().toISOString()
+            });
+
+            sessionStorage.setItem('dunes_journey_timeline', JSON.stringify(timeline));
+        } catch (e) {}
+    },
+
+    // 3. Active Dwell Timer (Accurately pauses when browser tab is inactive/hidden)
+    _setupDwellTimer() {
+        this._isTabVisible = !document.hidden;
+        this._lastActiveTick = Date.now();
+
+        const tick = () => {
+            const now = Date.now();
+            if (this._isTabVisible) {
+                const delta = Math.floor((now - this._lastActiveTick) / 1000);
+                if (delta >= 1) {
+                    this._activeDuration += delta;
+                    this._lastActiveTick = now;
+                    this._persistCurrentDwell();
+                }
+            } else {
+                this._lastActiveTick = now;
+            }
+        };
+
+        setInterval(tick, 2000);
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                this._isTabVisible = false;
+                this._persistCurrentDwell();
+            } else {
+                this._isTabVisible = true;
+                this._lastActiveTick = Date.now();
+            }
+        });
+    },
+
+    _persistCurrentDwell() {
+        try {
+            const raw = sessionStorage.getItem('dunes_journey_timeline');
+            if (!raw) return;
+            const timeline = JSON.parse(raw);
+            if (Array.isArray(timeline) && timeline[this._currentStepIndex]) {
+                timeline[this._currentStepIndex].duration_seconds = this._activeDuration;
+                timeline[this._currentStepIndex].sections = Array.from(this._sectionsSeen);
+                sessionStorage.setItem('dunes_journey_timeline', JSON.stringify(timeline));
+            }
+        } catch (e) {}
+    },
+
+    // 4. High-Value Section View Observer (IntersectionObserver)
+    _setupSectionObserver() {
+        if (typeof IntersectionObserver === 'undefined') return;
+
+        const sectionMap = [
+            { selector: '#itinerary, [data-section="itinerary"], .tour-itinerary', name: 'Itinerary Timeline' },
+            { selector: '#pricing, #packages, [data-section="pricing"], .tier-matrix', name: 'Pricing Tiers & Packages' },
+            { selector: '#camp-experience, [data-section="camp"], .vip-camp', name: 'VIP Camp Experience' },
+            { selector: '#inclusions, [data-section="inclusions"], .tour-inclusions', name: 'Inclusions & Exclusions' },
+            { selector: '#addons, [data-section="addons"], .addons-grid', name: 'Quad & Buggy Add-ons' },
+            { selector: '#reviews, [data-section="reviews"], .guest-reviews-section', name: 'Guest Reviews' },
+            { selector: '#faq, [data-section="faq"], .tour-faqs', name: 'FAQs & Policies' },
+            { selector: '#gallery, [data-section="gallery"], .tour-gallery', name: 'Media Gallery' },
+            { selector: '#customizerApp, .customizer-container', name: 'Custom Safari Builder' }
+        ];
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && entry.intersectionRatio >= 0.25) {
+                    const name = entry.target.dataset?.journeySectionName;
+                    if (name && !this._sectionsSeen.has(name)) {
+                        this._sectionsSeen.add(name);
+                        this._persistCurrentDwell();
+                    }
+                }
+            });
+        }, { threshold: [0.25] });
+
+        const bindElements = () => {
+            sectionMap.forEach(item => {
+                const els = document.querySelectorAll(item.selector);
+                els.forEach(el => {
+                    el.dataset.journeySectionName = item.name;
+                    observer.observe(el);
+                });
+            });
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', bindElements);
+        } else {
+            bindElements();
+        }
+    },
+
+    recordCustomSection(sectionName) {
+        if (!sectionName) return;
+        this._sectionsSeen.add(String(sectionName).trim());
+        this._persistCurrentDwell();
+    },
+
+    // 5. Page Flush on Unload
+    _bindPageLifecycle() {
+        const flush = () => {
+            this._persistCurrentDwell();
+        };
+        window.addEventListener('beforeunload', flush);
+        window.addEventListener('pagehide', flush);
+    },
+
+    // 6. Comprehensive Summary for Lead Ingestion
+    getSummary() {
+        this._persistCurrentDwell();
+
+        let attribution = {};
+        try {
+            const raw = sessionStorage.getItem('dunes_attribution');
+            if (raw) attribution = JSON.parse(raw);
+        } catch (e) {}
+
+        let timeline = [];
+        try {
+            const rawTimeline = sessionStorage.getItem('dunes_journey_timeline');
+            if (rawTimeline) timeline = JSON.parse(rawTimeline);
+        } catch (e) {}
+
+        if (!Array.isArray(timeline) || timeline.length === 0) {
+            timeline = [{
+                step: 1,
+                url: window.location.pathname || '/',
+                title: (document.title || 'Desert Safari Dubai').split('|')[0].trim(),
+                duration_seconds: Math.max(5, this._activeDuration),
+                sections: Array.from(this._sectionsSeen),
+                timestamp: new Date().toISOString()
+            }];
+        }
+
+        let totalDuration = 0;
+        timeline.forEach(step => {
+            totalDuration += (parseInt(step.duration_seconds, 10) || 0);
+        });
+
+        return {
+            traffic_channel: attribution.traffic_channel || 'Direct',
+            initial_referrer: attribution.initial_referrer || 'Direct / None',
+            landing_page: attribution.landing_page || (window.location.pathname || '/'),
+            session_duration_seconds: totalDuration,
+            pages_viewed_count: timeline.length,
+            journey_timeline: JSON.stringify(timeline),
+            gclid: attribution.gclid || null,
+            fbclid: attribution.fbclid || null
+        };
+    },
+
+    injectIntoFormData(fd) {
+        if (!fd || typeof fd.append !== 'function') return;
+        const summary = this.getSummary();
+
+        if (!fd.has('traffic_channel') && summary.traffic_channel) fd.append('traffic_channel', summary.traffic_channel);
+        if (!fd.has('initial_referrer') && summary.initial_referrer) fd.append('initial_referrer', summary.initial_referrer);
+        if (!fd.has('landing_page') && summary.landing_page) fd.append('landing_page', summary.landing_page);
+        if (!fd.has('session_duration_seconds')) fd.append('session_duration_seconds', summary.session_duration_seconds);
+        if (!fd.has('pages_viewed_count')) fd.append('pages_viewed_count', summary.pages_viewed_count);
+        if (!fd.has('journey_timeline')) fd.append('journey_timeline', summary.journey_timeline);
+        if (!fd.has('gclid') && summary.gclid) fd.append('gclid', summary.gclid);
+        if (!fd.has('fbclid') && summary.fbclid) fd.append('fbclid', summary.fbclid);
+    }
+};
+
+// Initialize immediately so initial referrer and landing are captured before any navigation
+window.DunesJourneyTracker.init();
+
+// =============================================================================
 // 1. ALPINE.JS REACTIVE STORES
 // =============================================================================
 
@@ -2238,11 +2628,58 @@ const App = {
             fd.append('action', 'logWhatsApp');
             fd.append('csrf_token', csrfToken);
             fd.append('_token', csrfToken);
-            fd.append('name', 'N/A');
-            fd.append('phone', 'N/A');
+
+            // Read first-party stored prospect identity if available
+            const identity = (window.DunesProspect && typeof window.DunesProspect.get === 'function') ? window.DunesProspect.get() : null;
+            if (identity) {
+                if (identity.name) fd.append('prospect_name', identity.name);
+                if (identity.phone) fd.append('prospect_phone', identity.phone);
+                if (identity.email) fd.append('prospect_email', identity.email);
+            }
+
+            fd.append('name', identity?.name || 'N/A');
+            fd.append('phone', identity?.phone || 'N/A');
+            if (identity?.email) fd.append('email', identity.email);
             fd.append('tour_name', tourName || 'General Inquiry');
             fd.append('page_url', window.location.href);
-            fd.append('message_text', prefillMsg);
+
+            // Detailed client-side telemetry
+            const screenRes = `${window.screen?.width || 0}x${window.screen?.height || 0}`;
+            const clientTimezone = (typeof Intl !== 'undefined' && Intl.DateTimeFormat) ? Intl.DateTimeFormat().resolvedOptions().timeZone : '';
+            const clientLanguage = navigator.language || navigator.userLanguage || '';
+            fd.append('screen_res', screenRes);
+            fd.append('client_timezone', clientTimezone);
+            fd.append('client_language', clientLanguage);
+
+            // Marketing attribution
+            try {
+                const sp = new URLSearchParams(window.location.search);
+                if (sp.get('utm_source')) fd.append('utm_source', sp.get('utm_source'));
+                if (sp.get('utm_medium')) fd.append('utm_medium', sp.get('utm_medium'));
+                if (sp.get('utm_campaign')) fd.append('utm_campaign', sp.get('utm_campaign'));
+                if (sp.get('utm_term')) fd.append('utm_term', sp.get('utm_term'));
+                if (sp.get('utm_content')) fd.append('utm_content', sp.get('utm_content'));
+                if (sp.get('gclid')) fd.append('gclid', sp.get('gclid'));
+            } catch (e) {}
+
+            // Inject complete multi-page journey timeline and acquisition attribution
+            if (window.DunesJourneyTracker && typeof window.DunesJourneyTracker.injectIntoFormData === 'function') {
+                window.DunesJourneyTracker.injectIntoFormData(fd);
+            }
+
+            // Unique correlation reference for this click
+            const refCode = 'WA-' + Math.floor(1000 + Math.random() * 9000);
+            fd.append('ref_code', refCode);
+
+            let trackedMsg = prefillMsg;
+            if (!trackedMsg.includes('[Ref:')) {
+                trackedMsg = trackedMsg.trim() + ` [Ref: #${refCode}]`;
+            }
+            fd.append('message_text', trackedMsg);
+
+            const trackedFallbackUrl = directHref 
+                ? (directHref.includes('?') ? (directHref.includes('text=') ? directHref : directHref + '&text=' + encodeURIComponent(trackedMsg)) : directHref + '?text=' + encodeURIComponent(trackedMsg))
+                : `https://wa.me/${defaultNum}?text=${encodeURIComponent(trackedMsg)}`;
 
             if (typeof window.gtag === 'function') {
                 window.gtag('event', 'contact', {
@@ -2261,7 +2698,7 @@ const App = {
             }
 
             // Open WhatsApp synchronously inside user click gesture to prevent popup blockers
-            window.open(fallbackUrl, '_blank', 'noopener,noreferrer');
+            window.open(trackedFallbackUrl, '_blank', 'noopener,noreferrer');
 
             fetch('/ajax.php', {
                 method: 'POST',
@@ -3753,6 +4190,11 @@ const App = {
                     });
                     if (fd.get('name')) {
                         try { localStorage.setItem('dunes_guest_name', String(fd.get('name'))); } catch (e) {}
+                    }
+
+                    // Inject complete multi-page journey timeline and acquisition attribution
+                    if (window.DunesJourneyTracker && typeof window.DunesJourneyTracker.injectIntoFormData === 'function') {
+                        window.DunesJourneyTracker.injectIntoFormData(fd);
                     }
 
                     // Google reCAPTCHA Enterprise

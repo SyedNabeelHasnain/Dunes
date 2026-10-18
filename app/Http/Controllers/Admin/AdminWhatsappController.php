@@ -29,12 +29,17 @@ class AdminWhatsappController extends Controller
             ->leftJoin('request_logs', 'whatsapp_inquiries.request_log_id', '=', 'request_logs.id')
             ->select(
                 'whatsapp_inquiries.*',
-                'request_logs.client_ip',
-                'request_logs.country',
-                'request_logs.city',
-                'request_logs.device_type',
-                'request_logs.browser_name',
-                'request_logs.os_name'
+                DB::raw("COALESCE(NULLIF(whatsapp_inquiries.client_ip, ''), NULLIF(request_logs.client_ip, ''), 'Not Available') as client_ip"),
+                DB::raw("COALESCE(NULLIF(whatsapp_inquiries.country, ''), NULLIF(request_logs.country, ''), 'Unknown') as country"),
+                DB::raw("COALESCE(NULLIF(whatsapp_inquiries.city, ''), NULLIF(request_logs.city, ''), 'Unknown') as city"),
+                DB::raw("COALESCE(NULLIF(whatsapp_inquiries.region, ''), NULLIF(request_logs.region, ''), '') as region"),
+                DB::raw("COALESCE(NULLIF(whatsapp_inquiries.device_type, ''), NULLIF(request_logs.device_type, ''), 'Desktop') as device_type"),
+                DB::raw("COALESCE(NULLIF(whatsapp_inquiries.browser_name, ''), NULLIF(request_logs.browser_name, ''), 'Unknown') as browser_name"),
+                DB::raw("COALESCE(NULLIF(whatsapp_inquiries.os_name, ''), NULLIF(request_logs.os_name, ''), 'Unknown') as os_name"),
+                DB::raw("COALESCE(NULLIF(whatsapp_inquiries.isp, ''), NULLIF(request_logs.isp, ''), 'Not Available') as isp"),
+                DB::raw("COALESCE(NULLIF(whatsapp_inquiries.organization, ''), NULLIF(request_logs.organization, ''), 'Not Available') as organization"),
+                DB::raw("COALESCE(NULLIF(whatsapp_inquiries.utm_source, ''), NULLIF(request_logs.utm_source, ''), 'Direct') as utm_source"),
+                DB::raw("COALESCE(NULLIF(whatsapp_inquiries.utm_campaign, ''), NULLIF(request_logs.utm_campaign, ''), 'Not Available') as utm_campaign")
             );
 
         if ($fromDate) {
@@ -245,8 +250,10 @@ class AdminWhatsappController extends Controller
         ];
 
         $columns = [
-            'ID', 'Timestamp', 'Customer Name', 'Phone Number', 'Tour / Activity',
-            'Source Page URL', 'Prefill Message', 'Client IP', 'Location', 'Device Type', 'OS / Browser',
+            'ID', 'Timestamp', 'Customer Name', 'Phone Number', 'Email', 'Tour / Activity',
+            'Traffic Channel', 'Initial Referrer', 'Landing Page', 'Stay Duration (Sec)', 'Pages Viewed',
+            'Google Ads GCLID', 'Meta FBCLID', 'Prospect Source', 'Source Page URL',
+            'Prefill Message', 'Client IP', 'Location', 'ISP / Carrier', 'Device Type', 'OS / Browser',
         ];
 
         $sanitize = function (array $row): array {
@@ -274,11 +281,21 @@ class AdminWhatsappController extends Controller
                     $lead->created_at,
                     $lead->name ?: 'Visitor',
                     $lead->phone ?: '',
+                    $lead->email ?: '',
                     $lead->tour_name ?: 'General',
+                    $lead->traffic_channel ?: ($lead->utm_source ?: 'Direct'),
+                    $lead->initial_referrer ?: ($lead->referrer_url ?: 'Direct / None'),
+                    $lead->landing_page ?: ($lead->page_url ?: ''),
+                    $lead->session_duration_seconds ?? 0,
+                    $lead->pages_viewed_count ?? 1,
+                    $lead->gclid ?: '',
+                    $lead->fbclid ?: '',
+                    $lead->prospect_source ?: 'Direct Click',
                     $lead->page_url ?: '',
                     $lead->message_text ?: '',
                     $lead->client_ip ?: '',
                     ($lead->city ?: 'Unknown').', '.($lead->country ?: ''),
+                    $lead->isp ?: ($lead->organization ?: ''),
                     $lead->device_type ?: 'Desktop',
                     ($lead->os_name ?: '').' / '.($lead->browser_name ?: ''),
                 ]));

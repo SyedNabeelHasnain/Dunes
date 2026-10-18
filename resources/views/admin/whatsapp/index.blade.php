@@ -181,6 +181,7 @@
                         </th>
                         <th class="py-3 px-4">Date & Time</th>
                         <th class="py-3 px-4">Customer</th>
+                        <th class="py-3 px-4">Acquisition & Stay</th>
                         <th class="py-3 px-4">Interest Context</th>
                         <th class="py-3 px-4">Message Snippet</th>
                         <th class="py-3 px-4">Location</th>
@@ -192,6 +193,12 @@
                     @forelse($leads as $lead)
                     @php
                         $isUnread = empty($lead->is_read) || $lead->status === 'new';
+                        $channel = $lead->traffic_channel ?: ($lead->utm_source ?: 'Direct');
+                        $durationSec = (int) ($lead->session_duration_seconds ?? 0);
+                        $pagesViewed = (int) ($lead->pages_viewed_count ?? 1);
+                        $mins = floor($durationSec / 60);
+                        $secs = $durationSec % 60;
+                        $stayStr = $durationSec > 0 ? ($mins > 0 ? "{$mins}m {$secs}s" : "{$secs}s") : '<15s';
                     @endphp
                     <tr id="whatsapp-row-{{ $lead->id }}" class="transition-colors {{ $isUnread ? 'is-unread-lead bg-emerald-50/50 hover:bg-emerald-100/50 border-l-4 border-l-emerald-500 font-semibold' : 'hover:bg-slate-50/60' }} whatsapp-row" data-id="{{ $lead->id }}">
                         <td class="py-3 px-4 no-export">
@@ -206,16 +213,66 @@
                             </div>
                         </td>
                         <td class="py-3 px-4">
-                            <div class="flex items-center gap-1.5">
+                            <div class="flex items-center gap-1.5 flex-wrap">
                                 @if($isUnread)
                                     <span class="unread-badge inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300 uppercase tracking-wide">
                                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> New
+                                    </span>
+                                @endif
+                                @if(!empty($lead->prospect_source) && $lead->prospect_source !== 'Direct Click')
+                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-extrabold bg-blue-100 text-blue-800 border border-blue-200 uppercase tracking-wide" title="{{ $lead->prospect_source }}">
+                                        <i class="bi bi-person-check-fill"></i> {{ Str::limit($lead->prospect_source, 18) }}
                                     </span>
                                 @endif
                                 <span class="font-bold text-slate-900 text-xs">{{ $lead->name ?: 'Visitor' }}</span>
                             </div>
                             <div class="text-emerald-600 font-mono font-bold text-xs mt-0.5">
                                 {{ $lead->phone }}
+                            </div>
+                            @if(!empty($lead->email))
+                                <div class="text-[11px] text-slate-400 truncate max-w-[160px]" title="{{ $lead->email }}">
+                                    {{ $lead->email }}
+                                </div>
+                            @endif
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="flex flex-col gap-1 items-start">
+                                @if(str_contains(strtolower($channel), 'google ads'))
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-300">
+                                        <i class="bi bi-google"></i> {{ $channel }}
+                                    </span>
+                                @elseif(str_contains(strtolower($channel), 'google'))
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-800 border border-blue-200">
+                                        <i class="bi bi-google"></i> Google
+                                    </span>
+                                @elseif(str_contains(strtolower($channel), 'instagram'))
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-pink-50 text-pink-800 border border-pink-200">
+                                        <i class="bi bi-instagram"></i> Instagram
+                                    </span>
+                                @elseif(str_contains(strtolower($channel), 'facebook'))
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                                        <i class="bi bi-facebook"></i> Facebook
+                                    </span>
+                                @elseif(str_contains(strtolower($channel), 'tiktok'))
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-900 text-white">
+                                        <i class="bi bi-tiktok"></i> TikTok
+                                    </span>
+                                @elseif(str_contains(strtolower($channel), 'youtube'))
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                        <i class="bi bi-youtube"></i> YouTube
+                                    </span>
+                                @elseif(str_contains(strtolower($channel), 'referral'))
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200" title="{{ $lead->initial_referrer }}">
+                                        <i class="bi bi-box-arrow-up-right"></i> {{ Str::limit($channel, 18) }}
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                                        Direct Visit
+                                    </span>
+                                @endif
+                                <div class="text-[11px] font-mono text-slate-500 flex items-center gap-1" title="Active dwell time & pages viewed">
+                                    <i class="bi bi-stopwatch text-slate-400"></i> {{ $stayStr }} <span class="text-slate-300">•</span> {{ $pagesViewed }} {{ Str::plural('page', $pagesViewed) }}
+                                </div>
                             </div>
                         </td>
                         <td class="py-3 px-4">
@@ -232,6 +289,11 @@
                             <div class="text-xs font-semibold text-slate-700 flex items-center gap-1">
                                 <i class="bi bi-geo-alt-fill text-rose-500"></i> {{ $lead->city ?: 'Unknown' }}, {{ $lead->country ?: '' }}
                             </div>
+                            @if(!empty($lead->isp) && $lead->isp !== 'Not Available')
+                                <div class="text-[10px] text-slate-400 truncate max-w-[140px]" title="{{ $lead->isp }}">
+                                    {{ Str::limit($lead->isp, 20) }}
+                                </div>
+                            @endif
                         </td>
                         <td class="py-3 px-4">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 capitalize">
@@ -256,12 +318,25 @@
                                         data-id="{{ $lead->id }}"
                                         data-name="{{ $lead->name }}"
                                         data-phone="{{ $lead->phone }}"
+                                        data-email="{{ $lead->email ?? '' }}"
                                         data-context="{{ $lead->tour_name ?: 'General Inquiry' }}"
                                         data-url="{{ $lead->page_url }}"
                                         data-msg="{{ $lead->message_text }}"
                                         data-ip="{{ $lead->client_ip ?? $lead->ip_address ?? 'Not Available' }}"
                                         data-location="{{ ($lead->city ?? 'Unknown') . ', ' . ($lead->country ?? '') }}"
-                                        data-device="{{ ucfirst($lead->device_type ?? '-') }} ({{ $lead->os_name ?? '-' }} / {{ $lead->browser_name ?? '-' }})">
+                                        data-device="{{ ucfirst($lead->device_type ?? '-') }} ({{ $lead->os_name ?? '-' }} / {{ $lead->browser_name ?? '-' }})"
+                                        data-isp="{{ $lead->isp ?: ($lead->organization ?: 'Not Available') }}"
+                                        data-prospect-source="{{ $lead->prospect_source ?: 'Direct Click' }}"
+                                        data-attribution="{{ ($lead->utm_source ?: 'Direct') . ($lead->utm_campaign && $lead->utm_campaign !== 'Not Available' ? ' (' . $lead->utm_campaign . ')' : '') }}"
+                                        data-screen="{{ ($lead->screen_res ?: '-') . ' • ' . ($lead->client_timezone ?: '-') }}"
+                                        data-traffic-channel="{{ $lead->traffic_channel ?: ($lead->utm_source ?: 'Direct') }}"
+                                        data-initial-referrer="{{ $lead->initial_referrer ?: ($lead->referrer_url ?: 'Direct / None') }}"
+                                        data-landing-page="{{ $lead->landing_page ?: ($lead->page_url ?: '-') }}"
+                                        data-duration="{{ (int) ($lead->session_duration_seconds ?? 0) }}"
+                                        data-pages-count="{{ (int) ($lead->pages_viewed_count ?? 1) }}"
+                                        data-journey="{{ is_string($lead->journey_timeline) ? $lead->journey_timeline : json_encode($lead->journey_timeline ?? []) }}"
+                                        data-gclid="{{ $lead->gclid ?? '' }}"
+                                        data-fbclid="{{ $lead->fbclid ?? '' }}">
                                     <i class="bi bi-search text-xs"></i>
                                 </button>
                                 <button type="button" class="w-8 h-8 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 flex items-center justify-center bg-white transition shadow-2xs btn-delete-lead cursor-pointer" 
@@ -274,7 +349,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="text-center py-12 text-slate-400 text-xs">
+                        <td colspan="9" class="text-center py-12 text-slate-400 text-xs">
                             <i class="bi bi-whatsapp text-4xl block mb-2 opacity-50"></i>
                             No WhatsApp leads found matching your criteria.
                         </td>
@@ -329,7 +404,7 @@
                 <!-- Client Details -->
                 <div class="p-4 bg-slate-50/70 rounded-2xl border border-slate-200/80 space-y-3">
                     <h4 class="text-xs font-black uppercase text-emerald-600 tracking-wider flex items-center gap-1.5">
-                        <i class="bi bi-person-fill"></i> Customer Identity
+                        <i class="bi bi-person-fill"></i> Customer Identity & Prospect Note
                     </h4>
                     <div>
                         <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Customer Name</div>
@@ -340,8 +415,16 @@
                         <div class="text-xs font-mono font-bold text-emerald-600" id="modalCustomerPhone">-</div>
                     </div>
                     <div>
+                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Email Address</div>
+                        <div class="text-xs font-mono text-slate-700" id="modalCustomerEmail">Not Available</div>
+                    </div>
+                    <div>
                         <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Interest Context</div>
                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-primary text-white mt-0.5" id="modalTourName">-</span>
+                    </div>
+                    <div>
+                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Prospect Identity Source</div>
+                        <div class="text-xs font-semibold text-slate-700" id="modalProspectSource">Direct Click</div>
                     </div>
                     <div>
                         <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Source Page</div>
@@ -352,7 +435,7 @@
                 <!-- Telemetry -->
                 <div class="p-4 bg-slate-50/70 rounded-2xl border border-slate-200/80 space-y-3">
                     <h4 class="text-xs font-black uppercase text-primary tracking-wider flex items-center gap-1.5">
-                        <i class="bi bi-geo-alt-fill"></i> Visitor Telemetry
+                        <i class="bi bi-geo-alt-fill"></i> Visitor Telemetry & Network
                     </h4>
                     <div>
                         <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Client IP Address</div>
@@ -363,8 +446,79 @@
                         <div class="text-xs font-bold text-slate-800" id="modalLocation">-</div>
                     </div>
                     <div>
-                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Device Environment</div>
+                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Network Carrier / ISP</div>
+                        <div class="text-xs font-semibold text-slate-700" id="modalIsp">-</div>
+                    </div>
+                    <div>
+                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Device & Browser Environment</div>
                         <div class="text-xs font-medium text-slate-700" id="modalDevice">-</div>
+                    </div>
+                    <div>
+                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Screen & Timezone</div>
+                        <div class="text-xs font-mono text-slate-600" id="modalScreen">-</div>
+                    </div>
+                    <div>
+                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Marketing Attribution</div>
+                        <div class="text-xs font-semibold text-emerald-700" id="modalAttribution">Direct</div>
+                    </div>
+                </div>
+
+                <!-- Buyer Journey, Multi-Page Navigation & Active Dwell Time -->
+                <div class="sm:col-span-2 p-4 bg-slate-50/70 rounded-2xl border border-slate-200/80 space-y-3">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <h4 class="text-xs font-black uppercase text-amber-600 tracking-wider flex items-center gap-1.5">
+                            <i class="bi bi-signpost-split-fill"></i> Buyer Journey, Multi-Page Navigation & Dwell Time
+                        </h4>
+                        <div class="flex items-center gap-2">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-100 text-amber-900 border border-amber-300" id="modalSessionDuration">
+                                <i class="bi bi-stopwatch"></i> Total Stay: <15s
+                            </span>
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-200 text-slate-700" id="modalPagesCount">
+                                1 Page Visited
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Acquisition Summary Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                        <div class="p-2.5 bg-white rounded-xl border border-slate-200/80">
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Acquisition Channel</div>
+                            <div class="text-xs font-bold text-slate-900 mt-0.5" id="modalTrafficChannel">Direct</div>
+                        </div>
+                        <div class="p-2.5 bg-white rounded-xl border border-slate-200/80">
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Original Referrer</div>
+                            <div class="text-xs font-semibold text-slate-700 truncate mt-0.5" id="modalInitialReferrer">Direct / None</div>
+                        </div>
+                        <div class="p-2.5 bg-white rounded-xl border border-slate-200/80">
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Initial Landing Page</div>
+                            <div class="text-xs font-semibold text-primary truncate mt-0.5" id="modalLandingPage">-</div>
+                        </div>
+                    </div>
+
+                    <!-- Paid Ad Click Identifiers (GCLID / FBCLID) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" id="modalClickIdsWrapper">
+                        <div class="p-2 bg-amber-50/70 border border-amber-200 rounded-xl" id="modalGclidRow" style="display:none;">
+                            <div class="text-[10px] font-extrabold text-amber-800 uppercase tracking-wider flex items-center gap-1">
+                                <i class="bi bi-google"></i> Google Ads Click ID (GCLID)
+                            </div>
+                            <div class="text-[11px] font-mono text-slate-700 truncate mt-0.5" id="modalGclidVal">-</div>
+                        </div>
+                        <div class="p-2 bg-blue-50/70 border border-blue-200 rounded-xl" id="modalFbclidRow" style="display:none;">
+                            <div class="text-[10px] font-extrabold text-blue-800 uppercase tracking-wider flex items-center gap-1">
+                                <i class="bi bi-facebook"></i> Meta / Facebook Click ID (FBCLID)
+                            </div>
+                            <div class="text-[11px] font-mono text-slate-700 truncate mt-0.5" id="modalFbclidVal">-</div>
+                        </div>
+                    </div>
+
+                    <!-- Step-by-Step Browsing Path Timeline -->
+                    <div>
+                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+                            Step-by-Step Pages Browsed & High-Value Sections Explored:
+                        </div>
+                        <div class="space-y-2 max-h-56 overflow-y-auto pr-1" id="modalJourneyTimeline">
+                            <!-- Rendered dynamically via JS -->
+                        </div>
                     </div>
                 </div>
 
@@ -464,15 +618,121 @@ $(document).ready(function() {
         const ip = String(btn.attr('data-ip') || btn.data('ip') || '-').trim();
         const loc = String(btn.attr('data-location') || btn.data('location') || 'Unknown Location').trim();
         const device = String(btn.attr('data-device') || btn.data('device') || '-').trim();
+        const email = String(btn.attr('data-email') || btn.data('email') || '').trim();
+        const isp = String(btn.attr('data-isp') || btn.data('isp') || 'Not Available').trim();
+        const prospectSource = String(btn.attr('data-prospect-source') || btn.data('prospect-source') || 'Direct Click').trim();
+        const attribution = String(btn.attr('data-attribution') || btn.data('attribution') || 'Direct').trim();
+        const screen = String(btn.attr('data-screen') || btn.data('screen') || '-').trim();
+        const trafficChannel = String(btn.attr('data-traffic-channel') || btn.data('traffic-channel') || 'Direct').trim();
+        const initialReferrer = String(btn.attr('data-initial-referrer') || btn.data('initial-referrer') || 'Direct / None').trim();
+        const landingPage = String(btn.attr('data-landing-page') || btn.data('landing-page') || '-').trim();
+        const durationSec = parseInt(btn.attr('data-duration') || btn.data('duration') || 0, 10);
+        const pagesCount = parseInt(btn.attr('data-pages-count') || btn.data('pages-count') || 1, 10);
+        const rawJourney = btn.attr('data-journey') || btn.data('journey');
+        const gclid = String(btn.attr('data-gclid') || btn.data('gclid') || '').trim();
+        const fbclid = String(btn.attr('data-fbclid') || btn.data('fbclid') || '').trim();
 
         $('#modalCustomerName').text(name);
         $('#modalCustomerPhone').text(phone || 'No Phone');
+        $('#modalCustomerEmail').text(email || 'Not Available');
         $('#modalTourName').text(context);
+        $('#modalProspectSource').text(prospectSource);
         $('#modalPageUrl').attr('href', url).text(url);
         $('#modalClientIp').text(ip);
         $('#modalLocation').text(loc);
+        $('#modalIsp').text(isp);
         $('#modalDevice').text(device);
+        $('#modalScreen').text(screen);
+        $('#modalAttribution').text(attribution);
         $('#modalMessageText').text(msg);
+
+        // Journey and Attribution summary
+        const mins = Math.floor(durationSec / 60);
+        const secs = durationSec % 60;
+        const stayStr = durationSec > 0 ? (mins > 0 ? `${mins}m ${secs}s` : `${secs}s`) : '<15s';
+        $('#modalSessionDuration').html(`<i class="bi bi-stopwatch"></i> Total Stay: ${stayStr}`);
+        $('#modalPagesCount').text(`${pagesCount} ${pagesCount === 1 ? 'Page' : 'Pages'} Visited`);
+
+        $('#modalTrafficChannel').text(trafficChannel);
+        
+        if (initialReferrer.startsWith('http')) {
+            $('#modalInitialReferrer').html(`<a href="${initialReferrer}" target="_blank" rel="noopener" class="text-primary hover:underline">${initialReferrer}</a>`);
+        } else {
+            $('#modalInitialReferrer').text(initialReferrer);
+        }
+
+        if (landingPage.startsWith('http') || landingPage.startsWith('/')) {
+            $('#modalLandingPage').html(`<a href="${landingPage}" target="_blank" rel="noopener" class="text-primary hover:underline">${landingPage}</a>`);
+        } else {
+            $('#modalLandingPage').text(landingPage);
+        }
+
+        // Paid Click Identifiers
+        if (gclid) {
+            $('#modalGclidRow').show();
+            $('#modalGclidVal').text(gclid);
+        } else {
+            $('#modalGclidRow').hide();
+        }
+
+        if (fbclid) {
+            $('#modalFbclidRow').show();
+            $('#modalFbclidVal').text(fbclid);
+        } else {
+            $('#modalFbclidRow').hide();
+        }
+
+        // Parse and render timeline steps
+        let timeline = [];
+        try {
+            timeline = typeof rawJourney === 'object' ? rawJourney : JSON.parse(rawJourney);
+        } catch (e) {
+            timeline = [];
+        }
+
+        const timelineContainer = $('#modalJourneyTimeline');
+        timelineContainer.empty();
+
+        if (Array.isArray(timeline) && timeline.length > 0) {
+            timeline.forEach((step, idx) => {
+                const stepNum = idx + 1;
+                const pageTitle = step.title || step.url || `Page ${stepNum}`;
+                const pagePath = step.url || '/';
+                const stepSecs = parseInt(step.duration_seconds || 0, 10);
+                const sMins = Math.floor(stepSecs / 60);
+                const sSecs = stepSecs % 60;
+                const stepStay = stepSecs > 0 ? (sMins > 0 ? `${sMins}m ${sSecs}s` : `${sSecs}s`) : 'Brief glance';
+                const sections = Array.isArray(step.sections) ? step.sections : [];
+
+                let sectionsBadges = '';
+                if (sections.length > 0) {
+                    sectionsBadges = `
+                        <div class="flex items-center gap-1.5 flex-wrap mt-1">
+                            <span class="text-[9px] uppercase font-bold text-slate-400">Viewed Sections:</span>
+                            ${sections.map(s => `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-900 border border-amber-200/80"><i class="bi bi-eye-fill me-1 text-[9px] text-amber-600"></i>${s}</span>`).join('')}
+                        </div>
+                    `;
+                }
+
+                timelineContainer.append(`
+                    <div class="flex items-start gap-3 p-2.5 rounded-xl bg-white border border-slate-200/70 shadow-2xs">
+                        <div class="w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-black shrink-0 mt-0.5">
+                            ${stepNum}
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center justify-between gap-2 flex-wrap">
+                                <span class="text-xs font-bold text-slate-900 truncate">${pageTitle}</span>
+                                <span class="text-[10px] font-mono font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full"><i class="bi bi-clock"></i> ${stepStay}</span>
+                            </div>
+                            <div class="text-[11px] text-primary truncate font-mono mt-0.5">${pagePath}</div>
+                            ${sectionsBadges}
+                        </div>
+                    </div>
+                `);
+            });
+        } else {
+            timelineContainer.html('<div class="text-xs text-slate-400 italic p-2 bg-white rounded-xl border border-slate-200/70">Single-page direct inquiry (Direct landing)</div>');
+        }
 
         if (phone && phone !== 'No Phone') {
             const cleanPhone = String(phone).replace(/[^0-9]/g, '');

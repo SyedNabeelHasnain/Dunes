@@ -14,7 +14,29 @@ class VisitorTrackerService
      */
     public function resolveClientIp(): array
     {
-        $ip = request()->ip() ?: '0.0.0.0';
+        $rawIp = null;
+        $candidates = [
+            request()->header('cf-connecting-ip'),
+            request()->header('x-real-ip'),
+            request()->header('x-forwarded-for'),
+            request()->ip(),
+            request()->server('REMOTE_ADDR'),
+        ];
+
+        foreach ($candidates as $candidate) {
+            if (! empty($candidate)) {
+                $parts = explode(',', (string) $candidate);
+                foreach ($parts as $p) {
+                    $p = trim($p);
+                    if (filter_var($p, FILTER_VALIDATE_IP)) {
+                        $rawIp = $p;
+                        break 2;
+                    }
+                }
+            }
+        }
+
+        $ip = $rawIp ?: (request()->ip() ?: '0.0.0.0');
         $version = 'Not Available';
         if ($ip !== '0.0.0.0') {
             if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
@@ -35,16 +57,17 @@ class VisitorTrackerService
     }
 
     /**
-     * Lookup IP details from IP-API (with caching).
+     * Lookup IP details from resilient 3-tier free, keyless open-source APIs (with 24h caching).
      */
     public function ipLookup(string $ip): ?array
     {
-        if (in_array($ip, ['127.0.0.1', '::1', '0.0.0.0', 'localhost'])) {
+        if (empty($ip) || in_array($ip, ['127.0.0.1', '::1', '0.0.0.0', 'localhost', 'not available'])) {
             return null;
         }
 
         // Cache the lookup results for 24 hours to prevent API rate limiting
         return Cache::remember("geoip_{$ip}", 86400, function () use ($ip) {
+            // Tier 1: IP-API.com
             try {
                 $response = Http::timeout(2)
                     ->get("http://ip-api.com/json/{$ip}?fields=status,message,country,regionName,city,lat,lon,timezone,isp,org,as,hosting,proxy");
@@ -52,33 +75,73 @@ class VisitorTrackerService
                 if ($response->successful()) {
                     $data = $response->json();
                     if (($data['status'] ?? '') === 'success') {
-                        return $data;
+                        return [
+                            'country' => $data['country'] ?? null,
+                            'regionName' => $data['regionName'] ?? null,
+                            'city' => $data['city'] ?? null,
+                            'lat' => $data['lat'] ?? null,
+                            'lon' => $data['lon'] ?? null,
+                            'timezone' => $data['timezone'] ?? null,
+                            'isp' => $data['isp'] ?? null,
+                            'org' => $data['org'] ?? null,
+                            'as' => $data['as'] ?? null,
+                            'hosting' => $data['hosting'] ?? false,
+                            'proxy' => $data['proxy'] ?? false,
+                        ];
                     }
                 }
-            } catch (\Exception $e) {
-                Log::warning("IP-API Lookup failed for IP: {$ip}, trying fallback: ".$e->getMessage());
+            } catch (\Throwable $e) {
+                Log::warning("IP-API Lookup failed for IP {$ip}: ".$e->getMessage());
             }
 
-            // Fallback to FreeGeoIP
+            // Tier 2: ipwho.is (Fast, HTTPS, open, no keys or signups)
             try {
-                $response = Http::timeout(2)->get("https://reallyfreegeoip.org/json/{$ip}");
+                $response = Http::timeout(2)->get("https://ipwho.is/{$ip}");
                 if ($response->successful()) {
                     $data = $response->json();
-
-                    return [
-                        'country' => $data['country_name'] ?? null,
-                        'regionName' => $data['region_name'] ?? null,
-                        'city' => $data['city'] ?? null,
-                        'lat' => $data['latitude'] ?? null,
-                        'lon' => $data['longitude'] ?? null,
-                        'timezone' => $data['time_zone'] ?? null,
-                        'isp' => null,
-                        'org' => null,
-                        'as' => null,
-                    ];
+                    if (($data['success'] ?? false) === true) {
+                        return [
+                            'country' => $data['country'] ?? null,
+                            'regionName' => $data['region'] ?? null,
+                            'city' => $data['city'] ?? null,
+                            'lat' => $data['latitude'] ?? null,
+                            'lon' => $data['longitude'] ?? null,
+                            'timezone' => $data['timezone']['id'] ?? null,
+                            'isp' => $data['connection']['isp'] ?? null,
+                            'org' => $data['connection']['org'] ?? null,
+                            'as' => ! empty($data['connection']['asn']) ? ('AS'.$data['connection']['asn'].' '.($data['connection']['org'] ?? '')) : null,
+                            'hosting' => false,
+                            'proxy' => false,
+                        ];
+                    }
                 }
-            } catch (\Exception $e) {
-                Log::error("GeoIP Fallback failed for IP: {$ip}: ".$e->getMessage());
+            } catch (\Throwable $e) {
+                Log::warning("ipwho.is Lookup failed for IP {$ip}: ".$e->getMessage());
+            }
+
+            // Tier 3: freeipapi.com (Reliable HTTPS fallback, no keys or signups)
+            try {
+                $response = Http::timeout(2)->get("https://freeipapi.com/api/json/{$ip}");
+                if ($response->successful()) {
+                    $data = $response->json();
+                    if (! empty($data['countryName'])) {
+                        return [
+                            'country' => $data['countryName'] ?? null,
+                            'regionName' => $data['regionName'] ?? null,
+                            'city' => $data['cityName'] ?? null,
+                            'lat' => $data['latitude'] ?? null,
+                            'lon' => $data['longitude'] ?? null,
+                            'timezone' => $data['timeZones'][0] ?? null,
+                            'isp' => $data['asnOrganization'] ?? null,
+                            'org' => $data['asnOrganization'] ?? null,
+                            'as' => ! empty($data['asn']) ? ('AS'.$data['asn']) : null,
+                            'hosting' => false,
+                            'proxy' => $data['isProxy'] ?? false,
+                        ];
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning("freeipapi Lookup failed for IP {$ip}: ".$e->getMessage());
             }
 
             return null;
@@ -345,19 +408,19 @@ class VisitorTrackerService
     }
 
     /**
-     * Check if a request log should be skipped (e.g. search engines, loopbacks).
+     * Check if a request log should be skipped (e.g. search engines, bots).
      */
-    public function shouldSkip(array $ctx): bool
+    public function shouldSkip(array $ctx, string $entityType = 'other'): bool
     {
+        // Explicit human inquiries (WhatsApp clicks, contact messages, bookings) should NEVER be dropped
+        if (in_array($entityType, ['whatsapp', 'contact', 'booking', 'inquiry'])) {
+            return false;
+        }
+
         $ip = strtolower($ctx['client_ip'] ?? '');
         $ua = strtolower($ctx['user_agent'] ?? '');
 
         if (empty($ip) || in_array($ip, ['not available', '0.0.0.0', '127.0.0.1', '::1', 'localhost'])) {
-            return true;
-        }
-
-        // Whitelisted test client IP in prod to prevent log floods
-        if ($ip === '175.107.244.213') {
             return true;
         }
 
@@ -380,7 +443,7 @@ class VisitorTrackerService
      */
     public function logRequest(string $entityType, ?int $entityId, string $formName, array $ctx): ?int
     {
-        if ($this->shouldSkip($ctx)) {
+        if ($this->shouldSkip($ctx, $entityType)) {
             return null;
         }
 

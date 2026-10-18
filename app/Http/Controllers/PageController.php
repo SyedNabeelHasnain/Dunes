@@ -236,19 +236,99 @@ class PageController extends Controller
         $request->validate([
             'phone' => ['nullable', 'string', 'max:50', 'regex:/^([\+]?[0-9\s\-\(\)\.]{5,25}|N\/A)?$/i'],
             'name' => 'nullable|string|max:100',
+            'email' => 'nullable|string|max:150',
             'tour_name' => 'nullable|string|max:150',
             'page_url' => 'nullable|string|max:255',
             'message_text' => 'nullable|string|max:1000',
+            'prospect_name' => 'nullable|string|max:100',
+            'prospect_phone' => 'nullable|string|max:50',
+            'prospect_email' => 'nullable|string|max:150',
+            'screen_res' => 'nullable|string|max:50',
+            'client_timezone' => 'nullable|string|max:100',
+            'client_language' => 'nullable|string|max:50',
+            'ref_code' => 'nullable|string|max:30',
+            'traffic_channel' => 'nullable|string|max:100',
+            'initial_referrer' => 'nullable|string|max:2000',
+            'landing_page' => 'nullable|string|max:2000',
+            'session_duration_seconds' => 'nullable|integer|min:0',
+            'pages_viewed_count' => 'nullable|integer|min:1',
+            'journey_timeline' => 'nullable',
+            'gclid' => 'nullable|string|max:150',
+            'fbclid' => 'nullable|string|max:150',
         ]);
 
         $name = strip_tags(trim($request->input('name', 'Anonymous'))) ?: 'Anonymous';
         $phone = strip_tags(trim($request->input('phone', 'N/A'))) ?: 'N/A';
+        $email = strip_tags(trim($request->input('email', '')));
         $tourName = strip_tags(trim($request->input('tour_name', 'General Inquiry'))) ?: 'General Inquiry';
         $pageUrl = strip_tags(trim($request->input('page_url', '')));
         $messageText = strip_tags(trim($request->input('message_text', '')));
 
+        // Collect comprehensive request context & telemetry
+        $ctx = $this->tracker->collectRequestContext('whatsapp', $request->all());
+
+        // First-party prospect resolution
+        $prospectSource = 'Direct Click';
+        if ($name === 'Anonymous' || $name === 'N/A' || empty($name)) {
+            if ($request->filled('prospect_name')) {
+                $name = strip_tags(trim($request->input('prospect_name')));
+                if ($phone === 'N/A' || empty($phone)) {
+                    $phone = strip_tags(trim($request->input('prospect_phone', 'N/A'))) ?: 'N/A';
+                }
+                if (empty($email)) {
+                    $email = strip_tags(trim($request->input('prospect_email', '')));
+                }
+                $prospectSource = 'Stored Browser Profile';
+            } else {
+                $clientIp = $ctx['client_ip'] ?? request()->ip();
+                $sessionId = session()->getId();
+
+                if ($clientIp && ! in_array($clientIp, ['0.0.0.0', '127.0.0.1', 'not available'])) {
+                    $priorBooking = \App\Models\Booking::where('ip_address', $clientIp)
+                        ->whereNotNull('name')
+                        ->where('name', '!=', '')
+                        ->latest()
+                        ->first();
+
+                    if ($priorBooking) {
+                        $name = $priorBooking->name;
+                        if ($phone === 'N/A' || empty($phone)) {
+                            $phone = $priorBooking->phone ?: 'N/A';
+                        }
+                        if (empty($email)) {
+                            $email = $priorBooking->email ?: '';
+                        }
+                        $prospectSource = 'Prior Booking History';
+                    } else {
+                        $priorContact = \App\Models\Contact::where('client_ip', $clientIp)
+                            ->whereNotNull('name')
+                            ->where('name', '!=', '')
+                            ->latest()
+                            ->first();
+
+                        if ($priorContact) {
+                            $name = $priorContact->name;
+                            if ($phone === 'N/A' || empty($phone)) {
+                                $phone = $priorContact->phone ?: 'N/A';
+                            }
+                            if (empty($email)) {
+                                $email = $priorContact->email ?: '';
+                            }
+                            $prospectSource = 'Prior Contact Message';
+                        }
+                    }
+                }
+            }
+        }
+
         $settings = app(SettingsService::class);
         $whatsappNum = preg_replace('/[^0-9]/', '', $settings->get('site_whatsapp', '971502456056')) ?: '971502456056';
+
+        // Inquiry correlation tracking tag
+        $refCode = strip_tags(trim($request->input('ref_code', '')));
+        if (empty($refCode)) {
+            $refCode = 'WA-'.strtoupper(substr(uniqid(), -4));
+        }
 
         if (empty($messageText)) {
             $messageText = ($tourName && $tourName !== 'General Inquiry')
@@ -256,19 +336,115 @@ class PageController extends Controller
                 : 'Hi Dunes Discovery Tourism, I would like to inquire about Dubai desert safaris.';
         }
 
+        if (! str_contains($messageText, '[Ref:')) {
+            $messageText = rtrim($messageText)." [Ref: #{$refCode}]";
+        }
+
         $redirectUrl = "https://wa.me/{$whatsappNum}?text=".urlencode($messageText);
 
-        // Collect request context
-        $ctx = $this->tracker->collectRequestContext('whatsapp');
+        // Acquisition & Traffic Channel resolution
+        $trafficChannel = strip_tags(trim($request->input('traffic_channel', '')));
+        $initialReferrer = strip_tags(trim($request->input('initial_referrer', '')));
+        $landingPage = strip_tags(trim($request->input('landing_page', '')));
+        $sessionDuration = (int) $request->input('session_duration_seconds', 0);
+        $pagesCount = (int) $request->input('pages_viewed_count', 1);
+        $gclid = strip_tags(trim($request->input('gclid', ''))) ?: ($ctx['gclid'] ?? session('google_ads_gclid'));
+        $fbclid = strip_tags(trim($request->input('fbclid', '')));
+
+        // If initial_referrer is empty, fall back to request context referrer
+        if (empty($initialReferrer) && ! empty($ctx['referrer_url']) && $ctx['referrer_url'] !== 'Not Available') {
+            $initialReferrer = $ctx['referrer_url'];
+        }
+
+        // If landing page is empty, fallback to pageUrl or current request
+        if (empty($landingPage)) {
+            $landingPage = $pageUrl ?: url()->previous();
+        }
+
+        // Channel Classification Fallback if client didn't provide one
+        if (empty($trafficChannel)) {
+            if (! empty($gclid) || strtolower($ctx['utm_medium'] ?? '') === 'cpc' || str_contains(strtolower($ctx['utm_source'] ?? ''), 'google ads')) {
+                $trafficChannel = 'Google Ads';
+            } elseif (! empty($fbclid) || str_contains(strtolower($initialReferrer), 'facebook.com') || str_contains(strtolower($initialReferrer), 'fb.com')) {
+                $trafficChannel = 'Facebook';
+            } elseif (str_contains(strtolower($initialReferrer), 'instagram.com')) {
+                $trafficChannel = 'Instagram';
+            } elseif (str_contains(strtolower($initialReferrer), 'tiktok.com')) {
+                $trafficChannel = 'TikTok';
+            } elseif (str_contains(strtolower($initialReferrer), 'youtube.com') || str_contains(strtolower($initialReferrer), 'youtu.be')) {
+                $trafficChannel = 'YouTube';
+            } elseif (str_contains(strtolower($initialReferrer), 'twitter.com') || str_contains(strtolower($initialReferrer), 'x.com') || str_contains(strtolower($initialReferrer), 't.co')) {
+                $trafficChannel = 'X (Twitter)';
+            } elseif (str_contains(strtolower($initialReferrer), 'linkedin.com')) {
+                $trafficChannel = 'LinkedIn';
+            } elseif (str_contains(strtolower($initialReferrer), 'google.')) {
+                $trafficChannel = 'Google Organic';
+            } elseif (str_contains(strtolower($initialReferrer), 'bing.')) {
+                $trafficChannel = 'Bing Organic';
+            } elseif (! empty($initialReferrer) && $initialReferrer !== 'Direct' && $initialReferrer !== 'Not Available') {
+                $refHost = parse_url($initialReferrer, PHP_URL_HOST);
+                $trafficChannel = $refHost ? 'Referral: '.preg_replace('/^www\./', '', $refHost) : 'Referral';
+            } else {
+                $trafficChannel = 'Direct';
+            }
+        }
+
+        // Parse and validate journey timeline
+        $journeyTimeline = $request->input('journey_timeline');
+        if (is_string($journeyTimeline)) {
+            $decoded = json_decode($journeyTimeline, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                $journeyTimeline = $decoded;
+            }
+        }
+
+        if (! is_array($journeyTimeline) || empty($journeyTimeline)) {
+            $journeyTimeline = [
+                [
+                    'step' => 1,
+                    'url' => $pageUrl ?: '/',
+                    'title' => ($tourName && $tourName !== 'General Inquiry') ? $tourName : 'Dubai Desert Safari Experience',
+                    'duration_seconds' => max(5, $sessionDuration),
+                    'sections' => ['Inquiry Triggered'],
+                    'timestamp' => now()->toIso8601String(),
+                ],
+            ];
+        }
 
         try {
-            // Save WhatsApp lead
+            // Save WhatsApp lead with direct telemetry columns (self-contained & resilient)
             $inquiry = WhatsappInquiry::create([
                 'name' => $name,
                 'phone' => $phone,
+                'email' => $email ?: null,
                 'tour_name' => $tourName,
                 'page_url' => $pageUrl,
                 'message_text' => $messageText,
+                'client_ip' => $ctx['client_ip'] ?? request()->ip(),
+                'country' => $ctx['country'] ?? null,
+                'city' => $ctx['city'] ?? null,
+                'region' => $ctx['region'] ?? null,
+                'device_type' => $ctx['device_type'] ?? null,
+                'browser_name' => $ctx['browser_name'] ?? null,
+                'os_name' => $ctx['os_name'] ?? null,
+                'isp' => $ctx['isp'] ?? null,
+                'organization' => $ctx['organization'] ?? null,
+                'utm_source' => $ctx['utm_source'] ?? null,
+                'utm_medium' => $ctx['utm_medium'] ?? null,
+                'utm_campaign' => $ctx['utm_campaign'] ?? null,
+                'referrer_url' => $ctx['referrer_url'] ?? null,
+                'screen_res' => $request->input('screen_res'),
+                'client_timezone' => $request->input('client_timezone'),
+                'client_language' => $request->input('client_language'),
+                'prospect_source' => $prospectSource,
+                'traffic_channel' => $trafficChannel,
+                'initial_referrer' => $initialReferrer ?: null,
+                'landing_page' => $landingPage ?: null,
+                'session_duration_seconds' => max(0, $sessionDuration),
+                'pages_viewed_count' => max(1, $pagesCount, count($journeyTimeline)),
+                'journey_timeline' => $journeyTimeline,
+                'gclid' => $gclid ?: null,
+                'fbclid' => $fbclid ?: null,
             ]);
 
             // Log detailed context in request_logs table
@@ -291,6 +467,7 @@ class PageController extends Controller
                 'success' => true,
                 'message' => 'WhatsApp click logged successfully',
                 'inquiry_id' => $inquiry->id,
+                'ref_code' => $refCode,
                 'redirect_url' => $redirectUrl,
             ]);
 
