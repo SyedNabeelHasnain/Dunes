@@ -343,13 +343,11 @@ class BlogController extends Controller
     {
         try {
             $feedLocale = app()->getLocale() ?: 'en';
-            $posts = Cache::remember('site_blog_rss_feed_'.$feedLocale, 3600, function () {
-                return BlogPost::where('status', 'published')
-                    ->with(['category', 'tags'])
-                    ->orderBy('published_at', 'desc')
-                    ->limit(30)
-                    ->get();
-            });
+            $posts = BlogPost::where('status', 'published')
+                ->with(['category', 'tags'])
+                ->orderBy('published_at', 'desc')
+                ->limit(30)
+                ->get();
 
             $latestPost = $posts->first();
             $lastBuildDate = $latestPost && $latestPost->published_at
@@ -376,10 +374,9 @@ class BlogController extends Controller
             \Illuminate\Support\Facades\Log::error('RSS feed generation error: ' . $e->getMessage());
 
             $fallback = '<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>Dunes Discovery Tourism | Blog Feed</title><link>' . url('/blog') . '</link><description>Dubai Desert Safari and Travel Blog</description><lastBuildDate>' . now()->toRfc2822String() . '</lastBuildDate></channel></rss>';
-            return response($fallback, 503, [
+            return response($fallback, 200, [
                 'Content-Type' => 'application/rss+xml; charset=utf-8',
                 'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-                'Retry-After' => '60',
             ]);
         }
     }
