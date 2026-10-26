@@ -147,7 +147,9 @@ $heroPoster = !empty($settings['site_hero_poster'])
 
 @push('preloads')
 <link rel="preload" as="image" href="{{ $heroPoster }}" fetchpriority="high">
+@endpush
 
+@push('schema')
 <!-- Homepage-Specific Connected Schema Graph: VideoObject and FAQPage -->
 <script type="application/ld+json">
 {
@@ -158,7 +160,7 @@ $heroPoster = !empty($settings['site_hero_poster'])
       "@id": "{{ url('/') }}#video",
       "name": "Dubai Desert Safari Experience - Dunes Discovery Tourism",
       "description": "Experience thrilling dune bashing across the Lahbab Red Dunes, sandboarding, 1000cc dune buggy rentals, and 5-star live BBQ dinner under the desert stars.",
-      "thumbnailUrl": [{!! json_encode($heroPoster, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}],
+      "thumbnailUrl": [{!! json_encode($heroPoster, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!}],
       "uploadDate": "2026-01-01T00:00:00+04:00",
       "contentUrl": "{{ asset('images/desert-safar-dubai-tour-short-dune-discovery-tourism.mp4') }}",
       "publisher": {
@@ -177,10 +179,10 @@ $heroPoster = !empty($settings['site_hero_poster'])
         @foreach($faqs as $fidx => $f)
         {
           "@type": "Question",
-          "name": {!! json_encode($f->question) !!},
+          "name": {!! json_encode($f->question, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": {!! json_encode($f->answer) !!}
+            "text": {!! json_encode($f->answer, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!}
           }
         }{{ $fidx < $faqs->count() - 1 ? ',' : '' }}
         @endforeach

@@ -109,6 +109,13 @@ class BookingController extends Controller
             }
         }
 
+        $isCustomizableTour = in_array((int) $tourId, [1, 2, 3], true)
+            || ($tour && in_array(strtolower($tour->slug), ['evening-desert-safari-dubai', 'morning-desert-safari-dubai', 'overnight-desert-safari-dubai'], true));
+
+        if ($isCustomBuilder && ! $isCustomizableTour) {
+            $isCustomBuilder = false;
+        }
+
         if ($isCustomBuilder && is_array($customQuoteData)) {
             $baseName = (string) ($customQuoteData['base_name'] ?? '');
             $isOvernightCustom = ($tourId === 3 || stripos($baseName, 'Overnight') !== false);
@@ -120,13 +127,15 @@ class BookingController extends Controller
             }
 
             // Strictly server-authoritative base safari pricing (never trust client-supplied base_price)
-            $basePrice = 79.0;
-            if (stripos($baseName, 'VIP') !== false) {
+            // Check overnight custom FIRST so VIP string matching doesn't downgrade Overnight (399 AED) to VIP (130 AED)
+            if ($isOvernightCustom) {
+                $basePrice = 399.0;
+            } elseif (stripos($baseName, 'VIP') !== false) {
                 $basePrice = 130.0;
             } elseif (stripos($baseName, 'Morning') !== false || $tourId === 2) {
                 $basePrice = 140.0;
-            } elseif ($isOvernightCustom) {
-                $basePrice = 399.0;
+            } else {
+                $basePrice = 79.0;
             }
 
             $childMultiplier = 0.70;
@@ -1104,9 +1113,16 @@ class BookingController extends Controller
         $clientSubtotal = max(0, (float) $request->input('subtotal', 0));
         $clientTotal = max(0, (float) $request->input('total', $clientSubtotal));
 
-        $resolvedPricing = $this->resolveAuthoritativeDraftPricing($tour, $tier, $adults, $children, $clientSubtotal, 0.0, null, $email, $date);
-        $subtotal = $resolvedPricing['authoritative'] ? $resolvedPricing['subtotal'] : $clientSubtotal;
-        $total = $resolvedPricing['authoritative'] ? $resolvedPricing['total'] : $clientTotal;
+        $resolvedPricing = $this->resolveAuthoritativeDraftPricing($tour, $tier, $adults, $children, 0.0, 0.0, null, $email, $date);
+        if (! $resolvedPricing['authoritative'] && $tour) {
+            $defaultTier = $tour->tiers()->first();
+            if ($defaultTier) {
+                $tier = $defaultTier;
+                $resolvedPricing = $this->resolveAuthoritativeDraftPricing($tour, $tier, $adults, $children, 0.0, 0.0, null, $email, $date);
+            }
+        }
+        $subtotal = $resolvedPricing['authoritative'] ? $resolvedPricing['subtotal'] : 0.0;
+        $total = $resolvedPricing['authoritative'] ? $resolvedPricing['total'] : 0.0;
 
         // Check if there is an existing draft for this session or email in the last 4 hours
         $sessionDraftId = session('active_booking_draft_id');
@@ -1323,27 +1339,55 @@ class BookingController extends Controller
             'payment_method' => $paymentMethod,
         ];
 
-        if ($resolved['authoritative']) {
+        if (! $resolved['authoritative'] && $tour) {
+            $defaultTier = $tour->tiers()->first();
+            if ($defaultTier) {
+                $tier = $defaultTier;
+                $resolved = $this->resolveAuthoritativeDraftPricing($tour, $tier, $adults, $children, 0.0, $addonsTotal, $booking->coupon_code, $email, $booking->tour_date);
+            }
+        }
+
+        if ($resolved['authoritative'] && (float) $resolved['total'] > 0) {
+            $updatePayload['tier_id'] = $tier ? $tier->id : $booking->tier_id;
+            $updatePayload['tier_name'] = $tier ? ($tier->display_name ?: $tier->name) : $booking->tier_name;
             $updatePayload['subtotal'] = $resolved['subtotal'];
             $updatePayload['addons_total'] = $addonsTotal;
             $updatePayload['discount_amount'] = $resolved['discount'];
             $updatePayload['original_total'] = round($resolved['subtotal'] + $addonsTotal, 2);
             $updatePayload['total'] = $resolved['total'];
+        } elseif ((float) $booking->total > 0) {
+            $updatePayload['subtotal'] = (float) $booking->subtotal;
+            $updatePayload['total'] = (float) $booking->total;
+        } else {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Booking pricing could not be verified. Please reselect your package options.',
+                ], 422);
+            }
+
+            return back()->with('error', 'Booking pricing could not be verified. Please reselect your package options.');
         }
 
-        $booking->update($updatePayload);
+        DB::transaction(function () use (&$booking, $updatePayload, $paymentMethod, $resolved) {
+            $booking->update($updatePayload);
+            $total = max(0, (float) $booking->total);
+
+            if ($paymentMethod === 'cash') {
+                $booking->update([
+                    'status' => 'confirmed',
+                    'payment_status' => 'unpaid',
+                    'payment_amount' => 0.00,
+                    'balance_due' => $total,
+                ]);
+
+                $this->recordCouponUsage($booking);
+            }
+        });
 
         $total = max(0, (float) $booking->total);
 
         if ($paymentMethod === 'cash') {
-            $booking->update([
-                'status' => 'confirmed',
-                'payment_status' => 'unpaid',
-                'payment_amount' => 0.00,
-                'balance_due' => $total,
-            ]);
-
-            $this->recordCouponUsage($booking);
             $this->sendEmailNotification('booking_cash', $booking);
 
             $custom = [

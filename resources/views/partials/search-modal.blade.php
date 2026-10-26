@@ -108,6 +108,7 @@
                         <input type="text" 
                                name="q" 
                                id="globalSearchModalInput" 
+                               aria-label="{{ __('ui.nav.search_placeholder') }}"
                                x-ref="searchInput"
                                x-model="query"
                                @input="handleInput"

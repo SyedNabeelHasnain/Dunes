@@ -146,9 +146,10 @@ class ZiinaWebhookController extends Controller
                 $remBalance = max(0, (float) $lockedBooking->total - (float) $totalPaid);
                 $method = $lockedBooking->payment_method;
                 $newPaymentStatus = ($remBalance <= 0) ? 'paid' : (($method === 'advance' || $totalPaid > 0) ? 'partial' : 'paid');
+                $bookingStatus = ($method === 'full' && $remBalance > 0.01) ? 'pending' : 'confirmed';
 
                 $lockedBooking->update([
-                    'status' => 'confirmed',
+                    'status' => $bookingStatus,
                     'payment_status' => $newPaymentStatus,
                     'ziina_status' => 'completed',
                     'balance_due' => $remBalance,
@@ -226,6 +227,7 @@ class ZiinaWebhookController extends Controller
                     }
 
                     $lockedBooking->update([
+                        'status' => in_array($status, ['cancelled', 'failed'], true) ? 'cancelled' : $lockedBooking->status,
                         'payment_status' => $status,
                         'ziina_status' => $status,
                     ]);

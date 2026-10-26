@@ -17,7 +17,7 @@ class Tier extends Model
     ];
 
     protected $fillable = [
-        'slug', 'name', 'display_name', 'description', 'guest_count', 'icon', 'badge', 'color',
+        'slug', 'name', 'display_name', 'description', 'guest_count', 'price_type', 'icon', 'badge', 'color',
         'is_popular', 'priority', 'status',
     ];
 
@@ -42,7 +42,7 @@ class Tier extends Model
     public function tours()
     {
         return $this->belongsToMany(Tour::class, 'tour_tiers')
-            ->withPivot('price', 'child_price', 'old_price', 'price_type', 'guest_count');
+            ->withPivot('price', 'old_price', 'price_type', 'guest_count');
     }
 
     public static function normalizePriceType(?string $priceType, ?Tour $tour = null): string
@@ -81,7 +81,7 @@ class Tier extends Model
             return $capacity;
         }
 
-        $priceType = $priceType ?: ($pricing->price_type ?? ($tier?->pivot?->price_type ?? null));
+        $priceType = $priceType ?: ($pricing->price_type ?? ($tier?->pivot?->price_type ?? ($tier?->price_type ?? null)));
 
         $tierName = (string) ($tier?->name ?? ($pricing->name ?? ''));
         if ($tierName !== '') {
@@ -107,6 +107,10 @@ class Tier extends Model
             return 6;
         }
 
-        return strtolower((string) $priceType) === 'per tent' ? 2 : 2;
+        if ($norm === 'per tent' || stripos($tierName, 'tent') !== false) {
+            return 2;
+        }
+
+        return 1;
     }
 }

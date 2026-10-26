@@ -120,7 +120,7 @@
             <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 shadow-xs">
                 <div class="relative">
                     <i class="bi bi-search absolute start-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
-                    <input type="text" id="faqSearchInput" class="w-full rounded-full ps-11 pe-4 py-3 bg-white border border-slate-200 text-base sm:text-sm text-slate-800 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs" placeholder="{{ __('ui.faq.search_placeholder') }}" oninput="handleFaqSearch(this.value)">
+                    <input type="text" id="faqSearchInput" aria-label="{{ __('ui.faq.search_placeholder') }}" class="w-full rounded-full ps-11 pe-4 py-3 bg-white border border-slate-200 text-base sm:text-sm text-slate-800 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs" placeholder="{{ __('ui.faq.search_placeholder') }}" oninput="handleFaqSearch(this.value)">
                 </div>
             </div>
         </div>

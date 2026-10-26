@@ -672,15 +672,7 @@ class AdminDashboardController extends Controller
 
         $sanitize = function (array $row): array {
             return array_map(function ($val) {
-                if ($val === null) {
-                    return '';
-                }
-                $str = (string) $val;
-                if (isset($str[0]) && in_array($str[0], ['=', '+', '-', '@', "\t", "\r"], true)) {
-                    return "'".$str;
-                }
-
-                return $str;
+                return sanitize_csv_cell($val);
             }, $row);
         };
 

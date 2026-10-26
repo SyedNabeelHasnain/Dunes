@@ -48,7 +48,9 @@
 
 @push('preloads')
     <link rel="preload" as="image" href="{{ $heroAvifUrl }}" type="image/avif">
-    
+@endpush
+
+@push('schema')
     <!-- 2026 Connected JSON-LD Schema Graph: TouristTrip, Product, Offer, TravelAgency, Itinerary, FAQPage -->
     <script type="application/ld+json">
     {
@@ -56,7 +58,7 @@
       "@graph": [
         {
           "@type": ["Product", "TouristTrip"],
-          "@id": {!! json_encode($canonical . '#trip', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "@id": {!! json_encode($canonical . '#trip', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
           "name": {!! json_encode($tour->name, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
           "inLanguage": {!! json_encode($currentLocale ?? app()->getLocale() ?? 'en', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
           "description": {!! json_encode(Str::limit(strip_tags($tour->short_desc ?: $tour->full_desc), 300), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},

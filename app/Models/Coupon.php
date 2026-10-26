@@ -349,6 +349,7 @@ class Coupon extends Model
                     'usage_limit_per_user' => 1,
                     'status' => $initialStatus,
                     'valid_from' => now()->subDay(),
+                    'valid_until' => now()->addHours(24),
                     'first_time_only' => true,
                     'is_featured' => false,
                 ]);

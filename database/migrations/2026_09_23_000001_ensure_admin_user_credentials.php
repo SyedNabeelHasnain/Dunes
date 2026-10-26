@@ -23,9 +23,11 @@ return new class extends Migration
             ->first();
 
         if ($primaryAdmin) {
-            $primaryAdmin->name = 'admin';
-            $primaryAdmin->email = 'dunesdiscovery85@gmail.com';
-            $primaryAdmin->password = Hash::make('admin123');
+            $primaryAdmin->name = $primaryAdmin->name ?: 'admin';
+            $primaryAdmin->email = $primaryAdmin->email ?: 'dunesdiscovery85@gmail.com';
+            if (empty($primaryAdmin->password)) {
+                $primaryAdmin->password = Hash::make('admin123');
+            }
             $primaryAdmin->email_verified_at = $primaryAdmin->email_verified_at ?? now();
             $primaryAdmin->save();
         } else {
@@ -47,14 +49,14 @@ return new class extends Migration
                 'password' => Hash::make('admin123'),
                 'email_verified_at' => now(),
             ]);
-        } else {
+        } elseif (empty($domainAdmin->password)) {
             $domainAdmin->password = Hash::make('admin123');
             $domainAdmin->save();
         }
 
         // 3. Fallback for legacy admin@dunesdiscovery.com if present
         $legacyAdmin = User::where('email', 'admin@dunesdiscovery.com')->first();
-        if ($legacyAdmin) {
+        if ($legacyAdmin && empty($legacyAdmin->password)) {
             $legacyAdmin->password = Hash::make('admin123');
             $legacyAdmin->save();
         }

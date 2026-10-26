@@ -1,81 +1,38 @@
 @extends('layouts.app')
 
-@section('content')
-@push('preloads')
+@php
+    $schemaPageType = 'ContactPage';
+@endphp
+
+@push('schema')
 <script type="application/ld+json">
 {
   "@@context": "https://schema.org",
-  "@graph": [
+  "@@graph": [
     {
-      "@type": "ContactPage",
-      "@id": {!! json_encode($canonical . '#webpage', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-      "url": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-      "name": {!! json_encode($pageTitle, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-      "description": {!! json_encode($pageDesc, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-      "inLanguage": {!! json_encode($currentLocale ?? app()->getLocale() ?? 'en', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-      "breadcrumb": {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": {!! json_encode(__('ui.nav.home') ?? 'Home', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-            "item": {!! json_encode(localized_route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": {!! json_encode(__('ui.nav.contact') ?? 'Contact Us', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-            "item": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
-          }
-        ]
-      },
-      "mainEntity": {
-        "@type": "TravelAgency",
-        "@id": {!! json_encode(route('home') . '#organization', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-        "name": {!! json_encode($settings['site_name'] ?? 'Dunes Discovery Tourism LLC', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-        "telephone": {!! json_encode($settings['site_phone'] ?? '+971 50 245 6056', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-        "email": {!! json_encode($settings['site_email'] ?? 'info@dunesdiscoverytourism.com', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-        "hasMap": {!! json_encode('https://maps.google.com/?q=' . ($settings['site_latitude'] ?? '25.2048') . ',' . ($settings['site_longitude'] ?? '55.2708'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": {!! json_encode($settings['site_address'] ?? 'Al Fahidi, Bur Dubai, Dubai, United Arab Emirates', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-          "addressLocality": "Dubai",
-          "addressRegion": "Dubai",
-          "postalCode": {!! json_encode($settings['site_postal_code'] ?? '00000', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-          "addressCountry": "AE"
+      "@@type": "BreadcrumbList",
+      "@@id": {!! json_encode($canonical . '#breadcrumb', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
+      "itemListElement": [
+        {
+          "@@type": "ListItem",
+          "position": 1,
+          "name": {!! json_encode(__('ui.nav.home') ?? 'Home', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
+          "item": {!! json_encode(localized_route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!}
         },
-        "geo": {
-          "@type": "GeoCoordinates",
-          "latitude": {!! json_encode($settings['site_latitude'] ?? '25.2048', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-          "longitude": {!! json_encode($settings['site_longitude'] ?? '55.2708', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
-        },
-        "openingHoursSpecification": {
-          "@type": "OpeningHoursSpecification",
-          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-          "opens": "00:00",
-          "closes": "23:59"
-        },
-        "identifier": [
-          {
-            "@type": "PropertyValue",
-            "propertyID": "DET Tourism License",
-            "value": {!! json_encode($settings['company_license_number'] ?? '1430583', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
-          }
-          @if(!empty($settings['google_place_id']))
-          ,{
-            "@type": "PropertyValue",
-            "propertyID": "Google Place ID",
-            "value": {!! json_encode($settings['google_place_id'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
-          }
-          @endif
-        ]
-      }
+        {
+          "@@type": "ListItem",
+          "position": 2,
+          "name": {!! json_encode(__('ui.nav.contact') ?? 'Contact Us', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
+          "item": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!}
+        }
+      ]
     }
   ]
 }
 </script>
 @endpush
+
+@section('content')
 
 <!-- Page Header Section -->
 <section class="hero-subpage bg-slate-950 text-white relative overflow-hidden" style="padding-top: calc(var(--header-h, 72px) + 2.5rem);">

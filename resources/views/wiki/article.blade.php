@@ -1,38 +1,34 @@
 @extends('layouts.app')
 
-@section('content')
-@php
-    $toc = $article->parsed_toc;
-    $contentHtml = Str::markdown((string) $article->content);
-@endphp
-
-<!-- Schema.org JSON-LD for TechArticle / Informational Guide -->
+@push('schema')
+<!-- Schema.org JSON-LD for Article / Informational Guide -->
 <script type="application/ld+json">
 {
   "@@context": "https://schema.org",
   "@graph": [
     {
       "@type": "BreadcrumbList",
+      "@id": {!! json_encode($canonical . '#breadcrumb', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
       "itemListElement": [
-        {"@type":"ListItem","position":1,"name":{!! json_encode(__('ui.nav.home') ?? 'Home', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},"item":{!! json_encode(localized_route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}},
-        {"@type":"ListItem","position":2,"name":{!! json_encode('Knowledge Portal', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},"item":{!! json_encode(localized_route('wiki.index'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}},
-        {"@type":"ListItem","position":3,"name":{!! json_encode($pillar->name, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},"item":{!! json_encode(localized_route('wiki.pillar', $pillar->slug), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}},
-        {"@type":"ListItem","position":4,"name":{!! json_encode($article->title, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},"item":{!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}}
+        {"@type":"ListItem","position":1,"name":{!! json_encode(__('ui.nav.home') ?? 'Home', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},"item":{!! json_encode(localized_route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!}},
+        {"@type":"ListItem","position":2,"name":{!! json_encode('Knowledge Portal', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},"item":{!! json_encode(localized_route('wiki.index'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!}},
+        {"@type":"ListItem","position":3,"name":{!! json_encode($pillar->name, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},"item":{!! json_encode(localized_route('wiki.pillar', $pillar->slug), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!}},
+        {"@type":"ListItem","position":4,"name":{!! json_encode($article->title, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},"item":{!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!}}
       ]
     },
     {
       "@type": "TechArticle",
-      "@id": {!! json_encode($canonical . '#article', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-      "headline": {!! json_encode($article->title, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-      "description": {!! json_encode($article->excerpt, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-      "image": [{!! json_encode(resolve_tour_image($article->hero_image ?: $pillar->hero_image), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}],
-      "inLanguage": {!! json_encode(app()->getLocale(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-      "datePublished": {!! json_encode($article->created_at->toIso8601String(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-      "dateModified": {!! json_encode($article->updated_at->toIso8601String(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "@id": {!! json_encode($canonical . '#article', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
+      "headline": {!! json_encode($article->title, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
+      "description": {!! json_encode($article->excerpt, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
+      "image": [{!! json_encode(resolve_tour_image($article->hero_image ?: $pillar->hero_image), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!}],
+      "inLanguage": {!! json_encode(app()->getLocale(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
+      "datePublished": {!! json_encode($article->created_at->toIso8601String(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
+      "dateModified": {!! json_encode($article->updated_at->toIso8601String(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
       "author": {
         "@type": "Organization",
         "name": "Dunes Discovery Tourism LLC",
-        "url": "https://dunesdiscoverytourism.com",
+        "url": {!! json_encode(url('/'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
         "identifier": {
           "@type": "PropertyValue",
           "name": "DET Tourism License",
@@ -42,8 +38,8 @@
       @if(!empty($article->reviewed_by_name))
       "reviewedBy": {
         "@type": "Person",
-        "name": {!! json_encode($article->reviewed_by_name, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-        "jobTitle": {!! json_encode($article->reviewed_by_title ?: 'Operations Lead (DET #1430583)', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        "name": {!! json_encode($article->reviewed_by_name, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
+        "jobTitle": {!! json_encode($article->reviewed_by_title ?: 'Operations Lead (DET #1430583)', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
         "worksFor": {
           "@type": "TravelAgency",
           "name": "Dunes Discovery Tourism LLC"
@@ -51,18 +47,19 @@
       },
       @endif
       "publisher": {
-        "@type": "TravelAgency",
-        "name": "Dunes Discovery Tourism LLC",
-        "url": "https://dunesdiscoverytourism.com",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "https://dunesdiscoverytourism.com/images/logo.png"
-        }
+        "@id": {!! json_encode(url('/') . '#organization', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!}
       }
     }
   ]
 }
 </script>
+@endpush
+
+@section('content')
+@php
+    $toc = $article->parsed_toc;
+    $contentHtml = Str::markdown((string) $article->content, ['html_input' => 'strip', 'allow_unsafe_links' => false]);
+@endphp
 
 <!-- Article Hero -->
 <section class="hero-subpage bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white relative overflow-hidden" style="padding-top: calc(var(--header-h, 72px) + 2.5rem); padding-bottom: 3.5rem;">

@@ -162,6 +162,7 @@
                         <i class="bi bi-search text-slate-400 text-sm shrink-0 me-2.5"></i>
                         <input type="text" 
                                name="q" 
+                               aria-label="{{ __('ui.nav.search_placeholder') }}"
                                value="{{ $cleanQuery }}" 
                                class="w-full bg-transparent border-none text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-0 p-0" 
                                placeholder="{{ __('ui.nav.search_placeholder') }}" 

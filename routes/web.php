@@ -132,6 +132,8 @@ Route::get('/booking/{reference}/voucher-pdf', [VoucherController::class, 'downl
 Route::get('/review/{ref}', [PageController::class, 'reviewRate'])->name('review.rate');
 Route::post('/review/{ref}', [PageController::class, 'submitReview'])->middleware('throttle:10,1')->name('review.submit');
 Route::post('/review/{ref}/feedback', [PageController::class, 'submitFeedback'])->middleware('throttle:10,1')->name('review.feedback');
+Route::redirect('/submit-review', '/review/guest', 301);
+Route::redirect('/review', '/review/guest', 301);
 
 // ── Admin CMS Panel (Guarded by auth & strict no-cache headers) ──────────────
 Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->name('admin.')->group(function () {
@@ -501,6 +503,8 @@ Route::prefix('{locale}')
         Route::get('/review/{ref}', [PageController::class, 'reviewRate'])->name('locale.review.rate');
         Route::post('/review/{ref}', [PageController::class, 'submitReview'])->middleware('throttle:10,1')->name('locale.review.submit');
         Route::post('/review/{ref}/feedback', [PageController::class, 'submitFeedback'])->middleware('throttle:10,1')->name('locale.review.feedback');
+        Route::get('/submit-review', fn(string $locale) => redirect('/'.$locale.'/review/guest', 301));
+        Route::get('/review', fn(string $locale) => redirect('/'.$locale.'/review/guest', 301));
 
         // Localized Legal Aliases & Quick Redirects
         Route::get('/terms', fn(string $locale) => redirect('/'.$locale.'/terms-condition', 301));

@@ -212,21 +212,21 @@ if (! function_exists('resolve_og_image')) {
     /**
      * Normalize any OG image path or URL to an absolute existing asset URL.
      */
-    function resolve_og_image(?string $raw, string $fallback = 'images/desert-safari-poster.avif'): string
+    function resolve_og_image(?string $raw, string $fallback = 'images/desert-safari-poster.webp'): string
     {
         if (empty($raw)) {
             return asset($fallback);
         }
 
         $legacyMap = [
-            'og-default.jpg' => 'images/desert-safari-poster.avif',
-            'og-home.jpg' => 'images/evening-desert-safari-dubai-dune-discovery-tourism.avif',
-            'og-tours.jpg' => 'images/dubai-desert-safari-tour-dune-discovery-tourism.avif',
-            'og-blog.jpg' => 'images/desert-safari-dubai-dune-discovery-tourism-HD.avif',
-            'og-about.jpg' => 'images/dubai-desert-safar-camel-ride-dune-discovery-tourism.avif',
-            'og-contact.jpg' => 'images/dubai-desert-safari-camp-dune-discovery-tourism.avif',
-            'og-faq.jpg' => 'images/dubai-desert-safari-dune-bashing-dune-discovery-tourism.avif',
-            'og-rate-card.jpg' => 'images/dubai-desert-safari-bbq-dune-discovery-tourism.avif',
+            'og-default.jpg' => 'images/desert-safari-poster.webp',
+            'og-home.jpg' => 'images/evening-desert-safari-dubai-dune-discovery-tourism.webp',
+            'og-tours.jpg' => 'images/dubai-desert-safari-tour-dune-discovery-tourism.webp',
+            'og-blog.jpg' => 'images/desert-safari-dubai-dune-discovery-tourism-HD.webp',
+            'og-about.jpg' => 'images/dubai-desert-safar-camel-ride-dune-discovery-tourism.webp',
+            'og-contact.jpg' => 'images/dubai-desert-safari-camp-dune-discovery-tourism.webp',
+            'og-faq.jpg' => 'images/dubai-desert-safari-dune-bashing-dune-discovery-tourism.webp',
+            'og-rate-card.jpg' => 'images/dubai-desert-safari-bbq-dune-discovery-tourism.webp',
         ];
 
         $basename = basename(parse_url($raw, PHP_URL_PATH) ?: $raw);

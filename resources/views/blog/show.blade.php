@@ -51,7 +51,7 @@
         ],
         'datePublished' => $publishedAt ? $publishedAt->toIso8601String() : now()->toIso8601String(),
         'dateModified' => $modifiedAt ? $modifiedAt->toIso8601String() : now()->toIso8601String(),
-        'mainEntityOfPage' => ['@type' => 'WebPage', '@id' => $canonical],
+        'mainEntityOfPage' => ['@id' => $canonical . '#webpage'],
         'url' => $canonical,
         'wordCount' => str_word_count(strip_tags($post->content ?? '')),
         'timeRequired' => 'PT' . (int)($post->read_time ?: 5) . 'M',
@@ -71,6 +71,7 @@
     <link rel="preload" as="image" href="{{ $featImgPath }}" type="image/avif">
 @endpush
 
+@push('schema')
 <script type="application/ld+json">{!! json_encode($articleSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
 <script type="application/ld+json">{!! json_encode($breadcrumbSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
 @if ($post->faqs->count() > 0)
@@ -94,6 +95,7 @@
 }
 </script>
 @endif
+@endpush
 
 <article class="blog-article">
     <header class="hero-subpage bg-slate-950 text-white relative overflow-hidden min-h-[420px]" style="padding-top: calc(var(--header-h, 72px) + 2.5rem);">

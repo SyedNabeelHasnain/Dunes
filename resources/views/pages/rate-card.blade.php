@@ -39,7 +39,7 @@
 </style>
 @endpush
 
-@section('content')
+@push('schema')
 <script type="application/ld+json">
 {
   "@@context": "https://schema.org",
@@ -84,6 +84,9 @@
   ]
 }
 </script>
+@endpush
+
+@section('content')
 <div class="rc-page page-standalone-clearance bg-slate-50 min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 

@@ -19,7 +19,7 @@ class AdminOperationsController extends Controller
         $selectedDate = $request->input('date', now()->format('Y-m-d'));
         $targetDate = Carbon::parse($selectedDate)->startOfDay();
 
-        $bookings = Booking::with(['tour', 'tier', 'addons', 'driver', 'vehicle'])
+        $bookings = Booking::with(['tour', 'tier', 'addons', 'driver.defaultVehicle', 'vehicle'])
             ->whereDate('tour_date', $selectedDate)
             ->whereIn('status', ['confirmed', 'completed', 'pending'])
             ->orderBy('pickup_location')
@@ -380,7 +380,7 @@ class AdminOperationsController extends Controller
     public function exportManifest(Request $request)
     {
         $selectedDate = $request->input('date', now()->format('Y-m-d'));
-        $bookings = Booking::with(['tour', 'tier', 'addons', 'driver', 'vehicle'])
+        $bookings = Booking::with(['tour', 'tier', 'addons', 'driver.defaultVehicle', 'vehicle'])
             ->whereDate('tour_date', $selectedDate)
             ->whereIn('status', ['confirmed', 'completed', 'pending'])
             ->orderBy('pickup_location')

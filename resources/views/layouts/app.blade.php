@@ -436,7 +436,7 @@
           "inLanguage": {!! json_encode(isset($activeLanguages) ? $activeLanguages->pluck('code')->toArray() : ['en', 'ar', 'ru', 'es', 'it'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}
         },
         {
-          "@@type": "WebPage",
+          "@@type": {!! json_encode($schemaPageType ?? 'WebPage', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
           "@@id": {!! json_encode($canonical . '#webpage', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
           "url": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
           "name": {!! json_encode($pageTitle, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
@@ -660,17 +660,17 @@
                         </a>
 
                         <!-- Quick Search Button (Min 44x44px Hit Target) -->
-                        <button type="button" class="w-9 h-9 sm:w-11 sm:h-11 rounded-full text-slate-700 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer text-sm shrink-0" @click="$store.modal.open('search')" aria-label="{{ __('ui.nav.search_placeholder') }}">
+                        <button type="button" class="w-11 h-11 rounded-full text-slate-700 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer text-sm shrink-0 focus:outline-none focus:ring-2 focus:ring-primary/40" @click="$store.modal.open('search')" aria-label="{{ __('ui.nav.search_placeholder') }}">
                             <i class="bi bi-search"></i>
                         </button>
 
                         <!-- WhatsApp Direct Button (Min 44x44px Hit Target) -->
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" class="w-9 h-9 sm:w-11 sm:h-11 rounded-full text-emerald-600 hover:bg-emerald-50 flex items-center justify-center transition-colors cursor-pointer text-base btn-whatsapp shrink-0" aria-label="{{ __('ui.common.whatsapp') }}" target="_blank" rel="noopener" data-action="whatsapp">
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" class="w-11 h-11 rounded-full text-emerald-600 hover:bg-emerald-50 flex items-center justify-center transition-colors cursor-pointer text-base btn-whatsapp shrink-0 focus:outline-none focus:ring-2 focus:ring-emerald-500/40" aria-label="{{ __('ui.common.whatsapp') }}" target="_blank" rel="noopener" data-action="whatsapp">
                             <i class="bi bi-whatsapp"></i>
                         </a>
 
                         <!-- Hamburger Drawer Trigger (Min 44x44px Hit Target) -->
-                        <button id="menuToggle" class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl text-slate-800 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer focus:outline-none shrink-0" type="button" @click.stop.prevent="$store.mobileNav.toggle()" aria-label="{{ __('ui.nav.all_tours') ?? 'Menu' }}">
+                        <button id="menuToggle" class="w-11 h-11 rounded-xl text-slate-800 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/40 shrink-0" type="button" data-action="toggle-mobile-menu" @click.stop.prevent="$store.mobileNav.toggle()" :aria-expanded="$store.mobileNav.open" aria-controls="mobileSheet" aria-label="{{ __('ui.nav.all_tours') ?? 'Menu' }}">
                             <i class="bi bi-list text-2xl"></i>
                         </button>
                     </div>
@@ -703,6 +703,9 @@
          x-transition:leave-end="ltr:translate-x-full rtl:-translate-x-full"
          class="fixed inset-y-0 end-0 max-w-xs sm:max-w-sm w-full bg-white z-[65] shadow-2xl p-5 flex flex-col justify-between overflow-y-auto overscroll-contain lg:hidden"
          style="display: none;"
+         role="dialog"
+         aria-modal="true"
+         aria-label="{{ __('ui.nav.all_tours') ?? 'Navigation Menu' }}"
          id="mobileSheet">
         <div>
             <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-4">
@@ -743,7 +746,7 @@
             <!-- Search Input in Drawer (16px on mobile to eliminate iOS zoom) -->
             <form action="{{ localized_route('tours.search') }}" method="GET" class="relative mb-3">
                 <i class="bi bi-search absolute start-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
-                <input type="text" name="q" class="w-full rounded-full ps-9 pe-4 py-2.5 bg-slate-100 text-slate-800 text-base sm:text-xs font-semibold border-0 focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="{{ __('ui.nav.search_placeholder') }}" required>
+                <input type="text" name="q" aria-label="{{ __('ui.nav.search_placeholder') }}" class="w-full rounded-full ps-9 pe-4 py-2.5 bg-slate-100 text-slate-800 text-base sm:text-xs font-semibold border-0 focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-slate-400" placeholder="{{ __('ui.nav.search_placeholder') }}" required>
             </form>
 
             <!-- Interactive Features CTAs -->

@@ -1,58 +1,38 @@
 @extends('layouts.app')
 
-@section('content')
-@push('preloads')
+@php
+    $schemaPageType = 'AboutPage';
+@endphp
+
+@push('schema')
 <script type="application/ld+json">
 {
   "@@context": "https://schema.org",
-  "@graph": [
+  "@@graph": [
     {
-      "@type": "AboutPage",
-      "@id": {!! json_encode($canonical . '#webpage', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-      "url": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-      "name": {!! json_encode($pageTitle, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-      "description": {!! json_encode($pageDesc, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-      "inLanguage": {!! json_encode($currentLocale ?? app()->getLocale() ?? 'en', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-      "breadcrumb": {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": {!! json_encode(__('ui.nav.home') ?? 'Home', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-            "item": {!! json_encode(localized_route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": {!! json_encode(__('ui.nav.about') ?? 'About Us', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-            "item": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
-          }
-        ]
-      },
-      "mainEntity": {
-        "@type": "TravelAgency",
-        "@id": {!! json_encode(route('home') . '#organization', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-        "name": {!! json_encode($settings['site_name'] ?? 'Dunes Discovery Tourism LLC', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-        "url": {!! json_encode(route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-        "logo": {!! json_encode(asset('images/logo.png'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-        "telephone": {!! json_encode($settings['site_phone'] ?? '+971 50 245 6056', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-        "email": {!! json_encode($settings['site_email'] ?? 'info@dunesdiscoverytourism.com', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-        "foundingDate": "2018",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": {!! json_encode($settings['site_address'] ?? 'Al Fahidi, Bur Dubai, Dubai', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-          "addressLocality": "Dubai",
-          "addressRegion": "Dubai",
-          "postalCode": "00000",
-          "addressCountry": "AE"
+      "@@type": "BreadcrumbList",
+      "@@id": {!! json_encode($canonical . '#breadcrumb', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
+      "itemListElement": [
+        {
+          "@@type": "ListItem",
+          "position": 1,
+          "name": {!! json_encode(__('ui.nav.home') ?? 'Home', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
+          "item": {!! json_encode(localized_route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!}
+        },
+        {
+          "@@type": "ListItem",
+          "position": 2,
+          "name": {!! json_encode(__('ui.nav.about') ?? 'About Us', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!},
+          "item": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!}
         }
-      }
+      ]
     }
   ]
 }
 </script>
 @endpush
+
+@section('content')
 
 <!-- Page Header Section -->
 <section class="hero-subpage bg-slate-950 text-white relative overflow-hidden" style="padding-top: calc(var(--header-h, 72px) + 2.5rem);">

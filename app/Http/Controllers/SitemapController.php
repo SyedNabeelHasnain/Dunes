@@ -140,7 +140,7 @@ class SitemapController extends Controller
 
             foreach ($blogs as $blog) {
                 $lastmod = $blog->updated_at ? $blog->updated_at->toAtomString() : now()->toAtomString();
-                $enUrl = url('/blog/'.$blog->slug);
+                $enUrl = !empty($blog->canonical_url) && str_starts_with($blog->canonical_url, 'http') ? $blog->canonical_url : url('/blog/'.$blog->slug);
 
                 $alternates = [
                     'x-default' => $enUrl,

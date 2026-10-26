@@ -6,26 +6,14 @@
   '@context' => 'https://schema.org',
   '@graph' => [
     [
-      '@type' => 'Organization',
-      '@id' => url('/') . '#organization',
-      'name' => 'Dunes Discovery Tourism LLC',
-      'alternateName' => 'Dunes Discovery Dubai',
-      'url' => url('/'),
-      'logo' => asset('images/logo.png'),
+      '@type' => 'WebPage',
+      '@id' => $canonical . '#presskit',
+      'url' => $canonical,
+      'name' => $pageTitle,
       'description' => $pageDesc,
-      'telephone' => '+971502456056',
-      'email' => 'info@dunesdiscoverytourism.com',
-      'address' => [
-        '@type' => 'PostalAddress',
-        'addressLocality' => 'Dubai',
-        'addressCountry' => 'AE',
-      ],
-      'aggregateRating' => [
-        '@type' => 'AggregateRating',
-        'ratingValue' => '4.9',
-        'reviewCount' => '2847',
-        'bestRating' => '5',
-        'worstRating' => '1',
+      'inLanguage' => $currentLocale ?? 'en',
+      'publisher' => [
+        '@id' => url('/') . '#organization',
       ],
     ],
     [

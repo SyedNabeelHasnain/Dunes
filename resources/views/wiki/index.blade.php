@@ -65,6 +65,7 @@
                     <input 
                         type="text" 
                         x-model="query"
+                        aria-label="Search topics and knowledge base"
                         @input.debounce.300ms="if(query.length >= 2) { loading = true; fetch('{{ localized_route('wiki.search') }}?q=' + encodeURIComponent(query)).then(r => r.json()).then(d => { results = d; loading = false; }); } else { results = null; }"
                         placeholder="Search topics (e.g. Lahbab sand, tire pressure, pregnancy, gahwa, buggy)..." 
                         class="w-full pl-11 pr-12 py-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
@@ -75,11 +76,11 @@
                 </div>
 
                 <!-- Instant Search Dropdown -->
-                <div x-show="results && (results.articles.length > 0 || results.terms.length > 0)" 
+                <div x-show="results && (Boolean(results.articles && results.articles.length) || Boolean(results.terms && results.terms.length))" 
                      class="absolute top-full left-0 right-0 mt-2 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-3 z-50 max-h-96 overflow-y-auto text-left" 
                      style="display: none;"
                 >
-                    <template x-if="results.articles.length > 0">
+                    <template x-if="Boolean(results && results.articles && results.articles.length > 0)">
                         <div class="mb-3">
                             <div class="text-[10px] font-bold text-amber-400 uppercase tracking-wider px-2 mb-1.5">Knowledge Guides</div>
                             <template x-for="a in results.articles" :key="a.url">
@@ -90,7 +91,7 @@
                             </template>
                         </div>
                     </template>
-                    <template x-if="results.terms.length > 0">
+                    <template x-if="Boolean(results && results.terms && results.terms.length > 0)">
                         <div>
                             <div class="text-[10px] font-bold text-sky-400 uppercase tracking-wider px-2 mb-1.5">Glossary Definitions</div>
                             <template x-for="t in results.terms" :key="t.term">

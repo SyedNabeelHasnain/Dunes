@@ -137,6 +137,7 @@
         currentIndex: 0,
         touchStartX: 0,
         copiedShare: false,
+        canShare: (typeof navigator !== 'undefined' && typeof navigator.share === 'function'),
         canScrollLeft: false,
         canScrollRight: false,
         isDraggingPills: false,
@@ -235,12 +236,16 @@
             });
         },
         nativeShare() {
-            if (navigator.share && this.activeItem) {
-                navigator.share({
-                    title: this.activeItem.review_title || 'Dubai Desert Safari Guest Photo',
-                    text: 'Verified moments from Dunes Discovery Tourism in Dubai:',
-                    url: this.currentShareUrl,
-                }).catch(() => {});
+            if (this.canShare && this.activeItem) {
+                try {
+                    navigator.share({
+                        title: this.activeItem.review_title || 'Dubai Desert Safari Guest Photo',
+                        text: 'Verified moments from Dunes Discovery Tourism in Dubai:',
+                        url: this.currentShareUrl,
+                    }).catch(() => {});
+                } catch (e) {
+                    this.copyShareLink();
+                }
             } else {
                 this.copyShareLink();
             }
@@ -730,7 +735,7 @@
                         </a>
 
                         <!-- Mobile Native Share -->
-                        <template x-if="typeof navigator !== 'undefined' && navigator.share">
+                        <template x-if="canShare">
                             <button type="button" 
                                     @click="nativeShare()"
                                     class="p-1.5 rounded-xl bg-slate-700/80 hover:bg-slate-600 text-slate-200 border border-white/10 transition-all inline-flex items-center justify-center cursor-pointer"

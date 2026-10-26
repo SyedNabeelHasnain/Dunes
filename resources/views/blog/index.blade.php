@@ -89,7 +89,7 @@
                     <input type="hidden" name="category" value="{{ $categorySlug }}">
                 @endif
                 <div class="relative w-full">
-                    <input type="search" name="search" class="w-full rounded-full ps-4 pe-11 py-2 bg-slate-50 border border-slate-200 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:bg-white min-h-[42px] transition-colors" placeholder="{{ __('ui.nav.search') }}..." value="{{ $search }}">
+                    <input type="search" name="search" aria-label="{{ __('ui.nav.search') }}" class="w-full rounded-full ps-4 pe-11 py-2 bg-slate-50 border border-slate-200 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:bg-white min-h-[42px] transition-colors" placeholder="{{ __('ui.nav.search') }}..." value="{{ $search }}">
                     <button type="submit" class="absolute end-0 top-0 bottom-0 px-3.5 flex items-center justify-center text-slate-500 hover:text-primary transition-colors min-w-[42px] min-h-[42px] cursor-pointer" aria-label="{{ __('ui.nav.search') }}">
                         <i class="bi bi-search text-xs"></i>
                     </button>
