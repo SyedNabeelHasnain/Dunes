@@ -503,4 +503,88 @@ class AdminWhatsappController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Re-lookup GeoIP & Telemetry for a WhatsApp Lead on-demand.
+     */
+    public function refreshTelemetry(Request $request, int $id)
+    {
+        $lead = WhatsappInquiry::findOrFail($id);
+        $tracker = app(\App\Services\VisitorTrackerService::class);
+
+        $ip = trim((string) $request->input('client_ip', $lead->client_ip));
+        if (empty($ip) || in_array(strtolower($ip), ['not available', '0.0.0.0', '-', 'unknown'])) {
+            // Check request log if linked
+            if ($lead->request_log_id) {
+                $reqLog = RequestLog::find($lead->request_log_id);
+                if ($reqLog && ! empty($reqLog->client_ip) && ! in_array(strtolower($reqLog->client_ip), ['not available', '0.0.0.0', '127.0.0.1'])) {
+                    $ip = $reqLog->client_ip;
+                }
+            }
+        }
+
+        $isPublic = (bool) filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
+
+        $updates = [];
+        if ($isPublic && $ip !== $lead->client_ip) {
+            $updates['client_ip'] = $ip;
+        }
+
+        if ($isPublic) {
+            // Clear cache for fresh lookup
+            Cache::forget("geoip_{$ip}");
+            $geo = $tracker->ipLookup($ip);
+            if ($geo) {
+                if (! empty($geo['country'])) {
+                    $updates['country'] = $geo['country'];
+                }
+                if (! empty($geo['city'])) {
+                    $updates['city'] = $geo['city'];
+                }
+                if (! empty($geo['regionName']) || ! empty($geo['region'])) {
+                    $updates['region'] = $geo['regionName'] ?? $geo['region'];
+                }
+                if (! empty($geo['isp'])) {
+                    $updates['isp'] = $geo['isp'];
+                }
+                if (! empty($geo['org'])) {
+                    $updates['organization'] = $geo['org'];
+                }
+                if (! empty($geo['timezone']) && empty($lead->client_timezone)) {
+                    $updates['client_timezone'] = $geo['timezone'];
+                }
+            }
+        }
+
+        // If client passed manual overrides
+        if ($request->filled('country')) {
+            $updates['country'] = $request->input('country');
+        }
+        if ($request->filled('city')) {
+            $updates['city'] = $request->input('city');
+        }
+        if ($request->filled('isp')) {
+            $updates['isp'] = $request->input('isp');
+        }
+
+        if (! empty($updates)) {
+            $lead->update($updates);
+        }
+
+        $loc = trim(($lead->city ?: 'Unknown').', '.($lead->country ?: 'Unknown'), ', ');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Telemetry refreshed successfully.',
+            'lead' => [
+                'id' => $lead->id,
+                'client_ip' => $lead->client_ip ?: 'Not Available',
+                'country' => $lead->country ?: 'Unknown',
+                'city' => $lead->city ?: 'Unknown',
+                'region' => $lead->region ?: '',
+                'isp' => $lead->isp ?: ($lead->organization ?: 'Not Available'),
+                'location' => $loc,
+            ],
+        ]);
+    }
 }

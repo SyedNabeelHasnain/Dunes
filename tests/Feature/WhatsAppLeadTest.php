@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\WhatsappInquiry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
@@ -19,6 +20,39 @@ class WhatsAppLeadTest extends TestCase
         parent::setUp();
         Cache::flush();
         Mail::fake();
+
+        Http::fake([
+            'http://ip-api.com/*' => Http::response([
+                'status' => 'success',
+                'country' => 'United Arab Emirates',
+                'city' => 'Dubai',
+                'regionName' => 'Dubai',
+                'isp' => 'Emirates Integrated Telecommunications',
+                'org' => 'du',
+                'lat' => 25.2048,
+                'lon' => 55.2708,
+                'timezone' => 'Asia/Dubai',
+            ], 200),
+            'https://freeipapi.com/*' => Http::response([
+                'countryName' => 'United Arab Emirates',
+                'cityName' => 'Dubai',
+                'regionName' => 'Dubai',
+                'asnOrganization' => 'du',
+                'latitude' => 25.2048,
+                'longitude' => 55.2708,
+                'timeZones' => ['Asia/Dubai'],
+            ], 200),
+            'https://ipwho.is/*' => Http::response([
+                'success' => true,
+                'country' => 'United Arab Emirates',
+                'city' => 'Dubai',
+                'region' => 'Dubai',
+                'connection' => [
+                    'isp' => 'du',
+                    'org' => 'du',
+                ],
+            ], 200),
+        ]);
 
         Setting::updateOrCreate(['setting_key' => 'site_whatsapp'], ['setting_value' => '971502456056']);
         Setting::updateOrCreate(['setting_key' => 'whatsapp_form_enabled'], ['setting_value' => '1']);
@@ -383,5 +417,65 @@ class WhatsAppLeadTest extends TestCase
         $this->assertStringContainsString('David Miller', $content);
         $this->assertStringContainsString('Google Ads', $content);
         $this->assertStringContainsString('GCLID-TEST-XYZ', $content);
+    }
+
+    public function test_whatsapp_lead_captures_client_echoed_ip_when_server_is_behind_private_proxy(): void
+    {
+        $response = $this->post('/ajax.php', [
+            'action' => 'logWhatsApp',
+            'name' => 'Sarah Connor',
+            'phone' => '+971509998888',
+            'tour_name' => 'Overnight Desert Safari Dubai',
+            'client_ip' => '86.96.12.34',
+            'client_country' => 'United Arab Emirates',
+            'client_city' => 'Dubai',
+            'client_isp' => 'du Telecom',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        $this->assertDatabaseHas('whatsapp_inquiries', [
+            'name' => 'Sarah Connor',
+            'phone' => '+971509998888',
+            'tour_name' => 'Overnight Desert Safari Dubai',
+            'client_ip' => '86.96.12.34',
+            'country' => 'United Arab Emirates',
+            'city' => 'Dubai',
+        ]);
+    }
+
+    public function test_admin_can_refresh_telemetry_for_whatsapp_lead(): void
+    {
+        $admin = User::first() ?: User::factory()->create([
+            'email' => 'admin@dunesdiscoverytourism.com',
+            'role' => 'admin',
+        ]);
+
+        $lead = WhatsappInquiry::create([
+            'name' => 'T-800',
+            'phone' => '971501112222',
+            'tour_name' => 'Desert Safari',
+            'client_ip' => '86.96.12.34',
+            'country' => 'Unknown',
+            'city' => 'Unknown',
+            'isp' => 'Not Available',
+        ]);
+
+        $response = $this->actingAs($admin)->postJson(route('admin.whatsapp.refresh-telemetry', ['id' => $lead->id]));
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'lead' => [
+                'id' => $lead->id,
+                'client_ip' => '86.96.12.34',
+                'country' => 'United Arab Emirates',
+                'city' => 'Dubai',
+            ],
+        ]);
+
+        $lead->refresh();
+        $this->assertEquals('United Arab Emirates', $lead->country);
+        $this->assertEquals('Dubai', $lead->city);
     }
 }

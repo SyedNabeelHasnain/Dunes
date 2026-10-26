@@ -434,9 +434,14 @@
 
                 <!-- Telemetry -->
                 <div class="p-4 bg-slate-50/70 rounded-2xl border border-slate-200/80 space-y-3">
-                    <h4 class="text-xs font-black uppercase text-primary tracking-wider flex items-center gap-1.5">
-                        <i class="bi bi-geo-alt-fill"></i> Visitor Telemetry & Network
-                    </h4>
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-xs font-black uppercase text-primary tracking-wider flex items-center gap-1.5">
+                            <i class="bi bi-geo-alt-fill"></i> Visitor Telemetry & Network
+                        </h4>
+                        <button type="button" id="btnRefreshLeadTelemetry" class="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold text-slate-600 bg-white hover:text-primary hover:border-primary border border-slate-200 rounded-lg shadow-2xs transition cursor-pointer" title="Re-query GeoIP & Refresh Network Telemetry">
+                            <i class="bi bi-arrow-clockwise text-xs" id="refreshTelemetryIcon"></i> <span>Refresh</span>
+                        </button>
+                    </div>
                     <div>
                         <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Client IP Address</div>
                         <div class="text-xs font-mono font-bold text-slate-800" id="modalClientIp">-</div>
@@ -750,6 +755,49 @@ $(document).ready(function() {
         $('#modalDeleteLeadBtn').off('click').on('click', function() {
             window.dispatchEvent(new CustomEvent('close-lead-modal'));
             promptPermanentDeleteLead(id, name, phone);
+        });
+
+        // Refresh / Re-lookup Visitor Telemetry on-demand
+        $('#btnRefreshLeadTelemetry').off('click').on('click', function() {
+            const btnRefresh = $(this);
+            const icon = $('#refreshTelemetryIcon');
+            btnRefresh.prop('disabled', true).addClass('opacity-60 cursor-not-allowed');
+            icon.addClass('spin');
+
+            $.ajax({
+                url: `/admin/whatsapp-leads/${id}/refresh-telemetry`,
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    client_ip: (ip && ip !== 'Not Available' && ip !== '-') ? ip : ''
+                },
+                headers: { 'Accept': 'application/json' },
+                success: function(res) {
+                    if (res.success && res.lead) {
+                        $('#modalClientIp').text(res.lead.client_ip);
+                        $('#modalLocation').text(res.lead.location);
+                        $('#modalIsp').text(res.lead.isp);
+
+                        // Update trigger button data attributes
+                        btn.attr('data-ip', res.lead.client_ip);
+                        btn.attr('data-location', res.lead.location);
+                        btn.attr('data-isp', res.lead.isp);
+
+                        // Update table row cells
+                        const tableRow = $(`#whatsapp-row-${id}`);
+                        if (tableRow.length) {
+                            tableRow.find('td:nth-child(5) .font-semibold').html(`<i class="bi bi-geo-alt-fill text-rose-500"></i> ${res.lead.location}`);
+                            if (res.lead.isp && res.lead.isp !== 'Not Available') {
+                                tableRow.find('td:nth-child(5) .text-\\[10px\\]').text(res.lead.isp);
+                            }
+                        }
+                    }
+                },
+                complete: function() {
+                    btnRefresh.prop('disabled', false).removeClass('opacity-60 cursor-not-allowed');
+                    icon.removeClass('spin');
+                }
+            });
         });
 
         // Auto mark as read on view details

@@ -10,27 +10,84 @@ use Illuminate\Support\Facades\Log;
 class VisitorTrackerService
 {
     /**
-     * Resolve detailed client IP.
+     * Resolve detailed client IP via multi-header reverse-proxy extraction with client-echo fallback.
      */
-    public function resolveClientIp(): array
+    public function resolveClientIp(array $submitData = []): array
     {
+        $isPublicIp = function (?string $candidate): bool {
+            if (empty($candidate)) {
+                return false;
+            }
+
+            return (bool) filter_var(
+                $candidate,
+                FILTER_VALIDATE_IP,
+                FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE
+            );
+        };
+
         $rawIp = null;
-        $candidates = [
+        $source = 'server_remote_addr';
+
+        // 1. Comprehensive list of reverse-proxy, CDN, and server headers
+        $serverCandidates = [
             request()->header('cf-connecting-ip'),
+            request()->server('HTTP_CF_CONNECTING_IP'),
+            request()->header('true-client-ip'),
+            request()->server('HTTP_TRUE_CLIENT_IP'),
             request()->header('x-real-ip'),
+            request()->server('HTTP_X_REAL_IP'),
             request()->header('x-forwarded-for'),
+            request()->server('HTTP_X_FORWARDED_FOR'),
+            request()->header('x-client-ip'),
+            request()->server('HTTP_X_CLIENT_IP'),
+            request()->header('client-ip'),
+            request()->server('HTTP_CLIENT_IP'),
+            request()->header('forwarded'),
+            request()->server('HTTP_FORWARDED'),
             request()->ip(),
             request()->server('REMOTE_ADDR'),
         ];
 
-        foreach ($candidates as $candidate) {
+        // 2. Scan server headers for the first genuine public IP
+        foreach ($serverCandidates as $candidate) {
             if (! empty($candidate)) {
                 $parts = explode(',', (string) $candidate);
                 foreach ($parts as $p) {
                     $p = trim($p);
-                    if (filter_var($p, FILTER_VALIDATE_IP)) {
+                    if ($isPublicIp($p)) {
                         $rawIp = $p;
+                        $source = 'server_cdn_proxy_header';
                         break 2;
+                    }
+                }
+            }
+        }
+
+        // 3. Fallback: If server headers only see internal/proxy IP (e.g. 10.x, 127.x, 192.168.x), check client-side echo
+        if (! $rawIp) {
+            $clientEcho = $submitData['client_ip'] ?? request()->input('client_ip');
+            if (! empty($clientEcho)) {
+                $clientEcho = trim((string) $clientEcho);
+                if ($isPublicIp($clientEcho)) {
+                    $rawIp = $clientEcho;
+                    $source = 'client_echo';
+                }
+            }
+        }
+
+        // 4. Fallback to any valid IP (including private/local) if no public IP could be found
+        if (! $rawIp) {
+            foreach ($serverCandidates as $candidate) {
+                if (! empty($candidate)) {
+                    $parts = explode(',', (string) $candidate);
+                    foreach ($parts as $p) {
+                        $p = trim($p);
+                        if (filter_var($p, FILTER_VALIDATE_IP)) {
+                            $rawIp = $p;
+                            $source = 'server_private_or_local';
+                            break 2;
+                        }
                     }
                 }
             }
@@ -53,20 +110,36 @@ class VisitorTrackerService
             'client_ip' => $ip,
             'ip_version' => $version,
             'ip_hash' => $hash,
+            'ip_source' => $source,
+            'is_public' => $isPublicIp($ip),
         ];
     }
 
     /**
-     * Lookup IP details from resilient 3-tier free, keyless open-source APIs (with 24h caching).
+     * Lookup IP details from resilient 3-tier free, keyless open-source APIs (with 24h caching & client fallback).
      */
-    public function ipLookup(string $ip): ?array
+    public function ipLookup(string $ip, array $fallbackGeo = []): ?array
     {
-        if (empty($ip) || in_array($ip, ['127.0.0.1', '::1', '0.0.0.0', 'localhost', 'not available'])) {
-            return null;
+        $hasFallback = ! empty($fallbackGeo['country']) || ! empty($fallbackGeo['city']);
+
+        if (empty($ip) || in_array(strtolower($ip), ['127.0.0.1', '::1', '0.0.0.0', 'localhost', 'not available'])) {
+            return $hasFallback ? [
+                'country' => $fallbackGeo['country'] ?? null,
+                'regionName' => $fallbackGeo['region'] ?? null,
+                'city' => $fallbackGeo['city'] ?? null,
+                'lat' => $fallbackGeo['lat'] ?? null,
+                'lon' => $fallbackGeo['lon'] ?? null,
+                'timezone' => $fallbackGeo['timezone'] ?? null,
+                'isp' => $fallbackGeo['isp'] ?? null,
+                'org' => $fallbackGeo['org'] ?? ($fallbackGeo['isp'] ?? null),
+                'as' => null,
+                'hosting' => false,
+                'proxy' => false,
+            ] : null;
         }
 
         // Cache the lookup results for 24 hours to prevent API rate limiting
-        return Cache::remember("geoip_{$ip}", 86400, function () use ($ip) {
+        $result = Cache::remember("geoip_{$ip}", 86400, function () use ($ip) {
             // Tier 1: IP-API.com
             try {
                 $response = Http::timeout(2)
@@ -146,6 +219,24 @@ class VisitorTrackerService
 
             return null;
         });
+
+        if (! $result && $hasFallback) {
+            return [
+                'country' => $fallbackGeo['country'] ?? null,
+                'regionName' => $fallbackGeo['region'] ?? null,
+                'city' => $fallbackGeo['city'] ?? null,
+                'lat' => $fallbackGeo['lat'] ?? null,
+                'lon' => $fallbackGeo['lon'] ?? null,
+                'timezone' => $fallbackGeo['timezone'] ?? null,
+                'isp' => $fallbackGeo['isp'] ?? null,
+                'org' => $fallbackGeo['org'] ?? ($fallbackGeo['isp'] ?? null),
+                'as' => null,
+                'hosting' => false,
+                'proxy' => false,
+            ];
+        }
+
+        return $result;
     }
 
     /**
@@ -241,9 +332,16 @@ class VisitorTrackerService
         $acceptEnc = request()->header('Accept-Encoding') ?: 'Not Available';
         $referrer = request()->header('referer') ?: 'Not Available';
 
-        // Geolocation IP details
-        $ipInfo = $this->resolveClientIp();
-        $ipMeta = $this->ipLookup($ipInfo['client_ip']);
+        // Geolocation IP details with multi-source fallback
+        $ipInfo = $this->resolveClientIp($submitData);
+        $fallbackGeo = [
+            'country' => $submitData['client_country'] ?? request()->input('client_country'),
+            'city' => $submitData['client_city'] ?? request()->input('client_city'),
+            'region' => $submitData['client_region'] ?? request()->input('client_region'),
+            'isp' => $submitData['client_isp'] ?? request()->input('client_isp'),
+            'timezone' => $submitData['client_timezone'] ?? request()->input('client_timezone'),
+        ];
+        $ipMeta = $this->ipLookup($ipInfo['client_ip'], $fallbackGeo);
 
         $gpsLat = $submitData['gps_lat'] ?? 'Not Available';
         $gpsLng = $submitData['gps_lng'] ?? 'Not Available';
@@ -252,14 +350,14 @@ class VisitorTrackerService
         $gpsSource = (! empty($submitData['gps_consent']) && $submitData['gps_consent'] === 'Yes') ? 'GPS (User Consented)' : 'Not Available';
 
         $loc = [
-            'country' => $ipMeta['country'] ?? 'Not Available',
-            'region' => $ipMeta['regionName'] ?? ($ipMeta['region'] ?? 'Not Available'),
-            'city' => $ipMeta['city'] ?? 'Not Available',
+            'country' => $ipMeta['country'] ?? ($fallbackGeo['country'] ?: 'Not Available'),
+            'region' => $ipMeta['regionName'] ?? ($ipMeta['region'] ?? ($fallbackGeo['region'] ?: 'Not Available')),
+            'city' => $ipMeta['city'] ?? ($fallbackGeo['city'] ?: 'Not Available'),
             'latitude' => $gpsLat !== 'Not Available' ? (string) $gpsLat : (! empty($ipMeta['lat']) ? (string) $ipMeta['lat'] : 'Not Available'),
             'longitude' => $gpsLng !== 'Not Available' ? (string) $gpsLng : (! empty($ipMeta['lon']) ? (string) $ipMeta['lon'] : 'Not Available'),
-            'timezone' => $ipMeta['timezone'] ?? 'Not Available',
-            'isp' => $ipMeta['isp'] ?? 'Not Available',
-            'organization' => $ipMeta['org'] ?? 'Not Available',
+            'timezone' => $ipMeta['timezone'] ?? ($fallbackGeo['timezone'] ?: 'Not Available'),
+            'isp' => $ipMeta['isp'] ?? ($fallbackGeo['isp'] ?: 'Not Available'),
+            'organization' => $ipMeta['org'] ?? ($fallbackGeo['isp'] ?: 'Not Available'),
             'asn' => $ipMeta['as'] ?? 'Not Available',
             'hosting_flag' => isset($ipMeta['hosting']) ? ($ipMeta['hosting'] ? 'Yes' : 'No') : 'Not Available',
             'proxy_flag' => isset($ipMeta['proxy']) ? ($ipMeta['proxy'] ? 'Yes' : 'No') : 'Not Available',

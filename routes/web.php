@@ -206,6 +206,7 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::post('/whatsapp-leads/bulk-action', [AdminWhatsappController::class, 'bulkAction'])->name('whatsapp.bulk');
     Route::post('/whatsapp-leads/{id}/mark-read', [AdminWhatsappController::class, 'markRead'])->name('whatsapp.mark-read');
     Route::post('/whatsapp-leads/{id}/toggle-read', [AdminWhatsappController::class, 'toggleRead'])->name('whatsapp.toggle-read');
+    Route::post('/whatsapp-leads/{id}/refresh-telemetry', [AdminWhatsappController::class, 'refreshTelemetry'])->name('whatsapp.refresh-telemetry');
     Route::delete('/whatsapp-leads/{id}', [AdminWhatsappController::class, 'destroy'])->name('whatsapp.destroy');
     Route::get('/whatsapp-leads', [AdminWhatsappController::class, 'index'])->name('whatsapp.leads');
     Route::get('/whatsapp', [AdminWhatsappController::class, 'index'])->name('whatsapp.index');

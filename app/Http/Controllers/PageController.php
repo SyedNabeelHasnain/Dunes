@@ -243,6 +243,11 @@ class PageController extends Controller
             'prospect_name' => 'nullable|string|max:100',
             'prospect_phone' => 'nullable|string|max:50',
             'prospect_email' => 'nullable|string|max:150',
+            'client_ip' => 'nullable|string|max:50',
+            'client_country' => 'nullable|string|max:100',
+            'client_city' => 'nullable|string|max:100',
+            'client_region' => 'nullable|string|max:100',
+            'client_isp' => 'nullable|string|max:150',
             'screen_res' => 'nullable|string|max:50',
             'client_timezone' => 'nullable|string|max:100',
             'client_language' => 'nullable|string|max:50',
@@ -412,6 +417,30 @@ class PageController extends Controller
         }
 
         try {
+            $finalClientIp = $ctx['client_ip'] ?? request()->ip();
+            if (empty($finalClientIp) || in_array(strtolower($finalClientIp), ['not available', '0.0.0.0', '127.0.0.1'])) {
+                $rawClientEcho = trim((string) $request->input('client_ip', ''));
+                if (filter_var($rawClientEcho, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                    $finalClientIp = $rawClientEcho;
+                }
+            }
+
+            $finalCountry = (! empty($ctx['country']) && $ctx['country'] !== 'Not Available' && $ctx['country'] !== 'Unknown')
+                ? $ctx['country']
+                : ($request->input('client_country') ?: null);
+
+            $finalCity = (! empty($ctx['city']) && $ctx['city'] !== 'Not Available' && $ctx['city'] !== 'Unknown')
+                ? $ctx['city']
+                : ($request->input('client_city') ?: null);
+
+            $finalRegion = (! empty($ctx['region']) && $ctx['region'] !== 'Not Available')
+                ? $ctx['region']
+                : ($request->input('client_region') ?: null);
+
+            $finalIsp = (! empty($ctx['isp']) && $ctx['isp'] !== 'Not Available')
+                ? $ctx['isp']
+                : ($request->input('client_isp') ?: ($ctx['organization'] ?? null));
+
             // Save WhatsApp lead with direct telemetry columns (self-contained & resilient)
             $inquiry = WhatsappInquiry::create([
                 'name' => $name,
@@ -420,15 +449,15 @@ class PageController extends Controller
                 'tour_name' => $tourName,
                 'page_url' => $pageUrl,
                 'message_text' => $messageText,
-                'client_ip' => $ctx['client_ip'] ?? request()->ip(),
-                'country' => $ctx['country'] ?? null,
-                'city' => $ctx['city'] ?? null,
-                'region' => $ctx['region'] ?? null,
+                'client_ip' => $finalClientIp ?: 'Not Available',
+                'country' => $finalCountry,
+                'city' => $finalCity,
+                'region' => $finalRegion,
                 'device_type' => $ctx['device_type'] ?? null,
                 'browser_name' => $ctx['browser_name'] ?? null,
                 'os_name' => $ctx['os_name'] ?? null,
-                'isp' => $ctx['isp'] ?? null,
-                'organization' => $ctx['organization'] ?? null,
+                'isp' => $finalIsp,
+                'organization' => $finalIsp,
                 'utm_source' => $ctx['utm_source'] ?? null,
                 'utm_medium' => $ctx['utm_medium'] ?? null,
                 'utm_campaign' => $ctx['utm_campaign'] ?? null,

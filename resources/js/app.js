@@ -78,6 +78,154 @@ document.addEventListener('change', function(e) {
 }, true);
 
 // =============================================================================
+// RESILIENT DUAL-ENGINE CLIENT IP & GEOLOCATION RESOLVER (KEYLESS & OPEN SOURCE)
+// =============================================================================
+window.DunesIpResolver = {
+    _cachedIp: null,
+    _cachedGeo: null,
+    _resolvingPromise: null,
+
+    init() {
+        try {
+            const storedIp = sessionStorage.getItem('dunes_client_ip');
+            const storedGeo = sessionStorage.getItem('dunes_client_geo');
+            if (storedIp && this._isValidPublicIp(storedIp)) {
+                this._cachedIp = storedIp;
+            }
+            if (storedGeo) {
+                try { this._cachedGeo = JSON.parse(storedGeo); } catch (e) {}
+            }
+        } catch (e) {}
+
+        // Non-blocking background public IP resolution
+        if (!this._cachedIp) {
+            if (typeof window.requestIdleCallback === 'function') {
+                window.requestIdleCallback(() => this.resolve(), { timeout: 2000 });
+            } else {
+                setTimeout(() => this.resolve(), 100);
+            }
+        }
+    },
+
+    _isValidPublicIp(ip) {
+        if (!ip || typeof ip !== 'string') return false;
+        ip = ip.trim();
+        if (ip === '127.0.0.1' || ip === '::1' || ip === '0.0.0.0' || ip.toLowerCase() === 'localhost') return false;
+        if (/^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/.test(ip)) return false;
+        const ipv4 = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+        const ipv6 = /^[a-fA-F0-9:]+$/;
+        return ipv4.test(ip) || (ipv6.test(ip) && ip.includes(':'));
+    },
+
+    async resolve() {
+        if (this._cachedIp) return { ip: this._cachedIp, geo: this._cachedGeo };
+        if (this._resolvingPromise) return this._resolvingPromise;
+
+        this._resolvingPromise = (async () => {
+            // Tier 1: freeipapi.com (Provides verified public IP + Country + City + ISP with zero keys or signups)
+            try {
+                const ctrl = new AbortController();
+                const tid = setTimeout(() => ctrl.abort(), 2500);
+                const res = await fetch('https://freeipapi.com/api/json', { signal: ctrl.signal });
+                clearTimeout(tid);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.ipAddress && this._isValidPublicIp(data.ipAddress)) {
+                        this._cachedIp = data.ipAddress;
+                        this._cachedGeo = {
+                            country: data.countryName || '',
+                            city: data.cityName || '',
+                            region: data.regionName || '',
+                            isp: data.asnOrganization || '',
+                            timezone: (data.timeZones && data.timeZones[0]) || ''
+                        };
+                        try {
+                            sessionStorage.setItem('dunes_client_ip', this._cachedIp);
+                            sessionStorage.setItem('dunes_client_geo', JSON.stringify(this._cachedGeo));
+                        } catch (e) {}
+                        return { ip: this._cachedIp, geo: this._cachedGeo };
+                    }
+                }
+            } catch (e) {}
+
+            // Tier 2: api64.ipify.org (Ultra-fast, dual-stack IPv4/IPv6 public IP echo, CORS-enabled, 100% free)
+            try {
+                const ctrl = new AbortController();
+                const tid = setTimeout(() => ctrl.abort(), 2000);
+                const res = await fetch('https://api64.ipify.org?format=json', { signal: ctrl.signal });
+                clearTimeout(tid);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.ip && this._isValidPublicIp(data.ip)) {
+                        this._cachedIp = data.ip;
+                        try {
+                            sessionStorage.setItem('dunes_client_ip', this._cachedIp);
+                        } catch (e) {}
+                        return { ip: this._cachedIp, geo: this._cachedGeo };
+                    }
+                }
+            } catch (e) {}
+
+            // Tier 3: ipwho.is (Free HTTPS fallback)
+            try {
+                const ctrl = new AbortController();
+                const tid = setTimeout(() => ctrl.abort(), 2000);
+                const res = await fetch('https://ipwho.is/', { signal: ctrl.signal });
+                clearTimeout(tid);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.success && data.ip && this._isValidPublicIp(data.ip)) {
+                        this._cachedIp = data.ip;
+                        this._cachedGeo = {
+                            country: data.country || '',
+                            city: data.city || '',
+                            region: data.region || '',
+                            isp: (data.connection && data.connection.isp) || '',
+                            timezone: (data.timezone && data.timezone.id) || ''
+                        };
+                        try {
+                            sessionStorage.setItem('dunes_client_ip', this._cachedIp);
+                            sessionStorage.setItem('dunes_client_geo', JSON.stringify(this._cachedGeo));
+                        } catch (e) {}
+                        return { ip: this._cachedIp, geo: this._cachedGeo };
+                    }
+                }
+            } catch (e) {}
+
+            return { ip: null, geo: null };
+        })();
+
+        return this._resolvingPromise;
+    },
+
+    getIp() {
+        return this._cachedIp;
+    },
+
+    getGeo() {
+        return this._cachedGeo;
+    },
+
+    injectIntoFormData(fd) {
+        if (!fd || typeof fd.append !== 'function') return;
+        const ip = this.getIp();
+        if (ip && !fd.has('client_ip')) {
+            fd.append('client_ip', ip);
+        }
+        const geo = this.getGeo();
+        if (geo) {
+            if (geo.country && !fd.has('client_country')) fd.append('client_country', geo.country);
+            if (geo.city && !fd.has('client_city')) fd.append('client_city', geo.city);
+            if (geo.region && !fd.has('client_region')) fd.append('client_region', geo.region);
+            if (geo.isp && !fd.has('client_isp')) fd.append('client_isp', geo.isp);
+            if (geo.timezone && !fd.has('client_timezone')) fd.append('client_timezone', geo.timezone);
+        }
+    }
+};
+
+window.DunesIpResolver.init();
+
+// =============================================================================
 // MARKETING ACQUISITION & MULTI-PAGE BREADCRUMB JOURNEY ENGINE
 // =============================================================================
 window.DunesJourneyTracker = {
@@ -385,6 +533,12 @@ window.DunesJourneyTracker = {
 
     injectIntoFormData(fd) {
         if (!fd || typeof fd.append !== 'function') return;
+
+        // Auto-inject verified client public IP and geo telemetry
+        if (window.DunesIpResolver && typeof window.DunesIpResolver.injectIntoFormData === 'function') {
+            window.DunesIpResolver.injectIntoFormData(fd);
+        }
+
         const summary = this.getSummary();
 
         if (!fd.has('traffic_channel') && summary.traffic_channel) fd.append('traffic_channel', summary.traffic_channel);
@@ -2661,6 +2815,11 @@ const App = {
                 if (sp.get('utm_content')) fd.append('utm_content', sp.get('utm_content'));
                 if (sp.get('gclid')) fd.append('gclid', sp.get('gclid'));
             } catch (e) {}
+
+            // Inject verified client public IP and geo telemetry
+            if (window.DunesIpResolver && typeof window.DunesIpResolver.injectIntoFormData === 'function') {
+                window.DunesIpResolver.injectIntoFormData(fd);
+            }
 
             // Inject complete multi-page journey timeline and acquisition attribution
             if (window.DunesJourneyTracker && typeof window.DunesJourneyTracker.injectIntoFormData === 'function') {

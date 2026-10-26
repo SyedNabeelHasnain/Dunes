@@ -232,6 +232,12 @@ window.openWhatsApp = function(tourName, directHref) {
             fd.append('page_url', window.location.href);
             fd.append('message_text', msg);
             fd.append('ref_code', refCode);
+            if (window.DunesIpResolver && typeof window.DunesIpResolver.injectIntoFormData === 'function') {
+                window.DunesIpResolver.injectIntoFormData(fd);
+            }
+            if (window.DunesJourneyTracker && typeof window.DunesJourneyTracker.injectIntoFormData === 'function') {
+                window.DunesJourneyTracker.injectIntoFormData(fd);
+            }
             fetch('/ajax.php', { method: 'POST', body: fd, keepalive: true }).catch(function(){});
         } catch (e) {}
         return;
