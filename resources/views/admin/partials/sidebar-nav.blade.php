@@ -35,15 +35,15 @@
 
     <!-- 1. STANDALONE DASHBOARD & ANALYTICS -->
     <a href="{{ route('admin.dashboard') }}" 
-       class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.dashboard') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }} @if(!$isMobile) :class=\"$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''\" @endif"
-       @if(!$isMobile) :title="$store.admin.sidebarCollapsed ? 'Dashboard' : ''" @endif>
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.dashboard') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}"
+       @if(!$isMobile) :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Dashboard' : ''" @endif>
         <i class="bi bi-grid-1x2-fill text-base shrink-0 {{ request()->routeIs('admin.dashboard') ? 'text-white' : 'text-slate-400' }}"></i>
         <span @if(!$isMobile) x-show="!$store.admin.sidebarCollapsed" @endif class="whitespace-nowrap">Dashboard</span>
     </a>
 
     <a href="{{ route('admin.analytics.index') }}" 
-       class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.analytics*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }} @if(!$isMobile) :class=\"$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''\" @endif"
-       @if(!$isMobile) :title="$store.admin.sidebarCollapsed ? 'Analytics & BI' : ''" @endif>
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.analytics*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}"
+       @if(!$isMobile) :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Analytics & BI' : ''" @endif>
         <i class="bi bi-graph-up-arrow text-base text-cyan-400 shrink-0"></i>
         <span @if(!$isMobile) x-show="!$store.admin.sidebarCollapsed" @endif class="whitespace-nowrap">Analytics & BI</span>
     </a>
@@ -52,8 +52,8 @@
     <div class="pt-2">
         <button type="button" 
                 @click="toggle('bookings')" 
-                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-medium transition text-left cursor-pointer {{ $isBookingsGroup ? 'bg-slate-900/90 text-white font-semibold' : 'text-slate-400 hover:bg-slate-900/70 hover:text-white' }} @if(!$isMobile) :class=\"$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''\" @endif"
-                @if(!$isMobile) :title="$store.admin.sidebarCollapsed ? 'Bookings & Sales' : ''" @endif>
+                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-medium transition text-left cursor-pointer {{ $isBookingsGroup ? 'bg-slate-900/90 text-white font-semibold' : 'text-slate-400 hover:bg-slate-900/70 hover:text-white' }}"
+                @if(!$isMobile) :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Bookings & Sales' : ''" @endif>
             <div class="flex items-center gap-3 min-w-0">
                 <i class="bi bi-calendar2-check-fill text-base text-amber-400 shrink-0"></i>
                 <span @if(!$isMobile) x-show="!$store.admin.sidebarCollapsed" @endif class="whitespace-nowrap text-sm">Bookings & Sales</span>
@@ -129,8 +129,8 @@
     <div class="pt-2">
         <button type="button" 
                 @click="toggle('operations')" 
-                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-medium transition text-left cursor-pointer {{ $isOperationsGroup ? 'bg-slate-900/90 text-white font-semibold' : 'text-slate-400 hover:bg-slate-900/70 hover:text-white' }} @if(!$isMobile) :class=\"$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''\" @endif"
-                @if(!$isMobile) :title="$store.admin.sidebarCollapsed ? 'Operations & Fleet' : ''" @endif>
+                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-medium transition text-left cursor-pointer {{ $isOperationsGroup ? 'bg-slate-900/90 text-white font-semibold' : 'text-slate-400 hover:bg-slate-900/70 hover:text-white' }}"
+                @if(!$isMobile) :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Operations & Fleet' : ''" @endif>
             <div class="flex items-center gap-3 min-w-0">
                 <i class="bi bi-truck-flatbed text-base text-sky-400 shrink-0"></i>
                 <span @if(!$isMobile) x-show="!$store.admin.sidebarCollapsed" @endif class="whitespace-nowrap text-sm">Operations & Fleet</span>
@@ -172,8 +172,8 @@
     <div class="pt-2">
         <button type="button" 
                 @click="toggle('catalog')" 
-                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-medium transition text-left cursor-pointer {{ $isCatalogGroup ? 'bg-slate-900/90 text-white font-semibold' : 'text-slate-400 hover:bg-slate-900/70 hover:text-white' }} @if(!$isMobile) :class=\"$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''\" @endif"
-                @if(!$isMobile) :title="$store.admin.sidebarCollapsed ? 'Tour Inventory' : ''" @endif>
+                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-medium transition text-left cursor-pointer {{ $isCatalogGroup ? 'bg-slate-900/90 text-white font-semibold' : 'text-slate-400 hover:bg-slate-900/70 hover:text-white' }}"
+                @if(!$isMobile) :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Tour Inventory' : ''" @endif>
             <div class="flex items-center gap-3 min-w-0">
                 <i class="bi bi-compass-fill text-base text-emerald-400 shrink-0"></i>
                 <span @if(!$isMobile) x-show="!$store.admin.sidebarCollapsed" @endif class="whitespace-nowrap text-sm">Tour Inventory</span>
@@ -218,8 +218,8 @@
     <div class="pt-2">
         <button type="button" 
                 @click="toggle('communications')" 
-                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-medium transition text-left cursor-pointer {{ $isCommunicationsGroup ? 'bg-slate-900/90 text-white font-semibold' : 'text-slate-400 hover:bg-slate-900/70 hover:text-white' }} @if(!$isMobile) :class=\"$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''\" @endif"
-                @if(!$isMobile) :title="$store.admin.sidebarCollapsed ? 'Communications & Leads' : ''" @endif>
+                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-medium transition text-left cursor-pointer {{ $isCommunicationsGroup ? 'bg-slate-900/90 text-white font-semibold' : 'text-slate-400 hover:bg-slate-900/70 hover:text-white' }}"
+                @if(!$isMobile) :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Communications & Leads' : ''" @endif>
             <div class="flex items-center gap-3 min-w-0">
                 <i class="bi bi-chat-left-dots-fill text-base text-teal-400 shrink-0"></i>
                 <span @if(!$isMobile) x-show="!$store.admin.sidebarCollapsed" @endif class="whitespace-nowrap text-sm">Leads & Messages</span>
@@ -289,8 +289,8 @@
     <div class="pt-2">
         <button type="button" 
                 @click="toggle('marketing')" 
-                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-medium transition text-left cursor-pointer {{ $isMarketingGroup ? 'bg-slate-900/90 text-white font-semibold' : 'text-slate-400 hover:bg-slate-900/70 hover:text-white' }} @if(!$isMobile) :class=\"$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''\" @endif"
-                @if(!$isMobile) :title="$store.admin.sidebarCollapsed ? 'Marketing & Promos' : ''" @endif>
+                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-medium transition text-left cursor-pointer {{ $isMarketingGroup ? 'bg-slate-900/90 text-white font-semibold' : 'text-slate-400 hover:bg-slate-900/70 hover:text-white' }}"
+                @if(!$isMobile) :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Marketing & Promos' : ''" @endif>
             <div class="flex items-center gap-3 min-w-0">
                 <i class="bi bi-megaphone-fill text-base text-amber-400 shrink-0"></i>
                 <span @if(!$isMobile) x-show="!$store.admin.sidebarCollapsed" @endif class="whitespace-nowrap text-sm">Marketing & Promos</span>
@@ -344,8 +344,8 @@
     <div class="pt-2">
         <button type="button" 
                 @click="toggle('content')" 
-                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-medium transition text-left cursor-pointer {{ $isContentGroup ? 'bg-slate-900/90 text-white font-semibold' : 'text-slate-400 hover:bg-slate-900/70 hover:text-white' }} @if(!$isMobile) :class=\"$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''\" @endif"
-                @if(!$isMobile) :title="$store.admin.sidebarCollapsed ? 'Content & Knowledge' : ''" @endif>
+                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-medium transition text-left cursor-pointer {{ $isContentGroup ? 'bg-slate-900/90 text-white font-semibold' : 'text-slate-400 hover:bg-slate-900/70 hover:text-white' }}"
+                @if(!$isMobile) :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Content & Knowledge' : ''" @endif>
             <div class="flex items-center gap-3 min-w-0">
                 <i class="bi bi-journal-richtext text-base text-rose-400 shrink-0"></i>
                 <span @if(!$isMobile) x-show="!$store.admin.sidebarCollapsed" @endif class="whitespace-nowrap text-sm">Content & Knowledge</span>
@@ -417,8 +417,8 @@
     <div class="pt-2">
         <button type="button" 
                 @click="toggle('settings')" 
-                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-medium transition text-left cursor-pointer {{ $isSettingsGroup ? 'bg-slate-900/90 text-white font-semibold' : 'text-slate-400 hover:bg-slate-900/70 hover:text-white' }} @if(!$isMobile) :class=\"$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''\" @endif"
-                @if(!$isMobile) :title="$store.admin.sidebarCollapsed ? 'Portal Settings' : ''" @endif>
+                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-medium transition text-left cursor-pointer {{ $isSettingsGroup ? 'bg-slate-900/90 text-white font-semibold' : 'text-slate-400 hover:bg-slate-900/70 hover:text-white' }}"
+                @if(!$isMobile) :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Portal Settings' : ''" @endif>
             <div class="flex items-center gap-3 min-w-0">
                 <i class="bi bi-gear-wide-connected text-base text-cyan-400 shrink-0"></i>
                 <span @if(!$isMobile) x-show="!$store.admin.sidebarCollapsed" @endif class="whitespace-nowrap text-sm">Portal Settings</span>
@@ -496,14 +496,14 @@
     <div class="pt-3">
         <div @if(!$isMobile) x-show="!$store.admin.sidebarCollapsed" @endif class="pb-1 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">External</div>
         <a href="{{ url('/rate-card') }}" target="_blank" 
-           class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:bg-slate-900 hover:text-white transition @if(!$isMobile) :class=\"$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''\" @endif" 
-           @if(!$isMobile) :title="$store.admin.sidebarCollapsed ? 'Live Rate Card' : ''" @endif>
+           class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:bg-slate-900 hover:text-white transition"
+           @if(!$isMobile) :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Live Rate Card' : ''" @endif>
             <i class="bi bi-file-earmark-pdf-fill text-amber-400 text-sm shrink-0"></i>
             <span @if(!$isMobile) x-show="!$store.admin.sidebarCollapsed" @endif class="whitespace-nowrap">Live Rate Card</span>
         </a>
         <a href="{{ url('/') }}" target="_blank" 
-           class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:bg-slate-900 hover:text-white transition @if(!$isMobile) :class=\"$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''\" @endif" 
-           @if(!$isMobile) :title="$store.admin.sidebarCollapsed ? 'Visit Live Website' : ''" @endif>
+           class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:bg-slate-900 hover:text-white transition"
+           @if(!$isMobile) :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Visit Live Website' : ''" @endif>
             <i class="bi bi-box-arrow-up-right text-cyan-400 text-sm shrink-0"></i>
             <span @if(!$isMobile) x-show="!$store.admin.sidebarCollapsed" @endif class="whitespace-nowrap">View Website</span>
         </a>
