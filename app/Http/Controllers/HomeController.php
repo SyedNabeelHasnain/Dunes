@@ -25,50 +25,42 @@ class HomeController extends Controller
         $currentLocale = app()->getLocale() ?: 'en';
 
         try {
-            $loadCatalog = static function (): array {
-                $categories = Category::with(['tours' => function ($query) {
-                    $query->where('status', 'active')->with(['tiers', 'category'])->orderBy('priority', 'asc');
-                }])->orderBy('priority', 'asc')->get();
+            $categories = Category::with(['tours' => function ($query) {
+                $query->where('status', 'active')->with(['tiers', 'category'])->orderBy('priority', 'asc');
+            }])->orderBy('priority', 'asc')->get();
 
-                $activeTourModels = Tour::where('status', 'active')
-                    ->with(['tiers', 'category'])
-                    ->orderBy('priority', 'asc')
-                    ->get();
+            $activeTourModels = Tour::where('status', 'active')
+                ->with(['tiers', 'category'])
+                ->orderBy('priority', 'asc')
+                ->get();
 
-                $bestsellers = $activeTourModels->where('is_bestseller', true)->values();
+            $bestsellers = $activeTourModels->where('is_bestseller', true)->values();
 
-                $allActiveTours = $activeTourModels->map(function ($t) {
-                    $minPrice = $t->tiers->pluck('pivot.price')->filter(function ($p) {
-                        return $p !== null && (float) $p > 0;
-                    })->min();
+            $allActiveTours = $activeTourModels->map(function ($t) {
+                $minPrice = $t->tiers->pluck('pivot.price')->filter(function ($p) {
+                    return $p !== null && (float) $p > 0;
+                })->min();
 
-                    if (! $minPrice) {
-                        $minPrice = 79;
-                    }
+                if (! $minPrice) {
+                    $minPrice = 79;
+                }
 
-                    return [
-                        'id' => (string) $t->id,
-                        'name' => $t->name,
-                        'slug' => $t->slug,
-                        'category_slug' => $t->category ? $t->category->slug : 'desert-safari',
-                        'category_name' => $t->category ? $t->category->name : 'Desert Safari',
-                        'duration' => $t->duration ?: '4-6 Hours',
-                        'rating' => (float) ($t->rating ?: 4.9),
-                        'review_count' => (int) ($t->review_count ?: 500),
-                        'min_price' => (float) $minPrice,
-                        'short_desc' => $t->short_desc ?: 'Top-rated Dubai tour experience.',
-                        'is_bestseller' => (bool) $t->is_bestseller,
-                        'is_featured' => (bool) $t->is_featured,
-                        'priority' => (int) $t->priority,
-                    ];
-                });
-
-                return [$categories, $bestsellers, $allActiveTours];
-            };
-
-            [$categories, $bestsellers, $allActiveTours] = app()->runningUnitTests()
-                ? $loadCatalog()
-                : Cache::remember('site_home_catalog_'.$currentLocale, 900, $loadCatalog);
+                return [
+                    'id' => (string) $t->id,
+                    'name' => $t->name,
+                    'slug' => $t->slug,
+                    'category_slug' => $t->category ? $t->category->slug : 'desert-safari',
+                    'category_name' => $t->category ? $t->category->name : 'Desert Safari',
+                    'duration' => $t->duration ?: '4-6 Hours',
+                    'rating' => (float) ($t->rating ?: 4.9),
+                    'review_count' => (int) ($t->review_count ?: 500),
+                    'min_price' => (float) $minPrice,
+                    'short_desc' => $t->short_desc ?: 'Top-rated Dubai tour experience.',
+                    'is_bestseller' => (bool) $t->is_bestseller,
+                    'is_featured' => (bool) $t->is_featured,
+                    'priority' => (int) $t->priority,
+                ];
+            });
         } catch (\Throwable $e) {
             $categories = collect();
             $bestsellers = collect();
@@ -89,7 +81,18 @@ class HomeController extends Controller
                         ->where('rating', '>=', 4.0)
                         ->orderByRaw('is_featured DESC, rating DESC, published_date DESC')
                         ->limit(40)
-                        ->get();
+                        ->get()
+                        ->map(fn ($r) => (object) [
+                            'rating' => (float) $r->rating,
+                            'source' => (string) $r->source,
+                            'review_url' => (string) $r->review_url,
+                            'reviewer_name' => (string) $r->reviewer_name,
+                            'reviewer_avatar_url' => (string) $r->reviewer_avatar_url,
+                            'published_date' => $r->published_date ? (string) $r->published_date : null,
+                            'photos' => $r->photos,
+                            'review_title' => (string) $r->review_title,
+                            'review_text' => (string) $r->review_text,
+                        ]);
 
                     $featured = collect($dbReviews);
                 } catch (\Throwable $e) {
