@@ -12,7 +12,7 @@ class Booking extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'id', 'reference', 'tour_id', 'tier_id', 'tour_name', 'tier_name',
+        'reference', 'tour_id', 'tier_id', 'tour_name', 'tier_name',
         'driver_id', 'vehicle_id', 'tour_date',
         'adults', 'children', 'infants', 'name', 'email', 'phone', 'pickup_location',
         'pickup_time_slot', 'pickup_status', 'driver_assigned_at', 'driver_notified_at',

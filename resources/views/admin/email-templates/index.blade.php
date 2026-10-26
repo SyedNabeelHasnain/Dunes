@@ -58,7 +58,7 @@
                 <!-- Visual Mini Thumbnail Frame -->
                 <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50 relative mb-4 h-40">
                     <iframe src="{{ route('admin.email-templates.preview', $template->id) }}" class="w-full h-full border-0 pointer-events-none" style="transform: scale(0.65); transform-origin: top left; width: 154%; height: 154%; pointer-events: none;" loading="lazy"></iframe>
-                    <div class="absolute inset-0 bg-transparent cursor-pointer" @click="previewTitle = '{{ addslashes($template->name) }}'; previewUrl = '{{ route('admin.email-templates.preview', $template->id) }}'; openPreview = true;"></div>
+                    <div class="absolute inset-0 bg-transparent cursor-pointer" @click="previewTitle = @js($template->name); previewUrl = '{{ route('admin.email-templates.preview', $template->id) }}'; openPreview = true;"></div>
                 </div>
 
                 <div class="flex items-center justify-between text-xs text-slate-400">
@@ -68,7 +68,7 @@
             </div>
 
             <div class="border-t border-slate-100 p-3 px-5 flex items-center justify-between gap-2 bg-slate-50/40">
-                <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-bold transition cursor-pointer" @click="previewTitle = '{{ addslashes($template->name) }}'; previewUrl = '{{ route('admin.email-templates.preview', $template->id) }}'; openPreview = true;">
+                <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-bold transition cursor-pointer" @click="previewTitle = @js($template->name); previewUrl = '{{ route('admin.email-templates.preview', $template->id) }}'; openPreview = true;">
                     <i class="bi bi-eye text-slate-500"></i> Preview
                 </button>
                 <div class="flex items-center gap-1">

@@ -412,6 +412,8 @@ Route::redirect('/quad-bike-tour-dubai', '/desert-safari-quad-biking-dubai', 301
 Route::redirect('/vip-desert-safari-dubai', '/evening-desert-safari-dubai', 301);
 Route::redirect('/luxury-vip-desert-safari-dubai', '/evening-desert-safari-dubai', 301);
 Route::redirect('/buggy-tour-dubai', '/dune-buggy-rental-dubai', 301);
+Route::redirect('/dhow-cruise-marina', '/dhow-cruise-catamaran-cruise-dinner-dubai', 301);
+Route::redirect('/quad-biking-safari', '/desert-safari-quad-biking-dubai', 301);
 
 // ── Legacy Press Kit & SEO OG Media Asset 301 Redirects ─────────────────────
 Route::redirect('/images/sunset-desert-safari-dubai-dunes-discovery-tourism.avif', '/images/dubai-desert-safar-camel-ride-dune-discovery-tourism.avif', 301);
@@ -431,9 +433,13 @@ Route::get('/blog/images/{path}', function (string $path) {
     return redirect('/images/'.ltrim($path, '/'), 301);
 })->where('path', '.*');
 
+// Canonical Redirect for English (Default Locale is served at root /)
+Route::get('/en', fn () => redirect('/', 301));
+Route::get('/en/{any}', fn (string $any) => redirect('/'.ltrim($any, '/'), 301))->where('any', '.*');
+
 // ── Multi-Language Localized Route Group (Non-Default Locales, e.g. /ar) ─────
 Route::prefix('{locale}')
-    ->where(['locale' => '^(?!admin|api|ajax|storage|images|css|js|favicon\.ico|en$)[a-z]{2}(-[a-z]{2})?$'])
+    ->where(['locale' => '^(?!admin|api|ajax|storage|images|css|js|favicon\.ico|en(?:/|$))[a-z]{2}(-[a-z]{2})?$'])
     ->group(function () {
         Route::get('/', [HomeController::class, 'index'])->name('locale.home');
         Route::get('/gallery', [GalleryController::class, 'index'])->name('locale.gallery.index');
@@ -489,9 +495,23 @@ Route::prefix('{locale}')
         Route::get('/payment-cancel', [BookingController::class, 'paymentCancel'])->name('locale.booking.cancel');
         Route::get('/checkout/{reference}', [BookingController::class, 'recoverCheckout'])->name('locale.booking.recover');
         Route::post('/checkout/{reference}', [BookingController::class, 'processRecoverCheckout'])->name('locale.booking.recover.process');
+        Route::get('/booking/{reference}/voucher', [VoucherController::class, 'show'])->name('locale.booking.voucher');
+        Route::get('/booking/{reference}/ticket-pdf', [VoucherController::class, 'downloadPdf'])->name('locale.booking.ticket.pdf');
+        Route::get('/booking/{reference}/voucher-pdf', [VoucherController::class, 'downloadPdf'])->name('locale.booking.voucher.pdf');
         Route::get('/review/{ref}', [PageController::class, 'reviewRate'])->name('locale.review.rate');
         Route::post('/review/{ref}', [PageController::class, 'submitReview'])->name('locale.review.submit');
         Route::post('/review/{ref}/feedback', [PageController::class, 'submitFeedback'])->name('locale.review.feedback');
+
+        // Localized Legal Aliases & Quick Redirects
+        Route::get('/terms', fn(string $locale) => redirect('/'.$locale.'/terms-condition', 301));
+        Route::get('/terms-and-conditions', fn(string $locale) => redirect('/'.$locale.'/terms-condition', 301));
+        Route::get('/privacy', fn(string $locale) => redirect('/'.$locale.'/privacy-policy', 301));
+        Route::get('/cookies', fn(string $locale) => redirect('/'.$locale.'/cookie-policy', 301));
+        Route::get('/cancellation-policy', fn(string $locale) => redirect('/'.$locale.'/cancellation-refund-policy', 301));
+        Route::get('/refund-policy', fn(string $locale) => redirect('/'.$locale.'/cancellation-refund-policy', 301));
+        Route::get('/safety-policy', fn(string $locale) => redirect('/'.$locale.'/safety-liability-waiver', 301));
+        Route::get('/ai-policy', fn(string $locale) => redirect('/'.$locale.'/ai-editorial-policy', 301));
+        Route::get('/sustainability', fn(string $locale) => redirect('/'.$locale.'/responsible-tourism-policy', 301));
 
         // High-Value & Geo
         Route::get('/dune-buggy-rental-dubai', [TourController::class, 'showBuggy'])->name('locale.tours.buggy');

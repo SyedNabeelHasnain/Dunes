@@ -341,7 +341,10 @@
                                 </button>
                                 <button type="button" class="w-8 h-8 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 flex items-center justify-center bg-white transition shadow-2xs btn-delete-lead cursor-pointer" 
                                         title="Permanently Delete WhatsApp Lead & All Footprints"
-                                        onclick="promptPermanentDeleteLead({{ $lead->id }}, '{{ addslashes($lead->name ?: 'Visitor') }}', '{{ addslashes($lead->phone ?: '') }}')">
+                                        data-id="{{ $lead->id }}"
+                                        data-name="{{ $lead->name ?: 'Visitor' }}"
+                                        data-phone="{{ $lead->phone ?: '' }}"
+                                        onclick="promptPermanentDeleteLead(this.dataset.id, this.dataset.name, this.dataset.phone)">
                                     <i class="bi bi-trash3 text-xs"></i>
                                 </button>
                             </div>

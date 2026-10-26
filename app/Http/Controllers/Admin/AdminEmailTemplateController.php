@@ -66,6 +66,14 @@ class AdminEmailTemplateController extends Controller
     }
 
     /**
+     * Display a single email template (redirects to edit view).
+     */
+    public function show(int $id)
+    {
+        return redirect()->route('admin.email-templates.edit', $id);
+    }
+
+    /**
      * Show edit template form.
      */
     public function edit(int $id)

@@ -34,7 +34,7 @@
                     <span>Explore Tour</span>
                     <i class="bi bi-arrow-right"></i>
                 </a>
-                <button type="button" @click="$store.modal.open('booking', { tourId: '{{ $tour->id }}', tourName: '{{ addslashes($tour->name) }}' })" class="inline-flex items-center justify-center gap-1 px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold border border-white/20 transition-all">
+                <button type="button" @click="$store.modal.open('booking', { tourId: '{{ $tour->id }}' })" class="inline-flex items-center justify-center gap-1 px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold border border-white/20 transition-all">
                     Book Now
                 </button>
             </div>

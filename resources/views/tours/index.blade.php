@@ -213,7 +213,7 @@
                                         <button type="button" class="border border-slate-300 hover:border-primary text-slate-700 bg-white hover:text-primary text-xs font-semibold rounded-full px-2.5 py-1 transition-colors btn-toggle-compare inline-flex items-center gap-1 cursor-pointer min-h-[36px]" data-tour-id="{{ $t->id }}" onclick="event.preventDefault(); event.stopPropagation(); window.DunesCompare && window.DunesCompare.toggle(this);">
                                             <i class="bi bi-shuffle"></i> <span class="compare-btn-text hidden sm:inline">{{ __('ui.common.compare') }}</span>
                                         </button>
-                                        <span role="button" tabindex="0" class="btn-circle-whatsapp fab-whatsapp w-9 h-9 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center cursor-pointer shadow-xs transition-transform hover:scale-105 shrink-0" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp" onclick="event.preventDefault(); event.stopPropagation(); if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp('{{ addslashes($t->name) }}'); }" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();if(window.App&&typeof window.App.openWhatsApp==='function'){window.App.openWhatsApp('{{ addslashes($t->name) }}');}}">
+                                        <span role="button" tabindex="0" class="btn-circle-whatsapp fab-whatsapp w-9 h-9 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center cursor-pointer shadow-xs transition-transform hover:scale-105 shrink-0" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp" onclick="event.preventDefault(); event.stopPropagation(); if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp(this.dataset.tourName); }" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();if(window.App&&typeof window.App.openWhatsApp==='function'){window.App.openWhatsApp(this.dataset.tourName);}}">
                                             <i class="bi bi-whatsapp text-sm"></i>
                                         </span>
                                         <div class="w-9 h-9 rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white flex items-center justify-center transition-colors shrink-0">
@@ -415,13 +415,13 @@ window.addEventListener('popstate', () => {
         "@type": "ItemList",
         "numberOfItems": {{ $tours->count() }},
         "itemListElement": [
-          @foreach($tours as $idx => $t)
+          @foreach($tours as $t)
           {
             "@type": "ListItem",
-            "position": {{ $idx + 1 }},
+            "position": {{ $loop->iteration }},
             "name": {!! json_encode($t->name, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
             "url": {!! json_encode(localized_route('tours.show', ['slug' => $t->slug]), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
-          }{{ $idx < $tours->count() - 1 ? ',' : '' }}
+          }{{ $loop->last ? '' : ',' }}
           @endforeach
         ]
       }

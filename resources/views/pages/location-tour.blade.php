@@ -111,15 +111,15 @@
         "priceCurrency": "AED",
         "lowPrice": "99",
         "highPrice": "450",
-        "offerCount": "{{ count($safariTours) }}"
-      },
+        "offerCount": {{ count($safariTours) }}
+      }@if(count($reviews) > 0),
       "aggregateRating": {
         "@type": "AggregateRating",
         "ratingValue": "5.0",
-        "reviewCount": "{{ count($reviews) > 0 ? count($reviews) : 329 }}",
+        "reviewCount": {{ count($reviews) }},
         "bestRating": "5",
         "worstRating": "1"
-      }@if(count($reviews) > 0),
+      },
       "review": [
         @foreach($reviews->take(3) as $rev)
         {
@@ -133,7 +133,7 @@
             "@type": "Person",
             "name": {!! json_encode($rev->reviewer_name ?: 'Verified Traveler', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           },
-          "datePublished": "{{ $rev->published_date ? (\Carbon\Carbon::parse($rev->published_date)->format('Y-m-d')) : date('Y-m-d') }}",
+          "datePublished": {!! json_encode($rev->published_date ? (\Carbon\Carbon::parse($rev->published_date)->format('Y-m-d')) : date('Y-m-d'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
           "reviewBody": {!! json_encode(Str::limit($rev->review_text ?: 'Incredible desert safari experience with Dunes Discovery Tourism.', 200), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
         }{{ $loop->last ? '' : ',' }}
         @endforeach

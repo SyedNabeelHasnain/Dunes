@@ -305,7 +305,7 @@ class PageController extends Controller
                         }
                         $prospectSource = 'Prior Booking History';
                     } else {
-                        $priorContact = \App\Models\Contact::where('client_ip', $clientIp)
+                        $priorContact = \App\Models\Contact::where('ip_address', $clientIp)
                             ->whereNotNull('name')
                             ->where('name', '!=', '')
                             ->latest()

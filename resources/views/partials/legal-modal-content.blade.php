@@ -8,7 +8,7 @@
     <div class="flex items-center justify-between flex-wrap gap-2 pb-3 mb-4 border-b border-slate-200">
         <div>
             <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-orange-50 text-primary border border-orange-200/60">Official Policy</span>
-            <h4 class="text-lg font-black text-slate-900 mt-1" id="modalLegalTitle" x-text="lang === 'ar' ? '{{ addslashes($titleAr) }}' : '{{ addslashes($titleEn) }}'">{{ $page->title }}</h4>
+            <h4 class="text-lg font-black text-slate-900 mt-1" id="modalLegalTitle" x-text="lang === 'ar' ? @js($titleAr) : @js($titleEn)">{{ $page->title }}</h4>
         </div>
         <div class="inline-flex rounded-xl p-1 bg-slate-100 border border-slate-200 text-xs font-semibold" role="group">
             <button type="button" class="px-3 py-1 rounded-lg transition-colors cursor-pointer" :class="lang === 'en' ? 'bg-primary text-white font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900'" @click="lang = 'en'">EN</button>

@@ -275,7 +275,7 @@
                                     <i class="bi bi-whatsapp"></i>
                                 </a>
                             @endif
-                            <button type="button" class="w-8 h-8 rounded-full border border-slate-200 hover:border-rose-400 hover:text-rose-600 text-slate-400 flex items-center justify-center transition cursor-pointer" title="Permanently Delete Booking & All Records" onclick="promptPermanentDelete({{ $b->id }}, '{{ $b->reference }}', '{{ addslashes($b->name) }}')">
+                            <button type="button" class="w-8 h-8 rounded-full border border-slate-200 hover:border-rose-400 hover:text-rose-600 text-slate-400 flex items-center justify-center transition cursor-pointer" title="Permanently Delete Booking & All Records" data-id="{{ $b->id }}" data-reference="{{ $b->reference }}" data-name="{{ $b->name }}" onclick="promptPermanentDelete(this.dataset.id, this.dataset.reference, this.dataset.name)">
                                 <i class="bi bi-trash3"></i>
                             </button>
                         </div>

@@ -227,9 +227,15 @@ class SubscriberController extends Controller
     {
         $targetUrl = $request->query('url', url('/'));
 
-        // Basic URL validation
+        // URL validation & open redirect mitigation
         if (! filter_var($targetUrl, FILTER_VALIDATE_URL)) {
             $targetUrl = url('/');
+        } else {
+            $targetHost = parse_url($targetUrl, PHP_URL_HOST);
+            $appHost = parse_url(config('app.url'), PHP_URL_HOST) ?: $request->getHost();
+            if ($targetHost && ! str_ends_with(strtolower($targetHost), strtolower($appHost))) {
+                $targetUrl = url('/');
+            }
         }
 
         if (! empty($token)) {

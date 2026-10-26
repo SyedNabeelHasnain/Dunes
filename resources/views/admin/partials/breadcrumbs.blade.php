@@ -338,7 +338,7 @@
                                 {{ $crumb['label'] }}
                             </a>
                         @else
-                            <span class="font-bold text-slate-800 {{ $loop->last ? 'truncate max-w-[220px] sm:max-w-xs md:max-w-md' : '' }}" {{ $loop->last ? 'aria-current=page' : '' }}>
+                            <span class="font-bold text-slate-800 {{ $loop->last ? 'truncate max-w-[220px] sm:max-w-xs md:max-w-md' : '' }}" {{ $loop->last ? 'aria-current="page"' : '' }}>
                                 {{ $crumb['label'] }}
                             </span>
                         @endif

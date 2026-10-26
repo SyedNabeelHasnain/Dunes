@@ -126,7 +126,7 @@
               },
               "datePublished": {!! json_encode($rev->published_date ? (\Carbon\Carbon::parse($rev->published_date)->format('Y-m-d')) : ($rev->created_at ? \Carbon\Carbon::parse($rev->created_at)->format('Y-m-d') : date('Y-m-d')), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
               "reviewBody": {!! json_encode(Str::limit($rev->review_text, 280), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
-            }{{ $ridx < $approvedReviews->count() - 1 ? ',' : '' }}
+            }{{ $loop->last ? '' : ',' }}
             @endforeach
           ],
           @endif
@@ -163,16 +163,16 @@
             "@type": "ItemList",
             "numberOfItems": {{ $tour->itineraries->count() }},
             "itemListElement": [
-              @foreach($tour->itineraries->sortBy('priority') as $idx => $it)
+              @foreach($tour->itineraries->sortBy('priority') as $it)
               {
                 "@type": "ListItem",
-                "position": {{ $idx + 1 }},
+                "position": {{ $loop->iteration }},
                 "item": {
                   "@type": "TouristAttraction",
                   "name": {!! json_encode($it->title, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
                   "description": {!! json_encode($it->description ?: $it->title, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
                 }
-              }{{ $idx < $tour->itineraries->count() - 1 ? ',' : '' }}
+              }{{ $loop->last ? '' : ',' }}
               @endforeach
             ]
           }
@@ -209,7 +209,7 @@
           "@id": {!! json_encode($canonical . '#faq', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
           "inLanguage": {!! json_encode($currentLocale ?? app()->getLocale() ?? 'en', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
           "mainEntity": [
-            @foreach($faqs as $fidx => $f)
+            @foreach($faqs as $f)
             {
               "@type": "Question",
               "name": {!! json_encode($f->question, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
@@ -217,7 +217,7 @@
                 "@type": "Answer",
                 "text": {!! json_encode($f->answer, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
               }
-            }{{ $fidx < $faqs->count() - 1 ? ',' : '' }}
+            }{{ $loop->last ? '' : ',' }}
             @endforeach
           ]
         }
@@ -1519,7 +1519,7 @@ if(window.fbq){
                                 <span class="text-lg font-black text-primary" data-aed="{{ $minPriceRel }}">{{ __('ui.common.aed') }} {{ number_format($minPriceRel) }}</span>
                             </div>
                             <div class="flex items-center gap-1.5">
-                                <span role="button" tabindex="0" class="btn-circle-whatsapp fab-whatsapp w-9 h-9 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center cursor-pointer shadow-xs transition-transform hover:scale-105 shrink-0" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp" onclick="event.preventDefault(); event.stopPropagation(); if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp('{{ addslashes($t->name) }}'); }" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();if(window.App&&typeof window.App.openWhatsApp==='function'){window.App.openWhatsApp('{{ addslashes($t->name) }}');}}">
+                                <span role="button" tabindex="0" class="btn-circle-whatsapp fab-whatsapp w-9 h-9 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center cursor-pointer shadow-xs transition-transform hover:scale-105 shrink-0" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp" onclick="event.preventDefault(); event.stopPropagation(); if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp(this.dataset.tourName); }" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();if(window.App&&typeof window.App.openWhatsApp==='function'){window.App.openWhatsApp(this.dataset.tourName);}}">
                                     <i class="bi bi-whatsapp text-sm"></i>
                                 </span>
                                 <div class="w-9 h-9 rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white flex items-center justify-center transition-colors shrink-0">

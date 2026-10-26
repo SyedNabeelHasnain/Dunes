@@ -72,7 +72,7 @@
                     </button>
                 </form>
             @endif
-            <button type="button" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-bold shadow-2xs transition-all" onclick="promptPermanentDeleteShow('{{ $booking->id }}', '{{ $booking->reference }}', '{{ addslashes($booking->name) }}')" title="Permanently Delete Booking & All Related Records">
+            <button type="button" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-bold shadow-2xs transition-all" data-id="{{ $booking->id }}" data-reference="{{ $booking->reference }}" data-name="{{ $booking->name }}" onclick="promptPermanentDeleteShow(this.dataset.id, this.dataset.reference, this.dataset.name)" title="Permanently Delete Booking & All Related Records">
                 <i class="bi bi-trash3"></i> Delete Booking
             </button>
         </div>

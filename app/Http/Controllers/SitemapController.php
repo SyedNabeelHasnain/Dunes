@@ -104,9 +104,9 @@ class SitemapController extends Controller
                     }
 
                     if (! empty($tour->hero_image) && $lang->is_default) {
-                        $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image);
+                        $imgUrl = resolve_tour_image($tour->hero_image);
                         $xml .= "    <image:image>\n";
-                        $xml .= '      <image:loc>'.$this->xmlEscape(asset('images/'.$imgFile))."</image:loc>\n";
+                        $xml .= '      <image:loc>'.$this->xmlEscape($imgUrl)."</image:loc>\n";
                         $xml .= '      <image:title>'.$this->xmlEscape($tour->name)."</image:title>\n";
                         $xml .= "    </image:image>\n";
                     }

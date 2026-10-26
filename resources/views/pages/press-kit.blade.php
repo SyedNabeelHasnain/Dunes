@@ -202,7 +202,8 @@
 
                 <!-- 1-Click Copy Button -->
                 <button type="button" 
-                        @click="copyEmbed('{{ $badge['id'] }}', '{{ addslashes($badge['embed_code']) }}')"
+                        data-embed="{{ $badge['embed_code'] }}"
+                        @click="copyEmbed('{{ $badge['id'] }}', $el.dataset.embed)"
                         class="w-full py-2.5 px-4 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs"
                         :class="copiedId === '{{ $badge['id'] }}' ? 'bg-emerald-600 text-white' : 'bg-slate-900 hover:bg-slate-800 text-white'">
                     <i :class="copiedId === '{{ $badge['id'] }}' ? 'bi bi-check2-all text-base' : 'bi bi-clipboard text-sm'"></i>

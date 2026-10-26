@@ -136,6 +136,7 @@
                                 </div>
 
                                 <form id="welcomeOfferForm" class="space-y-3.5">
+                                    @csrf
                                     <div>
                                         <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1" for="welcomeName">{{ __('ui.booking.name') }} <span class="text-red-500">*</span></label>
                                         <div class="relative rounded-xl shadow-2xs overflow-hidden border border-slate-200 bg-white focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
@@ -215,7 +216,7 @@
     <span class="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-xs">{{ (int)$popupDiscount }}% OFF</span>
     <span class="text-xs font-bold font-mono text-white" id="floatingPillCode">FIRST25-OFF</span>
     <span class="text-xs text-slate-300 font-mono hidden sm:inline" id="floatingPillTimer">{{ sprintf('%02d', $popupTimerMins) }}:00</span>
-    <button type="button" class="px-3 py-1.5 min-h-[36px] rounded-full bg-primary hover:bg-primary-dark text-white font-bold text-xs transition-colors ms-1 cursor-pointer flex items-center justify-center">
+    <button type="button" class="px-3.5 py-2 min-h-[44px] rounded-full bg-primary hover:bg-primary-dark text-white font-bold text-xs transition-colors ms-1 cursor-pointer flex items-center justify-center">
         Apply
     </button>
 </div>

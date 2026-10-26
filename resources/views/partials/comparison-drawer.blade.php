@@ -158,7 +158,7 @@
             </div>
             <div class="flex items-center gap-2">
                 <button type="button" 
-                        class="px-3.5 py-1.5 min-h-[38px] rounded-full border border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-white text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer flex items-center justify-center gap-1.5" 
+                        class="px-3.5 py-2 min-h-[44px] rounded-full border border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-white text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer flex items-center justify-center gap-1.5" 
                         id="drawerPresetBtn"
                         @click="$store.compare.loadBestsellers()">
                     <i class="bi bi-lightning-fill text-amber-400"></i>

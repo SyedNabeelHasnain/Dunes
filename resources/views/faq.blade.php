@@ -31,7 +31,7 @@
       "@id": {!! json_encode($canonical . '#faqpage', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "inLanguage": {!! json_encode($currentLocale ?? app()->getLocale() ?? 'en', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "mainEntity": [
-        @foreach($faqs as $index => $f)
+        @foreach($faqs as $f)
         {
           "@type": "Question",
           "name": {!! json_encode($f->question, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
@@ -39,7 +39,7 @@
             "@type": "Answer",
             "text": {!! json_encode($f->answer, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           }
-        }{{ $index < $faqs->count() - 1 ? ',' : '' }}
+        }{{ $loop->last ? '' : ',' }}
         @endforeach
       ]
     }

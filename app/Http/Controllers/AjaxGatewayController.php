@@ -253,10 +253,10 @@ class AjaxGatewayController extends Controller
                     $fallbacks = [
                         ['name' => 'Michael R.', 'tour' => 'Premium Evening Desert Safari Dubai', 'slug' => 'evening-desert-safari-dubai', 'img' => 'evening-desert-safari-dubai-hero.avif', 'time' => '12 minutes ago'],
                         ['name' => 'Elena S.', 'tour' => 'Self-Drive Dune Buggy Safari Dubai', 'slug' => 'dune-buggy-rental-dubai', 'img' => 'dubai-desert-safari-buggy-dune-discovery-tourism.avif', 'time' => '28 minutes ago'],
-                        ['name' => 'David L.', 'tour' => 'Dubai Marina Luxury Dhow Cruise Dinner', 'slug' => 'dhow-cruise-marina', 'img' => 'dhow-cruise-dubai-marina-dune-discovery-tourism.avif', 'time' => '45 minutes ago'],
+                        ['name' => 'David L.', 'tour' => 'Dubai Marina Luxury Dhow Cruise Dinner', 'slug' => 'dhow-cruise-catamaran-cruise-dinner-dubai', 'img' => 'dhow-cruise-dubai-marina-dune-discovery-tourism.avif', 'time' => '45 minutes ago'],
                         ['name' => 'Sophie M.', 'tour' => 'Sunrise Morning Desert Safari Dubai', 'slug' => 'morning-desert-safari-dubai', 'img' => 'morning-desert-safari-dubai-hero.avif', 'time' => '1 hour ago'],
                         ['name' => 'Ahmed K.', 'tour' => 'Overnight Bedouin Camp Safari Dubai', 'slug' => 'overnight-desert-safari-dubai', 'img' => 'overnight-desert-safari-dubai-hero.avif', 'time' => '2 hours ago'],
-                        ['name' => 'Emma W.', 'tour' => 'VIP Quad Bike Adventure Safari', 'slug' => 'quad-biking-safari', 'img' => 'desert-safari-quad-biking-hero.avif', 'time' => '3 hours ago'],
+                        ['name' => 'Emma W.', 'tour' => 'VIP Quad Bike Adventure Safari', 'slug' => 'desert-safari-quad-biking-dubai', 'img' => 'desert-safari-quad-biking-hero.avif', 'time' => '3 hours ago'],
                     ];
 
                     foreach ($fallbacks as $f) {

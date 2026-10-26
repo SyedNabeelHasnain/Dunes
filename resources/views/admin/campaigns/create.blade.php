@@ -336,7 +336,7 @@ function updateLivePreview() {
         '@{{last_name}}': 'Turner',
         '@{{email}}': 'alex.turner@example.com',
         '@{{unsubscribe_url}}': '#unsubscribe-sample',
-        '@{{site_name}}': '{{ addslashes($defaultFromName) }}',
+        '@{{site_name}}': @json($defaultFromName),
         '@{{site_url}}': window.location.origin,
         '@{{current_year}}': new Date().getFullYear().toString()
     };

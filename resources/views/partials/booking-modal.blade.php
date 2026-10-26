@@ -143,7 +143,7 @@
                                 <div class="flex items-center justify-between mb-2 gap-2 flex-wrap">
                                     <div class="text-xs font-black uppercase tracking-wider text-slate-800">{{ __('ui.booking.when') }}</div>
                                     <div class="flex items-center gap-2">
-                                        <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer min-h-[36px]" id="calendarTrigger">
+                                        <button type="button" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer min-h-[44px]" id="calendarTrigger">
                                             <i class="bi bi-calendar3 text-primary"></i>
                                             <span>{{ __('ui.booking.select_date') }}</span>
                                         </button>
@@ -189,12 +189,12 @@
                                         <label class="block text-[11px] font-black uppercase tracking-wider text-slate-800" for="bookingChildren">Children <span class="text-[10px] text-slate-400 font-semibold lowercase">(3–10 yrs)</span></label>
                                         <span class="text-[9px] font-black text-emerald-700 bg-emerald-100/80 px-1.5 py-0.5 rounded-full">30% OFF</span>
                                     </div>
-                                    <div class="flex items-center justify-between bg-white shadow-2xs rounded-xl border border-slate-200 p-0.5 h-[44px]">
-                                        <button type="button" class="w-10 h-10 flex items-center justify-center text-primary hover:bg-orange-50 rounded-lg transition-colors cursor-pointer" data-action="minus" data-target="children" aria-label="Decrease children">
+                                    <div class="flex items-center justify-between bg-white shadow-2xs rounded-xl border border-slate-200 p-0.5 h-[48px]">
+                                        <button type="button" class="w-11 h-11 flex items-center justify-center text-primary hover:bg-orange-50 rounded-lg transition-colors cursor-pointer" data-action="minus" data-target="children" aria-label="Decrease children">
                                             <i class="bi bi-dash-circle-fill text-lg"></i>
                                         </button>
                                         <input type="number" class="w-8 text-center font-black text-slate-900 border-0 bg-transparent p-0 text-sm focus:outline-none" name="children" id="bookingChildren" value="0" min="0" max="30" readonly autocomplete="off">
-                                        <button type="button" class="w-10 h-10 flex items-center justify-center text-primary hover:bg-orange-50 rounded-lg transition-colors cursor-pointer" data-action="plus" data-target="children" aria-label="Increase children">
+                                        <button type="button" class="w-11 h-11 flex items-center justify-center text-primary hover:bg-orange-50 rounded-lg transition-colors cursor-pointer" data-action="plus" data-target="children" aria-label="Increase children">
                                             <i class="bi bi-plus-circle-fill text-lg"></i>
                                         </button>
                                     </div>
@@ -204,12 +204,12 @@
                                         <label class="block text-[11px] font-black uppercase tracking-wider text-slate-800" for="bookingInfants">Infants <span class="text-[10px] text-slate-400 font-semibold lowercase">(&lt;3 yrs)</span></label>
                                         <span class="text-[9px] font-black text-primary bg-orange-100/80 px-1.5 py-0.5 rounded-full">FREE</span>
                                     </div>
-                                    <div class="flex items-center justify-between bg-white shadow-2xs rounded-xl border border-slate-200 p-0.5 h-[44px]">
-                                        <button type="button" class="w-10 h-10 flex items-center justify-center text-primary hover:bg-orange-50 rounded-lg transition-colors cursor-pointer" data-action="minus" data-target="infants" aria-label="Decrease infants">
+                                    <div class="flex items-center justify-between bg-white shadow-2xs rounded-xl border border-slate-200 p-0.5 h-[48px]">
+                                        <button type="button" class="w-11 h-11 flex items-center justify-center text-primary hover:bg-orange-50 rounded-lg transition-colors cursor-pointer" data-action="minus" data-target="infants" aria-label="Decrease infants">
                                             <i class="bi bi-dash-circle-fill text-lg"></i>
                                         </button>
                                         <input type="number" class="w-8 text-center font-black text-slate-900 border-0 bg-transparent p-0 text-sm focus:outline-none" name="infants" id="bookingInfants" value="0" min="0" max="15" readonly autocomplete="off">
-                                        <button type="button" class="w-10 h-10 flex items-center justify-center text-primary hover:bg-orange-50 rounded-lg transition-colors cursor-pointer" data-action="plus" data-target="infants" aria-label="Increase infants">
+                                        <button type="button" class="w-11 h-11 flex items-center justify-center text-primary hover:bg-orange-50 rounded-lg transition-colors cursor-pointer" data-action="plus" data-target="infants" aria-label="Increase infants">
                                             <i class="bi bi-plus-circle-fill text-lg"></i>
                                         </button>
                                     </div>
