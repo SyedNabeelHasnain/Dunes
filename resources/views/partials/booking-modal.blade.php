@@ -757,12 +757,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const dateInput = document.getElementById('bookingDate');
     const adultsInput = document.getElementById('bookingAdults');
     const childrenInput = document.getElementById('bookingChildren');
+    const emailInput = document.getElementById('bookingEmail');
 
     if (tourSelect) tourSelect.addEventListener('change', window.revalidateAppliedPromo);
     if (tierInput) tierInput.addEventListener('change', window.revalidateAppliedPromo);
     if (dateInput) dateInput.addEventListener('change', window.revalidateAppliedPromo);
     if (adultsInput) adultsInput.addEventListener('change', window.revalidateAppliedPromo);
     if (childrenInput) childrenInput.addEventListener('change', window.revalidateAppliedPromo);
+    if (emailInput) {
+        emailInput.addEventListener('change', window.revalidateAppliedPromo);
+        emailInput.addEventListener('blur', window.revalidateAppliedPromo);
+    }
 
     document.querySelectorAll('[data-action="plus"], [data-action="minus"]').forEach(btn => {
         btn.addEventListener('click', () => {

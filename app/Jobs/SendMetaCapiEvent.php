@@ -16,6 +16,10 @@ class SendMetaCapiEvent implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public int $tries = 3;
+
+    public array $backoff = [15, 60, 180];
+
     protected $eventName;
 
     protected $data;
@@ -54,7 +58,8 @@ class SendMetaCapiEvent implements ShouldQueue
             return;
         }
 
-        $endpoint = "https://graph.facebook.com/v25.0/{$pixelId}/events";
+        $graphVersion = config('services.meta.graph_version', 'v21.0') ?: 'v21.0';
+        $endpoint = "https://graph.facebook.com/{$graphVersion}/{$pixelId}/events";
 
         $userData = [];
 
@@ -79,9 +84,9 @@ class SendMetaCapiEvent implements ShouldQueue
             }
         }
 
-        // IP and User Agent settings check
-        $sendIpUaSetting = Setting::where('setting_key', 'meta_send_ip_ua')->first();
-        $sendIpUa = ! $sendIpUaSetting || $sendIpUaSetting->setting_value === '1';
+        // IP and User Agent settings check (via cached SettingsService)
+        $sendIpUaRaw = $settings->get('meta_send_ip_ua', '1');
+        $sendIpUa = $sendIpUaRaw === null || $sendIpUaRaw === '' || $sendIpUaRaw === '1' || $sendIpUaRaw === 'true';
 
         if ($sendIpUa) {
             if (! empty($this->clientIp)) {
@@ -110,29 +115,35 @@ class SendMetaCapiEvent implements ShouldQueue
 
         $payload = [
             'data' => [$eventPayload],
+            'access_token' => $token,
         ];
 
         // Test event code config
-        $testCodeSetting = Setting::where('setting_key', 'meta_test_event_code')->first();
-        $testCode = $testCodeSetting ? trim($testCodeSetting->setting_value) : '';
+        $testCode = trim((string) $settings->get('meta_test_event_code', ''));
         if (! empty($testCode)) {
             $payload['test_event_code'] = $testCode;
         }
 
         try {
-            $response = Http::timeout(15)
-                ->post("{$endpoint}?access_token=".rawurlencode($token), $payload);
+            $response = Http::connectTimeout(5)->timeout(12)->post($endpoint, $payload);
 
             if ($response->failed()) {
+                $status = $response->status();
                 Log::error("Meta CAPI Error ({$this->eventName})", [
-                    'status' => $response->status(),
+                    'status' => $status,
                     'body' => $response->json(),
                 ]);
+
+                if (($status === 429 || $status >= 500) && $this->job && $this->job->getConnectionName() !== 'sync') {
+                    $this->release(60);
+                }
             }
-        } catch (\Exception $e) {
-            Log::error("Meta CAPI Job Exception ({$this->eventName})", [
-                'message' => $e->getMessage(),
-            ]);
+        } catch (\Throwable $e) {
+            Log::warning("Meta CAPI Exception ({$this->eventName}): ".$e->getMessage());
+
+            if ($this->job && $this->job->getConnectionName() !== 'sync') {
+                $this->release(60);
+            }
         }
     }
 }

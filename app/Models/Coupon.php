@@ -179,11 +179,28 @@ class Coupon extends Model
             }
 
             if ($this->usage_limit_per_user > 0) {
-                $usedByUser = CouponUsage::where('coupon_id', $this->id)
-                    ->where('customer_email', $userEmail)
-                    ->count();
+                $usedByUser = $this->exists
+                    ? CouponUsage::where('coupon_id', $this->id)
+                        ->where('customer_email', $userEmail)
+                        ->count()
+                    : 0;
+
                 if ($usedByUser >= $this->usage_limit_per_user) {
                     return ['valid' => false, 'message' => "You have already reached the maximum usage limit ({$this->usage_limit_per_user}) for this promo code."];
+                }
+            }
+
+            if (in_array($this->code, ['FIRST25', 'DUNESWELCOME'], true) || str_starts_with((string) $this->code, 'FIRST25-')) {
+                $alreadyClaimedWelcome = CouponUsage::where('customer_email', $userEmail)
+                    ->whereHas('coupon', function ($q) {
+                        $q->withTrashed()
+                            ->where('code', 'like', 'FIRST25%')
+                            ->orWhere('code', 'DUNESWELCOME');
+                    })
+                    ->exists();
+
+                if ($alreadyClaimedWelcome) {
+                    return ['valid' => false, 'message' => 'This welcome promo offer has already been redeemed for your email address.'];
                 }
             }
         }
@@ -252,9 +269,13 @@ class Coupon extends Model
             $exitIntentActive = false;
         }
 
-        $coupon = static::where('code', $normalized)->first();
+        $coupon = static::withTrashed()->where('code', $normalized)->first();
 
         if ($coupon) {
+            if ($coupon->trashed()) {
+                return null;
+            }
+
             // Respect database status, or settings toggle if either is active for MATCH5/SAVE5
             if ($normalized === 'MATCH5') {
                 $coupon->status = ($coupon->getRawOriginal('status') === 'active' || $conciergeActive) ? 'active' : 'inactive';
@@ -304,14 +325,34 @@ class Coupon extends Model
             }
         }
 
-        // Automatic fallback for official first-time visitor 25% promo codes (including dynamic FIRST25-* codes)
-        if (in_array($normalized, ['DUNESWELCOME', 'FIRST25']) || str_starts_with($normalized, 'FIRST25-')) {
+        // Automatic fallback for official first-time visitor 25% promo codes (including bounded dynamic FIRST25-* codes)
+        $isDynamicFirst25 = preg_match('/^FIRST25-[A-Z0-9]{4,10}$/', $normalized) === 1;
+        if (in_array($normalized, ['DUNESWELCOME', 'FIRST25'], true) || $isDynamicFirst25) {
             $bannerDisabled = false;
             try {
                 $bannerDisabled = DB::table('settings')->whereIn('setting_key', ['top_promo_banner_active', 'promo_top_banner_enabled'])->where('setting_value', '0')->exists();
             } catch (\Throwable $e) {
             }
             $initialStatus = $bannerDisabled ? 'inactive' : 'active';
+
+            // For dynamic FIRST25-* codes not yet in DB, return an unsaved model on read so validation requests cannot bloat the coupons table
+            if ($isDynamicFirst25) {
+                return new static([
+                    'code' => $normalized,
+                    'name' => 'First-Time Guest 25% Promo',
+                    'description' => 'Official 25% welcome promo code for first-time visitors',
+                    'discount_type' => 'percentage',
+                    'discount_value' => 25.00,
+                    'min_spend' => 0.00,
+                    'min_guests' => 1,
+                    'usage_limit' => 1,
+                    'usage_limit_per_user' => 1,
+                    'status' => $initialStatus,
+                    'valid_from' => now()->subDay(),
+                    'first_time_only' => true,
+                    'is_featured' => false,
+                ]);
+            }
 
             try {
                 return static::firstOrCreate(
@@ -323,7 +364,7 @@ class Coupon extends Model
                         'discount_value' => 25.00,
                         'min_spend' => 0.00,
                         'min_guests' => 1,
-                        'usage_limit_per_user' => 10,
+                        'usage_limit_per_user' => 1,
                         'status' => $initialStatus,
                         'valid_from' => now()->subDay(),
                         'first_time_only' => true,

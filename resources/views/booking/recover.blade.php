@@ -1,5 +1,5 @@
 @php
-    $pageRobots = 'noindex, follow';
+    $pageRobots = 'noindex, nofollow';
     $googleActive = ($settings['google_active'] ?? '0') === '1';
     $metaActive = ($settings['meta_active'] ?? '0') === '1';
     $metaPixelId = $settings['meta_pixel_id'] ?? null;
@@ -374,9 +374,14 @@ window.dataLayer.push({
                             <span class="text-slate-400 uppercase font-bold text-[10px] block mb-2">Selected Upgrades</span>
                             <div class="space-y-1.5">
                                 @foreach($booking->addons as $addon)
+                                @php
+                                    $addonLabel = $addon->addon_name ?? $addon->name ?? 'Safari Add-on';
+                                    $addonQty = max(1, (int) ($addon->quantity ?? ($addon->pivot->quantity ?? 1)));
+                                    $addonUnitPrice = (float) ($addon->price ?? ($addon->pivot->price ?? 0));
+                                @endphp
                                 <div class="flex items-center justify-between text-slate-700">
-                                    <span>&bull; {{ $addon->name }} (x{{ $addon->pivot->quantity ?? 1 }})</span>
-                                    <span class="font-bold font-mono">AED {{ number_format($addon->pivot->price * ($addon->pivot->quantity ?? 1), 2) }}</span>
+                                    <span>&bull; {{ $addonLabel }} (x{{ $addonQty }})</span>
+                                    <span class="font-bold font-mono">AED {{ number_format($addonUnitPrice * $addonQty, 2) }}</span>
                                 </div>
                                 @endforeach
                             </div>

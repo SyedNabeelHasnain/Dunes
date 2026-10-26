@@ -42,13 +42,22 @@ class IndexNowService
     }
 
     /**
-     * Get the configured IndexNow verification key.
+     * Get the configured IndexNow verification key (strictly validated against path traversal/reserved names).
      */
     public function getKey(): string
     {
         $key = trim((string) $this->settings->get('indexnow_key', ''));
+        $reserved = ['robots', 'sitemap', 'llms', 'llms-full', 'security', 'index'];
 
-        return ! empty($key) ? $key : self::DEFAULT_KEY;
+        if (
+            $key === ''
+            || ! preg_match('/^[a-zA-Z0-9_\-]{8,64}$/', $key)
+            || in_array(strtolower($key), $reserved, true)
+        ) {
+            return self::DEFAULT_KEY;
+        }
+
+        return $key;
     }
 
     /**
@@ -58,7 +67,7 @@ class IndexNowService
     public function ensureKeyFileExists(): void
     {
         $key = $this->getKey();
-        if (empty($key)) {
+        if (empty($key) || ! preg_match('/^[a-zA-Z0-9_\-]{8,64}$/', $key)) {
             return;
         }
 
@@ -126,7 +135,7 @@ class IndexNowService
 
             // Re-normalize URL to canonical https://{host}{path}
             if ($parsedHost === $host || $parsedHost === 'dunesdiscoverytourism.com' || $parsedHost === 'localhost' || $parsedHost === '127.0.0.1' || empty($parsedHost)) {
-                $fullUrl = 'https://' . $host . ($parsedPath === '/' && empty($parsedQuery) ? '' : $parsedPath);
+                $fullUrl = 'https://' . $host . ($parsedPath === '/' && empty($parsedQuery) ? '/' : $parsedPath);
                 if (!empty($parsedQuery)) {
                     $fullUrl .= '?' . $parsedQuery;
                 }

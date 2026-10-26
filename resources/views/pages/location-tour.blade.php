@@ -7,7 +7,7 @@
   "@graph": [
     {
       "@type": "WebPage",
-      "@id": {!! json_encode($canonical . '#webpage', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "@id": {!! json_encode($canonical . '#landing', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
       "url": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "name": {!! json_encode($pageTitle ?? $locationData['meta_title'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "description": {!! json_encode($pageDesc ?? $locationData['meta_desc'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
@@ -361,7 +361,7 @@
                         })->min();
                         $minPrice = $minPrice ? (float)$minPrice : 99.0;
                         $firstTier = $tour->tiers->first();
-                        $heroImg = $tour->hero_image ? asset('images/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image)) : asset('images/desert-safari-poster.avif');
+                        $heroImg = $tour->hero_image ? resolve_tour_image($tour->hero_image) : asset('images/desert-safari-poster.avif');
                     @endphp
                     <div class="bg-slate-900 border border-white/10 rounded-2xl overflow-hidden flex flex-col h-full transition-all duration-300 hover:-translate-y-1 hover:border-primary hover:shadow-2xl">
                         <!-- Image Slider Wrap -->

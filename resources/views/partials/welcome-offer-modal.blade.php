@@ -208,8 +208,6 @@
         </div>
     </div>
 </div>
-@endif
-
 <!-- Floating Persistent Voucher Reminder Pill (Appears when claimed) -->
 <div id="welcomeFloatingPill" 
      class="hidden fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] start-4 sm:bottom-6 sm:start-6 z-40 mb-safe items-center gap-2 p-2 px-3.5 rounded-full bg-slate-950/95 text-white border border-orange-500/50 shadow-2xl backdrop-blur-md cursor-pointer hover:scale-105 transition-all">
@@ -220,9 +218,11 @@
         Apply
     </button>
 </div>
+@endif
 
 <script>
 (function() {
+    const popupActive = {{ $popupActive ? 'true' : 'false' }};
     const popupDelaySec = {{ (int)$popupDelaySec }};
     const popupTimerMins = {{ (int)$popupTimerMins }};
     const enableScroll = {{ $popupScrollTrigger ? 'true' : 'false' }};
@@ -499,7 +499,7 @@
         }
 
         const savedClaimedCode = localStorage.getItem('dunes_welcome_claimed');
-        if (savedClaimedCode) {
+        if (popupActive && savedClaimedCode) {
             showFloatingPill(savedClaimedCode);
         }
     }

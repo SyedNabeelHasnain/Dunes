@@ -56,7 +56,18 @@ class BlogPost extends Model
             return asset($clean);
         }
 
-        return asset('images/blog/'.preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $clean));
+        $avifCandidate = 'images/blog/'.preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $clean);
+        if (file_exists(public_path($avifCandidate))) {
+            return asset($avifCandidate);
+        }
+        if (file_exists(public_path('images/blog/'.$clean))) {
+            return asset('images/blog/'.$clean);
+        }
+        if (file_exists(public_path($clean))) {
+            return asset($clean);
+        }
+
+        return asset($avifCandidate);
     }
 
     public function getOgImageUrlAttribute(): string

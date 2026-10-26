@@ -48,6 +48,12 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
+        if (\App\Models\User::count() <= 1) {
+            return Redirect::route('profile.edit')->withErrors([
+                'password' => 'Cannot delete the sole remaining administrator account.',
+            ], 'userDeletion');
+        }
+
         Auth::logout();
 
         $user->delete();

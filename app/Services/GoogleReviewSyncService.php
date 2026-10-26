@@ -347,9 +347,7 @@ class GoogleReviewSyncService
     public function purgeCaches(): void
     {
         try {
-            Cache::forget('site_home_reviews_feed');
-            Cache::forget('site_social_proof_feed');
-            Cache::forget('site_home_cache');
+            flush_review_and_social_proof_caches();
             Cache::forget('site_settings_cache');
             Cache::forget('google_reviews_cache');
             $this->settings->clearCache();
@@ -395,11 +393,6 @@ class GoogleReviewSyncService
         $key = config('services.google.places_api_key');
         if (! empty($key)) {
             return $key;
-        }
-
-        $envKey = env('GOOGLE_PLACES_API_KEY') ?: env('GOOGLE_MAPS_API_KEY');
-        if (! empty($envKey)) {
-            return $envKey;
         }
 
         return $this->settings->get('google_places_api_key') ?: $this->settings->get('google_maps_api_key');

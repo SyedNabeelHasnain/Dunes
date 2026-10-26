@@ -46,7 +46,7 @@
   "@graph": [
     {
       "@type": "WebPage",
-      "@id": {!! json_encode($canonical . '#webpage', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "@id": {!! json_encode($canonical . '#ratecard', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
       "url": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "name": {!! json_encode($pageTitle, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "description": {!! json_encode($pageDesc, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
@@ -271,7 +271,7 @@
                                             <span class="text-slate-400 line-through text-[11px] me-1" data-aed="{{ $tier->pivot->old_price }}">AED {{ number_format($tier->pivot->old_price) }}</span>
                                             @endif
                                             <span class="font-black text-primary text-sm" data-aed="{{ $tier->pivot->price }}">AED {{ number_format($tier->pivot->price) }}</span>
-                                            <span class="text-slate-400 text-[9px] block">/ {{ $tier->pivot->price_type && $tier->pivot->price_type !== 'person' ? $tier->pivot->price_type : __('ui.rate_card.per_person') }}</span>
+                                            <span class="text-slate-400 text-[9px] block">/ {{ $tier->pivot->price_type && strtolower($tier->pivot->price_type) !== 'per person' ? $tier->pivot->price_type : __('ui.rate_card.per_person') }}</span>
                                         </div>
                                     </div>
                                     @endforeach
@@ -280,7 +280,7 @@
                                     <div class="flex items-center justify-between py-1.5 text-xs">
                                         <div class="font-bold text-slate-800">{{ __('ui.rate_card.standard_exp') }}</div>
                                         <div class="text-end">
-                                            <span class="font-black text-primary text-sm" data-aed="{{ $t->price }}">AED {{ number_format($t->price) }}</span>
+                                            <span class="font-black text-primary text-sm" data-aed="{{ $t->min_price ?? 0 }}">AED {{ number_format($t->min_price ?? 0) }}</span>
                                             <span class="text-slate-400 text-[9px] block">/ {{ __('ui.rate_card.per_person') }}</span>
                                         </div>
                                     </div>
@@ -323,8 +323,9 @@
                             <span class="text-slate-500 text-[10px] block line-clamp-1">{{ Str::limit($addon->description, 45) }}</span>
                             @endif
                         </div>
-                        <div class="font-black text-primary text-sm whitespace-nowrap" data-aed="{{ $addon->default_price ?: $addon->price ?: 0 }}">
+                        <div class="font-black text-primary text-sm whitespace-nowrap text-end" data-aed="{{ $addon->default_price ?: $addon->price ?: 0 }}">
                             AED {{ number_format($addon->default_price ?: $addon->price ?: 0) }}
+                            <span class="text-[9px] text-slate-400 block font-normal">{{ ($addon->price_type ?? 'per_person') === 'per_group' ? '/ booking' : '/ guest' }}</span>
                         </div>
                     </div>
                     @endforeach

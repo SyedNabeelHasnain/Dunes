@@ -118,6 +118,7 @@ class BlogController extends Controller
     {
         $slug = (string) end($params);
         $post = BlogPost::where('slug', $slug)
+            ->where('status', 'published')
             ->with(['category', 'tags', 'faqs'])
             ->first();
 
@@ -341,7 +342,8 @@ class BlogController extends Controller
     public function feed(...$params)
     {
         try {
-            $posts = Cache::remember('site_blog_rss_feed', 3600, function () {
+            $feedLocale = app()->getLocale() ?: 'en';
+            $posts = Cache::remember('site_blog_rss_feed_'.$feedLocale, 3600, function () {
                 return BlogPost::where('status', 'published')
                     ->with(['category', 'tags'])
                     ->orderBy('published_at', 'desc')
@@ -362,7 +364,7 @@ class BlogController extends Controller
                 'channelTitle' => 'Dunes Discovery Tourism | Dubai Desert Safari & Adventure Blog',
                 'channelLink' => localized_route('blog.index'),
                 'channelDescription' => 'Expert insider guides, desert safari tips, dune buggy safety, and cultural Dubai travel insights by DTCM-licensed operator Dunes Discovery Tourism.',
-                'channelLanguage' => app()->getLocale() ?: 'en',
+                'channelLanguage' => $feedLocale,
                 'feedUrl' => url(request()->getPathInfo() ?: '/feed.xml'),
             ])->render();
 
@@ -374,8 +376,10 @@ class BlogController extends Controller
             \Illuminate\Support\Facades\Log::error('RSS feed generation error: ' . $e->getMessage());
 
             $fallback = '<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>Dunes Discovery Tourism | Blog Feed</title><link>' . url('/blog') . '</link><description>Dubai Desert Safari and Travel Blog</description><lastBuildDate>' . now()->toRfc2822String() . '</lastBuildDate></channel></rss>';
-            return response($fallback, 200, [
+            return response($fallback, 503, [
                 'Content-Type' => 'application/rss+xml; charset=utf-8',
+                'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+                'Retry-After' => '60',
             ]);
         }
     }

@@ -41,7 +41,7 @@ class ZiinaWebhookController extends Controller
         $rawPayload = $request->getContent();
 
         // 1. Signature Verification (strict requirement)
-        $secret = $this->settings->get('ziina_webhook_secret', '') ?: config('services.ziina.webhook_secret', '') ?: env('ZIINA_WEBHOOK_SECRET', '');
+        $secret = $this->settings->get('ziina_webhook_secret', '') ?: config('services.ziina.webhook_secret', '');
         $signature = $request->header('X-Ziina-Signature') ?: $request->header('Ziina-Signature');
 
         if (empty($secret)) {
@@ -129,7 +129,7 @@ class ZiinaWebhookController extends Controller
                 $lockedPayment = $paymentRecord ? BookingPayment::where('id', $paymentRecord->id)->lockForUpdate()->first() : null;
 
                 $wasCompleted = ($lockedPayment && $lockedPayment->status === 'completed')
-                    && ($lockedBooking && $lockedBooking->status === 'confirmed' && in_array($lockedBooking->payment_status, ['paid', 'partial']));
+                    || (! $lockedPayment && $lockedBooking && $lockedBooking->status === 'confirmed' && $lockedBooking->payment_status === 'paid');
 
                 if ($lockedPayment && $lockedPayment->status !== 'completed') {
                     $lockedPayment->update(['status' => 'completed']);
@@ -197,31 +197,40 @@ class ZiinaWebhookController extends Controller
 
         // 6. Process Failed or Cancelled Status
         if (in_array($status, ['failed', 'cancelled'])) {
-            if (! in_array($booking->status, ['confirmed', 'completed']) && ! in_array($booking->payment_status, ['paid', 'partial'])) {
-                if ($booking->coupon_id) {
-                    try {
-                        $usage = CouponUsage::where('booking_id', $booking->id)->first();
-                        if ($usage) {
-                            $coupon = Coupon::find($booking->coupon_id);
-                            if ($coupon && $coupon->used_count > 0) {
-                                $coupon->decrement('used_count');
+            DB::transaction(function () use ($booking, $paymentRecord, $status) {
+                $lockedBooking = Booking::where('id', $booking->id)->lockForUpdate()->first();
+                $lockedPayment = $paymentRecord ? BookingPayment::where('id', $paymentRecord->id)->lockForUpdate()->first() : null;
+
+                if ($lockedPayment && $lockedPayment->status !== 'completed') {
+                    $lockedPayment->update(['status' => $status]);
+                }
+
+                $hasAnyCompletedPayment = BookingPayment::where('booking_id', $lockedBooking->id)
+                    ->where('status', 'completed')
+                    ->exists();
+
+                if (! $hasAnyCompletedPayment && ! in_array($lockedBooking->status, ['confirmed', 'completed']) && ! in_array($lockedBooking->payment_status, ['paid', 'partial'])) {
+                    if ($lockedBooking->coupon_id) {
+                        try {
+                            $usage = CouponUsage::where('booking_id', $lockedBooking->id)->lockForUpdate()->first();
+                            if ($usage) {
+                                $coupon = Coupon::where('id', $lockedBooking->coupon_id)->lockForUpdate()->first();
+                                if ($coupon && $coupon->used_count > 0) {
+                                    $coupon->decrement('used_count');
+                                }
+                                $usage->delete();
                             }
-                            $usage->delete();
+                        } catch (\Throwable $e) {
+                            Log::error('Ziina Webhook: Failed to release coupon on cancellation: '.$e->getMessage());
                         }
-                    } catch (\Throwable $e) {
-                        Log::error('Ziina Webhook: Failed to release coupon on cancellation: '.$e->getMessage());
                     }
-                }
 
-                $booking->update([
-                    'payment_status' => $status,
-                    'ziina_status' => $status,
-                ]);
-
-                if ($paymentRecord) {
-                    $paymentRecord->update(['status' => $status]);
+                    $lockedBooking->update([
+                        'payment_status' => $status,
+                        'ziina_status' => $status,
+                    ]);
                 }
-            }
+            });
 
             return response()->json([
                 'success' => true,
@@ -284,6 +293,9 @@ class ZiinaWebhookController extends Controller
     protected function sendEmailNotification(string $type, Booking $booking): void
     {
         try {
+            if (! app()->environment('testing')) {
+                app(\App\Services\EmailMarketingService::class)->applySmtpConfig();
+            }
             $fromEmail = $this->settings->getFromEmail();
             $adminEmail = $this->settings->getAdminEmail();
             $ccEmails = $this->settings->getCcEmails();

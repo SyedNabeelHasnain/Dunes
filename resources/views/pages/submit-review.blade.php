@@ -7,7 +7,7 @@
   "@graph": [
     {
       "@type": "WebPage",
-      "@id": {!! json_encode(($canonical ?? request()->url()) . '#webpage', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "@id": {!! json_encode(($canonical ?? request()->url()) . '#reviewform', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
       "url": {!! json_encode($canonical ?? request()->url(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "name": {!! json_encode($pageTitle ?? 'Guest Review & Feedback | Dunes Discovery Tourism', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "description": {!! json_encode($pageDesc ?? 'Verified guest review and rating submission for Dubai desert safaris and tours by Dunes Discovery Tourism.', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},

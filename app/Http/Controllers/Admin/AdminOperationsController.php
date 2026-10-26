@@ -274,6 +274,11 @@ class AdminOperationsController extends Controller
         $toDate = $request->input('to_date', now()->endOfMonth()->format('Y-m-d'));
 
         $drivers = Driver::with(['defaultVehicle'])->orderBy('name')->get();
+        $bookingsByDriver = Booking::whereIn('driver_id', $drivers->pluck('id'))
+            ->whereBetween('tour_date', [$fromDate, $toDate])
+            ->whereIn('status', ['confirmed', 'completed'])
+            ->get()
+            ->groupBy('driver_id');
 
         $reportData = [];
         $totalTripsAll = 0;
@@ -281,10 +286,7 @@ class AdminOperationsController extends Controller
         $totalCashAll = 0;
 
         foreach ($drivers as $d) {
-            $bookings = Booking::where('driver_id', $d->id)
-                ->whereBetween('tour_date', [$fromDate, $toDate])
-                ->whereIn('status', ['confirmed', 'completed'])
-                ->get();
+            $bookings = $bookingsByDriver->get($d->id, collect());
 
             $trips = $bookings->count();
             $adults = $bookings->sum('adults');
@@ -327,13 +329,18 @@ class AdminOperationsController extends Controller
         $toDate = $request->input('to_date', now()->endOfMonth()->format('Y-m-d'));
 
         $drivers = Driver::with(['defaultVehicle'])->orderBy('name')->get();
+        $bookingsByDriver = Booking::whereIn('driver_id', $drivers->pluck('id'))
+            ->whereBetween('tour_date', [$fromDate, $toDate])
+            ->whereIn('status', ['confirmed', 'completed'])
+            ->get()
+            ->groupBy('driver_id');
 
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => 'attachment; filename="dunes-driver-reconciliation-' . $fromDate . '-to-' . $toDate . '.csv"',
         ];
 
-        $callback = function () use ($drivers, $fromDate, $toDate) {
+        $callback = function () use ($drivers, $bookingsByDriver) {
             $file = fopen('php://output', 'w');
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
             fputcsv($file, [
@@ -343,12 +350,9 @@ class AdminOperationsController extends Controller
             ]);
 
             foreach ($drivers as $d) {
-                $bookings = Booking::where('driver_id', $d->id)
-                    ->whereBetween('tour_date', [$fromDate, $toDate])
-                    ->whereIn('status', ['confirmed', 'completed'])
-                    ->get();
+                $bookings = $bookingsByDriver->get($d->id, collect());
 
-                fputcsv($file, [
+                fputcsv($file, sanitize_csv_row([
                     $d->name,
                     $d->license_number ?: 'N/A',
                     $d->phone,
@@ -361,7 +365,7 @@ class AdminOperationsController extends Controller
                     $bookings->where('payment_status', '!=', 'paid')->sum('balance_due'),
                     $bookings->where('payment_status', 'paid')->sum('payment_amount'),
                     $d->rating,
-                ]);
+                ]));
             }
 
             fclose($file);
@@ -387,19 +391,7 @@ class AdminOperationsController extends Controller
             'Content-Disposition' => 'attachment; filename="dunes-dispatch-manifest-'.$selectedDate.'.csv"',
         ];
 
-        $sanitize = function (array $row): array {
-            return array_map(function ($val) {
-                if ($val === null) {
-                    return '';
-                }
-                $str = (string) $val;
-                if (isset($str[0]) && in_array($str[0], ['=', '+', '-', '@', "\t", "\r"], true)) {
-                    return "'".$str;
-                }
-
-                return $str;
-            }, $row);
-        };
+        $sanitize = static fn (array $row): array => sanitize_csv_row($row);
 
         $callback = function () use ($bookings, $selectedDate, $sanitize) {
             $file = fopen('php://output', 'w');

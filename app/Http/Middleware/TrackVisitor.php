@@ -29,16 +29,24 @@ class TrackVisitor
      */
     public function terminate(Request $request, Response $response): void
     {
-        // Only log GET requests that are HTML page loads (exclude AJAX, API, files, or admin panel)
+        if (app()->runningUnitTests()) {
+            return;
+        }
+
+        // Only log genuine HTML page loads (exclude AJAX, API, feeds, sitemaps, bots, driver run-sheets, and admin panel)
         if ($request->isMethod('GET')
+            && $response->getStatusCode() < 400
             && ! $request->ajax()
-            && ! $request->is('admin*')
-            && ! $request->is('api*')
-            && ! $request->is('login')
-            && ! $request->is('register')
-            && ! $request->is('logout')
+            && ! $request->is('admin*', 'api*', 'login', 'register', 'logout', 'up', 'driver/*', 'sitemap*', '*/sitemap*', 'feed.xml', '*/feed.xml', 'blog/feed.xml', '*/blog/feed.xml', 'robots.txt', 'llms*', '.well-known/*', 'badges/*', 'uploads/*', 'images/*', 'assets/*', 'build/*', 'storage/*', 'booking/*/ticket-pdf', '*/booking/*/ticket-pdf')
         ) {
             try {
+                $ua = strtolower((string) $request->userAgent());
+                foreach (['bot', 'crawler', 'spider', 'slurp', 'curl', 'wget', 'lighthouse', 'pagespeed', 'headlesschrome', 'inspect', 'uptime', 'pingdom'] as $botPat) {
+                    if ($ua !== '' && str_contains($ua, $botPat)) {
+                        return;
+                    }
+                }
+
                 $ctx = $this->tracker->collectRequestContext('navigation');
                 $this->tracker->logRequest('page_view', 0, 'navigation', $ctx);
             } catch (\Throwable $e) {

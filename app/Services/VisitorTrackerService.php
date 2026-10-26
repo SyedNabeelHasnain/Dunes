@@ -138,38 +138,19 @@ class VisitorTrackerService
             ] : null;
         }
 
+        // Skip external GeoIP HTTP lookups for automated crawlers/bots
+        $uaLower = strtolower((string) (request()->userAgent() ?: ''));
+        foreach (['bot', 'crawler', 'spider', 'slurp', 'curl', 'wget', 'lighthouse', 'pagespeed'] as $botToken) {
+            if ($uaLower !== '' && str_contains($uaLower, $botToken)) {
+                return null;
+            }
+        }
+
         // Cache the lookup results for 24 hours to prevent API rate limiting
         $result = Cache::remember("geoip_{$ip}", 86400, function () use ($ip) {
-            // Tier 1: IP-API.com
+            // Tier 1: ipwho.is (Fast HTTPS, no plaintext IP leakage)
             try {
-                $response = Http::timeout(2)
-                    ->get("http://ip-api.com/json/{$ip}?fields=status,message,country,regionName,city,lat,lon,timezone,isp,org,as,hosting,proxy");
-
-                if ($response->successful()) {
-                    $data = $response->json();
-                    if (($data['status'] ?? '') === 'success') {
-                        return [
-                            'country' => $data['country'] ?? null,
-                            'regionName' => $data['regionName'] ?? null,
-                            'city' => $data['city'] ?? null,
-                            'lat' => $data['lat'] ?? null,
-                            'lon' => $data['lon'] ?? null,
-                            'timezone' => $data['timezone'] ?? null,
-                            'isp' => $data['isp'] ?? null,
-                            'org' => $data['org'] ?? null,
-                            'as' => $data['as'] ?? null,
-                            'hosting' => $data['hosting'] ?? false,
-                            'proxy' => $data['proxy'] ?? false,
-                        ];
-                    }
-                }
-            } catch (\Throwable $e) {
-                Log::warning("IP-API Lookup failed for IP {$ip}: ".$e->getMessage());
-            }
-
-            // Tier 2: ipwho.is (Fast, HTTPS, open, no keys or signups)
-            try {
-                $response = Http::timeout(2)->get("https://ipwho.is/{$ip}");
+                $response = Http::connectTimeout(1.5)->timeout(1.5)->get("https://ipwho.is/{$ip}");
                 if ($response->successful()) {
                     $data = $response->json();
                     if (($data['success'] ?? false) === true) {
@@ -189,12 +170,12 @@ class VisitorTrackerService
                     }
                 }
             } catch (\Throwable $e) {
-                Log::warning("ipwho.is Lookup failed for IP {$ip}: ".$e->getMessage());
+                Log::debug("ipwho.is Lookup failed for IP {$ip}: ".$e->getMessage());
             }
 
-            // Tier 3: freeipapi.com (Reliable HTTPS fallback, no keys or signups)
+            // Tier 2: freeipapi.com (Reliable HTTPS fallback)
             try {
-                $response = Http::timeout(2)->get("https://freeipapi.com/api/json/{$ip}");
+                $response = Http::connectTimeout(1.5)->timeout(1.5)->get("https://freeipapi.com/api/json/{$ip}");
                 if ($response->successful()) {
                     $data = $response->json();
                     if (! empty($data['countryName'])) {
@@ -214,13 +195,25 @@ class VisitorTrackerService
                     }
                 }
             } catch (\Throwable $e) {
-                Log::warning("freeipapi Lookup failed for IP {$ip}: ".$e->getMessage());
+                Log::debug("freeipapi Lookup failed for IP {$ip}: ".$e->getMessage());
             }
 
-            return null;
+            return [
+                'country' => null,
+                'regionName' => null,
+                'city' => null,
+                'lat' => null,
+                'lon' => null,
+                'timezone' => null,
+                'isp' => null,
+                'org' => null,
+                'as' => null,
+                'hosting' => false,
+                'proxy' => false,
+            ];
         });
 
-        if (! $result && $hasFallback) {
+        if (empty($result['country']) && $hasFallback) {
             return [
                 'country' => $fallbackGeo['country'] ?? null,
                 'regionName' => $fallbackGeo['region'] ?? null,
@@ -487,8 +480,8 @@ class VisitorTrackerService
             'accept_language' => $acceptLang,
             'accept_encoding' => $acceptEnc,
             'referrer_url' => $referrer,
-            'utm_source' => $utmSource,
-            'utm_medium' => $utmMedium,
+            'utm_source' => $utmSource ?: 'Direct',
+            'utm_medium' => $utmMedium ?: 'Not Available',
             'utm_campaign' => $utmCampaign ?: 'Not Available',
             'utm_term' => $utmTerm ?: 'Not Available',
             'utm_content' => $utmContent ?: 'Not Available',

@@ -22,6 +22,10 @@ class AppServiceProvider extends ServiceProvider
             $this->app->usePublicPath(base_path('../public_html'));
         }
 
+        $this->app->singleton(SettingsService::class, fn () => new SettingsService);
+        $this->app->singleton(\App\Services\CmsContentService::class);
+        $this->app->singleton(\App\Services\Localization\LocaleManager::class);
+
         $this->app->singleton('url', function ($app) {
             $routes = $app['router']->getRoutes();
             $app->instance('routes', $routes);
@@ -73,19 +77,39 @@ class AppServiceProvider extends ServiceProvider
             @mkdir($fontDir, 0775, true);
         }
 
-        View::composer('*', function ($view) {
-            try {
-                $settings = app(SettingsService::class)->all();
-                $view->with('settings', $settings);
-            } catch (\Throwable $e) {
-                $view->with('settings', collect());
+        $secretSettingKeys = [
+            'smtp_password',
+            'ziina_access_token',
+            'ziina_webhook_secret',
+            'meta_access_token',
+            'meta_capi_token',
+            'recaptcha_secret_key',
+            'tripadvisor_api_key',
+            'deepl_auth_key',
+            'google_translate_api_key',
+            'google_places_api_key',
+        ];
+
+        View::composer('*', function ($view) use ($secretSettingKeys) {
+            $viewData = $view->getData();
+            $viewName = (string) $view->getName();
+            $isAdminView = str_starts_with($viewName, 'admin.') || str_starts_with($viewName, 'layouts.admin');
+
+            if (! array_key_exists('settings', $viewData)) {
+                try {
+                    $allSettings = app(SettingsService::class)->all();
+                    $view->with('settings', $isAdminView ? $allSettings : $allSettings->except($secretSettingKeys));
+                } catch (\Throwable $e) {
+                    $view->with('settings', collect());
+                }
             }
 
-            try {
-                $activeLanguages = Language::getActive();
-                $view->with('activeLanguages', $activeLanguages);
-            } catch (\Throwable $e) {
-                $view->with('activeLanguages', Language::fallbackCollection());
+            if (! array_key_exists('activeLanguages', $viewData)) {
+                try {
+                    $view->with('activeLanguages', Language::getActive());
+                } catch (\Throwable $e) {
+                    $view->with('activeLanguages', Language::fallbackCollection());
+                }
             }
         });
 

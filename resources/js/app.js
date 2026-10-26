@@ -897,6 +897,8 @@ Alpine.store('modal', {
 
                 if (data.customQuote) {
                     window.customBuilderQuote = data.customQuote;
+                    const quoteBasePrice = parseFloat(data.customQuote.subtotal !== undefined ? data.customQuote.subtotal : data.customQuote.total) || 0;
+                    const quoteFinalPrice = parseFloat(data.customQuote.total) || quoteBasePrice;
                     if (isCustomInp) isCustomInp.value = '1';
                     if (customDataInp) customDataInp.value = JSON.stringify(data.customQuote);
 
@@ -912,7 +914,7 @@ Alpine.store('modal', {
                             `;
                         }
                         const priceEl = document.getElementById('customBuilderSummaryPrice');
-                        if (priceEl) priceEl.innerText = `AED ${data.customQuote.total.toFixed(2)}`;
+                        if (priceEl) priceEl.innerText = `AED ${quoteFinalPrice.toFixed(2)}`;
                     }
 
                     if (wrapper) wrapper.classList.add('hidden', 'd-none');
@@ -921,7 +923,7 @@ Alpine.store('modal', {
                     const tierCardsEl = document.getElementById('tierCards');
                     if (tierCardsEl) {
                         tierCardsEl.innerHTML = `
-                            <div class="tier-card selected" data-tier="1" data-price="${data.customQuote.total}" data-price-type="per package" data-guest-count="${data.customQuote.adults + data.customQuote.children}" data-capacity="${data.customQuote.adults + data.customQuote.children}">
+                            <div class="tier-card selected" data-tier="1" data-price="${quoteBasePrice}" data-price-type="per package" data-guest-count="${data.customQuote.adults + data.customQuote.children}" data-capacity="${data.customQuote.adults + data.customQuote.children}">
                                 <div class="tier-popular-badge">Configured Spec</div>
                                 <div class="tier-card-inner">
                                     <div class="tier-card-info">
@@ -930,7 +932,7 @@ Alpine.store('modal', {
                                     </div>
                                     <div class="tier-card-right">
                                         <div class="tier-card-price">
-                                            <div class="current" data-aed="${data.customQuote.total}">AED ${data.customQuote.total}</div>
+                                            <div class="current" data-aed="${quoteBasePrice}">AED ${quoteBasePrice.toFixed(2)}</div>
                                         </div>
                                         <div class="tier-card-check"><i class="bi bi-check-lg"></i></div>
                                     </div>
@@ -941,7 +943,7 @@ Alpine.store('modal', {
                     const selectedTier = document.getElementById('selectedTier');
                     if (selectedTier) selectedTier.value = '1';
                     window.App.selectedTier = '1';
-                    window.App.selectedPrice = data.customQuote.total;
+                    window.App.selectedPrice = quoteBasePrice;
 
                     const requestsInput = document.getElementById('bookingRequests');
                     if (requestsInput) requestsInput.value = data.customQuote.spec_text;
@@ -3596,12 +3598,21 @@ const App = {
                 });
                 container.innerHTML = h;
 
+                let selectedAny = false;
                 container.querySelectorAll('.tier-card').forEach(c => {
                     c.addEventListener('click', () => this.selectTier(c));
                     if (this.preselectedTierId && c.dataset.tier === this.preselectedTierId) {
                         this.selectTier(c);
+                        selectedAny = true;
                     }
                 });
+
+                if (!selectedAny && !window.customBuilderQuote) {
+                    const defaultCard = container.querySelector('.tier-card.popular') || container.querySelector('.tier-card');
+                    if (defaultCard) {
+                        this.selectTier(defaultCard);
+                    }
+                }
 
                 const pendingCode = window.pendingPromoCode || document.getElementById('bookingPromoInput')?.value || document.getElementById('bookingPromoCode')?.value;
                 if (pendingCode && !window.appliedPromoCoupon && typeof window.validateCurrentPromo === 'function') {
@@ -3618,7 +3629,9 @@ const App = {
                     const visualHtml = a.image 
                         ? `<img src="/images/${a.image}" alt="${a.name}" class="w-8 h-8 rounded-xl object-cover shrink-0 border border-orange-200/60 shadow-2xs" loading="lazy">`
                         : `<div class="w-8 h-8 rounded-xl bg-orange-50 text-primary border border-orange-200/60 flex items-center justify-center shrink-0 text-sm"><i class="${iconName}"></i></div>`;
-                    ah += `<div class="addon-card-horizontal group relative flex flex-col justify-between p-3.5 sm:p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-primary/60 hover:shadow-md transition-all cursor-pointer select-none shrink-0" data-addon="${a.id}" data-price="${a.price}">
+                    const priceType = (a.price_type || 'per_person').toLowerCase();
+                    const priceTypeLabel = priceType === 'per_person' ? '/guest' : '/booking';
+                    ah += `<div class="addon-card-horizontal group relative flex flex-col justify-between p-3.5 sm:p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-primary/60 hover:shadow-md transition-all cursor-pointer select-none shrink-0" data-addon="${a.id}" data-price="${a.price}" data-price-type="${priceType}">
                         <input type="checkbox" name="addons[]" value="${a.id}" class="sr-only">
                         <div class="addon-check-abs hidden absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-500 text-white items-center justify-center text-[10px] font-black shadow-2xs">
                             <i class="bi bi-check-lg"></i>
@@ -3631,7 +3644,7 @@ const App = {
                             <p class="text-[11px] text-slate-500 font-medium line-clamp-2 mb-3 leading-relaxed min-h-[32px]">${a.description || 'Optional safari enhancement'}</p>
                         </div>
                         <div class="mt-auto pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
-                            <span class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-800 font-black text-xs font-mono border border-slate-200/80 shadow-2xs" data-aed="${a.price}" data-is-addon="true">+AED ${parseFloat(a.price).toFixed(2)}</span>
+                            <span class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-800 font-black text-xs font-mono border border-slate-200/80 shadow-2xs" data-aed="${a.price}" data-is-addon="true">+AED ${parseFloat(a.price).toFixed(2)}${priceTypeLabel}</span>
                             <span class="addon-status-label inline-flex items-center gap-1 text-[11px] font-extrabold text-primary bg-orange-50 hover:bg-orange-100 border border-orange-200/80 px-2.5 py-0.5 rounded-full transition-all">+ Add</span>
                         </div>
                     </div>`;
@@ -3692,10 +3705,15 @@ const App = {
         this.selectedTier = card.dataset.tier;
         this.selectedPrice = parseFloat(card.dataset.price);
 
-        const targetGuests = parseInt(card.dataset.guestCount || card.dataset.capacity, 10);
+        const priceType = (card.dataset.priceType || 'per person').toLowerCase();
+        const isUnitTier = ['per buggy', 'per vehicle', 'per group', 'private', 'per tent', 'per package'].includes(priceType);
+        const targetGuests = parseInt(card.dataset.guestCount || card.dataset.capacity, 10) || 0;
         const bookingAdults = document.getElementById('bookingAdults');
-        if (bookingAdults && targetGuests > 0) {
-            bookingAdults.value = targetGuests;
+        if (bookingAdults) {
+            const currentAdults = parseInt(bookingAdults.value, 10) || 1;
+            if (isUnitTier && targetGuests > 0 && currentAdults < targetGuests) {
+                bookingAdults.value = targetGuests;
+            }
         }
 
         this.updateTotal();
@@ -3716,15 +3734,19 @@ const App = {
             const item = inp.closest('.addon-card-horizontal');
             this.selectedAddons.push({
                 id: inp.value,
-                price: parseFloat(item.dataset.price)
+                price: parseFloat(item.dataset.price) || 0,
+                priceType: (item.dataset.priceType || 'per_person').toLowerCase()
             });
         });
         this.updateTotal();
+        if (typeof window.revalidateAppliedPromo === 'function') {
+            window.revalidateAppliedPromo();
+        }
     },
 
     calculateBaseTotal() {
         if (window.customBuilderQuote) {
-            return parseFloat(window.customBuilderQuote.total) || 0;
+            return parseFloat(window.customBuilderQuote.subtotal !== undefined ? window.customBuilderQuote.subtotal : window.customBuilderQuote.total) || 0;
         }
         const adults = parseInt(document.getElementById('bookingAdults')?.value) || 1;
         const children = parseInt(document.getElementById('bookingChildren')?.value) || 0;
@@ -3763,7 +3785,11 @@ const App = {
         } else {
             total = (price * adults) + (childPrice * children);
         }
-        this.selectedAddons.forEach(a => total += a.price);
+        const totalGuests = Math.max(1, adults + children);
+        this.selectedAddons.forEach(a => {
+            const isPerPerson = (a.priceType || 'per_person') === 'per_person';
+            total += isPerPerson ? (a.price * totalGuests) : a.price;
+        });
         return total;
     },
 
@@ -3788,7 +3814,7 @@ const App = {
 
         let baseTotal = 0;
         if (window.customBuilderQuote) {
-            baseTotal = parseFloat(window.customBuilderQuote.total) || 0;
+            baseTotal = parseFloat(window.customBuilderQuote.subtotal !== undefined ? window.customBuilderQuote.subtotal : window.customBuilderQuote.total) || 0;
         } else if (['per buggy', 'per vehicle', 'per group', 'private', 'per tent', 'per package'].includes(priceType)) {
             let capacity = parseInt(selectedTierCard?.dataset.capacity || selectedTierCard?.dataset.guestCount, 10) || 0;
             if (capacity <= 0) {
@@ -3804,7 +3830,11 @@ const App = {
             baseTotal = (this.selectedPrice * adults) + (childPrice * children);
         }
         if (!window.customBuilderQuote) {
-            this.selectedAddons.forEach(a => baseTotal += a.price);
+            const totalGuests = Math.max(1, adults + children);
+            this.selectedAddons.forEach(a => {
+                const isPerPerson = (a.priceType || 'per_person') === 'per_person';
+                baseTotal += isPerPerson ? (a.price * totalGuests) : a.price;
+            });
         }
 
         // Apply promo coupon if active
@@ -3880,8 +3910,7 @@ const App = {
                 const adults = parseInt(document.getElementById('bookingAdults')?.value) || 1;
                 const children = parseInt(document.getElementById('bookingChildren')?.value) || 0;
 
-                let total = (this.selectedPrice * adults) + (this.selectedPrice * 0.7 * children);
-                this.selectedAddons.forEach(a => total += a.price);
+                let total = this.calculateBaseTotal();
 
                 window.dataLayer.push({ ecommerce: null });
                 window.dataLayer.push({

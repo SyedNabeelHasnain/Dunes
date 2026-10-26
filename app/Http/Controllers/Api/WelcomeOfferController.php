@@ -36,6 +36,15 @@ class WelcomeOfferController extends Controller
      */
     public function claimOffer(Request $request): JsonResponse
     {
+        $modalEnabled = $this->settings->get('promo_welcome_modal_enabled');
+        $modalActive = $this->settings->get('welcome_popup_active');
+        if ($modalEnabled === '0' || $modalActive === '0') {
+            return response()->json([
+                'success' => false,
+                'message' => 'This promotional offer is currently unavailable.',
+            ], 403);
+        }
+
         $request->validate([
             'name' => 'required|string|min:2|max:255',
             'email' => 'required|email|max:255',
@@ -45,6 +54,24 @@ class WelcomeOfferController extends Controller
         $email = strtolower(trim($request->input('email')));
         $name = trim($request->input('name'));
         $phone = trim($request->input('phone'));
+
+        $isReturningCustomer = \App\Models\Booking::where('email', $email)
+            ->where(function ($q) {
+                $q->whereIn('status', ['confirmed', 'completed'])
+                    ->orWhereIn('payment_status', ['paid', 'partial', 'advance_paid']);
+            })
+            ->exists();
+
+        if ($isReturningCustomer) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This welcome voucher is exclusively available for first-time guests.',
+            ], 422);
+        }
+
+        $rawDiscount = (float) $this->settings->get('promo_welcome_modal_discount', $this->settings->get('welcome_popup_discount', '25'));
+        $discountPercent = $rawDiscount > 0 ? max(1.0, min(50.0, round($rawDiscount, 2))) : 25.00;
+        $discountInt = (int) round($discountPercent);
 
         // Check if there is already an active welcome coupon generated for this specific email today
         $existing = Coupon::where('code', 'like', 'FIRST25-%')
@@ -64,10 +91,10 @@ class WelcomeOfferController extends Controller
 
             $coupon = Coupon::create([
                 'code' => $code,
-                'name' => 'First-Time 25% Welcome Offer ('.$email.')',
-                'description' => 'Claimed via welcome offer popup modal by '.$name.' ('.$phone.') on '.now()->format('Y-m-d H:i'),
+                'name' => "First-Time {$discountInt}% Welcome Offer ({$email})",
+                'description' => "Claimed via welcome offer popup modal by {$name} ({$phone}) on ".now()->format('Y-m-d H:i'),
                 'discount_type' => 'percentage',
-                'discount_value' => 25.00,
+                'discount_value' => $discountPercent,
                 'min_spend' => 0.00,
                 'max_discount' => null,
                 'min_guests' => 1,
@@ -132,9 +159,12 @@ class WelcomeOfferController extends Controller
 
         // Send Email Voucher to Customer
         try {
+            if (! app()->environment('testing')) {
+                app(\App\Services\EmailMarketingService::class)->applySmtpConfig();
+            }
             $fromEmail = $this->settings->getFromEmail();
             Mail::to($email)->send(
-                (new WelcomeOfferMail($coupon->code, 25.00, $name))->from($fromEmail, 'Dunes Discovery Tourism')
+                (new WelcomeOfferMail($coupon->code, (float) $coupon->discount_value, $name))->from($fromEmail, 'Dunes Discovery Tourism')
             );
         } catch (\Throwable $e) {
             Log::error("Failed to dispatch welcome offer email to {$email}: ".$e->getMessage());
@@ -147,7 +177,7 @@ class WelcomeOfferController extends Controller
                 'email' => $email,
                 'phone' => $phone,
                 'custom_data' => [
-                    'content_name' => 'First-Time 25% Welcome Voucher',
+                    'content_name' => "First-Time {$discountInt}% Welcome Voucher",
                     'content_category' => 'Welcome Offer',
                     'coupon' => $coupon->code,
                     'value' => 0.00,
@@ -160,12 +190,12 @@ class WelcomeOfferController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Congratulations! Your 25% discount voucher is ready.',
+            'message' => "Congratulations! Your {$discountInt}% discount voucher is ready.",
             'coupon' => [
                 'code' => $coupon->code,
-                'discount' => 25,
+                'discount' => (float) $coupon->discount_value,
                 'discount_type' => 'percentage',
-                'savings_text' => '25% OFF Today',
+                'savings_text' => "{$discountInt}% OFF Today",
                 'valid_until' => $coupon->valid_until ? $coupon->valid_until->toIso8601String() : null,
                 'timer_seconds' => 900, // 15 minutes session urgency
             ],

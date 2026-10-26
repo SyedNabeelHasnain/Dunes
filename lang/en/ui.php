@@ -473,6 +473,17 @@ return [
         'custom_btn' => 'Custom Safari',
     ],
 
+    // Home Hero Section
+    'home_hero' => [
+        'rating_pill' => 'Rated 4.9/5 by 2,847+ Travelers',
+        'title_prefix' => 'Top-Rated',
+        'title_highlight' => 'Dubai Desert Safari',
+        'title_suffix' => 'Tours & Adventures',
+        'description' => 'Experience thrilling dune bashing across the Lahbab Red Dunes, 1000cc dune buggy rentals, magical sunsets, authentic live BBQ dinner, and 5-star entertainment under the desert stars.',
+        'card_title' => 'Dubai Desert Safari with Luxury Land Cruiser Pick & Drop',
+        'card_desc' => 'Enjoy a premium desert safari experience with chauffeur-driven Luxury Land Cruiser hotel pickup and drop-off. Comfortable seating, professional drivers, and hassle-free transfers included with every booking.',
+    ],
+
     // Home Popular Tours
     'home_popular' => [
         'title' => 'Popular',

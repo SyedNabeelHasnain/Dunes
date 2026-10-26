@@ -54,7 +54,7 @@ class SendReviewRequestsCommand extends Command
         $count = 0;
         foreach ($bookings as $booking) {
             // Check if review already requested via special_requests tag
-            if ($booking->special_requests && str_contains($booking->special_requests, '[REVIEW_REQUESTED]')) {
+            if ($booking->special_requests && str_contains($booking->special_requests, '[REVIEW_REQUESTED')) {
                 continue;
             }
 

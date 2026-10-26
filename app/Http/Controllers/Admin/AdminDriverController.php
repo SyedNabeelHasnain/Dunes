@@ -82,8 +82,13 @@ class AdminDriverController extends Controller
 
         if ($request->hasFile('photo')) {
             $file = $request->file('photo');
-            $filename = 'captain-' . Str::slug($data['name']) . '-' . time() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('images/drivers'), $filename);
+            $uploadDir = public_path('images/drivers');
+            if (! file_exists($uploadDir)) {
+                @mkdir($uploadDir, 0755, true);
+            }
+            $ext = safe_uploaded_image_ext($file, 'jpg');
+            $filename = 'captain-' . Str::slug($data['name']) . '-' . time() . '.' . $ext;
+            $file->move($uploadDir, $filename);
             $data['photo'] = 'images/drivers/' . $filename;
         }
 
@@ -169,8 +174,13 @@ class AdminDriverController extends Controller
 
         if ($request->hasFile('photo')) {
             $file = $request->file('photo');
-            $filename = 'captain-' . Str::slug($data['name']) . '-' . time() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('images/drivers'), $filename);
+            $uploadDir = public_path('images/drivers');
+            if (! file_exists($uploadDir)) {
+                @mkdir($uploadDir, 0755, true);
+            }
+            $ext = safe_uploaded_image_ext($file, 'jpg');
+            $filename = 'captain-' . Str::slug($data['name']) . '-' . time() . '.' . $ext;
+            $file->move($uploadDir, $filename);
             $data['photo'] = 'images/drivers/' . $filename;
         }
 

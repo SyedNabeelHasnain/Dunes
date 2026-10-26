@@ -54,6 +54,10 @@ class RecoverAbandonedBookingsCommand extends Command
                 $query->where('payment_status', 'unpaid')
                     ->orWhereNull('payment_status');
             })
+            ->where(function ($query) {
+                $query->whereNull('payment_method')
+                    ->orWhere('payment_method', '!=', 'cash');
+            })
             ->whereBetween('created_at', [$startTime, $endTime])
             ->whereNotNull('email')
             ->where('email', '!=', '')
@@ -69,7 +73,7 @@ class RecoverAbandonedBookingsCommand extends Command
             // Prevent duplicate recovery emails (check cache and tag)
             $cacheKey = 'abandoned_recovery_sent_'.$booking->id;
             if (Cache::has($cacheKey) ||
-                ($booking->special_requests && str_contains($booking->special_requests, '[RECOVERY_DISPATCHED]'))) {
+                ($booking->special_requests && str_contains($booking->special_requests, '[RECOVERY_DISPATCHED'))) {
                 continue;
             }
 

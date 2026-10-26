@@ -473,6 +473,17 @@ return [
         'custom_btn' => 'Safari Personalizzato',
     ],
 
+    // Sezione Hero Principale
+    'home_hero' => [
+        'rating_pill' => 'Valutato 4.9/5 da oltre 2,847 viaggiatori',
+        'title_prefix' => 'I migliori tour di',
+        'title_highlight' => 'Safari nel Deserto di Dubai',
+        'title_suffix' => 'e avventure',
+        'description' => 'Emozionante dune bashing sulle dune rosse di Lahbab, noleggio buggy 1000cc, tramonti magici, cena barbecue dal vivo e spettacoli a 5 stelle sotto le stelle del deserto.',
+        'card_title' => 'Safari nel Deserto di Dubai con transfer in Luxury Land Cruiser',
+        'card_desc' => 'Vivi un safari premium con prelievo e rientro in hotel a bordo di comodi fuoristrada Land Cruiser con autista professionista.',
+    ],
+
     // Tour Popolari
     'home_popular' => [
         'title' => 'Tour',

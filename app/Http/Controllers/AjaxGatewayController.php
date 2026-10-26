@@ -142,6 +142,19 @@ class AjaxGatewayController extends Controller
                 ];
             });
 
+        $popularSeen = false;
+        $tiers = $tiers->map(function (array $t) use (&$popularSeen) {
+            if (! empty($t['is_popular'])) {
+                if ($popularSeen) {
+                    $t['is_popular'] = 0;
+                } else {
+                    $popularSeen = true;
+                }
+            }
+
+            return $t;
+        })->values();
+
         $addonImages = [
             'camel-ride' => 'addon-camel-ride-dubai-desert-running-caravan-sunset.webp',
             'falcon-photo' => 'addon-falcon-photo-dubai-desert-safari-camp-falconer.webp',
@@ -164,6 +177,7 @@ class AjaxGatewayController extends Controller
                     'description' => $addon->description,
                     'icon' => $addon->icon ?: 'plus-circle',
                     'price' => (float) $addon->pivot->price,
+                    'price_type' => $addon->price_type ?: 'per_person',
                     'image' => $addonImages[$addon->slug] ?? null,
                 ];
             });

@@ -124,6 +124,11 @@ class ZiinaPaymentService
      */
     public function fetchPaymentIntent(string $intentId): array
     {
+        $intentId = trim($intentId);
+        if (! preg_match('/^[A-Za-z0-9_\-]{4,128}$/', $intentId)) {
+            return ['error' => 'Invalid Ziina payment intent identifier'];
+        }
+
         $token = $this->getToken();
         if (empty($token)) {
             return ['error' => 'Ziina access token missing'];
@@ -132,7 +137,8 @@ class ZiinaPaymentService
         try {
             $response = Http::withToken($token)
                 ->withHeaders(['Accept' => 'application/json'])
-                ->timeout(20)
+                ->connectTimeout(5)
+                ->timeout(15)
                 ->get("https://api-v2.ziina.com/api/payment_intent/{$intentId}");
 
             if ($response->failed()) {

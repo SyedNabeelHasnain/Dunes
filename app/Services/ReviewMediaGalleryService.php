@@ -472,18 +472,48 @@ class ReviewMediaGalleryService
 
     /**
      * Mark a URL as broken (called via AJAX error reporting from the frontend).
+     * Guards against unauthenticated cache-flush DoS by verifying the URL belongs to active gallery media.
      */
     public function markUrlAsBroken(string $url): void
     {
-        if (empty($url)) {
+        $url = trim($url);
+        if ($url === '' || ! filter_var($url, FILTER_VALIDATE_URL)) {
             return;
         }
 
         $cacheKey = 'gallery_media_status_'.md5($url);
+        $cachedItems = Cache::get(self::CACHE_KEY_ITEMS);
+        $existsInGallery = is_array($cachedItems) && collect($cachedItems)->contains(fn ($item) => ($item['url'] ?? '') === $url);
+        $alreadyTracked = Cache::has($cacheKey);
+
+        if (! $existsInGallery && ! $alreadyTracked) {
+            $host = strtolower((string) parse_url($url, PHP_URL_HOST));
+            $allowedHosts = ['dunesdiscoverytourism.com', 'googleusercontent.com', 'ggpht.com', 'tacdn.com', 'tripadvisor.com'];
+            $isTrustedHost = false;
+            foreach ($allowedHosts as $allowed) {
+                if ($host === $allowed || str_ends_with($host, '.'.$allowed)) {
+                    $isTrustedHost = true;
+                    break;
+                }
+            }
+
+            if (! $isTrustedHost) {
+                $existsInDb = Review::where('status', 'approved')
+                    ->whereNotNull('photos')
+                    ->where('photos', 'like', '%'.addcslashes($url, '%_\\').'%')
+                    ->exists();
+
+                if (! $existsInDb) {
+                    return;
+                }
+            }
+        }
+
         Cache::put($cacheKey, false, self::URL_STATUS_TTL_SECONDS);
 
-        // Invalidate aggregate gallery feeds so broken image is omitted on next load
-        $this->clearCache();
+        if ($existsInGallery || $alreadyTracked) {
+            $this->clearCache();
+        }
 
         Log::info("Review gallery media URL reported broken & blacklisted: {$url}");
     }

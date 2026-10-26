@@ -8,7 +8,7 @@
     $googleActive = ($settings['google_active'] ?? '0') === '1';
     $metaActive = ($settings['meta_active'] ?? '0') === '1';
     $metaPixelId = $settings['meta_pixel_id'] ?? null;
-    $adsIdSetting = $settings['google_ads_id'] ?? 'AW-17859624049';
+    $adsIdSetting = normalize_google_ads_id($settings['google_ads_id'] ?? 'AW-17859624049');
     $conversionLabel = $settings['google_conversion_label'] ?? 'eR3SCLimtvobEPH4kMRC';
     $conversionSendTo = (!empty($adsIdSetting) && !empty($conversionLabel)) ? "{$adsIdSetting}/{$conversionLabel}" : 'AW-17859624049/eR3SCLimtvobEPH4kMRC';
     $whatsappVal = $settings['site_whatsapp'] ?? '971502456056';
@@ -57,8 +57,8 @@
                     value: {{ (float)$booking->total }},
                     currency: 'AED',
                     items: [{
-                        item_name: @json($booking->tour_name),
-                        item_id: @json((string) $booking->tour_id),
+                        item_name: @json($booking->tour_name, JSON_HEX_TAG),
+                        item_id: @json((string) $booking->tour_id, JSON_HEX_TAG),
                         price: {{ (float)$booking->total }},
                         item_category: 'Tours',
                         quantity: 1

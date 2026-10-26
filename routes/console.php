@@ -14,19 +14,19 @@ Schedule::call(function () {
 })->everyMinute()->name('scheduler:heartbeat');
 
 // Dispatch post-tour review collection requests to yesterday's completed safari guests daily at 10:00 AM
-Schedule::command('tours:send-review-requests')->dailyAt('10:00');
+Schedule::command('tours:send-review-requests')->dailyAt('10:00')->withoutOverlapping(10);
 
 // Recover abandoned booking checkouts created in the last 24 hours (hourly frequency)
-Schedule::command('bookings:recover-abandoned')->hourly();
+Schedule::command('bookings:recover-abandoned')->hourly()->withoutOverlapping(10);
 
 // Process queued background jobs (e.g. Meta CAPI, notifications, recovery) every minute
-Schedule::command('queue:work --stop-when-empty --tries=3')->everyMinute();
+Schedule::command('queue:work --stop-when-empty --tries=3')->everyMinute()->withoutOverlapping(5);
 
 // Synchronize foreign currency exchange rates (USD, EUR, GBP, SAR, INR) daily at 02:00 AM
-Schedule::command('currency:sync-rates')->dailyAt('02:00');
+Schedule::command('currency:sync-rates')->dailyAt('02:00')->withoutOverlapping(10);
 
 // Dispatch scheduled email marketing campaigns (every 5 minutes)
-Schedule::command('campaigns:send-scheduled')->everyFiveMinutes();
+Schedule::command('campaigns:send-scheduled')->everyFiveMinutes()->withoutOverlapping(10);
 
 // Synchronize customer reviews and rating metrics from Google Places API daily at midnight
 Schedule::command('reviews:sync-google')->daily()->withoutOverlapping()->runInBackground();

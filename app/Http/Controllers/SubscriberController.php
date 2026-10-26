@@ -227,13 +227,20 @@ class SubscriberController extends Controller
     {
         $targetUrl = $request->query('url', url('/'));
 
-        // URL validation & open redirect mitigation
+        // URL validation & strict open redirect mitigation
         if (! filter_var($targetUrl, FILTER_VALIDATE_URL)) {
             $targetUrl = url('/');
         } else {
-            $targetHost = parse_url($targetUrl, PHP_URL_HOST);
-            $appHost = parse_url(config('app.url'), PHP_URL_HOST) ?: $request->getHost();
-            if ($targetHost && ! str_ends_with(strtolower($targetHost), strtolower($appHost))) {
+            $scheme = strtolower((string) parse_url($targetUrl, PHP_URL_SCHEME));
+            $targetHost = strtolower((string) parse_url($targetUrl, PHP_URL_HOST));
+            $appHost = strtolower((string) (parse_url(config('app.url'), PHP_URL_HOST) ?: $request->getHost()));
+            $appBaseHost = preg_replace('/^www\./', '', $appHost);
+
+            if (
+                ! in_array($scheme, ['http', 'https'], true)
+                || $targetHost === ''
+                || ($targetHost !== $appBaseHost && ! str_ends_with($targetHost, '.'.$appBaseHost))
+            ) {
                 $targetUrl = url('/');
             }
         }

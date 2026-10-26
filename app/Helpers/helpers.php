@@ -74,7 +74,7 @@ if (! function_exists('renderFloatingTextarea')) {
         $required = ! empty($opts['required']);
         $wrapperClass = $opts['wrapperClass'] ?? 'relative rounded-xl';
         $inputClass = $opts['inputClass'] ?? 'w-full rounded-xl border border-slate-200 px-3.5 pt-5 pb-2 text-xs font-semibold text-slate-800 outline-hidden focus:border-primary';
-        $labelClass = $opts['labelClass'] ?? 'absolute text-[10px] uppercase font-bold text-slate-400 left-3.5 top-1.5 transition-all pointer-events-none';
+        $labelClass = $opts['labelClass'] ?? 'absolute text-[10px] uppercase font-bold text-slate-400 start-3.5 top-1.5 transition-all pointer-events-none';
         $wrapperAttrs = $opts['wrapperAttrs'] ?? [];
         $inputAttrs = $opts['inputAttrs'] ?? [];
         $labelAttrs = $opts['labelAttrs'] ?? [];
@@ -235,7 +235,15 @@ if (! function_exists('resolve_og_image')) {
         }
 
         if (str_starts_with($raw, 'http://') || str_starts_with($raw, 'https://')) {
-            return $raw;
+            $parsedHost = strtolower((string) parse_url($raw, PHP_URL_HOST));
+            $appHost = strtolower((string) (parse_url(config('app.url'), PHP_URL_HOST) ?: 'dunesdiscoverytourism.com'));
+            if (! in_array($parsedHost, [$appHost, 'www.'.$appHost, 'localhost', '127.0.0.1', 'dunesdiscoverytourism.com', 'www.dunesdiscoverytourism.com'], true)) {
+                return $raw;
+            }
+            $raw = (string) (parse_url($raw, PHP_URL_PATH) ?: '');
+            if (empty($raw)) {
+                return asset($fallback);
+            }
         }
 
         $clean = ltrim($raw, '/');
@@ -243,7 +251,109 @@ if (! function_exists('resolve_og_image')) {
             $clean = 'images/'.$clean;
         }
 
-        return asset($clean);
+        if (file_exists(public_path($clean))) {
+            return asset($clean);
+        }
+
+        if (str_starts_with($clean, 'storage/')) {
+            $storageRel = substr($clean, strlen('storage/'));
+            if (file_exists(storage_path('app/public/'.$storageRel))) {
+                return asset($clean);
+            }
+        }
+
+        $baseNoExt = preg_replace('/\.(jpe?g|png|webp|avif)$/i', '', $clean);
+        foreach (['.avif', '.webp', '.jpg', '.jpeg', '.png'] as $ext) {
+            if (file_exists(public_path($baseNoExt.$ext))) {
+                return asset($baseNoExt.$ext);
+            }
+        }
+
+        // Also check images/blog/ if a blog image filename was passed without blog/ subfolder
+        $blogBase = 'images/blog/'.basename($baseNoExt);
+        foreach (['.avif', '.webp', '.jpg', '.jpeg', '.png'] as $ext) {
+            if (file_exists(public_path($blogBase.$ext))) {
+                return asset($blogBase.$ext);
+            }
+        }
+
+        return asset($fallback);
+    }
+}
+
+if (! function_exists('normalize_google_ads_id')) {
+    /**
+     * Normalize a Google Ads tag/customer ID to canonical AW-XXXXXXXXXX format.
+     * Converts bare customer IDs like "7927294548" or "792-729-4548" to "AW-7927294548".
+     */
+    function normalize_google_ads_id(?string $raw): string
+    {
+        $val = trim((string) $raw);
+        if ($val === '') {
+            return '';
+        }
+
+        // Strip formatting hyphens/spaces in numeric IDs (e.g. 792-729-4548)
+        if (preg_match('/^aw[-\s]*(\d[\d\-\s]{4,18}\d)$/i', $val, $m)) {
+            return 'AW-'.preg_replace('/\D/', '', $m[1]);
+        }
+
+        if (preg_match('/^\d[\d\-\s]{4,18}\d$/', $val)) {
+            return 'AW-'.preg_replace('/\D/', '', $val);
+        }
+
+        if (str_starts_with(strtolower($val), 'aw-')) {
+            return 'AW-'.substr($val, 3);
+        }
+
+        return $val;
+    }
+}
+
+if (! function_exists('sanitize_csv_cell')) {
+    /**
+     * Neutralize spreadsheet formula injection (=, +, -, @, tab, CR) while keeping E.164 phone numbers readable.
+     */
+    function sanitize_csv_cell(mixed $value): mixed
+    {
+        if (! is_string($value) || $value === '') {
+            return $value;
+        }
+
+        if (preg_match('/^[\s]*[=+\-@\t\r]/', $value)) {
+            // Preserve legitimate international phone numbers like "+971 50 245 6056"
+            if (preg_match('/^\+[0-9][0-9\s\-()]{5,20}$/', trim($value))) {
+                return $value;
+            }
+
+            return "'".$value;
+        }
+
+        return $value;
+    }
+}
+
+if (! function_exists('safe_uploaded_image_ext')) {
+    /**
+     * Determine a safe server-verified image extension from MIME/magic bytes, never raw client filename.
+     */
+    function safe_uploaded_image_ext(\Illuminate\Http\UploadedFile $file, string $default = 'jpg'): string
+    {
+        $allowed = ['jpg', 'jpeg', 'png', 'webp', 'avif'];
+        $guessed = strtolower((string) ($file->guessExtension() ?: $file->extension() ?: ''));
+        if (in_array($guessed, $allowed, true)) {
+            return $guessed === 'jpeg' ? 'jpg' : $guessed;
+        }
+
+        $mime = strtolower((string) $file->getMimeType());
+        $mimeMap = [
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/webp' => 'webp',
+            'image/avif' => 'avif',
+        ];
+
+        return $mimeMap[$mime] ?? $default;
     }
 }
 
@@ -294,5 +404,38 @@ if (! function_exists('resolve_tour_image')) {
         }
 
         return asset('images/'.$clean);
+    }
+}
+
+if (! function_exists('sanitize_csv_row')) {
+    /**
+     * Sanitize an entire CSV row array against spreadsheet formula injection.
+     */
+    function sanitize_csv_row(array $row): array
+    {
+        return array_map(static fn ($cell) => sanitize_csv_cell($cell === null ? '' : $cell), $row);
+    }
+}
+
+if (! function_exists('flush_review_and_social_proof_caches')) {
+    /**
+     * Purge all homepage review and social-proof feed cache variants.
+     */
+    function flush_review_and_social_proof_caches(): void
+    {
+        $keys = [
+            'site_home_reviews_feed',
+            'site_social_proof_feed',
+            'site_social_proof_feed_all',
+            'site_social_proof_feed_bookings_only',
+            'site_social_proof_feed_custom_only',
+            'site_social_proof_feed_google',
+            'site_social_proof_feed_tripadvisor',
+            'site_social_proof_feed_website',
+            'site_home_cache',
+        ];
+        foreach ($keys as $key) {
+            \Illuminate\Support\Facades\Cache::forget($key);
+        }
     }
 }

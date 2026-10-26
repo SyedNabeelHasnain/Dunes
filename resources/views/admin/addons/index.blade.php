@@ -81,7 +81,10 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="py-3 px-4 font-bold text-slate-900">AED {{ number_format($addon->default_price, 2) }}</td>
+                        <td class="py-3 px-4">
+                            <div class="font-bold text-slate-900">AED {{ number_format($addon->default_price, 2) }}</div>
+                            <span class="text-[10px] font-semibold text-slate-400 uppercase">{{ ($addon->price_type ?? 'per_person') === 'per_group' ? 'Flat / Booking' : 'Per Guest' }}</span>
+                        </td>
                         <td class="py-3 px-4">
                             <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
                                 <i class="bi bi-link-45deg"></i> {{ $addon->tours_count ?? $addon->tours->count() }} Tours
@@ -115,6 +118,7 @@
                                     data-description="{{ $addon->description }}"
                                     data-icon="{{ $addon->icon }}"
                                     data-price="{{ $addon->default_price }}"
+                                    data-price-type="{{ $addon->price_type ?? 'per_person' }}"
                                     data-status="{{ $addon->status }}"
                                     data-priority="{{ $addon->priority }}"
                                     data-action="{{ route('admin.addons.update', $addon->id) }}">
@@ -176,6 +180,13 @@
                         <label for="addonIcon" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Icon Class</label>
                         <input type="text" name="icon" id="addonIcon" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden focus:border-primary" placeholder="e.g. plus-lg, bicycle" value="plus-lg">
                     </div>
+                </div>
+                <div>
+                    <label for="addonPriceType" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Billing Mode</label>
+                    <select name="price_type" id="addonPriceType" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden bg-white">
+                        <option value="per_person" selected>Per Guest (Multiplied by Adults + Children)</option>
+                        <option value="per_group">Flat Per Booking (Charged Once Per Group)</option>
+                    </select>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
@@ -239,6 +250,13 @@
                         <input type="text" name="icon" id="editAddonIcon" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden focus:border-primary">
                     </div>
                 </div>
+                <div>
+                    <label for="editAddonPriceType" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Billing Mode</label>
+                    <select name="price_type" id="editAddonPriceType" class="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-800 outline-hidden bg-white">
+                        <option value="per_person">Per Guest (Multiplied by Adults + Children)</option>
+                        <option value="per_group">Flat Per Booking (Charged Once Per Group)</option>
+                    </select>
+                </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label for="editAddonStatus" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Status</label>
@@ -274,6 +292,7 @@ $(document).ready(function() {
         $('#editAddonName').val(btn.data('name'));
         $('#editAddonSlug').val(btn.data('slug'));
         $('#editAddonPrice').val(btn.data('price'));
+        $('#editAddonPriceType').val(btn.data('price-type') || 'per_person');
         $('#editAddonIcon').val(btn.data('icon'));
         $('#editAddonStatus').val(btn.data('status'));
         $('#editAddonPriority').val(btn.data('priority'));

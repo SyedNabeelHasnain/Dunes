@@ -24,8 +24,17 @@ class EmailMarketingService
      */
     public function applySmtpConfig(): void
     {
+        if (app()->environment('testing')) {
+            return;
+        }
+
+        $configuredHost = trim((string) $this->settings->get('smtp_host', ''));
+        if ($configuredHost === '') {
+            return;
+        }
+
         $driver = $this->settings->get('smtp_driver', config('mail.default', 'smtp'));
-        $host = $this->settings->get('smtp_host', config('mail.mailers.smtp.host'));
+        $host = $configuredHost;
         $port = (int) $this->settings->get('smtp_port', config('mail.mailers.smtp.port', 465));
         $encryption = $this->settings->get('smtp_encryption', config('mail.mailers.smtp.encryption', 'ssl'));
         $username = $this->settings->get('smtp_username', config('mail.mailers.smtp.username'));
@@ -162,11 +171,25 @@ class EmailMarketingService
     {
         $this->applySmtpConfig();
 
-        // 1. Mark campaign as sending
-        $campaign->update([
-            'status' => 'sending',
-            'sent_at' => now(),
-        ]);
+        // 1. Atomically claim scheduled campaigns so concurrent runners cannot double-send
+        if ($campaign->status === 'scheduled') {
+            $claimed = EmailCampaign::where('id', $campaign->id)
+                ->where('status', 'scheduled')
+                ->update([
+                    'status' => 'sending',
+                    'sent_at' => now(),
+                ]);
+
+            if (! $claimed) {
+                return ['success' => false, 'sent' => 0, 'failed' => 0, 'total' => 0];
+            }
+            $campaign->refresh();
+        } else {
+            $campaign->update([
+                'status' => 'sending',
+                'sent_at' => now(),
+            ]);
+        }
 
         // 2. Query target audience
         $query = Subscriber::query()->where('status', 'subscribed');

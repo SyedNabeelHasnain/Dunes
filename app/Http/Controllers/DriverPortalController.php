@@ -14,7 +14,10 @@ class DriverPortalController extends Controller
      */
     public function showRunSheet(Request $request, $token)
     {
-        $driver = Driver::with(['defaultVehicle'])->where('access_token', $token)->firstOrFail();
+        $driver = Driver::with(['defaultVehicle'])
+            ->where('access_token', $token)
+            ->where('status', 'active')
+            ->firstOrFail();
 
         $selectedDate = $request->input('date', now()->format('Y-m-d'));
         $targetDate = Carbon::parse($selectedDate);
@@ -28,8 +31,11 @@ class DriverPortalController extends Controller
 
         $totalGuests = $bookings->sum(fn ($b) => (int) $b->adults + (int) $b->children);
         $totalCashToCollect = $bookings->where('payment_status', '!=', 'paid')->sum('balance_due');
+        $pageRobots = 'noindex, nofollow';
 
-        return view('driver.run-sheet', compact('driver', 'selectedDate', 'targetDate', 'bookings', 'totalGuests', 'totalCashToCollect', 'token'));
+        return response()
+            ->view('driver.run-sheet', compact('driver', 'selectedDate', 'targetDate', 'bookings', 'totalGuests', 'totalCashToCollect', 'token', 'pageRobots'))
+            ->header('X-Robots-Tag', 'noindex, nofollow');
     }
 
     /**
@@ -37,7 +43,9 @@ class DriverPortalController extends Controller
      */
     public function updateStatus(Request $request, $token, $bookingId)
     {
-        $driver = Driver::where('access_token', $token)->firstOrFail();
+        $driver = Driver::where('access_token', $token)
+            ->where('status', 'active')
+            ->firstOrFail();
         $booking = Booking::where('id', $bookingId)->where('driver_id', $driver->id)->firstOrFail();
 
         $request->validate([

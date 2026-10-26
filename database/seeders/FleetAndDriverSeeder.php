@@ -207,10 +207,15 @@ class FleetAndDriverSeeder extends Seeder
             $defaultPlate = $d['default_vehicle_plate'] ?? null;
             unset($d['default_vehicle_plate']);
 
+            $existingDriver = Driver::where('phone', $d['phone'])->first();
+            $token = ($existingDriver && ! empty($existingDriver->access_token))
+                ? $existingDriver->access_token
+                : Str::random(32);
+
             $driver = Driver::updateOrCreate(
                 ['phone' => $d['phone']],
                 array_merge($d, [
-                    'access_token' => Str::random(32),
+                    'access_token' => $token,
                 ])
             );
 

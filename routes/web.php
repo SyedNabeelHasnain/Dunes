@@ -53,7 +53,7 @@ use Illuminate\Support\Facades\Route;
 // ── Front-Facing Pages ────────────────────────────────────────────────────────
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index');
-Route::post('/api/gallery/report-broken', [GalleryController::class, 'reportBroken'])->name('api.gallery.report-broken');
+Route::post('/api/gallery/report-broken', [GalleryController::class, 'reportBroken'])->middleware('throttle:10,1')->name('api.gallery.report-broken');
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 Route::get('/faq', [PageController::class, 'faq'])->name('faq');
@@ -64,8 +64,8 @@ Route::get('/press-kit', [PageController::class, 'pressKit'])->name('press.kit')
 Route::redirect('/cron-status', '/api/v1/cron/status', 302);
 
 // ── Driver Mobile Portal (Token-Based Run Sheet) ───────────────────────────
-Route::get('/driver/run-sheet/{token}', [DriverPortalController::class, 'showRunSheet'])->name('driver.run-sheet');
-Route::post('/driver/run-sheet/{token}/update-status/{bookingId}', [DriverPortalController::class, 'updateStatus'])->name('driver.update-status');
+Route::get('/driver/run-sheet/{token}', [DriverPortalController::class, 'showRunSheet'])->middleware('throttle:30,1')->name('driver.run-sheet');
+Route::post('/driver/run-sheet/{token}/update-status/{bookingId}', [DriverPortalController::class, 'updateStatus'])->middleware('throttle:30,1')->name('driver.update-status');
 
 // ── Legal, Privacy & Compliance Policies ──────────────────────────────────
 Route::get('/terms-condition', [LegalController::class, 'terms'])->name('terms');
@@ -123,15 +123,15 @@ Route::get('/wiki/{pillarSlug}/{articleSlug}', [WikiController::class, 'article'
 
 Route::get('/thankyou', [BookingController::class, 'thankyou'])->name('booking.thankyou');
 Route::get('/payment-cancel', [BookingController::class, 'paymentCancel'])->name('booking.cancel');
-Route::post('/booking/draft', [BookingController::class, 'saveDraft'])->name('booking.draft');
+Route::post('/booking/draft', [BookingController::class, 'saveDraft'])->middleware('throttle:20,1')->name('booking.draft');
 Route::get('/checkout/{reference}', [BookingController::class, 'recoverCheckout'])->name('booking.recover');
-Route::post('/checkout/{reference}', [BookingController::class, 'processRecoverCheckout'])->name('booking.recover.process');
+Route::post('/checkout/{reference}', [BookingController::class, 'processRecoverCheckout'])->middleware('throttle:15,1')->name('booking.recover.process');
 Route::get('/booking/{reference}/voucher', [VoucherController::class, 'show'])->name('booking.voucher');
 Route::get('/booking/{reference}/ticket-pdf', [VoucherController::class, 'downloadPdf'])->name('booking.ticket.pdf');
 Route::get('/booking/{reference}/voucher-pdf', [VoucherController::class, 'downloadPdf'])->name('booking.voucher.pdf');
 Route::get('/review/{ref}', [PageController::class, 'reviewRate'])->name('review.rate');
-Route::post('/review/{ref}', [PageController::class, 'submitReview'])->name('review.submit');
-Route::post('/review/{ref}/feedback', [PageController::class, 'submitFeedback'])->name('review.feedback');
+Route::post('/review/{ref}', [PageController::class, 'submitReview'])->middleware('throttle:10,1')->name('review.submit');
+Route::post('/review/{ref}/feedback', [PageController::class, 'submitFeedback'])->middleware('throttle:10,1')->name('review.feedback');
 
 // ── Admin CMS Panel (Guarded by auth & strict no-cache headers) ──────────────
 Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->name('admin.')->group(function () {
@@ -430,12 +430,12 @@ Route::redirect('/images/og-faq.jpg', '/images/dubai-desert-safari-dune-bashing-
 Route::redirect('/images/og-rate-card.jpg', '/images/dubai-desert-safari-bbq-dune-discovery-tourism.avif', 301);
 
 Route::get('/blog/images/{path}', function (string $path) {
-    return redirect('/images/'.ltrim($path, '/'), 301);
+    return redirect('/images/'.ltrim($path, '/\\'), 301);
 })->where('path', '.*');
 
 // Canonical Redirect for English (Default Locale is served at root /)
 Route::get('/en', fn () => redirect('/', 301));
-Route::get('/en/{any}', fn (string $any) => redirect('/'.ltrim($any, '/'), 301))->where('any', '.*');
+Route::get('/en/{any}', fn (string $any) => redirect('/'.ltrim($any, '/\\'), 301))->where('any', '.*');
 
 // ── Multi-Language Localized Route Group (Non-Default Locales, e.g. /ar) ─────
 Route::prefix('{locale}')
@@ -479,7 +479,7 @@ Route::prefix('{locale}')
         Route::get('/blog/feed.xml', [BlogController::class, 'feed'])->name('locale.blog.feed');
         Route::get('/feed.xml', [BlogController::class, 'feed'])->name('locale.feed.unified');
         Route::get('/blog/images/{path}', function (string $locale, string $path) {
-            return redirect('/images/'.ltrim($path, '/'), 301);
+            return redirect('/images/'.ltrim($path, '/\\'), 301);
         })->where('path', '.*');
         Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('locale.blog.show');
 
@@ -494,13 +494,13 @@ Route::prefix('{locale}')
         Route::get('/thankyou', [BookingController::class, 'thankyou'])->name('locale.booking.thankyou');
         Route::get('/payment-cancel', [BookingController::class, 'paymentCancel'])->name('locale.booking.cancel');
         Route::get('/checkout/{reference}', [BookingController::class, 'recoverCheckout'])->name('locale.booking.recover');
-        Route::post('/checkout/{reference}', [BookingController::class, 'processRecoverCheckout'])->name('locale.booking.recover.process');
+        Route::post('/checkout/{reference}', [BookingController::class, 'processRecoverCheckout'])->middleware('throttle:15,1')->name('locale.booking.recover.process');
         Route::get('/booking/{reference}/voucher', [VoucherController::class, 'show'])->name('locale.booking.voucher');
         Route::get('/booking/{reference}/ticket-pdf', [VoucherController::class, 'downloadPdf'])->name('locale.booking.ticket.pdf');
         Route::get('/booking/{reference}/voucher-pdf', [VoucherController::class, 'downloadPdf'])->name('locale.booking.voucher.pdf');
         Route::get('/review/{ref}', [PageController::class, 'reviewRate'])->name('locale.review.rate');
-        Route::post('/review/{ref}', [PageController::class, 'submitReview'])->name('locale.review.submit');
-        Route::post('/review/{ref}/feedback', [PageController::class, 'submitFeedback'])->name('locale.review.feedback');
+        Route::post('/review/{ref}', [PageController::class, 'submitReview'])->middleware('throttle:10,1')->name('locale.review.submit');
+        Route::post('/review/{ref}/feedback', [PageController::class, 'submitFeedback'])->middleware('throttle:10,1')->name('locale.review.feedback');
 
         // Localized Legal Aliases & Quick Redirects
         Route::get('/terms', fn(string $locale) => redirect('/'.$locale.'/terms-condition', 301));

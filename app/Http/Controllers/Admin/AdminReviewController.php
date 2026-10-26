@@ -116,9 +116,7 @@ class AdminReviewController extends Controller
             'imported_at' => now(),
         ]);
 
-        Cache::forget('site_home_reviews_feed');
-        Cache::forget('site_social_proof_feed');
-        Cache::forget('site_home_cache');
+        flush_review_and_social_proof_caches();
 
         return redirect()->route('admin.reviews.index')->with('success', 'Review added successfully.');
     }
@@ -149,9 +147,7 @@ class AdminReviewController extends Controller
             'published_date' => $request->input('published_date') ?: $review->published_date,
         ]);
 
-        Cache::forget('site_home_reviews_feed');
-        Cache::forget('site_social_proof_feed');
-        Cache::forget('site_home_cache');
+        flush_review_and_social_proof_caches();
 
         return redirect()->route('admin.reviews.index')->with('success', 'Review updated successfully.');
     }
@@ -164,9 +160,7 @@ class AdminReviewController extends Controller
         $review = Review::findOrFail($id);
         $review->delete();
 
-        Cache::forget('site_home_reviews_feed');
-        Cache::forget('site_social_proof_feed');
-        Cache::forget('site_home_cache');
+        flush_review_and_social_proof_caches();
 
         return redirect()->route('admin.reviews.index')->with('success', 'Review deleted successfully.');
     }
@@ -180,9 +174,7 @@ class AdminReviewController extends Controller
         $review->status = $review->status === 'approved' ? 'pending' : 'approved';
         $review->save();
 
-        Cache::forget('site_home_reviews_feed');
-        Cache::forget('site_social_proof_feed');
-        Cache::forget('site_home_cache');
+        flush_review_and_social_proof_caches();
 
         return response()->json([
             'success' => true,

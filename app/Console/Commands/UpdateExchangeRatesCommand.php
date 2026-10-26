@@ -3,8 +3,10 @@
 namespace App\Console\Commands;
 
 use App\Models\Setting;
+use App\Services\SettingsService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class UpdateExchangeRatesCommand extends Command
@@ -32,28 +34,28 @@ class UpdateExchangeRatesCommand extends Command
 
         $apiUrl = 'https://open.er-api.com/v6/latest/AED';
 
-        $ch = curl_init($apiUrl);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 12);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'User-Agent: DunesDiscoveryTourism-RateEngine/2.0',
-        ]);
-
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $curlError = curl_error($ch);
-        curl_close($ch);
-
-        if ($httpCode !== 200 || empty($response)) {
-            $msg = "Currency sync API request failed (HTTP {$httpCode}): ".($curlError ?: 'Empty response');
+        try {
+            $response = Http::connectTimeout(5)
+                ->timeout(12)
+                ->withHeaders(['User-Agent' => 'DunesDiscoveryTourism-RateEngine/2.0'])
+                ->get($apiUrl);
+        } catch (\Throwable $e) {
+            $msg = 'Currency sync API request failed: '.$e->getMessage();
             $this->error($msg);
             Log::warning($msg);
 
             return Command::FAILURE;
         }
 
-        $data = json_decode($response, true);
+        if (! $response->successful()) {
+            $msg = "Currency sync API request failed (HTTP {$response->status()}).";
+            $this->error($msg);
+            Log::warning($msg);
+
+            return Command::FAILURE;
+        }
+
+        $data = $response->json();
 
         if (! isset($data['result']) || $data['result'] !== 'success' || empty($data['rates'])) {
             $msg = 'Currency sync API returned malformed or non-success payload.';
@@ -89,6 +91,7 @@ class UpdateExchangeRatesCommand extends Command
             );
 
             Cache::forget('site_settings_cache');
+            app(SettingsService::class)->clearCache();
 
             $this->info("Currency rates synchronized successfully at {$now}.");
             Log::info('Currency rates synchronized successfully via Open Exchange Rates.');

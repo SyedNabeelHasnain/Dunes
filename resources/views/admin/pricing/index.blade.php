@@ -62,10 +62,18 @@
                                             </div>
 
                                             <!-- Price Type -->
+                                            @php
+                                                $currentPriceType = strtolower(trim((string) ($pivot?->price_type ?? 'per person')));
+                                            @endphp
                                             <select name="pricing[{{ $tour->id }}][{{ $tier->id }}][price_type]" class="w-full rounded-lg border border-slate-200 bg-white px-2 py-1 text-[11px] text-slate-700 focus:border-primary outline-hidden">
-                                                <option value="per person" {{ $pivot && $pivot->price_type === 'per person' ? 'selected' : '' }}>Per Person</option>
-                                                <option value="per group" {{ $pivot && $pivot->price_type === 'per group' ? 'selected' : '' }}>Per Group</option>
-                                                <option value="per car" {{ $pivot && $pivot->price_type === 'per car' ? 'selected' : '' }}>Per Car</option>
+                                                <option value="per person" {{ $currentPriceType === 'per person' ? 'selected' : '' }}>Per Person</option>
+                                                <option value="per buggy" {{ $currentPriceType === 'per buggy' ? 'selected' : '' }}>Per Buggy</option>
+                                                <option value="per tent" {{ $currentPriceType === 'per tent' ? 'selected' : '' }}>Per Tent</option>
+                                                <option value="per vehicle" {{ in_array($currentPriceType, ['per vehicle', 'per_vehicle'], true) ? 'selected' : '' }}>Per Vehicle</option>
+                                                <option value="per car" {{ $currentPriceType === 'per car' ? 'selected' : '' }}>Per Car</option>
+                                                <option value="per group" {{ in_array($currentPriceType, ['per group', 'per_group'], true) ? 'selected' : '' }}>Per Group</option>
+                                                <option value="per package" {{ $currentPriceType === 'per package' ? 'selected' : '' }}>Per Package</option>
+                                                <option value="private" {{ $currentPriceType === 'private' ? 'selected' : '' }}>Private</option>
                                             </select>
                                         </div>
                                     </td>

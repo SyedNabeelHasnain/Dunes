@@ -28,7 +28,8 @@
     $googleActive = isset($settings['google_active']) && $settings['google_active'] === '1';
     $gtmId = $settings['google_gtm_id'] ?? '';
     $ga4Id = $settings['google_ga4_id'] ?? '';
-    $adsId = $settings['google_ads_id'] ?? 'AW-17859624049';
+    $adsId = normalize_google_ads_id($settings['google_ads_id'] ?? 'AW-17859624049');
+    $primaryGtagId = !empty($adsId) ? $adsId : ($googleActive && !empty($ga4Id) ? $ga4Id : '');
     $conversionLabel = $settings['google_conversion_label'] ?? 'eR3SCLimtvobEPH4kMRC';
     $conversionSendTo = (!empty($adsId) && !empty($conversionLabel)) ? "{$adsId}/{$conversionLabel}" : '';
     $gVerify = $settings['google_site_verification'] ?? config('services.google.site_verification') ?? env('GOOGLE_SITE_VERIFICATION', '');
@@ -90,17 +91,19 @@
     </style>
     @endif
 
-    @if(!empty($adsId))
-    <!-- Google tag (gtag.js) {{ $adsId }} (Sitewide First-Party Conversion Tag) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $adsId }}"></script>
+    @if(!empty($primaryGtagId))
+    <!-- Google tag (gtag.js) {{ $primaryGtagId }} (Decoupled Sitewide Tag) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $primaryGtagId }}"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
 
+      @if(!empty($adsId))
       gtag('config', '{{ $adsId }}', {
         'allow_enhanced_conversions': true
       });
+      @endif
       @if($googleActive && !empty($ga4Id))
       gtag('config', '{{ $ga4Id }}');
       @endif
@@ -149,6 +152,23 @@
     <script>
       window.gtagSendEvent = function(url) { if (url) window.location = url; return false; };
       window.gtagReportConversion = window.gtagSendEvent;
+    </script>
+    @endif
+
+    @if($metaActive && !empty($metaPixelId))
+    <!-- Meta Pixel Code with Immediate Synchronous fbq Stub -->
+    <script>
+      !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+      n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+      document,'script','https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '{{ $metaPixelId }}');
+      fbq('track', 'PageView');
+    </script>
+    @else
+    <script>
+      window.fbq = window.fbq || function() {};
     </script>
     @endif
 
@@ -256,30 +276,6 @@
 
     @stack('styles')
 
-    <script>
-      var initThirdPartyTracking = function() {
-          if (window._trackingInitialized) return;
-          window._trackingInitialized = true;
-
-          @if($metaActive && !empty($metaPixelId))
-          !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-          n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-          n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-          t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
-          document,'script','https://connect.facebook.net/en_US/fbevents.js');
-          if(window.fbq){ fbq('init', '{{ $metaPixelId }}'); fbq('track', 'PageView'); }
-          @endif
-      };
-
-      if ('requestIdleCallback' in window) {
-          requestIdleCallback(function() { setTimeout(initThirdPartyTracking, 2000); });
-      } else {
-          setTimeout(initThirdPartyTracking, 3500);
-      }
-      ['touchstart', 'scroll', 'pointermove'].forEach(function(ev) {
-          window.addEventListener(ev, initThirdPartyTracking, { once: true, passive: true });
-      });
-    </script>
 
     @stack('preloads')
 
@@ -290,16 +286,16 @@
       "@@graph": [
         {
           "@@type": "TravelAgency",
-          "@@id": {!! json_encode(url('/') . '#organization', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-          "name": {!! json_encode($settings['site_name'] ?? 'Dunes Discovery Tourism LLC', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "@@id": {!! json_encode(url('/') . '#organization', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
+          "name": {!! json_encode($settings['site_name'] ?? 'Dunes Discovery Tourism LLC', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
           "legalName": "Dunes Discovery Tourism LLC",
           "alternateName": ["Dunes Discovery", "Dunes Discovery Tourism", "Dunes Discovery Dubai"],
-          "description": {!! json_encode($settings['site_description'] ?? 'Licensed Dubai Destination Management Company offering premium Desert Safaris, 1000cc Dune Buggy Rentals, Quad Biking, Dhow Cruise Dinners, and Abu Dhabi City Tours.', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-          "url": {!! json_encode(url('/'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-          "logo": {!! json_encode(asset('images/logo.png'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-          "image": {!! json_encode(!empty($settings['site_default_image']) ? (str_starts_with($settings['site_default_image'], 'http') ? $settings['site_default_image'] : asset(ltrim($settings['site_default_image'], '/'))) : (!empty($settings['seo_default_og_image']) ? (str_starts_with($settings['seo_default_og_image'], 'http') ? $settings['seo_default_og_image'] : asset(ltrim($settings['seo_default_og_image'], '/'))) : asset('images/desert-safari-poster.avif')), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-          "telephone": {!! json_encode($phone, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-          "email": {!! json_encode($email, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "description": {!! json_encode($settings['site_description'] ?? 'Licensed Dubai Destination Management Company offering premium Desert Safaris, 1000cc Dune Buggy Rentals, Quad Biking, Dhow Cruise Dinners, and Abu Dhabi City Tours.', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
+          "url": {!! json_encode(url('/'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
+          "logo": {!! json_encode(asset('images/logo.png'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
+          "image": {!! json_encode(!empty($settings['site_default_image']) ? (str_starts_with($settings['site_default_image'], 'http') ? $settings['site_default_image'] : asset(ltrim($settings['site_default_image'], '/'))) : (!empty($settings['seo_default_og_image']) ? (str_starts_with($settings['seo_default_og_image'], 'http') ? $settings['seo_default_og_image'] : asset(ltrim($settings['seo_default_og_image'], '/'))) : asset('images/desert-safari-poster.avif')), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
+          "telephone": {!! json_encode($phone, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
+          "email": {!! json_encode($email, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
           "priceRange": "AED 79 - AED 1500",
           "currenciesAccepted": "AED, USD, EUR, GBP",
           "paymentAccepted": "Cash, Credit Card, Debit Card, Ziina",
@@ -307,20 +303,20 @@
             {
               "@@type": "PropertyValue",
               "propertyID": "DET Tourism License",
-              "value": {!! json_encode($detLicense, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+              "value": {!! json_encode($detLicense, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}
             }
             @if(!empty($googlePlaceId))
             ,{
               "@@type": "PropertyValue",
               "propertyID": "Google Place ID",
-              "value": {!! json_encode($googlePlaceId, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+              "value": {!! json_encode($googlePlaceId, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}
             }
             @endif
             @if(!empty($googleCid))
             ,{
               "@@type": "PropertyValue",
               "propertyID": "Google CID",
-              "value": {!! json_encode($googleCid, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+              "value": {!! json_encode($googleCid, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}
             }
             @endif
           ],
@@ -367,10 +363,10 @@
           @endif
           "address": {
             "@@type": "PostalAddress",
-            "streetAddress": {!! json_encode($siteAddress, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+            "streetAddress": {!! json_encode($siteAddress, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
             "addressLocality": "Dubai",
             "addressRegion": "Dubai",
-            "postalCode": {!! json_encode($sitePostalCode, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+            "postalCode": {!! json_encode($sitePostalCode, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
             "addressCountry": "AE"
           },
           "geo": {
@@ -378,21 +374,21 @@
             "latitude": {{ (float)$siteLat }},
             "longitude": {{ (float)$siteLng }}
           },
-          "hasMap": {!! json_encode("https://maps.google.com/?q={$siteLat},{$siteLng}", JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "hasMap": {!! json_encode("https://maps.google.com/?q={$siteLat},{$siteLng}", JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
           "contactPoint": [
             {
               "@@type": "ContactPoint",
-              "telephone": {!! json_encode($phone, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+              "telephone": {!! json_encode($phone, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
               "contactType": "customer service",
               "areaServed": "AE",
-              "availableLanguage": {!! json_encode(isset($activeLanguages) ? $activeLanguages->pluck('code')->toArray() : ['en', 'ar', 'ru', 'es', 'it'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+              "availableLanguage": {!! json_encode(isset($activeLanguages) ? $activeLanguages->pluck('code')->toArray() : ['en', 'ar', 'ru', 'es', 'it'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}
             },
             {
               "@@type": "ContactPoint",
               "telephone": "+971502456056",
               "contactType": "reservations",
               "areaServed": "AE",
-              "availableLanguage": {!! json_encode(isset($activeLanguages) ? $activeLanguages->pluck('code')->toArray() : ['en', 'ar', 'ru', 'es', 'it'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+              "availableLanguage": {!! json_encode(isset($activeLanguages) ? $activeLanguages->pluck('code')->toArray() : ['en', 'ar', 'ru', 'es', 'it'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}
             }
           ],
           "openingHoursSpecification": {
@@ -403,10 +399,10 @@
           },
           "sameAs": [
             @if(!empty($googleReviewUrl))
-            {!! json_encode($googleReviewUrl, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+            {!! json_encode($googleReviewUrl, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
             @endif
             @if(!empty($googleCid))
-            {!! json_encode("https://maps.google.com/?cid={$googleCid}", JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+            {!! json_encode("https://maps.google.com/?cid={$googleCid}", JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
             @endif
             "https://www.facebook.com/dunesdiscoverytourism",
             "https://www.instagram.com/dunesdiscoverytourism",
@@ -423,31 +419,31 @@
         },
         {
           "@@type": "WebSite",
-          "@@id": {!! json_encode(url('/') . '#website', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-          "url": {!! json_encode(url('/'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "@@id": {!! json_encode(url('/') . '#website', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
+          "url": {!! json_encode(url('/'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
           "name": "Dunes Discovery Tourism",
           "publisher": {
-            "@@id": {!! json_encode(url('/') . '#organization', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+            "@@id": {!! json_encode(url('/') . '#organization', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}
           },
           "potentialAction": {
             "@@type": "SearchAction",
             "target": {
               "@@type": "EntryPoint",
-              "urlTemplate": {!! json_encode(localized_route('tours.search') . '?q={search_term_string}', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+              "urlTemplate": {!! json_encode(localized_route('tours.search') . '?q={search_term_string}', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}
             },
             "query-input": "required name=search_term_string"
           },
-          "inLanguage": {!! json_encode(isset($activeLanguages) ? $activeLanguages->pluck('code')->toArray() : ['en', 'ar', 'ru', 'es', 'it'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+          "inLanguage": {!! json_encode(isset($activeLanguages) ? $activeLanguages->pluck('code')->toArray() : ['en', 'ar', 'ru', 'es', 'it'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}
         },
         {
           "@@type": "WebPage",
-          "@@id": {!! json_encode($canonical . '#webpage', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-          "url": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-          "name": {!! json_encode($pageTitle, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-          "description": {!! json_encode($pageDesc, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-          "inLanguage": {!! json_encode($currentLocale, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "@@id": {!! json_encode($canonical . '#webpage', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
+          "url": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
+          "name": {!! json_encode($pageTitle, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
+          "description": {!! json_encode($pageDesc, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
+          "inLanguage": {!! json_encode($currentLocale, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
           "isPartOf": {
-            "@@id": {!! json_encode(url('/') . '#website', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+            "@@id": {!! json_encode(url('/') . '#website', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}
           },
           "speakable": {
             "@@type": "SpeakableSpecification",
@@ -464,7 +460,7 @@
     <!-- WCAG 2.2 SC 2.4.1 Skip to Main Content Link -->
     <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:start-4 focus:z-50 focus:px-4 focus:py-2.5 focus:bg-primary focus:text-white focus:rounded-xl focus:shadow-lg focus:font-bold">Skip to main content</a>
 
-    @if($googleActive && !empty($gtmId) && strpos($gtmId, 'G-') !== 0)
+    @if($googleActive && !empty($gtmId) && str_starts_with($gtmId, 'GTM-'))
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ $gtmId }}" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     @endif
     @if($metaActive && !empty($metaPixelId))

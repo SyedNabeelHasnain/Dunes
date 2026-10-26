@@ -502,7 +502,7 @@ class AdminBookingController extends Controller
             fputcsv($file, $columns);
 
             foreach ($drafts as $d) {
-                fputcsv($file, [
+                fputcsv($file, sanitize_csv_row([
                     $d->reference,
                     $d->created_at?->format('Y-m-d H:i:s') ?? '',
                     $d->name,
@@ -517,7 +517,7 @@ class AdminBookingController extends Controller
                     number_format((float) $d->total, 2, '.', ''),
                     $d->pickup_location ?: '',
                     $d->ip_address ?: '',
-                ]);
+                ]));
             }
             fclose($file);
         };
@@ -542,24 +542,36 @@ class AdminBookingController extends Controller
 
         $toursCatalog = $tours->map(function (Tour $tour) use ($allTiers, $allAddons) {
             $tierItems = $tour->tiers->isNotEmpty()
-                ? $tour->tiers->map(fn ($tier) => [
-                    'id' => (int) $tier->id,
-                    'name' => (string) ($tier->display_name ?: $tier->name),
-                    'code' => (string) ($tier->slug ?: $tier->code),
-                    'price' => (float) ($tier->pivot->price ?? $tour->price),
-                    'child_price' => (float) ($tier->pivot->child_price ?? 0),
-                    'price_type' => (string) ($tier->pivot->price_type ?? $tier->type ?? 'per_person'),
-                    'capacity' => max(1, (int) ($tier->capacity ?: 6)),
-                ])->values()->all()
-                : $allTiers->map(fn ($tier) => [
-                    'id' => (int) $tier->id,
-                    'name' => (string) ($tier->display_name ?: $tier->name),
-                    'code' => (string) ($tier->slug ?: $tier->code),
-                    'price' => (float) $tour->price,
-                    'child_price' => 0.0,
-                    'price_type' => (string) ($tier->type ?? 'per_person'),
-                    'capacity' => max(1, (int) ($tier->capacity ?: 6)),
-                ])->values()->all();
+                ? $tour->tiers->map(function ($tier) use ($tour) {
+                    $normalizedType = Tier::normalizePriceType($tier->pivot->price_type ?? 'per person', $tour);
+
+                    return [
+                        'id' => (int) $tier->id,
+                        'name' => (string) ($tier->display_name ?: $tier->name),
+                        'code' => (string) ($tier->slug ?: $tier->code),
+                        'price' => (float) ($tier->pivot->price ?? $tour->min_price ?? 0),
+                        'child_price' => (float) ($tier->pivot->child_price ?? 0),
+                        'price_type' => $normalizedType,
+                        'capacity' => Tier::isUnitPriceType($normalizedType, $tour)
+                            ? Tier::resolveUnitCapacity($tier->pivot, $tier, $normalizedType)
+                            : max(1, (int) ($tier->guest_count ?: 6)),
+                    ];
+                })->values()->all()
+                : $allTiers->map(function ($tier) use ($tour) {
+                    $normalizedType = Tier::normalizePriceType('per person', $tour);
+
+                    return [
+                        'id' => (int) $tier->id,
+                        'name' => (string) ($tier->display_name ?: $tier->name),
+                        'code' => (string) ($tier->slug ?: $tier->code),
+                        'price' => (float) ($tour->min_price ?? 0),
+                        'child_price' => 0.0,
+                        'price_type' => $normalizedType,
+                        'capacity' => Tier::isUnitPriceType($normalizedType, $tour)
+                            ? Tier::resolveUnitCapacity(null, $tier, $normalizedType)
+                            : max(1, (int) ($tier->guest_count ?: 6)),
+                    ];
+                })->values()->all();
 
             $tourAddonMap = $tour->addons->keyBy('id');
             $addonItems = $allAddons->map(function ($addon) use ($tourAddonMap) {
@@ -667,22 +679,22 @@ class AdminBookingController extends Controller
             ->where('tier_id', $tier->id)
             ->first();
 
-        $price = $tourTier ? (float) $tourTier->price : (float) $tour->price;
-        $priceType = $tourTier ? $tourTier->price_type : ($tier->type ?? 'per_person');
+        $price = $tourTier ? (float) $tourTier->price : (float) ($tour->min_price ?? 0);
+        $priceType = Tier::normalizePriceType($tourTier ? $tourTier->price_type : 'per person', $tour);
 
         $adults = max(1, (int) $request->input('adults', 1));
         $children = max(0, (int) $request->input('children', 0));
         $infants = max(0, (int) $request->input('infants', 0));
 
-        if ($priceType === 'per_vehicle') {
-            $capacity = max(1, (int) ($tier->capacity ?: 6));
+        if (Tier::isUnitPriceType($priceType, $tour)) {
+            $capacity = Tier::resolveUnitCapacity($tourTier, $tier, $priceType);
             $billableGuests = max(1, $adults + $children);
-            $vehicles = (int) ceil($billableGuests / $capacity);
+            $vehicles = (int) ceil($billableGuests / max(1, $capacity));
             $subtotal = $vehicles * $price;
         } else {
             $childPrice = ($tourTier && isset($tourTier->child_price) && (float) $tourTier->child_price > 0)
                 ? (float) $tourTier->child_price
-                : ($price * 0.70);
+                : round($price * 0.70, 2);
             $subtotal = ($adults * $price) + ($children * $childPrice);
         }
 
@@ -751,7 +763,8 @@ class AdminBookingController extends Controller
             if ($request->filled('payment_amount') && (float) $request->input('payment_amount') > 0) {
                 $paymentAmount = min($total, max(0, round((float) $request->input('payment_amount'), 2)));
             } else {
-                $paymentAmount = round($total * 0.25, 2);
+                $advancePct = app(ZiinaPaymentService::class)->getAdvancePercent();
+                $paymentAmount = round(($total * $advancePct) / 100, 2);
             }
             $balanceDue = $request->filled('balance_due')
                 ? max(0, round((float) $request->input('balance_due'), 2))
@@ -793,6 +806,8 @@ class AdminBookingController extends Controller
                 'tier_id' => $tier->id,
                 'coupon_id' => $appliedCoupon?->id,
                 'coupon_code' => $appliedCoupon ? $appliedCoupon->code : ($couponCodeInput ?: null),
+                'discount_type' => $appliedCoupon?->discount_type,
+                'discount_rate' => $appliedCoupon ? (float) $appliedCoupon->discount_value : 0.00,
                 'tour_name' => $tour->name,
                 'tier_name' => $tier->display_name ?: $tier->name,
                 'name' => trim((string) $request->input('name')),
@@ -857,6 +872,11 @@ class AdminBookingController extends Controller
                     'Booking '.$booking->reference
                 );
                 if (! empty($intent['redirect_url']) && ! empty($intent['id'])) {
+                    $booking->update([
+                        'ziina_payment_intent_id' => $intent['id'],
+                        'ziina_status' => $intent['status'] ?? 'pending',
+                        'ziina_redirect_url' => $intent['redirect_url'],
+                    ]);
                     BookingPayment::create([
                         'booking_id' => $booking->id,
                         'payment_intent_id' => $intent['id'],
@@ -950,19 +970,7 @@ class AdminBookingController extends Controller
             'Balance Due (AED)', 'Payment Method', 'Payment Status', 'Booking Status',
         ];
 
-        $sanitize = function (array $row): array {
-            return array_map(function ($val) {
-                if ($val === null) {
-                    return '';
-                }
-                $str = (string) $val;
-                if (isset($str[0]) && in_array($str[0], ['=', '+', '-', '@', "\t", "\r"], true)) {
-                    return "'".$str;
-                }
-
-                return $str;
-            }, $row);
-        };
+        $sanitize = static fn (array $row): array => sanitize_csv_row($row);
 
         $callback = function () use ($query, $columns, $sanitize) {
             $file = fopen('php://output', 'w');
@@ -1345,6 +1353,12 @@ class AdminBookingController extends Controller
         if (empty($intent['redirect_url']) || empty($intent['id'])) {
             return response()->json(['success' => false, 'message' => 'Payment link could not be generated.'], 400);
         }
+
+        $booking->update([
+            'ziina_payment_intent_id' => $intent['id'],
+            'ziina_status' => $intent['status'] ?? 'pending',
+            'ziina_redirect_url' => $intent['redirect_url'],
+        ]);
 
         $payment = BookingPayment::create([
             'booking_id' => $booking->id,

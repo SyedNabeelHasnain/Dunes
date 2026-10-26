@@ -14,6 +14,7 @@ class VoucherController extends Controller
     public function show(string $reference)
     {
         $booking = Booking::where('reference', $reference)
+            ->whereNotIn('status', ['draft', 'cancelled'])
             ->with(['addons', 'tier'])
             ->firstOrFail();
 
@@ -35,10 +36,12 @@ class VoucherController extends Controller
      */
     public function downloadPdf(string $reference)
     {
+        $booking = Booking::where('reference', $reference)
+            ->whereNotIn('status', ['draft', 'cancelled'])
+            ->with(['addons', 'tier', 'tour'])
+            ->firstOrFail();
+
         try {
-            $booking = Booking::where('reference', $reference)
-                ->with(['addons', 'tier', 'tour'])
-                ->firstOrFail();
 
             $verificationUrl = route('booking.voucher', $booking->reference);
             $qrSvg = null;

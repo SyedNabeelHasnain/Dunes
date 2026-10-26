@@ -53,6 +53,7 @@ class WikiController extends Controller
         $pageKeys = 'dubai desert safari wiki, dubai desert knowledge portal, lahbab red dunes geology, dune bashing physics, desert safari safety pregnant, bedouin heritage dubai';
         $canonical = localized_route('wiki.index');
         $ogImage = resolve_og_image(null, 'images/desert-safari-poster.avif');
+        $pageRobots = ! empty($request->query()) ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
 
         return view('wiki.index', compact(
             'pillars',
@@ -63,7 +64,8 @@ class WikiController extends Controller
             'pageDesc',
             'pageKeys',
             'canonical',
-            'ogImage'
+            'ogImage',
+            'pageRobots'
         ));
     }
 
@@ -94,6 +96,7 @@ class WikiController extends Controller
         $pageKeys = $pillar->slug . ', dubai desert guide, ' . $pillar->name;
         $canonical = localized_route('wiki.pillar', ['pillarSlug' => $pillar->slug]);
         $ogImage = resolve_og_image($pillar->hero_image, 'images/desert-safari-poster.avif');
+        $pageRobots = ! empty($request->query()) ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
 
         return view('wiki.pillar', compact(
             'pillar',
@@ -103,7 +106,8 @@ class WikiController extends Controller
             'pageDesc',
             'pageKeys',
             'canonical',
-            'ogImage'
+            'ogImage',
+            'pageRobots'
         ));
     }
 
@@ -141,6 +145,7 @@ class WikiController extends Controller
             'articleSlug' => $article->slug,
         ]);
         $ogImage = resolve_og_image($article->hero_image ?: $pillar->hero_image, 'images/desert-safari-poster.avif');
+        $pageRobots = ! empty($request->query()) ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
 
         // Contextual tour for booking conversion
         $contextualTour = $article->tours->first();
@@ -160,7 +165,8 @@ class WikiController extends Controller
             'pageDesc',
             'pageKeys',
             'canonical',
-            'ogImage'
+            'ogImage',
+            'pageRobots'
         ));
     }
 
@@ -186,6 +192,7 @@ class WikiController extends Controller
         $pageKeys = 'desert safari glossary, dubai desert terms, lahbab definition, dune bashing meaning, gahwa meaning';
         $canonical = localized_route('wiki.glossary');
         $ogImage = resolve_og_image(null, 'images/desert-safari-poster.avif');
+        $pageRobots = ! empty($request->query()) ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
 
         return view('wiki.glossary', compact(
             'groupedTerms',
@@ -193,7 +200,8 @@ class WikiController extends Controller
             'pageDesc',
             'pageKeys',
             'canonical',
-            'ogImage'
+            'ogImage',
+            'pageRobots'
         ));
     }
 

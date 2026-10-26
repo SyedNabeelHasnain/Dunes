@@ -42,6 +42,10 @@
             <li><strong>Reference:</strong> {{ $booking->reference }}</li>
             <li><strong>Tour:</strong> {{ $booking->tour_name ?? ($booking->tour->name ?? 'Tour') }}</li>
             <li><strong>Date:</strong> {{ \Carbon\Carbon::parse($booking->tour_date)->format('M d, Y') }}</li>
+            @if($booking->discount_amount > 0)
+            <li><strong>Subtotal:</strong> AED {{ number_format($booking->original_total, 2) }}</li>
+            <li><strong>Promo Discount ({{ $booking->coupon_code }}):</strong> -AED {{ number_format($booking->discount_amount, 2) }}</li>
+            @endif
             <li><strong>Amount Paid:</strong> AED {{ number_format($booking->payment_amount, 2) }}</li>
             <li><strong>Status:</strong> Confirmed</li>
         </ul>
@@ -53,6 +57,10 @@
             <li><strong>Tour:</strong> {{ $booking->tour_name ?? ($booking->tour->name ?? 'Tour') }}</li>
             <li><strong>Date:</strong> {{ \Carbon\Carbon::parse($booking->tour_date)->format('M d, Y') }}</li>
             <li><strong>Pickup Location:</strong> {{ $booking->pickup_location }}</li>
+            @if($booking->discount_amount > 0)
+            <li><strong>Subtotal:</strong> AED {{ number_format($booking->original_total, 2) }}</li>
+            <li><strong>Promo Discount ({{ $booking->coupon_code }}):</strong> -AED {{ number_format($booking->discount_amount, 2) }}</li>
+            @endif
             <li><strong>Total Amount:</strong> AED {{ number_format($booking->total, 2) }}</li>
             @if($booking->balance_due > 0)
             <li><strong>Balance Due:</strong> AED {{ number_format($booking->balance_due, 2) }}</li>

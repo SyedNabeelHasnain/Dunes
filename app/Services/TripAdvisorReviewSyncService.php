@@ -406,9 +406,7 @@ class TripAdvisorReviewSyncService
     public function purgeCaches(): void
     {
         try {
-            Cache::forget('site_home_reviews_feed');
-            Cache::forget('site_social_proof_feed');
-            Cache::forget('site_home_cache');
+            flush_review_and_social_proof_caches();
             Cache::forget('site_settings_cache');
             Cache::forget('tripadvisor_reviews_cache');
             $this->settings->clearCache();
@@ -454,11 +452,6 @@ class TripAdvisorReviewSyncService
         $key = config('services.tripadvisor.api_key');
         if (! empty($key)) {
             return $key;
-        }
-
-        $envKey = env('TRIPADVISOR_API_KEY');
-        if (! empty($envKey)) {
-            return $envKey;
         }
 
         return $this->settings->get('tripadvisor_api_key');

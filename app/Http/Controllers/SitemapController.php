@@ -162,9 +162,9 @@ class SitemapController extends Controller
                     }
 
                     if (! empty($blog->featured_image) && $lang->is_default) {
-                        $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $blog->featured_image);
+                        $imgUrl = $this->resolveDiskImage($blog->featured_image, 'images/blog');
                         $xml .= "    <image:image>\n";
-                        $xml .= '      <image:loc>'.$this->xmlEscape(asset('images/blog/'.$imgFile))."</image:loc>\n";
+                        $xml .= '      <image:loc>'.$this->xmlEscape($imgUrl)."</image:loc>\n";
                         $xml .= '      <image:title>'.$this->xmlEscape($blog->title)."</image:title>\n";
                         $xml .= "    </image:image>\n";
                     }
@@ -294,11 +294,11 @@ class SitemapController extends Controller
             $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">'."\n";
 
             foreach ($tours as $tour) {
-                $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $tour->hero_image);
+                $imgUrl = resolve_tour_image($tour->hero_image);
                 $xml .= "  <url>\n";
                 $xml .= '    <loc>'.$this->xmlEscape(url('/'.$tour->slug))."</loc>\n";
                 $xml .= "    <image:image>\n";
-                $xml .= '      <image:loc>'.$this->xmlEscape(asset('images/'.$imgFile))."</image:loc>\n";
+                $xml .= '      <image:loc>'.$this->xmlEscape($imgUrl)."</image:loc>\n";
                 $xml .= '      <image:title>'.$this->xmlEscape($tour->name)." - Dubai Desert Safari</image:title>\n";
                 $xml .= '      <image:caption>'.$this->xmlEscape($tour->short_desc ?: $tour->name)."</image:caption>\n";
                 $xml .= "    </image:image>\n";
@@ -306,11 +306,11 @@ class SitemapController extends Controller
             }
 
             foreach ($blogs as $blog) {
-                $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $blog->featured_image);
+                $imgUrl = $this->resolveDiskImage($blog->featured_image, 'images/blog');
                 $xml .= "  <url>\n";
                 $xml .= '    <loc>'.$this->xmlEscape(url('/blog/'.$blog->slug))."</loc>\n";
                 $xml .= "    <image:image>\n";
-                $xml .= '      <image:loc>'.$this->xmlEscape(asset('images/blog/'.$imgFile))."</image:loc>\n";
+                $xml .= '      <image:loc>'.$this->xmlEscape($imgUrl)."</image:loc>\n";
                 $xml .= '      <image:title>'.$this->xmlEscape($blog->title)."</image:title>\n";
                 $xml .= "    </image:image>\n";
                 $xml .= "  </url>\n";
@@ -457,10 +457,9 @@ class SitemapController extends Controller
                         }
 
                         if (! empty($article->hero_image) && $lang->is_default) {
-                            $imgFile = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $article->hero_image);
-                            $cleanImg = ltrim(preg_replace('#^images/#i', '', $imgFile), '/');
+                            $imgUrl = $this->resolveDiskImage($article->hero_image, 'images');
                             $xml .= "    <image:image>\n";
-                            $xml .= '      <image:loc>'.$this->xmlEscape(asset('images/'.$cleanImg))."</image:loc>\n";
+                            $xml .= '      <image:loc>'.$this->xmlEscape($imgUrl)."</image:loc>\n";
                             $xml .= '      <image:title>'.$this->xmlEscape($article->title)."</image:title>\n";
                             if (! empty($article->excerpt)) {
                                 $xml .= '      <image:caption>'.$this->xmlEscape($article->excerpt)."</image:caption>\n";
@@ -479,6 +478,26 @@ class SitemapController extends Controller
         });
 
         return response($content, 200, ['Content-Type' => 'text/xml; charset=utf-8']);
+    }
+
+    /**
+     * Resolve image URL ensuring that it exists on disk or fallback to safe poster.
+     */
+    protected function resolveDiskImage(string $path, string $folder = 'images'): string
+    {
+        $clean = ltrim(preg_replace('#^'.$folder.'/#i', '', $path), '/');
+        $avifCandidate = $folder.'/'.preg_replace('/\.(jpe?g|png|webp|avif)$/i', '.avif', $clean);
+        if (file_exists(public_path($avifCandidate))) {
+            return asset($avifCandidate);
+        }
+        if (file_exists(public_path($folder.'/'.$clean))) {
+            return asset($folder.'/'.$clean);
+        }
+        if (file_exists(public_path($clean))) {
+            return asset($clean);
+        }
+
+        return asset('images/desert-safari-poster.avif');
     }
 
     /**

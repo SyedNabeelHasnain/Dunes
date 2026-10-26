@@ -473,6 +473,17 @@ return [
         'custom_btn' => 'Safari Personalizado',
     ],
 
+    // Sección Hero Principal
+    'home_hero' => [
+        'rating_pill' => 'Calificado 4.9/5 por más de 2,847 viajeros',
+        'title_prefix' => 'Los mejores tours de',
+        'title_highlight' => 'Safari por el Desierto de Dubái',
+        'title_suffix' => 'y aventuras',
+        'description' => 'Emocionante paseo por las dunas rojas de Lahbab, alquiler de buggies de 1000cc, atardeceres mágicos, cena barbacoa en vivo y espectáculos bajo las estrellas.',
+        'card_title' => 'Safari por el Desierto de Dubái con traslado en Luxury Land Cruiser',
+        'card_desc' => 'Disfruta de una experiencia de safari premium con recogida y regreso al hotel en cómodos vehículos Land Cruiser 4x4 con chófer profesional.',
+    ],
+
     // Tours populares
     'home_popular' => [
         'title' => 'Tours',

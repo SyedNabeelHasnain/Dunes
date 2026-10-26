@@ -532,7 +532,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const childMultiplier = 0.70;
         const baseTotal = (state.base.price * state.adults) + (state.base.price * childMultiplier * state.children);
         const transferTotal = (state.transfer.type === 'flat') ? state.transfer.price : (state.transfer.price * totalGuests);
-        const sportsTotal = (state.sports.type === 'flat') ? state.sports.price : (state.sports.price * state.adults);
+        let sportsTotal = 0;
+        if (state.sports.price > 0) {
+            if (state.sports.name && (state.sports.name.includes('Buggy') || state.sports.name.includes('Can-Am'))) {
+                sportsTotal = 550 * Math.max(1, Math.ceil(state.adults / 2));
+            } else if (state.sports.type === 'flat') {
+                sportsTotal = state.sports.price;
+            } else {
+                sportsTotal = state.sports.price * state.adults;
+            }
+        }
         let addonsTotal = 0;
         state.addons.forEach(a => {
             addonsTotal += (a.type === 'flat') ? a.price : (a.price * totalGuests);
@@ -572,6 +581,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     type: this.getAttribute('data-type') || 'per_person',
                     tourId: this.getAttribute('data-tour-id') || null
                 };
+
+                if (group === 'base') {
+                    const isOvernight = (state.base.tourId == 3 || (state.base.name && state.base.name.toLowerCase().includes('overnight')));
+                    if (isOvernight) {
+                        if (state.adults < 2) {
+                            state.adults = 2;
+                        } else if (state.adults % 2 !== 0) {
+                            state.adults += 1;
+                        }
+                        if (adultsCountEl) adultsCountEl.innerText = state.adults;
+                    }
+                }
 
                 updateCalculation();
             });
@@ -619,15 +640,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Guest counter adjustments
     document.getElementById('customizerAdultsMinus').addEventListener('click', () => {
-        if (state.adults > 1) {
-            state.adults--;
+        const isOvernight = (state.base.tourId == 3 || (state.base.name && state.base.name.toLowerCase().includes('overnight')));
+        const minAdults = isOvernight ? 2 : 1;
+        const step = isOvernight ? 2 : 1;
+        if (state.adults > minAdults) {
+            state.adults -= step;
+            if (isOvernight && state.adults % 2 !== 0) state.adults--;
+            if (state.adults < minAdults) state.adults = minAdults;
             adultsCountEl.innerText = state.adults;
             updateCalculation();
         }
     });
     document.getElementById('customizerAdultsPlus').addEventListener('click', () => {
+        const isOvernight = (state.base.tourId == 3 || (state.base.name && state.base.name.toLowerCase().includes('overnight')));
+        const step = isOvernight ? 2 : 1;
         if (state.adults < 30) {
-            state.adults++;
+            state.adults += step;
+            if (isOvernight && state.adults % 2 !== 0) state.adults++;
             adultsCountEl.innerText = state.adults;
             updateCalculation();
         }
@@ -809,7 +838,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (bookNowBtn) {
         bookNowBtn.addEventListener('click', function() {
             const promo = (promoInputEl ? promoInputEl.value : '').trim();
-            const calcAed = parseInt(totalDisplayEl.getAttribute('data-aed') || totalDisplayEl.innerText.replace(/[^0-9]/g, ''), 10) || computeSubtotal();
+            const subtotalVal = parseFloat(computeSubtotal().toFixed(2));
+            const calcAed = parseInt(totalDisplayEl.getAttribute('data-aed') || totalDisplayEl.innerText.replace(/[^0-9]/g, ''), 10) || subtotalVal;
             const customQuote = {
                 is_custom_builder: 1,
                 base_tour_id: state.base.tourId,
@@ -824,7 +854,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 addons: state.addons.map(a => ({ key: a.key, name: a.name, price: a.price, type: a.type })),
                 adults: state.adults,
                 children: state.children,
-                subtotal: computeSubtotal(),
+                subtotal: subtotalVal,
                 total: calcAed,
                 promo: promo || undefined,
                 spec_text: `[CUSTOM SAFARI BUILDER SPEC]\n` +

@@ -16,6 +16,7 @@ use App\Models\WhatsappInquiry;
 use App\Services\ZiinaPaymentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -23,101 +24,116 @@ use Illuminate\Support\Str;
 class AdminDashboardController extends Controller
 {
     /**
-     * Compute 100% fresh, real-time KPI metrics directly from database (Zero Caching).
+     * Compute real-time KPI metrics from database (consolidated SQL with short 15s cache in production).
      */
     public function computeRealtimeKpis(): array
     {
-        // 1. Booking counts excluding draft checkout abandonments
-        $totalBookings = Booking::where('status', '!=', 'draft')->count();
-        $confirmedBookings = Booking::where('status', 'confirmed')->count();
-        $completedBookings = Booking::where('status', 'completed')->count();
-        $confirmedAndCompleted = $confirmedBookings + $completedBookings;
-        $pendingBookings = Booking::where('status', 'pending')->count();
-        $cancelledBookings = Booking::where('status', 'cancelled')->count();
-        $draftBookings = Booking::where('status', 'draft')->count();
+        $compute = function (): array {
+            $todayStr = now()->format('Y-m-d');
+            $thirtyDaysAgo = now()->subDays(30)->toDateTimeString();
 
-        // 2. Collected Revenue: only actual received payments from confirmed/completed reservations
-        $revenue = (float) Booking::whereIn('status', ['confirmed', 'completed'])
-            ->whereIn('payment_status', ['paid', 'partial'])
-            ->sum(DB::raw("CASE WHEN payment_amount > 0 THEN payment_amount ELSE (CASE WHEN payment_status = 'paid' THEN total ELSE 0 END) END"));
+            // 1. Consolidated Booking aggregates in a single table scan
+            $bAgg = Booking::selectRaw("
+                SUM(CASE WHEN status != 'draft' THEN 1 ELSE 0 END) as total_bookings,
+                SUM(CASE WHEN status = 'confirmed' THEN 1 ELSE 0 END) as confirmed_bookings,
+                SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed_bookings,
+                SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending_bookings,
+                SUM(CASE WHEN status = 'cancelled' THEN 1 ELSE 0 END) as cancelled_bookings,
+                SUM(CASE WHEN status = 'draft' THEN 1 ELSE 0 END) as draft_bookings,
+                SUM(CASE WHEN status IN ('confirmed', 'completed') AND payment_status IN ('paid', 'partial')
+                    THEN (CASE WHEN payment_amount > 0 THEN payment_amount ELSE (CASE WHEN payment_status = 'paid' THEN total ELSE 0 END) END)
+                    ELSE 0 END) as collected_revenue,
+                SUM(CASE WHEN status IN ('confirmed', 'completed') AND payment_status IN ('paid', 'partial') THEN 1 ELSE 0 END) as paid_count,
+                SUM(CASE WHEN created_at >= ? AND status != 'draft' THEN 1 ELSE 0 END) as recent_bookings,
+                SUM(CASE WHEN DATE(tour_date) = ? AND status IN ('confirmed', 'completed', 'pending') THEN 1 ELSE 0 END) as today_departures,
+                SUM(CASE WHEN DATE(tour_date) >= ? AND status IN ('confirmed', 'completed', 'pending') THEN 1 ELSE 0 END) as upcoming_departures
+            ", [$thirtyDaysAgo, $todayStr, $todayStr])->first();
 
-        // 3. Average Order Value (AOV): Revenue divided by paid reservations
-        $paidCount = Booking::whereIn('status', ['confirmed', 'completed'])
-            ->whereIn('payment_status', ['paid', 'partial'])
-            ->count();
-        $avgOrderValue = $paidCount > 0 ? round($revenue / $paidCount, 2) : 0.0;
+            $totalBookings = (int) ($bAgg->total_bookings ?? 0);
+            $confirmedBookings = (int) ($bAgg->confirmed_bookings ?? 0);
+            $completedBookings = (int) ($bAgg->completed_bookings ?? 0);
+            $confirmedAndCompleted = $confirmedBookings + $completedBookings;
+            $pendingBookings = (int) ($bAgg->pending_bookings ?? 0);
+            $cancelledBookings = (int) ($bAgg->cancelled_bookings ?? 0);
+            $draftBookings = (int) ($bAgg->draft_bookings ?? 0);
+            $revenue = (float) ($bAgg->collected_revenue ?? 0.0);
+            $paidCount = (int) ($bAgg->paid_count ?? 0);
+            $avgOrderValue = $paidCount > 0 ? round($revenue / $paidCount, 2) : 0.0;
 
-        // 4. 30-Day Conversion Rate: Real human visitors to completed bookings (excl drafts)
-        $visitorsCount = RequestLog::where('request_timestamp', '>=', now()->subDays(30))
-            ->where('bot_indicator', 'Likely Human')
-            ->distinct('session_id')
-            ->count('session_id') ?: 1;
+            $visitorsCount = RequestLog::where('request_timestamp', '>=', $thirtyDaysAgo)
+                ->where('bot_indicator', 'Likely Human')
+                ->distinct('session_id')
+                ->count('session_id') ?: 1;
 
-        $recentBookingsCount = Booking::where('created_at', '>=', now()->subDays(30))
-            ->where('status', '!=', 'draft')
-            ->count();
-        $conversionRate = round(($recentBookingsCount / $visitorsCount) * 100, 2);
+            $recentBookingsCount = (int) ($bAgg->recent_bookings ?? 0);
+            $conversionRate = round(($recentBookingsCount / $visitorsCount) * 100, 2);
 
-        // 5. Customer Communications: Contact Inquiries & WhatsApp Leads
-        $newInquiries = Contact::where('status', 'new')->count();
-        $totalInquiries = Contact::count();
-        $totalWhatsappLeads = WhatsappInquiry::count();
-        $unreadWhatsappLeads = WhatsappInquiry::where(function ($q) {
-            $q->where('is_read', false)->orWhereNull('is_read');
-        })->count();
+            $newInquiries = Contact::where('status', 'new')->count();
+            $totalInquiries = Contact::count();
+            $totalWhatsappLeads = WhatsappInquiry::count();
+            $unreadWhatsappLeads = WhatsappInquiry::where(function ($q) {
+                $q->where('is_read', false)->orWhereNull('is_read');
+            })->count();
 
-        // 6. Audience & Email Marketing
-        $subscribersCount = Subscriber::where('status', 'subscribed')->count();
-        $campaignsCount = EmailCampaign::count();
-        $campaignsSent = EmailCampaign::where('status', 'sent')->count();
+            $subscribersCount = Subscriber::where('status', 'subscribed')->count();
+            $campaignsCount = EmailCampaign::count();
+            $campaignsSent = EmailCampaign::where('status', 'sent')->count();
 
-        // 7. Inventory, Reviews, Blog & Daily Tour Operations
-        $activeToursCount = Tour::where('status', 'active')->count();
-        $totalToursCount = Tour::count();
+            $activeToursCount = Tour::where('status', 'active')->count();
+            $totalToursCount = Tour::count();
 
-        $totalReviewsCount = Review::count();
-        $approvedReviewsCount = Review::where('status', 'approved')->count();
-        $avgReviewRating = (float) round(Review::where('status', 'approved')->avg('rating') ?: 5.0, 1);
+            $rAgg = Review::selectRaw("
+                COUNT(*) as total_reviews,
+                SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved_reviews,
+                AVG(CASE WHEN status = 'approved' THEN rating ELSE NULL END) as avg_rating
+            ")->first();
 
-        $publishedBlogPostsCount = BlogPost::where('status', 'published')->count();
-        $totalBlogPostsCount = BlogPost::count();
+            $totalReviewsCount = (int) ($rAgg->total_reviews ?? 0);
+            $approvedReviewsCount = (int) ($rAgg->approved_reviews ?? 0);
+            $avgReviewRating = (float) round((float) ($rAgg->avg_rating ?: 5.0), 1);
 
-        $todayDeparturesCount = Booking::whereDate('tour_date', now()->format('Y-m-d'))
-            ->whereIn('status', ['confirmed', 'completed', 'pending'])
-            ->count();
-        $upcomingDeparturesCount = Booking::where('tour_date', '>=', now()->format('Y-m-d'))
-            ->whereIn('status', ['confirmed', 'completed', 'pending'])
-            ->count();
+            $publishedBlogPostsCount = BlogPost::where('status', 'published')->count();
+            $totalBlogPostsCount = BlogPost::count();
 
-        return [
-            'revenue' => (float) $revenue,
-            'total' => (int) $totalBookings,
-            'confirmed' => (int) $confirmedBookings,
-            'completed' => (int) $completedBookings,
-            'confirmed_and_completed' => (int) $confirmedAndCompleted,
-            'pending' => (int) $pendingBookings,
-            'cancelled' => (int) $cancelledBookings,
-            'drafts' => (int) $draftBookings,
-            'aov' => (float) $avgOrderValue,
-            'conversion_rate' => (float) $conversionRate,
-            'new_inquiries' => (int) $newInquiries,
-            'total_inquiries' => (int) $totalInquiries,
-            'whatsapp_leads' => (int) $totalWhatsappLeads,
-            'unread_whatsapp_leads' => (int) $unreadWhatsappLeads,
-            'subscribers_count' => (int) $subscribersCount,
-            'campaigns_count' => (int) $campaignsCount,
-            'campaigns_sent' => (int) $campaignsSent,
-            'active_tours' => (int) $activeToursCount,
-            'total_tours' => (int) $totalToursCount,
-            'total_reviews' => (int) $totalReviewsCount,
-            'approved_reviews' => (int) $approvedReviewsCount,
-            'avg_rating' => (float) $avgReviewRating,
-            'published_posts' => (int) $publishedBlogPostsCount,
-            'total_posts' => (int) $totalBlogPostsCount,
-            'today_departures' => (int) $todayDeparturesCount,
-            'upcoming_departures' => (int) $upcomingDeparturesCount,
-            'timestamp' => now()->toIso8601String(),
-        ];
+            $todayDeparturesCount = (int) ($bAgg->today_departures ?? 0);
+            $upcomingDeparturesCount = (int) ($bAgg->upcoming_departures ?? 0);
+
+            return [
+                'revenue' => (float) $revenue,
+                'total' => $totalBookings,
+                'confirmed' => $confirmedBookings,
+                'completed' => $completedBookings,
+                'confirmed_and_completed' => $confirmedAndCompleted,
+                'pending' => $pendingBookings,
+                'cancelled' => $cancelledBookings,
+                'drafts' => $draftBookings,
+                'aov' => (float) $avgOrderValue,
+                'conversion_rate' => (float) $conversionRate,
+                'new_inquiries' => (int) $newInquiries,
+                'total_inquiries' => (int) $totalInquiries,
+                'whatsapp_leads' => (int) $totalWhatsappLeads,
+                'unread_whatsapp_leads' => (int) $unreadWhatsappLeads,
+                'subscribers_count' => (int) $subscribersCount,
+                'campaigns_count' => (int) $campaignsCount,
+                'campaigns_sent' => (int) $campaignsSent,
+                'active_tours' => (int) $activeToursCount,
+                'total_tours' => (int) $totalToursCount,
+                'total_reviews' => $totalReviewsCount,
+                'approved_reviews' => $approvedReviewsCount,
+                'avg_rating' => $avgReviewRating,
+                'published_posts' => (int) $publishedBlogPostsCount,
+                'total_posts' => (int) $totalBlogPostsCount,
+                'today_departures' => $todayDeparturesCount,
+                'upcoming_departures' => $upcomingDeparturesCount,
+                'timestamp' => now()->toIso8601String(),
+            ];
+        };
+
+        if (app()->runningUnitTests()) {
+            return $compute();
+        }
+
+        return Cache::remember('admin_dashboard_kpis', 15, $compute);
     }
 
     /**
@@ -313,8 +329,12 @@ class AdminDashboardController extends Controller
                 'devices', 'browsers', 'logs'
             ));
         } catch (\Throwable $e) {
-            return response('ANALYTICS ERROR: '.$e->getMessage()."\n".$e->getTraceAsString(), 500)
-                ->header('Content-Type', 'text/plain');
+            Log::error('Admin analytics error: '.$e->getMessage(), [
+                'exception' => get_class($e),
+            ]);
+
+            return redirect()->route('admin.dashboard')
+                ->with('error', 'Unable to load analytics dashboard right now. Please check server logs for details.');
         }
     }
 

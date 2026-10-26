@@ -108,6 +108,9 @@ class AdminTourController extends Controller
                         'old_price' => ! empty($pivot['old_price']) ? (float) $pivot['old_price'] : null,
                         'price_type' => $pivot['price_type'] ?? 'per person',
                     ];
+                    if (isset($pivot['child_price']) && $pivot['child_price'] !== '') {
+                        $tierRow['child_price'] = (float) $pivot['child_price'];
+                    }
                     if (isset($pivot['guest_count']) && $pivot['guest_count'] !== '') {
                         $tierRow['guest_count'] = (int) $pivot['guest_count'];
                     }
@@ -225,6 +228,9 @@ class AdminTourController extends Controller
                         'old_price' => ! empty($pivot['old_price']) ? (float) $pivot['old_price'] : null,
                         'price_type' => $pivot['price_type'] ?? 'per person',
                     ];
+                    if (isset($pivot['child_price']) && $pivot['child_price'] !== '') {
+                        $tierRow['child_price'] = (float) $pivot['child_price'];
+                    }
                     if (isset($pivot['guest_count']) && $pivot['guest_count'] !== '') {
                         $tierRow['guest_count'] = (int) $pivot['guest_count'];
                     }
@@ -416,6 +422,7 @@ class AdminTourController extends Controller
             'description' => 'nullable|string',
             'icon' => 'nullable|string|max:100',
             'default_price' => 'required|numeric|min:0',
+            'price_type' => 'nullable|string|in:per_person,per_group',
             'status' => 'required|string|in:active,inactive',
             'priority' => 'required|integer',
         ]);
@@ -431,6 +438,7 @@ class AdminTourController extends Controller
             'description' => $request->description,
             'icon' => $request->icon ?: 'plus-lg',
             'default_price' => (float) $request->default_price,
+            'price_type' => $request->input('price_type', 'per_person'),
             'status' => $request->status,
             'priority' => (int) $request->priority,
         ]);
@@ -453,6 +461,7 @@ class AdminTourController extends Controller
             'description' => 'nullable|string',
             'icon' => 'nullable|string|max:100',
             'default_price' => 'required|numeric|min:0',
+            'price_type' => 'nullable|string|in:per_person,per_group',
             'status' => 'required|string|in:active,inactive',
             'priority' => 'required|integer',
         ]);
@@ -463,6 +472,7 @@ class AdminTourController extends Controller
             'description' => $request->description,
             'icon' => $request->icon ?: 'plus-lg',
             'default_price' => (float) $request->default_price,
+            'price_type' => $request->input('price_type', $addon->price_type ?: 'per_person'),
             'status' => $request->status,
             'priority' => (int) $request->priority,
         ]);
@@ -507,16 +517,29 @@ class AdminTourController extends Controller
         foreach ($pricing as $tourId => $tiers) {
             $tour = Tour::find($tourId);
             if ($tour) {
+                $existingPivots = \Illuminate\Support\Facades\DB::table('tour_tiers')
+                    ->where('tour_id', $tour->id)
+                    ->get()
+                    ->keyBy('tier_id');
+
                 $syncData = [];
                 foreach ($tiers as $tierId => $prices) {
                     if (isset($prices['price']) && $prices['price'] !== '') {
+                        $prev = $existingPivots->get((int) $tierId);
                         $tierRow = [
                             'price' => (float) $prices['price'],
                             'old_price' => ! empty($prices['old_price']) ? (float) $prices['old_price'] : null,
-                            'price_type' => $prices['price_type'] ?? 'per person',
+                            'price_type' => $prices['price_type'] ?? ($prev->price_type ?? 'per person'),
                         ];
+                        if (isset($prices['child_price']) && $prices['child_price'] !== '') {
+                            $tierRow['child_price'] = (float) $prices['child_price'];
+                        } elseif ($prev && isset($prev->child_price) && $prev->child_price !== null) {
+                            $tierRow['child_price'] = (float) $prev->child_price;
+                        }
                         if (isset($prices['guest_count']) && $prices['guest_count'] !== '') {
                             $tierRow['guest_count'] = (int) $prices['guest_count'];
+                        } elseif ($prev && isset($prev->guest_count) && $prev->guest_count !== null) {
+                            $tierRow['guest_count'] = (int) $prev->guest_count;
                         }
                         $syncData[$tierId] = $tierRow;
                     }

@@ -19,17 +19,31 @@
     <div class="p-6">
         <form action="{{ route('admin.settings.update') }}" method="POST">
             @csrf
+            <input type="hidden" name="meta_form_submitted" value="1">
 
-            <!-- CAPI Status Switch -->
-            <div class="p-5 bg-slate-50/70 rounded-2xl border border-slate-200/80 mb-6">
-                <h6 class="text-xs font-black uppercase tracking-wider text-primary mb-3">Conversions API Tracking</h6>
+            <!-- Meta Pixel Switch -->
+            <div class="p-5 bg-slate-50/70 rounded-2xl border border-slate-200/80 mb-4">
+                <h6 class="text-xs font-black uppercase tracking-wider text-primary mb-3">Browser Meta Pixel</h6>
                 <div class="flex items-center gap-3">
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="hidden" name="meta_active" value="0">
                         <input type="checkbox" name="meta_active" id="meta_active" value="1" {{ ($settings['meta_active'] ?? '') == '1' ? 'checked' : '' }} class="sr-only peer">
                         <div class="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                     </label>
-                    <label class="text-xs font-bold text-slate-900 cursor-pointer" for="meta_active">Inject browser Pixel and trigger Server Conversions API events</label>
+                    <label class="text-xs font-bold text-slate-900 cursor-pointer" for="meta_active">Inject browser Pixel and track client-side events</label>
+                </div>
+            </div>
+
+            <!-- CAPI Status Switch -->
+            <div class="p-5 bg-slate-50/70 rounded-2xl border border-slate-200/80 mb-6">
+                <h6 class="text-xs font-black uppercase tracking-wider text-primary mb-3">Conversions API (Server-Side CAPI)</h6>
+                <div class="flex items-center gap-3">
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="hidden" name="meta_capi_enabled" value="0">
+                        <input type="checkbox" name="meta_capi_enabled" id="meta_capi_enabled" value="1" {{ ($settings['meta_capi_enabled'] ?? '') == '1' ? 'checked' : '' }} class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                    </label>
+                    <label class="text-xs font-bold text-slate-900 cursor-pointer" for="meta_capi_enabled">Trigger Server Conversions API events directly to Meta Graph</label>
                 </div>
                 <div class="mt-2 text-[11px] text-slate-500">When enabled, server-side actions like Checkout initiated or WhatsApp clicks will submit secure telemetry directly to Meta via CAPI.</div>
             </div>

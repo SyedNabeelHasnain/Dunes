@@ -202,7 +202,7 @@ class AdminSettingController extends Controller
 
             // Google Integrations & Business Profile (Local SEO)
             'google_active', 'google_gtm_id', 'google_ga4_id', 'google_analytics_id', 'google_tag_manager_id',
-            'google_ads_id', 'google_conversion_label', 'google_site_verification', 'google_maps_api_key',
+            'google_ads_id', 'google_conversion_label', 'google_site_verification', 'google_maps_api_key', 'google_places_api_key',
             'recaptcha_site_key', 'recaptcha_secret_key',
             'google_place_id', 'google_cid', 'google_review_url',
             'site_latitude', 'site_longitude', 'site_postal_code',
@@ -215,7 +215,7 @@ class AdminSettingController extends Controller
             'gttd_feed_enabled', 'gttd_partner_id', 'gttd_default_poi_place_id',
 
             // Meta Integrations
-            'meta_active', 'meta_pixel_id', 'meta_access_token', 'meta_capi_enabled', 'meta_test_event_code',
+            'meta_active', 'meta_pixel_id', 'meta_access_token', 'meta_capi_token', 'meta_capi_enabled', 'meta_send_ip_ua', 'meta_test_event_code',
 
             // Email & Payment Settings
             'admin_email', 'admin_email_cc', 'admin_email_bcc',
@@ -241,17 +241,22 @@ class AdminSettingController extends Controller
             $settings['ziina_advance_percent'] = $settings['deposit_percentage'];
         }
 
-        // Handle uploaded image files
+        // Handle uploaded image files & strict key validation
         $request->validate([
+            'indexnow_key' => ['nullable', 'string', 'min:8', 'max:64', 'regex:/^(?!robots$|sitemap$|llms$|llms-full$|security$|index$)[a-zA-Z0-9_\-]+$/i'],
             'site_hero_poster_file' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
             'site_default_image_file' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
             'seo_default_og_image_file' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
             'seo_home_og_image_file' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
         ]);
 
+        if (isset($settings['google_ads_id'])) {
+            $settings['google_ads_id'] = normalize_google_ads_id($settings['google_ads_id']);
+        }
+
         if ($request->hasFile('site_hero_poster_file')) {
             $file = $request->file('site_hero_poster_file');
-            $ext = strtolower($file->getClientOriginalExtension() ?: ($file->guessExtension() ?: 'avif'));
+            $ext = safe_uploaded_image_ext($file, 'avif');
             $filename = 'hero-poster-' . time() . '.' . $ext;
             $file->move(public_path('images'), $filename);
             $settings['site_hero_poster'] = '/images/' . $filename;
@@ -259,7 +264,7 @@ class AdminSettingController extends Controller
 
         if ($request->hasFile('seo_default_og_image_file') || $request->hasFile('site_default_image_file')) {
             $file = $request->file('seo_default_og_image_file') ?: $request->file('site_default_image_file');
-            $ext = strtolower($file->getClientOriginalExtension() ?: ($file->guessExtension() ?: 'avif'));
+            $ext = safe_uploaded_image_ext($file, 'avif');
             $filename = 'og-default-' . time() . '.' . $ext;
             $file->move(public_path('images'), $filename);
             $settings['seo_default_og_image'] = '/images/' . $filename;
@@ -268,7 +273,7 @@ class AdminSettingController extends Controller
 
         if ($request->hasFile('seo_home_og_image_file')) {
             $file = $request->file('seo_home_og_image_file');
-            $ext = strtolower($file->getClientOriginalExtension() ?: ($file->guessExtension() ?: 'avif'));
+            $ext = safe_uploaded_image_ext($file, 'avif');
             $filename = 'og-home-' . time() . '.' . $ext;
             $file->move(public_path('images'), $filename);
             $settings['seo_home_og_image'] = '/images/' . $filename;
@@ -279,8 +284,12 @@ class AdminSettingController extends Controller
             $settings['google_active'] = $request->has('google_active') ? '1' : '0';
         }
 
-        if ($request->has('meta_pixel_id') || $request->has('meta_access_token')) {
-            $settings['meta_active'] = $request->has('meta_active') ? '1' : '0';
+        if ($request->has('meta_pixel_id') || $request->has('meta_access_token') || $request->has('meta_capi_token') || $request->has('meta_form_submitted')) {
+            $settings['meta_active'] = $request->input('meta_active', '0') === '1' ? '1' : '0';
+            if ($request->has('meta_form_submitted')) {
+                $settings['meta_capi_enabled'] = $request->input('meta_capi_enabled', '0') === '1' ? '1' : '0';
+                $settings['meta_send_ip_ua'] = $request->input('meta_send_ip_ua', '0') === '1' ? '1' : '0';
+            }
         }
 
         if ($request->has('promo_banner_form_submitted')) {

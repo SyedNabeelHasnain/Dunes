@@ -98,7 +98,7 @@
                         <h2 class="text-xs font-black uppercase tracking-wider text-primary flex items-center gap-2">
                             <i class="bi bi-compass-fill text-base"></i> 2. Experience, Package Tier & Pax
                         </h2>
-                        <span class="text-[11px] font-semibold text-slate-400" x-text="selectedTierObj ? (selectedTierObj.price_type === 'per_vehicle' ? 'Private Vehicle Pricing' : 'Per-Person Pricing') : ''"></span>
+                        <span class="text-[11px] font-semibold text-slate-400" x-text="selectedTierObj ? (isUnitTier(selectedTierObj) ? 'Unit / Private Pricing' : 'Per-Person Pricing') : ''"></span>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
@@ -118,7 +118,7 @@
                                     class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-semibold text-slate-800 bg-white outline-hidden focus:border-primary transition">
                                 <template x-for="tier in availableTiers" :key="tier.id">
                                     <option :value="tier.id"
-                                            x-text="tier.name + ' — AED ' + Number(tier.price).toLocaleString() + (tier.price_type === 'per_vehicle' ? ' / vehicle (up to ' + tier.capacity + ' pax)' : ' / adult')"
+                                            x-text="tier.name + ' — AED ' + Number(tier.price).toLocaleString() + (isUnitTier(tier) ? ' / unit (up to ' + tier.capacity + ' pax)' : ' / adult')"
                                             :selected="Number(tier.id) === Number(tierId)"></option>
                                 </template>
                             </select>
@@ -475,10 +475,16 @@ function manualBookingCreator() {
             this.recalc();
         },
 
+        isUnitTier(tier) {
+            if (!tier) return false;
+            const pt = String(tier.price_type || '').toLowerCase().trim();
+            return ['per_vehicle', 'per vehicle', 'per buggy', 'per car', 'per group', 'per_group', 'private', 'per tent', 'per package'].includes(pt);
+        },
+
         childUnitPriceLabel() {
             const tier = this.selectedTierObj;
             if (!tier) return '';
-            if (tier.price_type === 'per_vehicle') return 'Included in vehicle';
+            if (this.isUnitTier(tier)) return 'Included in package';
             const cp = Number(tier.child_price) > 0 ? Number(tier.child_price) : Math.round(Number(tier.price) * 0.70);
             return 'AED ' + cp.toLocaleString();
         },
@@ -488,10 +494,10 @@ function manualBookingCreator() {
             if (!tier) return '';
             const a = Math.max(1, Number(this.adults) || 1);
             const c = Math.max(0, Number(this.children) || 0);
-            if (tier.price_type === 'per_vehicle') {
+            if (this.isUnitTier(tier)) {
                 const cap = Math.max(1, Number(tier.capacity) || 6);
                 const vehicles = Math.ceil((a + c) / cap);
-                return vehicles + ' Vehicle(s) × AED ' + Number(tier.price).toLocaleString() + ' (up to ' + cap + ' pax/vehicle)';
+                return vehicles + ' Unit(s) × AED ' + Number(tier.price).toLocaleString() + ' (up to ' + cap + ' pax/unit)';
             }
             const cp = Number(tier.child_price) > 0 ? Number(tier.child_price) : (Number(tier.price) * 0.70);
             let parts = [a + ' Adult(s) × AED ' + Number(tier.price).toLocaleString()];
@@ -534,7 +540,7 @@ function manualBookingCreator() {
             const billableGuests = Math.max(1, a + c);
 
             if (tier) {
-                if (tier.price_type === 'per_vehicle') {
+                if (this.isUnitTier(tier)) {
                     const cap = Math.max(1, Number(tier.capacity) || 6);
                     const vehicles = Math.ceil(billableGuests / cap);
                     this.subtotal = vehicles * Number(tier.price);

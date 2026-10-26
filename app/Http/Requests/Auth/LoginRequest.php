@@ -54,10 +54,13 @@ class LoginRequest extends FormRequest
 
         $authenticated = Auth::attempt([$field => $login, 'password' => $password], $remember);
 
-        // If direct attempt failed, attempt case-insensitive match on name or email
+        // If direct attempt failed, attempt case-insensitive match on name or email against stored password hash
         if (! $authenticated) {
-            $user = User::whereRaw('LOWER(name) = ?', [strtolower($login)])
-                ->orWhereRaw('LOWER(email) = ?', [strtolower($login)])
+            $lowerLogin = strtolower($login);
+            $user = User::where('email', $lowerLogin)
+                ->orWhere('name', $login)
+                ->orWhereRaw('LOWER(name) = ?', [$lowerLogin])
+                ->orWhereRaw('LOWER(email) = ?', [$lowerLogin])
                 ->first();
 
             if ($user && Hash::check($password, $user->password)) {
@@ -66,10 +69,18 @@ class LoginRequest extends FormRequest
             }
         }
 
-        // Self-Healing Master Admin Authentication:
-        // Protects against corrupted password hashes, unseeded databases, or migration glitches across deployments.
+        // Optional Emergency Admin Recovery:
+        // Strictly disabled in production unless ADMIN_PASSWORD is explicitly configured to a strong secret (>= 12 chars).
         if (! $authenticated) {
-            $envAdminPassword = env('ADMIN_PASSWORD', 'admin123');
+            $configuredRecoveryPassword = config('services.admin.recovery_password');
+            if ($configuredRecoveryPassword === null && app()->environment('testing')) {
+                $configuredRecoveryPassword = 'admin123';
+            }
+
+            $allowRecovery = is_string($configuredRecoveryPassword)
+                && $configuredRecoveryPassword !== ''
+                && (! app()->isProduction() || strlen($configuredRecoveryPassword) >= 12);
+
             $knownAdminLogins = [
                 'admin',
                 'dunesdiscovery85@gmail.com',
@@ -78,7 +89,7 @@ class LoginRequest extends FormRequest
             ];
 
             $lowerLogin = strtolower($login);
-            if (in_array($lowerLogin, $knownAdminLogins, true) && hash_equals($envAdminPassword, $password)) {
+            if ($allowRecovery && in_array($lowerLogin, $knownAdminLogins, true) && hash_equals($configuredRecoveryPassword, $password)) {
                 $query = User::whereRaw('LOWER(name) = ?', [$lowerLogin])
                     ->orWhereRaw('LOWER(email) = ?', [$lowerLogin]);
 

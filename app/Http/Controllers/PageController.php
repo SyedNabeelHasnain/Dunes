@@ -190,6 +190,7 @@ class PageController extends Controller
 
             // Send Email Notifications
             try {
+                app(\App\Services\EmailMarketingService::class)->applySmtpConfig();
                 $settings = app(SettingsService::class);
                 $fromEmail = $settings->getFromEmail();
                 $adminEmail = $settings->getAdminEmail();
@@ -272,7 +273,7 @@ class PageController extends Controller
         // Collect comprehensive request context & telemetry
         $ctx = $this->tracker->collectRequestContext('whatsapp', $request->all());
 
-        // First-party prospect resolution
+        // First-party prospect resolution (internal CRM attribution only; never returned in client JSON response)
         $prospectSource = 'Direct Click';
         if ($name === 'Anonymous' || $name === 'N/A' || empty($name)) {
             if ($request->filled('prospect_name')) {
@@ -285,11 +286,11 @@ class PageController extends Controller
                 }
                 $prospectSource = 'Stored Browser Profile';
             } else {
-                $clientIp = $ctx['client_ip'] ?? request()->ip();
-                $sessionId = session()->getId();
-
-                if ($clientIp && ! in_array($clientIp, ['0.0.0.0', '127.0.0.1', 'not available'])) {
-                    $priorBooking = \App\Models\Booking::where('ip_address', $clientIp)
+                // Only use server-observed transport IP (never client-supplied client_ip) bounded to recent 30-day window
+                $transportIp = $request->ip();
+                if ($transportIp && ! in_array(strtolower($transportIp), ['0.0.0.0', '127.0.0.1', '::1', 'not available'], true)) {
+                    $priorBooking = Booking::where('ip_address', $transportIp)
+                        ->where('created_at', '>=', now()->subDays(30))
                         ->whereNotNull('name')
                         ->where('name', '!=', '')
                         ->latest()
@@ -305,7 +306,8 @@ class PageController extends Controller
                         }
                         $prospectSource = 'Prior Booking History';
                     } else {
-                        $priorContact = \App\Models\Contact::where('ip_address', $clientIp)
+                        $priorContact = Contact::where('ip_address', $transportIp)
+                            ->where('created_at', '>=', now()->subDays(30))
                             ->whereNotNull('name')
                             ->where('name', '!=', '')
                             ->latest()
@@ -484,6 +486,7 @@ class PageController extends Controller
 
             // Send Admin Email Notification
             try {
+                app(\App\Services\EmailMarketingService::class)->applySmtpConfig();
                 $adminEmail = $settings->get('site_email', 'info@dunesdiscoverytourism.com');
                 Mail::to($adminEmail)->send(
                     (new WhatsappLeadNotification($name, $phone, $tourName, $pageUrl, $messageText))->from($adminEmail, 'Dunes Discovery Tourism')
@@ -577,8 +580,15 @@ class PageController extends Controller
      */
     public function submitReview(Request $request, ...$params)
     {
-        $ref = (string) end($params);
-        $booking = Booking::where('reference', $ref)->first();
+        $ref = trim((string) end($params));
+        $booking = ($ref !== '' && strtolower($ref) !== 'guest')
+            ? Booking::where('reference', $ref)->first()
+            : null;
+
+        if (strtolower($ref) !== 'guest' && ! $booking) {
+            abort(404);
+        }
+
         $isGuestMode = ! $booking;
 
         $rules = [
@@ -607,7 +617,7 @@ class PageController extends Controller
 
             foreach ($request->file('photos') as $photoFile) {
                 if ($photoFile->isValid()) {
-                    $ext = strtolower($photoFile->getClientOriginalExtension() ?: ($photoFile->guessExtension() ?: 'avif'));
+                    $ext = safe_uploaded_image_ext($photoFile, 'jpg');
                     $filename = 'rev_'.uniqid().'_'.time().'.'.$ext;
                     $photoFile->move($uploadDir, $filename);
                     $storedPhotos[] = 'uploads/reviews/'.$filename;
@@ -615,7 +625,8 @@ class PageController extends Controller
             }
         }
 
-        $sourceReviewId = $booking ? $booking->reference : ('GUEST-'.strtoupper($ref).'-'.substr(md5($reviewerName.($storedPhotos[0] ?? time())), 0, 8));
+        $sourceReviewId = $booking ? $booking->reference : ('GUEST-'.substr(md5($reviewerName.($storedPhotos[0] ?? microtime(true))), 0, 12));
+        $isVerifiedCompletedBooking = $booking && in_array($booking->status, ['confirmed', 'completed'], true);
 
         $review = Review::updateOrCreate(
             [
@@ -629,16 +640,14 @@ class PageController extends Controller
                 'review_title' => $request->input('review_title') ?: 'Unforgettable Desert Safari Experience',
                 'review_text' => $request->input('review_text'),
                 'photos' => $storedPhotos,
-                'status' => ($rating >= 4) ? 'approved' : 'pending',
-                'is_featured' => ($rating >= 4.5 && count($storedPhotos) > 0),
+                'status' => ($isVerifiedCompletedBooking && $rating >= 4) ? 'approved' : 'pending',
+                'is_featured' => ($isVerifiedCompletedBooking && $rating >= 4.5 && count($storedPhotos) > 0),
                 'published_date' => now()->toDateString(),
                 'imported_at' => now(),
             ]
         );
 
-        Cache::forget('site_home_reviews_feed');
-        Cache::forget('site_social_proof_feed');
-        Cache::forget('site_home_cache');
+        flush_review_and_social_proof_caches();
 
         $settings = app(SettingsService::class);
         $googleReviewUrl = $settings->get('google_review_url', 'https://search.google.com/local/writereview?placeid=ChIJbWsIEIVEdEER4uHEhb2dbcQ');
@@ -663,15 +672,21 @@ class PageController extends Controller
      */
     public function submitFeedback(Request $request, ...$params)
     {
-        $ref = (string) end($params);
+        $request->validate([
+            'feedback' => 'required|string|max:2000',
+        ]);
+
+        $ref = trim((string) end($params));
         $booking = Booking::where('reference', $ref)->first();
-        $feedback = trim($request->input('feedback', ''));
+        $feedback = strip_tags(trim($request->input('feedback', '')));
 
         if ($booking && ! empty($feedback)) {
             $notes = $booking->special_requests ?: '';
-            $booking->update([
-                'special_requests' => trim($notes."\n[GUEST FEEDBACK: ".$feedback.']'),
-            ]);
+            if (! str_contains($notes, '[GUEST FEEDBACK:')) {
+                $booking->update([
+                    'special_requests' => mb_substr(trim($notes."\n[GUEST FEEDBACK: ".$feedback.']'), 0, 4000),
+                ]);
+            }
         }
 
         return redirect()->to(localized_route('home'))->with('success', 'Thank you for your valuable feedback. Our management team will review your comments.');

@@ -299,12 +299,16 @@ class AdminSubscriberController extends Controller
                 $lastName = ($lastNameIndex !== false && isset($row[$lastNameIndex])) ? trim($row[$lastNameIndex]) : null;
                 $phone = ($phoneIndex !== false && isset($row[$phoneIndex])) ? trim($row[$phoneIndex]) : null;
 
-                $sub = Subscriber::where('email', $email)->first();
+                $sub = Subscriber::withTrashed()->where('email', $email)->first();
                 if ($sub) {
+                    if ($sub->trashed()) {
+                        $sub->restore();
+                    }
                     $sub->update([
                         'first_name' => $firstName ?: $sub->first_name,
                         'last_name' => $lastName ?: $sub->last_name,
                         'phone' => $phone ?: $sub->phone,
+                        'status' => $sub->status === 'unsubscribed' ? 'unsubscribed' : 'subscribed',
                     ]);
                     $updated++;
                 } else {

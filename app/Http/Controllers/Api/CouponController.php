@@ -48,23 +48,11 @@ class CouponController extends Controller
                 ->where('tier_id', $tierId)
                 ->first();
             if ($pricing && (float) $pricing->price > 0) {
-                $priceType = strtolower($pricing->price_type ?? 'per person');
-                if (in_array($priceType, ['per buggy', 'per vehicle', 'per group', 'private', 'per tent', 'per package'])) {
-                    $tier = Tier::find($tierId);
-                    $capacity = (int) ($pricing->guest_count ?? ($tier?->guest_count ?? 0));
-                    if ($capacity <= 0) {
-                        if ($tier && preg_match('/(6|six)/i', $tier->name ?? '')) {
-                            $capacity = 6;
-                        } elseif ($tier && preg_match('/(4|four)/i', $tier->name ?? '')) {
-                            $capacity = 4;
-                        } elseif ($tier && preg_match('/(2|two)/i', $tier->name ?? '')) {
-                            $capacity = 2;
-                        } elseif ($tier && preg_match('/(1|single|solo)/i', $tier->name ?? '')) {
-                            $capacity = 1;
-                        } else {
-                            $capacity = 2;
-                        }
-                    }
+                $tour = Tour::find($tourId);
+                $tier = Tier::find($tierId);
+                $priceType = Tier::normalizePriceType($pricing->price_type ?? 'per person', $tour);
+                if (Tier::isUnitPriceType($priceType, $tour)) {
+                    $capacity = Tier::resolveUnitCapacity($pricing, $tier, $priceType);
                     $vehicles = (int) ceil(($adults + $children) / max(1, $capacity));
                     $subtotal = $vehicles * (float) $pricing->price;
                 } else {

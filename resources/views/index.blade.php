@@ -205,34 +205,34 @@ $heroPoster = !empty($settings['site_hero_poster'])
         </div>
         <div class="inline-flex items-center gap-2 rounded-full bg-slate-900/85 border border-white/20 text-white backdrop-blur-md px-4 py-1.5 mb-5 text-xs sm:text-sm shadow-lg">
             <i class="bi bi-star-fill text-amber-400"></i>
-            <span class="font-semibold text-white">Rated 4.9/5 by 2,847+ Travelers</span>
+            <span class="font-semibold text-white">{{ __('ui.home_hero.rating_pill') }}</span>
         </div>
         <h1 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 text-white tracking-tight leading-tight">
-            Top-Rated <span class="text-gradient-primary">Dubai Desert Safari</span> Tours & Adventures
+            {{ __('ui.home_hero.title_prefix') }} <span class="text-gradient-primary">{{ __('ui.home_hero.title_highlight') }}</span> {{ __('ui.home_hero.title_suffix') }}
         </h1>
         <p class="text-base sm:text-lg lg:text-xl mb-8 mx-auto text-white/90 max-w-2xl font-light leading-relaxed">
-            Experience thrilling dune bashing across the Lahbab Red Dunes, 1000cc dune buggy rentals, magical sunsets, authentic live BBQ dinner, and 5-star entertainment under the desert stars.
+            {{ __('ui.home_hero.description') }}
         </p>
 
-        <div class="flex flex-col sm:flex-row gap-3 justify-center items-center mb-10">
-            <button type="button" class="btn-desert-animated text-base sm:text-lg font-bold rounded-full px-8 py-3.5 shadow-xl text-white inline-flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto" @click="$store.modal.open('booking')">
+        <div class="flex flex-col sm:flex-row flex-wrap justify-center items-center gap-3 mb-10">
+            <button type="button" class="btn-desert-animated text-sm sm:text-base md:text-lg font-bold rounded-full px-6 sm:px-8 py-3.5 shadow-xl text-white inline-flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto" @click="$store.modal.open('booking')">
                 <i class="bi bi-calendar-check text-lg"></i>
                 <span>{{ __('ui.common.book_online_now') }}</span>
             </button>
-            <button type="button" class="inline-flex items-center justify-center gap-2 text-base font-bold rounded-full px-6 py-3.5 border border-primary/60 text-primary bg-slate-900/60 backdrop-blur-md hover:bg-slate-900/80 transition-all cursor-pointer w-full sm:w-auto" @click="$store.modal.open('safari-matcher')">
+            <button type="button" class="inline-flex items-center justify-center gap-2 text-sm sm:text-base font-bold rounded-full px-5 sm:px-6 py-3.5 border border-primary/60 text-primary bg-slate-900/60 backdrop-blur-md hover:bg-slate-900/80 transition-all cursor-pointer w-full sm:w-auto" @click="$store.modal.open('safari-matcher')">
                 <i class="bi bi-compass text-amber-400 text-lg"></i>
                 <span>{{ __('ui.home_concierge.quiz_btn') }}</span>
                 <span class="bg-amber-400 text-slate-950 font-bold rounded-full px-2 py-0.5 text-[10px]">5% OFF</span>
             </button>
-            <button type="button" class="btn-desert-animated-dark text-base font-bold rounded-full px-6 py-3.5 inline-flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto" data-action="open-booking" data-tour="1" data-tier="1" @click.stop="$store.modal.open('booking', { tourId: 1, tierId: 1 })">
+            <button type="button" class="btn-desert-animated-dark text-sm sm:text-base font-bold rounded-full px-5 sm:px-6 py-3.5 inline-flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto" data-action="open-booking" data-tour="1" data-tier="1" @click.stop="$store.modal.open('booking', { tourId: 1, tierId: 1 })">
                 <span class="font-bold text-white text-sm">{{ __('ui.common.starting_from') }}</span>
                 <span class="text-xl font-black text-primary" data-aed="79">{{ __('ui.common.aed') }} 79</span>
             </button>
         </div>
 
         <div class="max-w-3xl mx-auto mb-8 bg-black/25 backdrop-blur-xs rounded-2xl p-4 sm:p-5 border border-white/10">
-            <h2 class="text-base sm:text-lg font-bold text-white mb-1.5">Dubai Desert Safari with Luxury Land Cruiser Pick & Drop</h2>
-            <p class="text-xs sm:text-sm text-white/80 leading-relaxed">Enjoy a premium desert safari experience with chauffeur-driven Luxury Land Cruiser hotel pickup and drop-off. Comfortable seating, professional drivers, and hassle-free transfers included with every booking.</p>
+            <h2 class="text-base sm:text-lg font-bold text-white mb-1.5">{{ __('ui.home_hero.card_title') }}</h2>
+            <p class="text-xs sm:text-sm text-white/80 leading-relaxed">{{ __('ui.home_hero.card_desc') }}</p>
         </div>
 
         <div class="flex justify-center items-center gap-3 sm:gap-12 opacity-85 text-center">

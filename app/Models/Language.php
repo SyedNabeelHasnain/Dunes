@@ -142,6 +142,8 @@ class Language extends Model
         }
     }
 
+    protected static ?Collection $activeMemo = null;
+
     /**
      * Get all active languages ordered by sort_order.
      *
@@ -149,20 +151,11 @@ class Language extends Model
      */
     public static function getActive(): Collection
     {
+        if (self::$activeMemo !== null && ! app()->runningUnitTests()) {
+            return self::$activeMemo;
+        }
+
         try {
-            // Self-healing: if languages table does not exist yet, trigger migration safely
-            if (! Schema::hasTable('languages')) {
-                try {
-                    Artisan::call('migrate', ['--force' => true]);
-                } catch (\Throwable $migrationError) {
-                    Log::warning('Self-healing migration failed: '.$migrationError->getMessage());
-                }
-
-                if (! Schema::hasTable('languages')) {
-                    return self::fallbackCollection();
-                }
-            }
-
             $rows = Cache::rememberForever('languages_active_data', function () {
                 return self::where('is_active', true)
                     ->orderBy('is_default', 'desc')
@@ -184,7 +177,12 @@ class Language extends Model
                 return $lang;
             }, $rows);
 
-            return new Collection($models);
+            $collection = new Collection($models);
+            if (! app()->runningUnitTests()) {
+                self::$activeMemo = $collection;
+            }
+
+            return $collection;
         } catch (\Throwable $e) {
             Log::warning('Language::getActive() query failed: '.$e->getMessage());
 
@@ -213,6 +211,7 @@ class Language extends Model
      */
     public static function clearLanguageCache(): void
     {
+        self::$activeMemo = null;
         try {
             Cache::forget('language_default');
             Cache::forget('languages_active');

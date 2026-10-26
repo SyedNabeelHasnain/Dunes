@@ -237,9 +237,9 @@ window.dataLayer.push({
     currency: "AED",
     value: {{ $activePrice }},
     items: [{
-      item_id: {!! json_encode((string) $tour->id) !!},
-      item_name: @json($tour->name),
-      item_category: {!! json_encode($tour->category ? $tour->category->slug : '') !!},
+      item_id: {!! json_encode((string) $tour->id, JSON_HEX_TAG) !!},
+      item_name: @json($tour->name, JSON_HEX_TAG),
+      item_category: {!! json_encode($tour->category ? $tour->category->slug : '', JSON_HEX_TAG) !!},
       price: {{ $activePrice }}
     }]
   }
@@ -990,22 +990,18 @@ if(window.fbq){
                             </div>
                         </div>
 
-                        <!-- Scarcity Urgency -->
-                        @php
-                            $detailBookings = (int)(($tour->id * 4 + (int)date('j')) % 6 + 4);
-                            $viewingNow = (int)(($tour->id * 2 + (int)date('G')) % 11 + 12);
-                        @endphp
-                        <div class="bg-red-500/5 border border-red-500/20 rounded-2xl p-3 mb-5">
+                        <!-- Verified Operator Trust Box -->
+                        <div class="bg-orange-50/60 border border-orange-200/80 rounded-2xl p-3 mb-5">
                             <div class="flex items-center justify-between gap-2 mb-1">
-                                <div class="flex items-center gap-1.5 text-red-600 font-bold text-xs">
-                                    <i class="bi bi-fire"></i>
-                                    <span>{{ __('ui.tour_sidebar.booked_today', ['count' => $detailBookings]) }}</span>
+                                <div class="flex items-center gap-1.5 text-slate-800 font-bold text-xs">
+                                    <i class="bi bi-shield-check text-emerald-600"></i>
+                                    <span>Instant Confirmation</span>
                                 </div>
-                                <span class="bg-red-500 text-white rounded-full px-2 py-0.5 text-[10px] font-bold">{{ __('ui.tour_sidebar.spots_left', ['count' => 2]) }}</span>
+                                <span class="bg-emerald-600 text-white rounded-full px-2.5 py-0.5 text-[10px] font-bold">100% Guaranteed</span>
                             </div>
                             <div class="flex items-center gap-1.5 text-slate-500 text-[11px]">
-                                <i class="bi bi-eye-fill text-primary"></i>
-                                <span>{{ __('ui.tour_sidebar.viewing_now', ['count' => $viewingNow]) }}</span>
+                                <i class="bi bi-arrow-repeat text-primary"></i>
+                                <span>Free cancellation up to 24h before tour</span>
                             </div>
                         </div>
 

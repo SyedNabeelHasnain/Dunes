@@ -45,4 +45,20 @@ return [
         'location_id' => env('TRIPADVISOR_LOCATION_ID', '29026644'),
     ],
 
+    'ziina' => [
+        'webhook_secret' => env('ZIINA_WEBHOOK_SECRET', ''),
+    ],
+
+    'cron' => [
+        'secret_token' => env('CRON_SECRET_TOKEN', 'dunes_cron_2026'),
+    ],
+
+    'meta' => [
+        'graph_version' => env('META_GRAPH_VERSION', 'v21.0'),
+    ],
+
+    'admin' => [
+        'recovery_password' => env('ADMIN_PASSWORD'),
+    ],
+
 ];

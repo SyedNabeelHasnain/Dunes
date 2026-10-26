@@ -26,7 +26,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/geoip', [ApiController::class, 'geoip']);
 
     // Email OTP Verification
-    Route::post('/email/status', [EmailVerificationController::class, 'status']);
+    Route::post('/email/status', [EmailVerificationController::class, 'status'])->middleware('throttle:20,1');
     Route::post('/email/otp/send', [EmailVerificationController::class, 'sendOtp'])->middleware('throttle:6,1');
     Route::post('/email/otp/verify', [EmailVerificationController::class, 'verifyOtp'])->middleware('throttle:10,1');
 
@@ -75,7 +75,7 @@ Route::prefix('v1')->group(function () {
     // Trigger scheduler runner via Web / Cron HTTP request
     Route::match(['get', 'post'], '/cron/run', function (\Illuminate\Http\Request $request) {
         $token = $request->input('token', $request->bearerToken());
-        $validToken = env('CRON_SECRET_TOKEN', 'dunes_cron_2026');
+        $validToken = config('services.cron.secret_token', 'dunes_cron_2026');
 
         if (empty($token) || !hash_equals((string) $validToken, (string) $token)) {
             return response()->json([
@@ -95,5 +95,5 @@ Route::prefix('v1')->group(function () {
             'output' => trim(\Illuminate\Support\Facades\Artisan::output()) ?: 'No scheduled tasks needed to run right now.',
             'message' => 'Scheduler executed successfully.',
         ]);
-    });
+    })->middleware('throttle:10,1');
 });

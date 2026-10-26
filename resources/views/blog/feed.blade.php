@@ -71,11 +71,19 @@
       @php
           $imageUrl = $post->featured_image_url;
           $imageAlt = is_array($post->featured_image_alt) ? (reset($post->featured_image_alt) ?: '') : (string) ($post->featured_image_alt ?? '');
+          $imgExt = strtolower(pathinfo((string) parse_url($imageUrl, PHP_URL_PATH), PATHINFO_EXTENSION));
+          $imgMime = match ($imgExt) {
+              'webp' => 'image/webp',
+              'png' => 'image/png',
+              'jpg', 'jpeg' => 'image/jpeg',
+              'svg' => 'image/svg+xml',
+              default => 'image/avif',
+          };
       @endphp
-      <media:content url="{{ $imageUrl }}" medium="image">
+      <media:content url="{{ $imageUrl }}" medium="image" type="{{ $imgMime }}">
         <media:title><![CDATA[{!! $escapeCdata($imageAlt ?: $postTitle) !!}]]></media:title>
       </media:content>
-      <enclosure url="{{ $imageUrl }}" type="image/avif" length="0" />
+      <enclosure url="{{ $imageUrl }}" type="{{ $imgMime }}" length="0" />
       @endif
     </item>
     @endforeach
