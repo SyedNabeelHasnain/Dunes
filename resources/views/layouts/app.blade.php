@@ -92,8 +92,7 @@
     @endif
 
     @if(!empty($primaryGtagId))
-    <!-- Google tag (gtag.js) {{ $primaryGtagId }} (Decoupled Sitewide Tag) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $primaryGtagId }}"></script>
+    <!-- Google tag (gtag.js) {{ $primaryGtagId }} (Deferred Non-blocking Sitewide Tag) -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
@@ -108,8 +107,18 @@
       gtag('config', '{{ $ga4Id }}');
       @endif
 
+      function loadGoogleAnalytics() {
+        if (window._gtagLoaded) return;
+        window._gtagLoaded = true;
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = "https://www.googletagmanager.com/gtag/js?id={{ $primaryGtagId }}";
+        document.head.appendChild(s);
+      }
+
       // Helper function to delay opening a URL until an event callback fires (without sending unwanted conversions)
       function gtagSendEvent(url, eventName, params) {
+        if (typeof loadGoogleAnalytics === 'function') loadGoogleAnalytics();
         var navigated = false;
         var callback = function () {
           if (!navigated && typeof url === 'string' && url) {
@@ -141,6 +150,7 @@
       window.gtagSendEvent = gtagSendEvent;
 
       function gtagReportConversion(url) {
+        if (typeof loadGoogleAnalytics === 'function') loadGoogleAnalytics();
         if (typeof url === 'string' && url) {
           window.location = url;
         }
@@ -156,13 +166,20 @@
     @endif
 
     @if($metaActive && !empty($metaPixelId))
-    <!-- Meta Pixel Code with Immediate Synchronous fbq Stub -->
+    <!-- Meta Pixel Code with Immediate Synchronous fbq Stub and Deferred Script Execution -->
     <script>
-      !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-      n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
-      document,'script','https://connect.facebook.net/en_US/fbevents.js');
+      !function(f,b,e,v,n,t,s){
+        if(f.fbq)return;
+        n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;
+        n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];
+        f._loadMetaPixel=function(){
+          if(f._metaPixelLoaded)return;
+          f._metaPixelLoaded=!0;
+          t=b.createElement(e);t.async=!0;t.src=v;
+          s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s);
+        };
+      }(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
       fbq('init', '{{ $metaPixelId }}');
       fbq('track', 'PageView');
     </script>
@@ -171,6 +188,30 @@
       window.fbq = window.fbq || function() {};
     </script>
     @endif
+
+    <script>
+      // Non-blocking third-party analytics bootstrap (fires on idle or first user interaction)
+      (function() {
+        var loaded = false;
+        function initAnalytics() {
+          if (loaded) return;
+          loaded = true;
+          if (typeof loadGoogleAnalytics === 'function') loadGoogleAnalytics();
+          if (typeof window._loadMetaPixel === 'function') window._loadMetaPixel();
+          ['pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(function(ev) {
+            window.removeEventListener(ev, initAnalytics, {passive: true});
+          });
+        }
+        ['pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(function(ev) {
+          window.addEventListener(ev, initAnalytics, {once: true, passive: true});
+        });
+        if ('requestIdleCallback' in window) {
+          window.requestIdleCallback(function() { setTimeout(initAnalytics, 2500); });
+        } else {
+          window.addEventListener('load', function() { setTimeout(initAnalytics, 2500); });
+        }
+      })();
+    </script>
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -269,9 +310,11 @@
     <!-- Prevent Alpine.js modal/drawer flashing during page hydration -->
     <style>[x-cloak] { display: none !important; }</style>
 
-    <!-- Stylesheets: Tailwind v4 Token System & Vendor Assets via Vite -->
-    <link rel="stylesheet" href="{{ asset('assets/vendor/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/vendor/intl-tel-input/26.0.6/build/intlTelInput.css') }}">
+    <!-- Stylesheets: Tailwind v4 Token System & Non-blocking Vendor Assets -->
+    <link rel="stylesheet" href="{{ asset('assets/vendor/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css') }}" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="{{ asset('assets/vendor/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css') }}"></noscript>
+    <link rel="stylesheet" href="{{ asset('assets/vendor/intl-tel-input/26.0.6/build/intlTelInput.css') }}" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="{{ asset('assets/vendor/intl-tel-input/26.0.6/build/intlTelInput.css') }}"></noscript>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @stack('styles')
@@ -494,7 +537,7 @@
                                 <div class="flex text-amber-400 text-[10px]">
                                     <i class="bi bi-star-fill"></i>
                                 </div>
-                                <span class="text-[10px] text-slate-400 font-semibold hidden xl:inline">Google</span>
+                                <span class="text-[10px] text-slate-600 font-semibold hidden xl:inline">Google</span>
                             </a>
 
                             <!-- TripAdvisor Reviews Badge -->
@@ -510,7 +553,7 @@
                                 <div class="flex text-emerald-600 text-[10px]">
                                     <i class="bi bi-star-fill"></i>
                                 </div>
-                                <span class="text-[10px] text-slate-400 font-semibold hidden xl:inline">TripAdvisor</span>
+                                <span class="text-[10px] text-slate-600 font-semibold hidden xl:inline">TripAdvisor</span>
                             </a>
                         </div>
                     </div>
@@ -536,7 +579,7 @@
                                     <li class="relative" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">
                                         <div class="inline-flex items-center rounded-xl {{ $isActive ? 'bg-slate-900 text-white font-bold shadow-xs' : '' }}">
                                             <a class="px-3 py-2 rounded-s-xl transition-all {{ $isActive ? 'text-white' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ $mItem->resolved_url }}" target="{{ $mItem->target ?? '_self' }}">{{ $mItem->label }}</a>
-                                            <button type="button" @click="open = !open" :aria-expanded="open" class="px-1.5 py-2 rounded-e-xl transition-all hover:opacity-80 cursor-pointer" aria-label="{{ $mItem->label }}">
+                                            <button type="button" @click="open = !open" :aria-expanded="open" class="px-2.5 py-2 min-h-[40px] min-w-[36px] rounded-e-xl transition-all hover:opacity-80 cursor-pointer" aria-label="{{ $mItem->label }}">
                                                 <i class="bi bi-chevron-down text-[10px] transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
                                             </button>
                                         </div>
@@ -575,7 +618,7 @@
                             <li class="relative" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">
                                 <div class="inline-flex items-center rounded-xl {{ request()->routeIs('tours.*', 'locale.tours.*') ? 'bg-slate-900 text-white font-bold shadow-xs' : '' }}">
                                     <a class="px-3 py-2 rounded-s-xl transition-all {{ request()->routeIs('tours.*', 'locale.tours.*') ? 'text-white' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ localized_route('tours.index') }}">{{ __('ui.nav.tours_short') ?? __('ui.nav.tours') }}</a>
-                                    <button type="button" @click="open = !open" :aria-expanded="open" class="px-1.5 py-2 rounded-e-xl transition-all hover:opacity-80 cursor-pointer" aria-label="{{ __('ui.nav.tours_short') ?? __('ui.nav.tours') }}">
+                                    <button type="button" @click="open = !open" :aria-expanded="open" class="px-2.5 py-2 min-h-[40px] min-w-[36px] rounded-e-xl transition-all hover:opacity-80 cursor-pointer" aria-label="{{ __('ui.nav.tours_short') ?? __('ui.nav.tours') }}">
                                         <i class="bi bi-chevron-down text-[10px] transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
                                     </button>
                                 </div>

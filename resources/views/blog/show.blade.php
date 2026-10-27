@@ -1,5 +1,13 @@
 @extends('layouts.app')
 
+@php
+    $featImgPath = $post->featured_image_url;
+@endphp
+
+@push('preloads')
+    <link rel="preload" as="image" href="{{ $featImgPath }}" type="image/avif">
+@endpush
+
 @section('content')
 @php
     $publishedAt = $post->published_at ?? $post->created_at;
@@ -66,10 +74,6 @@
         'itemListElement' => $breadcrumbItems
     ];
 @endphp
-
-@push('preloads')
-    <link rel="preload" as="image" href="{{ $featImgPath }}" type="image/avif">
-@endpush
 
 @push('schema')
 <script type="application/ld+json">{!! json_encode($articleSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>

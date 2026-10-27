@@ -43,10 +43,28 @@ RewriteRule ^ index.php [L]
     ExpiresByType video/mp4 "access plus 1 year"
 </IfModule>
 
+# Enable Gzip / Deflate Compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+    AddOutputFilterByType DEFLATE application/json
+    AddOutputFilterByType DEFLATE image/svg+xml
+    AddOutputFilterByType DEFLATE font/woff
+    AddOutputFilterByType DEFLATE font/woff2
+</IfModule>
+
 <IfModule mod_headers.c>
     <FilesMatch "\.(avif|webp|png|jpg|jpeg|svg|css|js|woff2|woff|mp4)$">
         Header set Cache-Control "public, max-age=31536000, immutable"
     </FilesMatch>
+    Header set Cross-Origin-Opener-Policy "same-origin-allow-popups"
 </IfModule>
 
 # Protect CLI scripts from direct HTTP web access

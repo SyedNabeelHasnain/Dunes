@@ -1,5 +1,15 @@
 @extends('layouts.app')
 
+@php
+$heroPoster = !empty($settings['site_hero_poster']) 
+    ? (str_starts_with($settings['site_hero_poster'], 'http') ? $settings['site_hero_poster'] : asset(ltrim($settings['site_hero_poster'], '/'))) 
+    : asset('images/desert-safari-poster.avif');
+@endphp
+
+@push('preloads')
+<link rel="preload" as="image" href="{{ $heroPoster }}" type="image/avif" fetchpriority="high">
+@endpush
+
 @section('content')
 @php
 if (!function_exists('renderReviewCardMarkup')) {
@@ -121,7 +131,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                         <span class="text-[11px] font-bold text-slate-700 bg-amber-50 border border-amber-200/60 rounded-md px-1.5 py-0.5 leading-none">5.0</span>
                     </div>
 
-                    ' . ($reviewTitle ? '<h4 class="text-sm font-bold text-slate-900 mb-1.5 line-clamp-1 leading-snug group-hover:text-slate-950">' . $reviewTitle . '</h4>' : '') . '
+                    ' . ($reviewTitle ? '<h3 class="text-sm font-bold text-slate-900 mb-1.5 line-clamp-1 leading-snug group-hover:text-slate-950">' . $reviewTitle . '</h3>' : '') . '
                     <p class="text-slate-600 text-xs sm:text-[13px] leading-relaxed line-clamp-3">"' . $reviewText . '"</p>
                     ' . $photosHtml . '
                 </div>
@@ -139,15 +149,7 @@ if (!function_exists('renderReviewCardMarkup')) {
         </a>';
     }
 }
-
-$heroPoster = !empty($settings['site_hero_poster']) 
-    ? (str_starts_with($settings['site_hero_poster'], 'http') ? $settings['site_hero_poster'] : asset(ltrim($settings['site_hero_poster'], '/'))) 
-    : asset('images/desert-safari-poster.avif');
 @endphp
-
-@push('preloads')
-<link rel="preload" as="image" href="{{ $heroPoster }}" fetchpriority="high">
-@endpush
 
 @push('schema')
 <!-- Homepage-Specific Connected Schema Graph: VideoObject and FAQPage -->
@@ -333,7 +335,7 @@ $heroPoster = !empty($settings['site_hero_poster'])
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-10 sm:mb-12">
             <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">
-                {{ __('ui.home_categories.title') }} <span class="text-primary">{{ __('ui.home_categories.title_highlight') }}</span>
+                {{ __('ui.home_categories.title') }} <span class="text-[#b9540c]">{{ __('ui.home_categories.title_highlight') }}</span>
             </h2>
             <p class="text-slate-600 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
                 {{ __('ui.home_categories.subtitle') }}
@@ -347,7 +349,7 @@ $heroPoster = !empty($settings['site_hero_poster'])
                 </div>
                 <h3 class="text-lg font-bold text-slate-900 mb-2">{{ __('ui.home_categories.evening_title') }}</h3>
                 <p class="text-slate-600 text-sm mb-4 flex-grow leading-relaxed">{{ __('ui.home_categories.evening_desc') }}</p>
-                <a href="{{ localized_route('tours.show', 'evening-desert-safari-dubai') }}" class="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:text-primary-hover transition-colors mt-auto">
+                <a href="{{ localized_route('tours.show', 'evening-desert-safari-dubai') }}" class="inline-flex items-center gap-1.5 text-sm font-bold text-[#b9540c] hover:text-primary-dark transition-colors mt-auto">
                     <span>{{ __('ui.home_categories.evening_btn') }}</span>
                     <i class="bi bi-arrow-right rtl:rotate-180 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform"></i>
                 </a>
@@ -359,7 +361,7 @@ $heroPoster = !empty($settings['site_hero_poster'])
                 </div>
                 <h3 class="text-lg font-bold text-slate-900 mb-2">{{ __('ui.home_categories.buggy_title') }}</h3>
                 <p class="text-slate-600 text-sm mb-4 flex-grow leading-relaxed">{{ __('ui.home_categories.buggy_desc') }}</p>
-                <a href="{{ localized_route('tours.buggy') }}" class="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:text-primary-hover transition-colors mt-auto">
+                <a href="{{ localized_route('tours.buggy') }}" class="inline-flex items-center gap-1.5 text-sm font-bold text-[#b9540c] hover:text-primary-dark transition-colors mt-auto">
                     <span>{{ __('ui.home_categories.buggy_btn') }}</span>
                     <i class="bi bi-arrow-right rtl:rotate-180 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform"></i>
                 </a>
@@ -371,7 +373,7 @@ $heroPoster = !empty($settings['site_hero_poster'])
                 </div>
                 <h3 class="text-lg font-bold text-slate-900 mb-2">{{ __('ui.home_categories.cruise_title') }}</h3>
                 <p class="text-slate-600 text-sm mb-4 flex-grow leading-relaxed">{{ __('ui.home_categories.cruise_desc') }}</p>
-                <a href="{{ localized_route('tours.show', 'dhow-cruise-catamaran-cruise-dinner-dubai') }}" class="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:text-primary-hover transition-colors mt-auto">
+                <a href="{{ localized_route('tours.show', 'dhow-cruise-catamaran-cruise-dinner-dubai') }}" class="inline-flex items-center gap-1.5 text-sm font-bold text-[#b9540c] hover:text-primary-dark transition-colors mt-auto">
                     <span>{{ __('ui.home_categories.cruise_btn') }}</span>
                     <i class="bi bi-arrow-right rtl:rotate-180 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform"></i>
                 </a>
@@ -383,7 +385,7 @@ $heroPoster = !empty($settings['site_hero_poster'])
                 </div>
                 <h3 class="text-lg font-bold text-slate-900 mb-2">{{ __('ui.home_categories.city_title') }}</h3>
                 <p class="text-slate-600 text-sm mb-4 flex-grow leading-relaxed">{{ __('ui.home_categories.city_desc') }}</p>
-                <a href="{{ localized_route('tours.show', 'abu-dhabi-city-tour-from-dubai') }}" class="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:text-primary-hover transition-colors mt-auto">
+                <a href="{{ localized_route('tours.show', 'abu-dhabi-city-tour-from-dubai') }}" class="inline-flex items-center gap-1.5 text-sm font-bold text-[#b9540c] hover:text-primary-dark transition-colors mt-auto">
                     <span>{{ __('ui.home_categories.city_btn') }}</span>
                     <i class="bi bi-arrow-right rtl:rotate-180 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform"></i>
                 </a>
@@ -459,7 +461,7 @@ $heroPoster = !empty($settings['site_hero_poster'])
                                     <span class="text-lg font-black text-primary" data-aed="{{ $minPrice }}">{{ __('ui.common.aed') }} {{ number_format($minPrice) }}</span>
                                 </div>
                                 <div class="flex items-center gap-1.5 shrink-0">
-                                    <button type="button" class="border border-slate-300 hover:border-primary text-slate-700 bg-white hover:text-primary text-xs font-semibold rounded-full px-2.5 py-1 transition-colors btn-toggle-compare inline-flex items-center gap-1 cursor-pointer min-h-[36px]" data-tour-id="{{ $t->id }}" onclick="event.preventDefault(); event.stopPropagation(); window.DunesCompare && window.DunesCompare.toggle(this);">
+                                    <button type="button" class="border border-slate-300 hover:border-primary text-slate-700 bg-white hover:text-primary text-xs font-semibold rounded-full px-2.5 py-1 transition-colors btn-toggle-compare inline-flex items-center gap-1 cursor-pointer min-h-[36px]" data-tour-id="{{ $t->id }}" aria-label="{{ __('ui.home_popular.compare') }} {{ $t->name }}" onclick="event.preventDefault(); event.stopPropagation(); window.DunesCompare && window.DunesCompare.toggle(this);">
                                         <i class="bi bi-shuffle"></i> <span class="compare-btn-text hidden sm:inline">{{ __('ui.home_popular.compare') }}</span>
                                     </button>
                                     <span role="button" tabindex="0" class="btn-circle-whatsapp fab-whatsapp w-9 h-9 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center cursor-pointer shadow-xs transition-transform hover:scale-105 shrink-0" data-tour-name="{{ $t->name }}" aria-label="Book {{ $t->name }} via WhatsApp" onclick="event.preventDefault(); event.stopPropagation(); if(window.App && typeof window.App.openWhatsApp === 'function'){ window.App.openWhatsApp(this.dataset.tourName); }" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();if(window.App&&typeof window.App.openWhatsApp==='function'){window.App.openWhatsApp(this.dataset.tourName);}}">

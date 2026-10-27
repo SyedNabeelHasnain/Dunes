@@ -1,5 +1,16 @@
 @extends('layouts.app')
 
+@php
+    $tourImages = $tour->getImageList();
+    $heroAvifUrl = $tourImages[0] ?? resolve_tour_image($tour->hero_image);
+@endphp
+
+@push('preloads')
+    <link rel="preload" as="image" href="{{ $heroAvifUrl }}" type="image/avif">
+@endpush
+
+
+
 @section('content')
 @php
     $phoneVal = $settings['site_phone'] ?? '+971 50 245 6056';
@@ -46,9 +57,7 @@
 </style>
 @endpush
 
-@push('preloads')
-    <link rel="preload" as="image" href="{{ $heroAvifUrl }}" type="image/avif">
-@endpush
+
 
 @push('schema')
     <!-- 2026 Connected JSON-LD Schema Graph: TouristTrip, Product, Offer, TravelAgency, Itinerary, FAQPage -->

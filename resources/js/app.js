@@ -1817,21 +1817,22 @@ const App = {
             });
 
             box.addEventListener('paste', (e) => {
-                e.preventDefault();
                 const pasted = (e.clipboardData || window.clipboardData)?.getData('text') || '';
                 const digits = pasted.replace(/\D/g, '').slice(0, 6);
                 if (!digits) return;
 
-                digits.split('').forEach((d, i) => {
-                    if (digitBoxes[i]) digitBoxes[i].value = d;
-                });
-                const nextFocus = Math.min(digits.length, digitBoxes.length - 1);
-                digitBoxes[nextFocus]?.focus();
+                setTimeout(() => {
+                    digits.split('').forEach((d, i) => {
+                        if (digitBoxes[i]) digitBoxes[i].value = d;
+                    });
+                    const nextFocus = Math.min(digits.length, digitBoxes.length - 1);
+                    digitBoxes[nextFocus]?.focus();
 
-                const code = syncMasterOtp();
-                if (code.length === 6) {
-                    this.verifyOtpCode(input);
-                }
+                    const code = syncMasterOtp();
+                    if (code.length === 6) {
+                        this.verifyOtpCode(input);
+                    }
+                }, 0);
             });
         });
 

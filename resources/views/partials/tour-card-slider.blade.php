@@ -12,17 +12,19 @@
      x-data="{
          activeIdx: 0,
          count: {{ $totalCount }},
+         hasInteracted: false,
          startX: 0,
-         prev(e) { if (e) { e.preventDefault(); e.stopPropagation(); } this.activeIdx = (this.activeIdx - 1 + this.count) % this.count; },
-         next(e) { if (e) { e.preventDefault(); e.stopPropagation(); } this.activeIdx = (this.activeIdx + 1) % this.count; },
-         go(idx, e) { if (e) { e.preventDefault(); e.stopPropagation(); } this.activeIdx = idx; },
-         touchStart(e) { this.startX = e.changedTouches[0].screenX; },
+         prev(e) { if (e) { e.preventDefault(); e.stopPropagation(); } this.hasInteracted = true; this.activeIdx = (this.activeIdx - 1 + this.count) % this.count; },
+         next(e) { if (e) { e.preventDefault(); e.stopPropagation(); } this.hasInteracted = true; this.activeIdx = (this.activeIdx + 1) % this.count; },
+         go(idx, e) { if (e) { e.preventDefault(); e.stopPropagation(); } this.hasInteracted = true; this.activeIdx = idx; },
+         touchStart(e) { this.hasInteracted = true; this.startX = e.changedTouches[0].screenX; },
          touchEnd(e) {
              const diff = e.changedTouches[0].screenX - this.startX;
              if (diff > 40) { this.prev(e); }
              else if (diff < -40) { this.next(e); }
          }
      }"
+     @mouseenter.once="hasInteracted = true"
      @touchstart.passive="touchStart($event)"
      @touchend.passive="touchEnd($event)"
      @endif>
@@ -30,17 +32,25 @@
     <!-- Images / Slides -->
     <div class="w-full h-full relative">
         @foreach($cardImages as $idx => $imgUrl)
-            <img src="{{ $imgUrl }}"
-                 width="400" height="250"
-                 alt="{{ $tour->name }} Dubai Desert Safari photo {{ $idx + 1 }}"
-                 loading="lazy"
-                 class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-opacity duration-500 ease-out"
-                 @if($totalCount >= 2)
-                 :style="activeIdx === {{ $idx }} ? 'opacity: 1; z-index: 10; pointer-events: auto;' : 'opacity: 0; z-index: 1; pointer-events: none;'"
-                 style="opacity: {{ $idx === 0 ? '1' : '0' }}; z-index: {{ $idx === 0 ? '10' : '1' }}; pointer-events: {{ $idx === 0 ? 'auto' : 'none' }};"
-                 @else
-                 style="opacity: 1; z-index: 10;"
-                 @endif>
+            @if($idx === 0)
+                <img src="{{ $imgUrl }}"
+                     width="400" height="250"
+                     alt="{{ $tour->name }} Dubai Desert Safari photo 1"
+                     loading="lazy"
+                     decoding="async"
+                     class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-opacity duration-300 ease-out"
+                     :style="activeIdx === 0 ? 'opacity: 1; z-index: 10; pointer-events: auto;' : 'opacity: 0; z-index: 1; pointer-events: none;'"
+                     style="opacity: 1; z-index: 10; pointer-events: auto;">
+            @else
+                <img :src="(hasInteracted || activeIdx === {{ $idx }}) ? '{{ $imgUrl }}' : ''"
+                     width="400" height="250"
+                     alt="{{ $tour->name }} Dubai Desert Safari photo {{ $idx + 1 }}"
+                     loading="lazy"
+                     decoding="async"
+                     class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-opacity duration-300 ease-out"
+                     :style="activeIdx === {{ $idx }} ? 'opacity: 1; z-index: 10; pointer-events: auto;' : 'opacity: 0; z-index: 1; pointer-events: none;'"
+                     style="opacity: 0; z-index: 1; pointer-events: none;">
+            @endif
         @endforeach
     </div>
 
@@ -72,13 +82,13 @@
         <button type="button"
                 @click.prevent.stop="prev($event)"
                 aria-label="Previous image"
-                class="absolute start-2 top-1/2 -translate-y-1/2 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-950/65 hover:bg-primary text-white flex items-center justify-center opacity-85 sm:opacity-0 group-hover:opacity-100 transition-all duration-200 shadow-md backdrop-blur-xs cursor-pointer focus:outline-hidden hover:scale-105 active:scale-95">
+                class="absolute start-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-slate-950/65 hover:bg-primary text-white flex items-center justify-center opacity-85 sm:opacity-0 group-hover:opacity-100 transition-all duration-200 shadow-md backdrop-blur-xs cursor-pointer focus:outline-hidden hover:scale-105 active:scale-95">
             <i class="bi bi-chevron-left text-xs rtl:rotate-180"></i>
         </button>
         <button type="button"
                 @click.prevent.stop="next($event)"
                 aria-label="Next image"
-                class="absolute end-2 top-1/2 -translate-y-1/2 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-950/65 hover:bg-primary text-white flex items-center justify-center opacity-85 sm:opacity-0 group-hover:opacity-100 transition-all duration-200 shadow-md backdrop-blur-xs cursor-pointer focus:outline-hidden hover:scale-105 active:scale-95">
+                class="absolute end-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-slate-950/65 hover:bg-primary text-white flex items-center justify-center opacity-85 sm:opacity-0 group-hover:opacity-100 transition-all duration-200 shadow-md backdrop-blur-xs cursor-pointer focus:outline-hidden hover:scale-105 active:scale-95">
             <i class="bi bi-chevron-right text-xs rtl:rotate-180"></i>
         </button>
 
@@ -94,8 +104,10 @@
                     <button type="button"
                             @click.prevent.stop="go({{ $idx }}, $event)"
                             aria-label="Photo {{ $idx + 1 }}"
-                            class="h-1.5 rounded-full transition-all duration-200 cursor-pointer"
-                            :class="activeIdx === {{ $idx }} ? 'w-4 bg-amber-400 shadow-xs' : 'w-1.5 bg-white/60 hover:bg-white'"></button>
+                            class="relative p-1.5 flex items-center justify-center cursor-pointer min-w-[24px] min-h-[24px]">
+                        <span class="block h-1.5 rounded-full transition-all duration-200"
+                              :class="activeIdx === {{ $idx }} ? 'w-4 bg-amber-400 shadow-xs' : 'w-1.5 bg-white/60 hover:bg-white'"></span>
+                    </button>
                 @endforeach
             </div>
         </div>

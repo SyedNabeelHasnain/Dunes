@@ -39,26 +39,26 @@
 
                 <!-- Step 1: Category -->
                 <div x-show="step === 1">
-                    <h4 class="font-black text-slate-900 text-base sm:text-lg mb-4 text-center">What type of Dubai experience are you looking for?</h4>
+                    <h3 class="font-black text-slate-900 text-base sm:text-lg mb-4 text-center">What type of Dubai experience are you looking for?</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         <div @click="selectChoice(1, 'desert')" class="p-4 rounded-2xl border border-slate-200 hover:border-primary hover:bg-orange-50/50 cursor-pointer transition-all text-center group">
                             <i class="bi bi-compass text-3xl text-amber-500 mb-2 block group-hover:scale-110 transition-transform"></i>
-                            <h6 class="font-bold text-slate-900 text-sm mb-1">Desert Safari & Red Dunes</h6>
+                            <h4 class="font-bold text-slate-900 text-sm mb-1">Desert Safari & Red Dunes</h4>
                             <p class="text-slate-500 text-xs leading-relaxed">4x4 Dune Bashing, Camel Rides, Live Camp Shows & BBQ Dinner</p>
                         </div>
                         <div @click="selectChoice(1, 'city')" class="p-4 rounded-2xl border border-slate-200 hover:border-primary hover:bg-orange-50/50 cursor-pointer transition-all text-center group">
                             <i class="bi bi-buildings text-3xl text-amber-500 mb-2 block group-hover:scale-110 transition-transform"></i>
-                            <h6 class="font-bold text-slate-900 text-sm mb-1">City Sightseeing & Landmarks</h6>
+                            <h4 class="font-bold text-slate-900 text-sm mb-1">City Sightseeing & Landmarks</h4>
                             <p class="text-slate-500 text-xs leading-relaxed">Dubai & Abu Dhabi iconic tours, Burj Khalifa & Grand Mosque</p>
                         </div>
                         <div @click="selectChoice(1, 'water')" class="p-4 rounded-2xl border border-slate-200 hover:border-primary hover:bg-orange-50/50 cursor-pointer transition-all text-center group">
                             <i class="bi bi-water text-3xl text-amber-500 mb-2 block group-hover:scale-110 transition-transform"></i>
-                            <h6 class="font-bold text-slate-900 text-sm mb-1">Marina Dhow & Luxury Cruise</h6>
+                            <h4 class="font-bold text-slate-900 text-sm mb-1">Marina Dhow & Luxury Cruise</h4>
                             <p class="text-slate-500 text-xs leading-relaxed">Dubai Marina dinner cruise with skyline views & entertainment</p>
                         </div>
                         <div @click="selectChoice(1, 'quad_buggy')" class="p-4 rounded-2xl border border-slate-200 hover:border-primary hover:bg-orange-50/50 cursor-pointer transition-all text-center group">
                             <i class="bi bi-speedometer2 text-3xl text-amber-500 mb-2 block group-hover:scale-110 transition-transform"></i>
-                            <h6 class="font-bold text-slate-900 text-sm mb-1">Quad Bike & Buggy Rentals</h6>
+                            <h4 class="font-bold text-slate-900 text-sm mb-1">Quad Bike & Buggy Rentals</h4>
                             <p class="text-slate-500 text-xs leading-relaxed">Self-drive 1000cc Buggy & 400cc ATV adrenaline in open red dunes</p>
                         </div>
                     </div>
@@ -66,21 +66,21 @@
 
                 <!-- Step 2: Timing -->
                 <div x-show="step === 2">
-                    <h4 class="font-black text-slate-900 text-base sm:text-lg mb-4 text-center">What time of day do you prefer?</h4>
+                    <h3 class="font-black text-slate-900 text-base sm:text-lg mb-4 text-center">What time of day do you prefer?</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                         <div @click="selectChoice(2, 'morning')" class="p-4 rounded-2xl border border-slate-200 hover:border-primary hover:bg-orange-50/50 cursor-pointer transition-all text-center group">
                             <i class="bi bi-sunrise text-3xl text-amber-500 mb-2 block group-hover:scale-110 transition-transform"></i>
-                            <h6 class="font-bold text-slate-900 text-sm mb-1">Morning Experience</h6>
+                            <h4 class="font-bold text-slate-900 text-sm mb-1">Morning Experience</h4>
                             <p class="text-slate-500 text-xs leading-relaxed">8:00 AM - 12:00 PM • Crisp breeze & cool weather</p>
                         </div>
                         <div @click="selectChoice(2, 'evening')" class="p-4 rounded-2xl border border-slate-200 hover:border-primary hover:bg-orange-50/50 cursor-pointer transition-all text-center group">
                             <i class="bi bi-sunset text-3xl text-amber-500 mb-2 block group-hover:scale-110 transition-transform"></i>
-                            <h6 class="font-bold text-slate-900 text-sm mb-1">Evening & Sunset</h6>
+                            <h4 class="font-bold text-slate-900 text-sm mb-1">Evening & Sunset</h4>
                             <p class="text-slate-500 text-xs leading-relaxed">3:00 PM - 9:30 PM • Sunset, 5-Star Buffet & Shows</p>
                         </div>
                         <div @click="selectChoice(2, 'overnight')" class="p-4 rounded-2xl border border-slate-200 hover:border-primary hover:bg-orange-50/50 cursor-pointer transition-all text-center group">
                             <i class="bi bi-moon-stars text-3xl text-amber-500 mb-2 block group-hover:scale-110 transition-transform"></i>
-                            <h6 class="font-bold text-slate-900 text-sm mb-1">Overnight Stay</h6>
+                            <h4 class="font-bold text-slate-900 text-sm mb-1">Overnight Stay</h4>
                             <p class="text-slate-500 text-xs leading-relaxed">Camp under stars with campfire & morning breakfast</p>
                         </div>
                     </div>
@@ -88,21 +88,21 @@
 
                 <!-- Step 3: Style -->
                 <div x-show="step === 3">
-                    <h4 class="font-black text-slate-900 text-base sm:text-lg mb-4 text-center">What is your group style & pace?</h4>
+                    <h3 class="font-black text-slate-900 text-base sm:text-lg mb-4 text-center">What is your group style & pace?</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                         <div @click="selectChoice(3, 'family')" class="p-4 rounded-2xl border border-slate-200 hover:border-primary hover:bg-orange-50/50 cursor-pointer transition-all text-center group">
                             <i class="bi bi-people text-3xl text-amber-500 mb-2 block group-hover:scale-110 transition-transform"></i>
-                            <h6 class="font-bold text-slate-900 text-sm mb-1">Family & Friends</h6>
+                            <h4 class="font-bold text-slate-900 text-sm mb-1">Family & Friends</h4>
                             <p class="text-slate-500 text-xs leading-relaxed">Relaxed sightseeing, photo stops & family-friendly fun</p>
                         </div>
                         <div @click="selectChoice(3, 'thrill')" class="p-4 rounded-2xl border border-slate-200 hover:border-primary hover:bg-orange-50/50 cursor-pointer transition-all text-center group">
                             <i class="bi bi-speedometer2 text-3xl text-amber-500 mb-2 block group-hover:scale-110 transition-transform"></i>
-                            <h6 class="font-bold text-slate-900 text-sm mb-1">Thrill & Adrenaline</h6>
+                            <h4 class="font-bold text-slate-900 text-sm mb-1">Thrill & Adrenaline</h4>
                             <p class="text-slate-500 text-xs leading-relaxed">Dune bashing, quad biking, sandboarding & high excitement</p>
                         </div>
                         <div @click="selectChoice(3, 'luxury')" class="p-4 rounded-2xl border border-slate-200 hover:border-primary hover:bg-orange-50/50 cursor-pointer transition-all text-center group">
                             <i class="bi bi-award text-3xl text-amber-400 mb-2 block group-hover:scale-110 transition-transform"></i>
-                            <h6 class="font-bold text-slate-900 text-sm mb-1">VIP Luxury & Romance</h6>
+                            <h4 class="font-bold text-slate-900 text-sm mb-1">VIP Luxury & Romance</h4>
                             <p class="text-slate-500 text-xs leading-relaxed">Private 4x4, reserved VIP dining & premium comfort</p>
                         </div>
                     </div>

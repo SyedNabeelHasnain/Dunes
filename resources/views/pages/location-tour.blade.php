@@ -417,7 +417,7 @@
                                     <span class="text-slate-400 text-xs">/ {{ __('ui.rate_card.per_person') }}</span>
                                 </div>
                                 <div class="flex items-center gap-1.5">
-                                    <button type="button" class="border border-slate-700 hover:border-slate-500 text-slate-300 rounded-full px-2.5 py-1 text-xs whitespace-nowrap btn-toggle-compare cursor-pointer" data-tour-id="{{ $tour->id }}" onclick="event.preventDefault(); event.stopPropagation(); window.DunesCompare && window.DunesCompare.toggle(this);">
+                                    <button type="button" class="border border-slate-700 hover:border-slate-500 text-slate-300 rounded-full px-2.5 py-1 text-xs whitespace-nowrap btn-toggle-compare cursor-pointer" data-tour-id="{{ $tour->id }}" aria-label="{{ __('ui.common.compare') }} {{ $tour->name }}" onclick="event.preventDefault(); event.stopPropagation(); window.DunesCompare && window.DunesCompare.toggle(this);">
                                         <i class="bi bi-shuffle me-0.5"></i> <span class="compare-btn-text">{{ __('ui.common.compare') }}</span>
                                     </button>
                                     <a href="{{ localized_route('tours.show', $tour->slug) }}" class="border border-white/20 hover:bg-white/10 text-white rounded-full px-3 py-1 text-xs font-semibold inline-flex items-center gap-1 transition-colors">
