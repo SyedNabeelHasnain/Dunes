@@ -1386,3 +1386,34 @@ body {
     size: A4 portrait;
   }
 }
+
+/* ==========================================================================
+   WCAG 2.2 SC 2.3.3 & ADA Title III: Reduced Motion Accessibility Support
+   Respects user operating system preference to silence vestibular triggers
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .hero-slide-zoom,
+  .btn-desert-animated,
+  .btn-whatsapp-animated,
+  .pulse-dot,
+  .animate-pulse,
+  .animate-spin {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Keep video quiet if user has vestibular sensitivity */
+  .hero-video {
+    animation: none !important;
+  }
+}
+

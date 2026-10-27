@@ -591,18 +591,24 @@
                 @foreach($locationData['faqs'] as $index => $faq)
                     <div class="bg-slate-800/90 border border-white/10 rounded-2xl overflow-hidden transition-all duration-200">
                         <button type="button"
+                                id="loc-faq-btn-{{ $index }}"
                                 @click="activeFaq = (activeFaq === {{ $index }} ? null : {{ $index }})"
-                                :aria-expanded="activeFaq === {{ $index }}"
+                                :aria-expanded="activeFaq === {{ $index }} ? 'true' : 'false'"
+                                aria-controls="loc-faq-panel-{{ $index }}"
                                 class="w-full text-start px-5 sm:px-6 py-4 sm:py-5 flex items-center justify-between gap-4 font-bold transition-colors cursor-pointer"
                                 :class="activeFaq === {{ $index }} ? 'text-amber-400 bg-amber-500/10' : 'text-white hover:text-amber-400'">
                             <span class="text-sm sm:text-base font-bold">{{ $faq['q'] }}</span>
                             <svg class="w-5 h-5 shrink-0 transition-transform duration-300"
                                  :class="activeFaq === {{ $index }} ? 'rotate-180 text-amber-400' : 'text-slate-400'"
-                                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                 fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                 aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
                             </svg>
                         </button>
-                        <div x-show="activeFaq === {{ $index }}"
+                        <div id="loc-faq-panel-{{ $index }}"
+                             role="region"
+                             aria-labelledby="loc-faq-btn-{{ $index }}"
+                             x-show="activeFaq === {{ $index }}"
                              x-collapse
                              class="px-5 sm:px-6 py-4 sm:py-5 text-slate-300 leading-relaxed text-xs sm:text-sm border-t border-white/5 bg-slate-800/50">
                             {!! $faq['a'] !!}

@@ -302,8 +302,10 @@
     <meta name="msvalidate.01" content="{{ $bingVerify }}">
     @endif
     
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/favicon-16x16.png') }}">
     <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('images/icon-192.png') }}">
+    <link rel="apple-touch-icon" sizes="192x192" href="{{ asset('images/icon-192.png') }}">
     <link rel="manifest" href="{{ asset('manifest.json') }}">
     <link rel="alternate" type="application/rss+xml" title="Dunes Discovery Tourism Travel Blog" href="{{ url('/feed.xml') }}">
 
@@ -532,7 +534,7 @@
                                class="nav-review-circle inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white hover:bg-slate-50 border border-slate-200/90 shadow-2xs hover:shadow-xs transition-all cursor-pointer group"
                                onclick="toggleReviewPopover(this, event)"
                                title="Google Reviews: 5.0 Rating">
-                                <img src="{{ asset('images/Google-G.avif') }}" alt="Google" width="16" height="16" class="w-4 h-4 object-contain">
+                                <img src="{{ asset('images/Google-G.avif') }}" alt="Google" width="16" height="16" decoding="async" class="w-4 h-4 object-contain">
                                 <span class="text-xs font-black text-slate-800 group-hover:text-primary transition-colors">5.0</span>
                                 <div class="flex text-amber-400 text-[10px]">
                                     <i class="bi bi-star-fill"></i>
@@ -548,7 +550,7 @@
                                class="nav-review-circle inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white hover:bg-slate-50 border border-slate-200/90 shadow-2xs hover:shadow-xs transition-all cursor-pointer group"
                                onclick="toggleReviewPopover(this, event)"
                                title="TripAdvisor Reviews: 4.9 Rating">
-                                <img src="{{ asset('images/tripadvisor-color-logo.svg') }}" alt="TripAdvisor" width="18" height="18" class="w-4.5 h-4.5 object-contain">
+                                <img src="{{ asset('images/tripadvisor-color-logo.svg') }}" alt="TripAdvisor" width="18" height="18" decoding="async" class="w-4.5 h-4.5 object-contain">
                                 <span class="text-xs font-black text-slate-800 group-hover:text-emerald-600 transition-colors">4.9</span>
                                 <div class="flex text-emerald-600 text-[10px]">
                                     <i class="bi bi-star-fill"></i>

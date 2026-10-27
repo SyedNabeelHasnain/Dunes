@@ -18,6 +18,7 @@
      class="fixed inset-0 z-50 overflow-y-auto"
      role="dialog"
      aria-modal="true"
+     aria-labelledby="safariMatcherModalLabel"
      @keydown.escape.window="$store.modal.close()">
 
     <!-- Backdrop -->
@@ -49,7 +50,7 @@
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-primary/20 text-primary border border-primary/40 mb-1">
                         <i class="bi bi-compass-fill"></i> Safari Concierge Recommendation
                     </span>
-                    <h4 class="text-lg sm:text-xl font-black text-white">
+                    <h4 id="safariMatcherModalLabel" class="text-lg sm:text-xl font-black text-white">
                         Safari Match <span class="bg-gradient-to-r from-orange-500 to-amber-400 bg-clip-text text-transparent">Concierge</span>
                     </h4>
                 </div>

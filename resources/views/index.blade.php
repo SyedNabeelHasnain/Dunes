@@ -71,7 +71,7 @@ if (!function_exists('renderReviewCardMarkup')) {
         $avatarUrl = $hasRealAvatar ? (str_starts_with($reviewerAvatar, 'http') ? $reviewerAvatar : asset($reviewerAvatar)) : '';
 
         $avatarMarkup = $hasRealAvatar
-            ? '<img src="' . htmlspecialchars($avatarUrl) . '" alt="' . $reviewerName . '" class="w-11 h-11 rounded-full object-cover shrink-0 shadow-2xs border border-slate-200/80" referrerpolicy="no-referrer" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"><div class="w-11 h-11 rounded-full bg-gradient-to-br from-amber-500/20 via-orange-500/15 to-primary/25 border border-amber-300/40 text-primary-accessible font-bold text-xs items-center justify-center shrink-0 shadow-2xs tracking-wider hidden">' . htmlspecialchars($initials) . '</div>'
+            ? '<img src="' . htmlspecialchars($avatarUrl) . '" alt="' . $reviewerName . '" width="44" height="44" decoding="async" class="w-11 h-11 rounded-full object-cover shrink-0 shadow-2xs border border-slate-200/80" referrerpolicy="no-referrer" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"><div class="w-11 h-11 rounded-full bg-gradient-to-br from-amber-500/20 via-orange-500/15 to-primary/25 border border-amber-300/40 text-primary-accessible font-bold text-xs items-center justify-center shrink-0 shadow-2xs tracking-wider hidden">' . htmlspecialchars($initials) . '</div>'
             : '<div class="w-11 h-11 rounded-full bg-gradient-to-br from-amber-500/20 via-orange-500/15 to-primary/25 border border-amber-300/40 text-primary-accessible font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs tracking-wider">' . htmlspecialchars($initials) . '</div>';
 
         $dateFormatted = '';
@@ -95,7 +95,7 @@ if (!function_exists('renderReviewCardMarkup')) {
             foreach (array_slice($photos, 0, 3) as $p) {
                 if (!is_string($p) || empty($p)) continue;
                 $pUrl = str_starts_with($p, 'http') ? $p : asset($p);
-                $photosHtml .= '<span class="rounded-xl overflow-hidden inline-block shadow-2xs border border-slate-200 w-11 h-11 shrink-0"><img src="' . htmlspecialchars($pUrl) . '" alt="Traveler photo" class="w-full h-full object-cover" loading="lazy"></span>';
+                $photosHtml .= '<span class="rounded-xl overflow-hidden inline-block shadow-2xs border border-slate-200 w-11 h-11 shrink-0"><img src="' . htmlspecialchars($pUrl) . '" alt="Traveler photo" width="44" height="44" decoding="async" class="w-full h-full object-cover" loading="lazy"></span>';
             }
             $photosHtml .= '</div>';
         }
@@ -220,6 +220,58 @@ if (!function_exists('renderReviewCardMarkup')) {
       ]
     }
     @endif
+    ,
+    {
+      "@type": "BreadcrumbList",
+      "@id": "{{ $canonical }}#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": {!! json_encode(__('ui.nav.home') ?? 'Home', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "item": {!! json_encode(localized_route('home'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+        }
+      ]
+    },
+    {
+      "@type": "HowTo",
+      "@id": "{{ $canonical }}#howto-book",
+      "name": "How to Book a Dubai Desert Safari with Instant Confirmation",
+      "description": "Step-by-step guide to reserving your Dubai desert safari, dune buggy, or quad biking tour with licensed DTCM operator Dunes Discovery Tourism.",
+      "totalTime": "PT3M",
+      "estimatedCost": {
+        "@type": "MonetaryAmount",
+        "currency": "AED",
+        "value": "79"
+      },
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "Select Safari Experience",
+          "text": "Browse our curated packages including Evening Desert Safari, Dune Buggy 1000cc, Quad Biking, or VIP Luxury Safari.",
+          "url": "{{ localized_route('tours.index') }}"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "Choose Date & Guest Count",
+          "text": "Select your tour date and number of guests. Choose between hotel 4x4 pickup or self-drive meeting point."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "Customize Inclusions",
+          "text": "Optionally add VIP table service, quad biking add-ons, or private vehicle upgrades."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 4,
+          "name": "Confirm & Receive Instant Voucher",
+          "text": "Confirm your reservation with secure online checkout or cash on arrival. Receive instant digital voucher and WhatsApp chauffeur dispatch tracking."
+        }
+      ]
+    }
   ]
 }
 </script>
@@ -833,6 +885,9 @@ if (!function_exists('renderReviewCardMarkup')) {
                     <div class="relative aspect-9/16 rounded-3xl overflow-hidden bg-slate-950 shadow-md group-hover:shadow-2xl transition-all duration-300 border border-slate-200">
                         <img src="{{ asset('images/video-posters/'.$v['poster_filename']) }}" 
                              alt="{{ $v['title'] }}" 
+                             width="270"
+                             height="480"
+                             decoding="async"
                              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                              loading="lazy">
                         
@@ -1082,6 +1137,9 @@ if (!function_exists('renderReviewCardMarkup')) {
                             <div class="relative w-full h-full flex items-center justify-center">
                                 <img :src="item.thumbnail_url" 
                                      :alt="item.review_title || 'Guest Safari Video'" 
+                                     width="400"
+                                     height="300"
+                                     decoding="async"
                                      class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
                                      loading="lazy"
                                      referrerpolicy="no-referrer"
@@ -1096,6 +1154,9 @@ if (!function_exists('renderReviewCardMarkup')) {
                         <template x-if="item.type !== 'video'">
                             <img :src="item.url" 
                                  :alt="item.review_title || 'Guest Safari Photo'" 
+                                 width="400"
+                                 height="300"
+                                 decoding="async"
                                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
                                  loading="lazy"
                                  referrerpolicy="no-referrer"
@@ -1392,13 +1453,20 @@ if (!function_exists('renderReviewCardMarkup')) {
             @foreach($faqs as $index => $f)
             <div class="bg-slate-50 hover:bg-slate-50/80 rounded-2xl border border-slate-200 overflow-hidden transition-all duration-200">
                 <button type="button" 
+                        id="home-faq-btn-{{ $index }}"
                         class="w-full text-start px-5 sm:px-6 py-4 sm:py-5 font-bold text-slate-900 flex items-start justify-between gap-4 cursor-pointer min-h-[52px]"
-                        @click="activeFaq = (activeFaq === {{ $index }} ? null : {{ $index }})">
+                        @click="activeFaq = (activeFaq === {{ $index }} ? null : {{ $index }})"
+                        :aria-expanded="activeFaq === {{ $index }} ? 'true' : 'false'"
+                        aria-controls="home-faq-panel-{{ $index }}">
                     <span class="text-sm sm:text-base pt-0.5">{{ $f->question }}</span>
                     <i class="bi bi-chevron-down transition-transform duration-300 text-slate-500 shrink-0 mt-1"
-                       :class="activeFaq === {{ $index }} ? 'rotate-180 text-primary' : ''"></i>
+                       :class="activeFaq === {{ $index }} ? 'rotate-180 text-primary' : ''"
+                       aria-hidden="true"></i>
                 </button>
-                <div x-show="activeFaq === {{ $index }}" 
+                <div id="home-faq-panel-{{ $index }}"
+                     role="region"
+                     aria-labelledby="home-faq-btn-{{ $index }}"
+                     x-show="activeFaq === {{ $index }}" 
                      x-collapse 
                      x-cloak 
                      class="px-5 sm:px-6 pb-5 text-slate-600 text-sm leading-relaxed border-t border-slate-200 pt-3">

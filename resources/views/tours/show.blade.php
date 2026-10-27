@@ -262,6 +262,40 @@
           }
           @endforeach
         @endif
+        ,
+        {
+          "@type": "HowTo",
+          "@id": {!! json_encode($canonical . '#howto-prep', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "name": {!! json_encode("How to Prepare for " . $tour->name, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "description": {!! json_encode("Essential traveler preparation checklist for " . $tour->name . " in Dubai's Lahbab Red Dunes.", JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+          "totalTime": "PT15M",
+          "step": [
+            {
+              "@type": "HowToStep",
+              "position": 1,
+              "name": "Wear Comfortable Breathable Clothing",
+              "text": "Dress in loose-fitting cotton clothing and closed-toe sneakers or sandals suited for walking across soft desert dunes."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 2,
+              "name": "Pack Desert Sun & Sand Protection",
+              "text": "Bring UV-protection sunglasses, sunscreen (SPF 50+), and a light scarf or keffiyeh for sand breeze protection."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 3,
+              "name": "Keep Mobile Voucher Ready",
+              "text": "Have your digital booking voucher and WhatsApp contact ready on your phone for chauffeur pickup coordination."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 4,
+              "name": "Board Licensed 4x4 Land Cruiser",
+              "text": "Meet your licensed DTCM desert safari captain at your hotel lobby and buckle up for red dunes bashing and dinner."
+            }
+          ]
+        }
       ]
     }
     </script>
@@ -523,6 +557,9 @@ if(window.fbq){
                         @foreach($tourImages as $idx => $imgUrl)
                             <img src="{{ $imgUrl }}"
                                  alt="{{ $tour->name }} photograph {{ $idx + 1 }}"
+                                 width="1200"
+                                 height="675"
+                                 decoding="async"
                                  loading="{{ $idx === 0 ? 'eager' : 'lazy' }}"
                                  class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out will-change-transform"
                                  :class="{ 'opacity-100 z-10 hero-slide-zoom': showIdx === {{ $idx }}, 'opacity-0 z-1 pointer-events-none': showIdx !== {{ $idx }} }"
@@ -552,7 +589,7 @@ if(window.fbq){
                                     @click="showIdx = {{ $idx }}"
                                     class="relative shrink-0 w-16 h-12 sm:w-20 sm:h-14 rounded-xl overflow-hidden border-2 transition-all duration-200 cursor-pointer"
                                     :class="showIdx === {{ $idx }} ? 'border-primary ring-2 ring-primary/30 scale-102' : 'border-slate-200 opacity-60 hover:opacity-100'">
-                                <img src="{{ $imgUrl }}" class="w-full h-full object-cover" loading="lazy">
+                                <img src="{{ $imgUrl }}" alt="{{ $tour->name }} thumbnail {{ $idx + 1 }}" width="80" height="56" decoding="async" class="w-full h-full object-cover" loading="lazy">
                             </button>
                         @endforeach
                     </div>
@@ -776,16 +813,26 @@ if(window.fbq){
                             @foreach($faqs as $index => $f)
                             <div class="bg-slate-50 rounded-2xl border border-slate-200/80 overflow-hidden">
                                 <button type="button" 
-                                        class="w-full text-start px-5 py-4 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
-                                        @click="openFaq = (openFaq === {{ $index }} ? null : {{ $index }})">
+                                        id="tour-faq-btn-{{ $index }}"
+                                        class="w-full text-start px-5 py-4 font-bold text-slate-900 flex items-center justify-between gap-4 cursor-pointer min-h-[48px]"
+                                        @click="openFaq = (openFaq === {{ $index }} ? null : {{ $index }})"
+                                        :aria-expanded="openFaq === {{ $index }} ? 'true' : 'false'"
+                                        aria-controls="tour-faq-panel-{{ $index }}">
                                     <span class="inline-flex items-center gap-2.5 text-sm sm:text-base">
-                                        <i class="bi bi-question-circle-fill text-primary"></i>
+                                        <i class="bi bi-question-circle-fill text-primary" aria-hidden="true"></i>
                                         <span>{{ $f->question }}</span>
                                     </span>
                                     <i class="bi bi-chevron-down transition-transform duration-300 text-slate-400 shrink-0"
-                                       :class="openFaq === {{ $index }} ? 'rotate-180 text-primary' : ''"></i>
+                                       :class="openFaq === {{ $index }} ? 'rotate-180 text-primary' : ''"
+                                       aria-hidden="true"></i>
                                 </button>
-                                <div x-show="openFaq === {{ $index }}" x-collapse x-cloak class="px-5 pb-5 text-slate-600 text-xs sm:text-sm leading-relaxed border-t border-slate-200/60 pt-3">
+                                <div id="tour-faq-panel-{{ $index }}"
+                                     role="region"
+                                     aria-labelledby="tour-faq-btn-{{ $index }}"
+                                     x-show="openFaq === {{ $index }}" 
+                                     x-collapse 
+                                     x-cloak 
+                                     class="px-5 pb-5 text-slate-600 text-xs sm:text-sm leading-relaxed border-t border-slate-200/60 pt-3">
                                     {{ $f->answer }}
                                 </div>
                             </div>
@@ -1171,6 +1218,9 @@ if(window.fbq){
                     <div class="relative w-full aspect-16/10 overflow-hidden bg-slate-950">
                         <img src="{{ asset('images/video-posters/'.$v['poster_filename']) }}" 
                              alt="{{ $v['title'] }}" 
+                             width="400"
+                             height="250"
+                             decoding="async"
                              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                              loading="lazy">
                         

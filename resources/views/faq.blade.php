@@ -129,16 +129,26 @@
             @foreach($faqs as $i => $f)
             <div class="faq-item bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden transition-all duration-200" data-question="{{ strtolower($f->question) }}" data-answer="{{ strtolower($f->answer) }}">
                 <button type="button" 
+                        id="page-faq-btn-{{ $i }}"
                         class="w-full text-start px-5 sm:px-6 py-4 sm:py-5 min-h-[52px] font-bold text-slate-900 flex items-start justify-between gap-4 cursor-pointer"
-                        @click="openFaq = (openFaq === {{ $i }} ? null : {{ $i }})">
+                        @click="openFaq = (openFaq === {{ $i }} ? null : {{ $i }})"
+                        :aria-expanded="openFaq === {{ $i }} ? 'true' : 'false'"
+                        aria-controls="page-faq-panel-{{ $i }}">
                     <span class="inline-flex items-start gap-3 text-sm sm:text-base leading-snug">
-                        <i class="bi bi-question-circle-fill text-primary shrink-0 mt-0.5"></i>
+                        <i class="bi bi-question-circle-fill text-primary shrink-0 mt-0.5" aria-hidden="true"></i>
                         <span>{{ $f->question }}</span>
                     </span>
                     <i class="bi bi-chevron-down transition-transform duration-300 text-slate-500 shrink-0 mt-1"
-                       :class="openFaq === {{ $i }} ? 'rotate-180 text-primary' : ''"></i>
+                       :class="openFaq === {{ $i }} ? 'rotate-180 text-primary' : ''"
+                       aria-hidden="true"></i>
                 </button>
-                <div x-show="openFaq === {{ $i }}" x-collapse x-cloak class="px-5 sm:px-6 pb-5 text-slate-600 text-xs sm:text-sm leading-relaxed border-t border-slate-200 pt-3.5">
+                <div id="page-faq-panel-{{ $i }}"
+                     role="region"
+                     aria-labelledby="page-faq-btn-{{ $i }}"
+                     x-show="openFaq === {{ $i }}" 
+                     x-collapse 
+                     x-cloak 
+                     class="px-5 sm:px-6 pb-5 text-slate-600 text-xs sm:text-sm leading-relaxed border-t border-slate-200 pt-3.5">
                     {{ $f->answer }}
                 </div>
             </div>

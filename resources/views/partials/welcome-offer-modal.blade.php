@@ -42,6 +42,7 @@
      class="fixed inset-0 z-50 overflow-y-auto" 
      role="dialog" 
      aria-modal="true"
+     aria-labelledby="welcomeOfferModalTitle"
      @keydown.escape.window="$store.modal.close()">
 
     <!-- Backdrop -->
@@ -89,7 +90,7 @@
                             <span>First-Time Guest Special</span>
                         </div>
 
-                        <h2 class="text-2xl sm:text-3xl font-black text-slate-900 leading-tight mb-2 tracking-tight">
+                        <h2 id="welcomeOfferModalTitle" class="text-2xl sm:text-3xl font-black text-slate-900 leading-tight mb-2 tracking-tight">
                             {{ $popupHeadline }}
                         </h2>
 
