@@ -78,13 +78,36 @@ class TourController extends Controller
         $legacySlugRedirects = [
             'luxury-vip-desert-safari-dubai' => fn () => localized_route('tours.show', 'evening-desert-safari-dubai'),
             'vip-desert-safari-dubai' => fn () => localized_route('tours.show', 'evening-desert-safari-dubai'),
+            'desert-safari-dubai' => fn () => localized_route('tours.show', 'evening-desert-safari-dubai'),
+            'dubai-desert-safari' => fn () => localized_route('tours.show', 'evening-desert-safari-dubai'),
+            'desert-safari' => fn () => localized_route('tours.show', 'evening-desert-safari-dubai'),
+            'safari-dubai' => fn () => localized_route('tours.show', 'evening-desert-safari-dubai'),
+            'desert-safaris-dubai' => fn () => localized_route('tours.index'),
+            'dubai-desert-safaris' => fn () => localized_route('tours.index'),
+            'packages' => fn () => localized_route('tours.index'),
+            'tour' => fn () => localized_route('tours.index'),
             'dubai-marina-dhow-cruise' => fn () => localized_route('tours.show', 'dhow-cruise-catamaran-cruise-dinner-dubai'),
             'ocean-empress-dhow-cruise' => fn () => localized_route('tours.show', 'dhow-cruise-catamaran-cruise-dinner-dubai'),
+            'dhow-cruise-marina' => fn () => localized_route('tours.show', 'dhow-cruise-catamaran-cruise-dinner-dubai'),
+            'dhow-cruise-dubai' => fn () => localized_route('tours.show', 'dhow-cruise-catamaran-cruise-dinner-dubai'),
+            'dhow-cruise' => fn () => localized_route('tours.show', 'dhow-cruise-catamaran-cruise-dinner-dubai'),
             'abu-dhabi-city-tour' => fn () => localized_route('tours.show', 'abu-dhabi-city-tour-from-dubai'),
+            'abu-dhabi-tour' => fn () => localized_route('tours.show', 'abu-dhabi-city-tour-from-dubai'),
+            'city-tour-dubai' => fn () => localized_route('tours.show', 'dubai-city-tour'),
+            'dubai-city-tours' => fn () => localized_route('tours.show', 'dubai-city-tour'),
             'quad-bike-tour-dubai' => fn () => localized_route('tours.show', 'desert-safari-quad-biking-dubai'),
+            'quad-biking-safari' => fn () => localized_route('tours.show', 'desert-safari-quad-biking-dubai'),
+            'quad-biking-dubai' => fn () => localized_route('tours.show', 'desert-safari-quad-biking-dubai'),
+            'quad-bike-dubai' => fn () => localized_route('tours.show', 'desert-safari-quad-biking-dubai'),
+            'quad-biking' => fn () => localized_route('tours.show', 'desert-safari-quad-biking-dubai'),
             'buggy-tour-dubai' => fn () => localized_route('tours.buggy'),
+            'dune-buggy-dubai' => fn () => localized_route('tours.buggy'),
+            'dune-buggy-rental' => fn () => localized_route('tours.buggy'),
+            'dune-buggies-dubai' => fn () => localized_route('tours.buggy'),
             'custom-safari' => fn () => localized_route('tours.customizer'),
             'pricing-guide' => fn () => localized_route('rate-card'),
+            'pricing' => fn () => localized_route('rate-card'),
+            'faqs' => fn () => localized_route('faq'),
             'terms' => fn () => localized_route('terms'),
             'terms-and-conditions' => fn () => localized_route('terms'),
             'terms-conditions' => fn () => localized_route('terms'),
@@ -338,92 +361,132 @@ class TourController extends Controller
      */
     public function liveSearch(Request $request)
     {
-        $rawQuery = (string) ($request->input('q') ?? $request->input('query') ?? $request->input('search') ?? '');
-        $cleanQuery = trim(preg_replace('/[^\p{L}\p{N}\s\-\+\&]/u', ' ', strip_tags($rawQuery)));
-        $cleanQuery = preg_replace('/\s+/', ' ', $cleanQuery);
-        $categoryFilter = trim((string) ($request->input('category') ?? ''));
+        try {
+            $rawQuery = (string) ($request->input('q') ?? $request->input('query') ?? $request->input('search') ?? '');
+            $cleanQuery = trim(preg_replace('/[^\p{L}\p{N}\s\-\+\&]/u', ' ', strip_tags($rawQuery)));
+            $cleanQuery = preg_replace('/\s+/', ' ', $cleanQuery);
+            $categoryFilter = trim((string) ($request->input('category') ?? ''));
 
-        $isAll = $request->boolean('all');
+            $isAll = $request->boolean('all');
 
-        if (mb_strlen($cleanQuery) < 2 && empty($categoryFilter) && ! $isAll) {
+            if (mb_strlen($cleanQuery) < 2 && empty($categoryFilter) && ! $isAll) {
+                return response()->json([
+                    'success' => true,
+                    'query' => $cleanQuery,
+                    'count' => 0,
+                    'categories' => [],
+                    'results' => [],
+                ]);
+            }
+
+            // Resilient active tours retrieval (guards against serialized model cache corruption)
+            $allActiveTours = null;
+            $cacheKey = 'site_active_tours_search_'.app()->getLocale();
+            try {
+                $cached = Cache::get($cacheKey);
+                if (is_iterable($cached) && ! ($cached instanceof \__PHP_Incomplete_Class)) {
+                    $allActiveTours = $cached;
+                } else {
+                    Cache::forget($cacheKey);
+                }
+            } catch (\Throwable $e) {
+                $allActiveTours = null;
+            }
+
+            if (! $allActiveTours) {
+                $allActiveTours = Tour::where('status', 'active')
+                    ->with(['tiers', 'category'])
+                    ->orderBy('priority', 'asc')
+                    ->get();
+                try {
+                    Cache::put($cacheKey, $allActiveTours, 600);
+                } catch (\Throwable $e) {
+                    // Ignore cache write failure
+                }
+            }
+
+            if (! empty($cleanQuery)) {
+                $intent = $this->analyzeSearchIntent($cleanQuery);
+                $scoredTours = $this->scoreAndRankTours($allActiveTours, $cleanQuery, $intent);
+            } else {
+                $scoredTours = $allActiveTours;
+            }
+
+            // Calculate available categories and their counts in the matched set
+            $availableCategories = $scoredTours->groupBy(function ($tour) {
+                return ($tour && $tour->category) ? $tour->category->name : 'Desert Safari';
+            })->map(function ($group, $name) {
+                $first = $group ? $group->first() : null;
+
+                return [
+                    'name' => $name,
+                    'slug' => ($first && $first->category) ? $first->category->slug : Str::slug($name),
+                    'count' => $group ? $group->count() : 0,
+                ];
+            })->values();
+
+            // If category filter is applied, narrow down the tours
+            if (! empty($categoryFilter) && $categoryFilter !== 'all') {
+                $scoredTours = $scoredTours->filter(function ($tour) use ($categoryFilter) {
+                    if (! $tour) {
+                        return false;
+                    }
+                    $catSlug = $tour->category ? $tour->category->slug : 'desert-safari';
+                    $catName = $tour->category ? $tour->category->name : 'Desert Safari';
+
+                    return strtolower($catSlug) === strtolower($categoryFilter) || strtolower($catName) === strtolower($categoryFilter);
+                });
+            }
+
+            $results = $scoredTours->map(function ($tour) {
+                $minPrice = 0.0;
+                if ($tour && $tour->tiers && $tour->tiers->isNotEmpty()) {
+                    $minPrice = (float) ($tour->tiers->min('pivot.price') ?? 0);
+                }
+                $thumbImage = ($tour->thumb_image ?? null) ?: (($tour->hero_image ?? null) ?: 'desert-safari-poster.avif');
+                $thumbImage = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $thumbImage);
+                $tourUrl = function_exists('localized_route') ? localized_route('tours.show', $tour->slug) : url('/'.$tour->slug);
+
+                return [
+                    'id' => $tour->id,
+                    'name' => $tour->name,
+                    'slug' => $tour->slug,
+                    'url' => $tourUrl,
+                    'category' => $tour->category ? $tour->category->name : 'Desert Safari',
+                    'category_slug' => $tour->category ? $tour->category->slug : 'desert-safari',
+                    'duration' => $tour->duration ?: '4-6 Hours',
+                    'rating' => (float) ($tour->rating ?: 4.9),
+                    'reviews_count' => (int) ($tour->review_count ?: 850),
+                    'price' => (float) $minPrice,
+                    'price_formatted' => $minPrice > 0 ? 'From AED '.number_format($minPrice) : 'Best Rates',
+                    'image' => asset('images/'.$thumbImage),
+                    'is_bestseller' => (bool) $tour->is_bestseller,
+                    'is_featured' => (bool) $tour->is_featured,
+                    'badge' => $tour->is_bestseller ? 'Bestseller' : ($tour->is_featured ? 'Popular' : ($tour->category ? $tour->category->name : 'Safari')),
+                    'highlights' => $tour->short_desc ? Str::limit(strip_tags($tour->short_desc), 85) : 'Luxury 4x4 Transfers, Red Dunes & BBQ Dinner',
+                ];
+            })->values();
+
             return response()->json([
                 'success' => true,
                 'query' => $cleanQuery,
+                'count' => $results->count(),
+                'categories' => $availableCategories,
+                'results' => $results,
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('liveSearch unexpected error: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'query' => (string) ($request->input('q') ?? ''),
                 'count' => 0,
                 'categories' => [],
                 'results' => [],
             ]);
         }
-
-        $allActiveTours = Cache::remember('site_active_tours_search_'.app()->getLocale(), 600, function () {
-            return Tour::where('status', 'active')
-                ->with(['tiers', 'category'])
-                ->orderBy('priority', 'asc')
-                ->get();
-        });
-
-        if (! empty($cleanQuery)) {
-            $intent = $this->analyzeSearchIntent($cleanQuery);
-            $scoredTours = $this->scoreAndRankTours($allActiveTours, $cleanQuery, $intent);
-        } else {
-            $scoredTours = $allActiveTours;
-        }
-
-        // Calculate available categories and their counts in the matched set
-        $availableCategories = $scoredTours->groupBy(function ($tour) {
-            return $tour->category ? $tour->category->name : 'Desert Safari';
-        })->map(function ($group, $name) {
-            $first = $group->first();
-
-            return [
-                'name' => $name,
-                'slug' => $first->category ? $first->category->slug : Str::slug($name),
-                'count' => $group->count(),
-            ];
-        })->values();
-
-        // If category filter is applied, narrow down the tours
-        if (! empty($categoryFilter) && $categoryFilter !== 'all') {
-            $scoredTours = $scoredTours->filter(function ($tour) use ($categoryFilter) {
-                $catSlug = $tour->category ? $tour->category->slug : 'desert-safari';
-                $catName = $tour->category ? $tour->category->name : 'Desert Safari';
-
-                return strtolower($catSlug) === strtolower($categoryFilter) || strtolower($catName) === strtolower($categoryFilter);
-            });
-        }
-
-        $results = $scoredTours->map(function ($tour) {
-            $minPrice = $tour->tiers->min('pivot.price') ?? 0;
-            $thumbImage = $tour->thumb_image ?: $tour->hero_image ?: 'desert-safari-poster.avif';
-            $thumbImage = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $thumbImage);
-
-            return [
-                'id' => $tour->id,
-                'name' => $tour->name,
-                'slug' => $tour->slug,
-                'url' => localized_route('tours.show', $tour->slug),
-                'category' => $tour->category ? $tour->category->name : 'Desert Safari',
-                'category_slug' => $tour->category ? $tour->category->slug : 'desert-safari',
-                'duration' => $tour->duration ?: '4-6 Hours',
-                'rating' => (float) ($tour->rating ?: 4.9),
-                'reviews_count' => (int) ($tour->review_count ?: 850),
-                'price' => (float) $minPrice,
-                'price_formatted' => $minPrice > 0 ? 'From AED '.number_format($minPrice) : 'Best Rates',
-                'image' => asset('images/'.$thumbImage),
-                'is_bestseller' => (bool) $tour->is_bestseller,
-                'is_featured' => (bool) $tour->is_featured,
-                'badge' => $tour->is_bestseller ? 'Bestseller' : ($tour->is_featured ? 'Popular' : ($tour->category ? $tour->category->name : 'Safari')),
-                'highlights' => $tour->short_desc ? Str::limit(strip_tags($tour->short_desc), 85) : 'Luxury 4x4 Transfers, Red Dunes & BBQ Dinner',
-            ];
-        })->values();
-
-        return response()->json([
-            'success' => true,
-            'query' => $cleanQuery,
-            'count' => $results->count(),
-            'categories' => $availableCategories,
-            'results' => $results,
-        ]);
     }
 
     /**

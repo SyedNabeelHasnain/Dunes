@@ -58,8 +58,11 @@ Route::post('/api/gallery/report-broken', [GalleryController::class, 'reportBrok
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 Route::get('/faq', [PageController::class, 'faq'])->name('faq');
+Route::redirect('/faqs', '/faq', 301);
 Route::get('/rate-card', [RateCardController::class, 'index'])->name('rate-card');
 Route::redirect('/pricing-guide', '/rate-card', 301);
+Route::redirect('/pricing', '/rate-card', 301);
+Route::redirect('/admin/login', '/login', 301);
 Route::get('/dubai-desert-sunset-times', [SunsetGuideController::class, 'index'])->name('sunset.guide');
 Route::get('/press-kit', [PageController::class, 'pressKit'])->name('press.kit');
 Route::redirect('/cron-status', '/api/v1/cron/status', 302);
@@ -418,15 +421,34 @@ Route::get('/dune-buggy-rental-dubai', [TourController::class, 'showBuggy'])->na
 Route::get('/desert-safari-from-{location}', [LocationLandingController::class, 'show'])->name('tours.location');
 
 // ── SEO 301 Permanent Redirects for Legacy / Shorthand Tour Slugs ───────────
+Route::redirect('/desert-safari', '/evening-desert-safari-dubai', 301);
+Route::redirect('/desert-safari-dubai', '/evening-desert-safari-dubai', 301);
+Route::redirect('/dubai-desert-safari', '/evening-desert-safari-dubai', 301);
+Route::redirect('/safari-dubai', '/evening-desert-safari-dubai', 301);
+Route::redirect('/desert-safaris-dubai', '/tours', 301);
+Route::redirect('/dubai-desert-safaris', '/tours', 301);
+Route::redirect('/packages', '/tours', 301);
+Route::redirect('/tour', '/tours', 301);
 Route::redirect('/dubai-marina-dhow-cruise', '/dhow-cruise-catamaran-cruise-dinner-dubai', 301);
 Route::redirect('/ocean-empress-dhow-cruise', '/dhow-cruise-catamaran-cruise-dinner-dubai', 301);
+Route::redirect('/dhow-cruise-marina', '/dhow-cruise-catamaran-cruise-dinner-dubai', 301);
+Route::redirect('/dhow-cruise-dubai', '/dhow-cruise-catamaran-cruise-dinner-dubai', 301);
+Route::redirect('/dhow-cruise', '/dhow-cruise-catamaran-cruise-dinner-dubai', 301);
 Route::redirect('/abu-dhabi-city-tour', '/abu-dhabi-city-tour-from-dubai', 301);
+Route::redirect('/abu-dhabi-tour', '/abu-dhabi-city-tour-from-dubai', 301);
+Route::redirect('/city-tour-dubai', '/dubai-city-tour', 301);
+Route::redirect('/dubai-city-tours', '/dubai-city-tour', 301);
 Route::redirect('/quad-bike-tour-dubai', '/desert-safari-quad-biking-dubai', 301);
+Route::redirect('/quad-biking-safari', '/desert-safari-quad-biking-dubai', 301);
+Route::redirect('/quad-biking-dubai', '/desert-safari-quad-biking-dubai', 301);
+Route::redirect('/quad-bike-dubai', '/desert-safari-quad-biking-dubai', 301);
+Route::redirect('/quad-biking', '/desert-safari-quad-biking-dubai', 301);
 Route::redirect('/vip-desert-safari-dubai', '/evening-desert-safari-dubai', 301);
 Route::redirect('/luxury-vip-desert-safari-dubai', '/evening-desert-safari-dubai', 301);
 Route::redirect('/buggy-tour-dubai', '/dune-buggy-rental-dubai', 301);
-Route::redirect('/dhow-cruise-marina', '/dhow-cruise-catamaran-cruise-dinner-dubai', 301);
-Route::redirect('/quad-biking-safari', '/desert-safari-quad-biking-dubai', 301);
+Route::redirect('/dune-buggy-dubai', '/dune-buggy-rental-dubai', 301);
+Route::redirect('/dune-buggy-rental', '/dune-buggy-rental-dubai', 301);
+Route::redirect('/dune-buggies-dubai', '/dune-buggy-rental-dubai', 301);
 
 // ── Legacy Press Kit & SEO OG Media Asset 301 Redirects ─────────────────────
 Route::redirect('/images/sunset-desert-safari-dubai-dunes-discovery-tourism.avif', '/images/dubai-desert-safar-camel-ride-dune-discovery-tourism.avif', 301);
@@ -518,6 +540,9 @@ Route::prefix('{locale}')
         Route::get('/review', fn(string $locale) => redirect('/'.$locale.'/review/guest', 301));
 
         // Localized Legal Aliases & Quick Redirects
+        Route::get('/faqs', fn(string $locale) => redirect('/'.$locale.'/faq', 301));
+        Route::get('/pricing', fn(string $locale) => redirect('/'.$locale.'/rate-card', 301));
+        Route::get('/pricing-guide', fn(string $locale) => redirect('/'.$locale.'/rate-card', 301));
         Route::get('/terms', fn(string $locale) => redirect('/'.$locale.'/terms-condition', 301));
         Route::get('/terms-and-conditions', fn(string $locale) => redirect('/'.$locale.'/terms-condition', 301));
         Route::get('/privacy', fn(string $locale) => redirect('/'.$locale.'/privacy-policy', 301));
@@ -527,6 +552,31 @@ Route::prefix('{locale}')
         Route::get('/safety-policy', fn(string $locale) => redirect('/'.$locale.'/safety-liability-waiver', 301));
         Route::get('/ai-policy', fn(string $locale) => redirect('/'.$locale.'/ai-editorial-policy', 301));
         Route::get('/sustainability', fn(string $locale) => redirect('/'.$locale.'/responsible-tourism-policy', 301));
+
+        // Localized Commercial Search Keyword Redirects
+        Route::get('/desert-safari', fn(string $locale) => redirect('/'.$locale.'/evening-desert-safari-dubai', 301));
+        Route::get('/desert-safari-dubai', fn(string $locale) => redirect('/'.$locale.'/evening-desert-safari-dubai', 301));
+        Route::get('/dubai-desert-safari', fn(string $locale) => redirect('/'.$locale.'/evening-desert-safari-dubai', 301));
+        Route::get('/safari-dubai', fn(string $locale) => redirect('/'.$locale.'/evening-desert-safari-dubai', 301));
+        Route::get('/desert-safaris-dubai', fn(string $locale) => redirect('/'.$locale.'/tours', 301));
+        Route::get('/dubai-desert-safaris', fn(string $locale) => redirect('/'.$locale.'/tours', 301));
+        Route::get('/packages', fn(string $locale) => redirect('/'.$locale.'/tours', 301));
+        Route::get('/tour', fn(string $locale) => redirect('/'.$locale.'/tours', 301));
+        Route::get('/dhow-cruise-dubai', fn(string $locale) => redirect('/'.$locale.'/dhow-cruise-catamaran-cruise-dinner-dubai', 301));
+        Route::get('/dhow-cruise', fn(string $locale) => redirect('/'.$locale.'/dhow-cruise-catamaran-cruise-dinner-dubai', 301));
+        Route::get('/dhow-cruise-marina', fn(string $locale) => redirect('/'.$locale.'/dhow-cruise-catamaran-cruise-dinner-dubai', 301));
+        Route::get('/abu-dhabi-tour', fn(string $locale) => redirect('/'.$locale.'/abu-dhabi-city-tour-from-dubai', 301));
+        Route::get('/abu-dhabi-city-tour', fn(string $locale) => redirect('/'.$locale.'/abu-dhabi-city-tour-from-dubai', 301));
+        Route::get('/city-tour-dubai', fn(string $locale) => redirect('/'.$locale.'/dubai-city-tour', 301));
+        Route::get('/dubai-city-tours', fn(string $locale) => redirect('/'.$locale.'/dubai-city-tour', 301));
+        Route::get('/quad-biking-dubai', fn(string $locale) => redirect('/'.$locale.'/desert-safari-quad-biking-dubai', 301));
+        Route::get('/quad-bike-dubai', fn(string $locale) => redirect('/'.$locale.'/desert-safari-quad-biking-dubai', 301));
+        Route::get('/quad-biking', fn(string $locale) => redirect('/'.$locale.'/desert-safari-quad-biking-dubai', 301));
+        Route::get('/quad-biking-safari', fn(string $locale) => redirect('/'.$locale.'/desert-safari-quad-biking-dubai', 301));
+        Route::get('/dune-buggy-dubai', fn(string $locale) => redirect('/'.$locale.'/dune-buggy-rental-dubai', 301));
+        Route::get('/dune-buggy-rental', fn(string $locale) => redirect('/'.$locale.'/dune-buggy-rental-dubai', 301));
+        Route::get('/dune-buggies-dubai', fn(string $locale) => redirect('/'.$locale.'/dune-buggy-rental-dubai', 301));
+        Route::get('/buggy-tour-dubai', fn(string $locale) => redirect('/'.$locale.'/dune-buggy-rental-dubai', 301));
 
         // High-Value & Geo
         Route::get('/dune-buggy-rental-dubai', [TourController::class, 'showBuggy'])->name('locale.tours.buggy');

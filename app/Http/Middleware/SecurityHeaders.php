@@ -25,6 +25,7 @@ class SecurityHeaders
             $response->header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
             $response->header('X-XSS-Protection', '1; mode=block');
             $response->header('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+            $response->header('Content-Security-Policy', "upgrade-insecure-requests; frame-ancestors 'self';");
         } elseif ($response && isset($response->headers)) {
             $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
             $response->headers->set('X-Content-Type-Options', 'nosniff');
@@ -33,6 +34,7 @@ class SecurityHeaders
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
             $response->headers->set('X-XSS-Protection', '1; mode=block');
             $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+            $response->headers->set('Content-Security-Policy', "upgrade-insecure-requests; frame-ancestors 'self';");
         }
 
         return $response;

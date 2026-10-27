@@ -70,14 +70,14 @@ class CustomerVideoReviewsTest extends TestCase
     {
         $tour = Tour::create([
             'name' => 'Dune Buggy Dubai Desert Safari',
-            'slug' => 'dune-buggy-dubai',
+            'slug' => 'dune-buggy-rental-dubai',
             'status' => 'active',
             'rating' => 5.0,
             'review_count' => 150,
             'hero_image' => 'images/evening-desert-safari.avif',
         ]);
 
-        $response = $this->get('/dune-buggy-dubai');
+        $response = $this->get('/'.$tour->slug);
 
         $response->assertStatus(200);
         $response->assertSee('Guest Video Reviews: Dune Buggy Dubai Desert Safari');
