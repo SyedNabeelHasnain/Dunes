@@ -228,4 +228,19 @@ class Tour extends Model
     {
         return $this->hasMany(Booking::class);
     }
+
+    /**
+     * Compute starting price across active tiers dynamically.
+     */
+    public function getStartingPriceAttribute(): float
+    {
+        if ($this->relationLoaded('tiers') && $this->tiers->isNotEmpty()) {
+            $min = $this->tiers->min(fn ($t) => $t->pivot->price ?? 0);
+            if ($min !== null && (float) $min > 0) {
+                return (float) $min;
+            }
+        }
+
+        return 79.00;
+    }
 }

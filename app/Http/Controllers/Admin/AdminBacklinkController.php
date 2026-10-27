@@ -296,9 +296,10 @@ class AdminBacklinkController extends Controller
      */
     public function syndication(): View
     {
-        $tours = Tour::where('status', 'active')
+        $tours = Tour::with('tiers')
+            ->where('status', 'active')
             ->orderBy('priority', 'asc')
-            ->get(['id', 'name', 'slug', 'starting_price', 'duration']);
+            ->get(['id', 'name', 'slug', 'duration']);
 
         $feedUrl = url('/feeds/tours.xml');
         $apiUrl = url('/api/v1/syndication/tours');
