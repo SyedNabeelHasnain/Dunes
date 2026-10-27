@@ -13,7 +13,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Section Header -->
         <div class="max-w-2xl mx-auto text-center mb-8">
-            <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-black bg-orange-50 text-primary border border-orange-200/60 uppercase tracking-wider mb-2">
+            <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-black bg-orange-50 text-primary-accessible border border-orange-200/60 uppercase tracking-wider mb-2">
                 <i class="bi bi-compass"></i> Tour Recommender
             </span>
             <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight mb-2">
@@ -31,10 +31,10 @@
                 <!-- Progress Header -->
                 <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6" x-show="step <= 3">
                     <div class="flex items-center gap-2.5">
-                        <span class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center font-black text-xs" x-text="step">1</span>
+                        <span class="w-7 h-7 rounded-full bg-primary-accessible text-white flex items-center justify-center font-black text-xs" x-text="step">1</span>
                         <span class="font-bold text-slate-800 text-xs sm:text-sm" x-text="step === 1 ? 'Choose Experience Type' : (step === 2 ? 'Choose Time of Day' : 'Choose Group Style & Pace')">Choose Experience Type</span>
                     </div>
-                    <span class="text-slate-400 font-mono text-xs font-bold" x-text="'Step ' + step + ' of 3'">Step 1 of 3</span>
+                    <span class="text-slate-600 font-mono text-xs font-bold" x-text="'Step ' + step + ' of 3'">Step 1 of 3</span>
                 </div>
 
                 <!-- Step 1: Category -->

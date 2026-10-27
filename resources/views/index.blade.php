@@ -71,8 +71,8 @@ if (!function_exists('renderReviewCardMarkup')) {
         $avatarUrl = $hasRealAvatar ? (str_starts_with($reviewerAvatar, 'http') ? $reviewerAvatar : asset($reviewerAvatar)) : '';
 
         $avatarMarkup = $hasRealAvatar
-            ? '<img src="' . htmlspecialchars($avatarUrl) . '" alt="' . $reviewerName . '" class="w-11 h-11 rounded-full object-cover shrink-0 shadow-2xs border border-slate-200/80" referrerpolicy="no-referrer" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"><div class="w-11 h-11 rounded-full bg-gradient-to-br from-amber-500/20 via-orange-500/15 to-primary/25 border border-amber-300/40 text-primary font-bold text-xs items-center justify-center shrink-0 shadow-2xs tracking-wider hidden">' . htmlspecialchars($initials) . '</div>'
-            : '<div class="w-11 h-11 rounded-full bg-gradient-to-br from-amber-500/20 via-orange-500/15 to-primary/25 border border-amber-300/40 text-primary font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs tracking-wider">' . htmlspecialchars($initials) . '</div>';
+            ? '<img src="' . htmlspecialchars($avatarUrl) . '" alt="' . $reviewerName . '" class="w-11 h-11 rounded-full object-cover shrink-0 shadow-2xs border border-slate-200/80" referrerpolicy="no-referrer" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"><div class="w-11 h-11 rounded-full bg-gradient-to-br from-amber-500/20 via-orange-500/15 to-primary/25 border border-amber-300/40 text-primary-accessible font-bold text-xs items-center justify-center shrink-0 shadow-2xs tracking-wider hidden">' . htmlspecialchars($initials) . '</div>'
+            : '<div class="w-11 h-11 rounded-full bg-gradient-to-br from-amber-500/20 via-orange-500/15 to-primary/25 border border-amber-300/40 text-primary-accessible font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs tracking-wider">' . htmlspecialchars($initials) . '</div>';
 
         $dateFormatted = '';
         if (!empty($r->published_date)) {
@@ -138,7 +138,7 @@ if (!function_exists('renderReviewCardMarkup')) {
 
                 <!-- Card Footer: Verification Link -->
                 <div class="flex items-center justify-between pt-3 border-t border-slate-100 mt-3 text-xs">
-                    <span class="inline-flex items-center gap-1 text-[11px] font-medium text-slate-400">
+                    <span class="inline-flex items-center gap-1 text-[11px] font-medium text-slate-600">
                         <i class="bi bi-patch-check-fill text-emerald-500"></i> Verified Guest
                     </span>
                     <span class="text-[11px] font-semibold text-slate-500 group-hover:text-primary transition-colors inline-flex items-center gap-1">
@@ -424,7 +424,7 @@ if (!function_exists('renderReviewCardMarkup')) {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-10 sm:mb-12">
             <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">
-                {{ __('ui.home_popular.title') }} <span class="text-primary">{{ __('ui.home_popular.title_highlight') }}</span>
+                {{ __('ui.home_popular.title') }} <span class="text-primary-accessible">{{ __('ui.home_popular.title_highlight') }}</span>
             </h2>
             <p class="text-slate-600 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
                 {{ __('ui.home_popular.subtitle') }}
@@ -445,8 +445,8 @@ if (!function_exists('renderReviewCardMarkup')) {
                                 <div class="text-slate-500 inline-flex items-center gap-1">
                                     <i class="bi bi-clock"></i>{{ $t->duration }}
                                 </div>
-                                <div class="text-amber-500 font-bold inline-flex items-center gap-1">
-                                    <i class="bi bi-star-fill"></i>{{ $t->rating }}
+                                <div class="text-amber-700 font-bold inline-flex items-center gap-1">
+                                    <i class="bi bi-star-fill text-amber-500"></i>{{ $t->rating }}
                                 </div>
                             </div>
                             <h3 class="text-base font-bold text-slate-900 mb-2 line-clamp-2 group-hover:text-primary transition-colors leading-snug">{{ $t->name }}</h3>
@@ -458,7 +458,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                             <div class="flex justify-between items-end mt-auto pt-3 border-t border-slate-200">
                                 <div>
                                     <span class="block text-[10px] uppercase font-bold text-slate-500">{{ __('ui.home_popular.starting_from') }}</span>
-                                    <span class="text-lg font-black text-primary" data-aed="{{ $minPrice }}">{{ __('ui.common.aed') }} {{ number_format($minPrice) }}</span>
+                                    <span class="text-lg font-black text-primary-accessible" data-aed="{{ $minPrice }}">{{ __('ui.common.aed') }} {{ number_format($minPrice) }}</span>
                                 </div>
                                 <div class="flex items-center gap-1.5 shrink-0">
                                     <button type="button" class="border border-slate-300 hover:border-primary text-slate-700 bg-white hover:text-primary text-xs font-semibold rounded-full px-2.5 py-1 transition-colors btn-toggle-compare inline-flex items-center gap-1 cursor-pointer min-h-[36px]" data-tour-id="{{ $t->id }}" aria-label="{{ __('ui.home_popular.compare') }} {{ $t->name }}" onclick="event.preventDefault(); event.stopPropagation(); window.DunesCompare && window.DunesCompare.toggle(this);">
@@ -498,7 +498,7 @@ if (!function_exists('renderReviewCardMarkup')) {
             <span>4.9 / 5 Rating Across 2,840+ Verified Reviews</span>
         </div>
         <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 mb-3 tracking-tight">
-            {{ __('ui.home_reviews.title') }} <span class="text-primary">{{ __('ui.home_reviews.title_highlight') }}</span>
+            {{ __('ui.home_reviews.title') }} <span class="text-primary-accessible">{{ __('ui.home_reviews.title_highlight') }}</span>
         </h2>
         <p class="text-slate-600 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">{{ __('ui.home_reviews.subtitle') }}</p>
     </div>
@@ -818,31 +818,31 @@ if (!function_exists('renderReviewCardMarkup')) {
         <!-- Filter Tabs for Home -->
         <div class="flex items-center gap-2 overflow-x-auto pb-4 mb-8 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 snap-x">
             <button type="button" @click="category = 'all'" 
-                :class="category === 'all' ? 'bg-primary text-white shadow-sm' : 'bg-white/10 hover:bg-white/20 text-white/80'"
+                :class="category === 'all' ? 'bg-primary-accessible text-white shadow-sm' : 'bg-white/10 hover:bg-white/20 text-white/80'"
                 class="px-4 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5 min-h-[42px] shrink-0 snap-start">
                 <i class="bi bi-grid-fill"></i>
                 <span>{{ __('ui.gallery_section.filter_all') ?? 'All Moments' }}</span>
             </button>
             <button type="button" @click="category = 'red_dunes'" 
-                :class="category === 'red_dunes' ? 'bg-primary text-white shadow-sm' : 'bg-white/10 hover:bg-white/20 text-white/80'"
+                :class="category === 'red_dunes' ? 'bg-primary-accessible text-white shadow-sm' : 'bg-white/10 hover:bg-white/20 text-white/80'"
                 class="px-4 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5 min-h-[42px] shrink-0 snap-start">
                 <i class="bi bi-compass-fill"></i>
                 <span>{{ __('ui.gallery_section.filter_red_dunes') ?? 'Red Dunes' }}</span>
             </button>
             <button type="button" @click="category = 'buggy_quad'" 
-                :class="category === 'buggy_quad' ? 'bg-primary text-white shadow-sm' : 'bg-white/10 hover:bg-white/20 text-white/80'"
+                :class="category === 'buggy_quad' ? 'bg-primary-accessible text-white shadow-sm' : 'bg-white/10 hover:bg-white/20 text-white/80'"
                 class="px-4 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5 min-h-[42px] shrink-0 snap-start">
                 <i class="bi bi-lightning-charge-fill"></i>
                 <span>{{ __('ui.gallery_section.filter_buggy_quad') ?? 'Buggies & Quads' }}</span>
             </button>
             <button type="button" @click="category = 'camp_bbq'" 
-                :class="category === 'camp_bbq' ? 'bg-primary text-white shadow-sm' : 'bg-white/10 hover:bg-white/20 text-white/80'"
+                :class="category === 'camp_bbq' ? 'bg-primary-accessible text-white shadow-sm' : 'bg-white/10 hover:bg-white/20 text-white/80'"
                 class="px-4 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5 min-h-[42px] shrink-0 snap-start">
                 <i class="bi bi-fire"></i>
                 <span>{{ __('ui.gallery_section.filter_camp_bbq') ?? 'Camp & BBQ' }}</span>
             </button>
             <button type="button" @click="category = 'sunset_camels'" 
-                :class="category === 'sunset_camels' ? 'bg-primary text-white shadow-sm' : 'bg-white/10 hover:bg-white/20 text-white/80'"
+                :class="category === 'sunset_camels' ? 'bg-primary-accessible text-white shadow-sm' : 'bg-white/10 hover:bg-white/20 text-white/80'"
                 class="px-4 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5 min-h-[42px] shrink-0 snap-start">
                 <i class="bi bi-sunset-fill"></i>
                 <span>{{ __('ui.gallery_section.filter_sunset_camels') ?? 'Sunset & Camels' }}</span>
@@ -1084,7 +1084,7 @@ if (!function_exists('renderReviewCardMarkup')) {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-10 sm:mb-12">
             <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">
-                {{ __('ui.guide_section.title') }} <span class="text-primary">{{ __('ui.guide_section.title_highlight') }}</span>
+                {{ __('ui.guide_section.title') }} <span class="text-primary-accessible">{{ __('ui.guide_section.title_highlight') }}</span>
             </h2>
             <p class="text-slate-600 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
                 {{ __('ui.guide_section.subtitle') }}

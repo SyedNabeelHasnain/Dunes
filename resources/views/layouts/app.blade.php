@@ -666,7 +666,7 @@
                             <i class="bi bi-search text-xs"></i>
                         </button>
                         @include('partials.language-currency-switcher', ['switcherId' => 'desktopLangCurrencyDropdownBtn'])
-                        <a class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full font-bold text-xs bg-emerald-500 hover:bg-emerald-600 text-white shadow-xs hover:shadow-sm transition-all cursor-pointer btn-whatsapp" href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" data-action="whatsapp">
+                        <a class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full font-bold text-xs bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs hover:shadow-sm transition-all cursor-pointer btn-whatsapp" href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}" target="_blank" rel="noopener" data-action="whatsapp">
                             <i class="bi bi-whatsapp"></i><span>{{ __('ui.common.whatsapp') }}</span>
                         </a>
                         <button type="button" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full font-extrabold text-xs text-white bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 shadow-sm hover:shadow-md transition-all cursor-pointer" data-action="open-booking">
@@ -903,7 +903,7 @@
                         </a>
                     </div>
                     <div class="mt-4">
-                        <button type="button" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold text-white bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 shadow-sm hover:shadow-md transition-all cursor-pointer" @click="$store.modal.open('safari-matcher')" aria-label="{{ __('ui.footer.safari_concierge_btn') }}">
+                        <button type="button" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold text-white bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 shadow-sm hover:shadow-md transition-all cursor-pointer" @click="$store.modal.open('safari-matcher')">
                             <i class="bi bi-compass text-white"></i>
                             <span>{{ __('ui.footer.safari_concierge_btn') }}</span>
                             @if($conciergePromoActive)

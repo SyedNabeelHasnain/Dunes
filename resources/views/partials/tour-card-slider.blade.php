@@ -58,8 +58,8 @@
     <div class="absolute top-3 inset-x-3 flex items-center justify-between z-20 pointer-events-none">
         <div>
             @if($bestseller)
-                <span class="bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-md inline-flex items-center gap-1">
-                    <i class="bi bi-fire text-amber-300"></i>{{ __('ui.home_popular.bestseller') }}
+                <span class="bg-primary-accessible text-white text-xs font-bold px-3 py-1 rounded-full shadow-md inline-flex items-center gap-1">
+                    <i class="bi bi-fire text-amber-200"></i>{{ __('ui.home_popular.bestseller') }}
                 </span>
             @elseif($featured)
                 <span class="bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md inline-flex items-center gap-1">
