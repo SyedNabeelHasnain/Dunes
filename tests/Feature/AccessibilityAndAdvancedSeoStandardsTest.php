@@ -192,4 +192,46 @@ class AccessibilityAndAdvancedSeoStandardsTest extends TestCase
         $this->assertStringContainsString('animation-duration: 0.01ms', $css);
         $this->assertStringContainsString('scroll-behavior: auto', $css);
     }
+
+    public function test_opensearch_and_manifest_standards_are_present(): void
+    {
+        $response = $this->get('/');
+        $response->assertStatus(200);
+
+        $content = $response->getContent();
+        $this->assertStringContainsString('rel="manifest"', $content);
+        $this->assertStringContainsString('rel="search"', $content);
+        $this->assertStringContainsString('type="application/opensearchdescription+xml"', $content);
+
+        // Verify public opensearch and manifest files exist
+        $this->assertFileExists(public_path('opensearch.xml'));
+        $this->assertFileExists(public_path('manifest.json'));
+        $this->assertFileExists(public_path('site.webmanifest'));
+    }
+
+    public function test_llms_txt_and_full_are_accessible_and_follow_standards(): void
+    {
+        $response = $this->get('/llms.txt');
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'text/markdown; charset=utf-8');
+        $this->assertStringContainsString('# Dunes Discovery Tourism', $response->getContent());
+        $this->assertStringContainsString('## Desert Safaris & Off-Road Adventures', $response->getContent());
+
+        $responseFull = $this->get('/llms-full.txt');
+        $responseFull->assertStatus(200);
+        $responseFull->assertHeader('Content-Type', 'text/markdown; charset=utf-8');
+    }
+
+    public function test_robots_txt_allows_generative_ai_crawlers(): void
+    {
+        $this->assertFileExists(public_path('robots.txt'));
+        $robots = file_get_contents(public_path('robots.txt'));
+
+        $this->assertStringContainsString('User-agent: GPTBot', $robots);
+        $this->assertStringContainsString('User-agent: ClaudeBot', $robots);
+        $this->assertStringContainsString('User-agent: PerplexityBot', $robots);
+        $this->assertStringContainsString('User-agent: Google-Extended', $robots);
+        $this->assertStringContainsString('User-agent: ChatGPT-User', $robots);
+        $this->assertStringContainsString('llms.txt', $robots);
+    }
 }

@@ -307,6 +307,7 @@
     <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
     <link rel="apple-touch-icon" sizes="192x192" href="{{ asset('images/icon-192.png') }}">
     <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <link rel="search" type="application/opensearchdescription+xml" title="Dunes Discovery Tourism" href="{{ asset('opensearch.xml') }}">
     <link rel="alternate" type="application/rss+xml" title="Dunes Discovery Tourism Travel Blog" href="{{ url('/feed.xml') }}">
 
     <!-- Prevent Alpine.js modal/drawer flashing during page hydration -->
@@ -895,7 +896,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 mb-12">
                 <!-- Col 1: Brand & Bio -->
                 <div class="sm:col-span-2 lg:col-span-4">
-                    <img src="{{ asset('images/logo-white.png') }}" alt="Dunes Discovery Tourism" width="160" height="46" class="h-9 w-auto object-contain mb-4">
+                    <img src="{{ asset('images/logo-white.png') }}" alt="Dunes Discovery Tourism" width="160" height="46" loading="lazy" decoding="async" class="h-9 w-auto object-contain mb-4">
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-sm mb-4">
                         {{ __('ui.footer.about_text') }}
                     </p>
@@ -997,7 +998,7 @@
 
                     <div class="flex flex-wrap gap-2 mt-4">
                         <a href="{{ $settings['social_tripadvisor'] ?? 'https://www.tripadvisor.com/Attraction_Review-g295424-d29026644-Reviews-Dunes_Discovery-Dubai_Emirate_of_Dubai.html' }}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 p-1.5 px-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-colors">
-                            <img src="{{ asset('images/tripadvisor-logo-circle-owl-icon-black-green.png') }}" alt="TripAdvisor" width="20" height="20" loading="lazy" class="w-5 h-5 object-contain">
+                            <img src="{{ asset('images/tripadvisor-logo-circle-owl-icon-black-green.png') }}" alt="TripAdvisor" width="20" height="20" loading="lazy" decoding="async" class="w-5 h-5 object-contain">
                             <div>
                                 <div class="text-white font-bold text-xs leading-none">4.9</div>
                                 <div class="text-amber-400 text-[9px] flex gap-0.5 mt-0.5">
@@ -1006,7 +1007,7 @@
                             </div>
                         </a>
                         <a href="{{ $settings['social_google'] ?? 'https://search.google.com/local/writereview?placeid=ChIJbWsIEIVEdEER4uHEhb2dbcQ' }}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 p-1.5 px-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-colors">
-                            <img src="{{ asset('images/Google-G.avif') }}" alt="Google" width="20" height="20" loading="lazy" class="w-5 h-5 object-contain">
+                            <img src="{{ asset('images/Google-G.avif') }}" alt="Google" width="20" height="20" loading="lazy" decoding="async" class="w-5 h-5 object-contain">
                             <div>
                                 <div class="text-white font-bold text-xs leading-none">5.0</div>
                                 <div class="text-amber-400 text-[9px] flex gap-0.5 mt-0.5">
@@ -1043,12 +1044,12 @@
                     </div>
                     <div class="inline-flex items-center gap-2 bg-slate-900 border border-slate-800 px-4 py-2.5 rounded-2xl lg:rounded-full flex-wrap justify-center">
                         <span class="text-slate-300 text-xs inline-flex items-center gap-1 font-semibold"><i class="bi bi-shield-lock-fill text-emerald-400"></i>{{ __('ui.footer.secure_checkout') }}</span>
-                        <span class="bg-white rounded px-2 py-0.5 inline-flex items-center justify-center shadow-2xs h-6"><img src="{{ asset('images/visa-card.svg') }}" alt="Visa" width="32" height="20" class="h-3.5 w-auto object-contain"></span>
-                        <span class="bg-white rounded px-2 py-0.5 inline-flex items-center justify-center shadow-2xs h-6"><img src="{{ asset('images/mastercard.svg') }}" alt="Mastercard" width="28" height="20" class="h-3.5 w-auto object-contain"></span>
-                        <span class="bg-white rounded px-2 py-0.5 inline-flex items-center justify-center shadow-2xs h-6"><img src="{{ asset('images/americanexpress.svg') }}" alt="American Express" width="28" height="20" class="h-3.5 w-auto object-contain"></span>
-                        <span class="bg-white rounded px-2 py-0.5 inline-flex items-center justify-center shadow-2xs h-6"><img src="{{ asset('images/applepay.svg') }}" alt="Apple Pay" width="32" height="20" class="h-3.5 w-auto object-contain"></span>
-                        <span class="bg-white rounded px-2 py-0.5 inline-flex items-center justify-center shadow-2xs h-6"><img src="{{ asset('images/googlepay.svg') }}" alt="Google Pay" width="32" height="20" class="h-3.5 w-auto object-contain"></span>
-                        <span class="bg-white rounded px-2 py-0.5 inline-flex items-center justify-center shadow-2xs h-6"><img src="{{ asset('images/ziina-icon.png') }}" alt="Ziina Payment Gateway" width="18" height="18" class="h-3.5 w-auto object-contain"></span>
+                        <span class="bg-white rounded px-2 py-0.5 inline-flex items-center justify-center shadow-2xs h-6"><img src="{{ asset('images/visa-card.svg') }}" alt="Visa" width="32" height="20" loading="lazy" decoding="async" class="h-3.5 w-auto object-contain"></span>
+                        <span class="bg-white rounded px-2 py-0.5 inline-flex items-center justify-center shadow-2xs h-6"><img src="{{ asset('images/mastercard.svg') }}" alt="Mastercard" width="28" height="20" loading="lazy" decoding="async" class="h-3.5 w-auto object-contain"></span>
+                        <span class="bg-white rounded px-2 py-0.5 inline-flex items-center justify-center shadow-2xs h-6"><img src="{{ asset('images/americanexpress.svg') }}" alt="American Express" width="28" height="20" loading="lazy" decoding="async" class="h-3.5 w-auto object-contain"></span>
+                        <span class="bg-white rounded px-2 py-0.5 inline-flex items-center justify-center shadow-2xs h-6"><img src="{{ asset('images/applepay.svg') }}" alt="Apple Pay" width="32" height="20" loading="lazy" decoding="async" class="h-3.5 w-auto object-contain"></span>
+                        <span class="bg-white rounded px-2 py-0.5 inline-flex items-center justify-center shadow-2xs h-6"><img src="{{ asset('images/googlepay.svg') }}" alt="Google Pay" width="32" height="20" loading="lazy" decoding="async" class="h-3.5 w-auto object-contain"></span>
+                        <span class="bg-white rounded px-2 py-0.5 inline-flex items-center justify-center shadow-2xs h-6"><img src="{{ asset('images/ziina-icon.png') }}" alt="Ziina Payment Gateway" width="18" height="18" loading="lazy" decoding="async" class="h-3.5 w-auto object-contain"></span>
                     </div>
                 </div>
             </div>
