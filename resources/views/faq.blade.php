@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-@push('preloads')
+@push('schema')
 <script type="application/ld+json">
 {
   "@@context": "https://schema.org",

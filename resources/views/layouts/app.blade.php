@@ -281,6 +281,8 @@
     
     <!-- Twitter Card Metadata -->
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@dunesdiscovery">
+    <meta name="twitter:creator" content="@dunesdiscovery">
     <meta name="twitter:title" content="{{ $pageTitle }}">
     <meta name="twitter:description" content="{{ $pageDesc }}">
     <meta name="twitter:image" content="{{ $ogImage }}">
@@ -493,7 +495,7 @@
           },
           "speakable": {
             "@@type": "SpeakableSpecification",
-            "cssSelector": ["#header", "#footer", "h1", ".hero-title", ".page-summary"]
+            "cssSelector": [".page-summary", ".hero-title", "h1"]
           }
         }
       ]
@@ -611,6 +613,33 @@
                                             </div>
                                         </div>
                                     </li>
+                                    <!-- Pickup Hubs Dropdown -->
+                                    <li class="relative" x-data="{ openHubs: false }" @click.outside="openHubs = false" @keydown.escape.window="openHubs = false">
+                                        <button type="button" @click="openHubs = !openHubs" :aria-expanded="openHubs" class="px-3 py-2 rounded-xl transition-all inline-flex items-center gap-1 hover:text-primary hover:bg-orange-50/60 cursor-pointer {{ request()->routeIs('tours.location', 'locale.tours.location') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'text-slate-700' }}">
+                                            <span>Pickup Hubs</span>
+                                            <i class="bi bi-chevron-down text-[10px] transition-transform duration-200" :class="{ 'rotate-180': openHubs }"></i>
+                                        </button>
+                                        <div x-show="openHubs" 
+                                             x-transition:enter="transition ease-out duration-150"
+                                             x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                                             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                             x-transition:leave="transition ease-in duration-100"
+                                             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                                             x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+                                             class="absolute start-0 mt-2 w-72 rounded-2xl bg-white p-2 shadow-xl border border-slate-200 z-50 focus:outline-none"
+                                             style="display: none;">
+                                            <div class="px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100 mb-1">
+                                                Hotel & Residence Pickup Areas
+                                            </div>
+                                            <div class="max-h-72 overflow-y-auto space-y-0.5">
+                                                @foreach(\App\Services\LocationLandingService::getLocations() as $hub)
+                                                <a class="block px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-primary transition-colors line-clamp-1" href="{{ url('/' . $hub['slug']) }}">
+                                                    {{ $hub['name'] }}
+                                                </a>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </li>
                                 @else
                                     <li>
                                         <a class="px-3 py-2 rounded-xl transition-all {{ $isActive ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ $mItem->resolved_url }}" target="{{ $mItem->target ?? '_self' }}">{{ $mItem->label }}</a>
@@ -644,6 +673,32 @@
                                         @foreach($allTours as $t)
                                         <a class="block px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-primary transition-colors line-clamp-1" href="{{ localized_route('tours.show', $t->slug) }}">
                                             {{ $t->name }}
+                                        </a>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="relative" x-data="{ openHubs: false }" @click.outside="openHubs = false" @keydown.escape.window="openHubs = false">
+                                <button type="button" @click="openHubs = !openHubs" :aria-expanded="openHubs" class="px-3 py-2 rounded-xl transition-all inline-flex items-center gap-1 hover:text-primary hover:bg-orange-50/60 cursor-pointer {{ request()->routeIs('tours.location', 'locale.tours.location') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'text-slate-700' }}">
+                                    <span>Pickup Hubs</span>
+                                    <i class="bi bi-chevron-down text-[10px] transition-transform duration-200" :class="{ 'rotate-180': openHubs }"></i>
+                                </button>
+                                <div x-show="openHubs" 
+                                     x-transition:enter="transition ease-out duration-150"
+                                     x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                                     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                     x-transition:leave="transition ease-in duration-100"
+                                     x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                                     x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+                                     class="absolute start-0 mt-2 w-72 rounded-2xl bg-white p-2 shadow-xl border border-slate-200 z-50 focus:outline-none"
+                                     style="display: none;">
+                                    <div class="px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100 mb-1">
+                                        Hotel & Residence Pickup Areas
+                                    </div>
+                                    <div class="max-h-72 overflow-y-auto space-y-0.5">
+                                        @foreach(\App\Services\LocationLandingService::getLocations() as $hub)
+                                        <a class="block px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-primary transition-colors line-clamp-1" href="{{ url('/' . $hub['slug']) }}">
+                                            {{ $hub['name'] }}
                                         </a>
                                         @endforeach
                                     </div>
@@ -849,6 +904,21 @@
                     <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('faq', 'locale.faq') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('faq') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.faq') }}</a>
                     <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('contact', 'locale.contact') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('contact') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.contact') }}</a>
                 @endif
+
+                <!-- Mobile Hotel Pickup Hubs Accordion -->
+                <div class="pt-2 border-t border-slate-100" x-data="{ openHubs: false }">
+                    <button type="button" @click="openHubs = !openHubs" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-100 transition-colors">
+                        <span class="flex items-center gap-2"><i class="bi bi-geo-alt-fill text-amber-500"></i> Hotel Pickup Hubs</span>
+                        <i class="bi bi-chevron-down text-xs transition-transform" :class="{ 'rotate-180': openHubs }"></i>
+                    </button>
+                    <div x-show="openHubs" class="pl-4 pr-2 py-1 space-y-0.5 max-h-60 overflow-y-auto" style="display: none;">
+                        @foreach(\App\Services\LocationLandingService::getLocations() as $hub)
+                        <a class="block px-3 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:text-primary hover:bg-orange-50" href="{{ url('/' . $hub['slug']) }}" @click="$store.mobileNav.close()">
+                            {{ $hub['name'] }}
+                        </a>
+                        @endforeach
+                    </div>
+                </div>
             </nav>
         </div>
 
@@ -1018,6 +1088,25 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Doorstep Hotel Pickup Hubs Internal Linking Matrix -->
+            <div class="border-t border-slate-800/80 pt-8 pb-4 mb-8">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-4">
+                    <div>
+                        <h4 class="text-xs font-black uppercase tracking-wider text-amber-400">Doorstep Hotel Pickup Hubs Across Dubai</h4>
+                        <p class="text-slate-400 text-xs">Complimentary 4x4 Land Cruiser hotel & residence pickup available across all major Dubai and Sharjah districts.</p>
+                    </div>
+                    <span class="text-[11px] font-bold text-emerald-400 inline-flex items-center gap-1.5"><i class="bi bi-shield-check"></i> DTCM Licensed Fleet</span>
+                </div>
+                <div class="flex flex-wrap gap-2 text-xs">
+                    @foreach(\App\Services\LocationLandingService::getLocations() as $hub)
+                        <a href="{{ url('/' . $hub['slug']) }}" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-amber-500/50 hover:bg-slate-800/80 transition-all font-medium inline-flex items-center gap-1.5">
+                            <i class="bi bi-geo-alt-fill text-amber-500 text-[10px]"></i>
+                            <span>{{ $hub['name'] }}</span>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
             
             <!-- Bottom Bar with Legal Links and Payment Badges -->
             <div class="border-t border-slate-800/80 pt-6">
@@ -1093,6 +1182,22 @@
 
     <!-- Scripts -->
     <script src="{{ asset('assets/vendor/intl-tel-input/26.0.6/build/intlTelInput.min.js') }}"></script>
+
+    <!-- Persistent Floating WhatsApp Action Button -->
+    <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}?text={{ urlencode('Hi Dunes Discovery! I would like to inquire about booking a Dubai Desert Safari.') }}"
+       target="_blank"
+       rel="noopener"
+       id="globalWhatsappFloat"
+       class="whatsapp-floating-btn fixed bottom-5 end-5 z-40 flex items-center gap-2.5 px-3.5 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2"
+       aria-label="Chat with Safari Concierge on WhatsApp"
+       data-action="whatsapp">
+        <i class="bi bi-whatsapp text-xl leading-none"></i>
+        <span class="text-xs font-bold tracking-tight hidden sm:inline-block pe-1">Chat with Us</span>
+        <span class="relative flex h-2.5 w-2.5 sm:hidden">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-100 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
+        </span>
+    </a>
 
     @stack('scripts')
 </body>

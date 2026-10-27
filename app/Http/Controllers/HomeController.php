@@ -145,8 +145,8 @@ class HomeController extends Controller
         $currentYear = date('Y');
 
         if ($currentLocale === 'en' || empty($currentLocale)) {
-            $defaultTitle = "Dubai Desert Safari Tours {$currentYear} | Best Price from AED 79 | Dunes Discovery Tourism";
-            $defaultDesc = 'Book top-rated Dubai Desert Safari, 1000cc Dune Buggy, Quad Biking, & Dhow Cruise dinners from AED 79. 4x4 Land Cruiser pickup, live BBQ, & 24h free cancellation.';
+            $defaultTitle = "Dubai Desert Safari from AED 79 ({$currentYear}) | 4x4 Lahbab Red Dunes | Dunes Discovery";
+            $defaultDesc = '★ 4.9/5 Rated (2,800+ Reviews). Book Dubai Desert Safari from AED 79. Includes 4x4 Lahbab Red Dunes bashing, camel ride, live BBQ & pickup. Instant WhatsApp voucher & pay on arrival.';
             $defaultKeys = 'dubai desert safari, desert safari dubai, evening desert safari dubai, dune buggy rental dubai, quad biking dubai, dhow cruise dubai, abu dhabi city tour';
 
             $pageTitle = $settingsService->get('seo_home_title') ?: $defaultTitle;

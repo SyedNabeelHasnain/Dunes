@@ -185,9 +185,12 @@ class AdminDashboardController extends Controller
     /**
      * Real-time JSON endpoint for live KPI refresh.
      */
-    public function liveKpis(): JsonResponse
+    public function liveKpis(\Illuminate\Http\Request $request): JsonResponse
     {
         try {
+            if ($request->boolean('force')) {
+                Cache::forget('admin_dashboard_kpis');
+            }
             $stats = $this->computeRealtimeKpis();
 
             return response()->json([

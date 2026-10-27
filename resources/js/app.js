@@ -5429,7 +5429,7 @@ Alpine.data('safariMatcherQuiz', (config = {}) => ({
  * 6.3 Custom Safari Modal Component
  */
 Alpine.data('customSafariModal', (config = {}) => ({
-    base: { name: 'Standard Evening Red Dunes', price: 150, tourId: 1 },
+    base: { name: 'Sunset Evening Red Dunes', price: 79, tourId: 1 },
     transfer: { name: 'Shared 4x4 Land Cruiser', price: 0, type: 'flat' },
     sports: { name: 'Scenic Only', price: 0, type: 'per_person' },
     addons: [],
@@ -5464,6 +5464,31 @@ Alpine.data('customSafariModal', (config = {}) => ({
         return `https://wa.me/${this.waPhone}?text=${msg}`;
     },
     book() {
+        const customQuote = {
+            is_custom_builder: 1,
+            base_tour_id: this.base.tourId,
+            base_name: this.base.name,
+            base_price: this.base.price,
+            transfer_name: this.transfer.name,
+            transfer_price: this.transfer.price,
+            transfer_type: this.transfer.type,
+            sports_name: this.sports.name,
+            sports_price: this.sports.price,
+            sports_type: this.sports.type,
+            addons: this.addons.map(a => ({ key: a.key, name: a.name, price: a.price, type: a.type })),
+            adults: this.adults,
+            children: 0,
+            subtotal: this.total,
+            total: this.total,
+            spec_text: `[CUSTOM SAFARI BUILDER SPEC]\n` +
+                `• Base Safari: ${this.base.name} (AED ${this.base.price}/guest)\n` +
+                `• Transfer Vehicle: ${this.transfer.name} (${this.transfer.price > 0 ? '+AED ' + this.transfer.price : 'Included'})\n` +
+                `• Motorsports: ${this.sports.name} (${this.sports.price > 0 ? '+AED ' + this.sports.price + (this.sports.type === 'per_person' ? '/guest' : '') : 'Included'})\n` +
+                `• Camp Addons: ${this.addons.length > 0 ? this.addons.map(a => a.name + ' (+AED ' + a.price + ')').join(', ') : 'None'}\n` +
+                `• Party Size: ${this.adults} Adults\n` +
+                `• Guaranteed Total: AED ${this.total}`
+        };
+
         if (window.Alpine && Alpine.store('modal')) {
             Alpine.store('modal').close();
         }
@@ -5472,7 +5497,9 @@ Alpine.data('customSafariModal', (config = {}) => ({
                 Alpine.store('modal').open('booking', {
                     tourId: this.base.tourId,
                     adults: this.adults,
-                    requests: `[CUSTOM BUILDER SPEC]\nVehicle: ${this.transfer.name}\nMotorsports: ${this.sports.name}\nAddons: ${this.summaryAddons}\nEstimated Total: AED ${this.total}`
+                    children: 0,
+                    customQuote: customQuote,
+                    requests: customQuote.spec_text
                 });
             }
             const tourSelect = document.getElementById('bookingTour');
@@ -5484,7 +5511,7 @@ Alpine.data('customSafariModal', (config = {}) => ({
             if (adultsInput) adultsInput.value = this.adults;
             const reqInput = document.getElementById('bookingRequests');
             if (reqInput) {
-                reqInput.value = `[CUSTOM BUILDER SPEC]\nVehicle: ${this.transfer.name}\nMotorsports: ${this.sports.name}\nAddons: ${this.summaryAddons}\nEstimated Total: AED ${this.total}`;
+                reqInput.value = customQuote.spec_text;
             }
         }, 300);
     }

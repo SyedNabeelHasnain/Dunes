@@ -234,4 +234,85 @@ class AccessibilityAndAdvancedSeoStandardsTest extends TestCase
         $this->assertStringContainsString('User-agent: ChatGPT-User', $robots);
         $this->assertStringContainsString('llms.txt', $robots);
     }
+
+    public function test_all_15_location_landing_hubs_render_and_have_self_referential_canonicals(): void
+    {
+        $locations = \App\Services\LocationLandingService::getLocations();
+        $this->assertCount(15, $locations, 'Expected exactly 15 programmatic location landing hubs');
+
+        foreach ($locations as $key => $loc) {
+            $url = '/' . $loc['slug'];
+            $response = $this->get($url);
+            $response->assertStatus(200);
+
+            $content = $response->getContent();
+            $this->assertStringContainsString($loc['headline'], $content, "Missing headline for {$loc['slug']}");
+            $this->assertStringContainsString('<link rel="canonical" href="http://localhost/' . $loc['slug'] . '">', $content);
+        }
+    }
+
+    public function test_location_hubs_are_internally_linked_in_navigation_and_footer(): void
+    {
+        $response = $this->get('/');
+        $response->assertStatus(200);
+
+        $content = $response->getContent();
+        $this->assertStringContainsString('Pickup Hubs', $content);
+        $this->assertStringContainsString('Doorstep Hotel Pickup Hubs Across Dubai', $content);
+
+        foreach (\App\Services\LocationLandingService::getLocations() as $loc) {
+            $this->assertStringContainsString($loc['slug'], $content, "Missing internal link for hub {$loc['slug']}");
+        }
+    }
+
+    public function test_homepage_ctr_optimized_title_and_description_render(): void
+    {
+        $response = $this->get('/');
+        $response->assertStatus(200);
+
+        $content = $response->getContent();
+        $this->assertStringContainsString('Dubai Desert Safari from AED 79 (2026) | 4x4 Lahbab Red Dunes | Dunes Discovery', $content);
+        $this->assertStringContainsString('★ 4.9/5 Rated (2,800+ Reviews)', $content);
+        $this->assertStringContainsString('<meta name="twitter:site" content="@dunesdiscovery">', $content);
+
+        // SpeakableSpecification should only contain meaningful content, not header/footer chrome
+        $this->assertStringNotContainsString('"cssSelector": ["#header"', $content);
+        $this->assertStringNotContainsString('"#footer"', $content);
+        $this->assertStringContainsString('"cssSelector": [".page-summary", ".hero-title", "h1"]', $content);
+    }
+
+    public function test_global_floating_whatsapp_button_is_rendered(): void
+    {
+        $response = $this->get('/');
+        $response->assertStatus(200);
+
+        $content = $response->getContent();
+        $this->assertStringContainsString('id="globalWhatsappFloat"', $content);
+        $this->assertStringContainsString('class="whatsapp-floating-btn', $content);
+        $this->assertStringContainsString('Chat with Us', $content);
+    }
+
+    public function test_faq_schema_is_stacked_into_schema_section(): void
+    {
+        $faq = Faq::create([
+            'question' => 'What is the refund policy?',
+            'answer' => 'Full refund for cancellations made 24 hours prior to departure.',
+            'category' => 'general',
+            'status' => 'active',
+            'priority' => 1,
+        ]);
+
+        FaqAssignment::create([
+            'faq_id' => $faq->id,
+            'entity_type' => 'general',
+            'entity_id' => null,
+        ]);
+
+        $response = $this->get('/faq');
+        $response->assertStatus(200);
+
+        $content = $response->getContent();
+        $this->assertStringContainsString('"@type": "FAQPage"', $content);
+        $this->assertStringContainsString('What is the refund policy?', $content);
+    }
 }
