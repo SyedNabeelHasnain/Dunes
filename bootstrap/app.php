@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies(at: '*');
         $middleware->web(append: [
             TrackVisitor::class,
+            \App\Http\Middleware\TrackBacklinkReferralMiddleware::class,
             SecurityHeaders::class,
             SetLocale::class,
         ]);

@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Controllers\Api\CouponController;
 use App\Http\Controllers\Api\EmailVerificationController;
+use App\Http\Controllers\Api\SyndicationController;
 use App\Http\Controllers\Api\WelcomeOfferController;
 use App\Http\Controllers\Api\ZiinaWebhookController;
 use App\Http\Controllers\BookingController;
@@ -19,6 +20,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('v1')->group(function () {
+    // Public Tour Syndication API (for partner portals, travel aggregators, and widgets)
+    Route::get('/syndication/tours', [SyndicationController::class, 'tours'])->middleware('throttle:60,1');
+
     // Tours Auto-complete Live Search
     Route::get('/tours/search', [TourController::class, 'liveSearch']);
 

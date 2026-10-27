@@ -17,7 +17,7 @@ class Booking extends Model
         'adults', 'children', 'infants', 'name', 'email', 'phone', 'pickup_location',
         'pickup_time_slot', 'pickup_status', 'driver_assigned_at', 'driver_notified_at',
         'guest_notified_at', 'driver_notes',
-        'special_requests', 'coupon_id', 'coupon_code', 'discount_type', 'discount_rate',
+        'special_requests', 'coupon_id', 'backlink_id', 'coupon_code', 'discount_type', 'discount_rate',
         'discount_amount', 'original_total', 'subtotal', 'addons_total', 'total', 'currency',
         'status', 'payment_method', 'payment_status', 'payment_amount',
         'balance_due', 'ziina_payment_intent_id', 'ziina_status',
@@ -146,5 +146,10 @@ class Booking extends Model
     public function couponUsage()
     {
         return $this->hasOne(CouponUsage::class);
+    }
+
+    public function backlink()
+    {
+        return $this->belongsTo(Backlink::class, 'backlink_id');
     }
 }

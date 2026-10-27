@@ -4,7 +4,7 @@
     $isOperationsGroup = request()->routeIs('admin.operations.*') || request()->routeIs('admin.drivers.*') || request()->routeIs('admin.vehicles.*');
     $isCatalogGroup = request()->routeIs('admin.tours.*') || request()->routeIs('admin.addons.*') || request()->routeIs('admin.tiers.*');
     $isCommunicationsGroup = request()->routeIs('admin.inquiries.*') || request()->routeIs('admin.whatsapp.*') || request()->routeIs('admin.reviews.*') || request()->routeIs('admin.video-reviews.*');
-    $isMarketingGroup = request()->routeIs('admin.coupons.*') || request()->routeIs('admin.subscribers.*') || request()->routeIs('admin.subscriber-groups.*') || request()->routeIs('admin.email-templates.*') || request()->routeIs('admin.campaigns.*');
+    $isMarketingGroup = request()->routeIs('admin.coupons.*') || request()->routeIs('admin.subscribers.*') || request()->routeIs('admin.subscriber-groups.*') || request()->routeIs('admin.email-templates.*') || request()->routeIs('admin.campaigns.*') || request()->routeIs('admin.backlinks.*');
     $isContentGroup = request()->routeIs('admin.blogs.*') || request()->routeIs('admin.blog-categories.*') || request()->routeIs('admin.wiki.*') || request()->routeIs('admin.pages.*') || request()->routeIs('admin.menus.*') || request()->routeIs('admin.faqs.*') || request()->routeIs('admin.legal.*');
     $isSettingsGroup = request()->routeIs('admin.settings.*');
 @endphp
@@ -348,6 +348,28 @@
                class="relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.campaigns*') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
                 <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.campaigns*') ? 'bg-primary' : 'bg-slate-600' }}"></span>
                 <span>Campaigns & Blasts</span>
+            </a>
+
+            <a href="{{ route('admin.backlinks.index') }}" 
+               class="relative flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.backlinks.index') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.backlinks.index') ? 'bg-primary' : 'bg-slate-600' }}"></span>
+                    <span>Backlinks & Off-Page</span>
+                </div>
+                <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    SEO
+                </span>
+            </a>
+
+            <a href="{{ route('admin.backlinks.syndication') }}" 
+               class="relative flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.backlinks.syndication') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.backlinks.syndication') ? 'bg-primary' : 'bg-slate-600' }}"></span>
+                    <span>API Syndication & Embeds</span>
+                </div>
+                <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                    <i class="bi bi-broadcast text-[9px] mr-0.5"></i> Hub
+                </span>
             </a>
         </div>
     </div>

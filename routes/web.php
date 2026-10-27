@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminBacklinkController;
 use App\Http\Controllers\Admin\AdminBlogCategoryController;
 use App\Http\Controllers\Admin\AdminBlogController;
 use App\Http\Controllers\Admin\AdminBookingController;
@@ -44,6 +45,7 @@ use App\Http\Controllers\RateCardController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SubscriberController;
 use App\Http\Controllers\SunsetGuideController;
+use App\Http\Controllers\SyndicationFeedController;
 use App\Http\Controllers\TourController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\WikiController;
@@ -359,6 +361,15 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::get('/settings/mail', [AdminMailSettingController::class, 'index'])->name('settings.mail');
     Route::post('/settings/mail', [AdminMailSettingController::class, 'update'])->name('settings.mail.update');
     Route::post('/settings/mail/test', [AdminMailSettingController::class, 'testConnection'])->name('settings.mail.test');
+
+    // ── Off-Page SEO: Backlink Tracking & Real-Time Syndication Hub ──────────
+    Route::get('/backlinks', [AdminBacklinkController::class, 'index'])->name('backlinks.index');
+    Route::post('/backlinks', [AdminBacklinkController::class, 'store'])->name('backlinks.store');
+    Route::put('/backlinks/{id}', [AdminBacklinkController::class, 'update'])->name('backlinks.update');
+    Route::delete('/backlinks/{id}', [AdminBacklinkController::class, 'destroy'])->name('backlinks.destroy');
+    Route::post('/backlinks/{id}/verify', [AdminBacklinkController::class, 'verifySingle'])->name('backlinks.verify');
+    Route::post('/backlinks/verify-all', [AdminBacklinkController::class, 'verifyAll'])->name('backlinks.verify-all');
+    Route::get('/backlinks/syndication', [AdminBacklinkController::class, 'syndication'])->name('backlinks.syndication');
 });
 
 // ── Profile routes (Breeze default) ──────────────────────────────────────────
@@ -389,6 +400,9 @@ Route::get('/sitemap-pages.xml', [SitemapController::class, 'pages'])->name('sit
 Route::get('/sitemap-images.xml', [SitemapController::class, 'images'])->name('sitemap.images');
 Route::get('/sitemap-videos.xml', [SitemapController::class, 'videos'])->name('sitemap.videos');
 Route::get('/video-sitemap.xml', [SitemapController::class, 'videos'])->name('sitemap.video');
+
+// ── Public Syndicated Tours RSS Feed ─────────────────────────────────────────
+Route::get('/feeds/tours.xml', [SyndicationFeedController::class, 'toursXml'])->name('feeds.tours');
 
 // ── Google Things to Do (GTTD) Partner Feeds ──────────────────────────────
 Route::get('/feeds/google-things-to-do/products.xml', [GoogleThingsToDoFeedController::class, 'productsXml'])->name('feeds.gttd.products');

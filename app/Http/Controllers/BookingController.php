@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\BookingAdminNotification;
 use App\Mail\BookingNotification;
+use App\Models\Backlink;
 use App\Models\Booking;
 use App\Models\BookingAddon;
 use App\Models\BookingPayment;
@@ -420,6 +421,7 @@ class BookingController extends Controller
                     'pickup_location' => $location,
                     'special_requests' => $requests,
                     'coupon_id' => $lockedCoupon ? $lockedCoupon->id : null,
+                    'backlink_id' => session('attributed_backlink_id') ?: (request()->hasCookie('dunes_backlink_ref') ? (int) request()->cookie('dunes_backlink_ref') : null),
                     'coupon_code' => $lockedCoupon ? $lockedCoupon->code : null,
                     'discount_type' => $lockedCoupon ? $lockedCoupon->discount_type : null,
                     'discount_rate' => $lockedCoupon ? (float) $lockedCoupon->discount_value : 0.00,
@@ -455,6 +457,9 @@ class BookingController extends Controller
                 // Record Coupon Usage immediately for cash bookings (instant confirmation)
                 if ($lockedCoupon && $discountAmount > 0 && $paymentMethod === 'cash') {
                     $this->recordCouponUsage($b);
+                }
+                if ($paymentMethod === 'cash') {
+                    $this->recordBacklinkAttribution($b);
                 }
 
                 // Save Booking Addons
@@ -801,6 +806,7 @@ class BookingController extends Controller
                         // Send booking confirmation email and record coupon on first completion only
                         if (! $wasCompleted) {
                             $this->recordCouponUsage($lockedBooking);
+                            $this->recordBacklinkAttribution($lockedBooking);
                             $shouldNotify = true;
                         }
                     });
@@ -1043,6 +1049,29 @@ class BookingController extends Controller
             }
         } catch (\Throwable $e) {
             Log::error("Failed to record coupon usage for {$booking->reference}: ".$e->getMessage());
+        }
+    }
+
+    /**
+     * Record backlink conversion attribution upon confirmed booking.
+     */
+    protected function recordBacklinkAttribution(Booking $booking): void
+    {
+        if (! $booking->backlink_id) {
+            return;
+        }
+
+        try {
+            $backlink = Backlink::find($booking->backlink_id);
+            if ($backlink) {
+                $backlink->increment('bookings_count');
+                $bookingTotal = max(0, (float) $booking->total);
+                if ($bookingTotal > 0) {
+                    $backlink->increment('revenue_generated_aed', $bookingTotal);
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::error("Failed to attribute backlink for {$booking->reference}: ".$e->getMessage());
         }
     }
 
@@ -1382,6 +1411,7 @@ class BookingController extends Controller
                 ]);
 
                 $this->recordCouponUsage($booking);
+                $this->recordBacklinkAttribution($booking);
             }
         });
 

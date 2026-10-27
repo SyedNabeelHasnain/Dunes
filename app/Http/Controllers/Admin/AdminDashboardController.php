@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Backlink;
 use App\Models\BlogPost;
 use App\Models\Booking;
 use App\Models\BookingPayment;
@@ -98,6 +99,14 @@ class AdminDashboardController extends Controller
             $todayDeparturesCount = (int) ($bAgg->today_departures ?? 0);
             $upcomingDeparturesCount = (int) ($bAgg->upcoming_departures ?? 0);
 
+            try {
+                $activeBacklinksCount = Backlink::where('status', 'active')->count();
+                $totalBacklinksCount = Backlink::count();
+            } catch (\Throwable $e) {
+                $activeBacklinksCount = 0;
+                $totalBacklinksCount = 0;
+            }
+
             return [
                 'revenue' => (float) $revenue,
                 'total' => $totalBookings,
@@ -125,6 +134,8 @@ class AdminDashboardController extends Controller
                 'total_posts' => (int) $totalBlogPostsCount,
                 'today_departures' => $todayDeparturesCount,
                 'upcoming_departures' => $upcomingDeparturesCount,
+                'active_backlinks' => (int) $activeBacklinksCount,
+                'total_backlinks' => (int) $totalBacklinksCount,
                 'timestamp' => now()->toIso8601String(),
             ];
         };
