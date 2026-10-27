@@ -71,13 +71,19 @@ class GalleryController extends Controller
             ? 'noindex, follow'
             : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
 
-        $firstItem = ! empty($filteredItems) ? $filteredItems[0] : null;
-        $ogImage = $firstItem ? $firstItem['url'] : asset('images/evening-desert-safari-dubai-dune-discovery-tourism.avif');
+        $photoItems = collect($filteredItems)->filter(fn ($i) => ($i['type'] ?? 'image') !== 'video');
+        $firstPhoto = $photoItems->first();
+        $ogImage = $firstPhoto ? $firstPhoto['url'] : asset('images/evening-desert-safari-dubai-dune-discovery-tourism.avif');
+
+        try {
+            $videoReviews = $this->galleryService->getCustomerVideoReviews();
+        } catch (\Throwable $e) {
+            $videoReviews = [];
+        }
 
         // Schema.org ImageGallery Graph
         $schemaImages = [];
-        $photoItems = collect($filteredItems)->filter(fn ($i) => ($i['type'] ?? 'image') !== 'video')->take(34);
-        foreach ($photoItems as $item) {
+        foreach ($photoItems->take(34) as $item) {
             $imageObj = [
                 '@type' => 'ImageObject',
                 'contentUrl' => $item['url'],
@@ -160,6 +166,7 @@ class GalleryController extends Controller
             'ogImage',
             'schemaImages',
             'schemaVideos',
+            'videoReviews',
             'currentLocale'
         ));
     }

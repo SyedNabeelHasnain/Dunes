@@ -251,7 +251,8 @@ class ReviewMediaGalleryService
         $rawItems = $this->extractAllReviewMedia();
         $ddtMoments = $this->getDdtMomentsMedia();
         $customerVideos = $this->getCustomerVideoReviews();
-        $merged = array_merge($customerVideos, $ddtMoments, $rawItems);
+        // Authentic guest photos first, followed by video reviews
+        $merged = array_merge($ddtMoments, $rawItems, $customerVideos);
 
         return $this->filterHealthyItems($merged, $force);
     }

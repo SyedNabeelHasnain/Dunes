@@ -133,4 +133,22 @@ class CustomerVideoReviewsTest extends TestCase
             'placement' => 'home',
         ]);
     }
+
+    public function test_navigation_header_renders_gallery_link(): void
+    {
+        $response = $this->get(route('home'));
+
+        $response->assertStatus(200);
+        $response->assertSee(localized_route('gallery.index'));
+    }
+
+    public function test_gallery_renders_photos_and_dedicated_video_reels_section(): void
+    {
+        $response = $this->get(route('gallery.index'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Authentic Guest Photo Gallery');
+        $response->assertSee('guest-video-reels');
+        $response->assertSee('Watch Unfiltered Guest Stories');
+    }
 }

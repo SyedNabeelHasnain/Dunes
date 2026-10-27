@@ -568,7 +568,8 @@
                                     if (!empty($mItem->route_name)) {
                                         $isActive = request()->routeIs($mItem->route_name, 'locale.' . $mItem->route_name)
                                             || ($isToursItem && request()->routeIs('tours.*', 'locale.tours.*'))
-                                            || (str_starts_with($mItem->route_name, 'blog') && request()->routeIs('blog.*', 'locale.blog.*'));
+                                            || (str_starts_with($mItem->route_name, 'blog') && request()->routeIs('blog.*', 'locale.blog.*'))
+                                            || (str_starts_with($mItem->route_name, 'gallery') && request()->routeIs('gallery.*', 'locale.gallery.*'));
                                     } elseif (!empty($mItem->url)) {
                                         $cleanPath = trim($mItem->url, '/');
                                         $isActive = request()->is($cleanPath, $cleanPath . '/*', '{locale}/' . $cleanPath, '{locale}/' . $cleanPath . '/*');
@@ -644,6 +645,9 @@
                                         @endforeach
                                     </div>
                                 </div>
+                            </li>
+                            <li>
+                                <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('gallery.*', 'locale.gallery.*') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ localized_route('gallery.index') }}">{{ __('ui.nav.gallery') ?? 'Gallery' }}</a>
                             </li>
                             <li>
                                 <a class="px-3 py-2 rounded-xl transition-all {{ request()->routeIs('about', 'locale.about') ? 'bg-slate-900 text-white font-bold shadow-xs' : 'hover:text-primary hover:bg-orange-50/60' }}" href="{{ localized_route('about') }}">{{ __('ui.nav.about_short') ?? __('ui.nav.about') }}</a>
@@ -825,7 +829,8 @@
                             if (!empty($mItem->route_name)) {
                                 $isActive = request()->routeIs($mItem->route_name, 'locale.' . $mItem->route_name)
                                     || ($isToursItem && request()->routeIs('tours.*', 'locale.tours.*'))
-                                    || (str_starts_with($mItem->route_name, 'blog') && request()->routeIs('blog.*', 'locale.blog.*'));
+                                    || (str_starts_with($mItem->route_name, 'blog') && request()->routeIs('blog.*', 'locale.blog.*'))
+                                    || (str_starts_with($mItem->route_name, 'gallery') && request()->routeIs('gallery.*', 'locale.gallery.*'));
                             } elseif (!empty($mItem->url)) {
                                 $cleanPath = trim($mItem->url, '/');
                                 $isActive = request()->is($cleanPath, $cleanPath . '/*', '{locale}/' . $cleanPath, '{locale}/' . $cleanPath . '/*');
@@ -835,6 +840,7 @@
                     @endforeach
                 @else
                     <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('tours.*', 'locale.tours.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('tours.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.tours_short') ?? __('ui.nav.tours') }}</a>
+                    <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('gallery.*', 'locale.gallery.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('gallery.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.gallery') ?? 'Gallery' }}</a>
                     <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('about', 'locale.about') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('about') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.about_short') ?? __('ui.nav.about') }}</a>
                     <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('blog.*', 'locale.blog.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('blog.index') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.blogs') ?? __('ui.nav.blog') }}</a>
                     <a class="block px-3.5 py-3 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center {{ request()->routeIs('faq', 'locale.faq') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}" href="{{ localized_route('faq') }}" @click="$store.mobileNav.close()">{{ __('ui.nav.faq') }}</a>
