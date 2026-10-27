@@ -315,4 +315,38 @@ class AccessibilityAndAdvancedSeoStandardsTest extends TestCase
         $this->assertStringContainsString('"@type": "FAQPage"', $content);
         $this->assertStringContainsString('What is the refund policy?', $content);
     }
+
+    public function test_all_15_location_hubs_have_accurate_multi_safari_timing_schedules(): void
+    {
+        $locations = \App\Services\LocationLandingService::getLocations();
+
+        foreach ($locations as $key => $loc) {
+            $this->assertArrayHasKey('schedules', $loc, "Location {$key} missing schedules array");
+            $this->assertArrayHasKey('morning', $loc['schedules'], "Location {$key} missing morning schedule");
+            $this->assertArrayHasKey('evening', $loc['schedules'], "Location {$key} missing evening schedule");
+            $this->assertArrayHasKey('overnight', $loc['schedules'], "Location {$key} missing overnight schedule");
+            $this->assertArrayHasKey('quad_buggy', $loc['schedules'], "Location {$key} missing quad_buggy schedule");
+
+            // Morning must be in AM
+            $this->assertStringContainsString('AM', $loc['schedules']['morning']['pickup']);
+            // Evening must be in PM
+            $this->assertStringContainsString('PM', $loc['schedules']['evening']['pickup']);
+            // Overnight return must be next day
+            $this->assertStringContainsString('Next Day', $loc['schedules']['overnight']['return']);
+
+            // Verify landing page renders multi-safari schedules
+            $response = $this->get('/' . $loc['slug']);
+            $response->assertStatus(200);
+            $content = $response->getContent();
+
+            $this->assertStringContainsString('Morning Safari', $content);
+            $this->assertStringContainsString('Evening Safari', $content);
+            $this->assertStringContainsString('Overnight Safari', $content);
+            $this->assertStringContainsString('Schedule Matrix', $content);
+            $this->assertStringContainsString('Safari Timings & Schedule', $content);
+            $this->assertStringContainsString($loc['schedules']['morning']['pickup'], $content);
+            $this->assertStringContainsString($loc['schedules']['evening']['pickup'], $content);
+            $this->assertStringContainsString($loc['schedules']['overnight']['return'], $content);
+        }
+    }
 }

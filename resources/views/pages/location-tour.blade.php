@@ -68,7 +68,7 @@
           {
             "@type": "ListItem",
             "position": 1,
-            "name": {!! json_encode('Doorstep Pickup from ' . $locationData['name'] . ' (' . $locationData['pickup_window'] . ')', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+            "name": {!! json_encode('Doorstep 4x4 Pickup from ' . $locationData['name'] . ' (Morning: ' . ($locationData['schedules']['morning']['pickup'] ?? '08:00 AM – 08:30 AM') . ' | Evening: ' . ($locationData['schedules']['evening']['pickup'] ?? $locationData['pickup_window']) . ')', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           },
           {
             "@type": "ListItem",
@@ -93,7 +93,7 @@
           {
             "@type": "ListItem",
             "position": 6,
-            "name": {!! json_encode('Return Drop-off to ' . $locationData['name'] . ' (' . $locationData['return_time'] . ')', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+            "name": {!! json_encode('Return Drop-off to ' . $locationData['name'] . ' (Morning: ' . ($locationData['schedules']['morning']['return'] ?? '12:00 PM – 12:30 PM') . ' | Evening: ' . ($locationData['schedules']['evening']['return'] ?? $locationData['return_time']) . ' | Overnight: ' . ($locationData['schedules']['overnight']['return'] ?? '08:30 AM – 09:00 AM Next Day') . ')', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           }
         ]
       },
@@ -210,23 +210,35 @@
                         </a>
                     </div>
 
-                    <!-- Quick Spec Pills -->
+                    <!-- Quick Spec Pills: Tour-Specific Schedules -->
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        <div class="bg-slate-800/80 backdrop-blur-md border border-white/10 rounded-2xl p-3.5 text-center transition-all hover:border-amber-500/40">
-                            <span class="text-white/50 block text-[10px] uppercase font-bold tracking-wider mb-1">Pickup Window</span>
-                            <span class="font-bold text-amber-400 text-xs sm:text-sm flex items-center justify-center gap-1"><i class="bi bi-clock"></i>{{ $locationData['pickup_window'] }}</span>
+                        <div class="bg-slate-800/80 backdrop-blur-md border border-white/10 rounded-2xl p-3 text-center transition-all hover:border-amber-500/40">
+                            <span class="text-amber-400 block text-[10px] uppercase font-bold tracking-wider mb-1 flex items-center justify-center gap-1">
+                                <i class="bi bi-sun"></i> Morning Safari
+                            </span>
+                            <span class="font-bold text-white text-xs sm:text-sm block">{{ $locationData['schedules']['morning']['pickup'] ?? '08:00 AM – 08:30 AM' }}</span>
+                            <span class="text-white/50 text-[10px] block mt-0.5">Drop-off: {{ $locationData['schedules']['morning']['return'] ?? '12:00 PM – 12:30 PM' }}</span>
                         </div>
-                        <div class="bg-slate-800/80 backdrop-blur-md border border-white/10 rounded-2xl p-3.5 text-center transition-all hover:border-amber-500/40">
-                            <span class="text-white/50 block text-[10px] uppercase font-bold tracking-wider mb-1">Return Time</span>
-                            <span class="font-bold text-white text-xs sm:text-sm flex items-center justify-center gap-1"><i class="bi bi-moon-stars"></i>{{ $locationData['return_time'] }}</span>
+                        <div class="bg-slate-800/80 backdrop-blur-md border border-amber-500/40 rounded-2xl p-3 text-center transition-all hover:border-amber-400 shadow-sm">
+                            <span class="text-amber-400 block text-[10px] uppercase font-bold tracking-wider mb-1 flex items-center justify-center gap-1">
+                                <i class="bi bi-sunset"></i> Evening Safari
+                            </span>
+                            <span class="font-bold text-amber-300 text-xs sm:text-sm block">{{ $locationData['schedules']['evening']['pickup'] ?? $locationData['pickup_window'] }}</span>
+                            <span class="text-white/50 text-[10px] block mt-0.5">Drop-off: {{ $locationData['schedules']['evening']['return'] ?? $locationData['return_time'] }}</span>
                         </div>
-                        <div class="bg-slate-800/80 backdrop-blur-md border border-white/10 rounded-2xl p-3.5 text-center transition-all hover:border-amber-500/40">
-                            <span class="text-white/50 block text-[10px] uppercase font-bold tracking-wider mb-1">Transit Time</span>
-                            <span class="font-bold text-white text-xs sm:text-sm flex items-center justify-center gap-1"><i class="bi bi-speedometer2"></i>40-50 Mins Direct</span>
+                        <div class="bg-slate-800/80 backdrop-blur-md border border-white/10 rounded-2xl p-3 text-center transition-all hover:border-amber-500/40">
+                            <span class="text-indigo-400 block text-[10px] uppercase font-bold tracking-wider mb-1 flex items-center justify-center gap-1">
+                                <i class="bi bi-moon-stars"></i> Overnight Safari
+                            </span>
+                            <span class="font-bold text-white text-xs sm:text-sm block">{{ $locationData['schedules']['overnight']['pickup'] ?? $locationData['pickup_window'] }}</span>
+                            <span class="text-white/50 text-[10px] block mt-0.5">Return: {{ $locationData['schedules']['overnight']['return'] ?? '08:30 AM Next Day' }}</span>
                         </div>
-                        <div class="bg-slate-800/80 backdrop-blur-md border border-white/10 rounded-2xl p-3.5 text-center transition-all hover:border-amber-500/40">
-                            <span class="text-white/50 block text-[10px] uppercase font-bold tracking-wider mb-1">Pickup Fleet</span>
-                            <span class="font-bold text-emerald-400 text-xs sm:text-sm flex items-center justify-center gap-1"><i class="bi bi-truck"></i>4x4 Land Cruiser</span>
+                        <div class="bg-slate-800/80 backdrop-blur-md border border-white/10 rounded-2xl p-3 text-center transition-all hover:border-emerald-500/40">
+                            <span class="text-emerald-400 block text-[10px] uppercase font-bold tracking-wider mb-1 flex items-center justify-center gap-1">
+                                <i class="bi bi-truck"></i> Doorstep 4x4 Fleet
+                            </span>
+                            <span class="font-bold text-white text-xs sm:text-sm block">Toyota Land Cruiser</span>
+                            <span class="text-white/50 text-[10px] block mt-0.5">{{ $locationData['transit_time'] }}</span>
                         </div>
                     </div>
                 </div>
@@ -443,73 +455,327 @@
         </div>
     </section>
 
-    <!-- ── ITINERARY & TIMELINE ──────────────────────────────────────────────── -->
-    <section class="py-14 sm:py-20 bg-slate-900 border-y border-white/5">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6">
-            <div class="text-center max-w-2xl mx-auto mb-12">
-                <span class="inline-block bg-amber-400 text-slate-950 text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full mb-2">Experience Schedule</span>
-                <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-2">Your Safari Day Timeline from {{ $locationData['name'] }}</h2>
-                <p class="text-slate-400 text-sm">Here is what a typical evening desert safari looks like from your doorstep pickup to drop-off.</p>
+    <!-- ── EXPERIENCE TIMING COMPARISON MATRIX ──────────────────────────────── -->
+    <section class="py-12 bg-slate-950/70 border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-10">
+                <span class="inline-block bg-amber-400 text-slate-950 text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full mb-2">Schedule Matrix</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-2">Safari Timings & Schedule from {{ $locationData['name'] }}</h2>
+                <p class="text-slate-400 text-sm">Pickup and return windows vary by experience. Review exact operational schedules below:</p>
             </div>
 
-            <div class="space-y-4">
-                <!-- Step 1 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Morning Safari Card -->
+                <div class="bg-slate-900 border border-white/10 rounded-2xl p-5 flex flex-col justify-between hover:border-amber-400/50 transition-all">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="inline-flex items-center gap-1.5 bg-amber-500/15 text-amber-400 text-xs font-bold px-2.5 py-1 rounded-full">
+                                <i class="bi bi-sun"></i> Morning Safari
+                            </span>
+                            <span class="text-slate-400 text-xs font-semibold">4 Hours</span>
+                        </div>
+                        <h3 class="text-white font-bold text-base mb-2">Morning Red Dunes Adventure</h3>
+                        <p class="text-slate-400 text-xs leading-relaxed mb-4">Ideal for early risers and cruise guests wanting cooler desert air before midday city plans.</p>
+                        <div class="space-y-2 border-t border-white/10 pt-3 text-xs">
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-400">Doorstep Pickup:</span>
+                                <span class="text-amber-400 font-bold">{{ $locationData['schedules']['morning']['pickup'] ?? '08:00 AM – 08:30 AM' }}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-400">Return Drop-off:</span>
+                                <span class="text-white font-bold">{{ $locationData['schedules']['morning']['return'] ?? '12:00 PM – 12:30 PM' }}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-400">Starting Price:</span>
+                                <span class="text-emerald-400 font-bold">AED 140 / person</span>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="#safari-packages" class="mt-4 block text-center bg-white/5 hover:bg-amber-400 hover:text-slate-950 text-slate-200 text-xs font-bold py-2 rounded-xl border border-white/10 transition-colors">
+                        Select Morning Safari
+                    </a>
+                </div>
+
+                <!-- Evening Safari Card -->
+                <div class="bg-slate-900 border border-amber-500/40 rounded-2xl p-5 flex flex-col justify-between hover:border-amber-400 transition-all shadow-lg relative">
+                    <span class="absolute -top-3 right-4 bg-primary text-slate-950 text-[10px] uppercase font-black px-2.5 py-0.5 rounded-full shadow">Most Popular</span>
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="inline-flex items-center gap-1.5 bg-amber-500/25 text-amber-300 text-xs font-bold px-2.5 py-1 rounded-full">
+                                <i class="bi bi-sunset"></i> Evening Safari
+                            </span>
+                            <span class="text-slate-400 text-xs font-semibold">6 Hours</span>
+                        </div>
+                        <h3 class="text-white font-bold text-base mb-2">Classic Evening Safari & BBQ</h3>
+                        <p class="text-slate-400 text-xs leading-relaxed mb-4">The signature Dubai experience: red dunes bashing, sunset photos, 5★ BBQ feast & 3 live shows.</p>
+                        <div class="space-y-2 border-t border-white/10 pt-3 text-xs">
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-400">Doorstep Pickup:</span>
+                                <span class="text-amber-400 font-bold">{{ $locationData['schedules']['evening']['pickup'] ?? $locationData['pickup_window'] }}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-400">Return Drop-off:</span>
+                                <span class="text-white font-bold">{{ $locationData['schedules']['evening']['return'] ?? $locationData['return_time'] }}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-400">Starting Price:</span>
+                                <span class="text-emerald-400 font-bold">AED 79 / person</span>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="#safari-packages" class="mt-4 block text-center bg-primary hover:bg-amber-300 text-slate-950 text-xs font-bold py-2 rounded-xl transition-colors">
+                        Select Evening Safari
+                    </a>
+                </div>
+
+                <!-- Overnight Safari Card -->
+                <div class="bg-slate-900 border border-white/10 rounded-2xl p-5 flex flex-col justify-between hover:border-amber-400/50 transition-all">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="inline-flex items-center gap-1.5 bg-indigo-500/20 text-indigo-300 text-xs font-bold px-2.5 py-1 rounded-full">
+                                <i class="bi bi-moon-stars"></i> Overnight Safari
+                            </span>
+                            <span class="text-slate-400 text-xs font-semibold">18 Hours</span>
+                        </div>
+                        <h3 class="text-white font-bold text-base mb-2">Overnight Camping & Sunrise</h3>
+                        <p class="text-slate-400 text-xs leading-relaxed mb-4">Evening safari + sleeping in private Bedouin tents under the stars, campfire & warm breakfast.</p>
+                        <div class="space-y-2 border-t border-white/10 pt-3 text-xs">
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-400">Doorstep Pickup:</span>
+                                <span class="text-amber-400 font-bold">{{ $locationData['schedules']['overnight']['pickup'] ?? $locationData['pickup_window'] }}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-400">Return Drop-off:</span>
+                                <span class="text-indigo-300 font-bold">{{ $locationData['schedules']['overnight']['return'] ?? '08:30 AM (Next Day)' }}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-400">Starting Price:</span>
+                                <span class="text-emerald-400 font-bold">AED 399 / person</span>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="#safari-packages" class="mt-4 block text-center bg-white/5 hover:bg-amber-400 hover:text-slate-950 text-slate-200 text-xs font-bold py-2 rounded-xl border border-white/10 transition-colors">
+                        Select Overnight Safari
+                    </a>
+                </div>
+
+                <!-- Quad Biking / Buggy Safari Card -->
+                <div class="bg-slate-900 border border-white/10 rounded-2xl p-5 flex flex-col justify-between hover:border-amber-400/50 transition-all">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="inline-flex items-center gap-1.5 bg-emerald-500/20 text-emerald-400 text-xs font-bold px-2.5 py-1 rounded-full">
+                                <i class="bi bi-speedometer2"></i> Quad & Buggy Safari
+                            </span>
+                            <span class="text-slate-400 text-xs font-semibold">7 Hours</span>
+                        </div>
+                        <h3 class="text-white font-bold text-base mb-2">Self-Drive Off-Road ATV</h3>
+                        <p class="text-slate-400 text-xs leading-relaxed mb-4">Earlier departure to enjoy 30-60 min daylight quad bike or Can-Am buggy track driving before evening camp.</p>
+                        <div class="space-y-2 border-t border-white/10 pt-3 text-xs">
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-400">Doorstep Pickup:</span>
+                                <span class="text-amber-400 font-bold">{{ $locationData['schedules']['quad_buggy']['pickup'] ?? '02:00 PM – 02:30 PM' }}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-400">Return Drop-off:</span>
+                                <span class="text-white font-bold">{{ $locationData['schedules']['quad_buggy']['return'] ?? '09:30 PM – 10:00 PM' }}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-400">Starting Price:</span>
+                                <span class="text-emerald-400 font-bold">AED 199 / person</span>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="#safari-packages" class="mt-4 block text-center bg-white/5 hover:bg-amber-400 hover:text-slate-950 text-slate-200 text-xs font-bold py-2 rounded-xl border border-white/10 transition-colors">
+                        Select Quad & Buggy
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── ITINERARY & TIMELINE (INTERACTIVE MULTI-SCHEDULE) ──────────────────── -->
+    <section class="py-14 sm:py-20 bg-slate-900 border-y border-white/5" x-data="{ activeSchedule: 'evening' }">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6">
+            <div class="text-center max-w-2xl mx-auto mb-8">
+                <span class="inline-block bg-amber-400 text-slate-950 text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full mb-2">Experience Schedule</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-2">Your Safari Day Timeline from {{ $locationData['name'] }}</h2>
+                <p class="text-slate-400 text-sm">Select an experience below to view its complete step-by-step itinerary from doorstep pickup to return.</p>
+            </div>
+
+            <!-- Schedule Tabs -->
+            <div class="flex justify-center mb-8">
+                <div class="inline-flex p-1 rounded-2xl bg-slate-800/90 border border-white/10 gap-1" role="tablist" aria-label="Safari schedule selector">
+                    <button type="button"
+                            @click="activeSchedule = 'evening'"
+                            :class="activeSchedule === 'evening' ? 'bg-primary text-slate-950 font-bold shadow-md' : 'text-slate-300 hover:text-white'"
+                            class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all inline-flex items-center gap-1.5 cursor-pointer"
+                            role="tab"
+                            :aria-selected="activeSchedule === 'evening'">
+                        <i class="bi bi-sunset"></i> Evening Safari (6h)
+                    </button>
+                    <button type="button"
+                            @click="activeSchedule = 'morning'"
+                            :class="activeSchedule === 'morning' ? 'bg-primary text-slate-950 font-bold shadow-md' : 'text-slate-300 hover:text-white'"
+                            class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all inline-flex items-center gap-1.5 cursor-pointer"
+                            role="tab"
+                            :aria-selected="activeSchedule === 'morning'">
+                        <i class="bi bi-sun"></i> Morning Safari (4h)
+                    </button>
+                    <button type="button"
+                            @click="activeSchedule = 'overnight'"
+                            :class="activeSchedule === 'overnight' ? 'bg-primary text-slate-950 font-bold shadow-md' : 'text-slate-300 hover:text-white'"
+                            class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all inline-flex items-center gap-1.5 cursor-pointer"
+                            role="tab"
+                            :aria-selected="activeSchedule === 'overnight'">
+                        <i class="bi bi-moon-stars"></i> Overnight Safari (18h)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Evening Safari Timeline -->
+            <div x-show="activeSchedule === 'evening'" x-cloak class="space-y-4">
                 <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
                     <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">1</div>
                     <div>
-                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">{{ $locationData['pickup_window'] }}</span>
-                        <h3 class="font-bold text-white text-base mb-1">Doorstep Hotel / Residence Pickup</h3>
-                        <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">Your safari captain pulls up in an air-conditioned 4x4 Toyota Land Cruiser at your hotel or tower entrance in {{ $locationData['district'] }}. Sit back and enjoy the scenic 45-minute highway drive toward the red dunes.</p>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">{{ $locationData['schedules']['evening']['pickup'] ?? $locationData['pickup_window'] }}</span>
+                        <h3 class="font-bold text-white text-base mb-1">Doorstep Hotel / Residence Pickup in 4x4 Land Cruiser</h3>
+                        <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">Your safari captain pulls up in an air-conditioned 4x4 Toyota Land Cruiser at your hotel or tower entrance in {{ $locationData['district'] }}. Sit back and enjoy the scenic highway drive toward the red dunes.</p>
                     </div>
                 </div>
-
-                <!-- Step 2 -->
                 <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
                     <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">2</div>
                     <div>
-                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">03:45 PM - 04:15 PM</span>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">03:45 PM – 04:15 PM</span>
                         <h3 class="font-bold text-white text-base mb-1">Desert Arrival & Quad Buggy Warm-up</h3>
                         <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">Arrive at our desert staging area in Lahbab. Tire pressure is adjusted for extreme sand drifting. Guests who added Quad Biking or Can-Am Maverick rentals can take their high-powered ride across the dunes.</p>
                     </div>
                 </div>
-
-                <!-- Step 3 -->
                 <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
                     <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">3</div>
                     <div>
-                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">04:30 PM - 05:15 PM</span>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">04:30 PM – 05:15 PM</span>
                         <h3 class="font-bold text-white text-base mb-1">High Red Dune Bashing Adventure</h3>
                         <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">Experience 40 to 45 minutes of adrenaline-pumping dune bashing across the highest red sand peaks of Dubai, driven by DTCM licensed desert masters.</p>
                     </div>
                 </div>
-
-                <!-- Step 4 -->
                 <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
                     <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">4</div>
                     <div>
-                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">05:15 PM - 05:45 PM</span>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">05:15 PM – 05:45 PM</span>
                         <h3 class="font-bold text-white text-base mb-1">Golden Hour Sunset Stop & Sandboarding</h3>
                         <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">Stop at the summit of the tallest virgin dune for panoramic sunset photos overlooking the endless desert. Grab a custom sandboard and surf down the silky dunes.</p>
                     </div>
                 </div>
-
-                <!-- Step 5 -->
                 <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
                     <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">5</div>
                     <div>
-                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">06:00 PM - 08:45 PM</span>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">06:00 PM – 08:45 PM</span>
                         <h3 class="font-bold text-white text-base mb-1">Bedouin Camp, 5-Star Live BBQ & Shows</h3>
                         <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">Arrive at our authentic desert fortress camp. Enjoy complimentary camel riding, Arabian coffee (Gahwa), fresh dates, henna body painting, and a sumptuous 5-star live BBQ buffet accompanied by live Fire, Tanoura, and Belly Dance performances.</p>
                     </div>
                 </div>
-
-                <!-- Step 6 -->
                 <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
                     <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">6</div>
                     <div>
-                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">{{ $locationData['return_time'] }}</span>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">{{ $locationData['schedules']['evening']['return'] ?? $locationData['return_time'] }}</span>
                         <h3 class="font-bold text-white text-base mb-1">Comfortable Drop-off Back at {{ $locationData['name'] }}</h3>
                         <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">Relax in climate-controlled comfort as your captain drives you directly back to your hotel or residence doorstep in {{ $locationData['name'] }}.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Morning Safari Timeline -->
+            <div x-show="activeSchedule === 'morning'" x-cloak class="space-y-4">
+                <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
+                    <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">1</div>
+                    <div>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">{{ $locationData['schedules']['morning']['pickup'] ?? '08:00 AM – 08:30 AM' }}</span>
+                        <h3 class="font-bold text-white text-base mb-1">Morning Doorstep Pickup from {{ $locationData['name'] }}</h3>
+                        <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">Direct hotel or residence lobby pickup in a private or shared 4x4 Land Cruiser. Start early to beat the midday heat and enjoy empty desert roads.</p>
+                    </div>
+                </div>
+                <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
+                    <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">2</div>
+                    <div>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">08:45 AM – 09:15 AM</span>
+                        <h3 class="font-bold text-white text-base mb-1">Lahbab Red Dunes Staging & Tire Deflation</h3>
+                        <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">Arrival at the Lahbab desert staging area. Captain deflates tires for optimal sand traction. Optional morning quad bike / ATV rental session available on arrival.</p>
+                    </div>
+                </div>
+                <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
+                    <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">3</div>
+                    <div>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">09:15 AM – 10:00 AM</span>
+                        <h3 class="font-bold text-white text-base mb-1">Morning Red Dune Bashing & Sandboarding</h3>
+                        <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">25 to 30 minutes of exhilarating dune drifting in crisp morning air. Stop on high pristine ridges with untouched wind ripples for magnificent photos and sandboarding.</p>
+                    </div>
+                </div>
+                <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
+                    <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">4</div>
+                    <div>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">10:00 AM – 10:45 AM</span>
+                        <h3 class="font-bold text-white text-base mb-1">Camel Riding & Traditional Arabic Coffee</h3>
+                        <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">Traditional Bedouin camel ride, photo session with trained falcon, and chilled refreshments, Arabian coffee (Gahwa) and dates.</p>
+                    </div>
+                </div>
+                <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
+                    <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">5</div>
+                    <div>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">{{ $locationData['schedules']['morning']['return'] ?? '12:00 PM – 12:30 PM' }}</span>
+                        <h3 class="font-bold text-white text-base mb-1">Return Drop-off Back at {{ $locationData['name'] }}</h3>
+                        <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">Arrive back at your hotel or residence before lunch with the entire afternoon and evening free for shopping, pool time, or city sightseeing.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Overnight Safari Timeline -->
+            <div x-show="activeSchedule === 'overnight'" x-cloak class="space-y-4">
+                <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
+                    <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">1</div>
+                    <div>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">{{ $locationData['schedules']['overnight']['pickup'] ?? $locationData['pickup_window'] }}</span>
+                        <h3 class="font-bold text-white text-base mb-1">Afternoon Doorstep Pickup from {{ $locationData['name'] }}</h3>
+                        <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">Board your 4x4 Land Cruiser with overnight bags stored safely in the luggage trunk. Drive out to the Lahbab Red Dunes.</p>
+                    </div>
+                </div>
+                <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
+                    <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">2</div>
+                    <div>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">04:30 PM – 09:00 PM</span>
+                        <h3 class="font-bold text-white text-base mb-1">High Dune Bashing, Sunset Sandboarding & 5★ BBQ Dinner</h3>
+                        <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">Experience full evening safari thrills: high dune bashing, sunset photoshoot, camel rides, henna painting, live BBQ buffet dinner, and 3 cultural shows (Tanoura, Fire, Belly Dance).</p>
+                    </div>
+                </div>
+                <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
+                    <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">3</div>
+                    <div>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">09:30 PM – 11:30 PM</span>
+                        <h3 class="font-bold text-white text-base mb-1">Campfire Gathering & Stargazing Under Arabian Skies</h3>
+                        <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">As day guests depart, the desert camp turns quiet and magical. Gather around the open campfire, sip fresh tea and Arabic Gahwa, enjoy shisha, and gaze at unpolluted desert constellations.</p>
+                    </div>
+                </div>
+                <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
+                    <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">4</div>
+                    <div>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">Midnight – 05:30 AM</span>
+                        <h3 class="font-bold text-white text-base mb-1">Peaceful Sleep in Deluxe Bedouin Tents</h3>
+                        <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">Retire to your private Bedouin tent equipped with clean mattresses, pillows, and warm blankets for a restful night in the silence of the desert.</p>
+                    </div>
+                </div>
+                <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
+                    <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">5</div>
+                    <div>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">06:00 AM – 07:30 AM</span>
+                        <h3 class="font-bold text-white text-base mb-1">Sunrise Over the Red Dunes & Warm Bedouin Breakfast</h3>
+                        <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">Wake up to the breathtaking sight of dawn breaking over endless red dunes. Enjoy an optional early morning camel walk followed by a warm breakfast of eggs, Arabic bread, cheeses, honey, and fresh tea.</p>
+                    </div>
+                </div>
+                <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
+                    <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">6</div>
+                    <div>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">{{ $locationData['schedules']['overnight']['return'] ?? '08:30 AM – 09:00 AM (Next Day)' }}</span>
+                        <h3 class="font-bold text-white text-base mb-1">Morning Return Drop-off Back at {{ $locationData['name'] }}</h3>
+                        <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">Board your 4x4 Land Cruiser for the return highway drive back to your hotel or residence in {{ $locationData['name'] }}, refreshed and recharged.</p>
                     </div>
                 </div>
             </div>
@@ -638,7 +904,7 @@
                             </div>
                             <p class="text-slate-400 text-xs leading-relaxed mb-3">{{ Str::limit($loc['district'], 55) }}</p>
                             <div class="text-amber-400 text-xs flex items-center gap-1.5 font-medium">
-                                <i class="bi bi-clock"></i> Pickup: {{ $loc['pickup_window'] }}
+                                <i class="bi bi-clock"></i> Morning: {{ $loc['schedules']['morning']['pickup'] ?? '08:00 AM' }} · Evening: {{ $loc['schedules']['evening']['pickup'] ?? $loc['pickup_window'] }}
                             </div>
                         </a>
                     @endif

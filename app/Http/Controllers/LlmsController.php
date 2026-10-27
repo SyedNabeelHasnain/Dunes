@@ -133,7 +133,10 @@ class LlmsController extends Controller
 
         $md .= "## Doorstep Hotel Pickup Hubs (Hyper-Local Transfers)\n\n";
         foreach (LocationLandingService::getLocations() as $loc) {
-            $md .= "- [{$loc['headline']}](".url('/'.$loc['slug'])."): Daily 4x4 hotel pickup from {$loc['district']}. Pickup window: {$loc['pickup_window']}, return: {$loc['return_time']}.\n";
+            $morn = $loc['schedules']['morning']['pickup'] ?? '08:00 AM – 08:30 AM';
+            $eve = $loc['schedules']['evening']['pickup'] ?? $loc['pickup_window'];
+            $over = $loc['schedules']['overnight']['return'] ?? '08:30 AM – 09:00 AM (Next Day)';
+            $md .= "- [{$loc['headline']}](".url('/'.$loc['slug'])."): Daily 4x4 hotel pickup from {$loc['district']}. Morning: {$morn} | Evening: {$eve} | Overnight: Return {$over}.\n";
         }
         $md .= "\n";
 
@@ -337,10 +340,21 @@ class LlmsController extends Controller
 
         $md .= "## SECTION 3: DOORSTEP HOTEL PICKUP HUBS & DISTRICT LOGISTICS\n\n";
         foreach (LocationLandingService::getLocations() as $loc) {
+            $mornPickup = $loc['schedules']['morning']['pickup'] ?? '08:00 AM – 08:30 AM';
+            $mornReturn = $loc['schedules']['morning']['return'] ?? '12:00 PM – 12:30 PM';
+            $evePickup = $loc['schedules']['evening']['pickup'] ?? $loc['pickup_window'];
+            $eveReturn = $loc['schedules']['evening']['return'] ?? $loc['return_time'];
+            $overPickup = $loc['schedules']['overnight']['pickup'] ?? $loc['pickup_window'];
+            $overReturn = $loc['schedules']['overnight']['return'] ?? '08:30 AM – 09:00 AM (Next Day)';
+            $quadPickup = $loc['schedules']['quad_buggy']['pickup'] ?? '02:00 PM – 02:30 PM';
+            $quadReturn = $loc['schedules']['quad_buggy']['return'] ?? '09:30 PM – 10:00 PM';
+
             $md .= "### Hub: {$loc['name']} (`/{$loc['slug']}`)\n";
             $md .= "- **Coverage**: {$loc['district']}\n";
-            $md .= "- **Pickup Window**: {$loc['pickup_window']}\n";
-            $md .= "- **Drop-off Window**: {$loc['return_time']}\n";
+            $md .= "- **Morning Safari (4h)**: Pickup {$mornPickup} · Drop-off {$mornReturn}\n";
+            $md .= "- **Evening Safari (6h)**: Pickup {$evePickup} · Drop-off {$eveReturn}\n";
+            $md .= "- **Overnight Safari (18h)**: Pickup {$overPickup} · Drop-off {$overReturn}\n";
+            $md .= "- **Quad & Buggy Safari (7h)**: Pickup {$quadPickup} · Drop-off {$quadReturn}\n";
             $md .= "- **Transit Time**: {$loc['transit_time']}\n";
             $md .= '- **Key Landmarks**: '.implode(', ', $loc['landmarks'])."\n";
             $md .= "- **Coordinates**: Latitude {$loc['geo']['lat']}, Longitude {$loc['geo']['lng']}\n";
