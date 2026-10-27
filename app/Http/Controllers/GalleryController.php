@@ -106,6 +106,45 @@ class GalleryController extends Controller
             $schemaImages[] = $imageObj;
         }
 
+        // Schema.org VideoObject Graph for Video SEO & Rich Snippets
+        $schemaVideos = [];
+        $videoItems = collect($filteredItems)->filter(fn ($i) => ($i['type'] ?? '') === 'video')->take(16);
+        foreach ($videoItems as $item) {
+            $videoObj = [
+                '@type' => 'VideoObject',
+                '@id' => $canonical . '#video_' . ($item['id'] ?? md5($item['url'])),
+                'name' => $item['title'] ?? ($item['review_title'] ?: 'Dubai Desert Safari Customer Video Review'),
+                'description' => $item['description'] ?: ($item['caption'] ?: $item['review_text']),
+                'thumbnailUrl' => [
+                    $item['poster_url'] ?? $item['thumbnail_url'],
+                ],
+                'uploadDate' => ! empty($item['published_date']) ? \Carbon\Carbon::parse($item['published_date'])->toDateString() : now()->toDateString(),
+                'duration' => $item['duration_iso'] ?? 'PT30S',
+                'contentUrl' => $item['url'],
+                'embedUrl' => $canonical . '?item=' . $item['id'],
+                'interactionStatistic' => [
+                    '@type' => 'InteractionCounter',
+                    'interactionType' => [
+                        '@type' => 'WatchAction',
+                    ],
+                    'userInteractionCount' => (int) ($item['likes_count'] ?? 150),
+                ],
+                'publisher' => [
+                    '@id' => url('/') . '#organization',
+                ],
+            ];
+
+            if (! empty($item['transcript'])) {
+                $videoObj['transcript'] = $item['transcript'];
+            }
+
+            if (! empty($item['keywords']) && is_array($item['keywords'])) {
+                $videoObj['keywords'] = implode(', ', $item['keywords']);
+            }
+
+            $schemaVideos[] = $videoObj;
+        }
+
         return view('gallery.index', compact(
             'filteredItems',
             'categories',
@@ -120,6 +159,7 @@ class GalleryController extends Controller
             'pageRobots',
             'ogImage',
             'schemaImages',
+            'schemaVideos',
             'currentLocale'
         ));
     }

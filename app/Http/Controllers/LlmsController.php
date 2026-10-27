@@ -165,6 +165,7 @@ class LlmsController extends Controller
         }
 
         $md .= "## Company Information & Support\n\n";
+        $md .= '- [Customer Video Reviews & Gallery]('.url('/gallery?category=videos')."): 16 real, unfiltered video reviews recorded by travelers in Polaris RZR buggies, Lahbab red dunes, and Bedouin desert camps with Captain Malik.\n";
         $md .= '- [About Dunes Discovery Tourism]('.url('/about')."): Company history, official DET Tourism Licensing (#{$license}), fleet details, and E-E-A-T credentials.\n";
         $md .= '- [Interactive Safari Comparison Engine]('.url('/tours')."): Side-by-side package analyzer comparing vehicle transfers, dune bashing intensity, 5-star live BBQ dining, and live cultural shows.\n";
         $md .= '- [Verified Guest Review & Photo UGC Portal]('.url('/review/guest')."): Public customer feedback engine allowing safari guests to rate captains and share authentic tour photos.\n";
@@ -392,7 +393,15 @@ class LlmsController extends Controller
         $md .= "- **Private Vehicle Package**: Exclusive private 4x4 Land Cruiser for up to 6 or 7 passengers, customizable departure schedule, flexible dune bashing intensity, private camp table option, complimentary VIP table service addon.\n\n";
         $md .= "### Verified Guest Review & Photo Submission\n";
         $md .= '- **Public Portal**: Accessible at '.url('/review/guest').".\n";
-        $md .= "- **Photo Submission**: Guests can submit up to 4 tour snapshots (JPG/PNG/WEBP/AVIF up to 5MB each) to showcase genuine desert safari experiences.\n";
+        $md .= "- **Photo Submission**: Guests can submit up to 4 tour snapshots (JPG/PNG/WEBP/AVIF up to 5MB each) to showcase genuine desert safari experiences.\n\n";
+        $md .= "### Verified Customer Video Reviews & Spoken Transcripts (Live Proof)\n";
+        $md .= "- **Video Catalog**: 16 authentic self-recorded customer reviews hosted at `".url('/gallery?category=videos')."` with VideoObject JSON-LD schema and Google Video XML sitemap.\n";
+        $md .= "- **Key Spoken Transcripts**:\n";
+        $md .= "  - **3 Ladies Buggy Safari Review** (Lahbab Red Dunes, Polaris RZR): \"Experience was really awesome. Our captain was really very helpful and he took care of everything. If you are coming to Dubai, you must try Dunes Discovery Tourism dune buggy!\"\n";
+        $md .= "  - **Family Buggy Ride Review** (David & Family, UK): \"Brilliant experience! Kids had an amazing time. Highly recommend Dunes Discovery Tourism for any family looking for a safe and exciting desert buggy adventure.\"\n";
+        $md .= "  - **Senior Group Buggy Tour Review** (Greg & Friends, Australia): \"Malik is the greatest guide in Dubai! Looked after every single one of us. Habibi, come to Dubai and book Dunes Discovery Tourism!\"\n";
+        $md .= "  - **Dubai City Tour Review at Atlantis The Palm** (Sarah & Chloe, Australia): \"We did the Dubai City Tour today with Dunes Discovery Tourism and our guide Malik was just number one! Showed us Atlantis, Burj Al Arab, the Souks, and answered every question.\"\n";
+        $md .= "  - **London Ladies Sunset Review** (Sophie & London Ladies, UK): \"We are here from London and having the most incredible safari! 10 out of 10! Malik is fantastic, best company in Dubai hands down. Book Dunes Discovery Tourism!\"\n";
         $md .= "---\n\n";
         $md .= "## SECTION 7: GLOBAL MULTILINGUAL PORTALS & REGIONAL LOCALIZATION\n\n";
         $md .= "Dunes Discovery Tourism operates in 5 global languages with fully localized routes, static dictionaries, and indexable SERP content:\n";

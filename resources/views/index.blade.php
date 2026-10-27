@@ -169,6 +169,35 @@ if (!function_exists('renderReviewCardMarkup')) {
         "@id": "{{ url('/') }}#organization"
       }
     }
+    @if(!empty($videoReviews))
+      @foreach($videoReviews as $vitem)
+      ,
+      {
+        "@type": "VideoObject",
+        "@id": "{{ url('/') }}#video_{{ $vitem['id'] }}",
+        "name": {!! json_encode($vitem['title'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        "description": {!! json_encode($vitem['description'] ?: ($vitem['caption'] ?: $vitem['title']), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        "thumbnailUrl": [{!! json_encode($vitem['poster_url'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}],
+        "uploadDate": {!! json_encode(!empty($vitem['published_date']) ? $vitem['published_date'] : '2026-10-15', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        "duration": {!! json_encode($vitem['duration_iso'] ?? 'PT30S', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        "contentUrl": {!! json_encode($vitem['url'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        "embedUrl": {!! json_encode(url('/gallery?item=' . $vitem['id']), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        @if(!empty($vitem['transcript']))
+        "transcript": {!! json_encode($vitem['transcript'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        @endif
+        "interactionStatistic": {
+          "@type": "InteractionCounter",
+          "interactionType": {
+            "@type": "WatchAction"
+          },
+          "userInteractionCount": {{ (int) ($vitem['likes_count'] ?? 120) }}
+        },
+        "publisher": {
+          "@id": "{{ url('/') }}#organization"
+        }
+      }
+      @endforeach
+    @endif
     @if(isset($faqs) && $faqs->count() > 0)
     ,
     {
@@ -733,6 +762,200 @@ if (!function_exists('renderReviewCardMarkup')) {
         </div>
     </div>
 </section>
+
+<!-- ── Real Guest Video Reviews & Stories (Reels Carousel) ────────────────────── -->
+@if(!empty($videoReviews) && count($videoReviews) > 0)
+<section class="py-12 sm:py-16 bg-white border-t border-slate-200/80 overflow-hidden" 
+    x-data="{
+        videos: @js($videoReviews),
+        activeVideo: null,
+        modalOpen: false,
+        openModal(v) {
+            this.activeVideo = v;
+            this.modalOpen = true;
+            document.body.classList.add('overflow-hidden');
+        },
+        closeModal() {
+            this.modalOpen = false;
+            this.activeVideo = null;
+            document.body.classList.remove('overflow-hidden');
+        },
+        scrollReels(delta) {
+            const el = this.$refs.reelsTrack;
+            if (el) el.scrollBy({ left: delta, behavior: 'smooth' });
+        }
+    }"
+    @keydown.escape.window="closeModal()">
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Section Header -->
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+            <div>
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200 shadow-2xs mb-2.5">
+                    <span class="w-2 h-2 rounded-full bg-rose-600 animate-ping"></span>
+                    <span class="w-2 h-2 rounded-full bg-rose-600 -ml-4"></span>
+                    <span>Real Customer Video Reviews</span>
+                </div>
+                <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
+                    Watch Real Travelers in the Dubai Dunes
+                </h2>
+                <p class="text-sm text-slate-500 mt-1 max-w-2xl">
+                    Unfiltered video feedback straight from our guests in Polaris RZR buggies, red dune bashing, and Bedouin desert camps.
+                </p>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+                <button type="button" 
+                        @click="scrollReels(-320)" 
+                        class="w-10 h-10 rounded-full border border-slate-200/90 bg-white hover:bg-slate-100 text-slate-700 shadow-2xs flex items-center justify-center transition-all cursor-pointer"
+                        aria-label="Scroll left">
+                    <i class="bi bi-chevron-left text-sm font-bold rtl:rotate-180"></i>
+                </button>
+                <button type="button" 
+                        @click="scrollReels(320)" 
+                        class="w-10 h-10 rounded-full border border-slate-200/90 bg-white hover:bg-slate-100 text-slate-700 shadow-2xs flex items-center justify-center transition-all cursor-pointer"
+                        aria-label="Scroll right">
+                    <i class="bi bi-chevron-right text-sm font-bold rtl:rotate-180"></i>
+                </button>
+                <a href="{{ localized_route('gallery.index', ['category' => 'videos']) }}" 
+                   class="btn-desert-animated px-4 py-2.5 rounded-full text-xs font-bold text-white shadow-xs inline-flex items-center gap-1.5 ml-2">
+                    <span>View All 16 Videos</span>
+                    <i class="bi bi-arrow-right rtl:rotate-180"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Reels Horizontal Scroll Track -->
+        <div x-ref="reelsTrack" class="flex gap-4 sm:gap-5 overflow-x-auto pb-4 scrollbar-none snap-x scroll-smooth -mx-4 px-4 sm:mx-0 sm:px-0">
+            @foreach($videoReviews as $v)
+                <div class="snap-start shrink-0 w-[240px] sm:w-[270px] group cursor-pointer"
+                     @click="openModal(@js($v))">
+                    <div class="relative aspect-9/16 rounded-3xl overflow-hidden bg-slate-950 shadow-md group-hover:shadow-2xl transition-all duration-300 border border-slate-200">
+                        <img src="{{ asset('images/video-posters/'.$v['poster_filename']) }}" 
+                             alt="{{ $v['title'] }}" 
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                             loading="lazy">
+                        
+                        <!-- Ambient Dark Gradient -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-slate-950/40 group-hover:from-slate-950/95 transition-colors"></div>
+
+                        <!-- Top Badges -->
+                        <div class="absolute top-3 inset-x-3 flex items-center justify-between pointer-events-none">
+                            <span class="bg-slate-900/80 backdrop-blur-md text-white border border-white/10 rounded-full px-2.5 py-1 text-[11px] font-bold flex items-center gap-1 shadow-xs">
+                                <i class="bi bi-geo-alt-fill text-amber-400 text-[10px]"></i>
+                                <span>{{ $v['reviewer_country'] ?? 'UAE' }}</span>
+                            </span>
+                            <span class="bg-slate-950/85 backdrop-blur-md text-white text-[10px] font-mono font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
+                                <i class="bi bi-clock-fill text-amber-400 text-[9px]"></i>
+                                <span>{{ sprintf('%02d:%02d', floor(($v['duration'] ?? 30) / 60), ($v['duration'] ?? 30) % 60) }}</span>
+                            </span>
+                        </div>
+
+                        <!-- Central Play Button -->
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <span class="w-13 h-13 rounded-full bg-primary/95 text-white flex items-center justify-center shadow-xl group-hover:scale-115 transition-transform duration-300 ring-4 ring-white/20">
+                                <i class="bi bi-play-fill text-2xl ml-0.5"></i>
+                            </span>
+                        </div>
+
+                        <!-- Bottom Info -->
+                        <div class="absolute bottom-0 inset-x-0 p-4 text-white">
+                            <div class="flex items-center gap-1 text-amber-400 text-xs mb-1">
+                                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                                <span class="text-white/80 font-bold ml-1 text-[11px]">5.0</span>
+                            </div>
+                            <h3 class="font-bold text-sm text-white line-clamp-2 leading-snug group-hover:text-primary-light transition-colors">
+                                {{ $v['title'] }}
+                            </h3>
+                            <p class="text-white/70 text-xs line-clamp-1 mt-1 italic">
+                                &ldquo;{{ $v['caption'] ?: $v['transcript'] }}&rdquo;
+                            </p>
+                            <div class="mt-2 text-[11px] font-semibold text-amber-300 flex items-center gap-1">
+                                <span>{{ $v['reviewer_name'] }}</span>
+                                <span class="text-white/40">•</span>
+                                <span class="text-white/60">{{ $v['tour_name'] ?: 'Dubai Desert' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+
+    <!-- Video Playback Modal -->
+    <div x-show="modalOpen" 
+         x-cloak 
+         class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 select-none bg-slate-950/90 backdrop-blur-md"
+         role="dialog" 
+         aria-modal="true"
+         @click="closeModal()">
+        
+        <div class="relative z-20 w-full max-w-4xl bg-slate-900 rounded-3xl overflow-hidden border border-white/10 shadow-2xl flex flex-col md:flex-row" 
+             @click.stop>
+            
+            <!-- Video Player -->
+            <div class="relative md:w-3/5 bg-black flex items-center justify-center aspect-16/9 md:aspect-auto min-h-[280px] sm:min-h-[380px]">
+                <template x-if="activeVideo">
+                    <video :src="activeVideo.url" controls autoplay playsinline class="w-full h-full object-contain max-h-[75vh]"></video>
+                </template>
+            </div>
+
+            <!-- Side Info & CTAs -->
+            <div class="md:w-2/5 p-5 sm:p-6 bg-slate-900 text-white flex flex-col justify-between overflow-y-auto max-h-[40vh] md:max-h-[75vh]">
+                <div>
+                    <!-- Header -->
+                    <div class="flex items-center justify-between pb-3 mb-3 border-b border-white/10">
+                        <div>
+                            <span class="text-xs font-bold text-amber-400" x-text="activeVideo ? activeVideo.reviewer_name : ''"></span>
+                            <div class="text-[11px] text-white/60 flex items-center gap-1 mt-0.5">
+                                <i class="bi bi-geo-alt-fill text-amber-400"></i>
+                                <span x-text="activeVideo ? activeVideo.reviewer_country : 'UAE'"></span>
+                                <span class="text-white/40">•</span>
+                                <span class="text-emerald-400 font-semibold">Verified Review</span>
+                            </div>
+                        </div>
+                        <button type="button" @click="closeModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors">
+                            <i class="bi bi-x-lg text-xs"></i>
+                        </button>
+                    </div>
+
+                    <!-- Title -->
+                    <h3 class="font-bold text-base text-white mb-2 leading-snug" x-text="activeVideo ? activeVideo.title : ''"></h3>
+
+                    <!-- Rating -->
+                    <div class="flex items-center gap-1 text-amber-400 text-xs mb-3">
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        <span class="text-white/80 font-bold ml-1 text-xs">5.0 Star Rating</span>
+                    </div>
+
+                    <!-- Transcript -->
+                    <div class="p-3 bg-slate-800/90 rounded-2xl border border-white/10 text-xs mb-4">
+                        <div class="font-bold text-amber-400 mb-1 flex items-center gap-1.5">
+                            <i class="bi bi-chat-quote-fill"></i> Spoken Customer Review:
+                        </div>
+                        <p class="text-slate-200 italic leading-relaxed" x-text="activeVideo ? ('&ldquo;' + (activeVideo.transcript || activeVideo.caption) + '&rdquo;') : ''"></p>
+                    </div>
+                </div>
+
+                <!-- CTAs -->
+                <div class="pt-4 border-t border-white/10 space-y-2.5">
+                    <template x-if="activeVideo && activeVideo.tour_slug">
+                        <a :href="'/' + activeVideo.tour_slug" class="btn-desert-animated w-full py-2.5 px-4 rounded-xl font-bold text-xs text-white shadow-md flex items-center justify-center gap-2 cursor-pointer text-center">
+                            <i class="bi bi-calendar-check-fill"></i>
+                            <span x-text="'Book ' + (activeVideo.tour_name || 'This Tour')"></span>
+                        </a>
+                    </template>
+                    <button type="button" @click="closeModal(); $store.modal.open('booking');" class="btn-desert-animated w-full py-2.5 px-4 rounded-xl font-bold text-xs text-white shadow-md flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="bi bi-calendar-check-fill"></i>
+                        <span>Book Desert Safari Now</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+@endif
 
 <!-- ── Real Moments Captured by Our Guests (Reviews Media Gallery) ────────────── -->
 @if(!empty($galleryItems) && count($galleryItems) > 0)

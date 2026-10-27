@@ -230,7 +230,13 @@ class TourController extends Controller
             $tourGalleryItems = [];
         }
 
-        return view('tours.show', compact('tour', 'highlights', 'inclusions', 'exclusions', 'faqs', 'relatedTours', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'pageRobots', 'ogImage', 'minPrice', 'approvedReviews', 'tourGalleryItems'));
+        try {
+            $tourVideoReviews = app(ReviewMediaGalleryService::class)->getTourVideoReviews($tour, 4);
+        } catch (\Throwable $e) {
+            $tourVideoReviews = [];
+        }
+
+        return view('tours.show', compact('tour', 'highlights', 'inclusions', 'exclusions', 'faqs', 'relatedTours', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'pageRobots', 'ogImage', 'minPrice', 'approvedReviews', 'tourGalleryItems', 'tourVideoReviews'));
     }
 
     /**

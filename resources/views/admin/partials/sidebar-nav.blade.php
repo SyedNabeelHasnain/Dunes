@@ -3,7 +3,7 @@
     $isBookingsGroup = request()->routeIs('admin.bookings.*') || request()->routeIs('admin.pricing.*');
     $isOperationsGroup = request()->routeIs('admin.operations.*') || request()->routeIs('admin.drivers.*') || request()->routeIs('admin.vehicles.*');
     $isCatalogGroup = request()->routeIs('admin.tours.*') || request()->routeIs('admin.addons.*') || request()->routeIs('admin.tiers.*');
-    $isCommunicationsGroup = request()->routeIs('admin.inquiries.*') || request()->routeIs('admin.whatsapp.*') || request()->routeIs('admin.reviews.*');
+    $isCommunicationsGroup = request()->routeIs('admin.inquiries.*') || request()->routeIs('admin.whatsapp.*') || request()->routeIs('admin.reviews.*') || request()->routeIs('admin.video-reviews.*');
     $isMarketingGroup = request()->routeIs('admin.coupons.*') || request()->routeIs('admin.subscribers.*') || request()->routeIs('admin.subscriber-groups.*') || request()->routeIs('admin.email-templates.*') || request()->routeIs('admin.campaigns.*');
     $isContentGroup = request()->routeIs('admin.blogs.*') || request()->routeIs('admin.blog-categories.*') || request()->routeIs('admin.wiki.*') || request()->routeIs('admin.pages.*') || request()->routeIs('admin.menus.*') || request()->routeIs('admin.faqs.*') || request()->routeIs('admin.legal.*');
     $isSettingsGroup = request()->routeIs('admin.settings.*');
@@ -281,6 +281,18 @@
                         {{ $sidebarCounts['pending_reviews'] }}
                     </span>
                 @endif
+            </a>
+
+            <!-- Customer Video Reviews & Video SEO -->
+            <a href="{{ route('admin.video-reviews.index') }}" 
+               class="relative flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.video-reviews*') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.video-reviews*') ? 'bg-primary' : 'bg-slate-600' }}"></span>
+                    <span>Video Reviews & SEO</span>
+                </div>
+                <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-primary/20 text-primary-light border border-primary/30">
+                    <i class="bi bi-camera-video-fill text-[9px] mr-0.5"></i> Video
+                </span>
             </a>
         </div>
     </div>

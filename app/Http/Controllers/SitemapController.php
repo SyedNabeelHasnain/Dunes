@@ -45,6 +45,7 @@ class SitemapController extends Controller
             url('/sitemap-wiki.xml') => $wikiUpdatedAt ? $wikiUpdatedAt->toAtomString() : $now,
             url('/sitemap-pages.xml') => $now,
             url('/sitemap-images.xml') => $latestImageDate ? $latestImageDate->toAtomString() : $now,
+            url('/sitemap-videos.xml') => $now,
         ];
 
         foreach ($subMaps as $loc => $lastmod) {
@@ -498,6 +499,64 @@ class SitemapController extends Controller
         }
 
         return asset('images/desert-safari-poster.avif');
+    }
+
+    /**
+     * Sub-sitemap: Google Video XML Sitemap (/sitemap-videos.xml and /video-sitemap.xml)
+     */
+    public function videos(): Response
+    {
+        $content = Cache::remember('sitemap_videos_xml', 3600, function () {
+            $galleryService = app(\App\Services\ReviewMediaGalleryService::class);
+            $videoReviews = $galleryService->getCustomerVideoReviews();
+
+            $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+            $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">'."\n";
+
+            foreach ($videoReviews as $item) {
+                $pageUrl = ! empty($item['tour_slug'])
+                    ? url('/'.$item['tour_slug'])
+                    : url('/gallery?item='.$item['id']);
+                $videoUrl = $item['url'];
+                $thumbnailUrl = $item['poster_url'];
+                $title = $item['title'];
+                $description = ! empty($item['description']) ? $item['description'] : ($item['caption'] ?: $title);
+                $duration = (int) ($item['duration'] ?? 30);
+                $pubDate = ! empty($item['published_date'])
+                    ? \Carbon\Carbon::parse($item['published_date'])->format('Y-m-d\TH:i:s+04:00')
+                    : now()->format('Y-m-d\TH:i:s+04:00');
+
+                $xml .= "  <url>\n";
+                $xml .= '    <loc>'.$this->xmlEscape($pageUrl)."</loc>\n";
+                $xml .= "    <video:video>\n";
+                $xml .= '      <video:thumbnail_loc>'.$this->xmlEscape($thumbnailUrl)."</video:thumbnail_loc>\n";
+                $xml .= '      <video:title>'.$this->xmlEscape($title)."</video:title>\n";
+                $xml .= '      <video:description>'.$this->xmlEscape($description)."</video:description>\n";
+                $xml .= '      <video:content_loc>'.$this->xmlEscape($videoUrl)."</video:content_loc>\n";
+                $xml .= '      <video:player_loc>'.$this->xmlEscape($pageUrl)."</video:player_loc>\n";
+                $xml .= '      <video:duration>'.$duration."</video:duration>\n";
+                $xml .= '      <video:publication_date>'.$pubDate."</video:publication_date>\n";
+                $xml .= "      <video:family_friendly>yes</video:family_friendly>\n";
+                $xml .= '      <video:uploader info="'.url('/').'">Dunes Discovery Tourism</video:uploader>'."\n";
+                $xml .= "      <video:live>no</video:live>\n";
+                $xml .= "      <video:requires_subscription>no</video:requires_subscription>\n";
+
+                if (! empty($item['keywords']) && is_array($item['keywords'])) {
+                    foreach (array_slice($item['keywords'], 0, 5) as $tag) {
+                        $xml .= '      <video:tag>'.$this->xmlEscape($tag)."</video:tag>\n";
+                    }
+                }
+
+                $xml .= "    </video:video>\n";
+                $xml .= "  </url>\n";
+            }
+
+            $xml .= '</urlset>';
+
+            return $xml;
+        });
+
+        return response($content, 200, ['Content-Type' => 'text/xml; charset=utf-8']);
     }
 
     /**

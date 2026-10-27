@@ -29,6 +29,11 @@ class ReviewMediaGalleryService
             'name' => 'All Moments',
             'icon' => 'bi bi-grid-fill',
         ],
+        'videos' => [
+            'id' => 'videos',
+            'name' => 'Guest Video Reviews',
+            'icon' => 'bi bi-play-circle-fill',
+        ],
         'red_dunes' => [
             'id' => 'red_dunes',
             'name' => 'Red Dunes & Safari',
@@ -91,9 +96,15 @@ class ReviewMediaGalleryService
         // Category filter
         $category = $options['category'] ?? 'all';
         if ($category && $category !== 'all') {
-            $collection = $collection->filter(function ($item) use ($category) {
-                return ($item['category'] ?? 'red_dunes') === $category;
-            });
+            if ($category === 'videos') {
+                $collection = $collection->filter(function ($item) {
+                    return ($item['type'] ?? 'image') === 'video';
+                });
+            } else {
+                $collection = $collection->filter(function ($item) use ($category) {
+                    return ($item['category'] ?? 'red_dunes') === $category;
+                });
+            }
         }
 
         // Media type filter (image, video)
@@ -233,15 +244,141 @@ class ReviewMediaGalleryService
     }
 
     /**
-     * Extract raw media from approved reviews and verified DDT Moments, and verify each URL.
+     * Extract raw media from approved reviews, verified DDT Moments, and customer video reviews, and verify each URL.
      */
     public function loadAndVerifyAllMedia(bool $force = false): array
     {
         $rawItems = $this->extractAllReviewMedia();
         $ddtMoments = $this->getDdtMomentsMedia();
-        $merged = array_merge($ddtMoments, $rawItems);
+        $customerVideos = $this->getCustomerVideoReviews();
+        $merged = array_merge($customerVideos, $ddtMoments, $rawItems);
 
         return $this->filterHealthyItems($merged, $force);
+    }
+
+    /**
+     * Retrieve authentic, verified customer review videos with full metadata, transcripts, and placements.
+     *
+     * @param  array<string, mixed>  $options
+     * @return array<int, array<string, mixed>>
+     */
+    public function getCustomerVideoReviews(array $options = []): array
+    {
+        $jsonPath = database_path('seeders/data/customer_video_reviews.json');
+        if (! file_exists($jsonPath)) {
+            return [];
+        }
+
+        $raw = json_decode((string) file_get_contents($jsonPath), true);
+        if (! is_array($raw)) {
+            return [];
+        }
+
+        $items = [];
+        foreach ($raw as $entry) {
+            if (isset($entry['is_active']) && ! $entry['is_active']) {
+                continue;
+            }
+
+            $filename = $entry['filename'] ?? '';
+            $posterFilename = $entry['poster_filename'] ?? (str_replace('.mp4', '.webp', $filename));
+            $videoUrl = asset('videos/reviews/'.$filename);
+            $posterUrl = asset('images/video-posters/'.$posterFilename);
+            $cat = $entry['category'] ?? 'red_dunes';
+            $tourSlug = $entry['tour_slug'] ?? null;
+            $publishedDate = isset($entry['date']) ? \Carbon\Carbon::parse($entry['date']) : now();
+
+            $items[] = [
+                'id' => $entry['id'] ?? ('video_'.md5($filename)),
+                'url' => $videoUrl,
+                'video_url' => $videoUrl,
+                'type' => 'video',
+                'thumbnail_url' => $posterUrl,
+                'poster_url' => $posterUrl,
+                'category' => $cat,
+                'category_label' => self::CATEGORIES[$cat]['name'] ?? 'Desert Adventure',
+                'reviewer_name' => $entry['reviewer_name'] ?? 'Verified Traveler',
+                'reviewer_country' => $entry['reviewer_country'] ?? 'UAE',
+                'reviewer_country_code' => $entry['reviewer_country_code'] ?? 'AE',
+                'reviewer_avatar_url' => asset('images/icon.png'),
+                'rating' => (float) ($entry['rating'] ?? 5.0),
+                'review_title' => $entry['title'] ?? 'Customer Video Review',
+                'title' => $entry['title'] ?? 'Customer Video Review',
+                'review_text' => $entry['caption'] ?? ($entry['title'] ?? ''),
+                'full_review_text' => $entry['description'] ?? '',
+                'caption' => $entry['caption'] ?? '',
+                'description' => $entry['description'] ?? '',
+                'transcript' => $entry['transcript'] ?? '',
+                'published_date' => $publishedDate->toDateString(),
+                'formatted_date' => $publishedDate->format('M d, Y'),
+                'source' => 'verified_video',
+                'source_label' => 'Verified Customer Video',
+                'review_url' => $tourSlug ? url('/'.$tourSlug) : null,
+                'is_local_guide' => true,
+                'likes_count' => (int) ($entry['likes_count'] ?? 95),
+                'alt' => $entry['alt'] ?? '',
+                'keywords' => $entry['keywords'] ?? [],
+                'location' => $entry['location'] ?? 'Dubai, UAE',
+                'tour_slug' => $tourSlug,
+                'tour_name' => $entry['tour_name'] ?? '',
+                'duration' => (int) ($entry['duration'] ?? 30),
+                'duration_iso' => $entry['duration_iso'] ?? 'PT30S',
+                'placements' => $entry['placements'] ?? ['home' => true, 'gallery' => true, 'tour' => true],
+                'filename' => $filename,
+                'poster_filename' => $posterFilename,
+                'sort_order' => (int) ($entry['sort_order'] ?? 999),
+            ];
+        }
+
+        // Apply filters
+        $collection = collect($items);
+
+        if (! empty($options['category']) && $options['category'] !== 'all') {
+            $cat = $options['category'];
+            $collection = $collection->filter(fn ($item) => ($item['category'] ?? '') === $cat);
+        }
+
+        if (! empty($options['placement'])) {
+            $placement = $options['placement'];
+            $collection = $collection->filter(fn ($item) => ! empty($item['placements'][$placement]));
+        }
+
+        if (! empty($options['tour'])) {
+            $collection = $this->filterByTourRelevance($collection, $options['tour']);
+        }
+
+        if (isset($options['limit']) && (int) $options['limit'] > 0) {
+            $collection = $collection->take((int) $options['limit']);
+        }
+
+        return array_values($collection->all());
+    }
+
+    /**
+     * Get verified customer video reviews curated for the homepage.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function getHomepageVideoReviews(int $limit = 8): array
+    {
+        return $this->getCustomerVideoReviews([
+            'placement' => 'home',
+            'limit' => $limit,
+        ]);
+    }
+
+    /**
+     * Get verified customer video reviews relevant to a specific tour.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function getTourVideoReviews(Tour|int|string $tour, int $limit = 4): array
+    {
+        return $this->getCustomerVideoReviews([
+            'tour' => $tour,
+            'placement' => 'tour',
+            'limit' => $limit,
+        ]);
     }
 
     /**
@@ -312,10 +449,15 @@ class ReviewMediaGalleryService
      */
     public function extractAllReviewMedia(): array
     {
-        $reviews = Review::where('status', 'approved')
-            ->whereNotNull('photos')
-            ->orderBy('published_date', 'desc')
-            ->get();
+        try {
+            $reviews = Review::where('status', 'approved')
+                ->whereNotNull('photos')
+                ->orderBy('published_date', 'desc')
+                ->get();
+        } catch (\Throwable $e) {
+            Log::warning('Review database query failed in ReviewMediaGalleryService: '.$e->getMessage());
+            return [];
+        }
 
         $items = [];
         $seenUrls = [];

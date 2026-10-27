@@ -4,7 +4,7 @@
 <script type="application/ld+json">
 {!! json_encode([
   '@context' => 'https://schema.org',
-  '@graph' => array_values(array_filter([
+  '@graph' => array_values(array_filter(array_merge([
     !empty($schemaImages) ? [
       '@type' => 'ImageGallery',
       '@id' => $canonical . '#gallery',
@@ -31,7 +31,7 @@
         ],
       ],
     ],
-  ])),
+  ], $schemaVideos ?? []))),
 ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
 </script>
 @endpush
@@ -494,6 +494,12 @@
                                         <i class="bi bi-play-fill text-2xl ml-0.5"></i>
                                     </span>
                                 </div>
+                                <template x-if="item.duration">
+                                    <span class="absolute bottom-2.5 end-2.5 bg-slate-950/85 backdrop-blur-xs text-white text-[10px] font-mono font-bold px-2 py-0.5 rounded-md flex items-center gap-1 shadow-sm pointer-events-none">
+                                        <i class="bi bi-clock-fill text-amber-400 text-[9px]"></i>
+                                        <span x-text="Math.floor(item.duration / 60) + ':' + String(item.duration % 60).padStart(2, '0')"></span>
+                                    </span>
+                                </template>
                             </div>
                         </template>
 
@@ -515,7 +521,13 @@
                             </span>
 
                             <!-- Source Badge -->
-                            <template x-if="item.source === 'ddt'">
+                            <template x-if="item.type === 'video'">
+                                <span class="bg-gradient-to-r from-red-600 to-amber-600 text-white rounded-full px-2.5 py-1 text-[11px] font-bold flex items-center gap-1 shadow-xs">
+                                    <i class="bi bi-camera-video-fill text-[10px]"></i>
+                                    <span>Verified Video</span>
+                                </span>
+                            </template>
+                            <template x-if="item.type !== 'video' && item.source === 'ddt'">
                                 <span class="bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full px-2.5 py-1 text-[11px] font-bold flex items-center gap-1 shadow-xs">
                                     <i class="bi bi-camera-fill text-[10px]"></i>
                                     <span>DDT Moments</span>
@@ -708,7 +720,17 @@
                     <template x-if="activeItem && activeItem.review_title">
                         <h5 class="text-lg font-bold text-white mb-2 leading-snug" x-text="activeItem.review_title"></h5>
                     </template>
-                    <p class="text-white/80 text-sm leading-relaxed mb-6 whitespace-pre-line" x-text="activeItem ? (activeItem.full_review_text || activeItem.review_text) : ''"></p>
+                    <p class="text-white/80 text-sm leading-relaxed mb-4 whitespace-pre-line" x-text="activeItem ? (activeItem.full_review_text || activeItem.review_text) : ''"></p>
+
+                    <!-- Spoken Transcript Box (AISEO & Accessibility) -->
+                    <template x-if="activeItem && activeItem.transcript">
+                        <div class="mb-5 p-3.5 bg-slate-800/90 rounded-2xl border border-white/10 text-xs">
+                            <div class="font-bold text-amber-400 mb-1 flex items-center gap-1.5">
+                                <i class="bi bi-chat-quote-fill"></i> Spoken Customer Review Transcript:
+                            </div>
+                            <p class="text-slate-200 italic leading-relaxed" x-text="'&ldquo;' + activeItem.transcript + '&rdquo;'"></p>
+                        </div>
+                    </template>
                 </div>
 
                 <!-- Social Sharing Bar (Deep-Link Magnet) -->
@@ -748,12 +770,22 @@
 
                 <!-- Action CTAs -->
                 <div class="pt-4 border-t border-white/10 space-y-3">
-                    <button type="button" 
-                            class="btn-desert-animated w-full py-3 px-4 rounded-xl font-bold text-sm text-white shadow-lg flex items-center justify-center gap-2 cursor-pointer"
-                            @click="closeLightbox(); $store.modal.open('booking');">
-                        <i class="bi bi-calendar-check-fill text-base"></i>
-                        <span>{{ __('ui.gallery_section.book_this') ?? 'Book This Safari Adventure' }}</span>
-                    </button>
+                    <template x-if="activeItem && activeItem.tour_slug">
+                        <a :href="'/' + activeItem.tour_slug"
+                           class="btn-desert-animated w-full py-3 px-4 rounded-xl font-bold text-sm text-white shadow-lg flex items-center justify-center gap-2 cursor-pointer text-center">
+                            <i class="bi bi-compass-fill text-base"></i>
+                            <span x-text="'Book ' + (activeItem.tour_name || 'This Tour')"></span>
+                        </a>
+                    </template>
+
+                    <template x-if="!activeItem || !activeItem.tour_slug">
+                        <button type="button" 
+                                class="btn-desert-animated w-full py-3 px-4 rounded-xl font-bold text-sm text-white shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+                                @click="closeLightbox(); $store.modal.open('booking');">
+                            <i class="bi bi-calendar-check-fill text-base"></i>
+                            <span>{{ __('ui.gallery_section.book_this') ?? 'Book This Safari Adventure' }}</span>
+                        </button>
+                    </template>
 
                     <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode('Hello Dunes Discovery, I saw your guest gallery photos and want to book a desert safari!') }}" 
                        target="_blank" 

@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\AdminTourController;
 use App\Http\Controllers\Admin\AdminTranslationApiController;
 use App\Http\Controllers\Admin\AdminTranslationSettingController;
 use App\Http\Controllers\Admin\AdminVehicleController;
+use App\Http\Controllers\Admin\AdminVideoReviewController;
 use App\Http\Controllers\Admin\AdminWhatsappController;
 use App\Http\Controllers\Admin\AdminWikiController;
 use App\Http\Controllers\AjaxGatewayController;
@@ -223,6 +224,14 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::post('/reviews/sync-tripadvisor', [AdminReviewController::class, 'syncTripAdvisor'])->name('reviews.sync-tripadvisor');
     Route::resource('reviews', AdminReviewController::class)->except(['create', 'show', 'edit']);
     Route::post('/reviews/{id}/toggle-status', [AdminReviewController::class, 'toggleStatus'])->name('reviews.toggle-status');
+
+    // Customer Video Reviews Management (SEO, AISEO, Placements & Transcripts)
+    Route::get('/video-reviews', [AdminVideoReviewController::class, 'index'])->name('video-reviews.index');
+    Route::post('/video-reviews', [AdminVideoReviewController::class, 'store'])->name('video-reviews.store');
+    Route::put('/video-reviews/{id}', [AdminVideoReviewController::class, 'update'])->name('video-reviews.update');
+    Route::delete('/video-reviews/{id}', [AdminVideoReviewController::class, 'destroy'])->name('video-reviews.destroy');
+    Route::post('/video-reviews/{id}/toggle-placement', [AdminVideoReviewController::class, 'togglePlacement'])->name('video-reviews.toggle-placement');
+    Route::post('/video-reviews/{id}/toggle-status', [AdminVideoReviewController::class, 'toggleStatus'])->name('video-reviews.toggle-status');
     Route::get('/inquiries/export/csv', [AdminDashboardController::class, 'exportInquiriesCsv'])->name('inquiries.export');
     Route::post('/inquiries/bulk-action', [AdminDashboardController::class, 'bulkInquiriesAction'])->name('inquiries.bulk');
     Route::get('/inquiries', [AdminDashboardController::class, 'inquiries'])->name('inquiries.index');
@@ -375,6 +384,8 @@ Route::get('/sitemap-blogs.xml', [SitemapController::class, 'blogs'])->name('sit
 Route::get('/sitemap-wiki.xml', [SitemapController::class, 'wiki'])->name('sitemap.wiki');
 Route::get('/sitemap-pages.xml', [SitemapController::class, 'pages'])->name('sitemap.pages');
 Route::get('/sitemap-images.xml', [SitemapController::class, 'images'])->name('sitemap.images');
+Route::get('/sitemap-videos.xml', [SitemapController::class, 'videos'])->name('sitemap.videos');
+Route::get('/video-sitemap.xml', [SitemapController::class, 'videos'])->name('sitemap.video');
 
 // ── Google Things to Do (GTTD) Partner Feeds ──────────────────────────────
 Route::get('/feeds/google-things-to-do/products.xml', [GoogleThingsToDoFeedController::class, 'productsXml'])->name('feeds.gttd.products');
