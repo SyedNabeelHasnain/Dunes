@@ -68,7 +68,7 @@
           {
             "@type": "ListItem",
             "position": 1,
-            "name": {!! json_encode('Doorstep 4x4 Pickup from ' . $locationData['name'] . ' (Morning: ' . ($locationData['schedules']['morning']['pickup'] ?? '08:00 AM – 08:30 AM') . ' | Evening: ' . ($locationData['schedules']['evening']['pickup'] ?? $locationData['pickup_window']) . ')', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+            "name": {!! json_encode('Doorstep 4x4 Pickup from ' . $locationData['name'] . ' (Morning: ' . ($locationData['schedules']['morning']['pickup'] ?? '07:00 AM – 07:30 AM') . ' | Evening: ' . ($locationData['schedules']['evening']['pickup'] ?? '02:30 PM – 03:00 PM') . ')', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           },
           {
             "@type": "ListItem",
@@ -93,7 +93,7 @@
           {
             "@type": "ListItem",
             "position": 6,
-            "name": {!! json_encode('Return Drop-off to ' . $locationData['name'] . ' (Morning: ' . ($locationData['schedules']['morning']['return'] ?? '12:00 PM – 12:30 PM') . ' | Evening: ' . ($locationData['schedules']['evening']['return'] ?? $locationData['return_time']) . ' | Overnight: ' . ($locationData['schedules']['overnight']['return'] ?? '08:30 AM – 09:00 AM Next Day') . ')', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+            "name": {!! json_encode('Return Drop-off to ' . $locationData['name'] . ' (Morning: ' . ($locationData['schedules']['morning']['return'] ?? '10:30 AM – 11:00 AM') . ' | Evening: ' . ($locationData['schedules']['evening']['return'] ?? '09:00 PM – 09:30 PM') . ' | Overnight: ' . ($locationData['schedules']['overnight']['return'] ?? '06:30 AM – 07:00 AM Next Day') . ')', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
           }
         ]
       },
@@ -216,22 +216,22 @@
                             <span class="text-amber-400 block text-[10px] uppercase font-bold tracking-wider mb-1 flex items-center justify-center gap-1">
                                 <i class="bi bi-sun"></i> Morning Safari
                             </span>
-                            <span class="font-bold text-white text-xs sm:text-sm block">{{ $locationData['schedules']['morning']['pickup'] ?? '08:00 AM – 08:30 AM' }}</span>
-                            <span class="text-white/50 text-[10px] block mt-0.5">Drop-off: {{ $locationData['schedules']['morning']['return'] ?? '12:00 PM – 12:30 PM' }}</span>
+                            <span class="font-bold text-white text-xs sm:text-sm block">{{ $locationData['schedules']['morning']['pickup'] ?? '07:00 AM – 07:30 AM' }}</span>
+                            <span class="text-white/50 text-[10px] block mt-0.5">Drop-off: {{ $locationData['schedules']['morning']['return'] ?? '10:30 AM – 11:00 AM' }}</span>
                         </div>
                         <div class="bg-slate-800/80 backdrop-blur-md border border-amber-500/40 rounded-2xl p-3 text-center transition-all hover:border-amber-400 shadow-sm">
                             <span class="text-amber-400 block text-[10px] uppercase font-bold tracking-wider mb-1 flex items-center justify-center gap-1">
                                 <i class="bi bi-sunset"></i> Evening Safari
                             </span>
-                            <span class="font-bold text-amber-300 text-xs sm:text-sm block">{{ $locationData['schedules']['evening']['pickup'] ?? $locationData['pickup_window'] }}</span>
-                            <span class="text-white/50 text-[10px] block mt-0.5">Drop-off: {{ $locationData['schedules']['evening']['return'] ?? $locationData['return_time'] }}</span>
+                            <span class="font-bold text-amber-300 text-xs sm:text-sm block">{{ $locationData['schedules']['evening']['pickup'] ?? '02:30 PM – 03:00 PM' }}</span>
+                            <span class="text-white/50 text-[10px] block mt-0.5">Drop-off: {{ $locationData['schedules']['evening']['return'] ?? '09:00 PM – 09:30 PM' }}</span>
                         </div>
                         <div class="bg-slate-800/80 backdrop-blur-md border border-white/10 rounded-2xl p-3 text-center transition-all hover:border-amber-500/40">
                             <span class="text-indigo-400 block text-[10px] uppercase font-bold tracking-wider mb-1 flex items-center justify-center gap-1">
                                 <i class="bi bi-moon-stars"></i> Overnight Safari
                             </span>
-                            <span class="font-bold text-white text-xs sm:text-sm block">{{ $locationData['schedules']['overnight']['pickup'] ?? $locationData['pickup_window'] }}</span>
-                            <span class="text-white/50 text-[10px] block mt-0.5">Return: {{ $locationData['schedules']['overnight']['return'] ?? '08:30 AM Next Day' }}</span>
+                            <span class="font-bold text-white text-xs sm:text-sm block">{{ $locationData['schedules']['overnight']['pickup'] ?? '02:45 PM – 03:15 PM' }}</span>
+                            <span class="text-white/50 text-[10px] block mt-0.5">Return: {{ $locationData['schedules']['overnight']['return'] ?? '06:30 AM – 07:00 AM Next Day' }}</span>
                         </div>
                         <div class="bg-slate-800/80 backdrop-blur-md border border-white/10 rounded-2xl p-3 text-center transition-all hover:border-emerald-500/40">
                             <span class="text-emerald-400 block text-[10px] uppercase font-bold tracking-wider mb-1 flex items-center justify-center gap-1">
@@ -479,11 +479,11 @@
                         <div class="space-y-2 border-t border-white/10 pt-3 text-xs">
                             <div class="flex items-center justify-between">
                                 <span class="text-slate-400">Doorstep Pickup:</span>
-                                <span class="text-amber-400 font-bold">{{ $locationData['schedules']['morning']['pickup'] ?? '08:00 AM – 08:30 AM' }}</span>
+                                <span class="text-amber-400 font-bold">{{ $locationData['schedules']['morning']['pickup'] ?? '07:00 AM – 07:30 AM' }}</span>
                             </div>
                             <div class="flex items-center justify-between">
                                 <span class="text-slate-400">Return Drop-off:</span>
-                                <span class="text-white font-bold">{{ $locationData['schedules']['morning']['return'] ?? '12:00 PM – 12:30 PM' }}</span>
+                                <span class="text-white font-bold">{{ $locationData['schedules']['morning']['return'] ?? '10:30 AM – 11:00 AM' }}</span>
                             </div>
                             <div class="flex items-center justify-between">
                                 <span class="text-slate-400">Starting Price:</span>
@@ -542,11 +542,11 @@
                         <div class="space-y-2 border-t border-white/10 pt-3 text-xs">
                             <div class="flex items-center justify-between">
                                 <span class="text-slate-400">Doorstep Pickup:</span>
-                                <span class="text-amber-400 font-bold">{{ $locationData['schedules']['overnight']['pickup'] ?? $locationData['pickup_window'] }}</span>
+                                <span class="text-amber-400 font-bold">{{ $locationData['schedules']['overnight']['pickup'] ?? '02:45 PM – 03:15 PM' }}</span>
                             </div>
                             <div class="flex items-center justify-between">
                                 <span class="text-slate-400">Return Drop-off:</span>
-                                <span class="text-indigo-300 font-bold">{{ $locationData['schedules']['overnight']['return'] ?? '08:30 AM (Next Day)' }}</span>
+                                <span class="text-indigo-300 font-bold">{{ $locationData['schedules']['overnight']['return'] ?? '06:30 AM – 07:00 AM (Next Day)' }}</span>
                             </div>
                             <div class="flex items-center justify-between">
                                 <span class="text-slate-400">Starting Price:</span>
@@ -577,7 +577,7 @@
                             </div>
                             <div class="flex items-center justify-between">
                                 <span class="text-slate-400">Return Drop-off:</span>
-                                <span class="text-white font-bold">{{ $locationData['schedules']['quad_buggy']['return'] ?? '09:30 PM – 10:00 PM' }}</span>
+                                <span class="text-white font-bold">{{ $locationData['schedules']['quad_buggy']['return'] ?? '09:00 PM – 09:30 PM' }}</span>
                             </div>
                             <div class="flex items-center justify-between">
                                 <span class="text-slate-400">Starting Price:</span>
@@ -627,7 +627,7 @@
                             class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all inline-flex items-center gap-1.5 cursor-pointer"
                             role="tab"
                             :aria-selected="activeSchedule === 'overnight'">
-                        <i class="bi bi-moon-stars"></i> Overnight Safari (18h)
+                        <i class="bi bi-moon-stars"></i> Overnight Safari (16h)
                     </button>
                 </div>
             </div>
@@ -669,7 +669,7 @@
                 <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
                     <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">5</div>
                     <div>
-                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">06:00 PM – 08:45 PM</span>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">06:00 PM – 08:30 PM</span>
                         <h3 class="font-bold text-white text-base mb-1">Bedouin Camp, 5-Star Live BBQ & Shows</h3>
                         <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">Arrive at our authentic desert fortress camp. Enjoy complimentary camel riding, Arabian coffee (Gahwa), fresh dates, henna body painting, and a sumptuous 5-star live BBQ buffet accompanied by live Fire, Tanoura, and Belly Dance performances.</p>
                     </div>
@@ -689,7 +689,7 @@
                 <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
                     <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">1</div>
                     <div>
-                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">{{ $locationData['schedules']['morning']['pickup'] ?? '08:00 AM – 08:30 AM' }}</span>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">{{ $locationData['schedules']['morning']['pickup'] ?? '07:00 AM – 07:30 AM' }}</span>
                         <h3 class="font-bold text-white text-base mb-1">Morning Doorstep Pickup from {{ $locationData['name'] }}</h3>
                         <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">Direct hotel or residence lobby pickup in a private or shared 4x4 Land Cruiser. Start early to beat the midday heat and enjoy empty desert roads.</p>
                     </div>
@@ -697,7 +697,7 @@
                 <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
                     <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">2</div>
                     <div>
-                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">08:45 AM – 09:15 AM</span>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">07:45 AM – 08:15 AM</span>
                         <h3 class="font-bold text-white text-base mb-1">Lahbab Red Dunes Staging & Tire Deflation</h3>
                         <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">Arrival at the Lahbab desert staging area. Captain deflates tires for optimal sand traction. Optional morning quad bike / ATV rental session available on arrival.</p>
                     </div>
@@ -705,7 +705,7 @@
                 <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
                     <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">3</div>
                     <div>
-                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">09:15 AM – 10:00 AM</span>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">08:15 AM – 09:00 AM</span>
                         <h3 class="font-bold text-white text-base mb-1">Morning Red Dune Bashing & Sandboarding</h3>
                         <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">25 to 30 minutes of exhilarating dune drifting in crisp morning air. Stop on high pristine ridges with untouched wind ripples for magnificent photos and sandboarding.</p>
                     </div>
@@ -713,7 +713,7 @@
                 <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
                     <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">4</div>
                     <div>
-                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">10:00 AM – 10:45 AM</span>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">09:00 AM – 09:45 AM</span>
                         <h3 class="font-bold text-white text-base mb-1">Camel Riding & Traditional Arabic Coffee</h3>
                         <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">Traditional Bedouin camel ride, photo session with trained falcon, and chilled refreshments, Arabian coffee (Gahwa) and dates.</p>
                     </div>
@@ -721,7 +721,7 @@
                 <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
                     <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">5</div>
                     <div>
-                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">{{ $locationData['schedules']['morning']['return'] ?? '12:00 PM – 12:30 PM' }}</span>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">{{ $locationData['schedules']['morning']['return'] ?? '10:30 AM – 11:00 AM' }}</span>
                         <h3 class="font-bold text-white text-base mb-1">Return Drop-off Back at {{ $locationData['name'] }}</h3>
                         <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">Arrive back at your hotel or residence before lunch with the entire afternoon and evening free for shopping, pool time, or city sightseeing.</p>
                     </div>
@@ -733,7 +733,7 @@
                 <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
                     <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">1</div>
                     <div>
-                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">{{ $locationData['schedules']['overnight']['pickup'] ?? $locationData['pickup_window'] }}</span>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">{{ $locationData['schedules']['overnight']['pickup'] ?? '02:45 PM – 03:15 PM' }}</span>
                         <h3 class="font-bold text-white text-base mb-1">Afternoon Doorstep Pickup from {{ $locationData['name'] }}</h3>
                         <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">Board your 4x4 Land Cruiser with overnight bags stored safely in the luggage trunk. Drive out to the Lahbab Red Dunes.</p>
                     </div>
@@ -741,7 +741,7 @@
                 <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
                     <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">2</div>
                     <div>
-                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">04:30 PM – 09:00 PM</span>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">04:00 PM – 08:30 PM</span>
                         <h3 class="font-bold text-white text-base mb-1">High Dune Bashing, Sunset Sandboarding & 5★ BBQ Dinner</h3>
                         <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">Experience full evening safari thrills: high dune bashing, sunset photoshoot, camel rides, henna painting, live BBQ buffet dinner, and 3 cultural shows (Tanoura, Fire, Belly Dance).</p>
                     </div>
@@ -749,7 +749,7 @@
                 <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
                     <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">3</div>
                     <div>
-                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">09:30 PM – 11:30 PM</span>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">08:30 PM – 11:00 PM</span>
                         <h3 class="font-bold text-white text-base mb-1">Campfire Gathering & Stargazing Under Arabian Skies</h3>
                         <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">As day guests depart, the desert camp turns quiet and magical. Gather around the open campfire, sip fresh tea and Arabic Gahwa, enjoy shisha, and gaze at unpolluted desert constellations.</p>
                     </div>
@@ -757,7 +757,7 @@
                 <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
                     <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">4</div>
                     <div>
-                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">Midnight – 05:30 AM</span>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">11:00 PM – 05:00 AM</span>
                         <h3 class="font-bold text-white text-base mb-1">Peaceful Sleep in Deluxe Bedouin Tents</h3>
                         <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">Retire to your private Bedouin tent equipped with clean mattresses, pillows, and warm blankets for a restful night in the silence of the desert.</p>
                     </div>
@@ -765,7 +765,7 @@
                 <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
                     <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">5</div>
                     <div>
-                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">06:00 AM – 07:30 AM</span>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">05:30 AM – 06:15 AM</span>
                         <h3 class="font-bold text-white text-base mb-1">Sunrise Over the Red Dunes & Warm Bedouin Breakfast</h3>
                         <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">Wake up to the breathtaking sight of dawn breaking over endless red dunes. Enjoy an optional early morning camel walk followed by a warm breakfast of eggs, Arabic bread, cheeses, honey, and fresh tea.</p>
                     </div>
@@ -773,7 +773,7 @@
                 <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
                     <div class="w-9 h-9 rounded-full bg-primary text-slate-950 font-black flex items-center justify-center text-sm shadow-md shrink-0">6</div>
                     <div>
-                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">{{ $locationData['schedules']['overnight']['return'] ?? '08:30 AM – 09:00 AM (Next Day)' }}</span>
+                        <span class="inline-block bg-amber-400/20 text-amber-400 font-bold text-xs px-2.5 py-0.5 rounded-full mb-1.5">{{ $locationData['schedules']['overnight']['return'] ?? '06:30 AM – 07:00 AM (Next Day)' }}</span>
                         <h3 class="font-bold text-white text-base mb-1">Morning Return Drop-off Back at {{ $locationData['name'] }}</h3>
                         <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-0">Board your 4x4 Land Cruiser for the return highway drive back to your hotel or residence in {{ $locationData['name'] }}, refreshed and recharged.</p>
                     </div>
@@ -904,7 +904,7 @@
                             </div>
                             <p class="text-slate-400 text-xs leading-relaxed mb-3">{{ Str::limit($loc['district'], 55) }}</p>
                             <div class="text-amber-400 text-xs flex items-center gap-1.5 font-medium">
-                                <i class="bi bi-clock"></i> Morning: {{ $loc['schedules']['morning']['pickup'] ?? '08:00 AM' }} · Evening: {{ $loc['schedules']['evening']['pickup'] ?? $loc['pickup_window'] }}
+                                <i class="bi bi-clock"></i> Morning: {{ $loc['schedules']['morning']['pickup'] ?? '07:00 AM – 07:30 AM' }} · Evening: {{ $loc['schedules']['evening']['pickup'] ?? $loc['pickup_window'] }}
                             </div>
                         </a>
                     @endif

@@ -558,9 +558,9 @@ class TourController extends Controller
                 'icon' => 'bi-sunrise',
                 'pills' => ['4x4 Dune Bashing', 'Camel Trekking', 'Sandboarding', 'Sunrise Photo Stop', 'Under AED 150'],
                 'ai_title' => 'Morning Desert Safari in Dubai: Timing, Itinerary & Benefits',
-                'summary' => 'Morning Desert Safaris operate daily from 8:00 AM to 12:30 PM, taking advantage of pleasant morning temperatures and crisp desert light. Includes 45 minutes of extreme red dune bashing, camel rides, sandboarding, and hotel pickup.',
+                'summary' => 'Morning Desert Safaris operate daily from 7:00 AM to 11:00 AM (pickup 7:00 AM – 7:30 AM, return 10:30 AM – 11:00 AM), taking advantage of pleasant morning temperatures and crisp desert light. Includes 45 minutes of extreme red dune bashing, camel rides, sandboarding, and hotel pickup.',
                 'specs' => [
-                    'Schedule' => '8:00 AM – 12:30 PM Daily',
+                    'Schedule' => '7:00 AM – 11:00 AM Daily',
                     'Dune Bashing' => '45 Minutes (Lahbab)',
                     'Activities' => 'Sandboarding & Camel Rides',
                     'Ideal For' => 'Early Risers & Quick Layovers',
@@ -578,7 +578,7 @@ class TourController extends Controller
                 'ai_title' => 'Overnight Dubai Desert Safari: Bedouin Camping & Stargazing',
                 'summary' => 'Overnight Desert Safaris feature the full evening safari program (dune bashing, live shows, BBQ dinner) followed by peaceful desert camping in Bedouin tents with sleeping bags, campfire stargazing, Arabian breakfast at sunrise, and morning dune trekking.',
                 'specs' => [
-                    'Duration' => '17 Hours (3:00 PM – 8:30 AM Next Day)',
+                    'Duration' => '16 Hours (2:45 PM – 7:00 AM Next Day)',
                     'Accommodation' => 'Private Bedouin Tents & Mattresses',
                     'Meals Included' => '5-Star BBQ Dinner + Fresh Breakfast',
                     'Experience' => 'Night Stargazing & Sunrise Views',

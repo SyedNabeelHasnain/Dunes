@@ -71,17 +71,17 @@
                         <div @click="selectChoice(2, 'morning')" class="p-4 rounded-2xl border border-slate-200 hover:border-primary hover:bg-orange-50/50 cursor-pointer transition-all text-center group">
                             <i class="bi bi-sunrise text-3xl text-amber-500 mb-2 block group-hover:scale-110 transition-transform"></i>
                             <h4 class="font-bold text-slate-900 text-sm mb-1">Morning Experience</h4>
-                            <p class="text-slate-500 text-xs leading-relaxed">8:00 AM - 12:00 PM • Crisp breeze & cool weather</p>
+                            <p class="text-slate-500 text-xs leading-relaxed">7:00 AM – 11:00 AM • Crisp breeze & cool weather</p>
                         </div>
                         <div @click="selectChoice(2, 'evening')" class="p-4 rounded-2xl border border-slate-200 hover:border-primary hover:bg-orange-50/50 cursor-pointer transition-all text-center group">
                             <i class="bi bi-sunset text-3xl text-amber-500 mb-2 block group-hover:scale-110 transition-transform"></i>
                             <h4 class="font-bold text-slate-900 text-sm mb-1">Evening & Sunset</h4>
-                            <p class="text-slate-500 text-xs leading-relaxed">3:00 PM - 9:30 PM • Sunset, 5-Star Buffet & Shows</p>
+                            <p class="text-slate-500 text-xs leading-relaxed">2:30 PM – 9:30 PM • Sunset, 5-Star Buffet & Shows</p>
                         </div>
                         <div @click="selectChoice(2, 'overnight')" class="p-4 rounded-2xl border border-slate-200 hover:border-primary hover:bg-orange-50/50 cursor-pointer transition-all text-center group">
                             <i class="bi bi-moon-stars text-3xl text-amber-500 mb-2 block group-hover:scale-110 transition-transform"></i>
                             <h4 class="font-bold text-slate-900 text-sm mb-1">Overnight Stay</h4>
-                            <p class="text-slate-500 text-xs leading-relaxed">Camp under stars with campfire & morning breakfast</p>
+                            <p class="text-slate-500 text-xs leading-relaxed">2:45 PM – 7:00 AM Next Day • Camp under stars & breakfast</p>
                         </div>
                     </div>
                 </div>

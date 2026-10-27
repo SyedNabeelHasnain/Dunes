@@ -146,7 +146,7 @@
                                 <i class="bi bi-sunset-fill text-2xl text-amber-400 shrink-0"></i>
                                 <div>
                                     <div class="font-bold text-white text-sm mb-1">Sunset Evening Safari (Classic)</div>
-                                    <div class="text-slate-300 text-xs leading-relaxed">2:30 PM - 9:30 PM. Red dunes sunset photos, camp, BBQ buffet & fire show.</div>
+                                    <div class="text-slate-300 text-xs leading-relaxed">2:30 PM – 9:30 PM. Red dunes sunset photos, camp, BBQ buffet & fire show.</div>
                                 </div>
                             </div>
                         </div>
@@ -158,7 +158,7 @@
                                 <i class="bi bi-sunrise-fill text-2xl text-amber-400 shrink-0"></i>
                                 <div>
                                     <div class="font-bold text-white text-sm mb-1">Crisp Morning Safari (Cooler)</div>
-                                    <div class="text-slate-300 text-xs leading-relaxed">8:00 AM - 12:30 PM. Crisp air, sunrise dunes, quad track, back before heat.</div>
+                                    <div class="text-slate-300 text-xs leading-relaxed">7:00 AM – 11:00 AM. Crisp morning air, red dunes, sandboarding & camel ride.</div>
                                 </div>
                             </div>
                         </div>
@@ -170,7 +170,7 @@
                                 <i class="bi bi-moon-stars-fill text-2xl text-amber-400 shrink-0"></i>
                                 <div>
                                     <div class="font-bold text-white text-sm mb-1">Overnight Stargazing Glamping</div>
-                                    <div class="text-slate-300 text-xs leading-relaxed">Full evening safari + private Bedouin tent, bonfire stargazing & breakfast.</div>
+                                    <div class="text-slate-300 text-xs leading-relaxed">2:45 PM – 7:00 AM Next Day. Evening safari + Bedouin tent, stargazing & breakfast.</div>
                                 </div>
                             </div>
                         </div>

@@ -208,7 +208,7 @@
                             </div>
                             <h6 class="font-bold text-slate-900 text-sm mb-1">Fresh Morning Desert Adventure</h6>
                             <p class="text-slate-500 text-xs mb-3 leading-relaxed">
-                                Crisp morning air, 25-30 min red dune drive, pristine desert photography, camel ride & sandboarding. Back by 12:30 PM.
+                                Crisp morning air, 25-30 min red dune drive, pristine desert photography, camel ride & sandboarding. Back by 11:00 AM.
                             </p>
                             <div class="font-black text-primary text-base" data-aed="140">{{ __('ui.common.aed') }} 140 <span class="text-slate-400 font-normal text-xs">/ guest</span></div>
                         </div>
