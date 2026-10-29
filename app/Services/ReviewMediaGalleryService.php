@@ -287,7 +287,16 @@ class ReviewMediaGalleryService
             $posterUrl = asset('images/video-posters/'.$posterFilename);
             $cat = $entry['category'] ?? 'red_dunes';
             $tourSlug = $entry['tour_slug'] ?? null;
-            $publishedDate = isset($entry['date']) ? \Carbon\Carbon::parse($entry['date']) : now();
+            $rawDate = $entry['date'] ?? '2026-10-15T08:00:00+04:00';
+            try {
+                $publishedDate = \Carbon\Carbon::parse($rawDate, 'Asia/Dubai')->setTimezone('Asia/Dubai');
+                if ($publishedDate->format('H:i:s') === '00:00:00') {
+                    $publishedDate = $publishedDate->setTime(8, 0, 0);
+                }
+            } catch (\Throwable $e) {
+                $publishedDate = \Carbon\Carbon::parse('2026-10-15 08:00:00', 'Asia/Dubai');
+            }
+            $uploadDateIso = $publishedDate->format('Y-m-d\TH:i:s+04:00');
 
             $items[] = [
                 'id' => $entry['id'] ?? ('video_'.md5($filename)),
@@ -310,7 +319,8 @@ class ReviewMediaGalleryService
                 'caption' => $entry['caption'] ?? '',
                 'description' => $entry['description'] ?? '',
                 'transcript' => $entry['transcript'] ?? '',
-                'published_date' => $publishedDate->toDateString(),
+                'published_date' => $uploadDateIso,
+                'upload_date_iso' => $uploadDateIso,
                 'formatted_date' => $publishedDate->format('M d, Y'),
                 'source' => 'verified_video',
                 'source_label' => 'Verified Customer Video',
@@ -406,7 +416,16 @@ class ReviewMediaGalleryService
             $cat = $entry['category'] ?? 'red_dunes';
             $tourSlug = $entry['tour_slug'] ?? null;
             $addonSlug = $entry['addon_slug'] ?? null;
-            $publishedDate = isset($entry['date']) ? \Carbon\Carbon::parse($entry['date']) : now();
+            $rawDate = $entry['date'] ?? '2026-10-15T08:00:00+04:00';
+            try {
+                $publishedDate = \Carbon\Carbon::parse($rawDate, 'Asia/Dubai')->setTimezone('Asia/Dubai');
+                if ($publishedDate->format('H:i:s') === '00:00:00') {
+                    $publishedDate = $publishedDate->setTime(8, 0, 0);
+                }
+            } catch (\Throwable $e) {
+                $publishedDate = \Carbon\Carbon::parse('2026-10-15 08:00:00', 'Asia/Dubai');
+            }
+            $uploadDateIso = $publishedDate->format('Y-m-d\TH:i:s+04:00');
 
             $items[] = [
                 'id' => 'ddt_'.md5($filename),

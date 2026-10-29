@@ -178,7 +178,19 @@ if (!function_exists('renderReviewCardMarkup')) {
         "name": {!! json_encode($vitem['title'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
         "description": {!! json_encode($vitem['description'] ?: ($vitem['caption'] ?: $vitem['title']), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
         "thumbnailUrl": [{!! json_encode($vitem['poster_url'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}],
-        "uploadDate": {!! json_encode(!empty($vitem['published_date']) ? $vitem['published_date'] : '2026-10-15', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        @php
+          $vRawDate = !empty($vitem['upload_date_iso']) ? $vitem['upload_date_iso'] : (!empty($vitem['published_date']) ? $vitem['published_date'] : '2026-10-15T08:00:00+04:00');
+          try {
+            $vCleanUploadDate = \Carbon\Carbon::parse($vRawDate, 'Asia/Dubai')->setTimezone('Asia/Dubai');
+            if ($vCleanUploadDate->format('H:i:s') === '00:00:00') {
+              $vCleanUploadDate = $vCleanUploadDate->setTime(8, 0, 0);
+            }
+            $vFinalUploadDate = $vCleanUploadDate->format('Y-m-d\TH:i:s+04:00');
+          } catch (\Throwable $e) {
+            $vFinalUploadDate = '2026-10-15T08:00:00+04:00';
+          }
+        @endphp
+        "uploadDate": {!! json_encode($vFinalUploadDate, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
         "duration": {!! json_encode($vitem['duration_iso'] ?? 'PT30S', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
         "contentUrl": {!! json_encode($vitem['url'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
         "embedUrl": {!! json_encode(url('/gallery?item=' . $vitem['id']), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},

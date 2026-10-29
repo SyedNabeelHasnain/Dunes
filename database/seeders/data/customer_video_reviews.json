@@ -18,7 +18,7 @@
         "rating": 5,
         "duration": 41,
         "duration_iso": "PT41S",
-        "date": "2026-10-14",
+        "date": "2026-10-14T08:00:00+04:00",
         "location": "Lahbab Red Dunes, Dubai, UAE",
         "keywords": [
             "dune buggy dubai review",
@@ -28,7 +28,7 @@
             "red dunes buggy adventure"
         ],
         "placements": {
-            "home": true,
+            "home": false,
             "gallery": true,
             "tour": true
         },
@@ -54,7 +54,7 @@
         "rating": 5,
         "duration": 12,
         "duration_iso": "PT12S",
-        "date": "2026-10-15",
+        "date": "2026-10-15T08:00:00+04:00",
         "location": "Lahbab Red Dunes, Dubai, UAE",
         "keywords": [
             "family buggy ride dubai",
@@ -89,7 +89,7 @@
         "rating": 5,
         "duration": 34,
         "duration_iso": "PT34S",
-        "date": "2026-10-16",
+        "date": "2026-10-16T08:00:00+04:00",
         "location": "Lahbab Red Dunes, Dubai, UAE",
         "keywords": [
             "captain malik dunes discovery",
@@ -124,7 +124,7 @@
         "rating": 5,
         "duration": 22,
         "duration_iso": "PT22S",
-        "date": "2026-10-18",
+        "date": "2026-10-18T08:00:00+04:00",
         "location": "Lahbab Red Dunes, Dubai, UAE",
         "keywords": [
             "polaris rzr 1000 dubai",
@@ -159,7 +159,7 @@
         "rating": 5,
         "duration": 20,
         "duration_iso": "PT20S",
-        "date": "2026-10-19",
+        "date": "2026-10-19T08:00:00+04:00",
         "location": "Lahbab Red Dunes, Dubai, UAE",
         "keywords": [
             "habibi come to dubai",
@@ -194,7 +194,7 @@
         "rating": 5,
         "duration": 25,
         "duration_iso": "PT25S",
-        "date": "2026-10-12",
+        "date": "2026-10-12T08:00:00+04:00",
         "location": "The Palm Jumeirah, Dubai, UAE",
         "keywords": [
             "dubai city tour review",
@@ -229,7 +229,7 @@
         "rating": 5,
         "duration": 26,
         "duration_iso": "PT26S",
-        "date": "2026-10-13",
+        "date": "2026-10-13T08:00:00+04:00",
         "location": "Atlantis The Palm, Dubai, UAE",
         "keywords": [
             "dubai city sightseeing review",
@@ -264,7 +264,7 @@
         "rating": 5,
         "duration": 18,
         "duration_iso": "PT18S",
-        "date": "2026-10-17",
+        "date": "2026-10-17T08:00:00+04:00",
         "location": "Al Awir Desert Camp, Dubai, UAE",
         "keywords": [
             "tanoura dance dubai camp",
@@ -299,7 +299,7 @@
         "rating": 5,
         "duration": 61,
         "duration_iso": "PT61S",
-        "date": "2026-10-10",
+        "date": "2026-10-10T08:00:00+04:00",
         "location": "Lahbab Red Dunes, Dubai, UAE",
         "keywords": [
             "falcon photography dubai desert",
@@ -334,7 +334,7 @@
         "rating": 5,
         "duration": 25,
         "duration_iso": "PT25S",
-        "date": "2026-10-11",
+        "date": "2026-10-11T08:00:00+04:00",
         "location": "Lahbab Red Dunes, Dubai, UAE",
         "keywords": [
             "dune bashing review dubai",
@@ -369,7 +369,7 @@
         "rating": 5,
         "duration": 21,
         "duration_iso": "PT21S",
-        "date": "2026-10-14",
+        "date": "2026-10-14T08:00:00+04:00",
         "location": "Lahbab Red Dunes, Dubai, UAE",
         "keywords": [
             "falcon photoshoot dubai",
@@ -404,7 +404,7 @@
         "rating": 5,
         "duration": 32,
         "duration_iso": "PT32S",
-        "date": "2026-10-15",
+        "date": "2026-10-15T08:00:00+04:00",
         "location": "Lahbab Red Dunes, Dubai, UAE",
         "keywords": [
             "luxury land cruiser safari",
@@ -439,7 +439,7 @@
         "rating": 5,
         "duration": 27,
         "duration_iso": "PT27S",
-        "date": "2026-10-18",
+        "date": "2026-10-18T08:00:00+04:00",
         "location": "Lahbab Red Dunes, Dubai, UAE",
         "keywords": [
             "girls trip dubai desert safari",
@@ -474,7 +474,7 @@
         "rating": 5,
         "duration": 51,
         "duration_iso": "PT51S",
-        "date": "2026-10-19",
+        "date": "2026-10-19T08:00:00+04:00",
         "location": "Al Awir Desert Camp, Dubai, UAE",
         "keywords": [
             "desert safari bbq dinner buffet",
@@ -509,7 +509,7 @@
         "rating": 5,
         "duration": 37,
         "duration_iso": "PT37S",
-        "date": "2026-10-16",
+        "date": "2026-10-16T08:00:00+04:00",
         "location": "Lahbab Red Dunes, Dubai, UAE",
         "keywords": [
             "morning desert safari dubai",
@@ -544,7 +544,7 @@
         "rating": 5,
         "duration": 30,
         "duration_iso": "PT30S",
-        "date": "2026-10-17",
+        "date": "2026-10-17T08:00:00+04:00",
         "location": "Lahbab Red Dunes, Dubai, UAE",
         "keywords": [
             "romantic sunrise desert safari",

@@ -242,7 +242,19 @@
             "name": {!! json_encode($tv['title'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
             "description": {!! json_encode($tv['description'] ?: ($tv['caption'] ?: $tv['title']), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
             "thumbnailUrl": [{!! json_encode($tv['poster_url'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}],
-            "uploadDate": {!! json_encode(!empty($tv['published_date']) ? $tv['published_date'] : '2026-10-15', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+            @php
+              $tvRawDate = !empty($tv['upload_date_iso']) ? $tv['upload_date_iso'] : (!empty($tv['published_date']) ? $tv['published_date'] : '2026-10-15T08:00:00+04:00');
+              try {
+                $tvCleanUploadDate = \Carbon\Carbon::parse($tvRawDate, 'Asia/Dubai')->setTimezone('Asia/Dubai');
+                if ($tvCleanUploadDate->format('H:i:s') === '00:00:00') {
+                  $tvCleanUploadDate = $tvCleanUploadDate->setTime(8, 0, 0);
+                }
+                $tvFinalUploadDate = $tvCleanUploadDate->format('Y-m-d\TH:i:s+04:00');
+              } catch (\Throwable $e) {
+                $tvFinalUploadDate = '2026-10-15T08:00:00+04:00';
+              }
+            @endphp
+            "uploadDate": {!! json_encode($tvFinalUploadDate, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
             "duration": {!! json_encode($tv['duration_iso'] ?? 'PT30S', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
             "contentUrl": {!! json_encode($tv['url'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
             "embedUrl": {!! json_encode($canonical . '#guest-video-reviews', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},

@@ -32,6 +32,8 @@ class CustomerVideoReviewsTest extends TestCase
         $this->assertNotEmpty($first['transcript']);
         $this->assertNotEmpty($first['duration_iso']);
         $this->assertArrayHasKey('placements', $first);
+        $this->assertMatchesRegularExpression('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+04:00$/', $first['upload_date_iso']);
+        $this->assertMatchesRegularExpression('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+04:00$/', $first['published_date']);
     }
 
     public function test_service_filters_homepage_and_tour_video_reviews(): void
@@ -54,6 +56,8 @@ class CustomerVideoReviewsTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('VideoObject');
         $response->assertSee('buggy-ride-dubai-desert-review-1.mp4');
+        $content = $response->getContent();
+        $this->assertDoesNotMatchRegularExpression('/"uploadDate":\s*"[0-9]{4}-[0-9]{2}-[0-9]{2}"/', $content, 'uploadDate in gallery must include timezone');
     }
 
     public function test_homepage_renders_guest_video_reels_section_and_schema(): void
@@ -64,6 +68,9 @@ class CustomerVideoReviewsTest extends TestCase
         $response->assertSee('Real Customer Video Reviews');
         $response->assertSee('Watch Real Travelers in the Dubai Dunes');
         $response->assertSee('VideoObject');
+        $content = $response->getContent();
+        $this->assertDoesNotMatchRegularExpression('/"uploadDate":\s*"[0-9]{4}-[0-9]{2}-[0-9]{2}"/', $content, 'uploadDate on homepage must include timezone');
+        $this->assertStringContainsString('+04:00', $content, 'Homepage VideoObjects must contain +04:00 timezone offset');
     }
 
     public function test_tour_detail_page_renders_guest_video_reviews_section(): void
@@ -82,6 +89,8 @@ class CustomerVideoReviewsTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Guest Video Reviews: Dune Buggy Dubai Desert Safari');
         $response->assertSee('VideoObject');
+        $content = $response->getContent();
+        $this->assertDoesNotMatchRegularExpression('/"uploadDate":\s*"[0-9]{4}-[0-9]{2}-[0-9]{2}"/', $content, 'uploadDate on tour page must include timezone');
     }
 
     public function test_google_video_sitemap_returns_valid_xml_with_video_tags(): void

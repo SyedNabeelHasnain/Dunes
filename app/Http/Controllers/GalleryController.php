@@ -124,7 +124,11 @@ class GalleryController extends Controller
                 'thumbnailUrl' => [
                     $item['poster_url'] ?? $item['thumbnail_url'],
                 ],
-                'uploadDate' => ! empty($item['published_date']) ? \Carbon\Carbon::parse($item['published_date'])->toDateString() : now()->toDateString(),
+                'uploadDate' => ! empty($item['upload_date_iso'])
+                    ? $item['upload_date_iso']
+                    : (! empty($item['published_date'])
+                        ? \Carbon\Carbon::parse($item['published_date'], 'Asia/Dubai')->setTimezone('Asia/Dubai')->format('Y-m-d\TH:i:s+04:00')
+                        : now('Asia/Dubai')->format('Y-m-d\TH:i:s+04:00')),
                 'duration' => $item['duration_iso'] ?? 'PT30S',
                 'contentUrl' => $item['url'],
                 'embedUrl' => $canonical . '?item=' . $item['id'],

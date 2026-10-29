@@ -210,7 +210,7 @@ class AdminVideoReviewController extends Controller
             'rating' => (float) $validated['rating'],
             'duration' => $durationSec,
             'duration_iso' => 'PT' . $durationSec . 'S',
-            'date' => now()->toDateString(),
+            'date' => now('Asia/Dubai')->format('Y-m-d\TH:i:s+04:00'),
             'location' => $validated['location'] ?: 'Lahbab Red Dunes, Dubai, UAE',
             'keywords' => $keywords,
             'placements' => $placements,
