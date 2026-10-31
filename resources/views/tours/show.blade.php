@@ -145,6 +145,7 @@
             "@type": "AggregateOffer",
             "url": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
             "priceCurrency": "AED",
+            "price": {!! json_encode(number_format($activePrice, 2, '.', ''), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
             "lowPrice": {!! json_encode(number_format($minPrice, 2, '.', ''), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
             "highPrice": {!! json_encode(number_format($tour->tiers->max('pivot.price') ?? $minPrice, 2, '.', ''), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
             "offerCount": {!! json_encode((string) ($tour->tiers->count() ?: 1), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
@@ -152,6 +153,7 @@
             "validFrom": {!! json_encode(now()->startOfYear()->toIso8601String(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
             "itemCondition": "https://schema.org/NewCondition",
             "availability": "https://schema.org/InStock",
+            "valueAddedTaxIncluded": true,
             "seller": {
               "@id": {!! json_encode(url('/') . '#organization', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
             },
@@ -163,6 +165,12 @@
               "returnMethod": "https://schema.org/ReturnInStore",
               "returnFees": "https://schema.org/FreeReturn"
             },
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "price": {!! json_encode(number_format($activePrice, 2, '.', ''), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+              "priceCurrency": "AED",
+              "valueAddedTaxIncluded": true
+            },
             "offers": [
               @foreach($tour->tiers->sortBy('priority') as $tierItem)
               {
@@ -170,6 +178,7 @@
                 "name": {!! json_encode($tierItem->name, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
                 "price": {!! json_encode(number_format($tierItem->pivot?->price ?? $minPrice, 2, '.', ''), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
                 "priceCurrency": "AED",
+                "valueAddedTaxIncluded": true,
                 "availability": "https://schema.org/InStock",
                 "url": {!! json_encode($canonical . '?tier=' . $tierItem->slug, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
               }{{ $loop->last ? '' : ',' }}

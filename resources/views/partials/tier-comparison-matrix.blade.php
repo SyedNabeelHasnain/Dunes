@@ -56,7 +56,7 @@
                 @if($isBuggyTour)
                 <tr>
                     <td class="text-start py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2 sticky start-0 bg-white z-10 shadow-[1px_0_0_0_#e2e8f0]">
-                        <i class="bi bi-speedometer2 text-primary"></i> {{ __('ui.tier_matrix.feat_buggy_engine') }}
+                        <i class="bi bi-speedometer2 text-primary"></i> {!! __('ui.tier_matrix.feat_buggy_engine') !!}
                     </td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
                     <td class="py-3.5 px-3 {{ $tier->is_popular ? 'bg-orange-50/30 border-x border-orange-200/60' : '' }}">

@@ -226,4 +226,63 @@ class SeoKeywordsAndRedirectsTest extends TestCase
         $response->assertHeader('Permissions-Policy');
         $response->assertHeader('Strict-Transport-Security');
     }
+
+    public function test_moz_top_backlink_pages_redirect_301_to_canonical_urls(): void
+    {
+        // 1. Historical /tour/{slug} backlinks identified in Moz audit
+        $respTourOvernight = $this->get('/tour/overnight-desert-safari-dubai');
+        $respTourOvernight->assertStatus(301);
+        $respTourOvernight->assertRedirect('/overnight-desert-safari-dubai');
+
+        $respTourCruise = $this->get('/tour/dhow-cruise-catamaran-cruise-dinner-dubai');
+        $respTourCruise->assertStatus(301);
+        $respTourCruise->assertRedirect('/dhow-cruise-catamaran-cruise-dinner-dubai');
+
+        // 2. Short/unqualified legacy slugs identified in Moz audit
+        $respMorning = $this->get('/morning-desert-safari');
+        $respMorning->assertStatus(301);
+        $respMorning->assertRedirect('/morning-desert-safari-dubai');
+
+        $respOvernight = $this->get('/overnight-desert-safari');
+        $respOvernight->assertStatus(301);
+        $respOvernight->assertRedirect('/overnight-desert-safari-dubai');
+
+        $respEvening = $this->get('/evening-desert-safari');
+        $respEvening->assertStatus(301);
+        $respEvening->assertRedirect('/evening-desert-safari-dubai');
+
+        // 3. Wix legacy import slug identified in Moz audit
+        $respCopyTour = $this->get('/copy-of-dubai-city-tour-1');
+        $respCopyTour->assertStatus(301);
+        $respCopyTour->assertRedirect('/dubai-city-tour');
+
+        // 4. Legacy /tours/{slug} prefix mapping
+        $respToursMorning = $this->get('/tours/morning-desert-safari');
+        $respToursMorning->assertStatus(301);
+        $respToursMorning->assertRedirect('/morning-desert-safari-dubai');
+
+        // 5. Query string preservation across 301 redirects
+        $respQuery = $this->get('/tour/overnight-desert-safari-dubai?tier=vip&utm_source=moz');
+        $respQuery->assertStatus(301);
+        $respQuery->assertRedirect('/overnight-desert-safari-dubai?tier=vip&utm_source=moz');
+    }
+
+    public function test_localized_moz_backlinks_redirect_301(): void
+    {
+        $locales = ['ar', 'ru', 'es', 'it'];
+
+        foreach ($locales as $loc) {
+            $respTour = $this->get("/{$loc}/tour/overnight-desert-safari-dubai");
+            $respTour->assertStatus(301);
+            $respTour->assertRedirect("/{$loc}/overnight-desert-safari-dubai");
+
+            $respMorning = $this->get("/{$loc}/morning-desert-safari");
+            $respMorning->assertStatus(301);
+            $respMorning->assertRedirect("/{$loc}/morning-desert-safari-dubai");
+
+            $respCopy = $this->get("/{$loc}/copy-of-dubai-city-tour-1");
+            $respCopy->assertStatus(301);
+            $respCopy->assertRedirect("/{$loc}/dubai-city-tour");
+        }
+    }
 }

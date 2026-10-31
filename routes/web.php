@@ -109,11 +109,63 @@ Route::get('/search', [TourController::class, 'search'])->name('tours.search');
 Route::get('/search/live', [TourController::class, 'liveSearch'])->name('tours.search.live');
 Route::get('/build-your-own-safari', [TourController::class, 'customizer'])->name('tours.customizer');
 Route::redirect('/custom-safari', '/build-your-own-safari', 301);
-Route::get('/tours/{slug}', function (Request $request, $slug) {
+
+// ── Universal Legacy Tour Redirect Engine (Preserves Inbound Backlinks & PageRank) ──
+$resolveLegacyTourRedirect = function (Request $request, string $slug, ?string $locale = null) {
+    $canonicalMap = [
+        'morning-desert-safari' => 'morning-desert-safari-dubai',
+        'overnight-desert-safari' => 'overnight-desert-safari-dubai',
+        'evening-desert-safari' => 'evening-desert-safari-dubai',
+        'copy-of-dubai-city-tour-1' => 'dubai-city-tour',
+        'luxury-vip-desert-safari-dubai' => 'evening-desert-safari-dubai',
+        'vip-desert-safari-dubai' => 'evening-desert-safari-dubai',
+        'desert-safari-dubai' => 'evening-desert-safari-dubai',
+        'dubai-desert-safari' => 'evening-desert-safari-dubai',
+        'desert-safari' => 'evening-desert-safari-dubai',
+        'safari-dubai' => 'evening-desert-safari-dubai',
+        'desert-safaris-dubai' => 'tours',
+        'dubai-desert-safaris' => 'tours',
+        'packages' => 'tours',
+        'tour' => 'tours',
+        'dubai-marina-dhow-cruise' => 'dhow-cruise-catamaran-cruise-dinner-dubai',
+        'ocean-empress-dhow-cruise' => 'dhow-cruise-catamaran-cruise-dinner-dubai',
+        'dhow-cruise-marina' => 'dhow-cruise-catamaran-cruise-dinner-dubai',
+        'dhow-cruise-dubai' => 'dhow-cruise-catamaran-cruise-dinner-dubai',
+        'dhow-cruise' => 'dhow-cruise-catamaran-cruise-dinner-dubai',
+        'abu-dhabi-city-tour' => 'abu-dhabi-city-tour-from-dubai',
+        'abu-dhabi-tour' => 'abu-dhabi-city-tour-from-dubai',
+        'city-tour-dubai' => 'dubai-city-tour',
+        'dubai-city-tours' => 'dubai-city-tour',
+        'quad-bike-tour-dubai' => 'desert-safari-quad-biking-dubai',
+        'quad-biking-safari' => 'desert-safari-quad-biking-dubai',
+        'quad-biking-dubai' => 'desert-safari-quad-biking-dubai',
+        'quad-bike-dubai' => 'desert-safari-quad-biking-dubai',
+        'quad-biking' => 'desert-safari-quad-biking-dubai',
+        'buggy-tour-dubai' => 'dune-buggy-rental-dubai',
+        'dune-buggy-dubai' => 'dune-buggy-rental-dubai',
+        'dune-buggy-rental' => 'dune-buggy-rental-dubai',
+        'dune-buggies-dubai' => 'dune-buggy-rental-dubai',
+    ];
+
+    if (str_starts_with($slug, 'copy-of-')) {
+        $slug = 'dubai-city-tour';
+    } elseif (isset($canonicalMap[$slug])) {
+        $slug = $canonicalMap[$slug];
+    }
+
+    $prefix = $locale ? '/'.$locale : '';
+    $path = $slug === 'tours' ? $prefix.'/tours' : $prefix.'/'.$slug;
     $queryString = $request->getQueryString();
 
-    return redirect('/'.$slug.($queryString ? '?'.$queryString : ''), 301);
-});
+    return redirect($path.($queryString ? '?'.$queryString : ''), 301);
+};
+
+Route::get('/tour/{slug}', fn (Request $request, string $slug) => $resolveLegacyTourRedirect($request, $slug));
+Route::get('/tours/{slug}', fn (Request $request, string $slug) => $resolveLegacyTourRedirect($request, $slug));
+Route::redirect('/morning-desert-safari', '/morning-desert-safari-dubai', 301);
+Route::redirect('/overnight-desert-safari', '/overnight-desert-safari-dubai', 301);
+Route::redirect('/evening-desert-safari', '/evening-desert-safari-dubai', 301);
+Route::redirect('/copy-of-dubai-city-tour-1', '/dubai-city-tour', 301);
 Route::redirect('/blogs', '/blog', 301);
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/feed.xml', [BlogController::class, 'feed'])->name('blog.feed');
@@ -489,7 +541,7 @@ Route::get('/en/{any}', fn (string $any) => redirect('/'.ltrim($any, '/\\'), 301
 // ── Multi-Language Localized Route Group (Non-Default Locales, e.g. /ar) ─────
 Route::prefix('{locale}')
     ->where(['locale' => '^(?!admin|api|ajax|storage|images|css|js|favicon\.ico|en(?:/|$))[a-z]{2}(-[a-z]{2})?$'])
-    ->group(function () {
+    ->group(function () use ($resolveLegacyTourRedirect) {
         Route::get('/', [HomeController::class, 'index'])->name('locale.home');
         Route::get('/gallery', [GalleryController::class, 'index'])->name('locale.gallery.index');
         Route::get('/about', [PageController::class, 'about'])->name('locale.about');
@@ -511,11 +563,12 @@ Route::prefix('{locale}')
 
         // Tours & search
         Route::get('/tours', [TourController::class, 'index'])->name('locale.tours.index');
-        Route::get('/tours/{slug}', function (Request $request, string $locale, string $slug) {
-            $queryString = $request->getQueryString();
-
-            return redirect('/'.$locale.'/'.$slug.($queryString ? '?'.$queryString : ''), 301);
-        });
+        Route::get('/tour/{slug}', fn (Request $request, string $locale, string $slug) => $resolveLegacyTourRedirect($request, $slug, $locale));
+        Route::get('/tours/{slug}', fn (Request $request, string $locale, string $slug) => $resolveLegacyTourRedirect($request, $slug, $locale));
+        Route::get('/morning-desert-safari', fn (Request $request, string $locale) => $resolveLegacyTourRedirect($request, 'morning-desert-safari-dubai', $locale));
+        Route::get('/overnight-desert-safari', fn (Request $request, string $locale) => $resolveLegacyTourRedirect($request, 'overnight-desert-safari-dubai', $locale));
+        Route::get('/evening-desert-safari', fn (Request $request, string $locale) => $resolveLegacyTourRedirect($request, 'evening-desert-safari-dubai', $locale));
+        Route::get('/copy-of-dubai-city-tour-1', fn (Request $request, string $locale) => $resolveLegacyTourRedirect($request, 'dubai-city-tour', $locale));
         Route::get('/search', [TourController::class, 'search'])->name('locale.tours.search');
         Route::get('/search/live', [TourController::class, 'liveSearch'])->name('locale.tours.search.live');
         Route::get('/build-your-own-safari', [TourController::class, 'customizer'])->name('locale.tours.customizer');

@@ -76,6 +76,10 @@ class TourController extends Controller
 
         // Handle legacy tour & policy slug redirects across all locales (301 Permanent)
         $legacySlugRedirects = [
+            'morning-desert-safari' => fn () => localized_route('tours.show', 'morning-desert-safari-dubai'),
+            'overnight-desert-safari' => fn () => localized_route('tours.show', 'overnight-desert-safari-dubai'),
+            'evening-desert-safari' => fn () => localized_route('tours.show', 'evening-desert-safari-dubai'),
+            'copy-of-dubai-city-tour-1' => fn () => localized_route('tours.show', 'dubai-city-tour'),
             'luxury-vip-desert-safari-dubai' => fn () => localized_route('tours.show', 'evening-desert-safari-dubai'),
             'vip-desert-safari-dubai' => fn () => localized_route('tours.show', 'evening-desert-safari-dubai'),
             'desert-safari-dubai' => fn () => localized_route('tours.show', 'evening-desert-safari-dubai'),
@@ -128,7 +132,27 @@ class TourController extends Controller
         ];
 
         if (isset($legacySlugRedirects[$slug])) {
-            return redirect()->to($legacySlugRedirects[$slug](), 301);
+            $targetUrl = $legacySlugRedirects[$slug]();
+            $queryString = request()->getQueryString();
+            if ($queryString) {
+                $targetUrl .= (str_contains($targetUrl, '?') ? '&' : '?').$queryString;
+            }
+
+            return redirect()->to($targetUrl, 301);
+        }
+
+        // Support Wix/legacy imported slugs starting with 'copy-of-'
+        if (str_starts_with($slug, 'copy-of-')) {
+            $cleaned = preg_replace('/^copy-of-/', '', $slug);
+            $cleaned = preg_replace('/-\d+$/', '', $cleaned);
+            $matched = Tour::where('slug', $cleaned)->exists() ? $cleaned : 'dubai-city-tour';
+            $targetUrl = localized_route('tours.show', $matched);
+            $queryString = request()->getQueryString();
+            if ($queryString) {
+                $targetUrl .= (str_contains($targetUrl, '?') ? '&' : '?').$queryString;
+            }
+
+            return redirect()->to($targetUrl, 301);
         }
 
         $query = Tour::where('slug', $slug)
