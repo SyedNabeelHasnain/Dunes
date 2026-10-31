@@ -301,28 +301,28 @@
                     <div class="w-12 h-12 rounded-xl bg-amber-500/15 text-primary flex items-center justify-center text-xl mb-4">
                         <i class="bi bi-building"></i>
                     </div>
-                    <h3 class="font-bold text-white text-base mb-1.5">Direct Door-to-Door</h3>
+                    <h3 class="font-bold text-white text-base mb-1.5">{{ __('ui.location_hubs.direct_doorstep_title') }}</h3>
                     <p class="text-slate-400 text-xs leading-relaxed">We pick you up directly from your hotel lobby, Airbnb apartment tower, or private villa anywhere in {{ $locationData['district'] }}.</p>
                 </div>
                 <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-6 transition-all hover:-translate-y-1 hover:border-amber-500/40 hover:shadow-xl">
                     <div class="w-12 h-12 rounded-xl bg-amber-500/15 text-primary flex items-center justify-center text-xl mb-4">
                         <i class="bi bi-whatsapp"></i>
                     </div>
-                    <h3 class="font-bold text-white text-base mb-1.5">WhatsApp Coordination</h3>
+                    <h3 class="font-bold text-white text-base mb-1.5">{{ __('ui.location_hubs.whatsapp_coord_title') }}</h3>
                     <p class="text-slate-400 text-xs leading-relaxed">Receive a live WhatsApp dispatch message with your captain's name, phone number, and exact vehicle ETA 30 minutes before pickup.</p>
                 </div>
                 <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-6 transition-all hover:-translate-y-1 hover:border-amber-500/40 hover:shadow-xl">
                     <div class="w-12 h-12 rounded-xl bg-amber-500/15 text-primary flex items-center justify-center text-xl mb-4">
                         <i class="bi bi-luggage"></i>
                     </div>
-                    <h3 class="font-bold text-white text-base mb-1.5">Luggage Friendly</h3>
+                    <h3 class="font-bold text-white text-base mb-1.5">{{ __('ui.location_hubs.luggage_friendly_title') }}</h3>
                     <p class="text-slate-400 text-xs leading-relaxed">Checking out today? Store your travel bags safely in our secure vehicle trunk during the safari. Drop-off at DXB airport also available.</p>
                 </div>
                 <div class="bg-slate-800/80 border border-white/10 rounded-2xl p-6 transition-all hover:-translate-y-1 hover:border-amber-500/40 hover:shadow-xl">
                     <div class="w-12 h-12 rounded-xl bg-amber-500/15 text-primary flex items-center justify-center text-xl mb-4">
                         <i class="bi bi-shield-check"></i>
                     </div>
-                    <h3 class="font-bold text-white text-base mb-1.5">DTCM Certified Fleet</h3>
+                    <h3 class="font-bold text-white text-base mb-1.5">{{ __('ui.location_hubs.dtcm_certified_title') }}</h3>
                     <p class="text-slate-400 text-xs leading-relaxed">Full roll-cage protected Toyota Land Cruisers with comprehensive passenger insurance and expert licensed desert drivers.</p>
                 </div>
             </div>
@@ -331,7 +331,7 @@
             <div class="p-5 sm:p-6 rounded-2xl bg-slate-800/60 border border-white/10 flex flex-col md:flex-row items-start md:items-center gap-4">
                 <div class="md:w-1/3">
                     <h4 class="font-bold text-white text-sm sm:text-base flex items-center gap-2 mb-0.5">
-                        <i class="bi bi-pin-map text-amber-400"></i> Prime Landmarks Covered:
+                        <i class="bi bi-pin-map text-amber-400"></i> {{ __('ui.location_hubs.prime_landmarks') }}
                     </h4>
                     <span class="text-slate-400 text-xs">Any hotel, resort, or tower across {{ $locationData['district'] }}</span>
                 </div>
@@ -342,7 +342,7 @@
                         </span>
                     @endforeach
                     <span class="inline-flex items-center gap-1.5 bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs px-3 py-1 rounded-full font-semibold">
-                        + All Private Airbnbs & Villas
+                        {{ __('ui.location_hubs.all_private_airbnbs') }}
                     </span>
                 </div>
             </div>
@@ -354,13 +354,13 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-wrap items-end justify-between gap-4 mb-10">
                 <div>
-                    <span class="inline-block bg-amber-400 text-slate-950 text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full mb-2">Verified Packages</span>
+                    <span class="inline-block bg-amber-400 text-slate-950 text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full mb-2">{{ __('ui.location_hubs.verified_packages') }}</span>
                     <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-1">Desert Safaris Available from {{ $locationData['name'] }}</h2>
                     <p class="text-slate-400 text-sm">Choose your preferred experience level. All packages include direct doorstep transfers.</p>
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="inline-flex items-center gap-1.5 bg-slate-900 border border-slate-700 text-slate-300 text-xs px-3.5 py-1.5 rounded-full font-medium">
-                        <i class="bi bi-shield-lock text-emerald-400"></i> Best Price Guarantee
+                        <i class="bi bi-shield-lock text-emerald-400"></i> {{ __('ui.location_hubs.best_price_guarantee') }}
                     </span>
                 </div>
             </div>
@@ -459,7 +459,7 @@
     <section class="py-12 bg-slate-950/70 border-t border-white/5">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-2xl mx-auto mb-10">
-                <span class="inline-block bg-amber-400 text-slate-950 text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full mb-2">Schedule Matrix</span>
+                <span class="inline-block bg-amber-400 text-slate-950 text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full mb-2">{{ __('ui.location_hubs.schedule_matrix_badge') }}</span>
                 <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-2">Safari Timings & Schedule from {{ $locationData['name'] }}</h2>
                 <p class="text-slate-400 text-sm">Pickup and return windows vary by experience. Review exact operational schedules below:</p>
             </div>
@@ -478,21 +478,21 @@
                         <p class="text-slate-400 text-xs leading-relaxed mb-4">Ideal for early risers and cruise guests wanting cooler desert air before midday city plans.</p>
                         <div class="space-y-2 border-t border-white/10 pt-3 text-xs">
                             <div class="flex items-center justify-between">
-                                <span class="text-slate-400">Doorstep Pickup:</span>
+                                <span class="text-slate-400">{{ __('ui.location_hubs.doorstep_pickup') }}</span>
                                 <span class="text-amber-400 font-bold">{{ $locationData['schedules']['morning']['pickup'] ?? '07:00 AM – 07:30 AM' }}</span>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="text-slate-400">Return Drop-off:</span>
+                                <span class="text-slate-400">{{ __('ui.location_hubs.return_dropoff') }}</span>
                                 <span class="text-white font-bold">{{ $locationData['schedules']['morning']['return'] ?? '10:30 AM – 11:00 AM' }}</span>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="text-slate-400">Starting Price:</span>
+                                <span class="text-slate-400">{{ __('ui.location_hubs.starting_price') }}</span>
                                 <span class="text-emerald-400 font-bold">AED 140 / person</span>
                             </div>
                         </div>
                     </div>
                     <a href="#safari-packages" class="mt-4 block text-center bg-white/5 hover:bg-amber-400 hover:text-slate-950 text-slate-200 text-xs font-bold py-2 rounded-xl border border-white/10 transition-colors">
-                        Select Morning Safari
+                        {{ __('ui.location_hubs.select_morning') }}
                     </a>
                 </div>
 
@@ -510,21 +510,21 @@
                         <p class="text-slate-400 text-xs leading-relaxed mb-4">The signature Dubai experience: red dunes bashing, sunset photos, 5★ BBQ feast & 3 live shows.</p>
                         <div class="space-y-2 border-t border-white/10 pt-3 text-xs">
                             <div class="flex items-center justify-between">
-                                <span class="text-slate-400">Doorstep Pickup:</span>
+                                <span class="text-slate-400">{{ __('ui.location_hubs.doorstep_pickup') }}</span>
                                 <span class="text-amber-400 font-bold">{{ $locationData['schedules']['evening']['pickup'] ?? $locationData['pickup_window'] }}</span>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="text-slate-400">Return Drop-off:</span>
+                                <span class="text-slate-400">{{ __('ui.location_hubs.return_dropoff') }}</span>
                                 <span class="text-white font-bold">{{ $locationData['schedules']['evening']['return'] ?? $locationData['return_time'] }}</span>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="text-slate-400">Starting Price:</span>
+                                <span class="text-slate-400">{{ __('ui.location_hubs.starting_price') }}</span>
                                 <span class="text-emerald-400 font-bold">AED 79 / person</span>
                             </div>
                         </div>
                     </div>
                     <a href="#safari-packages" class="mt-4 block text-center bg-primary hover:bg-amber-300 text-slate-950 text-xs font-bold py-2 rounded-xl transition-colors">
-                        Select Evening Safari
+                        {{ __('ui.location_hubs.select_evening') }}
                     </a>
                 </div>
 
@@ -541,21 +541,21 @@
                         <p class="text-slate-400 text-xs leading-relaxed mb-4">Evening safari + sleeping in private Bedouin tents under the stars, campfire & warm breakfast.</p>
                         <div class="space-y-2 border-t border-white/10 pt-3 text-xs">
                             <div class="flex items-center justify-between">
-                                <span class="text-slate-400">Doorstep Pickup:</span>
+                                <span class="text-slate-400">{{ __('ui.location_hubs.doorstep_pickup') }}</span>
                                 <span class="text-amber-400 font-bold">{{ $locationData['schedules']['overnight']['pickup'] ?? '02:45 PM – 03:15 PM' }}</span>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="text-slate-400">Return Drop-off:</span>
+                                <span class="text-slate-400">{{ __('ui.location_hubs.return_dropoff') }}</span>
                                 <span class="text-indigo-300 font-bold">{{ $locationData['schedules']['overnight']['return'] ?? '06:30 AM – 07:00 AM (Next Day)' }}</span>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="text-slate-400">Starting Price:</span>
+                                <span class="text-slate-400">{{ __('ui.location_hubs.starting_price') }}</span>
                                 <span class="text-emerald-400 font-bold">AED 399 / person</span>
                             </div>
                         </div>
                     </div>
                     <a href="#safari-packages" class="mt-4 block text-center bg-white/5 hover:bg-amber-400 hover:text-slate-950 text-slate-200 text-xs font-bold py-2 rounded-xl border border-white/10 transition-colors">
-                        Select Overnight Safari
+                        {{ __('ui.location_hubs.select_overnight') }}
                     </a>
                 </div>
 
@@ -572,15 +572,15 @@
                         <p class="text-slate-400 text-xs leading-relaxed mb-4">Earlier departure to enjoy 30-60 min daylight quad bike or Can-Am buggy track driving before evening camp.</p>
                         <div class="space-y-2 border-t border-white/10 pt-3 text-xs">
                             <div class="flex items-center justify-between">
-                                <span class="text-slate-400">Doorstep Pickup:</span>
+                                <span class="text-slate-400">{{ __('ui.location_hubs.doorstep_pickup') }}</span>
                                 <span class="text-amber-400 font-bold">{{ $locationData['schedules']['quad_buggy']['pickup'] ?? '02:00 PM – 02:30 PM' }}</span>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="text-slate-400">Return Drop-off:</span>
+                                <span class="text-slate-400">{{ __('ui.location_hubs.return_dropoff') }}</span>
                                 <span class="text-white font-bold">{{ $locationData['schedules']['quad_buggy']['return'] ?? '09:00 PM – 09:30 PM' }}</span>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="text-slate-400">Starting Price:</span>
+                                <span class="text-slate-400">{{ __('ui.location_hubs.starting_price') }}</span>
                                 <span class="text-emerald-400 font-bold">AED 199 / person</span>
                             </div>
                         </div>

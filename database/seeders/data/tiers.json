@@ -2,9 +2,27 @@
     {
         "id": 1,
         "slug": "classic",
-        "name": "Classic",
-        "display_name": "Classic",
-        "description": "Perfect for budget travelers",
+        "name": {
+            "en": "Classic",
+            "ar": "الكلاسيكية",
+            "ru": "Классический",
+            "es": "Clásico",
+            "it": "Classico"
+        },
+        "display_name": {
+            "en": "Classic",
+            "ar": "الباقة الكلاسيكية",
+            "ru": "Классический пакет",
+            "es": "Paquete Clásico",
+            "it": "Pacchetto Classico"
+        },
+        "description": {
+            "en": "Perfect for budget travelers",
+            "ar": "مثالية للمسافرين الباحثين عن أفضل قيمة وتجربة صحراوية كاملة.",
+            "ru": "Идеально для экономных путешественников: полный набор впечатлений по лучшей цене.",
+            "es": "Ideal para viajeros que buscan la mejor relación calidad-precio y la experiencia completa.",
+            "it": "Ideale per viaggiatori attenti al budget: l'esperienza completa al miglior prezzo."
+        },
         "guest_count": 1,
         "icon": "star",
         "badge": null,
@@ -16,9 +34,27 @@
     {
         "id": 2,
         "slug": "premium",
-        "name": "Premium",
-        "display_name": "Premium",
-        "description": "Most popular choice",
+        "name": {
+            "en": "Premium",
+            "ar": "الممتازة (بريميوم)",
+            "ru": "Премиум",
+            "es": "Premium",
+            "it": "Premium"
+        },
+        "display_name": {
+            "en": "Premium",
+            "ar": "الباقة الممتازة VIP",
+            "ru": "Премиум пакет VIP",
+            "es": "Paquete Premium VIP",
+            "it": "Pacchetto Premium VIP"
+        },
+        "description": {
+            "en": "Most popular choice",
+            "ar": "الخيار الأكثر شعبية وطلباً مع خدمات وترقيات إضافية مميزة.",
+            "ru": "Самый популярный выбор с дополнительным комфортом и эксклюзивными опциями.",
+            "es": "La opción más popular con mayor comodidad y servicios exclusivos.",
+            "it": "La scelta più richiesta con comfort extra e servizi esclusivi."
+        },
         "guest_count": 1,
         "icon": "star",
         "badge": null,
@@ -30,9 +66,27 @@
     {
         "id": 4,
         "slug": "morning-desert-safari-private",
-        "name": "Private",
-        "display_name": "Private",
-        "description": "Land Cruiser \/ Nissan petrol - Latest Model",
+        "name": {
+            "en": "Private",
+            "ar": "سيارة خاصة",
+            "ru": "Приватный джип",
+            "es": "Vehículo Privado",
+            "it": "Veicolo Privato"
+        },
+        "display_name": {
+            "en": "Private",
+            "ar": "باقة الجيب الخاص (لاند كروزر \/ نيسان باترول)",
+            "ru": "Приватный тур (Land Cruiser \/ Nissan Patrol)",
+            "es": "Tour Privado (Land Cruiser \/ Nissan Patrol)",
+            "it": "Tour Privato (Land Cruiser \/ Nissan Patrol)"
+        },
+        "description": {
+            "en": "Land Cruiser \/ Nissan petrol - Latest Model",
+            "ar": "سيارة لاند كروزر أو نيسان باترول حصرية لمجموعتك فقط — أحدث موديل.",
+            "ru": "Эксклюзивный внедорожник Land Cruiser или Nissan Patrol новейшей модели только для вашей компании.",
+            "es": "Vehículo exclusivo Land Cruiser o Nissan Patrol último modelo solo para tu grupo.",
+            "it": "Fuoristrada esclusivo Land Cruiser o Nissan Patrol ultimo modello riservato al tuo gruppo."
+        },
         "guest_count": 6,
         "icon": "star",
         "badge": null,
@@ -44,9 +98,27 @@
     {
         "id": 5,
         "slug": "overnight-desert-safari-premium-2-adults",
-        "name": "Premium 2 Adults",
-        "display_name": "Premium 2 Adults",
-        "description": "1 tent (2 adults, 1 child)",
+        "name": {
+            "en": "Premium 2 Adults",
+            "ar": "بريميوم شخصين بالغين",
+            "ru": "Премиум на 2 взрослых",
+            "es": "Premium 2 Adultos",
+            "it": "Premium 2 Adulti"
+        },
+        "display_name": {
+            "en": "Premium 2 Adults",
+            "ar": "خيمة بريميوم (شخصين بالغين + طفل)",
+            "ru": "Премиум шатер (2 взрослых + 1 ребенок)",
+            "es": "Tienda Premium (2 adultos + 1 niño)",
+            "it": "Tenda Premium (2 adulti + 1 bambino)"
+        },
+        "description": {
+            "en": "1 tent (2 adults, 1 child)",
+            "ar": "خيمة بدوية مجهزة لشخصين بالغين مع طفل واحد تشمل العشاء والإفطار.",
+            "ru": "1 отдельный шатер для 2 взрослых и 1 ребенка с ужином и утренним завтраком.",
+            "es": "1 tienda beduina privada para 2 adultos y 1 niño, incluye cena y desayuno.",
+            "it": "1 tenda privata per 2 adulti e 1 bambino, include cena e colazione all'alba."
+        },
         "guest_count": 2,
         "icon": "star",
         "badge": null,
@@ -58,9 +130,27 @@
     {
         "id": 6,
         "slug": "overnight-desert-safari-premium-4-adults",
-        "name": "Premium 4 Adults",
-        "display_name": "Premium 4 Adults",
-        "description": "2 tents (for 4 adults, 2 children)",
+        "name": {
+            "en": "Premium 4 Adults",
+            "ar": "بريميوم 4 أشخاص بالغين",
+            "ru": "Премиум на 4 взрослых",
+            "es": "Premium 4 Adultos",
+            "it": "Premium 4 Adulti"
+        },
+        "display_name": {
+            "en": "Premium 4 Adults",
+            "ar": "خيمتان بريميوم (4 أشخاص بالغين + طفلين)",
+            "ru": "Премиум шатры (4 взрослых + 2 детей)",
+            "es": "Tiendas Premium (4 adultos + 2 niños)",
+            "it": "Tende Premium (4 adulti + 2 bambini)"
+        },
+        "description": {
+            "en": "2 tents (for 4 adults, 2 children)",
+            "ar": "خيمتان مجهزتان بالكامل لـ 4 أشخاص بالغين وطفلين مع كامل الوجبات والأنشطة.",
+            "ru": "2 отдельных комфортных шатра для 4 взрослых и 2 детей со всеми включенными услугами.",
+            "es": "2 tiendas privadas para 4 adultos y 2 niños con todas las comidas y actividades incluidas.",
+            "it": "2 tende private per 4 adulti e 2 bambini con tutti i servizi e i pasti inclusi."
+        },
         "guest_count": 4,
         "icon": "star",
         "badge": null,
@@ -72,9 +162,27 @@
     {
         "id": 7,
         "slug": "overnight-desert-safari-premium-6-adults",
-        "name": "Premium 6 Adults",
-        "display_name": "Premium 6 Adults",
-        "description": "3 tents (for 6 adults, 3 children)",
+        "name": {
+            "en": "Premium 6 Adults",
+            "ar": "بريميوم 6 أشخاص بالغين",
+            "ru": "Премиум на 6 взрослых",
+            "es": "Premium 6 Adultos",
+            "it": "Premium 6 Adulti"
+        },
+        "display_name": {
+            "en": "Premium 6 Adults",
+            "ar": "3 خيام بريميوم (6 أشخاص بالغين + 3 أطفال)",
+            "ru": "Премиум шатры (6 взрослых + 3 детей)",
+            "es": "Tiendas Premium (6 adultos + 3 niños)",
+            "it": "Tende Premium (6 adulti + 3 bambini)"
+        },
+        "description": {
+            "en": "3 tents (for 6 adults, 3 children)",
+            "ar": "3 خيام بدوية مجهزة لـ 6 أشخاص بالغين و3 أطفال، مثالية للعائلات والمجموعات.",
+            "ru": "3 отдельных комфортных шатра для 6 взрослых и 3 детей — идеальный выбор для больших семей и групп.",
+            "es": "3 tiendas privadas para 6 adultos y 3 niños, ideal para familias numerosas y grupos de amigos.",
+            "it": "3 tende private per 6 adulti e 3 bambini, ideale per famiglie numerose e gruppi."
+        },
         "guest_count": 6,
         "icon": "star",
         "badge": null,
@@ -86,9 +194,27 @@
     {
         "id": 8,
         "slug": "dhow-cruise-al-jaddaf",
-        "name": "Dhow (Al-Jaddaf)",
-        "display_name": "Dhow (Al-Jaddaf)",
-        "description": "Dhow Cruise (Al Jaddaf)",
+        "name": {
+            "en": "Dhow (Al-Jaddaf)",
+            "ar": "سفينة الداو (الجداف)",
+            "ru": "Круиз на дау (Аль-Джаддаф)",
+            "es": "Dhow (Al Jaddaf)",
+            "it": "Dhow (Al Jaddaf)"
+        },
+        "display_name": {
+            "en": "Dhow (Al-Jaddaf)",
+            "ar": "رحلة عشاء الداو - قناة الجداف التاريخية",
+            "ru": "Круиз на дау с ужином — канал Аль-Джаддаф",
+            "es": "Crucero en Dhow con Cena — Al Jaddaf",
+            "it": "Crociera in Dhow con Cena — Al Jaddaf"
+        },
+        "description": {
+            "en": "Dhow Cruise (Al Jaddaf)",
+            "ar": "رحلة عشاء كلاسيكية بسفينة الداو الخشبية في قناة الجداف وخور دبي.",
+            "ru": "Классический круиз на деревянной лодке дау с ужином в заливе Аль-Джаддаф.",
+            "es": "Crucero tradicional en dhow de madera con cena buffet en el canal de Al Jaddaf.",
+            "it": "Crociera classica in dhow di legno con cena a buffet nel canale di Al Jaddaf."
+        },
         "icon": "star",
         "badge": null,
         "color": null,
@@ -99,9 +225,27 @@
     {
         "id": 9,
         "slug": "dhow-cruise-marina",
-        "name": "Dhow (Dubai Marina)",
-        "display_name": "Dhow (Dubai Marina)",
-        "description": "Dhow Cruise (Dubai Marina)",
+        "name": {
+            "en": "Dhow (Dubai Marina)",
+            "ar": "سفينة الداو (دبي مارينا)",
+            "ru": "Круиз на дау (Дубай Марина)",
+            "es": "Dhow (Dubai Marina)",
+            "it": "Dhow (Dubai Marina)"
+        },
+        "display_name": {
+            "en": "Dhow (Dubai Marina)",
+            "ar": "رحلة عشاء الداو - دبي مارينا الفاخرة",
+            "ru": "Круиз на дау с ужином — Дубай Марина",
+            "es": "Crucero en Dhow con Cena — Dubai Marina",
+            "it": "Crociera in Dhow con Cena — Dubai Marina"
+        },
+        "description": {
+            "en": "Dhow Cruise (Dubai Marina)",
+            "ar": "رحلة عشاء مميزة في دبي مارينا بين ناطحات السحاب المضاءة وبوفيه عالمي 5 نجوم.",
+            "ru": "Престижный круиз на дау среди сияющих небоскребов Дубай Марины с ужином 5 звезд.",
+            "es": "Crucero exclusivo en dhow por Dubai Marina entre rascacielos iluminados con cena 5 estrellas.",
+            "it": "Crociera esclusiva in dhow a Dubai Marina tra i grattacieli illuminati con buffet 5 stelle."
+        },
         "icon": "star",
         "badge": null,
         "color": null,
@@ -112,9 +256,27 @@
     {
         "id": 10,
         "slug": "catamaran-cruise-dubai-marina",
-        "name": "Catamaran (Dubai Marina)",
-        "display_name": "Catamaran (Dubai Marina)",
-        "description": "Catamaran Cruise (Dubai Marina)",
+        "name": {
+            "en": "Catamaran (Dubai Marina)",
+            "ar": "كاتاماران زجاجي (دبي مارينا)",
+            "ru": "Катамаран (Дубай Марина)",
+            "es": "Catamarán (Dubai Marina)",
+            "it": "Catamarano (Dubai Marina)"
+        },
+        "display_name": {
+            "en": "Catamaran (Dubai Marina)",
+            "ar": "رحلة عشاء الكاتاماران الفاخر - دبي مارينا",
+            "ru": "Премиум круиз на катамаране — Дубай Марина",
+            "es": "Crucero Premium en Catamarán — Dubai Marina",
+            "it": "Crociera Premium in Catamarano — Dubai Marina"
+        },
+        "description": {
+            "en": "Catamaran Cruise (Dubai Marina)",
+            "ar": "أرقى رحلة عشاء على متن يخت كاتاماران زجاجي عصري في دبي مارينا وعين دبي.",
+            "ru": "Современный стеклянный катамаран с панорамными видами на Дубай Марину и колесо Ain Dubai.",
+            "es": "Crucero de lujo en moderno catamarán acristalado con vistas panorámicas de Dubai Marina y Ain Dubai.",
+            "it": "Lussuoso catamarano panoramico con vista mozzafiato su Dubai Marina e la ruota Ain Dubai."
+        },
         "icon": "star",
         "badge": null,
         "color": null,
@@ -125,9 +287,27 @@
     {
         "id": 11,
         "slug": "dubai-city-tour-half-day",
-        "name": "Half Day Dubai City Tour",
-        "display_name": "Half Day Dubai City Tour",
-        "description": "9:00 A.M. to 1:00 P.M.",
+        "name": {
+            "en": "Half Day Dubai City Tour",
+            "ar": "جولة دبي نصف يوم",
+            "ru": "Тур по Дубаю на полдня",
+            "es": "Tour por Dubái Medio Día",
+            "it": "Tour di Dubai Mezza Giornata"
+        },
+        "display_name": {
+            "en": "Half Day Dubai City Tour",
+            "ar": "جولة معالم دبي السياحية - نصف يوم (4 ساعات)",
+            "ru": "Обзорная экскурсия по Дубаю — полдня (4 часа)",
+            "es": "Tour Panorámico por Dubái — Medio Día (4 horas)",
+            "it": "Tour Panoramico di Dubai — Mezza Giornata (4 ore)"
+        },
+        "description": {
+            "en": "9:00 A.M. to 1:00 P.M.",
+            "ar": "من 9:00 صباحاً إلى 1:00 ظهراً تشمل أهم المعالم التراثية والحديثة.",
+            "ru": "С 9:00 до 13:00: главные исторические и современные достопримечательности города.",
+            "es": "De 9:00 a 13:00 h, visita los monumentos históricos y modernos imprescindibles.",
+            "it": "Dalle 9:00 alle 13:00, visita i monumenti storici e contemporanei imperdibili."
+        },
         "icon": "star",
         "badge": null,
         "color": null,
@@ -138,9 +318,27 @@
     {
         "id": 12,
         "slug": "dubai-city-tour-full-day",
-        "name": "Full Day Dubai City Tour",
-        "display_name": "Full Day Dubai City Tour",
-        "description": "9:00 A.M. to 5:00 P.M.",
+        "name": {
+            "en": "Full Day Dubai City Tour",
+            "ar": "جولة دبي يوم كامل",
+            "ru": "Тур по Дубаю на целый день",
+            "es": "Tour por Dubái Día Completo",
+            "it": "Tour di Dubai Giornata Intera"
+        },
+        "display_name": {
+            "en": "Full Day Dubai City Tour",
+            "ar": "جولة معالم دبي الشاملة - يوم كامل (8 ساعات)",
+            "ru": "Большая экскурсия по Дубаю — весь день (8 часов)",
+            "es": "Gran Tour por Dubái — Día Completo (8 horas)",
+            "it": "Gran Tour di Dubai — Giornata Intera (8 ore)"
+        },
+        "description": {
+            "en": "9:00 A.M. to 5:00 P.M.",
+            "ar": "من 9:00 صباحاً إلى 5:00 مساءً مع استكشاف معمق لأبرز معالم ومتاحف دبي.",
+            "ru": "С 9:00 до 17:00: глубокое знакомство со всеми знаковыми местами и районами Дубая.",
+            "es": "De 9:00 a 17:00 h, recorrido completo por todos los distritos y atractivos de Dubái.",
+            "it": "Dalle 9:00 alle 17:00, itinerario approfondito tra tutti i quartieri e le icone di Dubai."
+        },
         "icon": "star",
         "badge": null,
         "color": null,
@@ -151,9 +349,27 @@
     {
         "id": 13,
         "slug": "abu-dhabi-city-tour",
-        "name": "Abu Dhabi City Tour",
-        "display_name": "Abu Dhabi City Tour",
-        "description": "Abu Dhabi city tour from Dubai",
+        "name": {
+            "en": "Abu Dhabi City Tour",
+            "ar": "جولة أبوظبي من دبي",
+            "ru": "Экскурсия в Абу-Даби",
+            "es": "Excursión a Abu Dabi",
+            "it": "Tour di Abu Dhabi"
+        },
+        "display_name": {
+            "en": "Abu Dhabi City Tour",
+            "ar": "جولة العاصمة أبوظبي وجامع الشيخ زايد - يوم كامل",
+            "ru": "Тур в Абу-Даби и мечеть Шейха Зайда — целый день",
+            "es": "Tour a Abu Dabi y Gran Mezquita — Día Completo",
+            "it": "Tour di Abu Dhabi e Gran Moschea — Giornata Intera"
+        },
+        "description": {
+            "en": "Abu Dhabi city tour from Dubai",
+            "ar": "رحلة يوم كامل من دبي إلى العاصمة أبوظبي مع زيارة جامع الشيخ زايد وقصر الإمارات.",
+            "ru": "Однодневная поездка из Дубая в Абу-Даби с посещением Белой мечети и Emirates Palace.",
+            "es": "Excursión de día completo desde Dubái a Abu Dabi con visita a la Gran Mezquita y Emirates Palace.",
+            "it": "Escursione di una giornata da Dubai ad Abu Dhabi con ingresso alla Gran Moschea ed Emirates Palace."
+        },
         "icon": "star",
         "badge": null,
         "color": null,

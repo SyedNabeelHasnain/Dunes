@@ -2,10 +2,28 @@
     {
         "id": 1,
         "slug": "evening-desert-safari-dubai",
-        "name": "Evening Desert Safari Dubai",
+        "name": {
+            "en": "Evening Desert Safari Dubai",
+            "ar": "رحلة سفاري صحراوية مسائية في دبي",
+            "ru": "Вечернее сафари по пустыне в Дубае",
+            "es": "Safari Vespertino por el Desierto de Dubái",
+            "it": "Safari Serale nel Deserto di Dubai"
+        },
         "category": "desert-safari",
-        "short_desc": "Discover the magic of Dubai's golden desert on our top-rated evening safari. Enjoy heart-pumping dune bashing in a 4x4 Land Cruiser, glide down towering sand dunes on a sandboard, ride a camel across the amber landscape, and witness a spellbinding sunset from atop the red dunes. Your evening continues at an authentic Bedouin-style camp where a lavish BBQ dinner buffet, mesmerising Tanoura and belly dance performances, a thrilling fire show, henna art, shisha, and falcon encounters await beneath the Arabian stars.",
-        "full_desc": "The Evening Desert Safari in Dubai by Dunes Discovery Tourism is the city's most sought-after desert adventure — a six-hour journey from the urban skyline into the vast silence of the Arabian sands. Whether you are a first-time visitor or a seasoned Dubai explorer, this experience captures everything that makes the desert magical.\r\n\r\nYour adventure begins with a convenient pick-up from your Dubai hotel or residence in an air-conditioned Toyota Land Cruiser driven by a government-licensed safari captain. As the city gives way to rolling dunes, your driver pauses to adjust tyre pressure before launching into an adrenaline-charged dune bashing session — 30 to 45 minutes of exhilarating climbs, drops, and slides across the Lahbab Red Dunes.\r\n\r\nNext, a stop atop the highest dune offers a front-row seat to one of nature's finest shows — the Dubai desert sunset. Capture the shifting palette of gold, amber, and crimson before descending to the camp. Along the way, try your hand at sandboarding down the steep dune faces.\r\n\r\nAt the traditional desert camp, you are greeted with Arabic coffee, dates, and warm hospitality. Explore the camp at your leisure: take a short camel ride, get intricate henna designs painted on your hands, don a flowing Arabic costume for memorable photographs, pose with a majestic trained falcon, or relax at the shisha corner.\r\n\r\nAs twilight deepens, a generous BBQ dinner buffet is laid out — grilled meats, kebabs, fresh salads, hummus, Arabic bread, rice dishes, and desserts, with vegetarian options always available. Unlimited soft drinks, water, tea, and coffee flow throughout.\r\n\r\nThe night reaches its crescendo with live cultural entertainment: the hypnotic whirl of a Tanoura dancer, the grace of a belly dance performance, a jaw-dropping fire show, and rhythmic Dabka drumming — all under a canopy of desert stars.\r\n\r\nBy around 9 PM, you are comfortably on your way back to the city, carrying memories and photographs that will last a lifetime. This is the best evening desert safari in Dubai — rated 4.9 out of 5 by over 1,200 guests who chose Dunes Discovery Tourism.",
+        "short_desc": {
+            "en": "Discover the magic of Dubai's golden desert on our top-rated evening safari. Enjoy heart-pumping dune bashing in a 4x4 Land Cruiser, glide down towering sand dunes on a sandboard, ride a camel across the amber landscape, and witness a spellbinding sunset from atop the red dunes. Your evening continues at an authentic Bedouin-style camp where a lavish BBQ dinner buffet, mesmerising Tanoura and belly dance performances, a thrilling fire show, henna art, shisha, and falcon encounters await beneath the Arabian stars.",
+            "ar": "اكتشف سحر صحراء دبي الذهبية في رحلة السفاري المسائية الأكثر تقييماً. استمتع بتطعيس الكثبان الرملية المثير بسيارات لاند كروزر 4x4، وتزلج على الرمال الناعمة، واركب الجمال عبر المناظر الخلابة، وشاهد غروب الشمس الساحر من قمة الكثبان الحمراء. تستمر ليلتك في مخيم بدوي أصيل مع بوفيه عشاء شواء فاخر، وعروض رقص التنورة والرقص الشرقي وعرض النار المثير ونقش الحناء والشيشة وتجربة الصقور تحت سماء الصحراء المرصعة بالنجوم.",
+            "ru": "Откройте для себя магию золотой пустыни Дубая в нашем популярном вечернем сафари. Насладитесь захватывающим джиппингом по дюнам на Toyota Land Cruiser 4x4, сэндбордингом по крутым песчаным склонам, прогулкой на верблюдах и волшебным закатом над красными дюнами. Ваш вечер продолжится в аутентичном бедуинском лагере с роскошным ужином-барбекю, завораживающим танцем Танура, шоу огня, восточными танцами, росписью хной, кальяном и фотосессией с соколом под сиянием арабских звезд.",
+            "es": "Descubre la magia del desierto dorado de Dubái en nuestro safari vespertino mejor valorado. Disfruta de la emocionante conducción sobre dunas en un Land Cruiser 4x4, deslízate en sandboard por colinas doradas, monta en camello y contempla una impresionante puesta de sol sobre las dunas rojas. Tu velada continúa en un auténtico campamento beduino con cena buffet BBQ gourmet, espectáculos en vivo de danza Tanoura, danza oriental y espectáculo de fuego, tatuajes de henna, shisha y fotos con halcones bajo el cielo estrellado de Arabia.",
+            "it": "Scopri la magia del deserto dorato di Dubai con il nostro safari serale più apprezzato. Vivi l'emozione del dune bashing su un Land Cruiser 4x4, sfreccia sulle dune con il sandboard, cavalca un dromedario e ammira un tramonto spettacolare dall'alto delle dune rosse. La serata continua in un autentico campo beduino con ricco buffet barbecue, spettacoli dal vivo di danza Tanoura, danza del ventre e spettacolo col fuoco, tatuaggi all'henné, narghilè e incontro con i falchi sotto il cielo stellato d'Arabia."
+        },
+        "full_desc": {
+            "en": "The Evening Desert Safari in Dubai by Dunes Discovery Tourism is the city's most sought-after desert adventure — a six-hour journey from the urban skyline into the vast silence of the Arabian sands. Whether you are a first-time visitor or a seasoned Dubai explorer, this experience captures everything that makes the desert magical.\r\n\r\nYour adventure begins with a convenient pick-up from your Dubai hotel or residence in an air-conditioned Toyota Land Cruiser driven by a government-licensed safari captain. As the city gives way to rolling dunes, your driver pauses to adjust tyre pressure before launching into an adrenaline-charged dune bashing session — 30 to 45 minutes of exhilarating climbs, drops, and slides across the Lahbab Red Dunes.\r\n\r\nNext, a stop atop the highest dune offers a front-row seat to one of nature's finest shows — the Dubai desert sunset. Capture the shifting palette of gold, amber, and crimson before descending to the camp. Along the way, try your hand at sandboarding down the steep dune faces.\r\n\r\nAt the traditional desert camp, you are greeted with Arabic coffee, dates, and warm hospitality. Explore the camp at your leisure: take a short camel ride, get intricate henna designs painted on your hands, don a flowing Arabic costume for memorable photographs, pose with a majestic trained falcon, or relax at the shisha corner.\r\n\r\nAs twilight deepens, a generous BBQ dinner buffet is laid out — grilled meats, kebabs, fresh salads, hummus, Arabic bread, rice dishes, and desserts, with vegetarian options always available. Unlimited soft drinks, water, tea, and coffee flow throughout.\r\n\r\nThe night reaches its crescendo with live cultural entertainment: the hypnotic whirl of a Tanoura dancer, the grace of a belly dance performance, a jaw-dropping fire show, and rhythmic Dabka drumming — all under a canopy of desert stars.\r\n\r\nBy around 9 PM, you are comfortably on your way back to the city, carrying memories and photographs that will last a lifetime. This is the best evening desert safari in Dubai — rated 4.9 out of 5 by over 1,200 guests who chose Dunes Discovery Tourism.",
+            "ar": "رحلة سفاري صحراء دبي المسائية من شركة ديونز ديسكفري توريزم هي المغامرة الصحراوية الأكثر طلباً في دبي — رحلة مدتها ست ساعات تأخذك من صخب ناطحات السحاب إلى هدوء وسكون الرمال العربية الممتدة. سواء كانت هذه زيارتك الأولى لدبي أو كنت خبيراً بها، فإن هذه التجربة تجسد كل ما يجعل الصحراء ساحرة واستثنائية.\n\nتبدأ مغامرتك بخدمة توصيل مريحة من باب فندقك أو مكان إقامتك في دبي بسيارة تويوتا لاند كروزر حديثة ومكيفة يقودها مرشد وقائد سفاري معتمد ومرخص من دائرة الاقتصاد والسياحة (DET). ومع ابتعادك عن أبراج المدينة واقترابك من الكثبان الرملية المتموجة، يتوقف السائق لضبط ضغط الإطارات استعداداً لانطلاق جلسة تطعيس حماسية مدتها 30 إلى 45 دقيقة تصعد خلالها المنحدرات وتنزلق بسلاسة وأمان عبر كثبان لهباب الحمراء الشهيرة.\n\nبعد ذلك، نتوقف على أعلى قمة رملية لتشهد واحداً من أروع مشاهد الطبيعة: غروب الشمس في صحراء دبي، حيث تتداخل ألوان الذهب والعنبر والياقوت في الأفق لتمنحك فرصة لا تعوض لالتقاط صور تذكارية مذهلة. كما يمكنك تجربة التزلج على الرمال على المنحدرات الناعمة.\n\nعند الوصول إلى المخيم البدوي التقليدي، نستقبلك بالقهوة العربية الأصلية والتمور الفاخرة وحفاوة الضيافة الإماراتية الأصيلة. استمتع بأنشطة المخيم المتنوعة: جولة قصيرة على ظهور الجمال، نقش الحناء التراثي على الأيدي، ارتداء الأزياء الإماراتية التقليدية لالتقاط الصور، التقاط الصور مع صقر الصيد الملكي، أو الاسترخاء في ركن الشيشة.\n\nومع حلول الليل، يُقدم بوفيه عشاء شواء عالمي 5 نجوم غني بالمشويات الطازجة والكباب والمقبلات وسلطات الحمص والخبز العربي والأرز والحلويات الشرقية، مع توفر خيارات نباتية متكاملة ومشروبات ومياه وشاي وقهوة غير محدودة طوال الأمسية.\n\nتصل الأمسية إلى ذروتها مع العروض الفلكلورية الحية: دوران راقص التنورة المذهل، استعراضات الرقص الشرقي الراقية، عرض النار الحماسي الخاطف للأنفاس، وإيقاعات الدبكة التراثية تحت قبة السماء الصافية.\n\nبحلول الساعة 9:00 إلى 9:30 مساءً، نُعيدك بكل راحة وأمان إلى فندقك حاملاً معك أجمل الذكريات والصور — هذه هي أفضل رحلة سفاري مسائية في دبي بتقييم 4.9 من 5 لدى ضيوف ديونز ديسكفري توريزم.",
+            "ru": "Вечернее сафари по пустыне в Дубае от компании Dunes Discovery Tourism — это главное приключение в ОАЭ: шестичасовое путешествие из ультрасовременного мегаполиса в завораживающую тишину Аравийской пустыни. Будь то ваш первый визит в Дубай или вы уже бывалый путешественник, эта программа раскроет для вас всю магию и самобытность пустыни.\n\nВаше путешествие начинается с комфортного трансфера прямо от дверей вашего отеля или апартаментов на мощном кондиционированном внедорожнике Toyota Land Cruiser под управлением опытного сафари-капитана, лицензированного Департаментом экономики и туризма Дубая (DET). Когда городские башни уступают место песчаным просторам, капитан стравливает давление в шинах и начинает 30-45 минут захватывающего джип-тура (dune bashing) по знаменитым алым дюнам Лахбаб.\n\nДалее следует остановка на вершине самой высокой дюны, откуда открывается потрясающая панорама заката в пустыне. Вы сможете сделать незабываемые фотографии на фоне золотых и багровых дюн, а также попробовать сэндбординг — спуск на специальной доске по шелковистому песку.\n\nПо прибытии в традиционный бедуинский лагерь вас встретят свежим арабским кофе (gahwa), финиками и восточным гостеприимством. В лагере вас ждут традиционные развлечения: катание на верблюдах, утонченная роспись хной, примерка национальных арабских нарядов для памятных фото, фотосессия с ловчим соколом и зона отдыха с кальяном.\n\nС наступлением сумерек накрывается щедрый шведский стол с блюдами барбекю на углях: шашлыки, кебабы, свежие салаты, хумус, арабский хлеб, рис и восточные десерты (с богатым выбором вегетарианских блюд). Прохладительные напитки, минеральная вода, чай и кофе предоставляются без ограничений.\n\nКульминацией вечера станет яркая шоу-программа: гипнотическое вращение танцора Танура, грациозный танец живота, опасное огненное шоу и ритмичные арабские барабаны Дабка под открытым ночным небом.\n\nОколо 21:00-21:30 мы комфортно доставим вас обратно в отель. Это лучшее вечернее сафари в Дубае с рейтингом 4.9 из 5 по отзывам более 1200 довольных туристов Dunes Discovery Tourism.",
+            "es": "El Safari Vespertino por el Desierto de Dubái organizado por Dunes Discovery Tourism es la aventura desértica más solicitada de la ciudad: una experiencia inolvidable de 6 horas que te lleva desde los rascacielos urbanos hasta el majestuoso silencio de las arenas árabes. Ya sea tu primera vez en los Emiratos o un viajero experimentado, este tour reúne todo lo que hace mágico al desierto.\n\nTu aventura comienza con la recogida directa en el lobby de tu hotel o residencia en un Toyota Land Cruiser 4x4 con aire acondicionado, conducido por un guía safari profesional con licencia oficial del DET. Al adentrarse en el desierto, el conductor ajusta la presión de los neumáticos antes de iniciar una vibrante sesión de dune bashing de 30 a 45 minutos entre las imponentes dunas rojas de Lahbab.\n\nPosteriormente, nos detenemos en lo alto de la duna más alta para disfrutar de un atardecer desértico sublime con tonos dorados, ámbar y rojizos, perfecto para sesiones fotográficas y para deslizarse en sandboard sobre la arena virgen.\n\nAl llegar al campamento beduino tradicional, recibirás una cálida bienvenida con café árabe (gahwa), dátiles selectos y hospitalidad emiratí. En el campamento podrás disfrutar de paseos en camello, diseños de henna personalizados, trajes árabes tradicionales para fotos, interacción con halcones reales y una relajante zona de shisha.\n\nAl anochecer, se sirve un abundante buffet internacional con parrillada BBQ recién preparada, carnes a la brasa, brochetas, ensaladas frescas, hummus, pan árabe caliente, arroces y postres orientales, siempre con opciones vegetarianas y bebidas refrescantes ilimitadas.\n\nLa noche concluye con vibrantes actuaciones culturales en directo: el hipnótico giro de la danza Tanoura, la elegancia de la danza del vientre, un impresionante espectáculo de fuego y percusión Dabka tradicional bajo las estrellas.\n\nHacia las 21:30 horas regresaremos cómodamente a tu hotel con recuerdos para toda la vida. Este es el safari vespertino número 1 en Dubái, calificado con 4.9 sobre 5 por nuestros clientes.",
+            "it": "Il Safari Serale nel Deserto di Dubai organizzato da Dunes Discovery Tourism è l'avventura desertica più amata della città: un'esperienza completa di 6 ore che porta dai moderni grattacieli al fascino silenzioso delle dune arabe. Perfetto per coppie, famiglie e gruppi, racchiude l'autentica essenza degli Emirati.\n\nL'esperienza inizia con il prelievo direttamente dal tuo hotel o residenza a Dubai a bordo di un confortevole fuoristrada Toyota Land Cruiser 4x4 climatizzato, guidato da un autista certificato DET. All'arrivo alle grandi dune rosse di Lahbab, l'autista regola la pressione delle gomme e inizia un'emozionante sessione di dune bashing di 30-45 minuti tra salite ripide e discese spettacolari.\n\nCi fermiamo poi sulla cresta più alta per ammirare un tramonto mozzafiato che tinge le sabbie di tonalità dorate e scarlatte. Qui potrai scattare foto memorabili e cimentarti nel sandboarding sulle dune incontaminate.\n\nRaggiunto il tradizionale campo beduino, sarai accolto con caffè arabo (gahwa), datteri freschi e sincera ospitalità locale. Tra le attività incluse: breve passeggiata a dorso di cammello, eleganti decorazioni all'henné sulle mani, prova di abiti tradizionali emiratini per foto ricordo, incontro con falco addestrato e narghilè nell'apposita area relax.\n\nA cena viene allestito un ricco buffet barbecue con carni alla griglia, spiedini, insalate fresche, hummus, pane arabo caldo, primi piatti e dolci arabi, con abbondanti alternative vegetariane e bevande analcoliche illimitate.\n\nLa serata si accende con spettacoli folkloristici dal vivo: la danza rotante Tanoura, la suggestiva danza del ventre, lo spericolato fire show con le fiamme e la musica tradizionale Dabka sotto la volta stellata del deserto.\n\nIl rientro in hotel è previsto per le 21:30 circa. Con oltre 1.200 recensioni eccellenti e un punteggio di 4.9 su 5, questo è il safari serale di riferimento a Dubai."
+        },
         "duration": "6 Hours",
         "pickup_time": "2:30 PM - 3:00 PM",
         "dropoff_time": "9:00 PM - 9:30 PM",
@@ -22,19 +40,55 @@
         "is_featured": 1,
         "status": "active",
         "priority": 1,
-        "meta_title": "Evening Desert Safari Dubai 2026 | 4x4 Dune Bashing & BBQ | From AED 79",
-        "meta_desc": "🔥 #1 Rated Red Dunes Evening Desert Safari in Dubai. Dune Bashing (15-45 Mins by Tier), Camel Rides, Sandboarding, BBQ Buffet & 3 Live Shows. 4x4 Hotel Pickup. Reserve Direct!",
-        "meta_keywords": "evening desert safari dubai, desert safari dubai, dune bashing dubai, bbq dinner desert safari, evening safari dubai price, dubai desert tour, evening desert safari with dinner, best desert safari dubai, desert safari deals dubai, desert camp dubai",
+        "meta_title": {
+            "en": "Evening Desert Safari Dubai 2026 | 4x4 Dune Bashing & BBQ | From AED 79",
+            "ar": "رحلة سفاري صحراوية مسائية في دبي 2026 | تطعيس كُثبان 4x4 وعشاء مشاوي | ابتداءً من 79 درهم",
+            "ru": "Вечернее сафари по пустыне в Дубае 2026 | Джиппинг 4x4 и барбекю | от 79 AED",
+            "es": "Safari Vespertino por el Desierto de Dubái 2026 | Dune Bashing 4x4 y Barbacoa | Desde 79 AED",
+            "it": "Safari Serale nel Deserto di Dubai 2026 | Dune Bashing 4x4 e Barbecue | Da 79 AED"
+        },
+        "meta_desc": {
+            "en": "🔥 #1 Rated Red Dunes Evening Desert Safari in Dubai. Dune Bashing (15-45 Mins by Tier), Camel Rides, Sandboarding, BBQ Buffet & 3 Live Shows. 4x4 Hotel Pickup. Reserve Direct!",
+            "ar": "🔥 أفضل رحلة سفاري صحراوية مسائية في الكثبان الحمراء بدبي. تطعيس كثبان (15-45 دقيقة حسب الباقة)، ركوب الجمال، تزلج على الرمال، بوفيه مشاوي فاخر و3 عروض حية. توصيل فندقي بسيارات 4x4. احجز مباشرة!",
+            "ru": "🔥 Лучшее вечернее сафари по красным дюнам в Дубае. Джиппинг (15–45 мин), катание на верблюдах, сэндбординг, ужин-барбекю и 3 живых шоу. Трансфер из отеля на 4x4. Бронируйте напрямую!",
+            "es": "🔥 El mejor safari vespertino por las dunas rojas de Dubái. Conducción 4x4 (15-45 min), paseo en camello, sandboard, cena barbacoa y 3 shows en vivo. Recogida en hotel. ¡Reserva directa!",
+            "it": "🔥 Il safari serale #1 tra le dune rosse di Dubai. Dune bashing 4x4 (15-45 min), cammelli, sandboard, cena barbecue e 3 spettacoli dal vivo. Pick-up in hotel. Prenota direttamente!"
+        },
+        "meta_keywords": {
+            "en": "evening desert safari dubai, desert safari dubai, dune bashing dubai, bbq dinner desert safari, evening safari dubai price, dubai desert tour, evening desert safari with dinner, best desert safari dubai, desert safari deals dubai, desert camp dubai",
+            "ar": "سفاري صحراء دبي المسائي, سفاري دبي, تطعيس الكثبان دبي, عشاء شواء سفاري دبي, اسعار سفاري دبي, جولات صحراوية دبي, مخيم صحراوي دبي, افضل سفاري دبي",
+            "ru": "вечернее сафари в дубае, джип сафари дубай, джиппинг по дюнам дубай, ужин барбекю в пустыне дубай, цена сафари в дубае, экскурсии по пустыне дубай, лучший сафари дубай",
+            "es": "safari vespertino dubai, safari desierto dubai, dune bashing dubai, cena barbacoa desierto dubai, precio safari dubai, tour desierto dubai, mejor safari desierto dubai, campamento beduino dubai",
+            "it": "safari serale dubai, safari deserto dubai, dune bashing dubai, cena barbecue deserto dubai, costo safari dubai, escursioni deserto dubai, miglior safari dubai, campo beduino dubai"
+        },
         "created_at": "2026-01-13 11:36:20",
         "updated_at": "2026-08-09 04:00:00"
     },
     {
         "id": 2,
         "slug": "morning-desert-safari-dubai",
-        "name": "Morning Desert Safari Dubai",
+        "name": {
+            "en": "Morning Desert Safari Dubai",
+            "ar": "رحلة سفاري صحراوية صباحية في دبي",
+            "ru": "Утреннее сафари по пустыне в Дубае",
+            "es": "Safari Matutino por el Desierto de Dubái",
+            "it": "Safari Mattutino nel Deserto di Dubai"
+        },
         "category": "desert-safari",
-        "short_desc": "Begin your Dubai morning with an exhilarating desert escape. Our morning desert safari delivers heart-racing dune bashing across the red dunes, sandboarding down golden slopes, a peaceful camel ride, and stunning desert photography — all wrapped up by lunchtime so you have the rest of the day free to explore the city.",
-        "full_desc": "The Morning Desert Safari in Dubai is the perfect half-day adventure for early risers, families, and travellers with packed itineraries. In just four action-filled hours, Dunes Discovery Tourism takes you from the city into the pristine desert landscape bathed in soft morning light — the most comfortable and photogenic time to experience the sands.\r\n\r\nYour safari begins with pick-up between 8:00 AM and 8:30 AM from any Dubai hotel or residence in a powerful, air-conditioned 4x4 vehicle. As you leave the city, the scenery transforms from glass towers to rolling amber dunes within minutes.\r\n\r\nAt the desert entry, your driver prepares the vehicle for a pulse-quickening dune bashing adventure — 20 to 30 minutes of high-energy driving over dramatic crests and valleys. The cooler morning air makes this an incredibly comfortable and enjoyable ride compared to afternoon temperatures.\r\n\r\nAfter the dune drive, a photo stop atop a commanding dune lets you capture the pristine morning desert with its long shadows, untouched ripple patterns, and golden-hour light — a photographer's paradise. Try sandboarding down the steep faces for an extra rush of excitement.\r\n\r\nA short, relaxing camel ride follows, offering a traditional perspective on desert travel. You will also have the opportunity to photograph a trained falcon and enjoy complimentary Arabic coffee, dates, and refreshments.\r\n\r\nBy noon, you are back at your hotel with the entire afternoon and evening ahead of you — ideal for combining with other Dubai experiences. The morning desert safari is especially popular with families who prefer cooler conditions, photographers chasing the best natural light, and guests who want a thrilling desert experience without a late night.",
+        "short_desc": {
+            "en": "Begin your Dubai morning with an exhilarating desert escape. Our morning desert safari delivers heart-racing dune bashing across the red dunes, sandboarding down golden slopes, a peaceful camel ride, and stunning desert photography — all wrapped up by lunchtime so you have the rest of the day free to explore the city.",
+            "ar": "ابدأ صباحك في دبي بمغامرة صحراوية منعشة واستثنائية. تمنحك رحلة السفاري الصباحية تطعيساً حماسياً فوق الكثبان الحمراء، وتزلجاً على الرمال الذهبية، وجولة هادئة على ظهور الجمال، وفرصاً لا تعوض للتصوير الاحترافي — كل ذلك ينتهي قبل وقت الغداء لتستمتع بباقي يومك في استكشاف المدينة.",
+            "ru": "Начните свое утро в Дубае с освежающего приключения в пустыне. Наше утреннее сафари подарит вам динамичный джиппинг по красным дюнам, сэндбординг по песчаным склонам, спокойную прогулку на верблюдах и великолепные фотографии — программа завершается к полудню, оставляя остаток дня свободным для прогулок по городу.",
+            "es": "Comienza tu mañana en Dubái con una estimulante escapada al desierto. Nuestro safari matutino ofrece un vibrante dune bashing por las dunas rojas, sandboarding por laderas doradas, un relajante paseo en camello y espectaculares fotos del amanecer, regresando al mediodía para que aproveches el resto del día en la ciudad.",
+            "it": "Inizia la tua mattinata a Dubai con un'entusiasmante fuga nel deserto. Il nostro safari mattutino offre un dinamico dune bashing sulle dune rosse, discese in sandboard sui pendii dorati, una tranquilla passeggiata in cammello e magnifiche foto ricordo, rientrando entro pranzo con il resto della giornata libero per visitare la città."
+        },
+        "full_desc": {
+            "en": "The Morning Desert Safari in Dubai is the perfect half-day adventure for early risers, families, and travellers with packed itineraries. In just four action-filled hours, Dunes Discovery Tourism takes you from the city into the pristine desert landscape bathed in soft morning light — the most comfortable and photogenic time to experience the sands.\r\n\r\nYour safari begins with pick-up between 8:00 AM and 8:30 AM from any Dubai hotel or residence in a powerful, air-conditioned 4x4 vehicle. As you leave the city, the scenery transforms from glass towers to rolling amber dunes within minutes.\r\n\r\nAt the desert entry, your driver prepares the vehicle for a pulse-quickening dune bashing adventure — 20 to 30 minutes of high-energy driving over dramatic crests and valleys. The cooler morning air makes this an incredibly comfortable and enjoyable ride compared to afternoon temperatures.\r\n\r\nAfter the dune drive, a photo stop atop a commanding dune lets you capture the pristine morning desert with its long shadows, untouched ripple patterns, and golden-hour light — a photographer's paradise. Try sandboarding down the steep faces for an extra rush of excitement.\r\n\r\nA short, relaxing camel ride follows, offering a traditional perspective on desert travel. You will also have the opportunity to photograph a trained falcon and enjoy complimentary Arabic coffee, dates, and refreshments.\r\n\r\nBy noon, you are back at your hotel with the entire afternoon and evening ahead of you — ideal for combining with other Dubai experiences. The morning desert safari is especially popular with families who prefer cooler conditions, photographers chasing the best natural light, and guests who want a thrilling desert experience without a late night.",
+            "ar": "رحلة سفاري صحراء دبي الصباحية هي المغامرة المثالية لمدة نصف يوم للمستيقظين مبكراً والعائلات والمسافرين ذوي الجداول الزمنية الحافلة. في غضون أربع ساعات مليئة بالحيوية والنشاط، تأخذك ديونز ديسكفري توريزم من صخب المدينة إلى سكون الصحراء البكر المضاءة بنور الصباح الباكر — وهو الوقت الأكثر اعتدالاً وملاءمة لالتقاط أروع الصور التذكارية.\n\nيبدأ السفاري بخدمة توصيل من الساعة 7:00 إلى 7:30 صباحاً من أي فندق أو سكن في دبي بواسطة سيارة دفع رباعي 4x4 حديثة ومكيفة. في غضون دقائق معدودة، يتحول المشهد من الأبراج الشاهقة إلى كثبان رملية ساحرة متلألئة في ضوء الشمس الصباحي.\n\nعند مدخل الصحراء، يجهز السائق السيارة لجولة تطعيس مثيرة مدتها 20 إلى 30 دقيقة عبر منحدرات وتلال رمال لهباب الحمراء. الهواء الصباحي العليل يجعل هذه الجولة ممتعة ومنعشة للغاية مقارنة بأوقات الظهيرة.\n\nبعد التطعيس، نتوقف لالتقاط صور بانورامية خلابة تعكس روعة الصحراء بتموجاتها الرملية وظلالها الذهبية، تليها تجربة التزلج على الرمال السريعة.\n\nثم تستمتع بجولة قصيرة على ظهور الجمال لتجربة السفر الصحراوي التقليدي، والتقاط صور مع صقر الصيد وتناول القهوة العربية والتمور والمشروبات الباردة.\n\nنعود بك إلى فندقك في دبي بين الساعة 10:30 و11:00 صباحاً، تاركين لك بقية اليوم كاملاً للاستمتاع بأنشطتك السياحية الأخرى في دبي.",
+            "ru": "Утреннее сафари по пустыне в Дубае — это идеальное четырехчасовое приключение для тех, кто любит ранний подъем, семей с детьми и путешественников с плотным графиком. Dunes Discovery Tourism доставит вас из мегаполиса в первозданные песчаные просторы, озаренные мягким утренним светом — лучшее время для комфортного отдыха и ярких фотографий.\n\nВас заберут из отеля с 7:00 до 7:30 утра на комфортабельном кондиционированном внедорожнике 4x4. По прибытии к дюнам Лахбаб капитан начинает 20–30 минут драйвового джиппинга по живописным гребням дюн. Утренний прохладный воздух делает поездку легкой и комфортной.\n\nЗатем следует остановка для панорамных фотографий с длинными тенями на песчаных волнах, катание на сэндборде со склонов и катание на верблюдах. Гостям предлагается арабский кофе, финики, освежающая вода и возможность сфотографироваться с охотничьим соколом.\n\nВозвращение в отель к 10:30–11:00 утра оставляет весь день в вашем распоряжении.",
+            "es": "El Safari Matutino por el Desierto de Dubái es la aventura perfecta de medio día para madrugadores, familias y viajeros con agendas completas. En tan solo 4 horas llenas de acción, Dunes Discovery Tourism te lleva al desierto bañado por la suave luz de la mañana, la hora más fresca y fotogénica del día.\n\nRecogida entre las 7:00 y las 7:30 AM en tu hotel en un 4x4 climatizado. Al llegar a las dunas rojas de Lahbab, disfrutarás de 20 a 30 minutos de emocionante dune bashing con giros dinámicos en un entorno fresco y agradable.\n\nIncluye parada fotográfica panorámica, sandboarding sobre la arena dorada, breve paseo en camello, degustación de café árabe tradicional, dátiles y bebidas frías. Regreso puntual al hotel hacia las 10:30–11:00 AM.",
+            "it": "Il Safari Mattutino nel Deserto di Dubai è l'avventura ideale di mezza giornata per mattinieri, famiglie e viaggiatori con orari serrati. In circa 4 ore, Dunes Discovery Tourism ti porta nel cuore delle dune illuminate dalla fresca luce del mattino, nel momento più confortevole e panoramico della giornata.\n\nPrelievo in hotel tra le 7:00 e le 7:30 su moderno fuoristrada 4x4. Sessione di dune bashing di 20-30 minuti sulle rosse dune di Lahbab, seguita da sosta fotografica, sandboarding sulle creste sabbiose e breve giro a dorso di cammello.\n\nRinfresco con autentico caffè arabo, datteri e bevande fresche. Rientro comodo in hotel tra le 10:30 e le 11:00 del mattino."
+        },
         "duration": "4 Hours",
         "pickup_time": "7:00 AM - 7:30 AM",
         "dropoff_time": "10:30 AM - 11:00 AM",
@@ -51,19 +105,55 @@
         "is_featured": 0,
         "status": "active",
         "priority": 2,
-        "meta_title": "Morning Desert Safari Dubai 2026 | Morning Dune Bashing | From AED 140",
-        "meta_desc": "🌅 Best Morning Desert Safari in Dubai's Red Dunes. 25-30 Min High Dune Bashing, Sandboarding & Camel Rides. Crisp Morning Photography & 4x4 Pickup!",
-        "meta_keywords": "morning desert safari dubai, morning safari dubai, dubai desert morning tour, dune bashing morning, sandboarding dubai, morning quad bike dubai, half day desert safari dubai, desert safari morning price, camel ride morning dubai, dubai desert adventure morning",
+        "meta_title": {
+            "en": "Morning Desert Safari Dubai 2026 | Morning Dune Bashing | From AED 140",
+            "ar": "رحلة سفاري صحراوية صباحية في دبي 2026 | تطعيس كُثبان صباحي | ابتداءً من 140 درهم",
+            "ru": "Утреннее сафари по пустыне в Дубае 2026 | Утренний джиппинг по дюнам | от 140 AED",
+            "es": "Safari Matutino por el Desierto de Dubái 2026 | Dune Bashing Matutino | Desde 140 AED",
+            "it": "Safari Mattutino nel Deserto di Dubai 2026 | Dune Bashing Mattutino | Da 140 AED"
+        },
+        "meta_desc": {
+            "en": "🌅 Best Morning Desert Safari in Dubai's Red Dunes. 25-30 Min High Dune Bashing, Sandboarding & Camel Rides. Crisp Morning Photography & 4x4 Pickup!",
+            "ar": "🌅 أفضل رحلة سفاري صحراوية صباحية في الكثبان الحمراء بدبي. 25-30 دقيقة تطعيس كثبان عالية، تزلج رملي وركوب جمال. تصوير صباحي نقي وتوصيل 4x4!",
+            "ru": "🌅 Лучшее утреннее сафари по красным дюнам Дубая. 25–30 минут захватывающего джиппинга, сэндбординг, верблюды, идеальные фото на рассвете и трансфер на 4x4!",
+            "es": "🌅 El mejor safari matutino en las dunas rojas de Dubái. 25-30 min de dune bashing, sandboard y paseos en camello. Fotos matutinas espectaculares y recogida en 4x4.",
+            "it": "🌅 Il miglior safari mattutino tra le dune rosse di Dubai. 25-30 minuti di dune bashing, sandboarding e cammelli. Fotografie mattutine e pick-up 4x4!"
+        },
+        "meta_keywords": {
+            "en": "morning desert safari dubai, morning safari dubai, dubai desert morning tour, dune bashing morning, sandboarding dubai, morning quad bike dubai, half day desert safari dubai, desert safari morning price, camel ride morning dubai, dubai desert adventure morning",
+            "ar": "سفاري صحراء دبي الصباحي, سفاري صباحي دبي, تطعيس صباحي دبي, تزلج على الرمال دبي, ركوب الجمال صباحا دبي, جولة صحراوية صباحية دبي, اسعار سفاري صباحي دبي",
+            "ru": "утреннее сафари в дубае, джип сафари утром дубай, сэндбординг дубай, катание на верблюдах утром дубай, утренний джиппинг дубай, цена утреннего сафари дубай",
+            "es": "safari matutino dubai, safari manana dubai, dune bashing matutino dubai, sandboarding dubai, paseo en camello manana dubai, tour matinal desierto dubai, precio safari matutino dubai",
+            "it": "safari mattutino dubai, safari mattina dubai, dune bashing mattino dubai, sandboarding dubai, giro cammello mattino dubai, tour deserto mattutino dubai, prezzo safari mattina dubai"
+        },
         "created_at": "2026-01-13 11:36:20",
         "updated_at": "2026-08-09 04:00:00"
     },
     {
         "id": 3,
         "slug": "overnight-desert-safari-dubai",
-        "name": "Overnight Desert Safari Dubai",
+        "name": {
+            "en": "Overnight Desert Safari Dubai",
+            "ar": "رحلة سفاري صحراوية مع مبيت في دبي",
+            "ru": "Ночное сафари с ночевкой в пустыне Дубая",
+            "es": "Safari Nocturno con Acampada en el Desierto de Dubái",
+            "it": "Safari Notturno con Pernottamento nel Deserto di Dubai"
+        },
         "category": "desert-safari",
-        "short_desc": "Live the ultimate Arabian desert experience — from a blazing sunset to a golden sunrise. Our overnight safari combines every evening adventure with an unforgettable night sleeping under millions of stars in a traditional Bedouin camp, complete with campfire, stargazing, and a warm desert breakfast at dawn.",
-        "full_desc": "The Overnight Desert Safari in Dubai is the most immersive desert adventure Dunes Discovery Tourism offers — a sunset-to-sunrise journey that lets you truly feel the rhythm of the Arabian wilderness. If you have ever dreamed of sleeping beneath a sky full of stars with nothing but golden sand dunes around you, this is the experience.\r\n\r\nYour evening begins identically to our popular evening safari: a thrilling dune bashing session through the Lahbab Red Dunes, a breathtaking sunset photo stop, and arrival at a beautifully appointed desert camp. Enjoy camel rides, sandboarding, henna art, shisha, falcon photography, and don traditional Arabic dress for memorable photos.\r\n\r\nA generous BBQ dinner buffet is served under the open sky — grilled meats, kebabs, salads, rice, Arabic bread, and desserts with unlimited beverages. As the evening unfolds, be captivated by live entertainment: Tanoura dance, belly dance, fire show, and traditional drumming.\r\n\r\nAfter the shows, the camp settles into a quieter, more intimate atmosphere. Gather around the campfire, share stories, sip Arabic coffee, and watch the embers dance. As the last lights fade, look up — the desert night sky, free from city light pollution, reveals a breathtaking blanket of stars and constellations you may never have seen before.\r\n\r\nRetire to your traditional Bedouin tent with clean bedding and blankets. The profound silence of the desert, broken only by the occasional whisper of wind across the dunes, provides an unparalleled sense of peace.\r\n\r\nWake gently to the cool desert dawn. An optional early nature walk lets you discover animal tracks and desert flora in the fresh morning light, while a stunning sunrise over the dunes paints the sand in shades of peach and amber — a photographer's dream.\r\n\r\nA hearty Bedouin-style breakfast of eggs, Arabic bread, cheese, jam, honey, fresh fruits, tea, and Arabic coffee fuels you for the journey back. By mid-morning, you are returned to your Dubai hotel carrying a memory no city experience can match.",
+        "short_desc": {
+            "en": "Live the ultimate Arabian desert experience — from a blazing sunset to a golden sunrise. Our overnight safari combines every evening adventure with an unforgettable night sleeping under millions of stars in a traditional Bedouin camp, complete with campfire, stargazing, and a warm desert breakfast at dawn.",
+            "ar": "عش التجربة الصحراوية العربية الأسمى — من لهيب غروب الشمس إلى شروقها الذهبي الخلاب. يجمع سفاري المبيت كل إثارة السفاري المسائي مع ليلة ساحرة تحت ملايين النجوم في مخيم بدوي مجهز بالكامل، وحلقة نار سمر، وتأمل في السماء المرصعة بالنجوم، وإفطار صحراوي دافئ عند الفجر.",
+            "ru": "Проживите непревзойденный арабский опыт в пустыне — от пламенного заката до золотого рассвета. Наше ночное сафари сочетает всю программу вечерних приключений с незабываемой ночевкой под миллионами звезд в традиционном бедуинском лагере с вечерним костром, созерцанием ночного неба и теплым утренним завтраком на рассвете.",
+            "es": "Vive la experiencia definitiva en el desierto árabe: desde un vibrante atardecer hasta un amanecer dorado. Nuestro safari nocturno con acampada combina toda la aventura vespertina con una noche mágica durmiendo bajo millones de estrellas en un campamento beduino tradicional, con fogata nocturna, observación estelar y desayuno caliente al alba.",
+            "it": "Vivi l'esperienza araba per eccellenza nel deserto: da un tramonto infuocato a un'alba dorata spettacolare. Il nostro safari con pernottamento unisce tutte le emozioni del safari serale a una notte indimenticabile sotto milioni di stelle in una tradizionale tenda beduina, con falò serale, cielo stellato e colazione calda all'alba."
+        },
+        "full_desc": {
+            "en": "The Overnight Desert Safari in Dubai is the most immersive desert adventure Dunes Discovery Tourism offers — a sunset-to-sunrise journey that lets you truly feel the rhythm of the Arabian wilderness. If you have ever dreamed of sleeping beneath a sky full of stars with nothing but golden sand dunes around you, this is the experience.\r\n\r\nYour evening begins identically to our popular evening safari: a thrilling dune bashing session through the Lahbab Red Dunes, a breathtaking sunset photo stop, and arrival at a beautifully appointed desert camp. Enjoy camel rides, sandboarding, henna art, shisha, falcon photography, and don traditional Arabic dress for memorable photos.\r\n\r\nA generous BBQ dinner buffet is served under the open sky — grilled meats, kebabs, salads, rice, Arabic bread, and desserts with unlimited beverages. As the evening unfolds, be captivated by live entertainment: Tanoura dance, belly dance, fire show, and traditional drumming.\r\n\r\nAfter the shows, the camp settles into a quieter, more intimate atmosphere. Gather around the campfire, share stories, sip Arabic coffee, and watch the embers dance. As the last lights fade, look up — the desert night sky, free from city light pollution, reveals a breathtaking blanket of stars and constellations you may never have seen before.\r\n\r\nRetire to your traditional Bedouin tent with clean bedding and blankets. The profound silence of the desert, broken only by the occasional whisper of wind across the dunes, provides an unparalleled sense of peace.\r\n\r\nWake gently to the cool desert dawn. An optional early nature walk lets you discover animal tracks and desert flora in the fresh morning light, while a stunning sunrise over the dunes paints the sand in shades of peach and amber — a photographer's dream.\r\n\r\nA hearty Bedouin-style breakfast of eggs, Arabic bread, cheese, jam, honey, fresh fruits, tea, and Arabic coffee fuels you for the journey back. By mid-morning, you are returned to your Dubai hotel carrying a memory no city experience can match.",
+            "ar": "سفاري المبيت في صحراء دبي من ديونز ديسكفري توريزم هو التجربة الأكثر عمقاً وأصالة في قلب الصحراء العربية — رحلة تمتد من الغروب حتى الشروق لتجعلك تشعر بنبض وجمال الطبيعة البكر. إذا كنت تحلم بالنوم تحت سماء مضاءة بآلاف النجوم وسط الكثبان الرملية الذهبية، فهذه هي الرحلة المنشودة.\n\nتبدأ رحلتك بنفس برنامج السفاري المسائي: تطعيس حماسي في كثبان لهباب الحمراء، وتوقف لالتقاط صور الغروب الساحرة، والوصول إلى المخيم البدوي المجهز. استمتع بركوب الجمال، والتزلج على الرمال، ونقش الحناء، والشيشة، والصور بالزي الإماراتي.\n\nيُقدم بوفيه عشاء شواء 5 نجوم فاخر تحت السماء المفتوحة مع عروض حية مميزة: رقص التنورة، الرقص الشرقي، عرض النار المثير وإيقاعات الطبول التقليدية.\n\nبعد انتهاء العروض، يتحول المخيم إلى واحة من الهدوء والسكينة. التفت حول حلقة النار، وتبادل القصص، واحتسِ القهوة العربية واستمتع بمشاهدة النجوم اللامعة بعيداً عن أضواء وصخب المدينة.\n\nتخلد إلى النوم في خيمة بدوية مريحة مزودة بمراتب وفرش وأغطية نظيفة. سكون الصحراء التام يمنحك راحة نفسية لا تضاهى.\n\nفي الصباح الباكر، استيقظ مع نسمات الفجر الباردة لمشاهدة شروق الشمس الساحر الذي يصبغ الرمال بألوان الخوخ والعنبر. ثم استمتع بإفطار بدوي شهي يشمل البيض والجبن والعسل والخبز العربي الطازج والفواكه والشاي والقهوة، قبل العودة المريحة إلى فندقك في دبي بين الساعة 6:30 و7:00 صباحاً.",
+            "ru": "Ночное сафари с ночевкой в пустыне Дубая от Dunes Discovery Tourism — это самое глубокое погружение в атмосферу Аравии: путешествие от заката до рассвета. Если вы мечтали уснуть под куполом из сотен тысяч ярких звезд в окружении бескрайних дюн, эта программа создана для вас.\n\nВечер начинается с классического сафари: захватывающий джиппинг по дюнам Лахбаб, фотосессия на закате, катание на верблюдах, сэндбординг, роспись хной и роскошный ужин-барбекю под звездным небом с тремя живыми шоу.\n\nПосле окончания вечерней программы лагерь погружается в тишину. Гости собираются у костра за чашкой ароматного арабского кофе и беседами, любуясь ночным небом без городского светового шума. Ночлег проходит в уютных бедуинских шатрах со свежим постельным бельем и теплыми пледами.\n\nУтром вас ждет встреча рассвета над дюнами, когда солнце окрашивает пустыню в нежные золотисто-розовые тона, и сытный бедуинский завтрак: омлет, арабский хлеб, сыр, мед, джем, свежие фрукты, чай и кофе. Возвращение в Дубай к 6:30–7:00 утра.",
+            "es": "El Safari Nocturno con Campamento en el Desierto de Dubái es la experiencia más auténtica e inmersiva que ofrece Dunes Discovery Tourism: un viaje desde el ocaso hasta el alba para conectar con la majestuosidad del desierto árabe.\n\nLa jornada incluye todo el programa del safari vespertino: dune bashing 4x4 en dunas rojas, fotos del atardecer, sandboarding, camellos, cena barbacoa 5 estrellas y espectáculos en vivo (Tanoura, danza del vientre y show de fuego).\n\nTras el espectáculo, el campamento se sumerge en una atmósfera íntima y serena. Nos reunimos alrededor de la fogata con café árabe, admirando constelaciones estelares invisibles desde la ciudad. Descansarás en tiendas beduinas tradicionales equipadas con camas y mantas confortables.\n\nAl amanecer, contempla la salida del sol sobre las dunas y disfruta de un desayuno tradicional completo antes de regresar cómodamente a tu hotel en Dubái entre las 6:30 y las 7:00 AM.",
+            "it": "Il Safari con Pernottamento nel Deserto di Dubai organizzato da Dunes Discovery Tourism è la proposta più suggestiva e immersiva per vivere il silenzio e la magia delle notti arabe, dal tramonto fino al sorgere del sole.\n\nInclude tutte le attrazioni del safari serale: dune bashing adrenalinico sulle dune rosse di Lahbab, sosta al tramonto, sandboard, giro in cammello, cena buffet barbecue con specialità tipiche e spettacoli dal vivo.\n\nTerminati gli show, il campo ritrova la sua quiete naturale. Ci si riunisce attorno al falò per sorseggiare caffè arabo sotto una volta celeste trapuntata di stelle. La notte si trascorre in comode tende beduine fornite di letti e coperte pulite.\n\nAl risveglio, ammira l'alba che illumina le dune di riflessi dorati e gusta una ricca colazione tradizionale con uova, pane caldo, formaggi, frutta e caffè, prima di rientrare in hotel tra le 6:30 e le 7:00 del mattino."
+        },
         "duration": "16 Hours",
         "pickup_time": "2:45 PM - 3:15 PM",
         "dropoff_time": "6:30 AM - 7:00 AM (next day)",
@@ -80,19 +170,55 @@
         "is_featured": 1,
         "status": "active",
         "priority": 4,
-        "meta_title": "Overnight Desert Safari Dubai 2026 | Bedouin Camping & Breakfast | From AED 798 (2 Guests)",
-        "meta_desc": "⛺ Authentic Overnight Desert Camping in Dubai. Sunset Dune Bashing, Stargazing, Shisha, Deluxe Private Tents & Fresh Breakfast. Book Your Desert Stay Direct!",
-        "meta_keywords": "overnight desert safari dubai, desert camping dubai, sleep in desert dubai, overnight safari dubai price, desert glamping dubai, bedouin camp dubai, stargazing desert safari, desert safari with breakfast, overnight tent desert dubai, dubai desert overnight experience",
+        "meta_title": {
+            "en": "Overnight Desert Safari Dubai 2026 | Bedouin Camping & Breakfast | From AED 798 (2 Guests)",
+            "ar": "رحلة سفاري صحراوية مع مبيت في دبي 2026 | تخييم بدوي وإفطار طازج | ابتداءً من 798 درهم (لشخصين)",
+            "ru": "Ночное сафари в Дубае с ночевкой 2026 | Бедуинский лагерь и завтрак | от 798 AED (на двоих)",
+            "es": "Safari Nocturno en el Desierto de Dubái 2026 | Acampada Beduina y Desayuno | Desde 798 AED (2 personas)",
+            "it": "Safari Notturno nel Deserto di Dubai 2026 | Campeggio Beduino e Colazione | Da 798 AED (2 persone)"
+        },
+        "meta_desc": {
+            "en": "⛺ Authentic Overnight Desert Camping in Dubai. Sunset Dune Bashing, Stargazing, Shisha, Deluxe Private Tents & Fresh Breakfast. Book Your Desert Stay Direct!",
+            "ar": "⛺ تخييم صحراوي بدوي أصيل طوال الليل في دبي. تطعيس عند الغروب، مراقبة النجوم، شيشة، خيام فاخرة خاصة وإفطار طازج في الصباح. احجز إقامتك الصحراوية مباشرة!",
+            "ru": "⛺ Аутентичный ночной кемпинг в пустыне Дубая. Джиппинг на закате, созерцание звезд, кальян, комфортабельные шатры и свежий завтрак. Бронируйте напрямую!",
+            "es": "⛺ Auténtica acampada nocturna en el desierto de Dubái. Dune bashing al atardecer, observación de estrellas, shisha, tiendas privadas de lujo y desayuno fresco. ¡Reserva directa!",
+            "it": "⛺ Autentico campeggio notturno nel deserto di Dubai. Dune bashing al tramonto, osservazione delle stelle, shisha, tende private deluxe e colazione fresca. Prenota ora!"
+        },
+        "meta_keywords": {
+            "en": "overnight desert safari dubai, desert camping dubai, sleep in desert dubai, overnight safari dubai price, desert glamping dubai, bedouin camp dubai, stargazing desert safari, desert safari with breakfast, overnight tent desert dubai, dubai desert overnight experience",
+            "ar": "سفاري المبيت دبي, تخييم صحراوي دبي, مبيت في صحراء دبي, اسعار سفاري المبيت دبي, خيام بدوية دبي, سياحة صحراوية ليلية دبي, افطار صحراوي دبي",
+            "ru": "сафари с ночевкой дубай, кемпинг в пустыне дубай, ночное сафари дубай, ночлег в пустыне дубай, бедуинский шатер дубай, рассвет в пустыне дубай, цена ночного сафари дубай",
+            "es": "safari nocturno dubai, acampada desierto dubai, dormir en el desierto dubai, precio safari nocturno dubai, campamento beduino noche dubai, amanecer desierto dubai, glamping desierto dubai",
+            "it": "safari pernottamento dubai, campeggio deserto dubai, dormire nel deserto dubai, costo safari notturno dubai, tenda beduina dubai, alba nel deserto dubai, colazione deserto dubai"
+        },
         "created_at": "2026-01-13 11:36:20",
         "updated_at": "2026-08-09 04:00:00"
     },
     {
         "id": 4,
         "slug": "desert-safari-quad-biking-dubai",
-        "name": "Desert Safari with Quad Biking",
+        "name": {
+            "en": "Desert Safari with Quad Biking Dubai",
+            "ar": "رحلة سفاري صحراوية مع دراجات كواد بايك في دبي",
+            "ru": "Сафари по пустыне с квадроциклами в Дубае",
+            "es": "Safari por el Desierto con Quads en Dubái",
+            "it": "Safari nel Deserto con Quad a Dubai"
+        },
         "category": "desert-safari",
-        "short_desc": "Double the adrenaline, double the fun. Our desert safari with quad biking combines a 30-minute self-drive ATV adventure through the open sands with the full evening safari experience — dune bashing, camp activities, BBQ dinner, and spectacular live entertainment shows.",
-        "full_desc": "The Desert Safari with Quad Biking in Dubai is the ultimate choice for thrill-seekers who want more than the classic safari. Dunes Discovery Tourism pairs a pulse-racing, self-drive quad bike (ATV) session with our complete evening desert safari — creating the most action-packed desert experience in Dubai.\r\n\r\nPick-up is slightly earlier — around 2:30 PM — to allow time for both the quad biking and the full evening programme. Your comfortable 4x4 vehicle delivers you to the desert entry point, where your quad biking adventure begins.\r\n\r\nAfter a thorough safety briefing and instruction on controls, you mount a powerful automatic ATV and set off across the open desert terrain for 30 exhilarating minutes. No prior experience is needed — the bikes are easy to handle, and an instructor guides you throughout. Feel the sand spray as you accelerate, turn, and navigate the rolling landscape at your own pace.\r\n\r\nWith quad biking complete, the classic safari unfolds: an intense dune bashing session (30–45 minutes) that takes you soaring over the towering red dunes, a scenic sunset photography stop, and arrival at our traditional Bedouin-style camp.\r\n\r\nAt camp, the evening mirrors our beloved evening safari: camel rides, henna painting, falcon photography, Arabic costume dress-up, and relaxation at the shisha corner — followed by a lavish BBQ dinner buffet with both vegetarian and non-vegetarian choices and unlimited soft beverages.\r\n\r\nThe evening is crowned by live cultural shows: the spinning Tanoura dancer, an elegant belly dance performance, a daring fire show, and energetic Dabka drumming — all performed under the open desert sky.\r\n\r\nYou return to your hotel by around 9:30 PM, having experienced two of Dubai's greatest desert thrills in a single unforgettable outing. This quad biking desert safari is rated 4.8/5 by hundreds of adventure-loving guests.",
+        "short_desc": {
+            "en": "Double the adrenaline, double the fun. Our desert safari with quad biking combines a 30-minute self-drive ATV adventure through the open sands with the full evening safari experience — dune bashing, camp activities, BBQ dinner, and spectacular live entertainment shows.",
+            "ar": "ضاعف الإثارة وضاعف المتعة! يجمع سفاري الكثبان الرملية مع الدراجات الرباعية بين 30 دقيقة من القيادة الذاتية لدراجات ATV القوية في الصحراء المفتوحة، وبرنامج السفاري المسائي الكامل: تطعيس 4x4، تصوير الغروب، ركوب الجمال، التزلج على الرمال، بوفيه عشاء شواء 5 نجوم، والعروض الفنية الحية.",
+            "ru": "Удвойте адреналин и впечатления! Наше сафари с квадроциклами объединяет 30-минутное самостоятельное катание на мощных квадроциклах ATV по открытым красным дюнам и полную программу вечернего сафари: экстремальный джиппинг, фотосессию на закате, верблюдов, сэндбординг, ужин-барбекю 5 звезд и живые шоу.",
+            "es": "¡Doble adrenalina, doble emoción! Nuestro safari por el desierto con quads combina una emocionante sesión de 30 minutos conduciendo un potente quad ATV por las dunas rojas con el programa completo del safari vespertino: dune bashing en 4x4, fotos del atardecer, paseo en camello, sandboarding, cena buffet BBQ gourmet y espectáculos en vivo.",
+            "it": "Raddoppia l'adrenalina e il divertimento! Il nostro safari nel deserto con quad ATV combina 30 minuti di guida autonoma su potenti quad fuoristrada tra le dune rosse aperte e l'intero programma serale: dune bashing in 4x4, foto al tramonto, giro in cammello, sandboard, cena buffet BBQ a 5 stelle e spettacoli folkloristici dal vivo."
+        },
+        "full_desc": {
+            "en": "The Desert Safari with Quad Biking in Dubai is the ultimate choice for thrill-seekers who want more than the classic safari. Dunes Discovery Tourism pairs a pulse-racing, self-drive quad bike (ATV) session with our complete evening desert safari — creating the most action-packed desert experience in Dubai.\r\n\r\nPick-up is slightly earlier — around 2:30 PM — to allow time for both the quad biking and the full evening programme. Your comfortable 4x4 vehicle delivers you to the desert entry point, where your quad biking adventure begins.\r\n\r\nAfter a thorough safety briefing and instruction on controls, you mount a powerful automatic ATV and set off across the open desert terrain for 30 exhilarating minutes. No prior experience is needed — the bikes are easy to handle, and an instructor guides you throughout. Feel the sand spray as you accelerate, turn, and navigate the rolling landscape at your own pace.\r\n\r\nWith quad biking complete, the classic safari unfolds: an intense dune bashing session (30–45 minutes) that takes you soaring over the towering red dunes, a scenic sunset photography stop, and arrival at our traditional Bedouin-style camp.\r\n\r\nAt camp, the evening mirrors our beloved evening safari: camel rides, henna painting, falcon photography, Arabic costume dress-up, and relaxation at the shisha corner — followed by a lavish BBQ dinner buffet with both vegetarian and non-vegetarian choices and unlimited soft beverages.\r\n\r\nThe evening is crowned by live cultural shows: the spinning Tanoura dancer, an elegant belly dance performance, a daring fire show, and energetic Dabka drumming — all performed under the open desert sky.\r\n\r\nYou return to your hotel by around 9:30 PM, having experienced two of Dubai's greatest desert thrills in a single unforgettable outing. This quad biking desert safari is rated 4.8/5 by hundreds of adventure-loving guests.",
+            "ar": "سفاري صحراء دبي مع قيادة الدراجات الرباعية ATV هو الخيار المفضل لعشاق المغامرة والسرعة في صحراء لهباب الحمراء بدبي.\n\nتبدأ المغامرة بالانطلاق من فندقك بسيارة دفع رباعي مريحة ومكيفة إلى محطة الانطلاق الصحراوية. بعد جلسة إرشادية وتدريب شامل على قواعد السلامة وارتداء الخوذة والنظارات الواقية، تنطلق على متن دراجة دفع رباعي أوتوماتيكية قوية (250cc إلى 400cc) لمدة 30 دقيقة من الإثارة بين الكثبان المفتوحة بمرافقة مدرب خبير.\n\nبعد جولة الدراجات، تنطلق في جلسة تطعيس شيقة بسيارات 4x4 لمدة 30 إلى 45 دقيقة عبر الرمال الشاهقة، يعقبها توقف لالتقاط صور الغروب الساحرة، ثم التوجه إلى المخيم البدوي.\n\nفي المخيم، تستمتع بجميع الأنشطة التراثية: ركوب الجمال، التزلج على الرمال، نقش الحناء، الشيشة، وبوفيه عشاء شواء فاخر مع عروض الرقص الشرقي والتنورة وعرض النار الحي، قبل العودة المريحة إلى فندقك في دبي حوالي الساعة 9:30 مساءً.",
+            "ru": "Пустынное сафари на квадроциклах в Дубае — топовый выбор для любителей скорости и драйва на красных дюнах Лахбаб.\n\nТрансфер из отеля доставляет вас на специализированную базу в пустыне. После инструктажа по технике безопасности и выдачи защитной экипировки вы садитесь за руль мощного квадроцикла (250–400cc) и отправляетесь на 30-минутный заезд по песчаным барханам в сопровождении опытного инструктора.\n\nЗатем начинается классическая программа сафари: мощный 40-минутный джиппинг по дюнам, фото на закате, прибытие в лагерь с верблюдами, росписью хной, сэндбордингом, кальяном, обильным ужином-барбекю и живыми танцевальными и огненными шоу. Возвращение в отель к 21:30.",
+            "es": "El Safari en Quad ATV por el Desierto de Dubái es la combinación definitiva para apasionados del motor y la aventura.\n\nTraslado privado o compartido desde tu hotel hasta la base del desierto. Con casco y gafas de protección, pilotarás un quad automático de 250cc o 400cc durante 30 minutos guiado por un instructor profesional por pistas de arena virgen.\n\nA continuación, disfruta del emocionante dune bashing en 4x4, parada fotográfica con la puesta de sol, campamento beduino con camellos, sandboarding, cena buffet barbacoa y espectáculos en vivo de Tanoura y fuego. Retorno a tu alojamiento hacia las 21:30 horas.",
+            "it": "Il Safari nel Deserto con Quad a Dubai è l'esperienza perfetta per chi cerca brivido e velocità tra le maestose dune di sabbia rossa di Lahbab.\n\nPrelievo in hotel e arrivo alla base desertica. Dopo un briefing sulla sicurezza e la consegna di casco e occhiali, salirai in sella a un quad ATV automatico (250cc-400cc) per 30 minuti di pura adrenalina guidato da un istruttore professionista.\n\nSubito dopo si prosegue con il dune bashing su fuoristrada 4x4, sosta panoramica per il tramonto, ingresso al campo beduino con dromedari, sandboarding, ricco buffet barbecue e spettacoli serali tipici. Rientro in hotel alle 21:30 circa."
+        },
         "duration": "7 Hours",
         "pickup_time": "2:00 PM - 2:30 PM",
         "dropoff_time": "9:00 PM - 9:30 PM",
@@ -109,19 +235,55 @@
         "is_featured": 1,
         "status": "active",
         "priority": 3,
-        "meta_title": "Desert Safari with Quad Biking Dubai 2026 | Self-Drive ATV | From AED 199",
-        "meta_desc": "🏁 Ultimate Quad Biking ATV Desert Safari in Dubai Red Dunes. Self-Drive 250cc-400cc Quad Bikes, Dune Bashing, Sandboarding & BBQ Dinner. Reserve Direct!",
-        "meta_keywords": "desert safari quad biking dubai, quad bike desert safari, atv desert safari dubai, quad biking dubai, desert safari with atv, evening safari quad bike, dune bashing quad biking, desert quad bike ride dubai, quad biking and bbq dinner dubai, adventure desert safari dubai",
+        "meta_title": {
+            "en": "Desert Safari with Quad Biking Dubai 2026 | Self-Drive ATV | From AED 199",
+            "ar": "سفاري صحراوي مع قيادة كواد بايك دبي 2026 | قيادة ذاتية للدراجات الرباعية | ابتداءً من 199 درهم",
+            "ru": "Сафари в Дубае с катанием на квадроциклах 2026 | Аренда квадроцикла | от 199 AED",
+            "es": "Safari por el Desierto con Quads en Dubái 2026 | Conducción de ATV | Desde 199 AED",
+            "it": "Safari nel Deserto con Guida Quad a Dubai 2026 | ATV a Guida Autonoma | Da 199 AED"
+        },
+        "meta_desc": {
+            "en": "🏁 Ultimate Quad Biking ATV Desert Safari in Dubai Red Dunes. Self-Drive 250cc-400cc Quad Bikes, Dune Bashing, Sandboarding & BBQ Dinner. Reserve Direct!",
+            "ar": "🏁 أقوى رحلة سفاري بدراجات كواد بايك في كثبان دبي الحمراء. قيادة ذاتية لدراجات 250cc-400cc، تطعيس كثبان، تزلج رملي وعشاء مشاوي فاخر. احجز مباشرة!",
+            "ru": "🏁 Экстремальное сафари на квадроциклах по красным дюнам Дубая. Мощные квадроциклы 250–400cc, джиппинг, сэндбординг и ужин-барбекю. Бронируйте напрямую!",
+            "es": "🏁 La aventura definitiva en quads por las dunas rojas de Dubái. Conducción de quads 250cc-400cc, dune bashing, sandboard y cena barbacoa. ¡Reserva directa!",
+            "it": "🏁 L'avventura definitiva in quad tra le dune rosse di Dubai. Guida quad 250cc-400cc, dune bashing, sandboard e cena barbecue. Prenota subito!"
+        },
+        "meta_keywords": {
+            "en": "desert safari quad biking dubai, quad bike desert safari, atv desert safari dubai, quad biking dubai, desert safari with atv, evening safari quad bike, dune bashing quad biking, desert quad bike ride dubai, quad biking and bbq dinner dubai, adventure desert safari dubai",
+            "ar": "سفاري دراجات رباعية دبي, دبابات صحراوية دبي, تاجير دراجات صحراوية دبي, تطعيس ودبابات دبي, اسعار دراجات الصحراء دبي, سفاري مسائي مع دباب دبي",
+            "ru": "сафари на квадроциклах дубай, аренда квадроциклов дубай, квадроциклы в пустыне дубай, atv сафари дубай, джиппинг и квадроциклы дубай, цена сафари с квадроциклом дубай",
+            "es": "safari quads dubai, alquiler quads desierto dubai, tour atv dubai, dune bashing con quads dubai, precio safari quad dubai, aventura en quad dubai",
+            "it": "safari quad dubai, noleggio quad deserto dubai, tour atv dubai, dune bashing e quad dubai, costo safari quad dubai, escursione quad dubai"
+        },
         "created_at": "2026-01-13 11:36:20",
         "updated_at": "2026-08-09 04:00:00"
     },
     {
         "id": 5,
         "slug": "dubai-city-tour",
-        "name": "Dubai City Tour",
+        "name": {
+            "en": "Dubai City Tour",
+            "ar": "جولة مدينة دبي السياحية",
+            "ru": "Обзорная экскурсия по Дубаю",
+            "es": "Tour por la Ciudad de Dubái",
+            "it": "Tour della Città di Dubai"
+        },
         "category": "city-tour",
-        "short_desc": "Explore Dubai's iconic landmarks from historic Creek to futuristic Downtown in one comprehensive tour.",
-        "full_desc": "Discover the best of Dubai with visits to Burj Khalifa views, Dubai Mall, Palm Jumeirah, Atlantis, Gold Souk, and more.",
+        "short_desc": {
+            "en": "Explore Dubai's iconic landmarks from historic Creek to futuristic Downtown in one comprehensive tour.",
+            "ar": "استكشف أبرز معالم دبي الأيقونية من خور دبي التاريخي وأسواقه التراثية إلى وسط المدينة المستقبلي وبرج خليفة في جولة سياحية شاملة ومريحة.",
+            "ru": "Исследуйте главные достопримечательности Дубая от исторического залива Дубай-Крик до ультрасовременного центра Downtown и Бурдж-Халифа в одной насыщенной экскурсии.",
+            "es": "Explora los lugares más emblemáticos de Dubái, desde el histórico Creek y sus zocos tradicionales hasta el futurista Downtown y Burj Khalifa en un tour guiado completo.",
+            "it": "Esplora i monumenti più iconici di Dubai, dallo storico Creek e i souk tradizionali fino al futuristico Downtown e Burj Khalifa in un tour completo e confortevole."
+        },
+        "full_desc": {
+            "en": "Discover the best of Dubai with visits to Burj Khalifa views, Dubai Mall, Palm Jumeirah, Atlantis, Gold Souk, and more.",
+            "ar": "اكتشف روعة وتنوع مدينة دبي في جولة سياحية استثنائية تأخذك في رحلة عبر الزمن من أحيائها التراثية الأصيلة إلى أرقى إنجازاتها المعمارية العالمية.\n\nتشمل الجولة زيارة متحف دبي وحي الفهيدي التاريخي، وركوب قارب العبرة التقليدي عبر خور دبي لزيارة سوق الذهب وسوق التوابل الشهيرين، والتوقف لالتقاط صور رائعة أمام برج العرب وجزيرة نخلة جميرا وفندق أتلانتس النخلة ومرسى دبي (دبي مارينا)، وصولاً إلى دبي مول وبرج خليفة — أطول برج في العالم. متوفرة بخيارات نصف يوم ويوم كامل مع سيارات حديثة ومرشدين سياحيين محترفين وتوصيل مباشر من وإلى الفندق.",
+            "ru": "Откройте для себя контрасты и величие Дубая в обзорной экскурсии, объединяющей вековые традиции и архитектурные чудеса XXI века.\n\nМаршрут включает исторический район Аль-Фахиди, традиционную переправу на деревянной лодке абра через залив Дубай-Крик, знаменитые Золотой рынок и Рынок специй, фотостопы у отеля-паруса Бурдж Аль-Араб, рукотворного острова Пальма Джумейра и отеля Atlantis The Palm, променад Дубай Марина, а также посещение Dubai Mall с видами на Бурдж-Халифа. Экскурсия доступна в формате на полдня и на целый день с трансфером из отеля и опытным гидом.",
+            "es": "Descubre los contrastes y maravillas de Dubái en una completa excursión panorámica que combina historia tradicional y arquitectura futurista.\n\nEl itinerario incluye el barrio histórico de Al Fahidi, travesía en la clásica barca abra por el Dubai Creek, el Zoco del Oro y el Zoco de las Especias, parada fotográfica junto al Burj Al Arab, la isla artificial Palm Jumeirah, el hotel Atlantis The Palm, Dubai Marina y Downtown Dubai con el majestuoso Burj Khalifa y Dubai Mall. Disponible en modalidades de medio día o día completo con transporte climatizado y guía experto.",
+            "it": "Scopri le meraviglie e i contrasti di Dubai in un tour panoramico guidato che unisce il fascino della tradizione araba ai prodigi dell'architettura moderna.\n\nL'itinerario include il quartiere storico di Al Fahidi, la tipica traversata in barca abra lungo il Dubai Creek, il Souk dell'Oro e delle Spezie, soste fotografiche al Burj Al Arab, all'isola Palm Jumeirah e all'hotel Atlantis The Palm, Dubai Marina e Downtown con il Dubai Mall e l'imponente Burj Khalifa. Disponibile in opzione mezza giornata o giornata intera con trasferimenti inclusi dall'hotel."
+        },
         "duration": "8 Hours",
         "pickup_time": "9:00 AM",
         "dropoff_time": "5:00 PM",
@@ -138,19 +300,55 @@
         "is_featured": 1,
         "status": "active",
         "priority": 7,
-        "meta_title": "Dubai City Tour 2026 | Half & Full Day Sightseeing | From AED 120",
-        "meta_desc": "⚡ Book the #1 rated Dubai City Tour. Explore Burj Khalifa, Gold Souk, Abra Boat & Marina. Includes door-to-door hotel pickup & 5-star guides. Reserve direct now!",
-        "meta_keywords": "dubai city tour, dubai sightseeing tour, burj khalifa tour, gold souk abra ride, dubai landmark tour, full day dubai city tour, half day dubai tour",
+        "meta_title": {
+            "en": "Dubai City Tour 2026 | Half & Full Day Sightseeing | From AED 120",
+            "ar": "جولة مدينة دبي 2026 | معالم سياحية نصف يوم ويوم كامل | ابتداءً من 120 درهم",
+            "ru": "Экскурсия по Дубаю 2026 | Обзорный тур на полдня и на весь день | от 120 AED",
+            "es": "Tour por la Ciudad de Dubái 2026 | Medio Día y Día Completo | Desde 120 AED",
+            "it": "Tour della Città di Dubai 2026 | Visita Guidata Mezza Giornata e Giornata Intera | Da 120 AED"
+        },
+        "meta_desc": {
+            "en": "⚡ Book the #1 rated Dubai City Tour. Explore Burj Khalifa, Gold Souk, Abra Boat & Marina. Includes door-to-door hotel pickup & 5-star guides. Reserve direct now!",
+            "ar": "⚡ احجز جولة مدينة دبي السياحية الأعلى تقييماً. استكشف برج خليفة، سوق الذهب، قارب العبرة التراثي ودبي مارينا. تشمل التوصيل الفندقي ومرشدين معتمدين. احجز الآن!",
+            "ru": "⚡ Забронируйте лучшую обзорную экскурсию по Дубаю. Посетите Бурдж-Халифа, Золотой рынок, лодку абра и Дубай Марину. Трансфер от дверей отеля и гиды высшего класса!",
+            "es": "⚡ Reserva el tour por la ciudad de Dubái mejor valorado. Descubre el Burj Khalifa, el Zoco del Oro, el paseo en barca tradicional Abra y Dubái Marina. Recogida en hotel incluida.",
+            "it": "⚡ Prenota il tour della città di Dubai più votato. Ammira il Burj Khalifa, il Souk dell'Oro, la barca tradizionale Abra e Dubai Marina. Include transfer dall'hotel e guide esperte."
+        },
+        "meta_keywords": {
+            "en": "dubai city tour, dubai sightseeing tour, burj khalifa tour, gold souk abra ride, dubai landmark tour, full day dubai city tour, half day dubai tour",
+            "ar": "جولة مدينة دبي, معالم دبي السياحية, رحلة دبي السياحية, برج خليفة, سوق الذهب دبي, جولة نخلة جميرا, زيارة دبي يوم كامل",
+            "ru": "обзорная экскурсия по дубаю, достопримечательности дубая, тур по дубаю, бурдж халифа экскурсия, золотой рынок дубай, пальма джумейра тур, экскурсия в дубае на русском",
+            "es": "tour ciudad dubai, excursion panoramica dubai, visitas guiadas dubai, burj khalifa entradas, zoco del oro dubai, palm jumeirah tour, que ver en dubai",
+            "it": "tour citta dubai, escursione panoramica dubai, visita guidata dubai, burj khalifa tour, souk dell oro dubai, palm jumeirah visita, attrazioni dubai"
+        },
         "created_at": "2026-01-13 11:36:20",
         "updated_at": "2026-08-09 04:00:00"
     },
     {
         "id": 6,
         "slug": "abu-dhabi-city-tour-from-dubai",
-        "name": "Abu Dhabi City Tour from Dubai",
+        "name": {
+            "en": "Abu Dhabi City Tour from Dubai",
+            "ar": "جولة مدينة أبوظبي من دبي",
+            "ru": "Экскурсия в Абу-Даби из Дубая",
+            "es": "Tour por la Ciudad de Abu Dabi desde Dubái",
+            "it": "Tour di Abu Dhabi da Dubai"
+        },
         "category": "city-tour",
-        "short_desc": "Visit the UAE capital including the magnificent Sheikh Zayed Grand Mosque.",
-        "full_desc": "Full-day tour to Abu Dhabi featuring the Grand Mosque, Emirates Palace, Corniche, and Heritage Villages.",
+        "short_desc": {
+            "en": "Visit the UAE capital including the magnificent Sheikh Zayed Grand Mosque.",
+            "ar": "قم بزيارة العاصمة الإماراتية أبوظبي واستكشف صروحها العالمية الساحرة، وفي مقدمتها جامع الشيخ زايد الكبير وقصر الإمارات وكورنيش أبوظبي في رحلة يوم كامل مميزة من دبي.",
+            "ru": "Посетите столицу ОАЭ Абу-Даби и откройте для себя ее всемирно известные шедевры: грандиозную Белую мечеть Шейха Зайда, дворец Emirates Palace и набережную Корниш в однодневном туре из Дубая.",
+            "es": "Visita la capital de los EAU, Abu Dabi, y admira sus monumentos más majestuosos, incluida la impresionante Gran Mezquita Sheikh Zayed, el Emirates Palace y la Corniche en una excursión de día completo desde Dubái.",
+            "it": "Visita la capitale degli Emirati Arabi, Abu Dhabi, ed esplora i suoi capolavori architettonici, tra cui la maestosa Gran Moschea Sheikh Zayed, l'Emirates Palace e la Corniche in un tour di un giorno da Dubai."
+        },
+        "full_desc": {
+            "en": "Full-day tour to Abu Dhabi featuring the Grand Mosque, Emirates Palace, Corniche, and Heritage Villages.",
+            "ar": "انطلق في رحلة مميزة ليوم كامل من دبي إلى العاصمة الإماراتية أبوظبي للتعرف على روعة التراث المعماري والثقافي لدولة الإمارات العربية المتحدة.\n\nالمحطة الأبرز في الجولة هي زيارة جامع الشيخ زايد الكبير — تحفة العمارة الإسلامية العالمية المكسوة بالرخام الأبيض والثريات الكريستالية الفاخرة وأكبر سجادة منسوجة يدوياً في العالم. تشمل الجولة أيضاً جولة بانورامية على كورنيش أبوظبي الخلاب، وإطلالة على قصر الإمارات الأسطوري وقصر الوطن الرئاسي، وزيارة القرية التراثية للتعرف على حياة الآباء والأجداد، والتوقف في جزيرة ياس بالقرب من عالم فيراري واللوفر أبوظبي، مع خدمة التوصيل المريح ذهاباً وإياباً من فندقك في دبي.",
+            "ru": "Отправьтесь в однодневную экскурсию из Дубая в столицу Арабских Эмиратов — Абу-Даби, город монументального величия и культурного наследия.\n\nГлавная жемчужина маршрута — посещение Белой мечети Шейха Зайда, одного из красивейших храмов мира с ослепительным белым мрамором, люстрами с кристаллами Swarovski и гигантским ковром ручной работы. Также в программу входит панорамная поездка по набережной Корниш, остановка у роскошного Emirates Palace и президентского дворца Каср Аль-Ватан, посещение Этнографической деревни (Heritage Village) и острова Яс с парком Ferrari World. Поездка проходит на комфортабельном транспорте с трансфером из отеля.",
+            "es": "Excursión de un día completo desde Dubái a Abu Dabi, la majestuosa capital de los Emiratos Árabes Unidos.\n\nEl punto cumbre es la visita guiada a la Gran Mezquita Sheikh Zayed, una de las mayores joyas arquitectónicas del mundo con sus cúpulas de mármol blanco, columnas de nácar y arañas de cristal. El recorrido abarca la elegante avenida marítima Corniche, vistas del lujoso hotel Emirates Palace y el palacio presidencial Qasr Al Watan, la Aldea del Patrimonio y la isla Yas, sede de Ferrari World y el Museo del Louvre Abu Dabi. Con transporte de ida y vuelta a tu hotel en Dubái.",
+            "it": "Escursione di una giornata intera da Dubai alla capitale Abu Dhabi per scoprire il volto più solenne e culturale degli Emirati.\n\nIl momento clou è la visita alla spettacolare Grande Moschea Sheikh Zayed, capolavoro dell'architettura sacra con i suoi marmi bianchi, mosaici floreali e i più grandi lampadari di cristallo al mondo. Il tour comprende la panoramica passeggiata lungo la Corniche, la vista sull'iconico Emirates Palace e sul palazzo presidenziale Qasr Al Watan, il Villaggio Tradizionale (Heritage Village) e l'isola di Yas con Ferrari World. Trasferimenti andata e ritorno dall'hotel inclusi."
+        },
         "duration": "10 Hours",
         "pickup_time": "8:00 AM",
         "dropoff_time": "6:00 PM",
@@ -167,19 +365,55 @@
         "is_featured": 1,
         "status": "active",
         "priority": 8,
-        "meta_title": "Abu Dhabi City Tour from Dubai 2026 | Sheikh Zayed Mosque | From AED 199",
-        "meta_desc": "★ Top-rated Abu Dhabi Day Trip from Dubai. Visit Sheikh Zayed Grand Mosque, Louvre & Corniche. Includes 4x4 pickup, entry passes & expert guide. Book direct!",
-        "meta_keywords": "abu dhabi tour from dubai, sheikh zayed grand mosque tour, abu dhabi day trip, abu dhabi sight-seeing from dubai, grand mosque tour dubai",
+        "meta_title": {
+            "en": "Abu Dhabi City Tour from Dubai 2026 | Sheikh Zayed Mosque | From AED 199",
+            "ar": "جولة مدينة أبوظبي من دبي 2026 | جامع الشيخ زايد الكبير | ابتداءً من 199 درهم",
+            "ru": "Экскурсия в Абу-Даби из Дубая 2026 | Мечеть шейха Зайда | от 199 AED",
+            "es": "Tour por Abu Dabi desde Dubái 2026 | Gran Mezquita Sheikh Zayed | Desde 199 AED",
+            "it": "Tour di Abu Dhabi da Dubai 2026 | Grande Moschea dello Sceicco Zayed | Da 199 AED"
+        },
+        "meta_desc": {
+            "en": "★ Top-rated Abu Dhabi Day Trip from Dubai. Visit Sheikh Zayed Grand Mosque, Louvre & Corniche. Includes 4x4 pickup, entry passes & expert guide. Book direct!",
+            "ar": "★ رحلة يومية مميزة إلى أبوظبي من دبي. زيارة جامع الشيخ زايد الكبير ومتحف اللوفر وكورنيش أبوظبي. تشمل التوصيل وتذاكر الدخول ومرشداً خبيراً. احجز مباشرة!",
+            "ru": "★ Популярная однодневная поездка в Абу-Даби из Дубая. Посещение Белой мечети шейха Зайда, Лувра и набережной Корниш. Трансфер на 4x4, входные билеты и гид включены!",
+            "es": "★ La mejor excursión de un día a Abu Dabi desde Dubái. Visita la Gran Mezquita Sheikh Zayed, el Louvre y la Corniche. Incluye traslados, entradas y guía experto.",
+            "it": "★ La migliore escursione giornaliera ad Abu Dhabi da Dubai. Visita la Grande Moschea dello Sceicco Zayed, il Louvre e la Corniche. Include pick-up, biglietti e guida esperta."
+        },
+        "meta_keywords": {
+            "en": "abu dhabi tour from dubai, sheikh zayed grand mosque tour, abu dhabi day trip, abu dhabi sight-seeing from dubai, grand mosque tour dubai",
+            "ar": "جولة ابوظبي من دبي, رحلة جامع الشيخ زايد, زيارة ابوظبي يوم كامل, اسعار جولة ابوظبي, معالم ابوظبي السياحية, قصر الامارات, جزيرة ياس",
+            "ru": "экскурсия в абу даби из дубая, мечеть шейха зайда экскурсия, поездка в абу даби, тур в абу даби на русском, феррари ворлд тур, лувр абу даби экскурсия",
+            "es": "tour abu dhabi desde dubai, mezquita sheikh zayed visita, excursion abu dhabi un dia, precio tour abu dhabi, emirates palace visita, ferrari world abu dhabi",
+            "it": "tour abu dhabi da dubai, grande moschea sheikh zayed, escursione abu dhabi un giorno, costo tour abu dhabi, emirates palace visita, yas island ferrari world"
+        },
         "created_at": "2026-01-13 11:36:20",
         "updated_at": "2026-08-09 04:00:00"
     },
     {
         "id": 7,
         "slug": "dhow-cruise-catamaran-cruise-dinner-dubai",
-        "name": "Dhow and Catamaran Cruise Dubai",
+        "name": {
+            "en": "Dhow and Catamaran Cruise Dubai",
+            "ar": "رحلة عشاء المراكب الشراعية والكاتاماران في دبي",
+            "ru": "Круиз на лодке доу и катамаране в Дубае",
+            "es": "Crucero Dhow y Catamarán en Dubái",
+            "it": "Crociera su Dhow e Catamarano a Dubai"
+        },
         "category": "water-activity",
-        "short_desc": "Enjoy a romantic dinner cruise along Dubai Marina with stunning skyline views.",
-        "full_desc": "Sail through Dubai Marina on a traditional wooden dhow while enjoying international buffet dinner and entertainment.",
+        "short_desc": {
+            "en": "Enjoy a romantic dinner cruise along Dubai Marina with stunning skyline views.",
+            "ar": "استمتع برحلة عشاء رومانسية فاخرة لمدة ساعتين على متن سفينة الداو الخشبية التراثية أو الكاتاماران الحديث في دبي مارينا مع إطلالات ساحرة على ناطحات السحاب المضاءة وبوفيه عالمي 5 نجوم.",
+            "ru": "Насладитесь романтическим двухчасовым круизом с ужином на традиционной лодке дау или современном катамаране по каналу Дубай Марина с видами на сияющие небоскребы и ужином 5 звезд.",
+            "es": "Disfruta de un romántico crucero nocturno de 2 horas con cena buffet internacional a bordo de un dhow tradicional de madera o catamarán en Dubai Marina, con vistas a los rascacielos iluminados.",
+            "it": "Goditi una romantica crociera serale di 2 ore con cena a bordo di un tradizionale dhow in legno o catamarano a Dubai Marina, ammirando i grattacieli illuminati e un ricco buffet a 5 stelle."
+        },
+        "full_desc": {
+            "en": "Sail through Dubai Marina on a traditional wooden dhow while enjoying international buffet dinner and entertainment.",
+            "ar": "عش أمسية ساحرة لا تُنسى على مياه دبي الهادئة مع رحلة العشاء البحرية على متن سفينة الداو الخشبية التراثية ذات الطابقين أو الكاتاماران الزجاجي الفاخر في دبي مارينا أو قناة الجداف التاريخية.\n\nأثناء إبحار السفينة بسلاسة، ستستمتع بإطلالات بانورامية خلابة على أبراج مرسى دبي الشاهقة وعين دبي وممشى الجميرا بيتش ريزيدنس المتلألئ بالأضواء. يُقدم على متن السفينة بوفيه عشاء دولي مفتوح يضم تشكيلة واسعة من المأكولات العربية والعالمية والمشويات والسلطات الطازجة والحلويات الشهية، مصحوبة بعرض التنورة الفلكلوري الحي والموسيقى الهادئة. تتوفر باقات طعام وشراب متعددة مع إمكانية الترقية إلى الطابق العلوي المفتوح أو المقاعد المضمونة بجوار النوافذ.",
+            "ru": "Проведите незабываемый вечер на воде во время двухчасового круиза с ужином на традиционной двухпалубной деревянной лодке дау или элегантном катамаране в живописной гавани Дубай Марина или историческом заливе Аль-Джаддаф.\n\nВо время неспешного плавания перед вами предстанут залитые ночными огнями небоскребы Дубай Марины, колесо обозрения Ain Dubai и яхтенный променад JBR. Гостей ждет шведский стол с блюдами международной и арабской кухни, грилем, свежими салатами и десертами, а также живой танец Танура и приятная фоновая музыка. Доступны опции с местами на открытой верхней палубе или столиками у панорамных окон.",
+            "es": "Pasa una noche inolvidable en las tranquilas aguas de Dubái con un crucero con cena de 2 horas en un dhow tradicional de madera de dos cubiertas o en un moderno catamarán por el canal de Dubai Marina o Al Jaddaf.\n\nNavega junto a los rascacielos iluminados de la marina, la noria Ain Dubai y el paseo marítimo de JBR. A bordo disfrutarás de un suculento buffet internacional con parrillada, especialidades árabes, ensaladas frescas y postres, amenizado con el tradicional baile Tanoura y música ambiental. Posibilidad de asientos reservados junto a la ventana o en la cubierta superior al aire libre.",
+            "it": "Vivi una serata romantica sulle placide acque di Dubai con una crociera di 2 ore con cena su un tradizionale dhow in legno a due piani o un moderno catamarano lungo il canale di Dubai Marina o nella baia di Al Jaddaf.\n\nAmmira da una prospettiva unica i grattacieli illuminati della Marina, la ruota panoramica Ain Dubai e la passeggiata di JBR. A bordo ti attende una cena a buffet internazionale con specialità calde, carne alla griglia, insalate e dolci, accompagnata dalla spettacolare danza tradizionale Tanoura. Disponibili posti sul ponte superiore panoramico o tavoli garantiti fronte finestra."
+        },
         "duration": "2 Hours",
         "pickup_time": "8:30 PM",
         "dropoff_time": "10:30 PM",
@@ -196,19 +430,55 @@
         "is_featured": 1,
         "status": "active",
         "priority": 6,
-        "meta_title": "Dubai Marina Dhow Cruise Dinner 2026 | 5★ Buffet & Shows | From AED 150",
-        "meta_desc": "🍷 Experience luxury Dubai Marina Dhow & Catamaran Dinner Cruises. 5-star international buffet, live Tanoura dance, soft drinks & skyline views. Reserve direct!",
-        "meta_keywords": "dubai marina cruise, dhow cruise dinner dubai, marina catamaran dinner, luxury dhow cruise dubai, creek dinner cruise dubai, marina dinner cruise",
+        "meta_title": {
+            "en": "Dubai Marina Dhow Cruise Dinner 2026 | 5★ Buffet & Shows | From AED 150",
+            "ar": "عشاء رحلة مركب شراعي في دبي مارينا 2026 | بوفيه 5 نجوم وعروض حية | ابتداءً من 150 درهم",
+            "ru": "Круиз с ужином на лодке доу в Дубай Марине 2026 | Шведский стол 5★ и шоу | от 150 AED",
+            "es": "Crucero con Cena en Dhow por Dubái Marina 2026 | Buffet 5 Estrellas y Shows | Desde 150 AED",
+            "it": "Crociera con Cena su Dhow a Dubai Marina 2026 | Buffet 5 Stelle e Spettacoli | Da 150 AED"
+        },
+        "meta_desc": {
+            "en": "🍷 Experience luxury Dubai Marina Dhow & Catamaran Dinner Cruises. 5-star international buffet, live Tanoura dance, soft drinks & skyline views. Reserve direct!",
+            "ar": "🍷 اختبر فخامة رحلات العشاء البحرية على متن المراكب الشراعية والكاتاماران في دبي مارينا. بوفيه دولي فاخر 5 نجوم، رقص التنورة المباشر، وإطلالات أفق دبي الساحرة. احجز مباشرة!",
+            "ru": "🍷 Роскошные круизы с ужином на традиционных лодках доу и катамаранах в Дубай Марине. Международный шведский стол 5 звезд, танец Танура и панорама небоскребов!",
+            "es": "🍷 Vive una experiencia de lujo en Dubái Marina con cenas en cruceros dhow y catamarán. Buffet internacional de 5 estrellas, danza Tanoura en vivo y vistas panorámicas.",
+            "it": "🍷 Vivi l'eleganza di una crociera con cena su dhow e catamarano a Dubai Marina. Buffet internazionale 5 stelle, danza Tanoura dal vivo e vedute mozzafiato sullo skyline."
+        },
+        "meta_keywords": {
+            "en": "dubai marina cruise, dhow cruise dinner dubai, marina catamaran dinner, luxury dhow cruise dubai, creek dinner cruise dubai, marina dinner cruise",
+            "ar": "رحلة عشاء دبي مارينا, كروز داو دبي مارينا, عشاء كاتاماران دبي, اسعار كروز دبي, رحلة بحرية دبي مع عشاء, افضل كروز في دبي",
+            "ru": "круиз с ужином дубай марина, круиз на дау дубай, катамаран дубай марина ужин, вечерний круиз в дубае, цена круиза с ужином дубай",
+            "es": "crucero con cena dubai marina, dhow cruise dubai, cena en barco dubai, catamaran dubai marina, paseo en barco dubai con cena, precio crucero dubai",
+            "it": "crociera con cena dubai marina, dhow cruise dubai marina, cena in barca dubai, battello dubai marina, costo crociera cena dubai"
+        },
         "created_at": "2026-01-13 11:36:20",
         "updated_at": "2026-08-09 04:00:00"
     },
     {
         "id": 8,
         "slug": "dune-buggy-rental-dubai",
-        "name": "Dune Buggy Rental Dubai",
+        "name": {
+            "en": "Dune Buggy Rental Dubai",
+            "ar": "استئجار عربات الدون باجي في دبي",
+            "ru": "Аренда багги в дюнах Дубая",
+            "es": "Alquiler de Buggy en las Dunas de Dubái",
+            "it": "Noleggio Dune Buggy a Dubai"
+        },
         "category": "desert-safari",
-        "short_desc": "Unleash the ultimate adrenaline rush in Dubai's Lahbab Red Dunes with our self-drive 1000cc Can-Am Maverick X3 and Polaris RZR dune buggies. Conquer towering sand dunes with full safety gear, expert guide instruction, and complimentary hotel pickup.",
-        "full_desc": "Take control of a high-powered 1000cc Can-Am Maverick X3 Turbo or Polaris RZR dune buggy and conquer the open desert of Dubai's famous Lahbab Red Dunes. Designed for thrill-seekers, couples, and friends, our self-drive dune buggy tours deliver an unparalleled off-road adventure under the guidance of certified desert rally instructors.\r\n\r\nYour experience begins with convenient hotel pick-up in a comfortable air-conditioned 4x4 vehicle. Upon arrival at our desert staging base, you will be briefed on vehicle operation, safety protocols, and equipped with full protective gear including helmets and goggles.\r\n\r\nFollowing a practice trail, follow your lead captain into the deep red dunes for 60 to 120 minutes of heart-stopping dune climbs, steep drops, and high-speed ridge carving. Pause atop the tallest dunes for breathtaking desert photo stops before returning to base for light refreshments, camel rides, and sandboarding.\r\n\r\nWhether you choose a single-seat, 2-seater, or 4-seater buggy, Dunes Discovery Tourism provides brand-new, meticulously maintained off-road buggies fitted with roll cages, 4-point safety harnesses, and GPS tracking.",
+        "short_desc": {
+            "en": "Unleash the ultimate adrenaline rush in Dubai's Lahbab Red Dunes with our self-drive 1000cc Can-Am Maverick X3 and Polaris RZR dune buggies. Conquer towering sand dunes with full safety gear, expert guide instruction, and complimentary hotel pickup.",
+            "ar": "أطلق العنان لأقصى درجات الحماس والإثارة في كثبان لهباب الحمراء بدبي مع عربات الباجي الصحراوية القوية Can-Am Maverick X3 بقوة 1000 سي سي وPolaris RZR ذات القيادة الذاتية. قهر الكثبان الرملية الشاهقة بمعدات سلامة متكاملة وإشراف مدربين محترفين وتوصيل فندقي مريح.",
+            "ru": "Ощутите максимальный выброс адреналина на красных дюнах Лахбаб за рулем мощных багги Can-Am Maverick X3 (1000cc Turbo) и Polaris RZR с независимым управлением. Покоряйте крутые дюны в полной защитной экипировке под руководством раллийных инструкторов с бесплатным трансфером из отеля.",
+            "es": "Desata la máxima adrenalina en las dunas rojas de Lahbab con nuestros potentes buggies 1000cc Can-Am Maverick X3 y Polaris RZR de conducción libre. Conquista dunas gigantes con equipamiento de seguridad completo, instrucción de guías expertos y recogida incluida en tu hotel.",
+            "it": "Scatena la massima adrenalina sulle dune rosse di Lahbab a Dubai alla guida dei potenti dune buggy 1000cc Can-Am Maverick X3 e Polaris RZR. Conquista le vette sabbiose con equipaggiamento di sicurezza completo, istruttori certificati e comodo prelievo in hotel."
+        },
+        "full_desc": {
+            "en": "Take control of a high-powered 1000cc Can-Am Maverick X3 Turbo or Polaris RZR dune buggy and conquer the open desert of Dubai's famous Lahbab Red Dunes. Designed for thrill-seekers, couples, and friends, our self-drive dune buggy tours deliver an unparalleled off-road adventure under the guidance of certified desert rally instructors.\r\n\r\nYour experience begins with convenient hotel pick-up in a comfortable air-conditioned 4x4 vehicle. Upon arrival at our desert staging base, you will be briefed on vehicle operation, safety protocols, and equipped with full protective gear including helmets and goggles.\r\n\r\nFollowing a practice trail, follow your lead captain into the deep red dunes for 60 to 120 minutes of heart-stopping dune climbs, steep drops, and high-speed ridge carving. Pause atop the tallest dunes for breathtaking desert photo stops before returning to base for light refreshments, camel rides, and sandboarding.\r\n\r\nWhether you choose a single-seat, 2-seater, or 4-seater buggy, Dunes Discovery Tourism provides brand-new, meticulously maintained off-road buggies fitted with roll cages, 4-point safety harnesses, and GPS tracking.",
+            "ar": "تولَّ عجلة القيادة في أقوى عربات الباجي الصحراوية 1000cc Can-Am Maverick X3 Turbo وPolaris RZR وانطلق لتحدي الكثبان الحمراء المفتوحة في صحراء لهباب الشهيرة بدبي. صُممت جولات الباجي ذاتية القيادة لعشاق الإثارة والأزواج والأصدقاء الباحثين عن مغامرة صحراوية استثنائية تحت إشراف طاقم مرشدين معتمدين.\n\nتبدأ تجربتك بخدمة التوصيل من فندقك بسيارة 4x4 مكيفة. فور وصولك إلى محطة الانطلاق، يتم إرشادك وتدريبك على استخدام أدوات التحكم وبروتوكولات السلامة وتزويدك بكامل معدات الوقاية من خوذات ونظارات مخصصة للصحراء.\n\nبعد جولة تجريبية قصيرة، تتبع مرشدك المحترف في عمق الكثبان الرملية لمدة 60 إلى 120 دقيقة من التسلق والانحدار السريع والمناورات الرائعة. نتوقف على أعلى القمم لالتقاط صور تذكارية مذهلة، يتبعها ركوب الجمال والتزلج على الرمال وتناول المرطبات الباردة.\n\nسواء اخترت باجي بمقعد فردي أو مقعدين أو 4 مقاعد، توفر ديونز ديسكفري توريزم أحدث المركبات المجهزة بأقفاص حماية صلبة وأحزمة أمان رباعية النقاط ونظام تتبع عبر الأقمار الصناعية لضمان متعة لا تضاهى بأقصى درجات الأمان.",
+            "ru": "Возьмите под контроль мощный багги Can-Am Maverick X3 Turbo (1000cc) или Polaris RZR и покорите открытые красные дюны Лахбаб в Дубае. Наши туры на багги созданы для любителей острых ощущений, пар и компаний друзей, желающих испытать чистый драйв под руководством сертифицированных инструкторов.\n\nВаше приключение начинается с комфортного трансфера из отеля на внедорожнике 4x4. На базе вы пройдете подробный инструктаж по управлению и безопасности и получите полную защитную экипировку (сертифицированные шлемы и очки).\n\nПосле короткого тренировочного круга вы следуете за капитаном в глубь дюн на 60–120 минут скоростных подъемов, спусков и виражей. В программе — остановка на гребнях для потрясающих фотографий, катание на верблюдах, сэндбординг и прохладительные напитки на базе.\n\nВ автопарке Dunes Discovery Tourism представлены новые 1-, 2- и 4-местные багги с каркасом безопасности, 4-точечными ремнями и спутниковой связью.",
+            "es": "Toma el control de un potente dune buggy Can-Am Maverick X3 Turbo de 1000cc o Polaris RZR y domina las famosas dunas rojas de Lahbab en Dubái. Diseñado para entusiastas de la adrenalina, parejas y amigos, este tour autoguiado ofrece una aventura todoterreno sin igual bajo la supervisión de instructores de rally certificados.\n\nTu experiencia comienza con la recogida en tu hotel en un 4x4 climatizado. En nuestra base del desierto recibirás instrucciones de manejo y seguridad, además de equipamiento de protección integral (cascos y gafas técnicas).\n\nTras una vuelta de prueba, seguirás al guía líder hacia el corazón de las dunas durante 60 a 120 minutos de subidas vertiginosas, descensos pronunciados y giros de alta velocidad. Haremos paradas en las crestas más altas para tomar fotos épicas, además de sandboarding, paseo en camello y refrescos en la base.\n\nDisponibles en versiones monoplaza, biplaza y de 4 plazas, todos nuestros vehículos cuentan con jaula antivuelco, arneses de 4 puntos y seguimiento GPS.",
+            "it": "Mettiti al volante di un potente dune buggy 1000cc Can-Am Maverick X3 Turbo o Polaris RZR e conquista le iconiche dune rosse di Lahbab a Dubai. Pensato per amanti dell'adrenalina, coppie e gruppi di amici, questo tour a guida autonoma regala un'emozione fuoristrada senza paragoni sotto la guida di istruttori rally esperti.\n\nPrelievo in hotel con fuoristrada 4x4 climatizzato. All'arrivo alla base nel deserto riceverai un briefing completo sulle tecniche di guida e sicurezza, oltre all'equipaggiamento protettivo (casco e occhiali tecnici).\n\nDopo una prova pratica, seguirai il capitano tra le dune più alte per 60-120 minuti di arrampicate mozzafiato, discese ripide e curve ad alta velocità. Sosta in vetta per scattare foto spettacolari, seguita da sandboard, cammelli e bibite rinfrescanti alla base.\n\nDisponibili modelli singoli, a 2 o a 4 posti, tutti dotati di gabbia di sicurezza roll-bar, cinture a 4 punti e tracciamento GPS."
+        },
         "duration": "3 Hours",
         "pickup_time": "7:00 AM / 3:00 PM",
         "dropoff_time": "10:00 AM / 6:00 PM",
@@ -225,9 +495,27 @@
         "is_featured": 1,
         "status": "active",
         "priority": 4,
-        "meta_title": "Dune Buggy Rental Dubai 2026 | 1000cc Can-Am Maverick X3 | From AED 599",
-        "meta_desc": "⚡ Rent High-Power 1000cc Can-Am Maverick & Polaris Buggies in Dubai Red Dunes. Self-drive off-road adventure with safety gear & 4x4 hotel pickup. Book Now!",
-        "meta_keywords": "dune buggy rental dubai, can am dune buggy dubai, polaris rzr dubai, self drive buggy desert safari, red dunes buggy rental",
+        "meta_title": {
+            "en": "Dune Buggy Rental Dubai 2026 | 1000cc Can-Am Maverick X3 | From AED 599",
+            "ar": "استئجار دون باجي في دبي 2026 | كان-آم مافريك X3 قوة 1000 سي سي | ابتداءً من 599 درهم",
+            "ru": "Аренда багги в Дубае 2026 | 1000cc Can-Am Maverick X3 | от 599 AED",
+            "es": "Alquiler de Dune Buggy en Dubái 2026 | Can-Am Maverick X3 1000cc | Desde 599 AED",
+            "it": "Noleggio Dune Buggy a Dubai 2026 | Can-Am Maverick X3 1000cc | Da 599 AED"
+        },
+        "meta_desc": {
+            "en": "⚡ Rent High-Power 1000cc Can-Am Maverick & Polaris Buggies in Dubai Red Dunes. Self-drive off-road adventure with safety gear & 4x4 hotel pickup. Book Now!",
+            "ar": "⚡ استأجر أقوى عربات الدون باجي كان-آم مافريك وبولاريس 1000 سي سي في الكثبان الحمراء بدبي. مغامرة قيادة ذاتية للطرق الوعرة مع معدات السلامة والتوصيل الفندقي. احجز الآن!",
+            "ru": "⚡ Аренда мощных багги Can-Am Maverick и Polaris 1000cc в красных дюнах Дубая. Самостоятельное вождение, защитная экипировка и трансфер на 4x4. Бронируйте сейчас!",
+            "es": "⚡ Alquila potentes buggies Can-Am Maverick y Polaris de 1000cc en las dunas rojas de Dubái. Aventura off-road con equipo de seguridad y traslados en 4x4. ¡Reserva hoy!",
+            "it": "⚡ Noleggia potenti buggy Can-Am Maverick e Polaris 1000cc tra le dune rosse di Dubai. Guida autonoma nel deserto con equipaggiamento di sicurezza e transfer 4x4. Prenota ora!"
+        },
+        "meta_keywords": {
+            "en": "dune buggy rental dubai, can am dune buggy dubai, polaris rzr dubai, self drive buggy desert safari, red dunes buggy rental",
+            "ar": "تاجير باجي صحراوي دبي, باجي كان ام دبي, باجي بولاريس دبي, اسعار تاجير باجي دبي, باجي الكثبان الحمراء دبي, سفاري قيادة باجي دبي",
+            "ru": "аренда багги в дубае, багги can am дубай, багги polaris дубай, покататься на багги в пустыне дубай, цена аренды багги дубай, сафари на багги дубай",
+            "es": "alquiler buggies dubai, can am maverick dubai, polaris rzr dubai, buggy desierto dubai, precio alquiler buggy dubai, buggy dunas rojas dubai",
+            "it": "noleggio dune buggy dubai, can am maverick dubai, polaris rzr dubai, buggy deserto dubai, costo noleggio buggy dubai, escursione buggy dubai"
+        },
         "created_at": "2026-02-08 10:00:00",
         "updated_at": "2026-08-09 04:00:00"
     }

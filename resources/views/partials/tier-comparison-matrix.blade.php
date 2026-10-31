@@ -7,26 +7,26 @@
     <div class="flex justify-between items-center mb-6 flex-wrap gap-3">
         <div>
             <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-orange-50 text-primary border border-orange-200/60 uppercase tracking-wider mb-2">
-                <i class="bi bi-layers"></i> Side-by-Side Comparison
+                <i class="bi bi-layers"></i> {{ __('ui.tier_matrix.badge') }}
             </div>
-            <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mb-1">Package Tier Feature Breakdown</h2>
-            <p class="text-slate-500 text-xs sm:text-sm">Compare what is included in each package tier to pick the ideal safari experience for your party.</p>
+            <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mb-1">{{ __('ui.tier_matrix.title') }}</h2>
+            <p class="text-slate-500 text-xs sm:text-sm">{{ __('ui.tier_matrix.subtitle') }}</p>
         </div>
         <div class="flex items-center gap-2">
             <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700">
-                <i class="bi bi-shield-check text-emerald-500"></i> Instant Confirmation
+                <i class="bi bi-shield-check text-emerald-500"></i> {{ __('ui.tier_matrix.instant_confirm') }}
             </span>
         </div>
     </div>
     <div class="sm:hidden text-[11px] text-slate-500 font-medium flex items-center gap-1.5 mb-3 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
-        <i class="bi bi-arrow-left-right text-primary"></i> Swipe horizontally to compare all packages
+        <i class="bi bi-arrow-left-right text-primary"></i> {{ __('ui.tier_matrix.swipe_hint') }}
     </div>
 
     <div class="overflow-x-auto rounded-2xl border border-slate-200">
         <table class="w-full text-center text-sm border-collapse min-w-[620px]">
             <thead class="bg-slate-50 border-b border-slate-200">
                 <tr>
-                    <th class="text-start py-4 px-4 text-slate-500 font-bold uppercase text-xs w-[28%] min-w-[180px] sticky start-0 bg-slate-50 z-10 shadow-[1px_0_0_0_#e2e8f0]">Feature / Inclusion</th>
+                    <th class="text-start py-4 px-4 text-slate-500 font-bold uppercase text-xs w-[28%] min-w-[180px] sticky start-0 bg-slate-50 z-10 shadow-[1px_0_0_0_#e2e8f0]">{{ __('ui.tier_matrix.feature_col') }}</th>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
                     @php
                         $isOvernight = ($tour->id === 3 || str_contains($tour->slug, 'overnight'));
@@ -35,9 +35,9 @@
                     @endphp
                     <th class="py-4 px-3 min-w-[140px] {{ $isTierSelected ? 'bg-orange-100/70 border-x-2 border-primary' : ($tier->is_popular ? 'bg-orange-50/60 border-x border-orange-200' : '') }}">
                         @if($isTierSelected)
-                        <span class="inline-block px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[9px] font-black uppercase mb-1">SELECTED OPTION</span>
+                        <span class="inline-block px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[9px] font-black uppercase mb-1">{{ __('ui.tier_matrix.selected_badge') }}</span>
                         @elseif($tier->is_popular)
-                        <span class="inline-block px-2 py-0.5 rounded-full bg-primary text-white text-[9px] font-black uppercase mb-1">MOST POPULAR</span>
+                        <span class="inline-block px-2 py-0.5 rounded-full bg-primary text-white text-[9px] font-black uppercase mb-1">{{ __('ui.tier_matrix.popular_badge') }}</span>
                         @endif
                         <div class="font-extrabold text-slate-900 text-sm">{{ $tier->name }}</div>
                         <div class="text-lg font-black text-primary font-mono mt-0.5" data-aed="{{ $tier->pivot?->price ?? 0 }}">AED {{ number_format($tier->pivot?->price ?? 0) }}</div>
@@ -56,7 +56,7 @@
                 @if($isBuggyTour)
                 <tr>
                     <td class="text-start py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2 sticky start-0 bg-white z-10 shadow-[1px_0_0_0_#e2e8f0]">
-                        <i class="bi bi-speedometer2 text-primary"></i> Buggy Model & Engine
+                        <i class="bi bi-speedometer2 text-primary"></i> {{ __('ui.tier_matrix.feat_buggy_engine') }}
                     </td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
                     <td class="py-3.5 px-3 {{ $tier->is_popular ? 'bg-orange-50/30 border-x border-orange-200/60' : '' }}">
@@ -72,7 +72,7 @@
                 </tr>
                 <tr>
                     <td class="text-start py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2 sticky start-0 bg-white z-10 shadow-[1px_0_0_0_#e2e8f0]">
-                        <i class="bi bi-people-fill text-primary"></i> Seating Capacity
+                        <i class="bi bi-people-fill text-primary"></i> {{ __('ui.tier_matrix.feat_seating') }}
                     </td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
                     <td class="py-3.5 px-3 {{ $tier->is_popular ? 'bg-orange-50/30 border-x border-orange-200/60' : '' }}">
@@ -88,7 +88,7 @@
                 </tr>
                 <tr>
                     <td class="text-start py-3.5 px-4 font-bold text-slate-800 flex items-center gap-2 sticky start-0 bg-white z-10 shadow-[1px_0_0_0_#e2e8f0]">
-                        <i class="bi bi-stopwatch-fill text-primary"></i> Self-Drive Duration
+                        <i class="bi bi-stopwatch-fill text-primary"></i> {{ __('ui.tier_matrix.feat_drive_duration') }}
                     </td>
                     @foreach($tour->tiers->sortBy('priority') as $tier)
                     <td class="py-3.5 px-3 {{ $tier->is_popular ? 'bg-orange-50/30 border-x border-orange-200/60' : '' }}">

@@ -14,10 +14,10 @@
         <!-- Section Header -->
         <div class="max-w-2xl mx-auto text-center mb-8">
             <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-black bg-orange-50 text-primary-accessible border border-orange-200/60 uppercase tracking-wider mb-2">
-                <i class="bi bi-compass"></i> Tour Recommender
+                <i class="bi bi-compass"></i> {{ __('ui.safari_quiz.badge') }}
             </span>
             <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight mb-2">
-                Find Your Perfect Dubai Experience in 3 Clicks
+                {{ __('ui.safari_quiz.title_prefix') }} {{ __('ui.safari_quiz.title_highlight') }}
             </h2>
             <p class="text-slate-500 text-xs sm:text-sm leading-relaxed">
                 Not sure which tour to pick? Answer 3 quick questions and our recommendation engine will find the exact experience tailored to your trip.
@@ -39,12 +39,12 @@
 
                 <!-- Step 1: Category -->
                 <div x-show="step === 1">
-                    <h3 class="font-black text-slate-900 text-base sm:text-lg mb-4 text-center">What type of Dubai experience are you looking for?</h3>
+                    <h3 class="font-black text-slate-900 text-base sm:text-lg mb-4 text-center">{{ __('ui.safari_quiz.step1_title') }}</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         <div @click="selectChoice(1, 'desert')" class="p-4 rounded-2xl border border-slate-200 hover:border-primary hover:bg-orange-50/50 cursor-pointer transition-all text-center group">
                             <i class="bi bi-compass text-3xl text-amber-500 mb-2 block group-hover:scale-110 transition-transform"></i>
-                            <h4 class="font-bold text-slate-900 text-sm mb-1">Desert Safari & Red Dunes</h4>
-                            <p class="text-slate-500 text-xs leading-relaxed">4x4 Dune Bashing, Camel Rides, Live Camp Shows & BBQ Dinner</p>
+                            <h4 class="font-bold text-slate-900 text-sm mb-1">{{ __('ui.safari_quiz.time_morning_title') }}</h4>
+                            <p class="text-slate-500 text-xs leading-relaxed">{{ __('ui.safari_quiz.package_includes') }}</p>
                         </div>
                         <div @click="selectChoice(1, 'city')" class="p-4 rounded-2xl border border-slate-200 hover:border-primary hover:bg-orange-50/50 cursor-pointer transition-all text-center group">
                             <i class="bi bi-buildings text-3xl text-amber-500 mb-2 block group-hover:scale-110 transition-transform"></i>
@@ -66,7 +66,7 @@
 
                 <!-- Step 2: Timing -->
                 <div x-show="step === 2">
-                    <h3 class="font-black text-slate-900 text-base sm:text-lg mb-4 text-center">What time of day do you prefer?</h3>
+                    <h3 class="font-black text-slate-900 text-base sm:text-lg mb-4 text-center">{{ __('ui.safari_quiz.step2_title') }}</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                         <div @click="selectChoice(2, 'morning')" class="p-4 rounded-2xl border border-slate-200 hover:border-primary hover:bg-orange-50/50 cursor-pointer transition-all text-center group">
                             <i class="bi bi-sunrise text-3xl text-amber-500 mb-2 block group-hover:scale-110 transition-transform"></i>
@@ -88,7 +88,7 @@
 
                 <!-- Step 3: Style -->
                 <div x-show="step === 3">
-                    <h3 class="font-black text-slate-900 text-base sm:text-lg mb-4 text-center">What is your group style & pace?</h3>
+                    <h3 class="font-black text-slate-900 text-base sm:text-lg mb-4 text-center">{{ __('ui.safari_quiz.step3_title') }}</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                         <div @click="selectChoice(3, 'family')" class="p-4 rounded-2xl border border-slate-200 hover:border-primary hover:bg-orange-50/50 cursor-pointer transition-all text-center group">
                             <i class="bi bi-people text-3xl text-amber-500 mb-2 block group-hover:scale-110 transition-transform"></i>
@@ -112,7 +112,7 @@
                 <div x-show="step === 4">
                     <div class="text-center mb-6">
                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 mb-2">
-                            <i class="bi bi-patch-check-fill text-emerald-500"></i> Top Recommendation Based on Your Choices
+                            <i class="bi bi-patch-check-fill text-emerald-500"></i> {{ __('ui.safari_quiz.recommendation_badge') }}
                         </span>
                         <h3 class="text-xl sm:text-2xl font-black text-slate-900 mb-1" x-text="matchedTour.title">Evening Desert Safari Dubai</h3>
                         <div class="flex items-center justify-center gap-3 text-xs text-slate-500 mb-2">
@@ -172,7 +172,7 @@
                                 class="text-xs text-slate-400 hover:text-slate-700 transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer py-2 px-3 min-h-[44px]" 
                                 @click="resetQuiz()">
                             <i class="bi bi-arrow-counterclockwise"></i>
-                            <span>Retake Matcher Quiz</span>
+                            <span>{{ __('ui.safari_quiz.retake_btn') }}</span>
                         </button>
                     </div>
                 </div>

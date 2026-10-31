@@ -48,10 +48,10 @@
             <div class="flex items-center justify-between pb-3 border-b border-slate-800">
                 <div>
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-primary/20 text-primary border border-primary/40 mb-1">
-                        <i class="bi bi-compass-fill"></i> Safari Concierge Recommendation
+                        <i class="bi bi-compass-fill"></i> {{ __('ui.safari_quiz.badge') }}
                     </span>
                     <h4 id="safariMatcherModalLabel" class="text-lg sm:text-xl font-black text-white">
-                        Safari Match <span class="bg-gradient-to-r from-orange-500 to-amber-400 bg-clip-text text-transparent">Concierge</span>
+                        {{ __('ui.safari_quiz.title_prefix') }} <span class="bg-gradient-to-r from-orange-500 to-amber-400 bg-clip-text text-transparent">{{ __('ui.safari_quiz.title_highlight') }}</span>
                     </h4>
                 </div>
                 <button type="button" 
@@ -65,7 +65,7 @@
             <!-- Stepper Progress Bar -->
             <div class="py-3" x-show="step <= 3">
                 <div class="flex items-center justify-between text-slate-300 text-xs font-mono mb-1.5">
-                    <span x-text="step === 1 ? 'Step 1 of 3: Travel Party' : (step === 2 ? 'Step 2 of 3: Time & Vibe' : 'Step 3 of 3: Must-Have Perks')"></span>
+                    <span x-text="step === 1 ? '{{ addslashes(__('ui.safari_quiz.step1_indicator')) }}' : (step === 2 ? '{{ addslashes(__('ui.safari_quiz.step2_indicator')) }}' : '{{ addslashes(__('ui.safari_quiz.step3_indicator')) }}')"></span>
                     <span x-text="step === 1 ? '33%' : (step === 2 ? '66%' : '90%')"></span>
                 </div>
                 <div class="w-full h-1.5 bg-slate-800/80 border border-slate-700/50 rounded-full overflow-hidden">
@@ -79,8 +79,8 @@
                 
                 <!-- Step 1: Group Style -->
                 <div x-show="step === 1">
-                    <h5 class="font-extrabold text-base sm:text-lg text-white mb-1">Who is joining you on this desert safari?</h5>
-                    <p class="text-slate-300 text-xs mb-4">Choose your party style so we can optimize dune pacing, vehicle safety, and camp seating.</p>
+                    <h5 class="font-extrabold text-base sm:text-lg text-white mb-1">{{ __('ui.safari_quiz.step1_title') }}</h5>
+                    <p class="text-slate-300 text-xs mb-4">{{ __('ui.safari_quiz.step1_subtitle') }}</p>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div @click="selectOption('group', 'family')" 
@@ -89,8 +89,8 @@
                             <div class="flex items-start gap-3">
                                 <i class="bi bi-people-fill text-2xl text-amber-400 shrink-0"></i>
                                 <div>
-                                    <div class="font-bold text-white text-sm mb-1">Family with Kids & Seniors</div>
-                                    <div class="text-slate-300 text-xs leading-relaxed">Moderate dune bashing, gentle camel rides & family-friendly dinner.</div>
+                                    <div class="font-bold text-white text-sm mb-1">{{ __('ui.safari_quiz.group_family_title') }}</div>
+                                    <div class="text-slate-300 text-xs leading-relaxed">{{ __('ui.safari_quiz.group_family_desc') }}</div>
                                 </div>
                             </div>
                         </div>
@@ -101,8 +101,8 @@
                             <div class="flex items-start gap-3">
                                 <i class="bi bi-lightning-charge-fill text-2xl text-amber-400 shrink-0"></i>
                                 <div>
-                                    <div class="font-bold text-white text-sm mb-1">Thrill & Adrenaline Seekers</div>
-                                    <div class="text-slate-300 text-xs leading-relaxed">High red dunes, powerful 400cc Quads, 1000cc Buggies & sandboarding.</div>
+                                    <div class="font-bold text-white text-sm mb-1">{{ __('ui.safari_quiz.group_adventure_title') }}</div>
+                                    <div class="text-slate-300 text-xs leading-relaxed">{{ __('ui.safari_quiz.group_adventure_desc') }}</div>
                                 </div>
                             </div>
                         </div>
@@ -113,8 +113,8 @@
                             <div class="flex items-start gap-3">
                                 <i class="bi bi-award-fill text-2xl text-amber-400 shrink-0"></i>
                                 <div>
-                                    <div class="font-bold text-white text-sm mb-1">VIP Luxury & Couples</div>
-                                    <div class="text-slate-300 text-xs leading-relaxed">Private 4x4 pickup, reserved elevated VIP table with private waiter service.</div>
+                                    <div class="font-bold text-white text-sm mb-1">{{ __('ui.safari_quiz.group_luxury_title') }}</div>
+                                    <div class="text-slate-300 text-xs leading-relaxed">{{ __('ui.safari_quiz.group_luxury_desc') }}</div>
                                 </div>
                             </div>
                         </div>
@@ -125,8 +125,8 @@
                             <div class="flex items-start gap-3">
                                 <i class="bi bi-tag-fill text-2xl text-amber-400 shrink-0"></i>
                                 <div>
-                                    <div class="font-bold text-white text-sm mb-1">Best Value / Solo Explorer</div>
-                                    <div class="text-slate-300 text-xs leading-relaxed">Dubai's #1 rated evening safari with full 5-star live BBQ and 3 cultural shows.</div>
+                                    <div class="font-bold text-white text-sm mb-1">{{ __('ui.safari_quiz.priority_budget_title') }}</div>
+                                    <div class="text-slate-300 text-xs leading-relaxed">{{ __('ui.safari_quiz.priority_budget_desc') }}</div>
                                 </div>
                             </div>
                         </div>
@@ -135,8 +135,8 @@
 
                 <!-- Step 2: Time & Vibe -->
                 <div x-show="step === 2">
-                    <h5 class="font-extrabold text-base sm:text-lg text-white mb-1">What time of day & atmosphere do you prefer?</h5>
-                    <p class="text-slate-300 text-xs mb-4">Select the timing that best fits your Dubai itinerary and climate preference.</p>
+                    <h5 class="font-extrabold text-base sm:text-lg text-white mb-1">{{ __('ui.safari_quiz.step2_title') }}</h5>
+                    <p class="text-slate-300 text-xs mb-4">{{ __('ui.safari_quiz.step2_subtitle') }}</p>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div @click="selectOption('vibe', 'evening')" 
@@ -145,8 +145,8 @@
                             <div class="flex items-start gap-3">
                                 <i class="bi bi-sunset-fill text-2xl text-amber-400 shrink-0"></i>
                                 <div>
-                                    <div class="font-bold text-white text-sm mb-1">Sunset Evening Safari (Classic)</div>
-                                    <div class="text-slate-300 text-xs leading-relaxed">2:30 PM – 9:30 PM. Red dunes sunset photos, camp, BBQ buffet & fire show.</div>
+                                    <div class="font-bold text-white text-sm mb-1">{{ __('ui.safari_quiz.time_evening_title') }}</div>
+                                    <div class="text-slate-300 text-xs leading-relaxed">{{ __('ui.safari_quiz.time_evening_desc') }}</div>
                                 </div>
                             </div>
                         </div>
@@ -157,8 +157,8 @@
                             <div class="flex items-start gap-3">
                                 <i class="bi bi-sunrise-fill text-2xl text-amber-400 shrink-0"></i>
                                 <div>
-                                    <div class="font-bold text-white text-sm mb-1">Crisp Morning Safari (Cooler)</div>
-                                    <div class="text-slate-300 text-xs leading-relaxed">7:00 AM – 11:00 AM. Crisp morning air, red dunes, sandboarding & camel ride.</div>
+                                    <div class="font-bold text-white text-sm mb-1">{{ __('ui.safari_quiz.time_morning_title') }}</div>
+                                    <div class="text-slate-300 text-xs leading-relaxed">{{ __('ui.safari_quiz.time_morning_desc') }}</div>
                                 </div>
                             </div>
                         </div>
@@ -169,8 +169,8 @@
                             <div class="flex items-start gap-3">
                                 <i class="bi bi-moon-stars-fill text-2xl text-amber-400 shrink-0"></i>
                                 <div>
-                                    <div class="font-bold text-white text-sm mb-1">Overnight Stargazing Glamping</div>
-                                    <div class="text-slate-300 text-xs leading-relaxed">2:45 PM – 7:00 AM Next Day. Evening safari + Bedouin tent, stargazing & breakfast.</div>
+                                    <div class="font-bold text-white text-sm mb-1">{{ __('ui.safari_quiz.time_overnight_title') }}</div>
+                                    <div class="text-slate-300 text-xs leading-relaxed">{{ __('ui.safari_quiz.time_overnight_desc') }}</div>
                                 </div>
                             </div>
                         </div>
@@ -181,8 +181,8 @@
                             <div class="flex items-start gap-3">
                                 <i class="bi bi-water text-2xl text-amber-400 shrink-0"></i>
                                 <div>
-                                    <div class="font-bold text-white text-sm mb-1">Marina Luxury Dhow Cruise</div>
-                                    <div class="text-slate-300 text-xs leading-relaxed">7:30 PM - 10:30 PM. Gliding past skyscrapers with 5-star buffet & live music.</div>
+                                    <div class="font-bold text-white text-sm mb-1">{{ __('ui.safari_quiz.time_buggy_title') }}</div>
+                                    <div class="text-slate-300 text-xs leading-relaxed">{{ __('ui.safari_quiz.time_buggy_desc') }}</div>
                                 </div>
                             </div>
                         </div>
@@ -191,8 +191,8 @@
 
                 <!-- Step 3: Must-Haves -->
                 <div x-show="step === 3">
-                    <h5 class="font-extrabold text-base sm:text-lg text-white mb-1">What is your #1 must-have experience or perk?</h5>
-                    <p class="text-slate-300 text-xs mb-4">Choose the feature you most look forward to experiencing.</p>
+                    <h5 class="font-extrabold text-base sm:text-lg text-white mb-1">{{ __('ui.safari_quiz.step3_title') }}</h5>
+                    <p class="text-slate-300 text-xs mb-4">{{ __('ui.safari_quiz.step3_subtitle') }}</p>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div @click="selectOption('perk', 'quad_buggy')" 
@@ -201,8 +201,8 @@
                             <div class="flex items-start gap-3">
                                 <i class="bi bi-speedometer2 text-2xl text-amber-400 shrink-0"></i>
                                 <div>
-                                    <div class="font-bold text-white text-sm mb-1">Quad Biking or Dune Buggy</div>
-                                    <div class="text-slate-300 text-xs leading-relaxed">350cc/400cc ATV or 1000cc Can-Am Turbo buggy self-drive in open red dunes.</div>
+                                    <div class="font-bold text-white text-sm mb-1">{{ __('ui.safari_quiz.time_buggy_title') }}</div>
+                                    <div class="text-slate-300 text-xs leading-relaxed">{{ __('ui.safari_quiz.priority_extreme_desc') }}</div>
                                 </div>
                             </div>
                         </div>
@@ -213,8 +213,8 @@
                             <div class="flex items-start gap-3">
                                 <i class="bi bi-cup-hot-fill text-2xl text-amber-400 shrink-0"></i>
                                 <div>
-                                    <div class="font-bold text-white text-sm mb-1">VIP Raised Table & Waiter</div>
-                                    <div class="text-slate-300 text-xs leading-relaxed">Skip all buffet lines with dedicated table-side service & stage view.</div>
+                                    <div class="font-bold text-white text-sm mb-1">{{ __('ui.safari_quiz.priority_vip_title') }}</div>
+                                    <div class="text-slate-300 text-xs leading-relaxed">{{ __('ui.safari_quiz.priority_vip_desc') }}</div>
                                 </div>
                             </div>
                         </div>
@@ -225,8 +225,8 @@
                             <div class="flex items-start gap-3">
                                 <i class="bi bi-car-front-fill text-2xl text-amber-400 shrink-0"></i>
                                 <div>
-                                    <div class="font-bold text-white text-sm mb-1">Private 4x4 (No Sharing)</div>
-                                    <div class="text-slate-300 text-xs leading-relaxed">Exclusive 7-seater Land Cruiser for your party, flexible hotel pickup.</div>
+                                    <div class="font-bold text-white text-sm mb-1">{{ __('ui.safari_quiz.priority_pickup_title') }}</div>
+                                    <div class="text-slate-300 text-xs leading-relaxed">{{ __('ui.safari_quiz.priority_pickup_desc') }}</div>
                                 </div>
                             </div>
                         </div>
@@ -237,8 +237,8 @@
                             <div class="flex items-start gap-3">
                                 <i class="bi bi-star-fill text-2xl text-amber-400 shrink-0"></i>
                                 <div>
-                                    <div class="font-bold text-white text-sm mb-1">All-Inclusive Standard Package</div>
-                                    <div class="text-slate-300 text-xs leading-relaxed">Dune bashing, camel ride, sandboarding, BBQ dinner & 3 shows.</div>
+                                    <div class="font-bold text-white text-sm mb-1">{{ __('ui.safari_quiz.priority_budget_title') }}</div>
+                                    <div class="text-slate-300 text-xs leading-relaxed">{{ __('ui.safari_quiz.package_includes') }}</div>
                                 </div>
                             </div>
                         </div>
@@ -248,18 +248,18 @@
                 <!-- Loading State -->
                 <div x-show="loading" class="text-center py-12">
                     <div class="inline-block w-12 h-12 border-4 border-amber-400 border-t-transparent rounded-full animate-spin mb-4"></div>
-                    <h5 class="text-lg font-bold text-white mb-2">Analyzing Safari Inventory...</h5>
-                    <p class="text-slate-300 text-xs max-w-sm mx-auto">Cross-referencing your travel style, preferred timing, and inclusions with verified DET inventory.</p>
+                    <h5 class="text-lg font-bold text-white mb-2">{{ __('ui.safari_quiz.calculating_title') }}</h5>
+                    <p class="text-slate-300 text-xs max-w-sm mx-auto">{{ __('ui.safari_quiz.calculating_desc') }}</p>
                 </div>
 
                 <!-- Result Screen -->
                 <div x-show="step === 4 && !loading && result">
                     <div class="text-center mb-4">
                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold mb-2">
-                            <i class="bi bi-patch-check-fill"></i> 99% Best Match Found
+                            <i class="bi bi-patch-check-fill"></i> {{ __('ui.safari_quiz.recommendation_badge') }}
                         </span>
-                        <h4 class="text-xl font-black text-white">We Found Your Perfect Dubai Adventure!</h4>
-                        <p class="text-slate-300 text-xs">Handpicked based on your party preferences and timing.</p>
+                        <h4 class="text-xl font-black text-white">{{ __('ui.safari_quiz.recommendation_badge') }}</h4>
+                        <p class="text-slate-300 text-xs">{{ __('ui.safari_quiz.match_confidence') }}</p>
                     </div>
 
                     <!-- Tour Card -->
@@ -267,14 +267,14 @@
                         <div class="flex flex-col sm:flex-row items-center gap-4">
                             <div class="w-full sm:w-32 h-24 rounded-xl overflow-hidden shrink-0 relative bg-slate-800">
                                 <img :src="(result && result.thumb) ? result.thumb : '{{ asset('images/desert-safari-poster.avif') }}'" :alt="result ? result.name : 'Dunes Discovery Tour'" class="w-full h-full object-cover">
-                                <span class="absolute top-1 start-1 px-1.5 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[9px]">Top Match</span>
+                                <span class="absolute top-1 start-1 px-1.5 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[9px]">{{ __('ui.safari_quiz.recommendation_badge') }}</span>
                             </div>
                             <div class="flex-1 min-w-0 text-start">
                                 <div class="flex items-start justify-between gap-2">
                                     <h5 class="font-extrabold text-white text-base truncate" x-text="result ? result.name : ''">Evening Desert Safari</h5>
                                     <div class="text-end shrink-0">
                                         <div class="text-lg font-black text-amber-400 font-mono" x-text="'{{ __('ui.common.aed') }} ' + ((result && result.min_price) ? result.min_price : 120)">{{ __('ui.common.aed') }} 150</div>
-                                        <small class="text-slate-400 text-[10px]">per person</small>
+                                        <small class="text-slate-400 text-[10px]">{{ __('ui.rate_card.per_person') }}</small>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-3 text-slate-300 text-xs my-1">
@@ -283,7 +283,7 @@
                                     <span class="flex items-center gap-1"><i class="bi bi-clock"></i><span x-text="(result && result.duration) ? result.duration : '6-7 Hours'"></span></span>
                                 </div>
                                 <div class="p-2.5 rounded-xl bg-slate-950/60 border border-slate-700/80 mt-2">
-                                    <span class="text-[10px] uppercase font-bold text-slate-300 tracking-wider block mb-1">Why This Matches You:</span>
+                                    <span class="text-[10px] uppercase font-bold text-slate-300 tracking-wider block mb-1">{{ __('ui.safari_quiz.match_confidence') }}:</span>
                                     <ul class="space-y-1 text-xs text-slate-300">
                                         <template x-for="reason in reasons" :key="reason">
                                              <li class="flex items-start gap-1.5">
@@ -338,11 +338,11 @@
                                  class="text-slate-300 hover:text-white transition-colors cursor-pointer flex items-center gap-1" 
                                  @click="resetQuiz()">
                              <i class="bi bi-arrow-counterclockwise"></i>
-                             <span>Retake Quiz</span>
+                             <span>{{ __('ui.safari_quiz.retake_btn') }}</span>
                          </button>
                          <a href="{{ localized_route('tours.index') }}" class="text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1">
                              <i class="bi bi-shuffle"></i>
-                             <span>Browse All Tours</span>
+                             <span>{{ __('ui.blog_journal.browse_all_tours') }}</span>
                          </a>
                      </div>
                  </div>
@@ -355,7 +355,7 @@
                          class="min-h-[44px] px-4 py-2 rounded-full border border-slate-700 hover:border-slate-500 text-slate-300 transition-colors cursor-pointer flex items-center justify-center gap-1" 
                          x-show="step > 1" 
                          @click="step--">
-                     <i class="bi bi-chevron-left rtl:rotate-180"></i> Back
+                     <i class="bi bi-chevron-left rtl:rotate-180"></i> {{ __('ui.safari_quiz.back_btn') }}
                  </button>
                  <div class="ms-auto flex items-center gap-1.5 text-[11px]">
                      <i class="bi bi-shield-lock-fill text-amber-400"></i>

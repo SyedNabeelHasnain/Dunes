@@ -2,8 +2,20 @@
     {
         "id": 1,
         "slug": "quad-biking",
-        "name": "Quad Biking",
-        "description": "30-minute quad bike adventure in the desert",
+        "name": {
+            "en": "Quad Biking",
+            "ar": "قيادة الدراجات الرباعية (كواد بايك)",
+            "ru": "Катание на квадроцикле ATV",
+            "es": "Paseo en Quad Biking ATV",
+            "it": "Giro in Quad Biking ATV"
+        },
+        "description": {
+            "en": "30-minute quad bike adventure in the desert",
+            "ar": "مغامرة قيادة دراجة رباعية ATV لمدة 30 دقيقة في الكثبان الرملية المفتوحة.",
+            "ru": "30 минут самостоятельного заезда на мощном квадроцикле по дюнам.",
+            "es": "Aventura de 30 minutos conduciendo un potente quad por las dunas abiertas.",
+            "it": "Avventura di 30 minuti alla guida di un quad fuoristrada tra le dune."
+        },
         "icon": "bi-joystick",
         "default_price": 150,
         "status": "active",
@@ -13,8 +25,20 @@
     {
         "id": 2,
         "slug": "camel-ride",
-        "name": "Extended Camel Ride",
-        "description": "45-minute camel trek through dunes",
+        "name": {
+            "en": "Extended Camel Ride",
+            "ar": "جولة جمال مطولة في الصحراء",
+            "ru": "Продленная прогулка на верблюдах",
+            "es": "Paseo Extendido en Camello",
+            "it": "Giro Prolungato in Cammello"
+        },
+        "description": {
+            "en": "45-minute camel trek through dunes",
+            "ar": "جولة استكشافية ممتدة على ظهور الجمال لمدة 45 دقيقة بين الكثبان الذهبية.",
+            "ru": "45-минутный караванный переход на верблюдах по барханам.",
+            "es": "Paseo guiado de 45 minutos a lomos de camello por el desierto dorado.",
+            "it": "Trekking panoramico di 45 minuti a dorso di dromedario tra le dune."
+        },
         "icon": "bi-heart",
         "default_price": 80,
         "status": "active",
@@ -24,8 +48,20 @@
     {
         "id": 3,
         "slug": "vip-seating",
-        "name": "VIP Seating",
-        "description": "Front row seats for all shows",
+        "name": {
+            "en": "VIP Seating",
+            "ar": "مقاعد VIP في الصف الأول",
+            "ru": "VIP места у сцены",
+            "es": "Asientos VIP en Primera Fila",
+            "it": "Posti a Sedere VIP in Prima Fila"
+        },
+        "description": {
+            "en": "Front row seats for all shows",
+            "ar": "مقاعد ممتازة في الصفوف الأولى أمام المسرح لجميع العروض الحية.",
+            "ru": "Премиальные места в первом ряду для лучшего обзора всех шоу.",
+            "es": "Asientos preferentes en primera fila para ver todos los espectáculos.",
+            "it": "Posti riservati in prima fila con la migliore visuale per tutti gli show."
+        },
         "icon": "bi-star",
         "default_price": 100,
         "status": "active",
@@ -34,8 +70,20 @@
     {
         "id": 4,
         "slug": "private-table",
-        "name": "Private Dining Table",
-        "description": "Exclusive table with waiter service",
+        "name": {
+            "en": "Private Dining Table",
+            "ar": "طاولة طعام خاصة مع خدمة الضيافة",
+            "ru": "Приватный столик с обслуживанием",
+            "es": "Mesa Privada con Servicio de Camarero",
+            "it": "Tavolo Privato con Servizio al Tavolo"
+        },
+        "description": {
+            "en": "Exclusive table with waiter service",
+            "ar": "طاولة حصرية خاصة بمجموعتك مع خدمة تقديم العشاء على الطاولة.",
+            "ru": "Эксклюзивный столик только для вашей компании с официантским сервисом.",
+            "es": "Mesa exclusiva para tu grupo con servicio personalizado de camarero.",
+            "it": "Tavolo esclusivo riservato al tuo gruppo con servizio al tavolo."
+        },
         "icon": "bi-table",
         "default_price": 120,
         "status": "active",
@@ -44,8 +92,20 @@
     {
         "id": 5,
         "slug": "photography",
-        "name": "Arabic Royal Studio Portrait & 3 Prints",
-        "description": "Studio lighting portrait in traditional royal Emirati attire with 3 mounted prints and high-res digital gallery delivered to your phone.",
+        "name": {
+            "en": "Arabic Royal Studio Portrait & 3 Prints",
+            "ar": "جلسة تصوير ملكية عربية مع 3 صور مطبوعة",
+            "ru": "Арабская королевская фотосессия + 3 отпечатка",
+            "es": "Sesión de Fotos Real Árabe + 3 Fotos Impresas",
+            "it": "Servizio Fotografico Reale Arabo + 3 Stampe"
+        },
+        "description": {
+            "en": "Studio lighting portrait in traditional royal Emirati attire with 3 mounted prints and high-res digital gallery delivered to your phone.",
+            "ar": "جلسة تصوير احترافية بإضاءة الاستوديو بالزي الإماراتي الملكي مع 3 صور مطبوعة ومعرض رقمي عالي الدقة يُرسل إلى هاتفك.",
+            "ru": "Профессиональная студийная фотосессия в королевских эмиратских нарядах: 3 фирменных фото и цифровая галерея в высоком разрешении на ваш телефон.",
+            "es": "Retrato de estudio profesional con atuendo tradicional emiratí de gala, 3 copias impresas montadas y galería digital de alta resolución en tu móvil.",
+            "it": "Ritratto professionale da studio in abito tradizionale reale emiratino, 3 stampe fotografiche e galleria digitale HD inviata sullo smartphone."
+        },
         "icon": "bi-camera",
         "default_price": 200,
         "status": "active",
@@ -54,8 +114,20 @@
     {
         "id": 6,
         "slug": "henna",
-        "name": "Intricate Bridal & Full-Hand Henna Art",
-        "description": "Elaborate multi-pattern bridal henna artwork extending from fingertips to wrists on both hands by master henna artists (standard single-motif hand henna is already included free).",
+        "name": {
+            "en": "Intricate Bridal & Full-Hand Henna Art",
+            "ar": "نقش حناء ملكي كامل لليدين",
+            "ru": "Изысканная роспись хной на обе руки",
+            "es": "Arte de Henna Nupcial para Ambas Manos",
+            "it": "Tatuaggio all'Henné Tradizionale per Entrambe le Mani"
+        },
+        "description": {
+            "en": "Elaborate multi-pattern bridal henna artwork extending from fingertips to wrists on both hands by master henna artists (standard single-motif hand henna is already included free).",
+            "ar": "نقوش حناء فاخرة تمتد من أطراف الأصابع إلى المعصمين على كلتا اليدين بأيدي خبيرات الحناء (النقش الفردي البسيط مشمول مجاناً).",
+            "ru": "Сложный многоузорный праздничный рисунок хной от кончиков пальцев до запястий на обеих руках (базовый рисунок на одну руку уже включен бесплатно).",
+            "es": "Elaborado diseño de henna desde la punta de los dedos hasta las muñecas en ambas manos por maestras artesanas (el diseño básico simple ya está incluido gratis).",
+            "it": "Elaborato motivo floreale all'henné dalla punta delle dita ai polsi su entrambe le mani (la decorazione semplice per una mano è già inclusa gratuitamente)."
+        },
         "icon": "bi-brush",
         "default_price": 50,
         "status": "active",
@@ -64,8 +136,20 @@
     {
         "id": 7,
         "slug": "falcon-photo",
-        "name": "Falcon Photo",
-        "description": "Photo opportunity with trained falcon",
+        "name": {
+            "en": "Falcon Photo",
+            "ar": "جلسة تصوير مع الصقر الملكي",
+            "ru": "Фотосессия с охотничьим соколом",
+            "es": "Foto con Halcón Real Entrenado",
+            "it": "Foto con Falco Reale Addestrato"
+        },
+        "description": {
+            "en": "Photo opportunity with trained falcon",
+            "ar": "فرصة تصوير مميزة وحمل الصقر الملكي المدرب على يدك مع مرشد الصقور.",
+            "ru": "Возможность подержать обученного охотничьего сокола на руке и сделать памятные кадры.",
+            "es": "Fotografía posando con un majestuoso halcón real adiestrado en tu brazo.",
+            "it": "Sessione fotografica con un magnifico falco reale addestrato sul tuo braccio."
+        },
         "icon": "bi-camera2",
         "default_price": 75,
         "status": "active",
@@ -75,8 +159,20 @@
     {
         "id": 8,
         "slug": "shisha",
-        "name": "Premium Shisha",
-        "description": "Selection of premium flavors",
+        "name": {
+            "en": "Premium Shisha",
+            "ar": "شيشة فاخرة بنكهات ممتازة",
+            "ru": "Премиальный кальян (Шиша)",
+            "es": "Shisha Gourmet con Sabores Selectos",
+            "it": "Narghilè Shisha Premium con Aromi a Scelta"
+        },
+        "description": {
+            "en": "Selection of premium flavors",
+            "ar": "تشكيلة مختارة من أرقى النكهات العالمية للشيشة تُقدم على طاولتك.",
+            "ru": "Выбор премиальных табачных вкусов с индивидуальной подачей к вашему столику.",
+            "es": "Selección de exclusivos sabores premium servidos directamente en tu mesa.",
+            "it": "Ampia selezione di aromi di prima qualità serviti direttamente al tuo tavolo."
+        },
         "icon": "bi-wind",
         "default_price": 60,
         "status": "active",
@@ -85,8 +181,20 @@
     {
         "id": 9,
         "slug": "dune-buggy",
-        "name": "Dune Buggy Ride",
-        "description": "30-minute thrilling buggy adventure through the dunes",
+        "name": {
+            "en": "Dune Buggy Ride",
+            "ar": "جولة عربات الباجي الصحراوية",
+            "ru": "Заезд на дюнном багги",
+            "es": "Paseo en Dune Buggy",
+            "it": "Giro in Dune Buggy"
+        },
+        "description": {
+            "en": "30-minute thrilling buggy adventure through the dunes",
+            "ar": "مغامرة مثيرة لمدة 30 دقيقة على متن عربة باجي صحراوية عبر الكثبان الحمراء.",
+            "ru": "30-минутный драйв на багги по песчаным барханам Лахбаб.",
+            "es": "Emocionante aventura de 30 minutos pilotando un buggy por las dunas rojas.",
+            "it": "Emozionante corsa di 30 minuti alla guida di un dune buggy sulle dune rosse."
+        },
         "icon": "truck",
         "default_price": 280,
         "status": "active",
@@ -96,8 +204,20 @@
     {
         "id": 10,
         "slug": "sandboarding",
-        "name": "Pro Sandboarding Masterclass & Wax Board",
-        "description": "Professional fiberglass speed board with ski wax and dedicated 1-on-1 slope coaching for advanced carved runs (standard wooden sandboard sliding is already included free).",
+        "name": {
+            "en": "Pro Sandboarding Masterclass & Wax Board",
+            "ar": "درس تزلج احترافي على الرمال مع لوح فايبرجلاس",
+            "ru": "Профессиональный мастер-класс по сэндбордингу",
+            "es": "Masterclass de Sandboard Profesional con Cera",
+            "it": "Masterclass di Sandboarding Professionale con Cera"
+        },
+        "description": {
+            "en": "Professional fiberglass speed board with ski wax and dedicated 1-on-1 slope coaching for advanced carved runs (standard wooden sandboard sliding is already included free).",
+            "ar": "لوح فايبرجلاس سريع ومخصص للتزلج مع شمع المنحدرات وتدريب شخصي 1-على-1 للنزول الاحترافي (التزلج البسيط بالألواح الخشبية مشمول مجاناً).",
+            "ru": "Профессиональная скоростная доска из стекловолокна, лыжный воск и индивидуальный урок с тренером для крутых виражей (базовый сэндбординг уже включен бесплатно).",
+            "es": "Tabla profesional de fibra de vidrio tratada con cera y entrenamiento personalizado uno a uno para descensos técnicos (el deslizamiento estándar es gratis).",
+            "it": "Tavola professionale in fibra di vetro con sciolina e coaching individuale per discese veloci (il sandboarding su tavole di legno standard è già gratis)."
+        },
         "icon": "activity",
         "default_price": 60,
         "status": "active",
@@ -107,8 +227,20 @@
     {
         "id": 11,
         "slug": "horse-riding",
-        "name": "Desert Horse Riding",
-        "description": "30-minute horse riding in the desert",
+        "name": {
+            "en": "Desert Horse Riding",
+            "ar": "ركوب الخيل في الصحراء",
+            "ru": "Прогулка на лошадях по пустыне",
+            "es": "Paseo a Caballo por el Desierto",
+            "it": "Passeggiata a Cavallo nel Deserto"
+        },
+        "description": {
+            "en": "30-minute horse riding in the desert",
+            "ar": "جولة فروسية أصيلة لمدة 30 دقيقة في رمال الصحراء برفقة مدرب خيل.",
+            "ru": "30-минутная верховая прогулка по песчаным просторам в сопровождении инструктора.",
+            "es": "Paseo a caballo de 30 minutos por las arenas del desierto con instructor.",
+            "it": "Passeggiata a cavallo di 30 minuti tra le dune del deserto con guida esperta."
+        },
         "icon": "heart",
         "default_price": 200,
         "status": "active",
@@ -117,8 +249,20 @@
     {
         "id": 12,
         "slug": "private-vehicle",
-        "name": "Private 4x4 Vehicle",
-        "description": "Exclusive Land Cruiser for your group only",
+        "name": {
+            "en": "Private 4x4 Vehicle",
+            "ar": "سيارة دفع رباعي خاصة حصرية",
+            "ru": "Приватный внедорожник 4x4",
+            "es": "Vehículo 4x4 Privado Exclusivo",
+            "it": "Fuoristrada 4x4 Privato Esclusivo"
+        },
+        "description": {
+            "en": "Exclusive Land Cruiser for your group only",
+            "ar": "سيارة لاند كروزر خاصة ومكيفة مخصصة لمجموعتك فقط طوال الجولة والتطعيس.",
+            "ru": "Комфортабельный Toyota Land Cruiser исключительно для вашей семьи или компании на всю поездку.",
+            "es": "Toyota Land Cruiser privado solo para ti y tus acompañantes durante todo el recorrido.",
+            "it": "Toyota Land Cruiser a uso esclusivo per il tuo gruppo per l'intera durata del tour."
+        },
         "icon": "truck",
         "default_price": 350,
         "status": "inactive",
@@ -127,8 +271,20 @@
     {
         "id": 13,
         "slug": "traditional-costume",
-        "name": "Traditional Costume Photo",
-        "description": "Dress in Arabic attire for photos",
+        "name": {
+            "en": "Traditional Costume Photo",
+            "ar": "جلسة تصوير بالأزياء العربية التقليدية",
+            "ru": "Фото в традиционных арабских костюмах",
+            "es": "Fotografía con Trajes Tradicionales Árabes",
+            "it": "Foto con Abiti Tradizionali Arabi"
+        },
+        "description": {
+            "en": "Dress in Arabic attire for photos",
+            "ar": "ارتداء الكندورة والبشت والعباية الإماراتية الفاخرة مع التقاط صور تذكارية.",
+            "ru": "Примерка красивых национальных эмиратских нарядов для ярких памятных фотографий.",
+            "es": "Vístete con elegantes túnicas árabes tradicionales para una sesión fotográfica.",
+            "it": "Indossa i tipici abiti tradizionali emiratini per indimenticabili foto ricordo."
+        },
         "icon": "camera",
         "default_price": 75,
         "status": "active",
@@ -137,8 +293,20 @@
     {
         "id": 14,
         "slug": "hot-air-balloon",
-        "name": "Hot Air Balloon Ride",
-        "description": "Sunrise balloon flight over the desert",
+        "name": {
+            "en": "Hot Air Balloon Ride",
+            "ar": "رحلة المنطاد الهوائي عند الشروق",
+            "ru": "Полет на воздушном шаре на рассвете",
+            "es": "Vuelo en Globo Aerostático al Amanecer",
+            "it": "Volo in Mongolfiera all'Alba"
+        },
+        "description": {
+            "en": "Sunrise balloon flight over the desert",
+            "ar": "رحلة جوية ساحرة بالمنطاد الهوائي فوق كثبان الصحراء مع شروق الشمس.",
+            "ru": "Завораживающий часовой полет на воздушном шаре над пустыней на восходе солнца.",
+            "es": "Vuelo en globo aerostático al amanecer sobrevolando las majestuosas dunas.",
+            "it": "Sorvolo in mongolfiera all'alba sulle dune del deserto arabo."
+        },
         "icon": "sunrise",
         "default_price": 850,
         "status": "active",
@@ -147,8 +315,20 @@
     {
         "id": 15,
         "slug": "burj-khalifa-124",
-        "name": "Burj Khalifa 124th Floor",
-        "description": "At The Top observation deck tickets",
+        "name": {
+            "en": "Burj Khalifa 124th Floor",
+            "ar": "تذكرة قمة برج خليفة (الطابق 124 و125)",
+            "ru": "Билет на Бурдж-Халифа (124 и 125 этажи)",
+            "es": "Entrada Burj Khalifa (Pisos 124 y 125)",
+            "it": "Biglietto Burj Khalifa (Piani 124 e 125)"
+        },
+        "description": {
+            "en": "At The Top observation deck tickets",
+            "ar": "تذكرة دخول منصة المراقبة At The Top في أعلى ناطحة سحاب بالعالم.",
+            "ru": "Входной билет на смотровую площадку At The Top с панорамой Дубая на 360 градусов.",
+            "es": "Entrada a la plataforma de observación At The Top con vistas panorámicas.",
+            "it": "Accesso al ponte di osservazione panoramico At The Top dell'edificio più alto del mondo."
+        },
         "icon": "building",
         "default_price": 169,
         "status": "active",
@@ -158,8 +338,20 @@
     {
         "id": 16,
         "slug": "burj-khalifa-148",
-        "name": "Burj Khalifa 148th Floor",
-        "description": "At The Top SKY premium experience",
+        "name": {
+            "en": "Burj Khalifa 148th Floor",
+            "ar": "تذكرة برج خليفة VIP سكاي (الطابق 148)",
+            "ru": "Бурдж-Халифа SKY VIP (148 этаж)",
+            "es": "Burj Khalifa SKY VIP (Piso 148)",
+            "it": "Burj Khalifa SKY VIP (Piano 148)"
+        },
+        "description": {
+            "en": "At The Top SKY premium experience",
+            "ar": "تجربة At The Top SKY الفاخرة مع صالة كبار الشخصيات والمسار السريع.",
+            "ru": "Премиальный VIP-доступ на 148 этаж со специальным лаунджем и проходом без очередей.",
+            "es": "Experiencia de lujo At The Top SKY con acceso prioritario y sala VIP.",
+            "it": "Esperienza esclusiva At The Top SKY con accesso prioritario e lounge VIP."
+        },
         "icon": "building",
         "default_price": 399,
         "status": "active",
@@ -169,8 +361,20 @@
     {
         "id": 17,
         "slug": "dubai-frame",
-        "name": "Dubai Frame Entry",
-        "description": "Visit the iconic Dubai Frame landmark",
+        "name": {
+            "en": "Dubai Frame Entry",
+            "ar": "تذكرة دخول برواز دبي",
+            "ru": "Входной билет в Дубайскую рамку (Dubai Frame)",
+            "es": "Entrada al Dubai Frame",
+            "it": "Biglietto d'Ingresso al Dubai Frame"
+        },
+        "description": {
+            "en": "Visit the iconic Dubai Frame landmark",
+            "ar": "زيارة المعلم الأيقوني وجسر الممشى الزجاجي الرابط بين دبي القديمة ودبي الحديثة.",
+            "ru": "Посещение уникального архитектурного шедевра со стеклянным мостом на высоте 150 метров.",
+            "es": "Visita el icónico monumento con puente de suelo de cristal que une el Dubái antiguo y moderno.",
+            "it": "Visita all'iconica cornice di Dubai con passerella in vetro trasparente a 150 metri."
+        },
         "icon": "frame",
         "default_price": 55,
         "status": "active",
@@ -180,8 +384,20 @@
     {
         "id": 18,
         "slug": "dubai-aquarium",
-        "name": "Dubai Aquarium & Zoo",
-        "description": "Underwater zoo experience at Dubai Mall",
+        "name": {
+            "en": "Dubai Aquarium & Zoo",
+            "ar": "تذكرة دبي أكواريوم وحديقة الحيوانات المائية",
+            "ru": "Дубайский аквариум и подводный зоопарк",
+            "es": "Entrada al Dubai Aquarium y Underwater Zoo",
+            "it": "Biglietto per Dubai Aquarium e Underwater Zoo"
+        },
+        "description": {
+            "en": "Underwater zoo experience at Dubai Mall",
+            "ar": "استكشف النفق المائي الشفاف وآلاف الكائنات البحرية وأسماك القرش في دبي مول.",
+            "ru": "Прогулка по прозрачному подводному туннелю с акулами и экзотическими рыбами в Dubai Mall.",
+            "es": "Recorre el túnel submarino y descubre miles de animales marinos en The Dubai Mall.",
+            "it": "Esplora il tunnel trasparente con squali e migliaia di creature marine al Dubai Mall."
+        },
         "icon": "fish",
         "default_price": 135,
         "status": "active",
@@ -190,8 +406,20 @@
     {
         "id": 19,
         "slug": "lunch-package",
-        "name": "Lunch Package",
-        "description": "Meal at selected premium restaurant",
+        "name": {
+            "en": "Lunch Package",
+            "ar": "باقة وجبة غداء فاخرة",
+            "ru": "Обеденный пакет в ресторане",
+            "es": "Almuerzo en Restaurante Selecto",
+            "it": "Pranzo in Ristorante Selezionato"
+        },
+        "description": {
+            "en": "Meal at selected premium restaurant",
+            "ar": "وجبة غداء شهية في أحد المطاعم المختارة الفاخرة أثناء جولتك.",
+            "ru": "Вкусный сытный обед в проверенном премиум-ресторане во время экскурсии.",
+            "es": "Menú de almuerzo completo en un restaurante de calidad durante tu excursión.",
+            "it": "Pranzo completo di qualità in ristorante selezionato durante l'escursione."
+        },
         "icon": "utensils",
         "default_price": 120,
         "status": "active",
@@ -200,8 +428,20 @@
     {
         "id": 20,
         "slug": "louvre-abu-dhabi",
-        "name": "Louvre Abu Dhabi Entry",
-        "description": "World-class art museum experience",
+        "name": {
+            "en": "Louvre Abu Dhabi Entry",
+            "ar": "تذكرة دخول متحف اللوفر أبوظبي",
+            "ru": "Входной билет в Лувр Абу-Даби",
+            "es": "Entrada al Museo Louvre Abu Dabi",
+            "it": "Biglietto per il Museo Louvre Abu Dhabi"
+        },
+        "description": {
+            "en": "World-class art museum experience",
+            "ar": "استكشف روائع الفن والحضارة العالمية تحت القبة العائمة لمتحف اللوفر أبوظبي.",
+            "ru": "Посещение всемирно известного художественного музея под ажурным парящим куполом Жана Нувеля.",
+            "es": "Admira obras maestras del arte universal bajo la cúpula flotante de Jean Nouvel.",
+            "it": "Scopri capolavori d'arte mondiale sotto la spettacolare cupola galleggiante di Jean Nouvel."
+        },
         "icon": "image",
         "default_price": 65,
         "status": "active",
@@ -211,8 +451,20 @@
     {
         "id": 21,
         "slug": "emirates-palace-tea",
-        "name": "Emirates Palace Tea",
-        "description": "Afternoon tea at the palace",
+        "name": {
+            "en": "Emirates Palace Tea",
+            "ar": "شاي ما بعد الظهيرة في قصر الإمارات",
+            "ru": "Послеобеденный чай в Emirates Palace",
+            "es": "Té de la Tarde en el Emirates Palace",
+            "it": "Tè Pomeridiano all'Emirates Palace"
+        },
+        "description": {
+            "en": "Afternoon tea at the palace",
+            "ar": "تجربة شاي فاخرة مع القهوة المرصعة برقائق الذهب عيار 24 في قصر الإمارات الأسطوري.",
+            "ru": "Роскошное чаепитие с фирменным капучино с хлопьями 24-каратного золота в гранд-отеле Emirates Palace.",
+            "es": "Disfruta del té de la tarde y el famoso café con virutas de oro de 24 quilates en el palacio.",
+            "it": "Raffinato tè pomeridiano e cappuccino con scaglie d'oro 24 carati nello storico hotel di lusso."
+        },
         "icon": "coffee",
         "default_price": 220,
         "status": "active",
@@ -221,8 +473,20 @@
     {
         "id": 22,
         "slug": "ferrari-world",
-        "name": "Ferrari World Entry",
-        "description": "Theme park general admission",
+        "name": {
+            "en": "Ferrari World Entry",
+            "ar": "تذكرة دخول عالم فيراري أبوظبي",
+            "ru": "Входной билет в парк Ferrari World",
+            "es": "Entrada General a Ferrari World",
+            "it": "Biglietto Generale per Ferrari World"
+        },
+        "description": {
+            "en": "Theme park general admission",
+            "ar": "دخول شامل لأول وأكبر مدينة ملاهي تحمل علامة فيراري وتجربة أسرع أفعوانية بالعالم.",
+            "ru": "Доступ ко всем аттракционам тематического парка Ferrari, включая самую быструю американскую горку в мире.",
+            "es": "Acceso general al parque temático con la montaña rusa más veloz del planeta, Formula Rossa.",
+            "it": "Accesso al parco a tema con le montagne russe più veloci al mondo, Formula Rossa."
+        },
         "icon": "zap",
         "default_price": 310,
         "status": "active",
@@ -231,8 +495,20 @@
     {
         "id": 23,
         "slug": "qasr-al-watan",
-        "name": "Qasr Al Watan Entry",
-        "description": "Presidential palace tour",
+        "name": {
+            "en": "Qasr Al Watan Entry",
+            "ar": "تذكرة دخول قصر الوطن الرئاسي",
+            "ru": "Входной билет в президентский дворец Каср Аль-Ватан",
+            "es": "Entrada al Palacio Presidencial Qasr Al Watan",
+            "it": "Biglietto per il Palazzo Presidenziale Qasr Al Watan"
+        },
+        "description": {
+            "en": "Presidential palace tour",
+            "ar": "جولة في القصر الرئاسي المهيب للتعرف على روعة العمارة والتراث القيادي الإماراتي.",
+            "ru": "Экскурсия по действующему президентскому дворцу ОАЭ с грандиозными залами и библиотекой.",
+            "es": "Recorrido por las majestuosas salas del palacio presidencial en activo de Abu Dabi.",
+            "it": "Tour all'interno del maestoso palazzo presidenziale degli Emirati Arabi Uniti."
+        },
         "icon": "building",
         "default_price": 65,
         "status": "active",
@@ -241,8 +517,20 @@
     {
         "id": 24,
         "slug": "vip-upper-deck",
-        "name": "VIP Upper Deck",
-        "description": "Premium upper deck seating with best views",
+        "name": {
+            "en": "VIP Upper Deck",
+            "ar": "مقاعد VIP في الطابق العلوي المفتوح",
+            "ru": "VIP места на верхней открытой палубе",
+            "es": "Asientos VIP en la Cubierta Superior",
+            "it": "Posti VIP sul Ponte Superiore Panoramico"
+        },
+        "description": {
+            "en": "Premium upper deck seating with best views",
+            "ar": "مقاعد ممتازة في الطابق العلوي المفتوح مع أفضل إطلالة بانورامية بزاوية 360 درجة.",
+            "ru": "Премиальные места на открытой верхней палубе с панорамным обзором ночного города.",
+            "es": "Asientos preferentes en la cubierta superior al aire libre con las mejores vistas de la marina.",
+            "it": "Posti esclusivi sul ponte superiore all'aperto con la migliore visuale sullo skyline."
+        },
         "icon": "star",
         "default_price": 80,
         "status": "active",
@@ -251,8 +539,20 @@
     {
         "id": 25,
         "slug": "window-seat",
-        "name": "Guaranteed Window Seat",
-        "description": "Reserved seat by the window",
+        "name": {
+            "en": "Guaranteed Window Seat",
+            "ar": "مقعد مضمون بجوار النافذة البانورامية",
+            "ru": "Гарантированный столик у окна",
+            "es": "Mesa Garantizada Junto a la Ventana",
+            "it": "Tavolo Garantito Fronte Finestra"
+        },
+        "description": {
+            "en": "Reserved seat by the window",
+            "ar": "حجز مؤكد لطاولة بجانب النوافذ الزجاجية الكبيرة للاستمتاع بالمناظر طوال الرحلة.",
+            "ru": "Индивидуальная бронь столика прямо у панорамного остекления для лучших видов во время ужина.",
+            "es": "Reserva garantizada de mesa junto a las cristaleras panorámicas durante todo el crucero.",
+            "it": "Prenotazione confermata al tavolo fronte vetrata per godersi il panorama durante la crociera."
+        },
         "icon": "eye",
         "default_price": 40,
         "status": "active",
@@ -261,8 +561,20 @@
     {
         "id": 26,
         "slug": "celebration-setup",
-        "name": "Celebration Setup",
-        "description": "Birthday or anniversary decoration",
+        "name": {
+            "en": "Celebration Setup",
+            "ar": "تجهيزات الاحتفال بالمناسبات وأعياد الميلاد",
+            "ru": "Праздничное оформление (День рождения \/ Юбилей)",
+            "es": "Decoración Especial de Cumpleaños o Aniversario",
+            "it": "Allestimento per Feste e Anniversari"
+        },
+        "description": {
+            "en": "Birthday or anniversary decoration",
+            "ar": "تزيين خاص للطاولة مع كعكة احتفالية وبالونات وموسيقى للاحتفال بيومك المميز.",
+            "ru": "Праздничный торт, воздушные шары и музыкальное поздравление для виновника торжества.",
+            "es": "Decoración temática de la mesa con tarta de celebración y ambiente festivo personalizado.",
+            "it": "Torta celebrativa, palloncini e musica per festeggiare compleanni o occasioni speciali."
+        },
         "icon": "gift",
         "default_price": 250,
         "status": "active",
@@ -271,8 +583,20 @@
     {
         "id": 27,
         "slug": "alcoholic-package",
-        "name": "House Beverage Package",
-        "description": "Unlimited house wine, beer and spirits",
+        "name": {
+            "en": "House Beverage Package",
+            "ar": "باقة المشروبات الفاخرة للرحلة البحرية",
+            "ru": "Пакет напитков для круиза",
+            "es": "Paquete de Bebidas para Crucero",
+            "it": "Pacchetto Bevande per Crociera"
+        },
+        "description": {
+            "en": "Unlimited house wine, beer and spirits",
+            "ar": "مشروبات مختارة غير محدودة طوال مدة الرحلة البحرية على متن السفينة.",
+            "ru": "Неограниченный выбор напитков во время двухчасового круиза.",
+            "es": "Selección ilimitada de bebidas durante las 2 horas de navegación.",
+            "it": "Selezione illimitata di bevande durante le due ore di navigazione a bordo."
+        },
         "icon": "wine",
         "default_price": 150,
         "status": "active",
@@ -281,8 +605,20 @@
     {
         "id": 28,
         "slug": "romantic-setup",
-        "name": "Romantic Setup",
-        "description": "Flowers, candles, and cake arrangement",
+        "name": {
+            "en": "Romantic Setup",
+            "ar": "تجهيزات رومانسية للأزواج (زهور وشموع وكعكة)",
+            "ru": "Романтический декор для двоих (цветы, свечи, торт)",
+            "es": "Arreglo Romántico para Parejas (Flores, Velas y Tarta)",
+            "it": "Allestimento Romantico per Coppie (Fiori, Candele e Torta)"
+        },
+        "description": {
+            "en": "Flowers, candles, and cake arrangement",
+            "ar": "تنسيق رومانسي فاخر يشمل باقة ورد طبيعي وشموع هادئة وكعكة حب شهية.",
+            "ru": "Элегантное оформление столика живыми цветами, свечами и романтическим тортом.",
+            "es": "Decoración íntima y romántica con rosas frescas, velas y tarta especial para dos.",
+            "it": "Composizione elegante con petali di rose fresche, candele e torta a forma di cuore."
+        },
         "icon": "heart",
         "default_price": 350,
         "status": "active",

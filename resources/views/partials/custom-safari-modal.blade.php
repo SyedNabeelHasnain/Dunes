@@ -40,14 +40,14 @@
                 <div>
                     <div class="flex items-center gap-2 mb-1">
                         <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-primary/20 text-primary border border-primary/40 uppercase tracking-wider">
-                            <i class="bi bi-sliders"></i> Interactive Customizer
+                            <i class="bi bi-sliders"></i> {{ __('ui.customizer.badge') }}
                         </span>
                         <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                             DET #1430583
                         </span>
                     </div>
                     <h5 class="text-base sm:text-lg font-black text-white" id="customSafariModalLabel">
-                        Build Your Own Dubai Desert Safari
+                        {{ __('ui.customizer.title') }}
                     </h5>
                 </div>
                 <button type="button" 
@@ -68,7 +68,7 @@
                         <!-- Step 1: Base -->
                         <div>
                             <label class="block text-xs font-black uppercase tracking-wider text-slate-300 mb-2.5">
-                                1. Select Base Experience
+                                {{ __('ui.customizer.step1_title') }}
                             </label>
                             <div class="grid grid-cols-2 gap-2.5">
                                 <!-- Base 1 -->
@@ -128,7 +128,7 @@
                         <!-- Step 2: Transfer -->
                         <div>
                             <label class="block text-xs font-black uppercase tracking-wider text-slate-300 mb-2.5">
-                                2. Transfer Option
+                                {{ __('ui.customizer.step2_title') }}
                             </label>
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                 <div @click="transfer = { name: 'Shared 4x4 Land Cruiser', price: 0, type: 'flat' }"
@@ -155,7 +155,7 @@
                         <!-- Step 3: Sports -->
                         <div>
                             <label class="block text-xs font-black uppercase tracking-wider text-slate-300 mb-2.5">
-                                3. Desert Motorsports
+                                {{ __('ui.customizer.step3_title') }}
                             </label>
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
                                 <div @click="sports = { name: 'Scenic Only', price: 0, type: 'per_person' }"
@@ -261,7 +261,7 @@
 
                             <!-- Total Display & CTAs -->
                             <div class="pt-4 border-t border-slate-700/80 text-center">
-                                <span class="text-[10px] uppercase font-bold text-slate-300 block tracking-wider mb-0.5">Live Estimated Total</span>
+                                <span class="text-[10px] uppercase font-bold text-slate-300 block tracking-wider mb-0.5">{{ __('ui.customizer.summary_total') }}</span>
                                 <div class="text-3xl font-black text-amber-400 font-mono my-1" x-text="'AED ' + total">AED 300</div>
                                 <div class="text-emerald-400 font-semibold text-[10px] mb-4 flex items-center justify-center gap-1">
                                     <i class="bi bi-shield-check"></i> Best Price Guarantee • Free Cancel 24h
@@ -272,7 +272,7 @@
                                             class="w-full py-3.5 min-h-[44px] rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs sm:text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2" 
                                             @click="book()">
                                         <i class="bi bi-calendar-check-fill"></i>
-                                        <span>Book Custom Safari</span>
+                                        <span>{{ __('ui.customizer.book_custom_btn') }}</span>
                                     </button>
                                     <a :href="waUrl" 
                                        target="_blank" 
@@ -282,7 +282,7 @@
                                        :data-tour-name="base ? base.name : 'Custom Desert Safari'"
                                        @click.prevent="window.openWhatsApp ? window.openWhatsApp(base ? base.name : 'Custom Desert Safari', waUrl) : null">
                                         <i class="bi bi-whatsapp"></i>
-                                        <span>WhatsApp Inquire</span>
+                                        <span>{{ __('ui.customizer.whatsapp_help') }}</span>
                                     </a>
                                 </div>
                             </div>

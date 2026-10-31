@@ -1,9 +1,21 @@
 [
   {
     "id": 1,
-    "name": "Desert Safaris",
+    "name": {
+      "en": "Desert Safaris",
+      "ar": "رحلات السفاري الصحراوية",
+      "ru": "Сафари по пустыне",
+      "es": "Safaris por el Desierto",
+      "it": "Safari nel Deserto"
+    },
     "slug": "desert-safari",
-    "description": "Comprehensive travel guides, dune bashing advice, quad biking tips, and safari comparisons in Dubai's Lahbab Red Dunes.",
+    "description": {
+      "en": "Comprehensive travel guides, dune bashing advice, quad biking tips, and safari comparisons in Dubai's Lahbab Red Dunes.",
+      "ar": "أدلة سفر شاملة، ونصائح للقيادة على الكثبان الرملية، وإرشادات الدراجات الرباعية، ومقارنات رحلات السفاري في كثبان لهباب الحمراء بدبي.",
+      "ru": "Подробные путеводители, советы по дюн-башингу, рекомендации по квадроциклам и сравнение сафари по красным дюнам Лахбаб в Дубае.",
+      "es": "Guías de viaje completas, consejos para dune bashing, recomendaciones de quads y comparativas de safaris en las dunas rojas de Lahbab en Dubái.",
+      "it": "Guide di viaggio complete, consigli per il dune bashing, suggerimenti per quad e confronti di safari tra le dune rosse di Lahbab a Dubai."
+    },
     "icon": "bi-sun-fill",
     "featured_image": "desert-safari-dubai-dune-discovery-tourism-HD.avif",
     "is_active": true,
@@ -12,9 +24,21 @@
   },
   {
     "id": 2,
-    "name": "City Tours",
+    "name": {
+      "en": "City Tours",
+      "ar": "جولات المدينة",
+      "ru": "Экскурсии по городу",
+      "es": "Tours por la Ciudad",
+      "it": "Tour della Città"
+    },
     "slug": "city-tour",
-    "description": "Landmark itineraries, cultural heritage guides, skyscraper view guides, and Instagram photo spots across Dubai.",
+    "description": {
+      "en": "Landmark itineraries, cultural heritage guides, skyscraper view guides, and Instagram photo spots across Dubai.",
+      "ar": "مسارات المعالم البارزة، وأدلة التراث الثقافي، وأفضل إطلالات ناطحات السحاب، ومواقع التصوير لإنستغرام في مختلف أنحاء دبي.",
+      "ru": "Маршруты по достопримечательностям, гиды по культурному наследию, смотровым площадкам небоскребов и инстаграмным локациям Дубая.",
+      "es": "Itinerarios por lugares emblemáticos, guías de patrimonio cultural, miradores de rascacielos y mejores puntos para fotos de Instagram en Dubái.",
+      "it": "Itinerari tra i luoghi simbolo, guide al patrimonio culturale, punti panoramici sui grattacieli e scorci imperdibili per Instagram a Dubai."
+    },
     "icon": "bi-building-fill",
     "featured_image": "dubai-city-tour-hero.avif",
     "is_active": true,
@@ -23,9 +47,21 @@
   },
   {
     "id": 3,
-    "name": "Cruises & Water Activities",
+    "name": {
+      "en": "Cruises & Water Activities",
+      "ar": "الرحلات البحرية والأنشطة المائية",
+      "ru": "Круизы и водные развлечения",
+      "es": "Cruceros y Actividades Acuáticas",
+      "it": "Crociere e Attività Acquatiche"
+    },
     "slug": "water-activity",
-    "description": "Dubai Marina dhow dinner cruises, luxury mega yacht experiences, Jet Ski adventures, and Dubai Creek dining guides.",
+    "description": {
+      "en": "Dubai Marina dhow dinner cruises, luxury mega yacht experiences, Jet Ski adventures, and Dubai Creek dining guides.",
+      "ar": "رحلات عشاء المراكب الشراعية في دبي مارينا، وتجارب اليخوت الفاخرة الضخمة، ومغامرات الجيت سكي، وأدلة تناول الطعام على خور دبي.",
+      "ru": "Ужины на традиционных лодках доу в Дубай Марине, прогулки на мега-яхтах класса люкс, катание на гидроциклах и гиды по ресторанам Дубай-Крик.",
+      "es": "Cenas en cruceros dhow por Dubái Marina, experiencias en megayates de lujo, aventuras en moto acuática y guías gastronómicas en Dubái Creek.",
+      "it": "Crociere con cena sui dhow a Dubai Marina, esperienze su mega yacht di lusso, avventure in moto d'acqua e guide gastronomiche su Dubai Creek."
+    },
     "icon": "bi-water",
     "featured_image": "dhow-cruise-dubai-marina-dune-discovery-tourism.avif",
     "is_active": true,
@@ -34,9 +70,21 @@
   },
   {
     "id": 4,
-    "name": "Day Trips",
+    "name": {
+      "en": "Day Trips",
+      "ar": "رحلات اليوم الواحد",
+      "ru": "Однодневные экскурсии",
+      "es": "Excursiones de un Día",
+      "it": "Escursioni Giornaliere"
+    },
     "slug": "day-trip",
-    "description": "Abu Dhabi city tour guides, Sheikh Zayed Mosque visitor advice, Louvre Abu Dhabi tips, and Hatta Mountain day excursions.",
+    "description": {
+      "en": "Abu Dhabi city tour guides, Sheikh Zayed Mosque visitor advice, Louvre Abu Dhabi tips, and Hatta Mountain day excursions.",
+      "ar": "أدلة جولات مدينة أبوظبي، ونصائح زيارة جامع الشيخ زايد الكبير، وإرشادات متحف اللوفر أبوظبي، ورحلات جبال حتا اليومية.",
+      "ru": "Путеводители по Абу-Даби, советы по посещению мечети шейха Зайда, рекомендации по Лувру Абу-Даби и однодневные поездки в горы Хатта.",
+      "es": "Guías de tours a Abu Dabi, consejos para visitar la Gran Mezquita Sheikh Zayed, el Louvre Abu Dabi y excursiones de un día a las montañas de Hatta.",
+      "it": "Guide per i tour ad Abu Dhabi, consigli per visitare la Grande Moschea dello Sceicco Zayed, il Louvre Abu Dhabi ed escursioni giornaliere sui monti di Hatta."
+    },
     "icon": "bi-compass-fill",
     "featured_image": "abu-dhabi-mosque-dune-discovery-tourism.avif",
     "is_active": true,

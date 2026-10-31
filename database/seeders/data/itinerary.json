@@ -3,8 +3,20 @@
         "id": 1,
         "tour_id": 1,
         "time": "3:00 PM",
-        "title": "Hotel Pickup",
-        "description": "Our professional safari captain collects you from your Dubai hotel or residence in a comfortable, air-conditioned Toyota Land Cruiser. Sit back and enjoy the transition from the glittering city to the open desert highway.",
+        "title": {
+            "en": "Hotel Pickup",
+            "ar": "التوصيل من الفندق",
+            "ru": "Трансфер из отеля",
+            "es": "Recogida en el Hotel",
+            "it": "Prelievo dall'Hotel"
+        },
+        "description": {
+            "en": "Our professional safari captain collects you from your Dubai hotel or residence in a comfortable, air-conditioned Toyota Land Cruiser. Sit back and enjoy the transition from the glittering city to the open desert highway.",
+            "ar": "يصل قائد السفاري المحترف إلى فندقك أو مكان إقامتك في دبي بسيارة تويوتا لاند كروزر حديثة ومكيفة لبدء رحلتك بكل راحة.",
+            "ru": "Профессиональный сафари-капитан заберет вас из отеля в Дубае на комфортабельном внедорожнике Toyota Land Cruiser.",
+            "es": "Nuestro conductor profesional te recoge en tu hotel o residencia en Dubái en un Toyota Land Cruiser 4x4 con aire acondicionado.",
+            "it": "Il nostro capitano safari professionista ti preleva dal tuo hotel a Dubai a bordo di un confortevole fuoristrada Toyota Land Cruiser climatizzato."
+        },
         "icon": "bi-truck",
         "duration": "30-60 mins",
         "priority": 1
@@ -13,8 +25,20 @@
         "id": 2,
         "tour_id": 1,
         "time": "4:00 PM",
-        "title": "Desert Drive",
-        "description": "As the desert opens up before you, enjoy a scenic drive through the sandy landscape with opportunities to photograph the stunning desert terrain and dune formations.",
+        "title": {
+            "en": "Desert Drive",
+            "ar": "الطريق إلى الصحراء",
+            "ru": "Поездка к пустыне",
+            "es": "Trayecto hacia el Desierto",
+            "it": "Viaggio verso il Deserto"
+        },
+        "description": {
+            "en": "As the desert opens up before you, enjoy a scenic drive through the sandy landscape with opportunities to photograph the stunning desert terrain and dune formations.",
+            "ar": "استمتع بمشاهدة الكثبان الرملية الذهبية الممتدة على جانبي الطريق مع إمكانية التقاط صور للمناظر الصحراوية الخلابة.",
+            "ru": "Живописная поездка по шоссе к пустыне с возможностью полюбоваться песчаными ландшафтами.",
+            "es": "Disfruta de un recorrido panorámico mientras la ciudad da paso a las majestuosas dunas del desierto.",
+            "it": "Goditi il tragitto panoramico mentre il paesaggio urbano lascia spazio alle maestose dune dorate."
+        },
         "icon": "bi-camera",
         "duration": "20 mins",
         "priority": 2
@@ -23,8 +47,20 @@
         "id": 3,
         "tour_id": 1,
         "time": "4:30 PM",
-        "title": "Dune Bashing",
-        "description": "Hold tight for the highlight of the journey — an adrenaline-pumping dune bashing ride across the Lahbab Red Dunes. Your expert driver navigates steep climbs, sharp drops, and sweeping slides in the powerful 4x4.",
+        "title": {
+            "en": "Dune Bashing",
+            "ar": "تطعيس الكثبان الرملية 4x4",
+            "ru": "Джиппинг по дюнам (Dune Bashing)",
+            "es": "Dune Bashing 4x4 por las Dunas",
+            "it": "Dune Bashing 4x4 sulle Dune"
+        },
+        "description": {
+            "en": "Hold tight for the highlight of the journey — an adrenaline-pumping dune bashing ride across the Lahbab Red Dunes. Your expert driver navigates steep climbs, sharp drops, and sweeping slides in the powerful 4x4.",
+            "ar": "استعد لأقوى لحظات الإثارة مع جولة تطعيس حماسية فوق كثبان لهباب الحمراء بقيادة خبير محترف.",
+            "ru": "30–45 минут динамичной езды по гребням высоких красных дюн Лахбаб на мощном внедорожнике.",
+            "es": "Sujétate bien para el momento cumbre: un emocionante recorrido 4x4 subiendo y bajando por las altas dunas rojas de Lahbab.",
+            "it": "Tieniti forte per il clou dell'avventura: un emozionante giro sui crinali delle dune rosse di Lahbab."
+        },
         "icon": "bi-speedometer",
         "duration": "30-45 mins",
         "priority": 3
@@ -33,8 +69,20 @@
         "id": 4,
         "tour_id": 1,
         "time": "5:15 PM",
-        "title": "Sunset Stop",
-        "description": "Pause at the peak of a towering dune to witness the desert sunset in its full glory. Golden, amber, and crimson hues sweep across the endless sands — a perfect moment for photographs and quiet wonder.",
+        "title": {
+            "en": "Sunset Stop",
+            "ar": "وقفة تصوير غروب الشمس",
+            "ru": "Остановка на закате в дюнах",
+            "es": "Parada Panorámica al Atardecer",
+            "it": "Sosta Fotografica al Tramonto"
+        },
+        "description": {
+            "en": "Pause at the peak of a towering dune to witness the desert sunset in its full glory. Golden, amber, and crimson hues sweep across the endless sands — a perfect moment for photographs and quiet wonder.",
+            "ar": "توقف على قمة أعلى كثيب رملي لمشاهدة غروب الشمس الساحر والتقاط أجمل الصور التذكارية.",
+            "ru": "Остановка на вершине высокой дюны для созерцания заката и великолепных фотографий.",
+            "es": "Pausa en la cresta de una gran duna para contemplar el cielo teñido de tonos dorados y rojizos.",
+            "it": "Sosta sulla cresta di una duna alta per ammirare i caldi riflessi del tramonto sul deserto."
+        },
         "icon": "bi-sunrise",
         "duration": "15-20 mins",
         "priority": 4
@@ -43,8 +91,20 @@
         "id": 5,
         "tour_id": 1,
         "time": "5:30 PM",
-        "title": "Desert Camp",
-        "description": "Arrive at our traditional Bedouin-style desert camp and enjoy a full evening of activities: camel riding, sandboarding, henna painting, Arabic costume photos, falcon display, shisha, a lavish BBQ dinner buffet, and mesmerising live shows including Tanoura dance, belly dance, fire show, and Dabka drumming.",
+        "title": {
+            "en": "Desert Camp",
+            "ar": "أنشطة المخيم البدوي",
+            "ru": "Прибытие в лагерь и вечерняя программа",
+            "es": "Campamento Beduino Tradicional",
+            "it": "Campo Beduino e Serata Tradizionale"
+        },
+        "description": {
+            "en": "Arrive at our traditional Bedouin-style desert camp and enjoy a full evening of activities: camel riding, sandboarding, henna painting, Arabic costume photos, falcon display, shisha, a lavish BBQ dinner buffet, and mesmerising live shows including Tanoura dance, belly dance, fire show, and Dabka drumming.",
+            "ar": "الوصول إلى المخيم والاستمتاع بركوب الجمال، التزلج على الرمال، نقش الحناء، الشيشة، عشاء الشواء، وعروض الرقص والنار.",
+            "ru": "Отдых в традиционном лагере: верблюды, сэндбординг, роспись хной, кальян, ужин-барбекю и живые шоу.",
+            "es": "Llegada al campamento con paseos en camello, sandboarding, henna, shisha, cena buffet BBQ y espectáculos en vivo.",
+            "it": "Arrivo al campo con passeggiata in dromedario, sandboard, henné, narghilè, ricco buffet BBQ e spettacoli dal vivo."
+        },
         "icon": "bi-house",
         "duration": "3-3.5 hours",
         "priority": 5
@@ -53,8 +113,20 @@
         "id": 6,
         "tour_id": 1,
         "time": "9:00 PM",
-        "title": "Return",
-        "description": "After an unforgettable desert evening, your driver returns you safely to your Dubai hotel or residence. Sit back and relive the memories on the comfortable ride home.",
+        "title": {
+            "en": "Return",
+            "ar": "العودة إلى الفندق",
+            "ru": "Возвращение в отель",
+            "es": "Regreso al Hotel",
+            "it": "Rientro in Hotel"
+        },
+        "description": {
+            "en": "After an unforgettable desert evening, your driver returns you safely to your Dubai hotel or residence. Sit back and relive the memories on the comfortable ride home.",
+            "ar": "بعد ليلة صحراوية لا تُنسى، يُعيدك قائد السفاري بأمان وراحة إلى فندقك في دبي.",
+            "ru": "Комфортный трансфер обратно в ваш отель в Дубае после насыщенного вечера.",
+            "es": "Traslado de vuelta con total comodidad y seguridad directamente a tu hotel en Dubái.",
+            "it": "Rientro comodo e sicuro direttamente al tuo hotel a Dubai dopo una splendida serata."
+        },
         "icon": "bi-geo-alt",
         "duration": "30-60 mins",
         "priority": 6
@@ -63,8 +135,20 @@
         "id": 7,
         "tour_id": 2,
         "time": "8:00 AM",
-        "title": "Hotel Pickup",
-        "description": "Your morning begins with a prompt pick-up from your Dubai hotel or residence in a comfortable, air-conditioned 4x4 vehicle. Enjoy the peaceful early-morning drive as the city wakes up around you.",
+        "title": {
+            "en": "Hotel Pickup",
+            "ar": "التوصيل من الفندق",
+            "ru": "Трансфер из отеля",
+            "es": "Recogida en el Hotel",
+            "it": "Prelievo dall'Hotel"
+        },
+        "description": {
+            "en": "Your morning begins with a prompt pick-up from your Dubai hotel or residence in a comfortable, air-conditioned 4x4 vehicle. Enjoy the peaceful early-morning drive as the city wakes up around you.",
+            "ar": "يصل قائد السفاري المحترف إلى فندقك أو مكان إقامتك في دبي بسيارة تويوتا لاند كروزر حديثة ومكيفة لبدء رحلتك بكل راحة.",
+            "ru": "Профессиональный сафари-капитан заберет вас из отеля в Дубае на комфортабельном внедорожнике Toyota Land Cruiser.",
+            "es": "Nuestro conductor profesional te recoge en tu hotel o residencia en Dubái en un Toyota Land Cruiser 4x4 con aire acondicionado.",
+            "it": "Il nostro capitano safari professionista ti preleva dal tuo hotel a Dubai a bordo di un confortevole fuoristrada Toyota Land Cruiser climatizzato."
+        },
         "icon": "bi-truck",
         "duration": "30-45 mins",
         "priority": 1
@@ -73,8 +157,20 @@
         "id": 8,
         "tour_id": 2,
         "time": "8:45 AM",
-        "title": "Desert Arrival & Preparation",
-        "description": "Arrive at the desert entry point where your driver prepares the vehicle for off-road action. Take a quick restroom break and get ready for the adventure ahead.",
+        "title": {
+            "en": "Desert Arrival & Preparation",
+            "ar": "الوصول إلى الصحراء والاستعداد",
+            "ru": "Прибытие в пустыню и подготовка",
+            "es": "Llegada al Desierto y Preparación",
+            "it": "Arrivo nel Deserto e Preparativi"
+        },
+        "description": {
+            "en": "Arrive at the desert entry point where your driver prepares the vehicle for off-road action. Take a quick restroom break and get ready for the adventure ahead.",
+            "ar": "الوصول إلى نقطة الدخول حيث يقوم السائق بتهيئة إطارات المركبة استعداداً للانطلاق فوق الكثبان.",
+            "ru": "Остановка на въезде в пустыню для стравливания давления в шинах перед выездом на песок.",
+            "es": "Llegada a la entrada del desierto donde el conductor prepara el vehículo para las dunas.",
+            "it": "Arrivo all'ingresso del deserto dove l'autista prepara il veicolo per la guida su sabbia."
+        },
         "icon": "bi-geo-alt",
         "duration": "10-15 mins",
         "priority": 2
@@ -83,8 +179,20 @@
         "id": 9,
         "tour_id": 2,
         "time": "9:00 AM",
-        "title": "Dune Bashing",
-        "description": "Experience an exhilarating 20-to-30-minute dune bashing ride across the red sand dunes. The cooler morning temperatures make this a supremely comfortable and thrilling experience with incredible visibility across the desert.",
+        "title": {
+            "en": "Dune Bashing",
+            "ar": "تطعيس الكثبان الرملية 4x4",
+            "ru": "Джиппинг по дюнам (Dune Bashing)",
+            "es": "Dune Bashing 4x4 por las Dunas",
+            "it": "Dune Bashing 4x4 sulle Dune"
+        },
+        "description": {
+            "en": "Experience an exhilarating 20-to-30-minute dune bashing ride across the red sand dunes. The cooler morning temperatures make this a supremely comfortable and thrilling experience with incredible visibility across the desert.",
+            "ar": "استعد لأقوى لحظات الإثارة مع جولة تطعيس حماسية فوق كثبان لهباب الحمراء بقيادة خبير محترف.",
+            "ru": "30–45 минут динамичной езды по гребням высоких красных дюн Лахбаб на мощном внедорожнике.",
+            "es": "Sujétate bien para el momento cumbre: un emocionante recorrido 4x4 subiendo y bajando por las altas dunas rojas de Lahbab.",
+            "it": "Tieniti forte per il clou dell'avventura: un emozionante giro sui crinali delle dune rosse di Lahbab."
+        },
         "icon": "bi-speedometer",
         "duration": "20-30 mins",
         "priority": 3
@@ -93,8 +201,20 @@
         "id": 10,
         "tour_id": 2,
         "time": "9:30 AM",
-        "title": "Photo Stop & Sandboarding",
-        "description": "Pause at the crest of a panoramic dune to capture the pristine morning desert with its long shadows and untouched ripple patterns. Try sandboarding down the steep slopes for an exciting rush.",
+        "title": {
+            "en": "Photo Stop & Sandboarding",
+            "ar": "وقفة تصوير وتزلج على الرمال",
+            "ru": "Фотостоп и сэндбординг",
+            "es": "Parada Fotográfica y Sandboarding",
+            "it": "Sosta Fotografica e Sandboarding"
+        },
+        "description": {
+            "en": "Pause at the crest of a panoramic dune to capture the pristine morning desert with its long shadows and untouched ripple patterns. Try sandboarding down the steep slopes for an exciting rush.",
+            "ar": "التوقف لالتقاط صور الصحراء الصباحية الخلابة وتجربة التزلج على المنحدرات الرملية الناعمة.",
+            "ru": "Красивые фотографии утренней пустыни и катание на сэндборде с крутых склонов.",
+            "es": "Fotos del paisaje matinal desértico y descensos en tabla de sandboard por las laderas.",
+            "it": "Foto panoramiche nel deserto mattutino e divertenti discese in sandboard."
+        },
         "icon": "bi-camera",
         "duration": "20-30 mins",
         "priority": 4
@@ -103,8 +223,20 @@
         "id": 11,
         "tour_id": 2,
         "time": "10:00 AM",
-        "title": "Camel Ride & Refreshments",
-        "description": "Enjoy a short camel ride through the tranquil morning landscape. Afterwards, relax with Arabic coffee, dates, and chilled refreshments while photographing a trained falcon.",
+        "title": {
+            "en": "Camel Ride & Refreshments",
+            "ar": "ركوب الجمال والضيافة العربية",
+            "ru": "Катание на верблюдах и угощения",
+            "es": "Paseo en Camello y Degustación Árabe",
+            "it": "Giro in Cammello e Rinfresco Arabo"
+        },
+        "description": {
+            "en": "Enjoy a short camel ride through the tranquil morning landscape. Afterwards, relax with Arabic coffee, dates, and chilled refreshments while photographing a trained falcon.",
+            "ar": "جولة على ظهور الجمال وتناول القهوة العربية الأصيلة والتمور الفاخرة والمشروبات المنعشة.",
+            "ru": "Прогулка на верблюдах, свежий арабский кофе, сладкие финики и прохладительные напитки.",
+            "es": "Breve paseo en camello acompañado de café árabe tradicional, dátiles y bebidas frescas.",
+            "it": "Passeggiata a dorso di dromedario con caffè arabo tradizionale, datteri e bibite fresche."
+        },
         "icon": "bi-cup-hot",
         "duration": "30-40 mins",
         "priority": 5
@@ -113,8 +245,20 @@
         "id": 12,
         "tour_id": 2,
         "time": "10:45 AM",
-        "title": "Free Desert Exploration",
-        "description": "Take your time to wander the desert, capture final photographs, or simply soak in the serene morning atmosphere before departure.",
+        "title": {
+            "en": "Free Desert Exploration",
+            "ar": "وقت حر للاستكشاف والتصوير",
+            "ru": "Свободное время в пустыне",
+            "es": "Tiempo Libre para Explorar y Fotos",
+            "it": "Tempo Libero per Foto ed Esplorazione"
+        },
+        "description": {
+            "en": "Take your time to wander the desert, capture final photographs, or simply soak in the serene morning atmosphere before departure.",
+            "ar": "وقت حر للتجول والاستمتاع بسكون الطبيعة الصباحية والتقاط الصور التذكارية الأخيرة.",
+            "ru": "Свободные минуты для прогулки по песку и памятных фото перед отъездом.",
+            "es": "Momento para pasear tranquilamente por la arena y sacar las últimas fotos del safari.",
+            "it": "Momento per passeggiare in tranquillità sulla sabbia e scattare le ultime foto."
+        },
         "icon": "bi-compass",
         "duration": "15-20 mins",
         "priority": 6
@@ -123,8 +267,20 @@
         "id": 13,
         "tour_id": 2,
         "time": "11:00 AM",
-        "title": "Return to Dubai",
-        "description": "Board your 4x4 for the comfortable drive back to the city. You are returned to your hotel by noon, leaving the entire afternoon and evening free for other Dubai experiences.",
+        "title": {
+            "en": "Return to Dubai",
+            "ar": "العودة إلى دبي",
+            "ru": "Возвращение в Дубай",
+            "es": "Regreso a Dubái",
+            "it": "Rientro a Dubai"
+        },
+        "description": {
+            "en": "Board your 4x4 for the comfortable drive back to the city. You are returned to your hotel by noon, leaving the entire afternoon and evening free for other Dubai experiences.",
+            "ar": "العودة بسيارة الدفع الرباعي المريحة إلى فندقك قبل وقت الغداء للاستمتاع ببقية يومك.",
+            "ru": "Возвращение в отель к полудню: весь остальной день свободен для ваших планов.",
+            "es": "Regreso cómodo a tu hotel antes del mediodía para aprovechar la tarde en Dubái.",
+            "it": "Rientro in hotel per l'ora di pranzo con il resto del giorno a disposizione."
+        },
         "icon": "bi-geo-alt",
         "duration": "45-60 mins",
         "priority": 7
@@ -133,8 +289,20 @@
         "id": 14,
         "tour_id": 3,
         "time": "3:00 PM",
-        "title": "Hotel Pickup",
-        "description": "Your overnight desert adventure begins with a comfortable pick-up from your Dubai hotel or residence in an air-conditioned Toyota Land Cruiser. Relax as the city skyline gradually gives way to vast desert horizons.",
+        "title": {
+            "en": "Hotel Pickup",
+            "ar": "التوصيل من الفندق",
+            "ru": "Трансфер из отеля",
+            "es": "Recogida en el Hotel",
+            "it": "Prelievo dall'Hotel"
+        },
+        "description": {
+            "en": "Your overnight desert adventure begins with a comfortable pick-up from your Dubai hotel or residence in an air-conditioned Toyota Land Cruiser. Relax as the city skyline gradually gives way to vast desert horizons.",
+            "ar": "يصل قائد السفاري المحترف إلى فندقك أو مكان إقامتك في دبي بسيارة تويوتا لاند كروزر حديثة ومكيفة لبدء رحلتك بكل راحة.",
+            "ru": "Профессиональный сафари-капитан заберет вас из отеля в Дубае на комфортабельном внедорожнике Toyota Land Cruiser.",
+            "es": "Nuestro conductor profesional te recoge en tu hotel o residencia en Dubái en un Toyota Land Cruiser 4x4 con aire acondicionado.",
+            "it": "Il nostro capitano safari professionista ti preleva dal tuo hotel a Dubai a bordo di un confortevole fuoristrada Toyota Land Cruiser climatizzato."
+        },
         "icon": "bi-truck",
         "duration": "30-60 mins",
         "priority": 1
@@ -143,8 +311,20 @@
         "id": 15,
         "tour_id": 3,
         "time": "4:00 PM",
-        "title": "Desert Arrival",
-        "description": "Arrive at the desert outskirts where your vehicle is prepared for the off-road drive. A brief stop allows restroom use and a first taste of the desert scenery.",
+        "title": {
+            "en": "Desert Arrival",
+            "ar": "الوصول إلى أطراف الصحراء",
+            "ru": "Прибытие на границу пустыни",
+            "es": "Llegada al Límite del Desierto",
+            "it": "Arrivo ai Margini del Deserto"
+        },
+        "description": {
+            "en": "Arrive at the desert outskirts where your vehicle is prepared for the off-road drive. A brief stop allows restroom use and a first taste of the desert scenery.",
+            "ar": "الوصول إلى مشارف الصحراء وأخذ استراحة قصيرة بينما يتم تجهيز المركبة للقيادة الوعرة.",
+            "ru": "Краткая остановка для подготовки внедорожника к заезду на барханы.",
+            "es": "Breve parada técnica para preparar el 4x4 antes de adentrarse en las arenas.",
+            "it": "Breve sosta tecnica per preparare il fuoristrada alla guida off-road."
+        },
         "icon": "bi-geo-alt",
         "duration": "15 mins",
         "priority": 2
@@ -153,8 +333,20 @@
         "id": 16,
         "tour_id": 3,
         "time": "4:15 PM",
-        "title": "Dune Bashing",
-        "description": "Buckle up for an adrenaline-fuelled dune bashing session across the towering Lahbab Red Dunes. Your skilled driver navigates dramatic crests and valleys for 30 to 45 minutes of pure excitement.",
+        "title": {
+            "en": "Dune Bashing",
+            "ar": "تطعيس الكثبان الرملية 4x4",
+            "ru": "Джиппинг по дюнам (Dune Bashing)",
+            "es": "Dune Bashing 4x4 por las Dunas",
+            "it": "Dune Bashing 4x4 sulle Dune"
+        },
+        "description": {
+            "en": "Buckle up for an adrenaline-fuelled dune bashing session across the towering Lahbab Red Dunes. Your skilled driver navigates dramatic crests and valleys for 30 to 45 minutes of pure excitement.",
+            "ar": "استعد لأقوى لحظات الإثارة مع جولة تطعيس حماسية فوق كثبان لهباب الحمراء بقيادة خبير محترف.",
+            "ru": "30–45 минут динамичной езды по гребням высоких красных дюн Лахбаб на мощном внедорожнике.",
+            "es": "Sujétate bien para el momento cumbre: un emocionante recorrido 4x4 subiendo y bajando por las altas dunas rojas de Lahbab.",
+            "it": "Tieniti forte per il clou dell'avventura: un emozionante giro sui crinali delle dune rosse di Lahbab."
+        },
         "icon": "bi-speedometer",
         "duration": "30-45 mins",
         "priority": 3
@@ -163,8 +355,20 @@
         "id": 17,
         "tour_id": 3,
         "time": "5:00 PM",
-        "title": "Sunset Photo Stop",
-        "description": "Stop atop a commanding dune to watch the desert sunset — a breathtaking canvas of gold, crimson, and violet stretching to every horizon. Capture this unforgettable moment and try sandboarding on the nearby slopes.",
+        "title": {
+            "en": "Sunset Photo Stop",
+            "ar": "وقفة تصوير الغروب والتزلج",
+            "ru": "Закатный фотостоп и сэндбординг",
+            "es": "Foto al Ocaso y Sandboard",
+            "it": "Foto al Tramonto e Sandboard"
+        },
+        "description": {
+            "en": "Stop atop a commanding dune to watch the desert sunset — a breathtaking canvas of gold, crimson, and violet stretching to every horizon. Capture this unforgettable moment and try sandboarding on the nearby slopes.",
+            "ar": "مشاهدة ألوان الغروب المتدرجة فوق الكثبان وتجربة التزلج على الرمال الساحرة.",
+            "ru": "Великолепный закат над пустыней и спуск на сэндборде с песчаного склона.",
+            "es": "Contempla los colores del atardecer sobre el desierto y prueba el sandboard.",
+            "it": "Ammira i colori del tramonto sulle dune e prova l'emozione del sandboard."
+        },
         "icon": "bi-sunrise",
         "duration": "20-30 mins",
         "priority": 4
@@ -173,8 +377,20 @@
         "id": 18,
         "tour_id": 3,
         "time": "5:30 PM",
-        "title": "Desert Camp Arrival",
-        "description": "Arrive at the overnight camp and receive a traditional welcome with Arabic coffee, dates, and tea. Settle into the Bedouin atmosphere and explore the camp at your leisure.",
+        "title": {
+            "en": "Desert Camp Arrival",
+            "ar": "الترحيب في المخيم البدوي",
+            "ru": "Встреча в ночном лагере",
+            "es": "Bienvenida al Campamento",
+            "it": "Accoglienza al Campo Beduino"
+        },
+        "description": {
+            "en": "Arrive at the overnight camp and receive a traditional welcome with Arabic coffee, dates, and tea. Settle into the Bedouin atmosphere and explore the camp at your leisure.",
+            "ar": "استقبال تقليدي بالقهوة والتمور والشاي، مع الاستقرار في أجواء الضيافة البدوية.",
+            "ru": "Традиционное арабское гостеприимство: кофе, финики, чай и размещение в лагере.",
+            "es": "Recepción con café árabe caliente, dátiles frescos y descanso en las jaimas.",
+            "it": "Benvenuto arabo con caffè speziato, datteri e sistemazione nell'accogliente campo."
+        },
         "icon": "bi-house",
         "duration": "30 mins",
         "priority": 5
@@ -183,8 +399,20 @@
         "id": 19,
         "tour_id": 3,
         "time": "6:00 PM",
-        "title": "Camp Activities",
-        "description": "Enjoy a full range of desert activities: take a camel ride, get henna designs painted, dress in Arabic attire for photos, pose with a falcon, or relax with shisha at the dedicated corner.",
+        "title": {
+            "en": "Camp Activities",
+            "ar": "فعاليات المخيم التراثية",
+            "ru": "Развлечения и традиции лагеря",
+            "es": "Actividades Tradicionales en el Campamento",
+            "it": "Attività Tradizionali al Campo"
+        },
+        "description": {
+            "en": "Enjoy a full range of desert activities: take a camel ride, get henna designs painted, dress in Arabic attire for photos, pose with a falcon, or relax with shisha at the dedicated corner.",
+            "ar": "ركوب الجمال، نقش الحناء، صور بالأزياء العربية، الصقور، والاسترخاء مع الشيشة.",
+            "ru": "Катание на верблюдах, роспись хной, арабские костюмы, соколы и кальянная зона.",
+            "es": "Paseos en camello, tatuajes de henna, trajes típicos para fotos y rincón de shisha.",
+            "it": "Passeggiate in cammello, tatuaggi all'henné, abiti arabi per foto e narghilè."
+        },
         "icon": "bi-stars",
         "duration": "60 mins",
         "priority": 6
@@ -193,8 +421,20 @@
         "id": 20,
         "tour_id": 3,
         "time": "7:00 PM",
-        "title": "BBQ Dinner Buffet",
-        "description": "A lavish BBQ dinner buffet is served under the open sky — grilled meats, kebabs, fresh salads, hummus, Arabic bread, rice dishes, and desserts. Vegetarian options are always available, with unlimited soft drinks, water, and hot beverages.",
+        "title": {
+            "en": "BBQ Dinner Buffet",
+            "ar": "بوفيه عشاء المشويات الفاخر",
+            "ru": "Шведский стол с барбекю",
+            "es": "Cena Buffet BBQ 5 Estrellas",
+            "it": "Cena a Buffet con Barbecue 5 Stelle"
+        },
+        "description": {
+            "en": "A lavish BBQ dinner buffet is served under the open sky — grilled meats, kebabs, fresh salads, hummus, Arabic bread, rice dishes, and desserts. Vegetarian options are always available, with unlimited soft drinks, water, and hot beverages.",
+            "ar": "بوفيه غني بأشهى المشويات والكباب والسلطات والمقبلات والأطباق النباتية والمشروبات.",
+            "ru": "Обильный ужин-барбекю на углях: мясо, люля-кебабы, салаты, хумус и сладости.",
+            "es": "Variado buffet de parrillada con carnes a la brasa, ensaladas, platos vegetarianos y postres.",
+            "it": "Ricco buffet barbecue con carni grigliate, insalate fresche, piatti vegetariani e dolci."
+        },
         "icon": "bi-egg-fried",
         "duration": "60 mins",
         "priority": 7
@@ -203,8 +443,20 @@
         "id": 21,
         "tour_id": 3,
         "time": "8:00 PM",
-        "title": "Live Entertainment",
-        "description": "Sit back for an evening of cultural performances: the mesmerising Tanoura dance, an elegant belly dance, a heart-stopping fire show, and rhythmic Dabka drumming — all staged beneath the starlit desert sky.",
+        "title": {
+            "en": "Live Entertainment",
+            "ar": "العروض الفنية والفلكلورية الحية",
+            "ru": "Шоу-программа под открытым небом",
+            "es": "Espectáculos Folclóricos en Vivo",
+            "it": "Spettacoli Folkloristici dal Vivo"
+        },
+        "description": {
+            "en": "Sit back for an evening of cultural performances: the mesmerising Tanoura dance, an elegant belly dance, a heart-stopping fire show, and rhythmic Dabka drumming — all staged beneath the starlit desert sky.",
+            "ar": "عروض رقص التنورة المدهش، الرقص الشرقي الراقي، وعرض النار المثير وإيقاعات الطبول.",
+            "ru": "Завораживающий танец Танура, восточные танцы, захватывающее шоу огня и барабаны Дабка.",
+            "es": "Fascinante danza Tanoura, danza del vientre, espectacular show de fuego y tambores árabes.",
+            "it": "Ipnotica danza Tanoura, elegante danza del ventre, suggestivo fire show e tamburi arabi."
+        },
         "icon": "bi-music-note",
         "duration": "45-60 mins",
         "priority": 8
@@ -213,8 +465,20 @@
         "id": 22,
         "tour_id": 3,
         "time": "9:00 PM",
-        "title": "Campfire & Stargazing",
-        "description": "As the entertainment ends, gather around the campfire for a quieter, more intimate experience. Sip Arabic coffee, share stories, and gaze upward — the desert sky, free from city light pollution, reveals thousands of stars and constellations.",
+        "title": {
+            "en": "Campfire & Stargazing",
+            "ar": "جلسة السمر ومراقبة النجوم",
+            "ru": "Вечерний костер и звезды",
+            "es": "Fogata Nocturna y Observación Estelar",
+            "it": "Falò Notturno e Cielo Stellato"
+        },
+        "description": {
+            "en": "As the entertainment ends, gather around the campfire for a quieter, more intimate experience. Sip Arabic coffee, share stories, and gaze upward — the desert sky, free from city light pollution, reveals thousands of stars and constellations.",
+            "ar": "جلسة هادئة حول نار السمر مع القهوة العربية والاستمتاع بمشاهدة آلاف النجوم اللامعة.",
+            "ru": "Уютные посиделки у костра за чашкой кофе и наблюдение за звездами в ночной тишине.",
+            "es": "Reunión íntima alrededor del fuego con café caliente admirando el cielo estrellado.",
+            "it": "Momento rilassante attorno al falò sorseggiando caffè sotto il cielo stellato."
+        },
         "icon": "bi-moon-stars",
         "duration": "60-90 mins",
         "priority": 9
@@ -223,8 +487,20 @@
         "id": 23,
         "tour_id": 3,
         "time": "10:30 PM",
-        "title": "Retire to Tent",
-        "description": "Retreat to your traditional Bedouin tent equipped with clean bedding and blankets. The profound silence of the desert provides an unparalleled sense of peace as you drift off to sleep.",
+        "title": {
+            "en": "Retire to Tent",
+            "ar": "المبيت في الخيمة البدوية",
+            "ru": "Ночлег в бедуинском шатре",
+            "es": "Descanso en la Tienda Beduina",
+            "it": "Pernottamento nella Tenda Beduina"
+        },
+        "description": {
+            "en": "Retreat to your traditional Bedouin tent equipped with clean bedding and blankets. The profound silence of the desert provides an unparalleled sense of peace as you drift off to sleep.",
+            "ar": "النوم في خيمة بدوية مجهزة بفرش وأغطية مريحة مع التمتع بالسكينة التامة لصحراء دبي.",
+            "ru": "Отдых в комфортном бедуинском шатре со свежим постельным бельем в абсолютной тишине.",
+            "es": "Noche de descanso en una jaima beduina tradicional equipada con camas y mantas.",
+            "it": "Sonno ristoratore in tenda beduina fornita di comodi materassi e coperte pulite."
+        },
         "icon": "bi-moon",
         "duration": "Overnight",
         "priority": 10
@@ -233,8 +509,20 @@
         "id": 24,
         "tour_id": 3,
         "time": "5:30 AM",
-        "title": "Desert Sunrise",
-        "description": "Wake gently to the cool desert dawn. An optional early-morning nature walk lets you discover animal tracks and desert flora. Watch the stunning sunrise paint the sand dunes in soft peach, amber, and gold.",
+        "title": {
+            "en": "Desert Sunrise",
+            "ar": "شروق الشمس الصحراوي الخلاب",
+            "ru": "Рассвет над песчаными дюнами",
+            "es": "Amanecer Mágico en el Desierto",
+            "it": "Alba Spettacolare nel Deserto"
+        },
+        "description": {
+            "en": "Wake gently to the cool desert dawn. An optional early-morning nature walk lets you discover animal tracks and desert flora. Watch the stunning sunrise paint the sand dunes in soft peach, amber, and gold.",
+            "ar": "الاستيقاظ مع نسائم الصباح لمشاهدة شروق الشمس الذهبي يغمر الرمال بالألوان الدافئة.",
+            "ru": "Встреча золотого восхода солнца, окрашивающего бескрайние дюны в нежные оттенки.",
+            "es": "Despierta con la suave brisa del alba para ver salir el sol iluminando el desierto.",
+            "it": "Risveglio alle prime luci del giorno per ammirare il sole sorgere sopra le dune dorate."
+        },
         "icon": "bi-sunrise",
         "duration": "30-45 mins",
         "priority": 11
@@ -243,8 +531,20 @@
         "id": 25,
         "tour_id": 3,
         "time": "6:30 AM",
-        "title": "Bedouin Breakfast",
-        "description": "A hearty traditional breakfast is served: eggs, Arabic bread, cheese, jam, honey, fresh fruits, tea, and Arabic coffee — the perfect fuel for the morning ahead.",
+        "title": {
+            "en": "Bedouin Breakfast",
+            "ar": "الإفطار البدوي الطازج",
+            "ru": "Традиционный бедуинский завтрак",
+            "es": "Desayuno Beduino Tradicional",
+            "it": "Colazione Tradizionale Beduina"
+        },
+        "description": {
+            "en": "A hearty traditional breakfast is served: eggs, Arabic bread, cheese, jam, honey, fresh fruits, tea, and Arabic coffee — the perfect fuel for the morning ahead.",
+            "ar": "إفطار شهي يشمل البيض والخبز العربي والأجبان والعسل والمشروبات الساخنة.",
+            "ru": "Свежий утренний завтрак: яйца, арабский хлеб, сыры, джемы, чай и кофе.",
+            "es": "Nutritivo desayuno con huevos, pan caliente, quesos, miel, frutas y café árabe.",
+            "it": "Ricca colazione mattutina con uova, pane caldo, formaggi, miele, frutta e caffè."
+        },
         "icon": "bi-cup-hot",
         "duration": "30-45 mins",
         "priority": 12
@@ -253,8 +553,20 @@
         "id": 26,
         "tour_id": 3,
         "time": "7:30 AM",
-        "title": "Free Time & Departure",
-        "description": "Enjoy final moments in the desert — take photographs, explore, or simply absorb the morning calm. Then board your vehicle for the comfortable return journey to your Dubai hotel, arriving between 9:00 and 10:00 AM.",
+        "title": {
+            "en": "Free Time & Departure",
+            "ar": "وقت حر والاستعداد للمغادرة",
+            "ru": "Свободное время и отъезд",
+            "es": "Tiempo Libre y Salida",
+            "it": "Tempo Libero e Partenza"
+        },
+        "description": {
+            "en": "Enjoy final moments in the desert — take photographs, explore, or simply absorb the morning calm. Then board your vehicle for the comfortable return journey to your Dubai hotel, arriving between 9:00 and 10:00 AM.",
+            "ar": "الاستمتاع باللحظات الصباحية الأخيرة في هدوء الصحراء والتقاط الصور، ثم ركوب المركبة للعودة المريحة إلى فندقك بدبي بين 6:30 و7:00 صباحاً.",
+            "ru": "Заключительные минуты в тишине утренней пустыни, фотосессия и комфортный трансфер обратно в ваш отель в Дубае.",
+            "es": "Últimos momentos para relajarse en la calma matinal del desierto, sacar fotos y emprender el cómodo viaje de regreso a tu hotel en Dubái.",
+            "it": "Ultimi momenti per assaporare la quiete del deserto all'alba, scattare foto e intraprendere il comodo viaggio di ritorno verso il tuo hotel a Dubai."
+        },
         "icon": "bi-geo-alt",
         "duration": "60-90 mins",
         "priority": 13
@@ -263,8 +575,20 @@
         "id": 27,
         "tour_id": 4,
         "time": "2:30 PM",
-        "title": "Hotel Pickup",
-        "description": "Your adventure starts with an earlier-than-usual pick-up from your Dubai hotel or residence in an air-conditioned 4x4. The extra time ensures you enjoy both quad biking and the full evening safari programme.",
+        "title": {
+            "en": "Hotel Pickup",
+            "ar": "التوصيل من الفندق",
+            "ru": "Трансфер из отеля",
+            "es": "Recogida en el Hotel",
+            "it": "Prelievo dall'Hotel"
+        },
+        "description": {
+            "en": "Your adventure starts with an earlier-than-usual pick-up from your Dubai hotel or residence in an air-conditioned 4x4. The extra time ensures you enjoy both quad biking and the full evening safari programme.",
+            "ar": "يصل قائد السفاري المحترف إلى فندقك أو مكان إقامتك في دبي بسيارة تويوتا لاند كروزر حديثة ومكيفة لبدء رحلتك بكل راحة.",
+            "ru": "Профессиональный сафари-капитан заберет вас из отеля в Дубае на комфортабельном внедорожнике Toyota Land Cruiser.",
+            "es": "Nuestro conductor profesional te recoge en tu hotel o residencia en Dubái en un Toyota Land Cruiser 4x4 con aire acondicionado.",
+            "it": "Il nostro capitano safari professionista ti preleva dal tuo hotel a Dubai a bordo di un confortevole fuoristrada Toyota Land Cruiser climatizzato."
+        },
         "icon": "bi-truck",
         "duration": "30-60 mins",
         "priority": 1
@@ -273,8 +597,20 @@
         "id": 28,
         "tour_id": 4,
         "time": "3:30 PM",
-        "title": "Quad Bike Safety Briefing",
-        "description": "Arrive at the desert ATV compound. A professional instructor gives you a thorough safety briefing covering controls, throttle management, braking, and track boundaries. Helmets and safety gear are provided.",
+        "title": {
+            "en": "Quad Bike Safety Briefing",
+            "ar": "التدريب على سلامة قيادة الدراجات",
+            "ru": "Инструктаж по безопасности ATV",
+            "es": "Instrucción de Seguridad para Quads",
+            "it": "Briefing di Sicurezza per Quad ATV"
+        },
+        "description": {
+            "en": "Arrive at the desert ATV compound. A professional instructor gives you a thorough safety briefing covering controls, throttle management, braking, and track boundaries. Helmets and safety gear are provided.",
+            "ar": "الوصول إلى محطة الدراجات، حيث يقدم لك المدرب المحترف شرحاً مفصلاً عن أدوات التحكم بالدراجة والفرامل والمسارات الآمنة مع تزويدك بالخوذة والنظارات.",
+            "ru": "Прибытие на базу ATV: подробный инструктаж тренера по управлению газом, тормозами и границами трассы, выдача защитных шлемов и очков.",
+            "es": "Llegada a la base ATV: explicación técnica completa de acelerador, frenado y límites de seguridad, con entrega de cascos y gafas protectoras.",
+            "it": "Arrivo alla base ATV: spiegazione tecnica completa sui comandi, freni e limiti di sicurezza, con consegna di casco e occhiali di protezione."
+        },
         "icon": "bi-shield-check",
         "duration": "10-15 mins",
         "priority": 2
@@ -283,8 +619,20 @@
         "id": 29,
         "tour_id": 4,
         "time": "3:45 PM",
-        "title": "Quad Biking Adventure",
-        "description": "Mount your powerful automatic ATV and ride freely across the open desert terrain for 30 thrilling minutes. No prior experience needed — the instructor guides you throughout. Accelerate, turn, and explore the sandy landscape at your own pace.",
+        "title": {
+            "en": "Quad Biking Adventure",
+            "ar": "مغامرة قيادة الدراجات الرباعية في الرمال",
+            "ru": "Заезд на квадроциклах по барханам",
+            "es": "Aventura en Quad por las Dunas",
+            "it": "Avventura in Quad tra le Dune"
+        },
+        "description": {
+            "en": "Mount your powerful automatic ATV and ride freely across the open desert terrain for 30 thrilling minutes. No prior experience needed — the instructor guides you throughout. Accelerate, turn, and explore the sandy landscape at your own pace.",
+            "ar": "انطلق على متن دراجتك الأوتوماتيكية القوية وقد بحرية لمدة 30 دقيقة من الحماس فوق الكثبان الرملية بمرافقة وإشراف المدرب طوال الجولة.",
+            "ru": "30 минут самостоятельной динамичной езды на мощном автоматическом квадроцикле по открытым барханам под присмотром инструктора.",
+            "es": "Conduce libremente tu potente quad automático durante 30 minutos trepidantes por la arena virgen, siempre acompañado por un guía experto.",
+            "it": "Guida in piena libertà il tuo potente quad automatico per 30 minuti di pura emozione sulla sabbia, costantemente seguito dalla guida esperta."
+        },
         "icon": "bi-lightning",
         "duration": "30 mins",
         "priority": 3
@@ -293,8 +641,20 @@
         "id": 30,
         "tour_id": 4,
         "time": "4:15 PM",
-        "title": "Dune Bashing",
-        "description": "Switch from handlebars to seatbelts as your expert driver launches into an intense dune bashing session across the towering red dunes. Hold on tight for 30 to 45 minutes of climbs, drops, and exhilarating slides.",
+        "title": {
+            "en": "Dune Bashing",
+            "ar": "تطعيس الكثبان الرملية 4x4",
+            "ru": "Джиппинг по дюнам (Dune Bashing)",
+            "es": "Dune Bashing 4x4 por las Dunas",
+            "it": "Dune Bashing 4x4 sulle Dune"
+        },
+        "description": {
+            "en": "Switch from handlebars to seatbelts as your expert driver launches into an intense dune bashing session across the towering red dunes. Hold on tight for 30 to 45 minutes of climbs, drops, and exhilarating slides.",
+            "ar": "استعد لأقوى لحظات الإثارة مع جولة تطعيس حماسية فوق كثبان لهباب الحمراء بقيادة خبير محترف.",
+            "ru": "30–45 минут динамичной езды по гребням высоких красных дюн Лахбаб на мощном внедорожнике.",
+            "es": "Sujétate bien para el momento cumbre: un emocionante recorrido 4x4 subiendo y bajando por las altas dunas rojas de Lahbab.",
+            "it": "Tieniti forte per il clou dell'avventura: un emozionante giro sui crinali delle dune rosse di Lahbab."
+        },
         "icon": "bi-speedometer",
         "duration": "30-45 mins",
         "priority": 4
@@ -303,8 +663,20 @@
         "id": 31,
         "tour_id": 4,
         "time": "5:00 PM",
-        "title": "Sunset Photo Stop",
-        "description": "Pause at a panoramic dune summit to witness the magical desert sunset. Capture golden-hour photographs of the infinite sand sea and try your hand at sandboarding on the steep slopes.",
+        "title": {
+            "en": "Sunset Photo Stop",
+            "ar": "وقفة تصوير الغروب والتزلج",
+            "ru": "Закатный фотостоп и сэндбординг",
+            "es": "Foto al Ocaso y Sandboard",
+            "it": "Foto al Tramonto e Sandboard"
+        },
+        "description": {
+            "en": "Pause at a panoramic dune summit to witness the magical desert sunset. Capture golden-hour photographs of the infinite sand sea and try your hand at sandboarding on the steep slopes.",
+            "ar": "مشاهدة ألوان الغروب المتدرجة فوق الكثبان وتجربة التزلج على الرمال الساحرة.",
+            "ru": "Великолепный закат над пустыней и спуск на сэндборде с песчаного склона.",
+            "es": "Contempla los colores del atardecer sobre el desierto y prueba el sandboard.",
+            "it": "Ammira i colori del tramonto sulle dune e prova l'emozione del sandboard."
+        },
         "icon": "bi-sunrise",
         "duration": "15-20 mins",
         "priority": 5
@@ -313,8 +685,20 @@
         "id": 32,
         "tour_id": 4,
         "time": "5:30 PM",
-        "title": "Desert Camp Arrival",
-        "description": "Arrive at the traditional Bedouin-style camp. Receive a warm welcome with Arabic coffee, dates, and tea. Settle in and begin exploring the camp facilities.",
+        "title": {
+            "en": "Desert Camp Arrival",
+            "ar": "الترحيب في المخيم البدوي",
+            "ru": "Встреча в ночном лагере",
+            "es": "Bienvenida al Campamento",
+            "it": "Accoglienza al Campo Beduino"
+        },
+        "description": {
+            "en": "Arrive at the traditional Bedouin-style camp. Receive a warm welcome with Arabic coffee, dates, and tea. Settle in and begin exploring the camp facilities.",
+            "ar": "استقبال تقليدي بالقهوة والتمور والشاي، مع الاستقرار في أجواء الضيافة البدوية.",
+            "ru": "Традиционное арабское гостеприимство: кофе, финики, чай и размещение в лагере.",
+            "es": "Recepción con café árabe caliente, dátiles frescos y descanso en las jaimas.",
+            "it": "Benvenuto arabo con caffè speziato, datteri e sistemazione nell'accogliente campo."
+        },
         "icon": "bi-house",
         "duration": "15-20 mins",
         "priority": 6
@@ -323,8 +707,20 @@
         "id": 33,
         "tour_id": 4,
         "time": "5:45 PM",
-        "title": "Camp Activities",
-        "description": "Enjoy camel riding, henna painting, traditional Arabic costume photos, falcon photography, and shisha at the dedicated corner. Take your time — the evening is yours.",
+        "title": {
+            "en": "Camp Activities",
+            "ar": "فعاليات المخيم التراثية",
+            "ru": "Развлечения и традиции лагеря",
+            "es": "Actividades Tradicionales en el Campamento",
+            "it": "Attività Tradizionali al Campo"
+        },
+        "description": {
+            "en": "Enjoy camel riding, henna painting, traditional Arabic costume photos, falcon photography, and shisha at the dedicated corner. Take your time — the evening is yours.",
+            "ar": "ركوب الجمال، نقش الحناء، صور بالأزياء العربية، الصقور، والاسترخاء مع الشيشة.",
+            "ru": "Катание на верблюдах, роспись хной, арабские костюмы, соколы и кальянная зона.",
+            "es": "Paseos en camello, tatuajes de henna, trajes típicos para fotos y rincón de shisha.",
+            "it": "Passeggiate in cammello, tatuaggi all'henné, abiti arabi per foto e narghilè."
+        },
         "icon": "bi-stars",
         "duration": "60-75 mins",
         "priority": 7
@@ -333,8 +729,20 @@
         "id": 34,
         "tour_id": 4,
         "time": "7:00 PM",
-        "title": "BBQ Dinner Buffet",
-        "description": "Savour a generous BBQ dinner buffet featuring grilled meats, kebabs, salads, hummus, Arabic bread, rice, and desserts. Vegetarian options and unlimited soft drinks, water, and hot beverages included.",
+        "title": {
+            "en": "BBQ Dinner Buffet",
+            "ar": "بوفيه عشاء المشويات الفاخر",
+            "ru": "Шведский стол с барбекю",
+            "es": "Cena Buffet BBQ 5 Estrellas",
+            "it": "Cena a Buffet con Barbecue 5 Stelle"
+        },
+        "description": {
+            "en": "Savour a generous BBQ dinner buffet featuring grilled meats, kebabs, salads, hummus, Arabic bread, rice, and desserts. Vegetarian options and unlimited soft drinks, water, and hot beverages included.",
+            "ar": "بوفيه غني بأشهى المشويات والكباب والسلطات والمقبلات والأطباق النباتية والمشروبات.",
+            "ru": "Обильный ужин-барбекю на углях: мясо, люля-кебабы, салаты, хумус и сладости.",
+            "es": "Variado buffet de parrillada con carnes a la brasa, ensaladas, platos vegetarianos y postres.",
+            "it": "Ricco buffet barbecue con carni grigliate, insalate fresche, piatti vegetariani e dolci."
+        },
         "icon": "bi-egg-fried",
         "duration": "45-60 mins",
         "priority": 8
@@ -343,8 +751,20 @@
         "id": 35,
         "tour_id": 4,
         "time": "8:00 PM",
-        "title": "Live Entertainment",
-        "description": "The evening reaches its peak with spectacular cultural performances: Tanoura dance, belly dance, a daring fire show, and Dabka drumming — all performed under a blanket of desert stars.",
+        "title": {
+            "en": "Live Entertainment",
+            "ar": "العروض الفنية والفلكلورية الحية",
+            "ru": "Шоу-программа под открытым небом",
+            "es": "Espectáculos Folclóricos en Vivo",
+            "it": "Spettacoli Folkloristici dal Vivo"
+        },
+        "description": {
+            "en": "The evening reaches its peak with spectacular cultural performances: Tanoura dance, belly dance, a daring fire show, and Dabka drumming — all performed under a blanket of desert stars.",
+            "ar": "عروض رقص التنورة المدهش، الرقص الشرقي الراقي، وعرض النار المثير وإيقاعات الطبول.",
+            "ru": "Завораживающий танец Танура, восточные танцы, захватывающее шоу огня и барабаны Дабка.",
+            "es": "Fascinante danza Tanoura, danza del vientre, espectacular show de fuego y tambores árabes.",
+            "it": "Ipnotica danza Tanoura, elegante danza del ventre, suggestivo fire show e tamburi arabi."
+        },
         "icon": "bi-music-note",
         "duration": "45-60 mins",
         "priority": 9
@@ -353,8 +773,20 @@
         "id": 36,
         "tour_id": 4,
         "time": "9:00 PM",
-        "title": "Return to Dubai",
-        "description": "Board your 4x4 for the comfortable return journey. You are dropped off at your Dubai hotel by approximately 9:30 PM, having packed two major adventures into one incredible evening.",
+        "title": {
+            "en": "Return to Dubai",
+            "ar": "العودة إلى دبي",
+            "ru": "Возвращение в Дубай",
+            "es": "Regreso a Dubái",
+            "it": "Rientro a Dubai"
+        },
+        "description": {
+            "en": "Board your 4x4 for the comfortable return journey. You are dropped off at your Dubai hotel by approximately 9:30 PM, having packed two major adventures into one incredible evening.",
+            "ar": "العودة بسيارة الدفع الرباعي المريحة إلى فندقك قبل وقت الغداء للاستمتاع ببقية يومك.",
+            "ru": "Возвращение в отель к полудню: весь остальной день свободен для ваших планов.",
+            "es": "Regreso cómodo a tu hotel antes del mediodía para aprovechar la tarde en Dubái.",
+            "it": "Rientro in hotel per l'ora di pranzo con il resto del giorno a disposizione."
+        },
         "icon": "bi-geo-alt",
         "duration": "30-60 mins",
         "priority": 10

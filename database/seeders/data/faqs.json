@@ -1,352 +1,880 @@
 [
     {
         "id": 1,
-        "question": "What should I wear for the desert safari?",
-        "answer": "Comfortable, loose-fitting clothes are recommended. Avoid high heels. Sunglasses and sunscreen are essential.",
+        "question": {
+            "en": "What should I wear for the desert safari?",
+            "ar": "ماذا يجب أن أرتدي لرحلة سفاري الصحراء؟",
+            "ru": "Что надеть на сафари в пустыне?",
+            "es": "¿Qué ropa debo llevar para el safari por el desierto?",
+            "it": "Cosa dovrei indossare per il safari nel deserto?"
+        },
+        "answer": {
+            "en": "Comfortable, loose-fitting clothes are recommended. Avoid high heels. Sunglasses and sunscreen are essential.",
+            "ar": "نوصي بارتداء ملابس قطنية فضفاضة ومريحة، وتجنب الكعب العالي تماماً وارتداء أحذية مريحة أو صنادل. النظارات الشمسية وواقي الشمس وقبعة خفيفة أمور أساسية في الصحراء.",
+            "ru": "Рекомендуется легкая, свободная одежда из натуральных тканей и удобная обувь без каблуков. Солнцезащитные очки, крем с SPF и головной убор обязательны.",
+            "es": "Se recomienda ropa ligera y holgada. Evita tacones y utiliza calzado cómodo o sandalias. Gafas de sol, protector solar y gorra son indispensables.",
+            "it": "Consigliamo abiti comodi e traspiranti. Evita i tacchi e usa scarpe comode o sandali. Occhiali da sole, crema solare e cappello sono essenziali."
+        },
         "category": "general",
         "priority": 99,
         "status": "active"
     },
     {
         "id": 2,
-        "question": "Is the desert safari suitable for children?",
-        "answer": "Yes! Children aged 3+ can enjoy the experience. Car seats available on request.",
+        "question": {
+            "en": "Is the desert safari suitable for children?",
+            "ar": "هل رحلة السفاري الصحراوية مناسبة للأطفال؟",
+            "ru": "Подходит ли сафари для детей?",
+            "es": "¿Es adecuado el safari para niños?",
+            "it": "Il safari è adatto ai bambini?"
+        },
+        "answer": {
+            "en": "Yes! Children aged 3+ can enjoy the experience. Car seats available on request.",
+            "ar": "نعم بالتأكيد! يمكن للأطفال من عمر 3 سنوات فما فوق الاستمتاع بالرحلة. وتتوفر مقاعد أمان للأطفال في السيارات عند الطلب المسبق أثناء الحجز.",
+            "ru": "Да! Дети от 3 лет отлично переносят сафари. По предварительному запросу при бронировании бесплатно предоставляются детские автокресла.",
+            "es": "¡Sí, totalmente! Los niños a partir de 3 años disfrutan mucho de la experiencia. Hay sillitas infantiles disponibles bajo petición al reservar.",
+            "it": "Certamente! I bambini dai 3 anni in su si divertono moltissimo. Seggiolini auto disponibili su richiesta al momento della prenotazione."
+        },
         "category": "general",
         "priority": 99,
         "status": "active"
     },
     {
         "id": 3,
-        "question": "Can I bring my camera?",
-        "answer": "Absolutely! The desert offers amazing photo opportunities. Professional photography is also available.",
+        "question": {
+            "en": "Can I bring my camera?",
+            "ar": "هل يمكنني إحضار كاميراتي الخاصة؟",
+            "ru": "Можно ли брать с собой фотоаппарат?",
+            "es": "¿Puedo llevar mi propia cámara?",
+            "it": "Posso portare la mia macchina fotografica?"
+        },
+        "answer": {
+            "en": "Absolutely! The desert offers amazing photo opportunities. Professional photography is also available.",
+            "ar": "بكل تأكيد! توفر الصحراء خلفيات طبيعية مذهلة وفرصاً رائعة للتصوير. كما يتوفر مصورون محترفون في المخيم لتقديم خدمات التصوير التذكاري.",
+            "ru": "Конечно! Пустыня дарит фантастические ракурсы для фото и видео. В лагере также работают профессиональные фотографы.",
+            "es": "¡Por supuesto! El desierto ofrece paisajes increíbles para fotografías. También hay servicio de fotografía profesional en el campamento.",
+            "it": "Certamente! Il deserto offre scenari spettacolari per scatti unici. Nel campo è presente anche un fotografo professionista."
+        },
         "category": "general",
         "priority": 99,
         "status": "active"
     },
     {
         "id": 4,
-        "question": "What is included in the BBQ dinner?",
-        "answer": "International buffet with grilled meats, salads, rice, bread, and vegetarian options. Soft drinks included.",
+        "question": {
+            "en": "What is included in the BBQ dinner?",
+            "ar": "ماذا يشمل بوفيه عشاء الشواء؟",
+            "ru": "Что входит в ужин-барбекю (BBQ)?",
+            "es": "¿Qué incluye la cena buffet barbacoa?",
+            "it": "Cosa comprende la cena a buffet con barbecue?"
+        },
+        "answer": {
+            "en": "International buffet with grilled meats, salads, rice, bread, and vegetarian options. Soft drinks included.",
+            "ar": "بوفيه عالمي متكامل يضم تشكيلة من المشويات الطازجة على الفحم، الكباب، الدجاج المشوي، المقبلات، السلطات، الحمص، الأرز، والخبز العربي مع توفر أطباق نباتية ومشروبات منعشة غير محدودة.",
+            "ru": "Интернациональный шведский стол: шашлыки из курицы и мяса на углях, люля-кебабы, свежие салаты, хумус, рис, арабские лепешки, вегетарианские блюда и безалкогольные напитки без ограничений.",
+            "es": "Buffet internacional con parrillada de carnes al carbón, brochetas, ensaladas variadas, arroz, hummus, pan árabe caliente, opciones vegetarianas y bebidas refrescantes ilimitadas.",
+            "it": "Buffet internazionale con carni grigliate alla brace, spiedini, insalate fresche, riso, hummus, pane arabo caldo, gustosi piatti vegetariani e bevande analcoliche illimitate."
+        },
         "category": "general",
         "priority": 99,
         "status": "active"
     },
     {
         "id": 5,
-        "question": "How long is the dune bashing?",
-        "answer": "Dune bashing typically lasts 30-45 minutes, depending on the package selected.",
+        "question": {
+            "en": "How long is the dune bashing?",
+            "ar": "كم تبلغ مدة تطعيس الكثبان الرملية (Dune Bashing)؟",
+            "ru": "Сколько длится джиппинг по дюнам (dune bashing)?",
+            "es": "¿Cuánto dura la sesión de dune bashing?",
+            "it": "Quanto dura la sessione di dune bashing?"
+        },
+        "answer": {
+            "en": "Dune bashing typically lasts 30-45 minutes, depending on the package selected.",
+            "ar": "تستغرق جولة التطعيس في العادة ما بين 30 إلى 45 دقيقة من الإثارة والمغامرة، حسب الباقة المختارة وتضاريس الكثبان الرملية.",
+            "ru": "Обычно джип-тур длится от 30 до 45 минут в зависимости от выбранного пакета и рельефа дюн.",
+            "es": "El recorrido por las dunas suele durar entre 30 y 45 minutos de pura emoción, según el paquete elegido.",
+            "it": "La corsa sulle dune dura generalmente tra i 30 e i 45 minuti di pura adrenalina, a seconda del pacchetto scelto."
+        },
         "category": "general",
         "priority": 99,
         "status": "active"
     },
     {
         "id": 6,
-        "question": "Is pickup from all Dubai hotels included?",
-        "answer": "Yes, we offer free pickup and drop-off from any hotel or residence in Dubai.",
+        "question": {
+            "en": "Is pickup from all Dubai hotels included?",
+            "ar": "هل خدمة التوصيل مشمولة من جميع فنادق دبي؟",
+            "ru": "Включен ли трансфер из любого отеля Дубая?",
+            "es": "¿Está incluida la recogida en cualquier hotel de Dubái?",
+            "it": "Il prelievo è incluso da tutti gli hotel di Dubai?"
+        },
+        "answer": {
+            "en": "Yes, we offer free pickup and drop-off from any hotel or residence in Dubai.",
+            "ar": "نعم، نوفر خدمة التوصيل المجانية ذهاباً وإياباً من باب أي فندق أو برج سكني أو فيلا خاصة في جميع مناطق إمارة دبي.",
+            "ru": "Да, мы предоставляем бесплатный трансфер от дверей любого отеля, апартаментов или виллы на всей территории Дубая.",
+            "es": "Sí, ofrecemos recogida y regreso gratuito directo en la puerta de cualquier hotel, apartamento o villa en Dubái.",
+            "it": "Sì, garantiamo il prelievo e il rientro gratuiti direttamente dal portone di qualsiasi hotel o residenza a Dubai."
+        },
         "category": "general",
         "priority": 99,
         "status": "active"
     },
     {
         "id": 7,
-        "question": "What payment methods do you accept?",
-        "answer": "We accept cash (AED), credit cards, and bank transfers. Payment collected at pickup.",
+        "question": {
+            "en": "What payment methods do you accept?",
+            "ar": "ما هي طرق الدفع المقبولة لديكم؟",
+            "ru": "Какие способы оплаты вы принимаете?",
+            "es": "¿Qué métodos de pago aceptan?",
+            "it": "Quali metodi di pagamento accettate?"
+        },
+        "answer": {
+            "en": "We accept cash (AED), credit cards, and bank transfers. Payment collected at pickup.",
+            "ar": "نقبل الدفع نقداً بالدرهم الإماراتي (AED)، وبطاقات الائتمان والخصم المباشر (Visa \/ Mastercard)، والدفع الإلكتروني الآمن عند الحجز أو عند الاستلام.",
+            "ru": "Мы принимаем наличные в дирхамах (AED), банковские карты Visa\/Mastercard и безопасные онлайн-платежи при бронировании или при встрече.",
+            "es": "Aceptamos efectivo en dírhams (AED), tarjetas de crédito\/débito y pagos online seguros en el momento de la recogida.",
+            "it": "Accettiamo contanti in dirham (AED), carte di credito\/debito e pagamenti elettronici sicuri al momento del prelievo."
+        },
         "category": "general",
         "priority": 99,
         "status": "active"
     },
     {
         "id": 8,
-        "question": "Can I cancel or reschedule my booking?",
-        "answer": "Free cancellation up to 24 hours before. Rescheduling subject to availability.",
+        "question": {
+            "en": "Can I cancel or reschedule my booking?",
+            "ar": "هل يمكنني إلغاء الحجز أو تغيير موعده؟",
+            "ru": "Можно ли отменить или перенести бронирование?",
+            "es": "¿Puedo cancelar o cambiar la fecha de mi reserva?",
+            "it": "Posso cancellare o modificare la mia prenotazione?"
+        },
+        "answer": {
+            "en": "Free cancellation up to 24 hours before. Rescheduling subject to availability.",
+            "ar": "نعم، نوفر إلغاءً مجانياً بنسبة 100% حتى 24 ساعة قبل موعد الانطلاق، كما يمكنك تغيير موعد الرحلة بسهولة حسب التوفر.",
+            "ru": "Да, бесплатная отмена бронирования доступна за 24 часа до выезда. Перенос даты осуществляется при наличии свободных мест.",
+            "es": "Sí, cancelación 100% gratuita hasta 24 horas antes del tour. Los cambios de fecha están sujetos a disponibilidad sin penalización.",
+            "it": "Sì, cancellazione gratuita al 100% fino a 24 ore prima dell'inizio del tour. Il cambio data è gratuito in base alla disponibilità."
+        },
         "category": "general",
         "priority": 99,
         "status": "active"
     },
     {
         "id": 9,
-        "question": "What is the difference between Standard, Premium and VIP?",
-        "answer": "Standard (Classic) includes shared 4x4 transfers and carpet camp seating. Premium includes shared 4x4 transfers, extended 25-30 min high-dune bashing, and reserved table seating with table service at the camp. VIP or Private 4x4 packages provide a dedicated private Land Cruiser exclusively for your party, VIP majlis seating, and premium table service.",
+        "question": {
+            "en": "What is the difference between Standard, Premium and VIP?",
+            "ar": "ما هو الفرق بين الباقة الكلاسيكية والممتازة وباقة VIP؟",
+            "ru": "В чем разница между тарифами Classic, Premium и VIP?",
+            "es": "¿Cuál es la diferencia entre los paquetes Classic, Premium y VIP?",
+            "it": "Qual è la differenza tra i pacchetti Classic, Premium e VIP?"
+        },
+        "answer": {
+            "en": "Standard (Classic) includes shared 4x4 transfers and carpet camp seating. Premium includes shared 4x4 transfers, extended 25-30 min high-dune bashing, and reserved table seating with table service at the camp. VIP or Private 4x4 packages provide a dedicated private Land Cruiser exclusively for your party, VIP majlis seating, and premium table service.",
+            "ar": "تشمل الباقة الكلاسيكية النقل المشترك بمركبات 4x4 والجلوس في المخيم على السجاد البدوي، بينما تتضمن باقة بريميوم جلسات طاولة مخصصة، وتمنحك باقة VIP سيارة خاصة وخدمة الضيافة على الطاولة والجلوس في الصفوف الأولى أمام العروض.",
+            "ru": "Classic включает трансфер на 4x4 и традиционные места на коврах. Premium предлагает удобные столики, а VIP включает приватный джип, премиальные места у сцены и персональное обслуживание официантами.",
+            "es": "El paquete Classic incluye traslado compartido en 4x4 y asientos sobre alfombras. Premium incluye mesa propia, y VIP añade transporte privado, asientos preferentes junto al escenario y servicio de mesa.",
+            "it": "Il pacchetto Classic include trasferimento 4x4 condiviso e sedute su tappeti tradizionali. Premium offre tavoli riservati, mentre VIP include auto privata, posti fronte palco e servizio al tavolo."
+        },
         "category": "general",
         "priority": 99,
         "status": "active"
     },
     {
         "id": 10,
-        "question": "Are vegetarian food options available?",
-        "answer": "Yes, we offer a variety of vegetarian dishes including salads, rice, grilled vegetables, and more.",
+        "question": {
+            "en": "Are vegetarian food options available?",
+            "ar": "هل تتوفر أطعمة وخيارات نباتية في البوفيه؟",
+            "ru": "Есть ли вегетарианские блюда на ужине?",
+            "es": "¿Tienen opciones vegetarianas en la cena?",
+            "it": "Sono disponibili piatti vegetariani a cena?"
+        },
+        "answer": {
+            "en": "Yes, we offer a variety of vegetarian dishes including salads, rice, grilled vegetables, and more.",
+            "ar": "نعم، يتضمن بوفيه العشاء مجموعة متنوعة وشهية من الأطباق النباتية بما في ذلك الخضار المشوية والأرز وسلطات الحمص والمتبل والتبولة والفلافل والمعكرونة.",
+            "ru": "Да, на шведском столе представлен отличный выбор вегетарианских блюд: овощи гриль, рис, хумус, табуле, фалафель, паста и свежие салаты.",
+            "es": "Sí, nuestro buffet incluye una deliciosa selección vegetariana: verduras a la brasa, arroz, hummus, tabulé, falafel, ensaladas frescas y pastas.",
+            "it": "Sì, il buffet propone un ricco assortimento vegetariano: verdure alla griglia, riso, hummus, tabulè, falafel, pasta e insalate fresche."
+        },
         "category": "general",
         "priority": 99,
         "status": "active"
     },
     {
         "id": 11,
-        "question": "What time does the evening desert safari start and end?",
-        "answer": "Our evening desert safari pick-up begins between 3:00 PM and 3:30 PM from your Dubai hotel. The exact time depends on your location and the seasonal sunset schedule. You are dropped back by approximately 9:00 PM to 9:30 PM. The total experience lasts about 6 hours.",
+        "question": {
+            "en": "What time does the evening desert safari start and end?",
+            "ar": "ما هي مواعيد انطلاق وعودة السفاري المسائي؟",
+            "ru": "В какое время начинается и заканчивается вечернее сафари?",
+            "es": "¿A qué hora empieza y termina el safari vespertino?",
+            "it": "A che ora inizia e termina il safari serale?"
+        },
+        "answer": {
+            "en": "Our evening desert safari pick-up begins between 3:00 PM and 3:30 PM from your Dubai hotel. The exact time depends on your location and the seasonal sunset schedule. You are dropped back by approximately 9:00 PM to 9:30 PM. The total experience lasts about 6 hours.",
+            "ar": "يبدأ التوصيل للسفاري المسائي بين الساعة 2:30 و3:00 عصراً من فندقك في دبي، وتكون العودة إلى الفندق بين الساعة 9:00 و9:30 مساءً.",
+            "ru": "Сбор гостей на вечернее сафари проходит с 14:30 до 15:00. Возвращение в отель планируется к 21:00–21:30.",
+            "es": "La recogida del safari vespertino se realiza entre las 14:30 y las 15:00 horas, con regreso al hotel hacia las 21:00–21:30 horas.",
+            "it": "Il prelievo per il safari serale avviene tra le 14:30 e le 15:00, con rientro in hotel previsto tra le 21:00 e le 21:30."
+        },
         "category": "evening-safari",
         "priority": 1,
         "status": "active"
     },
     {
         "id": 12,
-        "question": "Can I skip dune bashing if I have health concerns?",
-        "answer": "Absolutely. If you prefer not to participate in dune bashing due to pregnancy, back problems, or any other concern, we can arrange for you to be driven directly to the desert camp in a separate vehicle at normal speed. You will still enjoy all camp activities, dinner, and shows.",
+        "question": {
+            "en": "Can I skip dune bashing if I have health concerns?",
+            "ar": "هل يمكنني تخطي تطعيس الكثبان الرملية إذا كانت لدي ظروف صحية؟",
+            "ru": "Можно ли пропустить джиппинг по состоянию здоровья?",
+            "es": "¿Puedo saltarme el dune bashing por motivos de salud?",
+            "it": "Posso saltare il dune bashing per motivi di salute?"
+        },
+        "answer": {
+            "en": "Absolutely. If you prefer not to participate in dune bashing due to pregnancy, back problems, or any other concern, we can arrange for you to be driven directly to the desert camp in a separate vehicle at normal speed. You will still enjoy all camp activities, dinner, and shows.",
+            "ar": "نعم بالتأكيد! إذا كنتِ حاملاً أو تعاني من آلام في الظهر أو الرقبة، يسلك السائق طريقاً ممهداً ومباشراً وهادئاً إلى المخيم دون المرور بمنحدرات التطعيس.",
+            "ru": "Безусловно. Беременные женщины и гости с болями в спине могут поехать напрямую в лагерь по ровной и плавной песчаной дороге без экстрима.",
+            "es": "¡Por supuesto! Mujeres embarazadas o personas con problemas de espalda pueden ir directamente al campamento por una pista plana y suave.",
+            "it": "Assolutamente sì! Donne in gravidanza o persone con problemi alla schiena possono raggiungere il campo tramite un comodo percorso pianeggiante."
+        },
         "category": "evening-safari",
         "priority": 2,
         "status": "active"
     },
     {
         "id": 13,
-        "question": "What entertainment shows are included in the evening safari?",
-        "answer": "Your evening includes a Tanoura (Sufi whirling) dance, belly dance performance, a dramatic fire show, and Dabka drumming. During the Holy Month of Ramadan, belly dance is paused out of respect, but all other shows continue.",
+        "question": {
+            "en": "What entertainment shows are included in the evening safari?",
+            "ar": "ما هي العروض الترفيهية المشمولة في السفاري المسائي؟",
+            "ru": "Какие шоу-программы включены в вечернее сафари?",
+            "es": "¿Qué espectáculos están incluidos en el safari vespertino?",
+            "it": "Quali spettacoli sono inclusi nel safari serale?"
+        },
+        "answer": {
+            "en": "Your evening includes a Tanoura (Sufi whirling) dance, belly dance performance, a dramatic fire show, and Dabka drumming. During the Holy Month of Ramadan, belly dance is paused out of respect, but all other shows continue.",
+            "ar": "تشمل الأمسية 3 عروض فلكلورية حية مذهلة: رقص التنورة التراثي الساحر، الرقص الشرقي الكلاسيكي، وعرض النار الحماسي المثير، مصحوبة بإيقاعات الطبول التقليدية.",
+            "ru": "Вас ждут 3 ярких живых представления: кружащийся танец Танура, грациозный танец живота, опасное огненное шоу и арабские барабаны под открытым небом.",
+            "es": "La velada incluye 3 magníficos espectáculos en directo: la hipnótica danza Tanoura, danza del vientre, espectacular show de fuego y percusión tradicional.",
+            "it": "La serata prevede 3 spettacoli dal vivo: l'affascinante danza dei dervisci Tanoura, la danza del ventre, un emozionante spettacolo col fuoco e tamburi arabi."
+        },
         "category": "evening-safari",
         "priority": 3,
         "status": "active"
     },
     {
         "id": 14,
-        "question": "Is the BBQ dinner suitable for vegetarians?",
-        "answer": "Yes. Our BBQ buffet always includes a variety of vegetarian dishes — grilled vegetables, salads, hummus, rice, Arabic bread, and desserts. If you have specific dietary requirements such as vegan, gluten-free, or allergies, please inform us at booking and we will accommodate you.",
+        "question": {
+            "en": "Is the BBQ dinner suitable for vegetarians?",
+            "ar": "هل الأطعمة المقدمة حلال في المخيم؟",
+            "ru": "Все ли блюда халяльные (Halal)?",
+            "es": "¿Toda la comida servida es Halal?",
+            "it": "Tutti i piatti serviti sono certificati Halal?"
+        },
+        "answer": {
+            "en": "Yes. Our BBQ buffet always includes a variety of vegetarian dishes — grilled vegetables, salads, hummus, rice, Arabic bread, and desserts. If you have specific dietary requirements such as vegan, gluten-free, or allergies, please inform us at booking and we will accommodate you.",
+            "ar": "نعم، جميع اللحوم والدواجن والأطعمة المقدمة في بوفيه العشاء حلال 100% ومجهزة وفق أعلى معايير سلامة الأغذية المعتمدة في دبي.",
+            "ru": "Да, абсолютно все мясные блюда и продукты на шведском столе сертифицированы как 100% Халяль и соответствуют строгим стандартам ОАЭ.",
+            "es": "Sí, todas las carnes y platos del buffet son 100% Halal certificados y cumplen con los rigurosos estándares sanitarios de Dubái.",
+            "it": "Sì, tutte le carni e le pietanze del buffet sono certificate 100% Halal e preparate secondo i più rigorosi standard igienici di Dubai."
+        },
         "category": "evening-safari",
         "priority": 4,
         "status": "active"
     },
     {
         "id": 15,
-        "question": "What type of vehicle is used for dune bashing?",
-        "answer": "We use Toyota Land Cruisers and similar high-performance 4x4 SUVs. All vehicles are fitted with safety roll cages, seatbelts for every passenger, fire extinguishers, and are maintained to the highest standards. Our drivers hold government-issued safari licences.",
+        "question": {
+            "en": "What type of vehicle is used for dune bashing?",
+            "ar": "ما هو نوع المركبات المستخدمة في تطعيس الصحراء؟",
+            "ru": "Какие автомобили используются для джиппинга?",
+            "es": "¿Qué vehículos se utilizan para el safari por las dunas?",
+            "it": "Che tipo di veicoli vengono utilizzati per il safari?"
+        },
+        "answer": {
+            "en": "We use Toyota Land Cruisers and similar high-performance 4x4 SUVs. All vehicles are fitted with safety roll cages, seatbelts for every passenger, fire extinguishers, and are maintained to the highest standards. Our drivers hold government-issued safari licences.",
+            "ar": "نستخدم سيارات تويوتا لاند كروزر 4x4 الحديثة ونيسان باترول المجهزة بأقفاص حماية داخلية كاملة (Roll Cage)، وأحزمة أمان وتأمين شامل لجميع الركاب.",
+            "ru": "Мы используем современные внедорожники Toyota Land Cruiser 4x4 и Nissan Patrol, оборудованные внутренними каркасами безопасности и ремнями.",
+            "es": "Utilizamos potentes todoterrenos Toyota Land Cruiser 4x4 y Nissan Patrol equipados con jaulas antivuelco y cinturones de seguridad completos.",
+            "it": "Utilizziamo moderni fuoristrada Toyota Land Cruiser 4x4 e Nissan Patrol dotati di roll-bar interni e cinture di sicurezza omologate."
+        },
         "category": "evening-safari",
         "priority": 5,
         "status": "active"
     },
     {
         "id": 16,
-        "question": "Is the evening desert safari suitable for elderly guests?",
-        "answer": "Guests of all ages are welcome at the camp. However, dune bashing involves vigorous movement and is not recommended for those with heart conditions, severe back issues, or limited mobility. Elderly guests can opt for a direct, gentle drive to the camp and enjoy all other activities.",
+        "question": {
+            "en": "Is the evening desert safari suitable for elderly guests?",
+            "ar": "هل رحلة السفاري المسائية مناسبة لكبار السن؟",
+            "ru": "Подходит ли вечернее сафари для пожилых людей?",
+            "es": "¿Es adecuado el safari vespertino para personas mayores?",
+            "it": "Il safari serale è adatto agli anziani?"
+        },
+        "answer": {
+            "en": "Guests of all ages are welcome at the camp. However, dune bashing involves vigorous movement and is not recommended for those with heart conditions, severe back issues, or limited mobility. Elderly guests can opt for a direct, gentle drive to the camp and enjoy all other activities.",
+            "ar": "نعم، كبار السن مرحب بهم تماماً للاستمتاع بالمخيم والعشاء والعروض. يمكنهم طلب قيادة هادئة ومباشرة إلى المخيم لتجنب حركات التطعيس السريعة.",
+            "ru": "Да, лагерь и вечерняя программа очень комфортны для пожилых людей. Водитель может доставить их прямо в лагерь по спокойной дороге в объезд крутых дюн.",
+            "es": "Sí, las personas mayores disfrutan mucho del campamento, la cena y los shows. Se puede solicitar una conducción suave y directa sin sobresaltos.",
+            "it": "Certamente, il campo e la cena sono molto piacevoli per gli anziani. Su richiesta l'autista effettua un percorso tranquillo evitando le pendenze ripide."
+        },
         "category": "evening-safari",
         "priority": 6,
         "status": "active"
     },
     {
         "id": 17,
-        "question": "Do you provide hotel pickup from all areas of Dubai?",
-        "answer": "Yes, we provide complimentary pick-up and drop-off from any hotel, apartment, or residence across Dubai including JBR, Marina, Downtown, Deira, Bur Dubai, Palm Jumeirah, Business Bay, and outlying areas. Sharjah and Ajman pickups may also be arranged.",
+        "question": {
+            "en": "Do you provide hotel pickup from all areas of Dubai?",
+            "ar": "هل توفرون التوصيل من مناطق دبي مارينا ووسط المدينة ونخلة جميرا؟",
+            "ru": "Есть ли трансфер из Дубай Марина, Downtown и Пальма Джумейра?",
+            "es": "¿Tienen recogida en Dubai Marina, Downtown y Palm Jumeirah?",
+            "it": "Effettuate il prelievo da Dubai Marina, Downtown e Palm Jumeirah?"
+        },
+        "answer": {
+            "en": "Yes, we provide complimentary pick-up and drop-off from any hotel, apartment, or residence across Dubai including JBR, Marina, Downtown, Deira, Bur Dubai, Palm Jumeirah, Business Bay, and outlying areas. Sharjah and Ajman pickups may also be arranged.",
+            "ar": "نعم، يشمل التوصيل المجاني جميع مناطق دبي بما في ذلك دبي مارينا، داون تاون، نخلة جميرا، ديرة، بر دبي، الخليج التجاري، والبرشاء دون أي رسوم إضافية.",
+            "ru": "Да, бесплатный трансфер действует во всех районах Дубая: Дубай Марина, Downtown, Пальма Джумейра, Дейра, Бар Дубай, Business Bay и Аль-Барша.",
+            "es": "Sí, la recogida gratuita cubre todas las zonas de Dubái, incluyendo Dubai Marina, Downtown, Palm Jumeirah, Deira, Bur Dubai y Business Bay.",
+            "it": "Sì, il prelievo gratuito copre l'intera città: Dubai Marina, Downtown, Palm Jumeirah, Deira, Bur Dubai, Business Bay e tutte le altre zone."
+        },
         "category": "evening-safari",
         "priority": 7,
         "status": "active"
     },
     {
         "id": 18,
-        "question": "What happens if it rains or there is a sandstorm?",
-        "answer": "Desert safaris may be rescheduled in cases of extreme weather for your safety. If a tour is cancelled due to weather, you will be offered an alternative date or a full refund. Our team will contact you as early as possible with updates.",
+        "question": {
+            "en": "What happens if it rains or there is a sandstorm?",
+            "ar": "ماذا يحدث في حال هطول أمطار أو حدوث عاصفة رملية؟",
+            "ru": "Что происходит в случае дождя или песчаной бури?",
+            "es": "¿Qué ocurre en caso de lluvia o tormenta de arena?",
+            "it": "Cosa succede in caso di pioggia o tempesta di sabbia?"
+        },
+        "answer": {
+            "en": "Desert safaris may be rescheduled in cases of extreme weather for your safety. If a tour is cancelled due to weather, you will be offered an alternative date or a full refund. Our team will contact you as early as possible with updates.",
+            "ar": "في الحالات الجوية النادرة التي قد تؤثر على السلامة، نقوم بإعادة جدولة الجولة في موعد لاحق يناسبك أو استرداد كامل المبلغ بنسبة 100% فوراً.",
+            "ru": "В редких случаях штормовой погоды ради безопасности тур переносится на удобную дату или осуществляется 100% возврат средств.",
+            "es": "En casos excepcionales de clima adverso, reprogramamos la excursión para otra fecha de tu agrado o reembolsamos el 100% de tu dinero de inmediato.",
+            "it": "In rari casi di maltempo estremo, riprogrammiamo il tour in una data comoda oppure rimborsiamo l'importo al 100% senza penali."
+        },
         "category": "evening-safari",
         "priority": 8,
         "status": "active"
     },
     {
         "id": 19,
-        "question": "How is the morning desert safari different from the evening?",
-        "answer": "The morning safari focuses on adventure and natural beauty in cooler, more comfortable temperatures. It includes dune bashing, sandboarding, camel riding, and photography — but does not include BBQ dinner, live entertainment shows, henna, or shisha, which are exclusive to the evening experience.",
+        "question": {
+            "en": "How is the morning desert safari different from the evening?",
+            "ar": "ما هو الفرق بين السفاري الصباحي والسفاري المسائي؟",
+            "ru": "Чем утреннее сафари отличается от вечернего?",
+            "es": "¿Qué diferencia hay entre el safari matutino y el vespertino?",
+            "it": "In cosa differisce il safari mattutino da quello serale?"
+        },
+        "answer": {
+            "en": "The morning safari focuses on adventure and natural beauty in cooler, more comfortable temperatures. It includes dune bashing, sandboarding, camel riding, and photography — but does not include BBQ dinner, live entertainment shows, henna, or shisha, which are exclusive to the evening experience.",
+            "ar": "يركز السفاري الصباحي على الأنشطة الحركية في درجات حرارة معتدلة (تطعيس، تزلج على الرمال، وركوب الجمال) وينتهي ظهراً، بينما يشمل المسائي المخيم البدوي وعشاء الشواء والعروض الحية تحت النجوم.",
+            "ru": "Утреннее сафари длится 4 часа и сфокусировано на экстриме в прохладные утренние часы. Вечернее сафари включает лагерь, ужин-барбекю и шоу-программу.",
+            "es": "El safari matutino dura 4 horas con actividades dinámicas en horas frescas (dunas, sandboard, camellos). El vespertino añade campamento, cena BBQ y shows.",
+            "it": "Il safari mattutino dura 4 ore ed è focalizzato sull'azione all'alba con temperature miti. Il serale include campo beduino, cena barbecue e spettacoli dal vivo."
+        },
         "category": "morning-safari",
         "priority": 1,
         "status": "active"
     },
     {
         "id": 20,
-        "question": "Is breakfast included in the morning desert safari?",
-        "answer": "The standard morning safari includes Arabic coffee, dates, bottled water, and light refreshments. A full breakfast is not included in the base package. If you would like a Bedouin-style breakfast, please enquire about our upgraded options at the time of booking.",
+        "question": {
+            "en": "Is breakfast included in the morning desert safari?",
+            "ar": "هل وجبة الإفطار مشمولة في السفاري الصباحي؟",
+            "ru": "Включен ли завтрак в утреннее сафари?",
+            "es": "¿Está incluido el desayuno en el safari matutino?",
+            "it": "La colazione è inclusa nel safari mattutino?"
+        },
+        "answer": {
+            "en": "The standard morning safari includes Arabic coffee, dates, bottled water, and light refreshments. A full breakfast is not included in the base package. If you would like a Bedouin-style breakfast, please enquire about our upgraded options at the time of booking.",
+            "ar": "تشمل باقة السفاري الصباحية الأساسية القهوة العربية والتمور والمياه والمشروبات الباردة، ويمكن ترقية الحجز لإضافة وجبة إفطار بدوية طازجة في المخيم.",
+            "ru": "Базовое утреннее сафари включает арабский кофе, финики, минеральную воду и напитки. Полноценный завтрак доступен при выборе специального тарифа.",
+            "es": "El safari matutino estándar incluye café árabe, dátiles, agua mineral y refrescos. Se puede añadir desayuno completo como suplemento opcional.",
+            "it": "Il safari mattutino include caffè arabo, datteri, acqua fresca e soft drink. È possibile aggiungere la colazione beduina come opzione extra."
+        },
         "category": "morning-safari",
         "priority": 2,
         "status": "active"
     },
     {
         "id": 21,
-        "question": "What is the best time of year for a morning desert safari?",
-        "answer": "October through February offers the most pleasant morning temperatures, typically between 20 and 28 degrees Celsius. Summer mornings (June to August) heat up quickly after 9 AM. However, the morning safari is always more comfortable than the afternoon regardless of season.",
+        "question": {
+            "en": "What is the best time of year for a morning desert safari?",
+            "ar": "ما هو أفضل وقت في السنة لرحلة السفاري الصباحية؟",
+            "ru": "Какое время года лучше всего подходит для утреннего сафари?",
+            "es": "¿Cuál es la mejor época del año para el safari matutino?",
+            "it": "Qual è il miglior periodo dell'anno per il safari mattutino?"
+        },
+        "answer": {
+            "en": "October through February offers the most pleasant morning temperatures, typically between 20 and 28 degrees Celsius. Summer mornings (June to August) heat up quickly after 9 AM. However, the morning safari is always more comfortable than the afternoon regardless of season.",
+            "ar": "الفترة من أكتوبر إلى أبريل هي الأفضل على الإطلاق؛ حيث يكون الطقس الصباحي منعشاً ومعتدلاً بدرجات حرارة تتراوح بين 20 إلى 26 درجة مئوية.",
+            "ru": "С октября по апрель — идеальный сезон, когда утренний воздух в пустыне свеж и комфортен (от 20 до 26 градусов тепла).",
+            "es": "De octubre a abril es la mejor temporada, con mañanas frescas y temperaturas muy agradables que oscilan entre 20 y 26 °C.",
+            "it": "Il periodo tra ottobre e aprile è ideale, con un'aria fresca e temperature mattutine piacevoli tra i 20 e i 26 °C."
+        },
         "category": "morning-safari",
         "priority": 3,
         "status": "active"
     },
     {
         "id": 22,
-        "question": "Can I add quad biking to my morning safari?",
-        "answer": "Yes, quad biking can be added as a paid upgrade. A 30-minute ATV session typically costs between AED 150 and AED 200. We recommend pre-booking to guarantee availability as on-site slots fill up quickly.",
+        "question": {
+            "en": "Can I add quad biking to my morning safari?",
+            "ar": "هل يمكنني إضافة دراجة رباعية (Quad Bike) إلى السفاري الصباحي؟",
+            "ru": "Можно ли добавить квадроцикл к утреннему сафари?",
+            "es": "¿Puedo añadir un quad al safari matutino?",
+            "it": "Posso aggiungere un quad al safari mattutino?"
+        },
+        "answer": {
+            "en": "Yes, quad biking can be added as a paid upgrade. A 30-minute ATV session typically costs between AED 150 and AED 200. We recommend pre-booking to guarantee availability as on-site slots fill up quickly.",
+            "ar": "نعم بكل تأكيد! يمكنك إضافة جلسة قيادة دراجات رباعية ATV لمدة 30 دقيقة بسهولة أثناء حجز السفاري الصباحي عبر الموقع.",
+            "ru": "Да, конечно! Вы можете выбрать дополнительную 30-минутную поездку на квадроцикле при бронировании утреннего тура.",
+            "es": "¡Sí, seguro! Puedes agregar una sesión de 30 minutos en quad ATV al reservar tu safari matutino a través de la web.",
+            "it": "Assolutamente sì! Puoi selezionare la sessione di 30 minuti in quad ATV direttamente in fase di prenotazione sul nostro sito."
+        },
         "category": "morning-safari",
         "priority": 4,
         "status": "active"
     },
     {
         "id": 23,
-        "question": "Will I see a sunrise on the morning safari?",
-        "answer": "Our standard morning safari departs at 8:00 AM, so you will experience the beautiful morning light but not the actual sunrise. If you specifically want a sunrise experience, ask us about the dedicated Sunrise Safari option with an earlier 4:30 AM to 5:00 AM departure.",
+        "question": {
+            "en": "Will I see a sunrise on the morning safari?",
+            "ar": "هل سأشاهد شروق الشمس خلال رحلة السفاري الصباحية؟",
+            "ru": "Увижу ли я восход солнца на утреннем сафари?",
+            "es": "¿Podré ver el amanecer en el safari matutino?",
+            "it": "Vedrò l'alba durante il safari mattutino?"
+        },
+        "answer": {
+            "en": "Our standard morning safari departs at 8:00 AM, so you will experience the beautiful morning light but not the actual sunrise. If you specifically want a sunrise experience, ask us about the dedicated Sunrise Safari option with an earlier 4:30 AM to 5:00 AM departure.",
+            "ar": "ينطلق السفاري الصباحي القياسي بين 7:00 و7:30 صباحاً لتستمتع بضوء الصباح الذهبي الخلاب. إذا كنت ترغب في مشاهدة بزوغ الشمس من الأفق، يمكن ترتيب انطلاق خاص عند الفجر.",
+            "ru": "Стандартный тур стартует в 7:00–7:30 утра, когда пустыня озарена мягким утренним светом. Для встречи самого рассвета можно заказать индивидуальный ранний выезд.",
+            "es": "El safari habitual sale entre las 7:00 y las 7:30 AM para disfrutar de la hermosa luz matinal. Para ver el sol nacer en el horizonte, ofrecemos salidas privadas al amanecer.",
+            "it": "Il safari standard parte tra le 7:00 e le 7:30 per godersi la morbida luce mattutina. Per ammirare il sorgere del sole all'orizzonte è possibile richiedere una partenza privata all'alba."
+        },
         "category": "morning-safari",
         "priority": 5,
         "status": "active"
     },
     {
         "id": 24,
-        "question": "Is the morning safari good for families with young children?",
-        "answer": "It is excellent for families. Cooler temperatures, a shorter four-hour duration, and the adventure-focused format make it ideal for children. Kids aged 3 and above can participate in dune bashing. Younger children require a private vehicle with a child seat.",
+        "question": {
+            "en": "Is the morning safari good for families with young children?",
+            "ar": "هل السفاري الصباحي مناسب للعائلات التي لديها أطفال صغار؟",
+            "ru": "Подходит ли утреннее сафари для семей с маленькими детьми?",
+            "es": "¿Es recomendable el safari matutino para familias con niños pequeños?",
+            "it": "Il safari mattutino è consigliato per famiglie con bambini piccoli?"
+        },
+        "answer": {
+            "en": "It is excellent for families. Cooler temperatures, a shorter four-hour duration, and the adventure-focused format make it ideal for children. Kids aged 3 and above can participate in dune bashing. Younger children require a private vehicle with a child seat.",
+            "ar": "نعم، إنه خيار ممتاز للعائلات؛ فالمدة أقصر (4 ساعات)، والطقس ألطف، وتوفر الجمال والتزلج على الرمال تجربة مرحة وآمنة تماماً للأطفال.",
+            "ru": "Да, это отличный выбор: комфортная температура, продолжительность всего 4 часа и море веселья на песке без вечерней усталости.",
+            "es": "Excelente para familias: duración más corta (4 horas), temperaturas frescas y diversión garantizada con camellos y sandboard sin cansar a los más pequeños.",
+            "it": "Perfetto per le famiglie: durata contenuta (4 ore), clima piacevole e tanto divertimento con dromedari e discese sulla sabbia senza affaticare i bimbi."
+        },
         "category": "morning-safari",
         "priority": 6,
         "status": "active"
     },
     {
         "id": 25,
-        "question": "Are there restroom facilities in the desert?",
-        "answer": "Yes, basic restroom facilities are available at the meeting point before entering the deep desert and at any camp or stop area. We recommend using the facilities before the dune bashing segment begins.",
+        "question": {
+            "en": "Are there restroom facilities in the desert?",
+            "ar": "هل تتوفر دورات مياه ومرافق صحية في الصحراء؟",
+            "ru": "Есть ли туалеты в пустыне?",
+            "es": "¿Hay baños e instalaciones sanitarias en el desierto?",
+            "it": "Ci sono servizi igienici nel desierto?"
+        },
+        "answer": {
+            "en": "Yes, basic restroom facilities are available at the meeting point before entering the deep desert and at any camp or stop area. We recommend using the facilities before the dune bashing segment begins.",
+            "ar": "نعم، تتوفر دورات مياه نظيفة ومجهزة بالكامل في استراحة مدخل الصحراء، وكذلك داخل المخيم البدوي الرئيسي.",
+            "ru": "Да, чистые и современные туалетные комнаты есть на базе перед въездом в дюны и в самом бедуинском лагере.",
+            "es": "Sí, disponemos de aseos limpios y equipados tanto en la estación de entrada al desierto como en el campamento principal.",
+            "it": "Sì, sono presenti servizi igienici puliti e attrezzati sia al punto di sosta all'ingresso del deserto sia all'interno del campo."
+        },
         "category": "morning-safari",
         "priority": 7,
         "status": "active"
     },
     {
         "id": 26,
-        "question": "What should I eat before the morning safari?",
-        "answer": "We suggest a light meal or snack before departure. Avoid heavy or greasy food as the dune bashing involves vigorous movement. Staying hydrated is important — we provide unlimited bottled water throughout the tour.",
+        "question": {
+            "en": "What should I eat before the morning safari?",
+            "ar": "ماذا يُفضل أن آكل قبل الانطلاق في السفاري الصباحي؟",
+            "ru": "Что лучше съесть перед утренним сафари?",
+            "es": "¿Qué conviene comer antes del safari matutino?",
+            "it": "Cosa è consigliabile mangiare prima del safari mattutino?"
+        },
+        "answer": {
+            "en": "We suggest a light meal or snack before departure. Avoid heavy or greasy food as the dune bashing involves vigorous movement. Staying hydrated is important — we provide unlimited bottled water throughout the tour.",
+            "ar": "نوصي بتناول وجبة خفيفة مثل الفواكه أو التوست أو الشاي، وتجنب الوجبات الدسمة والثقيلة قبل جولة التطعيس لتفادي الشعور بالدوار.",
+            "ru": "Рекомендуем легкий перекус (тосты, фрукты, чай). Избегайте жирной и тяжелой пищи непосредственно перед заездом по барханам.",
+            "es": "Aconsejamos un desayuno ligero (tostadas, fruta, café). Evita comidas copiosas o grasas antes de la sesión de dunas para prevenir mareos.",
+            "it": "Suggeriamo una colazione leggera (fette biscottate, frutta, tè). Evita cibi pesanti prima delle salite sulle dune per prevenire la nausea."
+        },
         "category": "morning-safari",
         "priority": 8,
         "status": "active"
     },
     {
         "id": 27,
-        "question": "Is it safe to sleep in the desert overnight?",
-        "answer": "Yes. Our overnight camps are professionally managed with on-site staff present throughout the night. The camps are in established, secure desert locations used regularly by licensed tour operators. Security, first aid, and emergency protocols are always in place.",
+        "question": {
+            "en": "Is it safe to sleep in the desert overnight?",
+            "ar": "هل المبيت في الصحراء آمن؟",
+            "ru": "Безопасно ли ночевать в пустыне?",
+            "es": "¿Es seguro pasar la noche en el desierto?",
+            "it": "È sicuro passare la notte nel deserto?"
+        },
+        "answer": {
+            "en": "Yes. Our overnight camps are professionally managed with on-site staff present throughout the night. The camps are in established, secure desert locations used regularly by licensed tour operators. Security, first aid, and emergency protocols are always in place.",
+            "ar": "نعم، آمن تماماً بنسبة 100%. مخيماتنا مراقبة ومحمية بالكامل مع تواجد طاقم حراسة وإشراف وإسعافات أولية على مدار 24 ساعة.",
+            "ru": "Да, абсолютно безопасно на 100%. Лагерь охраняется, территория огорожена, а дежурный персонал и спасатели дежурят всю ночь.",
+            "es": "Totalmente seguro al 100%. Nuestros campamentos están vigilados y cuentan con personal de asistencia disponible las 24 horas.",
+            "it": "Completamente sicuro al 100%. Il campo è custodito e dispone di personale e presidio di primo soccorso attivo tutta la notte."
+        },
         "category": "overnight-safari",
         "priority": 1,
         "status": "active"
     },
     {
         "id": 28,
-        "question": "What type of accommodation is provided?",
-        "answer": "Standard overnight packages include traditional open-air Bedouin-style tents with clean mattresses, pillows, and warm blankets. Premium upgrades with air-conditioned tents, thicker mattresses, and additional privacy can be arranged — please ask at booking.",
+        "question": {
+            "en": "What type of accommodation is provided?",
+            "ar": "ما هي طبيعة أماكن النوم في سفاري المبيت؟",
+            "ru": "Какие условия для сна предоставляются в ночном сафари?",
+            "es": "¿Cómo es el alojamiento en el safari nocturno?",
+            "it": "Che tipo di sistemazione viene fornita per la notte?"
+        },
+        "answer": {
+            "en": "Standard overnight packages include traditional open-air Bedouin-style tents with clean mattresses, pillows, and warm blankets. Premium upgrades with air-conditioned tents, thicker mattresses, and additional privacy can be arranged — please ask at booking.",
+            "ar": "نوفر خياماً بدوية مريحة مزودة بفرش ومراتب وأغطية ووسائد نظيفة، مع توفر خيارات الترقية إلى خيام خاصة مكيفة ومغلقة بالكامل.",
+            "ru": "Гостям предоставляются традиционные бедуинские шатры с чистыми матрасами, подушками и теплыми одеялами. Доступны закрытые VIP-шатры.",
+            "es": "Dispones de tiendas beduinas tradicionales equipadas con colchones confortables, sábanas limpias y mantas. Posibilidad de jaimas privadas con aire acondicionado.",
+            "it": "Forniamo comode tende beduine fornite di materassi igienizzati, lenzuola e coperte calde. Disponibili su richiesta tende private climatizzate."
+        },
         "category": "overnight-safari",
         "priority": 2,
         "status": "active"
     },
     {
         "id": 29,
-        "question": "How cold does the desert get at night?",
-        "answer": "Desert temperatures can drop to 10 to 15 degrees Celsius during winter months (November through February). In summer, nights remain warmer at around 25 to 30 degrees. Blankets are provided, but we strongly recommend bringing a jacket or fleece, especially in winter.",
+        "question": {
+            "en": "How cold does the desert get at night?",
+            "ar": "كم تبلغ درجات الحرارة في الصحراء ليلاً؟",
+            "ru": "Насколько холодно в пустыне ночью?",
+            "es": "¿Qué temperatura hace en el desierto por la noche?",
+            "it": "Quanto scende la temperatura nel deserto di notte?"
+        },
+        "answer": {
+            "en": "Desert temperatures can drop to 10 to 15 degrees Celsius during winter months (November through February). In summer, nights remain warmer at around 25 to 30 degrees. Blankets are provided, but we strongly recommend bringing a jacket or fleece, especially in winter.",
+            "ar": "في أشهر الشتاء (نوفمبر إلى فبراير) قد تنخفض درجات الحرارة إلى 12–16 درجة مئوية؛ لذا ننصح بإحضار سترة خفيفة. في الصيف تكون الأجواء دافئة ومعتدلة.",
+            "ru": "Зимой (с ноября по февраль) температура может опускаться до +12...+16 °C, поэтому стоит взять теплую кофту или куртку. Летом ночи теплые.",
+            "es": "En invierno (noviembre a febrero) puede refrescar hasta los 12–16 °C, por lo que recomendamos llevar una chaqueta ligera. En verano las noches son cálidas.",
+            "it": "In inverno (da novembre a febbraio) la temperatura può scendere intorno ai 12–16 °C; consigliamo una giacca leggera. D'estate le notti restano miti."
+        },
         "category": "overnight-safari",
         "priority": 3,
         "status": "active"
     },
     {
         "id": 30,
-        "question": "Is breakfast included the next morning?",
-        "answer": "Yes. A hearty Bedouin-style breakfast is included: eggs, Arabic bread, cheese, jam, honey, fresh fruits, tea, and Arabic coffee. It is served after the optional sunrise experience.",
+        "question": {
+            "en": "Is breakfast included the next morning?",
+            "ar": "هل وجبة الإفطار مشمولة في صباح اليوم التالي؟",
+            "ru": "Включен ли завтрак на следующее утро?",
+            "es": "¿Está incluido el desayuno a la mañana siguiente?",
+            "it": "La colazione del mattino seguente è inclusa?"
+        },
+        "answer": {
+            "en": "Yes. A hearty Bedouin-style breakfast is included: eggs, Arabic bread, cheese, jam, honey, fresh fruits, tea, and Arabic coffee. It is served after the optional sunrise experience.",
+            "ar": "نعم بالتأكيد! يتضمن سفاري المبيت إفطاراً بدوياً شهياً يشمل البيض، الجبن، الخبز العربي، العسل، الفواكه الطازجة، الشاي والقهوة عند شروق الشمس.",
+            "ru": "Да! В программу ночного сафари входит горячий завтрак: омлет, арабские лепешки, сыры, джемы, фрукты, свежезаваренный чай и кофе.",
+            "es": "¡Sí! Incluye un completo desayuno tradicional con huevos, pan árabe caliente, quesos, miel, fruta fresca, té y café al amanecer.",
+            "it": "Certamente! È inclusa una colazione tradizionale completa con uova, pane caldo, formaggi, miele, frutta fresca, tè e caffè all'alba."
+        },
         "category": "overnight-safari",
         "priority": 4,
         "status": "active"
     },
     {
         "id": 31,
-        "question": "Can I charge my phone at the desert camp?",
-        "answer": "Most standard camps have limited or no electrical outlets. We strongly recommend bringing a fully charged portable power bank. Some premium camp setups may offer basic charging facilities — confirm at booking.",
+        "question": {
+            "en": "Can I charge my phone at the desert camp?",
+            "ar": "هل يمكنني شحن هاتفي النقال في المخيم الصحراوي؟",
+            "ru": "Можно ли зарядить телефон в лагере?",
+            "es": "¿Puedo cargar mi móvil en el campamento?",
+            "it": "Posso ricaricare il telefono cellulare al campo?"
+        },
+        "answer": {
+            "en": "Most standard camps have limited or no electrical outlets. We strongly recommend bringing a fully charged portable power bank. Some premium camp setups may offer basic charging facilities — confirm at booking.",
+            "ar": "تتوفر نقاط شحن كهربائية في مناطق محددة داخل المخيم الرئيسي، ولكن نوصي دوماً باصطحاب بنك طاقة محمول (Power Bank) لضمان شحن أجهزتك في أي وقت.",
+            "ru": "В лагере есть розетки для зарядки, однако мы настоятельно рекомендуем взять с собой заряженный пауэрбанк для полной автономности.",
+            "es": "Hay enchufes disponibles en áreas comunes del campamento, pero siempre sugerimos llevar una batería externa (power bank) para mayor comodidad.",
+            "it": "Ci sono punti di ricarica nelle aree comuni del campo, ma raccomandiamo di portare con sé un power bank per la massima comodità."
+        },
         "category": "overnight-safari",
         "priority": 5,
         "status": "active"
     },
     {
         "id": 32,
-        "question": "Is there mobile phone signal in the desert?",
-        "answer": "Mobile network signal is generally weak or absent at overnight camp locations deep in the desert. WiFi is available in the vehicles during transit but typically not at the camp itself. We suggest informing family or friends that you may be unreachable until morning.",
+        "question": {
+            "en": "Is there mobile phone signal in the desert?",
+            "ar": "هل تتوفر تغطية لشبكات الهاتف المحمول في الصحراء؟",
+            "ru": "Есть ли мобильная связь и интернет в пустыне?",
+            "es": "¿Hay cobertura móvil e internet en el desierto?",
+            "it": "C'è copertura di rete mobile e internet nel deserto?"
+        },
+        "answer": {
+            "en": "Mobile network signal is generally weak or absent at overnight camp locations deep in the desert. WiFi is available in the vehicles during transit but typically not at the camp itself. We suggest informing family or friends that you may be unreachable until morning.",
+            "ar": "تتوفر شبكة الهاتف المحمول (4G\/5G) لمعظم مزودي الخدمة في الإمارات في معظم أرجاء المخيم، بينما قد تكون الإشارة ضعيفة في بعض المنخفضات العميقة بين الكثبان.",
+            "ru": "Мобильная связь основных операторов ОАЭ (e& и du) стабильно ловит в лагере, но может временно пропадать в глубоких низинах между барханами.",
+            "es": "Hay cobertura móvil de los operadores locales en la mayor parte del campamento, aunque la señal puede debilitarse entre los valles profundos de las dunas.",
+            "it": "La rete cellulare dei principali operatori è presente nella maggior parte del campo, anche se può risultare debole tra le vallate più profonde delle dune."
+        },
         "category": "overnight-safari",
         "priority": 6,
         "status": "active"
     },
     {
         "id": 33,
-        "question": "Is the overnight safari suitable for children?",
-        "answer": "Children aged 5 and above generally enjoy the overnight experience. Younger children may find the long hours and sleeping conditions challenging. Private family tent arrangements can be discussed with our team at booking to ensure maximum comfort.",
+        "question": {
+            "en": "Is the overnight safari suitable for children?",
+            "ar": "هل سفاري المبيت مناسب للأطفال؟",
+            "ru": "Подходит ли ночевка в пустыне для детей?",
+            "es": "¿Es adecuado el safari con noche para niños?",
+            "it": "Il pernottamento nel deserto è adatto ai bambini?"
+        },
+        "answer": {
+            "en": "Children aged 5 and above generally enjoy the overnight experience. Younger children may find the long hours and sleeping conditions challenging. Private family tent arrangements can be discussed with our team at booking to ensure maximum comfort.",
+            "ar": "نعم، الأطفال من عمر 5 سنوات فما فوق يقضون وقتاً رائعاً وتجربة تعليمية وترفيهية فريدة تحت النجوم بين الكثبان الرملية.",
+            "ru": "Да, детям от 5 лет очень нравится ночевка в шатрах, костер и наблюдение за звездами — это настоящее приключение.",
+            "es": "Sí, los niños a partir de 5 años disfrutan enormemente de la acampada en jaimas, la fogata y las estrellas como una gran aventura.",
+            "it": "Sì, i bambini dai 5 anni in su adorano l'esperienza della tenda beduina, del falò e del cielo stellato: una vera avventura formativa."
+        },
         "category": "overnight-safari",
         "priority": 7,
         "status": "active"
     },
     {
         "id": 34,
-        "question": "What wildlife might I see in the desert?",
-        "answer": "The Arabian desert is home to desert foxes, sand gazelles, Arabian oryx, and various reptiles and insects. During the early morning nature walk, you may spot tracks and desert-adapted wildlife. Sightings depend on the season and cannot be guaranteed.",
+        "question": {
+            "en": "What wildlife might I see in the desert?",
+            "ar": "ما هي الحيوانات البرية التي يمكن رؤيتها في الصحراء؟",
+            "ru": "Каких диких животных можно встретить в пустыне?",
+            "es": "¿Qué fauna salvaje se puede ver en el desierto?",
+            "it": "Quali animali selvatici si possono avvistare nel deserto?"
+        },
+        "answer": {
+            "en": "The Arabian desert is home to desert foxes, sand gazelles, Arabian oryx, and various reptiles and insects. During the early morning nature walk, you may spot tracks and desert-adapted wildlife. Sightings depend on the season and cannot be guaranteed.",
+            "ar": "تعد الصحراء موطناً للمها العربي، غزلان الريم الصحراوية، الثعالب الرملية، وطيور الصقور. وتزداد فرص رؤيتها في ساعات الصباح الباكر الهادئة.",
+            "ru": "Здесь обитают аравийские ориксы, пустынные газели, песчаные лисицы и соколы. Чаще всего их можно заметить на рассвете.",
+            "es": "El desierto alberga órix árabes, gacelas de las dunas, zorros del desierto y halcones, más fáciles de avistar en las primeras horas del alba.",
+            "it": "Il deserto è popolato da orici arabi, gazzelle delle sabbie, volpi del deserto e falchi, avvistabili soprattutto nelle prime ore del mattino."
+        },
         "category": "overnight-safari",
         "priority": 8,
         "status": "active"
     },
     {
         "id": 35,
-        "question": "What if the weather turns bad during the overnight stay?",
-        "answer": "In the rare event of extreme weather such as a sandstorm or heavy rain, our team will make every effort to ensure your safety and comfort. If conditions require cancellation before departure, a full refund or rescheduling is offered. If weather changes during the stay, emergency shelter and transport are available.",
+        "question": {
+            "en": "What if the weather turns bad during the overnight stay?",
+            "ar": "ماذا يحدث إذا ساءت الأحوال الجوية أثناء المبيت؟",
+            "ru": "Что если ночью испортится погода?",
+            "es": "¿Qué pasa si hace mal tiempo durante la noche?",
+            "it": "Cosa succede se il tempo peggiora durante la notte?"
+        },
+        "answer": {
+            "en": "In the rare event of extreme weather such as a sandstorm or heavy rain, our team will make every effort to ensure your safety and comfort. If conditions require cancellation before departure, a full refund or rescheduling is offered. If weather changes during the stay, emergency shelter and transport are available.",
+            "ar": "مخيماتنا مزودة بمبانٍ واستراحات ثابتة ومغلقة لحالات الطوارئ، وفي حال حدوث عواصف غير متوقعة يتم توفير النقل الفوري إلى الفندق بأمان تام.",
+            "ru": "В лагере имеются капитальные закрытые строения. В случае неожиданного шторма организуется безопасная эвакуация в отель.",
+            "es": "El campamento cuenta con recintos cerrados de protección. En caso de tormenta imprevista, trasladamos a los huéspedes a su hotel con total seguridad.",
+            "it": "Il campo dispone di strutture chiuse e sicure. Qualora si verificasse una tempesta imprevista, garantiamo il rientro tempestivo in hotel in piena sicurezza."
+        },
         "category": "overnight-safari",
         "priority": 9,
         "status": "active"
     },
     {
         "id": 36,
-        "question": "Do I need prior experience to ride a quad bike?",
-        "answer": "No prior experience is necessary. All our quad bikes are automatic (no gear changes required). Before your ride, a professional instructor provides a complete safety briefing covering controls, throttle, braking, and track rules. It is very easy to pick up within the first minute or two.",
+        "question": {
+            "en": "Do I need prior experience to ride a quad bike?",
+            "ar": "هل أحتاج إلى خبرة سابقة لقيادة الدراجات الرباعية (Quad Biking)؟",
+            "ru": "Нужен ли опыт вождения для катания на квадроцикле?",
+            "es": "¿Se necesita experiencia previa para conducir un quad?",
+            "it": "È necessaria esperienza precedente per guidare il quad?"
+        },
+        "answer": {
+            "en": "No prior experience is necessary. All our quad bikes are automatic (no gear changes required). Before your ride, a professional instructor provides a complete safety briefing covering controls, throttle, braking, and track rules. It is very easy to pick up within the first minute or two.",
+            "ar": "لا تحتاج إلى أي خبرة سابقة إطلاقاً؛ فجميع دراجاتنا الرباعية أوتوماتيكية بالكامل وسهلة القيادة، ويقدم المدرب شرحاً شاملاً وتوجيهاً كاملاً قبل الانطلاق.",
+            "ru": "Опыт не требуется! Все квадроциклы автоматические и интуитивно понятные. Инструктор подробно покажет управление и проведет разминку.",
+            "es": "¡No se requiere ninguna experiencia! Los quads son totalmente automáticos y muy fáciles de manejar. El monitor te enseñará todo antes de partir.",
+            "it": "Nessuna esperienza richiesta! I quad sono completamente automatici ed estremamente facili da pilotare. L'istruttore fornirà una spiegazione dettagliata."
+        },
         "category": "quad-biking-safari",
         "priority": 1,
         "status": "active"
     },
     {
         "id": 37,
-        "question": "What is the minimum age for quad biking?",
-        "answer": "Self-driving is available for guests aged 16 and above (some sessions may require 18). Children under 16 can ride as a passenger with a trained instructor on designated children's quad bikes within a restricted, safer area.",
+        "question": {
+            "en": "What is the minimum age for quad biking?",
+            "ar": "ما هو الحد الأدنى لعمر قيادة الدراجات الرباعية؟",
+            "ru": "Какой минимальный возраст для управления квадроциклом?",
+            "es": "¿Cuál es la edad mínima para conducir un quad?",
+            "it": "Qual è l'età minima per guidare un quad?"
+        },
+        "answer": {
+            "en": "Self-driving is available for guests aged 16 and above (some sessions may require 18). Children under 16 can ride as a passenger with a trained instructor on designated children's quad bikes within a restricted, safer area.",
+            "ar": "الحد الأدنى للقيادة الفردية في الكثبان المفتوحة هو 16 سنة. ويمكن للأطفال دون ذلك الركوب بمرافقة مدرب أو ولي الأمر في مسارات مخصصة وآمنة.",
+            "ru": "Самостоятельное вождение разрешено с 16 лет. Подростки младше могут кататься пассажирами со взрослыми на специальных безопасных трассах.",
+            "es": "La edad mínima para conducir en solitario en dunas abiertas es de 16 años. Los menores pueden ir como acompañantes en circuitos controlados.",
+            "it": "L'età minima per guidare autonomamente è di 16 anni. I minori possono partecipare come passeggeri in aree protette con istruttore."
+        },
         "category": "quad-biking-safari",
         "priority": 2,
         "status": "active"
     },
     {
         "id": 38,
-        "question": "Do I need a driving licence for quad biking?",
-        "answer": "No driving licence is required for desert quad biking. The rides take place on private desert terrain, not public roads, so no licence is necessary.",
+        "question": {
+            "en": "Do I need a driving licence for quad biking?",
+            "ar": "هل أحتاج إلى رخصة قيادة لاستئجار وقيادة الدراجات الرباعية؟",
+            "ru": "Нужны ли водительские права для квадроцикла?",
+            "es": "¿Se requiere carnet de conducir para pilotar un quad?",
+            "it": "Serve la patente di guida per condurre un quad?"
+        },
+        "answer": {
+            "en": "No driving licence is required for desert quad biking. The rides take place on private desert terrain, not public roads, so no licence is necessary.",
+            "ar": "لا يُشترط وجود رخصة قيادة لأن الجولة تقام داخل مناطق وتضاريس صحراوية خاصة مخصصة للرياضات والمغامرات وليس على الطرق العامة.",
+            "ru": "Водительские права не требуются, так как заезды проходят на закрытой частной песчаной территории под контролем гидов.",
+            "es": "No se necesita carnet de conducir, ya que la actividad se realiza en zonas privadas fuera de las carreteras públicas.",
+            "it": "Non serve la patente, poiché l'attività si svolge interamente su percorsi fuoristrada privati autorizzati e sorvegliati."
+        },
         "category": "quad-biking-safari",
         "priority": 3,
         "status": "active"
     },
     {
         "id": 39,
-        "question": "How long is the quad biking session?",
-        "answer": "The standard included session is 30 minutes — plenty of time to get comfortable and enjoy the experience. If you want more, you can extend by an additional 30 to 60 minutes at an extra charge payable at the desert.",
+        "question": {
+            "en": "How long is the quad biking session?",
+            "ar": "كم تبلغ مدة جلسة قيادة الدراجات الرباعية؟",
+            "ru": "Сколько длится заезд на квадроциклах?",
+            "es": "¿Cuánto tiempo dura la sesión de quad?",
+            "it": "Quanto dura il percorso in quad?"
+        },
+        "answer": {
+            "en": "The standard included session is 30 minutes — plenty of time to get comfortable and enjoy the experience. If you want more, you can extend by an additional 30 to 60 minutes at an extra charge payable at the desert.",
+            "ar": "تبلغ الجلسة الأساسية 30 دقيقة من القيادة الممتعة والمثيرة، مع إمكانية التمديد إلى 60 دقيقة بناءً على طلبك أثناء الحجز.",
+            "ru": "Стандартный заезд длится 30 минут чистого драйва. При желании можно забронировать часовую сессию на 60 минут.",
+            "es": "La sesión habitual es de 30 minutos de adrenalina, con opción de ampliar a 60 minutos al realizar la reserva.",
+            "it": "La sessione base è di 30 minuti intensi, con la possibilità di prolungare a 60 minuti durante la prenotazione."
+        },
         "category": "quad-biking-safari",
         "priority": 4,
         "status": "active"
     },
     {
         "id": 40,
-        "question": "What safety gear is provided for quad biking?",
-        "answer": "We provide helmets and safety goggles for every rider. Closed-toe shoes are recommended. Our ATVs are professionally maintained and inspected before each session. An instructor monitors all riders throughout the experience.",
+        "question": {
+            "en": "What safety gear is provided for quad biking?",
+            "ar": "ما هي معدات السلامة المتوفرة لجولة الدراجات الرباعية؟",
+            "ru": "Какая защитная экипировка выдается?",
+            "es": "¿Qué equipamiento de seguridad se proporciona para los quads?",
+            "it": "Quale attrezzatura di sicurezza viene fornita per i quad?"
+        },
+        "answer": {
+            "en": "We provide helmets and safety goggles for every rider. Closed-toe shoes are recommended. Our ATVs are professionally maintained and inspected before each session. An instructor monitors all riders throughout the experience.",
+            "ar": "نوفر خوذات رأس معتمدة ومطابقة للمواصفات ونظارات واقية من الغبار والرمال، كما تخضع مركباتنا لفحص فني وصيانة دورية صارمة قبل كل انطلاق.",
+            "ru": "Каждому райдеру выдаются сертифицированный шлем и защитные очки. Вся техника ежедневно проходит технический осмотр.",
+            "es": "Entregamos cascos homologados y gafas protectoras para el polvo. Todos nuestros quads pasan estrictas revisiones mecánicas diarias.",
+            "it": "Forniamo caschi protettivi omologati e occhiali tecnici antipolvere. Tutti i mezzi sono sottoposti a verifiche meccaniche prima di ogni uscita."
+        },
         "category": "quad-biking-safari",
         "priority": 5,
         "status": "active"
     },
     {
         "id": 41,
-        "question": "Can I ride the quad bike with a passenger?",
-        "answer": "Standard ATVs are single-rider vehicles. If you want to ride with a companion, ask about our 2-seater dune buggy option, which is available at an additional charge and offers an equally thrilling experience for two.",
+        "question": {
+            "en": "Can I ride the quad bike with a passenger?",
+            "ar": "هل يمكن لشخصين ركوب دراجة رباعية واحدة؟",
+            "ru": "Можно ли кататься на квадроцикле вдвоем?",
+            "es": "¿Se puede ir dos personas en un mismo quad?",
+            "it": "È possibile salire in due sullo stesso quad?"
+        },
+        "answer": {
+            "en": "Standard ATVs are single-rider vehicles. If you want to ride with a companion, ask about our 2-seater dune buggy option, which is available at an additional charge and offers an equally thrilling experience for two.",
+            "ar": "الدراجات الرباعية ATV مخصصة لراكب واحد لضمان التوازن والأمان. إذا كنت ترغب في تجربة لشخصين معاً، نوصي باختيار عربات الباجي (Dune Buggy 2-Seater).",
+            "ru": "Квадроциклы ATV предназначены строго для одного человека. Для поездки вдвоем отлично подходят двухместные багги Can-Am.",
+            "es": "Los quads ATV son monoplazas por motivos de equilibrio y seguridad. Para compartir vehículo en pareja recomendamos los buggies biplaza (Dune Buggy).",
+            "it": "I quad ATV sono monoposto per garantire stabilità e sicurezza. Per viaggiare in coppia consigliamo i dune buggy biposto (Can-Am)."
+        },
         "category": "quad-biking-safari",
         "priority": 6,
         "status": "active"
     },
     {
         "id": 42,
-        "question": "Should I pre-book the quad biking or pay at the desert?",
-        "answer": "We strongly recommend pre-booking. On-site availability is not guaranteed as quad bikes are limited, on-site prices are typically higher, and you may face wait times. Pre-booking ensures your ATV is reserved, your session is scheduled seamlessly with the safari, and you get the best rate.",
+        "question": {
+            "en": "Should I pre-book the quad biking or pay at the desert?",
+            "ar": "هل يُفضل الحجز المسبق للدراجات الرباعية أم الدفع في الصحراء؟",
+            "ru": "Лучше бронировать квадроциклы заранее или на месте?",
+            "es": "¿Es mejor reservar el quad por la web o contratarlo en el desierto?",
+            "it": "È meglio prenotare il quad online in anticipo o sul posto?"
+        },
+        "answer": {
+            "en": "We strongly recommend pre-booking. On-site availability is not guaranteed as quad bikes are limited, on-site prices are typically higher, and you may face wait times. Pre-booking ensures your ATV is reserved, your session is scheduled seamlessly with the safari, and you get the best rate.",
+            "ar": "ننصح بشدة بالحجز المسبق عبر موقعنا؛ لضمان توفر الدراجة وتجنب الانتظار، بالإضافة إلى الحصول على أسعار العروض الترويجية الحصرية الأقل مقارنة بالدفع المباشر.",
+            "ru": "Настоятельно рекомендуем бронировать онлайн заранее: на месте цены существенно выше, а свободных квадроциклов в пиковые часы может не быть.",
+            "es": "Recomendamos encarecidamente reservar online por adelantado: garantizas disponibilidad sin esperas y obtienes tarifas con descuento.",
+            "it": "Raccomandiamo di prenotare online in anticipo: garantisci la disponibilità del mezzo senza attese e approfitti delle tariffe promozionali."
+        },
         "category": "quad-biking-safari",
         "priority": 7,
         "status": "active"
     },
     {
         "id": 43,
-        "question": "Can I take photos while riding the quad bike?",
-        "answer": "For safety reasons, we do not recommend using a phone while actively riding. However, the instructor can stop the group for photo opportunities during the session. GoPro or action camera mounts can often be arranged — ask your instructor.",
+        "question": {
+            "en": "Can I take photos while riding the quad bike?",
+            "ar": "هل يمكنني التقاط الصور ومقاطع الفيديو أثناء القيادة؟",
+            "ru": "Можно ли снимать фото и видео во время поездки на квадроцикле?",
+            "es": "¿Se pueden hacer fotos o vídeos mientras se conduce el quad?",
+            "it": "Si possono scattare foto o video mentre si guida il quad?"
+        },
+        "answer": {
+            "en": "For safety reasons, we do not recommend using a phone while actively riding. However, the instructor can stop the group for photo opportunities during the session. GoPro or action camera mounts can often be arranged — ask your instructor.",
+            "ar": "حفاظاً على سلامتك، يجب إبقاء كلتا اليدين على المقود أثناء القيادة. ويتوقف المدرب في نقاط بانورامية مخصصة فوق الكثبان لتتمكن من التقاط الصور بحرية وأمان.",
+            "ru": "В целях безопасности руки должны быть на руле во время движения. Инструктор делает остановки на гребнях дюн специально для красивых фотосессий.",
+            "es": "Por seguridad ambas manos deben permanecer en el manillar. Hacemos paradas estratégicas en las mejores crestas para fotos y vídeos.",
+            "it": "Per sicurezza entrambe le mani devono rimanere sul manubrio. L'istruttore effettua soste dedicate sulle creste per permetterti di scattare foto spettacolari."
+        },
         "category": "quad-biking-safari",
         "priority": 8,
         "status": "active"
     },
     {
         "id": 44,
-        "question": "Who should avoid quad biking?",
-        "answer": "Quad biking is not recommended for pregnant women, guests with severe back or neck problems, those prone to vertigo, or anyone who has recently undergone hand, arm, or shoulder surgery. If you are unsure, please consult with our team before booking.",
+        "question": {
+            "en": "Who should avoid quad biking?",
+            "ar": "من هم الأشخاص الذين يُنصح بعدم قيادتهم للدراجات الرباعية؟",
+            "ru": "Кому не рекомендуется кататься на квадроциклах?",
+            "es": "¿A quiénes no se les recomienda conducir quads?",
+            "it": "A chi è sconsigliata la guida del quad?"
+        },
+        "answer": {
+            "en": "Quad biking is not recommended for pregnant women, guests with severe back or neck problems, those prone to vertigo, or anyone who has recently undergone hand, arm, or shoulder surgery. If you are unsure, please consult with our team before booking.",
+            "ar": "لا يُنصح بها للسيدات الحوامل، أو الأشخاص الذين يعانون من مشاكل حادة في الظهر أو العمود الفقري، أو الذين خضعوا لعمليات جراحية حديثة حفاظاً على سلامتهم.",
+            "ru": "Катание на квадроциклах не рекомендуется беременным женщинам, людям с травмами позвоночника, суставов и недавно перенесшим операции.",
+            "es": "No está recomendado para mujeres embarazadas, personas con dolencias de espalda severas o que hayan sido operadas recientemente.",
+            "it": "L'attività è sconsigliata a donne in gravidanza, persone con gravi patologie alla schiena o convalescenti da interventi chirurgici recenti."
+        },
         "category": "quad-biking-safari",
         "priority": 9,
         "status": "active"
