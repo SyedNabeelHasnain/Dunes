@@ -288,6 +288,81 @@
     </div>
 </section>
 
+<!-- Complete Semantic HTML Comparison Matrix for AI Engines & Travelers -->
+<section class="py-12 sm:py-16 bg-white border-t border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+            <div>
+                <span class="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider mb-2">
+                    Commercial Catalogue Matrix
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                    Compare All Dubai Safari & City Tours
+                </h2>
+                <p class="text-slate-600 text-sm mt-1 max-w-2xl">
+                    Side-by-side comparison of duration, departure timings, starting prices, and ideal traveler suitability.
+                </p>
+            </div>
+            <div class="flex items-center gap-2 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full w-fit">
+                <i class="bi bi-shield-check"></i> DET Licensed Pricing
+            </div>
+        </div>
+
+        <div class="tour-comparison-table-wrapper overflow-x-auto rounded-2xl border border-slate-200 shadow-xs">
+            <table class="w-full text-start text-xs sm:text-sm border-collapse min-w-[720px]">
+                <thead class="bg-slate-50 border-b border-slate-200 text-slate-700 font-bold uppercase text-[11px] tracking-wider">
+                    <tr>
+                        <th scope="col" class="py-3.5 px-4 text-start">Tour Experience</th>
+                        <th scope="col" class="py-3.5 px-3 text-start">Category</th>
+                        <th scope="col" class="py-3.5 px-3 text-center">Duration</th>
+                        <th scope="col" class="py-3.5 px-3 text-center">Pickup / Drop-off</th>
+                        <th scope="col" class="py-3.5 px-3 text-center">Starting Price (AED)</th>
+                        <th scope="col" class="py-3.5 px-4 text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 bg-white">
+                    @foreach($tours as $t)
+                    @php
+                        $tMinPrice = $t->tiers->min('pivot.price') ?? 79;
+                    @endphp
+                    <tr class="hover:bg-slate-50/80 transition-colors">
+                        <td class="py-3.5 px-4 font-bold text-slate-900">
+                            <a href="{{ localized_route('tours.show', $t->slug) }}" class="hover:text-primary transition-colors flex items-center gap-2">
+                                <span>{{ $t->name }}</span>
+                                @if($t->is_bestseller)
+                                <span class="px-1.5 py-0.5 rounded-md bg-amber-500/15 text-amber-700 text-[10px] font-black uppercase">Bestseller</span>
+                                @endif
+                            </a>
+                        </td>
+                        <td class="py-3.5 px-3 text-slate-600">
+                            <span class="inline-block px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs font-medium">
+                                {{ $t->category?->name ?? 'Desert Safari' }}
+                            </span>
+                        </td>
+                        <td class="py-3.5 px-3 text-center text-slate-700 font-medium">
+                            {{ $t->duration ?: '6 - 7 Hours' }}
+                        </td>
+                        <td class="py-3.5 px-3 text-center text-slate-600 text-xs font-mono">
+                            <div>{{ $t->pickup_time ?: 'Flexible' }}</div>
+                            <div class="text-[11px] text-slate-400">Return: {{ $t->dropoff_time ?: 'Hotel Return' }}</div>
+                        </td>
+                        <td class="py-3.5 px-3 text-center font-bold text-primary font-mono">
+                            AED {{ number_format($tMinPrice) }}
+                        </td>
+                        <td class="py-3.5 px-4 text-end">
+                            <a href="{{ localized_route('tours.show', $t->slug) }}" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-slate-900 hover:bg-primary text-white text-xs font-bold transition-colors">
+                                <span>View Tour</span>
+                                <i class="bi bi-chevron-right text-[10px]"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
 @push('scripts')
 <script>
 let currentCategory = @json($selectedCategorySlug ?? '');

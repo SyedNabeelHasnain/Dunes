@@ -163,7 +163,7 @@
                         <i class="bi bi-robot text-primary"></i>
                         <span class="font-bold text-xs uppercase text-primary tracking-wider">{{ __('ui.blog.quick_summary') ?? 'Quick Summary' }}</span>
                     </div>
-                    <p class="text-slate-700 text-sm leading-relaxed mb-0">{{ $post->ai_summary }}</p>
+                    <p class="text-slate-700 text-sm leading-relaxed mb-0 page-summary">{{ $post->ai_summary }}</p>
                 </div>
                 @endif
 

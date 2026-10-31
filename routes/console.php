@@ -39,3 +39,6 @@ Schedule::command('gallery:verify-media')->weeklyOn(1, '03:00')->withoutOverlapp
 
 // Audit and verify health, anchor text, and HTTP status of registered backlinks daily at 04:00 AM
 Schedule::command('seo:verify-backlinks')->dailyAt('04:00')->withoutOverlapping()->runInBackground();
+
+// Instantly notify participating search engines (Bing, Yandex, Seznam, Naver) of updated catalog URLs via IndexNow daily at 04:30 AM
+Schedule::command('seo:indexnow')->dailyAt('04:30')->withoutOverlapping()->runInBackground();

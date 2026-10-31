@@ -1112,7 +1112,11 @@
             <div class="border-t border-slate-800/80 pt-6">
                 <div class="flex flex-col lg:flex-row items-center justify-between gap-4 text-center lg:text-start">
                     <div>
-                        <p class="text-slate-400 text-xs mb-1">{{ __('ui.footer.license_line', ['year' => date('Y'), 'name' => $settings['site_name'] ?? 'Dunes Discovery Tourism L.L.C.', 'license' => $settings['company_license_number'] ?? '1430583']) }}</p>
+                        <p class="text-slate-400 text-xs mb-1">{!! __('ui.footer.license_line', [
+                            'year' => date('Y'),
+                            'name' => e($settings['site_name'] ?? 'Dunes Discovery Tourism L.L.C.'),
+                            'license' => '<a href="https://www.dubaitourism.gov.ae" target="_blank" rel="noopener noreferrer" class="text-amber-400 hover:text-amber-300 underline font-semibold">' . e($settings['company_license_number'] ?? '1430583') . '</a>'
+                        ]) !!}</p>
                         <div class="flex flex-wrap justify-center lg:justify-start items-center gap-x-3.5 gap-y-2 text-xs text-slate-300">
                             <a href="{{ localized_route('terms') }}" class="hover:text-white transition-colors py-1">{{ __('ui.footer.terms') }}</a>
                             <span class="text-slate-500">&bull;</span>

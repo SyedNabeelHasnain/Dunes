@@ -164,6 +164,35 @@
                     </div>
                     @endif
 
+                    <!-- AI Search & GEO "Key Takeaways & Field Specs" Direct Answer Box -->
+                    <div class="border-s-4 border-amber-500 bg-amber-500/5 rounded-2xl p-5 mb-8">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="bi bi-lightbulb-fill text-amber-500"></i>
+                            <span class="font-bold text-xs uppercase text-amber-700 tracking-wider">Executive Takeaways & Field Specs</span>
+                        </div>
+                        <p class="text-slate-800 text-sm leading-relaxed mb-3 page-summary">
+                            {{ $article->excerpt }}
+                        </p>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 border-t border-amber-500/15 text-xs">
+                            <div>
+                                <span class="text-slate-500 block text-[11px]">Field Pillar</span>
+                                <strong class="text-slate-900">{{ $pillar->name }}</strong>
+                            </div>
+                            <div>
+                                <span class="text-slate-500 block text-[11px]">Estimated Read</span>
+                                <strong class="text-slate-900">{{ $article->reading_time_minutes ?? 5 }} Mins</strong>
+                            </div>
+                            <div>
+                                <span class="text-slate-500 block text-[11px]">Regulatory Compliance</span>
+                                <strong class="text-emerald-700">DET #1430583</strong>
+                            </div>
+                            <div>
+                                <span class="text-slate-500 block text-[11px]">Audit Cycle</span>
+                                <strong class="text-slate-900">{{ $article->last_reviewed_at ? $article->last_reviewed_at->format('M Y') : 'Active 2026' }}</strong>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Prose Markdown Content -->
                     <div class="prose prose-slate max-w-none text-slate-700 text-sm sm:text-base leading-relaxed
                                 prose-headings:font-bold prose-headings:text-slate-900 prose-headings:tracking-tight

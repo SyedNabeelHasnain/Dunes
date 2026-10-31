@@ -48,7 +48,7 @@ class SyndicationFeedController extends Controller
         $siteUrl = url('/');
 
         $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        $xml .= '<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom">' . "\n";
+        $xml .= '<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dunes="https://dunesdiscoverytourism.com/ns/tours">' . "\n";
         $xml .= "  <channel>\n";
         $xml .= '    <title>' . $this->escape('Dunes Discovery Tourism | Dubai Tours & Desert Safaris Feed') . "</title>\n";
         $xml .= "    <link>{$siteUrl}</link>\n";
@@ -70,8 +70,10 @@ class SyndicationFeedController extends Controller
                 }
             }
 
+            $pickupTime = $tour->pickup_time ?: 'Flexible Departure';
+            $dropoffTime = $tour->dropoff_time ?: 'Hotel Return';
             $desc = strip_tags((string) $tour->short_desc);
-            $descFull = "{$desc} Starting from AED {$startingPrice}. Duration: {$tour->duration}. Verified DET License #{$license}.";
+            $descFull = "{$desc} Starting from AED {$startingPrice}. Duration: {$tour->duration}. Pickup: {$pickupTime}. Drop-off: {$dropoffTime}. Verified DET License #{$license}.";
             $descEsc = $this->escape($descFull);
 
             $images = $tour->getImageList();
@@ -87,6 +89,10 @@ class SyndicationFeedController extends Controller
             $xml .= "      <category>{$category}</category>\n";
             $xml .= "      <dc:creator>Dunes Discovery Tourism</dc:creator>\n";
             $xml .= "      <pubDate>{$pubDate}</pubDate>\n";
+            $xml .= '      <dunes:starting_price currency="AED">' . number_format($startingPrice, 2, '.', '') . "</dunes:starting_price>\n";
+            $xml .= '      <dunes:duration>' . $this->escape($tour->duration) . "</dunes:duration>\n";
+            $xml .= '      <dunes:pickup_time>' . $this->escape($pickupTime) . "</dunes:pickup_time>\n";
+            $xml .= '      <dunes:dropoff_time>' . $this->escape($dropoffTime) . "</dunes:dropoff_time>\n";
             $xml .= '      <media:content url="' . $this->escape($heroImage) . '" medium="image" />' . "\n";
             $xml .= "    </item>\n";
         }

@@ -61,6 +61,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register model observers for real-time IndexNow search engine dissemination
+        \App\Models\Tour::observe(\App\Observers\TourObserver::class);
+        \App\Models\BlogPost::observe(\App\Observers\BlogPostObserver::class);
+
         // Support AVIF in Laravel's built-in 'image' validator
         Validator::resolver(function ($translator, $data, $rules, $messages, $customAttributes) {
             return new AppValidator($translator, $data, $rules, $messages, $customAttributes);

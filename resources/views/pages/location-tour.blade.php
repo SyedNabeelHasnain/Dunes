@@ -196,7 +196,7 @@
                     <h1 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4">
                         {{ $locationData['headline'] }}
                     </h1>
-                    <p class="text-slate-300 text-base sm:text-lg leading-relaxed mb-8 max-w-3xl font-light">
+                    <p class="text-slate-300 text-base sm:text-lg leading-relaxed mb-8 max-w-3xl font-light page-summary">
                         {{ $locationData['subheadline'] }} Enjoy seamless, stress-free desert adventures with verified door-to-door 4x4 transfers, desert master captains, live BBQ buffet feasts, and sunset dune bashing.
                     </p>
 

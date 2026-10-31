@@ -142,10 +142,12 @@
           ],
           @endif
           "offers": {
-            "@type": "Offer",
+            "@type": "AggregateOffer",
             "url": {!! json_encode($canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
             "priceCurrency": "AED",
-            "price": {!! json_encode(number_format($activePrice, 2, '.', ''), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+            "lowPrice": {!! json_encode(number_format($minPrice, 2, '.', ''), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+            "highPrice": {!! json_encode(number_format($tour->tiers->max('pivot.price') ?? $minPrice, 2, '.', ''), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+            "offerCount": {!! json_encode((string) ($tour->tiers->count() ?: 1), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
             "priceValidUntil": {!! json_encode(now()->addYear()->endOfYear()->format('Y-m-d'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
             "validFrom": {!! json_encode(now()->startOfYear()->toIso8601String(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
             "itemCondition": "https://schema.org/NewCondition",
@@ -161,12 +163,18 @@
               "returnMethod": "https://schema.org/ReturnInStore",
               "returnFees": "https://schema.org/FreeReturn"
             },
-            "priceSpecification": {
-              "@type": "PriceSpecification",
-              "price": {!! json_encode(number_format($activePrice, 2, '.', ''), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-              "priceCurrency": "AED",
-              "valueAddedTaxIncluded": true
-            }
+            "offers": [
+              @foreach($tour->tiers->sortBy('priority') as $tierItem)
+              {
+                "@type": "Offer",
+                "name": {!! json_encode($tierItem->name, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+                "price": {!! json_encode(number_format($tierItem->pivot?->price ?? $minPrice, 2, '.', ''), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+                "priceCurrency": "AED",
+                "availability": "https://schema.org/InStock",
+                "url": {!! json_encode($canonical . '?tier=' . $tierItem->slug, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+              }{{ $loop->last ? '' : ',' }}
+              @endforeach
+            ]
           }
           @if($tour->itineraries->count() > 0)
           ,
@@ -609,7 +617,7 @@ if(window.fbq){
                 @endif
 
                 <!-- GEO & AI Search "Tour at a Glance" Quick Facts Card -->
-                <div class="bg-primary/5 rounded-2xl p-6 mb-8 border-s-4 border-primary shadow-xs">
+                <div class="bg-primary/5 rounded-2xl p-6 mb-8 border-s-4 border-primary shadow-xs page-summary">
                     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
                         <h2 class="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
                             <i class="bi bi-lightning-charge-fill text-primary"></i>{{ __('ui.tour_glance.title') }}
@@ -690,7 +698,7 @@ if(window.fbq){
                         <span>{{ __('ui.tour_glance.about_tour', ['name' => $tour->name]) }}</span>
                     </h2>
                     <div x-data="{ expanded: false }" class="relative">
-                        <div id="tourDescriptionText" :class="expanded ? '' : 'line-clamp-4'" class="text-slate-600 text-base leading-relaxed">
+                        <div id="tourDescriptionText" :class="expanded ? '' : 'line-clamp-4'" class="text-slate-600 text-base leading-relaxed page-summary">
                             {!! nl2br(e($tour->full_desc)) !!}
                         </div>
                         <button type="button" class="mt-3 text-sm font-bold text-primary hover:text-primary-hover inline-flex items-center gap-1.5 border border-primary/30 rounded-full px-4 py-1.5 cursor-pointer shadow-xs transition-colors" @click="expanded = !expanded">
