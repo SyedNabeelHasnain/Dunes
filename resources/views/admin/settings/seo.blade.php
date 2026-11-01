@@ -56,6 +56,9 @@
                     <button type="button" @click="activeTab = 'indexnow'" :class="activeTab === 'indexnow' ? 'bg-primary text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'" class="px-3.5 py-2 rounded-xl text-xs font-bold transition shrink-0" id="indexnow-tab">
                         IndexNow Protocol
                     </button>
+                    <button type="button" @click="activeTab = 'verifications'" :class="activeTab === 'verifications' ? 'bg-primary text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'" class="px-3.5 py-2 rounded-xl text-xs font-bold transition shrink-0" id="verifications-tab">
+                        Search Engine Verifications
+                    </button>
                 </div>
 
                 <div id="seoTabsContent">
@@ -592,6 +595,59 @@
                                         class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs inline-flex items-center gap-1.5 cursor-pointer">
                                     <i class="bi bi-send-fill text-xs"></i> Ping Search Engines Now
                                 </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 12. Search Engine Verifications (Google, Bing, Yandex, Baidu) -->
+                    <div x-show="activeTab === 'verifications'" id="tab-verifications" x-cloak>
+                        <div class="p-5 bg-slate-50/70 rounded-2xl border border-slate-200/80 space-y-5">
+                            <div class="flex items-center justify-between mb-1 flex-wrap gap-2">
+                                <h6 class="text-xs font-black uppercase tracking-wider text-primary flex items-center gap-2">
+                                    <i class="bi bi-shield-check"></i> Webmaster Search Engine Verifications
+                                </h6>
+                                <span class="rounded-full border border-primary/20 bg-amber-500/10 px-3 py-1 text-[11px] font-bold text-primary">Regional Search Engines</span>
+                            </div>
+                            <p class="text-xs text-slate-500 mb-4">Authorize and verify ownership across regional search engine webmaster platforms to monitor crawl indexing, rankings, and search appearance in Google, Bing, Yandex, and Baidu.</p>
+
+                            <!-- Google Site Verification -->
+                            <div class="p-4 bg-white rounded-xl border border-slate-200">
+                                <div class="flex items-center gap-2 mb-1.5">
+                                    <i class="bi bi-google text-rose-500 font-bold"></i>
+                                    <label for="google_site_verification" class="text-xs font-bold text-slate-800">Google Search Console Verification Token</label>
+                                </div>
+                                <p class="text-[11px] text-slate-500 mb-2">Meta tag verification string provided by Google Search Console (e.g. <code>zhXtPc5kK0...</code>). Rendered as <code>&lt;meta name="google-site-verification"&gt;</code>.</p>
+                                <input type="text" name="google_site_verification" id="google_site_verification" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary font-mono" value="{{ $settings['google_site_verification'] ?? '' }}" placeholder="Enter Google verification token">
+                            </div>
+
+                            <!-- Bing Webmaster Verification -->
+                            <div class="p-4 bg-white rounded-xl border border-slate-200">
+                                <div class="flex items-center gap-2 mb-1.5">
+                                    <i class="bi bi-microsoft text-sky-600 font-bold"></i>
+                                    <label for="bing_site_verification" class="text-xs font-bold text-slate-800">Bing Webmaster Tools Verification Token (msvalidate.01)</label>
+                                </div>
+                                <p class="text-[11px] text-slate-500 mb-2">32-character authentication code from Bing Webmaster Tools. Rendered as <code>&lt;meta name="msvalidate.01"&gt;</code> for Bing, Yahoo, and DuckDuckGo indexing.</p>
+                                <input type="text" name="bing_site_verification" id="bing_site_verification" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary font-mono" value="{{ $settings['bing_site_verification'] ?? '' }}" placeholder="Enter Bing msvalidate.01 token">
+                            </div>
+
+                            <!-- Yandex Webmaster Verification -->
+                            <div class="p-4 bg-white rounded-xl border border-slate-200">
+                                <div class="flex items-center gap-2 mb-1.5">
+                                    <i class="bi bi-globe-europe-africa text-red-600 font-bold"></i>
+                                    <label for="yandex_site_verification" class="text-xs font-bold text-slate-800">Yandex Webmaster Verification Token (yandex-verification)</label>
+                                </div>
+                                <p class="text-[11px] text-slate-500 mb-2">Meta tag code from Yandex Webmaster (<a href="https://webmaster.yandex.ru" target="_blank" rel="noopener" class="text-primary hover:underline">webmaster.yandex.ru</a>). Vital for ranking in Russia & CIS, Dubai's top inbound tourism market. Rendered as <code>&lt;meta name="yandex-verification"&gt;</code>.</p>
+                                <input type="text" name="yandex_site_verification" id="yandex_site_verification" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary font-mono" value="{{ $settings['yandex_site_verification'] ?? '' }}" placeholder="Enter Yandex verification token">
+                            </div>
+
+                            <!-- Baidu Webmaster Verification -->
+                            <div class="p-4 bg-white rounded-xl border border-slate-200">
+                                <div class="flex items-center gap-2 mb-1.5">
+                                    <i class="bi bi-shield-lock text-blue-700 font-bold"></i>
+                                    <label for="baidu_site_verification" class="text-xs font-bold text-slate-800">Baidu Search Verification Token (baidu-site-verification)</label>
+                                </div>
+                                <p class="text-[11px] text-slate-500 mb-2">Baidu Webmaster token for Chinese inbound tourists. Rendered as <code>&lt;meta name="baidu-site-verification"&gt;</code>.</p>
+                                <input type="text" name="baidu_site_verification" id="baidu_site_verification" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary font-mono" value="{{ $settings['baidu_site_verification'] ?? '' }}" placeholder="Enter Baidu verification token">
                             </div>
                         </div>
                     </div>

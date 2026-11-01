@@ -34,6 +34,8 @@
     $conversionSendTo = (!empty($adsId) && !empty($conversionLabel)) ? "{$adsId}/{$conversionLabel}" : '';
     $gVerify = $settings['google_site_verification'] ?? config('services.google.site_verification') ?? env('GOOGLE_SITE_VERIFICATION', '');
     $bingVerify = $settings['bing_site_verification'] ?? config('services.bing.site_verification') ?? env('BING_SITE_VERIFICATION', '');
+    $yandexVerify = $settings['yandex_site_verification'] ?? config('services.yandex.site_verification') ?? env('YANDEX_SITE_VERIFICATION', '');
+    $baiduVerify = $settings['baidu_site_verification'] ?? config('services.baidu.site_verification') ?? env('BAIDU_SITE_VERIFICATION', '');
     
     $metaActive = isset($settings['meta_active']) && $settings['meta_active'] === '1';
     $metaCapi = isset($settings['meta_capi_enabled']) && $settings['meta_capi_enabled'] === '1';
@@ -303,6 +305,12 @@
     @if(!empty($bingVerify))
     <meta name="msvalidate.01" content="{{ $bingVerify }}">
     @endif
+    @if(!empty($yandexVerify))
+    <meta name="yandex-verification" content="{{ $yandexVerify }}">
+    @endif
+    @if(!empty($baiduVerify))
+    <meta name="baidu-site-verification" content="{{ $baiduVerify }}">
+    @endif
     
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon-32x32.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/favicon-16x16.png') }}">
@@ -428,15 +436,15 @@
               "@@type": "ContactPoint",
               "telephone": {!! json_encode($phone, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
               "contactType": "customer service",
-              "areaServed": "AE",
-              "availableLanguage": {!! json_encode(isset($activeLanguages) ? $activeLanguages->pluck('code')->toArray() : ['en', 'ar', 'ru', 'es', 'it'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}
+              "areaServed": ["AE", "SA", "GB", "DE", "FR", "IT", "ES", "RU", "US"],
+              "availableLanguage": ["en", "ar", "ru", "es", "it", "English", "Arabic", "Russian", "Spanish", "Italian"]
             },
             {
               "@@type": "ContactPoint",
               "telephone": "+971502456056",
               "contactType": "reservations",
-              "areaServed": "AE",
-              "availableLanguage": {!! json_encode(isset($activeLanguages) ? $activeLanguages->pluck('code')->toArray() : ['en', 'ar', 'ru', 'es', 'it'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}
+              "areaServed": ["AE", "SA", "GB", "DE", "FR", "IT", "ES", "RU", "US"],
+              "availableLanguage": ["en", "ar", "ru", "es", "it", "English", "Arabic", "Russian", "Spanish", "Italian"]
             }
           ],
           "openingHoursSpecification": {

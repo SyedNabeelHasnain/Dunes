@@ -57,6 +57,7 @@ class LocationLandingService
                 ],
                 'transit_time' => '45 Minutes direct drive via E44 / Al Ain Highway',
                 'geo' => ['lat' => 25.0772, 'lng' => 55.1330],
+                'wikidata_uri' => 'https://www.wikidata.org/wiki/Q1262846',
                 'landmarks' => [
                     'Dubai Marina Mall', 'The Walk JBR', 'Address Beach Resort', 'Rixos Premium Dubai',
                     'Grosvenor House', 'Bluewaters Island & Ain Dubai', 'Habtoor Grand Resort',
@@ -128,6 +129,7 @@ class LocationLandingService
                 ],
                 'transit_time' => '40 Minutes direct highway drive via Ras Al Khor & E44',
                 'geo' => ['lat' => 25.1972, 'lng' => 55.2744],
+                'wikidata_uri' => 'https://www.wikidata.org/wiki/Q1056586',
                 'landmarks' => [
                     'Burj Khalifa & Dubai Mall', 'Address Downtown', 'Armani Hotel Dubai', 'Palace Downtown',
                     'JW Marriott Marquis Business Bay', 'The Ritz-Carlton DIFC', 'SLS Dubai',
@@ -199,6 +201,7 @@ class LocationLandingService
                 ],
                 'transit_time' => '50 Minutes direct drive via Sheikh Zayed Road & E44',
                 'geo' => ['lat' => 25.1124, 'lng' => 55.1390],
+                'wikidata_uri' => 'https://www.wikidata.org/wiki/Q277251',
                 'landmarks' => [
                     'Atlantis The Palm', 'Atlantis The Royal', 'FIVE Palm Jumeirah', 'W Dubai - The Palm',
                     'Anantara The Palm Resort', 'Waldorf Astoria Palm Jumeirah', 'One&Only The Palm',
@@ -270,6 +273,7 @@ class LocationLandingService
                 ],
                 'transit_time' => '40 Minutes drive via E66 / Dubai-Al Ain Road',
                 'geo' => ['lat' => 25.2697, 'lng' => 55.3095],
+                'wikidata_uri' => 'https://www.wikidata.org/wiki/Q1151622',
                 'landmarks' => [
                     'City Centre Deira', 'Al Seef Heritage District', 'Gold Souk & Spice Souk',
                     'Hyatt Regency Dubai Creek', 'Grand Hyatt Dubai', 'Al Rigga Metro Station area',
@@ -341,6 +345,7 @@ class LocationLandingService
                 ],
                 'transit_time' => '40 Minutes direct highway access via Umm Suqeim Street & E44',
                 'geo' => ['lat' => 25.1112, 'lng' => 55.2005],
+                'wikidata_uri' => 'https://www.wikidata.org/wiki/Q2044810',
                 'landmarks' => [
                     'Mall of the Emirates & Ski Dubai', 'Kempinski Hotel Mall of the Emirates', 'Sheraton Mall of the Emirates',
                     'Grand Millennium Dubai Barsha Heights', 'Novotel Suites Dubai Mall of the Emirates',
@@ -412,6 +417,7 @@ class LocationLandingService
                 ],
                 'transit_time' => '45 Minutes direct via Emirates Road (E611)',
                 'geo' => ['lat' => 25.3463, 'lng' => 55.4209],
+                'wikidata_uri' => 'https://www.wikidata.org/wiki/Q188810',
                 'landmarks' => [
                     'Al Majaz Waterfront', 'Sharjah Corniche', 'Sheraton Sharjah Beach Resort',
                     'Radisson Blu Resort Sharjah', 'Ajman Hotel (Kempinski)', 'Sahara Centre Sharjah',
@@ -483,6 +489,7 @@ class LocationLandingService
                 ],
                 'transit_time' => '45 Minutes direct via Al Khail Road & E44 Al Ain Highway',
                 'geo' => ['lat' => 25.0780, 'lng' => 55.1328],
+                'wikidata_uri' => 'https://www.wikidata.org/wiki/Q2248574',
                 'landmarks' => [
                     'The Walk JBR', 'Hilton Dubai Jumeirah', 'Rixos Premium Dubai JBR',
                     'Sofitel Dubai Jumeirah Beach', 'Sheraton Jumeirah Beach Resort', 'Flying Cup JBR',
@@ -554,6 +561,7 @@ class LocationLandingService
                 ],
                 'transit_time' => '35 Minutes direct drive via Ras Al Khor Road & E44',
                 'geo' => ['lat' => 25.1857, 'lng' => 55.2638],
+                'wikidata_uri' => 'https://www.wikidata.org/wiki/Q261546',
                 'landmarks' => [
                     'JW Marriott Marquis Hotel', 'SLS Dubai Hotel & Residences', 'The Oberoi Dubai',
                     'Paramount Hotel Dubai', 'Radisson Blu Hotel Dubai Canal View', 'Bay Square',
@@ -625,6 +633,7 @@ class LocationLandingService
                 ],
                 'transit_time' => '35 Minutes direct drive via Al Majaz & E66/E44',
                 'geo' => ['lat' => 25.2104, 'lng' => 55.2810],
+                'wikidata_uri' => 'https://www.wikidata.org/wiki/Q1262862',
                 'landmarks' => [
                     'Gate Village DIFC', 'The Ritz-Carlton DIFC', 'Waldorf Astoria DIFC',
                     'Four Seasons Hotel DIFC', 'Jumeirah Emirates Towers', 'Museum of the Future',
@@ -696,6 +705,7 @@ class LocationLandingService
                 ],
                 'transit_time' => '40 Minutes direct drive via Umm Suqeim Street & E44',
                 'geo' => ['lat' => 25.1412, 'lng' => 55.1852],
+                'wikidata_uri' => 'https://www.wikidata.org/wiki/Q1584988',
                 'landmarks' => [
                     'Burj Al Arab Jumeirah', 'Jumeirah Beach Hotel', 'Madinat Jumeirah Resort',
                     'Mandarin Oriental Jumeira', 'Four Seasons Resort Dubai at Jumeirah Beach', 'Kite Beach',
@@ -767,6 +777,7 @@ class LocationLandingService
                 ],
                 'transit_time' => '35 Minutes direct highway route via E44',
                 'geo' => ['lat' => 25.2185, 'lng' => 55.2780],
+                'wikidata_uri' => 'https://www.wikidata.org/wiki/Q1807490',
                 'landmarks' => [
                     'Dubai World Trade Centre (DWTC)', 'Conrad Dubai', 'Shangri-La Hotel Dubai',
                     'Fairmont Dubai', 'Sheraton Grand Hotel', 'Dusit Thani Dubai',
@@ -838,6 +849,7 @@ class LocationLandingService
                 ],
                 'transit_time' => '35 Minutes direct drive via Dubai-Al Ain Road (E66)',
                 'geo' => ['lat' => 25.2532, 'lng' => 55.2972],
+                'wikidata_uri' => 'https://www.wikidata.org/wiki/Q1017366',
                 'landmarks' => [
                     'Al Fahidi Historical Neighbourhood', 'Meena Bazaar', 'Dubai Museum',
                     'Grand Excelsior Hotel Bur Dubai', 'Mövenpick Hotel & Apartments Bur Dubai', 'Raffles Dubai Oud Metha',
@@ -909,6 +921,7 @@ class LocationLandingService
                 ],
                 'transit_time' => '30 Minutes fast direct highway access via E44 / Ras Al Khor',
                 'geo' => ['lat' => 25.2014, 'lng' => 55.3524],
+                'wikidata_uri' => 'https://www.wikidata.org/wiki/Q1262874',
                 'landmarks' => [
                     'Vida Creek Harbour', 'Address Grand Creek Harbour', 'InterContinental Dubai Festival City',
                     'Palazzo Versace Dubai', 'Crowne Plaza Dubai Festival City', 'Dubai Creek Marina',
@@ -980,6 +993,7 @@ class LocationLandingService
                 ],
                 'transit_time' => '35 Minutes direct drive via E66',
                 'geo' => ['lat' => 25.2608, 'lng' => 55.3045],
+                'wikidata_uri' => 'https://www.wikidata.org/wiki/Q612',
                 'landmarks' => [
                     'Al Seef Heritage Promenade', 'Canopy by Hilton Dubai Al Seef', 'Al Seef Heritage Hotel Dubai',
                     'Queen Elizabeth 2 (QE2) Port Rashid', 'Port Rashid Cruise Terminal 2 & 3', 'Consulate Area Umm Hurair',
@@ -1051,6 +1065,7 @@ class LocationLandingService
                 ],
                 'transit_time' => '45 Minutes direct drive via First Al Khail Road & E44',
                 'geo' => ['lat' => 25.0740, 'lng' => 55.1488],
+                'wikidata_uri' => 'https://www.wikidata.org/wiki/Q1425147',
                 'landmarks' => [
                     'DMCC Headquarters & Almas Tower', 'Mövenpick Hotel Jumeirah Lakes Towers',
                     'Pullman Dubai Jumeirah Lakes Towers', 'Taj Jumeirah Lakes Towers',

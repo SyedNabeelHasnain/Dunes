@@ -100,6 +100,9 @@
       "areaServed": {
         "@type": "Place",
         "name": {!! json_encode($locationData['district'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        @if(!empty($locationData['wikidata_uri']))
+        "sameAs": {!! json_encode($locationData['wikidata_uri'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        @endif
         "geo": {
           "@type": "GeoCoordinates",
           "latitude": {{ $locationData['geo']['lat'] }},
@@ -138,6 +141,35 @@
         }{{ $loop->last ? '' : ',' }}
         @endforeach
       ]@endif
+    },
+    {
+      "@type": "Service",
+      "@id": {!! json_encode($canonical . '#pickup-service', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "name": {!! json_encode('Doorstep 4x4 Desert Safari Hotel Pickup from ' . $locationData['name'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "serviceType": "Tourist Transfer & Desert Safari Tour Pickup",
+      "provider": {
+        "@type": "TravelAgency",
+        "name": "Dunes Discovery Tourism LLC",
+        "url": {!! json_encode(url('/'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        "telephone": "+971502456056",
+        "identifier": {
+          "@type": "PropertyValue",
+          "name": "DET Tourism License",
+          "value": "1430583"
+        }
+      },
+      "areaServed": {
+        "@type": "Place",
+        "name": {!! json_encode($locationData['district'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        @if(!empty($locationData['wikidata_uri']))
+        "sameAs": {!! json_encode($locationData['wikidata_uri'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+        @endif
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": {{ $locationData['geo']['lat'] }},
+          "longitude": {{ $locationData['geo']['lng'] }}
+        }
+      }
     },
     {
       "@type": "FAQPage",

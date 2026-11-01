@@ -38,6 +38,19 @@ return [
     'google' => [
         'places_api_key' => env('GOOGLE_PLACES_API_KEY', env('GOOGLE_MAPS_API_KEY')),
         'place_id' => env('GOOGLE_PLACE_ID', 'ChIJbWsIEIVEdEER4uHEhb2dbcQ'),
+        'site_verification' => env('GOOGLE_SITE_VERIFICATION', ''),
+    ],
+
+    'bing' => [
+        'site_verification' => env('BING_SITE_VERIFICATION', ''),
+    ],
+
+    'yandex' => [
+        'site_verification' => env('YANDEX_SITE_VERIFICATION', ''),
+    ],
+
+    'baidu' => [
+        'site_verification' => env('BAIDU_SITE_VERIFICATION', ''),
     ],
 
     'tripadvisor' => [
