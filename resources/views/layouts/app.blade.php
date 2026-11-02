@@ -36,6 +36,8 @@
     $bingVerify = $settings['bing_site_verification'] ?? config('services.bing.site_verification') ?? env('BING_SITE_VERIFICATION', '');
     $yandexVerify = $settings['yandex_site_verification'] ?? config('services.yandex.site_verification') ?? env('YANDEX_SITE_VERIFICATION', '');
     $baiduVerify = $settings['baidu_site_verification'] ?? config('services.baidu.site_verification') ?? env('BAIDU_SITE_VERIFICATION', '');
+    $clarityId = $settings['clarity_id'] ?? config('services.clarity.id') ?? env('CLARITY_ID', 'z79y89wha9');
+    $clarityActive = ($settings['clarity_active'] ?? '1') !== '0';
     
     $metaActive = isset($settings['meta_active']) && $settings['meta_active'] === '1';
     $metaCapi = isset($settings['meta_capi_enabled']) && $settings['meta_capi_enabled'] === '1';
@@ -188,6 +190,17 @@
     @else
     <script>
       window.fbq = window.fbq || function() {};
+    </script>
+    @endif
+
+    @if($clarityActive && !empty($clarityId))
+    <!-- Microsoft Clarity (Bing Webmaster Tools) -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i+"?ref=bwt";
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "{{ $clarityId }}");
     </script>
     @endif
 

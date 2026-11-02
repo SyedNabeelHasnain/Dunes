@@ -61,6 +61,7 @@ class AdminSettingController extends Controller
             'seo_press_title', 'seo_press_description', 'seo_press_keywords', 'seo_press_og_image',
             'indexnow_enabled', 'indexnow_key', 'indexnow_last_submission',
             'google_site_verification', 'bing_site_verification', 'yandex_site_verification', 'baidu_site_verification',
+            'clarity_id', 'clarity_active',
             'site_hero_poster', 'site_default_image',
         ];
 
@@ -203,7 +204,7 @@ class AdminSettingController extends Controller
 
             // Google Integrations & Business Profile (Local SEO)
             'google_active', 'google_gtm_id', 'google_ga4_id', 'google_analytics_id', 'google_tag_manager_id',
-            'google_ads_id', 'google_conversion_label', 'google_site_verification', 'bing_site_verification', 'yandex_site_verification', 'baidu_site_verification', 'google_maps_api_key', 'google_places_api_key',
+            'google_ads_id', 'google_conversion_label', 'google_site_verification', 'bing_site_verification', 'yandex_site_verification', 'baidu_site_verification', 'clarity_id', 'clarity_active', 'google_maps_api_key', 'google_places_api_key',
             'recaptcha_site_key', 'recaptcha_secret_key',
             'google_place_id', 'google_cid', 'google_review_url',
             'site_latitude', 'site_longitude', 'site_postal_code',

@@ -630,6 +630,26 @@
                                 <input type="text" name="bing_site_verification" id="bing_site_verification" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary font-mono" value="{{ $settings['bing_site_verification'] ?? '' }}" placeholder="Enter Bing msvalidate.01 token">
                             </div>
 
+                            <!-- Microsoft Clarity / Bing Behavior Analytics -->
+                            <div class="p-4 bg-gradient-to-br from-sky-50/50 via-white to-slate-50 rounded-xl border border-sky-200/80">
+                                <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+                                    <div class="flex items-center gap-2">
+                                        <i class="bi bi-graph-up text-sky-600 font-bold"></i>
+                                        <label for="clarity_id" class="text-xs font-bold text-slate-800">Microsoft Clarity Project ID (Bing Webmaster Tools)</label>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="hidden" name="clarity_active" value="0">
+                                            <input type="checkbox" name="clarity_active" id="clarity_active" value="1" {{ ($settings['clarity_active'] ?? '1') !== '0' ? 'checked' : '' }} class="sr-only peer">
+                                            <div class="w-9 h-5 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                                        </label>
+                                        <span class="text-[11px] font-bold text-slate-700">Active</span>
+                                    </div>
+                                </div>
+                                <p class="text-[11px] text-slate-500 mb-2">Plug-and-play tracking code for Microsoft Clarity user behavior, session heatmaps, and Bing Webmaster analytics. The script in <code>&lt;head&gt;</code> automatically adopts this ID.</p>
+                                <input type="text" name="clarity_id" id="clarity_id" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary font-mono" value="{{ $settings['clarity_id'] ?? (config('services.clarity.id') ?: 'z79y89wha9') }}" placeholder="e.g. z79y89wha9">
+                            </div>
+
                             <!-- Yandex Webmaster Verification -->
                             <div class="p-4 bg-white rounded-xl border border-slate-200">
                                 <div class="flex items-center gap-2 mb-1.5">

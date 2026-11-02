@@ -135,4 +135,62 @@ class RegionalSearchEngineVisibilityTest extends TestCase
         $responseAr->assertSee('hreflang="es"', false);
         $responseAr->assertSee('hreflang="it"', false);
     }
+
+    public function test_admin_can_update_clarity_id_and_status_in_cms(): void
+    {
+        $admin = User::factory()->create();
+
+        $response = $this->actingAs($admin)->post(route('admin.settings.update'), [
+            'clarity_id' => 'custom_clarity_999',
+            'clarity_active' => '1',
+        ]);
+
+        $response->assertRedirect();
+        app(SettingsService::class)->clearCache();
+
+        $this->assertDatabaseHas('settings', [
+            'setting_key' => 'clarity_id',
+            'setting_value' => 'custom_clarity_999',
+        ]);
+
+        $this->assertDatabaseHas('settings', [
+            'setting_key' => 'clarity_active',
+            'setting_value' => '1',
+        ]);
+    }
+
+    public function test_frontend_renders_microsoft_clarity_script_dynamically(): void
+    {
+        Setting::updateOrCreate(
+            ['setting_key' => 'clarity_id'],
+            ['setting_value' => 'z79y89wha9']
+        );
+        Setting::updateOrCreate(
+            ['setting_key' => 'clarity_active'],
+            ['setting_value' => '1']
+        );
+        app(SettingsService::class)->clearCache();
+
+        $response = $this->get('/');
+        $response->assertOk();
+        $response->assertSee('https://www.clarity.ms/tag/"+i+"?ref=bwt', false);
+        $response->assertSee('"clarity", "script", "z79y89wha9"', false);
+    }
+
+    public function test_frontend_omits_microsoft_clarity_script_when_disabled(): void
+    {
+        Setting::updateOrCreate(
+            ['setting_key' => 'clarity_id'],
+            ['setting_value' => 'z79y89wha9']
+        );
+        Setting::updateOrCreate(
+            ['setting_key' => 'clarity_active'],
+            ['setting_value' => '0']
+        );
+        app(SettingsService::class)->clearCache();
+
+        $response = $this->get('/');
+        $response->assertOk();
+        $response->assertDontSee('https://www.clarity.ms/tag/"+i+"?ref=bwt', false);
+    }
 }

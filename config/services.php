@@ -53,6 +53,10 @@ return [
         'site_verification' => env('BAIDU_SITE_VERIFICATION', ''),
     ],
 
+    'clarity' => [
+        'id' => env('CLARITY_ID', 'z79y89wha9'),
+    ],
+
     'tripadvisor' => [
         'api_key' => env('TRIPADVISOR_API_KEY'),
         'location_id' => env('TRIPADVISOR_LOCATION_ID', '29026644'),
