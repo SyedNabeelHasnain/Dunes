@@ -947,13 +947,10 @@ class AdminBookingController extends Controller
         // Optional Guest Confirmation Email
         if ($request->boolean('send_confirmation_email') && ! empty($booking->email)) {
             try {
-                if (! app()->environment('testing')) {
-                    try {
-                        app(EmailMarketingService::class)->applySmtpConfig();
-                    } catch (\Throwable $e) {
-                    }
-                }
-                $fromEmail = app(SettingsService::class)->getFromEmail();
+                $notificationService = app(\App\Services\NotificationManagementService::class);
+                $sender = $notificationService->getSenderIdentity();
+                $customerPdfEnabled = app(SettingsService::class)->get('notification_booking_customer_attach_pdf', '1') === '1';
+
                 $emailType = match (true) {
                     $booking->status === 'cancelled' => 'booking_cancelled',
                     in_array($booking->status, ['confirmed', 'completed'], true) => 'booking_confirmed',
@@ -961,9 +958,19 @@ class AdminBookingController extends Controller
                     $booking->payment_status === 'partial' => 'booking_advance',
                     default => 'booking_cash',
                 };
-                Mail::to($booking->email)->send(
-                    (new BookingNotification($emailType, $booking->load('addons')))->from($fromEmail, 'Dunes Discovery Tourism')
-                );
+
+                $mail = (new BookingNotification($emailType, $booking->load('addons')))
+                    ->from($sender['email'], $sender['name'])
+                    ->replyTo($sender['reply_to'], $sender['name']);
+
+                if ($customerPdfEnabled && $emailType !== 'booking_cancelled') {
+                    $pdfBinary = $notificationService->generateVoucherPdfBinary($booking);
+                    if ($pdfBinary) {
+                        $mail->withPdfAttachment($pdfBinary, 'Dunes-Discovery-Ticket-Voucher-'.$booking->reference.'.pdf');
+                    }
+                }
+
+                Mail::to($booking->email)->send($mail);
             } catch (\Throwable $e) {
                 Log::error('Failed to send manual booking confirmation email: '.$e->getMessage());
             }
@@ -1245,23 +1252,25 @@ class AdminBookingController extends Controller
         // If status changed to confirmed or cancelled, trigger notifications
         if ($oldStatus !== $booking->status) {
             try {
-                if (! app()->environment('testing')) {
-                    try {
-                        app(EmailMarketingService::class)->applySmtpConfig();
-                    } catch (\Throwable $e) {
-                    }
-                }
-                $settings = app(SettingsService::class);
-                $fromEmail = $settings->getFromEmail();
+                $notificationService = app(\App\Services\NotificationManagementService::class);
+                $sender = $notificationService->getSenderIdentity();
+                $customerPdfEnabled = app(SettingsService::class)->get('notification_booking_customer_attach_pdf', '1') === '1';
 
-                if ($booking->status === 'confirmed') {
-                    Mail::to($booking->email)->send(
-                        (new BookingNotification('booking_confirmed', $booking))->from($fromEmail, 'Dunes Discovery Tourism')
-                    );
-                } elseif ($booking->status === 'cancelled') {
-                    Mail::to($booking->email)->send(
-                        (new BookingNotification('booking_cancelled', $booking))->from($fromEmail, 'Dunes Discovery Tourism')
-                    );
+                $targetStatus = ($booking->status === 'confirmed') ? 'booking_confirmed' : (($booking->status === 'cancelled') ? 'booking_cancelled' : null);
+
+                if ($targetStatus) {
+                    $mail = (new BookingNotification($targetStatus, $booking))
+                        ->from($sender['email'], $sender['name'])
+                        ->replyTo($sender['reply_to'], $sender['name']);
+
+                    if ($booking->status === 'confirmed' && $customerPdfEnabled) {
+                        $pdfBinary = $notificationService->generateVoucherPdfBinary($booking);
+                        if ($pdfBinary) {
+                            $mail->withPdfAttachment($pdfBinary, 'Dunes-Discovery-Ticket-Voucher-'.$booking->reference.'.pdf');
+                        }
+                    }
+
+                    Mail::to($booking->email)->send($mail);
                 }
             } catch (\Throwable $e) {
                 \Log::error('Failed to send booking status change email: '.$e->getMessage());
@@ -1533,16 +1542,23 @@ class AdminBookingController extends Controller
         }
 
         try {
-            try {
-                app(EmailMarketingService::class)->applySmtpConfig();
-            } catch (\Throwable $e) {}
-
-            $fromEmail = app(SettingsService::class)->getFromEmail();
+            $notificationService = app(\App\Services\NotificationManagementService::class);
+            $sender = $notificationService->getSenderIdentity();
+            $customerPdfEnabled = app(SettingsService::class)->get('notification_booking_customer_attach_pdf', '1') === '1';
             $emailType = ($booking->status === 'cancelled') ? 'booking_cancelled' : 'booking_confirmed';
 
-            Mail::to($booking->email)->send(
-                (new BookingNotification($emailType, $booking))->from($fromEmail, 'Dunes Discovery Tourism')
-            );
+            $mail = (new BookingNotification($emailType, $booking))
+                ->from($sender['email'], $sender['name'])
+                ->replyTo($sender['reply_to'], $sender['name']);
+
+            if ($customerPdfEnabled && $emailType !== 'booking_cancelled') {
+                $pdfBinary = $notificationService->generateVoucherPdfBinary($booking);
+                if ($pdfBinary) {
+                    $mail->withPdfAttachment($pdfBinary, 'Dunes-Discovery-Ticket-Voucher-'.$booking->reference.'.pdf');
+                }
+            }
+
+            Mail::to($booking->email)->send($mail);
 
             return response()->json([
                 'success' => true,

@@ -21,6 +21,10 @@ class BookingNotification extends Mailable implements ShouldQueue
 
     public string $brandColor = '#F58F43';
 
+    public ?string $pdfBinary = null;
+
+    public ?string $pdfFileName = null;
+
     /**
      * Create a new message instance.
      */
@@ -28,6 +32,17 @@ class BookingNotification extends Mailable implements ShouldQueue
     {
         $this->type = $type;
         $this->booking = $booking;
+    }
+
+    /**
+     * Attach in-memory PDF ticket voucher.
+     */
+    public function withPdfAttachment(?string $binary, ?string $filename = null): self
+    {
+        $this->pdfBinary = $binary;
+        $this->pdfFileName = $filename ?: 'Dunes-Discovery-Ticket-Voucher-' . $this->booking->reference . '.pdf';
+
+        return $this;
     }
 
     /**
@@ -65,6 +80,13 @@ class BookingNotification extends Mailable implements ShouldQueue
      */
     public function attachments(): array
     {
+        if (! empty($this->pdfBinary)) {
+            return [
+                Attachment::fromData(fn () => $this->pdfBinary, $this->pdfFileName ?: 'Dunes-Discovery-Ticket-Voucher.pdf')
+                    ->withMime('application/pdf'),
+            ];
+        }
+
         return [];
     }
 }

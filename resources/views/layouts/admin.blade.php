@@ -600,6 +600,10 @@
                                 <span class="flex items-center gap-2"><i class="bi bi-envelope-gear text-sky-500"></i> SMTP & Mailer Setup</span>
                                 <span class="text-[10px] text-slate-400 font-mono">/admin/settings/mail</span>
                             </a>
+                            <a href="{{ route('admin.settings.notifications') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="settings" data-keywords="notifications alerts email pdf voucher whatsapp contact inquiries review webhook routing recipients">
+                                <span class="flex items-center gap-2"><i class="bi bi-bell-fill text-amber-500"></i> Notifications & Alerts Hub</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/settings/notifications</span>
+                            </a>
                             <a href="{{ route('admin.settings.google') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="settings" data-keywords="google tag manager gtm analytics ga4 search console place id business profile maps">
                                 <span class="flex items-center gap-2"><i class="bi bi-google text-rose-500"></i> Google Integrations & Local SEO</span>
                                 <span class="text-[10px] text-slate-400 font-mono">/admin/settings/google</span>

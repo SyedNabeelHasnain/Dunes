@@ -376,6 +376,9 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::post('/settings/gttd/flush-cache', [AdminSettingController::class, 'flushGttdCache'])->name('settings.gttd.flush-cache');
     Route::get('/settings/meta', [AdminSettingController::class, 'meta'])->name('settings.meta');
     Route::get('/settings/currency', [AdminSettingController::class, 'currency'])->name('settings.currency');
+    Route::get('/settings/notifications', [AdminSettingController::class, 'notifications'])->name('settings.notifications');
+    Route::post('/settings/notifications', [AdminSettingController::class, 'updateNotifications'])->name('settings.notifications.update');
+    Route::post('/settings/notifications/test', [AdminSettingController::class, 'sendTestNotification'])->name('settings.notifications.test');
 
     // ── Multi-Language & Locales Management ──────────────────────────────────
     Route::get('/settings/languages', [AdminLanguageController::class, 'index'])->name('settings.languages');

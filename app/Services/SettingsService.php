@@ -73,6 +73,22 @@ class SettingsService
         return ! empty($bcc) ? array_filter(array_map('trim', explode(',', $bcc))) : [];
     }
 
+    /**
+     * Parse comma-separated notification recipient emails with fallback.
+     */
+    public function getNotificationRecipients(string $key, array $fallback = []): array
+    {
+        $val = $this->get($key, '');
+        if (! empty($val)) {
+            $parsed = array_filter(array_map('trim', explode(',', $val)));
+            if (! empty($parsed)) {
+                return $parsed;
+            }
+        }
+
+        return $fallback;
+    }
+
     public function clearCache(): void
     {
         try {

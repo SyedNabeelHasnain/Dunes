@@ -202,25 +202,7 @@ class PageController extends Controller
 
             // Send Email Notifications
             try {
-                app(\App\Services\EmailMarketingService::class)->applySmtpConfig();
-                $settings = app(SettingsService::class);
-                $fromEmail = $settings->getFromEmail();
-                $adminEmail = $settings->getAdminEmail();
-                $ccEmails = $settings->getCcEmails();
-                $bccEmails = $settings->getBccEmails();
-
-                // Admin notification
-                $adminMail = (new ContactNotification($name, $email, $phone, $subject, $messageText))->from($fromEmail, 'Dunes Discovery Tourism');
-                if (! empty($ccEmails)) {
-                    $adminMail->cc($ccEmails);
-                }
-                if (! empty($bccEmails)) {
-                    $adminMail->bcc($bccEmails);
-                }
-                Mail::to($adminEmail)->send($adminMail);
-
-                // User acknowledgement
-                Mail::to($email)->send((new ContactAcknowledgement($name))->from($fromEmail, 'Dunes Discovery Tourism'));
+                app(\App\Services\NotificationManagementService::class)->notifyContactInquiry($contact);
             } catch (\Throwable $e) {
                 Log::error('Failed to send contact emails: '.$e->getMessage());
             }
@@ -498,11 +480,7 @@ class PageController extends Controller
 
             // Send Admin Email Notification
             try {
-                app(\App\Services\EmailMarketingService::class)->applySmtpConfig();
-                $adminEmail = $settings->get('site_email', 'info@dunesdiscoverytourism.com');
-                Mail::to($adminEmail)->send(
-                    (new WhatsappLeadNotification($name, $phone, $tourName, $pageUrl, $messageText))->from($adminEmail, 'Dunes Discovery Tourism')
-                );
+                app(\App\Services\NotificationManagementService::class)->notifyWhatsappLead($inquiry);
             } catch (\Throwable $e) {
                 Log::error('Failed to send WhatsApp lead email: '.$e->getMessage());
             }
@@ -661,6 +639,12 @@ class PageController extends Controller
 
         flush_review_and_social_proof_caches();
 
+        try {
+            app(\App\Services\NotificationManagementService::class)->notifyCustomerReview($review, $booking, 'review');
+        } catch (\Throwable $e) {
+            Log::error('Failed to send customer review notification: '.$e->getMessage());
+        }
+
         $settings = app(SettingsService::class);
         $googleReviewUrl = $settings->get('google_review_url', 'https://search.google.com/local/writereview?placeid=ChIJbWsIEIVEdEER4uHEhb2dbcQ');
 
@@ -698,6 +682,20 @@ class PageController extends Controller
                 $booking->update([
                     'special_requests' => mb_substr(trim($notes."\n[GUEST FEEDBACK: ".$feedback.']'), 0, 4000),
                 ]);
+            }
+
+            try {
+                $feedbackReview = new Review([
+                    'reviewer_name' => $booking->name ?: 'Valued Guest',
+                    'rating' => 5.0,
+                    'review_title' => 'Guest Service Recovery Feedback (Ref: #'.$booking->reference.')',
+                    'review_text' => $feedback,
+                    'status' => 'pending',
+                ]);
+                $feedbackReview->id = $booking->id;
+                app(\App\Services\NotificationManagementService::class)->notifyCustomerReview($feedbackReview, $booking, 'feedback');
+            } catch (\Throwable $e) {
+                Log::error('Failed to send guest feedback notification: '.$e->getMessage());
             }
         }
 

@@ -170,6 +170,131 @@ class AdminSettingController extends Controller
     }
 
     /**
+     * Show Comprehensive Notification & Alert Management Center.
+     */
+    public function notifications()
+    {
+        $keys = [
+            'notification_from_name',
+            'notification_from_email',
+            'notification_reply_to',
+            'notification_booking_customer_enabled',
+            'notification_booking_customer_attach_pdf',
+            'notification_booking_admin_enabled',
+            'notification_booking_admin_attach_pdf',
+            'notification_booking_recipients',
+            'notification_whatsapp_admin_enabled',
+            'notification_whatsapp_recipients',
+            'notification_contact_admin_enabled',
+            'notification_contact_recipients',
+            'notification_contact_customer_enabled',
+            'notification_review_admin_enabled',
+            'notification_review_recipients',
+            'notification_webhook_enabled',
+            'notification_webhook_url',
+            'notification_webhook_secret',
+            'admin_email',
+            'admin_email_cc',
+            'admin_email_bcc',
+            'site_email',
+        ];
+
+        $settings = Setting::whereIn('setting_key', $keys)
+            ->get()
+            ->pluck('setting_value', 'setting_key')
+            ->toArray();
+
+        return view('admin.settings.notifications', compact('settings'));
+    }
+
+    /**
+     * Save Notification Management Center settings.
+     */
+    public function updateNotifications(Request $request)
+    {
+        $validated = $request->validate([
+            'notification_from_name' => 'nullable|string|max:255',
+            'notification_from_email' => 'nullable|email:filter|max:255',
+            'notification_reply_to' => 'nullable|email:filter|max:255',
+            'notification_booking_customer_enabled' => 'nullable|in:0,1',
+            'notification_booking_customer_attach_pdf' => 'nullable|in:0,1',
+            'notification_booking_admin_enabled' => 'nullable|in:0,1',
+            'notification_booking_admin_attach_pdf' => 'nullable|in:0,1',
+            'notification_booking_recipients' => 'nullable|string|max:1000',
+            'notification_whatsapp_admin_enabled' => 'nullable|in:0,1',
+            'notification_whatsapp_recipients' => 'nullable|string|max:1000',
+            'notification_contact_admin_enabled' => 'nullable|in:0,1',
+            'notification_contact_recipients' => 'nullable|string|max:1000',
+            'notification_contact_customer_enabled' => 'nullable|in:0,1',
+            'notification_review_admin_enabled' => 'nullable|in:0,1',
+            'notification_review_recipients' => 'nullable|string|max:1000',
+            'notification_webhook_enabled' => 'nullable|in:0,1',
+            'notification_webhook_url' => 'nullable|url|max:500',
+            'notification_webhook_secret' => 'nullable|string|max:255',
+        ]);
+
+        $booleanKeys = [
+            'notification_booking_customer_enabled',
+            'notification_booking_customer_attach_pdf',
+            'notification_booking_admin_enabled',
+            'notification_booking_admin_attach_pdf',
+            'notification_whatsapp_admin_enabled',
+            'notification_contact_admin_enabled',
+            'notification_contact_customer_enabled',
+            'notification_review_admin_enabled',
+            'notification_webhook_enabled',
+        ];
+
+        foreach ($booleanKeys as $bKey) {
+            Setting::updateOrCreate(
+                ['setting_key' => $bKey],
+                ['setting_value' => $request->has($bKey) ? '1' : '0']
+            );
+        }
+
+        $textKeys = [
+            'notification_from_name',
+            'notification_from_email',
+            'notification_reply_to',
+            'notification_booking_recipients',
+            'notification_whatsapp_recipients',
+            'notification_contact_recipients',
+            'notification_review_recipients',
+            'notification_webhook_url',
+            'notification_webhook_secret',
+        ];
+
+        foreach ($textKeys as $tKey) {
+            Setting::updateOrCreate(
+                ['setting_key' => $tKey],
+                ['setting_value' => trim((string) ($validated[$tKey] ?? ''))]
+            );
+        }
+
+        Cache::forget('site_settings_cache');
+        app(SettingsService::class)->clearCache();
+
+        return redirect()->route('admin.settings.notifications')
+            ->with('success', 'Notification preferences and multi-recipient routing updated successfully.');
+    }
+
+    /**
+     * Dispatch live diagnostic notification to verify email delivery and PDF attachment.
+     */
+    public function sendTestNotification(Request $request)
+    {
+        $validated = $request->validate([
+            'event' => 'required|string|in:booking_customer,booking_admin,whatsapp_lead,contact_inquiry,customer_review',
+            'test_email' => 'required|email:filter|max:255',
+        ]);
+
+        $notificationService = app(\App\Services\NotificationManagementService::class);
+        $result = $notificationService->sendTestNotification($validated['event'], $validated['test_email']);
+
+        return response()->json($result, $result['success'] ? 200 : 422);
+    }
+
+    /**
      * Update bulk settings.
      */
     public function update(Request $request)
@@ -233,6 +358,15 @@ class AdminSettingController extends Controller
             // Multi-Currency Exchange Rates
             'currency_rate_usd', 'currency_rate_eur', 'currency_rate_gbp', 'currency_rate_sar', 'currency_rate_inr',
             'currency_rates_last_synced',
+
+            // Notification & Communication Controls
+            'notification_from_name', 'notification_from_email', 'notification_reply_to',
+            'notification_booking_customer_enabled', 'notification_booking_customer_attach_pdf',
+            'notification_booking_admin_enabled', 'notification_booking_admin_attach_pdf', 'notification_booking_recipients',
+            'notification_whatsapp_admin_enabled', 'notification_whatsapp_recipients',
+            'notification_contact_admin_enabled', 'notification_contact_recipients', 'notification_contact_customer_enabled',
+            'notification_review_admin_enabled', 'notification_review_recipients',
+            'notification_webhook_enabled', 'notification_webhook_url', 'notification_webhook_secret',
         ];
 
         $settings = $request->only($allowedKeys);

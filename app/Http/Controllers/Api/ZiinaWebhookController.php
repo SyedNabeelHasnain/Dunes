@@ -295,37 +295,9 @@ class ZiinaWebhookController extends Controller
     protected function sendEmailNotification(string $type, Booking $booking): void
     {
         try {
-            if (! app()->environment('testing')) {
-                app(\App\Services\EmailMarketingService::class)->applySmtpConfig();
-            }
-            $fromEmail = $this->settings->getFromEmail();
-            $adminEmail = $this->settings->getAdminEmail();
-            $ccEmails = $this->settings->getCcEmails();
-            $bccEmails = $this->settings->getBccEmails();
-
-            // Send to customer
-            try {
-                Mail::to($booking->email)
-                    ->send((new BookingNotification($type, $booking))->from($fromEmail, 'Dunes Discovery Tourism'));
-            } catch (\Throwable $e) {
-                Log::error("Ziina Webhook: Failed to send customer booking email for {$booking->reference}: ".$e->getMessage());
-            }
-
-            // Send to admin
-            try {
-                $adminMail = (new BookingAdminNotification($booking))->from($fromEmail, 'Dunes Discovery Tourism');
-                if (! empty($ccEmails)) {
-                    $adminMail->cc($ccEmails);
-                }
-                if (! empty($bccEmails)) {
-                    $adminMail->bcc($bccEmails);
-                }
-                Mail::to($adminEmail)->send($adminMail);
-            } catch (\Throwable $e) {
-                Log::error("Ziina Webhook: Failed to send admin booking email for {$booking->reference}: ".$e->getMessage());
-            }
+            app(\App\Services\NotificationManagementService::class)->notifyBookingConfirmed($booking, $type);
         } catch (\Throwable $e) {
-            Log::error("Ziina Webhook: Failed to prepare booking email for {$booking->reference}: ".$e->getMessage());
+            Log::error("Ziina Webhook: Failed to process booking notifications for {$booking->reference}: ".$e->getMessage());
         }
     }
 }
