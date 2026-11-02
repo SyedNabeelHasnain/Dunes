@@ -41,19 +41,15 @@ class TourObserver
             Cache::forget('feeds_tours_rss_xml');
             Cache::forget('site_home_cache');
 
-            // Collect URLs for IndexNow
+            // Collect URLs for IndexNow streaming (only the modified tour and its language alternates)
             $urls = [
                 url('/' . $tour->slug),
-                url('/tours'),
-                url('/'),
             ];
 
             try {
                 $languages = Language::where('is_active', true)->where('is_default', false)->get();
                 foreach ($languages as $lang) {
                     $urls[] = url('/' . $lang->code . '/' . $tour->slug);
-                    $urls[] = url('/' . $lang->code . '/tours');
-                    $urls[] = url('/' . $lang->code);
                 }
             } catch (\Throwable $e) {
                 // Fallback standard locales

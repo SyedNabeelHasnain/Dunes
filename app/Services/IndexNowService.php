@@ -314,4 +314,61 @@ class IndexNowService
 
         return $this->submit($urls);
     }
+
+    /**
+     * Submit recently modified URLs from the last N hours (Streaming delta mode).
+     * Avoids mass-batching unchanged URLs, complying directly with Bing Webmaster recommendations.
+     */
+    public function submitRecent(int $hours = 24): array
+    {
+        $since = now()->subHours($hours);
+        $urls = [];
+        $host = $this->getHost();
+        $scheme = 'https://';
+
+        try {
+            $languages = Language::getActive();
+        } catch (\Throwable $e) {
+            $languages = Language::fallbackCollection();
+        }
+
+        try {
+            $recentTours = Tour::where('updated_at', '>=', $since)->pluck('slug');
+            foreach ($recentTours as $slug) {
+                $urls[] = $scheme . $host . '/' . $slug;
+                foreach ($languages as $lang) {
+                    if (! $lang->is_default) {
+                        $urls[] = $scheme . $host . '/' . $lang->code . '/' . $slug;
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+        }
+
+        try {
+            $recentBlogs = BlogPost::where('updated_at', '>=', $since)->where('status', 'published')->pluck('slug');
+            foreach ($recentBlogs as $slug) {
+                $urls[] = $scheme . $host . '/blog/' . $slug;
+                foreach ($languages as $lang) {
+                    if (! $lang->is_default) {
+                        $urls[] = $scheme . $host . '/' . $lang->code . '/blog/' . $slug;
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+        }
+
+        if (empty($urls)) {
+            return [
+                'success' => true,
+                'is_verification_pending' => false,
+                'status' => 200,
+                'message' => 'No content modified in the last ' . $hours . ' hours. Preserved streaming mode with 0 batch submissions.',
+                'count' => 0,
+                'submitted_at' => now()->toIso8601String(),
+            ];
+        }
+
+        return $this->submit($urls);
+    }
 }

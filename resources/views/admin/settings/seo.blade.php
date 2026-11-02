@@ -516,9 +516,24 @@
                                 <h6 class="text-xs font-black uppercase tracking-wider text-primary flex items-center gap-2">
                                     <i class="bi bi-broadcast"></i> IndexNow Protocol (Instant Search Engine Indexing)
                                 </h6>
-                                <span class="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-bold text-emerald-700">Bing, Yandex, Seznam, Naver</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="rounded-full border border-sky-200 bg-sky-50 px-2.5 py-0.5 text-[10px] font-bold text-sky-800">
+                                        <i class="bi bi-lightning-charge-fill text-sky-600"></i> Streaming Mode (Bing Standard)
+                                    </span>
+                                    <span class="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-bold text-emerald-700">Bing, Yandex, Seznam, Naver</span>
+                                </div>
                             </div>
-                            <p class="text-xs text-slate-500 mb-5">IndexNow allows website owners to instantly inform search engines about the latest content changes on their website, eliminating crawl delays.</p>
+                            <p class="text-xs text-slate-500 mb-3">IndexNow allows website owners to instantly inform search engines about the latest content changes on their website, eliminating crawl delays.</p>
+                            
+                            <!-- Bing Streaming Mode Status Callout -->
+                            <div class="p-3.5 mb-5 rounded-xl bg-sky-50/70 border border-sky-200/80 text-xs text-slate-700 flex items-start gap-3">
+                                <div class="w-7 h-7 rounded-lg bg-sky-600 text-white flex items-center justify-center text-sm shrink-0 mt-0.5">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                </div>
+                                <div class="text-[11px] leading-relaxed">
+                                    <span class="font-bold text-slate-900">Streaming Mode Compliant:</span> URLs are submitted individually in real time through model observers (<code class="text-sky-700 font-mono">TourObserver</code>, <code class="text-sky-700 font-mono">BlogPostObserver</code>) as edits occur. Scheduled sweeps only stream delta updates from the last 24 hours, strictly avoiding batch dumps to keep indexing fast and responsive in Bing Webmaster Tools.
+                                </div>
+                            </div>
 
                             <div class="p-4 bg-white rounded-2xl border border-slate-200 mb-5 flex items-center justify-between gap-4 flex-wrap">
                                 <div>

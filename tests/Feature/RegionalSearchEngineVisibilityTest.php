@@ -193,4 +193,36 @@ class RegionalSearchEngineVisibilityTest extends TestCase
         $response->assertOk();
         $response->assertDontSee('https://www.clarity.ms/tag/"+i+"?ref=bwt', false);
     }
+
+    public function test_indexnow_command_defaults_to_streaming_delta_mode(): void
+    {
+        \Illuminate\Support\Facades\Http::fake([
+            'https://api.indexnow.org/indexnow' => \Illuminate\Support\Facades\Http::response(['message' => 'OK'], 200),
+        ]);
+
+        \App\Models\Tour::query()->update(['updated_at' => now()->subDays(2)]);
+        \App\Models\BlogPost::query()->update(['updated_at' => now()->subDays(2)]);
+
+        // Default run should succeed in streaming mode without dumping all URLs
+        $this->artisan('seo:indexnow')
+            ->expectsOutputToContain('Preserved streaming mode')
+            ->assertExitCode(0);
+    }
+
+    public function test_indexnow_service_submit_recent_handles_clean_zero_updates(): void
+    {
+        \Illuminate\Support\Facades\Http::fake([
+            'https://api.indexnow.org/indexnow' => \Illuminate\Support\Facades\Http::response(['message' => 'OK'], 200),
+        ]);
+
+        \App\Models\Tour::query()->update(['updated_at' => now()->subDays(2)]);
+        \App\Models\BlogPost::query()->update(['updated_at' => now()->subDays(2)]);
+
+        $service = app(\App\Services\IndexNowService::class);
+        $result = $service->submitRecent(24);
+
+        $this->assertTrue($result['success']);
+        $this->assertEquals(0, $result['count']);
+        $this->assertStringContainsString('Preserved streaming mode', $result['message']);
+    }
 }

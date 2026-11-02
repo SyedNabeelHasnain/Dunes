@@ -41,16 +41,15 @@ class BlogPostObserver
                 return;
             }
 
+            // Collect URLs for IndexNow streaming (only the modified blog post and its language alternates)
             $urls = [
                 url('/blog/' . $post->slug),
-                url('/blog'),
             ];
 
             try {
                 $languages = Language::where('is_active', true)->where('is_default', false)->get();
                 foreach ($languages as $lang) {
                     $urls[] = url('/' . $lang->code . '/blog/' . $post->slug);
-                    $urls[] = url('/' . $lang->code . '/blog');
                 }
             } catch (\Throwable $e) {
                 foreach (['ar', 'ru', 'es', 'it'] as $code) {

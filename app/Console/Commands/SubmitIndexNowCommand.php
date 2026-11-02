@@ -12,14 +12,14 @@ class SubmitIndexNowCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'seo:indexnow {--all : Submit all catalog URLs} {--url=* : Specific URLs to submit}';
+    protected $signature = 'seo:indexnow {--all : Submit all catalog URLs (manual full batch)} {--recent : Submit only URLs updated in the last 24 hours (streaming delta)} {--url=* : Specific URLs to submit}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Instantly notify search engines (Bing, Yandex, Seznam, Naver) of updated content via IndexNow protocol';
+    protected $description = 'Instantly notify search engines (Bing, Yandex, Seznam, Naver) of updated content via IndexNow protocol (Streaming Mode)';
 
     /**
      * Execute the console command.
@@ -39,8 +39,11 @@ class SubmitIndexNowCommand extends Command
 
         if (! empty($specificUrls)) {
             $result = $indexNow->submit($specificUrls);
-        } else {
+        } elseif ($this->option('all')) {
             $result = $indexNow->submitAll();
+        } else {
+            // Default to streaming delta (only recently modified URLs) to comply with Bing Webmaster recommendations
+            $result = $indexNow->submitRecent();
         }
 
         if ($result['success']) {
