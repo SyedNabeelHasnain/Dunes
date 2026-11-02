@@ -742,7 +742,7 @@ class AdminPortalTest extends TestCase
         $response->assertStatus(200);
         $response->assertJson(['success' => true]);
 
-        \Illuminate\Support\Facades\Mail::assertQueued(\App\Mail\BookingNotification::class, function ($mail) use ($booking) {
+        \Illuminate\Support\Facades\Mail::assertSent(\App\Mail\BookingNotification::class, function ($mail) use ($booking) {
             return $mail->hasTo($booking->email);
         });
     }

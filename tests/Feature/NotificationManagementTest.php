@@ -85,12 +85,12 @@ class NotificationManagementTest extends TestCase
         $this->assertTrue($result['admin_sent']);
         $this->assertTrue($result['pdf_attached']);
 
-        Mail::assertQueued(BookingNotification::class, function ($mail) use ($booking) {
+        Mail::assertSent(BookingNotification::class, function ($mail) use ($booking) {
             $hasAttachment = count($mail->attachments()) > 0;
             return $mail->hasTo($booking->email) && $hasAttachment;
         });
 
-        Mail::assertQueued(BookingAdminNotification::class, function ($mail) {
+        Mail::assertSent(BookingAdminNotification::class, function ($mail) {
             $hasAttachment = count($mail->attachments()) > 0;
             return $mail->hasTo('admin@dunesdiscoverytourism.com') && $hasAttachment;
         });
@@ -128,8 +128,8 @@ class NotificationManagementTest extends TestCase
         $this->assertFalse($result['customer_sent']);
         $this->assertTrue($result['admin_sent']);
 
-        Mail::assertNotQueued(BookingNotification::class);
-        Mail::assertQueued(BookingAdminNotification::class);
+        Mail::assertNotSent(BookingNotification::class);
+        Mail::assertSent(BookingAdminNotification::class);
     }
 
     /**
@@ -165,7 +165,7 @@ class NotificationManagementTest extends TestCase
         $this->assertTrue($result['customer_sent']);
         $this->assertFalse($result['pdf_attached']);
 
-        Mail::assertQueued(BookingNotification::class, function ($mail) {
+        Mail::assertSent(BookingNotification::class, function ($mail) {
             return count($mail->attachments()) === 0;
         });
     }
@@ -327,7 +327,7 @@ class NotificationManagementTest extends TestCase
             'pdf_attached' => true,
         ]);
 
-        Mail::assertQueued(BookingNotification::class, function ($mail) {
+        Mail::assertSent(BookingNotification::class, function ($mail) {
             return $mail->hasTo('qa-tester@dunesdiscoverytourism.com') &&
                    count($mail->attachments()) > 0;
         });

@@ -64,6 +64,14 @@ class EmailMarketingService
             Config::set('mail.from.address', $fromAddress);
             Config::set('mail.from.name', $fromName);
         }
+
+        try {
+            Mail::purge('smtp');
+            if (! empty($driver) && $driver !== 'smtp') {
+                Mail::purge($driver);
+            }
+        } catch (\Throwable $e) {
+        }
     }
 
     /**

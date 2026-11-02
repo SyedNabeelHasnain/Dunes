@@ -459,11 +459,18 @@ class NotificationManagementService
 
     /**
      * 6. Live Test Notification Dispatcher for Admin Verification.
+     * Enforces direct, synchronous live SMTP transmission with zero queueing or fake log fallback.
      */
     public function sendTestNotification(string $event, string $recipientEmail): array
     {
         $this->prepareMailEnvironment();
         $sender = $this->getSenderIdentity();
+
+        // Target real delivery transport directly to prevent failover to log
+        $targetMailer = config('mail.default', 'smtp');
+        if ($targetMailer === 'failover' || empty($targetMailer)) {
+            $targetMailer = 'smtp';
+        }
 
         try {
             switch ($event) {
@@ -488,17 +495,18 @@ class NotificationManagementService
 
                     $pdfBinary = $this->generateVoucherPdfBinary($dummyBooking);
                     $mail = (new BookingNotification('booking_confirmed', $dummyBooking))
-                        ->from($sender['email'], $sender['name']);
+                        ->from($sender['email'], $sender['name'])
+                        ->replyTo($sender['reply_to'], $sender['name']);
 
                     if ($pdfBinary) {
                         $mail->withPdfAttachment($pdfBinary, 'Dunes-Discovery-Ticket-Voucher-' . $dummyBooking->reference . '.pdf');
                     }
 
-                    Mail::to($recipientEmail)->send($mail);
+                    Mail::mailer($targetMailer)->to($recipientEmail)->send($mail);
 
                     return [
                         'success' => true,
-                        'message' => "Test customer confirmation email with PDF voucher successfully dispatched to {$recipientEmail}!",
+                        'message' => "Live test customer confirmation email with PDF voucher successfully delivered via SMTP ({$targetMailer}) to {$recipientEmail}!",
                         'pdf_attached' => ! empty($pdfBinary),
                     ];
 
@@ -521,17 +529,18 @@ class NotificationManagementService
 
                     $pdfBinary = $this->generateVoucherPdfBinary($dummyBooking);
                     $mail = (new BookingAdminNotification($dummyBooking))
-                        ->from($sender['email'], $sender['name']);
+                        ->from($sender['email'], $sender['name'])
+                        ->replyTo($sender['reply_to'], $sender['name']);
 
                     if ($pdfBinary) {
                         $mail->withPdfAttachment($pdfBinary, 'Dunes-Discovery-Ticket-Voucher-' . $dummyBooking->reference . '.pdf');
                     }
 
-                    Mail::to($recipientEmail)->send($mail);
+                    Mail::mailer($targetMailer)->to($recipientEmail)->send($mail);
 
                     return [
                         'success' => true,
-                        'message' => "Test admin booking alert email with PDF voucher successfully dispatched to {$recipientEmail}!",
+                        'message' => "Live test admin booking alert email with PDF voucher successfully delivered via SMTP ({$targetMailer}) to {$recipientEmail}!",
                         'pdf_attached' => ! empty($pdfBinary),
                     ];
 
@@ -547,13 +556,14 @@ class NotificationManagementService
                         deviceType: 'iPhone / Safari',
                         refCode: 'WA-TEST',
                         inquiryId: 777
-                    ))->from($sender['email'], $sender['name']);
+                    ))->from($sender['email'], $sender['name'])
+                      ->replyTo($sender['reply_to'], $sender['name']);
 
-                    Mail::to($recipientEmail)->send($mail);
+                    Mail::mailer($targetMailer)->to($recipientEmail)->send($mail);
 
                     return [
                         'success' => true,
-                        'message' => "Test WhatsApp Lead notification email successfully dispatched to {$recipientEmail}!",
+                        'message' => "Live test WhatsApp Lead notification email successfully delivered via SMTP ({$targetMailer}) to {$recipientEmail}!",
                     ];
 
                 case 'contact_inquiry':
@@ -563,13 +573,14 @@ class NotificationManagementService
                         '+39 06 12345678',
                         'Corporate Team Building Desert Safari (50 Guests)',
                         'We would like a full buyout of the VIP desert camp on November 15th with private entertainment.'
-                    ))->from($sender['email'], $sender['name']);
+                    ))->from($sender['email'], $sender['name'])
+                      ->replyTo($sender['reply_to'], $sender['name']);
 
-                    Mail::to($recipientEmail)->send($mail);
+                    Mail::mailer($targetMailer)->to($recipientEmail)->send($mail);
 
                     return [
                         'success' => true,
-                        'message' => "Test Contact Inquiry notification email successfully dispatched to {$recipientEmail}!",
+                        'message' => "Live test Contact Inquiry notification email successfully delivered via SMTP ({$targetMailer}) to {$recipientEmail}!",
                     ];
 
                 case 'customer_review':
@@ -583,13 +594,14 @@ class NotificationManagementService
                     $dummyReview->id = 888;
 
                     $mail = (new ReviewAdminNotification($dummyReview, null))
-                        ->from($sender['email'], $sender['name']);
+                        ->from($sender['email'], $sender['name'])
+                        ->replyTo($sender['reply_to'], $sender['name']);
 
-                    Mail::to($recipientEmail)->send($mail);
+                    Mail::mailer($targetMailer)->to($recipientEmail)->send($mail);
 
                     return [
                         'success' => true,
-                        'message' => "Test Customer Review notification email successfully dispatched to {$recipientEmail}!",
+                        'message' => "Live test Customer Review notification email successfully delivered via SMTP ({$targetMailer}) to {$recipientEmail}!",
                     ];
 
                 default:
@@ -600,7 +612,7 @@ class NotificationManagementService
 
             return [
                 'success' => false,
-                'message' => 'Notification dispatch failed: ' . $e->getMessage(),
+                'message' => 'Live SMTP Delivery Failed: ' . $e->getMessage(),
             ];
         }
     }

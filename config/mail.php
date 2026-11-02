@@ -104,7 +104,6 @@ return [
                 'smtp_hostinger_tls',
                 'smtp_hostinger_starttls',
                 'sendmail',
-                'log',
             ],
             'retry_after' => 10,
         ],
