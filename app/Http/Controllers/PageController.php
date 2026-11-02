@@ -170,7 +170,9 @@ class PageController extends Controller
         $ctx = $this->tracker->collectRequestContext('contact', $gpsPost);
 
         try {
-            // Save contact record
+            // Save contact record with full attribution context
+            $trafficChannel = $request->input('traffic_channel') ?? ($ctx['traffic_channel'] ?? \App\Services\VisitorTrackerService::determineChannel($ctx['utm_source'] ?? null, $ctx['utm_medium'] ?? null, $ctx['gclid'] ?? null, $ctx['fbclid'] ?? null, $ctx['referrer_url'] ?? null));
+
             $contact = Contact::create([
                 'name' => $name,
                 'email' => $email,
@@ -180,6 +182,16 @@ class PageController extends Controller
                 'status' => 'new',
                 'is_verified' => $isVerified,
                 'ip_address' => $ctx['client_ip'],
+                'traffic_channel' => $trafficChannel,
+                'utm_source' => $request->input('utm_source') ?? ($ctx['utm_source'] ?? null),
+                'utm_medium' => $request->input('utm_medium') ?? ($ctx['utm_medium'] ?? null),
+                'utm_campaign' => $request->input('utm_campaign') ?? ($ctx['utm_campaign'] ?? null),
+                'utm_term' => $request->input('utm_term') ?? ($ctx['utm_term'] ?? null),
+                'utm_content' => $request->input('utm_content') ?? ($ctx['utm_content'] ?? null),
+                'gclid' => $request->input('gclid') ?? ($ctx['gclid'] ?? null),
+                'fbclid' => $request->input('fbclid') ?? ($ctx['fbclid'] ?? null),
+                'initial_referrer' => $request->input('initial_referrer') ?? ($ctx['referrer_url'] ?? null),
+                'landing_page' => $request->input('landing_page') ?? ($ctx['landing_page'] ?? null),
             ]);
 
             // Log detailed context in request_logs table

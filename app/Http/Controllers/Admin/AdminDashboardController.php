@@ -384,6 +384,7 @@ class AdminDashboardController extends Controller
     public function inquiries(Request $request)
     {
         $status = $request->input('status');
+        $trafficChannel = $request->input('traffic_channel') ?? $request->input('channel');
         $fromDate = $request->input('from_date');
         $toDate = $request->input('to_date');
         $search = $request->input('search');
@@ -392,6 +393,9 @@ class AdminDashboardController extends Controller
 
         if ($status) {
             $query->where('status', $status);
+        }
+        if ($trafficChannel) {
+            $query->where('traffic_channel', $trafficChannel);
         }
         if ($fromDate) {
             $query->whereDate('created_at', '>=', $fromDate);
@@ -454,6 +458,7 @@ class AdminDashboardController extends Controller
             'trendData',
             'statusBreakdown',
             'status',
+            'trafficChannel',
             'fromDate',
             'toDate',
             'search'
@@ -657,6 +662,9 @@ class AdminDashboardController extends Controller
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
+        if ($request->filled('traffic_channel') || $request->filled('channel')) {
+            $query->where('traffic_channel', $request->input('traffic_channel') ?? $request->input('channel'));
+        }
         if ($request->filled('search')) {
             $s = $request->search;
             $query->where(function ($q) use ($s) {
@@ -682,7 +690,7 @@ class AdminDashboardController extends Controller
             'Expires' => '0',
         ];
 
-        $columns = ['ID', 'Date', 'Name', 'Email', 'Phone', 'Subject', 'Message', 'Status', 'IP Address'];
+        $columns = ['ID', 'Date', 'Name', 'Email', 'Phone', 'Subject', 'Message', 'Status', 'Traffic Channel', 'UTM Source', 'UTM Campaign', 'GCLID', 'Initial Referrer', 'Landing Page', 'IP Address'];
 
         $sanitize = function (array $row): array {
             return array_map(function ($val) {
@@ -706,6 +714,12 @@ class AdminDashboardController extends Controller
                         $inq->subject,
                         $inq->message,
                         $inq->status,
+                        $inq->traffic_channel ?: 'Direct',
+                        $inq->utm_source ?: '',
+                        $inq->utm_campaign ?: '',
+                        $inq->gclid ?: '',
+                        $inq->initial_referrer ?: '',
+                        $inq->landing_page ?: '',
                         $inq->ip_address,
                     ]));
                 }

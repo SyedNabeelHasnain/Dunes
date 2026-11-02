@@ -374,15 +374,25 @@ class VisitorTrackerService
         $uaData = $this->parseUserAgent();
         $bot = $this->classifyBot($uaData);
 
+        // Persistent attribution cookie lookup
+        $cookieAttr = [];
+        if (request()->hasCookie('dunes_attribution')) {
+            $raw = request()->cookie('dunes_attribution');
+            $decoded = is_string($raw) ? json_decode($raw, true) : null;
+            if (is_array($decoded)) {
+                $cookieAttr = $decoded;
+            }
+        }
+
         // UTM tracking parameters
-        $utmSource = $submitData['utm_source'] ?? request()->input('utm_source');
-        $utmMedium = $submitData['utm_medium'] ?? request()->input('utm_medium');
-        $utmCampaign = $submitData['utm_campaign'] ?? request()->input('utm_campaign');
-        $utmTerm = $submitData['utm_term'] ?? request()->input('utm_term');
-        $utmContent = $submitData['utm_content'] ?? request()->input('utm_content');
+        $utmSource = $submitData['utm_source'] ?? request()->input('utm_source') ?? ($cookieAttr['utm_source'] ?? null);
+        $utmMedium = $submitData['utm_medium'] ?? request()->input('utm_medium') ?? ($cookieAttr['utm_medium'] ?? null);
+        $utmCampaign = $submitData['utm_campaign'] ?? request()->input('utm_campaign') ?? ($cookieAttr['utm_campaign'] ?? null);
+        $utmTerm = $submitData['utm_term'] ?? request()->input('utm_term') ?? ($cookieAttr['utm_term'] ?? null);
+        $utmContent = $submitData['utm_content'] ?? request()->input('utm_content') ?? ($cookieAttr['utm_content'] ?? null);
 
         // GCLID Google Ads tracking
-        $gclid = request()->input('gclid') ?? session('google_ads_gclid');
+        $gclid = request()->input('gclid') ?? session('google_ads_gclid') ?? ($cookieAttr['gclid'] ?? null);
         if (! empty($gclid)) {
             session(['google_ads_gclid' => $gclid]);
             if (empty($utmSource)) {
@@ -400,6 +410,18 @@ class VisitorTrackerService
                 $utmCampaign = 'Desert Safari Dubai - 15 Jan 2026';
             } elseif ($campaignId && empty($utmCampaign)) {
                 $utmCampaign = 'Campaign '.$campaignId;
+            }
+        }
+
+        // FBCLID Meta Ads tracking
+        $fbclid = request()->input('fbclid') ?? session('meta_ads_fbclid') ?? ($cookieAttr['fbclid'] ?? null);
+        if (! empty($fbclid)) {
+            session(['meta_ads_fbclid' => $fbclid]);
+            if (empty($utmSource)) {
+                $utmSource = 'Meta Ads';
+            }
+            if (empty($utmMedium)) {
+                $utmMedium = 'CPC';
             }
         }
 
@@ -436,6 +458,12 @@ class VisitorTrackerService
         if (empty($utmSource)) {
             $utmSource = 'Direct';
             $utmMedium = 'None';
+        }
+
+        // Authoritative Traffic Channel Classification
+        $trafficChannel = $submitData['traffic_channel'] ?? request()->input('traffic_channel') ?? ($cookieAttr['traffic_channel'] ?? null);
+        if (empty($trafficChannel)) {
+            $trafficChannel = self::determineChannel($utmSource, $utmMedium, $gclid, $fbclid, $referrer);
         }
 
         // Session tracking
@@ -480,6 +508,10 @@ class VisitorTrackerService
             'accept_language' => $acceptLang,
             'accept_encoding' => $acceptEnc,
             'referrer_url' => $referrer,
+            'traffic_channel' => $trafficChannel,
+            'gclid' => $gclid ?: null,
+            'fbclid' => $fbclid ?: null,
+            'initial_referrer' => $referrer !== 'Not Available' ? $referrer : null,
             'utm_source' => $utmSource ?: 'Direct',
             'utm_medium' => $utmMedium ?: 'Not Available',
             'utm_campaign' => $utmCampaign ?: 'Not Available',
@@ -527,6 +559,59 @@ class VisitorTrackerService
         }
 
         return false;
+    }
+
+    /**
+     * Determine standardized traffic channel from attribution parameters.
+     */
+    public static function determineChannel(?string $source, ?string $medium = null, ?string $gclid = null, ?string $fbclid = null, ?string $referrer = null): string
+    {
+        $src = strtolower(trim((string) $source));
+        $med = strtolower(trim((string) $medium));
+        $ref = strtolower(trim((string) $referrer));
+
+        // 1. Google Ads
+        if (! empty($gclid) || str_contains($src, 'google ads') || (str_contains($src, 'google') && in_array($med, ['cpc', 'ppc', 'paid', 'ad', 'ads', 'search', 'paidsearch'])) || str_contains($ref, 'syndicatedsearch.goog')) {
+            return 'Google Ads';
+        }
+
+        // 2. Meta Ads (Facebook / Instagram Paid)
+        if (! empty($fbclid) || (in_array($src, ['facebook', 'instagram', 'meta', 'fb', 'ig']) && in_array($med, ['cpc', 'ppc', 'paid', 'ad', 'ads', 'sponsored']))) {
+            return 'Meta Ads';
+        }
+
+        // 3. TikTok Ads
+        if (str_contains($src, 'tiktok') && in_array($med, ['cpc', 'ppc', 'paid', 'ad', 'ads'])) {
+            return 'TikTok Ads';
+        }
+
+        // 4. Bing Ads
+        if (str_contains($src, 'bing') && in_array($med, ['cpc', 'ppc', 'paid', 'ad', 'ads'])) {
+            return 'Bing Ads';
+        }
+
+        // 5. Social Organic
+        if (in_array($med, ['social', 'organic_social']) || in_array($src, ['facebook', 'instagram', 'tiktok', 'youtube', 'linkedin', 'twitter', 'pinterest', 'threads', 'x']) || str_contains($ref, 'instagram.com') || str_contains($ref, 'facebook.com') || str_contains($ref, 'fb.com') || str_contains($ref, 'tiktok.com') || str_contains($ref, 'youtube.com') || str_contains($ref, 't.co') || str_contains($ref, 'linkedin.com')) {
+            return 'Social';
+        }
+
+        // 6. Organic Search
+        if ($med === 'organic' || str_contains($src, 'organic') || str_contains($ref, 'google.') || str_contains($ref, 'bing.com') || str_contains($ref, 'yandex.') || str_contains($ref, 'yahoo.com') || str_contains($ref, 'duckduckgo.com') || str_contains($ref, 'ecosia.org') || str_contains($ref, 'baidu.com')) {
+            return 'Organic Search';
+        }
+
+        // 7. Email Marketing
+        if (in_array($med, ['email', 'newsletter']) || str_contains($src, 'newsletter') || str_contains($src, 'mail')) {
+            return 'Email';
+        }
+
+        // 8. Referral
+        if ($med === 'referral' || (! empty($ref) && $ref !== 'not available' && ! str_contains($ref, 'dunesdiscoverytourism.com') && ! str_contains($ref, '127.0.0.1') && ! str_contains($ref, 'localhost'))) {
+            return 'Referral';
+        }
+
+        // 9. Direct / Fallback
+        return 'Direct';
     }
 
     /**

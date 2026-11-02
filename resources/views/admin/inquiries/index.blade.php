@@ -110,7 +110,7 @@
     <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4">
         <form method="GET" action="{{ route('admin.inquiries.index') }}">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end">
-                <div class="lg:col-span-5 sm:col-span-2">
+                <div class="lg:col-span-4 sm:col-span-2">
                     <label for="inquirySearch" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Search Messages</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -120,7 +120,22 @@
                     </div>
                 </div>
 
-                <div class="lg:col-span-3">
+                <div class="lg:col-span-2">
+                    <label for="channelFilter" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Channel</label>
+                    <select name="traffic_channel" id="channelFilter" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden bg-white">
+                        <option value="">All Channels</option>
+                        <option value="Google Ads" {{ request('traffic_channel') === 'Google Ads' ? 'selected' : '' }}>Google Ads</option>
+                        <option value="Meta Ads" {{ request('traffic_channel') === 'Meta Ads' ? 'selected' : '' }}>Meta Ads</option>
+                        <option value="TikTok Ads" {{ request('traffic_channel') === 'TikTok Ads' ? 'selected' : '' }}>TikTok Ads</option>
+                        <option value="Bing Ads" {{ request('traffic_channel') === 'Bing Ads' ? 'selected' : '' }}>Bing Ads</option>
+                        <option value="Organic Search" {{ request('traffic_channel') === 'Organic Search' ? 'selected' : '' }}>Organic Search</option>
+                        <option value="Social" {{ request('traffic_channel') === 'Social' ? 'selected' : '' }}>Social</option>
+                        <option value="Referral" {{ request('traffic_channel') === 'Referral' ? 'selected' : '' }}>Referral</option>
+                        <option value="Direct" {{ request('traffic_channel') === 'Direct' ? 'selected' : '' }}>Direct</option>
+                    </select>
+                </div>
+
+                <div class="lg:col-span-2">
                     <label for="statusFilter" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Status</label>
                     <select name="status" id="statusFilter" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden bg-white">
                         <option value="">All Statuses</option>
@@ -159,6 +174,7 @@
                         <th class="py-3 px-4">Date</th>
                         <th class="py-3 px-4">Customer</th>
                         <th class="py-3 px-4">Subject</th>
+                        <th class="py-3 px-4">Channel</th>
                         <th class="py-3 px-4 text-center">Status</th>
                         <th class="py-3 px-4 text-right no-sort pe-4">Actions</th>
                     </tr>
@@ -187,6 +203,9 @@
                         <td class="py-3 px-4">
                             <div class="text-xs font-semibold text-slate-800 line-clamp-1">{{ $c->subject }}</div>
                             <div class="text-[11px] text-slate-400 line-clamp-1">{{ Str::limit($c->message, 60) }}</div>
+                        </td>
+                        <td class="py-3 px-4 whitespace-nowrap" data-order="{{ $c->traffic_channel ?: 'Direct' }}">
+                            @include('partials.admin.channel-badge', ['channel' => $c->traffic_channel ?: ($c->utm_source ?: 'Direct')])
                         </td>
                         <td class="py-3 px-4 text-center status-col" data-order="{{ $c->status }}">
                             @php

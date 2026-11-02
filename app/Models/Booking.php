@@ -23,7 +23,8 @@ class Booking extends Model
         'balance_due', 'ziina_payment_intent_id', 'ziina_status',
         'ziina_redirect_url', 'request_log_id', 'ip_address', 'ip_location',
         'gps_lat', 'gps_lng', 'gps_address', 'device_type', 'browser',
-        'platform', 'user_agent', 'referrer', 'utm_source', 'utm_medium',
+        'platform', 'user_agent', 'referrer', 'traffic_channel', 'gclid', 'fbclid',
+        'landing_page', 'draft_token', 'utm_source', 'utm_medium',
         'utm_campaign', 'utm_term', 'utm_content', 'is_verified',
     ];
 

@@ -446,6 +446,11 @@ class BookingController extends Controller
                     'platform' => $ctx['os_name'],
                     'user_agent' => $ctx['user_agent'],
                     'referrer' => $ctx['referrer_url'],
+                    'traffic_channel' => $ctx['traffic_channel'] ?? \App\Services\VisitorTrackerService::determineChannel($ctx['utm_source'] ?? null, $ctx['utm_medium'] ?? null, $ctx['gclid'] ?? null, $ctx['fbclid'] ?? null, $ctx['referrer_url'] ?? null),
+                    'gclid' => $ctx['gclid'] ?? null,
+                    'fbclid' => $ctx['fbclid'] ?? null,
+                    'landing_page' => $ctx['landing_page'] ?? null,
+                    'draft_token' => $request->input('draft_token') ?? $request->cookie('dunes_draft_token') ?? session('active_booking_draft_token') ?? null,
                     'utm_source' => $ctx['utm_source'],
                     'utm_medium' => $ctx['utm_medium'],
                     'utm_campaign' => $ctx['utm_campaign'],
@@ -478,6 +483,31 @@ class BookingController extends Controller
 
             // Permanently record the customer's email as verified in the database for future bookings
             VerifiedEmail::markVerified($email);
+
+            // Transition and retire prior draft to converted status
+            try {
+                $activeDraftId = $request->input('draft_id') ?? session('active_booking_draft_id');
+                $draftToken = $request->input('draft_token') ?? $request->cookie('dunes_draft_token') ?? session('active_booking_draft_token');
+                if ($activeDraftId || $draftToken) {
+                    $priorDraft = Booking::where('status', 'draft')
+                        ->where(function ($q) use ($activeDraftId, $draftToken) {
+                            if ($activeDraftId) {
+                                $q->where('id', $activeDraftId);
+                            }
+                            if ($draftToken) {
+                                $q->orWhere('draft_token', $draftToken);
+                            }
+                        })->first();
+                    if ($priorDraft) {
+                        $priorDraft->status = 'converted';
+                        $priorDraft->special_requests = trim(($priorDraft->special_requests ?? '')." [Converted to Confirmed Booking #{$booking->reference}]");
+                        $priorDraft->save();
+                    }
+                    session()->forget(['active_booking_draft_id', 'active_booking_draft_token']);
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Draft conversion transition failed: '.$e->getMessage());
+            }
 
             // Log detailed context in request_logs table
             $logId = $this->tracker->logRequest('booking', $booking->id, 'booking', $ctx);
@@ -1121,12 +1151,13 @@ class BookingController extends Controller
      */
     public function saveDraft(Request $request)
     {
-        $name = trim($request->input('name', ''));
-        $email = strtolower(trim($request->input('email', '')));
-        $phone = trim($request->input('phone', ''));
+        $name = trim((string) $request->input('name', ''));
+        $email = strtolower(trim((string) $request->input('email', '')));
+        $phone = trim((string) $request->input('phone', ''));
         $tourId = $request->input('tour_id');
         $tierId = $request->input('tier_id');
         $date = $request->input('date');
+        $draftToken = trim((string) ($request->input('draft_token') ?? $request->cookie('dunes_draft_token') ?? session('active_booking_draft_token') ?? ''));
 
         // Only save if at least phone or email or name is provided
         if (empty($name) && empty($email) && empty($phone)) {
@@ -1153,60 +1184,182 @@ class BookingController extends Controller
         $subtotal = $resolvedPricing['authoritative'] ? $resolvedPricing['subtotal'] : 0.0;
         $total = $resolvedPricing['authoritative'] ? $resolvedPricing['total'] : 0.0;
 
-        // Check if there is an existing draft for this session or email in the last 4 hours
+        // 1. Locate existing draft using persistent draft_token, session draft ID, request draft_id, or guest identity
         $sessionDraftId = session('active_booking_draft_id');
         $draftId = $request->input('draft_id');
         $draft = null;
 
-        // Strictly ensure caller owns the draft they are attempting to update
-        if ($draftId && $sessionDraftId && (int) $draftId === (int) $sessionDraftId) {
-            $draft = Booking::where('id', $draftId)->where('status', 'draft')->first();
+        // A. Match by explicit draft_token (strongest persistent cross-page fingerprint)
+        if (! empty($draftToken)) {
+            $draft = Booking::where('draft_token', $draftToken)->where('status', 'draft')->first();
         }
 
+        // B. Match by draft_id if owned by current session or caller
+        if (! $draft && $draftId) {
+            if (($sessionDraftId && (int) $draftId === (int) $sessionDraftId) || empty($sessionDraftId)) {
+                $draft = Booking::where('id', $draftId)->where('status', 'draft')->first();
+            }
+        }
+
+        // C. Match by active session draft ID
+        if (! $draft && $sessionDraftId) {
+            $draft = Booking::where('id', $sessionDraftId)->where('status', 'draft')->first();
+        }
+
+        // D. Match by verified email in recent 24-hour window
         if (! $draft && ! empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $draft = Booking::where('email', $email)
                 ->where('status', 'draft')
-                ->where('created_at', '>=', now()->subHours(4))
-                ->where(function ($q) use ($request) {
-                    $q->where('ip_address', $request->ip())
-                        ->orWhereNull('ip_address');
-                })
+                ->where('created_at', '>=', now()->subHours(24))
+                ->latest()
                 ->first();
         }
+
+        // E. Match by phone in recent 24-hour window
+        if (! $draft && ! empty($phone) && strlen(preg_replace('/[^0-9]/', '', $phone)) >= 7) {
+            $draft = Booking::where('phone', $phone)
+                ->where('status', 'draft')
+                ->where('created_at', '>=', now()->subHours(24))
+                ->latest()
+                ->first();
+        }
+
+        // 2. Attribution Context resolution
+        $ctx = $this->tracker->collectRequestContext('draft', $request->all());
+        $trafficChannel = $request->input('traffic_channel') ?? ($ctx['traffic_channel'] ?? \App\Services\VisitorTrackerService::determineChannel($ctx['utm_source'] ?? null, $ctx['utm_medium'] ?? null, $ctx['gclid'] ?? null, $ctx['fbclid'] ?? null, $ctx['referrer_url'] ?? null));
 
         if (! $draft) {
             $ref = 'DFT'.date('ymd').strtoupper(Str::random(5));
             $draft = new Booking;
             $draft->reference = $ref;
             $draft->status = 'draft';
+            if (empty($draftToken)) {
+                $draftToken = (string) Str::uuid();
+            }
+            $draft->draft_token = $draftToken;
+            $draft->traffic_channel = $trafficChannel;
+            $draft->gclid = $ctx['gclid'] ?? null;
+            $draft->fbclid = $ctx['fbclid'] ?? null;
+            $draft->landing_page = $ctx['landing_page'] ?? null;
+            $draft->referrer = $ctx['referrer_url'] ?? null;
+            $draft->utm_source = $ctx['utm_source'] ?? null;
+            $draft->utm_medium = $ctx['utm_medium'] ?? null;
+            $draft->utm_campaign = $ctx['utm_campaign'] ?? null;
+            $draft->utm_term = $ctx['utm_term'] ?? null;
+            $draft->utm_content = $ctx['utm_content'] ?? null;
+        } else {
+            // Keep existing draft_token or assign if missing
+            if (empty($draft->draft_token)) {
+                if (empty($draftToken)) {
+                    $draftToken = (string) Str::uuid();
+                }
+                $draft->draft_token = $draftToken;
+            } else {
+                $draftToken = $draft->draft_token;
+            }
+            // Preserve first-touch attribution if already set, or enrich if missing
+            if (empty($draft->traffic_channel) || $draft->traffic_channel === 'Direct') {
+                $draft->traffic_channel = $trafficChannel;
+            }
+            if (empty($draft->gclid) && ! empty($ctx['gclid'])) {
+                $draft->gclid = $ctx['gclid'];
+            }
+            if (empty($draft->fbclid) && ! empty($ctx['fbclid'])) {
+                $draft->fbclid = $ctx['fbclid'];
+            }
+            if (empty($draft->landing_page) && ! empty($ctx['landing_page'])) {
+                $draft->landing_page = $ctx['landing_page'];
+            }
+            if (empty($draft->utm_source) && ! empty($ctx['utm_source'])) {
+                $draft->utm_source = $ctx['utm_source'];
+                $draft->utm_medium = $ctx['utm_medium'] ?? null;
+                $draft->utm_campaign = $ctx['utm_campaign'] ?? null;
+            }
         }
 
-        $draft->tour_id = $tour ? $tour->id : null;
-        $draft->tier_id = $tier ? $tier->id : null;
-        $draft->tour_name = $tour ? $tour->name : 'Desert Safari Experience';
-        $draft->tier_name = $tier ? ($tier->display_name ?: $tier->name) : 'Standard Package';
-        $draft->tour_date = $date ? date('Y-m-d', strtotime($date)) : now()->addDay()->format('Y-m-d');
+        // 3. Heuristic Maximum Information Merge
+        // Name: only overwrite if new name is provided and not fallback
+        if (! empty($name) && $name !== 'Prospective Guest') {
+            $draft->name = $name;
+        } elseif (empty($draft->name)) {
+            $draft->name = 'Prospective Guest';
+        }
+
+        // Email: only overwrite if new valid email is provided (and not fallback placeholder)
+        if (! empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL) && ! str_ends_with($email, '@guest.local')) {
+            $draft->email = $email;
+        } elseif (empty($draft->email)) {
+            $draft->email = 'abandoned@guest.local';
+        }
+
+        // Phone: only overwrite if non-empty
+        if (! empty($phone)) {
+            $draft->phone = $phone;
+        } elseif (! isset($draft->phone) || $draft->phone === null) {
+            $draft->phone = '';
+        }
+
+        // Tour details: update if resolved, otherwise keep existing
+        if ($tour) {
+            $draft->tour_id = $tour->id;
+            $draft->tour_name = $tour->name;
+        } elseif (empty($draft->tour_name)) {
+            $draft->tour_name = 'Desert Safari Experience';
+        }
+
+        if ($tier) {
+            $draft->tier_id = $tier->id;
+            $draft->tier_name = $tier->display_name ?: $tier->name;
+        } elseif (empty($draft->tier_name)) {
+            $draft->tier_name = 'Standard Package';
+        }
+
+        if ($date) {
+            $draft->tour_date = date('Y-m-d', strtotime($date));
+        } elseif (empty($draft->tour_date)) {
+            $draft->tour_date = now()->addDay()->format('Y-m-d');
+        }
+
         $draft->adults = $adults;
         $draft->children = $children;
         $draft->infants = $infants;
-        $draft->name = $name ?: 'Prospective Guest';
-        $draft->email = $email ?: 'abandoned@guest.local';
-        $draft->phone = $phone;
-        $draft->pickup_location = $request->input('pickup_location', 'Dubai Hotel');
-        $draft->subtotal = $subtotal;
-        $draft->total = $total;
+
+        $pickupLoc = trim((string) $request->input('pickup_location', ''));
+        if (! empty($pickupLoc) && $pickupLoc !== 'Dubai Hotel') {
+            $draft->pickup_location = $pickupLoc;
+        } elseif (empty($draft->pickup_location)) {
+            $draft->pickup_location = 'Dubai Hotel';
+        }
+
+        $finalSubtotal = (float) ($subtotal ?: ($total ?: ($clientSubtotal ?: ($clientTotal ?: 0.0))));
+        $finalTotal = (float) ($total ?: ($subtotal ?: ($clientTotal ?: ($clientSubtotal ?: 0.0))));
+
+        if ($finalTotal > 0 || empty($draft->total)) {
+            $draft->subtotal = $finalSubtotal;
+            $draft->total = $finalTotal;
+        }
+        if ($draft->subtotal === null) {
+            $draft->subtotal = 0.00;
+        }
+        if ($draft->total === null) {
+            $draft->total = 0.00;
+        }
         $draft->currency = 'AED';
-        $draft->payment_method = $request->input('payment_method', 'cash');
+        $draft->payment_method = $request->input('payment_method', $draft->payment_method ?: 'cash');
         $draft->payment_status = 'unpaid';
         $draft->ip_address = $request->ip();
         $draft->save();
 
-        session(['active_booking_draft_id' => $draft->id]);
+        session([
+            'active_booking_draft_id' => $draft->id,
+            'active_booking_draft_token' => $draftToken,
+        ]);
 
         return response()->json([
             'success' => true,
             'draft_id' => $draft->id,
             'reference' => $draft->reference,
+            'draft_token' => $draftToken,
         ]);
     }
 

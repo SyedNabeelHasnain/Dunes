@@ -923,13 +923,111 @@ const App={
         setTimeout(() => window.dispatchEvent(new Event('resize')), 50);
     },
 
+    getDraftToken() {
+        let token = null;
+        try {
+            token = localStorage.getItem('dunes_draft_token');
+        } catch(e) {}
+        if (!token) {
+            const match = document.cookie.match(/(?:^|;\s*)dunes_draft_token=([^;]+)/);
+            if (match) token = decodeURIComponent(match[1]);
+        }
+        if (!token) {
+            token = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+            try { localStorage.setItem('dunes_draft_token', token); } catch(e) {}
+        }
+        try {
+            document.cookie = 'dunes_draft_token=' + encodeURIComponent(token) + '; path=/; max-age=2592000; SameSite=Lax';
+        } catch(e) {}
+        return token;
+    },
+
+    getAttribution() {
+        let attr = null;
+        try {
+            const raw = localStorage.getItem('dunes_attribution');
+            if (raw) attr = JSON.parse(raw);
+        } catch(e) {}
+        if (!attr) {
+            const match = document.cookie.match(/(?:^|;\s*)dunes_attribution=([^;]+)/);
+            if (match) {
+                try { attr = JSON.parse(decodeURIComponent(match[1])); } catch(e) {}
+            }
+        }
+        return attr || {};
+    },
+
     initUTM(){
-        const p=new URLSearchParams(location.search);
-        ['utm_source','utm_medium','utm_campaign'].forEach(k=>{
-            const v=p.get(k)||sessionStorage.getItem(k)||'';
-            if(p.get(k))sessionStorage.setItem(k,p.get(k));
-            const el=document.getElementById(k.replace('utm_','utm').replace(/_([a-z])/g,(_,l)=>l.toUpperCase()));
-            if(el)el.value=v;
+        const p = new URLSearchParams(window.location.search);
+        const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid', 'ttclid', 'msclkid'];
+        let existing = this.getAttribution();
+        let current = {};
+
+        keys.forEach(k => {
+            if (p.has(k) && p.get(k)) {
+                current[k] = p.get(k);
+            } else if (existing[k]) {
+                current[k] = existing[k];
+            }
+        });
+
+        // Capture landing page and initial referrer
+        if (!existing.landing_page) {
+            current.landing_page = window.location.href;
+        } else {
+            current.landing_page = existing.landing_page;
+        }
+
+        if (document.referrer && !document.referrer.includes(window.location.hostname)) {
+            if (!existing.referrer) current.referrer = document.referrer;
+            else current.referrer = existing.referrer;
+        } else {
+            current.referrer = existing.referrer || 'Direct';
+        }
+
+        // Standardized Traffic Channel Heuristic
+        const src = (current.utm_source || '').toLowerCase();
+        const med = (current.utm_medium || '').toLowerCase();
+        const ref = (current.referrer || '').toLowerCase();
+
+        let channel = 'Direct';
+        if (current.gclid || src.includes('google ads') || (src.includes('google') && ['cpc', 'ppc', 'paid', 'ad', 'ads', 'search'].includes(med)) || ref.includes('syndicatedsearch.goog')) {
+            channel = 'Google Ads';
+        } else if (current.fbclid || ['facebook', 'instagram', 'meta', 'fb', 'ig'].includes(src) && ['cpc', 'ppc', 'paid', 'ad', 'ads', 'sponsored'].includes(med)) {
+            channel = 'Meta Ads';
+        } else if (current.ttclid || (src.includes('tiktok') && ['cpc', 'ppc', 'paid', 'ads'].includes(med))) {
+            channel = 'TikTok Ads';
+        } else if (current.msclkid || (src.includes('bing') && ['cpc', 'ppc', 'paid', 'ads'].includes(med))) {
+            channel = 'Bing Ads';
+        } else if (['social', 'organic_social'].includes(med) || ['facebook', 'instagram', 'tiktok', 'youtube', 'linkedin', 'twitter', 'pinterest'].includes(src) || ref.includes('instagram.com') || ref.includes('facebook.com') || ref.includes('tiktok.com') || ref.includes('youtube.com')) {
+            channel = 'Social';
+        } else if (med === 'organic' || src.includes('organic') || ref.includes('google.') || ref.includes('bing.com') || ref.includes('yandex.') || ref.includes('yahoo.com') || ref.includes('duckduckgo.com')) {
+            channel = 'Organic Search';
+        } else if (['email', 'newsletter'].includes(med) || src.includes('newsletter') || src.includes('mail')) {
+            channel = 'Email';
+        } else if (med === 'referral' || (ref && ref !== 'direct' && !ref.includes(window.location.hostname))) {
+            channel = 'Referral';
+        }
+
+        current.traffic_channel = channel;
+
+        // Persist cross-session
+        try {
+            localStorage.setItem('dunes_attribution', JSON.stringify(current));
+            document.cookie = 'dunes_attribution=' + encodeURIComponent(JSON.stringify(current)) + '; path=/; max-age=2592000; SameSite=Lax';
+        } catch(e) {}
+
+        // Initialize persistent draft token
+        this.getDraftToken();
+
+        // Populate DOM inputs if present
+        keys.forEach(k => {
+            const v = current[k] || '';
+            const el = document.getElementById(k.replace('utm_', 'utm').replace(/_([a-z])/g, (_, l) => l.toUpperCase()));
+            if (el) el.value = v;
         });
     },
 
@@ -1358,61 +1456,119 @@ const App={
 
     initDraftAutoSave(){
         let draftTimer = null;
+        let isDraftSaving = false;
+        let pendingDraftSave = false;
+
         let activeDraftId = null;
+        try {
+            activeDraftId = localStorage.getItem('dunes_active_draft_id') || sessionStorage.getItem('dunes_active_draft_id') || null;
+        } catch(e) {}
 
-        const triggerDraftSave = () => {
-            clearTimeout(draftTimer);
-            draftTimer = setTimeout(async () => {
-                const name = document.getElementById('bookingName')?.value.trim();
-                const email = document.getElementById('bookingEmail')?.value.trim();
-                const phoneEl = document.getElementById('bookingPhone');
-                const phone = (phoneEl && phoneEl._iti && typeof phoneEl._iti.getNumber === 'function' && phoneEl._iti.getNumber())
-                    ? phoneEl._iti.getNumber()
-                    : phoneEl?.value.trim();
+        const draftToken = this.getDraftToken();
 
-                if ((name && name.length >= 2) || (email && email.includes('@')) || (phone && phone.length >= 7)) {
-                    const tourId = document.getElementById('bookingTour')?.value;
-                    const tierId = document.getElementById('selectedTier')?.value || this.selectedTier;
-                    const date = document.getElementById('bookingDate')?.value;
-                    const adults = document.getElementById('bookingAdults')?.value || 1;
-                    const children = document.getElementById('bookingChildren')?.value || 0;
-                    const location = document.getElementById('bookingLocation')?.value;
-                    const baseTotal = this.calculateBaseTotal();
+        const executeDraftSave = async () => {
+            if (isDraftSaving) {
+                pendingDraftSave = true;
+                return;
+            }
 
-                    try {
-                        const res = await fetch('/api/v1/booking/draft', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-                            },
-                            body: JSON.stringify({
-                                draft_id: activeDraftId,
-                                name: name,
-                                email: email,
-                                phone: phone,
-                                tour_id: tourId,
-                                tier_id: tierId,
-                                date: date,
-                                adults: adults,
-                                children: children,
-                                pickup_location: location,
-                                subtotal: baseTotal,
-                                total: baseTotal
-                            })
-                        });
-                        const data = await res.json();
-                        if (data.success && data.draft_id) {
-                            activeDraftId = data.draft_id;
-                        }
-                    } catch (e) {}
+            const name = document.getElementById('bookingName')?.value.trim();
+            const email = document.getElementById('bookingEmail')?.value.trim();
+            const phoneEl = document.getElementById('bookingPhone');
+            const phone = (phoneEl && phoneEl._iti && typeof phoneEl._iti.getNumber === 'function' && phoneEl._iti.getNumber())
+                ? phoneEl._iti.getNumber()
+                : phoneEl?.value.trim();
+
+            // Save only if at least one identity signal is present
+            if ((name && name.length >= 2) || (email && email.includes('@')) || (phone && phone.length >= 7)) {
+                const tourId = document.getElementById('bookingTour')?.value;
+                const tierId = document.getElementById('selectedTier')?.value || this.selectedTier;
+                const date = document.getElementById('bookingDate')?.value;
+                const adults = document.getElementById('bookingAdults')?.value || 1;
+                const children = document.getElementById('bookingChildren')?.value || 0;
+                const location = document.getElementById('bookingLocation')?.value;
+                const baseTotal = this.calculateBaseTotal();
+                const attr = this.getAttribution();
+
+                isDraftSaving = true;
+
+                try {
+                    const res = await fetch('/api/v1/booking/draft', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                        },
+                        body: JSON.stringify({
+                            draft_token: draftToken,
+                            draft_id: activeDraftId,
+                            name: name,
+                            email: email,
+                            phone: phone,
+                            tour_id: tourId,
+                            tier_id: tierId,
+                            date: date,
+                            adults: adults,
+                            children: children,
+                            pickup_location: location,
+                            subtotal: baseTotal,
+                            total: baseTotal,
+                            traffic_channel: attr.traffic_channel,
+                            utm_source: attr.utm_source,
+                            utm_medium: attr.utm_medium,
+                            utm_campaign: attr.utm_campaign,
+                            utm_term: attr.utm_term,
+                            utm_content: attr.utm_content,
+                            gclid: attr.gclid,
+                            fbclid: attr.fbclid,
+                            landing_page: attr.landing_page,
+                            referrer: attr.referrer
+                        })
+                    });
+                    const data = await res.json();
+                    if (data.success && data.draft_id) {
+                        activeDraftId = data.draft_id;
+                        try {
+                            localStorage.setItem('dunes_active_draft_id', data.draft_id);
+                            sessionStorage.setItem('dunes_active_draft_id', data.draft_id);
+                        } catch(e) {}
+                    }
+                } catch (e) {
+                    // Silently handle network drops
+                } finally {
+                    isDraftSaving = false;
+                    if (pendingDraftSave) {
+                        pendingDraftSave = false;
+                        setTimeout(executeDraftSave, 300);
+                    }
                 }
-            }, 800);
+            }
+        };
+
+        const triggerDebouncedDraftSave = () => {
+            clearTimeout(draftTimer);
+            draftTimer = setTimeout(executeDraftSave, 1200);
+        };
+
+        const triggerImmediateDraftSave = () => {
+            clearTimeout(draftTimer);
+            executeDraftSave();
         };
 
         ['bookingName', 'bookingEmail', 'bookingPhone'].forEach(id => {
             const el = document.getElementById(id);
-            if (el) el.addEventListener('input', triggerDraftSave);
+            if (el) {
+                el.addEventListener('input', triggerDebouncedDraftSave);
+                el.addEventListener('blur', triggerImmediateDraftSave);
+                el.addEventListener('change', triggerImmediateDraftSave);
+            }
+        });
+
+        ['bookingDate', 'bookingAdults', 'bookingChildren', 'bookingLocation'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('change', triggerImmediateDraftSave);
+            }
         });
     },
 
@@ -2046,6 +2202,30 @@ const App={
                     if (!fd.has('_token') && csrfToken) {
                         fd.append('_token', csrfToken);
                     }
+
+                    // Automatically attach attribution context and draft identities
+                    const attr = this.getAttribution();
+                    if (attr) {
+                        if (!fd.has('traffic_channel') && attr.traffic_channel) fd.append('traffic_channel', attr.traffic_channel);
+                        if (!fd.has('utm_source') && attr.utm_source) fd.append('utm_source', attr.utm_source);
+                        if (!fd.has('utm_medium') && attr.utm_medium) fd.append('utm_medium', attr.utm_medium);
+                        if (!fd.has('utm_campaign') && attr.utm_campaign) fd.append('utm_campaign', attr.utm_campaign);
+                        if (!fd.has('utm_term') && attr.utm_term) fd.append('utm_term', attr.utm_term);
+                        if (!fd.has('utm_content') && attr.utm_content) fd.append('utm_content', attr.utm_content);
+                        if (!fd.has('gclid') && attr.gclid) fd.append('gclid', attr.gclid);
+                        if (!fd.has('fbclid') && attr.fbclid) fd.append('fbclid', attr.fbclid);
+                        if (!fd.has('landing_page') && attr.landing_page) fd.append('landing_page', attr.landing_page);
+                        if (!fd.has('initial_referrer') && attr.referrer) fd.append('initial_referrer', attr.referrer);
+                    }
+                    const draftToken = this.getDraftToken();
+                    if (draftToken && !fd.has('draft_token')) {
+                        fd.append('draft_token', draftToken);
+                    }
+                    const activeDraftId = localStorage.getItem('dunes_active_draft_id') || sessionStorage.getItem('dunes_active_draft_id');
+                    if (activeDraftId && !fd.has('draft_id')) {
+                        fd.append('draft_id', activeDraftId);
+                    }
+
                     const res=await fetch('/ajax.php',{
                         method:'POST',
                         headers:{
@@ -2067,6 +2247,12 @@ const App={
                     }
 
                     if(data.success){
+                        if (action === 'booking') {
+                            try {
+                                localStorage.removeItem('dunes_active_draft_id');
+                                sessionStorage.removeItem('dunes_active_draft_id');
+                            } catch(e) {}
+                        }
                         const targetUrl = data.redirect_url || (data.reference ? ('/thankyou?ref=' + encodeURIComponent(data.reference)) : null);
 
                         // Engagement & Lead tracking for contact / lead forms (NEVER Google Ads booking conversion)

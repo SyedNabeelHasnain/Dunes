@@ -28,6 +28,12 @@
             </p>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
+            <form method="POST" action="{{ route('admin.bookings.drafts.consolidate') }}" class="inline" onsubmit="return confirm('Consolidate duplicate drafts and merge visitor details into the most complete records?');">
+                @csrf
+                <button type="submit" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-900 text-xs font-bold shadow-xs transition" title="Merge duplicate abandoned records for the same visitor into single complete draft">
+                    <i class="bi bi-magic"></i> Deduplicate Drafts
+                </button>
+            </form>
             <a href="{{ route('admin.bookings.drafts.export', request()->query()) }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold shadow-2xs transition">
                 <i class="bi bi-download text-emerald-600"></i> Export CSV
             </a>
@@ -113,7 +119,7 @@
         <form method="GET" action="{{ route('admin.bookings.drafts') }}">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end">
                 <!-- Search Keyword -->
-                <div class="lg:col-span-4 sm:col-span-2">
+                <div class="lg:col-span-3 sm:col-span-2">
                     <label for="draftSearch" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Search Drafts</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -121,6 +127,22 @@
                         </div>
                         <input type="text" name="search" id="draftSearch" class="w-full rounded-xl border border-slate-200 pl-9 pr-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden" placeholder="Guest name, phone, email, ref..." value="{{ request('search') }}">
                     </div>
+                </div>
+
+                <!-- Acquisition Channel -->
+                <div class="lg:col-span-2">
+                    <label for="channelFilter" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Channel</label>
+                    <select name="traffic_channel" id="channelFilter" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-xs text-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-hidden bg-white">
+                        <option value="">All Channels</option>
+                        <option value="Google Ads" {{ request('traffic_channel') === 'Google Ads' ? 'selected' : '' }}>Google Ads</option>
+                        <option value="Meta Ads" {{ request('traffic_channel') === 'Meta Ads' ? 'selected' : '' }}>Meta Ads</option>
+                        <option value="TikTok Ads" {{ request('traffic_channel') === 'TikTok Ads' ? 'selected' : '' }}>TikTok Ads</option>
+                        <option value="Bing Ads" {{ request('traffic_channel') === 'Bing Ads' ? 'selected' : '' }}>Bing Ads</option>
+                        <option value="Organic Search" {{ request('traffic_channel') === 'Organic Search' ? 'selected' : '' }}>Organic Search</option>
+                        <option value="Social" {{ request('traffic_channel') === 'Social' ? 'selected' : '' }}>Social</option>
+                        <option value="Referral" {{ request('traffic_channel') === 'Referral' ? 'selected' : '' }}>Referral</option>
+                        <option value="Direct" {{ request('traffic_channel') === 'Direct' ? 'selected' : '' }}>Direct</option>
+                    </select>
                 </div>
 
                 <!-- Contact Reachability Filter -->
@@ -177,6 +199,7 @@
                         <th class="py-3 px-4">Prospective Guest</th>
                         <th class="py-3 px-4">Tour & Setup</th>
                         <th class="py-3 px-4">Cart Total</th>
+                        <th class="py-3 px-4">Attribution</th>
                         <th class="py-3 px-4 text-center">Status</th>
                         <th class="py-3 px-4 text-right pe-4">1-Click Recovery Actions</th>
                     </tr>
@@ -271,6 +294,16 @@
                             <div class="text-[10px] text-slate-400 uppercase tracking-wider mt-0.5">
                                 {{ $d->payment_method ?: 'Cash/Card' }}
                             </div>
+                        </td>
+
+                        <!-- Attribution & Channel -->
+                        <td class="py-3.5 px-4 whitespace-nowrap">
+                            @include('partials.admin.channel-badge', ['channel' => $d->traffic_channel ?: ($d->utm_source ?: 'Direct')])
+                            @if($d->utm_campaign && $d->utm_campaign !== 'Not Available')
+                                <div class="text-[10px] text-slate-500 truncate max-w-[130px] mt-0.5" title="{{ $d->utm_campaign }}">
+                                    <i class="bi bi-tag text-[9px]"></i> {{ $d->utm_campaign }}
+                                </div>
+                            @endif
                         </td>
 
                         <!-- Status Badge -->

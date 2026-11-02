@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\AdminMenuController;
 use App\Http\Controllers\Admin\AdminOperationsController;
 use App\Http\Controllers\Admin\AdminPageController;
 use App\Http\Controllers\Admin\AdminReviewController;
+use App\Http\Controllers\Admin\AdminReportController;
 use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\AdminSpotlightController;
 use App\Http\Controllers\Admin\AdminSubscriberController;
@@ -59,6 +60,7 @@ Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index
 Route::post('/api/gallery/report-broken', [GalleryController::class, 'reportBroken'])->middleware('throttle:10,1')->name('api.gallery.report-broken');
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
+Route::post('/contact', [PageController::class, 'submitContact'])->name('contact.submit');
 Route::get('/faq', [PageController::class, 'faq'])->name('faq');
 Route::redirect('/faqs', '/faq', 301);
 Route::get('/rate-card', [RateCardController::class, 'index'])->name('rate-card');
@@ -231,6 +233,7 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     // Bookings & WhatsApp Leads
     Route::get('/bookings/drafts', [AdminBookingController::class, 'drafts'])->name('bookings.drafts');
     Route::get('/bookings/drafts/export', [AdminBookingController::class, 'exportDraftsCsv'])->name('bookings.drafts.export');
+    Route::post('/bookings/drafts/consolidate', [AdminBookingController::class, 'consolidateDrafts'])->name('bookings.drafts.consolidate');
     Route::post('/bookings/drafts/{id}/convert', [AdminBookingController::class, 'convertDraft'])->name('bookings.drafts.convert');
     Route::get('/bookings/drafts/{id}/preview-recovery', [AdminBookingController::class, 'previewDraftRecovery'])->name('bookings.drafts.preview-recovery');
     Route::post('/bookings/drafts/{id}/send-recovery', [AdminBookingController::class, 'sendDraftRecovery'])->name('bookings.drafts.send-recovery');
@@ -252,6 +255,11 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::get('/operations/reports', [AdminOperationsController::class, 'reports'])->name('operations.reports');
     Route::get('/operations/reports/export', [AdminOperationsController::class, 'exportReportsCsv'])->name('operations.reports.export');
     Route::get('/operations/export/csv', [AdminOperationsController::class, 'exportManifest'])->name('operations.export');
+
+    // Enterprise Business Intelligence & Reporting Hub
+    Route::get('/reports', [AdminReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/export/csv', [AdminReportController::class, 'exportCsv'])->name('reports.export.csv');
+    Route::get('/reports/print', [AdminReportController::class, 'printView'])->name('reports.print');
 
     // Safari Drivers Management
     Route::resource('drivers', AdminDriverController::class);

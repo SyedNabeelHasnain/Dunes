@@ -14,6 +14,9 @@ class Contact extends Model
     protected $fillable = [
         'name', 'email', 'phone', 'subject', 'message', 'status',
         'request_log_id', 'ip_address', 'is_verified',
+        'traffic_channel', 'utm_source', 'utm_medium', 'utm_campaign',
+        'utm_term', 'utm_content', 'gclid', 'fbclid',
+        'initial_referrer', 'landing_page',
     ];
 
     protected $casts = [

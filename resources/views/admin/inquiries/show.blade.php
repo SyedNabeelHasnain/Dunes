@@ -133,7 +133,9 @@
                     <h2 class="text-xs font-black uppercase tracking-wider text-primary flex items-center gap-2">
                         <i class="bi bi-cpu text-base"></i> Technical Attribution
                     </h2>
-                    <span class="text-xs text-slate-400">Visitor Telemetry</span>
+                    <div>
+                        @include('partials.admin.channel-badge', ['channel' => $inquiry->traffic_channel ?: ($inquiry->utm_source ?: ($log?->utm_source ?: 'Direct'))])
+                    </div>
                 </div>
                 
                 @if($log)

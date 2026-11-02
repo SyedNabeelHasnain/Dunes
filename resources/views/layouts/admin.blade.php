@@ -377,6 +377,15 @@
                                     </div>
                                 </a>
                             </div>
+                            <div class="cmd-entry rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group cursor-pointer" data-category="actions" data-keywords="enterprise reporting bi business intelligence power bi crystal reports executive audit attribution channels profit revenue">
+                                <a href="{{ route('admin.reports.index') }}" class="flex items-center gap-3 p-2.5">
+                                    <i class="bi bi-bar-chart-line-fill text-emerald-500 text-xl shrink-0"></i>
+                                    <div>
+                                        <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Enterprise BI & Reports Hub</strong>
+                                        <span class="text-[11px] text-slate-500">Multi-channel attribution, funnels & exports</span>
+                                    </div>
+                                </a>
+                            </div>
                             <div class="cmd-entry rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group cursor-pointer" data-category="actions" data-keywords="export bookings csv download excel sheet customers report">
                                 <a href="{{ route('admin.bookings.export') }}" class="flex items-center gap-3 p-2.5">
                                     <i class="bi bi-file-earmark-spreadsheet-fill text-emerald-600 text-xl shrink-0"></i>
@@ -466,6 +475,10 @@
                             <a href="{{ route('admin.analytics.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="analytics traffic visitors acquisition referrers sources campaigns utm">
                                 <span class="flex items-center gap-2"><i class="bi bi-graph-up-arrow text-primary"></i> Real-Time Analytics Dashboard</span>
                                 <span class="text-[10px] text-slate-400 font-mono">/admin/analytics</span>
+                            </a>
+                            <a href="{{ route('admin.reports.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="reports reporting bi business intelligence attribution channels draft conversion finance reconciliation audit crystal power">
+                                <span class="flex items-center gap-2"><i class="bi bi-bar-chart-line-fill text-emerald-500"></i> Enterprise Reporting & BI Hub</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/reports</span>
                             </a>
                             <a href="{{ route('admin.bookings.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="bookings orders customers reservations payments guest tickets status">
                                 <span class="flex items-center gap-2"><i class="bi bi-calendar2-check-fill text-primary"></i> Bookings & Reservations</span>

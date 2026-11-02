@@ -128,6 +128,21 @@
             </div>
 
             <div class="lg:col-span-2">
+                <label for="channelFilter" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Acquisition Channel</label>
+                <select name="traffic_channel" id="channelFilter" class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs font-semibold text-slate-700 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-2xs">
+                    <option value="">All Channels</option>
+                    <option value="Google Ads" {{ request('traffic_channel') === 'Google Ads' ? 'selected' : '' }}>Google Ads</option>
+                    <option value="Meta Ads" {{ request('traffic_channel') === 'Meta Ads' ? 'selected' : '' }}>Meta Ads</option>
+                    <option value="TikTok Ads" {{ request('traffic_channel') === 'TikTok Ads' ? 'selected' : '' }}>TikTok Ads</option>
+                    <option value="Bing Ads" {{ request('traffic_channel') === 'Bing Ads' ? 'selected' : '' }}>Bing Ads</option>
+                    <option value="Organic Search" {{ request('traffic_channel') === 'Organic Search' ? 'selected' : '' }}>Organic Search</option>
+                    <option value="Social" {{ request('traffic_channel') === 'Social' ? 'selected' : '' }}>Social Media</option>
+                    <option value="Referral" {{ request('traffic_channel') === 'Referral' ? 'selected' : '' }}>Referral</option>
+                    <option value="Direct" {{ request('traffic_channel') === 'Direct' ? 'selected' : '' }}>Direct</option>
+                </select>
+            </div>
+
+            <div class="lg:col-span-2">
                 <label for="paymentFilter" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Payment Status</label>
                 <select name="payment_status" id="paymentFilter" class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs font-semibold text-slate-700 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-2xs">
                     <option value="">All Payments</option>
@@ -174,6 +189,7 @@
                     <th class="py-3 px-4">Tour / Activity</th>
                     <th class="py-3 px-4">Tour Date</th>
                     <th class="py-3 px-4">Total & Paid</th>
+                    <th class="py-3 px-4">Channel</th>
                     <th class="py-3 px-4 text-center">Status</th>
                     <th class="py-3 px-4 text-right no-sort">Actions</th>
                 </tr>
@@ -229,6 +245,14 @@
                                 Paid: <strong class="text-slate-500">AED 0</strong> | Due: AED {{ number_format($b->total) }}
                             @endif
                         </div>
+                    </td>
+                    <td class="py-3.5 px-4" data-order="{{ $b->traffic_channel ?: 'Direct' }}">
+                        @include('partials.admin.channel-badge', ['channel' => $b->traffic_channel ?: ($b->utm_source ?: 'Direct')])
+                        @if($b->utm_campaign && $b->utm_campaign !== 'Not Available')
+                            <div class="text-[10px] text-slate-500 truncate max-w-[140px] mt-0.5" title="{{ $b->utm_campaign }}">
+                                <i class="bi bi-tag text-[9px]"></i> {{ $b->utm_campaign }}
+                            </div>
+                        @endif
                     </td>
                     <td class="py-3.5 px-4 text-center" data-order="{{ $b->status }}">
                         @php

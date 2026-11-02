@@ -43,9 +43,17 @@
 
     <a href="{{ route('admin.analytics.index') }}" 
        class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.analytics*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}"
-       @if(!$isMobile) :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Analytics & BI' : ''" @endif>
+       @if(!$isMobile) :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Analytics & Traffic' : ''" @endif>
         <i class="bi bi-graph-up-arrow text-base text-cyan-400 shrink-0"></i>
-        <span @if(!$isMobile) x-show="!$store.admin.sidebarCollapsed" @endif class="whitespace-nowrap">Analytics & BI</span>
+        <span @if(!$isMobile) x-show="!$store.admin.sidebarCollapsed" @endif class="whitespace-nowrap">Analytics & Traffic</span>
+    </a>
+
+    <!-- Enterprise Reports & BI Hub -->
+    <a href="{{ route('admin.reports.index') }}" 
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.reports*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}"
+       @if(!$isMobile) :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Enterprise Reports & BI Hub' : ''" @endif>
+        <i class="bi bi-bar-chart-line-fill text-base text-emerald-400 shrink-0"></i>
+        <span @if(!$isMobile) x-show="!$store.admin.sidebarCollapsed" @endif class="whitespace-nowrap">Reports & BI Hub</span>
     </a>
 
     <!-- 2. BOOKINGS & SALES GROUP (Collapsible Tree) -->
@@ -121,6 +129,16 @@
                class="relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.pricing*') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
                 <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.pricing*') ? 'bg-primary' : 'bg-slate-600' }}"></span>
                 <span>Pricing Matrix</span>
+            </a>
+
+            <!-- Executive Reports & BI -->
+            <a href="{{ route('admin.reports.index') }}" 
+               class="relative flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.reports*') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.reports*') ? 'bg-emerald-400' : 'bg-slate-600' }}"></span>
+                    <span>Executive Reports & BI</span>
+                </div>
+                <i class="bi bi-bar-chart-line-fill text-[11px] text-emerald-400"></i>
             </a>
         </div>
     </div>

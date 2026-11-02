@@ -242,6 +242,67 @@
         </div>
     </div>
 
+    <!-- Acquisition & Marketing Journey Card -->
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 mb-6">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+            <h2 class="text-xs font-black uppercase tracking-wider text-primary flex items-center gap-2">
+                <i class="bi bi-funnel-fill text-base"></i> Acquisition & Marketing Journey
+            </h2>
+            <div>
+                @include('partials.admin.channel-badge', ['channel' => $booking->traffic_channel ?: ($booking->utm_source ?: 'Direct')])
+            </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+                <div class="text-[10px] font-bold uppercase text-slate-400 mb-1">Source / Medium</div>
+                <div class="font-bold text-slate-800">{{ $booking->utm_source ?: 'Direct' }} / {{ $booking->utm_medium ?: 'None' }}</div>
+            </div>
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+                <div class="text-[10px] font-bold uppercase text-slate-400 mb-1">Campaign & Term</div>
+                <div class="font-bold text-slate-800 truncate" title="{{ $booking->utm_campaign }}">{{ $booking->utm_campaign ?: 'None' }}</div>
+                @if($booking->utm_term)
+                    <div class="text-[11px] text-slate-500 font-mono mt-0.5">Term: {{ $booking->utm_term }}</div>
+                @endif
+            </div>
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+                <div class="text-[10px] font-bold uppercase text-slate-400 mb-1">Ad Click Identifiers</div>
+                @if($booking->gclid)
+                    <div class="text-[11px] font-mono text-amber-700 truncate" title="{{ $booking->gclid }}">GCLID: {{ $booking->gclid }}</div>
+                @endif
+                @if($booking->fbclid)
+                    <div class="text-[11px] font-mono text-blue-700 truncate" title="{{ $booking->fbclid }}">FBCLID: {{ $booking->fbclid }}</div>
+                @endif
+                @if(!$booking->gclid && !$booking->fbclid)
+                    <div class="text-slate-400 italic">No paid click IDs captured</div>
+                @endif
+            </div>
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+                <div class="text-[10px] font-bold uppercase text-slate-400 mb-1">Draft Token & Origin</div>
+                @if($booking->draft_token)
+                    <div class="text-[10px] font-mono text-slate-600 truncate" title="{{ $booking->draft_token }}">{{ $booking->draft_token }}</div>
+                @else
+                    <div class="text-slate-400 italic">Direct Checkout</div>
+                @endif
+            </div>
+        </div>
+        @if($booking->landing_page || $booking->referrer)
+        <div class="mt-3 pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            @if($booking->landing_page)
+            <div>
+                <span class="text-[10px] font-bold uppercase text-slate-400 block mb-0.5">Landing Page:</span>
+                <span class="text-slate-700 font-mono text-[11px] break-all">{{ $booking->landing_page }}</span>
+            </div>
+            @endif
+            @if($booking->referrer)
+            <div>
+                <span class="text-[10px] font-bold uppercase text-slate-400 block mb-0.5">Initial Referrer:</span>
+                <span class="text-slate-700 font-mono text-[11px] break-all">{{ $booking->referrer }}</span>
+            </div>
+            @endif
+        </div>
+        @endif
+    </div>
+
     <!-- Logistics & Safari Captain Dispatch Card -->
     <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6" x-data="{ assignModalOpen: false }">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3 mb-5">

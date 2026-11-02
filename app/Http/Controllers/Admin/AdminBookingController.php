@@ -45,6 +45,7 @@ class AdminBookingController extends Controller
         $status = $request->input('status');
         $search = $request->input('search');
         $paymentStatus = $request->input('payment_status');
+        $trafficChannel = $request->input('traffic_channel') ?? $request->input('channel');
         $fromDate = $request->input('from_date');
         $toDate = $request->input('to_date');
 
@@ -54,6 +55,10 @@ class AdminBookingController extends Controller
             $query->where('status', $status);
         } else {
             $query->where('status', '!=', 'draft');
+        }
+
+        if ($trafficChannel) {
+            $query->where('traffic_channel', $trafficChannel);
         }
 
         if ($paymentStatus) {
@@ -131,7 +136,7 @@ class AdminBookingController extends Controller
 
         $bookings = $query->orderBy('created_at', 'desc')->get();
 
-        return view('admin.bookings.index', compact('bookings', 'status', 'search', 'paymentStatus', 'fromDate', 'toDate', 'stats', 'trendData', 'statusDistribution'));
+        return view('admin.bookings.index', compact('bookings', 'status', 'search', 'paymentStatus', 'trafficChannel', 'fromDate', 'toDate', 'stats', 'trendData', 'statusDistribution'));
     }
 
     /**
@@ -142,11 +147,16 @@ class AdminBookingController extends Controller
         $search = $request->input('search');
         $tourId = $request->input('tour_id');
         $contactType = $request->input('contact_type');
+        $trafficChannel = $request->input('traffic_channel') ?? $request->input('channel');
         $fromDate = $request->input('from_date');
         $toDate = $request->input('to_date');
 
         $query = Booking::with(['tour', 'tier'])
             ->where('status', 'draft');
+
+        if ($trafficChannel) {
+            $query->where('traffic_channel', $trafficChannel);
+        }
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -234,6 +244,7 @@ class AdminBookingController extends Controller
             'search',
             'tourId',
             'contactType',
+            'trafficChannel',
             'fromDate',
             'toDate'
         ));
@@ -410,6 +421,38 @@ class AdminBookingController extends Controller
     }
 
     /**
+     * Trigger heuristic draft consolidation and deduplication.
+     */
+    public function consolidateDrafts(Request $request)
+    {
+        try {
+            \Illuminate\Support\Facades\Artisan::call('bookings:consolidate-drafts');
+            $output = trim(\Illuminate\Support\Facades\Artisan::output());
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $output ?: 'Drafts consolidated successfully.',
+                ]);
+            }
+
+            return redirect()->route('admin.bookings.drafts')
+                ->with('success', 'Drafts consolidated successfully: '.$output);
+        } catch (\Throwable $e) {
+            Log::error('Draft consolidation failed: '.$e->getMessage());
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Consolidation failed: '.$e->getMessage(),
+                ], 500);
+            }
+
+            return redirect()->back()->with('error', 'Consolidation failed: '.$e->getMessage());
+        }
+    }
+
+    /**
      * Batch bulk actions for drafts.
      */
     public function bulkDraftsAction(Request $request)
@@ -461,6 +504,10 @@ class AdminBookingController extends Controller
             $query->where('tour_id', $request->input('tour_id'));
         }
 
+        if ($request->filled('traffic_channel') || $request->filled('channel')) {
+            $query->where('traffic_channel', $request->input('traffic_channel') ?? $request->input('channel'));
+        }
+
         if ($request->filled('contact_type')) {
             $ct = $request->input('contact_type');
             if ($ct === 'has_phone') {
@@ -493,7 +540,7 @@ class AdminBookingController extends Controller
         $columns = [
             'Draft Ref', 'Date Dropped', 'Guest Name', 'Phone', 'Email',
             'Tour Name', 'Package Tier', 'Target Tour Date', 'Adults', 'Children', 'Infants',
-            'Cart Total AED', 'Pickup Location', 'IP Address',
+            'Cart Total AED', 'Traffic Channel', 'UTM Source', 'UTM Campaign', 'GCLID', 'Landing Page', 'Pickup Location', 'IP Address',
         ];
 
         $callback = function () use ($drafts, $columns) {
@@ -515,6 +562,11 @@ class AdminBookingController extends Controller
                     $d->children,
                     $d->infants,
                     number_format((float) $d->total, 2, '.', ''),
+                    $d->traffic_channel ?: 'Direct',
+                    $d->utm_source ?: '',
+                    $d->utm_campaign ?: '',
+                    $d->gclid ?: '',
+                    $d->landing_page ?: '',
                     $d->pickup_location ?: '',
                     $d->ip_address ?: '',
                 ]));
@@ -938,6 +990,9 @@ class AdminBookingController extends Controller
         if ($request->filled('payment_status')) {
             $query->where('payment_status', $request->payment_status);
         }
+        if ($request->filled('traffic_channel') || $request->filled('channel')) {
+            $query->where('traffic_channel', $request->input('traffic_channel') ?? $request->input('channel'));
+        }
         if ($request->filled('search')) {
             $s = $request->search;
             $query->where(function ($q) use ($s) {
@@ -968,6 +1023,7 @@ class AdminBookingController extends Controller
             'Tour Name', 'Package Tier', 'Tour Date', 'Pickup Time', 'Adults',
             'Children', 'Infants', 'Pickup Location', 'Total (AED)', 'Paid (AED)',
             'Balance Due (AED)', 'Payment Method', 'Payment Status', 'Booking Status',
+            'Traffic Channel', 'UTM Source', 'UTM Campaign', 'GCLID', 'Landing Page',
         ];
 
         $sanitize = static fn (array $row): array => sanitize_csv_row($row);
@@ -999,6 +1055,11 @@ class AdminBookingController extends Controller
                         $b->payment_method,
                         $b->payment_status,
                         $b->status,
+                        $b->traffic_channel ?: 'Direct',
+                        $b->utm_source ?: '',
+                        $b->utm_campaign ?: '',
+                        $b->gclid ?: '',
+                        $b->landing_page ?: '',
                     ]));
                 }
             });
