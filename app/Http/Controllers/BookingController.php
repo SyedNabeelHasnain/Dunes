@@ -368,6 +368,8 @@ class BookingController extends Controller
             'gps_speed' => $request->input('gps_speed'),
         ];
         $ctx = $this->tracker->collectRequestContext('booking', $gpsPost);
+        $draftToken = $request->input('draft_token') ?? $request->cookie('dunes_draft_token') ?? session('active_booking_draft_token') ?? null;
+        $activeDraftId = $request->input('draft_id') ?? session('active_booking_draft_id');
 
         try {
             // Save Booking atomically inside transaction
@@ -375,7 +377,7 @@ class BookingController extends Controller
                 $ref, $tourId, $tierId, $tour, $tier, $date, $adults, $children, $infants,
                 $name, $email, $phone, $location, $requests, $appliedCoupon, $discountAmount,
                 $originalTotal, $subtotal, $addonsTotal, $total, $paymentMethod, $ctx,
-                $isVerified, $selectedAddons, $isCustomBuilder, $customQuoteData
+                $isVerified, $selectedAddons, $isCustomBuilder, $customQuoteData, $draftToken
             ) {
                 $lockedCoupon = null;
                 if ($appliedCoupon && $discountAmount > 0) {
@@ -450,7 +452,7 @@ class BookingController extends Controller
                     'gclid' => $ctx['gclid'] ?? null,
                     'fbclid' => $ctx['fbclid'] ?? null,
                     'landing_page' => $ctx['landing_page'] ?? null,
-                    'draft_token' => $request->input('draft_token') ?? $request->cookie('dunes_draft_token') ?? session('active_booking_draft_token') ?? null,
+                    'draft_token' => $draftToken,
                     'utm_source' => $ctx['utm_source'],
                     'utm_medium' => $ctx['utm_medium'],
                     'utm_campaign' => $ctx['utm_campaign'],
