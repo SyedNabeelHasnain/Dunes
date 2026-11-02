@@ -11,6 +11,7 @@ use App\Mail\WhatsappLeadNotification;
 use App\Models\Booking;
 use App\Models\Contact;
 use App\Models\Review;
+use App\Models\Tour;
 use App\Models\WhatsappInquiry;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Http;
@@ -475,31 +476,42 @@ class NotificationManagementService
         try {
             switch ($event) {
                 case 'booking_customer':
-                    $dummyBooking = new Booking([
-                        'reference' => 'DT-TEST-' . strtoupper(substr(uniqid(), -5)),
-                        'tour_name' => 'Premium Evening Desert Safari Dubai (VIP Test)',
-                        'tier_name' => 'Private 4x4 Land Cruiser',
-                        'tour_date' => now()->addDays(2)->format('Y-m-d'),
-                        'name' => 'Honorable VIP Traveler',
-                        'email' => $recipientEmail,
-                        'phone' => '+971 50 123 4567',
-                        'pickup_location' => 'Burj Al Arab Hotel Lobby',
-                        'adults' => 2,
-                        'children' => 1,
-                        'infants' => 0,
-                        'total' => 750.00,
-                        'payment_status' => 'paid',
-                        'status' => 'confirmed',
-                    ]);
-                    $dummyBooking->id = 999999;
+                    $firstTour = Tour::where('status', 'active')->first() ?: Tour::first();
+                    $tier = $firstTour?->tiers()->first();
+                    $ref = 'DT-TEST-' . strtoupper(substr(uniqid(), -5));
 
-                    $pdfBinary = $this->generateVoucherPdfBinary($dummyBooking);
-                    $mail = (new BookingNotification('booking_confirmed', $dummyBooking))
+                    $testBooking = Booking::updateOrCreate(
+                        ['reference' => $ref],
+                        [
+                            'tour_id' => $firstTour?->id,
+                            'tier_id' => $tier?->id,
+                            'tour_name' => $firstTour?->name ?? 'Premium Evening Desert Safari Dubai (VIP Test)',
+                            'tier_name' => $tier?->name ?? 'Private 4x4 Land Cruiser',
+                            'tour_date' => now()->addDays(2)->format('Y-m-d'),
+                            'pickup_time' => '3:00 PM - 3:30 PM',
+                            'pickup_location' => 'Burj Al Arab Hotel Lobby, Dubai',
+                            'name' => 'Honorable VIP Traveler',
+                            'email' => $recipientEmail,
+                            'phone' => '+971 50 123 4567',
+                            'adults' => 2,
+                            'children' => 1,
+                            'infants' => 0,
+                            'subtotal' => 750.00,
+                            'total' => 750.00,
+                            'payment_status' => 'paid',
+                            'payment_method' => 'card',
+                            'status' => 'confirmed',
+                            'notes' => 'Vegetarian dinner requested. VIP seating near stage.',
+                        ]
+                    );
+
+                    $pdfBinary = $this->generateVoucherPdfBinary($testBooking);
+                    $mail = (new BookingNotification('booking_confirmed', $testBooking))
                         ->from($sender['email'], $sender['name'])
                         ->replyTo($sender['reply_to'], $sender['name']);
 
                     if ($pdfBinary) {
-                        $mail->withPdfAttachment($pdfBinary, 'Dunes-Discovery-Ticket-Voucher-' . $dummyBooking->reference . '.pdf');
+                        $mail->withPdfAttachment($pdfBinary, 'Dunes-Discovery-Ticket-Voucher-' . $testBooking->reference . '.pdf');
                     }
 
                     Mail::mailer($targetMailer)->to($recipientEmail)->send($mail);
@@ -511,29 +523,42 @@ class NotificationManagementService
                     ];
 
                 case 'booking_admin':
-                    $dummyBooking = new Booking([
-                        'reference' => 'DT-ADMIN-' . strtoupper(substr(uniqid(), -5)),
-                        'tour_name' => 'Overnight Desert Safari & Bedouin Camp (Test)',
-                        'tour_date' => now()->addDays(3)->format('Y-m-d'),
-                        'name' => 'Alexander Wright',
-                        'email' => 'alexander.wright@uk-travel.co.uk',
-                        'phone' => '+44 7911 123456',
-                        'pickup_location' => 'Atlantis The Royal, Palm Jumeirah',
-                        'adults' => 4,
-                        'children' => 0,
-                        'total' => 1800.00,
-                        'payment_status' => 'paid',
-                        'status' => 'confirmed',
-                    ]);
-                    $dummyBooking->id = 999998;
+                    $firstTour = Tour::where('status', 'active')->first() ?: Tour::first();
+                    $tier = $firstTour?->tiers()->first();
+                    $ref = 'DT-ADMIN-' . strtoupper(substr(uniqid(), -5));
 
-                    $pdfBinary = $this->generateVoucherPdfBinary($dummyBooking);
-                    $mail = (new BookingAdminNotification($dummyBooking))
+                    $testBooking = Booking::updateOrCreate(
+                        ['reference' => $ref],
+                        [
+                            'tour_id' => $firstTour?->id,
+                            'tier_id' => $tier?->id,
+                            'tour_name' => $firstTour?->name ?? 'Overnight Desert Safari & Bedouin Camp (Test)',
+                            'tier_name' => $tier?->name ?? 'Private Luxury Chalet Tent',
+                            'tour_date' => now()->addDays(3)->format('Y-m-d'),
+                            'pickup_time' => '2:30 PM - 3:00 PM',
+                            'pickup_location' => 'Atlantis The Royal, Palm Jumeirah',
+                            'name' => 'Alexander Wright',
+                            'email' => 'alexander.wright@uk-travel.co.uk',
+                            'phone' => '+44 7911 123456',
+                            'adults' => 4,
+                            'children' => 0,
+                            'infants' => 0,
+                            'subtotal' => 1800.00,
+                            'total' => 1800.00,
+                            'payment_status' => 'paid',
+                            'payment_method' => 'card',
+                            'status' => 'confirmed',
+                            'notes' => 'Corporate VIP Guest - Premium Falconry Experience',
+                        ]
+                    );
+
+                    $pdfBinary = $this->generateVoucherPdfBinary($testBooking);
+                    $mail = (new BookingAdminNotification($testBooking))
                         ->from($sender['email'], $sender['name'])
                         ->replyTo($sender['reply_to'], $sender['name']);
 
                     if ($pdfBinary) {
-                        $mail->withPdfAttachment($pdfBinary, 'Dunes-Discovery-Ticket-Voucher-' . $dummyBooking->reference . '.pdf');
+                        $mail->withPdfAttachment($pdfBinary, 'Dunes-Discovery-Ticket-Voucher-' . $testBooking->reference . '.pdf');
                     }
 
                     Mail::mailer($targetMailer)->to($recipientEmail)->send($mail);

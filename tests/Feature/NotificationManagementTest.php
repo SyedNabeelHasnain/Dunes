@@ -328,8 +328,75 @@ class NotificationManagementTest extends TestCase
         ]);
 
         Mail::assertSent(BookingNotification::class, function ($mail) {
-            return $mail->hasTo('qa-tester@dunesdiscoverytourism.com') &&
-                   count($mail->attachments()) > 0;
+            $hasAttachment = count($mail->attachments()) > 0;
+            return $mail->hasTo('qa-tester@dunesdiscoverytourism.com') && $hasAttachment;
         });
+    }
+
+    /**
+     * Test 9: Test booking reference voucher URL resolves to 200 OK and never 404s.
+     */
+    public function test_test_booking_voucher_url_resolves_and_never_404s(): void
+    {
+        // Even for an ad-hoc test reference not previously in database
+        $response = $this->get('/booking/DT-TEST-3143D/voucher');
+        $response->assertOk();
+        $response->assertSee('DT-TEST-3143D');
+        $response->assertSee('Honorable VIP Traveler');
+
+        // Test PDF download for test reference also succeeds
+        $pdfResponse = $this->get('/booking/DT-TEST-3143D/ticket-pdf');
+        $pdfResponse->assertOk();
+        $this->assertEquals('application/pdf', $pdfResponse->headers->get('content-type'));
+    }
+
+    /**
+     * Test 10: Email layout renders dark luxury header, brand logo, and authoritative footer.
+     */
+    public function test_email_template_renders_dark_luxury_header_and_social_footer(): void
+    {
+        $booking = Booking::create([
+            'tour_id' => $this->tour->id,
+            'reference' => 'DT-TEST-VIEW',
+            'tour_name' => $this->tour->name,
+            'tour_date' => now()->addDays(2)->format('Y-m-d'),
+            'name' => 'Royal Guest',
+            'email' => 'royal.guest@example.com',
+            'phone' => '+971 50 999 8877',
+            'pickup_location' => 'Burj Al Arab Hotel Lobby',
+            'adults' => 2,
+            'children' => 1,
+            'infants' => 0,
+            'subtotal' => 750.00,
+            'total' => 750.00,
+            'status' => 'confirmed',
+            'payment_status' => 'paid',
+            'payment_method' => 'card',
+        ]);
+
+        $mailable = new BookingNotification('booking_confirmed', $booking);
+        $renderedHtml = $mailable->render();
+
+        // 1. Dark luxury header (#0b1120) with white brand logo
+        $this->assertStringContainsString('#0b1120', $renderedHtml);
+        $this->assertStringContainsString('logo-white.png', $renderedHtml);
+
+        // 2. No redundant <h1>Dunes Discovery Tourism</h1> text title in header
+        $this->assertStringNotContainsString('<h1>Dunes Discovery Tourism</h1>', $renderedHtml);
+
+        // 3. Structured itinerary table & booking reference
+        $this->assertStringContainsString('DT-TEST-VIEW', $renderedHtml);
+        $this->assertStringContainsString('Experience Summary & Itinerary', $renderedHtml);
+        $this->assertStringContainsString('Payment & Financial Breakdown', $renderedHtml);
+
+        // 4. Working voucher button link
+        $this->assertStringContainsString(route('booking.voucher', 'DT-TEST-VIEW'), $renderedHtml);
+
+        // 5. Authoritative footer with social media channels and DET License
+        $this->assertStringContainsString('instagram.com/dunesdiscoverytourism', $renderedHtml);
+        $this->assertStringContainsString('facebook.com/dunesdiscoverytourism', $renderedHtml);
+        $this->assertStringContainsString('tripadvisor.com', $renderedHtml);
+        $this->assertStringContainsString('DET License #1430583', $renderedHtml);
+        $this->assertStringContainsString('+971 50 245 6056', $renderedHtml);
     }
 }

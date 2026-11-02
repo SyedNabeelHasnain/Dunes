@@ -37,6 +37,12 @@ class BookingAdminNotification extends Mailable
         $this->pdfBinary = $binary;
         $this->pdfFileName = $filename ?: 'Dunes-Discovery-Ticket-Voucher-' . $this->booking->reference . '.pdf';
 
+        if (! empty($binary)) {
+            $this->attachData($binary, $this->pdfFileName, [
+                'mime' => 'application/pdf',
+            ]);
+        }
+
         return $this;
     }
 
