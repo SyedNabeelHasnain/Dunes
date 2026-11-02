@@ -32,11 +32,11 @@
     $primaryGtagId = !empty($adsId) ? $adsId : ($googleActive && !empty($ga4Id) ? $ga4Id : '');
     $conversionLabel = $settings['google_conversion_label'] ?? 'eR3SCLimtvobEPH4kMRC';
     $conversionSendTo = (!empty($adsId) && !empty($conversionLabel)) ? "{$adsId}/{$conversionLabel}" : '';
-    $gVerify = $settings['google_site_verification'] ?? config('services.google.site_verification') ?? env('GOOGLE_SITE_VERIFICATION', '');
-    $bingVerify = $settings['bing_site_verification'] ?? config('services.bing.site_verification') ?? env('BING_SITE_VERIFICATION', '');
-    $yandexVerify = $settings['yandex_site_verification'] ?? config('services.yandex.site_verification') ?? env('YANDEX_SITE_VERIFICATION', '');
-    $baiduVerify = $settings['baidu_site_verification'] ?? config('services.baidu.site_verification') ?? env('BAIDU_SITE_VERIFICATION', '');
-    $clarityId = $settings['clarity_id'] ?? config('services.clarity.id') ?? env('CLARITY_ID', 'z79y89wha9');
+    $gVerify = ($settings['google_site_verification'] ?? null) ?: (config('services.google.site_verification') ?: env('GOOGLE_SITE_VERIFICATION', ''));
+    $bingVerify = ($settings['bing_site_verification'] ?? null) ?: (config('services.bing.site_verification') ?: env('BING_SITE_VERIFICATION', ''));
+    $yandexVerify = ($settings['yandex_site_verification'] ?? null) ?: (config('services.yandex.site_verification') ?: env('YANDEX_SITE_VERIFICATION', ''));
+    $baiduVerify = ($settings['baidu_site_verification'] ?? null) ?: (config('services.baidu.site_verification') ?: env('BAIDU_SITE_VERIFICATION', ''));
+    $clarityId = ($settings['clarity_id'] ?? null) ?: (config('services.clarity.id') ?: env('CLARITY_ID', 'z79y89wha9'));
     $clarityActive = ($settings['clarity_active'] ?? '1') !== '0';
     
     $metaActive = isset($settings['meta_active']) && $settings['meta_active'] === '1';

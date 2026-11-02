@@ -337,6 +337,10 @@ class GoogleSearchConsoleRemediationTest extends TestCase
     {
         putenv('GOOGLE_SITE_VERIFICATION=google_test_token_123');
         putenv('BING_SITE_VERIFICATION=bing_test_token_456');
+        config([
+            'services.google.site_verification' => 'google_test_token_123',
+            'services.bing.site_verification' => 'bing_test_token_456',
+        ]);
 
         $response = $this->get('/');
         $response->assertStatus(200);
@@ -347,6 +351,10 @@ class GoogleSearchConsoleRemediationTest extends TestCase
 
         putenv('GOOGLE_SITE_VERIFICATION');
         putenv('BING_SITE_VERIFICATION');
+        config([
+            'services.google.site_verification' => '',
+            'services.bing.site_verification' => '',
+        ]);
     }
 
     /**
