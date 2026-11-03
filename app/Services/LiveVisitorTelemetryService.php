@@ -264,71 +264,81 @@ class LiveVisitorTelemetryService
 
         // 2. Resolve Customer Lead (Draft checkout, Inquiry, or WhatsApp)
         $lead = null;
-        $draft = Booking::where('status', 'draft')
-            ->where(function ($q) use ($sessionId, $ip) {
-                if (! empty($sessionId)) {
-                    $q->where('draft_token', $sessionId);
-                }
-                if (! empty($ip)) {
-                    $q->orWhere('ip_address', $ip);
-                }
-            })
-            ->latest()
-            ->first();
+        try {
+            $draft = Booking::where('status', 'draft')
+                ->where(function ($q) use ($sessionId, $ip) {
+                    if (! empty($sessionId)) {
+                        $q->where('draft_token', $sessionId);
+                    }
+                    if (! empty($ip)) {
+                        $q->orWhere('ip_address', $ip);
+                    }
+                })
+                ->latest()
+                ->first();
 
-        if ($draft && (! empty($draft->email) || ! empty($draft->phone) || ! empty($draft->name))) {
-            $lead = [
-                'type' => 'draft_checkout',
-                'reference' => $draft->reference,
-                'name' => $draft->name ?: 'Guest Traveler',
-                'email' => $draft->email,
-                'phone' => $draft->phone,
-                'tour_name' => $draft->tour_name,
-                'tier_name' => $draft->tier_name,
-                'tour_date' => $draft->tour_date ? Carbon::parse($draft->tour_date)->format('M d, Y') : 'Not Chosen',
-                'guests' => "{$draft->adults} Adults" . ($draft->children ? ", {$draft->children} Children" : ''),
-                'subtotal' => (float) $draft->subtotal,
-                'total' => (float) $draft->total,
-                'url' => route('admin.bookings.drafts', ['search' => $draft->reference]),
-            ];
-        } else {
-            // Check WhatsApp inquiries
-            $wa = WhatsappInquiry::where('ip_address', $ip)->latest()->first();
-            if ($wa) {
+            if ($draft && (! empty($draft->email) || ! empty($draft->phone) || ! empty($draft->name))) {
                 $lead = [
-                    'type' => 'whatsapp_inquiry',
-                    'reference' => 'WA-#' . $wa->id,
-                    'name' => $wa->name ?: 'WhatsApp Guest',
-                    'email' => $wa->email,
-                    'phone' => $wa->phone,
-                    'tour_name' => $wa->tour_name,
-                    'tier_name' => 'Direct Message',
-                    'tour_date' => $wa->tour_date ? Carbon::parse($wa->tour_date)->format('M d, Y') : null,
-                    'guests' => $wa->guests,
-                    'subtotal' => 0.0,
-                    'total' => 0.0,
-                    'url' => route('admin.whatsapp.index', ['search' => $wa->phone ?: $wa->name]),
+                    'type' => 'draft_checkout',
+                    'reference' => $draft->reference,
+                    'name' => $draft->name ?: 'Guest Traveler',
+                    'email' => $draft->email,
+                    'phone' => $draft->phone,
+                    'tour_name' => $draft->tour_name,
+                    'tier_name' => $draft->tier_name,
+                    'tour_date' => $draft->tour_date ? Carbon::parse($draft->tour_date)->format('M d, Y') : 'Not Chosen',
+                    'guests' => "{$draft->adults} Adults" . ($draft->children ? ", {$draft->children} Children" : ''),
+                    'subtotal' => (float) $draft->subtotal,
+                    'total' => (float) $draft->total,
+                    'url' => route('admin.bookings.drafts', ['search' => $draft->reference]),
                 ];
             } else {
-                // Check Contact Inquiries
-                $contact = Contact::where('client_ip', $ip)->latest()->first();
-                if ($contact) {
+                // Check WhatsApp inquiries (table has client_ip)
+                $wa = null;
+                if (! empty($ip)) {
+                    $wa = WhatsappInquiry::where('client_ip', $ip)->latest()->first();
+                }
+                if ($wa) {
                     $lead = [
-                        'type' => 'contact_inquiry',
-                        'reference' => 'INQ-#' . $contact->id,
-                        'name' => $contact->name,
-                        'email' => $contact->email,
-                        'phone' => $contact->phone,
-                        'tour_name' => $contact->subject,
-                        'tier_name' => 'Web Form',
-                        'tour_date' => null,
-                        'guests' => null,
+                        'type' => 'whatsapp_inquiry',
+                        'reference' => 'WA-#' . $wa->id,
+                        'name' => $wa->name ?: 'WhatsApp Guest',
+                        'email' => $wa->email,
+                        'phone' => $wa->phone,
+                        'tour_name' => $wa->tour_name,
+                        'tier_name' => 'Direct Message',
+                        'tour_date' => $wa->tour_date ? Carbon::parse($wa->tour_date)->format('M d, Y') : null,
+                        'guests' => $wa->guests,
                         'subtotal' => 0.0,
                         'total' => 0.0,
-                        'url' => route('admin.inquiries.index', ['search' => $contact->email ?: $contact->name]),
+                        'url' => route('admin.whatsapp.index', ['search' => $wa->phone ?: $wa->name]),
                     ];
+                } else {
+                    // Check Contact Inquiries (table has ip_address)
+                    $contact = null;
+                    if (! empty($ip)) {
+                        $contact = Contact::where('ip_address', $ip)->latest()->first();
+                    }
+                    if ($contact) {
+                        $lead = [
+                            'type' => 'contact_inquiry',
+                            'reference' => 'INQ-#' . $contact->id,
+                            'name' => $contact->name,
+                            'email' => $contact->email,
+                            'phone' => $contact->phone,
+                            'tour_name' => $contact->subject,
+                            'tier_name' => 'Web Form',
+                            'tour_date' => null,
+                            'guests' => null,
+                            'subtotal' => 0.0,
+                            'total' => 0.0,
+                            'url' => route('admin.inquiries.index', ['search' => $contact->email ?: $contact->name]),
+                        ];
+                    }
                 }
             }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('LiveVisitorTelemetryService lead resolution error: ' . $e->getMessage());
         }
 
         // 3. Resolve Current Live Screen Data
@@ -505,7 +515,7 @@ class LiveVisitorTelemetryService
                 $startingPrice = 150.0;
                 try {
                     if (method_exists($tour, 'tiers') && $tour->tiers()->exists()) {
-                        $minPrice = $tour->tiers()->min('price_adult');
+                        $minPrice = $tour->tiers()->min('tour_tiers.price');
                         if ($minPrice) {
                             $startingPrice = (float) $minPrice;
                         }
@@ -523,8 +533,8 @@ class LiveVisitorTelemetryService
                     'rating' => (float) ($tour->rating ?: 4.9),
                     'review_count' => (int) ($tour->review_count ?: 120),
                     'starting_price' => $startingPrice,
-                    'edit_url' => route('admin.tours.edit', $tour->id),
-                    'live_url' => route('tours.show', $tour->slug),
+                    'edit_url' => url('/admin/tours/' . $tour->id . '/edit'),
+                    'live_url' => url('/' . ltrim($tour->slug, '/')),
                 ];
                 $liveAction = "Comparing package tiers & checking inclusions for {$tour->name}";
             }
