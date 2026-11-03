@@ -379,6 +379,7 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::get('/settings/notifications', [AdminSettingController::class, 'notifications'])->name('settings.notifications');
     Route::post('/settings/notifications', [AdminSettingController::class, 'updateNotifications'])->name('settings.notifications.update');
     Route::post('/settings/notifications/test', [AdminSettingController::class, 'sendTestNotification'])->name('settings.notifications.test');
+    Route::post('/settings/notifications/purge-test-bookings', [AdminSettingController::class, 'purgeTestBookings'])->name('settings.notifications.purge-test-bookings');
 
     // ── Multi-Language & Locales Management ──────────────────────────────────
     Route::get('/settings/languages', [AdminLanguageController::class, 'index'])->name('settings.languages');

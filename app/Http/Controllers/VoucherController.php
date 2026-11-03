@@ -19,37 +19,42 @@ class VoucherController extends Controller
             ->with($relations)
             ->first();
 
-        // Gracefully support live diagnostic test references so preview URLs never 404
-        if (! $booking && (str_starts_with($reference, 'DT-TEST-') || str_starts_with($reference, 'DT-ADMIN-'))) {
+        // Gracefully support live diagnostic test references so preview URLs never 404 without database pollution
+        if (! $booking && (str_starts_with($reference, 'DT-TEST-') || str_starts_with($reference, 'DT-ADMIN-') || str_starts_with($reference, 'DT-VERIFY-'))) {
             $firstTour = Tour::where('status', 'active')->first() ?: Tour::first();
             $tier = $firstTour?->tiers()->first();
 
-            $booking = Booking::updateOrCreate(
-                ['reference' => $reference],
-                [
-                    'tour_id' => $firstTour?->id,
-                    'tier_id' => $tier?->id,
-                    'tour_name' => $firstTour?->name ?? 'Premium Evening Desert Safari Dubai (VIP Test Experience)',
-                    'tier_name' => $tier?->name ?? 'Private 4x4 Land Cruiser',
-                    'tour_date' => now()->addDays(2)->format('Y-m-d'),
-                    'pickup_time' => '3:00 PM - 3:30 PM',
-                    'pickup_location' => 'Burj Al Arab Hotel Lobby, Dubai',
-                    'name' => 'Honorable VIP Traveler',
-                    'email' => 'reservations@dunesdiscoverytourism.com',
-                    'phone' => '+971 50 123 4567',
-                    'adults' => 2,
-                    'children' => 1,
-                    'infants' => 0,
-                    'subtotal' => 750.00,
-                    'total' => 750.00,
-                    'payment_status' => 'paid',
-                    'payment_method' => 'card',
-                    'status' => 'confirmed',
-                    'notes' => 'Test Booking / Digital Boarding Pass Demonstration',
-                ]
-            );
+            $booking = new Booking([
+                'id' => 0,
+                'reference' => $reference,
+                'tour_id' => $firstTour?->id,
+                'tier_id' => $tier?->id,
+                'tour_name' => $firstTour?->name ?? 'Premium Evening Desert Safari Dubai (VIP Test Experience)',
+                'tier_name' => $tier?->name ?? 'Private 4x4 Land Cruiser',
+                'tour_date' => now()->addDays(2)->format('Y-m-d'),
+                'pickup_time' => '3:00 PM - 3:30 PM',
+                'pickup_location' => 'Burj Al Arab Hotel Lobby, Dubai',
+                'name' => 'Honorable VIP Traveler',
+                'email' => 'reservations@dunesdiscoverytourism.com',
+                'phone' => '+971 50 123 4567',
+                'adults' => 2,
+                'children' => 1,
+                'infants' => 0,
+                'subtotal' => 750.00,
+                'total' => 750.00,
+                'payment_status' => 'paid',
+                'payment_method' => 'card',
+                'status' => 'confirmed',
+                'notes' => 'Test Booking / Digital Boarding Pass Demonstration',
+            ]);
 
-            $booking->loadMissing($relations);
+            $booking->setRelation('addons', collect());
+            if ($firstTour) {
+                $booking->setRelation('tour', $firstTour);
+            }
+            if ($tier) {
+                $booking->setRelation('tier', $tier);
+            }
         }
 
         return $booking;

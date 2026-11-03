@@ -358,6 +358,27 @@
                 <div id="testNotificationResult" class="mt-4 hidden"></div>
             </div>
 
+            <!-- Safe Test Data Purge & Analytics Integrity Card -->
+            <div class="rounded-2xl border border-rose-200 bg-rose-50/50 p-6 shadow-xs">
+                <div class="flex items-center justify-between mb-3 border-b border-rose-200/60 pb-3">
+                    <h5 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                        <i class="bi bi-trash3-fill text-rose-600"></i> Test Bookings Purge
+                    </h5>
+                    <span class="rounded-full border border-rose-500/20 bg-rose-500/10 px-2 py-0.5 text-[10px] font-bold text-rose-700">
+                        Zero Risk Guard
+                    </span>
+                </div>
+                <p class="text-xs text-slate-600 mb-4 leading-relaxed">
+                    Safely and permanently purge test bookings (<code class="bg-rose-100 text-rose-900 px-1 py-0.5 rounded text-[10px]">DT-TEST-*</code>, <code class="bg-rose-100 text-rose-900 px-1 py-0.5 rounded text-[10px]">DT-ADMIN-*</code>) along with all simulated addons, payments, and cached vouchers to ensure financial accounting, analytics, and KPIs remain 100% clean. Authentic customer bookings (<code class="bg-emerald-100 text-emerald-900 px-1 py-0.5 rounded text-[10px]">DDT*</code>, <code class="bg-emerald-100 text-emerald-900 px-1 py-0.5 rounded text-[10px]">DFT*</code>) are strictly protected and never touched.
+                </p>
+
+                <button type="button" id="btnPurgeTestBookings" onclick="executePurgeTestBookings()" class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-rose-600 px-4 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-rose-700 transition cursor-pointer">
+                    <i class="bi bi-shield-x"></i> Purge All Test Bookings & Reset Test Data
+                </button>
+
+                <div id="purgeTestBookingsResult" class="mt-4 hidden"></div>
+            </div>
+
             <!-- Global Recipient Directory Card -->
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs">
                 <h5 class="text-xs font-black uppercase tracking-wider text-slate-800 mb-3 flex items-center gap-2">
@@ -462,6 +483,48 @@ async function dispatchLiveNotificationTest() {
     } finally {
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-send-fill text-primary"></i> Dispatch Live Test Notification';
+    }
+}
+
+async function executePurgeTestBookings() {
+    if (!confirm('Are you sure you want to permanently purge all test bookings and test telemetry? Authentic customer bookings will NOT be touched.')) {
+        return;
+    }
+
+    const btn = document.getElementById('btnPurgeTestBookings');
+    const resultBox = document.getElementById('purgeTestBookingsResult');
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="inline-block animate-spin mr-2"><i class="bi bi-arrow-repeat"></i></span> Purging Test Bookings...';
+    resultBox.classList.add('hidden');
+
+    try {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
+        const response = await fetch('{{ route("admin.settings.notifications.purge-test-bookings") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            resultBox.className = 'p-3.5 mt-3 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 text-xs shadow-xs';
+            resultBox.innerHTML = `<strong><i class="bi bi-check-circle-fill mr-1 text-emerald-600"></i> Complete:</strong> ${data.message}`;
+        } else {
+            resultBox.className = 'p-3.5 mt-3 rounded-xl border border-rose-200 bg-rose-50 text-rose-800 text-xs shadow-xs';
+            resultBox.innerHTML = `<strong><i class="bi bi-exclamation-triangle-fill mr-1 text-rose-600"></i> Purge Error:</strong><br>${data.message || 'Failed purging test bookings.'}`;
+        }
+        resultBox.classList.remove('hidden');
+    } catch (err) {
+        resultBox.className = 'p-3.5 mt-3 rounded-xl border border-rose-200 bg-rose-50 text-rose-800 text-xs shadow-xs';
+        resultBox.innerHTML = `<strong><i class="bi bi-x-circle-fill mr-1 text-rose-600"></i> System Error:</strong> Unable to communicate with server.`;
+        resultBox.classList.remove('hidden');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-shield-x"></i> Purge All Test Bookings & Reset Test Data';
     }
 }
 </script>

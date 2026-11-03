@@ -512,30 +512,36 @@ class NotificationManagementService
                     $tier = $firstTour?->tiers()->first();
                     $ref = 'DT-TEST-' . strtoupper(substr(uniqid(), -5));
 
-                    $testBooking = Booking::updateOrCreate(
-                        ['reference' => $ref],
-                        [
-                            'tour_id' => $firstTour?->id,
-                            'tier_id' => $tier?->id,
-                            'tour_name' => $firstTour?->name ?? 'Premium Evening Desert Safari Dubai (VIP Test)',
-                            'tier_name' => $tier?->name ?? 'Private 4x4 Land Cruiser',
-                            'tour_date' => now()->addDays(2)->format('Y-m-d'),
-                            'pickup_time' => '3:00 PM - 3:30 PM',
-                            'pickup_location' => 'Burj Al Arab Hotel Lobby, Dubai',
-                            'name' => 'Honorable VIP Traveler',
-                            'email' => $recipientEmail,
-                            'phone' => '+971 50 123 4567',
-                            'adults' => 2,
-                            'children' => 1,
-                            'infants' => 0,
-                            'subtotal' => 750.00,
-                            'total' => 750.00,
-                            'payment_status' => 'paid',
-                            'payment_method' => 'card',
-                            'status' => 'confirmed',
-                            'notes' => 'Vegetarian dinner requested. VIP seating near stage.',
-                        ]
-                    );
+                    $testBooking = new Booking([
+                        'id' => 0,
+                        'reference' => $ref,
+                        'tour_id' => $firstTour?->id,
+                        'tier_id' => $tier?->id,
+                        'tour_name' => $firstTour?->name ?? 'Premium Evening Desert Safari Dubai (VIP Test)',
+                        'tier_name' => $tier?->name ?? 'Private 4x4 Land Cruiser',
+                        'tour_date' => now()->addDays(2)->format('Y-m-d'),
+                        'pickup_time' => '3:00 PM - 3:30 PM',
+                        'pickup_location' => 'Burj Al Arab Hotel Lobby, Dubai',
+                        'name' => 'Honorable VIP Traveler',
+                        'email' => $recipientEmail,
+                        'phone' => '+971 50 123 4567',
+                        'adults' => 2,
+                        'children' => 1,
+                        'infants' => 0,
+                        'subtotal' => 750.00,
+                        'total' => 750.00,
+                        'payment_status' => 'paid',
+                        'payment_method' => 'card',
+                        'status' => 'confirmed',
+                        'notes' => 'Vegetarian dinner requested. VIP seating near stage.',
+                    ]);
+                    $testBooking->setRelation('addons', collect());
+                    if ($firstTour) {
+                        $testBooking->setRelation('tour', $firstTour);
+                    }
+                    if ($tier) {
+                        $testBooking->setRelation('tier', $tier);
+                    }
 
                     $pdfBinary = $this->generateVoucherPdfBinary($testBooking);
                     if (empty($pdfBinary)) {
@@ -570,30 +576,36 @@ class NotificationManagementService
                     $tier = $firstTour?->tiers()->first();
                     $ref = 'DT-ADMIN-' . strtoupper(substr(uniqid(), -5));
 
-                    $testBooking = Booking::updateOrCreate(
-                        ['reference' => $ref],
-                        [
-                            'tour_id' => $firstTour?->id,
-                            'tier_id' => $tier?->id,
-                            'tour_name' => $firstTour?->name ?? 'Overnight Desert Safari & Bedouin Camp (Test)',
-                            'tier_name' => $tier?->name ?? 'Private Luxury Chalet Tent',
-                            'tour_date' => now()->addDays(3)->format('Y-m-d'),
-                            'pickup_time' => '2:30 PM - 3:00 PM',
-                            'pickup_location' => 'Atlantis The Royal, Palm Jumeirah',
-                            'name' => 'Alexander Wright',
-                            'email' => 'alexander.wright@uk-travel.co.uk',
-                            'phone' => '+44 7911 123456',
-                            'adults' => 4,
-                            'children' => 0,
-                            'infants' => 0,
-                            'subtotal' => 1800.00,
-                            'total' => 1800.00,
-                            'payment_status' => 'paid',
-                            'payment_method' => 'card',
-                            'status' => 'confirmed',
-                            'notes' => 'Corporate VIP Guest - Premium Falconry Experience',
-                        ]
-                    );
+                    $testBooking = new Booking([
+                        'id' => 0,
+                        'reference' => $ref,
+                        'tour_id' => $firstTour?->id,
+                        'tier_id' => $tier?->id,
+                        'tour_name' => $firstTour?->name ?? 'Overnight Desert Safari & Bedouin Camp (Test)',
+                        'tier_name' => $tier?->name ?? 'Private Luxury Chalet Tent',
+                        'tour_date' => now()->addDays(3)->format('Y-m-d'),
+                        'pickup_time' => '2:30 PM - 3:00 PM',
+                        'pickup_location' => 'Atlantis The Royal, Palm Jumeirah',
+                        'name' => 'Alexander Wright',
+                        'email' => 'alexander.wright@uk-travel.co.uk',
+                        'phone' => '+44 7911 123456',
+                        'adults' => 4,
+                        'children' => 0,
+                        'infants' => 0,
+                        'subtotal' => 1800.00,
+                        'total' => 1800.00,
+                        'payment_status' => 'paid',
+                        'payment_method' => 'card',
+                        'status' => 'confirmed',
+                        'notes' => 'Corporate VIP Guest - Premium Falconry Experience',
+                    ]);
+                    $testBooking->setRelation('addons', collect());
+                    if ($firstTour) {
+                        $testBooking->setRelation('tour', $firstTour);
+                    }
+                    if ($tier) {
+                        $testBooking->setRelation('tier', $tier);
+                    }
 
                     $pdfBinary = $this->generateVoucherPdfBinary($testBooking);
                     if (empty($pdfBinary)) {

@@ -295,6 +295,43 @@ class AdminSettingController extends Controller
     }
 
     /**
+     * Safely and permanently purge all test bookings and their cascading records.
+     */
+    public function purgeTestBookings(Request $request)
+    {
+        try {
+            $exitCode = Artisan::call('bookings:purge-test-bookings', ['--force' => true]);
+            $rawOutput = Artisan::output();
+
+            // Strip ANSI codes if any
+            $cleanOutput = preg_replace('/\x1b\[[0-9;]*m/', '', $rawOutput);
+            $cleanOutput = trim($cleanOutput);
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $cleanOutput ?: 'All test bookings and associated artifacts permanently purged.',
+                ]);
+            }
+
+            return redirect()->route('admin.settings.notifications')
+                ->with('success', $cleanOutput ?: 'All test bookings and associated artifacts permanently purged.');
+        } catch (\Throwable $e) {
+            Log::error('Failed to purge test bookings: ' . $e->getMessage());
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to purge test bookings: ' . $e->getMessage(),
+                ], 500);
+            }
+
+            return redirect()->route('admin.settings.notifications')
+                ->with('error', 'Failed to purge test bookings: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Update bulk settings.
      */
     public function update(Request $request)
