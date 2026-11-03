@@ -28,38 +28,38 @@
              x-transition:leave="ease-in duration-150"
              x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
              x-transition:leave-end="opacity-0 translate-y-4 sm:scale-95"
-             class="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-slate-200 text-start overflow-hidden flex flex-col max-h-[92vh]"
+             class="relative w-full max-w-5xl bg-white rounded-3xl shadow-2xl border border-slate-200 text-start overflow-hidden flex flex-col max-h-[94vh]"
              @click.stop>
 
             <!-- 1. Modal Top Bar -->
             <div class="px-5 py-3.5 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800 shrink-0">
                 <div class="flex items-center gap-3">
-                    <span class="w-9 h-9 rounded-xl bg-primary/20 text-primary flex items-center justify-center text-lg">
-                        <i class="bi bi-activity"></i>
+                    <span class="w-9 h-9 rounded-xl bg-primary/20 text-primary flex items-center justify-center text-lg shadow-2xs">
+                        <i class="bi bi-display"></i>
                     </span>
                     <div>
                         <div class="flex items-center gap-2">
-                            <h3 class="text-sm sm:text-base font-black text-white tracking-tight">Live Visitor Journey &amp; Friction Inspector</h3>
+                            <h3 class="text-sm sm:text-base font-black text-white tracking-tight">Live Visitor Journey &amp; Screen Inspector</h3>
                             <template x-if="data && data.visitor && data.visitor.is_active_now">
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 inline-flex items-center gap-1.5">
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 inline-flex items-center gap-1.5 shadow-2xs">
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                                     LIVE NOW
                                 </span>
                             </template>
                         </div>
-                        <p class="text-[11px] text-slate-400">Step-by-step clickstream, dwell metrics, customer lead match, and obstacle diagnostics.</p>
+                        <p class="text-[11px] text-slate-400">Real-time screen viewing, live dwell timer, step-by-step clickstream, and friction diagnostics.</p>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-2">
                     <!-- Live Auto-Refresh Toggle -->
                     <button type="button" 
-                            @click="autoRefresh = !autoRefresh" 
+                            @click="autoRefresh = !autoRefresh; if (autoRefresh) startPoller(); else stopPoller();" 
                             :class="autoRefresh ? 'bg-emerald-600/30 text-emerald-300 border-emerald-500/40' : 'bg-slate-800 text-slate-400 border-slate-700'"
                             class="px-2.5 py-1 rounded-lg text-xs font-bold border transition inline-flex items-center gap-1.5 cursor-pointer"
-                            :title="autoRefresh ? 'Live Auto-Polling Active (every 5s)' : 'Click to enable live auto-polling'">
+                            :title="autoRefresh ? 'Live Auto-Polling Active (every 4s)' : 'Click to enable live auto-polling'">
                         <i class="bi bi-broadcast text-[11px]" :class="autoRefresh ? 'animate-pulse text-emerald-400' : ''"></i>
-                        <span class="hidden sm:inline" x-text="autoRefresh ? 'Live Sync On' : 'Live Sync Off'"></span>
+                        <span class="hidden sm:inline" x-text="autoRefresh ? 'Live Sync On (4s)' : 'Live Sync Off'"></span>
                     </button>
 
                     <button type="button" 
@@ -79,22 +79,322 @@
             </div>
 
             <!-- 2. Scrollable Body -->
-            <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 bg-slate-50/50">
+            <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 bg-slate-50/60">
 
-                <!-- Loading State -->
+                <!-- Loading State Skeleton -->
                 <template x-if="loading && !data">
-                    <div class="py-16 text-center">
-                        <div class="inline-block animate-spin text-primary text-3xl mb-3">
-                            <i class="bi bi-arrow-repeat"></i>
+                    <div class="space-y-4 py-8 animate-pulse">
+                        <div class="h-28 bg-slate-200 rounded-3xl"></div>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <div class="h-20 bg-slate-200 rounded-2xl"></div>
+                            <div class="h-20 bg-slate-200 rounded-2xl"></div>
+                            <div class="h-20 bg-slate-200 rounded-2xl"></div>
+                            <div class="h-20 bg-slate-200 rounded-2xl"></div>
                         </div>
-                        <p class="text-xs font-bold text-slate-600">Reconstructing visitor clickstream and friction diagnostics...</p>
+                        <div class="h-44 bg-slate-200 rounded-3xl"></div>
+                        <div class="h-32 bg-slate-200 rounded-2xl"></div>
                     </div>
                 </template>
 
-                <template x-if="data && data.success">
-                    <div class="space-y-5">
+                <!-- Error Fallback State -->
+                <template x-if="error && !data">
+                    <div class="p-6 rounded-3xl bg-white border border-rose-200 shadow-xs text-center space-y-3">
+                        <span class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 inline-flex items-center justify-center text-xl">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                        </span>
+                        <h4 class="font-extrabold text-slate-900 text-sm">Failed to Load Live Visitor Journey</h4>
+                        <p class="text-xs text-slate-500 max-w-md mx-auto" x-text="error"></p>
+                        <div class="pt-2">
+                            <button type="button" @click="refreshData(true)" class="px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-xs shadow-xs transition cursor-pointer">
+                                <i class="bi bi-arrow-repeat mr-1"></i> Retry Live Sync
+                            </button>
+                        </div>
+                    </div>
+                </template>
 
-                        <!-- A. Hero Metric Cards (IP, Location, Device, Attribution) -->
+                <!-- Active Data Content -->
+                <template x-if="data && data.success">
+                    <div class="space-y-6">
+
+                        <!-- ═════════════════════════════════════════════════════════════════ -->
+                        <!-- A. CURRENT LIVE SCREEN & ACTIVE VIEWPORT DISPLAY (Screen View)   -->
+                        <!-- ═════════════════════════════════════════════════════════════════ -->
+                        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                            <!-- Mock Browser Viewport Header -->
+                            <div class="px-4 py-3 bg-slate-900 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                                <!-- Traffic Lights & SSL Bar -->
+                                <div class="flex items-center gap-3 min-w-0 flex-1">
+                                    <div class="flex items-center gap-1.5 shrink-0">
+                                        <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
+                                        <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
+                                        <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-800 border border-slate-700/80 text-xs text-slate-300 min-w-0 max-w-full">
+                                        <i class="bi bi-lock-fill text-emerald-400 text-[10px] shrink-0"></i>
+                                        <span class="text-slate-400 shrink-0">https://dunesdiscoverytourism.com</span>
+                                        <span class="text-white font-mono font-bold truncate" x-text="data.current_screen ? data.current_screen.uri : data.visitor.current_page"></span>
+                                        <button type="button" 
+                                                @click="copyToClipboard(data.current_screen ? data.current_screen.full_url : data.visitor.current_page, 'URL copied!')" 
+                                                class="text-slate-400 hover:text-white ml-1 shrink-0 cursor-pointer" 
+                                                title="Copy Full Page URL">
+                                            <i class="bi bi-copy text-[10px]"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Screen Controls & Live Dwell -->
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <span class="px-2.5 py-1 rounded-lg bg-emerald-950/80 border border-emerald-500/40 font-mono text-emerald-400 text-xs font-bold inline-flex items-center gap-1.5 shadow-2xs">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                                        <span x-text="'On Screen: ' + formatLiveDwell(liveDwellSeconds)"></span>
+                                    </span>
+
+                                    <!-- 1-Click Open Live Screen Button -->
+                                    <a :href="data.current_screen ? data.current_screen.full_url : ('/' + (data.visitor.current_page || '').replace(/^\//, ''))" 
+                                       target="_blank" 
+                                       class="px-3.5 py-1 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-xs shadow-xs transition inline-flex items-center gap-1.5">
+                                        <span>Open Live Screen</span>
+                                        <i class="bi bi-box-arrow-up-right text-[10px]"></i>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Real-Time User Action Pulse Banner -->
+                            <div class="px-5 py-2.5 bg-linear-to-r from-emerald-50 via-teal-50 to-blue-50 border-b border-emerald-100 flex items-center justify-between gap-3 text-xs">
+                                <div class="flex items-center gap-2 min-w-0">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                                    <span class="font-black text-emerald-900 shrink-0 uppercase tracking-wider text-[10px]">Real-Time User Action:</span>
+                                    <span class="font-bold text-slate-800 truncate" x-text="data.current_screen ? data.current_screen.live_action : 'Actively browsing website'"></span>
+                                </div>
+                                <button type="button" 
+                                        @click="showIframePreview = !showIframePreview" 
+                                        class="px-2.5 py-0.5 rounded-lg bg-white border border-emerald-200 text-emerald-800 hover:bg-emerald-100/60 font-bold text-[11px] shadow-2xs transition inline-flex items-center gap-1 shrink-0 cursor-pointer">
+                                    <i class="bi" :class="showIframePreview ? 'bi-chevron-up' : 'bi-display'"></i>
+                                    <span x-text="showIframePreview ? 'Collapse Viewport' : 'Preview Screen Viewport'"></span>
+                                </button>
+                            </div>
+
+                            <!-- Screen Card Content (Tour, Booking, or General Screen) -->
+                            <div class="p-4 sm:p-5">
+                                <!-- Case 1: Active Tour Screen -->
+                                <template x-if="data.current_screen && data.current_screen.tour">
+                                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+                                        <div class="flex items-center gap-4 min-w-0">
+                                            <template x-if="data.current_screen.tour.thumb_image || data.current_screen.tour.hero_image">
+                                                <img :src="data.current_screen.tour.thumb_image || data.current_screen.tour.hero_image" 
+                                                     :alt="data.current_screen.tour.name" 
+                                                     class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border border-slate-200 shadow-xs shrink-0">
+                                            </template>
+                                            <div class="min-w-0 space-y-1">
+                                                <div class="flex items-center gap-2 flex-wrap">
+                                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-primary/10 text-primary border border-primary/20">Active Tour Page</span>
+                                                    <span class="text-xs text-amber-500 font-bold inline-flex items-center gap-1">
+                                                        <i class="bi bi-star-fill text-[11px]"></i>
+                                                        <span x-text="data.current_screen.tour.rating"></span>
+                                                        <span class="text-slate-400 font-normal" x-text="'(' + data.current_screen.tour.review_count + ' reviews)'"></span>
+                                                    </span>
+                                                </div>
+                                                <h4 class="font-black text-slate-900 text-sm sm:text-base tracking-tight truncate" x-text="data.current_screen.tour.name"></h4>
+                                                <div class="flex items-center gap-3 text-xs text-slate-500 flex-wrap">
+                                                    <span class="inline-flex items-center gap-1">
+                                                        <i class="bi bi-clock text-slate-400"></i>
+                                                        <span x-text="data.current_screen.tour.duration"></span>
+                                                    </span>
+                                                    <span>&bull;</span>
+                                                    <span class="inline-flex items-center gap-1 font-bold text-slate-900">
+                                                        <span>From AED</span>
+                                                        <span class="text-primary font-black" x-text="data.current_screen.tour.starting_price"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end">
+                                            <a :href="data.current_screen.tour.edit_url" target="_blank" class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 font-bold text-xs shadow-2xs transition inline-flex items-center gap-1">
+                                                <i class="bi bi-pencil-square text-slate-400"></i> Edit Tour in CMS
+                                            </a>
+                                            <a :href="data.current_screen.tour.live_url" target="_blank" class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-xs transition inline-flex items-center gap-1">
+                                                <i class="bi bi-box-arrow-up-right text-amber-400"></i> View Tour Live
+                                            </a>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <!-- Case 2: Checkout / Booking Funnel Screen -->
+                                <template x-if="data.current_screen && data.current_screen.booking">
+                                    <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                        <div class="flex items-center gap-3.5 min-w-0">
+                                            <span class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-xl shadow-xs shrink-0">
+                                                <i class="bi bi-cart-check-fill"></i>
+                                            </span>
+                                            <div class="min-w-0 space-y-0.5">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-200 text-amber-900">In Checkout Funnel</span>
+                                                    <span class="font-mono font-bold text-xs text-slate-600" x-text="'Ref: #' + data.current_screen.booking.reference"></span>
+                                                </div>
+                                                <h4 class="font-black text-slate-900 text-sm truncate" x-text="data.current_screen.booking.tour_name"></h4>
+                                                <div class="flex items-center gap-3 text-xs text-slate-600 flex-wrap">
+                                                    <span x-text="'Date: ' + data.current_screen.booking.tour_date"></span>
+                                                    <span>&bull;</span>
+                                                    <span x-text="data.current_screen.booking.adults + ' Adults' + (data.current_screen.booking.children ? ', ' + data.current_screen.booking.children + ' Children' : '')"></span>
+                                                    <span>&bull;</span>
+                                                    <span class="font-black text-emerald-700">AED <span x-text="Number(data.current_screen.booking.total).toFixed(2)"></span></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="shrink-0 w-full sm:w-auto text-right">
+                                            <a :href="'/admin/bookings/drafts?search=' + encodeURIComponent(data.current_screen.booking.reference)" target="_blank" class="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-xs transition inline-flex items-center gap-1.5">
+                                                <i class="bi bi-box-arrow-up-right"></i> Inspect Draft Cart
+                                            </a>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <!-- Case 3: Other Catalog, Homepage, or Content Screen -->
+                                <template x-if="data.current_screen && !data.current_screen.tour && !data.current_screen.booking">
+                                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-3">
+                                        <div class="flex items-center gap-3">
+                                            <span class="w-10 h-10 rounded-xl bg-white border border-slate-200 text-primary flex items-center justify-center text-lg shadow-2xs shrink-0">
+                                                <i class="bi bi-compass"></i>
+                                            </span>
+                                            <div>
+                                                <h4 class="font-black text-slate-900 text-sm" x-text="data.current_screen.title"></h4>
+                                                <p class="text-xs text-slate-500 font-mono mt-0.5" x-text="data.current_screen.uri"></p>
+                                            </div>
+                                        </div>
+                                        <a :href="data.current_screen.full_url" target="_blank" class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 font-bold text-xs shadow-2xs transition inline-flex items-center gap-1 shrink-0">
+                                            <i class="bi bi-box-arrow-up-right text-slate-400"></i> Open Page
+                                        </a>
+                                    </div>
+                                </template>
+
+                                <!-- Expandable Sandboxed Live Iframe Preview -->
+                                <div x-show="showIframePreview" x-transition class="mt-4 pt-4 border-t border-slate-200">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-xs font-bold text-slate-600 flex items-center gap-1.5">
+                                            <i class="bi bi-display text-primary"></i> Interactive Live Viewport Preview (Direct Screen Render)
+                                        </span>
+                                        <span class="text-[10px] text-slate-400">Sandboxed Preview</span>
+                                    </div>
+                                    <iframe :src="data.current_screen ? data.current_screen.full_url : '/'" 
+                                            class="w-full h-80 sm:h-96 rounded-2xl border border-slate-300 bg-white shadow-inner" 
+                                            sandbox="allow-scripts allow-same-origin"></iframe>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ═════════════════════════════════════════════════════════════════ -->
+                        <!-- B. REAL-TIME USER ACTIVITY STREAM (Clickstream Timeline Feed)    -->
+                        <!-- ═════════════════════════════════════════════════════════════════ -->
+                        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-4 sm:p-5">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 border-b border-slate-100 gap-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                                        <i class="bi bi-clock-history"></i>
+                                    </span>
+                                    <div>
+                                        <h4 class="text-xs font-black uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
+                                            <span>Real-Time User Activity Stream</span>
+                                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                        </h4>
+                                        <p class="text-[11px] text-slate-400">Chronological sequence of every screen, cart interaction, and friction event.</p>
+                                    </div>
+                                </div>
+
+                                <!-- Activity Filter Pills -->
+                                <div class="flex items-center gap-1 flex-wrap">
+                                    <button type="button" 
+                                            @click="activeTab = 'all'"
+                                            :class="activeTab === 'all' ? 'bg-slate-900 text-white font-black' : 'bg-slate-100 text-slate-600 hover:text-slate-900 font-bold'"
+                                            class="px-2.5 py-1 rounded-lg text-xs transition cursor-pointer">
+                                        All (<span x-text="data.journey_steps.length"></span>)
+                                    </button>
+                                    <button type="button" 
+                                            @click="activeTab = 'screens'"
+                                            :class="activeTab === 'screens' ? 'bg-primary text-white font-black' : 'bg-slate-100 text-slate-600 hover:text-slate-900 font-bold'"
+                                            class="px-2.5 py-1 rounded-lg text-xs transition cursor-pointer">
+                                        Screens
+                                    </button>
+                                    <button type="button" 
+                                            @click="activeTab = 'leads'"
+                                            :class="activeTab === 'leads' ? 'bg-amber-600 text-white font-black' : 'bg-amber-50 text-amber-800 hover:bg-amber-100 font-bold'"
+                                            class="px-2.5 py-1 rounded-lg text-xs transition cursor-pointer">
+                                        Carts &amp; Leads
+                                    </button>
+                                    <button type="button" 
+                                            @click="activeTab = 'friction'"
+                                            :class="activeTab === 'friction' ? 'bg-rose-600 text-white font-black' : 'bg-rose-50 text-rose-800 hover:bg-rose-100 font-bold'"
+                                            class="px-2.5 py-1 rounded-lg text-xs transition cursor-pointer">
+                                        Friction (404)
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Clickstream Activity List -->
+                            <div class="mt-3 divide-y divide-slate-100 rounded-2xl border border-slate-100 overflow-hidden">
+                                <template x-for="(step, sIndex) in filteredSteps()" :key="sIndex">
+                                    <div class="p-3.5 hover:bg-slate-50 transition flex items-center justify-between gap-3 text-xs"
+                                         :class="step.is_current ? 'bg-primary/5 border-l-4 border-l-primary' : ''">
+                                        <div class="flex items-center gap-3 min-w-0">
+                                            <!-- Step Number Badge -->
+                                            <span class="w-7 h-7 rounded-lg flex items-center justify-center font-bold text-[11px] shrink-0"
+                                                  :class="{
+                                                      'bg-primary text-white': step.is_current,
+                                                      'bg-rose-100 text-rose-800': step.type === 'error',
+                                                      'bg-amber-100 text-amber-800': step.type === 'draft',
+                                                      'bg-emerald-100 text-emerald-800': step.type === 'whatsapp',
+                                                      'bg-slate-100 text-slate-700': step.type === 'pageview'
+                                                  }"
+                                                  x-text="'#' + step.step_number"></span>
+
+                                            <!-- Step Description -->
+                                            <div class="min-w-0">
+                                                <div class="flex items-center gap-2 flex-wrap">
+                                                    <span class="font-extrabold text-slate-900 truncate" x-text="step.title"></span>
+                                                    <template x-if="step.is_current">
+                                                        <span class="px-2 py-0.5 rounded-full bg-emerald-500 text-white text-[9px] font-black uppercase inline-flex items-center gap-1 shadow-2xs">
+                                                            <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
+                                                            Current Screen
+                                                        </span>
+                                                    </template>
+                                                    <template x-if="step.type === 'error'">
+                                                        <span class="px-1.5 py-0.5 rounded bg-rose-600 text-white text-[9px] font-black uppercase">404 Error</span>
+                                                    </template>
+                                                    <template x-if="step.type === 'draft'">
+                                                        <span class="px-1.5 py-0.5 rounded bg-amber-500 text-white text-[9px] font-black uppercase">Draft Cart</span>
+                                                    </template>
+                                                    <template x-if="step.type === 'whatsapp'">
+                                                        <span class="px-1.5 py-0.5 rounded bg-emerald-600 text-white text-[9px] font-black uppercase">WhatsApp Concierge</span>
+                                                    </template>
+                                                </div>
+                                                <div class="flex items-center gap-2 mt-0.5 text-[11px] text-slate-400">
+                                                    <span class="font-mono text-slate-500 truncate max-w-xs sm:max-w-md" x-text="step.uri"></span>
+                                                    <span>&bull;</span>
+                                                    <span x-text="step.timestamp"></span>
+                                                    <span>&bull;</span>
+                                                    <span x-text="step.relative_time"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex items-center gap-2.5 shrink-0">
+                                            <!-- Dwell Time on Step -->
+                                            <span class="px-2 py-1 rounded-lg bg-slate-100 font-mono text-[11px] font-bold text-slate-600" 
+                                                  title="Time spent on this page" 
+                                                  x-text="step.is_current ? formatLiveDwell(liveDwellSeconds) : step.dwell_formatted"></span>
+                                            
+                                            <!-- View Live Page in New Tab -->
+                                            <a :href="step.url" target="_blank" class="p-1 rounded-lg text-slate-400 hover:text-primary transition cursor-pointer" title="Open this page on live website">
+                                                <i class="bi bi-box-arrow-up-right text-xs"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- ═════════════════════════════════════════════════════════════════ -->
+                        <!-- C. VISITOR METADATA & ACQUISITION (Identity, Location, Device)   -->
+                        <!-- ═════════════════════════════════════════════════════════════════ -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                             <!-- IP & Geolocation -->
                             <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-2xs">
@@ -104,7 +404,7 @@
                                 </div>
                                 <div class="flex items-center gap-1.5">
                                     <span class="font-mono font-black text-slate-900 text-xs truncate" x-text="data.visitor.client_ip"></span>
-                                    <button type="button" @click="navigator.clipboard.writeText(data.visitor.client_ip); Swal.fire({toast:true, position:'top-end', icon:'success', title:'IP copied to clipboard', timer:1500, showConfirmButton:false});" class="text-slate-400 hover:text-primary" title="Copy IP">
+                                    <button type="button" @click="copyToClipboard(data.visitor.client_ip, 'IP copied!')" class="text-slate-400 hover:text-primary cursor-pointer" title="Copy IP">
                                         <i class="bi bi-copy text-[10px]"></i>
                                     </button>
                                 </div>
@@ -149,7 +449,7 @@
                             <!-- Session Timing & Dwell -->
                             <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-2xs">
                                 <div class="flex items-center justify-between text-slate-400 mb-1">
-                                    <span class="text-[10px] font-bold uppercase tracking-wider">Time on Site</span>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider">Total Time on Site</span>
                                     <i class="bi bi-stopwatch-fill text-rose-500 text-xs"></i>
                                 </div>
                                 <div class="font-mono font-black text-slate-900 text-xs" x-text="Math.floor(data.visitor.total_duration_sec / 60) + 'm ' + (data.visitor.total_duration_sec % 60) + 's'"></div>
@@ -161,7 +461,9 @@
                             </div>
                         </div>
 
-                        <!-- B. Identified Customer Lead Card (If draft or inquiry submitted) -->
+                        <!-- ═════════════════════════════════════════════════════════════════ -->
+                        <!-- D. IDENTIFIED CUSTOMER LEAD CARD (If Draft or Inquiry exists)     -->
+                        <!-- ═════════════════════════════════════════════════════════════════ -->
                         <template x-if="data.lead">
                             <div class="p-4 rounded-2xl bg-linear-to-r from-amber-50 to-orange-50 border border-amber-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                 <div class="flex items-center gap-3">
@@ -203,7 +505,9 @@
                             </div>
                         </template>
 
-                        <!-- C. Friction & Problem Diagnostic Box (Crucial Improvement Intelligence) -->
+                        <!-- ═════════════════════════════════════════════════════════════════ -->
+                        <!-- E. FRICTION & OBSTACLE DIAGNOSTICS (Drop-off & Error Resolution) -->
+                        <!-- ═════════════════════════════════════════════════════════════════ -->
                         <div>
                             <div class="flex items-center justify-between mb-2.5">
                                 <h4 class="text-xs font-black uppercase tracking-wider text-slate-600 flex items-center gap-2">
@@ -252,69 +556,6 @@
                             </template>
                         </div>
 
-                        <!-- D. Chronological Clickstream / Timeline -->
-                        <div>
-                            <div class="flex items-center justify-between mb-3">
-                                <h4 class="text-xs font-black uppercase tracking-wider text-slate-600 flex items-center gap-2">
-                                    <i class="bi bi-clock-history text-primary"></i>
-                                    <span>Chronological Clickstream Journey (Newest First)</span>
-                                </h4>
-                                <span class="text-[11px] text-slate-400 font-medium" x-text="data.journey_steps.length + ' Recorded Steps'"></span>
-                            </div>
-
-                            <div class="bg-white rounded-2xl border border-slate-200 divide-y divide-slate-100 overflow-hidden shadow-2xs">
-                                <template x-for="(step, sIndex) in data.journey_steps" :key="sIndex">
-                                    <div class="p-3.5 hover:bg-slate-50/70 transition flex items-center justify-between gap-3 text-xs"
-                                         :class="step.is_current ? 'bg-primary/5 border-l-4 border-l-primary' : ''">
-                                        <div class="flex items-center gap-3 min-w-0">
-                                            <!-- Step Badge -->
-                                            <span class="w-7 h-7 rounded-lg flex items-center justify-center font-bold text-[11px] shrink-0"
-                                                  :class="{
-                                                      'bg-primary text-white': step.is_current,
-                                                      'bg-rose-100 text-rose-800': step.type === 'error',
-                                                      'bg-amber-100 text-amber-800': step.type === 'draft',
-                                                      'bg-emerald-100 text-emerald-800': step.type === 'whatsapp',
-                                                      'bg-slate-100 text-slate-700': step.type === 'pageview'
-                                                  }"
-                                                  x-text="'#' + step.step_number"></span>
-
-                                            <div class="min-w-0">
-                                                <div class="flex items-center gap-2 flex-wrap">
-                                                    <span class="font-extrabold text-slate-900 truncate" x-text="step.title"></span>
-                                                    <template x-if="step.is_current">
-                                                        <span class="px-1.5 py-0.2 rounded bg-primary text-white text-[9px] font-black uppercase">Current</span>
-                                                    </template>
-                                                    <template x-if="step.type === 'error'">
-                                                        <span class="px-1.5 py-0.2 rounded bg-rose-600 text-white text-[9px] font-black uppercase">Error 404</span>
-                                                    </template>
-                                                    <template x-if="step.type === 'draft'">
-                                                        <span class="px-1.5 py-0.2 rounded bg-amber-500 text-white text-[9px] font-black uppercase">Draft Cart</span>
-                                                    </template>
-                                                </div>
-                                                <div class="flex items-center gap-2 mt-0.5 text-[11px] text-slate-400">
-                                                    <span class="font-mono text-slate-500 truncate max-w-xs sm:max-w-md" x-text="step.uri"></span>
-                                                    <span>&bull;</span>
-                                                    <span x-text="step.timestamp"></span>
-                                                    <span>&bull;</span>
-                                                    <span x-text="step.relative_time"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="flex items-center gap-2.5 shrink-0">
-                                            <!-- Dwell Time Badge -->
-                                            <span class="px-2 py-1 rounded-lg bg-slate-100 font-mono text-[11px] font-bold text-slate-600" title="Time spent on this page" x-text="step.dwell_formatted"></span>
-                                            
-                                            <!-- View Live Page in New Tab -->
-                                            <a :href="step.url" target="_blank" class="p-1 rounded-lg text-slate-400 hover:text-primary transition" title="Open this page on live website">
-                                                <i class="bi bi-box-arrow-up-right text-xs"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </template>
-                            </div>
-                        </div>
-
                     </div>
                 </template>
             </div>
@@ -323,7 +564,7 @@
             <div class="px-5 py-3.5 bg-white border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 shrink-0">
                 <div class="flex items-center gap-2 flex-wrap">
                     <template x-if="data && data.visitor">
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 flex-wrap">
                             <!-- 1-Click Exclude IP from Analytics -->
                             <button type="button" 
                                     @click="quickIgnoreIp(data.visitor.client_ip)" 
@@ -370,22 +611,33 @@ function liveVisitorInspectorModal() {
         sessionId: null,
         clientIp: null,
         loading: false,
+        error: null,
         autoRefresh: true,
         data: null,
         pollTimer: null,
+        dwellTicker: null,
+        liveDwellSeconds: 0,
+        showIframePreview: false,
+        activeTab: 'all',
 
         openModal(sessionId, clientIp) {
             this.sessionId = sessionId;
             this.clientIp = clientIp;
             this.isOpen = true;
             this.data = null;
-            this.refreshData();
+            this.error = null;
+            this.showIframePreview = false;
+            this.activeTab = 'all';
+            this.liveDwellSeconds = 0;
+            this.refreshData(true);
             this.startPoller();
+            this.startTicker();
         },
 
         closeModal() {
             this.isOpen = false;
             this.stopPoller();
+            this.stopTicker();
         },
 
         startPoller() {
@@ -394,7 +646,7 @@ function liveVisitorInspectorModal() {
                 if (this.isOpen && this.autoRefresh && !this.loading) {
                     this.refreshData(false);
                 }
-            }, 5000);
+            }, 4000);
         },
 
         stopPoller() {
@@ -404,21 +656,87 @@ function liveVisitorInspectorModal() {
             }
         },
 
+        startTicker() {
+            this.stopTicker();
+            this.dwellTicker = setInterval(() => {
+                if (this.isOpen && this.data && this.data.visitor && this.data.visitor.is_active_now) {
+                    this.liveDwellSeconds++;
+                }
+            }, 1000);
+        },
+
+        stopTicker() {
+            if (this.dwellTicker) {
+                clearInterval(this.dwellTicker);
+                this.dwellTicker = null;
+            }
+        },
+
         async refreshData(showLoader = true) {
-            if (showLoader) this.loading = true;
+            if (showLoader && !this.data) this.loading = true;
             try {
-                const url = `/admin/api/visitor-journey/${encodeURIComponent(this.sessionId || '')}?client_ip=${encodeURIComponent(this.clientIp || '')}`;
+                const params = new URLSearchParams();
+                if (this.sessionId) params.append('session_id', this.sessionId);
+                if (this.clientIp) params.append('client_ip', this.clientIp);
+
+                const url = `/admin/api/visitor-journey?${params.toString()}`;
                 const res = await fetch(url, {
                     headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
                 });
+
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}: Failed to reach journey inspector endpoint.`);
+                }
+
                 const json = await res.json();
-                if (json.success) {
+                if (json && json.success) {
                     this.data = json;
+                    this.error = null;
+                    if (json.current_screen && typeof json.current_screen.dwell_seconds === 'number') {
+                        this.liveDwellSeconds = json.current_screen.dwell_seconds;
+                    }
+                } else {
+                    this.error = json?.message || 'Unable to retrieve visitor journey.';
                 }
             } catch (err) {
                 console.error("Live journey inspector error:", err);
+                if (!this.data) {
+                    this.error = err.message || 'Error communicating with live telemetry service.';
+                }
             } finally {
                 this.loading = false;
+            }
+        },
+
+        formatLiveDwell(totalSec) {
+            const s = Math.max(0, parseInt(totalSec || 0));
+            if (s < 60) return `${s}s`;
+            const mins = Math.floor(s / 60);
+            const rem = s % 60;
+            return `${mins}m ${rem}s`;
+        },
+
+        filteredSteps() {
+            if (!this.data || !this.data.journey_steps) return [];
+            if (this.activeTab === 'all') return this.data.journey_steps;
+            if (this.activeTab === 'screens') return this.data.journey_steps.filter(s => s.type === 'pageview');
+            if (this.activeTab === 'leads') return this.data.journey_steps.filter(s => s.type === 'draft' || s.type === 'whatsapp' || s.type === 'booking');
+            if (this.activeTab === 'friction') return this.data.journey_steps.filter(s => s.type === 'error' || s.type === 'warning');
+            return this.data.journey_steps;
+        },
+
+        copyToClipboard(text, msg = 'Copied to clipboard!') {
+            if (!text) return;
+            navigator.clipboard.writeText(text);
+            if (window.Swal) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: msg,
+                    showConfirmButton: false,
+                    timer: 2000
+                });
             }
         },
 

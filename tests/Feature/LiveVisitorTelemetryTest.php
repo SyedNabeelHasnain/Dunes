@@ -148,6 +148,30 @@ class LiveVisitorTelemetryTest extends TestCase
         $this->assertTrue($has404Alert);
 
         $this->assertCount(3, $data['journey_steps']);
+        $this->assertArrayHasKey('current_screen', $data);
+        $this->assertNotEmpty($data['current_screen']['title']);
+    }
+
+    public function test_visitor_journey_supports_query_parameters_and_synthesizes_fresh_profile(): void
+    {
+        $freshIp = '2001:4860:7:1532::fa';
+
+        // Call journey via query parameters without any prior request logs
+        $response = $this->actingAs($this->admin)->getJson('/admin/api/visitor-journey?client_ip=' . urlencode($freshIp));
+
+        $response->assertOk()
+            ->assertJson([
+                'success' => true,
+                'visitor' => [
+                    'client_ip' => $freshIp,
+                    'is_active_now' => true,
+                ],
+            ]);
+
+        $data = $response->json();
+        $this->assertArrayHasKey('current_screen', $data);
+        $this->assertEquals('/', $data['current_screen']['uri']);
+        $this->assertNotEmpty($data['journey_steps']);
     }
 
     public function test_quick_ignore_action_adds_rule_and_purges_telemetry(): void

@@ -208,7 +208,7 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::get('/analytics', [AdminDashboardController::class, 'analytics'])->name('analytics.index');
     Route::get('/analytics/live-visitors', [AdminDashboardController::class, 'liveVisitorsHub'])->name('analytics.live-visitors');
     Route::get('/active-visitors', [AdminDashboardController::class, 'activeVisitors'])->name('active-visitors');
-    Route::get('/api/visitor-journey/{sessionId}', [AdminDashboardController::class, 'visitorJourney'])->name('api.visitor-journey');
+    Route::get('/api/visitor-journey/{sessionId?}', [AdminDashboardController::class, 'visitorJourney'])->name('api.visitor-journey')->where('sessionId', '.*');
     Route::post('/api/visitors/quick-ignore', [AdminDashboardController::class, 'quickIgnoreVisitor'])->name('api.visitors.quick-ignore');
     Route::post('/api/visitors/quick-block', [AdminDashboardController::class, 'quickBlockVisitor'])->name('api.visitors.quick-block');
     Route::get('/api/kpis', [AdminDashboardController::class, 'liveKpis'])->name('api.kpis');

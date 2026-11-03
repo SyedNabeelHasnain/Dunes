@@ -378,9 +378,11 @@ class AdminDashboardController extends Controller
     /**
      * Detailed Live Visitor Journey & Friction Inspector API.
      */
-    public function visitorJourney(Request $request, string $sessionId, LiveVisitorTelemetryService $telemetryService): JsonResponse
+    public function visitorJourney(Request $request, ?string $sessionId = null, ?LiveVisitorTelemetryService $telemetryService = null): JsonResponse
     {
-        $clientIp = $request->input('client_ip');
+        $telemetryService = $telemetryService ?: app(LiveVisitorTelemetryService::class);
+        $sessionId = $sessionId ?: (string) $request->input('session_id', '');
+        $clientIp = (string) $request->input('client_ip', '');
         $result = $telemetryService->getVisitorJourney($sessionId, $clientIp);
 
         return response()->json($result);
