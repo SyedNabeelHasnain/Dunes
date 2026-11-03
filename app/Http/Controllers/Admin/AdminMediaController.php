@@ -1,0 +1,389 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\MediaAsset;
+use App\Services\MediaManagerService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\View\View;
+
+class AdminMediaController extends Controller
+{
+    protected MediaManagerService $mediaService;
+
+    public function __construct(MediaManagerService $mediaService)
+    {
+        $this->mediaService = $mediaService;
+    }
+
+    /**
+     * Display the Media Library index.
+     */
+    public function index(Request $request): View
+    {
+        $query = MediaAsset::query();
+
+        // 1. Filter by Search
+        if ($request->filled('search')) {
+            $query->search($request->input('search'));
+        }
+
+        // 2. Filter by Media Type (All, Image, Video)
+        if ($request->filled('type') && $request->input('type') !== 'all') {
+            $query->where('media_type', $request->input('type'));
+        }
+
+        // 3. Filter by Category
+        if ($request->filled('category') && $request->input('category') !== 'all') {
+            $query->where('category', $request->input('category'));
+        }
+
+        // 4. Filter by Usage
+        if ($request->input('usage') === 'in_use') {
+            $query->inUse();
+        } elseif ($request->input('usage') === 'unused') {
+            $query->unused();
+        }
+
+        // 5. Sorting
+        $sort = $request->input('sort', 'newest');
+        switch ($sort) {
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'size_desc':
+                $query->orderBy('file_size_bytes', 'desc');
+                break;
+            case 'size_asc':
+                $query->orderBy('file_size_bytes', 'asc');
+                break;
+            case 'used_desc':
+                $query->orderBy('usage_count', 'desc');
+                break;
+            case 'name_asc':
+                $query->orderBy('filename', 'asc');
+                break;
+            case 'newest':
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+
+        $perPage = (int) $request->input('per_page', 36);
+        $perPage = in_array($perPage, [18, 36, 72, 120]) ? $perPage : 36;
+        $assets = $query->paginate($perPage)->withQueryString();
+
+        // High-level KPI aggregations
+        $kpis = [
+            'total_assets' => MediaAsset::count(),
+            'total_bytes' => (int) MediaAsset::sum('file_size_bytes'),
+            'images_count' => MediaAsset::images()->count(),
+            'images_bytes' => (int) MediaAsset::images()->sum('file_size_bytes'),
+            'videos_count' => MediaAsset::videos()->count(),
+            'videos_bytes' => (int) MediaAsset::videos()->sum('file_size_bytes'),
+            'in_use_count' => MediaAsset::inUse()->count(),
+            'unused_count' => MediaAsset::unused()->count(),
+        ];
+
+        // Format total storage
+        $kpis['formatted_total_size'] = $this->formatBytes($kpis['total_bytes']);
+        $kpis['formatted_images_size'] = $this->formatBytes($kpis['images_bytes']);
+        $kpis['formatted_videos_size'] = $this->formatBytes($kpis['videos_bytes']);
+        $kpis['in_use_pct'] = $kpis['total_assets'] > 0 ? round(($kpis['in_use_count'] / $kpis['total_assets']) * 100) : 0;
+
+        $categories = [
+            'all' => 'All Categories',
+            'tours' => 'Tours & Experiences',
+            'blogs' => 'Blog & Articles',
+            'reviews' => 'Customer Reviews & Reels',
+            'banners' => 'Hero & Promo Banners',
+            'site' => 'Site Assets (Logo, OG)',
+            'general' => 'General Uploads',
+        ];
+
+        $viewMode = $request->input('view', 'grid');
+
+        return view('admin.media.index', compact('assets', 'kpis', 'categories', 'viewMode'));
+    }
+
+    /**
+     * Upload single or multiple files via dropzone AJAX.
+     */
+    public function upload(Request $request): JsonResponse
+    {
+        $request->validate([
+            'files' => 'nullable|array',
+            'files.*' => 'file|mimes:jpeg,png,jpg,webp,avif,svg,gif,bmp,mp4,webm,mov,ogg,m4v|max:51200', // max 50MB
+            'file' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif,svg,gif,bmp,mp4,webm,mov,ogg,m4v|max:51200',
+            'category' => 'nullable|string|max:50',
+            'title' => 'nullable|string|max:255',
+            'alt_text' => 'nullable|string|max:255',
+        ]);
+
+        $uploadedFiles = [];
+        if ($request->hasFile('files')) {
+            $uploadedFiles = $request->file('files');
+        } elseif ($request->hasFile('file')) {
+            $uploadedFiles = [$request->file('file')];
+        }
+
+        if (empty($uploadedFiles)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No files were provided for upload.',
+            ], 422);
+        }
+
+        $userId = auth()->id();
+        $createdAssets = [];
+        $errors = [];
+
+        foreach ($uploadedFiles as $file) {
+            try {
+                $asset = $this->mediaService->upload($file, [
+                    'category' => $request->input('category', 'general'),
+                    'title' => $request->input('title'),
+                    'alt_text' => $request->input('alt_text'),
+                ], $userId);
+
+                $createdAssets[] = [
+                    'id' => $asset->id,
+                    'uuid' => $asset->uuid,
+                    'filename' => $asset->filename,
+                    'public_url' => $asset->public_url,
+                    'url' => $asset->url,
+                    'media_type' => $asset->media_type,
+                    'formatted_size' => $asset->formatted_file_size,
+                    'dimensions' => $asset->dimensions,
+                ];
+            } catch (\Throwable $e) {
+                Log::error('Media Upload Error: ' . $e->getMessage());
+                $errors[] = $file->getClientOriginalName() . ': ' . $e->getMessage();
+            }
+        }
+
+        return response()->json([
+            'success' => count($createdAssets) > 0,
+            'uploaded' => $createdAssets,
+            'errors' => $errors,
+            'message' => count($createdAssets) . ' file(s) successfully uploaded.',
+        ]);
+    }
+
+    /**
+     * Get asset details & fresh usage references as JSON.
+     */
+    public function details(int $id): JsonResponse
+    {
+        $asset = MediaAsset::with('uploader:id,name')->findOrFail($id);
+
+        // Refresh usage locations dynamically
+        $usages = $this->mediaService->resolveAssetUsages($asset);
+
+        return response()->json([
+            'success' => true,
+            'asset' => [
+                'id' => $asset->id,
+                'uuid' => $asset->uuid,
+                'filename' => $asset->filename,
+                'original_name' => $asset->original_name,
+                'file_path' => $asset->file_path,
+                'public_url' => $asset->public_url,
+                'full_url' => $asset->url,
+                'media_type' => $asset->media_type,
+                'mime_type' => $asset->mime_type,
+                'extension' => strtoupper($asset->extension),
+                'file_size_bytes' => $asset->file_size_bytes,
+                'formatted_size' => $asset->formatted_file_size,
+                'width' => $asset->width,
+                'height' => $asset->height,
+                'dimensions' => $asset->dimensions,
+                'title' => $asset->title,
+                'alt_text' => $asset->alt_text,
+                'caption' => $asset->caption,
+                'category' => $asset->category,
+                'folder' => $asset->folder,
+                'usage_count' => count($usages),
+                'usage_locations' => $usages,
+                'uploaded_by' => $asset->uploader ? $asset->uploader->name : 'System / Auto-Sync',
+                'created_at' => $asset->created_at ? $asset->created_at->format('M d, Y h:i A') : 'N/A',
+                'updated_at' => $asset->updated_at ? $asset->updated_at->format('M d, Y h:i A') : 'N/A',
+            ],
+        ]);
+    }
+
+    /**
+     * Update asset metadata (Title, Alt Text, Caption, Category).
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        $asset = MediaAsset::findOrFail($id);
+
+        $validated = $request->validate([
+            'title' => 'nullable|string|max:255',
+            'alt_text' => 'nullable|string|max:255',
+            'caption' => 'nullable|string|max:1000',
+            'category' => 'nullable|string|max:50',
+        ]);
+
+        $asset->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Media metadata updated successfully.',
+            'asset' => $asset,
+        ]);
+    }
+
+    /**
+     * Replace an existing media file preserving URL.
+     */
+    public function replace(Request $request, int $id): JsonResponse
+    {
+        $asset = MediaAsset::findOrFail($id);
+
+        $request->validate([
+            'file' => 'required|file|max:51200',
+        ]);
+
+        try {
+            $updated = $this->mediaService->replace($asset, $request->file('file'));
+
+            return response()->json([
+                'success' => true,
+                'message' => 'File successfully replaced on disk. URL preserved.',
+                'asset' => [
+                    'id' => $updated->id,
+                    'formatted_size' => $updated->formatted_file_size,
+                    'dimensions' => $updated->dimensions,
+                    'mime_type' => $updated->mime_type,
+                    'url' => $updated->url,
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            Log::error("Media replacement failed for asset {$id}: " . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to replace file: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Delete a media asset with safe usage checks.
+     */
+    public function destroy(Request $request, int $id): JsonResponse
+    {
+        $asset = MediaAsset::findOrFail($id);
+        $force = $request->boolean('force');
+
+        $result = $this->mediaService->deleteAsset($asset, $force);
+
+        if (! $result['success']) {
+            return response()->json($result, 422);
+        }
+
+        return response()->json($result);
+    }
+
+    /**
+     * Trigger manual scan and sync of server files.
+     */
+    public function syncExisting(): JsonResponse
+    {
+        try {
+            $stats = $this->mediaService->scanAndSyncExistingMedia();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Sync complete: {$stats['scanned']} scanned, {$stats['indexed']} newly indexed, {$stats['updated']} updated, {$stats['in_use']} active in-use.",
+                'stats' => $stats,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Media auto-sync failed: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Sync failed: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Bulk actions handler.
+     */
+    public function bulkAction(Request $request): JsonResponse
+    {
+        $request->validate([
+            'action' => 'required|string|in:delete,set_category,refresh_usage',
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:media_assets,id',
+            'category' => 'nullable|string|max:50',
+            'force' => 'nullable|boolean',
+        ]);
+
+        $action = $request->input('action');
+        $ids = $request->input('ids');
+        $force = $request->boolean('force');
+
+        if ($action === 'set_category') {
+            $cat = $request->input('category', 'general');
+            MediaAsset::whereIn('id', $ids)->update(['category' => $cat]);
+
+            return response()->json(['success' => true, 'message' => count($ids) . ' asset(s) moved to ' . $cat . '.']);
+        }
+
+        if ($action === 'refresh_usage') {
+            $assets = MediaAsset::whereIn('id', $ids)->get();
+            foreach ($assets as $asset) {
+                $this->mediaService->resolveAssetUsages($asset);
+            }
+
+            return response()->json(['success' => true, 'message' => 'Refreshed usages for ' . count($ids) . ' asset(s).']);
+        }
+
+        if ($action === 'delete') {
+            $deleted = 0;
+            $inUseBlocked = [];
+            $assets = MediaAsset::whereIn('id', $ids)->get();
+
+            foreach ($assets as $asset) {
+                $res = $this->mediaService->deleteAsset($asset, $force);
+                if ($res['success']) {
+                    $deleted++;
+                } else {
+                    $inUseBlocked[] = $asset->filename;
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => "Deleted {$deleted} asset(s)." . (count($inUseBlocked) > 0 ? " Blocked " . count($inUseBlocked) . " in-use asset(s)." : ""),
+                'blocked' => $inUseBlocked,
+            ]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Invalid action.'], 400);
+    }
+
+    /**
+     * Format bytes to human string.
+     */
+    protected function formatBytes(int $bytes): string
+    {
+        if ($bytes <= 0) {
+            return '0 B';
+        }
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        $i = floor(log($bytes, 1024));
+        $i = min($i, count($units) - 1);
+        $val = round($bytes / pow(1024, $i), 1);
+
+        return $val . ' ' . $units[$i];
+    }
+}

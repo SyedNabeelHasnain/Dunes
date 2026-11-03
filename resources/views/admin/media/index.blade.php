@@ -1,0 +1,1205 @@
+@extends('layouts.admin')
+
+@section('page_title', 'Media Library (Images & Videos)')
+
+@section('content')
+<div x-data="mediaManager()" x-init="init()" class="space-y-6">
+
+    <!-- Top Header & Actions -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <div class="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-1">
+                <a href="{{ route('admin.dashboard') }}" class="hover:text-primary transition">Dashboard</a>
+                <span>/</span>
+                <span>Content &amp; Knowledge</span>
+                <span>/</span>
+                <span class="text-slate-800">Media Library</span>
+            </div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                <i class="bi bi-images text-rose-500"></i> Media Library &amp; Asset Manager
+            </h1>
+            <p class="text-xs text-slate-500 mt-0.5">
+                Centralized management for all website images, photography, tour galleries, promotional banners, and customer video reels.
+            </p>
+        </div>
+
+        <div class="flex items-center gap-2.5 shrink-0">
+            <!-- Sync Server Files Button -->
+            <button type="button" 
+                    @click="syncServerFiles()" 
+                    :disabled="syncing"
+                    class="inline-flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-700 bg-white border border-slate-200/80 hover:bg-slate-50 hover:border-slate-300 shadow-2xs transition disabled:opacity-50 cursor-pointer"
+                    title="Scan public folders to index untracked media and refresh usage links">
+                <i class="bi bi-arrow-repeat text-sm text-primary" :class="syncing ? 'animate-spin' : ''"></i>
+                <span x-text="syncing ? 'Syncing...' : 'Scan & Sync Server Media'">Scan &amp; Sync Server Media</span>
+            </button>
+
+            <!-- Upload Media Button -->
+            <button type="button" 
+                    @click="openUploadModal()" 
+                    class="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold text-white bg-primary hover:bg-primary-dark shadow-md hover:shadow-lg transition cursor-pointer">
+                <i class="bi bi-cloud-arrow-up-fill text-sm"></i>
+                <span>Upload Media</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- KPI Statistics Overview Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-3.5">
+        <!-- Total Assets -->
+        <div class="rounded-2xl border border-slate-200/90 bg-white p-4 shadow-2xs">
+            <div class="flex items-center justify-between text-slate-500 text-xs font-medium">
+                <span>Total Media</span>
+                <div class="w-7 h-7 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
+                    <i class="bi bi-collection-play-fill text-sm"></i>
+                </div>
+            </div>
+            <div class="text-xl font-extrabold text-slate-900 mt-2">{{ number_format($kpis['total_assets']) }}</div>
+            <div class="text-[11px] font-medium text-slate-500 mt-0.5">{{ $kpis['formatted_total_size'] }} storage</div>
+        </div>
+
+        <!-- Images & Photos -->
+        <div class="rounded-2xl border border-slate-200/90 bg-white p-4 shadow-2xs">
+            <div class="flex items-center justify-between text-slate-500 text-xs font-medium">
+                <span>Photos &amp; Images</span>
+                <div class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <i class="bi bi-image-fill text-sm"></i>
+                </div>
+            </div>
+            <div class="text-xl font-extrabold text-slate-900 mt-2">{{ number_format($kpis['images_count']) }}</div>
+            <div class="text-[11px] font-medium text-emerald-600 mt-0.5">{{ $kpis['formatted_images_size'] }} • WebP/AVIF</div>
+        </div>
+
+        <!-- Videos & Reels -->
+        <div class="rounded-2xl border border-slate-200/90 bg-white p-4 shadow-2xs">
+            <div class="flex items-center justify-between text-slate-500 text-xs font-medium">
+                <span>Videos &amp; Reels</span>
+                <div class="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                    <i class="bi bi-play-btn-fill text-sm"></i>
+                </div>
+            </div>
+            <div class="text-xl font-extrabold text-slate-900 mt-2">{{ number_format($kpis['videos_count']) }}</div>
+            <div class="text-[11px] font-medium text-amber-600 mt-0.5">{{ $kpis['formatted_videos_size'] }} • MP4 Reels</div>
+        </div>
+
+        <!-- In-Use Assets -->
+        <div class="rounded-2xl border border-slate-200/90 bg-white p-4 shadow-2xs">
+            <div class="flex items-center justify-between text-slate-500 text-xs font-medium">
+                <span>In-Use Links</span>
+                <div class="w-7 h-7 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
+                    <i class="bi bi-link-45deg text-sm"></i>
+                </div>
+            </div>
+            <div class="text-xl font-extrabold text-slate-900 mt-2">{{ number_format($kpis['in_use_count']) }}</div>
+            <div class="text-[11px] font-semibold text-sky-600 mt-0.5">{{ $kpis['in_use_pct'] }}% of library linked</div>
+        </div>
+
+        <!-- Unused / Orphans -->
+        <div class="rounded-2xl border border-slate-200/90 bg-white p-4 shadow-2xs col-span-2 lg:col-span-1">
+            <div class="flex items-center justify-between text-slate-500 text-xs font-medium">
+                <span>Unused Assets</span>
+                <div class="w-7 h-7 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center">
+                    <i class="bi bi-archive-fill text-sm"></i>
+                </div>
+            </div>
+            <div class="text-xl font-extrabold text-slate-900 mt-2">{{ number_format($kpis['unused_count']) }}</div>
+            <div class="text-[11px] font-medium text-slate-400 mt-0.5">Ready for cleanup</div>
+        </div>
+    </div>
+
+    <!-- Filter & Toolbar Card -->
+    <div class="rounded-2xl border border-slate-200/90 bg-white p-4 shadow-2xs space-y-3">
+        <form method="GET" action="{{ route('admin.media.index') }}" id="mediaFilterForm" class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+            <input type="hidden" name="view" value="{{ $viewMode }}">
+
+            <!-- Search input -->
+            <div class="relative flex-1 min-w-[240px]">
+                <i class="bi bi-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input type="text" 
+                       name="search" 
+                       value="{{ request('search') }}" 
+                       placeholder="Search by filename, title, alt text, or path..." 
+                       class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary transition outline-none">
+                @if(request('search'))
+                    <a href="{{ route('admin.media.index', array_merge(request()->except('search'), ['view' => $viewMode])) }}" 
+                       class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs">
+                        <i class="bi bi-x-circle-fill"></i>
+                    </a>
+                @endif
+            </div>
+
+            <!-- Filters cluster -->
+            <div class="flex flex-wrap items-center gap-2">
+                <!-- Media Type Dropdown -->
+                <select name="type" onchange="this.form.submit()" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-white hover:border-slate-300 focus:ring-2 focus:ring-primary/20 outline-none transition cursor-pointer">
+                    <option value="all" {{ request('type', 'all') === 'all' ? 'selected' : '' }}>All Media Types</option>
+                    <option value="image" {{ request('type') === 'image' ? 'selected' : '' }}>🖼️ Images Only</option>
+                    <option value="video" {{ request('type') === 'video' ? 'selected' : '' }}>🎥 Videos Only</option>
+                </select>
+
+                <!-- Category Dropdown -->
+                <select name="category" onchange="this.form.submit()" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-white hover:border-slate-300 focus:ring-2 focus:ring-primary/20 outline-none transition cursor-pointer">
+                    @foreach($categories as $catKey => $catLabel)
+                        <option value="{{ $catKey }}" {{ request('category', 'all') === $catKey ? 'selected' : '' }}>
+                            {{ $catLabel }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <!-- Usage Dropdown -->
+                <select name="usage" onchange="this.form.submit()" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-white hover:border-slate-300 focus:ring-2 focus:ring-primary/20 outline-none transition cursor-pointer">
+                    <option value="all" {{ request('usage', 'all') === 'all' ? 'selected' : '' }}>All Usages</option>
+                    <option value="in_use" {{ request('usage') === 'in_use' ? 'selected' : '' }}>🟢 In-Use Only</option>
+                    <option value="unused" {{ request('usage') === 'unused' ? 'selected' : '' }}>⚪ Unused Only</option>
+                </select>
+
+                <!-- Sort Dropdown -->
+                <select name="sort" onchange="this.form.submit()" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-white hover:border-slate-300 focus:ring-2 focus:ring-primary/20 outline-none transition cursor-pointer">
+                    <option value="newest" {{ request('sort', 'newest') === 'newest' ? 'selected' : '' }}>Newest First</option>
+                    <option value="oldest" {{ request('sort') === 'oldest' ? 'selected' : '' }}>Oldest First</option>
+                    <option value="size_desc" {{ request('sort') === 'size_desc' ? 'selected' : '' }}>Size (Largest)</option>
+                    <option value="size_asc" {{ request('sort') === 'size_asc' ? 'selected' : '' }}>Size (Smallest)</option>
+                    <option value="used_desc" {{ request('sort') === 'used_desc' ? 'selected' : '' }}>Most Used</option>
+                    <option value="name_asc" {{ request('sort') === 'name_asc' ? 'selected' : '' }}>Filename (A-Z)</option>
+                </select>
+
+                <!-- View Switcher (Grid vs List) -->
+                <div class="flex items-center rounded-xl border border-slate-200 p-0.5 bg-slate-50">
+                    <a href="{{ route('admin.media.index', array_merge(request()->query(), ['view' => 'grid'])) }}" 
+                       class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 {{ $viewMode === 'grid' ? 'bg-white text-primary shadow-2xs font-extrabold' : 'text-slate-500 hover:text-slate-900' }}"
+                       title="Grid View">
+                        <i class="bi bi-grid-fill"></i>
+                    </a>
+                    <a href="{{ route('admin.media.index', array_merge(request()->query(), ['view' => 'list'])) }}" 
+                       class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 {{ $viewMode === 'list' ? 'bg-white text-primary shadow-2xs font-extrabold' : 'text-slate-500 hover:text-slate-900' }}"
+                       title="List View">
+                        <i class="bi bi-list-ul"></i>
+                    </a>
+                </div>
+            </div>
+        </form>
+
+        <!-- Bulk Actions Floating Bar (Shows when 1+ selected) -->
+        <div x-show="selectedIds.length > 0" 
+             x-transition 
+             class="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-slate-900 text-white text-xs font-medium shadow-md">
+            <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded-full bg-primary text-white font-bold" x-text="selectedIds.length"></span>
+                <span>items selected</span>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <!-- Move to Category -->
+                <div class="flex items-center gap-1.5">
+                    <select x-model="bulkCategory" class="px-2.5 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-white text-xs outline-none">
+                        <option value="">Move to Category...</option>
+                        <option value="tours">Tours &amp; Experiences</option>
+                        <option value="blogs">Blog &amp; Articles</option>
+                        <option value="reviews">Reviews &amp; Reels</option>
+                        <option value="banners">Banners &amp; Promos</option>
+                        <option value="site">Site Assets</option>
+                        <option value="general">General</option>
+                    </select>
+                    <button type="button" @click="applyBulkCategory()" class="px-2.5 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-semibold transition">
+                        Move
+                    </button>
+                </div>
+
+                <!-- Refresh Usage -->
+                <button type="button" @click="bulkRefreshUsage()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-semibold transition flex items-center gap-1.5">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    <span>Check Usages</span>
+                </button>
+
+                <!-- Bulk Delete -->
+                <button type="button" @click="confirmBulkDelete()" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold transition flex items-center gap-1.5">
+                    <i class="bi bi-trash-fill"></i>
+                    <span>Delete</span>
+                </button>
+
+                <!-- Deselect All -->
+                <button type="button" @click="selectedIds = []" class="p-1.5 rounded-lg text-slate-400 hover:text-white transition" title="Clear selection">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Media Library Content Area -->
+    @if($assets->isEmpty())
+        <!-- Empty State -->
+        <div class="rounded-2xl border border-slate-200/90 bg-white p-12 text-center shadow-2xs">
+            <div class="w-16 h-16 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center mx-auto mb-4 text-2xl shadow-xs">
+                <i class="bi bi-images"></i>
+            </div>
+            <h3 class="text-base font-bold text-slate-900">No media assets found</h3>
+            <p class="text-xs text-slate-500 max-w-sm mx-auto mt-1 mb-5">
+                No files matched your search or filters. Try adjusting your query or scan existing server files into the library.
+            </p>
+            <div class="flex items-center justify-center gap-3">
+                <a href="{{ route('admin.media.index') }}" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition">
+                    Clear Filters
+                </a>
+                <button type="button" @click="syncServerFiles()" class="px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold shadow-md hover:bg-primary-dark transition">
+                    <i class="bi bi-arrow-repeat me-1"></i> Scan Server Media
+                </button>
+            </div>
+        </div>
+    @elseif($viewMode === 'grid')
+        <!-- GRID VIEW -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5">
+            @foreach($assets as $asset)
+                <div class="group relative rounded-2xl border border-slate-200/90 bg-white overflow-hidden shadow-2xs hover:shadow-md hover:border-primary/50 transition-all flex flex-col cursor-pointer"
+                     @click="openDetails({{ $asset->id }})">
+                    
+                    <!-- Thumbnail Container with 1:1 Aspect Ratio -->
+                    <div class="relative w-full aspect-square bg-slate-900/5 overflow-hidden flex items-center justify-center">
+                        @if($asset->is_image)
+                            <img src="{{ $asset->public_url }}" 
+                                 alt="{{ $asset->alt_text ?: $asset->filename }}" 
+                                 loading="lazy" 
+                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                 onerror="this.src='/images/placeholder.webp'; this.onerror=null;">
+                        @elseif($asset->is_video)
+                            <video src="{{ $asset->public_url }}#t=0.5" 
+                                   preload="metadata" 
+                                   muted 
+                                   playsinline 
+                                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                            </video>
+                            <div class="absolute inset-0 bg-slate-950/30 flex items-center justify-center group-hover:bg-slate-950/20 transition">
+                                <div class="w-10 h-10 rounded-full bg-white/90 text-primary flex items-center justify-center shadow-md group-hover:scale-110 transition">
+                                    <i class="bi bi-play-fill text-xl translate-x-0.5"></i>
+                                </div>
+                            </div>
+                        @else
+                            <div class="text-3xl text-slate-400">
+                                <i class="bi bi-file-earmark"></i>
+                            </div>
+                        @endif
+
+                        <!-- Top Overlay Controls -->
+                        <div class="absolute top-2 left-2 right-2 flex items-center justify-between pointer-events-none" @click.stop>
+                            <!-- Multi-select checkbox -->
+                            <input type="checkbox" 
+                                   value="{{ $asset->id }}" 
+                                   x-model="selectedIds" 
+                                   class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary pointer-events-auto shadow-2xs cursor-pointer">
+
+                            <!-- Extension Badge -->
+                            <span class="px-1.5 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-slate-950/70 text-white backdrop-blur-xs">
+                                {{ $asset->extension }}
+                            </span>
+                        </div>
+
+                        <!-- Bottom Overlay Badges -->
+                        <div class="absolute bottom-2 left-2 right-2 flex items-center justify-between text-[10px] font-bold pointer-events-none">
+                            <!-- Usage Badge -->
+                            @if($asset->usage_count > 0)
+                                <span class="px-1.5 py-0.5 rounded-md bg-emerald-600/90 text-white shadow-2xs backdrop-blur-xs">
+                                    {{ $asset->usage_count }} in use
+                                </span>
+                            @else
+                                <span class="px-1.5 py-0.5 rounded-md bg-slate-900/60 text-slate-300 shadow-2xs backdrop-blur-xs">
+                                    Unused
+                                </span>
+                            @endif
+
+                            <!-- File Size Badge -->
+                            <span class="px-1.5 py-0.5 rounded-md bg-slate-950/70 text-white shadow-2xs backdrop-blur-xs">
+                                {{ $asset->formatted_file_size }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="p-2.5 flex-1 flex flex-col justify-between gap-1.5">
+                        <div class="min-w-0">
+                            <h4 class="text-xs font-bold text-slate-800 truncate" title="{{ $asset->filename }}">
+                                {{ $asset->filename }}
+                            </h4>
+                            <p class="text-[11px] text-slate-400 truncate mt-0.5" title="{{ $asset->title ?: $asset->category }}">
+                                {{ $asset->title ?: ucfirst($asset->category) }}
+                            </p>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-1.5 border-t border-slate-100 text-[11px]" @click.stop>
+                            <span class="text-slate-400 capitalize">{{ $asset->category }}</span>
+                            <button type="button" 
+                                    @click="copyUrl('{{ $asset->public_url }}')" 
+                                    class="p-1 rounded-md text-slate-400 hover:text-primary hover:bg-slate-50 transition cursor-pointer"
+                                    title="Copy public URL">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    @else
+        <!-- LIST / TABLE VIEW -->
+        <div class="rounded-2xl border border-slate-200/90 bg-white overflow-hidden shadow-2xs">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-50 border-b border-slate-200/80 text-slate-500 font-bold uppercase text-[10px] tracking-wider">
+                        <tr>
+                            <th class="py-3 px-3.5 w-10 text-center">
+                                <input type="checkbox" 
+                                       @change="toggleSelectAll($event)" 
+                                       class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer">
+                            </th>
+                            <th class="py-3 px-3 w-16">Preview</th>
+                            <th class="py-3 px-3">Filename &amp; Title</th>
+                            <th class="py-3 px-3">Type &amp; Ext</th>
+                            <th class="py-3 px-3">Dimensions</th>
+                            <th class="py-3 px-3">Size</th>
+                            <th class="py-3 px-3">Category</th>
+                            <th class="py-3 px-3">Usages</th>
+                            <th class="py-3 px-3">Date</th>
+                            <th class="py-3 px-3.5 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @foreach($assets as $asset)
+                            <tr class="hover:bg-slate-50/80 transition group">
+                                <td class="py-2.5 px-3.5 text-center">
+                                    <input type="checkbox" 
+                                           value="{{ $asset->id }}" 
+                                           x-model="selectedIds" 
+                                           class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer">
+                                </td>
+                                <td class="py-2.5 px-3">
+                                    <div class="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200/80 overflow-hidden flex items-center justify-center shrink-0 cursor-pointer"
+                                         @click="openDetails({{ $asset->id }})">
+                                        @if($asset->is_image)
+                                            <img src="{{ $asset->public_url }}" 
+                                                 alt="{{ $asset->filename }}" 
+                                                 class="w-full h-full object-cover">
+                                        @elseif($asset->is_video)
+                                            <div class="relative w-full h-full bg-slate-900 flex items-center justify-center text-white">
+                                                <i class="bi bi-play-fill text-sm"></i>
+                                            </div>
+                                        @else
+                                            <i class="bi bi-file-earmark text-slate-400 text-base"></i>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td class="py-2.5 px-3 min-w-[200px]">
+                                    <div class="font-bold text-slate-900 hover:text-primary transition cursor-pointer" @click="openDetails({{ $asset->id }})">
+                                        {{ $asset->filename }}
+                                    </div>
+                                    <div class="text-[11px] text-slate-400 truncate max-w-xs">
+                                        {{ $asset->title ?: '—' }}
+                                    </div>
+                                </td>
+                                <td class="py-2.5 px-3">
+                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase {{ $asset->is_video ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700' }}">
+                                        {{ $asset->extension }}
+                                    </span>
+                                </td>
+                                <td class="py-2.5 px-3 font-mono text-[11px] text-slate-600">
+                                    {{ $asset->dimensions ?: '—' }}
+                                </td>
+                                <td class="py-2.5 px-3 font-mono text-[11px] text-slate-600">
+                                    {{ $asset->formatted_file_size }}
+                                </td>
+                                <td class="py-2.5 px-3">
+                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-600 capitalize">
+                                        {{ $asset->category }}
+                                    </span>
+                                </td>
+                                <td class="py-2.5 px-3">
+                                    @if($asset->usage_count > 0)
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                            {{ $asset->usage_count }} links
+                                        </span>
+                                    @else
+                                        <span class="px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-100 text-slate-500">
+                                            Unused
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="py-2.5 px-3 text-[11px] text-slate-500 whitespace-nowrap">
+                                    {{ $asset->created_at ? $asset->created_at->format('M d, Y') : '—' }}
+                                </td>
+                                <td class="py-2.5 px-3.5 text-right whitespace-nowrap">
+                                    <div class="flex items-center justify-end gap-1.5">
+                                        <button type="button" 
+                                                @click="copyUrl('{{ $asset->public_url }}')" 
+                                                class="p-1.5 rounded-lg text-slate-400 hover:text-primary hover:bg-slate-100 transition"
+                                                title="Copy public URL">
+                                            <i class="bi bi-clipboard"></i>
+                                        </button>
+                                        <button type="button" 
+                                                @click="openDetails({{ $asset->id }})" 
+                                                class="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition"
+                                                title="Inspect asset">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button type="button" 
+                                                @click="confirmDeleteAsset({{ $asset->id }}, '{{ addslashes($asset->filename) }}', {{ $asset->usage_count }})" 
+                                                class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
+                                                title="Delete asset">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    @endif
+
+    <!-- Pagination -->
+    @if($assets->hasPages())
+        <div class="pt-2">
+            {{ $assets->links() }}
+        </div>
+    @endif
+
+    <!-- SLIDE-OVER ASSET DETAIL & INSPECTOR DRAWER -->
+    <div x-show="drawerOpen" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-50 overflow-hidden bg-slate-950/60 backdrop-blur-xs flex justify-end"
+         style="display: none;"
+         @keydown.escape.window="drawerOpen = false">
+        
+        <div x-show="drawerOpen" 
+             x-transition:enter="transition ease-out duration-300 transform"
+             x-transition:enter-start="translate-x-full"
+             x-transition:enter-end="translate-x-0"
+             x-transition:leave="transition ease-in duration-200 transform"
+             x-transition:leave-start="translate-x-0"
+             x-transition:leave-end="translate-x-full"
+             class="w-full max-w-xl bg-white h-full shadow-2xl flex flex-col overflow-hidden"
+             @click.outside="drawerOpen = false">
+            
+            <!-- Drawer Header -->
+            <div class="px-5 py-4 border-b border-slate-200/80 flex items-center justify-between bg-slate-50/50">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+                        <i class="bi" :class="activeAsset?.media_type === 'video' ? 'bi-play-btn-fill' : 'bi-image-fill'"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="text-sm font-bold text-slate-900 truncate" x-text="activeAsset?.filename || 'Asset Inspector'"></h3>
+                        <p class="text-[11px] text-slate-400 font-mono" x-text="activeAsset?.dimensions ? activeAsset.dimensions + ' • ' + activeAsset.formatted_size : activeAsset?.formatted_size"></p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-1.5">
+                    <button type="button" 
+                            @click="copyUrl(activeAsset?.public_url)" 
+                            class="p-2 rounded-xl text-slate-500 hover:text-primary hover:bg-slate-100 transition" 
+                            title="Copy Public URL">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
+                    <a :href="activeAsset?.full_url" 
+                       download 
+                       target="_blank" 
+                       class="p-2 rounded-xl text-slate-500 hover:text-primary hover:bg-slate-100 transition" 
+                       title="Download file">
+                        <i class="bi bi-download"></i>
+                    </a>
+                    <button type="button" 
+                            @click="drawerOpen = false" 
+                            class="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Drawer Scrollable Content -->
+            <div class="flex-1 overflow-y-auto p-5 space-y-5">
+                
+                <!-- Media Preview Canvas -->
+                <div class="rounded-2xl border border-slate-200/90 bg-slate-900/5 overflow-hidden flex items-center justify-center p-2 min-h-[220px] max-h-[340px]">
+                    <template x-if="activeAsset?.media_type === 'image'">
+                        <img :src="activeAsset?.public_url" 
+                             :alt="activeAsset?.alt_text" 
+                             class="max-w-full max-h-[320px] rounded-xl object-contain shadow-sm">
+                    </template>
+                    <template x-if="activeAsset?.media_type === 'video'">
+                        <video :src="activeAsset?.public_url" 
+                               controls 
+                               playsinline 
+                               class="max-w-full max-h-[320px] rounded-xl shadow-sm bg-black">
+                        </video>
+                    </template>
+                </div>
+
+                <!-- URL Bar with 1-Click Copy -->
+                <div>
+                    <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Public URL</label>
+                    <div class="flex items-center gap-2">
+                        <input type="text" 
+                               readonly 
+                               :value="activeAsset?.public_url" 
+                               class="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono text-slate-700 outline-none">
+                        <button type="button" 
+                                @click="copyUrl(activeAsset?.public_url)" 
+                                class="px-3.5 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold shrink-0 transition flex items-center gap-1.5 cursor-pointer">
+                            <i class="bi bi-clipboard"></i>
+                            <span>Copy</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Specs Grid -->
+                <div class="grid grid-cols-2 gap-3 text-xs bg-slate-50 p-3.5 rounded-xl border border-slate-200/70">
+                    <div>
+                        <span class="text-slate-400 block text-[10px] font-bold uppercase">Format / MIME</span>
+                        <span class="font-bold text-slate-800" x-text="activeAsset?.mime_type || activeAsset?.extension"></span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block text-[10px] font-bold uppercase">File Size</span>
+                        <span class="font-bold text-slate-800" x-text="activeAsset?.formatted_size"></span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block text-[10px] font-bold uppercase">Resolution</span>
+                        <span class="font-bold text-slate-800" x-text="activeAsset?.dimensions || 'N/A'"></span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block text-[10px] font-bold uppercase">Uploaded At</span>
+                        <span class="font-bold text-slate-800" x-text="activeAsset?.created_at"></span>
+                    </div>
+                </div>
+
+                <!-- Editable Metadata Form -->
+                <div class="space-y-3 pt-2 border-t border-slate-200/80">
+                    <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="bi bi-pencil-square text-primary"></i> Metadata &amp; Image SEO
+                    </h4>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Title</label>
+                        <input type="text" 
+                               x-model="editMeta.title" 
+                               placeholder="e.g. Desert Safari Dune Bashing Sunset" 
+                               class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition">
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="text-xs font-semibold text-slate-700">Alt Text (Crucial for Google Image SEO)</label>
+                            <span class="text-[10px] text-emerald-600 font-bold" x-show="editMeta.alt_text?.length > 10">SEO Optimized</span>
+                        </div>
+                        <input type="text" 
+                               x-model="editMeta.alt_text" 
+                               placeholder="Descriptive alt text for Google rankings & accessibility..." 
+                               class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Category</label>
+                        <select x-model="editMeta.category" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-white focus:ring-2 focus:ring-primary/20 outline-none transition">
+                            <option value="tours">Tours &amp; Experiences</option>
+                            <option value="blogs">Blog &amp; Articles</option>
+                            <option value="reviews">Reviews &amp; Reels</option>
+                            <option value="banners">Hero &amp; Promo Banners</option>
+                            <option value="site">Site Assets (Logo, OG)</option>
+                            <option value="general">General</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Caption</label>
+                        <textarea x-model="editMeta.caption" 
+                                  rows="2" 
+                                  placeholder="Optional caption..." 
+                                  class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition"></textarea>
+                    </div>
+
+                    <button type="button" 
+                            @click="saveMetadata()" 
+                            :disabled="savingMeta"
+                            class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition shadow-sm flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50">
+                        <i class="bi" :class="savingMeta ? 'bi-arrow-repeat animate-spin' : 'bi-check2-circle'"></i>
+                        <span x-text="savingMeta ? 'Saving...' : 'Save Metadata'">Save Metadata</span>
+                    </button>
+                </div>
+
+                <!-- Where is this file used? (Active Links Tracker) -->
+                <div class="space-y-2 pt-2 border-t border-slate-200/80">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                            <i class="bi bi-diagram-3-fill text-sky-500"></i> Active Website Usages
+                        </h4>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold" 
+                              :class="activeAsset?.usage_count > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-500'" 
+                              x-text="(activeAsset?.usage_count || 0) + ' references'">
+                        </span>
+                    </div>
+
+                    <template x-if="activeAsset?.usage_locations && activeAsset.usage_locations.length > 0">
+                        <div class="space-y-1.5">
+                            <template x-for="(loc, idx) in activeAsset.usage_locations" :key="idx">
+                                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between text-xs">
+                                    <div>
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="px-1.5 py-0.2 rounded text-[10px] font-bold uppercase bg-sky-100 text-sky-800" x-text="loc.type"></span>
+                                            <strong class="text-slate-800 font-semibold" x-text="loc.name"></strong>
+                                        </div>
+                                        <span class="text-[11px] text-slate-500" x-text="'Field: ' + loc.field"></span>
+                                    </div>
+                                    <template x-if="loc.edit_url">
+                                        <a :href="loc.edit_url" target="_blank" class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-700 hover:text-primary hover:border-primary text-[11px] font-bold transition flex items-center gap-1">
+                                            <span>Edit</span>
+                                            <i class="bi bi-box-arrow-up-right text-[10px]"></i>
+                                        </a>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+
+                    <template x-if="!activeAsset?.usage_locations || activeAsset.usage_locations.length === 0">
+                        <div class="p-3 rounded-xl bg-slate-50 border border-dashed border-slate-200 text-center text-xs text-slate-500">
+                            <i class="bi bi-info-circle text-sm text-slate-400 block mb-1"></i>
+                            This file is currently not referenced in any tours, blog posts, or site settings. Safe to delete or keep as archive.
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Replace File & Danger Zone -->
+                <div class="pt-2 border-t border-slate-200/80 space-y-2.5">
+                    <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="bi bi-shield-exclamation text-amber-500"></i> Asset Operations
+                    </h4>
+
+                    <!-- Replace File preserving URL -->
+                    <div class="p-3 rounded-xl bg-amber-50/70 border border-amber-200/80">
+                        <div class="flex items-start justify-between gap-2">
+                            <div>
+                                <strong class="text-xs font-bold text-amber-900 block">Replace File (Preserve URL)</strong>
+                                <p class="text-[11px] text-amber-700 mt-0.5">
+                                    Upload a new file to overwrite this asset on disk. All existing tours &amp; blogs will immediately reflect the new image without breaking links.
+                                </p>
+                            </div>
+                            <label class="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs cursor-pointer shrink-0 transition flex items-center gap-1">
+                                <i class="bi bi-arrow-repeat"></i>
+                                <span>Replace</span>
+                                <input type="file" @change="replaceAssetFile($event)" class="hidden">
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Delete Asset Button -->
+                    <button type="button" 
+                            @click="confirmDeleteAsset(activeAsset.id, activeAsset.filename, activeAsset.usage_count)" 
+                            class="w-full py-2.5 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer">
+                        <i class="bi bi-trash-fill"></i>
+                        <span>Delete Asset from Library</span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- DRAG-AND-DROP UPLOAD MODAL -->
+    <div x-show="uploadModalOpen" 
+         x-transition 
+         class="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4" 
+         style="display: none;"
+         @keydown.escape.window="uploadModalOpen = false">
+        
+        <div class="w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl space-y-4" @click.outside="uploadModalOpen = false">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2">
+                    <div class="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-lg">
+                        <i class="bi bi-cloud-arrow-up-fill"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900">Upload Media Assets</h3>
+                        <p class="text-xs text-slate-500">Supports AVIF, WebP, JPG, PNG, SVG images and MP4 reels</p>
+                    </div>
+                </div>
+                <button type="button" @click="uploadModalOpen = false" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <!-- Target Category -->
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Target Category</label>
+                <select x-model="uploadCategory" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-white outline-none">
+                    <option value="general">General Uploads</option>
+                    <option value="tours">Tours &amp; Experiences</option>
+                    <option value="blogs">Blog &amp; Articles</option>
+                    <option value="reviews">Reviews &amp; Reels</option>
+                    <option value="banners">Hero &amp; Promo Banners</option>
+                    <option value="site">Site Assets (Logo, Favicon)</option>
+                </select>
+            </div>
+
+            <!-- Dropzone Area -->
+            <div @dragover.prevent="dragOver = true"
+                 @dragleave.prevent="dragOver = false"
+                 @drop.prevent="handleDrop($event)"
+                 :class="dragOver ? 'border-primary bg-primary/5' : 'border-slate-300 bg-slate-50'"
+                 class="rounded-2xl border-2 border-dashed p-8 text-center transition flex flex-col items-center justify-center cursor-pointer relative"
+                 @click="$refs.fileInput.click()">
+                
+                <input type="file" 
+                       x-ref="fileInput" 
+                       multiple 
+                       @change="handleFilesSelected($event)" 
+                       class="hidden" 
+                       accept="image/*,video/mp4,video/webm,video/quicktime">
+
+                <div class="w-12 h-12 rounded-2xl bg-white text-primary flex items-center justify-center text-2xl shadow-xs mb-3">
+                    <i class="bi bi-cloud-arrow-up"></i>
+                </div>
+                <p class="text-xs font-bold text-slate-800">Drag and drop files here, or <span class="text-primary underline">browse</span></p>
+                <p class="text-[11px] text-slate-400 mt-1">Images up to 10MB • Videos up to 50MB</p>
+            </div>
+
+            <!-- Queued Files List -->
+            <template x-if="queuedFiles.length > 0">
+                <div class="space-y-2 max-h-48 overflow-y-auto">
+                    <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center justify-between">
+                        <span x-text="queuedFiles.length + ' files ready'"></span>
+                        <button type="button" @click="queuedFiles = []" class="text-rose-500 hover:underline">Clear all</button>
+                    </div>
+
+                    <template x-for="(f, i) in queuedFiles" :key="i">
+                        <div class="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-200/80 text-xs">
+                            <div class="flex items-center gap-2 truncate min-w-0">
+                                <i class="bi" :class="f.type.startsWith('video/') ? 'bi-file-earmark-play text-amber-500' : 'bi-file-earmark-image text-emerald-500'"></i>
+                                <span class="truncate font-semibold text-slate-800" x-text="f.name"></span>
+                                <span class="text-[10px] text-slate-400 font-mono" x-text="formatBytes(f.size)"></span>
+                            </div>
+                            <button type="button" @click="removeQueuedFile(i)" class="text-slate-400 hover:text-rose-500 p-1">
+                                <i class="bi bi-x-circle-fill"></i>
+                            </button>
+                        </div>
+                    </template>
+                </div>
+            </template>
+
+            <!-- Upload Progress Bar -->
+            <template x-if="uploading">
+                <div class="space-y-1.5">
+                    <div class="flex items-center justify-between text-xs font-bold text-slate-700">
+                        <span>Uploading files...</span>
+                        <span x-text="uploadProgress + '%'"></span>
+                    </div>
+                    <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                        <div class="h-full bg-primary transition-all duration-200" :style="'width: ' + uploadProgress + '%'"></div>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Modal Action Buttons -->
+            <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+                <button type="button" 
+                        @click="uploadModalOpen = false" 
+                        class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition">
+                    Cancel
+                </button>
+                <button type="button" 
+                        @click="submitUpload()" 
+                        :disabled="queuedFiles.length === 0 || uploading"
+                        class="px-5 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold transition shadow-md disabled:opacity-50 flex items-center gap-1.5 cursor-pointer">
+                    <i class="bi" :class="uploading ? 'bi-arrow-repeat animate-spin' : 'bi-cloud-arrow-up-fill'"></i>
+                    <span x-text="uploading ? 'Uploading...' : 'Start Upload'">Start Upload</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SAFE DELETE CONFIRMATION MODAL -->
+    <div x-show="deleteModalOpen" 
+         x-transition 
+         class="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4" 
+         style="display: none;"
+         @keydown.escape.window="deleteModalOpen = false">
+        
+        <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl space-y-4" @click.outside="deleteModalOpen = false">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-xl shrink-0">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-900">Confirm Asset Deletion</h3>
+                    <p class="text-xs text-slate-500" x-text="deleteTarget.filename"></p>
+                </div>
+            </div>
+
+            <!-- In-Use Danger Alert -->
+            <template x-if="deleteTarget.usageCount > 0">
+                <div class="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs space-y-2">
+                    <div class="font-bold flex items-center gap-1.5 text-rose-900">
+                        <i class="bi bi-shield-x"></i>
+                        <span>Warning: Asset is actively linked!</span>
+                    </div>
+                    <p class="text-[11px] leading-relaxed">
+                        This file is actively referenced across <strong x-text="deleteTarget.usageCount"></strong> location(s) (tours, blogs, or site settings). Deleting it will result in broken images or 404s on the live website.
+                    </p>
+                    <label class="flex items-center gap-2 pt-1 font-bold text-rose-900 cursor-pointer">
+                        <input type="checkbox" x-model="deleteTarget.force" class="w-4 h-4 rounded border-rose-300 text-rose-600 focus:ring-rose-500">
+                        <span>Yes, force delete anyway</span>
+                    </label>
+                </div>
+            </template>
+
+            <template x-if="deleteTarget.usageCount === 0">
+                <p class="text-xs text-slate-600">
+                    Are you sure you want to delete this file? This file will be removed from server disk and marked deleted in the library.
+                </p>
+            </template>
+
+            <div class="flex items-center justify-end gap-2.5 pt-2">
+                <button type="button" @click="deleteModalOpen = false" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition">
+                    Cancel
+                </button>
+                <button type="button" 
+                        @click="executeDelete()" 
+                        :disabled="deleteTarget.usageCount > 0 && !deleteTarget.force"
+                        class="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition shadow-md disabled:opacity-40 flex items-center gap-1.5 cursor-pointer">
+                    <i class="bi bi-trash-fill"></i>
+                    <span>Confirm Delete</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Alpine.js Component Script -->
+<script>
+function mediaManager() {
+    return {
+        selectedIds: [],
+        bulkCategory: '',
+        syncing: false,
+        drawerOpen: false,
+        activeAsset: null,
+        editMeta: { title: '', alt_text: '', caption: '', category: 'general' },
+        savingMeta: false,
+        uploadModalOpen: false,
+        dragOver: false,
+        queuedFiles: [],
+        uploadCategory: 'general',
+        uploading: false,
+        uploadProgress: 0,
+        deleteModalOpen: false,
+        deleteTarget: { id: null, filename: '', usageCount: 0, force: false },
+
+        init() {
+            // Hotkeys or initializations if needed
+        },
+
+        copyUrl(url) {
+            if (!url) return;
+            const full = url.startsWith('http') ? url : (window.location.origin + url);
+            navigator.clipboard.writeText(full).then(() => {
+                alert('Copied to clipboard:\n' + full);
+            }).catch(() => {
+                prompt('Copy URL:', full);
+            });
+        },
+
+        toggleSelectAll(e) {
+            if (e.target.checked) {
+                const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+                this.selectedIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
+            } else {
+                this.selectedIds = [];
+            }
+        },
+
+        async syncServerFiles() {
+            this.syncing = true;
+            try {
+                const res = await fetch('{{ route('admin.media.sync-existing') }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(data.message);
+                    window.location.reload();
+                } else {
+                    alert('Sync error: ' + (data.message || 'Unknown error'));
+                }
+            } catch (err) {
+                alert('Failed to execute sync: ' + err.message);
+            } finally {
+                this.syncing = false;
+            }
+        },
+
+        async openDetails(id) {
+            try {
+                const res = await fetch(`/admin/media/${id}/details`);
+                const data = await res.json();
+                if (data.success) {
+                    this.activeAsset = data.asset;
+                    this.editMeta = {
+                        title: data.asset.title || '',
+                        alt_text: data.asset.alt_text || '',
+                        caption: data.asset.caption || '',
+                        category: data.asset.category || 'general'
+                    };
+                    this.drawerOpen = true;
+                }
+            } catch (err) {
+                alert('Could not load asset details: ' + err.message);
+            }
+        },
+
+        async saveMetadata() {
+            if (!this.activeAsset) return;
+            this.savingMeta = true;
+            try {
+                const res = await fetch(`/admin/media/${this.activeAsset.id}/update`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(this.editMeta)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    this.activeAsset.title = this.editMeta.title;
+                    this.activeAsset.alt_text = this.editMeta.alt_text;
+                    this.activeAsset.caption = this.editMeta.caption;
+                    this.activeAsset.category = this.editMeta.category;
+                    alert('Metadata updated successfully!');
+                } else {
+                    alert('Save failed: ' + (data.message || 'Validation error'));
+                }
+            } catch (err) {
+                alert('Network error while saving: ' + err.message);
+            } finally {
+                this.savingMeta = false;
+            }
+        },
+
+        async replaceAssetFile(event) {
+            const file = event.target.files[0];
+            if (!file || !this.activeAsset) return;
+
+            if (!confirm(`Are you sure you want to replace "${this.activeAsset.filename}" with "${file.name}"? The URL will remain identical.`)) {
+                event.target.value = '';
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const res = await fetch(`/admin/media/${this.activeAsset.id}/replace`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('File successfully replaced!');
+                    window.location.reload();
+                } else {
+                    alert('Replacement failed: ' + (data.message || 'Error'));
+                }
+            } catch (err) {
+                alert('Upload replacement error: ' + err.message);
+            }
+        },
+
+        openUploadModal() {
+            this.queuedFiles = [];
+            this.uploadProgress = 0;
+            this.uploading = false;
+            this.uploadModalOpen = true;
+        },
+
+        handleFilesSelected(e) {
+            const files = Array.from(e.target.files);
+            this.queuedFiles.push(...files);
+            e.target.value = '';
+        },
+
+        handleDrop(e) {
+            this.dragOver = false;
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                const files = Array.from(e.dataTransfer.files);
+                this.queuedFiles.push(...files);
+            }
+        },
+
+        removeQueuedFile(index) {
+            this.queuedFiles.splice(index, 1);
+        },
+
+        formatBytes(bytes) {
+            if (bytes <= 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        },
+
+        async submitUpload() {
+            if (this.queuedFiles.length === 0) return;
+            this.uploading = true;
+            this.uploadProgress = 10;
+
+            const formData = new FormData();
+            this.queuedFiles.forEach(file => {
+                formData.append('files[]', file);
+            });
+            formData.append('category', this.uploadCategory);
+
+            try {
+                this.uploadProgress = 50;
+                const res = await fetch('{{ route('admin.media.upload') }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                });
+                this.uploadProgress = 90;
+                const data = await res.json();
+                this.uploadProgress = 100;
+
+                if (data.success) {
+                    alert(data.message);
+                    this.uploadModalOpen = false;
+                    window.location.reload();
+                } else {
+                    alert('Upload issues: ' + (data.message || data.errors?.join(', ')));
+                }
+            } catch (err) {
+                alert('Upload network error: ' + err.message);
+            } finally {
+                this.uploading = false;
+            }
+        },
+
+        confirmDeleteAsset(id, filename, usageCount) {
+            this.deleteTarget = { id, filename, usageCount, force: false };
+            this.deleteModalOpen = true;
+        },
+
+        async executeDelete() {
+            if (!this.deleteTarget.id) return;
+            try {
+                const res = await fetch(`/admin/media/${this.deleteTarget.id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ force: this.deleteTarget.force })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(data.message);
+                    this.deleteModalOpen = false;
+                    this.drawerOpen = false;
+                    window.location.reload();
+                } else {
+                    alert('Delete blocked: ' + data.message);
+                }
+            } catch (err) {
+                alert('Delete error: ' + err.message);
+            }
+        },
+
+        async applyBulkCategory() {
+            if (!this.bulkCategory || this.selectedIds.length === 0) return;
+            try {
+                const res = await fetch('{{ route('admin.media.bulk-action') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'set_category',
+                        ids: this.selectedIds,
+                        category: this.bulkCategory
+                    })
+                });
+                const data = await res.json();
+                alert(data.message);
+                window.location.reload();
+            } catch (err) {
+                alert('Bulk update error: ' + err.message);
+            }
+        },
+
+        async bulkRefreshUsage() {
+            if (this.selectedIds.length === 0) return;
+            try {
+                const res = await fetch('{{ route('admin.media.bulk-action') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'refresh_usage',
+                        ids: this.selectedIds
+                    })
+                });
+                const data = await res.json();
+                alert(data.message);
+                window.location.reload();
+            } catch (err) {
+                alert('Usage refresh error: ' + err.message);
+            }
+        },
+
+        async confirmBulkDelete() {
+            if (this.selectedIds.length === 0) return;
+            const force = confirm(`Are you sure you want to delete ${this.selectedIds.length} assets?\n\nIf any assets are in-use, click OK to force delete, or Cancel to abort.`);
+            if (!force) return;
+
+            try {
+                const res = await fetch('{{ route('admin.media.bulk-action') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'delete',
+                        ids: this.selectedIds,
+                        force: true
+                    })
+                });
+                const data = await res.json();
+                alert(data.message);
+                window.location.reload();
+            } catch (err) {
+                alert('Bulk delete error: ' + err.message);
+            }
+        }
+    };
+}
+</script>
+@endsection

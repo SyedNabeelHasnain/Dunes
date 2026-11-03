@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\AdminFaqController;
 use App\Http\Controllers\Admin\AdminLanguageController;
 use App\Http\Controllers\Admin\AdminLegalController;
 use App\Http\Controllers\Admin\AdminMailSettingController;
+use App\Http\Controllers\Admin\AdminMediaController;
 use App\Http\Controllers\Admin\AdminMenuController;
 use App\Http\Controllers\Admin\AdminOperationsController;
 use App\Http\Controllers\Admin\AdminPageController;
@@ -327,6 +328,16 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::post('/inquiries/{id}/mark-read', [AdminDashboardController::class, 'markInquiryRead'])->name('inquiries.mark-read');
     Route::post('/inquiries/{id}/status', [AdminDashboardController::class, 'updateInquiryStatus'])->name('inquiries.status');
     Route::delete('/inquiries/{id}', [AdminDashboardController::class, 'deleteInquiry'])->name('inquiries.destroy');
+
+    // Unified Media Library & Asset Management (Images & Videos)
+    Route::get('/media', [AdminMediaController::class, 'index'])->name('media.index');
+    Route::post('/media/upload', [AdminMediaController::class, 'upload'])->name('media.upload');
+    Route::get('/media/{id}/details', [AdminMediaController::class, 'details'])->name('media.details');
+    Route::post('/media/{id}/update', [AdminMediaController::class, 'update'])->name('media.update');
+    Route::post('/media/{id}/replace', [AdminMediaController::class, 'replace'])->name('media.replace');
+    Route::delete('/media/{id}', [AdminMediaController::class, 'destroy'])->name('media.destroy');
+    Route::post('/media/sync-existing', [AdminMediaController::class, 'syncExisting'])->name('media.sync-existing');
+    Route::post('/media/bulk-action', [AdminMediaController::class, 'bulkAction'])->name('media.bulk-action');
 
     // Blog CMS
     Route::resource('blogs', AdminBlogController::class)->except(['show']);

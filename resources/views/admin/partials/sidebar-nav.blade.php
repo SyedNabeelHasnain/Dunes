@@ -6,7 +6,7 @@
     $isCatalogGroup = request()->routeIs('admin.tours.*') || request()->routeIs('admin.addons.*') || request()->routeIs('admin.tiers.*');
     $isCommunicationsGroup = request()->routeIs('admin.inquiries.*') || request()->routeIs('admin.whatsapp.*') || request()->routeIs('admin.reviews.*') || request()->routeIs('admin.video-reviews.*');
     $isMarketingGroup = request()->routeIs('admin.coupons.*') || request()->routeIs('admin.subscribers.*') || request()->routeIs('admin.subscriber-groups.*') || request()->routeIs('admin.email-templates.*') || request()->routeIs('admin.campaigns.*') || request()->routeIs('admin.backlinks.*');
-    $isContentGroup = request()->routeIs('admin.blogs.*') || request()->routeIs('admin.blog-categories.*') || request()->routeIs('admin.wiki.*') || request()->routeIs('admin.pages.*') || request()->routeIs('admin.menus.*') || request()->routeIs('admin.faqs.*') || request()->routeIs('admin.legal.*');
+    $isContentGroup = request()->routeIs('admin.media.*') || request()->routeIs('admin.blogs.*') || request()->routeIs('admin.blog-categories.*') || request()->routeIs('admin.wiki.*') || request()->routeIs('admin.pages.*') || request()->routeIs('admin.menus.*') || request()->routeIs('admin.faqs.*') || request()->routeIs('admin.legal.*');
     $isSettingsGroup = request()->routeIs('admin.settings.*');
 @endphp
 
@@ -473,6 +473,16 @@
              x-collapse 
              class="ps-3.5 ms-4 border-s-2 border-slate-800/80 space-y-1 mt-1">
             
+            <!-- Media Library (Images & Videos) -->
+            <a href="{{ route('admin.media.index') }}" 
+               class="relative flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.media*') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.media*') ? 'bg-rose-400 shadow-sm shadow-rose-400/50' : 'bg-slate-600' }}"></span>
+                    <span>Media Library</span>
+                </div>
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">Photos &amp; Video</span>
+            </a>
+
             <a href="{{ route('admin.blogs.index') }}" 
                class="relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.blogs*') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
                 <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.blogs*') ? 'bg-primary' : 'bg-slate-600' }}"></span>

@@ -368,6 +368,15 @@
                                     </div>
                                 </a>
                             </div>
+                            <div class="cmd-entry rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group cursor-pointer" data-category="actions" data-keywords="upload media images videos library photos gallery banner dropzone">
+                                <a href="{{ route('admin.media.index') }}" class="flex items-center gap-3 p-2.5">
+                                    <i class="bi bi-images text-rose-500 text-xl shrink-0"></i>
+                                    <div>
+                                        <strong class="block text-xs font-bold text-slate-900 group-hover:text-primary">Media Library &amp; Uploads</strong>
+                                        <span class="text-[11px] text-slate-500">Manage all images, videos, banners &amp; reels</span>
+                                    </div>
+                                </a>
+                            </div>
                             <div class="cmd-entry rounded-xl border border-slate-200 hover:border-primary hover:bg-slate-50 transition group cursor-pointer" data-category="actions" data-keywords="write blog new article post desert travel guide publish">
                                 <a href="{{ route('admin.blogs.create') }}" class="flex items-center gap-3 p-2.5">
                                     <i class="bi bi-journal-plus text-emerald-500 text-xl shrink-0"></i>
@@ -555,6 +564,10 @@
                             <a href="{{ route('admin.pricing.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="pricing matrix bulk calendar rates seasonal">
                                 <span class="flex items-center gap-2"><i class="bi bi-cash-stack text-emerald-600"></i> Pricing Matrix</span>
                                 <span class="text-[10px] text-slate-400 font-mono">/admin/pricing</span>
+                            </a>
+                            <a href="{{ route('admin.media.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="media library photos images videos mp4 banners reels files gallery assets uploads">
+                                <span class="flex items-center gap-2"><i class="bi bi-images text-rose-500"></i> Media Library (Photos &amp; Videos)</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/media</span>
                             </a>
                             <a href="{{ route('admin.blogs.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="blogs articles posts guides desert travel tips publishing">
                                 <span class="flex items-center gap-2"><i class="bi bi-journal-richtext text-emerald-500"></i> Blog Articles & Posts</span>
