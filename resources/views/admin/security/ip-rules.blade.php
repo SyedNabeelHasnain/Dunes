@@ -16,8 +16,8 @@
         </div>
 
         <div class="flex items-center gap-2.5">
-            <button type="button" onclick="openAddRuleModal()" class="btn-desert-animated inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold text-white shadow-xs">
-                <i class="bi bi-plus-circle-fill"></i> Add IP Rule
+            <button type="button" onclick="openAddRuleModal()" class="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold text-white bg-primary hover:bg-primary-dark shadow-md hover:shadow-lg transition-all cursor-pointer">
+                <i class="bi bi-plus-circle-fill text-sm"></i> Add IP Rule
             </button>
         </div>
     </div>
@@ -169,16 +169,22 @@
                     <a href="{{ route('admin.security.ip-rules', ['tab' => 'inactive']) }}" class="px-3 py-1.5 rounded-lg text-xs font-bold transition {{ $tab === 'inactive' ? 'bg-slate-700 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">Inactive</a>
                 </div>
 
-                <form method="GET" action="{{ route('admin.security.ip-rules') }}" class="flex items-center gap-2">
-                    <input type="hidden" name="tab" value="{{ $tab }}">
-                    <div class="relative">
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search IP or label..." class="w-56 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary">
-                        @if(request('search'))
-                            <a href="{{ route('admin.security.ip-rules', ['tab' => $tab]) }}" class="absolute right-2 top-1.5 text-slate-400 hover:text-slate-600 text-xs">&times;</a>
-                        @endif
-                    </div>
-                    <button type="submit" class="px-3 py-1.5 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition cursor-pointer">Filter</button>
-                </form>
+                <div class="flex items-center gap-2.5">
+                    <form method="GET" action="{{ route('admin.security.ip-rules') }}" class="flex items-center gap-2">
+                        <input type="hidden" name="tab" value="{{ $tab }}">
+                        <div class="relative">
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search IP or label..." class="w-56 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary">
+                            @if(request('search'))
+                                <a href="{{ route('admin.security.ip-rules', ['tab' => $tab]) }}" class="absolute right-2 top-1.5 text-slate-400 hover:text-slate-600 text-xs">&times;</a>
+                            @endif
+                        </div>
+                        <button type="submit" class="px-3 py-1.5 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition cursor-pointer">Filter</button>
+                    </form>
+
+                    <button type="button" onclick="openAddRuleModal()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold shadow-xs transition cursor-pointer whitespace-nowrap">
+                        <i class="bi bi-plus-circle-fill"></i> Add IP Rule
+                    </button>
+                </div>
             </div>
 
             <!-- Rules Table Card -->
@@ -302,12 +308,18 @@
         <!-- ==================== TAB 2: UNBLOCK APPEAL REQUESTS ==================== -->
         <div x-show="currentTab === 'appeals'" class="space-y-4">
             <!-- Filter Toolbar -->
-            <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs flex items-center gap-2">
-                <span class="text-xs font-bold text-slate-600 mr-2">Filter Appeals:</span>
-                <a href="{{ route('admin.security.ip-rules', ['appeal_status' => 'all']) }}" class="px-3 py-1.5 rounded-lg text-xs font-bold transition {{ $appealStatus === 'all' ? 'bg-primary text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">All Requests</a>
-                <a href="{{ route('admin.security.ip-rules', ['appeal_status' => 'pending']) }}" class="px-3 py-1.5 rounded-lg text-xs font-bold transition {{ $appealStatus === 'pending' ? 'bg-amber-600 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">Pending ({{ $stats['pending_appeals'] }})</a>
-                <a href="{{ route('admin.security.ip-rules', ['appeal_status' => 'approved_unblocked']) }}" class="px-3 py-1.5 rounded-lg text-xs font-bold transition {{ $appealStatus === 'approved_unblocked' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">Approved</a>
-                <a href="{{ route('admin.security.ip-rules', ['appeal_status' => 'rejected_kept_blocked']) }}" class="px-3 py-1.5 rounded-lg text-xs font-bold transition {{ $appealStatus === 'rejected_kept_blocked' ? 'bg-rose-600 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">Rejected</a>
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-xs font-bold text-slate-600 mr-2">Filter Appeals:</span>
+                    <a href="{{ route('admin.security.ip-rules', ['appeal_status' => 'all']) }}" class="px-3 py-1.5 rounded-lg text-xs font-bold transition {{ $appealStatus === 'all' ? 'bg-primary text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">All Requests</a>
+                    <a href="{{ route('admin.security.ip-rules', ['appeal_status' => 'pending']) }}" class="px-3 py-1.5 rounded-lg text-xs font-bold transition {{ $appealStatus === 'pending' ? 'bg-amber-600 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">Pending ({{ $stats['pending_appeals'] }})</a>
+                    <a href="{{ route('admin.security.ip-rules', ['appeal_status' => 'approved_unblocked']) }}" class="px-3 py-1.5 rounded-lg text-xs font-bold transition {{ $appealStatus === 'approved_unblocked' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">Approved</a>
+                    <a href="{{ route('admin.security.ip-rules', ['appeal_status' => 'rejected_kept_blocked']) }}" class="px-3 py-1.5 rounded-lg text-xs font-bold transition {{ $appealStatus === 'rejected_kept_blocked' ? 'bg-rose-600 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">Rejected</a>
+                </div>
+
+                <button type="button" onclick="openAddRuleModal()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold shadow-xs transition cursor-pointer whitespace-nowrap self-start sm:self-auto">
+                    <i class="bi bi-plus-circle-fill"></i> Add IP Rule
+                </button>
             </div>
 
             <!-- Appeals Table Card -->
@@ -425,13 +437,13 @@
 </div>
 
 <!-- Add Rule Modal -->
-<div id="addRuleModal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+<div id="addRuleModal" onclick="if(event.target === this) closeAddRuleModal()" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 max-w-lg w-full shadow-2xl relative">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-5">
             <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
                 <i class="bi bi-shield-plus text-primary"></i> Create Security IP Rule
             </h3>
-            <button type="button" onclick="closeAddRuleModal()" class="text-slate-400 hover:text-slate-700 text-lg">&times;</button>
+            <button type="button" onclick="closeAddRuleModal()" class="text-slate-400 hover:text-slate-700 text-lg cursor-pointer">&times;</button>
         </div>
 
         <form method="POST" action="{{ route('admin.security.ip-rules.store') }}" class="space-y-4">
@@ -489,7 +501,9 @@
 
             <div class="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-100">
                 <button type="button" onclick="closeAddRuleModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer">Cancel</button>
-                <button type="submit" class="btn-desert-animated px-5 py-2 rounded-xl text-xs font-bold text-white shadow-xs cursor-pointer">Save IP Rule</button>
+                <button type="submit" class="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-primary hover:bg-primary-dark shadow-md hover:shadow-lg transition-all cursor-pointer">
+                    <i class="bi bi-check-circle-fill"></i> Save IP Rule
+                </button>
             </div>
         </form>
     </div>
@@ -499,10 +513,14 @@
 <script>
 function openAddRuleModal() {
     document.getElementById('addRuleModal').classList.remove('hidden');
+    document.querySelector('#addRuleModal input[name="ip_address"]')?.focus();
 }
 function closeAddRuleModal() {
     document.getElementById('addRuleModal').classList.add('hidden');
 }
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeAddRuleModal();
+});
 
 async function purgeLogsForIp(ip) {
     if (!confirm(`Are you sure you want to permanently purge all historical telemetry and request logs for IP ${ip}?`)) {

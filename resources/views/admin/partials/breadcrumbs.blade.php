@@ -256,6 +256,12 @@
                 ['label' => 'Settings', 'url' => route('admin.settings.general')],
                 ['label' => 'Translation APIs'],
             ],
+
+            // Security & Firewalls
+            'admin.security.ip-rules' => [
+                ['label' => 'Security & Firewalls'],
+                ['label' => 'IP Rules & Firewall'],
+            ],
             'admin.profile' => [
                 ['label' => 'Account', 'url' => route('admin.profile')],
                 ['label' => 'Profile & Security'],
