@@ -129,4 +129,11 @@ class HeatmapTest extends TestCase
             ],
         ]);
     }
+
+    public function test_admin_can_access_heatmaps_index_page(): void
+    {
+        $response = $this->actingAs($this->admin)->get('/admin/analytics/heatmaps');
+        $response->assertStatus(200);
+        $response->assertSee('Heatmap & Scroll Analytics');
+    }
 }

@@ -316,12 +316,12 @@
                                 <!-- Journey / Pages -->
                                 <td class="py-3.5 px-4 max-w-xs">
                                     <div class="truncate font-semibold text-slate-900" title="{{ $rec->landing_page }}">
-                                        {{ $rec->landing_page ? parse_url($rec->landing_page, PHP_URL_PATH) : '/' }}
+                                        {{ $rec->clean_landing_page }}
                                     </div>
-                                    @if($rec->exit_page && $rec->exit_page !== $rec->landing_page)
+                                    @if($rec->exit_page && $rec->clean_exit_page !== $rec->clean_landing_page)
                                         <div class="truncate text-[11px] text-slate-400 flex items-center gap-1 mt-0.5" title="{{ $rec->exit_page }}">
                                             <i class="bi bi-arrow-right text-[10px]"></i>
-                                            <span>{{ parse_url($rec->exit_page, PHP_URL_PATH) }}</span>
+                                            <span>{{ $rec->clean_exit_page }}</span>
                                         </div>
                                     @endif
                                 </td>

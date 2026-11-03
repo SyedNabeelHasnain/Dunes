@@ -25,53 +25,75 @@ class AdminSessionRecordingController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = VisitorSessionRecording::query()->orderBy('last_event_at', 'desc');
+        try {
+            $query = VisitorSessionRecording::query()->orderByRaw('COALESCE(last_event_at, created_at) desc');
 
-        if ($request->filled('device') && $request->device !== 'all') {
-            $query->where('device_type', $request->device);
-        }
-
-        if ($request->filled('country') && $request->country !== 'all') {
-            $query->where('country', $request->country);
-        }
-
-        if ($request->filled('inquiry')) {
-            if ($request->inquiry === 'yes') {
-                $query->where('has_inquiry', true);
-            } elseif ($request->inquiry === 'no') {
-                $query->where('has_inquiry', false);
+            if ($request->filled('device') && $request->device !== 'all') {
+                $query->where('device_type', $request->device);
             }
+
+            if ($request->filled('country') && $request->country !== 'all') {
+                $query->where('country', $request->country);
+            }
+
+            if ($request->filled('inquiry')) {
+                if ($request->inquiry === 'yes') {
+                    $query->where('has_inquiry', true);
+                } elseif ($request->inquiry === 'no') {
+                    $query->where('has_inquiry', false);
+                }
+            }
+
+            if ($request->filled('starred') && $request->starred === '1') {
+                $query->where('is_starred', true);
+            }
+
+            if ($request->filled('search')) {
+                $s = trim($request->search);
+                $query->where(function ($q) use ($s) {
+                    $q->where('session_id', 'like', "%{$s}%")
+                      ->orWhere('client_ip', 'like', "%{$s}%")
+                      ->orWhere('city', 'like', "%{$s}%")
+                      ->orWhere('landing_page', 'like', "%{$s}%");
+                });
+            }
+
+            if ($request->filled('days') && is_numeric($request->days)) {
+                $query->where('created_at', '>=', now()->subDays((int) $request->days));
+            }
+
+            $recordings = $query->paginate(25)->withQueryString();
+            $stats = $this->recordingService->getStorageStats();
+
+            // Get unique countries for filter dropdown
+            $countries = VisitorSessionRecording::whereNotNull('country')
+                ->where('country', '!=', '')
+                ->distinct()
+                ->orderBy('country')
+                ->pluck('country');
+
+            return view('admin.analytics.recordings.index', compact('recordings', 'stats', 'countries'));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Admin recordings index error: ' . $e->getMessage(), [
+                'exception' => $e,
+            ]);
+
+            $recordings = VisitorSessionRecording::query()->paginate(25);
+            $stats = [
+                'total_recordings' => 0,
+                'starred_recordings' => 0,
+                'inquiries_recordings' => 0,
+                'total_bytes' => 0,
+                'formatted_bytes' => '0 KB',
+                'total_duration_sec' => 0,
+                'formatted_duration' => '0m',
+                'retention_days' => 14,
+                'is_enabled' => true,
+            ];
+            $countries = collect();
+
+            return view('admin.analytics.recordings.index', compact('recordings', 'stats', 'countries'));
         }
-
-        if ($request->filled('starred') && $request->starred === '1') {
-            $query->where('is_starred', true);
-        }
-
-        if ($request->filled('search')) {
-            $s = trim($request->search);
-            $query->where(function ($q) use ($s) {
-                $q->where('session_id', 'like', "%{$s}%")
-                  ->orWhere('client_ip', 'like', "%{$s}%")
-                  ->orWhere('city', 'like', "%{$s}%")
-                  ->orWhere('landing_page', 'like', "%{$s}%");
-            });
-        }
-
-        if ($request->filled('days') && is_numeric($request->days)) {
-            $query->where('created_at', '>=', now()->subDays((int) $request->days));
-        }
-
-        $recordings = $query->paginate(25)->withQueryString();
-        $stats = $this->recordingService->getStorageStats();
-
-        // Get unique countries for filter dropdown
-        $countries = VisitorSessionRecording::whereNotNull('country')
-            ->where('country', '!=', '')
-            ->distinct()
-            ->orderBy('country')
-            ->pluck('country');
-
-        return view('admin.analytics.recordings.index', compact('recordings', 'stats', 'countries'));
     }
 
     /**

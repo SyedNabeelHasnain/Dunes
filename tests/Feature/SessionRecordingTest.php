@@ -170,6 +170,26 @@ class SessionRecordingTest extends TestCase
         $this->recordingService->deleteRecording($recording);
     }
 
+    public function test_admin_can_access_recordings_index_page(): void
+    {
+        VisitorSessionRecording::create([
+            'session_id' => 'view-test-' . uniqid(),
+            'client_ip' => '198.51.100.11',
+            'country' => 'United Arab Emirates',
+            'city' => 'Dubai',
+            'device_type' => 'desktop',
+            'landing_page' => '/tours',
+            'duration_seconds' => 45,
+            'events_count' => 12,
+            'is_starred' => false,
+            'has_inquiry' => false,
+        ]);
+
+        $response = $this->actingAs($this->admin)->get('/admin/analytics/recordings');
+        $response->assertStatus(200);
+        $response->assertSee('Session Recordings & Replay');
+    }
+
     public function test_admin_can_toggle_starred_status_on_recording(): void
     {
         $recording = VisitorSessionRecording::create([

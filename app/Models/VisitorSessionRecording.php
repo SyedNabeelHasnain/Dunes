@@ -86,4 +86,30 @@ class VisitorSessionRecording extends Model
             default => 'bi-laptop',
         };
     }
+
+    /**
+     * Get clean landing page path without query params.
+     */
+    public function getCleanLandingPageAttribute(): string
+    {
+        if (empty($this->landing_page)) {
+            return '/';
+        }
+        $p = parse_url($this->landing_page, PHP_URL_PATH);
+
+        return ! empty($p) ? $p : '/';
+    }
+
+    /**
+     * Get clean exit page path without query params.
+     */
+    public function getCleanExitPageAttribute(): string
+    {
+        if (empty($this->exit_page)) {
+            return '';
+        }
+        $p = parse_url($this->exit_page, PHP_URL_PATH);
+
+        return ! empty($p) ? $p : '';
+    }
 }

@@ -24,15 +24,45 @@ class AdminHeatmapController extends Controller
      */
     public function index(Request $request): View
     {
-        $pages = $this->heatmapService->getAvailablePages();
-        $selectedPage = $request->input('page', $pages[0]['page_path'] ?? '/');
-        $selectedDevice = $request->input('device', 'all');
-        $days = (int) $request->input('days', 30);
+        try {
+            $pages = $this->heatmapService->getAvailablePages();
+            $selectedPage = $request->input('page', $pages[0]['page_path'] ?? '/');
+            $selectedDevice = $request->input('device', 'all');
+            $days = (int) $request->input('days', 30);
 
-        $heatmapData = $this->heatmapService->getHeatmapData($selectedPage, $selectedDevice, $days);
-        $isEnabled = $this->heatmapService->isEnabled();
+            $heatmapData = $this->heatmapService->getHeatmapData($selectedPage, $selectedDevice, $days);
+            $isEnabled = $this->heatmapService->isEnabled();
 
-        return view('admin.analytics.heatmaps.index', compact('pages', 'selectedPage', 'selectedDevice', 'days', 'heatmapData', 'isEnabled'));
+            return view('admin.analytics.heatmaps.index', compact('pages', 'selectedPage', 'selectedDevice', 'days', 'heatmapData', 'isEnabled'));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Admin heatmap index error: ' . $e->getMessage(), [
+                'exception' => $e,
+            ]);
+
+            $pages = [['page_path' => '/', 'count' => 0]];
+            $selectedPage = '/';
+            $selectedDevice = 'all';
+            $days = 30;
+            $heatmapData = [
+                'page_path' => '/',
+                'device_type' => 'all',
+                'days' => 30,
+                'total_clicks' => 0,
+                'clicks' => collect(),
+                'top_elements' => collect(),
+                'scroll' => [
+                    'total_records' => 0,
+                    'avg_scroll_percent' => 0,
+                    'reach_25' => 0,
+                    'reach_50' => 0,
+                    'reach_75' => 0,
+                    'reach_100' => 0,
+                ],
+            ];
+            $isEnabled = true;
+
+            return view('admin.analytics.heatmaps.index', compact('pages', 'selectedPage', 'selectedDevice', 'days', 'heatmapData', 'isEnabled'));
+        }
     }
 
     /**
