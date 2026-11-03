@@ -187,13 +187,13 @@ class AdminSessionRecordingController extends Controller
         ]);
 
         Setting::updateOrCreate(
-            ['key' => 'session_recordings_retention_days'],
-            ['value' => (string) $request->session_recordings_retention_days]
+            ['setting_key' => 'session_recordings_retention_days'],
+            ['setting_value' => (string) $request->session_recordings_retention_days]
         );
 
         Setting::updateOrCreate(
-            ['key' => 'session_recordings_enabled'],
-            ['value' => $request->boolean('session_recordings_enabled') ? '1' : '0']
+            ['setting_key' => 'session_recordings_enabled'],
+            ['setting_value' => $request->boolean('session_recordings_enabled') ? '1' : '0']
         );
 
         return back()->with('success', 'Session recording preferences updated successfully.');

@@ -28,8 +28,12 @@ class SessionRecordingService
      */
     public function isEnabled(): bool
     {
-        $val = Setting::where('key', 'session_recordings_enabled')->value('value');
-        return $val === null || $val === '1' || $val === 'true';
+        try {
+            $val = Setting::where('setting_key', 'session_recordings_enabled')->value('setting_value');
+            return $val === null || $val === '1' || $val === 'true';
+        } catch (\Throwable $e) {
+            return true;
+        }
     }
 
     /**
@@ -37,8 +41,12 @@ class SessionRecordingService
      */
     public function getRetentionDays(): int
     {
-        $val = Setting::where('key', 'session_recordings_retention_days')->value('value');
-        return ! empty($val) && is_numeric($val) ? (int) $val : 14;
+        try {
+            $val = Setting::where('setting_key', 'session_recordings_retention_days')->value('setting_value');
+            return ! empty($val) && is_numeric($val) ? (int) $val : 14;
+        } catch (\Throwable $e) {
+            return 14;
+        }
     }
 
     /**

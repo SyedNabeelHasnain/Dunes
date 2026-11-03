@@ -21,8 +21,12 @@ class HeatmapService
      */
     public function isEnabled(): bool
     {
-        $val = Setting::where('key', 'heatmaps_enabled')->value('value');
-        return $val === null || $val === '1' || $val === 'true';
+        try {
+            $val = Setting::where('setting_key', 'heatmaps_enabled')->value('setting_value');
+            return $val === null || $val === '1' || $val === 'true';
+        } catch (\Throwable $e) {
+            return true;
+        }
     }
 
     /**

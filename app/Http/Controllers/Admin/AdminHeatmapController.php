@@ -69,8 +69,8 @@ class AdminHeatmapController extends Controller
     public function updateSettings(Request $request): RedirectResponse
     {
         Setting::updateOrCreate(
-            ['key' => 'heatmaps_enabled'],
-            ['value' => $request->boolean('heatmaps_enabled') ? '1' : '0']
+            ['setting_key' => 'heatmaps_enabled'],
+            ['setting_value' => $request->boolean('heatmaps_enabled') ? '1' : '0']
         );
 
         return back()->with('success', 'Heatmap preferences updated successfully.');
