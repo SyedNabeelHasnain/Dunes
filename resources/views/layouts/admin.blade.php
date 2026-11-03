@@ -512,6 +512,14 @@
                                 <span class="flex items-center gap-2"><i class="bi bi-graph-up-arrow text-primary"></i> Real-Time Analytics Dashboard</span>
                                 <span class="text-[10px] text-slate-400 font-mono">/admin/analytics</span>
                             </a>
+                            <a href="{{ route('admin.analytics.recordings.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="recordings session replay rrweb screen playback video visitor watch telemetry">
+                                <span class="flex items-center gap-2"><i class="bi bi-camera-reels-fill text-amber-500"></i> Session Recordings &amp; Replay Hub</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/analytics/recordings</span>
+                            </a>
+                            <a href="{{ route('admin.analytics.heatmaps.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="heatmaps clicks scroll depth map visual hotspot friction page fold">
+                                <span class="flex items-center gap-2"><i class="bi bi-fire text-orange-500"></i> Heatmaps &amp; Scroll Depth Visualizer</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/analytics/heatmaps</span>
+                            </a>
                             <a href="{{ route('admin.reports.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="reports reporting bi business intelligence attribution channels draft conversion finance reconciliation audit crystal power">
                                 <span class="flex items-center gap-2"><i class="bi bi-bar-chart-line-fill text-emerald-500"></i> Enterprise Reporting & BI Hub</span>
                                 <span class="text-[10px] text-slate-400 font-mono">/admin/reports</span>

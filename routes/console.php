@@ -42,3 +42,7 @@ Schedule::command('seo:verify-backlinks')->dailyAt('04:00')->withoutOverlapping(
 
 // Stream recently modified catalog URLs via IndexNow daily at 04:30 AM (complying with Bing Webmaster streaming recommendation)
 Schedule::command('seo:indexnow --recent')->dailyAt('04:30')->withoutOverlapping()->runInBackground();
+
+// Prune expired session recordings and heatmaps daily according to retention settings at 03:30 AM
+Schedule::command('telemetry:purge-recordings')->dailyAt('03:30')->withoutOverlapping()->runInBackground();
+

@@ -1207,6 +1207,8 @@
 
     <!-- Scripts -->
     <script src="{{ asset('assets/vendor/intl-tel-input/26.0.6/build/intlTelInput.min.js') }}"></script>
+    <!-- Real-time Session Recording & Heatmap Telemetry (Self-Hosted, Human-Only) -->
+    <script defer src="{{ asset('assets/js/dunes-telemetry.js') }}"></script>
 
     <!-- Persistent Floating WhatsApp Action Button -->
     <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}?text={{ urlencode('Hi Dunes Discovery! I would like to inquire about booking a Dubai Desert Safari.') }}"

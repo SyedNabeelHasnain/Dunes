@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Controllers\Api\CouponController;
 use App\Http\Controllers\Api\EmailVerificationController;
+use App\Http\Controllers\Api\SessionTelemetryController;
 use App\Http\Controllers\Api\SyndicationController;
 use App\Http\Controllers\Api\WelcomeOfferController;
 use App\Http\Controllers\Api\ZiinaWebhookController;
@@ -56,6 +57,11 @@ Route::prefix('v1')->group(function () {
     // Public Newsletter & Marketing Subscription
     Route::post('/subscribers/subscribe', [SubscriberController::class, 'subscribe'])->middleware('throttle:10,1');
 
+    // Self-Hosted Session Recording & Heatmap Ingestion (rrweb & click/scroll telemetry)
+    Route::post('/telemetry/recordings/batch', [SessionTelemetryController::class, 'ingestRecordingBatch'])->middleware('throttle:180,1');
+    Route::post('/telemetry/heatmaps/click', [SessionTelemetryController::class, 'recordHeatmapClick'])->middleware('throttle:300,1');
+    Route::post('/telemetry/heatmaps/scroll', [SessionTelemetryController::class, 'recordHeatmapScroll'])->middleware('throttle:120,1');
+
     // Admin Real-time Active Visitors tracking
     Route::middleware('auth:sanctum')->get('/visitors/active', [AdminDashboardController::class, 'activeVisitors']);
 
@@ -101,3 +107,9 @@ Route::prefix('v1')->group(function () {
         ]);
     })->middleware('throttle:10,1');
 });
+
+// Top-level aliases for direct /api/telemetry calls
+Route::post('/telemetry/recordings/batch', [SessionTelemetryController::class, 'ingestRecordingBatch'])->middleware('throttle:180,1');
+Route::post('/telemetry/heatmaps/click', [SessionTelemetryController::class, 'recordHeatmapClick'])->middleware('throttle:300,1');
+Route::post('/telemetry/heatmaps/scroll', [SessionTelemetryController::class, 'recordHeatmapScroll'])->middleware('throttle:120,1');
+

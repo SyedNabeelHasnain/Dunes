@@ -152,9 +152,18 @@
                                     <!-- 1-Click Open Live Screen Button -->
                                     <a :href="data.current_screen ? data.current_screen.full_url : ('/' + (data.visitor.current_page || '').replace(/^\//, ''))" 
                                        target="_blank" 
-                                       class="px-3.5 py-1 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-xs shadow-xs transition inline-flex items-center gap-1.5">
-                                        <span>Open Live Screen</span>
+                                       class="px-3 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs shadow-xs transition inline-flex items-center gap-1.5">
+                                        <span>Open Tab</span>
                                         <i class="bi bi-box-arrow-up-right text-[10px]"></i>
+                                    </a>
+
+                                    <!-- 1-Click Replay Session Button -->
+                                    <a :href="'/admin/analytics/recordings?search=' + encodeURIComponent(data.visitor ? (data.visitor.session_id || data.visitor.client_ip) : '')" 
+                                       target="_blank" 
+                                       class="px-3.5 py-1 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs shadow-xs transition inline-flex items-center gap-1.5"
+                                       title="Watch recorded screen replay of this guest">
+                                        <i class="bi bi-camera-reels-fill text-[11px]"></i>
+                                        <span>Watch Recording</span>
                                     </a>
                                 </div>
                             </div>

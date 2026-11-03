@@ -1,5 +1,6 @@
 @php
     $isMobile = $isMobile ?? false;
+    $isAnalyticsGroup = request()->routeIs('admin.analytics.*') || request()->routeIs('admin.reports.*') || request()->routeIs('admin.security.ip-rules');
     $isBookingsGroup = request()->routeIs('admin.bookings.*') || request()->routeIs('admin.pricing.*');
     $isOperationsGroup = request()->routeIs('admin.operations.*') || request()->routeIs('admin.drivers.*') || request()->routeIs('admin.vehicles.*');
     $isCatalogGroup = request()->routeIs('admin.tours.*') || request()->routeIs('admin.addons.*') || request()->routeIs('admin.tiers.*');
@@ -11,6 +12,7 @@
 
 <div x-data="{
     openGroups: {
+        analytics: {{ $isAnalyticsGroup ? 'true' : 'false' }},
         bookings: {{ $isBookingsGroup ? 'true' : 'false' }},
         operations: {{ $isOperationsGroup ? 'true' : 'false' }},
         catalog: {{ $isCatalogGroup ? 'true' : 'false' }},
@@ -33,7 +35,7 @@
     }
 }" class="space-y-1">
 
-    <!-- 1. STANDALONE DASHBOARD & ANALYTICS -->
+    <!-- 1. STANDALONE DASHBOARD -->
     <a href="{{ route('admin.dashboard') }}" 
        class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.dashboard') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}"
        @if(!$isMobile) :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Dashboard' : ''" @endif>
@@ -41,20 +43,82 @@
         <span @if(!$isMobile) x-show="!$store.admin.sidebarCollapsed" @endif class="whitespace-nowrap">Dashboard</span>
     </a>
 
-    <a href="{{ route('admin.analytics.index') }}" 
-       class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.analytics*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}"
-       @if(!$isMobile) :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Analytics & Traffic' : ''" @endif>
-        <i class="bi bi-graph-up-arrow text-base text-cyan-400 shrink-0"></i>
-        <span @if(!$isMobile) x-show="!$store.admin.sidebarCollapsed" @endif class="whitespace-nowrap">Analytics & Traffic</span>
-    </a>
+    <!-- ANALYTICS & VISITOR INTELLIGENCE GROUP (Collapsible Tree) -->
+    <div class="pt-1">
+        <button type="button" 
+                @click="toggle('analytics')" 
+                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-medium transition text-left cursor-pointer {{ $isAnalyticsGroup ? 'bg-slate-900/90 text-white font-semibold' : 'text-slate-400 hover:bg-slate-900/70 hover:text-white' }}"
+                @if(!$isMobile) :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Analytics & Telemetry' : ''" @endif>
+            <div class="flex items-center gap-3 min-w-0">
+                <i class="bi bi-graph-up-arrow text-base text-cyan-400 shrink-0"></i>
+                <span @if(!$isMobile) x-show="!$store.admin.sidebarCollapsed" @endif class="whitespace-nowrap text-sm">Analytics &amp; Telemetry</span>
+            </div>
+            <div @if(!$isMobile) x-show="!$store.admin.sidebarCollapsed" @endif class="flex items-center gap-1.5 shrink-0">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <i class="bi bi-chevron-right text-[11px] text-slate-500 transition-transform duration-200" :class="openGroups.analytics ? 'rotate-90 text-cyan-400' : ''"></i>
+            </div>
+        </button>
 
-    <!-- Enterprise Reports & BI Hub -->
-    <a href="{{ route('admin.reports.index') }}" 
-       class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.reports*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}"
-       @if(!$isMobile) :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Enterprise Reports & BI Hub' : ''" @endif>
-        <i class="bi bi-bar-chart-line-fill text-base text-emerald-400 shrink-0"></i>
-        <span @if(!$isMobile) x-show="!$store.admin.sidebarCollapsed" @endif class="whitespace-nowrap">Reports & BI Hub</span>
-    </a>
+        <div x-show="openGroups.analytics @if(!$isMobile) && !$store.admin.sidebarCollapsed @endif" 
+             x-collapse 
+             class="ps-3.5 ms-4 border-s-2 border-slate-800/80 space-y-1 mt-1">
+            
+            <!-- Real-Time Analytics -->
+            <a href="{{ route('admin.analytics.index') }}" 
+               class="relative flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.analytics.index') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.analytics.index') ? 'bg-primary' : 'bg-slate-600' }}"></span>
+                    <span>Analytics Dashboard</span>
+                </div>
+            </a>
+
+            <!-- Live Visitors Stream -->
+            <a href="{{ route('admin.analytics.live-visitors') }}" 
+               class="relative flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.analytics.live-visitors') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>Live Visitors Stream</span>
+                </div>
+            </a>
+
+            <!-- Session Recordings & Replay -->
+            <a href="{{ route('admin.analytics.recordings.index') }}" 
+               class="relative flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.analytics.recordings.*') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.analytics.recordings.*') ? 'bg-amber-400' : 'bg-slate-600' }}"></span>
+                    <span>Session Replays</span>
+                </div>
+                <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">rrweb</span>
+            </a>
+
+            <!-- Heatmaps & Scroll Maps -->
+            <a href="{{ route('admin.analytics.heatmaps.index') }}" 
+               class="relative flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.analytics.heatmaps.*') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.analytics.heatmaps.*') ? 'bg-orange-400' : 'bg-slate-600' }}"></span>
+                    <span>Heatmaps &amp; Scroll</span>
+                </div>
+            </a>
+
+            <!-- Enterprise Reports & BI Hub -->
+            <a href="{{ route('admin.reports.index') }}" 
+               class="relative flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.reports*') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.reports*') ? 'bg-emerald-400' : 'bg-slate-600' }}"></span>
+                    <span>Enterprise BI Reports</span>
+                </div>
+            </a>
+
+            <!-- IP Firewall & Filters -->
+            <a href="{{ route('admin.security.ip-rules') }}" 
+               class="relative flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.security.ip-rules') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.security.ip-rules') ? 'bg-rose-400' : 'bg-slate-600' }}"></span>
+                    <span>IP Firewall &amp; Filters</span>
+                </div>
+            </a>
+        </div>
+    </div>
 
     <!-- 2. BOOKINGS & SALES GROUP (Collapsible Tree) -->
     <div class="pt-2">
