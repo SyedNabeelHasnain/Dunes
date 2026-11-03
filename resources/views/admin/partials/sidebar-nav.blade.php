@@ -547,6 +547,22 @@
                 <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.settings.notifications*') ? 'bg-primary' : 'bg-slate-600' }}"></span>
                 <span>Notifications & Alerts</span>
             </a>
+
+            <a href="{{ route('admin.security.ip-rules') }}" 
+               class="relative flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.security*') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.security*') ? 'bg-primary' : 'bg-slate-600' }}"></span>
+                    <span>IP Rules & Firewall</span>
+                </div>
+                @php
+                    $pendingAppealsCount = \Illuminate\Support\Facades\Schema::hasTable('unblock_requests') ? \App\Models\UnblockRequest::where('status', 'pending')->count() : 0;
+                @endphp
+                @if($pendingAppealsCount > 0)
+                    <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-500 text-white animate-pulse">
+                        {{ $pendingAppealsCount }}
+                    </span>
+                @endif
+            </a>
         </div>
     </div>
 

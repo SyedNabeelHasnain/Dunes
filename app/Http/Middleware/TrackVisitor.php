@@ -33,13 +33,24 @@ class TrackVisitor
             return;
         }
 
+        // Respect IP exclusion rules (e.g. administrator/internal testing IPs)
+        if ($request->attributes->get('is_analytics_ignored') === true) {
+            return;
+        }
+
         // Only log genuine HTML page loads (exclude AJAX, API, feeds, sitemaps, bots, driver run-sheets, and admin panel)
         if ($request->isMethod('GET')
             && $response->getStatusCode() < 400
             && ! $request->ajax()
-            && ! $request->is('admin*', 'api*', 'login', 'register', 'logout', 'up', 'driver/*', 'sitemap*', '*/sitemap*', 'feed.xml', '*/feed.xml', 'blog/feed.xml', '*/blog/feed.xml', 'robots.txt', 'llms*', '.well-known/*', 'badges/*', 'uploads/*', 'images/*', 'assets/*', 'build/*', 'storage/*', 'booking/*/ticket-pdf', '*/booking/*/ticket-pdf')
+            && ! $request->is('admin*', 'api*', 'security/*', 'login', 'register', 'logout', 'up', 'driver/*', 'sitemap*', '*/sitemap*', 'feed.xml', '*/feed.xml', 'blog/feed.xml', '*/blog/feed.xml', 'robots.txt', 'llms*', '.well-known/*', 'badges/*', 'uploads/*', 'images/*', 'assets/*', 'build/*', 'storage/*', 'booking/*/ticket-pdf', '*/booking/*/ticket-pdf')
         ) {
             try {
+                // Secondary check for ignored IP
+                $ipData = $this->tracker->resolveClientIp();
+                $clientIp = $ipData['client_ip'] ?: ($request->ip() ?: '');
+                if (! empty($clientIp) && app(\App\Services\IpSecurityService::class)->isIpIgnoredFromAnalytics($clientIp)) {
+                    return;
+                }
                 $ua = strtolower((string) $request->userAgent());
                 foreach (['bot', 'crawler', 'spider', 'slurp', 'curl', 'wget', 'lighthouse', 'pagespeed', 'headlesschrome', 'inspect', 'uptime', 'pingdom'] as $botPat) {
                     if ($ua !== '' && str_contains($ua, $botPat)) {

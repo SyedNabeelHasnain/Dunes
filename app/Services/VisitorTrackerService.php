@@ -547,6 +547,11 @@ class VisitorTrackerService
             return true;
         }
 
+        // Check if IP is in the active ignored list
+        if (app(\App\Services\IpSecurityService::class)->isIpIgnoredFromAnalytics($ip)) {
+            return true;
+        }
+
         if (($ctx['bot_indicator'] ?? '') === 'Likely Bot') {
             return true;
         }

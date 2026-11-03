@@ -23,6 +23,22 @@
         </form>
     </div>
 
+    @if(isset($ignoredCount) && $ignoredCount > 0)
+    <div class="rounded-2xl border border-amber-200/80 bg-amber-50/70 p-4 text-xs text-amber-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+        <div class="flex items-center gap-2.5">
+            <span class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-sm shrink-0 border border-amber-300/60">
+                <i class="bi bi-shield-slash"></i>
+            </span>
+            <div>
+                <span class="font-bold">Analytics Exclusion Active:</span> {{ $ignoredCount }} internal testing/admin IP {{ Str::plural('address', $ignoredCount) }} are actively excluded from all charts, visitor counts, and pageview telemetry.
+            </div>
+        </div>
+        <a href="{{ route('admin.security.ip-rules') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-600 text-white font-bold text-xs hover:bg-amber-700 transition-colors shadow-2xs shrink-0 self-start sm:self-auto">
+            <i class="bi bi-shield-check"></i> Manage Excluded IPs
+        </a>
+    </div>
+    @endif
+
     <!-- 4 Key Stat Cards -->
     <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
         <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
@@ -390,8 +406,34 @@
                             <div class="text-[11px] text-slate-400">{{ \Carbon\Carbon::parse($log->request_timestamp)->format('H:i:s') }}</div>
                         </td>
                         <td class="py-3 px-4">
-                            <div class="font-mono font-bold text-slate-800 text-xs">{{ $log->client_ip }}</div>
-                            <div class="text-[11px] text-slate-400">{{ ($log->city ?: 'Unknown') . ', ' . ($log->country ?: '') }}</div>
+                            <div class="flex items-center justify-between gap-2">
+                                <div>
+                                    <div class="font-mono font-bold text-slate-800 text-xs">{{ $log->client_ip }}</div>
+                                    <div class="text-[11px] text-slate-400">{{ ($log->city ?: 'Unknown') . ', ' . ($log->country ?: '') }}</div>
+                                </div>
+                                <div class="flex items-center gap-1 shrink-0 opacity-70 hover:opacity-100 transition-opacity">
+                                    <form action="{{ route('admin.security.ip-rules.store') }}" method="POST" class="inline" onsubmit="return confirm('Ignore IP {{ $log->client_ip }} from analytics to prevent testing pollution?')">
+                                        @csrf
+                                        <input type="hidden" name="ip_address" value="{{ $log->client_ip }}">
+                                        <input type="hidden" name="mode" value="ignore_analytics">
+                                        <input type="hidden" name="status" value="active">
+                                        <input type="hidden" name="label" value="Ignored from logs ({{ $log->city ?: 'UAE' }})">
+                                        <button type="submit" title="Ignore this IP from Analytics" class="p-1 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-colors">
+                                            <i class="bi bi-eye-slash text-xs"></i>
+                                        </button>
+                                    </form>
+                                    <form action="{{ route('admin.security.ip-rules.store') }}" method="POST" class="inline" onsubmit="return confirm('BLOCK IP {{ $log->client_ip }} from accessing Dunes Discovery Tourism?')">
+                                        @csrf
+                                        <input type="hidden" name="ip_address" value="{{ $log->client_ip }}">
+                                        <input type="hidden" name="mode" value="block">
+                                        <input type="hidden" name="status" value="active">
+                                        <input type="hidden" name="label" value="Blocked from logs">
+                                        <button type="submit" title="Block this IP (Firewall)" class="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors">
+                                            <i class="bi bi-shield-x text-xs"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
                         </td>
                         <td class="py-3 px-4 font-mono text-xs text-primary break-all">
                             {{ $log->request_uri }}

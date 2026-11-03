@@ -19,6 +19,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
+        $middleware->web(prepend: [
+            \App\Http\Middleware\IpFirewallMiddleware::class,
+        ]);
         $middleware->web(append: [
             TrackVisitor::class,
             \App\Http\Middleware\TrackBacklinkReferralMiddleware::class,

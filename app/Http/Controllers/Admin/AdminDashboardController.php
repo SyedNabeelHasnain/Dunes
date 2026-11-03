@@ -225,17 +225,26 @@ class AdminDashboardController extends Controller
             $days = (int) $request->input('days', 30);
             $startDate = now()->subDays($days)->startOfDay();
 
+            // Fetch active ignored IPs to ensure testing & admin visits do not pollute analytics
+            $ignoredIps = app(\App\Services\IpSecurityService::class)->getIgnoredIpsList();
+            $applyFilter = function ($query) use ($ignoredIps) {
+                if (! empty($ignoredIps)) {
+                    $query->whereNotIn('client_ip', $ignoredIps);
+                }
+                return $query;
+            };
+
             // 1. Core Traffic Stats
-            $totalPageviews = RequestLog::where('request_timestamp', '>=', $startDate)->count();
-            $humanPageviews = RequestLog::where('request_timestamp', '>=', $startDate)
-                ->where('bot_indicator', 'Likely Human')
+            $totalPageviews = $applyFilter(RequestLog::where('request_timestamp', '>=', $startDate))->count();
+            $humanPageviews = $applyFilter(RequestLog::where('request_timestamp', '>=', $startDate)
+                ->where('bot_indicator', 'Likely Human'))
                 ->count();
-            $uniqueVisitors = RequestLog::where('request_timestamp', '>=', $startDate)
-                ->where('bot_indicator', 'Likely Human')
+            $uniqueVisitors = $applyFilter(RequestLog::where('request_timestamp', '>=', $startDate)
+                ->where('bot_indicator', 'Likely Human'))
                 ->distinct('session_id')
                 ->count('session_id');
-            $uniqueIPs = RequestLog::where('request_timestamp', '>=', $startDate)
-                ->where('bot_indicator', 'Likely Human')
+            $uniqueIPs = $applyFilter(RequestLog::where('request_timestamp', '>=', $startDate)
+                ->where('bot_indicator', 'Likely Human'))
                 ->distinct('client_ip')
                 ->count('client_ip');
 
@@ -335,12 +344,13 @@ class AdminDashboardController extends Controller
                 ->get();
 
             // 9. Recent Request Logs (Paginated)
-            $logs = RequestLog::orderBy('request_timestamp', 'desc')->paginate(25);
+            $logs = $applyFilter(RequestLog::orderBy('request_timestamp', 'desc'))->paginate(25);
+            $ignoredCount = count($ignoredIps);
 
             return view('admin.analytics.index', compact(
                 'days', 'totalPageviews', 'humanPageviews', 'uniqueVisitors', 'uniqueIPs',
                 'topPages', 'topCountries', 'trafficSources', 'topReferrers', 'campaigns', 'dailyTrend',
-                'devices', 'browsers', 'logs'
+                'devices', 'browsers', 'logs', 'ignoredCount', 'ignoredIps'
             ));
         } catch (\Throwable $e) {
             Log::error('Admin analytics error: '.$e->getMessage(), [
@@ -358,14 +368,17 @@ class AdminDashboardController extends Controller
     public function activeVisitors(): JsonResponse
     {
         $window = now()->subMinutes(5)->toDateTimeString();
+        $ignoredIps = app(\App\Services\IpSecurityService::class)->getIgnoredIpsList();
 
-        $count = RequestLog::where('request_timestamp', '>=', $window)
-            ->where('bot_indicator', 'Likely Human')
-            ->distinct('session_id')
-            ->count('session_id');
+        $baseQuery = RequestLog::where('request_timestamp', '>=', $window)
+            ->where('bot_indicator', 'Likely Human');
+        if (! empty($ignoredIps)) {
+            $baseQuery->whereNotIn('client_ip', $ignoredIps);
+        }
 
-        $visitors = RequestLog::where('request_timestamp', '>=', $window)
-            ->where('bot_indicator', 'Likely Human')
+        $count = (clone $baseQuery)->distinct('session_id')->count('session_id');
+
+        $visitors = (clone $baseQuery)
             ->select('session_id', 'client_ip', 'user_agent', 'country', 'city', 'request_uri', 'request_timestamp', 'device_type', 'browser_name', 'os_name')
             ->orderBy('request_timestamp', 'desc')
             ->get()

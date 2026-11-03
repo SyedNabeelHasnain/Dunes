@@ -151,8 +151,14 @@ class AdminBookingController extends Controller
         $fromDate = $request->input('from_date');
         $toDate = $request->input('to_date');
 
+        $ignoredIps = app(\App\Services\IpSecurityService::class)->getIgnoredIpsList();
+
         $query = Booking::with(['tour', 'tier'])
             ->where('status', 'draft');
+
+        if (! empty($ignoredIps)) {
+            $query->whereNotIn('ip_address', $ignoredIps);
+        }
 
         if ($trafficChannel) {
             $query->where('traffic_channel', $trafficChannel);
@@ -188,12 +194,17 @@ class AdminBookingController extends Controller
             $query->whereDate('created_at', '<=', $toDate);
         }
 
-        // Analytics KPIs for Drafts
-        $totalDrafts = Booking::where('status', 'draft')->count();
-        $todayDrafts = Booking::where('status', 'draft')->whereDate('created_at', today())->count();
-        $recoverableValue = (float) Booking::where('status', 'draft')->sum('total');
+        // Analytics KPIs for Drafts (excluding ignored testing IPs)
+        $baseDrafts = Booking::where('status', 'draft');
+        if (! empty($ignoredIps)) {
+            $baseDrafts->whereNotIn('ip_address', $ignoredIps);
+        }
 
-        $contactableCount = Booking::where('status', 'draft')
+        $totalDrafts = (clone $baseDrafts)->count();
+        $todayDrafts = (clone $baseDrafts)->whereDate('created_at', today())->count();
+        $recoverableValue = (float) (clone $baseDrafts)->sum('total');
+
+        $contactableCount = (clone $baseDrafts)
             ->where(function ($q) {
                 $q->where(function ($sq) {
                     $sq->whereNotNull('phone')->where('phone', '!=', '');
@@ -213,8 +224,13 @@ class AdminBookingController extends Controller
         ];
 
         // 14-Day Abandonment Trend
-        $dailyTrend = Booking::where('status', 'draft')
-            ->where('created_at', '>=', now()->subDays(13)->startOfDay())
+        $dailyTrendQuery = Booking::where('status', 'draft')
+            ->where('created_at', '>=', now()->subDays(13)->startOfDay());
+        if (! empty($ignoredIps)) {
+            $dailyTrendQuery->whereNotIn('ip_address', $ignoredIps);
+        }
+
+        $dailyTrend = $dailyTrendQuery
             ->selectRaw('DATE(created_at) as d, COUNT(*) as c, SUM(total) as val')
             ->groupBy('d')
             ->get()

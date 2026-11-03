@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\AdminOperationsController;
 use App\Http\Controllers\Admin\AdminPageController;
 use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\AdminReportController;
+use App\Http\Controllers\Admin\AdminSecurityController;
 use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\AdminSpotlightController;
 use App\Http\Controllers\Admin\AdminSubscriberController;
@@ -43,6 +44,7 @@ use App\Http\Controllers\LocationLandingController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RateCardController;
+use App\Http\Controllers\SecurityAppealController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SubscriberController;
 use App\Http\Controllers\SunsetGuideController;
@@ -70,6 +72,10 @@ Route::redirect('/admin/login', '/login', 301);
 Route::get('/dubai-desert-sunset-times', [SunsetGuideController::class, 'index'])->name('sunset.guide');
 Route::get('/press-kit', [PageController::class, 'pressKit'])->name('press.kit');
 Route::redirect('/cron-status', '/api/v1/cron/status', 302);
+
+// ── Security Firewall & Unblock Appeals ─────────────────────────────────────
+Route::get('/security/blocked', [SecurityAppealController::class, 'showBlocked'])->name('security.blocked');
+Route::post('/security/unblock-request', [SecurityAppealController::class, 'submitUnblockRequest'])->middleware('throttle:5,1')->name('security.unblock-request');
 
 // ── Driver Mobile Portal (Token-Based Run Sheet) ───────────────────────────
 Route::get('/driver/run-sheet/{token}', [DriverPortalController::class, 'showRunSheet'])->middleware('throttle:30,1')->name('driver.run-sheet');
@@ -380,6 +386,19 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::post('/settings/notifications', [AdminSettingController::class, 'updateNotifications'])->name('settings.notifications.update');
     Route::post('/settings/notifications/test', [AdminSettingController::class, 'sendTestNotification'])->name('settings.notifications.test');
     Route::post('/settings/notifications/purge-test-bookings', [AdminSettingController::class, 'purgeTestBookings'])->name('settings.notifications.purge-test-bookings');
+
+    // ── Security Firewall & IP Analytics Filters ─────────────────────────────
+    Route::get('/security/ip-rules', [AdminSecurityController::class, 'index'])->name('security.ip-rules');
+    Route::post('/security/ip-rules', [AdminSecurityController::class, 'storeRule'])->name('security.ip-rules.store');
+    Route::post('/security/ip-rules/quick-ignore', [AdminSecurityController::class, 'quickIgnoreCurrentIp'])->name('security.ip-rules.quick-ignore');
+    Route::post('/security/ip-rules/{id}/toggle-mode', [AdminSecurityController::class, 'toggleRuleMode'])->name('security.ip-rules.toggle-mode');
+    Route::post('/security/ip-rules/{id}/toggle-status', [AdminSecurityController::class, 'toggleRuleStatus'])->name('security.ip-rules.toggle-status');
+    Route::put('/security/ip-rules/{id}', [AdminSecurityController::class, 'updateRule'])->name('security.ip-rules.update');
+    Route::delete('/security/ip-rules/{id}', [AdminSecurityController::class, 'destroyRule'])->name('security.ip-rules.destroy');
+    Route::post('/security/ip-rules/purge-logs', [AdminSecurityController::class, 'purgeLogs'])->name('security.ip-rules.purge-logs');
+    Route::post('/security/unblock-requests/{id}/approve', [AdminSecurityController::class, 'approveUnblockRequest'])->name('security.unblock-requests.approve');
+    Route::post('/security/unblock-requests/{id}/reject', [AdminSecurityController::class, 'rejectUnblockRequest'])->name('security.unblock-requests.reject');
+    Route::delete('/security/unblock-requests/{id}', [AdminSecurityController::class, 'destroyUnblockRequest'])->name('security.unblock-requests.destroy');
 
     // ── Multi-Language & Locales Management ──────────────────────────────────
     Route::get('/settings/languages', [AdminLanguageController::class, 'index'])->name('settings.languages');
