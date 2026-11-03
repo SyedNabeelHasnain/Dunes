@@ -28,7 +28,7 @@
             "red dunes buggy adventure"
         ],
         "placements": {
-            "home": false,
+            "home": true,
             "gallery": true,
             "tour": true
         },

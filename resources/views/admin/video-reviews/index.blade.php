@@ -520,8 +520,9 @@
                     <button type="button" @click="editModalOpen = false" class="px-5 py-2.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-600 hover:bg-slate-100 transition-all">
                         Cancel
                     </button>
-                    <button type="submit" class="btn-desert-animated px-6 py-2.5 rounded-xl text-xs font-bold text-white shadow-xs">
-                        Save Video Changes
+                    <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+                        <i class="bi bi-check2-circle"></i>
+                        <span>Save Video Changes</span>
                     </button>
                 </div>
             </form>
@@ -666,8 +667,9 @@
                     <button type="button" @click="addModalOpen = false" class="px-5 py-2.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-600 hover:bg-slate-100 transition-all">
                         Cancel
                     </button>
-                    <button type="submit" class="btn-desert-animated px-6 py-2.5 rounded-xl text-xs font-bold text-white shadow-xs">
-                        Publish Video Review
+                    <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+                        <i class="bi bi-cloud-arrow-up-fill"></i>
+                        <span>Publish Video Review</span>
                     </button>
                 </div>
             </form>

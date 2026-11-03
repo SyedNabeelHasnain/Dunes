@@ -257,11 +257,155 @@
                 ['label' => 'Translation APIs'],
             ],
 
+            // Reports & Business Intelligence
+            'admin.reports.index' => [
+                ['label' => 'Reports & BI Hub'],
+            ],
+            'admin.reports.print' => [
+                ['label' => 'Reports & BI Hub', 'url' => route('admin.reports.index')],
+                ['label' => 'Print Report'],
+            ],
+
+            // Video Reviews Hub
+            'admin.video-reviews.index' => [
+                ['label' => 'Communications', 'url' => route('admin.reviews.index')],
+                ['label' => 'Video Reviews Hub'],
+            ],
+
             // Security & Firewalls
             'admin.security.ip-rules' => [
                 ['label' => 'Security & Firewalls'],
                 ['label' => 'IP Rules & Firewall'],
             ],
+
+            // Authority & SEO Backlinks
+            'admin.backlinks.index' => [
+                ['label' => 'SEO & Authority'],
+                ['label' => 'Backlink Directory'],
+            ],
+            'admin.backlinks.syndication' => [
+                ['label' => 'SEO & Authority', 'url' => route('admin.backlinks.index')],
+                ['label' => 'Content Syndication Engine'],
+            ],
+
+            // Extended Fleet & Drivers
+            'admin.drivers.run-sheet' => [
+                ['label' => 'Operations & Fleet', 'url' => route('admin.operations.index')],
+                ['label' => 'Safari Drivers', 'url' => route('admin.drivers.index')],
+                ['label' => 'Driver Run Sheet'],
+            ],
+            'admin.drivers.show' => [
+                ['label' => 'Operations & Fleet', 'url' => route('admin.operations.index')],
+                ['label' => 'Safari Drivers', 'url' => route('admin.drivers.index')],
+                ['label' => 'Driver Details'],
+            ],
+            'admin.vehicles.show' => [
+                ['label' => 'Operations & Fleet', 'url' => route('admin.operations.index')],
+                ['label' => 'Vehicle Fleet', 'url' => route('admin.vehicles.index')],
+                ['label' => 'Vehicle Details'],
+            ],
+
+            // Inquiries & WhatsApp Operations
+            'admin.whatsapp.index' => [
+                ['label' => 'Communications', 'url' => route('admin.inquiries.index')],
+                ['label' => 'WhatsApp Operations Hub'],
+            ],
+            'admin.whatsapp.leads.alias' => [
+                ['label' => 'Communications', 'url' => route('admin.inquiries.index')],
+                ['label' => 'WhatsApp Leads'],
+            ],
+            'admin.inquiries.show' => [
+                ['label' => 'Communications', 'url' => route('admin.inquiries.index')],
+                ['label' => 'Inquiry Details'],
+            ],
+
+            // Extended Coupons
+            'admin.coupons.show' => [
+                ['label' => 'Marketing & Promos', 'url' => route('admin.coupons.index')],
+                ['label' => 'Coupon Details'],
+            ],
+            'admin.coupons.usages' => [
+                ['label' => 'Marketing & Promos', 'url' => route('admin.coupons.index')],
+                ['label' => 'Coupon Usages Log'],
+            ],
+
+            // Extended Email Marketing
+            'admin.subscribers.create' => [
+                ['label' => 'Email Marketing', 'url' => route('admin.subscribers.index')],
+                ['label' => 'Add Subscriber'],
+            ],
+            'admin.subscribers.edit' => [
+                ['label' => 'Email Marketing', 'url' => route('admin.subscribers.index')],
+                ['label' => 'Edit Subscriber'],
+            ],
+            'admin.subscribers.show' => [
+                ['label' => 'Email Marketing', 'url' => route('admin.subscribers.index')],
+                ['label' => 'Subscriber Details'],
+            ],
+            'admin.subscriber-groups.create' => [
+                ['label' => 'Email Marketing', 'url' => route('admin.subscribers.index')],
+                ['label' => 'Subscriber Groups', 'url' => route('admin.subscriber-groups.index')],
+                ['label' => 'New Group'],
+            ],
+            'admin.subscriber-groups.edit' => [
+                ['label' => 'Email Marketing', 'url' => route('admin.subscribers.index')],
+                ['label' => 'Subscriber Groups', 'url' => route('admin.subscriber-groups.index')],
+                ['label' => 'Edit Group'],
+            ],
+            'admin.subscriber-groups.show' => [
+                ['label' => 'Email Marketing', 'url' => route('admin.subscribers.index')],
+                ['label' => 'Subscriber Groups', 'url' => route('admin.subscriber-groups.index')],
+                ['label' => 'Group Details'],
+            ],
+            'admin.email-templates.create' => [
+                ['label' => 'Email Marketing', 'url' => route('admin.subscribers.index')],
+                ['label' => 'Email Templates', 'url' => route('admin.email-templates.index')],
+                ['label' => 'New Template'],
+            ],
+            'admin.email-templates.edit' => [
+                ['label' => 'Email Marketing', 'url' => route('admin.subscribers.index')],
+                ['label' => 'Email Templates', 'url' => route('admin.email-templates.index')],
+                ['label' => 'Edit Template'],
+            ],
+            'admin.email-templates.show' => [
+                ['label' => 'Email Marketing', 'url' => route('admin.subscribers.index')],
+                ['label' => 'Email Templates', 'url' => route('admin.email-templates.index')],
+                ['label' => 'Template Details'],
+            ],
+            'admin.email-templates.preview' => [
+                ['label' => 'Email Marketing', 'url' => route('admin.subscribers.index')],
+                ['label' => 'Email Templates', 'url' => route('admin.email-templates.index')],
+                ['label' => 'Template Preview'],
+            ],
+
+            // Extended Knowledge Hub
+            'admin.wiki.articles.create' => [
+                ['label' => 'Knowledge Hub', 'url' => route('admin.wiki.index')],
+                ['label' => 'New Wiki Article'],
+            ],
+            'admin.wiki.articles.edit' => [
+                ['label' => 'Knowledge Hub', 'url' => route('admin.wiki.index')],
+                ['label' => 'Edit Wiki Article'],
+            ],
+
+            // Extended Legal & Settings
+            'admin.legal.edit' => [
+                ['label' => 'Content & Portal', 'url' => route('admin.legal.index')],
+                ['label' => 'Edit Legal Policy'],
+            ],
+            'admin.legal.alias' => [
+                ['label' => 'Content & Portal', 'url' => route('admin.legal.index')],
+                ['label' => 'Legal Policies'],
+            ],
+            'admin.settings.notifications' => [
+                ['label' => 'Settings', 'url' => route('admin.settings.general')],
+                ['label' => 'Notification & Alert Controls'],
+            ],
+            'admin.settings.marketing' => [
+                ['label' => 'Settings', 'url' => route('admin.settings.general')],
+                ['label' => 'Marketing Settings'],
+            ],
+            'admin.dashboard.alias' => [],
             'admin.profile' => [
                 ['label' => 'Account', 'url' => route('admin.profile')],
                 ['label' => 'Profile & Security'],
@@ -289,8 +433,10 @@
                     'faqs' => 'FAQs',
                     'drafts' => 'Incomplete Drafts Hub',
                     'leads' => 'WhatsApp Leads',
-                    'reports' => 'Driver Reports',
+                    'reports' => 'Reports & BI Hub',
                     'bi' => 'Business Intelligence',
+                    'ip-rules' => 'IP Rules & Firewall',
+                    'notifications' => 'Notification Controls',
                 ];
 
                 $label = $friendlyOverrides[strtolower($segment)] ?? ucwords(str_replace(['-', '_'], ' ', $segment));
@@ -298,8 +444,11 @@
                     $label = '#' . $segment;
                 }
 
+                $rawLabel = ($isLast && View::hasSection('page_title')) ? View::getSection('page_title') : $label;
+                $cleanLabel = html_entity_decode(strip_tags((string) $rawLabel), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
                 $breadcrumbs[] = [
-                    'label' => ($isLast && View::hasSection('page_title')) ? View::getSection('page_title') : $label,
+                    'label' => $cleanLabel,
                     'url' => $isLast ? null : $currentUrl,
                 ];
             }
@@ -341,11 +490,11 @@
                         <i class="bi bi-chevron-right text-[9px] text-slate-400 shrink-0"></i>
                         @if(!empty($crumb['url']) && !$loop->last)
                             <a href="{{ $crumb['url'] }}" class="text-slate-600 hover:text-primary transition font-medium hover:underline">
-                                {{ $crumb['label'] }}
+                                {{ html_entity_decode((string) $crumb['label'], ENT_QUOTES | ENT_HTML5, 'UTF-8') }}
                             </a>
                         @else
                             <span class="font-bold text-slate-800 {{ $loop->last ? 'truncate max-w-[220px] sm:max-w-xs md:max-w-md' : '' }}" {{ $loop->last ? 'aria-current="page"' : '' }}>
-                                {{ $crumb['label'] }}
+                                {{ html_entity_decode((string) $crumb['label'], ENT_QUOTES | ENT_HTML5, 'UTF-8') }}
                             </span>
                         @endif
                     </li>
