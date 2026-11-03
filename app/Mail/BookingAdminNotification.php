@@ -21,6 +21,8 @@ class BookingAdminNotification extends Mailable
 
     public ?string $pdfFileName = null;
 
+    public ?string $pdfFilePath = null;
+
     /**
      * Create a new message instance.
      */
@@ -30,17 +32,24 @@ class BookingAdminNotification extends Mailable
     }
 
     /**
-     * Attach in-memory PDF ticket voucher.
+     * Attach in-memory PDF ticket voucher binary.
      */
     public function withPdfAttachment(?string $binary, ?string $filename = null): self
     {
         $this->pdfBinary = $binary;
         $this->pdfFileName = $filename ?: 'Dunes-Discovery-Ticket-Voucher-' . $this->booking->reference . '.pdf';
 
-        if (! empty($binary)) {
-            $this->attachData($binary, $this->pdfFileName, [
-                'mime' => 'application/pdf',
-            ]);
+        return $this;
+    }
+
+    /**
+     * Attach PDF ticket voucher from server filesystem path.
+     */
+    public function withPdfFile(?string $filePath, ?string $filename = null): self
+    {
+        $this->pdfFilePath = $filePath;
+        if ($filename) {
+            $this->pdfFileName = $filename;
         }
 
         return $this;
@@ -76,6 +85,14 @@ class BookingAdminNotification extends Mailable
         if (! empty($this->pdfBinary)) {
             return [
                 Attachment::fromData(fn () => $this->pdfBinary, $this->pdfFileName ?: 'Dunes-Discovery-Ticket-Voucher.pdf')
+                    ->withMime('application/pdf'),
+            ];
+        }
+
+        if (! empty($this->pdfFilePath) && file_exists($this->pdfFilePath)) {
+            return [
+                Attachment::fromPath($this->pdfFilePath)
+                    ->as($this->pdfFileName ?: basename($this->pdfFilePath))
                     ->withMime('application/pdf'),
             ];
         }

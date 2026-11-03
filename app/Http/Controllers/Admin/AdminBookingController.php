@@ -1629,6 +1629,30 @@ class AdminBookingController extends Controller
     {
         try {
             $booking = Booking::with(['addons', 'tier', 'tour'])->findOrFail($id);
+            $fileName = 'Dunes-Discovery-Voucher-' . $booking->reference . '.pdf';
+
+            // Check if pre-cached PDF exists on disk from notification service
+            $cachedPath = storage_path('app/vouchers/' . $booking->reference . '.pdf');
+            if (file_exists($cachedPath) && filesize($cachedPath) > 500) {
+                return response()->download($cachedPath, $fileName, [
+                    'Content-Type' => 'application/pdf',
+                ]);
+            }
+
+            $notificationService = app(\App\Services\NotificationManagementService::class);
+            $binary = $notificationService->generateVoucherPdfBinary($booking);
+
+            if ($binary && strlen($binary) > 500) {
+                return response($binary, 200, [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+                ]);
+            }
+
+            $fontsDir = storage_path('fonts');
+            if (! is_dir($fontsDir)) {
+                @mkdir($fontsDir, 0775, true);
+            }
 
             $verificationUrl = route('booking.voucher', $booking->reference);
             $qrSvg = null;
@@ -1636,25 +1660,27 @@ class AdminBookingController extends Controller
 
             try {
                 $qrSvg = (string) QrCode::format('svg')->size(140)->margin(1)->generate($verificationUrl);
-                $qrCodeUrl = 'data:image/svg+xml;base64,'.base64_encode($qrSvg);
+                $qrCodeUrl = 'data:image/svg+xml;base64,' . base64_encode($qrSvg);
             } catch (\Throwable $qrEx) {
-                \Log::warning('QR generation failed for booking #'.$booking->reference.': '.$qrEx->getMessage());
+                \Log::warning('QR generation failed for booking #' . $booking->reference . ': ' . $qrEx->getMessage());
             }
 
             $pdf = Pdf::loadView('booking.ticket-pdf', compact('booking', 'qrCodeUrl', 'qrSvg'))
                 ->setPaper('a4', 'portrait')
                 ->setOptions([
+                    'font_dir' => $fontsDir,
+                    'font_cache' => $fontsDir,
+                    'temp_dir' => sys_get_temp_dir(),
+                    'chroot' => base_path(),
                     'isRemoteEnabled' => false,
                     'isHtml5ParserEnabled' => true,
                     'dpi' => 120,
                     'defaultFont' => 'sans-serif',
-                ]);
-
-            $fileName = 'Dunes-Voucher-'.$booking->reference.'.pdf';
+                ], true);
 
             return $pdf->download($fileName);
         } catch (\Throwable $e) {
-            \Log::error('Admin Booking ticket PDF generation failed: '.$e->getMessage(), [
+            \Log::error('Admin Booking ticket PDF generation failed: ' . $e->getMessage(), [
                 'booking_id' => $id,
                 'trace' => $e->getTraceAsString(),
             ]);

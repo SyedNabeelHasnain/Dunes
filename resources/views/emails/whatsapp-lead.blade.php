@@ -4,7 +4,7 @@
 
 @section('content')
     <div style="border-bottom: 2px solid #22c55e; padding-bottom: 12px; margin-bottom: 18px;">
-        <h2 style="color: #0f172a; margin: 0 0 6px 0; font-size: 20px;">⚡ New WhatsApp Lead Alert</h2>
+        <h2 style="color: #0f172a; margin: 0 0 6px 0; font-size: 20px;">New WhatsApp Lead Alert</h2>
         <span style="display: inline-block; background-color: #dcfce7; color: #15803d; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 4px;">
             Action Required: Direct Chat Initiated
         </span>
@@ -76,7 +76,7 @@
     @if(!empty($directChatUrl))
     <div style="text-align: center; margin: 25px 0;">
         <a href="{{ $directChatUrl }}" target="_blank" style="background-color: #22c55e; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 50px; font-weight: bold; display: inline-block; font-size: 14px; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(34, 197, 94, 0.35);">
-            💬 Open Direct WhatsApp Chat With Guest
+            Open Direct WhatsApp Chat With Guest
         </a>
     </div>
     @endif

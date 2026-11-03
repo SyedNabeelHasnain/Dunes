@@ -89,13 +89,24 @@ class NotificationManagementService
     }
 
     /**
-     * Generate official A4 PDF Ticket Voucher directly in-memory (0 disk files).
+     * Generate official A4 PDF Ticket Voucher directly in-memory and cache on disk.
      */
     public function generateVoucherPdfBinary(Booking $booking): ?string
     {
         try {
             if (! $booking->relationLoaded('addons') || ! $booking->relationLoaded('tier') || ! $booking->relationLoaded('tour')) {
                 $booking->loadMissing(['addons', 'tier', 'tour']);
+            }
+
+            // Ensure font and voucher cache directories exist with full permissions
+            $fontsDir = storage_path('fonts');
+            if (! is_dir($fontsDir)) {
+                @mkdir($fontsDir, 0775, true);
+            }
+
+            $vouchersDir = storage_path('app/vouchers');
+            if (! is_dir($vouchersDir)) {
+                @mkdir($vouchersDir, 0775, true);
             }
 
             $verificationUrl = route('booking.voucher', $booking->reference);
@@ -112,13 +123,26 @@ class NotificationManagementService
             $pdf = Pdf::loadView('booking.ticket-pdf', compact('booking', 'qrCodeUrl', 'qrSvg'))
                 ->setPaper('a4', 'portrait')
                 ->setOptions([
+                    'font_dir' => $fontsDir,
+                    'font_cache' => $fontsDir,
+                    'temp_dir' => sys_get_temp_dir(),
+                    'chroot' => base_path(),
                     'isRemoteEnabled' => false,
                     'isHtml5ParserEnabled' => true,
                     'dpi' => 120,
                     'defaultFont' => 'sans-serif',
-                ]);
+                ], true);
 
-            return $pdf->output();
+            $output = $pdf->output();
+
+            if (empty($output) || strlen($output) < 500) {
+                throw new \RuntimeException("DomPDF produced empty or corrupted binary for #{$booking->reference}");
+            }
+
+            // Write to disk cache for instantaneous streaming via download link
+            @file_put_contents($vouchersDir . '/' . $booking->reference . '.pdf', $output);
+
+            return $output;
         } catch (\Throwable $e) {
             Log::error("In-memory Voucher PDF generation failed for booking #{$booking->reference}: " . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
@@ -165,6 +189,10 @@ class NotificationManagementService
 
                 if ($customerPdfEnabled && $pdfBinary) {
                     $customerMail->withPdfAttachment($pdfBinary, $pdfFileName);
+                    $diskPath = storage_path('app/vouchers/' . $booking->reference . '.pdf');
+                    if (file_exists($diskPath)) {
+                        $customerMail->withPdfFile($diskPath, $pdfFileName);
+                    }
                 }
 
                 Mail::to($booking->email)->send($customerMail);
@@ -187,6 +215,10 @@ class NotificationManagementService
 
                 if ($adminPdfEnabled && $pdfBinary) {
                     $adminMail->withPdfAttachment($pdfBinary, $pdfFileName);
+                    $diskPath = storage_path('app/vouchers/' . $booking->reference . '.pdf');
+                    if (file_exists($diskPath)) {
+                        $adminMail->withPdfFile($diskPath, $pdfFileName);
+                    }
                 }
 
                 $ccList = array_merge($recipients, $this->settings->getCcEmails());
@@ -506,12 +538,23 @@ class NotificationManagementService
                     );
 
                     $pdfBinary = $this->generateVoucherPdfBinary($testBooking);
+                    if (empty($pdfBinary)) {
+                        return [
+                            'success' => false,
+                            'message' => 'Voucher PDF generation failed on server. Please verify PHP DomPDF extension and storage/fonts permissions.',
+                            'pdf_attached' => false,
+                        ];
+                    }
+
+                    $pdfFileName = 'Dunes-Discovery-Ticket-Voucher-' . $testBooking->reference . '.pdf';
                     $mail = (new BookingNotification('booking_confirmed', $testBooking))
                         ->from($sender['email'], $sender['name'])
-                        ->replyTo($sender['reply_to'], $sender['name']);
+                        ->replyTo($sender['reply_to'], $sender['name'])
+                        ->withPdfAttachment($pdfBinary, $pdfFileName);
 
-                    if ($pdfBinary) {
-                        $mail->withPdfAttachment($pdfBinary, 'Dunes-Discovery-Ticket-Voucher-' . $testBooking->reference . '.pdf');
+                    $diskPath = storage_path('app/vouchers/' . $testBooking->reference . '.pdf');
+                    if (file_exists($diskPath)) {
+                        $mail->withPdfFile($diskPath, $pdfFileName);
                     }
 
                     Mail::mailer($targetMailer)->to($recipientEmail)->send($mail);
@@ -519,7 +562,7 @@ class NotificationManagementService
                     return [
                         'success' => true,
                         'message' => "Live test customer confirmation email with PDF voucher successfully delivered via SMTP ({$targetMailer}) to {$recipientEmail}!",
-                        'pdf_attached' => ! empty($pdfBinary),
+                        'pdf_attached' => true,
                     ];
 
                 case 'booking_admin':
@@ -553,12 +596,23 @@ class NotificationManagementService
                     );
 
                     $pdfBinary = $this->generateVoucherPdfBinary($testBooking);
+                    if (empty($pdfBinary)) {
+                        return [
+                            'success' => false,
+                            'message' => 'Voucher PDF generation failed on server. Please verify PHP DomPDF extension and storage/fonts permissions.',
+                            'pdf_attached' => false,
+                        ];
+                    }
+
+                    $pdfFileName = 'Dunes-Discovery-Ticket-Voucher-' . $testBooking->reference . '.pdf';
                     $mail = (new BookingAdminNotification($testBooking))
                         ->from($sender['email'], $sender['name'])
-                        ->replyTo($sender['reply_to'], $sender['name']);
+                        ->replyTo($sender['reply_to'], $sender['name'])
+                        ->withPdfAttachment($pdfBinary, $pdfFileName);
 
-                    if ($pdfBinary) {
-                        $mail->withPdfAttachment($pdfBinary, 'Dunes-Discovery-Ticket-Voucher-' . $testBooking->reference . '.pdf');
+                    $diskPath = storage_path('app/vouchers/' . $testBooking->reference . '.pdf');
+                    if (file_exists($diskPath)) {
+                        $mail->withPdfFile($diskPath, $pdfFileName);
                     }
 
                     Mail::mailer($targetMailer)->to($recipientEmail)->send($mail);
@@ -566,7 +620,7 @@ class NotificationManagementService
                     return [
                         'success' => true,
                         'message' => "Live test admin booking alert email with PDF voucher successfully delivered via SMTP ({$targetMailer}) to {$recipientEmail}!",
-                        'pdf_attached' => ! empty($pdfBinary),
+                        'pdf_attached' => true,
                     ];
 
                 case 'whatsapp_lead':

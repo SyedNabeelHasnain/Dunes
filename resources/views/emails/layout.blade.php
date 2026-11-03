@@ -121,27 +121,27 @@
                                 <tr>
                                     <td align="center" style="padding: 3px;">
                                         <a href="https://www.instagram.com/dunesdiscoverytourism" target="_blank" style="display: inline-block; background-color: #1e293b; color: #f8fafc; font-size: 11px; font-weight: 700; padding: 7px 14px; border-radius: 6px; border: 1px solid #334155; text-decoration: none; margin: 2px;">
-                                            📷 Instagram
+                                            Instagram
                                         </a>
                                     </td>
                                     <td align="center" style="padding: 3px;">
                                         <a href="https://www.facebook.com/dunesdiscoverytourism" target="_blank" style="display: inline-block; background-color: #1e293b; color: #f8fafc; font-size: 11px; font-weight: 700; padding: 7px 14px; border-radius: 6px; border: 1px solid #334155; text-decoration: none; margin: 2px;">
-                                            👍 Facebook
+                                            Facebook
                                         </a>
                                     </td>
                                     <td align="center" style="padding: 3px;">
                                         <a href="https://www.tripadvisor.com/Attraction_Review-g295424-d29026644-Reviews-Dunes_Discovery-Dubai_Emirate_of_Dubai.html" target="_blank" style="display: inline-block; background-color: #1e293b; color: #f8fafc; font-size: 11px; font-weight: 700; padding: 7px 14px; border-radius: 6px; border: 1px solid #334155; text-decoration: none; margin: 2px;">
-                                            🦉 TripAdvisor
+                                            TripAdvisor
                                         </a>
                                     </td>
                                     <td align="center" style="padding: 3px;">
                                         <a href="https://wa.me/971502456056" target="_blank" style="display: inline-block; background-color: #064e3b; color: #6ee7b7; font-size: 11px; font-weight: 700; padding: 7px 14px; border-radius: 6px; border: 1px solid #047857; text-decoration: none; margin: 2px;">
-                                            💬 WhatsApp Concierge
+                                            WhatsApp Concierge
                                         </a>
                                     </td>
                                     <td align="center" style="padding: 3px;">
                                         <a href="https://www.tiktok.com/@dunesdiscoverytourism" target="_blank" style="display: inline-block; background-color: #1e293b; color: #f8fafc; font-size: 11px; font-weight: 700; padding: 7px 14px; border-radius: 6px; border: 1px solid #334155; text-decoration: none; margin: 2px;">
-                                            🎵 TikTok
+                                            TikTok
                                         </a>
                                     </td>
                                 </tr>
@@ -165,16 +165,16 @@
                             <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size: 11px; color: #94a3b8; margin-bottom: 18px;">
                                 <tr>
                                     <td align="center" style="line-height: 1.7;">
-                                        📍 Dubai, United Arab Emirates<br>
-                                        📞 24/7 Concierge & Emergency Dispatch: <a href="tel:+971502456056" style="color: #22c55e; font-weight: bold; text-decoration: none;">+971 50 245 6056</a><br>
-                                        ✉️ Official Support: <a href="mailto:reservations@dunesdiscoverytourism.com" style="color: #F58F43; text-decoration: none;">reservations@dunesdiscoverytourism.com</a> &bull; <a href="https://dunesdiscoverytourism.com" target="_blank" style="color: #F58F43; text-decoration: none;">dunesdiscoverytourism.com</a>
+                                        Dubai, United Arab Emirates<br>
+                                        24/7 Operations Concierge: <a href="tel:+971502456056" style="color: #22c55e; font-weight: bold; text-decoration: none;">+971 50 245 6056</a><br>
+                                        Official Support: <a href="mailto:reservations@dunesdiscoverytourism.com" style="color: #F58F43; text-decoration: none;">reservations@dunesdiscoverytourism.com</a> &bull; <a href="https://dunesdiscoverytourism.com" target="_blank" style="color: #F58F43; text-decoration: none;">dunesdiscoverytourism.com</a>
                                     </td>
                                 </tr>
                             </table>
 
                             <!-- Security & Legal Reassurance -->
                             <div style="font-size: 10px; color: #64748b; line-height: 1.5; border-top: 1px solid #1e293b; padding-top: 14px;">
-                                🔒 256-Bit SSL Encrypted Transaction & Official Tourism Provider Guarantee.<br>
+                                256-Bit SSL Encrypted Transaction & Official Tourism Provider Guarantee.<br>
                                 You received this transactional email because an official booking or service inquiry was registered with Dunes Discovery Tourism LLC.<br>
                                 &copy; {{ date('Y') }} Dunes Discovery Tourism LLC. All rights reserved.
                             </div>

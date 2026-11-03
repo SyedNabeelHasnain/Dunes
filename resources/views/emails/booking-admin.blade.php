@@ -21,14 +21,14 @@
     $balanceDue = (float) ($booking->balance_due ?? max(0, $totalAmount - $paidAmount));
 @endphp
 
-@section('title', '🚨 Operational Booking Alert: #' . $booking->reference . ' - Dunes Discovery Tourism')
+@section('title', 'Operational Booking Alert: #' . $booking->reference . ' - Dunes Discovery Tourism')
 
 @section('content')
 
     <!-- Priority Admin Badge -->
     <div style="margin-bottom: 18px;">
         <span style="display: inline-block; background-color: #fef3c7; color: #b45309; border: 1px solid #fde68a; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; padding: 5px 12px; border-radius: 20px;">
-            🚨 Fleet & Dispatch Operational Alert
+            Fleet & Dispatch Operational Alert
         </span>
         <span style="display: inline-block; background-color: #f1f5f9; color: #475569; font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 20px; margin-left: 4px;">
             Ref: #{{ $booking->reference }}
@@ -82,7 +82,7 @@
                     Acquisition Source
                 </td>
                 <td style="padding: 9px 12px; border-bottom: 1px solid #f1f5f9; color: #059669; font-size: 12px; font-weight: 700;">
-                    🎯 {{ $booking->traffic_channel }}
+                    {{ $booking->traffic_channel }}
                 </td>
             </tr>
             @endif
@@ -116,7 +116,7 @@
                     Tour Date
                 </td>
                 <td style="padding: 9px 12px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-size: 13px; font-weight: 700;">
-                    📅 {{ $tourDateDisplay }}
+                    {{ $tourDateDisplay }}
                 </td>
             </tr>
             <tr>
@@ -124,7 +124,7 @@
                     Pickup Location
                 </td>
                 <td style="padding: 9px 12px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-size: 13px; font-weight: 600;">
-                    📍 {{ $booking->pickup_location ?: 'To Be Confirmed' }}
+                    {{ $booking->pickup_location ?: 'To Be Confirmed' }}
                 </td>
             </tr>
             <tr>
@@ -132,7 +132,7 @@
                     Passengers
                 </td>
                 <td style="padding: 9px 12px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-size: 13px; font-weight: 600;">
-                    👥 {{ (int)($booking->adults ?? 1) }} Adult(s)
+                    {{ (int)($booking->adults ?? 1) }} Adult(s)
                     @if(!empty($booking->children) && $booking->children > 0) &bull; {{ $booking->children }} Child(ren) @endif
                     @if(!empty($booking->infants) && $booking->infants > 0) &bull; {{ $booking->infants }} Infant(s) @endif
                 </td>
@@ -143,7 +143,7 @@
                     Add-ons
                 </td>
                 <td style="padding: 9px 12px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-size: 13px; font-weight: 600;">
-                    ✨ {{ $booking->addons->pluck('addon_name')->implode(', ') }}
+                    {{ $booking->addons->pluck('addon_name')->implode(', ') }}
                 </td>
             </tr>
             @endif

@@ -90,32 +90,61 @@ class VoucherController extends Controller
             abort(404);
         }
 
+        $fileName = 'Dunes-Discovery-Voucher-' . $booking->reference . '.pdf';
+
+        // 1. Check if pre-cached PDF exists on disk from notification service
+        $cachedPath = storage_path('app/vouchers/' . $booking->reference . '.pdf');
+        if (file_exists($cachedPath) && filesize($cachedPath) > 500) {
+            return response()->download($cachedPath, $fileName, [
+                'Content-Type' => 'application/pdf',
+            ]);
+        }
+
         try {
+            // 2. Generate via centralized NotificationManagementService
+            $notificationService = app(\App\Services\NotificationManagementService::class);
+            $binary = $notificationService->generateVoucherPdfBinary($booking);
+
+            if ($binary && strlen($binary) > 500) {
+                return response($binary, 200, [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+                ]);
+            }
+
+            // 3. Fallback direct DomPDF generation with explicit font directories
+            $fontsDir = storage_path('fonts');
+            if (! is_dir($fontsDir)) {
+                @mkdir($fontsDir, 0775, true);
+            }
+
             $verificationUrl = route('booking.voucher', $booking->reference);
             $qrSvg = null;
             $qrCodeUrl = null;
 
             try {
                 $qrSvg = (string) QrCode::format('svg')->size(140)->margin(1)->generate($verificationUrl);
-                $qrCodeUrl = 'data:image/svg+xml;base64,'.base64_encode($qrSvg);
+                $qrCodeUrl = 'data:image/svg+xml;base64,' . base64_encode($qrSvg);
             } catch (\Throwable $qrEx) {
-                \Log::warning('QR generation failed for public voucher #'.$reference.': '.$qrEx->getMessage());
+                \Log::warning('QR generation failed for public voucher #' . $reference . ': ' . $qrEx->getMessage());
             }
 
             $pdf = Pdf::loadView('booking.ticket-pdf', compact('booking', 'qrCodeUrl', 'qrSvg'))
                 ->setPaper('a4', 'portrait')
                 ->setOptions([
+                    'font_dir' => $fontsDir,
+                    'font_cache' => $fontsDir,
+                    'temp_dir' => sys_get_temp_dir(),
+                    'chroot' => base_path(),
                     'isRemoteEnabled' => false,
                     'isHtml5ParserEnabled' => true,
                     'dpi' => 120,
                     'defaultFont' => 'sans-serif',
-                ]);
-
-            $fileName = 'Dunes-Discovery-Voucher-'.$booking->reference.'.pdf';
+                ], true);
 
             return $pdf->download($fileName);
         } catch (\Throwable $e) {
-            \Log::error('Public Voucher PDF generation failed: '.$e->getMessage(), [
+            \Log::error('Public Voucher PDF generation failed: ' . $e->getMessage(), [
                 'reference' => $reference,
                 'trace' => $e->getTraceAsString(),
             ]);

@@ -30,19 +30,19 @@
     <div style="margin-bottom: 20px;">
         @if($type === 'booking_cancelled')
             <span style="display: inline-block; background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; padding: 6px 14px; border-radius: 20px;">
-                ✕ Reservation Cancelled
+                Reservation Cancelled
             </span>
         @elseif($isPaidInFull)
             <span style="display: inline-block; background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; padding: 6px 14px; border-radius: 20px;">
-                ✓ Confirmed &bull; Paid in Full
+                Confirmed &bull; Paid in Full
             </span>
         @elseif($type === 'booking_advance' || $paidAmount > 0)
             <span style="display: inline-block; background-color: #e0f2fe; color: #075985; border: 1px solid #bae6fd; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; padding: 6px 14px; border-radius: 20px;">
-                ✓ Confirmed &bull; Deposit Received
+                Confirmed &bull; Deposit Received
             </span>
         @else
             <span style="display: inline-block; background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; padding: 6px 14px; border-radius: 20px;">
-                ✓ Confirmed &bull; Cash on Pickup
+                Confirmed &bull; Cash on Pickup
             </span>
         @endif
     </div>
@@ -100,7 +100,7 @@
                     Tour Date
                 </td>
                 <td style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-size: 13px; font-weight: 700;">
-                    📅 {{ $tourDateDisplay }}
+                    {{ $tourDateDisplay }}
                 </td>
             </tr>
             <tr>
@@ -108,7 +108,7 @@
                     Estimated Pickup
                 </td>
                 <td style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-size: 13px; font-weight: 600;">
-                    ⏰ {{ $booking->pickup_time ?: 'Between 2:45 PM – 3:30 PM (Confirmed on tour day)' }}
+                    {{ $booking->pickup_time ?: 'Between 2:45 PM – 3:30 PM (Confirmed on tour day)' }}
                 </td>
             </tr>
             <tr>
@@ -116,7 +116,7 @@
                     Pickup Location
                 </td>
                 <td style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-size: 13px; font-weight: 600;">
-                    📍 {{ $booking->pickup_location ?: 'Hotel Lobby / Residence in Dubai or Sharjah' }}
+                    {{ $booking->pickup_location ?: 'Hotel Lobby / Residence in Dubai or Sharjah' }}
                 </td>
             </tr>
             <tr>
@@ -124,7 +124,7 @@
                     Guest Manifest
                 </td>
                 <td style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-size: 13px; font-weight: 600;">
-                    👥 {{ (int)($booking->adults ?? 1) }} Adult{{ ($booking->adults ?? 1) > 1 ? 's' : '' }}
+                    {{ (int)($booking->adults ?? 1) }} Adult{{ ($booking->adults ?? 1) > 1 ? 's' : '' }}
                     @if(!empty($booking->children) && $booking->children > 0)
                         &bull; {{ $booking->children }} Child{{ $booking->children > 1 ? 'ren' : '' }}
                     @endif
@@ -139,7 +139,7 @@
                     Included Add-ons
                 </td>
                 <td style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-size: 13px; font-weight: 600;">
-                    ✨ {{ $booking->addons->pluck('addon_name')->implode(', ') }}
+                    {{ $booking->addons->pluck('addon_name')->implode(', ') }}
                 </td>
             </tr>
             @endif
@@ -224,10 +224,12 @@
     <div style="background-color: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #F58F43; border-radius: 8px; padding: 16px 18px; margin-bottom: 24px;">
         <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
             <tr>
-                <td style="vertical-align: top; width: 34px; font-size: 24px; line-height: 1;">
-                    📄
+                <td style="vertical-align: middle; width: 42px; text-align: center;">
+                    <span style="display: inline-block; background-color: #F58F43; color: #ffffff; font-size: 11px; font-weight: 800; padding: 5px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;">
+                        PDF
+                    </span>
                 </td>
-                <td style="vertical-align: top; padding-left: 10px;">
+                <td style="vertical-align: top; padding-left: 12px;">
                     <div style="font-size: 13px; font-weight: 800; color: #92400e; margin-bottom: 4px;">
                         Official A4 Ticket Voucher Attached (Printable PDF)
                     </div>

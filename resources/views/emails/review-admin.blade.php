@@ -5,14 +5,14 @@
 @section('content')
     <div style="border-bottom: 2px solid #eab308; padding-bottom: 12px; margin-bottom: 18px;">
         @if($type === 'feedback')
-            <h2 style="color: #0f172a; margin: 0 0 6px 0; font-size: 20px;">💬 Direct Guest Service Feedback</h2>
+            <h2 style="color: #0f172a; margin: 0 0 6px 0; font-size: 20px;">Direct Guest Service Feedback</h2>
             <span style="display: inline-block; background-color: #f0fdf4; color: #166534; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 4px;">
                 Direct Post-Tour Submission
             </span>
         @else
-            <h2 style="color: #0f172a; margin: 0 0 6px 0; font-size: 20px;">⭐ New Customer Review Submitted</h2>
+            <h2 style="color: #0f172a; margin: 0 0 6px 0; font-size: 20px;">New Customer Review Submitted</h2>
             <span style="display: inline-block; background-color: #fef9c3; color: #854d0e; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 4px;">
-                Rating: {{ $review->rating }} / 5.0 {{ str_repeat('★', (int) round($review->rating)) }}
+                Rating: {{ $review->rating }} / 5.0
             </span>
             <span style="display: inline-block; background-color: #f1f5f9; color: #475569; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 4px; margin-left: 4px;">
                 Status: {{ ucfirst($review->status) }}
