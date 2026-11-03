@@ -41,6 +41,16 @@ return Application::configure(basePath: dirname(__DIR__))
         );
 
         $exceptions->render(function (HttpException $e, Request $request) {
+            if ($e->getStatusCode() === 404) {
+                if (! $request->is('admin*', 'api*', 'assets/*', 'build/*', 'storage/*', 'images/*', 'uploads/*') && ! app()->runningUnitTests()) {
+                    try {
+                        $tracker = app(\App\Services\VisitorTrackerService::class);
+                        $ctx = $tracker->collectRequestContext('404_not_found');
+                        $tracker->logRequest('error_404', 0, '404_not_found', $ctx);
+                    } catch (\Throwable $trackEx) {}
+                }
+            }
+
             if ($e->getStatusCode() === 419) {
                 if ($request->is('api/*') || $request->is('ajax.php') || $request->ajax()) {
                     return response()->json([

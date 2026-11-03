@@ -67,6 +67,13 @@ class CouponController extends Controller
         $coupon = Coupon::findByCode($code);
 
         if (! $coupon) {
+            try {
+                $tracker = app(\App\Services\VisitorTrackerService::class);
+                $ctx = $tracker->collectRequestContext('promo_validator');
+                $ctx['query_string'] = 'code=' . urlencode($code) . '&reason=' . urlencode('Invalid promo code');
+                $tracker->logRequest('promo_failure', 0, 'promo_validator', $ctx);
+            } catch (\Throwable $trackEx) {}
+
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid promo code. Please check for typos and try again.',
@@ -76,6 +83,13 @@ class CouponController extends Controller
         $check = $coupon->validateEligibility($subtotal, $tourId, $tierId, $email, $totalGuests, $tourDate);
 
         if (! $check['valid']) {
+            try {
+                $tracker = app(\App\Services\VisitorTrackerService::class);
+                $ctx = $tracker->collectRequestContext('promo_validator');
+                $ctx['query_string'] = 'code=' . urlencode($code) . '&reason=' . urlencode($check['message']);
+                $tracker->logRequest('promo_failure', $coupon->id, 'promo_validator', $ctx);
+            } catch (\Throwable $trackEx) {}
+
             return response()->json([
                 'success' => false,
                 'message' => $check['message'],

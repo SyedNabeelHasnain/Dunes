@@ -13,14 +13,21 @@
             <p class="text-xs text-slate-500 mt-0.5">Real-time visitor telemetry, traffic channels, referring websites, and UTM campaign attribution.</p>
         </div>
         
-        <form method="GET" action="{{ route('admin.analytics.index') }}" class="flex items-center gap-2">
-            <label for="days" class="text-xs font-bold text-slate-700 whitespace-nowrap">Timeframe:</label>
-            <select name="days" id="days" class="rounded-xl border border-slate-200 px-3.5 py-1.5 text-xs font-bold text-slate-800 outline-hidden bg-white shadow-2xs focus:border-primary" onchange="this.form.submit()">
-                <option value="7" {{ $days == 7 ? 'selected' : '' }}>Last 7 Days</option>
-                <option value="30" {{ $days == 30 ? 'selected' : '' }}>Last 30 Days</option>
-                <option value="90" {{ $days == 90 ? 'selected' : '' }}>Last 90 Days</option>
-            </select>
-        </form>
+        <div class="flex items-center gap-2 flex-wrap">
+            <a href="{{ route('admin.analytics.live-visitors') }}" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition">
+                <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                <span>Live Visitors Hub</span>
+            </a>
+
+            <form method="GET" action="{{ route('admin.analytics.index') }}" class="flex items-center gap-2">
+                <label for="days" class="text-xs font-bold text-slate-700 whitespace-nowrap">Timeframe:</label>
+                <select name="days" id="days" class="rounded-xl border border-slate-200 px-3.5 py-1.5 text-xs font-bold text-slate-800 outline-hidden bg-white shadow-2xs focus:border-primary" onchange="this.form.submit()">
+                    <option value="7" {{ $days == 7 ? 'selected' : '' }}>Last 7 Days</option>
+                    <option value="30" {{ $days == 30 ? 'selected' : '' }}>Last 30 Days</option>
+                    <option value="90" {{ $days == 90 ? 'selected' : '' }}>Last 90 Days</option>
+                </select>
+            </form>
+        </div>
     </div>
 
     @if(isset($ignoredCount) && $ignoredCount > 0)

@@ -16,6 +16,10 @@
             'admin.analytics.index' => [
                 ['label' => 'Analytics & Intelligence'],
             ],
+            'admin.analytics.live-visitors' => [
+                ['label' => 'Analytics & Intelligence', 'url' => route('admin.analytics.index')],
+                ['label' => 'Live Visitors & Telemetry Hub'],
+            ],
 
             // Bookings & Reservations
             'admin.bookings.index' => [

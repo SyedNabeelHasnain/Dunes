@@ -9,11 +9,14 @@ use App\Models\Booking;
 use App\Models\BookingPayment;
 use App\Models\Contact;
 use App\Models\EmailCampaign;
+use App\Models\IpRule;
 use App\Models\RequestLog;
 use App\Models\Review;
 use App\Models\Subscriber;
 use App\Models\Tour;
 use App\Models\WhatsappInquiry;
+use App\Services\IpSecurityService;
+use App\Services\LiveVisitorTelemetryService;
 use App\Services\ZiinaPaymentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -363,32 +366,102 @@ class AdminDashboardController extends Controller
     }
 
     /**
-     * Polling endpoint for active visitors in the last 5 minutes.
+     * Polling endpoint for active visitors in the last 5 minutes (Enriched with friction & lead telemetry).
      */
-    public function activeVisitors(): JsonResponse
+    public function activeVisitors(LiveVisitorTelemetryService $telemetryService): JsonResponse
     {
-        $window = now()->subMinutes(5)->toDateTimeString();
-        $ignoredIps = app(\App\Services\IpSecurityService::class)->getIgnoredIpsList();
+        $data = $telemetryService->getActiveVisitors(5);
 
-        $baseQuery = RequestLog::where('request_timestamp', '>=', $window)
-            ->where('bot_indicator', 'Likely Human');
-        if (! empty($ignoredIps)) {
-            $baseQuery->whereNotIn('client_ip', $ignoredIps);
-        }
+        return response()->json($data);
+    }
 
-        $count = (clone $baseQuery)->distinct('session_id')->count('session_id');
+    /**
+     * Detailed Live Visitor Journey & Friction Inspector API.
+     */
+    public function visitorJourney(Request $request, string $sessionId, LiveVisitorTelemetryService $telemetryService): JsonResponse
+    {
+        $clientIp = $request->input('client_ip');
+        $result = $telemetryService->getVisitorJourney($sessionId, $clientIp);
 
-        $visitors = (clone $baseQuery)
-            ->select('session_id', 'client_ip', 'user_agent', 'country', 'city', 'request_uri', 'request_timestamp', 'device_type', 'browser_name', 'os_name')
-            ->orderBy('request_timestamp', 'desc')
-            ->get()
-            ->unique('session_id')
-            ->values();
+        return response()->json($result);
+    }
+
+    /**
+     * 1-Click Exclude Visitor IP from Analytics directly from Inspector.
+     */
+    public function quickIgnoreVisitor(Request $request, IpSecurityService $ipSecurity): JsonResponse
+    {
+        $request->validate([
+            'ip' => 'required|string|max:45',
+        ]);
+        $ip = trim((string) $request->input('ip'));
+
+        IpRule::updateOrCreate(
+            ['ip_address' => $ip],
+            [
+                'mode' => 'ignore_analytics',
+                'label' => 'Live Telemetry Quick Exclude',
+                'reason' => '1-Click Excluded from Live Telemetry Inspector to prevent data skewing.',
+                'status' => 'active',
+                'created_by' => auth()->id(),
+            ]
+        );
+
+        $ipSecurity->clearRulesCache();
+        $purged = $ipSecurity->purgeHistoricalLogsForIp($ip);
 
         return response()->json([
-            'count' => $count,
-            'visitors' => $visitors,
+            'success' => true,
+            'message' => "IP {$ip} successfully excluded from visitor analytics. ({$purged} past logs purged)",
         ]);
+    }
+
+    /**
+     * 1-Click Block Visitor IP via Firewall directly from Inspector.
+     */
+    public function quickBlockVisitor(Request $request, IpSecurityService $ipSecurity): JsonResponse
+    {
+        $request->validate([
+            'ip' => 'required|string|max:45',
+        ]);
+        $ip = trim((string) $request->input('ip'));
+
+        IpRule::updateOrCreate(
+            ['ip_address' => $ip],
+            [
+                'mode' => 'block',
+                'label' => 'Live Telemetry Quick Block',
+                'reason' => '1-Click Blocked from Live Telemetry Inspector.',
+                'status' => 'active',
+                'created_by' => auth()->id(),
+            ]
+        );
+
+        $ipSecurity->clearRulesCache();
+
+        return response()->json([
+            'success' => true,
+            'message' => "IP {$ip} successfully blocked by Firewall.",
+        ]);
+    }
+
+    /**
+     * Dedicated Full-Page Live Visitors & Telemetry Hub in CMS.
+     */
+    public function liveVisitorsHub(Request $request, LiveVisitorTelemetryService $telemetryService)
+    {
+        $activeData = $telemetryService->getActiveVisitors(15);
+        $recentVisitors = $activeData['visitors'];
+        $activeCount = $activeData['count'];
+
+        // Aggregate friction stats
+        $draftsCount = collect($recentVisitors)->where('has_draft', true)->count();
+        $errorsCount = collect($recentVisitors)->where('has_error', true)->count();
+        $whatsappCount = collect($recentVisitors)->where('has_whatsapp', true)->count();
+
+        return view('admin.analytics.live-visitors', compact(
+            'recentVisitors', 'activeCount', 'draftsCount', 'errorsCount', 'whatsappCount'
+        ));
     }
 
     /**

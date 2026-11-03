@@ -206,7 +206,11 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard.alias');
     Route::get('/analytics', [AdminDashboardController::class, 'analytics'])->name('analytics.index');
+    Route::get('/analytics/live-visitors', [AdminDashboardController::class, 'liveVisitorsHub'])->name('analytics.live-visitors');
     Route::get('/active-visitors', [AdminDashboardController::class, 'activeVisitors'])->name('active-visitors');
+    Route::get('/api/visitor-journey/{sessionId}', [AdminDashboardController::class, 'visitorJourney'])->name('api.visitor-journey');
+    Route::post('/api/visitors/quick-ignore', [AdminDashboardController::class, 'quickIgnoreVisitor'])->name('api.visitors.quick-ignore');
+    Route::post('/api/visitors/quick-block', [AdminDashboardController::class, 'quickBlockVisitor'])->name('api.visitors.quick-block');
     Route::get('/api/kpis', [AdminDashboardController::class, 'liveKpis'])->name('api.kpis');
     Route::get('/api/bookings-stats', [AdminBookingController::class, 'liveStats'])->name('api.bookings.stats');
     Route::get('/api/spotlight', [AdminSpotlightController::class, 'search'])->name('api.spotlight');

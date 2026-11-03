@@ -146,31 +146,67 @@
                         </span>
                         <span id="activeVisitorsCount" x-text="$store.admin.activeVisitorsCount">0 Online</span>
                     </button>
-                    <!-- Visitors Popover Dropdown -->
-                    <div x-show="open" @click.outside="open = false" x-transition class="absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-slate-200 p-3 z-30 text-xs" style="display: none;">
-                        <div class="font-bold text-slate-800 pb-2 border-b border-slate-100 flex items-center justify-between">
-                            <span>Live Visitors (Last 5m)</span>
-                            <span class="text-primary font-mono text-[11px]" x-text="$store.admin.activeVisitorsCount"></span>
+                    <!-- Visitors Popover Dropdown (Interactive Clickable Telemetry List) -->
+                    <div x-show="open" @click.outside="open = false" x-transition class="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 p-3.5 z-30 text-xs" style="display: none;">
+                        <div class="font-bold text-slate-800 pb-2.5 border-b border-slate-100 flex items-center justify-between">
+                            <div class="flex items-center gap-1.5">
+                                <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span class="font-black text-slate-900">Live Visitors</span>
+                                <span class="text-[11px] text-slate-400 font-normal">(Last 5m)</span>
+                            </div>
+                            <span class="text-primary font-mono font-bold text-xs" x-text="$store.admin.activeVisitorsCount"></span>
                         </div>
-                        <div class="max-h-60 overflow-y-auto divide-y divide-slate-100 pt-1" id="activeVisitorsList">
+                        <div class="max-h-72 overflow-y-auto divide-y divide-slate-100 pt-1.5 space-y-1" id="activeVisitorsList">
                             <template x-if="$store.admin.activeVisitorsList && $store.admin.activeVisitorsList.length > 0">
                                 <div>
                                     <template x-for="(v, index) in $store.admin.activeVisitorsList" :key="index">
-                                        <div class="py-2 space-y-0.5">
+                                        <div @click="$dispatch('inspect-visitor', { sessionId: v.session_id, clientIp: v.client_ip }); open = false;"
+                                             class="p-2.5 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-200 transition cursor-pointer group space-y-1">
                                             <div class="flex items-center justify-between font-mono text-[11px]">
-                                                <span class="font-semibold text-slate-800" x-text="v.client_ip"></span>
-                                                <span class="text-slate-400" x-text="new Date(v.request_timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})"></span>
+                                                <span class="font-bold text-slate-800 group-hover:text-primary flex items-center gap-1.5 truncate">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                                                    <span class="truncate" x-text="v.client_ip"></span>
+                                                </span>
+                                                <span class="text-slate-400 text-[10px] shrink-0 font-sans" x-text="v.last_active_human || 'Active'"></span>
                                             </div>
-                                            <div class="text-primary truncate font-medium" x-text="(v.city || 'Unknown') + ', ' + (v.country || '')"></div>
-                                            <div class="text-slate-500 truncate" x-text="v.request_uri"></div>
-                                            <div class="text-[10px] text-slate-400" x-text="v.device_type + ' (' + v.browser_name + ')'"></div>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-slate-700 font-semibold truncate" x-text="(v.city || 'Dubai') + ', ' + (v.country || 'UAE')"></span>
+                                                <span class="text-[10px] text-slate-400 shrink-0" x-text="v.device_type + ' (' + v.browser_name + ')'"></span>
+                                            </div>
+                                            <div class="flex items-center justify-between gap-1 text-[11px] pt-0.5">
+                                                <span class="font-mono text-slate-500 truncate max-w-[190px] bg-slate-100 px-1.5 py-0.5 rounded text-[10px]" x-text="v.request_uri || '/'"></span>
+                                                <div class="flex items-center gap-1 shrink-0">
+                                                    <template x-if="v.has_draft">
+                                                        <span class="px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-800 text-[9px] font-black uppercase" title="Incomplete checkout draft">
+                                                            <i class="bi bi-cart"></i> Draft
+                                                        </span>
+                                                    </template>
+                                                    <template x-if="v.has_error">
+                                                        <span class="px-1.5 py-0.2 rounded-full bg-rose-100 text-rose-800 text-[9px] font-black uppercase" title="404 or page error">
+                                                            <i class="bi bi-exclamation-triangle"></i> 404
+                                                        </span>
+                                                    </template>
+                                                    <template x-if="v.has_whatsapp">
+                                                        <span class="px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-black uppercase" title="WhatsApp assistance requested">
+                                                            <i class="bi bi-whatsapp"></i> Chat
+                                                        </span>
+                                                    </template>
+                                                    <i class="bi bi-chevron-right text-[10px] text-slate-400 group-hover:text-primary group-hover:translate-x-0.5 transition-transform"></i>
+                                                </div>
+                                            </div>
                                         </div>
                                     </template>
                                 </div>
                             </template>
                             <template x-if="!$store.admin.activeVisitorsList || $store.admin.activeVisitorsList.length === 0">
-                                <div class="text-center text-slate-400 py-3">No active human visitors detected</div>
+                                <div class="text-center text-slate-400 py-4 text-xs">No active human visitors detected</div>
                             </template>
+                        </div>
+                        <div class="pt-2.5 mt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                            <span class="text-slate-400 text-[10px]">Click visitor to inspect live journey</span>
+                            <a href="{{ route('admin.analytics.live-visitors') }}" class="text-primary hover:underline font-bold inline-flex items-center gap-1">
+                                <span>Live Hub</span> <i class="bi bi-arrow-right text-[10px]"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -722,6 +758,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Live Visitor Journey & Friction Inspector Modal -->
+    @include('admin.partials.live-visitor-inspector-modal')
 
     <!-- Essential Scripts & Plugins -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" crossorigin="anonymous"></script>
