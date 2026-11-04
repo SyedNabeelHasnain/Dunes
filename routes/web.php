@@ -402,6 +402,7 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile');
 
     // Integrations & Portal Settings (General, SEO, Marketing, Google, Meta, Currency, Cache)
+    Route::get('/settings', [AdminSettingController::class, 'general'])->name('settings.index');
     Route::get('/settings/general', [AdminSettingController::class, 'general'])->name('settings.general');
     Route::get('/settings/seo', [AdminSettingController::class, 'seo'])->name('settings.seo');
     Route::post('/settings/indexnow/ping', [AdminSettingController::class, 'pingIndexNow'])->name('settings.indexnow.ping');

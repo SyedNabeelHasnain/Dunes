@@ -48,6 +48,41 @@ class ComprehensiveCmsAndMediaEnhancementsTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Customer Video Reviews Reel');
         $response->assertSee('Watch Real Travelers in the Dubai Dunes');
+        $response->assertSee('Manage Video Reviews');
+        $response->assertSee(route('admin.video-reviews.index'));
+        $response->assertSee('Manage Guest Reviews');
+        $response->assertSee(route('admin.reviews.index'));
+        $response->assertSee('Manage Media & Moments');
+        $response->assertSee(route('admin.media.index'));
+        $response->assertSee('Manage Tours & Packages');
+        $response->assertSee(route('admin.tours.index'));
+        $response->assertSee('Manage FAQs Hub');
+        $response->assertSee(route('admin.faqs.index'));
+        $response->assertSee('Manage Bookings Funnel');
+        $response->assertSee(route('admin.bookings.index'));
+    }
+
+    public function test_admin_settings_index_route_is_defined_and_accessible(): void
+    {
+        $this->assertTrue(\Illuminate\Support\Facades\Route::has('admin.settings.index'));
+        $response = $this->actingAs($this->admin)->get(route('admin.settings.index'));
+        $response->assertStatus(200);
+    }
+
+    public function test_contact_faq_and_tours_views_render_dynamic_cms_content(): void
+    {
+        $this->artisan('migrate');
+
+        $contactRes = $this->get('/contact');
+        $contactRes->assertStatus(200);
+        $contactRes->assertSee('Contact Dunes Discovery Tourism');
+
+        $faqRes = $this->get('/faq');
+        $faqRes->assertStatus(200);
+
+        $toursRes = $this->get('/tours');
+        $toursRes->assertStatus(200);
+        $toursRes->assertSee('Explore All Dubai Desert Safari & Adventure Tours');
     }
 
     public function test_media_manager_deduplicates_format_variants_seamlessly(): void

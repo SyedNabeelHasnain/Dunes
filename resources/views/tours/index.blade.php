@@ -1,5 +1,14 @@
 @extends('layouts.app')
 
+@php
+    $cmsSvc = app(\App\Services\CmsContentService::class);
+    $toursPage = $cmsSvc->getPage('tours');
+    $defaultToursTitle = ($toursPage && $toursPage->title) ? $toursPage->title : 'Explore Dubai Safari Tours & Experiences';
+    $defaultToursSubtitle = ($toursPage && $toursPage->subtitle) ? $toursPage->subtitle : 'Discover top-rated desert adventures, high-power dune buggies, skyline dhow cruises & city tours.';
+    $whyBookSec = $cmsSvc->getSection('tours', 'why_book');
+    $categoriesSec = $cmsSvc->getSection('tours', 'categories');
+@endphp
+
 @section('content')
 <!-- Page Header Section -->
 <section class="hero-subpage bg-slate-950 text-white relative overflow-hidden" style="padding-top: calc(var(--header-h, 72px) + 2.5rem);">
@@ -28,10 +37,16 @@
                     @elseif($selectedCategorySlug)
                         {{ ucwords(str_replace('-', ' ', $selectedCategorySlug)) }}
                     @else
-                        Explore Dubai Safari Tours & Experiences
+                        {{ $defaultToursTitle }}
                     @endif
                 </h1>
-                <p class="text-sm sm:text-base text-white/80 max-w-2xl leading-relaxed">Discover top-rated desert adventures, high-power dune buggies, skyline dhow cruises & city tours.</p>
+                <p class="text-sm sm:text-base text-white/80 max-w-2xl leading-relaxed">
+                    @if(!request('q') && !$selectedCategorySlug)
+                        {{ $defaultToursSubtitle }}
+                    @else
+                        Discover top-rated desert adventures, high-power dune buggies, skyline dhow cruises & city tours.
+                    @endif
+                </p>
             </div>
             <div class="hidden lg:block shrink-0">
                 <span class="bg-primary/20 text-primary border border-primary/40 px-4 py-2 rounded-full font-bold text-sm inline-flex items-center gap-1.5">
@@ -251,14 +266,15 @@
 </section>
 
 <!-- GEO & AI Direct-Answer Catalog Buyer's Guide -->
+@if($cmsSvc->isSectionVisible('tours', 'why_book'))
 <section class="py-12 sm:py-16 bg-slate-50 border-t border-slate-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-10 sm:mb-12">
             <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">
-                Dubai Tour Selection <span class="text-primary">Guide & FAQ</span>
+                {{ $whyBookSec?->title ?: 'Dubai Tour Selection Guide & FAQ' }}
             </h2>
             <p class="text-slate-600 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
-                Expert tips to help you choose the best desert safari or city adventure for your group.
+                {{ $whyBookSec?->subtitle ?: 'Expert tips to help you choose the best desert safari or city adventure for your group.' }}
             </p>
         </div>
 
@@ -287,6 +303,7 @@
         </div>
     </div>
 </section>
+@endif
 
 <!-- Complete Semantic HTML Comparison Matrix for AI Engines & Travelers -->
 <section class="py-12 sm:py-16 bg-white border-t border-slate-200">

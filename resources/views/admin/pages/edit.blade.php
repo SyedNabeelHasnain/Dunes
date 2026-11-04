@@ -2,6 +2,151 @@
 
 @section('page_title', 'Edit Page Content: ' . $page->name)
 
+@php
+    $sectionShortcuts = [
+        'videos' => [
+            'route' => route('admin.video-reviews.index'),
+            'label' => 'Manage Video Reviews',
+            'icon' => 'bi-camera-reels-fill',
+            'badge_color' => 'bg-rose-50 text-rose-700 hover:bg-rose-100 border-rose-200',
+            'desc' => 'Manage guest customer video reels, YouTube embeds, approval status, and front-end placement.'
+        ],
+        'video_reels' => [
+            'route' => route('admin.video-reviews.index'),
+            'label' => 'Manage Video Reviews',
+            'icon' => 'bi-camera-reels-fill',
+            'badge_color' => 'bg-rose-50 text-rose-700 hover:bg-rose-100 border-rose-200',
+            'desc' => 'Manage guest customer video reels, YouTube embeds, approval status, and front-end placement.'
+        ],
+        'reviews' => [
+            'route' => route('admin.reviews.index'),
+            'label' => 'Manage Guest Reviews',
+            'icon' => 'bi-star-fill',
+            'badge_color' => 'bg-amber-50 text-amber-700 hover:bg-amber-100 border-amber-200',
+            'desc' => 'Moderate 5-star customer testimonials, Google & TripAdvisor sync, and review photos.'
+        ],
+        'moments' => [
+            'route' => route('admin.media.index'),
+            'label' => 'Manage Media & Moments',
+            'icon' => 'bi-images',
+            'badge_color' => 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border-indigo-200',
+            'desc' => 'Upload, replace, and organize photography, desert safari moments, and gallery media.'
+        ],
+        'featured_tours' => [
+            'route' => route('admin.tours.index'),
+            'label' => 'Manage Tours & Packages',
+            'icon' => 'bi-compass-fill',
+            'badge_color' => 'bg-orange-50 text-orange-700 hover:bg-orange-100 border-orange-200',
+            'desc' => 'Edit pricing, itineraries, inclusions, availability, and featured flags on all tours.'
+        ],
+        'silos' => [
+            'route' => route('admin.tours.index'),
+            'label' => 'Manage Adventure Categories',
+            'icon' => 'bi-grid-fill',
+            'badge_color' => 'bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200',
+            'desc' => 'Organize adventure categories (Morning, Evening, Overnight, Buggies, Dhow Cruises).'
+        ],
+        'concierge' => [
+            'route' => route('admin.tours.index'),
+            'label' => 'Manage Concierge Tours',
+            'icon' => 'bi-chat-dots-fill',
+            'badge_color' => 'bg-purple-50 text-purple-700 hover:bg-purple-100 border-purple-200',
+            'desc' => 'Configure VIP custom safari concierge options and direct booking packages.'
+        ],
+        'why_choose_us' => [
+            'route' => route('admin.tours.index'),
+            'label' => 'Manage Tour Highlights',
+            'icon' => 'bi-check-circle-fill',
+            'badge_color' => 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200',
+            'desc' => 'Edit value propositions, direct-operator guarantees, and booking perks.'
+        ],
+        'why_book' => [
+            'route' => route('admin.tours.index'),
+            'label' => 'Manage Tour Highlights',
+            'icon' => 'bi-check-circle-fill',
+            'badge_color' => 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200',
+            'desc' => 'Edit value propositions, direct-operator guarantees, and booking perks.'
+        ],
+        'faqs' => [
+            'route' => route('admin.faqs.index'),
+            'label' => 'Manage FAQs Hub',
+            'icon' => 'bi-question-circle-fill',
+            'badge_color' => 'bg-teal-50 text-teal-700 hover:bg-teal-100 border-teal-200',
+            'desc' => 'Add, reorder, or edit questions and answers for desert safaris and city tours.'
+        ],
+        'trust_bar' => [
+            'route' => route('admin.settings.general'),
+            'label' => 'Manage Trust & Badges',
+            'icon' => 'bi-shield-check',
+            'badge_color' => 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200',
+            'desc' => 'Configure DTCM licensing, cancellation policy, halal certification, and operator badges.'
+        ],
+        'desert_cta' => [
+            'route' => route('admin.bookings.index'),
+            'label' => 'Manage Bookings Funnel',
+            'icon' => 'bi-calendar-check-fill',
+            'badge_color' => 'bg-amber-50 text-amber-700 hover:bg-amber-100 border-amber-200',
+            'desc' => 'View incoming guest bookings, reservation statuses, passenger details, and vouchers.'
+        ],
+        'channels' => [
+            'route' => route('admin.whatsapp.index'),
+            'label' => 'Manage WhatsApp Concierge',
+            'icon' => 'bi-whatsapp',
+            'badge_color' => 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200',
+            'desc' => 'Monitor real-time WhatsApp conversation leads, agent assignments, and phone routing.'
+        ],
+        'office_info' => [
+            'route' => route('admin.settings.general'),
+            'label' => 'Edit Office & Contact Info',
+            'icon' => 'bi-geo-alt-fill',
+            'badge_color' => 'bg-cyan-50 text-cyan-700 hover:bg-cyan-100 border-cyan-200',
+            'desc' => 'Update physical office address, phone numbers, email support, and operating hours.'
+        ],
+        'support_banner' => [
+            'route' => route('admin.inquiries.index'),
+            'label' => 'Manage Inquiries Desk',
+            'icon' => 'bi-envelope-paper-fill',
+            'badge_color' => 'bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200',
+            'desc' => 'Respond to customer contact messages, group custom quotes, and urgent requests.'
+        ],
+        'happy_guests' => [
+            'route' => route('admin.operations.index'),
+            'label' => 'Manage Fleet & Operations',
+            'icon' => 'bi-truck',
+            'badge_color' => 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border-indigo-200',
+            'desc' => 'Track Land Cruiser fleet, 1000cc buggies, drivers, guides, and desert logistics.'
+        ],
+        'story' => [
+            'route' => route('admin.settings.general'),
+            'label' => 'Manage Brand Identity',
+            'icon' => 'bi-building-fill',
+            'badge_color' => 'bg-slate-100 text-slate-800 hover:bg-slate-200 border-slate-300',
+            'desc' => 'Update company history, mission, brand description, and licensing credentials.'
+        ],
+        'values' => [
+            'route' => route('admin.settings.general'),
+            'label' => 'Manage Core Values',
+            'icon' => 'bi-award-fill',
+            'badge_color' => 'bg-slate-100 text-slate-800 hover:bg-slate-200 border-slate-300',
+            'desc' => 'Configure core company values, safety standards, and customer promises.'
+        ],
+        'categories' => [
+            'route' => route('admin.tours.index'),
+            'label' => 'Manage Tour Categories',
+            'icon' => 'bi-collection-fill',
+            'badge_color' => 'bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200',
+            'desc' => 'Manage tour category silos and catalog filtering.'
+        ],
+        'community' => [
+            'route' => route('admin.media.index'),
+            'label' => 'Manage Community Media',
+            'icon' => 'bi-instagram',
+            'badge_color' => 'bg-pink-50 text-pink-700 hover:bg-pink-100 border-pink-200',
+            'desc' => 'Curate traveler social moments, tag #DunesDiscovery, and Instagram media.'
+        ],
+    ];
+@endphp
+
 @section('content')
 <div class="space-y-6" x-data="{ addSectionModal: false, activeLangTab: 'en' }">
     <!-- Top Action Bar -->
@@ -117,15 +262,25 @@
                     $secBodyTrans = $sec->getTranslations('body');
                 @endphp
                 <div class="border border-slate-200 rounded-2xl p-4 bg-slate-50/50 hover:bg-slate-50 transition" x-data="{ expanded: false, editMode: false, isActive: {{ $sec->is_active ? 'true' : 'false' }} }">
-                    <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
                         <div class="flex items-center gap-2.5 min-w-0">
-                            <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-slate-200 text-slate-700">#{{ $sec->section_key }}</span>
+                            <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-slate-200 text-slate-700 shrink-0">#{{ $sec->section_key }}</span>
                             <div class="min-w-0">
                                 <h4 class="text-xs font-black text-slate-900 truncate">{{ $sec->name }}</h4>
                                 <p class="text-[11px] text-slate-500 truncate">{{ $sec->title ?: 'No heading' }}</p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2 shrink-0">
+                        <div class="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
+                            @if(isset($sectionShortcuts[$sec->section_key]))
+                                @php $sc = $sectionShortcuts[$sec->section_key]; @endphp
+                                <a href="{{ $sc['route'] }}" 
+                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border {{ $sc['badge_color'] }} text-xs font-bold transition shadow-2xs hover:shadow-sm" 
+                                   title="{{ $sc['desc'] }}">
+                                    <i class="bi {{ $sc['icon'] }}"></i>
+                                    <span>{{ $sc['label'] }}</span>
+                                    <i class="bi bi-box-arrow-up-right text-[10px] opacity-75"></i>
+                                </a>
+                            @endif
                             <button type="button"
                                 @click="fetch('{{ route('admin.pages.sections.toggle-status', ['pageId' => $page->id, 'sectionId' => $sec->id]) }}', { method: 'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' } }).then(r => r.json()).then(d => { if(d.success) isActive = d.is_active; })"
                                 :class="isActive ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-500 border-slate-200'"
@@ -147,6 +302,26 @@
 
                     <!-- Inline Section Editor Form -->
                     <div x-show="editMode" class="mt-4 pt-4 border-t border-slate-200" style="display: none;">
+                        @if(isset($sectionShortcuts[$sec->section_key]))
+                            @php $sc = $sectionShortcuts[$sec->section_key]; @endphp
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl border bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border-amber-200/80 text-xs mb-3">
+                                <div class="flex items-center gap-2.5 text-slate-800">
+                                    <div class="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center shrink-0">
+                                        <i class="bi {{ $sc['icon'] }} text-base"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-slate-900">{{ $sc['label'] }}</div>
+                                        <div class="text-[11px] text-slate-500">{{ $sc['desc'] }}</div>
+                                    </div>
+                                </div>
+                                <a href="{{ $sc['route'] }}" 
+                                   class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold transition shadow-xs shrink-0 text-xs">
+                                    <span>Open {{ $sc['label'] }}</span>
+                                    <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+                        @endif
+
                         <form action="{{ route('admin.pages.sections.update', ['pageId' => $page->id, 'sectionId' => $sec->id]) }}" method="POST" class="space-y-3">
                             @csrf
                             @method('PUT')

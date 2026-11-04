@@ -1,5 +1,14 @@
 @extends('layouts.app')
 
+@php
+    $cmsSvc = app(\App\Services\CmsContentService::class);
+    $faqPage = $cmsSvc->getPage('faq');
+    $faqTitle = ($faqPage && $faqPage->title) ? $faqPage->title : __('ui.faq.title');
+    $faqSubtitle = ($faqPage && $faqPage->subtitle) ? $faqPage->subtitle : __('ui.faq.subtitle');
+    $faqsSec = $cmsSvc->getSection('faq', 'faqs');
+    $supportSec = $cmsSvc->getSection('faq', 'support_banner');
+@endphp
+
 @section('content')
 @push('schema')
 <script type="application/ld+json">
@@ -65,8 +74,8 @@
                 <span class="glass-dark text-white rounded-full px-3.5 py-1 text-xs font-semibold inline-flex items-center gap-1.5 mb-2 shadow-xs">
                     <i class="bi bi-patch-question-fill text-primary"></i>{{ __('ui.faq.help_center') }}
                 </span>
-                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-2">{{ __('ui.faq.title') }}</h1>
-                <p class="text-sm sm:text-base text-white/80 max-w-2xl leading-relaxed">{{ __('ui.faq.subtitle') }}</p>
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-2">{{ $faqTitle }}</h1>
+                <p class="text-sm sm:text-base text-white/80 max-w-2xl leading-relaxed">{{ $faqSubtitle }}</p>
             </div>
             <div class="hidden lg:block shrink-0">
                 <span class="bg-primary/20 text-primary border border-primary/40 px-4 py-2 rounded-full font-bold text-sm inline-flex items-center gap-1.5">
@@ -115,6 +124,7 @@
 
 <section class="py-12 sm:py-20 bg-white">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        @if($cmsSvc->isSectionVisible('faq', 'faqs'))
         <!-- Live Instant Search Bar for FAQs -->
         <div class="mb-10">
             <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 shadow-xs">
@@ -162,13 +172,15 @@
             <h3 class="text-base font-bold text-slate-900 mb-1">{{ __('ui.faq.no_results_title') }}</h3>
             <p class="text-slate-500 text-xs">{{ __('ui.faq.no_results_desc') }}</p>
         </div>
+        @endif
 
+        @if($cmsSvc->isSectionVisible('faq', 'support_banner'))
         <div class="mt-14 p-8 sm:p-12 text-center bg-slate-50 rounded-3xl border border-slate-200">
             <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl text-primary shadow-xs">
                 <i class="bi bi-chat-dots-fill"></i>
             </div>
-            <h2 class="text-2xl font-extrabold text-slate-900 mb-2">{{ __('ui.faq.still_have_questions') }}</h2>
-            <p class="text-slate-600 text-sm mb-6 max-w-md mx-auto">{{ __('ui.faq.team_ready') }}</p>
+            <h2 class="text-2xl font-extrabold text-slate-900 mb-2">{{ $supportSec?->title ?: __('ui.faq.still_have_questions') }}</h2>
+            <p class="text-slate-600 text-sm mb-6 max-w-md mx-auto">{{ $supportSec?->subtitle ?: __('ui.faq.team_ready') }}</p>
             <div class="flex flex-col sm:flex-row justify-center gap-3">
                 <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$settings['site_whatsapp'] ?? '971502456056') }}?text={{ urlencode('Hi! I have a question about your tours.') }}" class="btn-whatsapp-animated rounded-full px-6 py-3 font-bold text-white text-sm inline-flex items-center justify-center gap-2 shadow-sm cursor-pointer w-full sm:w-auto min-h-[44px]" target="_blank" rel="noopener noreferrer" data-action="whatsapp">
                     <i class="bi bi-whatsapp"></i>
@@ -180,6 +192,7 @@
                 </a>
             </div>
         </div>
+        @endif
     </div>
 </section>
 

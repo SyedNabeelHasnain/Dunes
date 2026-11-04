@@ -2,6 +2,12 @@
 
 @php
     $schemaPageType = 'ContactPage';
+    $cmsSvc = app(\App\Services\CmsContentService::class);
+    $contactPage = $cmsSvc->getPage('contact');
+    $contactTitle = ($contactPage && $contactPage->title) ? $contactPage->title : __('ui.contact_page.title');
+    $contactSubtitle = ($contactPage && $contactPage->subtitle) ? $contactPage->subtitle : __('ui.contact_page.subtitle');
+    $channelsSec = $cmsSvc->getSection('contact', 'channels');
+    $officeSec = $cmsSvc->getSection('contact', 'office_info');
 @endphp
 
 @push('schema')
@@ -55,8 +61,8 @@
                         <i class="bi bi-patch-check-fill text-emerald-200"></i>{{ __('ui.trust.licensed_operator') }}
                     </span>
                 </div>
-                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-2">{{ __('ui.contact_page.title') }}</h1>
-                <p class="text-sm sm:text-base text-white/80 max-w-2xl leading-relaxed">{{ __('ui.contact_page.subtitle') }}</p>
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-2">{{ $contactTitle }}</h1>
+                <p class="text-sm sm:text-base text-white/80 max-w-2xl leading-relaxed">{{ $contactSubtitle }}</p>
             </div>
             <div class="hidden lg:block shrink-0">
                 <span class="bg-primary/20 text-primary border border-primary/40 px-4 py-2 rounded-full font-bold text-sm inline-flex items-center gap-1.5">
@@ -111,6 +117,7 @@
             $whatsappVal = $settings['site_whatsapp'] ?? '971502456056';
         @endphp
         
+        @if($cmsSvc->isSectionVisible('contact', 'channels'))
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 mb-8 sm:mb-12">
             <a href="tel:{{ preg_replace('/[^0-9+]/','',$phoneVal) }}" class="bg-slate-50 hover:bg-white rounded-2xl p-5 sm:p-6 text-center border border-slate-200 hover:border-primary/40 shadow-xs hover:shadow-lg transition-all duration-300 group">
                 <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-xl mx-auto mb-3 group-hover:scale-110 transition-transform">
@@ -136,9 +143,10 @@
                 <div class="text-slate-600 text-sm">{{ __('ui.contact_page.chat_247') }}</div>
             </a>
         </div>
+        @endif
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-            <div class="lg:col-span-7">
+            <div class="{{ $cmsSvc->isSectionVisible('contact', 'office_info') ? 'lg:col-span-7' : 'lg:col-span-12 max-w-3xl mx-auto w-full' }}">
                 <div class="bg-white rounded-2xl p-6 sm:p-10 border border-slate-200 shadow-md">
                     <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-6">{{ __('ui.contact_page.send_message') }}</h2>
                     <form id="contactForm" method="POST" action="/ajax.php" autocomplete="off" class="needs-validation space-y-5" novalidate>
@@ -240,6 +248,7 @@
                 </div>
             </div>
             
+            @if($cmsSvc->isSectionVisible('contact', 'office_info'))
             <div class="lg:col-span-5 flex flex-col gap-6">
                 <!-- Google Verified Entity & Review Card -->
                 <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-md">
@@ -310,6 +319,7 @@
                     <iframe src="{{ $settings['google_maps_embed_url'] ?? 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14439.467468694034!2d55.2707828!3d25.2048493!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f434910086b6d%3A0xc4db9db186e4e1e2!2sDunes%20Discovery%20Tourism%20LLC!5e0!3m2!1sen!2sae!4v1700000000000!5m2!1sen!2sae' }}" class="w-full h-full border-0 min-h-[260px]" allowfullscreen loading="lazy"></iframe>
                 </div>
             </div>
+            @endif
         </div>
     </div>
 </section>
