@@ -250,26 +250,83 @@
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5">
             @foreach($assets as $asset)
                 <div class="group relative rounded-2xl border border-slate-200/90 bg-white overflow-hidden shadow-2xs hover:shadow-md hover:border-primary/50 transition-all flex flex-col cursor-pointer"
+                     x-data="{ isPlaying: false, isMuted: true }"
                      @click="openDetails({{ $asset->id }})">
                     
                     <!-- Thumbnail Container with 1:1 Aspect Ratio -->
                     <div class="relative w-full aspect-square bg-slate-900/5 overflow-hidden flex items-center justify-center">
                         @if($asset->is_image)
-                            <img src="{{ $asset->public_url }}" 
+                            <!-- IMAGE THUMBNAIL -->
+                            <img src="{{ $asset->clean_public_url }}" 
                                  alt="{{ $asset->alt_text ?: $asset->filename }}" 
                                  loading="lazy" 
                                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                 onerror="this.src='/images/placeholder.webp'; this.onerror=null;">
+                                 onerror="this.src='/images/media-placeholder.svg'; this.onerror=null;">
                         @elseif($asset->is_video)
-                            <video src="{{ $asset->public_url }}#t=0.5" 
-                                   preload="metadata" 
-                                   muted 
+                            <!-- VIDEO POSTER THUMBNAIL (Visible when not playing) -->
+                            <img x-show="!isPlaying"
+                                 src="{{ $asset->poster_url }}" 
+                                 alt="{{ $asset->alt_text ?: $asset->filename }}" 
+                                 loading="lazy" 
+                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                 onerror="this.src='/images/media-placeholder.svg'; this.onerror=null;">
+
+                            <!-- Centered Interactive Play Button Overlay -->
+                            <div x-show="!isPlaying" 
+                                 class="absolute inset-0 bg-slate-950/30 flex items-center justify-center group-hover:bg-slate-950/20 transition">
+                                <button type="button" 
+                                        @click.stop="isPlaying = true; $nextTick(() => { const v = $refs.cardVideo_{{ $asset->id }}; if(v){ v.play(); } })"
+                                        class="w-12 h-12 rounded-full bg-primary/95 hover:bg-primary text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition cursor-pointer"
+                                        title="Play preview in card">
+                                    <i class="bi bi-play-fill text-2xl translate-x-0.5"></i>
+                                </button>
+                            </div>
+
+                            <!-- INLINE VIDEO PLAYER (Active when playing) -->
+                            <video x-ref="cardVideo_{{ $asset->id }}"
+                                   x-show="isPlaying"
+                                   src="{{ $asset->clean_public_url }}" 
+                                   poster="{{ $asset->poster_url }}"
+                                   :muted="isMuted"
                                    playsinline 
-                                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                   preload="none"
+                                   @ended="isPlaying = false"
+                                   class="w-full h-full object-cover bg-black"
+                                   style="display: none;"
+                                   @click.stop>
                             </video>
-                            <div class="absolute inset-0 bg-slate-950/30 flex items-center justify-center group-hover:bg-slate-950/20 transition">
-                                <div class="w-10 h-10 rounded-full bg-white/90 text-primary flex items-center justify-center shadow-md group-hover:scale-110 transition">
-                                    <i class="bi bi-play-fill text-xl translate-x-0.5"></i>
+
+                            <!-- Floating Inline Controls Bar (When Video Is Playing Inside Card) -->
+                            <div x-show="isPlaying" 
+                                 @click.stop
+                                 class="absolute bottom-1.5 left-1.5 right-1.5 flex items-center justify-between p-1 rounded-lg bg-slate-950/85 backdrop-blur-xs text-white text-[11px] z-20 shadow-md">
+                                <div class="flex items-center gap-1">
+                                    <button type="button" 
+                                            @click="const v = $refs.cardVideo_{{ $asset->id }}; if(v){ v.paused ? v.play() : v.pause(); }" 
+                                            class="p-1 hover:text-primary transition"
+                                            title="Play / Pause">
+                                        <i class="bi" :class="$refs.cardVideo_{{ $asset->id }}?.paused ? 'bi-play-fill text-sm' : 'bi-pause-fill text-sm'"></i>
+                                    </button>
+                                    <button type="button" 
+                                            @click="isMuted = !isMuted; if($refs.cardVideo_{{ $asset->id }}){ $refs.cardVideo_{{ $asset->id }}.muted = isMuted; }" 
+                                            class="p-1 hover:text-primary transition"
+                                            :title="isMuted ? 'Unmute Audio' : 'Mute Audio'">
+                                        <i class="bi" :class="isMuted ? 'bi-volume-mute-fill text-xs' : 'bi-volume-up-fill text-xs text-emerald-400'"></i>
+                                    </button>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <button type="button" 
+                                            @click="openVideoModal('{{ $asset->clean_public_url }}', '{{ $asset->poster_url }}', '{{ addslashes($asset->filename) }}')" 
+                                            class="p-1 hover:text-primary transition"
+                                            title="Expand Cinema Player">
+                                        <i class="bi bi-arrows-fullscreen text-xs"></i>
+                                    </button>
+                                    <button type="button" 
+                                            @click="isPlaying = false; const v = $refs.cardVideo_{{ $asset->id }}; if(v){ v.pause(); v.currentTime = 0; }" 
+                                            class="p-1 hover:text-rose-400 transition"
+                                            title="Close Video">
+                                        <i class="bi bi-x-circle-fill text-xs"></i>
+                                    </button>
                                 </div>
                             </div>
                         @else
@@ -279,21 +336,31 @@
                         @endif
 
                         <!-- Top Overlay Controls -->
-                        <div class="absolute top-2 left-2 right-2 flex items-center justify-between pointer-events-none" @click.stop>
+                        <div class="absolute top-2 left-2 right-2 flex items-center justify-between pointer-events-none z-10" @click.stop>
                             <!-- Multi-select checkbox -->
                             <input type="checkbox" 
                                    value="{{ $asset->id }}" 
                                    x-model="selectedIds" 
                                    class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary pointer-events-auto shadow-2xs cursor-pointer">
 
-                            <!-- Extension Badge -->
-                            <span class="px-1.5 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-slate-950/70 text-white backdrop-blur-xs">
-                                {{ $asset->extension }}
-                            </span>
+                            <div class="flex items-center gap-1">
+                                @if($asset->is_video)
+                                    <button type="button" 
+                                            @click="openVideoModal('{{ $asset->clean_public_url }}', '{{ $asset->poster_url }}', '{{ addslashes($asset->filename) }}')"
+                                            class="pointer-events-auto p-1 rounded-md bg-slate-950/70 hover:bg-primary text-white backdrop-blur-xs transition"
+                                            title="Open full cinema video player">
+                                        <i class="bi bi-arrows-fullscreen text-[10px]"></i>
+                                    </button>
+                                @endif
+                                <!-- Extension Badge -->
+                                <span class="px-1.5 py-0.5 rounded-md text-[10px] font-extrabold uppercase {{ $asset->is_video ? 'bg-amber-600 text-white' : 'bg-slate-950/70 text-white' }} backdrop-blur-xs">
+                                    {{ $asset->extension }}
+                                </span>
+                            </div>
                         </div>
 
-                        <!-- Bottom Overlay Badges -->
-                        <div class="absolute bottom-2 left-2 right-2 flex items-center justify-between text-[10px] font-bold pointer-events-none">
+                        <!-- Bottom Overlay Badges (Hidden when playing inline) -->
+                        <div x-show="!isPlaying" class="absolute bottom-2 left-2 right-2 flex items-center justify-between text-[10px] font-bold pointer-events-none z-10">
                             <!-- Usage Badge -->
                             @if($asset->usage_count > 0)
                                 <span class="px-1.5 py-0.5 rounded-md bg-emerald-600/90 text-white shadow-2xs backdrop-blur-xs">
@@ -325,12 +392,22 @@
 
                         <div class="flex items-center justify-between pt-1.5 border-t border-slate-100 text-[11px]" @click.stop>
                             <span class="text-slate-400 capitalize">{{ $asset->category }}</span>
-                            <button type="button" 
-                                    @click="copyUrl('{{ $asset->public_url }}')" 
-                                    class="p-1 rounded-md text-slate-400 hover:text-primary hover:bg-slate-50 transition cursor-pointer"
-                                    title="Copy public URL">
-                                <i class="bi bi-clipboard"></i>
-                            </button>
+                            <div class="flex items-center gap-1">
+                                @if($asset->is_video)
+                                    <button type="button" 
+                                            @click="openVideoModal('{{ $asset->clean_public_url }}', '{{ $asset->poster_url }}', '{{ addslashes($asset->filename) }}')" 
+                                            class="p-1 rounded-md text-amber-600 hover:text-amber-700 hover:bg-amber-50 transition cursor-pointer"
+                                            title="Watch Fullscreen">
+                                        <i class="bi bi-play-circle-fill"></i>
+                                    </button>
+                                @endif
+                                <button type="button" 
+                                        @click="copyUrl('{{ $asset->clean_public_url }}')" 
+                                        class="p-1 rounded-md text-slate-400 hover:text-primary hover:bg-slate-50 transition cursor-pointer"
+                                        title="Copy public URL">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -369,15 +446,20 @@
                                            class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer">
                                 </td>
                                 <td class="py-2.5 px-3">
-                                    <div class="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200/80 overflow-hidden flex items-center justify-center shrink-0 cursor-pointer"
+                                    <div class="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200/80 overflow-hidden flex items-center justify-center shrink-0 cursor-pointer relative"
                                          @click="openDetails({{ $asset->id }})">
                                         @if($asset->is_image)
-                                            <img src="{{ $asset->public_url }}" 
+                                            <img src="{{ $asset->clean_public_url }}" 
                                                  alt="{{ $asset->filename }}" 
-                                                 class="w-full h-full object-cover">
+                                                 class="w-full h-full object-cover"
+                                                 onerror="this.src='/images/media-placeholder.svg'; this.onerror=null;">
                                         @elseif($asset->is_video)
-                                            <div class="relative w-full h-full bg-slate-900 flex items-center justify-center text-white">
-                                                <i class="bi bi-play-fill text-sm"></i>
+                                            <img src="{{ $asset->poster_url }}" 
+                                                 alt="{{ $asset->filename }}" 
+                                                 class="w-full h-full object-cover"
+                                                 onerror="this.src='/images/media-placeholder.svg'; this.onerror=null;">
+                                            <div class="absolute inset-0 bg-black/40 flex items-center justify-center text-white">
+                                                <i class="bi bi-play-fill text-xs"></i>
                                             </div>
                                         @else
                                             <i class="bi bi-file-earmark text-slate-400 text-base"></i>
@@ -425,8 +507,16 @@
                                 </td>
                                 <td class="py-2.5 px-3.5 text-right whitespace-nowrap">
                                     <div class="flex items-center justify-end gap-1.5">
+                                        @if($asset->is_video)
+                                            <button type="button" 
+                                                    @click="openVideoModal('{{ $asset->clean_public_url }}', '{{ $asset->poster_url }}', '{{ addslashes($asset->filename) }}')" 
+                                                    class="p-1.5 rounded-lg text-amber-600 hover:text-amber-700 hover:bg-amber-50 transition"
+                                                    title="Watch video">
+                                                <i class="bi bi-play-circle-fill"></i>
+                                            </button>
+                                        @endif
                                         <button type="button" 
-                                                @click="copyUrl('{{ $asset->public_url }}')" 
+                                                @click="copyUrl('{{ $asset->clean_public_url }}')" 
                                                 class="p-1.5 rounded-lg text-slate-400 hover:text-primary hover:bg-slate-100 transition"
                                                 title="Copy public URL">
                                             <i class="bi bi-clipboard"></i>
@@ -495,6 +585,14 @@
                 </div>
 
                 <div class="flex items-center gap-1.5">
+                    <template x-if="activeAsset?.media_type === 'video'">
+                        <button type="button" 
+                                @click="openVideoModal(activeAsset?.public_url, activeAsset?.poster_url, activeAsset?.filename)" 
+                                class="p-2 rounded-xl text-amber-600 hover:text-amber-700 hover:bg-amber-50 transition" 
+                                title="Watch Cinema Player">
+                            <i class="bi bi-arrows-fullscreen"></i>
+                        </button>
+                    </template>
                     <button type="button" 
                             @click="copyUrl(activeAsset?.public_url)" 
                             class="p-2 rounded-xl text-slate-500 hover:text-primary hover:bg-slate-100 transition" 
@@ -520,18 +618,22 @@
             <div class="flex-1 overflow-y-auto p-5 space-y-5">
                 
                 <!-- Media Preview Canvas -->
-                <div class="rounded-2xl border border-slate-200/90 bg-slate-900/5 overflow-hidden flex items-center justify-center p-2 min-h-[220px] max-h-[340px]">
+                <div class="rounded-2xl border border-slate-200/90 bg-slate-950 overflow-hidden flex items-center justify-center p-2 min-h-[220px] max-h-[360px] relative">
                     <template x-if="activeAsset?.media_type === 'image'">
                         <img :src="activeAsset?.public_url" 
                              :alt="activeAsset?.alt_text" 
-                             class="max-w-full max-h-[320px] rounded-xl object-contain shadow-sm">
+                             class="max-w-full max-h-[340px] rounded-xl object-contain shadow-sm"
+                             onerror="this.src='/images/media-placeholder.svg'; this.onerror=null;">
                     </template>
                     <template x-if="activeAsset?.media_type === 'video'">
-                        <video :src="activeAsset?.public_url" 
-                               controls 
-                               playsinline 
-                               class="max-w-full max-h-[320px] rounded-xl shadow-sm bg-black">
-                        </video>
+                        <div class="w-full flex flex-col items-center">
+                            <video :src="activeAsset?.public_url" 
+                                   :poster="activeAsset?.poster_url"
+                                   controls 
+                                   playsinline 
+                                   class="max-w-full max-h-[340px] rounded-xl shadow-lg bg-black">
+                            </video>
+                        </div>
                     </template>
                 </div>
 
@@ -700,6 +802,51 @@
                     </button>
                 </div>
 
+            </div>
+        </div>
+    </div>
+
+    <!-- DEDICATED CINEMA VIDEO PLAYER MODAL -->
+    <div x-show="videoModalOpen" 
+         x-transition 
+         class="fixed inset-0 z-50 overflow-hidden bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-6" 
+         style="display: none;"
+         @keydown.escape.window="closeVideoModal()">
+        
+        <div class="w-full max-w-4xl bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-slate-800 flex flex-col" 
+             @click.outside="closeVideoModal()">
+            
+            <!-- Video Modal Header -->
+            <div class="px-5 py-3.5 bg-slate-950 border-b border-slate-800 flex items-center justify-between text-white">
+                <div class="flex items-center gap-2 min-w-0">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
+                    <h3 class="text-sm font-bold truncate text-slate-100" x-text="videoModalData.title"></h3>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" 
+                            @click="copyUrl(videoModalData.url)" 
+                            class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition flex items-center gap-1">
+                        <i class="bi bi-clipboard"></i>
+                        <span>Copy URL</span>
+                    </button>
+                    <button type="button" 
+                            @click="closeVideoModal()" 
+                            class="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition">
+                        <i class="bi bi-x-lg text-base"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Video Player Screen -->
+            <div class="relative w-full aspect-video sm:aspect-[16/9] max-h-[72vh] bg-black flex items-center justify-center">
+                <video x-ref="cinemaVideo"
+                       :src="videoModalData.url" 
+                       :poster="videoModalData.poster"
+                       controls 
+                       autoplay 
+                       playsinline 
+                       class="w-full h-full object-contain">
+                </video>
             </div>
         </div>
     </div>
@@ -893,9 +1040,29 @@ function mediaManager() {
         uploadProgress: 0,
         deleteModalOpen: false,
         deleteTarget: { id: null, filename: '', usageCount: 0, force: false },
+        videoModalOpen: false,
+        videoModalData: { url: '', poster: '', title: '' },
 
         init() {
             // Hotkeys or initializations if needed
+        },
+
+        openVideoModal(url, poster, title) {
+            this.videoModalData = { url, poster, title };
+            this.videoModalOpen = true;
+            this.$nextTick(() => {
+                if (this.$refs.cinemaVideo) {
+                    this.$refs.cinemaVideo.currentTime = 0;
+                    this.$refs.cinemaVideo.play();
+                }
+            });
+        },
+
+        closeVideoModal() {
+            if (this.$refs.cinemaVideo) {
+                this.$refs.cinemaVideo.pause();
+            }
+            this.videoModalOpen = false;
         },
 
         copyUrl(url) {

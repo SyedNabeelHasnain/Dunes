@@ -24,6 +24,33 @@ class MediaManagerService
     protected array $videoExtensions = ['mp4', 'webm', 'mov', 'ogg', 'm4v'];
 
     /**
+     * Normalize absolute or local path to canonical web-relative path (e.g. images/... or videos/...).
+     */
+    public function normalizeRelativePath(string $fullPath): string
+    {
+        $normalized = str_replace('\\', '/', $fullPath);
+
+        // Extract canonical path starting with standard web folders
+        foreach (['images/', 'videos/', 'uploads/'] as $prefix) {
+            $pos = strpos($normalized, '/' . $prefix);
+            if ($pos !== false) {
+                return substr($normalized, $pos + 1);
+            }
+            if (str_starts_with($normalized, $prefix)) {
+                return $normalized;
+            }
+        }
+
+        // Fallback: strip public_path if matched
+        $normalizedPublic = rtrim(str_replace('\\', '/', public_path()), '/') . '/';
+        if (str_starts_with($normalized, $normalizedPublic)) {
+            return substr($normalized, strlen($normalizedPublic));
+        }
+
+        return ltrim($normalized, '/');
+    }
+
+    /**
      * Scan all existing media in public directories and synchronize with database.
      */
     public function scanAndSyncExistingMedia(): array
@@ -36,17 +63,42 @@ class MediaManagerService
             'in_use' => 0,
         ];
 
-        $targetDirs = [
+        // Target scan directories (both standard public_path and parent public_html for Hostinger)
+        $targetDirs = array_filter([
             public_path('images'),
             public_path('videos'),
             public_path('uploads'),
-        ];
+            base_path('../public_html/images'),
+            base_path('../public_html/videos'),
+            base_path('../public_html/uploads'),
+        ], fn ($p) => File::exists($p));
 
-        foreach ($targetDirs as $dir) {
-            if (! File::exists($dir)) {
-                continue;
+        // Sanitize any existing records with raw server absolute path prefixes
+        try {
+            $corrupted = MediaAsset::where('public_url', 'like', '%home/%')
+                ->orWhere('public_url', 'like', '%public_html%')
+                ->orWhere('public_url', 'like', '%dunes-laravel%')
+                ->get();
+            foreach ($corrupted as $row) {
+                $row->update([
+                    'public_url' => $row->clean_public_url,
+                    'file_path' => ltrim($row->clean_public_url, '/'),
+                ]);
             }
+        } catch (\Throwable $ex) {
+            Log::warning('MediaManagerService sanitize notice: ' . $ex->getMessage());
+        }
 
+        // Deduplicate directory paths
+        $realDirs = [];
+        foreach ($targetDirs as $d) {
+            $r = realpath($d);
+            if ($r && ! in_array($r, $realDirs)) {
+                $realDirs[] = $r;
+            }
+        }
+
+        foreach ($realDirs as $dir) {
             $files = File::allFiles($dir);
 
             foreach ($files as $file) {
@@ -58,10 +110,8 @@ class MediaManagerService
 
                 $stats['scanned']++;
 
-                // Compute relative path from public_path
                 $fullPath = $file->getRealPath();
-                $publicPath = public_path();
-                $relativePath = ltrim(str_replace(['\\', $publicPath], ['/', ''], $fullPath), '/');
+                $relativePath = $this->normalizeRelativePath($fullPath);
                 $publicUrl = '/' . $relativePath;
                 $filename = $file->getFilename();
                 $sizeBytes = $file->getSize();
@@ -88,8 +138,11 @@ class MediaManagerService
                 $cleanName = pathinfo($filename, PATHINFO_FILENAME);
                 $humanTitle = Str::headline(str_replace(['-', '_'], ' ', $cleanName));
 
-                // Find existing record
-                $existing = MediaAsset::where('file_path', $relativePath)->first();
+                // Find existing record by relative path, clean public url, or filename
+                $existing = MediaAsset::where('file_path', $relativePath)
+                    ->orWhere('public_url', $publicUrl)
+                    ->orWhere('filename', $filename)
+                    ->first();
 
                 if (! $existing) {
                     $asset = MediaAsset::create([
@@ -115,6 +168,8 @@ class MediaManagerService
                     $asset = $existing;
                     $asset->update([
                         'filename' => $filename,
+                        'file_path' => $relativePath,
+                        'public_url' => $publicUrl,
                         'file_size_bytes' => $sizeBytes,
                         'mime_type' => $mimeType,
                         'width' => $width ?: $existing->width,
@@ -169,7 +224,7 @@ class MediaManagerService
         $usages = [];
         $filename = $asset->filename;
         $path = $asset->file_path;
-        $url = $asset->public_url;
+        $url = $asset->clean_public_url;
 
         try {
             // 1. Tours
@@ -523,7 +578,7 @@ class MediaManagerService
         }
 
         // Delete database record
-        $asset->delete(); // Soft delete or forceDelete depending on preference
+        $asset->delete();
         Cache::forget('sitemap_images_xml');
 
         return [

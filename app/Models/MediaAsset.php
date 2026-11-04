@@ -49,6 +49,15 @@ class MediaAsset extends Model
         'usage_locations' => 'array',
     ];
 
+    protected $appends = [
+        'clean_public_url',
+        'poster_url',
+        'formatted_file_size',
+        'dimensions',
+        'is_image',
+        'is_video',
+    ];
+
     protected static function booted(): void
     {
         static::creating(function ($asset) {
@@ -64,6 +73,68 @@ class MediaAsset extends Model
     public function uploader(): BelongsTo
     {
         return $this->belongsTo(User::class, 'uploaded_by');
+    }
+
+    /**
+     * Canonical clean public URL (e.g. /images/... or /videos/...)
+     * Strips any absolute server path prefixes if stored erroneously.
+     */
+    public function getCleanPublicUrlAttribute(): string
+    {
+        $raw = $this->public_url ?: $this->file_path;
+        if (empty($raw)) {
+            return '/images/media-placeholder.svg';
+        }
+
+        $normalized = str_replace('\\', '/', $raw);
+
+        // If the path contains full server directory prefixes, extract the canonical web path
+        foreach (['images/', 'videos/', 'uploads/'] as $prefix) {
+            $pos = strpos($normalized, '/' . $prefix);
+            if ($pos !== false) {
+                return substr($normalized, $pos);
+            }
+            if (str_starts_with($normalized, $prefix)) {
+                return '/' . $normalized;
+            }
+        }
+
+        return Str::startsWith($normalized, '/') ? $normalized : ('/' . $normalized);
+    }
+
+    /**
+     * Associated poster / thumbnail for video or image.
+     */
+    public function getPosterUrlAttribute(): ?string
+    {
+        if ($this->media_type === 'image') {
+            return $this->clean_public_url;
+        }
+
+        if ($this->media_type !== 'video') {
+            return '/images/media-placeholder.svg';
+        }
+
+        $baseName = pathinfo($this->filename, PATHINFO_FILENAME);
+
+        // Check if there is an existing poster in images/video-posters/
+        $candidates = [
+            "/images/video-posters/{$baseName}.webp",
+            "/images/video-posters/{$baseName}.jpg",
+            "/images/video-posters/{$baseName}.png",
+            "/images/{$baseName}.webp",
+            "/images/{$baseName}.jpg",
+        ];
+
+        foreach ($candidates as $cand) {
+            $local = public_path(ltrim($cand, '/'));
+            if (file_exists($local)) {
+                return $cand;
+            }
+        }
+
+        // Default convention: video posters live in /images/video-posters/{baseName}.webp
+        return "/images/video-posters/{$baseName}.webp";
     }
 
     /**
@@ -116,11 +187,12 @@ class MediaAsset extends Model
      */
     public function getUrlAttribute(): string
     {
-        if (Str::startsWith($this->public_url, ['http://', 'https://'])) {
-            return $this->public_url;
+        $clean = $this->clean_public_url;
+        if (Str::startsWith($clean, ['http://', 'https://'])) {
+            return $clean;
         }
 
-        return url($this->public_url);
+        return url($clean);
     }
 
     /**

@@ -222,4 +222,20 @@ class MediaManagerTest extends TestCase
         $this->artisan('media:scan-assets', ['--refresh-usages' => true])
             ->assertSuccessful();
     }
+
+    public function test_clean_public_url_and_poster_url_accessors(): void
+    {
+        $video = MediaAsset::create([
+            'uuid' => 'test-video-uuid',
+            'filename' => 'buggy-ride-dubai-desert-review-1.mp4',
+            'disk' => 'direct_public',
+            'file_path' => 'videos/reviews/buggy-ride-dubai-desert-review-1.mp4',
+            'public_url' => '/home/u410503041/domains/dunesdiscoverytourism.com/public_html/videos/reviews/buggy-ride-dubai-desert-review-1.mp4',
+            'media_type' => 'video',
+            'extension' => 'mp4',
+        ]);
+
+        $this->assertEquals('/videos/reviews/buggy-ride-dubai-desert-review-1.mp4', $video->clean_public_url);
+        $this->assertStringContainsString('buggy-ride-dubai-desert-review-1', $video->poster_url);
+    }
 }
