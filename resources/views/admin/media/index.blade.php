@@ -355,8 +355,9 @@
                                     </button>
                                 @endif
                                 <!-- Extension Badge -->
-                                <span class="px-1.5 py-0.5 rounded-md text-[10px] font-extrabold uppercase {{ $asset->is_video ? 'bg-amber-600 text-white' : 'bg-slate-950/70 text-white' }} backdrop-blur-xs">
-                                    {{ $asset->extension }}
+                                <span class="px-1.5 py-0.5 rounded-md text-[10px] font-extrabold uppercase {{ $asset->is_video ? 'bg-amber-600 text-white' : 'bg-slate-950/70 text-white' }} backdrop-blur-xs"
+                                      @if(!empty($asset->format_variants)) title="Available formats: {{ strtoupper($asset->extension) }}, {{ strtoupper(implode(', ', array_keys($asset->format_variants))) }}" @endif>
+                                    {{ $asset->extension }}@if(!empty($asset->format_variants))<span class="text-amber-300 font-normal ms-0.5">+{{ count($asset->format_variants) }}</span>@endif
                                 </span>
                             </div>
                         </div>
@@ -477,8 +478,9 @@
                                     </div>
                                 </td>
                                 <td class="py-2.5 px-3">
-                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase {{ $asset->is_video ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700' }}">
-                                        {{ $asset->extension }}
+                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase {{ $asset->is_video ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700' }}"
+                                          @if(!empty($asset->format_variants)) title="Available fallback formats: {{ strtoupper(implode(', ', array_keys($asset->format_variants))) }}" @endif>
+                                        {{ $asset->extension }}@if(!empty($asset->format_variants))<span class="text-slate-500 font-normal ms-0.5">+{{ count($asset->format_variants) }}</span>@endif
                                     </span>
                                 </td>
                                 <td class="py-2.5 px-3 font-mono text-[11px] text-slate-600">
@@ -674,6 +676,19 @@
                         <span class="text-slate-400 block text-[10px] font-bold uppercase">Uploaded At</span>
                         <span class="font-bold text-slate-800" x-text="activeAsset?.created_at"></span>
                     </div>
+
+                    <!-- Available Format Variants -->
+                    <template x-if="activeAsset?.format_variants && Object.keys(activeAsset.format_variants).length > 0">
+                        <div class="col-span-2 pt-2 border-t border-slate-200/60">
+                            <span class="text-slate-400 block text-[10px] font-bold uppercase mb-1">Available Format Variants</span>
+                            <div class="flex flex-wrap gap-1.5">
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800" x-text="(activeAsset.extension || '').toUpperCase() + ' (Primary)'"></span>
+                                <template x-for="(vInfo, ext) in activeAsset.format_variants" :key="ext">
+                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-200 text-slate-700" x-text="ext.toUpperCase() + ' (Fallback)'"></span>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
                 </div>
 
                 <!-- Editable Metadata Form -->

@@ -161,6 +161,7 @@ class AdminMediaController extends Controller
                 'alt_text' => $asset->alt_text,
                 'category' => $asset->category,
                 'usage_count' => (int) $asset->usage_count,
+                'format_variants' => $asset->format_variants,
                 'created_at_human' => $asset->created_at ? $asset->created_at->format('M d, Y') : '',
             ];
         });
@@ -279,6 +280,7 @@ class AdminMediaController extends Controller
                 'folder' => $asset->folder,
                 'usage_count' => count($usages),
                 'usage_locations' => $usages,
+                'format_variants' => $asset->format_variants,
                 'uploaded_by' => $asset->uploader ? $asset->uploader->name : 'System / Auto-Sync',
                 'created_at' => $asset->created_at ? $asset->created_at->format('M d, Y h:i A') : 'N/A',
                 'updated_at' => $asset->updated_at ? $asset->updated_at->format('M d, Y h:i A') : 'N/A',

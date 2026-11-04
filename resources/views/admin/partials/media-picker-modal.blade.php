@@ -156,8 +156,11 @@
 
                                     <!-- Top Right Extension Badge -->
                                     <div class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase text-white backdrop-blur-xs z-10"
-                                         :class="item.is_video ? 'bg-amber-600' : 'bg-slate-900/70'"
-                                         x-text="item.extension">
+                                         :class="item.is_video ? 'bg-amber-600' : 'bg-slate-900/70'">
+                                        <span x-text="item.extension"></span>
+                                        <template x-if="item.format_variants && Object.keys(item.format_variants).length > 0">
+                                            <span class="text-amber-300 font-normal ms-0.5" x-text="'+' + Object.keys(item.format_variants).length"></span>
+                                        </template>
                                     </div>
 
                                     <!-- Thumbnail -->
@@ -246,6 +249,9 @@
                                     <div class="text-[11px] text-slate-400 font-mono break-all" x-text="selectedAsset.file_path"></div>
                                     <div class="flex flex-wrap items-center gap-2 pt-1 text-[11px] text-slate-500">
                                         <span class="px-2 py-0.5 rounded-md bg-slate-100 font-bold" x-text="selectedAsset.extension"></span>
+                                        <template x-if="selectedAsset.format_variants && Object.keys(selectedAsset.format_variants).length > 0">
+                                            <span class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 font-semibold text-[10px]" x-text="'+ ' + Object.keys(selectedAsset.format_variants).join(', ').toUpperCase() + ' fallback'"></span>
+                                        </template>
                                         <span x-text="selectedAsset.formatted_size"></span>
                                         <span x-show="selectedAsset.dimensions" x-text="selectedAsset.dimensions"></span>
                                     </div>

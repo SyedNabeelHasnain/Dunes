@@ -37,6 +37,7 @@ class MediaAsset extends Model
         'is_optimized',
         'usage_count',
         'usage_locations',
+        'extra_metadata',
         'uploaded_by',
     ];
 
@@ -48,6 +49,7 @@ class MediaAsset extends Model
         'is_optimized' => 'boolean',
         'usage_count' => 'integer',
         'usage_locations' => 'array',
+        'extra_metadata' => 'array',
     ];
 
     protected $appends = [
@@ -57,6 +59,8 @@ class MediaAsset extends Model
         'dimensions',
         'is_image',
         'is_video',
+        'format_variants',
+        'base_name',
     ];
 
     protected static function booted(): void
@@ -194,6 +198,22 @@ class MediaAsset extends Model
         }
 
         return url($clean);
+    }
+
+    /**
+     * Sibling format variants of this visual asset (e.g. ['jpg' => '/images/...jpg'])
+     */
+    public function getFormatVariantsAttribute(): array
+    {
+        return $this->extra_metadata['format_variants'] ?? [];
+    }
+
+    /**
+     * Canonical filename without extension.
+     */
+    public function getBaseNameAttribute(): string
+    {
+        return pathinfo($this->filename, PATHINFO_FILENAME);
     }
 
     /**

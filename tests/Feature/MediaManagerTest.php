@@ -353,4 +353,72 @@ class MediaManagerTest extends TestCase
         $this->assertEquals('images/tours/new-thumb.webp', $freshTour->thumb_image);
         $this->assertContains('images/tours/slide-3.webp', $freshTour->gallery_images);
     }
+
+    public function test_format_variant_deduplication_collapses_webp_and_jpg_siblings(): void
+    {
+        $webpAsset = MediaAsset::create([
+            'uuid' => 'test-webp-uuid',
+            'filename' => 'dubai-city-tour-review-atlantis-2.webp',
+            'disk' => 'direct_public',
+            'file_path' => 'images/video-posters/dubai-city-tour-review-atlantis-2.webp',
+            'public_url' => '/images/video-posters/dubai-city-tour-review-atlantis-2.webp',
+            'media_type' => 'image',
+            'extension' => 'webp',
+            'file_size_bytes' => 84886,
+            'folder' => 'images/video-posters',
+            'usage_count' => 0,
+            'usage_locations' => [],
+        ]);
+
+        $jpgAsset = MediaAsset::create([
+            'uuid' => 'test-jpg-uuid',
+            'filename' => 'dubai-city-tour-review-atlantis-2.jpg',
+            'disk' => 'direct_public',
+            'file_path' => 'images/video-posters/dubai-city-tour-review-atlantis-2.jpg',
+            'public_url' => '/images/video-posters/dubai-city-tour-review-atlantis-2.jpg',
+            'media_type' => 'image',
+            'extension' => 'jpg',
+            'file_size_bytes' => 165161,
+            'folder' => 'images/video-posters',
+            'usage_count' => 1,
+            'usage_locations' => [
+                [
+                    'type' => 'Tour',
+                    'id' => 99,
+                    'name' => 'Dubai Atlantis Tour',
+                    'field' => 'Hero Image',
+                    'edit_url' => '/admin/tours/99/edit',
+                ],
+            ],
+        ]);
+
+        $service = app(MediaManagerService::class);
+        $result = $service->deduplicateFormatVariants();
+
+        $this->assertEquals(1, $result['deleted']);
+        $this->assertEquals(1, $result['merged']);
+
+        // Assert canonical webp remains in database
+        $this->assertDatabaseHas('media_assets', ['id' => $webpAsset->id, 'extension' => 'webp']);
+        // Assert duplicate jpg is removed from database
+        $this->assertDatabaseMissing('media_assets', ['id' => $jpgAsset->id]);
+
+        $freshWebp = $webpAsset->fresh();
+        // Assert usages were merged into the canonical webp
+        $this->assertEquals(1, $freshWebp->usage_count);
+        $this->assertEquals('Tour', $freshWebp->usage_locations[0]['type']);
+
+        // Assert fallback format metadata is recorded
+        $this->assertArrayHasKey('jpg', $freshWebp->format_variants);
+        $this->assertEquals('/images/video-posters/dubai-city-tour-review-atlantis-2.jpg', $freshWebp->format_variants['jpg']['public_url']);
+    }
+
+    public function test_sidebar_navigation_renders_standalone_media_management_menu(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('admin.dashboard'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Media Management', false);
+        $response->assertSee(route('admin.media.index'), false);
+    }
 }
