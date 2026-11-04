@@ -309,27 +309,30 @@
                         </div>
 
                         <!-- Media Uploads -->
-                        <div class="bg-slate-50/80 rounded-2xl border border-slate-200/80 p-5 space-y-4">
+                        <div class="bg-white rounded-2xl border border-slate-200/80 p-5 space-y-4 shadow-2xs">
                             <h2 class="text-xs font-black uppercase tracking-wider text-primary flex items-center gap-2">
-                                <i class="bi bi-images text-base"></i> Media Uploads
+                                <i class="bi bi-images text-base"></i> Media Assets &amp; Gallery
                             </h2>
                             
-                            <div>
-                                <label for="hero_image" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Hero Banner Image</label>
-                                <input type="file" name="hero_image" id="hero_image" accept="image/jpeg,image/png,image/webp,image/avif" class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
-                                <p class="text-[11px] text-slate-400 mt-1">1920x800 recommended (AVIF, WebP, JPG). Max 8MB.</p>
-                            </div>
+                            <x-media-picker 
+                                name="hero_image" 
+                                label="Hero Banner Image" 
+                                category="tours" 
+                                help="1920x800 recommended (AVIF, WebP, JPG). Used for the tour header banner." />
 
-                            <div>
-                                <label for="thumb_image" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Thumbnail Image (Fixed Card Slide 1)</label>
-                                <input type="file" name="thumb_image" id="thumb_image" accept="image/jpeg,image/png,image/webp,image/avif" class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
-                                <p class="text-[11px] text-slate-400 mt-1">600x400 recommended (AVIF, WebP, JPG). Max 8MB.</p>
-                            </div>
+                            <x-media-picker 
+                                name="thumb_image" 
+                                label="Thumbnail Image (Fixed Card Slide 1)" 
+                                category="tours" 
+                                help="600x400 recommended (AVIF, WebP, JPG). Primary card display photo." />
 
-                            <div>
-                                <label for="gallery_images" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Additional Gallery Images (Sliders)</label>
-                                <input type="file" name="gallery_images[]" multiple id="gallery_images" accept="image/jpeg,image/png,image/webp,image/avif" class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
-                                <p class="text-[11px] text-slate-400 mt-1">Select one or multiple images to add to the tour slider (AVIF, WebP, JPG). Max 8MB each.</p>
+                            <div class="pt-2 border-t border-slate-100">
+                                <x-media-picker 
+                                    name="gallery_images" 
+                                    label="Additional Gallery Images (Sliders)" 
+                                    category="tours" 
+                                    :multiple="true" 
+                                    help="Select one or multiple photos to feature in the tour media slider." />
                             </div>
                         </div>
                     </div>

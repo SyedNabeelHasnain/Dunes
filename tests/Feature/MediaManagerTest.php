@@ -238,4 +238,119 @@ class MediaManagerTest extends TestCase
         $this->assertEquals('/videos/reviews/buggy-ride-dubai-desert-review-1.mp4', $video->clean_public_url);
         $this->assertStringContainsString('buggy-ride-dubai-desert-review-1', $video->poster_url);
     }
+
+    public function test_picker_items_returns_paginated_json_with_filters(): void
+    {
+        MediaAsset::create([
+            'uuid' => 'test-picker-1',
+            'filename' => 'dune-buggy-adventure.webp',
+            'disk' => 'direct_public',
+            'file_path' => 'images/tours/dune-buggy-adventure.webp',
+            'public_url' => '/images/tours/dune-buggy-adventure.webp',
+            'media_type' => 'image',
+            'extension' => 'webp',
+            'category' => 'tours',
+        ]);
+
+        $response = $this->actingAs($this->admin)->getJson(route('admin.media.picker-items', [
+            'type' => 'image',
+            'category' => 'tours',
+            'search' => 'dune-buggy',
+        ]));
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+        ]);
+        $response->assertJsonFragment([
+            'filename' => 'dune-buggy-adventure.webp',
+        ]);
+    }
+
+    public function test_deduplication_routine_merges_duplicate_records(): void
+    {
+        $primary = MediaAsset::create([
+            'uuid' => 'test-primary',
+            'filename' => 'ziina-icon.png',
+            'file_path' => 'images/ziina-icon.png',
+            'public_url' => '/images/ziina-icon.png',
+            'file_hash' => 'hash1234567890abcdef',
+            'usage_count' => 1,
+            'usage_locations' => [['type' => 'Setting', 'field' => 'Payment Icon']],
+        ]);
+
+        $duplicate = MediaAsset::create([
+            'uuid' => 'test-duplicate',
+            'filename' => 'ziina-icon.png',
+            'file_path' => 'images/blog/ziina-icon.png',
+            'public_url' => '/images/blog/ziina-icon.png',
+            'file_hash' => 'hash1234567890abcdef',
+            'usage_count' => 1,
+            'usage_locations' => [['type' => 'Blog Post', 'field' => 'Article Content']],
+        ]);
+
+        $service = app(MediaManagerService::class);
+        $result = $service->deduplicateExistingAssets();
+
+        $this->assertGreaterThanOrEqual(1, $result['deleted']);
+        $this->assertDatabaseHas('media_assets', ['id' => $primary->id]);
+        $this->assertDatabaseMissing('media_assets', ['id' => $duplicate->id]);
+
+        $freshPrimary = $primary->fresh();
+        $this->assertEquals(2, $freshPrimary->usage_count);
+    }
+
+    public function test_tour_creation_and_update_with_media_library_paths(): void
+    {
+        $category = \App\Models\Category::create([
+            'slug' => 'desert-safari',
+            'name' => 'Desert Safari',
+        ]);
+
+        $response = $this->actingAs($this->admin)->post(route('admin.tours.store'), [
+            'name' => 'Premium Evening Desert Safari',
+            'category_id' => $category->id,
+            'short_desc' => 'Short desert safari description',
+            'full_desc' => 'Comprehensive detailed tour overview description',
+            'duration' => '6 Hours',
+            'priority' => 1,
+            'status' => 'active',
+            'hero_image' => 'images/tours/evening-safari-hero.webp',
+            'thumb_image' => 'images/tours/evening-safari-thumb.webp',
+            'gallery_images' => [
+                'images/tours/slide-1.webp',
+                'images/tours/slide-2.webp',
+            ],
+        ]);
+
+        $response->assertSessionHasNoErrors();
+        $tour = Tour::where('slug', 'like', 'premium-evening-desert-safari%')->first();
+        $this->assertNotNull($tour);
+        $this->assertEquals('images/tours/evening-safari-hero.webp', $tour->hero_image);
+        $this->assertEquals('images/tours/evening-safari-thumb.webp', $tour->thumb_image);
+        $this->assertCount(2, $tour->gallery_images);
+
+        // Update tour with changed media library selection
+        $updateResponse = $this->actingAs($this->admin)->put(route('admin.tours.update', $tour->id), [
+            'name' => 'Premium Evening Desert Safari Updated',
+            'category_id' => $category->id,
+            'short_desc' => 'Short desert safari description',
+            'full_desc' => 'Comprehensive detailed tour overview description',
+            'duration' => '6 Hours',
+            'priority' => 1,
+            'status' => 'active',
+            'hero_image' => 'images/tours/new-hero.webp',
+            'thumb_image' => 'images/tours/new-thumb.webp',
+            'gallery_images' => [
+                'images/tours/slide-1.webp',
+                'images/tours/slide-3.webp',
+            ],
+        ]);
+
+        $updateResponse->assertSessionHasNoErrors();
+        $freshTour = $tour->fresh();
+        $this->assertEquals('images/tours/new-hero.webp', $freshTour->hero_image);
+        $this->assertEquals('images/tours/new-thumb.webp', $freshTour->thumb_image);
+        $this->assertContains('images/tours/slide-3.webp', $freshTour->gallery_images);
+    }
 }

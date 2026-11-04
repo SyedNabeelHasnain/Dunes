@@ -59,9 +59,10 @@ class AdminTourController extends Controller
             'dropoff_time' => 'nullable|string|max:255',
             'priority' => 'required|integer',
             'status' => 'required|string|in:active,inactive',
-            'hero_image' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
-            'thumb_image' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
-            'gallery_images.*' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
+            'hero_image' => $request->hasFile('hero_image') ? 'file|mimes:jpeg,png,jpg,webp,avif|max:8192' : 'nullable|string|max:500',
+            'thumb_image' => $request->hasFile('thumb_image') ? 'file|mimes:jpeg,png,jpg,webp,avif|max:8192' : 'nullable|string|max:500',
+            'gallery_images' => 'nullable|array',
+            'gallery_images.*' => 'nullable',
         ]);
 
         $data = $this->normalizeLocalizedData(
@@ -79,22 +80,42 @@ class AdminTourController extends Controller
         $data['is_featured'] = $request->boolean('is_featured');
         $data['is_bestseller'] = $request->boolean('is_bestseller');
 
-        // Handle image uploads
+        // Handle hero image (uploaded file or selected from media library)
         if ($request->hasFile('hero_image')) {
             $data['hero_image'] = $request->file('hero_image')->store('tours/hero', 'public');
+            try {
+                app(\App\Services\MediaManagerService::class)->scanAndSyncFile(public_path('storage/' . $data['hero_image']), 'tours');
+            } catch (\Throwable $e) {}
+        } elseif ($request->filled('hero_image')) {
+            $data['hero_image'] = ltrim(trim($request->input('hero_image')), '/');
         }
+
+        // Handle thumbnail image
         if ($request->hasFile('thumb_image')) {
             $data['thumb_image'] = $request->file('thumb_image')->store('tours/thumb', 'public');
+            try {
+                app(\App\Services\MediaManagerService::class)->scanAndSyncFile(public_path('storage/' . $data['thumb_image']), 'tours');
+            } catch (\Throwable $e) {}
+        } elseif ($request->filled('thumb_image')) {
+            $data['thumb_image'] = ltrim(trim($request->input('thumb_image')), '/');
         }
-        if ($request->hasFile('gallery_images')) {
-            $galleryPaths = [];
-            foreach ($request->file('gallery_images') as $gFile) {
-                if ($gFile->isValid()) {
-                    $galleryPaths[] = $gFile->store('tours/gallery', 'public');
+
+        // Handle gallery images (array of strings or files)
+        $galleryPaths = [];
+        if ($request->has('gallery_images') && is_array($request->gallery_images)) {
+            foreach ($request->gallery_images as $gItem) {
+                if ($gItem instanceof \Illuminate\Http\UploadedFile && $gItem->isValid()) {
+                    $path = $gItem->store('tours/gallery', 'public');
+                    $galleryPaths[] = $path;
+                    try {
+                        app(\App\Services\MediaManagerService::class)->scanAndSyncFile(public_path('storage/' . $path), 'tours');
+                    } catch (\Throwable $e) {}
+                } elseif (is_string($gItem) && ! empty(trim($gItem))) {
+                    $galleryPaths[] = ltrim(trim($gItem), '/');
                 }
             }
-            $data['gallery_images'] = $galleryPaths;
         }
+        $data['gallery_images'] = array_values(array_unique($galleryPaths));
 
         $tour = Tour::create($data);
 
@@ -168,9 +189,10 @@ class AdminTourController extends Controller
             'dropoff_time' => 'nullable|string|max:255',
             'priority' => 'required|integer',
             'status' => 'required|string|in:active,inactive',
-            'hero_image' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
-            'thumb_image' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
-            'gallery_images.*' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
+            'hero_image' => $request->hasFile('hero_image') ? 'file|mimes:jpeg,png,jpg,webp,avif|max:8192' : 'nullable|string|max:500',
+            'thumb_image' => $request->hasFile('thumb_image') ? 'file|mimes:jpeg,png,jpg,webp,avif|max:8192' : 'nullable|string|max:500',
+            'gallery_images' => 'nullable|array',
+            'gallery_images.*' => 'nullable',
         ]);
 
         $data = $this->normalizeLocalizedData(
@@ -197,24 +219,41 @@ class AdminTourController extends Controller
 
         if ($request->hasFile('hero_image')) {
             $data['hero_image'] = $request->file('hero_image')->store('tours/hero', 'public');
+            try {
+                app(\App\Services\MediaManagerService::class)->scanAndSyncFile(public_path('storage/' . $data['hero_image']), 'tours');
+            } catch (\Throwable $e) {}
+        } elseif ($request->has('hero_image')) {
+            $data['hero_image'] = ltrim(trim((string) $request->input('hero_image')), '/');
         }
+
         if ($request->hasFile('thumb_image')) {
             $data['thumb_image'] = $request->file('thumb_image')->store('tours/thumb', 'public');
+            try {
+                app(\App\Services\MediaManagerService::class)->scanAndSyncFile(public_path('storage/' . $data['thumb_image']), 'tours');
+            } catch (\Throwable $e) {}
+        } elseif ($request->has('thumb_image')) {
+            $data['thumb_image'] = ltrim(trim((string) $request->input('thumb_image')), '/');
         }
 
         // Manage gallery images
-        $currentGallery = is_array($tour->gallery_images) ? $tour->gallery_images : [];
-        if ($request->has('remove_gallery_images') && is_array($request->remove_gallery_images)) {
-            $currentGallery = array_values(array_diff($currentGallery, $request->remove_gallery_images));
-        }
-        if ($request->hasFile('gallery_images')) {
-            foreach ($request->file('gallery_images') as $gFile) {
-                if ($gFile->isValid()) {
-                    $currentGallery[] = $gFile->store('tours/gallery', 'public');
+        if ($request->has('gallery_images') && is_array($request->gallery_images)) {
+            $currentGallery = [];
+            foreach ($request->gallery_images as $gItem) {
+                if ($gItem instanceof \Illuminate\Http\UploadedFile && $gItem->isValid()) {
+                    $path = $gItem->store('tours/gallery', 'public');
+                    $currentGallery[] = $path;
+                    try {
+                        app(\App\Services\MediaManagerService::class)->scanAndSyncFile(public_path('storage/' . $path), 'tours');
+                    } catch (\Throwable $e) {}
+                } elseif (is_string($gItem) && ! empty(trim($gItem))) {
+                    $currentGallery[] = ltrim(trim($gItem), '/');
                 }
             }
+            $data['gallery_images'] = array_values(array_unique($currentGallery));
+        } elseif ($request->has('remove_gallery_images') && is_array($request->remove_gallery_images)) {
+            $currentGallery = is_array($tour->gallery_images) ? $tour->gallery_images : [];
+            $data['gallery_images'] = array_values(array_diff($currentGallery, $request->remove_gallery_images));
         }
-        $data['gallery_images'] = array_values(array_unique($currentGallery));
 
         $tour->update($data);
 

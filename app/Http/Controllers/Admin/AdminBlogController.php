@@ -49,7 +49,8 @@ class AdminBlogController extends Controller
             'excerpt' => 'required',
             'category_id' => 'required|integer',
             'status' => 'required|string|in:draft,published,scheduled',
-            'featured_image' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
+            'featured_image' => $request->hasFile('featured_image') ? 'file|mimes:jpeg,png,jpg,webp,avif|max:8192' : 'nullable|string|max:500',
+            'og_image' => $request->hasFile('og_image') ? 'file|mimes:jpeg,png,jpg,webp,avif|max:8192' : 'nullable|string|max:500',
         ]);
 
         $data = $this->normalizeLocalizedData(
@@ -67,6 +68,11 @@ class AdminBlogController extends Controller
 
         if ($request->hasFile('featured_image')) {
             $data['featured_image'] = $request->file('featured_image')->store('blogs', 'public');
+            try {
+                app(\App\Services\MediaManagerService::class)->scanAndSyncFile(public_path('storage/' . $data['featured_image']), 'blogs');
+            } catch (\Throwable $e) {}
+        } elseif ($request->filled('featured_image')) {
+            $data['featured_image'] = ltrim(trim($request->input('featured_image')), '/');
         }
 
         if ($request->input('status') === 'published' && empty($request->input('published_at'))) {
@@ -126,7 +132,8 @@ class AdminBlogController extends Controller
             'excerpt' => 'required',
             'category_id' => 'required|integer',
             'status' => 'required|string|in:draft,published,scheduled',
-            'featured_image' => 'nullable|file|mimes:jpeg,png,jpg,webp,avif|max:8192',
+            'featured_image' => $request->hasFile('featured_image') ? 'file|mimes:jpeg,png,jpg,webp,avif|max:8192' : 'nullable|string|max:500',
+            'og_image' => $request->hasFile('og_image') ? 'file|mimes:jpeg,png,jpg,webp,avif|max:8192' : 'nullable|string|max:500',
         ]);
 
         $data = $this->normalizeLocalizedData(
@@ -149,6 +156,11 @@ class AdminBlogController extends Controller
 
         if ($request->hasFile('featured_image')) {
             $data['featured_image'] = $request->file('featured_image')->store('blogs', 'public');
+            try {
+                app(\App\Services\MediaManagerService::class)->scanAndSyncFile(public_path('storage/' . $data['featured_image']), 'blogs');
+            } catch (\Throwable $e) {}
+        } elseif ($request->filled('featured_image')) {
+            $data['featured_image'] = ltrim(trim($request->input('featured_image')), '/');
         }
 
         if ($request->input('status') === 'published' && empty($post->published_at)) {

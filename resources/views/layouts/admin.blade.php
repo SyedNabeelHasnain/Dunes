@@ -783,6 +783,9 @@
     <!-- Live Visitor Journey & Friction Inspector Modal -->
     @include('admin.partials.live-visitor-inspector-modal')
 
+    <!-- Universal Media Hub & Attachment Picker Modal -->
+    @include('admin.partials.media-picker-modal')
+
     <!-- Essential Scripts & Plugins -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>

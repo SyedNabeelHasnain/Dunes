@@ -264,20 +264,24 @@ class AdminVideoReviewController extends Controller
 
         $entry = $records[$foundIndex];
 
-        // Replace video if uploaded
+        // Replace video if uploaded or selected from library
         if ($request->hasFile('video_file')) {
             $video = $request->file('video_file');
             $safeName = Str::slug(pathinfo($video->getClientOriginalName(), PATHINFO_FILENAME)) . '-' . time() . '.' . $video->getClientOriginalExtension();
             $video->move(public_path('videos/reviews'), $safeName);
             $entry['filename'] = $safeName;
+        } elseif ($request->filled('existing_filename')) {
+            $entry['filename'] = basename($request->input('existing_filename'));
         }
 
-        // Replace poster if uploaded
+        // Replace poster if uploaded or selected from library
         if ($request->hasFile('poster_file')) {
             $poster = $request->file('poster_file');
             $safePosterName = Str::slug(pathinfo($poster->getClientOriginalName(), PATHINFO_FILENAME)) . '-' . time() . '.' . $poster->getClientOriginalExtension();
             $poster->move(public_path('images/video-posters'), $safePosterName);
             $entry['poster_filename'] = $safePosterName;
+        } elseif ($request->filled('existing_poster')) {
+            $entry['poster_filename'] = basename($request->input('existing_poster'));
         }
 
         $keywords = ! empty($validated['keywords'])

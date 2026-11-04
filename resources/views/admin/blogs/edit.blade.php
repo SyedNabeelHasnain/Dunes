@@ -262,18 +262,18 @@
                                 </div>
                             </div>
 
-                            <div class="bg-slate-50/80 rounded-2xl border border-slate-200/80 p-5 space-y-4">
+                            <div class="bg-white rounded-2xl border border-slate-200/80 p-5 space-y-4 shadow-2xs">
                                 <h2 class="text-xs font-black uppercase tracking-wider text-primary flex items-center gap-2">
-                                    <i class="bi bi-images text-base"></i> Media files
+                                    <i class="bi bi-images text-base"></i> Media Assets
                                 </h2>
-                                <div>
-                                    <label for="featured_image" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Featured Image</label>
-                                    @if($post->featured_image)
-                                        <div class="mb-2"><img src="{{ $post->featured_image_url }}" alt="{{ $post->title }}" class="w-full h-24 rounded-xl object-cover border border-slate-200" onerror="this.src='{{ asset('images/desert-safari-poster.avif') }}'"></div>
-                                    @endif
-                                    <input type="file" name="featured_image" id="featured_image" accept="image/jpeg,image/png,image/webp,image/avif" class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
-                                    <p class="text-[11px] text-slate-400 mt-1">Max size 8MB. AVIF, WEBP, JPG, PNG.</p>
-                                </div>
+                                
+                                <x-media-picker 
+                                    name="featured_image" 
+                                    :value="$post->featured_image" 
+                                    label="Featured Image" 
+                                    category="blogs" 
+                                    help="Recommended size: 1200x630 (AVIF, WebP, JPG). Used for blog header and card covers." />
+
                                 <div>
                                     <label for="featured_image_caption" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Image Caption (Optional)</label>
                                     <input type="text" name="featured_image_caption" id="featured_image_caption" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800 focus:border-primary outline-hidden" value="{{ $post->featured_image_caption }}" placeholder="e.g. Dubai Red Dunes Safari">

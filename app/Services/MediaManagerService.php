@@ -131,6 +131,9 @@ class MediaManagerService
                     }
                 }
 
+                // Compute SHA256 content hash for robust deduplication
+                $fileHash = @hash_file('sha256', $fullPath) ?: null;
+
                 // Categorization heuristic
                 $category = $this->determineCategory($relativePath, $filename);
 
@@ -138,11 +141,17 @@ class MediaManagerService
                 $cleanName = pathinfo($filename, PATHINFO_FILENAME);
                 $humanTitle = Str::headline(str_replace(['-', '_'], ' ', $cleanName));
 
-                // Find existing record by relative path, clean public url, or filename
-                $existing = MediaAsset::where('file_path', $relativePath)
-                    ->orWhere('public_url', $publicUrl)
-                    ->orWhere('filename', $filename)
-                    ->first();
+                // Find existing record by content hash first, then relative path, clean public url, or filename
+                $existing = null;
+                if ($fileHash) {
+                    $existing = MediaAsset::where('file_hash', $fileHash)->first();
+                }
+                if (! $existing) {
+                    $existing = MediaAsset::where('file_path', $relativePath)
+                        ->orWhere('public_url', $publicUrl)
+                        ->orWhere('filename', $filename)
+                        ->first();
+                }
 
                 if (! $existing) {
                     $asset = MediaAsset::create([
@@ -155,6 +164,7 @@ class MediaManagerService
                         'media_type' => $mediaType,
                         'mime_type' => $mimeType,
                         'extension' => $ext,
+                        'file_hash' => $fileHash,
                         'file_size_bytes' => $sizeBytes,
                         'width' => $width,
                         'height' => $height,
@@ -166,15 +176,20 @@ class MediaManagerService
                     $stats['indexed']++;
                 } else {
                     $asset = $existing;
-                    $asset->update([
-                        'filename' => $filename,
-                        'file_path' => $relativePath,
-                        'public_url' => $publicUrl,
+                    $updateData = [
                         'file_size_bytes' => $sizeBytes,
                         'mime_type' => $mimeType,
+                        'file_hash' => $fileHash ?: $existing->file_hash,
                         'width' => $width ?: $existing->width,
                         'height' => $height ?: $existing->height,
-                    ]);
+                    ];
+                    // Keep the cleanest, most canonical path (e.g. root images/ over images/blog/)
+                    if (empty($existing->file_path) || (str_contains($existing->file_path, '/blog/') && ! str_contains($relativePath, '/blog/'))) {
+                        $updateData['filename'] = $filename;
+                        $updateData['file_path'] = $relativePath;
+                        $updateData['public_url'] = $publicUrl;
+                    }
+                    $asset->update($updateData);
                     $stats['updated']++;
                 }
 
@@ -452,6 +467,7 @@ class MediaManagerService
         $relativePath = $subfolder . '/' . $uniqueFilename;
         $publicUrl = '/' . $relativePath;
         $sizeBytes = filesize($fullPath);
+        $fileHash = @hash_file('sha256', $fullPath) ?: null;
         $mimeType = File::mimeType($fullPath) ?: ($mediaType === 'video' ? 'video/' . $ext : 'image/' . $ext);
 
         // Dimensions for images
@@ -479,6 +495,7 @@ class MediaManagerService
             'media_type' => $mediaType,
             'mime_type' => $mimeType,
             'extension' => $ext,
+            'file_hash' => $fileHash,
             'file_size_bytes' => $sizeBytes,
             'width' => $width,
             'height' => $height,
@@ -600,5 +617,204 @@ class MediaManagerService
         }
 
         return $count;
+    }
+
+    /**
+     * Deduplicate existing media asset rows by content hash and filename.
+     * Merges usage locations into the canonical record and safely removes redundant entries.
+     */
+    public function deduplicateExistingAssets(): array
+    {
+        $report = ['merged' => 0, 'deleted' => 0];
+
+        // 1. Calculate file_hash for existing records if missing
+        $allAssets = MediaAsset::all();
+        foreach ($allAssets as $asset) {
+            if (empty($asset->file_hash)) {
+                $candidates = [
+                    public_path($asset->file_path),
+                    public_path(ltrim($asset->public_url, '/')),
+                    base_path('../public_html/' . $asset->file_path),
+                    base_path('../public_html/' . ltrim($asset->public_url, '/')),
+                ];
+                $found = null;
+                foreach ($candidates as $cand) {
+                    if (File::exists($cand)) {
+                        $found = $cand;
+                        break;
+                    }
+                }
+                if ($found) {
+                    $asset->file_hash = @hash_file('sha256', $found) ?: null;
+                    $asset->saveQuietly();
+                }
+            }
+        }
+
+        // 2. Group by file_hash (where present)
+        $groupedByHash = MediaAsset::whereNotNull('file_hash')
+            ->get()
+            ->groupBy('file_hash');
+
+        foreach ($groupedByHash as $hash => $records) {
+            if ($records->count() <= 1) {
+                continue;
+            }
+
+            // Select canonical: prioritize higher usage count, then root images/ folder over blog/
+            $canonical = $records->sortByDesc(function ($item) {
+                $score = ($item->usage_count * 100);
+                if (! str_contains($item->file_path, '/blog/')) {
+                    $score += 10;
+                }
+                return $score;
+            })->first();
+
+            foreach ($records as $duplicate) {
+                if ($duplicate->id === $canonical->id) {
+                    continue;
+                }
+
+                // Merge usage locations
+                $cUsages = is_array($canonical->usage_locations) ? $canonical->usage_locations : [];
+                $dUsages = is_array($duplicate->usage_locations) ? $duplicate->usage_locations : [];
+                $merged = array_merge($cUsages, $dUsages);
+                $unique = [];
+                foreach ($merged as $u) {
+                    $k = ($u['type'] ?? '') . '-' . ($u['id'] ?? '') . '-' . ($u['field'] ?? '');
+                    $unique[$k] = $u;
+                }
+                $canonical->usage_locations = array_values($unique);
+                $canonical->usage_count = count($unique);
+                $canonical->saveQuietly();
+
+                $duplicate->forceDelete();
+                $report['deleted']++;
+                $report['merged']++;
+            }
+        }
+
+        // 3. Deduplicate by exact filename for any rows without hash
+        $groupedByName = MediaAsset::all()->groupBy('filename');
+        foreach ($groupedByName as $filename => $records) {
+            if ($records->count() <= 1) {
+                continue;
+            }
+
+            $canonical = $records->sortByDesc(function ($item) {
+                $score = ($item->usage_count * 100);
+                if (! str_contains($item->file_path, '/blog/')) {
+                    $score += 10;
+                }
+                return $score;
+            })->first();
+
+            foreach ($records as $duplicate) {
+                if ($duplicate->id === $canonical->id) {
+                    continue;
+                }
+
+                $cUsages = is_array($canonical->usage_locations) ? $canonical->usage_locations : [];
+                $dUsages = is_array($duplicate->usage_locations) ? $duplicate->usage_locations : [];
+                $merged = array_merge($cUsages, $dUsages);
+                $unique = [];
+                foreach ($merged as $u) {
+                    $k = ($u['type'] ?? '') . '-' . ($u['id'] ?? '') . '-' . ($u['field'] ?? '');
+                    $unique[$k] = $u;
+                }
+                $canonical->usage_locations = array_values($unique);
+                $canonical->usage_count = count($unique);
+                $canonical->saveQuietly();
+
+                $duplicate->forceDelete();
+                $report['deleted']++;
+                $report['merged']++;
+            }
+        }
+
+        return $report;
+    }
+
+    /**
+     * Index a single existing or newly saved file into MediaAsset library.
+     */
+    public function scanAndSyncFile(string $fullPath, string $category = 'general'): ?MediaAsset
+    {
+        if (! File::exists($fullPath)) {
+            return null;
+        }
+
+        $ext = strtolower(pathinfo($fullPath, PATHINFO_EXTENSION));
+        if (! in_array($ext, array_merge($this->imageExtensions, $this->videoExtensions))) {
+            return null;
+        }
+
+        $relativePath = $this->normalizeRelativePath($fullPath);
+        $publicUrl = '/' . $relativePath;
+        $filename = basename($fullPath);
+        $sizeBytes = filesize($fullPath);
+        $fileHash = @hash_file('sha256', $fullPath) ?: null;
+
+        $mediaType = in_array($ext, $this->videoExtensions) ? 'video' : 'image';
+        $mimeType = File::mimeType($fullPath) ?: ($mediaType === 'video' ? 'video/' . $ext : 'image/' . $ext);
+
+        $width = null;
+        $height = null;
+        if ($mediaType === 'image' && in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'avif', 'gif'])) {
+            $imageInfo = @getimagesize($fullPath);
+            if ($imageInfo) {
+                $width = $imageInfo[0];
+                $height = $imageInfo[1];
+            }
+        }
+
+        $existing = null;
+        if ($fileHash) {
+            $existing = MediaAsset::where('file_hash', $fileHash)->first();
+        }
+        if (! $existing) {
+            $existing = MediaAsset::where('filename', $filename)
+                ->orWhere('file_path', $relativePath)
+                ->orWhere('public_url', $publicUrl)
+                ->first();
+        }
+
+        $cleanName = pathinfo($filename, PATHINFO_FILENAME);
+        $humanTitle = Str::headline(str_replace(['-', '_'], ' ', $cleanName));
+
+        if (! $existing) {
+            $asset = MediaAsset::create([
+                'uuid' => (string) Str::uuid(),
+                'filename' => $filename,
+                'original_name' => $filename,
+                'disk' => 'direct_public',
+                'file_path' => $relativePath,
+                'public_url' => $publicUrl,
+                'media_type' => $mediaType,
+                'mime_type' => $mimeType,
+                'extension' => $ext,
+                'file_hash' => $fileHash,
+                'file_size_bytes' => $sizeBytes,
+                'width' => $width,
+                'height' => $height,
+                'title' => $humanTitle,
+                'alt_text' => $humanTitle . ' - Dunes Discovery Dubai',
+                'category' => $category,
+                'folder' => dirname($relativePath),
+            ]);
+        } else {
+            $asset = $existing;
+            $asset->update([
+                'file_size_bytes' => $sizeBytes,
+                'mime_type' => $mimeType,
+                'file_hash' => $fileHash ?: $existing->file_hash,
+                'width' => $width ?: $existing->width,
+                'height' => $height ?: $existing->height,
+            ]);
+        }
+
+        $this->resolveAssetUsages($asset);
+
+        return $asset;
     }
 }

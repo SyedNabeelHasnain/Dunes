@@ -111,6 +111,73 @@ class AdminMediaController extends Controller
     }
 
     /**
+     * Get paginated media assets for the Universal Media Picker modal (JSON).
+     */
+    public function pickerItems(Request $request): JsonResponse
+    {
+        $query = MediaAsset::query();
+
+        // 1. Filter by Search
+        if ($request->filled('search')) {
+            $query->search($request->input('search'));
+        }
+
+        // 2. Filter by Media Type (all, image, video)
+        if ($request->filled('type') && $request->input('type') !== 'all') {
+            $query->where('media_type', $request->input('type'));
+        }
+
+        // 3. Filter by Category
+        if ($request->filled('category') && $request->input('category') !== 'all') {
+            $query->where('category', $request->input('category'));
+        }
+
+        // 4. Default sort by newest
+        $query->orderBy('created_at', 'desc');
+
+        $perPage = min(60, max(12, (int) $request->input('per_page', 36)));
+        $paginator = $query->paginate($perPage);
+
+        $items = $paginator->getCollection()->map(function (MediaAsset $asset) {
+            return [
+                'id' => $asset->id,
+                'uuid' => $asset->uuid,
+                'filename' => $asset->filename,
+                'original_name' => $asset->original_name ?: $asset->filename,
+                'file_path' => $asset->file_path,
+                'public_url' => $asset->clean_public_url,
+                'full_url' => $asset->url,
+                'poster_url' => $asset->poster_url,
+                'media_type' => $asset->media_type,
+                'is_image' => $asset->is_image,
+                'is_video' => $asset->is_video,
+                'extension' => strtoupper($asset->extension ?: ''),
+                'formatted_size' => $asset->formatted_file_size,
+                'file_size_bytes' => $asset->file_size_bytes,
+                'dimensions' => $asset->dimensions,
+                'width' => $asset->width,
+                'height' => $asset->height,
+                'title' => $asset->title,
+                'alt_text' => $asset->alt_text,
+                'category' => $asset->category,
+                'usage_count' => (int) $asset->usage_count,
+                'created_at_human' => $asset->created_at ? $asset->created_at->format('M d, Y') : '',
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'assets' => $items,
+            'pagination' => [
+                'current_page' => $paginator->currentPage(),
+                'last_page' => $paginator->lastPage(),
+                'total' => $paginator->total(),
+                'has_more' => $paginator->hasMorePages(),
+            ],
+        ]);
+    }
+
+    /**
      * Upload single or multiple files via dropzone AJAX.
      */
     public function upload(Request $request): JsonResponse

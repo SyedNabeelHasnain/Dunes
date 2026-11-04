@@ -505,14 +505,33 @@
                         </div>
                     </div>
 
-                    <!-- File Overwrites (Optional) -->
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Replace Video File (Optional MP4/WebM)</label>
-                        <input type="file" name="video_file" accept="video/mp4,video/webm,video/mov" class="w-full text-xs">
+                    <!-- File Overwrites / Choose from Library -->
+                    <div class="space-y-3 p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
+                        <x-media-picker 
+                            name="existing_filename" 
+                            type="video" 
+                            category="reviews" 
+                            label="Video Reel File (from Library)" 
+                            help="Or upload a direct file below if not yet in library." />
+                        
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">Direct Video Upload (Optional MP4/WebM)</label>
+                            <input type="file" name="video_file" accept="video/mp4,video/webm,video/mov" class="w-full text-xs">
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Replace Poster Image (Optional WebP/JPG)</label>
-                        <input type="file" name="poster_file" accept="image/*" class="w-full text-xs">
+
+                    <div class="space-y-3 p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
+                        <x-media-picker 
+                            name="existing_poster" 
+                            type="image" 
+                            category="reviews" 
+                            label="Video Poster Image (from Library)" 
+                            help="Or upload a direct image below if not yet in library." />
+                        
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">Direct Poster Upload (Optional WebP/JPG)</label>
+                            <input type="file" name="poster_file" accept="image/*" class="w-full text-xs">
+                        </div>
                     </div>
                 </div>
 
@@ -632,15 +651,33 @@
                         <input type="text" name="keywords" placeholder="dubai desert safari, buggy review, customer feedback" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs">
                     </div>
 
-                    <!-- File Uploads -->
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Video File (MP4, WebM)</label>
-                        <input type="file" name="video_file" accept="video/mp4,video/webm,video/mov" class="w-full text-xs">
+                    <!-- File Uploads / Choose from Library -->
+                    <div class="sm:col-span-2 space-y-3 p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
+                        <x-media-picker 
+                            name="existing_filename" 
+                            type="video" 
+                            category="reviews" 
+                            label="Video Reel File (from Library)" 
+                            help="Or upload a direct file below if not yet in library." />
+                        
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">Direct Video Upload (Optional MP4/WebM)</label>
+                            <input type="file" name="video_file" accept="video/mp4,video/webm,video/mov" class="w-full text-xs">
+                        </div>
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Poster Image (WebP, JPG)</label>
-                        <input type="file" name="poster_file" accept="image/*" class="w-full text-xs">
+                    <div class="sm:col-span-2 space-y-3 p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
+                        <x-media-picker 
+                            name="existing_poster" 
+                            type="image" 
+                            category="reviews" 
+                            label="Video Poster Image (from Library)" 
+                            help="Or upload a direct image below if not yet in library." />
+                        
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">Direct Poster Upload (Optional WebP/JPG)</label>
+                            <input type="file" name="poster_file" accept="image/*" class="w-full text-xs">
+                        </div>
                     </div>
 
                     <!-- Placements Checkboxes -->

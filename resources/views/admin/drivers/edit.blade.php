@@ -66,13 +66,12 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Update Photo</label>
-                    <div class="flex items-center gap-3 mb-2">
-                        @if($driver->photo)
-                            <img src="{{ asset($driver->photo) }}" alt="{{ $driver->name }}" class="w-12 h-12 rounded-full object-cover border border-slate-200">
-                        @endif
-                        <input type="file" name="photo" accept="image/*" class="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-primary file:text-white hover:file:bg-primary-dark cursor-pointer">
-                    </div>
+                    <x-media-picker 
+                        name="photo" 
+                        :value="$driver->photo" 
+                        label="Captain Photo / Avatar" 
+                        category="general" 
+                        help="Displayed on guest digital tickets & vouchers for verification." />
                 </div>
 
                 <div>

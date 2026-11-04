@@ -250,7 +250,7 @@
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5">
             @foreach($assets as $asset)
                 <div class="group relative rounded-2xl border border-slate-200/90 bg-white overflow-hidden shadow-2xs hover:shadow-md hover:border-primary/50 transition-all flex flex-col cursor-pointer"
-                     x-data="{ isPlaying: false, isMuted: true }"
+                     x-data="{ isPlaying: false, isPaused: false, isMuted: true }"
                      @click="openDetails({{ $asset->id }})">
                     
                     <!-- Thumbnail Container with 1:1 Aspect Ratio -->
@@ -275,7 +275,7 @@
                             <div x-show="!isPlaying" 
                                  class="absolute inset-0 bg-slate-950/30 flex items-center justify-center group-hover:bg-slate-950/20 transition">
                                 <button type="button" 
-                                        @click.stop="isPlaying = true; $nextTick(() => { const v = $refs.cardVideo_{{ $asset->id }}; if(v){ v.play(); } })"
+                                        @click.stop="isPlaying = true; isPaused = false; $nextTick(() => { const v = $refs.cardVideo_{{ $asset->id }}; if(v){ v.play(); } })"
                                         class="w-12 h-12 rounded-full bg-primary/95 hover:bg-primary text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition cursor-pointer"
                                         title="Play preview in card">
                                     <i class="bi bi-play-fill text-2xl translate-x-0.5"></i>
@@ -290,7 +290,9 @@
                                    :muted="isMuted"
                                    playsinline 
                                    preload="none"
-                                   @ended="isPlaying = false"
+                                   @play="isPaused = false"
+                                   @pause="isPaused = true"
+                                   @ended="isPlaying = false; isPaused = false"
                                    class="w-full h-full object-cover bg-black"
                                    style="display: none;"
                                    @click.stop>
@@ -302,27 +304,27 @@
                                  class="absolute bottom-1.5 left-1.5 right-1.5 flex items-center justify-between p-1 rounded-lg bg-slate-950/85 backdrop-blur-xs text-white text-[11px] z-20 shadow-md">
                                 <div class="flex items-center gap-1">
                                     <button type="button" 
-                                            @click="const v = $refs.cardVideo_{{ $asset->id }}; if(v){ v.paused ? v.play() : v.pause(); }" 
+                                            @click.stop="const v = $refs.cardVideo_{{ $asset->id }}; if(v){ if(v.paused){ v.play(); } else { v.pause(); } }" 
                                             class="p-1 hover:text-primary transition"
-                                            title="Play / Pause">
-                                        <i class="bi" :class="$refs.cardVideo_{{ $asset->id }}?.paused ? 'bi-play-fill text-sm' : 'bi-pause-fill text-sm'"></i>
+                                            :title="isPaused ? 'Resume Playback' : 'Pause Playback'">
+                                        <i class="bi" :class="isPaused ? 'bi-play-fill text-sm text-amber-400' : 'bi-pause-fill text-sm text-emerald-400'"></i>
                                     </button>
                                     <button type="button" 
-                                            @click="isMuted = !isMuted; if($refs.cardVideo_{{ $asset->id }}){ $refs.cardVideo_{{ $asset->id }}.muted = isMuted; }" 
+                                            @click.stop="isMuted = !isMuted; if($refs.cardVideo_{{ $asset->id }}){ $refs.cardVideo_{{ $asset->id }}.muted = isMuted; }" 
                                             class="p-1 hover:text-primary transition"
                                             :title="isMuted ? 'Unmute Audio' : 'Mute Audio'">
-                                        <i class="bi" :class="isMuted ? 'bi-volume-mute-fill text-xs' : 'bi-volume-up-fill text-xs text-emerald-400'"></i>
+                                        <i class="bi" :class="isMuted ? 'bi-volume-mute-fill text-xs text-slate-300' : 'bi-volume-up-fill text-xs text-emerald-400'"></i>
                                     </button>
                                 </div>
                                 <div class="flex items-center gap-1">
                                     <button type="button" 
-                                            @click="openVideoModal('{{ $asset->clean_public_url }}', '{{ $asset->poster_url }}', '{{ addslashes($asset->filename) }}')" 
+                                            @click.stop="openVideoModal('{{ $asset->clean_public_url }}', '{{ $asset->poster_url }}', '{{ addslashes($asset->filename) }}')" 
                                             class="p-1 hover:text-primary transition"
                                             title="Expand Cinema Player">
                                         <i class="bi bi-arrows-fullscreen text-xs"></i>
                                     </button>
                                     <button type="button" 
-                                            @click="isPlaying = false; const v = $refs.cardVideo_{{ $asset->id }}; if(v){ v.pause(); v.currentTime = 0; }" 
+                                            @click.stop="isPlaying = false; isPaused = false; const v = $refs.cardVideo_{{ $asset->id }}; if(v){ v.pause(); v.currentTime = 0; }" 
                                             class="p-1 hover:text-rose-400 transition"
                                             title="Close Video">
                                         <i class="bi bi-x-circle-fill text-xs"></i>

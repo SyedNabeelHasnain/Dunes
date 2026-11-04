@@ -68,7 +68,7 @@ class AdminDriverController extends Controller
             'license_number' => 'nullable|string|max:100',
             'phone' => 'required|string|max:50|unique:drivers,phone',
             'email' => 'nullable|email|max:255',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:3072',
+            'photo' => $request->hasFile('photo') ? 'image|mimes:jpeg,png,jpg,webp,avif|max:3072' : 'nullable|string|max:500',
             'languages' => 'nullable|array',
             'status' => 'required|in:active,on_leave,inactive',
             'default_vehicle_id' => 'nullable|exists:vehicles,id',
@@ -90,6 +90,11 @@ class AdminDriverController extends Controller
             $filename = 'captain-' . Str::slug($data['name']) . '-' . time() . '.' . $ext;
             $file->move($uploadDir, $filename);
             $data['photo'] = 'images/drivers/' . $filename;
+            try {
+                app(\App\Services\MediaManagerService::class)->scanAndSyncFile($uploadDir . '/' . $filename, 'general');
+            } catch (\Throwable $e) {}
+        } elseif ($request->filled('photo')) {
+            $data['photo'] = ltrim(trim($request->input('photo')), '/');
         }
 
         $data['access_token'] = Str::random(32);
@@ -160,7 +165,7 @@ class AdminDriverController extends Controller
             'license_number' => 'nullable|string|max:100',
             'phone' => 'required|string|max:50|unique:drivers,phone,' . $id,
             'email' => 'nullable|email|max:255',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp,avif|max:3072',
+            'photo' => $request->hasFile('photo') ? 'image|mimes:jpeg,png,jpg,webp,avif|max:3072' : 'nullable|string|max:500',
             'languages' => 'nullable|array',
             'status' => 'required|in:active,on_leave,inactive',
             'default_vehicle_id' => 'nullable|exists:vehicles,id',
@@ -182,6 +187,11 @@ class AdminDriverController extends Controller
             $filename = 'captain-' . Str::slug($data['name']) . '-' . time() . '.' . $ext;
             $file->move($uploadDir, $filename);
             $data['photo'] = 'images/drivers/' . $filename;
+            try {
+                app(\App\Services\MediaManagerService::class)->scanAndSyncFile($uploadDir . '/' . $filename, 'general');
+            } catch (\Throwable $e) {}
+        } elseif ($request->filled('photo')) {
+            $data['photo'] = ltrim(trim($request->input('photo')), '/');
         }
 
         $driver->update($data);

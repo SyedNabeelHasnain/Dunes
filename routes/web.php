@@ -331,6 +331,7 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
 
     // Unified Media Library & Asset Management (Images & Videos)
     Route::get('/media', [AdminMediaController::class, 'index'])->name('media.index');
+    Route::get('/media/picker-items', [AdminMediaController::class, 'pickerItems'])->name('media.picker-items');
     Route::post('/media/upload', [AdminMediaController::class, 'upload'])->name('media.upload');
     Route::get('/media/{id}/details', [AdminMediaController::class, 'details'])->name('media.details');
     Route::post('/media/{id}/update', [AdminMediaController::class, 'update'])->name('media.update');
