@@ -37,6 +37,9 @@
 @endpush
 
 @section('content')
+@php
+    $cmsSvc = app(\App\Services\CmsContentService::class);
+@endphp
 <!-- Page Header Section -->
 <section class="hero-subpage bg-slate-950 text-white relative overflow-hidden" style="padding-top: calc(var(--header-h, 72px) + 2.5rem);">
     <div class="absolute inset-0 w-full h-full bg-[radial-gradient(ellipse_at_20%_25%,rgba(246,144,68,0.22)_0%,transparent_65%)] pointer-events-none"></div>
@@ -823,7 +826,7 @@
 </section>
 
 <!-- ── Dedicated Guest Video Reviews Section ({All Videos}) ────────────────────── -->
-@if(!empty($videoReviews) && count($videoReviews) > 0)
+@if(!empty($videoReviews) && count($videoReviews) > 0 && $cmsSvc->isSectionVisible('gallery', 'video_reels'))
 <section class="py-12 sm:py-20 bg-slate-900 text-white relative overflow-hidden border-t border-slate-800" id="guest-video-reels"
     x-data="{
         videos: @js($videoReviews),
@@ -861,13 +864,13 @@
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 text-xs font-bold border border-rose-500/30 mb-3">
                     <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
                     <span class="w-2 h-2 rounded-full bg-rose-500 -ml-4"></span>
-                    <span>Real Customer Video Reviews</span>
+                    <span>{{ $cmsSvc->getSectionBody('gallery', 'video_reels') ?: 'Real Customer Video Reviews' }}</span>
                 </div>
                 <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
-                    Watch Unfiltered Guest Stories & Video Reviews
+                    {{ $cmsSvc->getSectionTitle('gallery', 'video_reels') ?: 'Watch Unfiltered Guest Stories & Video Reviews' }}
                 </h2>
                 <p class="text-xs sm:text-sm text-slate-300 mt-2 max-w-2xl leading-relaxed">
-                    Real, self-recorded customer feedback filmed on the dunes, inside 4-seater buggies, and under the desert stars with Captain Malik.
+                    {{ $cmsSvc->getSectionSubtitle('gallery', 'video_reels') ?: 'Real, self-recorded customer feedback filmed on the dunes, inside 4-seater buggies, and under the desert stars with Captain Malik.' }}
                 </p>
             </div>
 

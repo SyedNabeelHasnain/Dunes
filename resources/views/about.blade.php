@@ -2,6 +2,7 @@
 
 @php
     $schemaPageType = 'AboutPage';
+    $cmsSvc = app(\App\Services\CmsContentService::class);
 @endphp
 
 @push('schema')
@@ -67,8 +68,9 @@
     </div>
 </section>
 
+@if($cmsSvc->isSectionVisible('about', 'trust_bar'))
 <!-- Regulatory E-E-A-T & Trust Bar -->
-<section class="bg-slate-50 py-3.5 border-b border-slate-200 shadow-xs">
+<section class="bg-slate-50 py-3.5 border-b border-slate-200 shadow-xs" id="trust_bar">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
             <div class="flex items-center gap-2.5">
@@ -102,9 +104,11 @@
         </div>
     </div>
 </section>
+@endif
 
+@if($cmsSvc->isSectionVisible('about', 'story'))
 <!-- Story Section -->
-<section class="py-12 sm:py-20 bg-white">
+<section class="py-12 sm:py-20 bg-white" id="story">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             <div class="lg:col-span-6">
@@ -124,10 +128,10 @@
             <div class="lg:col-span-6">
                 <div class="lg:ps-6">
                     <div class="inline-flex items-center gap-2 mb-3">
-                        <span class="bg-primary/10 text-primary px-3.5 py-1 rounded-full text-xs font-bold">{{ __('ui.about_story.badge') }}</span>
+                        <span class="bg-primary/10 text-primary px-3.5 py-1 rounded-full text-xs font-bold">{{ $cmsSvc->getSectionBody('about', 'story') ?: __('ui.about_story.badge') }}</span>
                     </div>
-                    <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight leading-tight">{{ __('ui.about_story.title') }}</h2>
-                    <p class="text-slate-700 text-base sm:text-lg mb-4 leading-relaxed font-medium">{{ __('ui.about_story.p1') }}</p>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight leading-tight">{{ $cmsSvc->getSectionTitle('about', 'story') ?: __('ui.about_story.title') }}</h2>
+                    <p class="text-slate-700 text-base sm:text-lg mb-4 leading-relaxed font-medium">{{ $cmsSvc->getSectionSubtitle('about', 'story') ?: __('ui.about_story.p1') }}</p>
                     <p class="text-slate-600 text-sm sm:text-base mb-6 leading-relaxed">{{ __('ui.about_story.p2') }}</p>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="flex items-center gap-3">
@@ -148,13 +152,15 @@
         </div>
     </div>
 </section>
+@endif
 
+@if($cmsSvc->isSectionVisible('about', 'values'))
 <!-- Why Choose Us Grid -->
-<section class="py-12 sm:py-20 bg-slate-50 border-t border-slate-200">
+<section class="py-12 sm:py-20 bg-slate-50 border-t border-slate-200" id="values">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-10 sm:mb-14">
-            <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">{{ __('ui.why_choose_us.title') }}</h2>
-            <p class="text-slate-600 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">{{ __('ui.why_choose_us.subtitle_about') }}</p>
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">{{ $cmsSvc->getSectionTitle('about', 'values') ?: __('ui.why_choose_us.title') }}</h2>
+            <p class="text-slate-600 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">{{ $cmsSvc->getSectionSubtitle('about', 'values') ?: __('ui.why_choose_us.subtitle_about') }}</p>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs hover:shadow-lg transition-all duration-300">
@@ -202,9 +208,11 @@
         </div>
     </div>
 </section>
+@endif
 
+@if($cmsSvc->isSectionVisible('about', 'happy_guests'))
 <!-- Stats Bar Section -->
-<section class="py-8 bg-slate-950">
+<section class="py-8 bg-slate-950" id="happy_guests">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 text-center">
             <div class="p-2">
@@ -240,4 +248,5 @@
         </div>
     </div>
 </section>
+@endif
 @endsection

@@ -261,51 +261,32 @@
                                  alt="{{ $asset->alt_text ?: $asset->filename }}" 
                                  loading="lazy" 
                                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                 onerror="this.src='/images/media-placeholder.svg'; this.onerror=null;">
+                                 onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\' fill=\'%23f8fafc\'><rect width=\'100\' height=\'100\' fill=\'%23f1f5f9\'/><path d=\'M30 40a10 10 0 1 0 0-20 10 10 0 0 0 0 20zm-15 45h70L65 55 50 70 40 60 15 85z\' fill=\'%23cbd5e1\'/></svg>'; this.onerror=null;">
                         @elseif($asset->is_video)
-                            <!-- VIDEO POSTER THUMBNAIL (Visible when not playing) -->
-                            <img x-show="!isPlaying"
-                                 src="{{ $asset->poster_url }}" 
-                                 alt="{{ $asset->alt_text ?: $asset->filename }}" 
-                                 loading="lazy" 
-                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                 onerror="this.src='/images/media-placeholder.svg'; this.onerror=null;">
-
-                            <!-- Centered Interactive Play Button Overlay -->
-                            <div x-show="!isPlaying" 
-                                 class="absolute inset-0 bg-slate-950/30 flex items-center justify-center group-hover:bg-slate-950/20 transition">
-                                <button type="button" 
-                                        @click.stop="isPlaying = true; isPaused = false; $nextTick(() => { const v = $refs.cardVideo_{{ $asset->id }}; if(v){ v.play().then(() => { isPaused = false; }).catch(() => { isPaused = true; }); } })"
-                                        class="w-12 h-12 rounded-full bg-primary/95 hover:bg-primary text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition cursor-pointer"
-                                        title="Play preview in card">
-                                    <i class="bi bi-play-fill text-2xl translate-x-0.5"></i>
-                                </button>
-                            </div>
-
-                            <!-- INLINE VIDEO PLAYER (Active when playing) -->
+                            <!-- VIDEO PLAYER & PREVIEW THUMBNAIL (Browser renders first frame automatically via preload="metadata") -->
                             <video x-ref="cardVideo_{{ $asset->id }}"
-                                   x-show="isPlaying"
-                                   src="{{ $asset->clean_public_url }}" 
-                                   poster="{{ $asset->poster_url }}"
+                                   src="{{ $asset->clean_public_url }}#t=0.001" 
+                                   @if(!empty($asset->poster_url)) poster="{{ $asset->poster_url }}" @endif
                                    :muted="isMuted"
                                    playsinline 
-                                   preload="none"
-                                   @play="isPaused = false"
+                                   preload="metadata"
+                                   @play="isPlaying = true; isPaused = false"
                                    @pause="isPaused = true"
-                                   @playing="isPaused = false"
+                                   @playing="isPlaying = true; isPaused = false"
                                    @ended="isPlaying = false; isPaused = false"
                                    class="w-full h-full object-cover bg-black"
-                                   style="display: none;"
-                                   @click.stop="const v = $refs.cardVideo_{{ $asset->id }}; if(v){ if(v.paused){ v.play().then(() => { isPaused = false; }).catch(() => { isPaused = true; }); } else { v.pause(); isPaused = true; } }">
+                                   @click.stop="const v = $refs.cardVideo_{{ $asset->id }}; if(v){ if(v.paused){ v.play().then(() => { isPlaying = true; isPaused = false; }).catch(() => { isPaused = true; }); } else { v.pause(); isPaused = true; } }">
                             </video>
 
-                            <!-- Centered Resume Button (When Paused In Card) -->
-                            <div x-show="isPlaying && isPaused" 
-                                 @click.stop="const v = $refs.cardVideo_{{ $asset->id }}; if(v){ v.play().then(() => { isPaused = false; }).catch(() => { isPaused = true; }); }" 
-                                 class="absolute inset-0 bg-black/40 flex items-center justify-center cursor-pointer z-10 transition">
-                                <div class="w-10 h-10 rounded-full bg-primary/95 text-white flex items-center justify-center shadow-lg">
-                                    <i class="bi bi-play-fill text-xl translate-x-0.5"></i>
-                                </div>
+                            <!-- Centered Interactive Play/Pause Button Overlay -->
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none transition"
+                                 :class="isPlaying && !isPaused ? 'opacity-0 group-hover:opacity-100 bg-slate-950/20' : 'bg-slate-950/30'">
+                                <button type="button" 
+                                        @click.stop="const v = $refs.cardVideo_{{ $asset->id }}; if(v){ if(v.paused || !isPlaying){ isPlaying = true; isPaused = false; v.play().catch(() => { isPaused = true; }); } else { v.pause(); isPaused = true; } }"
+                                        class="pointer-events-auto w-12 h-12 rounded-full bg-primary/95 hover:bg-primary text-white flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition cursor-pointer"
+                                        :title="isPlaying && !isPaused ? 'Pause Video' : 'Play Video'">
+                                    <i class="bi text-2xl" :class="isPlaying && !isPaused ? 'bi-pause-fill' : 'bi-play-fill translate-x-0.5'"></i>
+                                </button>
                             </div>
 
                             <!-- Floating Inline Controls Bar (When Video Is Playing Inside Card) -->
@@ -314,7 +295,7 @@
                                  class="absolute bottom-1.5 left-1.5 right-1.5 flex items-center justify-between p-1 rounded-lg bg-slate-950/85 backdrop-blur-xs text-white text-[11px] z-20 shadow-md">
                                 <div class="flex items-center gap-1">
                                     <button type="button" 
-                                            @click.stop="const v = $refs.cardVideo_{{ $asset->id }}; if(v){ if(v.paused){ v.play().then(() => { isPaused = false; }).catch(() => { isPaused = true; }); } else { v.pause(); isPaused = true; } }" 
+                                            @click.stop="const v = $refs.cardVideo_{{ $asset->id }}; if(v){ if(v.paused){ v.play().then(() => { isPlaying = true; isPaused = false; }).catch(() => { isPaused = true; }); } else { v.pause(); isPaused = true; } }" 
                                             class="p-1 hover:text-primary transition"
                                             :title="isPaused ? 'Resume Playback' : 'Pause Playback'">
                                         <i class="bi" :class="isPaused ? 'bi-play-fill text-sm text-amber-400' : 'bi-pause-fill text-sm text-emerald-400'"></i>
@@ -465,13 +446,14 @@
                                             <img src="{{ $asset->clean_public_url }}" 
                                                  alt="{{ $asset->filename }}" 
                                                  class="w-full h-full object-cover"
-                                                 onerror="this.src='/images/media-placeholder.svg'; this.onerror=null;">
+                                                 onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\' fill=\'%23f8fafc\'><rect width=\'100\' height=\'100\' fill=\'%23f1f5f9\'/><path d=\'M30 40a10 10 0 1 0 0-20 10 10 0 0 0 0 20zm-15 45h70L65 55 50 70 40 60 15 85z\' fill=\'%23cbd5e1\'/></svg>'; this.onerror=null;">
                                         @elseif($asset->is_video)
-                                            <img src="{{ $asset->poster_url }}" 
-                                                 alt="{{ $asset->filename }}" 
-                                                 class="w-full h-full object-cover"
-                                                 onerror="this.src='/images/media-placeholder.svg'; this.onerror=null;">
-                                            <div class="absolute inset-0 bg-black/40 flex items-center justify-center text-white">
+                                            <video src="{{ $asset->clean_public_url }}#t=0.001" 
+                                                   @if(!empty($asset->poster_url)) poster="{{ $asset->poster_url }}" @endif
+                                                   preload="metadata" 
+                                                   class="w-full h-full object-cover bg-black">
+                                            </video>
+                                            <div class="absolute inset-0 bg-black/30 flex items-center justify-center text-white">
                                                 <i class="bi bi-play-fill text-xs"></i>
                                             </div>
                                         @else
@@ -637,7 +619,7 @@
                         <img :src="activeAsset?.public_url" 
                              :alt="activeAsset?.alt_text" 
                              class="max-w-full max-h-[340px] rounded-xl object-contain shadow-sm"
-                             onerror="this.src='/images/media-placeholder.svg'; this.onerror=null;">
+                             onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\' fill=\'%23f8fafc\'><rect width=\'100\' height=\'100\' fill=\'%23f1f5f9\'/><path d=\'M30 40a10 10 0 1 0 0-20 10 10 0 0 0 0 20zm-15 45h70L65 55 50 70 40 60 15 85z\' fill=\'%23cbd5e1\'/></svg>'; this.onerror=null;">
                     </template>
                     <template x-if="activeAsset?.media_type === 'video'">
                         <div class="w-full flex flex-col items-center">

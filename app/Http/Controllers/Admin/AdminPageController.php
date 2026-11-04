@@ -23,7 +23,7 @@ class AdminPageController extends Controller
 
     public function edit(int $id)
     {
-        $page = Page::with('sections')->findOrFail($id);
+        $page = Page::with(['sections' => fn ($q) => $q->orderBy('order', 'asc')->orderBy('id', 'asc')])->findOrFail($id);
         $languages = Language::getActive();
 
         return view('admin.pages.edit', compact('page', 'languages'));

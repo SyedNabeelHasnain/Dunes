@@ -18,7 +18,7 @@ class CmsContentService
         try {
             $pages = Cache::remember('cms_pages_cache', 3600, function () {
                 return Page::with(['sections' => function ($q) {
-                    $q->where('is_active', true)->orderBy('order', 'asc');
+                    $q->orderBy('order', 'asc');
                 }])->where('status', 'published')->get();
             });
 
@@ -26,6 +26,19 @@ class CmsContentService
         } catch (\Throwable $e) {
             return null;
         }
+    }
+
+    /**
+     * Check if a section is visible (active) or default true if not set.
+     */
+    public function isSectionVisible(string $pageSlug, string $sectionKey): bool
+    {
+        $section = $this->getSection($pageSlug, $sectionKey);
+        if ($section) {
+            return (bool) $section->is_active;
+        }
+
+        return true;
     }
 
     /**
@@ -62,6 +75,19 @@ class CmsContentService
         $section = $this->getSection($pageSlug, $sectionKey);
         if ($section && ! empty($section->subtitle)) {
             return $section->subtitle;
+        }
+
+        return $default ?? '';
+    }
+
+    /**
+     * Get translated body / tag badge of a section or fallback.
+     */
+    public function getSectionBody(string $pageSlug, string $sectionKey, ?string $default = null): string
+    {
+        $section = $this->getSection($pageSlug, $sectionKey);
+        if ($section && ! empty($section->body)) {
+            return $section->body;
         }
 
         return $default ?? '';

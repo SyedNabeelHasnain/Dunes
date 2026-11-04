@@ -169,14 +169,15 @@
                                              :alt="item.alt_text || item.filename" 
                                              loading="lazy" 
                                              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                             onerror="this.src='/images/media-placeholder.svg'; this.onerror=null;">
+                                             onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\' fill=\'%23f8fafc\'><rect width=\'100\' height=\'100\' fill=\'%23f1f5f9\'/><path d=\'M30 40a10 10 0 1 0 0-20 10 10 0 0 0 0 20zm-15 45h70L65 55 50 70 40 60 15 85z\' fill=\'%23cbd5e1\'/></svg>'; this.onerror=null;">
                                     </template>
                                     <template x-if="item.is_video">
                                         <div class="w-full h-full relative bg-slate-900 flex items-center justify-center overflow-hidden">
-                                            <img :src="item.poster_url" 
-                                                 :alt="item.filename" 
-                                                 class="w-full h-full object-cover opacity-80"
-                                                 onerror="this.src='/images/media-placeholder.svg'; this.onerror=null;">
+                                            <video :src="item.clean_public_url + '#t=0.001'" 
+                                                   :poster="item.poster_url"
+                                                   preload="metadata"
+                                                   class="w-full h-full object-cover">
+                                            </video>
                                             <div class="absolute inset-0 bg-black/30 flex items-center justify-center">
                                                 <div class="w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center shadow-md">
                                                     <i class="bi bi-play-fill text-base translate-x-0.5"></i>
@@ -232,7 +233,7 @@
                                     <template x-if="selectedAsset.is_image">
                                         <img :src="selectedAsset.clean_public_url" 
                                              class="w-full h-full object-contain"
-                                             onerror="this.src='/images/media-placeholder.svg'; this.onerror=null;">
+                                             onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\' fill=\'%23f8fafc\'><rect width=\'100\' height=\'100\' fill=\'%23f1f5f9\'/><path d=\'M30 40a10 10 0 1 0 0-20 10 10 0 0 0 0 20zm-15 45h70L65 55 50 70 40 60 15 85z\' fill=\'%23cbd5e1\'/></svg>'; this.onerror=null;">
                                     </template>
                                     <template x-if="selectedAsset.is_video">
                                         <video :src="selectedAsset.clean_public_url" 

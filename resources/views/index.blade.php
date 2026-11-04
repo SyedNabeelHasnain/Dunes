@@ -8,6 +8,8 @@ $heroPoster = !empty($settings['site_hero_poster'])
 $heroVideo = !empty($settings['site_hero_video']) 
     ? (str_starts_with($settings['site_hero_video'], 'http') ? $settings['site_hero_video'] : asset(ltrim($settings['site_hero_video'], '/'))) 
     : asset('images/desert-safar-dubai-tour-short-dune-discovery-tourism.mp4');
+
+$cmsSvc = app(\App\Services\CmsContentService::class);
 @endphp
 
 @push('preloads')
@@ -353,8 +355,9 @@ if (!function_exists('renderReviewCardMarkup')) {
     </div>
 </section>
 
+@if($cmsSvc->isSectionVisible('home', 'trust_bar'))
 <!-- Regulatory E-E-A-T & Trust Bar -->
-<section class="bg-slate-50 py-3.5 border-b border-slate-200 shadow-xs">
+<section class="bg-slate-50 py-3.5 border-b border-slate-200 shadow-xs" id="trust_bar">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
             <div class="flex items-center gap-2.5">
@@ -426,16 +429,18 @@ if (!function_exists('renderReviewCardMarkup')) {
         </div>
     </div>
 </div>
+@endif
 
+@if($cmsSvc->isSectionVisible('home', 'silos'))
 <!-- Category Silos Section: Explore Dubai by Adventure Type -->
-<section class="py-12 sm:py-16 bg-white">
+<section class="py-12 sm:py-16 bg-white" id="silos">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-10 sm:mb-12">
             <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">
-                {{ __('ui.home_categories.title') }} <span class="text-[#b9540c]">{{ __('ui.home_categories.title_highlight') }}</span>
+                {{ $cmsSvc->getSectionTitle('home', 'silos') ?: __('ui.home_categories.title') . ' ' . __('ui.home_categories.title_highlight') }}
             </h2>
             <p class="text-slate-600 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-                {{ __('ui.home_categories.subtitle') }}
+                {{ $cmsSvc->getSectionSubtitle('home', 'silos') ?: __('ui.home_categories.subtitle') }}
             </p>
         </div>
 
@@ -489,19 +494,20 @@ if (!function_exists('renderReviewCardMarkup')) {
             </div>
         </div>
 
-        <div class="mt-8 p-6 sm:p-8 rounded-2xl shadow-sm bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-primary/30">
+        @if($cmsSvc->isSectionVisible('home', 'concierge'))
+        <div class="mt-8 p-6 sm:p-8 rounded-2xl shadow-sm bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-primary/30" id="concierge">
             <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
                 <div class="text-center lg:text-start">
                     <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2 mb-2">
                         <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold bg-primary/20 text-primary border border-primary/40">
-                            <i class="bi bi-compass"></i> {{ __('ui.home_concierge.badge') }}
+                            <i class="bi bi-compass"></i> {{ $cmsSvc->getSectionBody('home', 'concierge') ?: __('ui.home_concierge.badge') }}
                         </span>
                         <span class="bg-amber-400 text-slate-950 rounded-full px-2.5 py-0.5 text-xs font-bold">
                             {{ __('ui.home_concierge.discount_badge') }}
                         </span>
                     </div>
-                    <h2 class="font-extrabold text-white text-xl sm:text-2xl mb-1.5">{{ __('ui.home_concierge.heading') }}</h2>
-                    <p class="text-slate-300 text-sm">{{ __('ui.home_concierge.subheading') }}</p>
+                    <h2 class="font-extrabold text-white text-xl sm:text-2xl mb-1.5">{{ $cmsSvc->getSectionTitle('home', 'concierge') ?: __('ui.home_concierge.heading') }}</h2>
+                    <p class="text-slate-300 text-sm">{{ $cmsSvc->getSectionSubtitle('home', 'concierge') ?: __('ui.home_concierge.subheading') }}</p>
                 </div>
                 <div class="flex flex-col sm:flex-row gap-3 shrink-0 w-full sm:w-auto">
                     <button type="button" class="btn-desert-animated text-sm font-bold rounded-full px-5 py-3 text-white inline-flex items-center justify-center gap-2 cursor-pointer shadow-md" @click="$store.modal.open('safari-matcher')">
@@ -513,18 +519,21 @@ if (!function_exists('renderReviewCardMarkup')) {
                 </div>
             </div>
         </div>
+        @endif
     </div>
 </section>
+@endif
 
+@if($cmsSvc->isSectionVisible('home', 'featured_tours'))
 <!-- Popular Tours Section -->
-<section class="py-12 sm:py-16 bg-slate-50">
+<section class="py-12 sm:py-16 bg-slate-50" id="featured_tours">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-10 sm:mb-12">
             <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">
-                {{ __('ui.home_popular.title') }} <span class="text-primary-accessible">{{ __('ui.home_popular.title_highlight') }}</span>
+                {{ $cmsSvc->getSectionTitle('home', 'featured_tours') ?: (__('ui.home_popular.title') . ' ' . __('ui.home_popular.title_highlight')) }}
             </h2>
             <p class="text-slate-600 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
-                {{ __('ui.home_popular.subtitle') }}
+                {{ $cmsSvc->getSectionSubtitle('home', 'featured_tours') ?: __('ui.home_popular.subtitle') }}
             </p>
         </div>
 
@@ -583,21 +592,23 @@ if (!function_exists('renderReviewCardMarkup')) {
         </div>
     </div>
 </section>
+@endif
 
 <!-- Interactive Safari Matcher Quiz -->
 @include('partials.safari-matcher-quiz')
 
+@if($cmsSvc->isSectionVisible('home', 'reviews'))
 <!-- Guest Reviews Marquee Section -->
-<section class="reviews-section bg-gradient-to-b from-[#FFFDF9] via-[#FAF6F2] to-[#F5EFE8] pt-14 pb-20 sm:pt-20 sm:pb-28 overflow-hidden relative">
+<section class="reviews-section bg-gradient-to-b from-[#FFFDF9] via-[#FAF6F2] to-[#F5EFE8] pt-14 pb-20 sm:pt-20 sm:pb-28 overflow-hidden relative" id="reviews">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 sm:mb-12 text-center">
         <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-900 text-xs font-bold mb-3 shadow-2xs">
             <span class="flex text-amber-500 gap-0.5 text-xs"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></span>
-            <span>4.9 / 5 Rating Across 2,840+ Verified Reviews</span>
+            <span>{{ $cmsSvc->getSectionBody('home', 'reviews') ?: '4.9 / 5 Rating Across 2,840+ Verified Reviews' }}</span>
         </div>
         <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 mb-3 tracking-tight">
-            {{ __('ui.home_reviews.title') }} <span class="text-primary-accessible">{{ __('ui.home_reviews.title_highlight') }}</span>
+            {{ $cmsSvc->getSectionTitle('home', 'reviews') ?: (__('ui.home_reviews.title') . ' ' . __('ui.home_reviews.title_highlight')) }}
         </h2>
-        <p class="text-slate-600 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">{{ __('ui.home_reviews.subtitle') }}</p>
+        <p class="text-slate-600 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">{{ $cmsSvc->getSectionSubtitle('home', 'reviews') ?: __('ui.home_reviews.subtitle') }}</p>
     </div>
 
     @php
@@ -830,10 +841,11 @@ if (!function_exists('renderReviewCardMarkup')) {
         </div>
     </div>
 </section>
+@endif
 
 <!-- ── Real Guest Video Reviews & Stories (Reels Carousel) ────────────────────── -->
-@if(!empty($videoReviews) && count($videoReviews) > 0)
-<section class="py-12 sm:py-16 bg-white border-t border-slate-200/80 overflow-hidden" 
+@if(!empty($videoReviews) && count($videoReviews) > 0 && $cmsSvc->isSectionVisible('home', 'videos'))
+<section class="py-12 sm:py-16 bg-white border-t border-slate-200/80 overflow-hidden" id="videos"
     x-data="{
         videos: @js($videoReviews),
         activeVideo: null,
@@ -862,13 +874,13 @@ if (!function_exists('renderReviewCardMarkup')) {
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200 shadow-2xs mb-2.5">
                     <span class="w-2 h-2 rounded-full bg-rose-600 animate-ping"></span>
                     <span class="w-2 h-2 rounded-full bg-rose-600 -ml-4"></span>
-                    <span>Real Customer Video Reviews</span>
+                    <span>{{ $cmsSvc->getSectionBody('home', 'videos') ?: 'Real Customer Video Reviews' }}</span>
                 </div>
                 <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
-                    Watch Real Travelers in the Dubai Dunes
+                    {{ $cmsSvc->getSectionTitle('home', 'videos') ?: 'Watch Real Travelers in the Dubai Dunes' }}
                 </h2>
                 <p class="text-sm text-slate-500 mt-1 max-w-2xl">
-                    Unfiltered video feedback straight from our guests in Polaris RZR buggies, red dune bashing, and Bedouin desert camps.
+                    {{ $cmsSvc->getSectionSubtitle('home', 'videos') ?: 'Unfiltered video feedback straight from our guests in Polaris RZR buggies, red dune bashing, and Bedouin desert camps.' }}
                 </p>
             </div>
 
@@ -1029,8 +1041,8 @@ if (!function_exists('renderReviewCardMarkup')) {
 @endif
 
 <!-- ── Real Moments Captured by Our Guests (Reviews Media Gallery) ────────────── -->
-@if(!empty($galleryItems) && count($galleryItems) > 0)
-<section class="py-12 sm:py-20 bg-slate-900 text-white relative overflow-hidden" 
+@if(!empty($galleryItems) && count($galleryItems) > 0 && $cmsSvc->isSectionVisible('home', 'moments'))
+<section class="py-12 sm:py-20 bg-slate-900 text-white relative overflow-hidden" id="moments" 
     x-data="{
         category: 'all',
         items: @js($galleryItems),
@@ -1092,13 +1104,13 @@ if (!function_exists('renderReviewCardMarkup')) {
             <div>
                 <div class="inline-flex items-center gap-2 rounded-full bg-primary/20 border border-primary/40 text-primary px-3.5 py-1 text-xs font-bold mb-3 shadow-xs">
                     <i class="bi bi-camera-fill"></i>
-                    <span>{{ __('ui.gallery_section.eyebrow') ?? 'Verified Guest Moments' }}</span>
+                    <span>{{ $cmsSvc->getSectionBody('home', 'moments') ?: (__('ui.gallery_section.eyebrow') ?? 'Verified Guest Moments') }}</span>
                 </div>
                 <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-2">
-                    {{ __('ui.gallery_section.title') ?? 'Captured in the Dunes by Our Travelers' }}
+                    {{ $cmsSvc->getSectionTitle('home', 'moments') ?: (__('ui.gallery_section.title') ?? 'Live Desert Moments & Guest Captures') }}
                 </h2>
                 <p class="text-white/70 text-sm sm:text-base max-w-2xl leading-relaxed">
-                    {{ __('ui.gallery_section.subtitle') ?? 'Authentic, unfiltered photos and videos posted by real guests on Google Maps and TripAdvisor.' }}
+                    {{ $cmsSvc->getSectionSubtitle('home', 'moments') ?: (__('ui.gallery_section.subtitle') ?? 'Authentic, unfiltered photos and videos posted by real guests on Google Maps and TripAdvisor.') }}
                 </p>
             </div>
             <div class="flex items-center gap-3">
@@ -1341,15 +1353,16 @@ if (!function_exists('renderReviewCardMarkup')) {
 </section>
 @endif
 
+@if($cmsSvc->isSectionVisible('home', 'why_choose_us'))
 <!-- Why Choose Us Section -->
-<section class="py-12 sm:py-16 bg-white">
+<section class="py-12 sm:py-16 bg-white" id="why_choose_us">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-10 sm:mb-12">
             <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">
-                {{ __('ui.why_choose_us.title') }}
+                {{ $cmsSvc->getSectionTitle('home', 'why_choose_us') ?: __('ui.why_choose_us.title') }}
             </h2>
             <p class="text-slate-600 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
-                {{ __('ui.why_choose_us.subtitle_home') }}
+                {{ $cmsSvc->getSectionSubtitle('home', 'why_choose_us') ?: __('ui.why_choose_us.subtitle_home') }}
             </p>
         </div>
 
@@ -1378,6 +1391,7 @@ if (!function_exists('renderReviewCardMarkup')) {
         </div>
     </div>
 </section>
+@endif
 
 <!-- GEO & AI Search Entity Knowledge Guide -->
 <section class="py-12 sm:py-16 bg-slate-50 border-t border-slate-200">
@@ -1455,14 +1469,15 @@ if (!function_exists('renderReviewCardMarkup')) {
     </div>
 </section>
 
+@if($cmsSvc->isSectionVisible('home', 'faqs'))
 <!-- FAQs Section -->
-<section class="py-12 sm:py-16 bg-white">
+<section class="py-12 sm:py-16 bg-white" id="faqs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-10 sm:mb-12">
             <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">
-                {{ __('ui.faq_section.common_questions') }}
+                {{ $cmsSvc->getSectionTitle('home', 'faqs') ?: __('ui.faq_section.common_questions') }}
             </h2>
-            <p class="text-slate-600 text-base sm:text-lg">{{ __('ui.faq_section.subtitle') }}</p>
+            <p class="text-slate-600 text-base sm:text-lg">{{ $cmsSvc->getSectionSubtitle('home', 'faqs') ?: __('ui.faq_section.subtitle') }}</p>
         </div>
 
         <div x-data="{ activeFaq: null }" class="max-w-3xl mx-auto space-y-3">
@@ -1500,22 +1515,24 @@ if (!function_exists('renderReviewCardMarkup')) {
         </div>
     </div>
 </section>
+@endif
 
+@if($cmsSvc->isSectionVisible('home', 'desert_cta'))
 <!-- CTA booking banner -->
-<section class="cta-section py-16 sm:py-24 relative bg-slate-950 text-white overflow-hidden border-t border-slate-800">
+<section class="cta-section py-16 sm:py-24 relative bg-slate-950 text-white overflow-hidden border-t border-slate-800" id="desert_cta">
     <!-- Ambient Desert Glow Effects -->
     <div class="absolute -top-24 start-1/2 -translate-x-1/2 rtl:translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-b from-orange-500/20 via-amber-500/10 to-transparent blur-3xl pointer-events-none -z-0"></div>
     <div class="absolute -bottom-24 end-10 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none -z-0"></div>
 
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-amber-400/30 text-amber-300 text-xs font-bold uppercase tracking-wider mb-5 shadow-lg">
-            <i class="bi bi-patch-check-fill text-amber-400"></i> {{ __('ui.home_cta.license_badge') }}
+            <i class="bi bi-patch-check-fill text-amber-400"></i> {{ $cmsSvc->getSectionBody('home', 'desert_cta') ?: __('ui.home_cta.license_badge') }}
         </div>
         <h2 class="text-3xl sm:text-5xl font-black mb-4 text-white tracking-tight leading-tight">
-            {{ __('ui.home_cta.title_prefix') }} <span class="bg-gradient-to-r from-orange-400 via-amber-300 to-yellow-400 bg-clip-text text-transparent">{{ __('ui.home_cta.title_highlight') }}</span>?
+            {{ $cmsSvc->getSectionTitle('home', 'desert_cta') ?: (__('ui.home_cta.title_prefix') . ' ' . __('ui.home_cta.title_highlight')) }}
         </h2>
         <p class="text-base sm:text-lg mb-8 text-slate-300 max-w-2xl mx-auto leading-relaxed font-normal">
-            {{ __('ui.home_cta.subtitle') }}
+            {{ $cmsSvc->getSectionSubtitle('home', 'desert_cta') ?: __('ui.home_cta.subtitle') }}
         </p>
         <div class="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4 max-w-md sm:max-w-none mx-auto">
             <button type="button" class="btn-desert-animated text-base sm:text-lg font-bold rounded-full px-8 py-3.5 shadow-xl inline-flex items-center justify-center gap-2 cursor-pointer text-white w-full sm:w-auto" @click="$store.modal.open('booking')">
@@ -1536,6 +1553,7 @@ if (!function_exists('renderReviewCardMarkup')) {
         </div>
     </div>
 </section>
+@endif
 
 @push('scripts')
 <script>

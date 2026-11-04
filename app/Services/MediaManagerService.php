@@ -1023,17 +1023,14 @@ class MediaManagerService
 
         $assets = MediaAsset::where('media_type', 'image')->get();
 
-        // Group by folder and lowercase canonical base name
+        // Group by lowercase canonical base name to consolidate format variants (.webp, .jpg, .png, .avif)
         $grouped = [];
         foreach ($assets as $asset) {
-            $folder = $asset->folder ?: dirname($asset->file_path);
-            $folder = str_replace('\\', '/', trim($folder, '/. '));
             $baseName = strtolower(pathinfo($asset->filename, PATHINFO_FILENAME));
-            $key = $folder . '::' . $baseName;
-            $grouped[$key][] = $asset;
+            $grouped[$baseName][] = $asset;
         }
 
-        foreach ($grouped as $key => $records) {
+        foreach ($grouped as $baseName => $records) {
             if (count($records) <= 1) {
                 continue;
             }
@@ -1129,6 +1126,9 @@ class MediaManagerService
             }
         }
 
+        $cleanName = pathinfo($filename, PATHINFO_FILENAME);
+        $humanTitle = Str::headline(str_replace(['-', '_'], ' ', $cleanName));
+
         $existing = null;
         if ($fileHash) {
             $existing = MediaAsset::where('file_hash', $fileHash)->first();
@@ -1140,8 +1140,63 @@ class MediaManagerService
                 ->first();
         }
 
-        $cleanName = pathinfo($filename, PATHINFO_FILENAME);
-        $humanTitle = Str::headline(str_replace(['-', '_'], ' ', $cleanName));
+        // Format-variant check for images: prevent creating duplicate records for .webp and .jpg siblings
+        if (! $existing && $mediaType === 'image') {
+            $baseLower = strtolower($cleanName);
+            $sibling = MediaAsset::where('media_type', 'image')
+                ->where(function ($q) use ($baseLower) {
+                    $q->whereRaw('LOWER(filename) LIKE ?', [$baseLower . '.%']);
+                })
+                ->first();
+
+            if ($sibling) {
+                $currentScore = $this->formatScore($ext);
+                $siblingScore = $this->formatScore($sibling->extension ?: '');
+
+                $meta = is_array($sibling->extra_metadata) ? $sibling->extra_metadata : [];
+                $variants = $meta['format_variants'] ?? [];
+
+                if ($currentScore > $siblingScore) {
+                    // Upgrade sibling to superior modern format (e.g. webp replaces jpg as canonical)
+                    $oldExt = strtolower($sibling->extension ?: 'jpg');
+                    $variants[$oldExt] = [
+                        'public_url' => $sibling->clean_public_url,
+                        'file_path' => $sibling->file_path,
+                        'file_size_bytes' => $sibling->file_size_bytes,
+                    ];
+                    $meta['format_variants'] = $variants;
+
+                    $sibling->update([
+                        'filename' => $filename,
+                        'original_name' => $filename,
+                        'file_path' => $relativePath,
+                        'public_url' => $publicUrl,
+                        'extension' => $ext,
+                        'mime_type' => $mimeType,
+                        'file_hash' => $fileHash,
+                        'file_size_bytes' => $sizeBytes,
+                        'width' => $width ?: $sibling->width,
+                        'height' => $height ?: $sibling->height,
+                        'extra_metadata' => $meta,
+                    ]);
+
+                    $this->resolveAssetUsages($sibling);
+                    return $sibling;
+                } else {
+                    // Sibling is already equal or superior (e.g. webp exists, this is jpg variant)
+                    $variants[$ext] = [
+                        'public_url' => $publicUrl,
+                        'file_path' => $relativePath,
+                        'file_size_bytes' => $sizeBytes,
+                    ];
+                    $meta['format_variants'] = $variants;
+                    $sibling->extra_metadata = $meta;
+                    $sibling->saveQuietly();
+
+                    return $sibling;
+                }
+            }
+        }
 
         if (! $existing) {
             $asset = MediaAsset::create([

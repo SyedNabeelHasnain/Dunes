@@ -27,12 +27,9 @@ class AdminMediaController extends Controller
     {
         // Auto-deduplicate format variants (e.g. webp + jpg) into single canonical cards
         try {
-            cache()->remember('media_format_variants_dedup', 300, function () {
-                $this->mediaService->deduplicateFormatVariants();
-                return true;
-            });
+            $this->mediaService->deduplicateFormatVariants();
         } catch (\Throwable $e) {
-            // Silently continue if cache/DB lock
+            // Silently continue if DB lock
         }
 
         $query = MediaAsset::query();

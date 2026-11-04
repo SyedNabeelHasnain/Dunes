@@ -56,8 +56,13 @@ jobs:
         cp -r public/. deploy/public_deploy/
         cp public/.htaccess deploy/public_deploy/.htaccess
         
-        # Remove images directory from staging to keep the zip small and prevent re-uploading
+        # Preserve essential UI SVGs and branding icons before trimming large photo directories
+        mkdir -p deploy/public_deploy/images_essential
+        cp public/images/*.svg public/images/*.png deploy/public_deploy/images_essential/ 2>/dev/null || true
         rm -rf deploy/public_deploy/images
+        mkdir -p deploy/public_deploy/images
+        cp -r deploy/public_deploy/images_essential/* deploy/public_deploy/images/ 2>/dev/null || true
+        rm -rf deploy/public_deploy/images_essential
         
         # Adjust paths in entry points to point to dunes-laravel directory
         for f in index.php ajax.php; do

@@ -458,15 +458,10 @@
 
     <!-- 7. STANDALONE MEDIA MANAGEMENT -->
     <a href="{{ route('admin.media.index') }}" 
-       class="flex items-center justify-between px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.media.*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}"
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.media.*') ? 'bg-primary text-white font-semibold shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}"
        @if(!$isMobile) :class="$store.admin.sidebarCollapsed ? 'justify-center px-0' : ''" :title="$store.admin.sidebarCollapsed ? 'Media Management' : ''" @endif>
-        <div class="flex items-center gap-3 min-w-0">
-            <i class="bi bi-images text-base shrink-0 {{ request()->routeIs('admin.media.*') ? 'text-white' : 'text-rose-400' }}"></i>
-            <span @if(!$isMobile) x-show="!$store.admin.sidebarCollapsed" @endif class="whitespace-nowrap text-sm">Media Management</span>
-        </div>
-        <span @if(!$isMobile) x-show="!$store.admin.sidebarCollapsed" @endif class="px-1.5 py-0.5 rounded text-[10px] font-bold {{ request()->routeIs('admin.media.*') ? 'bg-white/20 text-white' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30' }}">
-            Photos &amp; Videos
-        </span>
+        <i class="bi bi-images text-base shrink-0 {{ request()->routeIs('admin.media.*') ? 'text-white' : 'text-rose-400' }}"></i>
+        <span @if(!$isMobile) x-show="!$store.admin.sidebarCollapsed" @endif class="whitespace-nowrap text-sm">Media Management</span>
     </a>
 
     <!-- 8. CONTENT & KNOWLEDGE PORTAL (Collapsible Tree) -->
