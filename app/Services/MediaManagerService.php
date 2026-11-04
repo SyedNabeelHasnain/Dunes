@@ -523,13 +523,24 @@ class MediaManagerService
 
             // 4. Settings
             $settings = Setting::select('id', 'setting_key', 'setting_value')->get();
+            $settingLabels = [
+                'site_logo' => 'Primary Brand Logo (Navbar/Schema)',
+                'site_logo_white' => 'White Brand Logo (Footer/Email)',
+                'site_favicon' => 'Browser Favicon',
+                'site_hero_video' => 'Homepage Hero Video Background',
+                'site_hero_poster' => 'Homepage Hero Video Poster',
+                'seo_default_og_image' => 'Global Social Share (OG) Card',
+                'about_story_image' => 'About Us Page Story Image',
+            ];
             foreach ($settings as $setting) {
-                if (! empty($setting->setting_value) && (str_contains($setting->setting_value, $filename) || str_contains($setting->setting_value, $path))) {
+                if (! empty($setting->setting_value) && ($this->stringMatchesAsset($setting->setting_value, $filename, $path, $url) || str_contains($setting->setting_value, $filename) || str_contains($setting->setting_value, $path))) {
+                    $key = $setting->setting_key;
+                    $fieldLabel = $settingLabels[$key] ?? ('Setting: ' . $key);
                     $usages[] = [
                         'type' => 'Site Setting',
                         'id' => $setting->id,
-                        'name' => $setting->setting_key,
-                        'field' => 'Configuration Value',
+                        'name' => $fieldLabel,
+                        'field' => 'General Settings & Branding',
                         'edit_url' => route('admin.settings.index'),
                     ];
                 }
@@ -559,6 +570,56 @@ class MediaManagerService
                         'field' => 'Driver Avatar',
                         'edit_url' => route('admin.drivers.edit', $d->id),
                     ];
+                }
+            }
+
+            // 6. Curated Customer Video Reviews (Reels & Tour Highlights)
+            $videoReviewsPath = database_path('seeders/data/customer_video_reviews.json');
+            if (file_exists($videoReviewsPath)) {
+                $videoData = json_decode((string) file_get_contents($videoReviewsPath), true);
+                if (is_array($videoData)) {
+                    foreach ($videoData as $vItem) {
+                        $vFile = $vItem['filename'] ?? '';
+                        $vPoster = $vItem['poster_filename'] ?? '';
+                        if ($this->stringMatchesAsset($vFile, $filename, $path, $url)) {
+                            $usages[] = [
+                                'type' => 'Customer Video Reel',
+                                'id' => $vItem['id'] ?? 'reel',
+                                'name' => $vItem['title'] ?? 'Customer Video Review',
+                                'field' => 'Video Review Stream (Home & Tours)',
+                                'edit_url' => route('admin.reviews.index'),
+                            ];
+                        }
+                        if ($this->stringMatchesAsset($vPoster, $filename, $path, $url)) {
+                            $usages[] = [
+                                'type' => 'Customer Video Reel',
+                                'id' => $vItem['id'] ?? 'poster',
+                                'name' => $vItem['title'] ?? 'Customer Video Review',
+                                'field' => 'Video Poster Thumbnail',
+                                'edit_url' => route('admin.reviews.index'),
+                            ];
+                        }
+                    }
+                }
+            }
+
+            // 7. DDT Moments Gallery
+            $ddtMomentsPath = database_path('seeders/data/ddt_moments.json');
+            if (file_exists($ddtMomentsPath)) {
+                $momentsData = json_decode((string) file_get_contents($ddtMomentsPath), true);
+                if (is_array($momentsData)) {
+                    foreach ($momentsData as $mItem) {
+                        $mFile = $mItem['filename'] ?? '';
+                        if ($this->stringMatchesAsset($mFile, $filename, $path, $url)) {
+                            $usages[] = [
+                                'type' => 'Moments Gallery',
+                                'id' => $mItem['id'] ?? 'moment',
+                                'name' => $mItem['title'] ?? 'DDT Desert Moment',
+                                'field' => 'Curated Guest Experience Photo',
+                                'edit_url' => route('admin.reviews.index'),
+                            ];
+                        }
+                    }
                 }
             }
         } catch (\Throwable $e) {

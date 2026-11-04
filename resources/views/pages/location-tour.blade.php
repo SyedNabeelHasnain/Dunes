@@ -47,7 +47,7 @@
       "@id": {!! json_encode($canonical . '#trip', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "name": {!! json_encode($locationData['headline'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "description": {!! json_encode($locationData['subheadline'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
-      "image": {!! json_encode($ogImage ?? asset('images/evening-desert-safari-dubai-dune-discovery-tourism.avif'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
+      "image": {!! json_encode(resolve_og_image($ogImage ?? ($settings['seo_default_og_image'] ?? 'images/evening-desert-safari-dubai-dune-discovery-tourism.avif')), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "inLanguage": {!! json_encode($currentLocale ?? app()->getLocale() ?? 'en', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!},
       "provider": {
         "@type": "TravelAgency",

@@ -110,7 +110,7 @@
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
             @php
-                $featuredImg = $featuredPost->featured_image ? asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $featuredPost->featured_image)) : asset('images/desert-safari-poster.avif');
+                $featuredImg = $featuredPost->featured_image_url;
             @endphp
             <!-- Main Hero Featured Card -->
             <div class="lg:col-span-7">
@@ -146,7 +146,7 @@
             <div class="lg:col-span-5 flex flex-col justify-between gap-6">
                 @foreach ($sideFeatured as $sidePost)
                 @php
-                    $sideImg = $sidePost->featured_image ? asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $sidePost->featured_image)) : asset('images/desert-safari-poster.avif');
+                    $sideImg = $sidePost->featured_image_url;
                 @endphp
                 <a href="{{ localized_route('blog.show', $sidePost->slug) }}" class="block flex-1 group text-inherit">
                     <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-200 flex flex-col sm:flex-row h-full">
@@ -210,7 +210,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @foreach ($posts as $post)
         @php
-            $postImg = $post->featured_image ? asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $post->featured_image)) : asset('images/desert-safari-poster.avif');
+            $postImg = $post->featured_image_url;
         @endphp
         <article class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 flex flex-col h-full group">
             <a href="{{ localized_route('blog.show', $post->slug) }}" class="block relative aspect-[16/10] overflow-hidden">

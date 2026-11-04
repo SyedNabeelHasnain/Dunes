@@ -95,8 +95,13 @@
                     <!-- 1. Luxury Dark Header with Brand Logo (No redundant text title) -->
                     <tr>
                         <td align="center" style="background-color: #0b1120; padding: 32px 24px; border-bottom: 3px solid #F58F43; text-align: center;">
+                            @php
+                                $emailLogo = !empty($settings['site_logo_white'])
+                                    ? (str_starts_with($settings['site_logo_white'], 'http') ? $settings['site_logo_white'] : url(ltrim($settings['site_logo_white'], '/')))
+                                    : url('images/logo-white.png');
+                            @endphp
                             <a href="https://dunesdiscoverytourism.com" target="_blank" style="display: inline-block; text-decoration: none;">
-                                <img src="https://dunesdiscoverytourism.com/images/logo-white.png" alt="Dunes Discovery Tourism LLC" width="175" style="max-width: 175px; width: 175px; height: auto; margin: 0 auto; display: block; border: 0;" />
+                                <img src="{{ $emailLogo }}" alt="Dunes Discovery Tourism LLC" width="175" style="max-width: 175px; width: 175px; height: auto; margin: 0 auto; display: block; border: 0;" />
                             </a>
                         </td>
                     </tr>

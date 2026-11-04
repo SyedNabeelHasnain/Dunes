@@ -25,6 +25,8 @@
     $pageDesc = $pageDesc ?? ($post->meta_desc ?: ($post->excerpt ?: Str::limit(strip_tags($post->content), 155)));
     $pageKeys = $pageKeys ?? ($post->meta_keywords ?: 'dubai, desert safari, travel');
     
+    $siteLogoUrl = !empty($settings['site_logo']) ? (str_starts_with($settings['site_logo'], 'http') || str_starts_with($settings['site_logo'], '/') ? $settings['site_logo'] : asset($settings['site_logo'])) : asset('images/logo.png');
+
     // Breadcrumb Schema
     $breadcrumbItems = [
         ['@type' => 'ListItem', 'position' => 1, 'name' => __('ui.nav.home') ?? 'Home', 'item' => localized_route('home')],
@@ -55,7 +57,7 @@
             '@id' => route('home') . '#organization',
             'name' => 'Dunes Discovery Tourism',
             'url' => route('home'),
-            'logo' => ['@type' => 'ImageObject', 'url' => asset('images/logo.png'), 'width' => 160, 'height' => 46]
+            'logo' => ['@type' => 'ImageObject', 'url' => $siteLogoUrl, 'width' => 160, 'height' => 46]
         ],
         'datePublished' => $publishedAt ? $publishedAt->toIso8601String() : now()->toIso8601String(),
         'dateModified' => $modifiedAt ? $modifiedAt->toIso8601String() : now()->toIso8601String(),
@@ -347,7 +349,7 @@
                         </div>
                         <div class="divide-y divide-slate-200">
                             @foreach ($relatedPosts as $rp)
-                            @php $rpImg = $rp->featured_image ? asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $rp->featured_image)) : asset('images/desert-safari-poster.avif'); @endphp
+                            @php $rpImg = $rp->featured_image_url; @endphp
                             <a href="{{ localized_route('blog.show', $rp->slug) }}" class="flex gap-3 p-4 hover:bg-slate-50 transition-colors group">
                                 <img src="{{ $rpImg }}" class="w-13 h-13 object-cover rounded-xl shrink-0" loading="lazy" alt="{{ $rp->title }}">
                                 <div>
@@ -381,7 +383,7 @@
         <h2 class="text-2xl font-extrabold text-slate-900 mb-8">{{ __('ui.blog.related_posts') }}</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             @foreach ($relatedPosts as $rp)
-            @php $rpImg = $rp->featured_image ? asset('images/blog/' . preg_replace('/\.(jpg|jpeg|png|webp)$/i', '.avif', $rp->featured_image)) : asset('images/desert-safari-poster.avif'); @endphp
+            @php $rpImg = $rp->featured_image_url; @endphp
             <article class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-200 flex flex-col h-full group">
                 <a href="{{ localized_route('blog.show', $rp->slug) }}" class="block relative aspect-[16/10] overflow-hidden">
                     <img src="{{ $rpImg }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $rp->featured_image_alt ?: $rp->title }}" loading="lazy">

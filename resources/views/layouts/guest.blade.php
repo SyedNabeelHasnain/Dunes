@@ -36,8 +36,13 @@
         <div class="w-full max-w-md relative z-10">
             <!-- Brand Logo -->
             <div class="text-center mb-6">
+                @php
+                    $guestLogo = !empty($settings['site_logo'])
+                        ? (str_starts_with($settings['site_logo'], 'http') ? $settings['site_logo'] : asset(ltrim($settings['site_logo'], '/')))
+                        : asset('images/logo.png');
+                @endphp
                 <a href="{{ url('/') }}" class="inline-block transition-transform duration-200 hover:scale-105" title="{{ config('app.name', 'Dunes Discovery Tourism') }}">
-                    <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'Dunes Discovery Tourism') }}" class="h-16 sm:h-20 w-auto object-contain mx-auto drop-shadow-xs">
+                    <img src="{{ $guestLogo }}" alt="{{ config('app.name', 'Dunes Discovery Tourism') }}" class="h-16 sm:h-20 w-auto object-contain mx-auto drop-shadow-xs">
                 </a>
             </div>
 

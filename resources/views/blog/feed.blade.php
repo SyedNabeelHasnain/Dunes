@@ -25,8 +25,11 @@
     <sy:updatePeriod>hourly</sy:updatePeriod>
     <sy:updateFrequency>1</sy:updateFrequency>
     <generator>Dunes Discovery Tourism CMS Engine</generator>
+    @php
+        $feedLogo = !empty($settings['site_logo']) ? (str_starts_with($settings['site_logo'], 'http') || str_starts_with($settings['site_logo'], '/') ? $settings['site_logo'] : asset($settings['site_logo'])) : asset('images/logo.png');
+    @endphp
     <image>
-      <url>{{ asset('images/logo.png') }}</url>
+      <url>{{ $feedLogo }}</url>
       <title>{{ $channelTitle }}</title>
       <link>{{ localized_route('blog.index') }}</link>
       <width>144</width>

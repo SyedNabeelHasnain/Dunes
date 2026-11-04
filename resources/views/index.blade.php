@@ -4,6 +4,10 @@
 $heroPoster = !empty($settings['site_hero_poster']) 
     ? (str_starts_with($settings['site_hero_poster'], 'http') ? $settings['site_hero_poster'] : asset(ltrim($settings['site_hero_poster'], '/'))) 
     : asset('images/desert-safari-poster.avif');
+
+$heroVideo = !empty($settings['site_hero_video']) 
+    ? (str_starts_with($settings['site_hero_video'], 'http') ? $settings['site_hero_video'] : asset(ltrim($settings['site_hero_video'], '/'))) 
+    : asset('images/desert-safar-dubai-tour-short-dune-discovery-tourism.mp4');
 @endphp
 
 @push('preloads')
@@ -164,7 +168,7 @@ if (!function_exists('renderReviewCardMarkup')) {
       "description": "Experience thrilling dune bashing across the Lahbab Red Dunes, sandboarding, 1000cc dune buggy rentals, and 5-star live BBQ dinner under the desert stars.",
       "thumbnailUrl": [{!! json_encode($heroPoster, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!}],
       "uploadDate": "2026-01-01T00:00:00+04:00",
-      "contentUrl": "{{ asset('images/desert-safar-dubai-tour-short-dune-discovery-tourism.mp4') }}",
+      "contentUrl": "{{ $heroVideo }}",
       "publisher": {
         "@id": "{{ url('/') }}#organization"
       }
@@ -895,7 +899,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                 <div class="snap-start shrink-0 w-[240px] sm:w-[270px] group cursor-pointer"
                      @click="openModal(@js($v))">
                     <div class="relative aspect-9/16 rounded-3xl overflow-hidden bg-slate-950 shadow-md group-hover:shadow-2xl transition-all duration-300 border border-slate-200">
-                        <img src="{{ asset('images/video-posters/'.$v['poster_filename']) }}" 
+                        <img src="{{ $v['poster_url'] ?? asset('images/video-posters/'.$v['poster_filename']) }}" 
                              alt="{{ $v['title'] }}" 
                              width="270"
                              height="480"
@@ -1543,7 +1547,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var v = document.getElementById('heroVideo');
         if (v && !v.querySelector('source')) {
             var s = document.createElement('source');
-            s.src = "{{ asset('images/desert-safar-dubai-tour-short-dune-discovery-tourism.mp4') }}";
+            s.src = "{{ $heroVideo }}";
             s.type = "video/mp4";
             v.appendChild(s);
             v.load();

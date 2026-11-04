@@ -21,48 +21,110 @@
             @csrf
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Brand Visuals, Hero Poster & Fallback Media -->
+                <!-- Brand Visuals, Hero Video/Poster, Logos & Sitewide Media -->
                 <div class="col-span-1 lg:col-span-2">
                     <div class="p-5 bg-slate-50/70 rounded-2xl border border-slate-200/80">
                         <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
                             <h6 class="text-xs font-black uppercase tracking-wider text-primary flex items-center gap-2">
-                                <i class="bi bi-image"></i> Brand Visuals, Homepage Hero Poster & Default Social Share Media
+                                <i class="bi bi-image"></i> Brand Visuals, Logos, Homepage Hero Video &amp; Sitewide Media Controls
                             </h6>
-                            <span class="rounded-full border border-primary/20 bg-amber-500/10 px-3 py-1 text-[11px] font-bold text-primary">Media Controls</span>
+                            <span class="rounded-full border border-primary/20 bg-amber-500/10 px-3 py-1 text-[11px] font-bold text-primary">Dynamic Media Controls</span>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- 1. Homepage Hero Video Poster -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                            <!-- 1. Primary Brand Logo -->
+                            <div class="p-4 bg-white rounded-xl border border-slate-200 flex flex-col justify-between">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Primary Brand Logo (Navbar / Header)</label>
+                                    <p class="text-[11px] text-slate-500 mb-3">Main logo rendered in standard light navigation headers, authentication screens, and JSON-LD schema.</p>
+                                    
+                                    <x-media-picker 
+                                        name="site_logo" 
+                                        :value="$settings['site_logo'] ?? '/images/logo.png'" 
+                                        category="site" 
+                                        type="image"
+                                        help="Recommended: Transparent PNG or SVG (height 50-80px)." />
+                                </div>
+                            </div>
+
+                            <!-- 2. White / Footer Logo -->
+                            <div class="p-4 bg-white rounded-xl border border-slate-200 flex flex-col justify-between">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">White Brand Logo (Footer &amp; System Emails)</label>
+                                    <p class="text-[11px] text-slate-500 mb-3">White/inverse logo version rendered over dark footer backdrops and outbound email templates.</p>
+                                    
+                                    <x-media-picker 
+                                        name="site_logo_white" 
+                                        :value="$settings['site_logo_white'] ?? '/images/logo-white.png'" 
+                                        category="site" 
+                                        type="image"
+                                        help="Recommended: Transparent White PNG or SVG." />
+                                </div>
+                            </div>
+
+                            <!-- 3. Homepage Hero Video -->
+                            <div class="p-4 bg-white rounded-xl border border-slate-200 flex flex-col justify-between">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Homepage Hero Background Video</label>
+                                    <p class="text-[11px] text-slate-500 mb-3">Background loop video playing on desktop &amp; tablet home screens and declared in VideoObject schemas.</p>
+                                    
+                                    <x-media-picker 
+                                        name="site_hero_video" 
+                                        :value="$settings['site_hero_video'] ?? '/images/desert-safar-dubai-tour-short-dune-discovery-tourism.mp4'" 
+                                        category="banners" 
+                                        type="video"
+                                        help="Recommended: Web-optimized MP4 video (under 15MB)." />
+                                </div>
+                            </div>
+
+                            <!-- 4. Homepage Hero Video Poster -->
                             <div class="p-4 bg-white rounded-xl border border-slate-200 flex flex-col justify-between">
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 mb-1">Homepage Hero Video Poster Image</label>
-                                    <p class="text-[11px] text-slate-500 mb-3">The poster image displayed on the homepage while the background video streams, on mobile devices, and in Google VideoObject rich snippet schemas.</p>
+                                    <p class="text-[11px] text-slate-500 mb-3">Poster image shown while background video streams, on mobile devices, and in Google search previews.</p>
                                     
                                     <x-media-picker 
                                         name="site_hero_poster" 
                                         :value="$settings['site_hero_poster'] ?? '/images/desert-safari-poster.avif'" 
                                         category="banners" 
-                                        help="Max 8MB. Recommended: 900x600 or 1920x1080 (HD AVIF, WebP, JPG)." />
+                                        type="image"
+                                        help="Recommended: 1920x1080 (HD WebP, AVIF, JPG)." />
                                 </div>
                             </div>
 
-                            <!-- 2. Sitewide Default OpenGraph / Social Share Image -->
+                            <!-- 5. Sitewide Default OpenGraph / Social Share Image -->
                             <div class="p-4 bg-white rounded-xl border border-slate-200 flex flex-col justify-between">
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-700 mb-1">Sitewide Default OpenGraph / Social Share Image</label>
-                                    <p class="text-[11px] text-slate-500 mb-3">The default link preview thumbnail shown when pages without specific social cards are shared across WhatsApp, iMessage, Facebook, and Twitter/X.</p>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Default OpenGraph Social Share Card</label>
+                                    <p class="text-[11px] text-slate-500 mb-3">Default preview card image when sharing site URLs across WhatsApp, iMessage, and social media.</p>
                                     
                                     <x-media-picker 
                                         name="seo_default_og_image" 
                                         :value="$settings['seo_default_og_image'] ?? '/images/desert-safari-poster.avif'" 
                                         category="site" 
-                                        help="Max 8MB. Recommended: 1200x630 (HD Landscape, 1.91:1 ratio)." />
+                                        type="image"
+                                        help="Recommended: 1200x630 (HD Landscape, 1.91:1 ratio)." />
+                                </div>
+                            </div>
+
+                            <!-- 6. About Us Page Story Image -->
+                            <div class="p-4 bg-white rounded-xl border border-slate-200 flex flex-col justify-between">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">About Us Page Story Image</label>
+                                    <p class="text-[11px] text-slate-500 mb-3">Featured story image showcased on the company About Us page alongside experience statistics.</p>
+                                    
+                                    <x-media-picker 
+                                        name="about_story_image" 
+                                        :value="$settings['about_story_image'] ?? '/images/dubai-desert-safari-tour-dune-discovery-tourism.avif'" 
+                                        category="tours" 
+                                        type="image"
+                                        help="Recommended: 800x600 (High Quality WebP or AVIF)." />
                                 </div>
                             </div>
                         </div>
 
                         <div class="mt-4 pt-3 border-t border-slate-200/60 flex items-center justify-between text-xs text-slate-500">
-                            <span><i class="bi bi-info-circle mr-1"></i>You can also customize individual per-page OpenGraph cards and search meta under <a href="{{ route('admin.settings.seo') }}" class="text-primary font-semibold hover:underline">SEO & Metadata Management</a>.</span>
+                            <span><i class="bi bi-info-circle mr-1"></i>All media can be browsed, uploaded, or managed centrally via <a href="{{ route('admin.media.index') }}" class="text-primary font-semibold hover:underline">Media Management</a>.</span>
                         </div>
                     </div>
                 </div>

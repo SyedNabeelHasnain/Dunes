@@ -275,7 +275,7 @@
                             <div x-show="!isPlaying" 
                                  class="absolute inset-0 bg-slate-950/30 flex items-center justify-center group-hover:bg-slate-950/20 transition">
                                 <button type="button" 
-                                        @click.stop="isPlaying = true; isPaused = false; $nextTick(() => { const v = $refs.cardVideo_{{ $asset->id }}; if(v){ v.play(); } })"
+                                        @click.stop="isPlaying = true; isPaused = false; $nextTick(() => { const v = $refs.cardVideo_{{ $asset->id }}; if(v){ v.play().then(() => { isPaused = false; }).catch(() => { isPaused = true; }); } })"
                                         class="w-12 h-12 rounded-full bg-primary/95 hover:bg-primary text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition cursor-pointer"
                                         title="Play preview in card">
                                     <i class="bi bi-play-fill text-2xl translate-x-0.5"></i>
@@ -292,11 +292,21 @@
                                    preload="none"
                                    @play="isPaused = false"
                                    @pause="isPaused = true"
+                                   @playing="isPaused = false"
                                    @ended="isPlaying = false; isPaused = false"
                                    class="w-full h-full object-cover bg-black"
                                    style="display: none;"
-                                   @click.stop>
+                                   @click.stop="const v = $refs.cardVideo_{{ $asset->id }}; if(v){ if(v.paused){ v.play().then(() => { isPaused = false; }).catch(() => { isPaused = true; }); } else { v.pause(); isPaused = true; } }">
                             </video>
+
+                            <!-- Centered Resume Button (When Paused In Card) -->
+                            <div x-show="isPlaying && isPaused" 
+                                 @click.stop="const v = $refs.cardVideo_{{ $asset->id }}; if(v){ v.play().then(() => { isPaused = false; }).catch(() => { isPaused = true; }); }" 
+                                 class="absolute inset-0 bg-black/40 flex items-center justify-center cursor-pointer z-10 transition">
+                                <div class="w-10 h-10 rounded-full bg-primary/95 text-white flex items-center justify-center shadow-lg">
+                                    <i class="bi bi-play-fill text-xl translate-x-0.5"></i>
+                                </div>
+                            </div>
 
                             <!-- Floating Inline Controls Bar (When Video Is Playing Inside Card) -->
                             <div x-show="isPlaying" 
@@ -304,7 +314,7 @@
                                  class="absolute bottom-1.5 left-1.5 right-1.5 flex items-center justify-between p-1 rounded-lg bg-slate-950/85 backdrop-blur-xs text-white text-[11px] z-20 shadow-md">
                                 <div class="flex items-center gap-1">
                                     <button type="button" 
-                                            @click.stop="const v = $refs.cardVideo_{{ $asset->id }}; if(v){ if(v.paused){ v.play(); } else { v.pause(); } }" 
+                                            @click.stop="const v = $refs.cardVideo_{{ $asset->id }}; if(v){ if(v.paused){ v.play().then(() => { isPaused = false; }).catch(() => { isPaused = true; }); } else { v.pause(); isPaused = true; } }" 
                                             class="p-1 hover:text-primary transition"
                                             :title="isPaused ? 'Resume Playback' : 'Pause Playback'">
                                         <i class="bi" :class="isPaused ? 'bi-play-fill text-sm text-amber-400' : 'bi-pause-fill text-sm text-emerald-400'"></i>

@@ -4,7 +4,7 @@
     $metaActive = ($settings['meta_active'] ?? '0') === '1';
     $metaPixelId = $settings['meta_pixel_id'] ?? null;
     $waPhone = $settings['site_whatsapp'] ?? '971502456056';
-    $tourImage = $tour?->hero_image ? asset('images/' . $tour->hero_image) : asset('images/desert-safari-poster.avif');
+    $tourImage = resolve_tour_image($tour?->hero_image);
     $initialMethod = old('payment_method', $booking->payment_method ?: 'cash');
     if (!$ziinaActive && in_array($initialMethod, ['advance', 'full'])) {
         $initialMethod = 'cash';

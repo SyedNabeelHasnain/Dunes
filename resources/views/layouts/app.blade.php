@@ -28,6 +28,14 @@
     $googleActive = isset($settings['google_active']) && $settings['google_active'] === '1';
     $gtmId = $settings['google_gtm_id'] ?? '';
     $ga4Id = $settings['google_ga4_id'] ?? '';
+
+    $siteLogo = !empty($settings['site_logo']) 
+        ? (str_starts_with($settings['site_logo'], 'http') ? $settings['site_logo'] : asset(ltrim($settings['site_logo'], '/'))) 
+        : asset('images/logo.png');
+
+    $siteLogoWhite = !empty($settings['site_logo_white']) 
+        ? (str_starts_with($settings['site_logo_white'], 'http') ? $settings['site_logo_white'] : asset(ltrim($settings['site_logo_white'], '/'))) 
+        : asset('images/logo-white.png');
     $adsId = normalize_google_ads_id($settings['google_ads_id'] ?? 'AW-17859624049');
     $primaryGtagId = !empty($adsId) ? $adsId : ($googleActive && !empty($ga4Id) ? $ga4Id : '');
     $conversionLabel = $settings['google_conversion_label'] ?? 'eR3SCLimtvobEPH4kMRC';
@@ -361,7 +369,7 @@
           "alternateName": ["Dunes Discovery", "Dunes Discovery Tourism", "Dunes Discovery Dubai"],
           "description": {!! json_encode($settings['site_description'] ?? 'Licensed Dubai Destination Management Company offering premium Desert Safaris, 1000cc Dune Buggy Rentals, Quad Biking, Dhow Cruise Dinners, and Abu Dhabi City Tours.', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
           "url": {!! json_encode(url('/'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
-          "logo": {!! json_encode(asset('images/logo.png'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
+          "logo": {!! json_encode($siteLogo, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
           "image": {!! json_encode(!empty($settings['site_default_image']) ? (str_starts_with($settings['site_default_image'], 'http') ? $settings['site_default_image'] : asset(ltrim($settings['site_default_image'], '/'))) : (!empty($settings['seo_default_og_image']) ? (str_starts_with($settings['seo_default_og_image'], 'http') ? $settings['seo_default_og_image'] : asset(ltrim($settings['seo_default_og_image'], '/'))) : asset('images/desert-safari-poster.avif')), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
           "telephone": {!! json_encode($phone, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
           "email": {!! json_encode($email, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
@@ -545,7 +553,7 @@
                     <!-- Brand Logo & Trust Badges -->
                     <div class="flex items-center gap-3 xl:gap-4 flex-shrink-0">
                         <a class="flex items-center hover:opacity-90 transition-opacity" href="{{ localized_route('home') }}" aria-label="Dunes Discovery Tourism">
-                            <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery Tourism" width="180" height="116" class="h-10 sm:h-12 lg:h-14 xl:h-16 w-auto object-contain transition-all" fetchpriority="high">
+                            <img src="{{ $siteLogo }}" alt="{{ $settings['site_name'] ?? 'Dunes Discovery Tourism' }}" width="180" height="116" class="h-10 sm:h-12 lg:h-14 xl:h-16 w-auto object-contain transition-all" fetchpriority="high">
                         </a>
 
                         <!-- Desktop Trust Badges (Google & TripAdvisor with Live Ratings) -->
@@ -836,7 +844,7 @@
         <div>
             <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-4">
                 <a href="{{ localized_route('home') }}" @click="$store.mobileNav.close()" class="flex items-center hover:opacity-90 transition-opacity" aria-label="Dunes Discovery Tourism">
-                    <img src="{{ asset('images/logo.png') }}" alt="Dunes Discovery Tourism" width="160" height="103" class="h-10 sm:h-11 w-auto object-contain">
+                    <img src="{{ $siteLogo }}" alt="{{ $settings['site_name'] ?? 'Dunes Discovery Tourism' }}" width="160" height="103" class="h-10 sm:h-11 w-auto object-contain">
                 </a>
                 <div class="flex items-center gap-1.5 sm:gap-2">
                     <!-- Review Popover Triggers in Mobile Drawer Header with Ratings -->
@@ -987,7 +995,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 mb-12">
                 <!-- Col 1: Brand & Bio -->
                 <div class="sm:col-span-2 lg:col-span-4">
-                    <img src="{{ asset('images/logo-white.png') }}" alt="Dunes Discovery Tourism" width="160" height="46" loading="lazy" decoding="async" class="h-9 w-auto object-contain mb-4">
+                    <img src="{{ $siteLogoWhite }}" alt="{{ $settings['site_name'] ?? 'Dunes Discovery Tourism' }}" width="160" height="46" loading="lazy" decoding="async" class="h-9 w-auto object-contain mb-4">
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-sm mb-4">
                         {{ __('ui.footer.about_text') }}
                     </p>

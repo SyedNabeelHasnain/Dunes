@@ -342,7 +342,7 @@ class AdminSettingController extends Controller
             'site_address', 'company_license_number', 'google_maps_embed_url',
             'social_tripadvisor', 'social_google', 'social_facebook', 'social_instagram',
             'social_youtube', 'social_tiktok', 'footer_about', 'site_copyright',
-            'site_hero_poster', 'site_default_image',
+            'site_hero_poster', 'site_hero_video', 'site_default_image', 'site_logo', 'site_logo_white', 'site_favicon', 'about_story_image',
 
             // Global & Per-Page SEO
             'seo_default_title', 'seo_default_description', 'seo_default_keywords', 'seo_default_og_image',
@@ -450,6 +450,30 @@ class AdminSettingController extends Controller
             $filename = 'og-home-' . time() . '.' . $ext;
             $file->move(public_path('images'), $filename);
             $settings['seo_home_og_image'] = '/images/' . $filename;
+        }
+
+        if ($request->hasFile('site_logo_file')) {
+            $file = $request->file('site_logo_file');
+            $ext = safe_uploaded_image_ext($file, 'png');
+            $filename = 'logo-' . time() . '.' . $ext;
+            $file->move(public_path('images'), $filename);
+            $settings['site_logo'] = '/images/' . $filename;
+        }
+
+        if ($request->hasFile('site_logo_white_file')) {
+            $file = $request->file('site_logo_white_file');
+            $ext = safe_uploaded_image_ext($file, 'png');
+            $filename = 'logo-white-' . time() . '.' . $ext;
+            $file->move(public_path('images'), $filename);
+            $settings['site_logo_white'] = '/images/' . $filename;
+        }
+
+        if ($request->hasFile('about_story_image_file')) {
+            $file = $request->file('about_story_image_file');
+            $ext = safe_uploaded_image_ext($file, 'avif');
+            $filename = 'about-story-' . time() . '.' . $ext;
+            $file->move(public_path('images'), $filename);
+            $settings['about_story_image'] = '/images/' . $filename;
         }
 
         // Handle boolean switches that are omitted when unchecked

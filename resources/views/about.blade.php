@@ -109,7 +109,12 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             <div class="lg:col-span-6">
                 <div class="relative">
-                    <img src="{{ asset('images/dubai-desert-safari-tour-dune-discovery-tourism.avif') }}" alt="Dunes Discovery Tourism Desert Safari Experience Dubai" width="800" height="600" loading="lazy" class="w-full rounded-2xl shadow-xl object-cover" onerror="this.src='https://placehold.co/800x600/F58F43/white?text=Our+Story'">
+                    @php
+                        $aboutStoryImg = !empty($settings['about_story_image'])
+                            ? (str_starts_with($settings['about_story_image'], 'http') ? $settings['about_story_image'] : asset(ltrim($settings['about_story_image'], '/')))
+                            : asset('images/dubai-desert-safari-tour-dune-discovery-tourism.avif');
+                    @endphp
+                    <img src="{{ $aboutStoryImg }}" alt="Dunes Discovery Tourism Desert Safari Experience Dubai" width="800" height="600" loading="lazy" class="w-full rounded-2xl shadow-xl object-cover" onerror="this.src='{{ asset('images/desert-safari-poster.avif') }}'">
                     <div class="mt-4 sm:mt-0 sm:absolute sm:-bottom-6 sm:-end-6 bg-primary text-white p-4 sm:p-5 rounded-2xl shadow-xl sm:shadow-2xl inline-block sm:block">
                         <div class="text-xl sm:text-2xl font-black mb-0.5">{{ __('ui.about_story.years_exp') }}</div>
                         <span class="text-xs text-white/80 block">{{ __('ui.about_story.years_sub') }}</span>

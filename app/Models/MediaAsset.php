@@ -132,8 +132,8 @@ class MediaAsset extends Model
         ];
 
         foreach ($candidates as $cand) {
-            $local = public_path(ltrim($cand, '/'));
-            if (file_exists($local)) {
+            $rel = ltrim($cand, '/');
+            if (file_exists(public_path($rel)) || file_exists(base_path('../public_html/' . $rel))) {
                 return $cand;
             }
         }

@@ -1245,7 +1245,7 @@ if(window.fbq){
                      @click="openModal(@js($v))">
                     
                     <div class="relative w-full aspect-16/10 overflow-hidden bg-slate-950">
-                        <img src="{{ asset('images/video-posters/'.$v['poster_filename']) }}" 
+                        <img src="{{ $v['poster_url'] ?? asset('images/video-posters/'.$v['poster_filename']) }}" 
                              alt="{{ $v['title'] }}" 
                              width="400"
                              height="250"
