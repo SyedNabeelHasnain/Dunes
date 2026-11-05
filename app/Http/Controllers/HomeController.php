@@ -170,15 +170,18 @@ class HomeController extends Controller
         }
 
         try {
-            $videoReviews = app(ReviewMediaGalleryService::class)->getHomepageVideoReviews(8);
+            $galleryService = app(ReviewMediaGalleryService::class);
+            $videoReviews = $galleryService->getHomepageVideoReviews();
+            $totalVideoReviewsCount = $galleryService->getTotalVideoReviewsCount();
         } catch (\Throwable $e) {
             $videoReviews = [];
+            $totalVideoReviewsCount = 0;
         }
 
         $pageRobots = ! empty(request()->query())
             ? 'noindex, follow'
             : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
 
-        return view('index', compact('categories', 'bestsellers', 'reviews', 'faqs', 'allActiveTours', 'galleryItems', 'videoReviews', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage', 'pageRobots'));
+        return view('index', compact('categories', 'bestsellers', 'reviews', 'faqs', 'allActiveTours', 'galleryItems', 'videoReviews', 'totalVideoReviewsCount', 'pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage', 'pageRobots'));
     }
 }

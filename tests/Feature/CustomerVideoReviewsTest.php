@@ -93,6 +93,8 @@ class CustomerVideoReviewsTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Real Customer Video Reviews');
         $response->assertSee('Watch Real Travelers in the Dubai Dunes');
+        $response->assertSee('View All 28 Videos');
+        $response->assertSee('evening-desert-safari-hotel-pickup-uk-review-1.mp4');
         $response->assertSee('VideoObject');
         $content = $response->getContent();
         $this->assertDoesNotMatchRegularExpression('/"uploadDate":\s*"[0-9]{4}-[0-9]{2}-[0-9]{2}"/', $content, 'uploadDate on homepage must include timezone');

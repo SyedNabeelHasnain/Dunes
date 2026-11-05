@@ -358,6 +358,9 @@ class ReviewMediaGalleryService
             $collection = $this->filterByTourRelevance($collection, $options['tour']);
         }
 
+        // Sort by sort_order
+        $collection = $collection->sortBy('sort_order')->values();
+
         if (isset($options['limit']) && (int) $options['limit'] > 0) {
             $collection = $collection->take((int) $options['limit']);
         }
@@ -370,12 +373,22 @@ class ReviewMediaGalleryService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getHomepageVideoReviews(int $limit = 8): array
+    public function getHomepageVideoReviews(?int $limit = null): array
     {
-        return $this->getCustomerVideoReviews([
-            'placement' => 'home',
-            'limit' => $limit,
-        ]);
+        $options = ['placement' => 'home'];
+        if ($limit !== null && $limit > 0) {
+            $options['limit'] = $limit;
+        }
+
+        return $this->getCustomerVideoReviews($options);
+    }
+
+    /**
+     * Get the total count of active customer video reviews.
+     */
+    public function getTotalVideoReviewsCount(): int
+    {
+        return count($this->getCustomerVideoReviews());
     }
 
     /**

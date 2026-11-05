@@ -899,7 +899,7 @@ if (!function_exists('renderReviewCardMarkup')) {
                 </button>
                 <a href="{{ localized_route('gallery.index', ['category' => 'videos']) }}" 
                    class="btn-desert-animated px-4 py-2.5 rounded-full text-xs font-bold text-white shadow-xs inline-flex items-center gap-1.5 ml-2">
-                    <span>View All 16 Videos</span>
+                    <span>View All {{ $totalVideoReviewsCount ?? (is_countable($videoReviews) ? count($videoReviews) : 28) }} Videos</span>
                     <i class="bi bi-arrow-right rtl:rotate-180"></i>
                 </a>
             </div>
