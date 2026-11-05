@@ -19,12 +19,12 @@ class CustomerVideoReviewsTest extends TestCase
         Cache::flush();
     }
 
-    public function test_service_loads_sixteen_customer_video_reviews(): void
+    public function test_service_loads_customer_video_reviews(): void
     {
         $service = app(ReviewMediaGalleryService::class);
         $videos = $service->getCustomerVideoReviews();
 
-        $this->assertCount(16, $videos);
+        $this->assertCount(28, $videos);
         $first = $videos[0];
         $this->assertEquals('video', $first['type']);
         $this->assertNotEmpty($first['url']);
@@ -34,6 +34,32 @@ class CustomerVideoReviewsTest extends TestCase
         $this->assertArrayHasKey('placements', $first);
         $this->assertMatchesRegularExpression('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+04:00$/', $first['upload_date_iso']);
         $this->assertMatchesRegularExpression('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+04:00$/', $first['published_date']);
+    }
+
+    public function test_all_twenty_eight_video_reviews_are_valid_and_indexed(): void
+    {
+        $service = app(ReviewMediaGalleryService::class);
+        $videos = $service->getCustomerVideoReviews();
+
+        $this->assertCount(28, $videos);
+        $ids = array_column($videos, 'id');
+        for ($i = 1; $i <= 28; $i++) {
+            $expectedId = sprintf('ddt_video_review_%02d', $i);
+            $this->assertContains($expectedId, $ids, "Review {$expectedId} must be present");
+        }
+
+        // Verify newly added November 2026 reviews have valid fields and files
+        $review17 = collect($videos)->firstWhere('id', 'ddt_video_review_17');
+        $this->assertNotNull($review17);
+        $this->assertEquals('evening-desert-safari-spanish-review-1.mp4', $review17['filename']);
+        $this->assertEquals('Elena & Friends', $review17['reviewer_name']);
+        $this->assertEquals('ES', $review17['reviewer_country_code']);
+
+        $review28 = collect($videos)->firstWhere('id', 'ddt_video_review_28');
+        $this->assertNotNull($review28);
+        $this->assertEquals('evening-desert-safari-hotel-pickup-uk-review-1.mp4', $review28['filename']);
+        $this->assertEquals('Claire & Daniel', $review28['reviewer_name']);
+        $this->assertEquals('GB', $review28['reviewer_country_code']);
     }
 
     public function test_service_filters_homepage_and_tour_video_reviews(): void
