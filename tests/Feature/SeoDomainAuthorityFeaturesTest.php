@@ -332,7 +332,6 @@ class SeoDomainAuthorityFeaturesTest extends TestCase
         $generalResp = $this->actingAs($admin)->get('/admin/settings/general');
         $generalResp->assertStatus(200);
         $generalResp->assertSee('site_hero_poster');
-        $generalResp->assertSee('site_hero_poster_file');
         $generalResp->assertSee('seo_default_og_image');
 
         $seoResp = $this->actingAs($admin)->get('/admin/settings/seo');

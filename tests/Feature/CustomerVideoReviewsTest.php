@@ -13,10 +13,25 @@ class CustomerVideoReviewsTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected ?string $originalJsonBackup = null;
+
     protected function setUp(): void
     {
         parent::setUp();
         Cache::flush();
+        $jsonPath = database_path('seeders/data/customer_video_reviews.json');
+        if (file_exists($jsonPath)) {
+            $this->originalJsonBackup = file_get_contents($jsonPath);
+        }
+    }
+
+    protected function tearDown(): void
+    {
+        if ($this->originalJsonBackup !== null) {
+            $jsonPath = database_path('seeders/data/customer_video_reviews.json');
+            file_put_contents($jsonPath, $this->originalJsonBackup);
+        }
+        parent::tearDown();
     }
 
     public function test_service_loads_customer_video_reviews(): void

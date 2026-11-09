@@ -166,8 +166,8 @@ class ReviewMediaGalleryTest extends TestCase
         $response = $this->get(route('home'));
 
         $response->assertOk();
-        $response->assertSee('Captured in the Dunes by Our Travelers');
         $response->assertSee('Michael Chang');
+        $response->assertSee('Live Desert Moments &amp; Guest Captures', false);
     }
 
     public function test_tour_page_renders_guest_gallery_section(): void
