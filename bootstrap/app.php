@@ -31,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             TrackVisitor::class,
             \App\Http\Middleware\TrackBacklinkReferralMiddleware::class,
+            \App\Http\Middleware\DynamicRedirectMiddleware::class,
             SecurityHeaders::class,
             SetLocale::class,
         ]);

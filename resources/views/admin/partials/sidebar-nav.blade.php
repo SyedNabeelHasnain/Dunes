@@ -1,6 +1,6 @@
 @php
     $isMobile = $isMobile ?? false;
-    $isAnalyticsGroup = request()->routeIs('admin.analytics.*') || request()->routeIs('admin.reports.*') || request()->routeIs('admin.security.ip-rules');
+    $isAnalyticsGroup = request()->routeIs('admin.analytics.*') || request()->routeIs('admin.reports.*') || request()->routeIs('admin.security.ip-rules') || request()->routeIs('admin.audit.*');
     $isBookingsGroup = request()->routeIs('admin.bookings.*') || request()->routeIs('admin.pricing.*');
     $isOperationsGroup = request()->routeIs('admin.operations.*') || request()->routeIs('admin.drivers.*') || request()->routeIs('admin.vehicles.*');
     $isCatalogGroup = request()->routeIs('admin.tours.*') || request()->routeIs('admin.addons.*') || request()->routeIs('admin.tiers.*');
@@ -63,6 +63,16 @@
              x-collapse 
              class="ps-3.5 ms-4 border-s-2 border-slate-800/80 space-y-1 mt-1">
             
+            <!-- Website Optimization & Audit Engine -->
+            <a href="{{ route('admin.audit.index') }}" 
+               class="relative flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.audit.*') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.audit.*') ? 'bg-emerald-400' : 'bg-slate-600' }}"></span>
+                    <span>Optimization &amp; Audit</span>
+                </div>
+                <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">AI+SEO</span>
+            </a>
+
             <!-- Real-Time Analytics -->
             <a href="{{ route('admin.analytics.index') }}" 
                class="relative flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.analytics.index') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
@@ -564,6 +574,12 @@
                class="relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.settings.seo*') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
                 <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.settings.seo*') ? 'bg-primary' : 'bg-slate-600' }}"></span>
                 <span>SEO & Metadata</span>
+            </a>
+
+            <a href="{{ route('admin.settings.redirects.index') }}" 
+               class="relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.settings.redirects*') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
+                <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.settings.redirects*') ? 'bg-primary' : 'bg-slate-600' }}"></span>
+                <span>Dynamic Redirects</span>
             </a>
 
             <a href="{{ route('admin.settings.mail') }}" 

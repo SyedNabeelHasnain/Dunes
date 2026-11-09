@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminAuditController;
 use App\Http\Controllers\Admin\AdminBacklinkController;
 use App\Http\Controllers\Admin\AdminBlogCategoryController;
 use App\Http\Controllers\Admin\AdminBlogController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\Admin\AdminMediaController;
 use App\Http\Controllers\Admin\AdminMenuController;
 use App\Http\Controllers\Admin\AdminOperationsController;
 use App\Http\Controllers\Admin\AdminPageController;
+use App\Http\Controllers\Admin\AdminRedirectController;
 use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\AdminReportController;
 use App\Http\Controllers\Admin\AdminSecurityController;
@@ -404,10 +406,22 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     // Admin Profile & Security
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile');
 
+    // ── Website Optimization, SEO & Quality Audit Engine ───────────────────
+    Route::get('/audit', [AdminAuditController::class, 'index'])->name('audit.index');
+    Route::post('/audit/run', [AdminAuditController::class, 'run'])->name('audit.run');
+    Route::get('/audit/run/{id}', [AdminAuditController::class, 'show'])->name('audit.show');
+    Route::put('/audit/issues/{id}', [AdminAuditController::class, 'updateIssue'])->name('audit.issues.update');
+    Route::get('/audit/export/{id}/{format?}', [AdminAuditController::class, 'export'])->name('audit.export');
+
     // Integrations & Portal Settings (General, SEO, Marketing, Google, Meta, Currency, Cache)
     Route::get('/settings', [AdminSettingController::class, 'general'])->name('settings.index');
     Route::get('/settings/general', [AdminSettingController::class, 'general'])->name('settings.general');
     Route::get('/settings/seo', [AdminSettingController::class, 'seo'])->name('settings.seo');
+    Route::get('/settings/redirects', [AdminRedirectController::class, 'index'])->name('settings.redirects.index');
+    Route::post('/settings/redirects', [AdminRedirectController::class, 'store'])->name('settings.redirects.store');
+    Route::put('/settings/redirects/{id}', [AdminRedirectController::class, 'update'])->name('settings.redirects.update');
+    Route::delete('/settings/redirects/{id}', [AdminRedirectController::class, 'destroy'])->name('settings.redirects.destroy');
+    Route::get('/api/redirects/test', [AdminRedirectController::class, 'test'])->name('api.redirects.test');
     Route::post('/settings/indexnow/ping', [AdminSettingController::class, 'pingIndexNow'])->name('settings.indexnow.ping');
     Route::get('/settings/marketing', [AdminSettingController::class, 'marketing'])->name('settings.marketing');
     Route::get('/settings/google', [AdminSettingController::class, 'google'])->name('settings.google');

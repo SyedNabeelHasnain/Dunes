@@ -517,6 +517,10 @@
                                 <span class="flex items-center gap-2"><i class="bi bi-grid-1x2-fill text-primary"></i> Dashboard Overview & KPIs</span>
                                 <span class="text-[10px] text-slate-400 font-mono">/admin/dashboard</span>
                             </a>
+                            <a href="{{ route('admin.audit.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="audit seo optimization health score scanner technical accessibility security schema wcag performance vitals">
+                                <span class="flex items-center gap-2"><i class="bi bi-shield-check text-emerald-500"></i> Optimization &amp; Quality Audit Engine</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/audit</span>
+                            </a>
                             <a href="{{ route('admin.analytics.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="navigation" data-keywords="analytics traffic visitors acquisition referrers sources campaigns utm">
                                 <span class="flex items-center gap-2"><i class="bi bi-graph-up-arrow text-primary"></i> Real-Time Analytics Dashboard</span>
                                 <span class="text-[10px] text-slate-400 font-mono">/admin/analytics</span>
@@ -648,6 +652,10 @@
                             <a href="{{ route('admin.settings.seo') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="settings" data-keywords="seo metadata canonical robots meta title description sitemap search console google indexing indexnow">
                                 <span class="flex items-center gap-2"><i class="bi bi-search text-sky-500"></i> SEO & Search Engine Indexing</span>
                                 <span class="text-[10px] text-slate-400 font-mono">/admin/settings/seo</span>
+                            </a>
+                            <a href="{{ route('admin.settings.redirects.index') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="settings" data-keywords="redirects 301 302 307 308 url alias chain loop backlink pagerank preserve">
+                                <span class="flex items-center gap-2"><i class="bi bi-signpost-split text-sky-500"></i> Dynamic Redirects &amp; Loop Shield</span>
+                                <span class="text-[10px] text-slate-400 font-mono">/admin/settings/redirects</span>
                             </a>
                             <a href="{{ route('admin.settings.marketing') }}" class="cmd-entry flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 text-xs font-medium text-slate-700 transition" data-category="settings" data-keywords="marketing promos banner settings exit intent popups tracking">
                                 <span class="flex items-center gap-2"><i class="bi bi-megaphone text-rose-500"></i> Marketing & Promo Settings</span>
