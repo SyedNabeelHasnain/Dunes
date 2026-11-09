@@ -316,6 +316,7 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
 
     // Customer Video Reviews Management (SEO, AISEO, Placements & Transcripts)
     Route::get('/video-reviews', [AdminVideoReviewController::class, 'index'])->name('video-reviews.index');
+    Route::post('/video-reviews/analyze', [AdminVideoReviewController::class, 'analyze'])->name('video-reviews.analyze');
     Route::post('/video-reviews', [AdminVideoReviewController::class, 'store'])->name('video-reviews.store');
     Route::put('/video-reviews/{id}', [AdminVideoReviewController::class, 'update'])->name('video-reviews.update');
     Route::delete('/video-reviews/{id}', [AdminVideoReviewController::class, 'destroy'])->name('video-reviews.destroy');

@@ -5,20 +5,26 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Tour;
 use App\Services\ReviewMediaGalleryService;
+use App\Services\VideoAnalysisService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class AdminVideoReviewController extends Controller
 {
     protected ReviewMediaGalleryService $galleryService;
+    protected VideoAnalysisService $analysisService;
 
-    public function __construct(ReviewMediaGalleryService $galleryService)
-    {
+    public function __construct(
+        ReviewMediaGalleryService $galleryService,
+        VideoAnalysisService $analysisService
+    ) {
         $this->galleryService = $galleryService;
+        $this->analysisService = $analysisService;
     }
 
     /**
@@ -129,6 +135,52 @@ class AdminVideoReviewController extends Controller
     }
 
     /**
+     * Analyze uploaded or selected video review with AI/FFmpeg.
+     */
+    public function analyze(Request $request): JsonResponse
+    {
+        $hasFile = $request->hasFile('video_file');
+        $hasExisting = $request->filled('existing_filename');
+
+        if (! $hasFile && ! $hasExisting) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please provide a video file to analyze (either upload a file or select one from the media library).',
+            ], 422);
+        }
+
+        try {
+            if ($hasFile) {
+                $request->validate([
+                    'video_file' => 'required|mimes:mp4,mov,webm,m4v|max:102400',
+                ]);
+                $videoInput = $request->file('video_file');
+            } else {
+                $videoInput = (string) $request->input('existing_filename');
+            }
+
+            $customSlug = $request->filled('custom_slug') ? (string) $request->input('custom_slug') : null;
+            $result = $this->analysisService->analyze($videoInput, $customSlug);
+
+            return response()->json($result);
+        } catch (\InvalidArgumentException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 404);
+        } catch (\Throwable $e) {
+            Log::error('Video review analysis failed: ' . $e->getMessage(), [
+                'exception' => $e,
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Video analysis encountered an error: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * Store a newly created or uploaded video review.
      */
     public function store(Request $request): RedirectResponse
@@ -156,8 +208,8 @@ class AdminVideoReviewController extends Controller
 
         $records = $this->loadRecords();
 
-        $filename = $validated['existing_filename'] ?? '';
-        $posterFilename = $validated['existing_poster'] ?? '';
+        $filename = ! empty($validated['existing_filename']) ? basename($validated['existing_filename']) : '';
+        $posterFilename = ! empty($validated['existing_poster']) ? basename($validated['existing_poster']) : '';
 
         // Handle video upload
         if ($request->hasFile('video_file')) {
@@ -197,21 +249,21 @@ class AdminVideoReviewController extends Controller
             'poster_filename' => $posterFilename,
             'type' => 'video',
             'category' => $validated['category'],
-            'tour_slug' => $validated['tour_slug'] ?: null,
+            'tour_slug' => ! empty($validated['tour_slug']) ? $validated['tour_slug'] : null,
             'tour_name' => $this->resolveTourName($validated['tour_slug'] ?? null),
             'title' => $validated['title'],
-            'alt' => $validated['alt'] ?: $validated['title'],
-            'caption' => $validated['caption'] ?: $validated['title'],
-            'description' => $validated['description'] ?: '',
-            'transcript' => $validated['transcript'] ?: '',
+            'alt' => ! empty($validated['alt']) ? $validated['alt'] : $validated['title'],
+            'caption' => ! empty($validated['caption']) ? $validated['caption'] : $validated['title'],
+            'description' => $validated['description'] ?? '',
+            'transcript' => $validated['transcript'] ?? '',
             'reviewer_name' => $validated['reviewer_name'],
-            'reviewer_country' => $validated['reviewer_country'] ?: 'UAE',
-            'reviewer_country_code' => strtoupper($validated['reviewer_country_code'] ?: 'AE'),
+            'reviewer_country' => ! empty($validated['reviewer_country']) ? $validated['reviewer_country'] : 'UAE',
+            'reviewer_country_code' => strtoupper(! empty($validated['reviewer_country_code']) ? $validated['reviewer_country_code'] : 'AE'),
             'rating' => (float) $validated['rating'],
             'duration' => $durationSec,
             'duration_iso' => 'PT' . $durationSec . 'S',
             'date' => now('Asia/Dubai')->format('Y-m-d\TH:i:s+04:00'),
-            'location' => $validated['location'] ?: 'Lahbab Red Dunes, Dubai, UAE',
+            'location' => ! empty($validated['location']) ? $validated['location'] : 'Lahbab Red Dunes, Dubai, UAE',
             'keywords' => $keywords,
             'placements' => $placements,
             'is_active' => (bool) $request->input('is_active', true),
@@ -292,19 +344,19 @@ class AdminVideoReviewController extends Controller
 
         $entry['title'] = $validated['title'];
         $entry['reviewer_name'] = $validated['reviewer_name'];
-        $entry['reviewer_country'] = $validated['reviewer_country'] ?: 'UAE';
-        $entry['reviewer_country_code'] = strtoupper($validated['reviewer_country_code'] ?: 'AE');
-        $entry['tour_slug'] = $validated['tour_slug'] ?: null;
+        $entry['reviewer_country'] = ! empty($validated['reviewer_country']) ? $validated['reviewer_country'] : 'UAE';
+        $entry['reviewer_country_code'] = strtoupper(! empty($validated['reviewer_country_code']) ? $validated['reviewer_country_code'] : 'AE');
+        $entry['tour_slug'] = ! empty($validated['tour_slug']) ? $validated['tour_slug'] : null;
         $entry['tour_name'] = $this->resolveTourName($validated['tour_slug'] ?? null);
         $entry['category'] = $validated['category'];
         $entry['rating'] = (float) $validated['rating'];
         $entry['duration'] = $durationSec;
         $entry['duration_iso'] = 'PT' . $durationSec . 'S';
-        $entry['caption'] = $validated['caption'] ?: $validated['title'];
-        $entry['description'] = $validated['description'] ?: '';
-        $entry['transcript'] = $validated['transcript'] ?: '';
-        $entry['alt'] = $validated['alt'] ?: $validated['title'];
-        $entry['location'] = $validated['location'] ?: 'Lahbab Red Dunes, Dubai, UAE';
+        $entry['caption'] = ! empty($validated['caption']) ? $validated['caption'] : $validated['title'];
+        $entry['description'] = $validated['description'] ?? '';
+        $entry['transcript'] = $validated['transcript'] ?? '';
+        $entry['alt'] = ! empty($validated['alt']) ? $validated['alt'] : $validated['title'];
+        $entry['location'] = ! empty($validated['location']) ? $validated['location'] : 'Lahbab Red Dunes, Dubai, UAE';
         $entry['keywords'] = $keywords;
         $entry['is_active'] = $request->has('is_active') ? (bool) $request->input('is_active') : ($entry['is_active'] ?? true);
 

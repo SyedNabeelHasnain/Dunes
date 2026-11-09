@@ -203,4 +203,105 @@ class CustomerVideoReviewsTest extends TestCase
         $response->assertSee('guest-video-reels');
         $response->assertSee('Watch Unfiltered Guest Stories');
     }
+
+    public function test_analyze_endpoint_requires_auth(): void
+    {
+        $response = $this->postJson(route('admin.video-reviews.analyze'), []);
+        $response->assertStatus(401);
+    }
+
+    public function test_analyze_endpoint_validates_required_input(): void
+    {
+        $admin = User::first() ?? User::factory()->create();
+
+        $response = $this->actingAs($admin)->postJson(route('admin.video-reviews.analyze'), []);
+
+        $response->assertStatus(422);
+        $response->assertJson([
+            'success' => false,
+        ]);
+    }
+
+    public function test_analyze_endpoint_analyzes_existing_library_video_and_autofills(): void
+    {
+        $admin = User::first() ?? User::factory()->create();
+
+        $response = $this->actingAs($admin)->postJson(route('admin.video-reviews.analyze'), [
+            'existing_filename' => 'evening-desert-safari-spanish-review-1.mp4',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'success',
+            'data' => [
+                'video_filename',
+                'poster_filename',
+                'poster_url',
+                'poster_jpg_url',
+                'title',
+                'reviewer_name',
+                'reviewer_country',
+                'reviewer_country_code',
+                'category',
+                'tour_slug',
+                'tour_name',
+                'rating',
+                'duration',
+                'duration_iso',
+                'transcript',
+                'english_translation',
+                'caption',
+                'description',
+                'location',
+                'keywords',
+                'placements' => ['home', 'gallery', 'tour'],
+                'is_active',
+            ],
+        ]);
+
+        $data = $response->json('data');
+        $this->assertEquals('evening-desert-safari-spanish-review-1.mp4', $data['video_filename']);
+        $this->assertNotEmpty($data['title']);
+        $this->assertNotEmpty($data['reviewer_name']);
+        $this->assertEquals(5.0, $data['rating']);
+        $this->assertGreaterThan(0, $data['duration']);
+        $this->assertStringContainsString('PT', $data['duration_iso']);
+        $this->assertNotEmpty($data['poster_filename']);
+    }
+
+    public function test_admin_can_publish_video_review_from_autofilled_data(): void
+    {
+        $admin = User::first() ?? User::factory()->create();
+
+        $response = $this->actingAs($admin)->post(route('admin.video-reviews.store'), [
+            'title' => 'VIP Dune Buggy Sunset Tour Review - Dunes Discovery Tourism',
+            'reviewer_name' => 'Alexander & Group',
+            'reviewer_country' => 'Germany',
+            'reviewer_country_code' => 'DE',
+            'category' => 'buggy_quad',
+            'tour_slug' => 'dune-buggy-dubai',
+            'rating' => 5.0,
+            'duration' => 45,
+            'caption' => 'The most exhilarating experience in the dunes! Highly recommended.',
+            'description' => 'German travelers reviewing their thrilling Polaris dune buggy adventure with Dunes Discovery Tourism in Dubai.',
+            'transcript' => 'Das war ein fantastisches Erlebnis in den Dünen von Dubai!',
+            'location' => 'Lahbab Red Dunes, Dubai, UAE',
+            'keywords' => 'dubai dune buggy, polaris rzr dubai, german review, desert safari',
+            'existing_filename' => 'evening-desert-safari-spanish-review-1.mp4',
+            'existing_poster' => 'evening-desert-safari-spanish-review-1.webp',
+            'placement_home' => '1',
+            'placement_gallery' => '1',
+            'placement_tour' => '1',
+        ]);
+
+        $response->assertRedirect(route('admin.video-reviews.index'));
+        $response->assertSessionHas('success');
+
+        // Verify record was appended
+        $records = json_decode(file_get_contents(database_path('seeders/data/customer_video_reviews.json')), true);
+        $last = end($records);
+        $this->assertEquals('VIP Dune Buggy Sunset Tour Review - Dunes Discovery Tourism', $last['title']);
+        $this->assertEquals('Alexander & Group', $last['reviewer_name']);
+        $this->assertEquals('DE', $last['reviewer_country_code']);
+    }
 }
