@@ -335,6 +335,7 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::get('/media/picker-items', [AdminMediaController::class, 'pickerItems'])->name('media.picker-items');
     Route::post('/media/upload', [AdminMediaController::class, 'upload'])->name('media.upload');
     Route::post('/media/check-duplicate', [AdminMediaController::class, 'checkDuplicate'])->name('media.check-duplicate');
+    Route::post('/media/inspect-optimization', [AdminMediaController::class, 'inspectOptimization'])->name('media.inspect-optimization');
     Route::get('/media/{id}/details', [AdminMediaController::class, 'details'])->name('media.details');
     Route::post('/media/{id}/update', [AdminMediaController::class, 'update'])->name('media.update');
     Route::post('/media/{id}/replace', [AdminMediaController::class, 'replace'])->name('media.replace');

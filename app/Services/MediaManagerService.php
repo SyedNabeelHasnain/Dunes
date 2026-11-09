@@ -712,6 +712,16 @@ class MediaManagerService
      */
     public function upload(UploadedFile $file, array $attributes = [], ?int $userId = null, bool $force = false): MediaAsset
     {
+        if (! empty($attributes['convert_to']) && in_array(strtolower($attributes['convert_to']), ['webp', 'avif'], true)) {
+            $optService = app(ImageOptimizationService::class);
+            if ($optService->needsConversion($file)) {
+                $convResult = $optService->convert($file, strtolower($attributes['convert_to']), [
+                    'quality' => $attributes['convert_quality'] ?? 'lossless',
+                ]);
+                $file = $convResult['file'];
+            }
+        }
+
         if (! $force) {
             $duplicate = $this->findDuplicate($file);
             if ($duplicate) {

@@ -354,7 +354,7 @@
                     </p>
 
                     <!-- Category target selector -->
-                    <div class="max-w-xs mx-auto mb-5 text-left">
+                    <div class="max-w-xs mx-auto mb-4 text-left">
                         <label class="block text-[11px] font-bold text-slate-600 mb-1">Target Category for Uploaded Media</label>
                         <select x-model="uploadCategory" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-white outline-none">
                             <option value="tours">Tours &amp; Experiences</option>
@@ -363,6 +363,22 @@
                             <option value="banners">Banners &amp; Promos</option>
                             <option value="site">Site Assets</option>
                             <option value="general" selected>General</option>
+                        </select>
+                    </div>
+
+                    <!-- Format Optimization & Conversion Setting -->
+                    <div class="max-w-xs mx-auto mb-5 text-left p-3 rounded-xl bg-slate-50 border border-slate-200">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
+                                <i class="bi bi-magic text-emerald-600"></i>
+                                <span>Image Format Optimization</span>
+                            </label>
+                            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700">Standards</span>
+                        </div>
+                        <select x-model="convertFormat" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-800 bg-white outline-none">
+                            <option value="webp">Convert to WebP (Recommended)</option>
+                            <option value="avif">Convert to AVIF (Next-Gen)</option>
+                            <option value="original">Keep Original Format</option>
                         </select>
                     </div>
 
@@ -416,6 +432,8 @@ function universalMediaPickerModal() {
         isUploading: false,
         uploadProgress: 0,
         uploadCategory: 'general',
+        convertFormat: 'webp',
+        convertQuality: 'lossless',
         uploadStatusMessage: 'Uploading...',
         isSavingMeta: false,
 
@@ -600,6 +618,8 @@ function universalMediaPickerModal() {
                 formData.append('files[]', fileList[i]);
             }
             formData.append('category', this.uploadCategory);
+            formData.append('convert_format', this.convertFormat || 'webp');
+            formData.append('convert_quality', this.convertQuality || 'lossless');
 
             try {
                 const xhr = new XMLHttpRequest();

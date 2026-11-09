@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Exceptions\DuplicateMediaException;
 use App\Http\Controllers\Controller;
 use App\Models\MediaAsset;
+use App\Services\ImageOptimizationService;
 use App\Services\MediaManagerService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,10 +16,12 @@ use Illuminate\View\View;
 class AdminMediaController extends Controller
 {
     protected MediaManagerService $mediaService;
+    protected ImageOptimizationService $optService;
 
-    public function __construct(MediaManagerService $mediaService)
+    public function __construct(MediaManagerService $mediaService, ImageOptimizationService $optService)
     {
         $this->mediaService = $mediaService;
+        $this->optService = $optService;
     }
 
     /**
@@ -199,9 +202,13 @@ class AdminMediaController extends Controller
             'title' => 'nullable|string|max:255',
             'alt_text' => 'nullable|string|max:255',
             'force_upload' => 'nullable',
+            'convert_format' => 'nullable|string|in:webp,avif,original',
+            'convert_quality' => 'nullable|string|max:20',
         ]);
 
         $forceUpload = $request->boolean('force_upload', false) || $request->input('force_upload') === '1';
+        $convertFormat = strtolower((string) $request->input('convert_format', ''));
+        $convertQuality = $request->input('convert_quality', 'lossless');
 
         $uploadedFiles = [];
         if ($request->hasFile('files')) {
@@ -215,6 +222,36 @@ class AdminMediaController extends Controller
                 'success' => false,
                 'message' => 'No files were provided for upload.',
             ], 422);
+        }
+
+        // 1. High-Quality Lossless / Near-Lossless Optimization & Conversion (WebP or AVIF)
+        $conversionStats = [];
+        if (in_array($convertFormat, ['webp', 'avif'], true)) {
+            $processedFiles = [];
+            foreach ($uploadedFiles as $file) {
+                if ($this->optService->needsConversion($file)) {
+                    try {
+                        $converted = $this->optService->convert($file, $convertFormat, ['quality' => $convertQuality]);
+                        $processedFiles[] = $converted['file'];
+                        $conversionStats[] = [
+                            'original_name' => $converted['original_filename'],
+                            'converted_name' => $converted['converted_filename'],
+                            'original_format' => $converted['original_format'],
+                            'original_size' => $converted['original_size'],
+                            'converted_size' => $converted['converted_size'],
+                            'savings_bytes' => $converted['savings_bytes'],
+                            'savings_percent' => $converted['savings_percent'],
+                            'target_format' => $converted['target_format'],
+                        ];
+                    } catch (\Throwable $e) {
+                        Log::warning('Image optimization failed for ' . $file->getClientOriginalName() . ': ' . $e->getMessage());
+                        $processedFiles[] = $file;
+                    }
+                } else {
+                    $processedFiles[] = $file;
+                }
+            }
+            $uploadedFiles = $processedFiles;
         }
 
         // Duplicate Pre-Check if not force uploading
@@ -309,11 +346,50 @@ class AdminMediaController extends Controller
             }
         }
 
+        $message = count($createdAssets) . ' file(s) successfully uploaded.';
+        if (! empty($conversionStats)) {
+            $message .= ' (' . count($conversionStats) . ' image(s) optimized to ' . strtoupper($convertFormat) . ')';
+        }
+
         return response()->json([
             'success' => count($createdAssets) > 0,
             'uploaded' => $createdAssets,
             'errors' => $errors,
-            'message' => count($createdAssets) . ' file(s) successfully uploaded.',
+            'conversions' => $conversionStats,
+            'message' => $message,
+        ]);
+    }
+
+    /**
+     * Inspect file(s) for modern image optimization and format conversion opportunities.
+     */
+    public function inspectOptimization(Request $request): JsonResponse
+    {
+        $files = [];
+        if ($request->hasFile('files')) {
+            $files = $request->file('files');
+        } elseif ($request->hasFile('file')) {
+            $files = [$request->file('file')];
+        }
+
+        $supported = $this->optService->getSupportedFormats();
+        $inspected = [];
+
+        foreach ($files as $file) {
+            $inspected[] = [
+                'name' => $file->getClientOriginalName(),
+                'size' => (int) $file->getSize(),
+                'is_optimized' => $this->optService->isOptimized($file),
+                'needs_conversion' => $this->optService->needsConversion($file),
+                'is_convertible' => $this->optService->isConvertibleImage($file),
+            ];
+        }
+
+        return response()->json([
+            'success' => true,
+            'supported_formats' => $supported,
+            'files' => $inspected,
+            'has_convertible' => collect($inspected)->contains('needs_conversion', true),
         ]);
     }
 

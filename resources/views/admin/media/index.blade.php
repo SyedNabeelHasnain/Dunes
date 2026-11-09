@@ -941,6 +941,48 @@
                 </div>
             </template>
 
+            <!-- Modern Format Optimization Bar (When non-WebP/AVIF images are queued) -->
+            <template x-if="hasConvertibleImages()">
+                <div class="p-3.5 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-teal-500/5 to-transparent border border-emerald-500/20 space-y-2">
+                    <div class="flex items-center justify-between text-xs">
+                        <div class="flex items-center gap-2 font-bold text-emerald-800">
+                            <i class="bi bi-magic text-emerald-600 text-sm"></i>
+                            <span>Next-Gen Image Standards Optimization</span>
+                        </div>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">WebP / AVIF Available</span>
+                    </div>
+                    <p class="text-[11px] text-slate-600">
+                        Convert to modern format on upload to ensure high site performance and Core Web Vitals standards.
+                    </p>
+                    <div class="flex flex-wrap items-center gap-2 pt-1 text-xs">
+                        <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border cursor-pointer font-bold transition text-[11px]"
+                               :class="selectedConvertFormat === 'webp' ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'">
+                            <input type="radio" value="webp" x-model="selectedConvertFormat" class="hidden">
+                            <i class="bi bi-check2"></i>
+                            <span>WebP (Recommended)</span>
+                        </label>
+                        <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border cursor-pointer font-bold transition text-[11px]"
+                               :class="selectedConvertFormat === 'avif' ? 'bg-purple-600 text-white border-purple-600 shadow-xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'">
+                            <input type="radio" value="avif" x-model="selectedConvertFormat" class="hidden">
+                            <i class="bi bi-check2"></i>
+                            <span>AVIF (Next-Gen)</span>
+                        </label>
+                        <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border cursor-pointer font-bold transition text-[11px]"
+                               :class="selectedConvertFormat === 'original' ? 'bg-slate-700 text-white border-slate-700 shadow-xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'">
+                            <input type="radio" value="original" x-model="selectedConvertFormat" class="hidden">
+                            <span>Keep Original</span>
+                        </label>
+                        
+                        <select x-show="selectedConvertFormat !== 'original'" 
+                                x-model="selectedConvertQuality" 
+                                class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-[11px] font-bold text-slate-700 bg-white outline-none ml-auto">
+                            <option value="lossless">Lossless (100% Quality)</option>
+                            <option value="high">High-Fidelity (92% Quality)</option>
+                        </select>
+                    </div>
+                </div>
+            </template>
+
             <!-- Upload Progress Bar -->
             <template x-if="uploading">
                 <div class="space-y-1.5">
@@ -962,7 +1004,7 @@
                     Cancel
                 </button>
                 <button type="button" 
-                        @click="submitUpload()" 
+                        @click="startUploadWithCheck()" 
                         :disabled="queuedFiles.length === 0 || uploading"
                         class="px-5 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold transition shadow-md disabled:opacity-50 flex items-center gap-1.5 cursor-pointer">
                     <i class="bi" :class="uploading ? 'bi-arrow-repeat animate-spin' : 'bi-cloud-arrow-up-fill'"></i>
@@ -1030,6 +1072,109 @@
                         class="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-600 hover:bg-slate-100 transition cursor-pointer">
                     Upload Duplicate Anyway
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- IMAGE OPTIMIZATION & NEXT-GEN FORMAT CONVERSION MODAL -->
+    <div x-show="optimizationModalOpen" 
+         x-transition 
+         class="fixed inset-0 z-50 overflow-y-auto bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4" 
+         style="display: none;"
+         @keydown.escape.window="optimizationModalOpen = false">
+        
+        <div class="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl space-y-4 border border-emerald-500/20" @click.outside="optimizationModalOpen = false">
+            <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
+                <div class="w-10 h-10 rounded-2xl bg-emerald-500/15 text-emerald-600 flex items-center justify-center text-xl shrink-0 border border-emerald-500/20">
+                    <i class="bi bi-magic"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-900">Modern Image Standards Optimization</h3>
+                    <p class="text-xs text-slate-500">We detected images that can be optimized to next-gen WebP or AVIF.</p>
+                </div>
+            </div>
+
+            <!-- List of convertible images -->
+            <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200 space-y-2 max-h-40 overflow-y-auto">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Pending Image(s) For Optimization</span>
+                <template x-for="(file, idx) in getConvertibleFiles()" :key="idx">
+                    <div class="flex items-center justify-between text-xs py-1 px-2 rounded-lg bg-white border border-slate-100">
+                        <div class="flex items-center gap-2 truncate min-w-0">
+                            <i class="bi bi-file-earmark-image text-emerald-500"></i>
+                            <span class="font-bold text-slate-800 truncate" x-text="file.name"></span>
+                        </div>
+                        <span class="text-[10px] text-slate-500 font-mono shrink-0" x-text="formatBytes(file.size)"></span>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Format & Quality Choices -->
+            <div class="space-y-3">
+                <label class="block text-xs font-bold text-slate-800">Select Target Next-Gen Format:</label>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <!-- WebP Option -->
+                    <button type="button" 
+                            @click="selectedConvertFormat = 'webp'"
+                            class="p-3.5 rounded-2xl border text-left transition relative cursor-pointer hover:border-emerald-500 hover:bg-emerald-50/50"
+                            :class="selectedConvertFormat === 'webp' ? 'border-emerald-500 bg-emerald-50/40 ring-2 ring-emerald-500/20' : 'border-slate-200 bg-white'">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                                <i class="bi bi-check-circle-fill text-emerald-500 text-sm"></i>
+                                WebP
+                            </span>
+                            <span class="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">Recommended</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 leading-snug">99.8% universal compatibility, lossless transparency, 60–75% file reduction.</p>
+                    </button>
+
+                    <!-- AVIF Option -->
+                    <button type="button" 
+                            @click="selectedConvertFormat = 'avif'"
+                            class="p-3.5 rounded-2xl border text-left transition relative cursor-pointer hover:border-purple-500 hover:bg-purple-50/50"
+                            :class="selectedConvertFormat === 'avif' ? 'border-purple-500 bg-purple-50/40 ring-2 ring-purple-500/20' : 'border-slate-200 bg-white'">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                                <i class="bi bi-lightning-charge-fill text-purple-500 text-sm"></i>
+                                AVIF
+                            </span>
+                            <span class="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-purple-100 text-purple-800">Next-Gen</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 leading-snug">Highest modern compression (up to 80% smaller), HDR color depth, high fidelity.</p>
+                    </button>
+                </div>
+
+                <!-- Quality Preset Selector -->
+                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+                    <span class="font-bold text-slate-700">Conversion Quality:</span>
+                    <select x-model="selectedConvertQuality" class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-800 bg-white outline-none">
+                        <option value="lossless">Lossless (100% Quality - Pixel Perfect)</option>
+                        <option value="high">High-Fidelity (92% Quality - Smallest Footprint)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-2.5 pt-3 border-t border-slate-100">
+                <button type="button" 
+                        @click="skipConversionAndUpload()" 
+                        class="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 transition cursor-pointer text-center">
+                    Upload Original As-Is
+                </button>
+                
+                <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    <button type="button" 
+                            @click="optimizationModalOpen = false" 
+                            class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition">
+                        Cancel
+                    </button>
+                    <button type="button" 
+                            @click="applyConversionAndUpload(selectedConvertFormat || 'webp', selectedConvertQuality)" 
+                            class="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md transition cursor-pointer">
+                        <i class="bi bi-magic"></i>
+                        <span x-text="'Convert to ' + (selectedConvertFormat ? selectedConvertFormat.toUpperCase() : 'WEBP') + ' & Upload'"></span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -1109,6 +1254,10 @@ function mediaManager() {
         uploadCategory: 'general',
         uploading: false,
         uploadProgress: 0,
+        optimizationModalOpen: false,
+        selectedConvertFormat: 'webp',
+        selectedConvertQuality: 'lossless',
+        autoConvertPromptShown: false,
         duplicateModalOpen: false,
         duplicateData: null,
         duplicateMessage: '',
@@ -1268,6 +1417,9 @@ function mediaManager() {
             this.queuedFiles = [];
             this.uploadProgress = 0;
             this.uploading = false;
+            this.autoConvertPromptShown = false;
+            this.selectedConvertFormat = 'webp';
+            this.selectedConvertQuality = 'lossless';
             this.uploadModalOpen = true;
         },
 
@@ -1283,6 +1435,46 @@ function mediaManager() {
                 const files = Array.from(e.dataTransfer.files);
                 this.queuedFiles.push(...files);
             }
+        },
+
+        hasConvertibleImages() {
+            const convertible = ['png', 'jpg', 'jpeg', 'bmp', 'gif'];
+            return this.queuedFiles.some(f => {
+                const ext = f.name.split('.').pop().toLowerCase();
+                return convertible.includes(ext);
+            });
+        },
+
+        getConvertibleFiles() {
+            const convertible = ['png', 'jpg', 'jpeg', 'bmp', 'gif'];
+            return this.queuedFiles.filter(f => {
+                const ext = f.name.split('.').pop().toLowerCase();
+                return convertible.includes(ext);
+            });
+        },
+
+        startUploadWithCheck() {
+            if (this.queuedFiles.length === 0) return;
+            if (this.hasConvertibleImages() && !this.autoConvertPromptShown) {
+                this.optimizationModalOpen = true;
+                return;
+            }
+            this.submitUpload(false);
+        },
+
+        applyConversionAndUpload(format, quality = 'lossless') {
+            this.selectedConvertFormat = format;
+            this.selectedConvertQuality = quality;
+            this.autoConvertPromptShown = true;
+            this.optimizationModalOpen = false;
+            this.submitUpload(false);
+        },
+
+        skipConversionAndUpload() {
+            this.selectedConvertFormat = 'original';
+            this.autoConvertPromptShown = true;
+            this.optimizationModalOpen = false;
+            this.submitUpload(false);
         },
 
         removeQueuedFile(index) {
@@ -1319,6 +1511,10 @@ function mediaManager() {
             if (force) {
                 formData.append('force_upload', '1');
             }
+            if (this.selectedConvertFormat) {
+                formData.append('convert_format', this.selectedConvertFormat);
+                formData.append('convert_quality', this.selectedConvertQuality || 'lossless');
+            }
 
             try {
                 this.uploadProgress = 50;
@@ -1353,6 +1549,7 @@ function mediaManager() {
                 alert('Upload network error: ' + err.message);
             } finally {
                 this.uploading = false;
+                this.autoConvertPromptShown = false;
             }
         },
 
