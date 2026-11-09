@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exceptions\DuplicateMediaException;
 use App\Http\Controllers\Controller;
 use App\Models\MediaAsset;
 use App\Services\MediaManagerService;
@@ -186,7 +187,7 @@ class AdminMediaController extends Controller
     }
 
     /**
-     * Upload single or multiple files via dropzone AJAX.
+     * Upload single or multiple files via dropzone AJAX with duplicate detection.
      */
     public function upload(Request $request): JsonResponse
     {
@@ -197,7 +198,10 @@ class AdminMediaController extends Controller
             'category' => 'nullable|string|max:50',
             'title' => 'nullable|string|max:255',
             'alt_text' => 'nullable|string|max:255',
+            'force_upload' => 'nullable',
         ]);
+
+        $forceUpload = $request->boolean('force_upload', false) || $request->input('force_upload') === '1';
 
         $uploadedFiles = [];
         if ($request->hasFile('files')) {
@@ -213,6 +217,48 @@ class AdminMediaController extends Controller
             ], 422);
         }
 
+        // Duplicate Pre-Check if not force uploading
+        if (! $forceUpload) {
+            $detectedDuplicates = [];
+            foreach ($uploadedFiles as $file) {
+                $dup = $this->mediaService->findDuplicate($file);
+                if ($dup) {
+                    $detectedDuplicates[] = [
+                        'uploaded_name' => $file->getClientOriginalName(),
+                        'existing' => [
+                            'id' => $dup->id,
+                            'uuid' => $dup->uuid,
+                            'filename' => $dup->filename,
+                            'original_name' => $dup->original_name,
+                            'public_url' => $dup->public_url,
+                            'url' => $dup->url,
+                            'thumbnail_url' => $dup->url,
+                            'media_type' => $dup->media_type,
+                            'formatted_size' => $dup->formatted_file_size,
+                            'dimensions' => $dup->dimensions,
+                            'category' => $dup->category,
+                            'usage_count' => (int) $dup->usage_count,
+                            'created_at_human' => $dup->created_at ? $dup->created_at->format('M d, Y') : '',
+                        ],
+                    ];
+                }
+            }
+
+            if (! empty($detectedDuplicates)) {
+                $firstDup = $detectedDuplicates[0]['existing'];
+                return response()->json([
+                    'success' => false,
+                    'is_duplicate' => true,
+                    'has_duplicates' => count($detectedDuplicates) > 1,
+                    'duplicate' => $firstDup,
+                    'duplicates' => $detectedDuplicates,
+                    'message' => count($detectedDuplicates) === 1
+                        ? "Duplicate detected: '{$detectedDuplicates[0]['uploaded_name']}' already exists as '{$firstDup['filename']}' in the Media Library."
+                        : count($detectedDuplicates) . " uploaded file(s) already exist in the Media Library.",
+                ], 409);
+            }
+        }
+
         $userId = auth()->id();
         $createdAssets = [];
         $errors = [];
@@ -223,7 +269,7 @@ class AdminMediaController extends Controller
                     'category' => $request->input('category', 'general'),
                     'title' => $request->input('title'),
                     'alt_text' => $request->input('alt_text'),
-                ], $userId);
+                ], $userId, $forceUpload);
 
                 $createdAssets[] = [
                     'id' => $asset->id,
@@ -235,6 +281,28 @@ class AdminMediaController extends Controller
                     'formatted_size' => $asset->formatted_file_size,
                     'dimensions' => $asset->dimensions,
                 ];
+            } catch (DuplicateMediaException $e) {
+                $dup = $e->getDuplicateAsset();
+                return response()->json([
+                    'success' => false,
+                    'is_duplicate' => true,
+                    'duplicate' => [
+                        'id' => $dup->id,
+                        'uuid' => $dup->uuid,
+                        'filename' => $dup->filename,
+                        'original_name' => $dup->original_name,
+                        'public_url' => $dup->public_url,
+                        'url' => $dup->url,
+                        'thumbnail_url' => $dup->url,
+                        'media_type' => $dup->media_type,
+                        'formatted_size' => $dup->formatted_file_size,
+                        'dimensions' => $dup->dimensions,
+                        'category' => $dup->category,
+                        'usage_count' => (int) $dup->usage_count,
+                        'created_at_human' => $dup->created_at ? $dup->created_at->format('M d, Y') : '',
+                    ],
+                    'message' => $e->getMessage(),
+                ], 409);
             } catch (\Throwable $e) {
                 Log::error('Media Upload Error: ' . $e->getMessage());
                 $errors[] = $file->getClientOriginalName() . ': ' . $e->getMessage();
@@ -246,6 +314,45 @@ class AdminMediaController extends Controller
             'uploaded' => $createdAssets,
             'errors' => $errors,
             'message' => count($createdAssets) . ' file(s) successfully uploaded.',
+        ]);
+    }
+
+    /**
+     * Check a file for duplicate before uploading.
+     */
+    public function checkDuplicate(Request $request): JsonResponse
+    {
+        if (! $request->hasFile('file')) {
+            return response()->json(['success' => false, 'message' => 'No file provided.'], 422);
+        }
+
+        $duplicate = $this->mediaService->findDuplicate($request->file('file'));
+        if ($duplicate) {
+            return response()->json([
+                'success' => true,
+                'is_duplicate' => true,
+                'duplicate' => [
+                    'id' => $duplicate->id,
+                    'uuid' => $duplicate->uuid,
+                    'filename' => $duplicate->filename,
+                    'original_name' => $duplicate->original_name,
+                    'public_url' => $duplicate->public_url,
+                    'url' => $duplicate->url,
+                    'thumbnail_url' => $duplicate->url,
+                    'media_type' => $duplicate->media_type,
+                    'formatted_size' => $duplicate->formatted_file_size,
+                    'dimensions' => $duplicate->dimensions,
+                    'category' => $duplicate->category,
+                    'usage_count' => (int) $duplicate->usage_count,
+                    'created_at_human' => $duplicate->created_at ? $duplicate->created_at->format('M d, Y') : '',
+                ],
+                'message' => "An identical file already exists in the library as '{$duplicate->filename}'.",
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'is_duplicate' => false,
         ]);
     }
 

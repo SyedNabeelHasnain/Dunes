@@ -211,20 +211,54 @@ class AdminVideoReviewController extends Controller
         $filename = ! empty($validated['existing_filename']) ? basename($validated['existing_filename']) : '';
         $posterFilename = ! empty($validated['existing_poster']) ? basename($validated['existing_poster']) : '';
 
-        // Handle video upload
+        // Handle video upload (with duplicate check to prevent disk bloat)
         if ($request->hasFile('video_file')) {
             $video = $request->file('video_file');
-            $safeName = Str::slug(pathinfo($video->getClientOriginalName(), PATHINFO_FILENAME)) . '-' . time() . '.' . $video->getClientOriginalExtension();
-            $video->move(public_path('videos/reviews'), $safeName);
-            $filename = $safeName;
+            $vHash = @hash_file('sha256', $video->getRealPath());
+            $existingMatch = null;
+            $reviewsDir = public_path('videos/reviews');
+
+            if ($vHash && File::exists($reviewsDir)) {
+                foreach (File::files($reviewsDir) as $vFile) {
+                    if (@hash_file('sha256', $vFile->getRealPath()) === $vHash) {
+                        $existingMatch = $vFile->getFilename();
+                        break;
+                    }
+                }
+            }
+
+            if ($existingMatch) {
+                $filename = $existingMatch;
+            } else {
+                $safeName = Str::slug(pathinfo($video->getClientOriginalName(), PATHINFO_FILENAME)) . '-' . time() . '.' . $video->getClientOriginalExtension();
+                $video->move($reviewsDir, $safeName);
+                $filename = $safeName;
+            }
         }
 
-        // Handle poster upload
+        // Handle poster upload (with duplicate check)
         if ($request->hasFile('poster_file')) {
             $poster = $request->file('poster_file');
-            $safePosterName = Str::slug(pathinfo($poster->getClientOriginalName(), PATHINFO_FILENAME)) . '-' . time() . '.' . $poster->getClientOriginalExtension();
-            $poster->move(public_path('images/video-posters'), $safePosterName);
-            $posterFilename = $safePosterName;
+            $pHash = @hash_file('sha256', $poster->getRealPath());
+            $existingPosterMatch = null;
+            $postersDir = public_path('images/video-posters');
+
+            if ($pHash && File::exists($postersDir)) {
+                foreach (File::files($postersDir) as $pFile) {
+                    if (@hash_file('sha256', $pFile->getRealPath()) === $pHash) {
+                        $existingPosterMatch = $pFile->getFilename();
+                        break;
+                    }
+                }
+            }
+
+            if ($existingPosterMatch) {
+                $posterFilename = $existingPosterMatch;
+            } else {
+                $safePosterName = Str::slug(pathinfo($poster->getClientOriginalName(), PATHINFO_FILENAME)) . '-' . time() . '.' . $poster->getClientOriginalExtension();
+                $poster->move($postersDir, $safePosterName);
+                $posterFilename = $safePosterName;
+            }
         } elseif (! empty($filename) && empty($posterFilename)) {
             $posterFilename = str_replace(pathinfo($filename, PATHINFO_EXTENSION), 'webp', $filename);
         }

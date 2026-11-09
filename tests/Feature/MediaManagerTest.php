@@ -9,6 +9,7 @@ use App\Services\MediaManagerService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class MediaManagerTest extends TestCase
@@ -22,6 +23,20 @@ class MediaManagerTest extends TestCase
         parent::setUp();
 
         $this->admin = User::first() ?: User::factory()->create();
+    }
+
+    protected function tearDown(): void
+    {
+        $uploadDir = public_path('images/uploads');
+        if (File::exists($uploadDir)) {
+            foreach (File::files($uploadDir) as $file) {
+                if (str_starts_with($file->getFilename(), 'desert-')) {
+                    @unlink($file->getRealPath());
+                }
+            }
+        }
+
+        parent::tearDown();
     }
 
     public function test_admin_can_access_media_library_index(): void
@@ -420,5 +435,93 @@ class MediaManagerTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Media Management', false);
         $response->assertSee(route('admin.media.index'), false);
+    }
+
+    public function test_duplicate_media_upload_is_blocked_with_409_and_asset_details(): void
+    {
+        Storage::fake('public');
+        $imageContent = 'fake-binary-image-content-for-duplicate-test';
+        $file1 = UploadedFile::fake()->createWithContent('desert-dune-dup-test.jpg', $imageContent);
+        $file2 = UploadedFile::fake()->createWithContent('desert-dune-dup-test.jpg', $imageContent);
+
+        // First upload succeeds
+        $firstResponse = $this->actingAs($this->admin)->post(route('admin.media.upload'), [
+            'files' => [$file1],
+            'category' => 'tours',
+        ]);
+        $firstResponse->assertStatus(200);
+        $firstAssetId = $firstResponse->json('uploaded.0.id');
+        $this->assertNotNull($firstAssetId);
+
+        // Re-upload identical file without force_upload flag -> blocked with 409
+        $dupResponse = $this->actingAs($this->admin)->post(route('admin.media.upload'), [
+            'files' => [$file2],
+            'category' => 'tours',
+        ]);
+
+        $dupResponse->assertStatus(409);
+        $dupResponse->assertJson([
+            'success' => false,
+            'is_duplicate' => true,
+        ]);
+        $this->assertEquals($firstAssetId, $dupResponse->json('duplicate.id'));
+    }
+
+    public function test_duplicate_media_can_be_force_uploaded_when_requested(): void
+    {
+        Storage::fake('public');
+        $imageContent = 'fake-binary-image-content-for-force-test';
+        $file1 = UploadedFile::fake()->createWithContent('desert-dune-force-test.jpg', $imageContent);
+        $file2 = UploadedFile::fake()->createWithContent('desert-dune-force-test.jpg', $imageContent);
+
+        // Initial upload
+        $firstResponse = $this->actingAs($this->admin)->post(route('admin.media.upload'), [
+            'files' => [$file1],
+            'category' => 'tours',
+        ]);
+        $firstResponse->assertStatus(200);
+
+        // Re-upload with force_upload = 1
+        $forceResponse = $this->actingAs($this->admin)->post(route('admin.media.upload'), [
+            'files' => [$file2],
+            'category' => 'tours',
+            'force_upload' => '1',
+        ]);
+
+        $forceResponse->assertStatus(200);
+        $forceResponse->assertJson([
+            'success' => true,
+        ]);
+        $this->assertCount(1, $forceResponse->json('uploaded'));
+    }
+
+    public function test_check_duplicate_endpoint_identifies_existing_assets(): void
+    {
+        Storage::fake('public');
+        $imageContent = 'fake-binary-image-content-for-precheck-test';
+        $preCheckFile = UploadedFile::fake()->createWithContent('desert-precheck-test.jpg', $imageContent);
+
+        // Pre-check before upload: not duplicate
+        $preCheckResponse = $this->actingAs($this->admin)->post(route('admin.media.check-duplicate'), [
+            'file' => $preCheckFile,
+        ]);
+        $preCheckResponse->assertStatus(200);
+        $this->assertFalse($preCheckResponse->json('is_duplicate'));
+
+        // Upload the file
+        $uploadFile = UploadedFile::fake()->createWithContent('desert-precheck-test.jpg', $imageContent);
+        $this->actingAs($this->admin)->post(route('admin.media.upload'), [
+            'files' => [$uploadFile],
+            'category' => 'tours',
+        ])->assertStatus(200);
+
+        // Pre-check after upload: is duplicate
+        $postCheckFile = UploadedFile::fake()->createWithContent('desert-precheck-test.jpg', $imageContent);
+        $postCheckResponse = $this->actingAs($this->admin)->post(route('admin.media.check-duplicate'), [
+            'file' => $postCheckFile,
+        ]);
+        $postCheckResponse->assertStatus(200);
+        $this->assertTrue($postCheckResponse->json('is_duplicate'));
+        $this->assertNotNull($postCheckResponse->json('duplicate.id'));
     }
 }

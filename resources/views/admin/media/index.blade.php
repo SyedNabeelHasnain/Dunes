@@ -972,6 +972,68 @@
         </div>
     </div>
 
+    <!-- DUPLICATE MEDIA RESOLUTION MODAL -->
+    <div x-show="duplicateModalOpen" 
+         x-transition 
+         class="fixed inset-0 z-50 overflow-y-auto bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4" 
+         style="display: none;"
+         @keydown.escape.window="duplicateModalOpen = false">
+        
+        <div class="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl space-y-4 border border-amber-200" @click.outside="duplicateModalOpen = false">
+            <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
+                <div class="w-10 h-10 rounded-2xl bg-amber-500/15 text-amber-600 flex items-center justify-center text-xl shrink-0 border border-amber-500/20">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-900">Duplicate Media Detected</h3>
+                    <p class="text-xs text-slate-500" x-text="duplicateMessage || 'This exact file already exists in your Media Library.'"></p>
+                </div>
+            </div>
+
+            <template x-if="duplicateData">
+                <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 flex items-center gap-4">
+                    <div class="w-16 h-16 rounded-xl bg-slate-200 overflow-hidden shrink-0 border border-slate-300 flex items-center justify-center">
+                        <template x-if="duplicateData.media_type === 'video'">
+                            <div class="w-full h-full bg-slate-900 flex items-center justify-center text-amber-400">
+                                <i class="bi bi-play-circle-fill text-2xl"></i>
+                            </div>
+                        </template>
+                        <template x-if="duplicateData.media_type !== 'video'">
+                            <img :src="duplicateData.url" class="w-full h-full object-cover" onerror="this.src='/images/media-placeholder.svg';">
+                        </template>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="text-xs font-bold text-slate-800 truncate" x-text="duplicateData.filename"></div>
+                        <div class="text-[11px] text-slate-500 font-mono truncate" x-text="duplicateData.public_url"></div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-700 uppercase" x-text="duplicateData.category"></span>
+                            <span class="text-[10px] text-slate-500" x-text="duplicateData.formatted_size"></span>
+                            <span class="text-[10px] font-bold text-primary" x-text="'Used in: ' + (duplicateData.usage_count || 0) + ' place(s)'"></span>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <p class="text-xs text-slate-600">
+                Uploading duplicate copies creates redundant files and clutters your library. We strongly recommend linking to the existing media file.
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+                <button type="button" 
+                        @click="useExistingDuplicate()" 
+                        class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold shadow-md transition cursor-pointer">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>Use Existing Media (Recommended)</span>
+                </button>
+                <button type="button" 
+                        @click="duplicateModalOpen = false; submitUpload(true)" 
+                        class="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-600 hover:bg-slate-100 transition cursor-pointer">
+                    Upload Duplicate Anyway
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- SAFE DELETE CONFIRMATION MODAL -->
     <div x-show="deleteModalOpen" 
          x-transition 
@@ -1047,6 +1109,9 @@ function mediaManager() {
         uploadCategory: 'general',
         uploading: false,
         uploadProgress: 0,
+        duplicateModalOpen: false,
+        duplicateData: null,
+        duplicateMessage: '',
         deleteModalOpen: false,
         deleteTarget: { id: null, filename: '', usageCount: 0, force: false },
         videoModalOpen: false,
@@ -1232,7 +1297,16 @@ function mediaManager() {
             return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
         },
 
-        async submitUpload() {
+        useExistingDuplicate() {
+            this.duplicateModalOpen = false;
+            this.uploadModalOpen = false;
+            this.queuedFiles = [];
+            if (this.duplicateData && this.duplicateData.id) {
+                this.openDetails(this.duplicateData.id);
+            }
+        },
+
+        async submitUpload(force = false) {
             if (this.queuedFiles.length === 0) return;
             this.uploading = true;
             this.uploadProgress = 10;
@@ -1242,6 +1316,9 @@ function mediaManager() {
                 formData.append('files[]', file);
             });
             formData.append('category', this.uploadCategory);
+            if (force) {
+                formData.append('force_upload', '1');
+            }
 
             try {
                 this.uploadProgress = 50;
@@ -1256,6 +1333,14 @@ function mediaManager() {
                 this.uploadProgress = 90;
                 const data = await res.json();
                 this.uploadProgress = 100;
+
+                if (res.status === 409 || data.is_duplicate) {
+                    this.uploading = false;
+                    this.duplicateData = data.duplicate || (data.duplicates && data.duplicates[0]?.existing) || null;
+                    this.duplicateMessage = data.message || 'Duplicate media detected in the library.';
+                    this.duplicateModalOpen = true;
+                    return;
+                }
 
                 if (data.success) {
                     alert(data.message);

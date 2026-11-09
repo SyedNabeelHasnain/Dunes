@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\DuplicateMediaException;
 use App\Models\BlogPost;
 use App\Models\Driver;
 use App\Models\MediaAsset;
@@ -670,10 +671,57 @@ class MediaManagerService
     }
 
     /**
-     * Upload one or multiple files and register in media library.
+     * Check if an uploaded file matches any existing media asset by content hash or filename/size.
      */
-    public function upload(UploadedFile $file, array $attributes = [], ?int $userId = null): MediaAsset
+    public function findDuplicate(UploadedFile $file): ?MediaAsset
     {
+        $realPath = $file->getRealPath();
+        if (! $realPath || ! File::exists($realPath)) {
+            return null;
+        }
+
+        $hash = @hash_file('sha256', $realPath);
+        if ($hash) {
+            $existing = MediaAsset::where('file_hash', $hash)->first();
+            if ($existing) {
+                return $existing;
+            }
+        }
+
+        // Secondary check by original name and exact byte size
+        $origName = $file->getClientOriginalName();
+        $size = $file->getSize();
+        if ($origName && $size > 0) {
+            $byNameAndSize = MediaAsset::where(function ($q) use ($origName) {
+                $q->where('original_name', $origName)
+                  ->orWhere('filename', $origName);
+            })->where('file_size_bytes', $size)->first();
+
+            if ($byNameAndSize) {
+                return $byNameAndSize;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Upload one or multiple files and register in media library.
+     *
+     * @throws DuplicateMediaException when duplicate is detected and force is false
+     */
+    public function upload(UploadedFile $file, array $attributes = [], ?int $userId = null, bool $force = false): MediaAsset
+    {
+        if (! $force) {
+            $duplicate = $this->findDuplicate($file);
+            if ($duplicate) {
+                throw new DuplicateMediaException(
+                    "Duplicate media detected: '" . $file->getClientOriginalName() . "' already exists as '" . $duplicate->filename . "' in the Media Library.",
+                    $duplicate
+                );
+            }
+        }
+
         $origName = $file->getClientOriginalName();
         $ext = strtolower($file->getClientOriginalExtension());
         $cleanBase = Str::slug(pathinfo($origName, PATHINFO_FILENAME));

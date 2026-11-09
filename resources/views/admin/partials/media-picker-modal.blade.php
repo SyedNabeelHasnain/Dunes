@@ -616,6 +616,24 @@ function universalMediaPickerModal() {
                 xhr.onload = async () => {
                     this.uploadProgress = 100;
                     this.isUploading = false;
+                    if (xhr.status === 409) {
+                        try {
+                            const resp = JSON.parse(xhr.responseText);
+                            const dup = resp.duplicate || (resp.duplicates && resp.duplicates[0]?.existing);
+                            if (dup) {
+                                alert(`⚠️ Duplicate Media Detected:\n"${dup.filename}" already exists in the Media Library.\n\nWe have automatically selected the existing asset for you to prevent duplicates!`);
+                                this.activeTab = 'browse';
+                                await this.fetchAssets(1);
+                                const match = this.assets.find(a => a.id === dup.id || a.filename === dup.filename);
+                                if (match) {
+                                    this.selectAsset(match);
+                                }
+                                return;
+                            }
+                        } catch (e) {
+                            console.error('Error handling duplicate upload response:', e);
+                        }
+                    }
                     if (xhr.status >= 200 && xhr.status < 300) {
                         const resp = JSON.parse(xhr.responseText);
                         if (resp.success && resp.uploaded && resp.uploaded.length > 0) {

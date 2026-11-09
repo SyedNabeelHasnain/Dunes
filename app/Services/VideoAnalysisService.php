@@ -126,6 +126,7 @@ class VideoAnalysisService
                     'tour' => true,
                 ],
                 'is_active' => true,
+                'is_duplicate_reuse' => (bool) ($videoInfo['is_duplicate'] ?? false),
             ],
         ];
     }
@@ -140,15 +141,46 @@ class VideoAnalysisService
     protected function resolveVideoFile(UploadedFile|string $videoInput, ?string $customSlug = null): array
     {
         if ($videoInput instanceof UploadedFile) {
-            $origName = pathinfo($videoInput->getClientOriginalName(), PATHINFO_FILENAME);
-            $ext = strtolower($videoInput->getClientOriginalExtension() ?: 'mp4');
-            $baseSlug = $customSlug ?: (Str::slug($origName) ?: 'customer-review') . '-' . time();
-            $targetFilename = $baseSlug . '.' . $ext;
-
+            $realPath = $videoInput->getRealPath();
+            $hash = $realPath ? @hash_file('sha256', $realPath) : null;
             $reviewsDir = public_path('videos/reviews');
             if (! File::exists($reviewsDir)) {
                 File::makeDirectory($reviewsDir, 0755, true, true);
             }
+
+            // Check if identical video already exists on disk or in media_assets
+            $matchedExisting = null;
+            if ($hash) {
+                $assetMatch = \App\Models\MediaAsset::where('file_hash', $hash)->where('media_type', 'video')->first();
+                if ($assetMatch && File::exists(public_path($assetMatch->file_path))) {
+                    $matchedExisting = public_path($assetMatch->file_path);
+                }
+
+                if (! $matchedExisting && File::exists($reviewsDir)) {
+                    foreach (File::files($reviewsDir) as $existingFile) {
+                        if (@hash_file('sha256', $existingFile->getRealPath()) === $hash) {
+                            $matchedExisting = $existingFile->getRealPath();
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if ($matchedExisting) {
+                $filename = basename($matchedExisting);
+                $baseSlug = $customSlug ?: Str::slug(pathinfo($filename, PATHINFO_FILENAME));
+                return [
+                    'full_path' => $matchedExisting,
+                    'filename' => $filename,
+                    'base_slug' => $baseSlug,
+                    'is_duplicate' => true,
+                ];
+            }
+
+            $origName = pathinfo($videoInput->getClientOriginalName(), PATHINFO_FILENAME);
+            $ext = strtolower($videoInput->getClientOriginalExtension() ?: 'mp4');
+            $baseSlug = $customSlug ?: (Str::slug($origName) ?: 'customer-review') . '-' . time();
+            $targetFilename = $baseSlug . '.' . $ext;
 
             $targetPath = $reviewsDir . DIRECTORY_SEPARATOR . $targetFilename;
             $videoInput->move($reviewsDir, $targetFilename);
@@ -164,6 +196,7 @@ class VideoAnalysisService
                 'full_path' => $targetPath,
                 'filename' => $targetFilename,
                 'base_slug' => $baseSlug,
+                'is_duplicate' => false,
             ];
         }
 
