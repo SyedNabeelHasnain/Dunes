@@ -37,7 +37,7 @@ class RequirePermission
             ]);
         }
 
-        if ($permissions !== [] && method_exists($user, 'hasAnyPermission')) {
+        if ($permissions !== [] && is_object($user) && method_exists($user, 'hasAnyPermission')) {
             if (! $user->hasAnyPermission($permissions)) {
                 if ($request->expectsJson()) {
                     return response()->json([

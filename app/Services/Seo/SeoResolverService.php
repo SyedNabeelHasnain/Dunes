@@ -237,13 +237,14 @@ class SeoResolverService
             ? $rawSettings->all()
             : (is_array($rawSettings) ? $rawSettings : []);
 
-        $entity = $vars['seoEntity']
+        $candidateEntity = $vars['seoEntity']
             ?? $vars['tour']
             ?? $vars['post']
             ?? $vars['article']
             ?? $vars['pillar']
             ?? $vars['page']
             ?? null;
+        $entity = $candidateEntity instanceof Model ? $candidateEntity : null;
 
         $contentType = match (true) {
             $entity instanceof Tour => 'tour',

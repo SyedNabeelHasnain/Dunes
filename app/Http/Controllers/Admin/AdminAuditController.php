@@ -26,7 +26,7 @@ class AdminAuditController extends Controller
     {
         $latestRun = $this->auditService->getLatestRun();
         if (! $latestRun) {
-            $latestRun = $this->auditService->runAudit('full', auth()->id());
+            $latestRun = $this->auditService->runAudit('incremental', auth()->id());
         }
 
         $query = AuditIssue::with('assignee')->where('audit_run_id', $latestRun->id);

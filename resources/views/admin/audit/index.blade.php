@@ -186,8 +186,8 @@
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
             <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Last Execution</span>
             <div>
-                <div class="text-xs font-black text-slate-900 mt-1">{{ $latestRun->created_at->format('M d, Y h:i A') }}</div>
-                <div class="text-[11px] text-slate-500 mt-0.5">{{ $latestRun->created_at->diffForHumans() }}</div>
+                <div class="text-xs font-black text-slate-900 mt-1">{{ optional($latestRun->created_at)->format('M d, Y h:i A') ?? 'N/A' }}</div>
+                <div class="text-[11px] text-slate-500 mt-0.5">{{ optional($latestRun->created_at)->diffForHumans() ?? 'Just now' }}</div>
             </div>
             <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
                 <span class="text-slate-400">Run ID:</span>
@@ -359,7 +359,7 @@
                     @foreach($recentRuns as $pastRun)
                         <tr>
                             <td class="py-2.5 px-3 font-mono font-bold">#{{ $pastRun->id }}</td>
-                            <td class="py-2.5 px-3">{{ $pastRun->created_at->format('M d, Y h:i A') }} · <span class="uppercase text-[10px] font-bold text-slate-500">{{ $pastRun->scan_type }}</span></td>
+                            <td class="py-2.5 px-3">{{ optional($pastRun->created_at)->format('M d, Y h:i A') ?? 'N/A' }} · <span class="uppercase text-[10px] font-bold text-slate-500">{{ $pastRun->scan_type }}</span></td>
                             <td class="py-2.5 px-3 font-black {{ $pastRun->health_score >= 85 ? 'text-emerald-600' : 'text-amber-600' }}">{{ $pastRun->health_score }}/100</td>
                             <td class="py-2.5 px-3">{{ $pastRun->total_issues_count }} ({{ $pastRun->critical_count }} Crit, {{ $pastRun->high_count }} High)</td>
                             <td class="py-2.5 px-3 text-end space-x-2">

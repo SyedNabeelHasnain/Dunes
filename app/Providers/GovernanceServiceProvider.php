@@ -14,7 +14,7 @@ class GovernanceServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::before(function ($user, string $ability) {
-            if (method_exists($user, 'isSuperAdmin') && $user->isSuperAdmin()) {
+            if (is_object($user) && method_exists($user, 'isSuperAdmin') && $user->isSuperAdmin()) {
                 return true;
             }
 
@@ -23,7 +23,7 @@ class GovernanceServiceProvider extends ServiceProvider
 
         foreach (array_keys(User::availablePermissions()) as $permission) {
             Gate::define($permission, function ($user) use ($permission): bool {
-                return method_exists($user, 'hasPermission') && $user->hasPermission($permission);
+                return is_object($user) && method_exists($user, 'hasPermission') && $user->hasPermission($permission);
             });
         }
 

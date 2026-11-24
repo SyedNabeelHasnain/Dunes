@@ -60,8 +60,9 @@ class SecurityHeaders
             $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
             $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(self)');
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
-            $response->headers->set('X-XSS-Protection', '1; mode=block');
+            $response->headers->set('X-XSS-Protection', '0');
             $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+            $response->headers->set('Cross-Origin-Resource-Policy', 'same-site');
             $response->headers->set('Content-Security-Policy', "upgrade-insecure-requests; frame-ancestors 'self';");
         }
 

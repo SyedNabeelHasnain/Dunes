@@ -37,7 +37,7 @@ class EnforceAdminRbac
             ]);
         }
 
-        if (! method_exists($user, 'isSuperAdmin') || $user->isSuperAdmin()) {
+        if (is_object($user) && (! method_exists($user, 'isSuperAdmin') || $user->isSuperAdmin())) {
             return $next($request);
         }
 

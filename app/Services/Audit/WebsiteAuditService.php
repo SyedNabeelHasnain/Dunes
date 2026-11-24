@@ -17,12 +17,14 @@ use App\Services\Audit\Checkers\SeoAuditChecker;
 use App\Services\Audit\Checkers\StructuredDataChecker;
 use App\Services\Audit\Checkers\TechnicalSeoChecker;
 use App\Services\Audit\Checkers\UxChecker;
-use Illuminate\Contracts\Http\Kernel as HttpKernel;
-use Illuminate\Http\Request;
+use App\Services\Http\InternalHttpProbeService;
 use Illuminate\Support\Facades\DB;
 
 class WebsiteAuditService
 {
+    public function __construct(
+        protected ?InternalHttpProbeService $probeService = null,
+    ) {}
     /**
      * Normalized 11-discipline Category Weights (Total = 1.00 / 100%).
      */
@@ -420,34 +422,6 @@ class WebsiteAuditService
      */
     private function probeInternalUrls(array $paths): array
     {
-        $results = [];
-        $kernel = app(HttpKernel::class);
-        $originalRequest = app()->bound('request') ? request() : null;
-
-        foreach ($paths as $path) {
-            $norm = $path === '' ? '/' : '/'.ltrim($path, '/');
-            if (str_starts_with($norm, '/admin')) {
-                continue;
-            }
-            try {
-                $subReq = Request::create($norm, 'GET');
-                $subReq->headers->set('User-Agent', 'DunesAuditBot/1.0');
-                $subRes = $kernel->handle($subReq);
-                $results[$norm] = [
-                    'status' => $subRes->getStatusCode(),
-                    'html' => str_contains((string) $subRes->headers->get('Content-Type'), 'html') || $subRes->getStatusCode() === 200
-                        ? (string) $subRes->getContent()
-                        : '',
-                ];
-            } catch (\Throwable) {
-                $results[$norm] = ['status' => 500, 'html' => ''];
-            }
-        }
-
-        if ($originalRequest) {
-            app()->instance('request', $originalRequest);
-        }
-
-        return $results;
+        return ($this->probeService ?? app(InternalHttpProbeService::class))->probePaths($paths);
     }
 }

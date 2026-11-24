@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Backlink;
+use App\Services\Http\InternalHttpProbeService;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -15,8 +16,8 @@ class TrackBacklinkReferralMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Only inspect GET requests to public pages
-        if ($request->isMethod('GET') && ! $request->is('admin*', 'api*', 'up', 'build/*', 'assets/*', 'images/*')) {
+        // Only inspect genuine external GET requests to public pages (never internal audit probes)
+        if (! InternalHttpProbeService::isProbing() && $request->isMethod('GET') && ! $request->is('admin*', 'api*', 'up', 'build/*', 'assets/*', 'images/*')) {
             try {
                 $this->detectAndAttributeReferral($request);
             } catch (\Throwable $e) {

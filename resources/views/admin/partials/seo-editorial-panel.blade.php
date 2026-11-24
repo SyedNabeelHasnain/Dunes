@@ -28,7 +28,7 @@
     $publicTargetUrl = match ($entityType ?? '') {
         'blog_post' => url('/blog/'.$entity->slug),
         'wiki_article' => url('/wiki/'.($entity->pillar?->slug ?? 'guide').'/'.$entity->slug),
-        default => url('/'.ltrim((string) $entity->slug, '/')),
+        default => ($entityType === 'page' && $entity->slug === 'home') ? url('/') : url('/'.ltrim((string) $entity->slug, '/')),
     };
 @endphp
 

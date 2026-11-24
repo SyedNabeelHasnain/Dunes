@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Schema;
 
 class SeoTemplate extends Model
@@ -154,11 +155,20 @@ class SeoTemplate extends Model
             return;
         }
 
-        foreach (self::defaultDefinitions() as $contentType => $attrs) {
-            self::firstOrCreate(
-                ['content_type' => $contentType],
-                array_merge($attrs, ['is_active' => true])
-            );
+        $defaults = self::defaultDefinitions();
+        if (self::query()->count() >= count($defaults)) {
+            return;
+        }
+
+        foreach ($defaults as $contentType => $attrs) {
+            try {
+                self::firstOrCreate(
+                    ['content_type' => $contentType],
+                    array_merge($attrs, ['is_active' => true])
+                );
+            } catch (QueryException) {
+                // Safe under concurrent requests attempting first-time default seeding
+            }
         }
     }
 }

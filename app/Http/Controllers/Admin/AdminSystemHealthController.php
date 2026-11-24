@@ -76,7 +76,7 @@ class AdminSystemHealthController extends Controller
         $error404Count = 0;
         try {
             if (class_exists(RequestLog::class) && Schema::hasTable('request_logs')) {
-                $error404Count = RequestLog::where('action_type', 'error_404')
+                $error404Count = RequestLog::where('entity_type', 'error_404')
                     ->where('request_timestamp', '>=', now()->subDays(7))
                     ->count();
             }

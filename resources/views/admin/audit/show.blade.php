@@ -14,7 +14,7 @@
                 <span class="text-xs font-bold text-slate-700">Audit Run #{{ $run->id }}</span>
             </div>
             <h1 class="text-xl font-extrabold text-slate-900 mt-1">Audit Run Execution #{{ $run->id }}</h1>
-            <p class="text-xs text-slate-500 mt-0.5">Executed on {{ $run->created_at->format('M d, Y h:i A') }} (Duration: {{ $run->duration_ms }} ms)</p>
+            <p class="text-xs text-slate-500 mt-0.5">Executed on {{ optional($run->created_at)->format('M d, Y h:i A') ?? 'N/A' }} (Duration: {{ $run->duration_ms }} ms)</p>
         </div>
         <div class="flex items-center gap-3">
             <a href="{{ route('admin.audit.export', ['id' => $run->id, 'format' => 'csv']) }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition shadow-2xs">

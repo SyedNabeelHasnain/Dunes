@@ -47,11 +47,13 @@ class AdminAiVisibilityController extends Controller
                         ->count();
                 }
 
-                $aiReferrals = RequestLog::where(function ($q) {
-                    foreach (self::AI_REFERRER_DOMAINS as $domain) {
-                        $q->orWhere('referrer_url', 'like', "%{$domain}%");
-                    }
-                })
+                $aiReferrals = RequestLog::whereNotNull('referrer_url')
+                    ->where('referrer_url', '!=', '')
+                    ->where(function ($q) {
+                        foreach (self::AI_REFERRER_DOMAINS as $domain) {
+                            $q->orWhere('referrer_url', 'like', "%{$domain}%");
+                        }
+                    })
                     ->where('request_timestamp', '>=', now()->subDays(30))
                     ->select('referrer_url', DB::raw('COUNT(*) as visits'), DB::raw('MAX(request_timestamp) as last_visit'))
                     ->groupBy('referrer_url')

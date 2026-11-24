@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\Http\InternalHttpProbeService;
 use App\Services\VisitorTrackerService;
 use Closure;
 use Illuminate\Http\Request;
@@ -29,7 +30,7 @@ class TrackVisitor
      */
     public function terminate(Request $request, Response $response): void
     {
-        if (app()->runningUnitTests()) {
+        if (app()->runningUnitTests() || InternalHttpProbeService::isProbing()) {
             return;
         }
 

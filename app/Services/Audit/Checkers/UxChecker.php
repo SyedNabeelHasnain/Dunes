@@ -19,7 +19,7 @@ class UxChecker implements AuditCheckerInterface
                     ->map(fn ($p) => RedirectRule::normalizePath((string) $p))
                     ->flip();
 
-                $topMissing = RequestLog::where('action_type', 'error_404')
+                $topMissing = RequestLog::where('entity_type', 'error_404')
                     ->where('request_timestamp', '>=', now()->subDays(14))
                     ->selectRaw('request_uri, COUNT(*) as hits')
                     ->groupBy('request_uri')

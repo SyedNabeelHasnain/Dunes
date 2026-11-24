@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Language;
+use App\Services\Http\InternalHttpProbeService;
 use Carbon\Carbon;
 use Closure;
 use Illuminate\Http\Request;
@@ -85,7 +86,7 @@ class SetLocale
             URL::defaults(['locale' => $currentLocale]);
         }
 
-        if ($request->hasSession()) {
+        if (! InternalHttpProbeService::isProbing() && $request->hasSession()) {
             $request->session()->put('locale', $currentLocale);
         }
 

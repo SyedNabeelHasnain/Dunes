@@ -62,6 +62,7 @@ class AdminSettingController extends Controller
             'indexnow_enabled', 'indexnow_key', 'indexnow_last_submission',
             'google_site_verification', 'bing_site_verification', 'yandex_site_verification', 'baidu_site_verification',
             'clarity_id', 'clarity_active',
+            'seo_index_tracking_params', 'schema_use_verified_review_count',
             'site_hero_poster', 'site_default_image',
         ];
 

@@ -7,9 +7,9 @@ use App\Models\RedirectRule;
 use App\Models\RequestLog;
 use App\Models\User;
 use App\Services\Governance\ConfigAuditService;
+use App\Services\Http\InternalHttpProbeService;
 use App\Services\RedirectManagerService;
 use App\Services\Security\SafeUrlValidator;
-use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -21,6 +21,7 @@ class AdminRedirectController extends Controller
     public function __construct(
         protected RedirectManagerService $redirectService,
         protected ConfigAuditService $audit,
+        protected InternalHttpProbeService $probeService,
     ) {}
 
     /**
@@ -68,7 +69,7 @@ class AdminRedirectController extends Controller
                 ->map(fn ($p) => RedirectRule::normalizePath((string) $p))
                 ->flip();
 
-            $top404s = RequestLog::where('action_type', 'error_404')
+            $top404s = RequestLog::where('entity_type', 'error_404')
                 ->whereNotNull('request_uri')
                 ->select('request_uri', DB::raw('COUNT(*) as hits'), DB::raw('MAX(request_timestamp) as last_seen_at'))
                 ->groupBy('request_uri')
@@ -253,10 +254,7 @@ class AdminRedirectController extends Controller
                 $res = SafeUrlValidator::httpClient(6, 3)->get($target);
                 $status = $res->status();
             } else {
-                $kernel = app(HttpKernel::class);
-                $subReq = Request::create('/'.ltrim($target, '/'), 'GET');
-                $subRes = $kernel->handle($subReq);
-                $status = $subRes->getStatusCode();
+                $status = $this->probeService->probePath($target)['status'];
             }
         } catch (\Throwable) {
             $status = 0;

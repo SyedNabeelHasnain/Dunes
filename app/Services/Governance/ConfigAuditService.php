@@ -63,7 +63,7 @@ class ConfigAuditService
             'user_id' => $user?->id,
             'user_name' => $user?->name ?? 'System',
             'user_email' => $user?->email,
-            'user_role' => method_exists($user, 'normalizedRole') ? $user->normalizedRole() : ($user?->role ?? 'system'),
+            'user_role' => (is_object($user) && method_exists($user, 'normalizedRole')) ? $user->normalizedRole() : ($user?->role ?? 'system'),
             'section' => $section,
             'action' => $action,
             'entity_type' => $entityType,

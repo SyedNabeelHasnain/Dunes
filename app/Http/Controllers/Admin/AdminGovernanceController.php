@@ -61,7 +61,7 @@ class AdminGovernanceController extends Controller
             'active_templates' => SeoTemplate::where('is_active', true)->count(),
             'active_redirects' => RedirectRule::where('is_active', true)->count(),
             'recent_404s' => class_exists(RequestLog::class)
-                ? RequestLog::where('action_type', 'error_404')->where('request_timestamp', '>=', now()->subDays(7))->count()
+                ? RequestLog::where('entity_type', 'error_404')->where('request_timestamp', '>=', now()->subDays(7))->count()
                 : 0,
             'consents_7d' => PrivacyConsent::where('consented_at', '>=', now()->subDays(7))->count(),
             'vitals_7d' => WebVitalsMetric::where('recorded_at', '>=', now()->subDays(7))->count(),

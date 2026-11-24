@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\Http\InternalHttpProbeService;
 use App\Services\IpSecurityService;
 use App\Services\VisitorTrackerService;
 use Closure;
@@ -24,6 +25,10 @@ class IpFirewallMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if (InternalHttpProbeService::isProbing()) {
+            return $next($request);
+        }
+
         // Resolve genuine client IP through multi-tier proxy/CDN detection
         $ipData = $this->tracker->resolveClientIp();
         $clientIp = $ipData['client_ip'] ?: ($request->ip() ?: '0.0.0.0');
