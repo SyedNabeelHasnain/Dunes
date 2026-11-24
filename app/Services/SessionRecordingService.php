@@ -84,44 +84,55 @@ class SessionRecordingService
 
         $relativeFilePath = $subDir . '/' . $safeSessionId . '.json.gz';
         $absoluteFilePath = storage_path('app/' . $relativeFilePath);
+        $lockFilePath = $absoluteFilePath . '.lock';
 
-        // Load existing events if recording file exists
-        $existingEvents = [];
-        if (File::exists($absoluteFilePath)) {
-            $raw = File::get($absoluteFilePath);
-            if ($raw !== false && ! empty($raw)) {
-                $decoded = @gzdecode($raw);
-                if ($decoded !== false) {
-                    $existingEvents = json_decode($decoded, true) ?: [];
-                } else {
-                    $existingEvents = json_decode($raw, true) ?: [];
+        $lockHandle = @fopen($lockFilePath, 'c+b');
+        if ($lockHandle) {
+            @flock($lockHandle, LOCK_EX);
+        }
+
+        try {
+            // Load existing events if recording file exists
+            $existingEvents = [];
+            if (File::exists($absoluteFilePath)) {
+                $raw = File::get($absoluteFilePath);
+                if ($raw !== false && ! empty($raw)) {
+                    $decoded = @gzdecode($raw);
+                    if ($decoded !== false) {
+                        $existingEvents = json_decode($decoded, true) ?: [];
+                    } else {
+                        $existingEvents = json_decode($raw, true) ?: [];
+                    }
                 }
             }
-        }
 
-        // Merge new events into array
-        $mergedEvents = array_merge($existingEvents, $events);
-        $eventsCount = count($mergedEvents);
+            // Merge, deduplicate, and chronologically sort events so multi-batch/unload requests never break playback
+            $mergedEvents = $this->normalizeEvents(array_merge($existingEvents, $events));
+            $eventsCount = count($mergedEvents);
 
-        // Calculate session duration from first and last event timestamps
-        $durationSeconds = 0;
-        if (! empty($mergedEvents)) {
-            $firstTs = $mergedEvents[0]['timestamp'] ?? null;
-            $lastTs = end($mergedEvents)['timestamp'] ?? null;
-            if ($firstTs && $lastTs && $lastTs >= $firstTs) {
-                $durationSeconds = (int) round(($lastTs - $firstTs) / 1000);
+            // Calculate accurate session duration across chronological timestamps
+            $durationSeconds = 0;
+            if (! empty($mergedEvents)) {
+                $firstTs = (float) ($mergedEvents[0]['timestamp'] ?? 0);
+                $lastTs = (float) (end($mergedEvents)['timestamp'] ?? 0);
+                if ($firstTs > 0 && $lastTs >= $firstTs) {
+                    $durationSeconds = (int) round(($lastTs - $firstTs) / 1000);
+                }
             }
-        }
 
-        // Compress and write back to disk
-        $jsonPayload = json_encode($mergedEvents, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        $compressed = gzencode($jsonPayload, 6);
-        if ($compressed !== false) {
-            File::put($absoluteFilePath, $compressed);
-            $fileSizeBytes = strlen($compressed);
-        } else {
-            File::put($absoluteFilePath, $jsonPayload);
-            $fileSizeBytes = strlen($jsonPayload);
+            // Compress and write atomically via temp file + rename under exclusive lock
+            $jsonPayload = json_encode($mergedEvents, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            $compressed = gzencode($jsonPayload, 6);
+            $bytesToWrite = $compressed !== false ? $compressed : $jsonPayload;
+            $tmpPath = $absoluteFilePath . '.tmp.' . uniqid('', true);
+            File::put($tmpPath, $bytesToWrite);
+            @rename($tmpPath, $absoluteFilePath);
+            $fileSizeBytes = strlen($bytesToWrite);
+        } finally {
+            if ($lockHandle) {
+                @flock($lockHandle, LOCK_UN);
+                @fclose($lockHandle);
+            }
         }
 
         // Check for inquiry associations (draft, whatsapp, contact)
@@ -154,7 +165,7 @@ class SessionRecordingService
         }
 
         $recording->exit_page = $meta['current_page'] ?? $recording->exit_page;
-        $recording->duration_seconds = max($recording->duration_seconds, $durationSeconds);
+        $recording->duration_seconds = max((int) ($recording->duration_seconds ?? 0), $durationSeconds);
         $recording->events_count = $eventsCount;
         $recording->storage_path = $relativeFilePath;
         $recording->file_size_bytes = $fileSizeBytes;
@@ -194,7 +205,134 @@ class SessionRecordingService
             }
         }
 
-        return json_decode($raw, true) ?: [];
+        $events = json_decode($raw, true) ?: [];
+
+        return $this->normalizeEvents(is_array($events) ? $events : []);
+    }
+
+    /**
+     * Prepare a recording stream for rrweb-player playback: validates FullSnapshot availability,
+     * strips leading orphan mutations before the first FullSnapshot, guarantees valid Meta dimensions,
+     * and extracts multi-page navigation timeline markers.
+     *
+     * @return array{
+     *   events: array<int, array<string, mixed>>,
+     *   replayable: bool,
+     *   has_full_snapshot: bool,
+     *   has_meta: bool,
+     *   raw_events_count: int,
+     *   duration_ms: int,
+     *   pages: array<int, array{url: string, path: string, offset_ms: int, timestamp: int}>,
+     *   reason: ?string
+     * }
+     */
+    public function prepareEventsForPlayback(VisitorSessionRecording $recording): array
+    {
+        $events = $this->getRecordingEvents($recording);
+        $rawCount = count($events);
+
+        if ($rawCount === 0) {
+            return [
+                'events' => [],
+                'replayable' => false,
+                'has_full_snapshot' => false,
+                'has_meta' => false,
+                'raw_events_count' => 0,
+                'duration_ms' => 0,
+                'pages' => [],
+                'reason' => 'No recorded DOM events were found on disk for this session.',
+            ];
+        }
+
+        $firstSnapIdx = null;
+        foreach ($events as $idx => $evt) {
+            if ((int) ($evt['type'] ?? -1) === 2) {
+                $firstSnapIdx = $idx;
+                break;
+            }
+        }
+
+        if ($firstSnapIdx === null) {
+            return [
+                'events' => $events,
+                'replayable' => false,
+                'has_full_snapshot' => false,
+                'has_meta' => false,
+                'raw_events_count' => $rawCount,
+                'duration_ms' => 0,
+                'pages' => [],
+                'reason' => "Captured {$rawCount} telemetry event(s), but the visitor navigated away before an initial DOM FullSnapshot reached the server.",
+            ];
+        }
+
+        // Keep any matching Meta/Load event at or right before the first FullSnapshot, dropping leading orphan incremental events
+        $startIdx = $firstSnapIdx;
+        for ($i = $firstSnapIdx - 1; $i >= 0; $i--) {
+            $t = (int) ($events[$i]['type'] ?? -1);
+            if ($t === 3) {
+                break;
+            }
+            $startIdx = $i;
+        }
+        $stream = array_slice($events, $startIdx);
+
+        $isMob = strtolower((string) ($recording->device_type ?? '')) === 'mobile';
+        $fallbackMeta = [
+            'href' => $recording->landing_page ? url($recording->landing_page) : url('/'),
+            'width' => $isMob ? 390 : 1280,
+            'height' => $isMob ? 844 : 800,
+        ];
+
+        // Normalize existing Meta events so width/height are always >= 320x240 (prevents Infinity scale in rrweb-player)
+        $hasMeta = false;
+        foreach ($stream as &$evt) {
+            if ((int) ($evt['type'] ?? -1) === 4) {
+                $hasMeta = true;
+                $data = is_array($evt['data'] ?? null) ? $evt['data'] : [];
+                $w = (int) ($data['width'] ?? 0);
+                $h = (int) ($data['height'] ?? 0);
+                if ($w < 320 || $h < 240) {
+                    $data['width'] = $w >= 320 ? $w : $fallbackMeta['width'];
+                    $data['height'] = $h >= 240 ? $h : $fallbackMeta['height'];
+                }
+                if (empty($data['href'])) {
+                    $data['href'] = $fallbackMeta['href'];
+                }
+                $evt['data'] = $data;
+            }
+        }
+        unset($evt);
+
+        $startTs = (int) ($stream[0]['timestamp'] ?? 0);
+        $endTs = (int) (end($stream)['timestamp'] ?? $startTs);
+        $durationMs = max(0, $endTs - $startTs);
+
+        $pages = [];
+        foreach ($stream as $evt) {
+            if ((int) ($evt['type'] ?? -1) === 4 && ! empty($evt['data']['href'])) {
+                $href = (string) $evt['data']['href'];
+                $path = parse_url($href, PHP_URL_PATH) ?: '/';
+                $ts = (int) ($evt['timestamp'] ?? $startTs);
+                $pages[] = [
+                    'url' => $href,
+                    'path' => $path,
+                    'offset_ms' => max(0, $ts - $startTs),
+                    'timestamp' => $ts,
+                ];
+            }
+        }
+
+        return [
+            'events' => $stream,
+            'replayable' => count($stream) >= 2,
+            'has_full_snapshot' => true,
+            'has_meta' => $hasMeta,
+            'recommended_meta' => $fallbackMeta,
+            'raw_events_count' => $rawCount,
+            'duration_ms' => $durationMs,
+            'pages' => $pages,
+            'reason' => null,
+        ];
     }
 
     /**
@@ -207,9 +345,67 @@ class SessionRecordingService
             if (File::exists($absolutePath)) {
                 @File::delete($absolutePath);
             }
+            if (File::exists($absolutePath . '.lock')) {
+                @File::delete($absolutePath . '.lock');
+            }
         }
 
         return (bool) $recording->delete();
+    }
+
+    /**
+     * Chronologically sort and deduplicate rrweb events while preserving Meta -> FullSnapshot ordering on equal timestamps.
+     *
+     * @param  array<int, mixed>  $events
+     * @return array<int, array<string, mixed>>
+     */
+    protected function normalizeEvents(array $events): array
+    {
+        $indexed = [];
+        $seen = [];
+
+        foreach ($events as $seq => $evt) {
+            if (! is_array($evt) || ! isset($evt['type'], $evt['timestamp'])) {
+                continue;
+            }
+            $type = (int) $evt['type'];
+            $ts = (float) $evt['timestamp'];
+
+            // Deduplicate identical retries/double-unload emissions
+            $sig = $type . '|' . $ts . '|' . md5(json_encode($evt['data'] ?? null));
+            if (isset($seen[$sig])) {
+                continue;
+            }
+            $seen[$sig] = true;
+
+            $indexed[] = [
+                'event' => $evt,
+                'ts' => $ts,
+                'prio' => match ($type) {
+                    0 => 0, // DomContentLoaded
+                    1 => 1, // Load
+                    4 => 2, // Meta (must precede FullSnapshot!)
+                    2 => 3, // FullSnapshot
+                    5 => 4, // Custom
+                    6 => 5, // Plugin
+                    default => 6, // IncrementalSnapshot
+                },
+                'seq' => $seq,
+            ];
+        }
+
+        usort($indexed, static function (array $a, array $b): int {
+            if ($a['ts'] !== $b['ts']) {
+                return $a['ts'] <=> $b['ts'];
+            }
+            if ($a['prio'] !== $b['prio']) {
+                return $a['prio'] <=> $b['prio'];
+            }
+
+            return $a['seq'] <=> $b['seq'];
+        });
+
+        return array_map(static fn (array $item): array => $item['event'], $indexed);
     }
 
     /**

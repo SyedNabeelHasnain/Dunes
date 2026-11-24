@@ -109,10 +109,17 @@ class AdminSessionRecordingController extends Controller
             return response()->json(['success' => false, 'message' => 'Recording not found.'], 404);
         }
 
-        $events = $this->recordingService->getRecordingEvents($recording);
+        $prepared = $this->recordingService->prepareEventsForPlayback($recording);
 
         return response()->json([
             'success' => true,
+            'replayable' => $prepared['replayable'],
+            'has_full_snapshot' => $prepared['has_full_snapshot'],
+            'has_meta' => $prepared['has_meta'],
+            'recommended_meta' => $prepared['recommended_meta'] ?? null,
+            'reason' => $prepared['reason'],
+            'pages' => $prepared['pages'],
+            'duration_ms' => $prepared['duration_ms'],
             'recording' => [
                 'id' => $recording->id,
                 'session_id' => $recording->session_id,
@@ -133,8 +140,8 @@ class AdminSessionRecordingController extends Controller
                 'created_at' => $recording->created_at?->format('M d, Y h:i A'),
                 'relative_time' => $recording->last_event_at?->diffForHumans() ?? $recording->created_at?->diffForHumans(),
             ],
-            'events' => $events,
-            'events_count' => count($events),
+            'events' => $prepared['events'],
+            'events_count' => count($prepared['events']),
         ]);
     }
 

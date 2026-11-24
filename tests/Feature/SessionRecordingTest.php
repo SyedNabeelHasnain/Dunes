@@ -248,4 +248,97 @@ class SessionRecordingTest extends TestCase
         // Assert fresh recording was preserved
         $this->assertDatabaseHas('visitor_session_recordings', ['id' => $freshRec->id]);
     }
+
+    public function test_gzip_base64_payload_and_out_of_order_batches_sort_meta_before_fullsnapshot(): void
+    {
+        $sessionId = 'gz-multipage-' . uniqid();
+
+        // Batch B (later incremental scroll) arrives BEFORE Batch A (initial Meta + FullSnapshot sharing identical timestamp)
+        $batchLater = [
+            ['type' => 3, 'data' => ['source' => 3, 'x' => 0, 'y' => 250], 'timestamp' => 1730600005000],
+        ];
+        $this->postJson('/api/telemetry/recordings/batch', [
+            'session_id' => $sessionId,
+            'events' => $batchLater,
+            'current_page' => '/',
+        ], [
+            'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'REMOTE_ADDR' => '198.51.100.60',
+        ])->assertStatus(200)->assertJson(['success' => true]);
+
+        // Now send compressed gzip+base64 initial batch with FullSnapshot (2) placed BEFORE Meta (4) at same timestamp
+        $batchInitial = [
+            ['type' => 2, 'data' => ['node' => ['id' => 1, 'type' => 0]], 'timestamp' => 1730600000000],
+            ['type' => 4, 'data' => ['href' => 'https://dunesdiscoverytourism.com/', 'width' => 1280, 'height' => 800], 'timestamp' => 1730600000000],
+        ];
+        $gzB64 = base64_encode(gzencode(json_encode($batchInitial)));
+
+        // Simulate text/plain beacon payload parsing as well as events_gz_b64 decoding
+        $rawRes = $this->call('POST', '/api/telemetry/recordings/batch', [], [], [], [
+            'HTTP_USER_AGENT' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'REMOTE_ADDR' => '198.51.100.60',
+            'CONTENT_TYPE' => 'text/plain;charset=UTF-8',
+        ], json_encode([
+            'session_id' => $sessionId,
+            'events_gz_b64' => $gzB64,
+            'current_page' => '/tours',
+            'is_final' => true,
+        ]));
+        $rawRes->assertStatus(200)->assertJson(['success' => true, 'session_id' => $sessionId, 'events_count' => 3]);
+
+        $recording = VisitorSessionRecording::where('session_id', $sessionId)->firstOrFail();
+        $eventsRes = $this->actingAs($this->admin)->getJson("/admin/analytics/recordings/{$recording->id}/events");
+        $eventsRes->assertStatus(200)->assertJson([
+            'success' => true,
+            'replayable' => true,
+            'has_full_snapshot' => true,
+            'events_count' => 3,
+        ]);
+
+        // Assert Meta (4) strictly precedes FullSnapshot (2), which precedes Incremental (3)
+        $returnedTypes = array_column($eventsRes->json('events'), 'type');
+        $this->assertSame([4, 2, 3], $returnedTypes);
+        $this->assertCount(1, $eventsRes->json('pages'));
+
+        $this->recordingService->deleteRecording($recording);
+    }
+
+    public function test_incomplete_stream_without_fullsnapshot_is_flagged_unreplayable_and_missing_meta_is_synthesized(): void
+    {
+        $orphanId = 'orphan-inc-' . uniqid();
+        $orphan = $this->recordingService->ingestBatch($orphanId, [
+            ['type' => 3, 'data' => ['source' => 1], 'timestamp' => 1730600001000],
+            ['type' => 3, 'data' => ['source' => 1], 'timestamp' => 1730600002000],
+        ], ['client_ip' => '198.51.100.61', 'current_page' => '/']);
+
+        $orphanRes = $this->actingAs($this->admin)->getJson("/admin/analytics/recordings/{$orphan->id}/events");
+        $orphanRes->assertStatus(200)->assertJson([
+            'success' => true,
+            'replayable' => false,
+            'has_full_snapshot' => false,
+        ]);
+        $this->assertNotEmpty($orphanRes->json('reason'));
+        $this->recordingService->deleteRecording($orphan);
+
+        // Stream with FullSnapshot + trailing incremental, preceded by orphan type 3 and missing Meta
+        $noMetaId = 'no-meta-' . uniqid();
+        $noMeta = $this->recordingService->ingestBatch($noMetaId, [
+            ['type' => 3, 'data' => ['source' => 1], 'timestamp' => 1730600000500],
+            ['type' => 2, 'data' => ['node' => ['id' => 1]], 'timestamp' => 1730600001000],
+            ['type' => 3, 'data' => ['source' => 3], 'timestamp' => 1730600003000],
+        ], ['client_ip' => '198.51.100.62', 'device_type' => 'mobile', 'current_page' => '/tours']);
+
+        $repairedRes = $this->actingAs($this->admin)->getJson("/admin/analytics/recordings/{$noMeta->id}/events");
+        $repairedRes->assertStatus(200)->assertJson([
+            'success' => true,
+            'replayable' => true,
+            'has_full_snapshot' => true,
+            'has_meta' => false,
+        ]);
+        $repairedEvents = $repairedRes->json('events');
+        // Leading orphan type 3 stripped so playback starts at FullSnapshot + mobile recommended_meta supplied for player
+        $this->assertSame([2, 3], array_column($repairedEvents, 'type'));
+        $this->assertSame(390, $repairedRes->json('recommended_meta.width'));
+        $this->recordingService->deleteRecording($noMeta);
+    }
 }

@@ -39,7 +39,13 @@ class SessionTelemetryController extends Controller
                 return response()->json(['skipped' => 'recordings_disabled'], 200);
             }
 
-            $ipInfo = $this->tracker->resolveClientIp($request->all());
+            // Parse raw request body once so beacons (text/plain or application/json) hydrate all fields cleanly
+            $rawContent = $request->getContent();
+            $parsedBody = is_string($rawContent) && $rawContent !== '' ? json_decode($rawContent, true) : null;
+            $bodyData = is_array($parsedBody) ? $parsedBody : [];
+
+            $payloadForIp = array_merge($bodyData, $request->all());
+            $ipInfo = $this->tracker->resolveClientIp($payloadForIp);
             $clientIp = $ipInfo['client_ip'];
 
             // Strict Exclusion: Firewall and Ignored IPs
@@ -49,44 +55,63 @@ class SessionTelemetryController extends Controller
 
             // Strict Exclusion: Bot Detection
             $uaData = $this->tracker->parseUserAgent();
-            $isBot = ($this->tracker->classifyBot($uaData) === 'Likely Bot') || $request->boolean('is_webdriver');
+            $isWebdriver = $request->boolean('is_webdriver') || ! empty($bodyData['is_webdriver']);
+            $isBot = ($this->tracker->classifyBot($uaData) === 'Likely Bot') || $isWebdriver;
             if ($isBot) {
                 return response()->json(['skipped' => 'bot_excluded'], 200);
             }
 
-            // Decode incoming events payload (handles json string or array, payload could come via beacon or raw body)
-            $rawEvents = $request->input('events');
-            if (is_string($rawEvents)) {
-                $events = json_decode($rawEvents, true) ?: [];
-            } elseif (is_array($rawEvents)) {
-                $events = $rawEvents;
-            } else {
-                // Check raw request content
-                $content = $request->getContent();
-                if (! empty($content)) {
-                    $parsed = json_decode($content, true);
-                    $events = $parsed['events'] ?? [];
-                } else {
-                    $events = [];
+            // Decode incoming events payload (supports gzip+base64 payload, JSON array/string, or raw beacon body)
+            $events = [];
+            $gzB64 = $request->input('events_gz_b64', $bodyData['events_gz_b64'] ?? null);
+            if (is_string($gzB64) && $gzB64 !== '' && strlen($gzB64) <= 4194304) {
+                $compressed = base64_decode($gzB64, true);
+                if ($compressed !== false) {
+                    $inflated = @gzdecode($compressed);
+                    if ($inflated !== false) {
+                        $decodedGz = json_decode($inflated, true);
+                        if (is_array($decodedGz)) {
+                            $events = $decodedGz;
+                        }
+                    }
                 }
             }
+
+            if (empty($events)) {
+                $rawEvents = $request->input('events', $bodyData['events'] ?? null);
+                if (is_string($rawEvents)) {
+                    $events = json_decode($rawEvents, true) ?: [];
+                } elseif (is_array($rawEvents)) {
+                    $events = $rawEvents;
+                }
+            }
+
+            $events = array_values(array_filter(
+                is_array($events) ? $events : [],
+                static fn ($evt) => is_array($evt) && isset($evt['type'], $evt['timestamp'])
+            ));
 
             if (empty($events)) {
                 return response()->json(['error' => 'empty_events'], 422);
             }
 
-            $sessionId = $request->input('session_id') ?: ($request->cookie('dunes_session') ?: session()->getId());
+            $sessionId = (string) ($request->input('session_id')
+                ?: ($bodyData['session_id'] ?? '')
+                ?: ($request->cookie('dunes_session') ?: session()->getId()));
             $geo = $this->tracker->ipLookup($clientIp);
+
+            $currentPage = $request->input('current_page', $bodyData['current_page'] ?? $request->header('referer'));
+            $isFinal = $request->boolean('is_final') || ! empty($bodyData['is_final']);
 
             $meta = [
                 'client_ip' => $clientIp,
                 'country' => $geo['country'] ?? null,
                 'city' => $geo['city'] ?? null,
-                'device_type' => $uaData['device_type'] ?? 'desktop',
+                'device_type' => $uaData['device_type'] ?? ($bodyData['device_type'] ?? 'desktop'),
                 'browser_name' => $uaData['browser_name'] ?? null,
                 'os_name' => $uaData['os_name'] ?? null,
-                'current_page' => $request->input('current_page', $request->header('referer')),
-                'is_final' => $request->boolean('is_final'),
+                'current_page' => $currentPage,
+                'is_final' => $isFinal,
                 'is_bot' => false,
             ];
 

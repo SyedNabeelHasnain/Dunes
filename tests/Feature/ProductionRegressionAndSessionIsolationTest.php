@@ -382,4 +382,34 @@ class ProductionRegressionAndSessionIsolationTest extends TestCase
         $seoView->assertStatus(200);
         $seoView->assertSee('name="seo_index_tracking_params" id="seo_index_tracking_params" value="1" checked', false);
     }
+
+    public function test_health_dashboard_survives_malformed_heartbeat_and_oversized_log_tail_safely(): void
+    {
+        $admin = User::factory()->create(['role' => 'super_admin', 'is_active' => true]);
+
+        \Illuminate\Support\Facades\Cache::put('scheduler_last_heartbeat', 'not-a-valid-date-string', 60);
+
+        $logPath = storage_path('logs/laravel.log');
+        $hadOriginal = file_exists($logPath);
+        $originalBackup = $hadOriginal ? file_get_contents($logPath) : null;
+
+        try {
+            // Write > 100 KB log payload with multi-byte UTF-8 error line beyond the 64 KB window
+            $paddingLine = "[2026-11-24 00:00:00] production.INFO: normal heartbeat log padding 0123456789\n";
+            $bigLog = str_repeat($paddingLine, 1400)
+                . "[2026-11-24 12:00:00] production.ERROR: Simulated UTF-8 desert tour error صحراء\n";
+            file_put_contents($logPath, $bigLog);
+
+            $res = $this->actingAs($admin)->withoutExceptionHandling()->get(route('admin.health.index'));
+            $res->assertStatus(200);
+            $res->assertSee('Simulated UTF-8 desert tour error');
+        } finally {
+            if ($hadOriginal) {
+                file_put_contents($logPath, $originalBackup);
+            } elseif (file_exists($logPath)) {
+                @unlink($logPath);
+            }
+            \Illuminate\Support\Facades\Cache::forget('scheduler_last_heartbeat');
+        }
+    }
 }

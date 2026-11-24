@@ -9,29 +9,25 @@
         background: #090d16;
         border-radius: 1rem;
         overflow: hidden;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
     }
-    .rrweb-player {
-        margin: 0 auto;
+    .rr-player {
+        margin: 0 auto !important;
+        float: none !important;
         box-shadow: none !important;
-        border: none !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 0.75rem !important;
     }
-    .rrweb-player .rr-controller {
-        background: rgba(15, 23, 42, 0.95) !important;
+    .rr-player .rr-controller {
+        background: rgba(15, 23, 42, 0.98) !important;
         backdrop-filter: blur(8px);
         border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
         color: #f1f5f9 !important;
     }
-    .rrweb-player .rr-timeline__time {
+    .rr-player .rr-timeline__time {
         color: #94a3b8 !important;
         font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
         font-size: 11px !important;
-    }
-    .rrweb-player .rr-controller__btn {
-        color: #cbd5e1 !important;
-    }
-    .rrweb-player .rr-controller__btn:hover {
-        color: #f59e0b !important;
     }
 </style>
 @endpush
@@ -390,16 +386,17 @@
     <!-- INTERACTIVE RRWEB REPLAYER MODAL           -->
     <!-- ========================================== -->
     <div x-show="playerModalOpen" 
+         @keydown.escape.window="if (playerModalOpen) closePlayerModal()"
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0"
          x-transition:enter-end="opacity-100"
          x-transition:leave="transition ease-in duration-200"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
-         class="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6"
+         class="fixed inset-0 z-50 overflow-y-auto bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-2 sm:p-5"
          style="display: none;">
         
-        <div class="bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl w-full max-w-6xl max-h-[94vh] flex flex-col overflow-hidden text-slate-100"
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl w-full max-w-6xl max-h-[95vh] flex flex-col overflow-hidden text-slate-100"
              @click.outside="closePlayerModal()">
             
             <!-- Modal Header -->
@@ -455,8 +452,24 @@
             </div>
 
             <!-- Replayer Canvas Cinema Body -->
-            <div class="flex-1 p-4 sm:p-6 overflow-hidden flex flex-col items-center justify-center bg-slate-950 min-h-[460px] relative">
+            <div class="flex-1 p-3 sm:p-5 overflow-auto flex flex-col items-center justify-center bg-slate-950 min-h-[380px] relative">
                 
+                <!-- Multi-Page Journey Jump Pills -->
+                <template x-if="!loadingEvents && !playerError && sessionPages.length > 0">
+                    <div class="w-full max-w-5xl mb-3 flex items-center gap-1.5 flex-wrap text-[11px]">
+                        <span class="text-slate-500 font-bold uppercase tracking-wider me-1">Journey Pages:</span>
+                        <template x-for="(pg, idx) in sessionPages" :key="idx">
+                            <button type="button"
+                                    @click="jumpToOffset(pg.offset_ms)"
+                                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-800/90 hover:bg-amber-500/20 border border-slate-700 hover:border-amber-500/40 text-slate-200 hover:text-amber-300 transition cursor-pointer font-mono">
+                                <i class="bi bi-file-earmark-code text-amber-400"></i>
+                                <span x-text="pg.path || '/'"></span>
+                                <span class="text-slate-400" x-text="'@ ' + formatMs(pg.offset_ms)"></span>
+                            </button>
+                        </template>
+                    </div>
+                </template>
+
                 <!-- Loading State -->
                 <div x-show="loadingEvents" class="text-center py-12">
                     <div class="w-12 h-12 rounded-full border-4 border-amber-400/20 border-t-amber-400 animate-spin mx-auto mb-3"></div>
@@ -464,19 +477,21 @@
                     <div class="text-xs text-slate-500 mt-1">Loading DOM mutations, mouse paths, and scroll events</div>
                 </div>
 
-                <!-- Error State -->
-                <div x-show="!loadingEvents && playerError" class="text-center py-12 max-w-md">
-                    <div class="w-12 h-12 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto mb-3">
+                <!-- Error / Incomplete Stream Diagnostic State -->
+                <div x-show="!loadingEvents && playerError" class="text-center py-12 max-w-lg px-4">
+                    <div class="w-12 h-12 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto mb-3">
                         <i class="bi bi-exclamation-triangle-fill text-xl"></i>
                     </div>
                     <div class="text-sm font-bold text-white" x-text="playerError"></div>
-                    <div class="text-xs text-slate-400 mt-1">This recording has no DOM events or the file was deleted.</div>
+                    <div class="text-xs text-slate-400 mt-2 leading-relaxed">
+                        Visual replay requires an initial DOM FullSnapshot plus interaction events. Short single-click bounces or pre-fix cached streams without a FullSnapshot cannot reconstruct a viewport frame.
+                    </div>
                 </div>
 
                 <!-- rrweb-player Mount Container -->
                 <div x-show="!loadingEvents && !playerError" 
                      id="rrweb-player-target" 
-                     class="w-full flex items-center justify-center overflow-hidden rr-player-cinema">
+                     class="w-full flex items-center justify-center rr-player-cinema">
                 </div>
             </div>
 
@@ -606,7 +621,9 @@ function recordingsHubApp() {
         loadingEvents: false,
         playerError: null,
         currentSession: null,
+        sessionPages: [],
         playerInstance: null,
+        activeFetchAbort: null,
         starredMap: {},
 
         isStarred(id, initialVal) {
@@ -664,71 +681,132 @@ function recordingsHubApp() {
             .catch(err => alert('Failed to exclude IP: ' + err.message));
         },
 
+        formatMs(ms) {
+            const totalSec = Math.max(0, Math.floor((ms || 0) / 1000));
+            const m = Math.floor(totalSec / 60);
+            const s = totalSec % 60;
+            return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        },
+
+        jumpToOffset(offsetMs) {
+            if (this.playerInstance && typeof this.playerInstance.goto === 'function') {
+                this.playerInstance.goto(Math.max(0, offsetMs || 0), true);
+            }
+        },
+
         playSession(id) {
+            if (this.activeFetchAbort) {
+                try { this.activeFetchAbort.abort(); } catch (e) {}
+            }
+            if (this.playerInstance && typeof this.playerInstance.pause === 'function') {
+                try { this.playerInstance.pause(); } catch (e) {}
+            }
+            this.playerInstance = null;
+
             this.playerModalOpen = true;
             this.loadingEvents = true;
             this.playerError = null;
             this.currentSession = null;
+            this.sessionPages = [];
 
             const target = document.getElementById('rrweb-player-target');
             if (target) {
                 target.innerHTML = '';
             }
 
-            fetch(`/admin/analytics/recordings/${id}/events`)
+            this.activeFetchAbort = typeof AbortController !== 'undefined' ? new AbortController() : null;
+
+            fetch(`/admin/analytics/recordings/${id}/events`, this.activeFetchAbort ? { signal: this.activeFetchAbort.signal } : {})
                 .then(res => res.json())
                 .then(data => {
                     this.loadingEvents = false;
-                    if (!data.success || !data.events || data.events.length < 2) {
-                        this.playerError = 'No DOM mutations or screen activity captured in this session.';
+                    this.currentSession = data.recording || null;
+                    this.sessionPages = Array.isArray(data.pages) ? data.pages : [];
+
+                    if (!data.success || !data.replayable || !data.events || data.events.length < 2) {
+                        this.playerError = data.reason || 'No DOM FullSnapshot or playable activity captured in this session.';
                         return;
                     }
 
-                    this.currentSession = data.recording;
                     this.$nextTick(() => {
-                        this.mountPlayer(data.events);
+                        this.mountPlayer(data.events, data.recommended_meta);
                     });
                 })
                 .catch(err => {
+                    if (err && err.name === 'AbortError') return;
                     this.loadingEvents = false;
-                    this.playerError = 'Failed to load recording events: ' + err.message;
+                    this.playerError = 'Failed to load recording events: ' + (err?.message || 'Unknown error');
                 });
         },
 
-        mountPlayer(events) {
+        mountPlayer(events, recommendedMeta) {
             const target = document.getElementById('rrweb-player-target');
             if (!target) return;
             target.innerHTML = '';
 
+            if (typeof window.rrwebPlayer !== 'function') {
+                this.playerError = 'Session replay player asset failed to load. Please hard-refresh the page.';
+                return;
+            }
+
+            // Guarantee Meta (type 4) event with valid viewport dimensions precedes FullSnapshot so rrwebPlayer unhides & scales cleanly
+            let stream = Array.isArray(events) ? events.slice() : [];
+            if (stream.length > 0 && !stream.some(e => Number(e.type) === 4)) {
+                const fallback = recommendedMeta || {
+                    href: window.location.origin + (this.currentSession?.landing_page || '/'),
+                    width: this.currentSession?.device_type === 'mobile' ? 390 : 1280,
+                    height: this.currentSession?.device_type === 'mobile' ? 844 : 800
+                };
+                stream.unshift({
+                    type: 4,
+                    data: fallback,
+                    timestamp: stream[0].timestamp || Date.now()
+                });
+            }
+
             try {
-                // Responsive dimensions for cinema player
-                const containerW = Math.min(1060, window.innerWidth - 64);
-                const containerH = Math.min(600, Math.round(containerW * 0.58));
+                // Viewport-aware dimensions so the 80px rr-controller timeline is never clipped on laptops
+                const maxAvailW = Math.max(320, Math.min(1040, (target.parentElement?.clientWidth || window.innerWidth) - 32));
+                const maxAvailH = Math.max(260, Math.min(540, window.innerHeight - 310));
+                const containerW = maxAvailW;
+                const containerH = Math.min(maxAvailH, Math.round(containerW * 0.56));
 
                 this.playerInstance = new rrwebPlayer({
                     target: target,
                     props: {
-                        events: events,
+                        events: stream,
                         width: containerW,
                         height: containerH,
                         autoPlay: true,
                         showController: true,
                         speedOption: [1, 2, 4, 8],
                         skipInactive: true,
+                        mouseTail: {
+                            strokeStyle: '#f59e0b',
+                            lineWidth: 2
+                        }
                     }
                 });
             } catch (err) {
-                this.playerError = 'Player initialization error: ' + err.message;
+                this.playerError = 'Player initialization error: ' + (err?.message || 'Unknown error');
             }
         },
 
         closePlayerModal() {
+            if (this.activeFetchAbort) {
+                try { this.activeFetchAbort.abort(); } catch (e) {}
+                this.activeFetchAbort = null;
+            }
+            if (this.playerInstance && typeof this.playerInstance.pause === 'function') {
+                try { this.playerInstance.pause(); } catch (e) {}
+            }
             this.playerModalOpen = false;
             const target = document.getElementById('rrweb-player-target');
             if (target) {
                 target.innerHTML = '';
             }
             this.playerInstance = null;
+            this.sessionPages = [];
         },
 
         confirmDelete(id) {

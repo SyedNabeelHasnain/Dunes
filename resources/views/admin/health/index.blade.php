@@ -107,7 +107,7 @@
                             <tr>
                                 <td class="px-4 py-2.5 font-mono text-[11px]">{{ $pg->page_path }}</td>
                                 <td class="px-4 py-2.5 font-bold">{{ $pg->metric_name }}</td>
-                                <td class="px-4 py-2.5 text-rose-700 font-bold">{{ round($pg->avg_value, 2) }}</td>
+                                <td class="px-4 py-2.5 text-rose-700 font-bold">{{ round((float) $pg->avg_value, 2) }}</td>
                                 <td class="px-4 py-2.5 text-right">{{ $pg->poor_samples }}</td>
                             </tr>
                         @empty

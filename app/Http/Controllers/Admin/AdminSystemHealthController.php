@@ -19,12 +19,25 @@ class AdminSystemHealthController extends Controller
     public function index(): View
     {
         $vitalsSummary = [];
+        $hasVitalsTable = false;
+        try {
+            $hasVitalsTable = Schema::hasTable('web_vitals_metrics');
+        } catch (\Throwable) {
+        }
+
         foreach (RumVitalsController::BUDGETS as $metric => $bounds) {
-            $values = WebVitalsMetric::where('metric_name', $metric)
-                ->where('recorded_at', '>=', now()->subDays(14))
-                ->orderBy('metric_value')
-                ->pluck('metric_value')
-                ->all();
+            $values = [];
+            if ($hasVitalsTable) {
+                try {
+                    $values = WebVitalsMetric::where('metric_name', $metric)
+                        ->where('recorded_at', '>=', now()->subDays(14))
+                        ->orderBy('metric_value')
+                        ->pluck('metric_value')
+                        ->all();
+                } catch (\Throwable) {
+                    $values = [];
+                }
+            }
 
             $count = count($values);
             $p75 = null;
@@ -47,13 +60,20 @@ class AdminSystemHealthController extends Controller
             ];
         }
 
-        $poorPages = WebVitalsMetric::where('rating', 'poor')
-            ->where('recorded_at', '>=', now()->subDays(14))
-            ->select('page_path', 'metric_name', DB::raw('COUNT(*) as poor_samples'), DB::raw('AVG(metric_value) as avg_value'))
-            ->groupBy('page_path', 'metric_name')
-            ->orderByDesc('poor_samples')
-            ->limit(15)
-            ->get();
+        $poorPages = collect();
+        if ($hasVitalsTable) {
+            try {
+                $poorPages = WebVitalsMetric::where('rating', 'poor')
+                    ->where('recorded_at', '>=', now()->subDays(14))
+                    ->select('page_path', 'metric_name', DB::raw('COUNT(*) as poor_samples'), DB::raw('AVG(metric_value) as avg_value'))
+                    ->groupBy('page_path', 'metric_name')
+                    ->orderByDesc('poor_samples')
+                    ->limit(15)
+                    ->get();
+            } catch (\Throwable) {
+                $poorPages = collect();
+            }
+        }
 
         $pendingJobs = 0;
         $failedJobsCount = 0;
@@ -70,8 +90,16 @@ class AdminSystemHealthController extends Controller
         } catch (\Throwable) {
         }
 
-        $lastHeartbeat = Cache::get('scheduler_last_heartbeat');
-        $cronActive = $lastHeartbeat && \Carbon\Carbon::parse($lastHeartbeat)->diffInMinutes(now()) <= 5;
+        $lastHeartbeat = null;
+        $cronActive = false;
+        try {
+            $lastHeartbeat = Cache::get('scheduler_last_heartbeat');
+            if ($lastHeartbeat) {
+                $cronActive = \Carbon\Carbon::parse((string) $lastHeartbeat)->diffInMinutes(now()) <= 5;
+            }
+        } catch (\Throwable) {
+            $cronActive = false;
+        }
 
         $error404Count = 0;
         try {
@@ -84,22 +112,27 @@ class AdminSystemHealthController extends Controller
         }
 
         $logPath = storage_path('logs/laravel.log');
-        $logSizeMb = file_exists($logPath) ? round(filesize($logPath) / 1048576, 2) : 0;
+        $logSizeMb = 0;
         $recentLogErrors = [];
-        if (file_exists($logPath) && is_readable($logPath)) {
-            $lines = @file($logPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
-            $tail = array_slice($lines, -120);
-            foreach (array_reverse($tail) as $line) {
-                if (str_contains($line, '.ERROR:') || str_contains($line, '.CRITICAL:')) {
-                    $recentLogErrors[] = substr($line, 0, 260);
-                    if (count($recentLogErrors) >= 10) {
-                        break;
-                    }
-                }
+        try {
+            if (is_file($logPath) && is_readable($logPath)) {
+                $size = @filesize($logPath) ?: 0;
+                $logSizeMb = round($size / 1048576, 2);
+                $recentLogErrors = $this->readRecentLogErrors($logPath, $size);
             }
+        } catch (\Throwable) {
         }
 
-        $diskFreeGb = @disk_free_space(base_path()) ? round(@disk_free_space(base_path()) / 1073741824, 2) : null;
+        $diskFreeGb = null;
+        try {
+            if (function_exists('disk_free_space')) {
+                $free = @disk_free_space(base_path());
+                if (is_numeric($free) && $free > 0) {
+                    $diskFreeGb = round(((float) $free) / 1073741824, 2);
+                }
+            }
+        } catch (\Throwable) {
+        }
 
         $system = [
             'php_version' => PHP_VERSION,
@@ -137,5 +170,54 @@ class AdminSystemHealthController extends Controller
         } catch (\Throwable $e) {
             return redirect()->route('admin.health.index')->withErrors(['queue' => $e->getMessage()]);
         }
+    }
+
+    /**
+     * Read only the tail 64 KB of laravel.log in constant O(1) memory so multi-megabyte log files never OOM.
+     *
+     * @return list<string>
+     */
+    private function readRecentLogErrors(string $logPath, int $fileSize): array
+    {
+        if ($fileSize <= 0) {
+            return [];
+        }
+
+        $handle = @fopen($logPath, 'rb');
+        if (! $handle) {
+            return [];
+        }
+
+        try {
+            $maxBytes = 65536;
+            $offset = max(0, $fileSize - $maxBytes);
+            if ($offset > 0) {
+                fseek($handle, $offset);
+            }
+            $chunk = stream_get_contents($handle) ?: '';
+        } finally {
+            fclose($handle);
+        }
+
+        if ($chunk === '') {
+            return [];
+        }
+
+        $lines = preg_split('/\r\n|\r|\n/', $chunk) ?: [];
+        $errors = [];
+        foreach (array_reverse($lines) as $line) {
+            $line = trim($line);
+            if ($line === '') {
+                continue;
+            }
+            if (str_contains($line, '.ERROR:') || str_contains($line, '.CRITICAL:')) {
+                $errors[] = function_exists('mb_strcut') ? mb_strcut($line, 0, 260, 'UTF-8') : substr($line, 0, 260);
+                if (count($errors) >= 10) {
+                    break;
+                }
+            }
+        }
+
+        return $errors;
     }
 }

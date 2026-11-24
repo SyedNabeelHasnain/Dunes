@@ -107,7 +107,7 @@ class ImageOptimizationService
             $success = @imageavif($img, $tempPath, $quality);
         }
 
-        imagedestroy($img);
+        unset($img);
 
         if (! $success || ! file_exists($tempPath) || filesize($tempPath) === 0) {
             if (file_exists($tempPath)) {
@@ -204,7 +204,7 @@ class ImageOptimizationService
                 };
 
                 if ($rotated !== null && $rotated !== false) {
-                    imagedestroy($img);
+                    unset($img);
                     return $rotated;
                 }
             }
