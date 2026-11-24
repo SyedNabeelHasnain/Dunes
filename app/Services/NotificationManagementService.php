@@ -482,7 +482,9 @@ class NotificationManagementService
                 $headers['X-Dunes-Signature'] = hash_hmac('sha256', $jsonBody, $secret);
             }
 
-            Http::timeout(5)
+            \App\Services\Security\SafeUrlValidator::assertSafeUrl($url);
+
+            \App\Services\Security\SafeUrlValidator::httpClient(5, 3)
                 ->withHeaders($headers)
                 ->post($url, $body);
         } catch (\Throwable $e) {

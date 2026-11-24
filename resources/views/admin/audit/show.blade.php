@@ -24,6 +24,19 @@
     </div>
 
     <!-- Health Score & Metric Summary -->
+    @if(!empty($comparison))
+        <div class="rounded-2xl border border-sky-200 bg-sky-50/70 px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div class="flex flex-wrap items-center gap-3">
+                <span class="font-extrabold text-sky-900">Delta vs Baseline Run #{{ $comparison['previous_run_id'] }}:</span>
+                <span class="px-2.5 py-0.5 rounded-full font-black {{ $comparison['score_delta'] >= 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800' }}">
+                    {{ $comparison['score_delta'] >= 0 ? '+' : '' }}{{ $comparison['score_delta'] }} pts
+                </span>
+                <span class="text-emerald-700 font-bold">{{ $comparison['resolved_count'] }} resolved</span> ·
+                <span class="text-amber-700 font-bold">{{ $comparison['new_count'] }} new</span>
+            </div>
+        </div>
+    @endif
+
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
             <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Health Score</span>

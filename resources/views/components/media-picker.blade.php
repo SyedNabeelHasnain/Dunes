@@ -49,7 +49,9 @@
                         </div>
                     </template>
                     <template x-if="mediaType !== 'video'">
-                        <img :src="resolvePreviewUrl(currentValue)" 
+                        <img :src="resolvePreviewUrl(currentValue)"
+                             :alt="extractFilename(currentValue) || 'Selected media asset preview'"
+                             width="64" height="64"
                              class="w-full h-full object-cover" 
                              onerror="this.src='/images/media-placeholder.svg'; this.onerror=null;">
                     </template>
@@ -114,7 +116,9 @@
             <div x-show="items.length > 0" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
                 <template x-for="(item, index) in items" :key="index">
                     <div class="group relative aspect-square rounded-xl border border-slate-200 overflow-hidden bg-slate-100 shadow-2xs">
-                        <img :src="resolvePreviewUrl(item)" 
+                        <img :src="resolvePreviewUrl(item)"
+                             :alt="extractFilename(item) || ('Gallery item ' + (index + 1))"
+                             width="128" height="128"
                              class="w-full h-full object-cover"
                              onerror="this.src='/images/media-placeholder.svg'; this.onerror=null;">
 

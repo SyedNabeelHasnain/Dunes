@@ -5,13 +5,29 @@
 @section('content')
 <div class="rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden mb-8">
     <div class="px-6 py-4 border-b border-slate-100 bg-white">
-        <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-full border border-slate-200 bg-slate-50 text-primary flex items-center justify-center text-xl shrink-0">
-                <i class="bi bi-search"></i>
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full border border-slate-200 bg-slate-50 text-primary flex items-center justify-center text-xl shrink-0">
+                    <i class="bi bi-search"></i>
+                </div>
+                <div>
+                    <h5 class="text-base font-extrabold text-slate-900 leading-tight">SEO & Metadata Management</h5>
+                    <div class="text-xs text-slate-500 mt-0.5">Configure global default metadata and custom per-page SEO titles, descriptions, keywords, and OpenGraph social share cards.</div>
+                </div>
             </div>
-            <div>
-                <h5 class="text-base font-extrabold text-slate-900 leading-tight">SEO & Metadata Management</h5>
-                <div class="text-xs text-slate-500 mt-0.5">Configure global default metadata and custom per-page SEO titles, descriptions, keywords, and OpenGraph social share cards.</div>
+            <div class="flex flex-wrap items-center gap-2">
+                <a href="{{ route('admin.settings.seo-templates.index') }}" class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-700 transition">
+                    <i class="bi bi-diagram-3"></i> SEO Templates
+                </a>
+                <a href="{{ route('admin.settings.robots.index') }}" class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-700 transition">
+                    <i class="bi bi-robot"></i> robots.txt &amp; AI Bots
+                </a>
+                <a href="{{ route('admin.settings.keywords.index') }}" class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-700 transition">
+                    <i class="bi bi-tags"></i> Keyword Matrix
+                </a>
+                <a href="{{ route('admin.governance.index') }}" class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-700 transition">
+                    <i class="bi bi-shield-check"></i> Governance Hub
+                </a>
             </div>
         </div>
     </div>
@@ -19,6 +35,7 @@
     <div class="p-6">
         <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
             @csrf
+            <input type="hidden" name="seo_form_submitted" value="1">
 
             <!-- Alpine Nav Tabs -->
             <div x-data="{ activeTab: 'default' }">
@@ -114,6 +131,14 @@
                                         <input type="file" name="seo_default_og_image_file" id="seo_default_og_image_file" accept="image/jpeg,image/png,image/webp,image/avif" class="w-full text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
                                     </div>
                                     <input type="text" name="seo_default_og_image" id="seo_default_og_image" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['seo_default_og_image'] ?? '' }}" placeholder="/images/desert-safari-poster.avif">
+                                </div>
+                            </div>
+
+                            <div class="mt-4 p-4 bg-white rounded-xl border border-slate-200 flex items-start gap-3">
+                                <input type="checkbox" name="seo_index_tracking_params" id="seo_index_tracking_params" value="1" {{ ($settings['seo_index_tracking_params'] ?? '0') === '1' ? 'checked' : '' }} class="mt-0.5 rounded border-slate-300 text-primary focus:ring-primary">
+                                <div>
+                                    <label for="seo_index_tracking_params" class="block text-xs font-bold text-slate-800 cursor-pointer">Allow Tracking Parameter URLs (<code>utm_*</code>, <code>gclid</code>, <code>fbclid</code>) to Remain Indexable</label>
+                                    <p class="text-[11px] text-slate-500 mt-0.5">Recommended <strong>OFF</strong> (default): prevents duplicate URL indexing in Google Search Console by applying <code>noindex, follow</code> when tracking parameters are present while keeping canonical URLs clean.</p>
                                 </div>
                             </div>
                         </div>

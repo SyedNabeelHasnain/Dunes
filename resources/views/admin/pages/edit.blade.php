@@ -402,5 +402,7 @@
             </form>
         </div>
     </div>
+
+    @include('admin.partials.seo-editorial-panel', ['entity' => $page, 'entityType' => 'page'])
 </div>
 @endsection

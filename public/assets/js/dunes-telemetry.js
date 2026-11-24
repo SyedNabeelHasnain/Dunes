@@ -55,8 +55,19 @@
         return 'desktop';
     }
 
+    // Privacy Consent Check (GDPR / ePrivacy strict pre-consent gating)
+    function hasAnalyticsConsent() {
+        if (window.DunesConsent && typeof window.DunesConsent.has === 'function') {
+            return window.DunesConsent.has('analytics');
+        }
+        return true;
+    }
+
     // Helper: Safe network transmission with Beacon / keepalive fallback
     function transmitTelemetry(url, payload, useBeacon) {
+        if (!hasAnalyticsConsent()) {
+            return;
+        }
         const body = JSON.stringify(payload);
         if (useBeacon && navigator.sendBeacon) {
             try {
@@ -219,8 +230,11 @@
         }
     }
 
-    // 5. Bootstrap only upon genuine Human interaction
+    // 5. Bootstrap only upon genuine Human interaction + Analytics Consent
     function onFirstHumanInteraction() {
+        if (!hasAnalyticsConsent()) {
+            return;
+        }
         window.removeEventListener('pointerdown', onFirstHumanInteraction, { passive: true });
         window.removeEventListener('keydown', onFirstHumanInteraction, { passive: true });
         window.removeEventListener('scroll', onFirstHumanInteraction, { passive: true });
@@ -242,6 +256,12 @@
             startRrwebRecording();
         }
     }
+
+    window.addEventListener('dunes:consent-updated', function (e) {
+        if (e && e.detail && e.detail.analytics) {
+            onFirstHumanInteraction();
+        }
+    });
 
     // Listen for first genuine user interaction
     ['pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(function (ev) {

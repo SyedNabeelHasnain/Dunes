@@ -241,11 +241,29 @@ class Backlink extends Model
         }
 
         try {
-            $response = Http::withHeaders([
-                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
-                'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                'Accept-Language' => 'en-US,en;q=0.9',
-            ])->timeout(10)->get($sourceUrl);
+            \App\Services\Security\SafeUrlValidator::assertSafeUrl($sourceUrl);
+        } catch (\InvalidArgumentException $e) {
+            $this->update([
+                'status' => 'broken',
+                'http_status_code' => 400,
+                'last_checked_at' => now(),
+                'verification_notes' => 'Blocked unsafe URL: '.$e->getMessage(),
+            ]);
+
+            return [
+                'success' => false,
+                'status' => 'broken',
+                'message' => 'Blocked unsafe URL: '.$e->getMessage(),
+            ];
+        }
+
+        try {
+            $response = \App\Services\Security\SafeUrlValidator::httpClient(10, 4)
+                ->withHeaders([
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
+                    'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                    'Accept-Language' => 'en-US,en;q=0.9',
+                ])->get($sourceUrl);
 
             $statusCode = $response->status();
             $this->http_status_code = $statusCode;

@@ -3,6 +3,7 @@
 namespace App\Services\Audit\Checkers;
 
 use App\Models\LegalPage;
+use App\Models\Setting;
 use Illuminate\Support\Facades\File;
 
 class PrivacyChecker implements AuditCheckerInterface
@@ -42,11 +43,11 @@ class PrivacyChecker implements AuditCheckerInterface
             ];
         }
 
-        // 2. Cookie Consent UI Banner Presence
+        // 2. Cookie Consent UI Banner & Strict Pre-Consent Gating Presence
         $cookieBannerExists = File::exists(resource_path('views/partials/cookie-banner.blade.php'));
         $appLayout = File::exists(resource_path('views/layouts/app.blade.php')) ? File::get(resource_path('views/layouts/app.blade.php')) : '';
 
-        if (!$cookieBannerExists && !str_contains($appLayout, 'cookie') && !str_contains($appLayout, 'consent')) {
+        if (!$cookieBannerExists || (!str_contains($appLayout, 'cookie-banner') && !str_contains($appLayout, 'DunesConsent'))) {
             $issues[] = [
                 'category' => 'privacy',
                 'check_key' => 'privacy_missing_consent_banner',
@@ -55,9 +56,41 @@ class PrivacyChecker implements AuditCheckerInterface
                 'severity' => 'high',
                 'verification_type' => 'automated',
                 'affected_url' => url('/'),
-                'evidence' => 'No cookie banner partial or consent component found in layouts/app.blade.php.',
-                'recommended_action' => 'Include an interactive cookie consent component allowing visitors to accept, customize, or decline non-essential cookies.',
+                'evidence' => 'No cookie banner partial or Consent Mode v2 controller found in layouts/app.blade.php.',
+                'recommended_action' => 'Enable the interactive cookie consent banner in Privacy & Consent v2 settings.',
             ];
+        }
+
+        $strictGating = Setting::getVal('privacy_strict_consent_gating', '1');
+        if ($strictGating === '0') {
+            $issues[] = [
+                'category' => 'privacy',
+                'check_key' => 'privacy_strict_gating_disabled',
+                'title' => 'Strict Pre-Consent Script Gating Is Disabled',
+                'description' => 'Third-party analytics or pixels may fire prior to explicit visitor consent when strict gating is disabled.',
+                'severity' => 'high',
+                'verification_type' => 'automated',
+                'affected_url' => route('admin.settings.privacy.index'),
+                'evidence' => 'privacy_strict_consent_gating = 0',
+                'recommended_action' => 'Enable strict script & telemetry gating in Privacy & Consent v2 settings.',
+            ];
+        }
+
+        foreach (($context['probed_pages'] ?? []) as $path => $probe) {
+            $html = (string) ($probe['html'] ?? '');
+            if ($html !== '' && str_contains($html, 'facebook.com/tr?id=') && str_contains($html, 'noscript=1')) {
+                $issues[] = [
+                    'category' => 'privacy',
+                    'check_key' => 'privacy_unconsented_pixel_beacon',
+                    'title' => "Unconsented Meta Pixel Beacon Emitted on {$path}",
+                    'description' => 'A tracking pixel image was rendered without user marketing consent.',
+                    'severity' => 'high',
+                    'verification_type' => 'automated',
+                    'affected_url' => url($path),
+                    'evidence' => 'Matched unconsented facebook.com/tr noscript beacon in HTML response.',
+                    'recommended_action' => 'Ensure Meta Pixel noscript beacon only renders after explicit marketing consent cookie verification.',
+                ];
+            }
         }
 
         return $issues;

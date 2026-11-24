@@ -223,7 +223,14 @@ window.DunesIpResolver = {
     }
 };
 
-window.DunesIpResolver.init();
+if (!window.DunesConsent || window.DunesConsent.has('analytics')) {
+    window.DunesIpResolver.init();
+}
+window.addEventListener('dunes:consent-updated', (e) => {
+    if (e?.detail?.analytics) {
+        window.DunesIpResolver.init();
+    }
+});
 
 // =============================================================================
 // MARKETING ACQUISITION & MULTI-PAGE BREADCRUMB JOURNEY ENGINE
@@ -552,8 +559,15 @@ window.DunesJourneyTracker = {
     }
 };
 
-// Initialize immediately so initial referrer and landing are captured before any navigation
-window.DunesJourneyTracker.init();
+// Initialize only when analytics consent is permitted (or listen for consent grant)
+if (!window.DunesConsent || window.DunesConsent.has('analytics')) {
+    window.DunesJourneyTracker.init();
+}
+window.addEventListener('dunes:consent-updated', (e) => {
+    if (e?.detail?.analytics) {
+        window.DunesJourneyTracker.init();
+    }
+});
 
 // =============================================================================
 // 1. ALPINE.JS REACTIVE STORES

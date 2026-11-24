@@ -67,7 +67,7 @@
                 @forelse($articles as $article)
                 <article class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-xs hover:shadow-lg hover:border-primary/40 transition-all flex flex-col sm:flex-row gap-5 group">
                     <a href="{{ localized_route('wiki.article', ['pillarSlug' => $pillar->slug, 'articleSlug' => $article->slug]) }}" class="w-full sm:w-48 h-36 rounded-xl overflow-hidden shrink-0 bg-slate-100">
-                        <img src="{{ resolve_tour_image($article->hero_image) }}" alt="{{ $article->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <img src="{{ resolve_tour_image($article->hero_image) }}" alt="{{ $article->title }}" width="480" height="360" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                     </a>
                     <div class="flex-1 flex flex-col justify-between">
                         <div>

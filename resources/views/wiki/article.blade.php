@@ -160,7 +160,7 @@
                     <!-- Featured Image -->
                     @if($article->hero_image)
                     <div class="rounded-xl overflow-hidden mb-8 border border-slate-200 aspect-video bg-slate-100">
-                        <img src="{{ resolve_tour_image($article->hero_image) }}" alt="{{ $article->title }}" class="w-full h-full object-cover">
+                        <img src="{{ resolve_tour_image($article->hero_image) }}" alt="{{ $article->title }}" width="1280" height="720" fetchpriority="high" class="w-full h-full object-cover">
                     </div>
                     @endif
 

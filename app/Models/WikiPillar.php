@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasSeoMetadata;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class WikiPillar extends Model
 {
-    use HasFactory, HasTranslations;
+    use HasFactory, HasSeoMetadata, HasTranslations;
 
     public array $translatable = [
         'name',

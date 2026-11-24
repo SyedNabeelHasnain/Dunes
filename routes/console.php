@@ -46,3 +46,7 @@ Schedule::command('seo:indexnow --recent')->dailyAt('04:30')->withoutOverlapping
 // Prune expired session recordings and heatmaps daily according to retention settings at 03:30 AM
 Schedule::command('telemetry:purge-recordings')->dailyAt('03:30')->withoutOverlapping()->runInBackground();
 
+// Automated daily incremental & weekly comprehensive Website Audit scans
+Schedule::command('audit:run --type=incremental')->dailyAt('05:00')->withoutOverlapping()->runInBackground();
+Schedule::command('audit:run --type=full')->weeklyOn(0, '05:30')->withoutOverlapping()->runInBackground();
+

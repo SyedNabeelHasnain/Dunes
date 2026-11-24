@@ -17,8 +17,12 @@ class RedirectRule extends Model
         'status_code',
         'hit_count',
         'last_hit_at',
+        'last_verified_at',
+        'last_verified_status',
+        'destination_ok',
         'notes',
         'created_by',
+        'source_type',
         'is_active',
     ];
 
@@ -26,6 +30,9 @@ class RedirectRule extends Model
         'status_code' => 'integer',
         'hit_count' => 'integer',
         'last_hit_at' => 'datetime',
+        'last_verified_at' => 'datetime',
+        'last_verified_status' => 'integer',
+        'destination_ok' => 'boolean',
         'is_active' => 'boolean',
     ];
 

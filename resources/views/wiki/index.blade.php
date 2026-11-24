@@ -163,7 +163,7 @@
             @foreach($featuredArticles as $article)
             <article class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col group">
                 <a href="{{ localized_route('wiki.article', ['pillarSlug' => $article->pillar->slug, 'articleSlug' => $article->slug]) }}" class="block aspect-video overflow-hidden relative bg-slate-100">
-                    <img src="{{ resolve_tour_image($article->hero_image) }}" alt="{{ $article->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <img src="{{ resolve_tour_image($article->hero_image) }}" alt="{{ $article->title }}" width="800" height="450" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                     <div class="absolute top-3 left-3">
                         <span class="px-2.5 py-1 rounded-md bg-slate-900/80 backdrop-blur-md text-amber-300 text-[10px] font-bold uppercase tracking-wider">
                             {{ $article->pillar->name }}

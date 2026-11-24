@@ -25,26 +25,28 @@ class RedirectManagerService
         }
 
         $ruleData = $map[$normalized];
-        $target = $ruleData['target_path'];
-        $status = $ruleData['status_code'];
-
-        // Follow chains up to 5 hops to yield single 301/302 response and avoid redirect chains
-        $visited = [$normalized => true];
+        $target = (string) ($ruleData['target_path'] ?? '');
+        $status = (int) $ruleData['status_code'];
         $hops = 0;
-        $maxHops = 5;
 
-        while ($hops < $maxHops) {
-            $nextNormalized = RedirectRule::normalizePath($target);
-            if (isset($map[$nextNormalized])) {
-                if (isset($visited[$nextNormalized])) {
-                    // Loop detected in chain; break out to prevent infinite redirect
+        if ($status !== 410 && $target !== '') {
+            // Follow chains up to 5 hops to yield single 301/302/307/308 response and avoid redirect chains
+            $visited = [$normalized => true];
+            $maxHops = 5;
+
+            while ($hops < $maxHops) {
+                $nextNormalized = RedirectRule::normalizePath($target);
+                if (isset($map[$nextNormalized]) && (int) $map[$nextNormalized]['status_code'] !== 410) {
+                    if (isset($visited[$nextNormalized])) {
+                        // Loop detected in chain; break out to prevent infinite redirect
+                        break;
+                    }
+                    $visited[$nextNormalized] = true;
+                    $target = (string) $map[$nextNormalized]['target_path'];
+                    $hops++;
+                } else {
                     break;
                 }
-                $visited[$nextNormalized] = true;
-                $target = $map[$nextNormalized]['target_path'];
-                $hops++;
-            } else {
-                break;
             }
         }
 
@@ -67,10 +69,20 @@ class RedirectManagerService
     /**
      * Detects redirect loops or chained hops before saving a rule.
      */
-    public function detectLoopOrChain(string $sourcePath, string $targetPath, ?int $ignoreId = null): array
+    public function detectLoopOrChain(string $sourcePath, ?string $targetPath, ?int $ignoreId = null, int $statusCode = 301): array
     {
+        if ($statusCode === 410) {
+            return [
+                'is_loop' => false,
+                'is_chain' => false,
+                'final_target' => '',
+                'hops' => [RedirectRule::normalizePath($sourcePath)],
+                'message' => 'HTTP 410 Gone terminates directly with no target redirect.',
+            ];
+        }
+
         $source = RedirectRule::normalizePath($sourcePath);
-        $target = RedirectRule::normalizePath($targetPath);
+        $target = RedirectRule::normalizePath((string) $targetPath);
 
         if ($source === $target) {
             return [
@@ -129,19 +141,24 @@ class RedirectManagerService
      */
     public function saveRule(array $data, ?int $id = null): RedirectRule
     {
-        $source = RedirectRule::normalizePath($data['source_path']);
-        $target = trim($data['target_path']);
+        $statusCode = in_array((int) ($data['status_code'] ?? 301), [301, 302, 307, 308, 410], true) ? (int) $data['status_code'] : 301;
+        $source = RedirectRule::normalizePath((string) $data['source_path']);
+        $target = $statusCode === 410 ? '' : trim((string) ($data['target_path'] ?? ''));
+
         // If relative, normalize; if full URL (e.g. external), keep trimmed
-        if (!str_starts_with($target, 'http://') && !str_starts_with($target, 'https://')) {
+        if ($target !== '' && ! str_starts_with($target, 'http://') && ! str_starts_with($target, 'https://')) {
             $target = RedirectRule::normalizePath($target);
         }
 
         $rule = $id ? RedirectRule::findOrFail($id) : new RedirectRule();
         $rule->source_path = $source;
         $rule->target_path = $target;
-        $rule->status_code = in_array((int) ($data['status_code'] ?? 301), [301, 302, 307, 308]) ? (int) $data['status_code'] : 301;
+        $rule->status_code = $statusCode;
         $rule->notes = $data['notes'] ?? null;
         $rule->is_active = isset($data['is_active']) ? (bool) $data['is_active'] : true;
+        if (isset($data['source_type'])) {
+            $rule->source_type = (string) $data['source_type'];
+        }
         if (isset($data['created_by'])) {
             $rule->created_by = $data['created_by'];
         }
@@ -160,6 +177,7 @@ class RedirectManagerService
         $rule = RedirectRule::findOrFail($id);
         $res = $rule->delete();
         $this->flushCache();
+
         return (bool) $res;
     }
 
@@ -180,16 +198,21 @@ class RedirectManagerService
                     ])
                     ->all();
             });
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             return [];
         }
     }
 
-    /**
-     * Invalidate cached redirect map.
-     */
     public function flushCache(): void
     {
         Cache::forget(self::CACHE_KEY);
+        if (class_exists(\App\Http\Controllers\SitemapController::class) && method_exists(\App\Http\Controllers\SitemapController::class, 'flushAllSitemapCaches')) {
+            \App\Http\Controllers\SitemapController::flushAllSitemapCaches();
+        }
+    }
+
+    public function clearCache(): void
+    {
+        $this->flushCache();
     }
 }

@@ -7,6 +7,7 @@ use App\Models\AuditIssue;
 use App\Models\AuditRun;
 use App\Models\User;
 use App\Services\Audit\WebsiteAuditService;
+use App\Services\Governance\ConfigAuditService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,121 +18,163 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class AdminAuditController extends Controller
 {
     public function __construct(
-        protected WebsiteAuditService $auditService
+        protected WebsiteAuditService $auditService,
+        protected ConfigAuditService $auditLog,
     ) {}
 
-    /**
-     * Display the Website Optimization & Audit Dashboard.
-     */
     public function index(Request $request): View
     {
         $latestRun = $this->auditService->getLatestRun();
-
-        // If no audit has ever run, execute an initial discovery audit automatically
-        if (!$latestRun) {
+        if (! $latestRun) {
             $latestRun = $this->auditService->runAudit('full', auth()->id());
         }
 
-        $query = $latestRun->issues();
+        $query = AuditIssue::with('assignee')->where('audit_run_id', $latestRun->id);
 
-        if ($cat = $request->input('category')) {
-            $query->where('category', $cat);
+        if ($category = $request->input('category')) {
+            $query->where('category', $category);
         }
-
-        if ($sev = $request->input('severity')) {
-            $query->where('severity', $sev);
+        if ($severity = $request->input('severity')) {
+            $query->where('severity', $severity);
         }
-
         if ($status = $request->input('status')) {
             $query->where('status', $status);
         }
-
+        if ($verType = $request->input('verification_type')) {
+            $query->where('verification_type', $verType);
+        }
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%")
                     ->orWhere('affected_url', 'like', "%{$search}%")
-                    ->orWhere('check_key', 'like', "%{$search}%");
+                    ->orWhere('evidence', 'like', "%{$search}%");
             });
         }
 
-        $issues = $query->orderByRaw("CASE severity WHEN 'critical' THEN 1 WHEN 'high' THEN 2 WHEN 'medium' THEN 3 WHEN 'low' THEN 4 ELSE 5 END")
-            ->paginate(15)
+        $issues = $query
+            ->orderByRaw("CASE severity WHEN 'critical' THEN 1 WHEN 'high' THEN 2 WHEN 'medium' THEN 3 WHEN 'low' THEN 4 ELSE 5 END")
+            ->orderByDesc('id')
+            ->paginate(25)
             ->withQueryString();
 
-        $recentRuns = AuditRun::where('status', 'completed')
-            ->latest('id')
-            ->take(5)
-            ->get();
+        $recentRuns = AuditRun::where('status', 'completed')->latest('id')->limit(15)->get();
 
-        $admins = User::all();
+        $compareId = $request->integer('compare_with') ?: $latestRun->parent_run_id;
+        $baselineRun = $compareId
+            ? AuditRun::find($compareId)
+            : AuditRun::where('status', 'completed')->where('id', '<', $latestRun->id)->latest('id')->first();
+        $comparison = $this->auditService->compareRuns($latestRun, $baselineRun);
 
-        return view('admin.audit.index', compact('latestRun', 'issues', 'recentRuns', 'admins'));
+        $verificationCounts = AuditIssue::where('audit_run_id', $latestRun->id)
+            ->selectRaw('verification_type, COUNT(*) as count')
+            ->groupBy('verification_type')
+            ->pluck('count', 'verification_type')
+            ->toArray();
+
+        $methodology = $this->auditService->getScoringMethodology();
+        $staffUsers = User::where('is_active', true)->orderBy('name')->get(['id', 'name', 'role']);
+
+        return view('admin.audit.index', compact(
+            'latestRun',
+            'issues',
+            'recentRuns',
+            'comparison',
+            'verificationCounts',
+            'methodology',
+            'staffUsers'
+        ));
     }
 
-    /**
-     * Trigger a new audit run.
-     */
     public function run(Request $request): RedirectResponse
     {
-        $scanType = $request->input('scan_type', 'full');
-        $run = $this->auditService->runAudit($scanType, auth()->id());
+        $scanType = in_array($request->input('scan_type'), ['full', 'incremental', 'single_url'], true)
+            ? (string) $request->input('scan_type')
+            : 'full';
+        $targetUrl = trim((string) $request->input('target_url', ''));
+
+        $run = $this->auditService->runAudit(
+            $scanType,
+            auth()->id(),
+            $targetUrl !== '' ? ['target_url' => $targetUrl] : []
+        );
+
+        $this->auditLog->log(
+            section: 'audit',
+            action: 'executed',
+            settingKey: "audit_run:{$run->id}",
+            oldValue: null,
+            newValue: ['scan_type' => $scanType, 'score' => $run->health_score, 'issues' => $run->total_issues_count],
+            entityType: AuditRun::class,
+            entityId: $run->id,
+            summary: "Executed {$scanType} audit (#{$run->id}): Score {$run->health_score}/100 ({$run->total_issues_count} findings)",
+        );
 
         return redirect()->route('admin.audit.index')
-            ->with('success', "Full website audit completed in {$run->duration_ms}ms with Overall Health Score: {$run->health_score}/100.");
+            ->with('success', "Audit Run #{$run->id} ({$scanType}) completed! Overall Health Score: {$run->health_score}/100 ({$run->total_issues_count} findings in {$run->duration_ms}ms).");
     }
 
-    /**
-     * Display detailed report for a past audit run.
-     */
     public function show(int $id, Request $request): View
     {
-        $run = AuditRun::with('issues')->findOrFail($id);
-        $issues = $run->issues()->paginate(25)->withQueryString();
-        $admins = User::all();
+        $run = AuditRun::with('issues.assignee')->findOrFail($id);
+        $issues = $run->issues()
+            ->with('assignee')
+            ->orderByRaw("CASE severity WHEN 'critical' THEN 1 WHEN 'high' THEN 2 WHEN 'medium' THEN 3 WHEN 'low' THEN 4 ELSE 5 END")
+            ->orderByDesc('id')
+            ->paginate(50)
+            ->withQueryString();
 
-        return view('admin.audit.show', compact('run', 'issues', 'admins'));
+        $baselineRun = $run->parent_run_id
+            ? AuditRun::find($run->parent_run_id)
+            : AuditRun::where('status', 'completed')->where('id', '<', $run->id)->latest('id')->first();
+        $comparison = $this->auditService->compareRuns($run, $baselineRun);
+        $staffUsers = User::where('is_active', true)->orderBy('name')->get(['id', 'name', 'role']);
+
+        return view('admin.audit.show', compact('run', 'issues', 'comparison', 'staffUsers'));
     }
 
-    /**
-     * Update remediation status, assignee, and notes for an issue.
-     */
     public function updateIssue(Request $request, int $id): JsonResponse|RedirectResponse
     {
         $issue = AuditIssue::findOrFail($id);
 
         $validated = $request->validate([
-            'status' => 'required|in:open,in_progress,resolved,ignored',
-            'assigned_to' => 'nullable|exists:users,id',
-            'remediation_notes' => 'nullable|string|max:2000',
+            'status' => ['required', 'in:open,in_progress,resolved,ignored'],
+            'assigned_to' => ['nullable', 'exists:users,id'],
+            'remediation_notes' => ['nullable', 'string', 'max:2000'],
         ]);
 
-        $issue->status = $validated['status'];
-        $issue->assigned_to = $validated['assigned_to'] ?? null;
-        $issue->remediation_notes = $validated['remediation_notes'] ?? null;
+        $old = $issue->only(['status', 'assigned_to', 'remediation_notes']);
+        $status = $validated['status'];
 
-        if ($validated['status'] === 'resolved' && !$issue->resolved_at) {
-            $issue->resolved_at = now();
-        } elseif ($validated['status'] !== 'resolved') {
-            $issue->resolved_at = null;
-        }
+        $issue->update([
+            'status' => $status,
+            'assigned_to' => array_key_exists('assigned_to', $validated) ? $validated['assigned_to'] : $issue->assigned_to,
+            'remediation_notes' => array_key_exists('remediation_notes', $validated) ? $validated['remediation_notes'] : $issue->remediation_notes,
+            'remediated_by' => auth()->id(),
+            'resolved_at' => $status === 'resolved' ? ($issue->resolved_at ?? now()) : null,
+        ]);
 
-        $issue->save();
+        $this->auditLog->log(
+            section: 'audit',
+            action: 'updated',
+            settingKey: "audit_issue:{$issue->id}",
+            oldValue: $old,
+            newValue: $issue->only(['status', 'assigned_to', 'remediation_notes']),
+            entityType: AuditIssue::class,
+            entityId: $issue->id,
+            summary: "Updated issue #{$issue->id} ({$issue->check_key}) -> {$status}",
+        );
 
-        if ($request->wantsJson()) {
+        if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Issue status updated successfully.',
-                'issue' => $issue,
+                'issue' => $issue->fresh('assignee'),
             ]);
         }
 
-        return back()->with('success', 'Remediation status updated.');
+        return back()->with('success', "Issue #{$issue->id} updated ({$status}).");
     }
 
-    /**
-     * Export audit issues report as CSV or JSON.
-     */
     public function export(int $id, string $format = 'csv'): Response|StreamedResponse|JsonResponse
     {
         $run = AuditRun::with('issues')->findOrFail($id);
@@ -143,17 +186,19 @@ class AdminAuditController extends Controller
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => "attachment; filename=\"dunes-audit-run-{$run->id}-report.csv\"",
+            'X-Robots-Tag' => 'noindex, nofollow',
         ];
 
         return response()->stream(function () use ($run) {
             $handle = fopen('php://output', 'w');
-            fputcsv($handle, ['ID', 'Category', 'Severity', 'Title', 'Status', 'Affected URL', 'Evidence', 'Recommended Action', 'Assigned To', 'Remediation Notes']);
+            fputcsv($handle, sanitize_csv_row(['ID', 'Category', 'Severity', 'Verification', 'Title', 'Status', 'Affected URL', 'Evidence', 'Recommended Action', 'Assigned To', 'Remediation Notes']));
 
             foreach ($run->issues as $issue) {
-                fputcsv($handle, [
+                fputcsv($handle, sanitize_csv_row([
                     $issue->id,
                     $issue->category,
                     $issue->severity,
+                    $issue->verification_type,
                     $issue->title,
                     $issue->status,
                     $issue->affected_url,
@@ -161,9 +206,23 @@ class AdminAuditController extends Controller
                     $issue->recommended_action,
                     $issue->assigned_to,
                     $issue->remediation_notes,
-                ]);
+                ]));
             }
             fclose($handle);
         }, 200, $headers);
+    }
+
+    public function auditPage(Request $request): JsonResponse
+    {
+        $request->validate([
+            'url' => ['required', 'string', 'max:500'],
+        ]);
+
+        $path = '/'.ltrim((string) parse_url((string) $request->input('url'), PHP_URL_PATH), '/');
+        if ($path === '') {
+            $path = '/';
+        }
+
+        return response()->json($this->auditService->auditSingleUrl($path));
     }
 }

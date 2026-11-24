@@ -26,6 +26,9 @@ class AuditRun extends Model
         'scanned_urls_count',
         'duration_ms',
         'triggered_by',
+        'parent_run_id',
+        'target_url',
+        'summary_notes',
     ];
 
     protected $casts = [

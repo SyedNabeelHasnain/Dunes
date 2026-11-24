@@ -576,6 +576,8 @@
     </div>
 </div>
 
+@include('admin.partials.seo-editorial-panel', ['entity' => $tour, 'entityType' => 'tour'])
+
 @push('scripts')
 <script>
 // Category Manager

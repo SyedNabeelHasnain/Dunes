@@ -147,4 +147,6 @@
         </div>
     </form>
 </div>
+
+@include('admin.partials.seo-editorial-panel', ['entity' => $article, 'entityType' => 'wiki_article'])
 @endsection

@@ -74,9 +74,25 @@
     $activeLanguages = $activeLanguages ?? \App\Models\Language::getActive();
     $yieldTitle = trim($__env->yieldContent('title') ?: $__env->yieldContent('page_title'));
     $yieldDesc = trim($__env->yieldContent('meta_description'));
-    $pageTitle = $pageTitle ?? ($yieldTitle ?: "Dunes Discovery Tourism | Dubai Desert Safari Tours ({$currentYear})");
-    $pageDesc = $pageDesc ?? ($yieldDesc ?: 'Book Dubai best desert safari tours from AED 99. Evening safari, city tours, dhow cruises with instant confirmation.');
-    $pageKeys = $pageKeys ?? 'dubai desert safari,desert safari dubai,evening desert safari';
+    if (! isset($pageTitle) && $yieldTitle !== '') {
+        $pageTitle = $yieldTitle;
+    }
+    if (! isset($pageDesc) && $yieldDesc !== '') {
+        $pageDesc = $yieldDesc;
+    }
+    try {
+        $resolvedOverrides = app(\App\Services\Seo\SeoResolverService::class)->applyToLayoutVariables(get_defined_vars(), request());
+        foreach ($resolvedOverrides as $rKey => $rVal) {
+            ${$rKey} = $rVal;
+        }
+    } catch (\Throwable $seoResolveEx) {
+        if (app()->runningUnitTests()) {
+            throw $seoResolveEx;
+        }
+    }
+    $pageTitle = $pageTitle ?? (! empty($settings['seo_default_title']) ? $settings['seo_default_title'] : "Dunes Discovery Tourism | Dubai Desert Safari Tours ({$currentYear})");
+    $pageDesc = $pageDesc ?? (! empty($settings['seo_default_description']) ? $settings['seo_default_description'] : 'Book Dubai best desert safari tours from AED 99. Evening safari, city tours, dhow cruises with instant confirmation.');
+    $pageKeys = $pageKeys ?? (! empty($settings['seo_default_keywords']) ? $settings['seo_default_keywords'] : 'dubai desert safari,desert safari dubai,evening desert safari');
     $pageRobots = $pageRobots ?? 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
     $canonical = $canonical ?? (request()->is('/') ? rtrim(url('/'), '/') . '/' : request()->url());
     $ogImage = resolve_og_image($ogImage ?? null);
@@ -92,6 +108,79 @@
 <!DOCTYPE html>
 <html lang="{{ $currentLocale }}" dir="{{ ($isRtl ?? ($currentLocale === 'ar')) ? 'rtl' : 'ltr' }}">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    @php
+        $privacyStrictGating = ($settings['privacy_strict_consent_gating'] ?? '1') !== '0';
+        $cookieConsentRaw = request()->cookie('ddt_consent_v1');
+        $cookieConsentDecoded = is_string($cookieConsentRaw) ? json_decode($cookieConsentRaw, true) : null;
+        $serverMarketingConsented = is_array($cookieConsentDecoded) && !empty($cookieConsentDecoded['marketing']);
+    @endphp
+    <script>
+        window.CSRF_TOKEN = "{{ csrf_token() }}";
+        window.WHATSAPP_FORM_ENABLED = "{{ (string)($settings['whatsapp_form_enabled'] ?? '1') }}";
+        window.WHATSAPP_NUMBER = "{{ (string)($settings['site_whatsapp'] ?? '971502456056') }}";
+
+        window.DunesConsent = (function() {
+            var strictGating = {{ $privacyStrictGating ? 'true' : 'false' }};
+            var cookieName = 'ddt_consent_v1=';
+            function readStored() {
+                try {
+                    var parts = document.cookie.split(';');
+                    for (var i = 0; i < parts.length; i++) {
+                        var c = parts[i].trim();
+                        if (c.indexOf(cookieName) === 0) {
+                            var parsed = JSON.parse(decodeURIComponent(c.substring(cookieName.length)));
+                            if (parsed && typeof parsed === 'object') {
+                                parsed.decided = true;
+                                return parsed;
+                            }
+                        }
+                    }
+                    var ls = localStorage.getItem('ddt_consent_v1');
+                    if (ls) {
+                        var parsedLs = JSON.parse(ls);
+                        if (parsedLs && typeof parsedLs === 'object') return parsedLs;
+                    }
+                } catch (e) {}
+                return { necessary: true, analytics: false, marketing: false, functional: false, decided: false };
+            }
+            var state = readStored();
+            function syncGtagConsent(s) {
+                if (typeof window.gtag === 'function') {
+                    window.gtag('consent', 'update', {
+                        'ad_storage': s.marketing ? 'granted' : 'denied',
+                        'ad_user_data': s.marketing ? 'granted' : 'denied',
+                        'ad_personalization': s.marketing ? 'granted' : 'denied',
+                        'analytics_storage': s.analytics ? 'granted' : 'denied',
+                        'functionality_storage': s.functional ? 'granted' : 'denied',
+                        'security_storage': 'granted'
+                    });
+                }
+            }
+            return {
+                isStrict: strictGating,
+                get: function() { return state; },
+                has: function(cat) {
+                    if (cat === 'necessary') return true;
+                    if (!strictGating && !state.decided) return true;
+                    return !!(state && state[cat]);
+                },
+                update: function(next) {
+                    state = Object.assign({ necessary: true, decided: true }, next || {});
+                    try {
+                        var serialized = JSON.stringify(state);
+                        localStorage.setItem('ddt_consent_v1', serialized);
+                        document.cookie = 'ddt_consent_v1=' + encodeURIComponent(serialized) + '; path=/; max-age=15552000; SameSite=Lax';
+                    } catch (e) {}
+                    syncGtagConsent(state);
+                    window.dispatchEvent(new CustomEvent('dunes:consent-updated', { detail: state }));
+                }
+            };
+        })();
+    </script>
     @if(($isRtl ?? false) || ($currentLocale ?? app()->getLocale()) === 'ar')
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -104,10 +193,22 @@
     @endif
 
     @if(!empty($primaryGtagId))
-    <!-- Google tag (gtag.js) {{ $primaryGtagId }} (Deferred Non-blocking Sitewide Tag) -->
+    <!-- Google tag (gtag.js) {{ $primaryGtagId }} (Google Consent Mode v2 Gated) -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
+      (function() {
+        var c = window.DunesConsent ? window.DunesConsent.get() : {};
+        gtag('consent', 'default', {
+          'ad_storage': (c.marketing ? 'granted' : 'denied'),
+          'ad_user_data': (c.marketing ? 'granted' : 'denied'),
+          'ad_personalization': (c.marketing ? 'granted' : 'denied'),
+          'analytics_storage': (c.analytics ? 'granted' : 'denied'),
+          'functionality_storage': 'granted',
+          'security_storage': 'granted',
+          'wait_for_update': 500
+        });
+      })();
       gtag('js', new Date());
 
       @if(!empty($adsId))
@@ -121,6 +222,7 @@
 
       function loadGoogleAnalytics() {
         if (window._gtagLoaded) return;
+        if (window.DunesConsent && !window.DunesConsent.has('analytics') && !window.DunesConsent.has('marketing')) return;
         window._gtagLoaded = true;
         var s = document.createElement('script');
         s.async = true;
@@ -178,7 +280,7 @@
     @endif
 
     @if($metaActive && !empty($metaPixelId))
-    <!-- Meta Pixel Code with Immediate Synchronous fbq Stub and Deferred Script Execution -->
+    <!-- Meta Pixel Code (Consent-Gated Execution) -->
     <script>
       !function(f,b,e,v,n,t,s){
         if(f.fbq)return;
@@ -187,13 +289,14 @@
         n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];
         f._loadMetaPixel=function(){
           if(f._metaPixelLoaded)return;
+          if(window.DunesConsent && !window.DunesConsent.has('marketing'))return;
           f._metaPixelLoaded=!0;
+          fbq('init', '{{ $metaPixelId }}');
+          fbq('track', 'PageView');
           t=b.createElement(e);t.async=!0;t.src=v;
           s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s);
         };
       }(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', '{{ $metaPixelId }}');
-      fbq('track', 'PageView');
     </script>
     @else
     <script>
@@ -202,48 +305,42 @@
     @endif
 
     @if($clarityActive && !empty($clarityId))
-    <!-- Microsoft Clarity (Bing Webmaster Tools) -->
+    <!-- Microsoft Clarity (Consent-Gated Loading) -->
     <script type="text/javascript">
-      (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i+"?ref=bwt";
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-      })(window, document, "clarity", "script", "{{ $clarityId }}");
+      window._loadClarity = function() {
+        if (window._clarityLoaded) return;
+        if (window.DunesConsent && !window.DunesConsent.has('analytics')) return;
+        window._clarityLoaded = true;
+        (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i+"?ref=bwt";
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "{{ $clarityId }}");
+      };
     </script>
     @endif
 
     <script>
-      // Non-blocking third-party analytics bootstrap (fires on idle or first user interaction)
+      // Consent-aware third-party analytics bootstrap
       (function() {
-        var loaded = false;
-        function initAnalytics() {
-          if (loaded) return;
-          loaded = true;
-          if (typeof loadGoogleAnalytics === 'function') loadGoogleAnalytics();
-          if (typeof window._loadMetaPixel === 'function') window._loadMetaPixel();
-          ['pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(function(ev) {
-            window.removeEventListener(ev, initAnalytics, {passive: true});
-          });
+        function initConsentedTags() {
+          if (window.DunesConsent && (window.DunesConsent.has('analytics') || window.DunesConsent.has('marketing'))) {
+            if (typeof loadGoogleAnalytics === 'function') loadGoogleAnalytics();
+          }
+          if (window.DunesConsent && window.DunesConsent.has('marketing')) {
+            if (typeof window._loadMetaPixel === 'function') window._loadMetaPixel();
+          }
+          if (window.DunesConsent && window.DunesConsent.has('analytics')) {
+            if (typeof window._loadClarity === 'function') window._loadClarity();
+          }
         }
-        ['pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(function(ev) {
-          window.addEventListener(ev, initAnalytics, {once: true, passive: true});
-        });
+        window.addEventListener('dunes:consent-updated', initConsentedTags);
         if ('requestIdleCallback' in window) {
-          window.requestIdleCallback(function() { setTimeout(initAnalytics, 2500); });
+          window.requestIdleCallback(function() { setTimeout(initConsentedTags, 1200); });
         } else {
-          window.addEventListener('load', function() { setTimeout(initAnalytics, 2500); });
+          window.addEventListener('load', function() { setTimeout(initConsentedTags, 1200); });
         }
       })();
-    </script>
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <script>
-        window.CSRF_TOKEN = "{{ csrf_token() }}";
-        window.WHATSAPP_FORM_ENABLED = "{{ (string)($settings['whatsapp_form_enabled'] ?? '1') }}";
-        window.WHATSAPP_NUMBER = "{{ (string)($settings['site_whatsapp'] ?? '971502456056') }}";
     </script>
     <title>{{ $pageTitle }}</title>
     <meta name="description" content="{{ $pageDesc }}">
@@ -271,14 +368,14 @@
 
     <!-- OpenGraph Metadata -->
     <meta property="og:type" content="{{ $ogType }}">
-    <meta property="og:url" content="{{ $canonical }}">
-    <meta property="og:title" content="{{ $pageTitle }}">
-    <meta property="og:description" content="{{ $pageDesc }}">
+    <meta property="og:url" content="{{ $canonicalUrl ?? $canonical }}">
+    <meta property="og:title" content="{{ $ogTitle ?? $pageTitle }}">
+    <meta property="og:description" content="{{ $ogDesc ?? $pageDesc }}">
     <meta property="og:image" content="{{ $ogImage }}">
     <meta property="og:image:type" content="{{ $ogImageType }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:site_name" content="Dunes Discovery Tourism">
+    <meta property="og:site_name" content="{{ $settings['site_name'] ?? 'Dunes Discovery Tourism' }}">
     @php
         $ogLocaleMap = [
             'en' => 'en_US',
@@ -303,12 +400,15 @@
     @endif
     
     <!-- Twitter Card Metadata -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:site" content="@dunesdiscovery">
-    <meta name="twitter:creator" content="@dunesdiscovery">
-    <meta name="twitter:title" content="{{ $pageTitle }}">
-    <meta name="twitter:description" content="{{ $pageDesc }}">
+    <meta name="twitter:card" content="{{ $twitterCard ?? 'summary_large_image' }}">
+    <meta name="twitter:site" content="{{ $settings['twitter_handle'] ?? '@dunesdiscovery' }}">
+    <meta name="twitter:creator" content="{{ $settings['twitter_handle'] ?? '@dunesdiscovery' }}">
+    <meta name="twitter:title" content="{{ $ogTitle ?? $pageTitle }}">
+    <meta name="twitter:description" content="{{ $ogDesc ?? $pageDesc }}">
     <meta name="twitter:image" content="{{ $ogImage }}">
+    @if(!empty($seoCustomSchemaJson))
+    <script type="application/ld+json">{!! $seoCustomSchemaJson !!}</script>
+    @endif
     
     <meta name="geo.region" content="AE-DU">
     <meta name="geo.placename" content="Dubai">
@@ -430,13 +530,29 @@
             }
           ],
           @if(request()->is('/') || request()->routeIs('home') || request()->routeIs('locale.home'))
+          @php
+              $useVerifiedSchemaReviews = ($settings['schema_use_verified_review_count'] ?? '0') === '1';
+              $schemaRatingValue = $settings['schema_homepage_rating'] ?? '4.9';
+              $schemaReviewCount = $settings['schema_homepage_review_count'] ?? '2847';
+              if ($useVerifiedSchemaReviews) {
+                  $realCount = \App\Models\Review::where('status', 'approved')->count();
+                  if ($realCount > 0) {
+                      $schemaReviewCount = (string) $realCount;
+                      $schemaRatingValue = (string) round((float) (\App\Models\Review::where('status', 'approved')->avg('rating') ?? 5.0), 1);
+                  } else {
+                      $schemaReviewCount = '0';
+                  }
+              }
+          @endphp
+          @if((int) $schemaReviewCount > 0)
           "aggregateRating": {
             "@@type": "AggregateRating",
-            "ratingValue": "4.9",
-            "reviewCount": "2847",
+            "ratingValue": "{{ $schemaRatingValue }}",
+            "reviewCount": "{{ $schemaReviewCount }}",
             "bestRating": "5",
             "worstRating": "1"
           },
+          @endif
           @endif
           "address": {
             "@@type": "PostalAddress",
@@ -540,7 +656,7 @@
     @if($googleActive && !empty($gtmId) && str_starts_with($gtmId, 'GTM-'))
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ $gtmId }}" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     @endif
-    @if($metaActive && !empty($metaPixelId))
+    @if($metaActive && !empty($metaPixelId) && (!$privacyStrictGating || $serverMarketingConsented))
     <noscript><img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id={{ $metaPixelId }}&ev=PageView&noscript=1"/></noscript>
     @endif
 
@@ -1029,6 +1145,7 @@
                 @endphp
 
                 <!-- Col 2: Desert Safaris -->
+                <h2 class="sr-only">Footer Navigation, Trust Policies &amp; Pickup Locations</h2>
                 <div class="col-span-1 lg:col-span-2">
                     <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 mb-3.5">{{ __('ui.footer.desert_safaris') }}</h3>
                     <ul class="space-y-2 text-xs sm:text-sm">
@@ -1082,6 +1199,7 @@
                             <li><a href="{{ localized_route('cancellation') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.refund') }}</a></li>
                             <li><a href="{{ localized_route('payment.security') }}" class="text-slate-300 hover:text-white transition-colors">{{ __('ui.footer.payment_security') }}</a></li>
                         @endif
+                            <li><button type="button" onclick="window.dispatchEvent(new CustomEvent('open-cookie-preferences'))" class="text-slate-300 hover:text-white transition-colors cursor-pointer text-start">Cookie Preferences</button></li>
                     </ul>
                 </div>
 
@@ -1122,7 +1240,7 @@
             <div class="border-t border-slate-800/80 pt-8 pb-4 mb-8">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-4">
                     <div>
-                        <h4 class="text-xs font-black uppercase tracking-wider text-amber-400">Doorstep Hotel Pickup Hubs Across Dubai</h4>
+                        <h3 class="text-xs font-black uppercase tracking-wider text-amber-400">Doorstep Hotel Pickup Hubs Across Dubai</h3>
                         <p class="text-slate-400 text-xs">Complimentary 4x4 Land Cruiser hotel & residence pickup available across all major Dubai and Sharjah districts.</p>
                     </div>
                     <span class="text-[11px] font-bold text-emerald-400 inline-flex items-center gap-1.5"><i class="bi bi-shield-check"></i> DTCM Licensed Fleet</span>
@@ -1214,9 +1332,11 @@
     </script>
 
     <!-- Scripts -->
-    <script src="{{ asset('assets/vendor/intl-tel-input/26.0.6/build/intlTelInput.min.js') }}"></script>
-    <!-- Real-time Session Recording & Heatmap Telemetry (Self-Hosted, Human-Only) -->
+    <script defer src="{{ asset('assets/vendor/intl-tel-input/26.0.6/build/intlTelInput.min.js') }}"></script>
+    <!-- Real-time Session Recording & Heatmap Telemetry (Self-Hosted, Consent-Gated) -->
     <script defer src="{{ asset('assets/js/dunes-telemetry.js') }}"></script>
+    <!-- Core Web Vitals Real-User Monitoring (RUM) Beacon -->
+    <script defer src="{{ asset('assets/js/dunes-rum.js') }}"></script>
 
     <!-- Persistent Floating WhatsApp Action Button -->
     <a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$waPhone) }}?text={{ urlencode('Hi Dunes Discovery! I would like to inquire about booking a Dubai Desert Safari.') }}"
@@ -1233,6 +1353,8 @@
             <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
         </span>
     </a>
+
+    @include('partials.cookie-banner')
 
     @stack('scripts')
 </body>

@@ -528,11 +528,93 @@ class AdminSettingController extends Controller
             $settings['indexnow_enabled'] = $request->has('indexnow_enabled') ? '1' : '0';
         }
 
+        if ($request->has('seo_form_submitted')) {
+            $settings['seo_index_tracking_params'] = $request->has('seo_index_tracking_params') ? '1' : '0';
+        }
+
+        $actor = $request->user();
+        $settingKeys = array_keys($settings);
+        $hasSecurityKeys = collect($settingKeys)->contains(fn ($k) => str_starts_with($k, 'security_'));
+        $hasPrivacyKeys = collect($settingKeys)->contains(fn ($k) => str_starts_with($k, 'privacy_'));
+        $hasSeoKeys = collect($settingKeys)->contains(fn ($k) => str_starts_with($k, 'seo_') || str_starts_with($k, 'indexnow_') || str_starts_with($k, 'robots_'));
+
+        if ($actor && method_exists($actor, 'hasPermission')) {
+            if ($hasSecurityKeys && ! $actor->hasAnyPermission(['security.manage', '*'])) {
+                abort(403, 'Insufficient permissions to modify security configuration.');
+            }
+            if ($hasPrivacyKeys && ! $actor->hasAnyPermission(['privacy.manage', '*'])) {
+                abort(403, 'Insufficient permissions to modify privacy & consent configuration.');
+            }
+            if ($hasSeoKeys && ! $actor->hasAnyPermission(['seo.manage', '*'])) {
+                abort(403, 'Insufficient permissions to modify SEO settings.');
+            }
+            if (! $hasSecurityKeys && ! $hasPrivacyKeys && ! $hasSeoKeys && ! $actor->hasAnyPermission(['seo.manage', 'security.manage', 'privacy.manage', '*'])) {
+                abort(403, 'Insufficient permissions to update site settings.');
+            }
+        }
+
+        $existingValues = Setting::whereIn('setting_key', $settingKeys)
+            ->pluck('setting_value', 'setting_key')
+            ->toArray();
+
+        $sensitiveApprovalKeys = array_values(array_filter($settingKeys, function ($key) {
+            return str_starts_with($key, 'seo_default_')
+                || str_starts_with($key, 'robots_')
+                || str_starts_with($key, 'security_')
+                || str_starts_with($key, 'privacy_');
+        }));
+
+        if ($sensitiveApprovalKeys !== [] && $actor && method_exists($actor, 'hasPermission') && ! $actor->hasAnyPermission(['governance.approve', '*'])) {
+            $section = $hasSecurityKeys ? 'security' : ($hasPrivacyKeys ? 'privacy' : 'seo_global');
+            $proposedPayload = array_intersect_key($settings, array_flip($sensitiveApprovalKeys));
+            $previousPayload = array_intersect_key($existingValues, array_flip($sensitiveApprovalKeys));
+
+            $approval = app(\App\Services\Governance\ApprovalWorkflowService::class)->propose(
+                section: $section,
+                targetKey: implode(', ', array_slice($sensitiveApprovalKeys, 0, 4)),
+                summary: 'Proposed sensitive settings update ('.count($sensitiveApprovalKeys).' keys)',
+                payload: $proposedPayload,
+                previousPayload: $previousPayload,
+                requester: $actor,
+            );
+
+            // Apply remaining non-sensitive keys if any
+            $settings = array_diff_key($settings, $proposedPayload);
+            if ($settings === []) {
+                return back()->with('success', "Sensitive configuration changes submitted for approval (#{$approval->id}).");
+            }
+        }
+
+        $audit = app(\App\Services\Governance\ConfigAuditService::class);
         foreach ($settings as $key => $value) {
+            $normalizedNew = $value !== null ? trim((string) $value) : '';
+            $oldVal = $existingValues[$key] ?? null;
+
             Setting::updateOrCreate(
                 ['setting_key' => $key],
-                ['setting_value' => $value !== null ? trim((string) $value) : '']
+                ['setting_value' => $normalizedNew]
             );
+
+            if ((string) $oldVal !== $normalizedNew) {
+                $auditSection = match (true) {
+                    str_starts_with($key, 'security_') => 'security',
+                    str_starts_with($key, 'privacy_') => 'privacy',
+                    str_starts_with($key, 'seo_'), str_starts_with($key, 'indexnow_'), str_starts_with($key, 'robots_') => 'seo',
+                    str_starts_with($key, 'google_'), str_starts_with($key, 'meta_'), str_starts_with($key, 'clarity_') => 'tracking',
+                    default => 'general',
+                };
+                $audit->log(
+                    section: $auditSection,
+                    action: 'updated',
+                    settingKey: $key,
+                    oldValue: $oldVal,
+                    newValue: $normalizedNew,
+                    entityType: Setting::class,
+                    entityId: null,
+                    summary: "Updated setting {$key}",
+                    actor: $actor,
+                );
+            }
         }
 
         Cache::forget('site_settings_cache');

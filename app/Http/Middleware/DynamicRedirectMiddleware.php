@@ -40,8 +40,15 @@ class DynamicRedirectMiddleware
         $resolved = $this->redirectService->resolve('/' . $path);
 
         if ($resolved) {
-            $target = $resolved['target'];
-            $status = $resolved['status'];
+            $target = (string) ($resolved['target'] ?? '');
+            $status = (int) $resolved['status'];
+
+            if ($status === 410) {
+                return response()->view('errors.404', ['goneStatus' => true], 410, [
+                    'X-Robots-Tag' => 'noindex, nofollow',
+                ]);
+            }
+
             $queryString = $request->getQueryString();
 
             if (str_starts_with($target, 'http://') || str_starts_with($target, 'https://')) {

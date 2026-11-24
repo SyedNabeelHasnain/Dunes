@@ -102,6 +102,8 @@ class VoucherController extends Controller
         if (file_exists($cachedPath) && filesize($cachedPath) > 500) {
             return response()->download($cachedPath, $fileName, [
                 'Content-Type' => 'application/pdf',
+                'X-Robots-Tag' => 'noindex, nofollow',
+                'Cache-Control' => 'no-store, private',
             ]);
         }
 
@@ -114,6 +116,8 @@ class VoucherController extends Controller
                 return response($binary, 200, [
                     'Content-Type' => 'application/pdf',
                     'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+                    'X-Robots-Tag' => 'noindex, nofollow',
+                    'Cache-Control' => 'no-store, private',
                 ]);
             }
 
@@ -147,7 +151,11 @@ class VoucherController extends Controller
                     'defaultFont' => 'sans-serif',
                 ], true);
 
-            return $pdf->download($fileName);
+            $response = $pdf->download($fileName);
+            $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
+            $response->headers->set('Cache-Control', 'no-store, private');
+
+            return $response;
         } catch (\Throwable $e) {
             \Log::error('Public Voucher PDF generation failed: ' . $e->getMessage(), [
                 'reference' => $reference,

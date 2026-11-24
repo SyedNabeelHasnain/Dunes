@@ -15,7 +15,7 @@ class AdminNoCacheMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $response = $next($request);
+        $response = app(EnforceAdminRbac::class)->handle($request, $next);
 
         if ($response && method_exists($response, 'header')) {
             $response->header('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0, private');

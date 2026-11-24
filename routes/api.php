@@ -57,6 +57,10 @@ Route::prefix('v1')->group(function () {
     // Public Newsletter & Marketing Subscription
     Route::post('/subscribers/subscribe', [SubscriberController::class, 'subscribe'])->middleware('throttle:10,1');
 
+    // Privacy Consent & Real-User Core Web Vitals (RUM) Telemetry
+    Route::post('/privacy/consent', [\App\Http\Controllers\PrivacyConsentController::class, 'store'])->middleware('throttle:30,1');
+    Route::post('/rum/vitals', [\App\Http\Controllers\RumVitalsController::class, 'store'])->middleware('throttle:120,1');
+
     // Self-Hosted Session Recording & Heatmap Ingestion (rrweb & click/scroll telemetry)
     Route::post('/telemetry/recordings/batch', [SessionTelemetryController::class, 'ingestRecordingBatch'])->middleware('throttle:180,1');
     Route::post('/telemetry/heatmaps/click', [SessionTelemetryController::class, 'recordHeatmapClick'])->middleware('throttle:300,1');
@@ -84,14 +88,14 @@ Route::prefix('v1')->group(function () {
 
     // Trigger scheduler runner via Web / Cron HTTP request
     Route::match(['get', 'post'], '/cron/run', function (\Illuminate\Http\Request $request) {
-        $token = $request->input('token', $request->bearerToken());
-        $validToken = config('services.cron.secret_token', 'dunes_cron_2026');
+        $token = $request->bearerToken() ?: $request->post('token', $request->query('token'));
+        $validToken = (string) config('services.cron.secret_token', 'dunes_cron_2026');
 
-        if (empty($token) || !hash_equals((string) $validToken, (string) $token)) {
+        if (empty($token) || empty($validToken) || !hash_equals($validToken, (string) $token)) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Unauthorized cron token.',
-            ], 403);
+            ], 403, ['Cache-Control' => 'no-store, private', 'X-Robots-Tag' => 'noindex, nofollow']);
         }
 
         \Illuminate\Support\Facades\Artisan::call('schedule:run');
@@ -104,7 +108,7 @@ Route::prefix('v1')->group(function () {
             'heartbeat' => now()->toIso8601String(),
             'output' => trim(\Illuminate\Support\Facades\Artisan::output()) ?: 'No scheduled tasks needed to run right now.',
             'message' => 'Scheduler executed successfully.',
-        ]);
+        ], 200, ['Cache-Control' => 'no-store, private', 'X-Robots-Tag' => 'noindex, nofollow']);
     })->middleware('throttle:10,1');
 });
 

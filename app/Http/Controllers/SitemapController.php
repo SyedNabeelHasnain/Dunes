@@ -4,15 +4,75 @@ namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
 use App\Models\Language;
+use App\Models\Page;
+use App\Models\RedirectRule;
 use App\Models\Tour;
 use App\Models\WikiArticle;
 use App\Models\WikiPillar;
 use App\Services\LocationLandingService;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 
 class SitemapController extends Controller
 {
+    public static function flushAllSitemapCaches(): void
+    {
+        foreach ([
+            'sitemap_index_xml',
+            'sitemap_tours_xml',
+            'sitemap_blogs_xml',
+            'sitemap_pages_xml',
+            'sitemap_images_xml',
+            'sitemap_wiki_xml',
+            'sitemap_videos_xml',
+        ] as $key) {
+            Cache::forget($key);
+        }
+    }
+
+    /**
+     * Build lookup of active dynamic redirect or 410 Gone paths so sitemaps never list redirected/gone URLs.
+     *
+     * @return array<string, true>
+     */
+    protected function activeRedirectSourceMap(): array
+    {
+        try {
+            if (! Schema::hasTable('redirect_rules')) {
+                return [];
+            }
+
+            return RedirectRule::where('is_active', true)
+                ->pluck('source_path')
+                ->mapWithKeys(fn ($p) => [RedirectRule::normalizePath((string) $p) => true])
+                ->all();
+        } catch (\Throwable) {
+            return [];
+        }
+    }
+
+    protected function shouldExcludeFromSitemap(string $path, mixed $entity = null, ?array $redirectMap = null): bool
+    {
+        $redirectMap ??= $this->activeRedirectSourceMap();
+        $norm = RedirectRule::normalizePath($path);
+        if (isset($redirectMap[$norm])) {
+            return true;
+        }
+
+        if ($entity) {
+            $meta = method_exists($entity, 'seoMeta') ? $entity->seoMeta : null;
+            if ($meta && $meta->include_in_sitemap === false) {
+                return true;
+            }
+            $robots = strtolower((string) ($meta?->robots_directive ?: ($entity->robots ?? '')));
+            if ($meta?->include_in_sitemap !== true && str_contains($robots, 'noindex')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
     /**
      * Escape a string for safe XML output.
      */
@@ -69,7 +129,11 @@ class SitemapController extends Controller
     public function tours(): Response
     {
         $content = Cache::remember('sitemap_tours_xml', 3600, function () {
-            $tours = Tour::where('status', 'active')->select('slug', 'name', 'hero_image', 'updated_at')->get();
+            $tours = Tour::where('status', 'active')
+                ->select('id', 'slug', 'name', 'hero_image', 'updated_at')
+                ->with('seoMeta')
+                ->get();
+            $redirectMap = $this->activeRedirectSourceMap();
             try {
                 $languages = Language::getActive();
             } catch (\Throwable $e) {
@@ -80,6 +144,9 @@ class SitemapController extends Controller
             $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml">'."\n";
 
             foreach ($tours as $tour) {
+                if ($this->shouldExcludeFromSitemap('/'.$tour->slug, $tour, $redirectMap)) {
+                    continue;
+                }
                 $lastmod = $tour->updated_at ? $tour->updated_at->toAtomString() : now()->toAtomString();
                 $enUrl = url('/'.$tour->slug);
 
@@ -129,7 +196,11 @@ class SitemapController extends Controller
     public function blogs(): Response
     {
         $content = Cache::remember('sitemap_blogs_xml', 3600, function () {
-            $blogs = BlogPost::where('status', 'published')->select('slug', 'title', 'featured_image', 'updated_at')->get();
+            $blogs = BlogPost::where('status', 'published')
+                ->select('id', 'slug', 'title', 'featured_image', 'canonical_url', 'robots', 'updated_at')
+                ->with('seoMeta')
+                ->get();
+            $redirectMap = $this->activeRedirectSourceMap();
             try {
                 $languages = Language::getActive();
             } catch (\Throwable $e) {
@@ -140,8 +211,12 @@ class SitemapController extends Controller
             $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml">'."\n";
 
             foreach ($blogs as $blog) {
+                if ($this->shouldExcludeFromSitemap('/blog/'.$blog->slug, $blog, $redirectMap)) {
+                    continue;
+                }
                 $lastmod = $blog->updated_at ? $blog->updated_at->toAtomString() : now()->toAtomString();
-                $enUrl = !empty($blog->canonical_url) && str_starts_with($blog->canonical_url, 'http') ? $blog->canonical_url : url('/blog/'.$blog->slug);
+                $rawCanonical = $blog->seoMeta?->canonical_override ?: $blog->canonical_url;
+                $enUrl = ! empty($rawCanonical) && str_starts_with($rawCanonical, 'http') ? $rawCanonical : url('/blog/'.$blog->slug);
 
                 $alternates = [
                     'x-default' => $enUrl,
@@ -231,7 +306,20 @@ class SitemapController extends Controller
             $tourMod = $latestTour?->updated_at ? $latestTour->updated_at->toAtomString() : $weeklyMod;
             $blogMod = $latestBlog?->updated_at ? $latestBlog->updated_at->toAtomString() : $weeklyMod;
 
+            $redirectMap = $this->activeRedirectSourceMap();
+            $pageModels = collect();
+            try {
+                $pageModels = Page::with('seoMeta')->get()->keyBy(fn ($p) => ltrim((string) $p->slug, '/'));
+            } catch (\Throwable) {
+                $pageModels = collect();
+            }
+
             foreach ($staticPages as $page => $meta) {
+                $slugKey = ltrim((string) $page, '/') ?: 'home';
+                $pageEntity = $pageModels->get($slugKey) ?? $pageModels->get(ltrim((string) $page, '/'));
+                if ($this->shouldExcludeFromSitemap($page ?: '/', $pageEntity, $redirectMap)) {
+                    continue;
+                }
                 if (in_array($page, ['', '/tours', '/build-your-own-safari', '/rate-card'], true)) {
                     $pageLastmod = $tourMod;
                 } elseif ($page === '/blog') {
@@ -371,8 +459,11 @@ class SitemapController extends Controller
                 $languages = Language::fallbackCollection();
             }
 
-            $pillars = WikiPillar::where('status', 'active')->with(['articles' => function ($q) {
-                $q->where('status', 'published')->select('id', 'pillar_id', 'slug', 'title', 'hero_image', 'excerpt', 'updated_at');
+            $redirectMap = $this->activeRedirectSourceMap();
+            $pillars = WikiPillar::where('status', 'active')->with(['seoMeta', 'articles' => function ($q) {
+                $q->where('status', 'published')
+                    ->select('id', 'pillar_id', 'slug', 'title', 'hero_image', 'excerpt', 'updated_at')
+                    ->with('seoMeta');
             }])->get();
 
             $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
@@ -438,6 +529,9 @@ class SitemapController extends Controller
                 foreach ($pillar->articles as $article) {
                     $artLastmod = $article->updated_at ? $article->updated_at->toAtomString() : $now;
                     $artPath = '/wiki/'.$pillar->slug.'/'.$article->slug;
+                    if ($this->shouldExcludeFromSitemap($artPath, $article, $redirectMap)) {
+                        continue;
+                    }
                     $artEnUrl = url($artPath);
 
                     $artAlternates = ['x-default' => $artEnUrl];

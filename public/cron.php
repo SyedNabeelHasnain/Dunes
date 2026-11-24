@@ -11,9 +11,39 @@
 
 $isCli = (php_sapi_name() === 'cli');
 
+// Locate core Laravel application root first so .env / config/services.php values apply before token checks.
+$coreBase = file_exists(__DIR__ . '/../dunes-laravel/bootstrap/app.php')
+    ? __DIR__ . '/../dunes-laravel'
+    : __DIR__ . '/..';
+
+if (!file_exists($coreBase . '/bootstrap/app.php')) {
+    if (!$isCli) {
+        http_response_code(500);
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'error', 'message' => 'Application bootstrap unavailable.']);
+        exit(1);
+    }
+    fwrite(STDERR, "Error: Unable to locate Laravel core bootstrap in {$coreBase}.\n");
+    exit(1);
+}
+
+require $coreBase . '/vendor/autoload.php';
+
+/** @var \Illuminate\Foundation\Application $app */
+$app = require_once $coreBase . '/bootstrap/app.php';
+$kernel = $app->make(\Illuminate\Contracts\Console\Kernel::class);
+$kernel->bootstrap();
+
 if (!$isCli) {
-    $token = $_GET['token'] ?? $_POST['token'] ?? '';
-    $validToken = getenv('CRON_SECRET_TOKEN') ?: 'dunes_cron_2026';
+    header('Cache-Control: no-store, private');
+    header('X-Robots-Tag: noindex, nofollow');
+
+    $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+    $bearerToken = (stripos($authHeader, 'Bearer ') === 0) ? trim(substr($authHeader, 7)) : '';
+    $token = $bearerToken ?: ($_POST['token'] ?? $_GET['token'] ?? '');
+
+    $configuredToken = (string) config('services.cron.secret_token', env('CRON_SECRET_TOKEN', ''));
+    $validToken = $configuredToken !== '' ? $configuredToken : 'dunes_cron_2026';
 
     if (empty($token) || !hash_equals($validToken, (string) $token)) {
         http_response_code(403);
@@ -23,23 +53,7 @@ if (!$isCli) {
     }
 }
 
-// Locate core Laravel application root
-$coreBase = file_exists(__DIR__ . '/../dunes-laravel/bootstrap/app.php')
-    ? __DIR__ . '/../dunes-laravel'
-    : __DIR__ . '/..';
-
-if (!file_exists($coreBase . '/bootstrap/app.php')) {
-    fwrite(STDERR, "Error: Unable to locate Laravel core bootstrap in {$coreBase}.\n");
-    exit(1);
-}
-
-require $coreBase . '/vendor/autoload.php';
-
-/** @var \Illuminate\Foundation\Application $app */
-$app = require_once $coreBase . '/bootstrap/app.php';
-
 // Execute the Laravel scheduler
-$kernel = $app->make(\Illuminate\Contracts\Console\Kernel::class);
 $status = $kernel->call('schedule:run');
 $output = trim($kernel->output());
 

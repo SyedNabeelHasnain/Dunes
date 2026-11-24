@@ -25,6 +25,9 @@ class AuditIssue extends Model
         'evidence',
         'recommended_action',
         'assigned_to',
+        'remediated_by',
+        'entity_type',
+        'entity_id',
         'remediation_notes',
         'resolved_at',
     ];

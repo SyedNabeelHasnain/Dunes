@@ -263,4 +263,25 @@ class WebsiteOptimizationAndAuditTest extends TestCase
             'status_code' => 301,
         ]);
     }
+
+    public function test_upgraded_eleven_category_single_url_audit_comparison_and_artisan_command(): void
+    {
+        $service = app(WebsiteAuditService::class);
+        $first = $service->runAudit('incremental', $this->admin->id);
+        $second = $service->runAudit('full', $this->admin->id);
+
+        $this->assertArrayHasKey('ux', $second->category_scores);
+        $this->assertArrayHasKey('infrastructure', $second->category_scores);
+        $this->assertSame($first->id, $second->parent_run_id);
+
+        $diff = $service->compareRuns($second, $first);
+        $this->assertNotNull($diff);
+        $this->assertArrayHasKey('score_delta', $diff);
+
+        $pageRes = $this->actingAs($this->admin)->postJson(route('admin.audit.page'), ['url' => '/']);
+        $pageRes->assertStatus(200)->assertJsonStructure(['url', 'http_status', 'health_score', 'issues']);
+
+        $this->artisan('audit:run --type=incremental')->assertSuccessful();
+        $this->actingAs($this->admin)->get(route('admin.audit.show', $second->id))->assertStatus(200);
+    }
 }

@@ -291,5 +291,7 @@
             </div>
         </div>
     </div>
+
+    @include('admin.partials.seo-editorial-panel', ['entity' => $post, 'entityType' => 'blog_post'])
 </div>
 @endsection

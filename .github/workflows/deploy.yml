@@ -111,8 +111,8 @@ jobs:
         sed -i "s|APP_ENV=local|APP_ENV=production|g" .env
         sed -i "s|APP_DEBUG=true|APP_DEBUG=false|g" .env
         sed -i "s|APP_URL=http://localhost|APP_URL=https://dunesdiscoverytourism.com|g" .env
-        sed -i "s|SESSION_ENCRYPT=.*|SESSION_ENCRYPT=false|g" .env
-        sed -i "s|SESSION_SECURE_COOKIE=.*|SESSION_SECURE_COOKIE=false|g" .env
+        sed -i "s|SESSION_ENCRYPT=.*|SESSION_ENCRYPT=true|g" .env
+        sed -i "s|SESSION_SECURE_COOKIE=.*|SESSION_SECURE_COOKIE=true|g" .env
 
         # Copy core Laravel directories and files, excluding public assets, node_modules, compiled views, tests, and heavy non-production data
         rsync -arv --exclude="public" --exclude="node_modules" --exclude=".git" --exclude=".github" --exclude="deploy" --exclude="tests" --exclude="database/seeders/data/request_logs.json" --exclude="database/database.sqlite" --exclude="storage/framework/views/*" --exclude="storage/framework/cache/*" --exclude="storage/logs/*" ./ deploy/core_deploy/

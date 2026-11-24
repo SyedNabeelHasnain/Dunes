@@ -3,7 +3,7 @@
     <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl pointer-events-none"></div>
     <div class="flex flex-col md:flex-row items-center gap-6 relative z-10">
         <div class="w-full md:w-44 h-36 rounded-xl overflow-hidden shrink-0 border border-white/10 shadow-md">
-            <img src="{{ resolve_tour_image($tour->thumb_image ?: $tour->hero_image) }}" alt="{{ $tour->name }}" class="w-full h-full object-cover">
+            <img src="{{ resolve_tour_image($tour->thumb_image ?: $tour->hero_image) }}" alt="{{ $tour->name }}" width="320" height="240" loading="lazy" class="w-full h-full object-cover">
         </div>
         <div class="flex-1 text-center md:text-left">
             <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-2">

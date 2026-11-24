@@ -73,6 +73,39 @@
                 <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">AI+SEO</span>
             </a>
 
+            <!-- Governance, Approvals & Audit Trail -->
+            <a href="{{ route('admin.governance.index') }}" 
+               class="relative flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.governance.*') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.governance.*') ? 'bg-amber-400' : 'bg-slate-600' }}"></span>
+                    <span>Governance &amp; RBAC</span>
+                </div>
+            </a>
+
+            <a href="{{ route('admin.health.index') }}" 
+               class="relative flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.health.*') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.health.*') ? 'bg-cyan-400' : 'bg-slate-600' }}"></span>
+                    <span>CWV &amp; System Health</span>
+                </div>
+            </a>
+
+            <a href="{{ route('admin.ai-visibility.index') }}" 
+               class="relative flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.ai-visibility.*') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.ai-visibility.*') ? 'bg-violet-400' : 'bg-slate-600' }}"></span>
+                    <span>AI Visibility &amp; GEO</span>
+                </div>
+            </a>
+
+            <a href="{{ route('admin.settings.privacy.index') }}" 
+               class="relative flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.settings.privacy*') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.settings.privacy*') ? 'bg-emerald-400' : 'bg-slate-600' }}"></span>
+                    <span>Privacy &amp; Consent v2</span>
+                </div>
+            </a>
+
             <!-- Real-Time Analytics -->
             <a href="{{ route('admin.analytics.index') }}" 
                class="relative flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.analytics.index') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
@@ -580,6 +613,24 @@
                class="relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.settings.redirects*') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
                 <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.settings.redirects*') ? 'bg-primary' : 'bg-slate-600' }}"></span>
                 <span>Dynamic Redirects</span>
+            </a>
+
+            <a href="{{ route('admin.settings.seo-templates.index') }}" 
+               class="relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.settings.seo-templates*') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
+                <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.settings.seo-templates*') ? 'bg-primary' : 'bg-slate-600' }}"></span>
+                <span>SEO Inheritance Templates</span>
+            </a>
+
+            <a href="{{ route('admin.settings.robots.index') }}" 
+               class="relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.settings.robots*') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
+                <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.settings.robots*') ? 'bg-primary' : 'bg-slate-600' }}"></span>
+                <span>robots.txt &amp; AI Bots</span>
+            </a>
+
+            <a href="{{ route('admin.settings.keywords.index') }}" 
+               class="relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.settings.keywords*') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
+                <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.settings.keywords*') ? 'bg-primary' : 'bg-slate-600' }}"></span>
+                <span>Keyword Matrix &amp; Links</span>
             </a>
 
             <a href="{{ route('admin.settings.mail') }}" 

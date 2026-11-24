@@ -2,8 +2,11 @@
 
 namespace App\Services\Audit\Checkers;
 
+use App\Http\Controllers\RumVitalsController;
 use App\Models\MediaAsset;
 use App\Models\Setting;
+use App\Models\WebVitalsMetric;
+use Illuminate\Support\Facades\Schema;
 
 class PerformanceChecker implements AuditCheckerInterface
 {
@@ -72,6 +75,65 @@ class PerformanceChecker implements AuditCheckerInterface
                 'evidence' => 'site_hero_poster setting is empty.',
                 'recommended_action' => 'Select an optimized AVIF/WebP hero poster in CMS Settings > Identity & Media.',
             ];
+        }
+
+        // 4. Real-User Core Web Vitals (p75 RUM vs Google Thresholds)
+        try {
+            if (Schema::hasTable('web_vitals_metrics')) {
+                foreach (['LCP', 'INP', 'CLS'] as $metric) {
+                    $vals = WebVitalsMetric::where('metric_name', $metric)
+                        ->where('recorded_at', '>=', now()->subDays(14))
+                        ->orderBy('metric_value')
+                        ->pluck('metric_value')
+                        ->all();
+                    if (count($vals) >= 5) {
+                        $p75 = (float) $vals[(int) floor(0.75 * (count($vals) - 1))];
+                        $budget = RumVitalsController::BUDGETS[$metric]['good'];
+                        if ($p75 > $budget) {
+                            $issues[] = [
+                                'category' => 'performance',
+                                'check_key' => 'perf_rum_budget_exceeded',
+                                'title' => "Core Web Vitals Budget Exceeded: p75 {$metric} = ".round($p75, 2),
+                                'description' => "Real user 75th percentile {$metric} exceeds target budget ({$budget}).",
+                                'severity' => $p75 > RumVitalsController::BUDGETS[$metric]['poor'] ? 'high' : 'medium',
+                                'verification_type' => 'automated',
+                                'affected_url' => route('admin.health.index'),
+                                'evidence' => "Observed p75 over ".count($vals)." samples: {$p75} vs budget <= {$budget}",
+                                'recommended_action' => 'Inspect System Health & CWV Monitor to optimize LCP/CLS/INP on slow pages.',
+                            ];
+                        }
+                    }
+                }
+            }
+        } catch (\Throwable) {
+        }
+
+        // 5. DOM Check on Probed Public Routes for Unsized Images (CLS) & Render-Blocking Scripts
+        foreach (($context['probed_pages'] ?? []) as $path => $probe) {
+            $html = (string) ($probe['html'] ?? '');
+            if ($html === '') {
+                continue;
+            }
+            preg_match_all('/<img\b[^>]*>/i', $html, $imgMatches);
+            $unsizedCount = 0;
+            foreach ($imgMatches[0] ?? [] as $imgTag) {
+                if (! preg_match('/\bwidth\s*=/i', $imgTag) || ! preg_match('/\bheight\s*=/i', $imgTag)) {
+                    $unsizedCount++;
+                }
+            }
+            if ($unsizedCount >= 3) {
+                $issues[] = [
+                    'category' => 'performance',
+                    'check_key' => 'perf_dom_unsized_images',
+                    'title' => "{$unsizedCount} Images Missing Explicit Dimensions on {$path}",
+                    'description' => 'Rendered HTML contains multiple <img> tags lacking explicit width and height attributes, elevating CLS risk.',
+                    'severity' => 'low',
+                    'verification_type' => 'automated',
+                    'affected_url' => url($path),
+                    'evidence' => "Unsized <img> count on {$path}: {$unsizedCount}",
+                    'recommended_action' => 'Add explicit width and height HTML attributes matching natural aspect ratio.',
+                ];
+            }
         }
 
         return $issues;
