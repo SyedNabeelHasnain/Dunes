@@ -45,9 +45,18 @@ class WelcomeOfferController extends Controller
             ], 403);
         }
 
+        // Anti-Spam & Backscatter Reflection Shield FIRST (logs & auto-blocks oversized phishing bots too)
+        $leadGuard = app(\App\Services\Security\ContactSpamGuardService::class)->evaluateLeadSubmission($request, 'welcome_offer');
+        if (! $leadGuard['allowed']) {
+            return response()->json([
+                'success' => (bool) ($leadGuard['stealth_drop'] ?? false),
+                'message' => $leadGuard['message'] ?: 'Unable to process offer claim.',
+            ], (int) ($leadGuard['http_status'] ?? 422));
+        }
+
         $request->validate([
-            'name' => 'required|string|min:2|max:255',
-            'email' => 'required|email|max:255',
+            'name' => 'required|string|min:2|max:80',
+            'email' => 'required|email:filter|max:255',
             'phone' => 'required|string|min:7|max:50',
         ]);
 
@@ -157,17 +166,20 @@ class WelcomeOfferController extends Controller
             Log::error('Failed to log welcome offer lead to whatsapp_inquiries: '.$e->getMessage());
         }
 
-        // Send Email Voucher to Customer
+        // Send Email Voucher to Customer (with sanitized greeting name)
         try {
             if (! app()->environment('testing')) {
                 app(\App\Services\EmailMarketingService::class)->applySmtpConfig();
             }
             $fromEmail = $this->settings->getFromEmail();
+            $safeName = \App\Services\Security\ContactSpamGuardService::sanitizeGreetingName($name);
             Mail::to($email)->send(
-                (new WelcomeOfferMail($coupon->code, (float) $coupon->discount_value, $name))->from($fromEmail, 'Dunes Discovery Tourism')
+                (new WelcomeOfferMail($coupon->code, (float) $coupon->discount_value, $safeName))->from($fromEmail, 'Dunes Discovery Tourism')
             );
+            app(\App\Services\Mail\SmtpDiagnosticService::class)->recordSuccess('welcome_offer');
         } catch (\Throwable $e) {
             Log::error("Failed to dispatch welcome offer email to {$email}: ".$e->getMessage());
+            app(\App\Services\Mail\SmtpDiagnosticService::class)->recordFailure('welcome_offer', $e, $email);
         }
 
         // Trigger Meta Conversions API Lead Event

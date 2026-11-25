@@ -26,6 +26,43 @@
     </div>
     @endif
 
+    @if(!empty($smtpHealth) && ($smtpHealth['status'] ?? 'unknown') === 'degraded' && !empty($smtpHealth['diagnosis']))
+    <div class="p-5 rounded-2xl border-2 border-rose-300 bg-rose-50 text-rose-900 text-xs mb-6 shadow-xs space-y-2">
+        <div class="flex items-start justify-between gap-3">
+            <div class="flex items-center gap-2.5">
+                <span class="w-9 h-9 rounded-xl bg-rose-600 text-white flex items-center justify-center shrink-0">
+                    <i class="bi bi-exclamation-octagon-fill text-base"></i>
+                </span>
+                <div>
+                    <div class="text-sm font-black text-rose-950">{{ $smtpHealth['diagnosis']['title'] ?? 'SMTP Delivery Degraded' }}</div>
+                    <div class="text-[11px] text-rose-700 font-semibold">
+                        Code: {{ $smtpHealth['diagnosis']['smtp_code'] ?? 'SMTP' }} · Source: {{ ($smtpHealth['diagnosis']['source'] ?? '') === 'recipient_email' ? 'Recipient Email' : 'Your SMTP Mail Server' }} · Detected {{ !empty($smtpHealth['checked_at']) ? \Carbon\Carbon::parse($smtpHealth['checked_at'])->diffForHumans() : 'recently' }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p class="text-xs text-rose-900 leading-relaxed">{{ $smtpHealth['diagnosis']['summary'] ?? '' }}</p>
+        @if(!empty($smtpHealth['diagnosis']['recommended_actions']))
+            <ul class="list-disc list-inside space-y-1 text-[11px] text-rose-800 font-medium pt-1">
+                @foreach($smtpHealth['diagnosis']['recommended_actions'] as $actionItem)
+                    <li>{{ $actionItem }}</li>
+                @endforeach
+            </ul>
+        @endif
+    </div>
+    @elseif(!empty($smtpHealth) && ($smtpHealth['status'] ?? 'unknown') === 'healthy')
+    <div class="flex items-center justify-between gap-3 p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/70 text-emerald-900 text-xs mb-6">
+        <div class="flex items-center gap-2 font-bold">
+            <i class="bi bi-shield-fill-check text-emerald-600 text-base"></i>
+            <span>SMTP Delivery Healthy</span>
+            <span class="font-normal text-emerald-700">· Last successful dispatch {{ !empty($smtpHealth['checked_at']) ? \Carbon\Carbon::parse($smtpHealth['checked_at'])->diffForHumans() : '' }}</span>
+        </div>
+        @if(($settings['smtp_fallback_enabled'] ?? '0') === '1' && !empty($settings['smtp_fallback_host'] ?? ''))
+            <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold">Failover Relay Armed</span>
+        @endif
+    </div>
+    @endif
+
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
         <!-- Main Settings Form Column -->
         <div class="xl:col-span-8">
@@ -106,6 +143,67 @@
                                 </button>
                             </div>
                             <div class="mt-1 text-[11px] text-slate-500">Passwords are securely stored. Leave blank if you don't wish to change the current password.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Secondary / Automatic Failover Transactional SMTP Relay -->
+                <div class="rounded-2xl border border-indigo-200/80 bg-gradient-to-br from-indigo-50/40 via-white to-white p-6 shadow-xs mb-6">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                        <div>
+                            <h5 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                                <i class="bi bi-arrow-left-right text-indigo-600"></i> Secondary Automatic Failover SMTP Relay (High Availability)
+                            </h5>
+                            <div class="text-[11px] text-slate-500 mt-0.5">If Primary SMTP (e.g., Hostinger) returns 554 / rate-limit / timeout, transactional booking vouchers, OTPs &amp; recovery emails seamlessly fail over here.</div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                            <input type="checkbox" name="smtp_fallback_enabled" value="1" id="smtpFallbackEnabled" {{ ($settings['smtp_fallback_enabled'] ?? '0') === '1' ? 'checked' : '' }} class="sr-only peer">
+                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                            <span class="ms-2 text-xs font-extrabold text-slate-700">Enable Failover</span>
+                        </label>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                        <div class="md:col-span-6">
+                            <label class="block text-xs font-bold text-slate-700 mb-1.5">Failover SMTP Host</label>
+                            <input type="text" name="smtp_fallback_host" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="smtp-relay.brevo.com / smtp.resend.com / smtp.postmarkapp.com" value="{{ old('smtp_fallback_host', $settings['smtp_fallback_host'] ?? '') }}">
+                        </div>
+                        <div class="md:col-span-3">
+                            <label class="block text-xs font-bold text-slate-700 mb-1.5">Port</label>
+                            <select name="smtp_fallback_port" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 outline-hidden transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                                <option value="587" {{ ($settings['smtp_fallback_port'] ?? '587') == '587' ? 'selected' : '' }}>587 (TLS / STARTTLS)</option>
+                                <option value="465" {{ ($settings['smtp_fallback_port'] ?? '') == '465' ? 'selected' : '' }}>465 (SSL / SMTPS)</option>
+                                <option value="2525" {{ ($settings['smtp_fallback_port'] ?? '') == '2525' ? 'selected' : '' }}>2525 (Alt TLS)</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-3">
+                            <label class="block text-xs font-bold text-slate-700 mb-1.5">Encryption</label>
+                            <select name="smtp_fallback_encryption" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 outline-hidden transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                                <option value="tls" {{ ($settings['smtp_fallback_encryption'] ?? 'tls') === 'tls' ? 'selected' : '' }}>TLS</option>
+                                <option value="ssl" {{ ($settings['smtp_fallback_encryption'] ?? '') === 'ssl' ? 'selected' : '' }}>SSL</option>
+                                <option value="none" {{ ($settings['smtp_fallback_encryption'] ?? '') === 'none' ? 'selected' : '' }}>None</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-6">
+                            <label class="block text-xs font-bold text-slate-700 mb-1.5">Failover Username / API User</label>
+                            <input type="text" name="smtp_fallback_username" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="resend / Brevo SMTP login / SES access key" value="{{ old('smtp_fallback_username', $settings['smtp_fallback_username'] ?? '') }}">
+                        </div>
+                        <div class="md:col-span-6">
+                            <label class="block text-xs font-bold text-slate-700 mb-1.5">Failover Password / SMTP Key</label>
+                            <div class="relative flex rounded-xl shadow-2xs">
+                                <input type="password" name="smtp_fallback_password" id="smtpFallbackPassword" class="w-full rounded-l-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="•••••••••••••• (Leave blank to keep existing)">
+                                <button type="button" class="inline-flex items-center px-3.5 rounded-r-xl border border-l-0 border-slate-200 bg-slate-50 text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition" onclick="togglePasswordVisibility('smtpFallbackPassword')">
+                                    <i class="bi bi-eye" id="smtpFallbackPasswordEye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="md:col-span-6">
+                            <label class="block text-xs font-bold text-slate-700 mb-1.5">Failover From Email (Optional)</label>
+                            <input type="email" name="smtp_fallback_from_address" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="Leave blank to use Primary From Email" value="{{ old('smtp_fallback_from_address', $settings['smtp_fallback_from_address'] ?? '') }}">
+                        </div>
+                        <div class="md:col-span-6">
+                            <label class="block text-xs font-bold text-slate-700 mb-1.5">Failover From Display Name (Optional)</label>
+                            <input type="text" name="smtp_fallback_from_name" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="Dunes Discovery Tourism" value="{{ old('smtp_fallback_from_name', $settings['smtp_fallback_from_name'] ?? '') }}">
                         </div>
                     </div>
                 </div>
@@ -199,9 +297,18 @@
                     Send a live diagnostic test email to verify that your mail server credentials authenticate and can transmit messages cleanly.
                 </p>
 
-                <div class="mb-4">
+                <div class="mb-3">
                     <label class="block text-xs font-bold text-slate-700 mb-1.5">Diagnostic Recipient Email:</label>
                     <input type="email" id="testConnectionEmail" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" placeholder="yourname@domain.com" value="{{ auth()->user()->email ?? '' }}">
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Mailer Route to Test:</label>
+                    <select id="testConnectionTarget" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800 outline-hidden focus:border-primary focus:ring-1 focus:ring-primary">
+                        <option value="auto">Auto (Primary &rarr; Failover Chain)</option>
+                        <option value="primary">Primary SMTP Only</option>
+                        <option value="fallback">Secondary Failover Relay Only</option>
+                    </select>
                 </div>
 
                 <button type="button" class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-slate-800 transition" id="btnTestConnection" onclick="runLiveSmtpTest()">
@@ -258,6 +365,7 @@ async function runLiveSmtpTest() {
     btn.innerHTML = '<span class="inline-block animate-spin mr-2"><i class="bi bi-arrow-repeat"></i></span> Testing Connection...';
     resultBox.classList.add('hidden');
 
+    const target = document.getElementById('testConnectionTarget')?.value || 'auto';
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
         const response = await fetch('{{ route("admin.settings.mail.test") }}', {
@@ -267,7 +375,7 @@ async function runLiveSmtpTest() {
                 'X-CSRF-TOKEN': csrfToken,
                 'Accept': 'application/json'
             },
-            body: JSON.stringify({ test_email: email })
+            body: JSON.stringify({ test_email: email, target: target })
         });
 
         const data = await response.json();
@@ -275,8 +383,14 @@ async function runLiveSmtpTest() {
             resultBox.className = 'p-3.5 mt-3 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 text-xs shadow-xs';
             resultBox.innerHTML = `<strong><i class="bi bi-check-circle-fill mr-1 text-emerald-600"></i> Success!</strong> ${data.message}`;
         } else {
-            resultBox.className = 'p-3.5 mt-3 rounded-xl border border-rose-200 bg-rose-50 text-rose-800 text-xs shadow-xs';
-            resultBox.innerHTML = `<strong><i class="bi bi-exclamation-triangle-fill mr-1 text-rose-600"></i> Connection Failed:</strong><br>${data.message}`;
+            const diag = data.diagnosis || null;
+            let actionsHtml = '';
+            if (diag && Array.isArray(diag.recommended_actions) && diag.recommended_actions.length) {
+                actionsHtml = '<ul class="list-disc list-inside mt-2 space-y-1 text-[11px]">' + diag.recommended_actions.map(a => `<li>${a}</li>`).join('') + '</ul>';
+            }
+            const rawHtml = diag?.raw_error ? `<div class="mt-2 p-2 rounded-lg bg-white/80 border border-rose-200 font-mono text-[10px] break-all">${diag.raw_error}</div>` : '';
+            resultBox.className = 'p-3.5 mt-3 rounded-xl border border-rose-200 bg-rose-50 text-rose-800 text-xs shadow-xs space-y-1';
+            resultBox.innerHTML = `<strong><i class="bi bi-exclamation-triangle-fill mr-1 text-rose-600"></i> ${diag?.title || 'Connection Failed'}:</strong><p class="mt-1">${diag?.summary || data.message}</p>${actionsHtml}${rawHtml}`;
         }
         resultBox.classList.remove('hidden');
     } catch (err) {

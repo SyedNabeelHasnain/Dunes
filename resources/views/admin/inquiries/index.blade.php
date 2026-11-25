@@ -16,9 +16,17 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <h1 class="text-2xl font-black text-slate-900 tracking-tight">Customer Inquiries Hub</h1>
-            <p class="text-xs text-slate-500 mt-0.5">Manage customer inquiries from website contact forms, track response times, and reply quickly.</p>
+            <p class="text-xs text-slate-500 mt-0.5">Manage customer inquiries from website contact forms, review quarantined bot spam, and reply quickly.</p>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
+            <button type="button" id="btnScanPurgeSpam" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition-all cursor-pointer">
+                <i class="bi bi-shield-fill-exclamation text-sm"></i>
+                <span>Scan &amp; Clean Spam</span>
+            </button>
+            <a href="{{ route('admin.settings.google') }}#antiSpamShieldSection" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-xs transition-all">
+                <i class="bi bi-shield-lock-fill text-amber-400 text-sm"></i>
+                <span>Anti-Spam Settings</span>
+            </a>
             <a href="{{ route('admin.inquiries.export', request()->query()) }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold shadow-2xs transition-all">
                 <i class="bi bi-file-earmark-arrow-down text-emerald-600 text-sm"></i>
                 <span>Export CSV</span>
@@ -26,17 +34,43 @@
         </div>
     </div>
 
-    <!-- 4 Key Performance Metric Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+    <!-- Inbox vs Spam Quarantine Tabs -->
+    <div class="flex flex-wrap items-center justify-between gap-3 bg-white rounded-2xl border border-slate-200/80 shadow-xs p-2">
+        <div class="flex items-center gap-2">
+            <a href="{{ route('admin.inquiries.index', ['view' => 'inbox']) }}"
+               class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold transition-all {{ ($viewMode ?? 'inbox') === 'inbox' ? 'bg-primary text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100' }}">
+                <i class="bi bi-inbox-fill"></i>
+                <span>Clean Inbox</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] {{ ($viewMode ?? 'inbox') === 'inbox' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-700' }}">{{ number_format($stats['total'] ?? 0) }}</span>
+            </a>
+            <a href="{{ route('admin.inquiries.index', ['view' => 'quarantine']) }}"
+               class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold transition-all {{ ($viewMode ?? 'inbox') === 'quarantine' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-600 hover:bg-rose-50 hover:text-rose-700' }}">
+                <i class="bi bi-shield-exclamation"></i>
+                <span>Spam Quarantine</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] {{ ($viewMode ?? 'inbox') === 'quarantine' ? 'bg-white/20 text-white' : (($stats['quarantined'] ?? 0) > 0 ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-600') }}">{{ number_format($stats['quarantined'] ?? 0) }}</span>
+            </a>
+        </div>
+        <div class="flex items-center gap-3 px-2 text-[11px] font-semibold text-slate-500">
+            <span class="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
+                <i class="bi bi-shield-check"></i> {{ number_format($spamTelemetry['blocked_24h'] ?? 0) }} bots blocked (24h)
+            </span>
+            <span class="hidden md:inline-flex items-center gap-1 text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
+                <i class="bi bi-ban"></i> {{ number_format($spamTelemetry['auto_ip_blocked_7d'] ?? 0) }} IPs auto-blocked (7d)
+            </span>
+        </div>
+    </div>
+
+    <!-- 5 Key Performance Metric Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5">
             <div class="flex items-center justify-between mb-2">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Inquiries</span>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Clean Inquiries</span>
                 <span class="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
                     <i class="bi bi-envelope-paper-fill text-sm"></i>
                 </span>
             </div>
             <div class="text-2xl font-black text-slate-900">{{ number_format($stats['total'] ?? 0) }}</div>
-            <span class="text-[11px] text-slate-400 mt-1 block">All contact submissions</span>
+            <span class="text-[11px] text-slate-400 mt-1 block">Verified human inquiries</span>
         </div>
 
         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5">
@@ -72,6 +106,17 @@
             </div>
             <div class="text-2xl font-black text-emerald-600">{{ $stats['response_rate'] ?? 0 }}%</div>
             <span class="text-[11px] text-slate-400 mt-1 block">{{ $stats['replied'] ?? 0 }} replied to customers</span>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-rose-200/80 shadow-xs p-5">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-rose-500">Spam Shield (7d)</span>
+                <span class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
+                    <i class="bi bi-shield-fill-check text-sm"></i>
+                </span>
+            </div>
+            <div class="text-2xl font-black text-rose-600">{{ number_format($spamTelemetry['blocked_7d'] ?? 0) }}</div>
+            <span class="text-[11px] text-slate-500 mt-1 block">{{ number_format($stats['quarantined'] ?? 0) }} in quarantine</span>
         </div>
     </div>
 
@@ -109,6 +154,7 @@
     <!-- Multi-Parameter Filter Toolbar -->
     <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4">
         <form method="GET" action="{{ route('admin.inquiries.index') }}">
+            <input type="hidden" name="view" value="{{ $viewMode ?? 'inbox' }}">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end">
                 <div class="lg:col-span-4 sm:col-span-2">
                     <label for="inquirySearch" class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Search Messages</label>
@@ -197,12 +243,29 @@
                             </div>
                         </td>
                         <td class="py-3 px-4">
-                            <div class="text-xs font-bold text-slate-900">{{ $c->name }}</div>
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="text-xs font-bold text-slate-900">{{ Str::limit($c->name, 75) }}</span>
+                                @if($c->is_verified)
+                                    <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold" title="Email OTP Verified">
+                                        <i class="bi bi-patch-check-fill"></i> Verified
+                                    </span>
+                                @endif
+                                @if((int)($c->spam_score ?? 0) > 0)
+                                    <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full {{ (int)$c->spam_score >= 50 ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-amber-50 text-amber-700 border-amber-200' }} border text-[10px] font-bold" title="{{ is_array($c->spam_reasons) ? implode(', ', $c->spam_reasons) : '' }}">
+                                        Risk {{ (int)$c->spam_score }}
+                                    </span>
+                                @endif
+                            </div>
                             <a href="mailto:{{ $c->email }}" class="text-[11px] text-slate-400 hover:text-primary transition">{{ $c->email }}</a>
                         </td>
                         <td class="py-3 px-4">
                             <div class="text-xs font-semibold text-slate-800 line-clamp-1">{{ $c->subject }}</div>
                             <div class="text-[11px] text-slate-400 line-clamp-1">{{ Str::limit($c->message, 60) }}</div>
+                            @if(($viewMode ?? 'inbox') === 'quarantine' && is_array($c->spam_reasons) && count($c->spam_reasons) > 0)
+                                <div class="text-[10px] text-rose-600 font-semibold mt-0.5 line-clamp-1">
+                                    <i class="bi bi-shield-exclamation me-0.5"></i>{{ implode(', ', array_slice($c->spam_reasons, 0, 3)) }}
+                                </div>
+                            @endif
                         </td>
                         <td class="py-3 px-4 whitespace-nowrap" data-order="{{ $c->traffic_channel ?: 'Direct' }}">
                             @include('partials.admin.channel-badge', ['channel' => $c->traffic_channel ?: ($c->utm_source ?: 'Direct')])
@@ -213,11 +276,12 @@
                                     'new' => 'bg-rose-50 text-rose-700 border-rose-200',
                                     'read' => 'bg-amber-50 text-amber-700 border-amber-200',
                                     'replied' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                                    'spam' => 'bg-rose-100 text-rose-800 border-rose-300',
                                     default => 'bg-slate-100 text-slate-700 border-slate-200',
                                 };
                             @endphp
                             <span class="status-badge inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border capitalize {{ $badgeClass }}">
-                                {{ $c->status === 'new' ? 'Action Needed' : ($c->status === 'read' ? 'In Review' : 'Replied') }}
+                                {{ $c->status === 'new' ? 'Action Needed' : ($c->status === 'read' ? 'In Review' : ($c->status === 'spam' ? 'Spam Quarantine' : 'Replied')) }}
                             </span>
                         </td>
                         <td class="py-3 px-4 text-right pe-4">
@@ -226,24 +290,41 @@
                                     <i class="bi bi-eye-fill text-xs"></i>
                                 </a>
 
-                                <button type="button" 
-                                        class="w-8 h-8 rounded-xl border border-slate-200 hover:border-amber-400 text-slate-500 hover:text-amber-600 flex items-center justify-center bg-white transition shadow-2xs btn-toggle-inquiry-read cursor-pointer" 
-                                        title="{{ $c->status === 'new' ? 'Mark as Read' : 'Mark as Action Needed' }}"
-                                        data-id="{{ $c->id }}"
-                                        data-status="{{ $c->status }}">
-                                    <i class="bi {{ $c->status === 'new' ? 'bi-envelope' : 'bi-envelope-open' }} text-xs"></i>
-                                </button>
-
-                                <form action="{{ route('admin.inquiries.status', $c->id) }}" method="POST" class="inline">
-                                    @csrf
-                                    <input type="hidden" name="status" value="replied">
-                                    <button type="submit" class="w-8 h-8 rounded-xl border border-emerald-200 text-emerald-600 hover:bg-emerald-50 flex items-center justify-center bg-white transition shadow-2xs disabled:opacity-40 disabled:cursor-not-allowed" title="Mark Replied" {{ $c->status === 'replied' ? 'disabled' : '' }}>
-                                        <i class="bi bi-check-lg text-xs"></i>
+                                @if(($viewMode ?? 'inbox') === 'quarantine' || $c->is_spam || $c->status === 'spam')
+                                    <form action="{{ route('admin.inquiries.restore-spam', $c->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="w-8 h-8 rounded-xl border border-emerald-200 text-emerald-600 hover:bg-emerald-50 flex items-center justify-center bg-white transition shadow-2xs cursor-pointer" title="Not Spam — Restore to Clean Inbox">
+                                            <i class="bi bi-arrow-counterclockwise text-xs"></i>
+                                        </button>
+                                    </form>
+                                @else
+                                    <button type="button"
+                                            class="w-8 h-8 rounded-xl border border-slate-200 hover:border-amber-400 text-slate-500 hover:text-amber-600 flex items-center justify-center bg-white transition shadow-2xs btn-toggle-inquiry-read cursor-pointer"
+                                            title="{{ $c->status === 'new' ? 'Mark as Read' : 'Mark as Action Needed' }}"
+                                            data-id="{{ $c->id }}"
+                                            data-status="{{ $c->status }}">
+                                        <i class="bi {{ $c->status === 'new' ? 'bi-envelope' : 'bi-envelope-open' }} text-xs"></i>
                                     </button>
-                                </form>
 
-                                <button type="button" 
-                                        class="w-8 h-8 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 flex items-center justify-center bg-white transition shadow-2xs btn-delete-inquiry" 
+                                    <form action="{{ route('admin.inquiries.status', $c->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        <input type="hidden" name="status" value="replied">
+                                        <button type="submit" class="w-8 h-8 rounded-xl border border-emerald-200 text-emerald-600 hover:bg-emerald-50 flex items-center justify-center bg-white transition shadow-2xs disabled:opacity-40 disabled:cursor-not-allowed" title="Mark Replied" {{ $c->status === 'replied' ? 'disabled' : '' }}>
+                                            <i class="bi bi-check-lg text-xs"></i>
+                                        </button>
+                                    </form>
+
+                                    <button type="button"
+                                            class="w-8 h-8 rounded-xl border border-amber-200 text-amber-700 hover:bg-amber-50 flex items-center justify-center bg-white transition shadow-2xs btn-mark-spam-inquiry cursor-pointer"
+                                            title="Mark as Spam &amp; Block IP"
+                                            data-id="{{ $c->id }}"
+                                            data-ip="{{ $c->ip_address ?: 'Unknown' }}">
+                                        <i class="bi bi-shield-fill-x text-xs"></i>
+                                    </button>
+                                @endif
+
+                                <button type="button"
+                                        class="w-8 h-8 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 flex items-center justify-center bg-white transition shadow-2xs btn-delete-inquiry"
                                         title="Permanently Delete Inquiry"
                                         data-id="{{ $c->id }}"
                                         data-name="{{ $c->name }}"
@@ -285,6 +366,15 @@
         <button type="button" class="px-3 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition inquiries-bulk-action" data-action="status_new">
             <i class="bi bi-bell text-rose-400 me-1"></i> Mark New
         </button>
+        @if(($viewMode ?? 'inbox') === 'quarantine')
+        <button type="button" class="px-3 py-1 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition inquiries-bulk-action" data-action="restore_spam">
+            <i class="bi bi-arrow-counterclockwise me-1"></i> Restore Clean
+        </button>
+        @else
+        <button type="button" class="px-3 py-1 rounded-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-xs transition inquiries-bulk-action" data-action="mark_spam_and_block">
+            <i class="bi bi-shield-fill-x me-1"></i> Spam &amp; Block IP
+        </button>
+        @endif
         <button type="button" class="px-3 py-1 rounded-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition inquiries-bulk-action" data-action="delete">
             <i class="bi bi-trash3 me-1"></i> Delete
         </button>
@@ -651,61 +741,179 @@ window.promptPermanentDeleteInquiry = function(id, name, email, subject) {
                 });
             }
         });
-    // Toggle Inquiry Read/Unread Status
-    $(document).on('click', '.btn-toggle-inquiry-read', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        const btn = $(this);
-        const id = btn.data('id');
-        const currentStatus = btn.attr('data-status') || 'new';
-        const targetStatus = currentStatus === 'new' ? 'read' : 'new';
-
-        btn.prop('disabled', true);
-        $.ajax({
-            url: `/admin/inquiries/${id}/status`,
-            method: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-                status: targetStatus
-            },
-            headers: { 'Accept': 'application/json' },
-            success: function(res) {
-                if (res.success) {
-                    const row = $(`#inquiry-row-${id}`);
-                    btn.attr('data-status', targetStatus);
-                    if (targetStatus === 'read') {
-                        row.removeClass('is-unread-inquiry bg-amber-50/70 hover:bg-amber-100/70 border-l-4 border-l-amber-500 font-semibold');
-                        row.find('.unread-dot').remove();
-                        btn.attr('title', 'Mark as Action Needed');
-                        btn.find('i').removeClass('bi-envelope').addClass('bi-envelope-open');
-                        row.find('.status-col').attr('data-order', 'read');
-                        row.find('.status-badge').removeClass('bg-rose-50 text-rose-700 border-rose-200').addClass('bg-amber-50 text-amber-700 border-amber-200').text('In Review');
-                    } else {
-                        row.addClass('is-unread-inquiry bg-amber-50/70 hover:bg-amber-100/70 border-l-4 border-l-amber-500 font-semibold');
-                        if (!row.find('.unread-dot').length) {
-                            row.find('td:eq(1) .flex').prepend('<span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0 unread-dot" title="Action Needed / Unread"></span>');
-                        }
-                        btn.attr('title', 'Mark as Read');
-                        btn.find('i').removeClass('bi-envelope-open').addClass('bi-envelope');
-                        row.find('.status-col').attr('data-order', 'new');
-                        row.find('.status-badge').removeClass('bg-amber-50 text-amber-700 border-amber-200').addClass('bg-rose-50 text-rose-700 border-rose-200').text('Action Needed');
-                    }
-                    if (res.unread_count !== undefined) {
-                        $('.inquiry-unread-count').text(res.unread_count);
-                        if (res.unread_count === 0) {
-                            $('.inquiry-unread-count').hide();
-                        } else {
-                            $('.inquiry-unread-count').show();
-                        }
-                    }
-                }
-            },
-            complete: function() {
-                btn.prop('disabled', false);
-            }
-        });
     });
 };
+
+// Toggle Inquiry Read/Unread Status (properly scoped outside promptPermanentDeleteInquiry)
+$(document).on('click', '.btn-toggle-inquiry-read', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const btn = $(this);
+    const id = btn.data('id');
+    const currentStatus = btn.attr('data-status') || 'new';
+    const targetStatus = currentStatus === 'new' ? 'read' : 'new';
+
+    btn.prop('disabled', true);
+    $.ajax({
+        url: `/admin/inquiries/${id}/status`,
+        method: 'POST',
+        data: {
+            _token: '{{ csrf_token() }}',
+            status: targetStatus
+        },
+        headers: { 'Accept': 'application/json' },
+        success: function(res) {
+            if (res.success) {
+                const row = $(`#inquiry-row-${id}`);
+                btn.attr('data-status', targetStatus);
+                if (targetStatus === 'read') {
+                    row.removeClass('is-unread-inquiry bg-amber-50/70 hover:bg-amber-100/70 border-l-4 border-l-amber-500 font-semibold');
+                    row.find('.unread-dot').remove();
+                    btn.attr('title', 'Mark as Action Needed');
+                    btn.find('i').removeClass('bi-envelope').addClass('bi-envelope-open');
+                    row.find('.status-col').attr('data-order', 'read');
+                    row.find('.status-badge').removeClass('bg-rose-50 text-rose-700 border-rose-200').addClass('bg-amber-50 text-amber-700 border-amber-200').text('In Review');
+                } else {
+                    row.addClass('is-unread-inquiry bg-amber-50/70 hover:bg-amber-100/70 border-l-4 border-l-amber-500 font-semibold');
+                    if (!row.find('.unread-dot').length) {
+                        row.find('td:eq(1) .flex').prepend('<span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0 unread-dot" title="Action Needed / Unread"></span>');
+                    }
+                    btn.attr('title', 'Mark as Read');
+                    btn.find('i').removeClass('bi-envelope-open').addClass('bi-envelope');
+                    row.find('.status-col').attr('data-order', 'new');
+                    row.find('.status-badge').removeClass('bg-amber-50 text-amber-700 border-amber-200').addClass('bg-rose-50 text-rose-700 border-rose-200').text('Action Needed');
+                }
+                if (res.unread_count !== undefined) {
+                    $('.inquiry-unread-count').text(res.unread_count);
+                    if (res.unread_count === 0) {
+                        $('.inquiry-unread-count').hide();
+                    } else {
+                        $('.inquiry-unread-count').show();
+                    }
+                }
+            }
+        },
+        complete: function() {
+            btn.prop('disabled', false);
+        }
+    });
+});
+
+// 1-Click Mark Single Inquiry as Spam & Block IP
+$(document).on('click', '.btn-mark-spam-inquiry', function(e) {
+    e.preventDefault();
+    const id = $(this).data('id');
+    const ip = $(this).data('ip') || 'Unknown';
+    Swal.fire({
+        title: 'Mark as Spam & Block IP?',
+        html: `<div class="text-xs text-slate-600 text-left">Move Inquiry <strong>#${id}</strong> to Spam Quarantine and add sender IP <code>${ip}</code> to the IP Firewall blocklist?</div>`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d97706',
+        confirmButtonText: '<i class="bi bi-shield-fill-x me-1"></i> Quarantine & Block IP',
+        cancelButtonText: 'Cancel',
+        showLoaderOnConfirm: true,
+        preConfirm: () => {
+            return $.ajax({
+                url: `/admin/inquiries/${id}/mark-spam`,
+                method: 'POST',
+                data: { _token: '{{ csrf_token() }}', block_ip: 1 },
+                headers: { 'Accept': 'application/json' }
+            });
+        }
+    }).then((res) => {
+        if (res.isConfirmed && res.value?.success) {
+            Swal.fire({ icon: 'success', title: 'Quarantined!', text: res.value.message, timer: 1600, showConfirmButton: false })
+                .then(() => window.location.reload());
+        }
+    });
+});
+
+// 1-Click Scan & Purge Existing Spam (Nov 25 Bot Flood Cleanup Tool)
+$('#btnScanPurgeSpam').on('click', function(e) {
+    e.preventDefault();
+    Swal.fire({
+        title: 'Scanning Existing Inquiries...',
+        text: 'Running Anti-Spam Intelligence over all stored contact records...',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+    });
+
+    $.ajax({
+        url: '{{ route("admin.inquiries.scan-purge-spam") }}',
+        method: 'POST',
+        data: { _token: '{{ csrf_token() }}', mode: 'preview', include_quarantined: 1 },
+        headers: { 'Accept': 'application/json' },
+        success: function(preview) {
+            if (!preview.spam_count) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Inbox Is 100% Clean!',
+                    text: `Scanned ${preview.scanned_total} inquiry record(s) — zero spam or phishing records detected.`
+                });
+                return;
+            }
+
+            const sampleHtml = (preview.samples || []).map(s => `
+                <div class="p-2 rounded-lg bg-rose-50/70 border border-rose-200/80 text-[11px] text-left">
+                    <div class="flex justify-between font-bold text-slate-900">
+                        <span>#${s.id} · ${s.email}</span>
+                        <span class="text-rose-700">Score ${s.score}</span>
+                    </div>
+                    <div class="text-slate-600 truncate">${s.name}</div>
+                    <div class="text-[10px] text-rose-600">IP: ${s.ip_address} · ${(s.reasons || []).join(', ')}</div>
+                </div>
+            `).join('');
+
+            Swal.fire({
+                title: `Found ${preview.spam_count} Spam Record(s)`,
+                width: 640,
+                html: `
+                    <div class="text-left text-xs text-slate-600 space-y-3">
+                        <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900">
+                            Scanned <strong>${preview.scanned_total}</strong> record(s). Detected <strong>${preview.spam_count}</strong> bot/phishing spam row(s) across <strong>${preview.unique_ips_count}</strong> unique IP address(es). Genuine customer inquiries are untouched.
+                        </div>
+                        <div class="max-h-56 overflow-y-auto space-y-1.5">${sampleHtml}</div>
+                        <label class="flex items-center gap-2 pt-1 font-bold text-slate-800 cursor-pointer">
+                            <input type="checkbox" id="scanBlockIpsCheck" checked class="rounded text-rose-600">
+                            <span>Also auto-block all ${preview.unique_ips_count} offending bot IP(s) in IP Firewall</span>
+                        </label>
+                    </div>
+                `,
+                icon: 'warning',
+                showDenyButton: true,
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                denyButtonColor: '#d97706',
+                confirmButtonText: '<i class="bi bi-trash3-fill me-1"></i> Permanently Purge All Spam',
+                denyButtonText: '<i class="bi bi-shield-exclamation me-1"></i> Move to Quarantine Only',
+                cancelButtonText: 'Cancel'
+            }).then((choice) => {
+                if (!choice.isConfirmed && !choice.isDenied) return;
+                const targetMode = choice.isConfirmed ? 'purge' : 'quarantine';
+                const blockIps = document.getElementById('scanBlockIpsCheck')?.checked ? 1 : 0;
+
+                Swal.fire({ title: 'Cleaning Spam...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                $.ajax({
+                    url: '{{ route("admin.inquiries.scan-purge-spam") }}',
+                    method: 'POST',
+                    data: { _token: '{{ csrf_token() }}', mode: targetMode, block_ips: blockIps, include_quarantined: 1 },
+                    headers: { 'Accept': 'application/json' },
+                    success: function(res) {
+                        Swal.fire({ icon: 'success', title: 'Cleanup Complete!', text: res.message })
+                            .then(() => window.location.reload());
+                    },
+                    error: function(xhr) {
+                        Swal.fire('Error', xhr.responseJSON?.message || 'Cleanup failed.', 'error');
+                    }
+                });
+            });
+        },
+        error: function(xhr) {
+            Swal.fire('Error', xhr.responseJSON?.message || 'Failed to scan inquiries.', 'error');
+        }
+    });
+});
 </script>
 @endpush
 @endsection

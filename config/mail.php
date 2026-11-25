@@ -52,6 +52,18 @@ return [
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         ],
 
+        'smtp_fallback' => [
+            'transport' => 'smtp',
+            'host' => env('MAIL_FALLBACK_HOST'),
+            'port' => env('MAIL_FALLBACK_PORT', 587),
+            'encryption' => env('MAIL_FALLBACK_ENCRYPTION', 'tls'),
+            'scheme' => env('MAIL_FALLBACK_ENCRYPTION', 'tls') === 'ssl' ? 'smtps' : null,
+            'username' => env('MAIL_FALLBACK_USERNAME'),
+            'password' => env('MAIL_FALLBACK_PASSWORD'),
+            'timeout' => 12,
+            'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+        ],
+
         'log' => [
             'transport' => 'log',
             'channel' => env('MAIL_LOG_CHANNEL'),

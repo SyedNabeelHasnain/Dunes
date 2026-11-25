@@ -223,6 +223,7 @@ class NotificationManagementTest extends TestCase
             'subject' => 'Corporate Buyout Desert Safari (60 Guests)',
             'message' => 'Please provide private desert camp rates for November 20th.',
             'status' => 'new',
+            'is_verified' => true,
             'traffic_channel' => 'Organic Search',
         ]);
 

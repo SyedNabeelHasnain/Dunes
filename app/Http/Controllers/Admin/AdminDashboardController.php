@@ -559,19 +559,20 @@ class AdminDashboardController extends Controller
     }
 
     /**
-     * List Contact Inquiries with Analytics & Filters.
+     * List Contact Inquiries with Analytics, Spam Quarantine Tab & Filters.
      */
     public function inquiries(Request $request)
     {
+        $viewMode = $request->input('view', 'inbox') === 'quarantine' ? 'quarantine' : 'inbox';
         $status = $request->input('status');
         $trafficChannel = $request->input('traffic_channel') ?? $request->input('channel');
         $fromDate = $request->input('from_date');
         $toDate = $request->input('to_date');
         $search = $request->input('search');
 
-        $query = Contact::query();
+        $query = $viewMode === 'quarantine' ? Contact::quarantined() : Contact::clean();
 
-        if ($status) {
+        if ($status && $viewMode === 'inbox') {
             $query->where('status', $status);
         }
         if ($trafficChannel) {
@@ -594,23 +595,28 @@ class AdminDashboardController extends Controller
 
         $inquiries = $query->orderBy('id', 'desc')->get();
 
-        // 1. Inquiries Key Performance Statistics
-        $totalInquiries = Contact::count();
-        $newInquiries = Contact::where('status', 'new')->count();
-        $readInquiries = Contact::where('status', 'read')->count();
-        $repliedInquiries = Contact::where('status', 'replied')->count();
+        // 1. Clean Inquiries Key Performance Statistics (isolated from quarantined spam)
+        $totalInquiries = Contact::clean()->count();
+        $newInquiries = Contact::clean()->where('status', 'new')->count();
+        $readInquiries = Contact::clean()->where('status', 'read')->count();
+        $repliedInquiries = Contact::clean()->where('status', 'replied')->count();
+        $quarantinedCount = Contact::quarantined()->count();
         $responseRate = $totalInquiries > 0 ? round(($repliedInquiries / $totalInquiries) * 100) : 0;
+
+        $spamTelemetry = app(\App\Services\Security\ContactSpamGuardService::class)->getTelemetrySummary();
 
         $stats = [
             'total' => $totalInquiries,
             'new' => $newInquiries,
             'read' => $readInquiries,
             'replied' => $repliedInquiries,
+            'quarantined' => $quarantinedCount,
             'response_rate' => $responseRate,
         ];
 
-        // 2. 14-Day Inquiries Acquisition Trend
-        $dailyCounts = Contact::where('created_at', '>=', now()->subDays(13)->startOfDay())
+        // 2. 14-Day Clean Inquiries Acquisition Trend
+        $dailyCounts = Contact::clean()
+            ->where('created_at', '>=', now()->subDays(13)->startOfDay())
             ->selectRaw('DATE(created_at) as d, COUNT(*) as c')
             ->groupBy('d')
             ->pluck('c', 'd');
@@ -635,6 +641,8 @@ class AdminDashboardController extends Controller
         return view('admin.inquiries.index', compact(
             'inquiries',
             'stats',
+            'spamTelemetry',
+            'viewMode',
             'trendData',
             'statusBreakdown',
             'status',
@@ -741,7 +749,7 @@ class AdminDashboardController extends Controller
         $inquiry->update(['status' => $request->input('status')]);
 
         if ($request->ajax() || $request->wantsJson()) {
-            $unreadCount = Contact::where('status', 'new')->count();
+            $unreadCount = Contact::clean()->where('status', 'new')->count();
             return response()->json([
                 'success' => true,
                 'message' => 'Inquiry status updated successfully.',
@@ -751,6 +759,195 @@ class AdminDashboardController extends Controller
         }
 
         return redirect()->route('admin.inquiries.index')->with('success', 'Inquiry status updated successfully.');
+    }
+
+    /**
+     * Mark an inquiry as Spam (Quarantine) and optionally block its IP in the Firewall.
+     */
+    public function markInquirySpam(Request $request, int $id)
+    {
+        $inquiry = Contact::findOrFail($id);
+        $blockIp = $request->boolean('block_ip', true);
+        $guard = app(\App\Services\Security\ContactSpamGuardService::class);
+
+        $existingReasons = is_array($inquiry->spam_reasons) ? $inquiry->spam_reasons : [];
+        $reasons = array_values(array_unique(array_merge($existingReasons, ['admin_marked_spam'])));
+
+        $inquiry->update([
+            'status' => 'spam',
+            'is_spam' => true,
+            'spam_score' => max(85, (int) ($inquiry->spam_score ?? 0)),
+            'spam_reasons' => $reasons,
+            'quarantined_at' => now(),
+        ]);
+
+        $ipBlocked = false;
+        if ($blockIp && ! empty($inquiry->ip_address)) {
+            $ipBlocked = $guard->blockIpInFirewall((string) $inquiry->ip_address, "Admin marked Inquiry #{$inquiry->id} as spam");
+        }
+
+        $guard->logSpamEvent(
+            $request,
+            'contact',
+            (string) ($inquiry->ip_address ?: 'unknown'),
+            (string) ($inquiry->email ?: ''),
+            (string) ($inquiry->name ?: ''),
+            (string) ($inquiry->subject ?: ''),
+            max(85, (int) ($inquiry->spam_score ?? 0)),
+            $ipBlocked ? 'auto_ip_blocked' : 'quarantined',
+            $reasons
+        );
+
+        $msg = "Inquiry #{$inquiry->id} moved to Spam Quarantine".($ipBlocked ? " and IP {$inquiry->ip_address} blocked in Firewall." : '.');
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $msg,
+                'ip_blocked' => $ipBlocked,
+                'unread_count' => Contact::clean()->where('status', 'new')->count(),
+            ]);
+        }
+
+        return redirect()->back()->with('success', $msg);
+    }
+
+    /**
+     * Restore a false-positive quarantined inquiry back to the Clean Inbox.
+     */
+    public function restoreInquirySpam(Request $request, int $id)
+    {
+        $inquiry = Contact::findOrFail($id);
+        $inquiry->update([
+            'status' => 'new',
+            'is_spam' => false,
+            'quarantined_at' => null,
+        ]);
+
+        $msg = "Inquiry #{$inquiry->id} restored to Clean Inbox.";
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $msg,
+                'unread_count' => Contact::clean()->where('status', 'new')->count(),
+            ]);
+        }
+
+        return redirect()->route('admin.inquiries.index', ['view' => 'quarantine'])->with('success', $msg);
+    }
+
+    /**
+     * Retroactively scan existing inquiries using ContactSpamGuardService to Preview, Quarantine, or Purge spam rows.
+     */
+    public function scanAndPurgeSpam(Request $request): JsonResponse
+    {
+        $request->validate([
+            'mode' => 'required|string|in:preview,quarantine,purge',
+            'block_ips' => 'nullable|boolean',
+            'include_quarantined' => 'nullable|boolean',
+        ]);
+
+        $mode = (string) $request->input('mode', 'preview');
+        $blockIps = $request->boolean('block_ips', true);
+        $includeQuarantined = $request->boolean('include_quarantined', true);
+        $guard = app(\App\Services\Security\ContactSpamGuardService::class);
+
+        $candidates = $includeQuarantined ? Contact::orderBy('id', 'desc')->get() : Contact::clean()->orderBy('id', 'desc')->get();
+        $matches = [];
+        $uniqueIps = [];
+
+        foreach ($candidates as $contact) {
+            $alreadySpam = (bool) $contact->is_spam || $contact->status === 'spam';
+            $scored = $guard->scorePayload([
+                'name' => $contact->name,
+                'email' => $contact->email,
+                'phone' => $contact->phone,
+                'subject' => $contact->subject,
+                'message' => $contact->message,
+            ], $contact->ip_address, false);
+
+            if ($alreadySpam || $scored['hard_block'] || $scored['score'] >= 45) {
+                $matches[] = [
+                    'model' => $contact,
+                    'score' => max((int) ($contact->spam_score ?? 0), (int) $scored['score']),
+                    'reasons' => ! empty($scored['reasons']) ? $scored['reasons'] : ($contact->spam_reasons ?: ['previously_quarantined']),
+                ];
+                if (! empty($contact->ip_address)) {
+                    $uniqueIps[$contact->ip_address] = true;
+                }
+            }
+        }
+
+        if ($mode === 'preview') {
+            $samples = array_map(function ($m) {
+                /** @var Contact $c */
+                $c = $m['model'];
+
+                return [
+                    'id' => $c->id,
+                    'name' => Str::limit((string) $c->name, 75),
+                    'email' => (string) $c->email,
+                    'subject' => Str::limit((string) $c->subject, 40),
+                    'ip_address' => (string) ($c->ip_address ?: 'N/A'),
+                    'score' => $m['score'],
+                    'reasons' => array_slice($m['reasons'], 0, 3),
+                    'created_at' => $c->created_at ? $c->created_at->format('M j, Y g:ia') : '',
+                ];
+            }, array_slice($matches, 0, 15));
+
+            return response()->json([
+                'success' => true,
+                'mode' => 'preview',
+                'scanned_total' => $candidates->count(),
+                'spam_count' => count($matches),
+                'unique_ips_count' => count($uniqueIps),
+                'samples' => $samples,
+            ]);
+        }
+
+        $processed = 0;
+        $blockedIpsCount = 0;
+        $blockedTracker = [];
+
+        DB::transaction(function () use ($matches, $mode, $blockIps, $guard, &$processed, &$blockedIpsCount, &$blockedTracker) {
+            foreach ($matches as $m) {
+                /** @var Contact $c */
+                $c = $m['model'];
+                $ip = (string) ($c->ip_address ?: '');
+
+                if ($blockIps && $ip !== '' && ! isset($blockedTracker[$ip])) {
+                    $blockedTracker[$ip] = true;
+                    if ($guard->blockIpInFirewall($ip, 'Bulk Spam Scanner Auto-Block')) {
+                        $blockedIpsCount++;
+                    }
+                }
+
+                if ($mode === 'purge') {
+                    $this->purgeInquiryData($c);
+                } else {
+                    $c->update([
+                        'status' => 'spam',
+                        'is_spam' => true,
+                        'spam_score' => $m['score'],
+                        'spam_reasons' => $m['reasons'],
+                        'quarantined_at' => now(),
+                    ]);
+                }
+                $processed++;
+            }
+        });
+
+        $verb = $mode === 'purge' ? 'permanently purged' : 'moved to Spam Quarantine';
+        $message = "{$processed} spam inquiry(s) {$verb}".($blockedIpsCount > 0 ? " and {$blockedIpsCount} offending bot IP(s) blocked in Firewall." : '.');
+
+        return response()->json([
+            'success' => true,
+            'mode' => $mode,
+            'processed' => $processed,
+            'blocked_ips' => $blockedIpsCount,
+            'message' => $message,
+        ]);
     }
 
     /**
@@ -836,8 +1033,9 @@ class AdminDashboardController extends Controller
      */
     public function exportInquiriesCsv(Request $request)
     {
-        $fileName = 'dunes-inquiries-export-'.date('Y-m-d-His').'.csv';
-        $query = Contact::orderBy('created_at', 'desc');
+        $viewMode = $request->input('view', 'inbox') === 'quarantine' ? 'quarantine' : 'inbox';
+        $fileName = 'dunes-inquiries-'.$viewMode.'-export-'.date('Y-m-d-His').'.csv';
+        $query = ($viewMode === 'quarantine' ? Contact::quarantined() : Contact::clean())->orderBy('created_at', 'desc');
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -919,7 +1117,7 @@ class AdminDashboardController extends Controller
         $request->validate([
             'ids' => 'required|array|min:1',
             'ids.*' => 'required|integer|exists:contacts,id',
-            'action' => 'required|string|in:status_new,status_read,status_replied,delete',
+            'action' => 'required|string|in:status_new,status_read,status_replied,mark_spam,mark_spam_and_block,restore_spam,delete',
         ]);
 
         $ids = $request->input('ids');
@@ -939,6 +1137,47 @@ class AdminDashboardController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => "{$count} inquiry(s) and all associated analytics permanently purged.",
+                ]);
+            }
+
+            if ($action === 'mark_spam' || $action === 'mark_spam_and_block') {
+                $guard = app(\App\Services\Security\ContactSpamGuardService::class);
+                $blockIp = $action === 'mark_spam_and_block';
+                $inquiries = Contact::whereIn('id', $ids)->get();
+                $blockedIps = 0;
+                $seenIps = [];
+                foreach ($inquiries as $inquiry) {
+                    $inquiry->update([
+                        'status' => 'spam',
+                        'is_spam' => true,
+                        'spam_score' => max(85, (int) ($inquiry->spam_score ?? 0)),
+                        'spam_reasons' => array_values(array_unique(array_merge((array) ($inquiry->spam_reasons ?: []), ['admin_bulk_marked_spam']))),
+                        'quarantined_at' => now(),
+                    ]);
+                    if ($blockIp && ! empty($inquiry->ip_address) && ! isset($seenIps[$inquiry->ip_address])) {
+                        $seenIps[$inquiry->ip_address] = true;
+                        if ($guard->blockIpInFirewall((string) $inquiry->ip_address, 'Bulk Marked as Spam')) {
+                            $blockedIps++;
+                        }
+                    }
+                }
+
+                return response()->json([
+                    'success' => true,
+                    'message' => $inquiries->count().' inquiry(s) moved to Spam Quarantine'.($blockedIps > 0 ? " and {$blockedIps} IP(s) blocked in Firewall." : '.'),
+                ]);
+            }
+
+            if ($action === 'restore_spam') {
+                $count = Contact::whereIn('id', $ids)->update([
+                    'status' => 'new',
+                    'is_spam' => false,
+                    'quarantined_at' => null,
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => "{$count} inquiry(s) restored to Clean Inbox.",
                 ]);
             }
 

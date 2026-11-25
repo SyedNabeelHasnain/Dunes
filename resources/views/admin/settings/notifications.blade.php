@@ -221,9 +221,21 @@
                             <input type="checkbox" name="notification_contact_customer_enabled" value="1" class="mt-0.5 h-4 w-4 rounded-sm border-slate-300 text-primary focus:ring-primary" {{ ($settings['notification_contact_customer_enabled'] ?? '1') === '1' ? 'checked' : '' }}>
                             <div class="text-xs">
                                 <div class="font-bold text-slate-800">Send Instant Customer Auto-Acknowledgement Receipt</div>
-                                <div class="text-[11px] text-slate-500">Sends polite automated confirmation confirming our team has received their message and will respond promptly.</div>
+                                <div class="text-[11px] text-slate-500">Sends polite automated confirmation using a strictly sanitized greeting name (never reflects raw untrusted URLs or ad copy).</div>
                             </div>
                         </label>
+
+                        <div class="p-3.5 rounded-xl border border-emerald-200/80 bg-emerald-50/40">
+                            <label class="block text-xs font-bold text-emerald-950 mb-1.5">
+                                <i class="bi bi-shield-lock-fill text-emerald-600 me-1"></i> Customer Auto-Receipt Backscatter Protection Mode
+                            </label>
+                            <select name="notification_contact_customer_mode" class="w-full rounded-xl border border-emerald-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-800 outline-hidden focus:border-primary">
+                                <option value="verified_only" {{ ($settings['notification_contact_customer_mode'] ?? 'verified_only') === 'verified_only' ? 'selected' : '' }}>Verified Emails Only (Maximum Security — Prevents SMTP 554 Backscatter Locks)</option>
+                                <option value="clean_all" {{ ($settings['notification_contact_customer_mode'] ?? '') === 'clean_all' ? 'selected' : '' }}>All Clean Low-Risk Inquiries (Sanitized Greeting Only)</option>
+                                <option value="disabled" {{ ($settings['notification_contact_customer_mode'] ?? '') === 'disabled' ? 'selected' : '' }}>Never Send External Customer Auto-Ack</option>
+                            </select>
+                            <p class="text-[10px] text-emerald-800/90 mt-1">Quarantined or high-risk submissions are ALWAYS blocked from sending outbound email regardless of mode.</p>
+                        </div>
                     </div>
 
                     <div>

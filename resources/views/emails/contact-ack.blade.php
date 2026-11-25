@@ -3,7 +3,10 @@
 @section('title', 'Thank you for contacting us')
 
 @section('content')
-    <p>Dear {{ $name }},</p>
+    @php
+        $safeGreetingName = \App\Services\Security\ContactSpamGuardService::sanitizeGreetingName($name ?? null);
+    @endphp
+    <p>Dear {{ $safeGreetingName }},</p>
     
     <p>Thank you for reaching out to Dunes Discovery Tourism. We have received your message and our team will get back to you as soon as possible.</p>
     

@@ -323,15 +323,24 @@ class NotificationManagementService
 
     /**
      * 3. Dispatch Contact Form Inquiry Notifications (Admin Alert & Customer Acknowledgement).
+     *    Hardened against SMTP backscatter reflection: never emails spam/quarantined rows,
+     *    sanitizes greeting name, and defaults customer auto-ack to verified emails only.
      */
     public function notifyContactInquiry(Contact $contact): array
     {
-        $this->prepareMailEnvironment();
-        $sender = $this->getSenderIdentity();
         $result = [
             'admin_sent' => false,
             'customer_sent' => false,
         ];
+
+        // Absolute safeguard: never transmit any email or webhook for flagged/quarantined spam
+        if ((bool) $contact->is_spam || $contact->status === 'spam' || (int) ($contact->spam_score ?? 0) >= 35) {
+            return $result;
+        }
+
+        $this->prepareMailEnvironment();
+        $sender = $this->getSenderIdentity();
+        $diagnostics = app(\App\Services\Mail\SmtpDiagnosticService::class);
 
         // 1. Admin Alert
         $adminEnabled = $this->settings->get('notification_contact_admin_enabled', '1') === '1';
@@ -348,7 +357,7 @@ class NotificationManagementService
                     $contact->message
                 ))
                 ->from($sender['email'], $sender['name'])
-                ->replyTo($contact->email, $contact->name);
+                ->replyTo($contact->email, \App\Services\Security\ContactSpamGuardService::sanitizeGreetingName($contact->name));
 
                 $ccList = array_merge($recipients, $this->settings->getCcEmails());
                 if (! empty($ccList)) {
@@ -361,24 +370,36 @@ class NotificationManagementService
                 }
 
                 Mail::to($primaryRecipient)->send($adminMail);
+                $diagnostics->recordSuccess('contact_admin_notification');
                 $result['admin_sent'] = true;
             } catch (\Throwable $e) {
                 Log::error("Failed sending admin contact notification for inquiry #{$contact->id}: " . $e->getMessage());
+                $diagnostics->recordFailure('contact_admin_notification', $e, $primaryRecipient ?? null);
             }
         }
 
-        // 2. Customer Auto-Acknowledgement
+        // 2. Customer Auto-Acknowledgement (Zero-Reflection + Verified-Only Default Policy)
         $customerEnabled = $this->settings->get('notification_contact_customer_enabled', '1') === '1';
-        if ($customerEnabled && ! empty($contact->email) && filter_var($contact->email, FILTER_VALIDATE_EMAIL)) {
+        $ackMode = (string) $this->settings->get('notification_contact_customer_mode', 'verified_only');
+        $eligibleForCustomerAck = $customerEnabled
+            && $ackMode !== 'disabled'
+            && ! empty($contact->email)
+            && filter_var($contact->email, FILTER_VALIDATE_EMAIL)
+            && ($ackMode === 'clean_all' || (bool) $contact->is_verified === true);
+
+        if ($eligibleForCustomerAck) {
             try {
-                $ackMail = (new ContactAcknowledgement($contact->name))
+                $safeName = \App\Services\Security\ContactSpamGuardService::sanitizeGreetingName($contact->name);
+                $ackMail = (new ContactAcknowledgement($safeName))
                     ->from($sender['email'], $sender['name'])
                     ->replyTo($sender['reply_to'], $sender['name']);
 
                 Mail::to($contact->email)->send($ackMail);
+                $diagnostics->recordSuccess('contact_customer_ack');
                 $result['customer_sent'] = true;
             } catch (\Throwable $e) {
                 Log::error("Failed sending customer contact acknowledgement to {$contact->email}: " . $e->getMessage());
+                $diagnostics->recordFailure('contact_customer_ack', $e, $contact->email);
             }
         }
 

@@ -87,11 +87,13 @@ class AppServiceProvider extends ServiceProvider
 
         $secretSettingKeys = [
             'smtp_password',
+            'smtp_fallback_password',
             'ziina_access_token',
             'ziina_webhook_secret',
             'meta_access_token',
             'meta_capi_token',
             'recaptcha_secret_key',
+            'turnstile_secret_key',
             'tripadvisor_api_key',
             'deepl_auth_key',
             'google_translate_api_key',
@@ -126,7 +128,9 @@ class AppServiceProvider extends ServiceProvider
                 $sidebarCounts = \Illuminate\Support\Facades\Cache::remember('admin_sidebar_counts', 15, function () {
                     $pendingBookings = \App\Models\Booking::where('status', 'pending')->whereNull('deleted_at')->count();
                     $draftBookings = \App\Models\Booking::where('status', 'draft')->whereNull('deleted_at')->count();
-                    $newInquiries = \App\Models\Contact::where('status', 'new')->whereNull('deleted_at')->count();
+                    $newInquiries = \Illuminate\Support\Facades\Schema::hasColumn('contacts', 'is_spam')
+                        ? \App\Models\Contact::clean()->where('status', 'new')->whereNull('deleted_at')->count()
+                        : \App\Models\Contact::where('status', 'new')->whereNull('deleted_at')->count();
 
                     $unreadWhatsapp = 0;
                     try {

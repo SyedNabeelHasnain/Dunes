@@ -236,22 +236,138 @@
                     </div>
                 </div>
 
-                <!-- Google reCAPTCHA v3 -->
-                <div class="col-span-1 md:col-span-2">
-                    <div class="p-5 bg-slate-50/70 rounded-2xl border border-slate-200/80">
-                        <h6 class="text-xs font-black uppercase tracking-wider text-primary mb-2 flex items-center gap-2">
-                            <i class="bi bi-shield-check"></i> Google reCAPTCHA v3 Protection
-                        </h6>
-                        <p class="text-xs text-slate-500 mb-4">Protects booking and inquiry contact forms from automated bots.</p>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Multi-Layer Anti-Spam, Bot Shield, reCAPTCHA, Turnstile & Contact Email OTP Suite -->
+                <div class="col-span-1 md:col-span-2" id="antiSpamShieldSection">
+                    <div class="p-6 bg-gradient-to-br from-emerald-50/40 via-white to-slate-50/80 rounded-2xl border border-emerald-200/70 space-y-5">
+                        <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-emerald-100">
                             <div>
-                                <label for="recaptcha_site_key" class="block text-xs font-bold text-slate-700 mb-1.5">reCAPTCHA v3 Site Key</label>
-                                <input type="text" name="recaptcha_site_key" id="recaptcha_site_key" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['recaptcha_site_key'] ?? '' }}" placeholder="Site Key">
+                                <h6 class="text-sm font-black text-slate-900 flex items-center gap-2">
+                                    <i class="bi bi-shield-fill-check text-emerald-600"></i> Multi-Layer Anti-Spam Shield, Contact Email OTP &amp; Bot Verification
+                                </h6>
+                                <p class="text-xs text-slate-500 mt-0.5">Executes signed form tokens, multi-trap honeypots, JS Proof-of-Work, server-side reCAPTCHA + Cloudflare Turnstile, AI heuristic scoring, on-spot Contact Email OTP, and auto-IP firewall blocking in strict order.</p>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-2 text-[11px] font-bold">
+                                <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">{{ number_format($spamTelemetry['blocked_24h'] ?? 0) }} Blocked (24h)</span>
+                                <span class="px-2.5 py-1 rounded-full bg-rose-100 text-rose-800 border border-rose-200">{{ number_format($spamTelemetry['auto_ip_blocked_7d'] ?? 0) }} IPs Auto-Blocked (7d)</span>
+                            </div>
+                        </div>
+
+                        <!-- Core Security Toggles & Thresholds -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="p-3.5 rounded-xl bg-white border border-slate-200">
+                                <input type="hidden" name="antispam_enabled" value="0">
+                                <label class="flex items-center justify-between cursor-pointer">
+                                    <span class="text-xs font-extrabold text-slate-800">Master Anti-Spam Shield</span>
+                                    <input type="checkbox" name="antispam_enabled" value="1" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4" {{ ($settings['antispam_enabled'] ?? '1') === '1' ? 'checked' : '' }}>
+                                </label>
+                                <p class="text-[11px] text-slate-500 mt-1">Enforces signed tokens, dwell time, honeypots, PoW &amp; heuristic scoring.</p>
+                            </div>
+
+                            <div class="p-3.5 rounded-xl bg-white border border-slate-200">
+                                <input type="hidden" name="contact_email_otp_required" value="0">
+                                <label class="flex items-center justify-between cursor-pointer">
+                                    <span class="text-xs font-extrabold text-slate-800">Contact Form On-Spot Email OTP</span>
+                                    <input type="checkbox" name="contact_email_otp_required" value="1" class="rounded text-primary focus:ring-primary w-4 h-4" {{ ($settings['contact_email_otp_required'] ?? '1') === '1' ? 'checked' : '' }}>
+                                </label>
+                                <p class="text-[11px] text-slate-500 mt-1">Checks verified_emails table; prompts unverified senders for 6-digit OTP on spot.</p>
+                            </div>
+
+                            <div class="p-3.5 rounded-xl bg-white border border-slate-200">
+                                <input type="hidden" name="antispam_auto_block_ip_enabled" value="0">
+                                <label class="flex items-center justify-between cursor-pointer">
+                                    <span class="text-xs font-extrabold text-slate-800">Auto-Escalate Repeat Bots to IP Firewall</span>
+                                    <input type="checkbox" name="antispam_auto_block_ip_enabled" value="1" class="rounded text-rose-600 focus:ring-rose-500 w-4 h-4" {{ ($settings['antispam_auto_block_ip_enabled'] ?? '1') === '1' ? 'checked' : '' }}>
+                                </label>
+                                <p class="text-[11px] text-slate-500 mt-1">Automatically adds repeat spammers to <code>ip_rules</code> blocking both web &amp; API.</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <label for="antispam_mode" class="block text-xs font-bold text-slate-700 mb-1.5">Protection Strictness</label>
+                                <select name="antispam_mode" id="antispam_mode" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs text-slate-800 outline-hidden focus:border-primary">
+                                    <option value="maximum" {{ ($settings['antispam_mode'] ?? 'maximum') === 'maximum' ? 'selected' : '' }}>Maximum Security (Recommended)</option>
+                                    <option value="balanced" {{ ($settings['antispam_mode'] ?? '') === 'balanced' ? 'selected' : '' }}>Balanced</option>
+                                </select>
                             </div>
                             <div>
-                                <label for="recaptcha_secret_key" class="block text-xs font-bold text-slate-700 mb-1.5">reCAPTCHA v3 Secret Key</label>
-                                <input type="password" name="recaptcha_secret_key" id="recaptcha_secret_key" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary" value="{{ $settings['recaptcha_secret_key'] ?? '' }}" placeholder="Secret Key">
+                                <label for="antispam_min_dwell_seconds" class="block text-xs font-bold text-slate-700 mb-1.5">Min Human Dwell (Seconds)</label>
+                                <input type="number" min="1" max="30" name="antispam_min_dwell_seconds" id="antispam_min_dwell_seconds" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs text-slate-800" value="{{ $settings['antispam_min_dwell_seconds'] ?? '3' }}">
+                            </div>
+                            <div>
+                                <label for="antispam_auto_block_threshold" class="block text-xs font-bold text-slate-700 mb-1.5">Auto-IP-Block Strikes (24h)</label>
+                                <input type="number" min="1" max="10" name="antispam_auto_block_threshold" id="antispam_auto_block_threshold" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs text-slate-800" value="{{ $settings['antispam_auto_block_threshold'] ?? '2' }}">
+                            </div>
+                            <div class="flex flex-col justify-end">
+                                <input type="hidden" name="antispam_check_email_mx" value="0">
+                                <label class="flex items-center justify-between p-2.5 rounded-xl border border-slate-200 bg-white cursor-pointer">
+                                    <span class="text-xs font-bold text-slate-700">Verify Email DNS MX</span>
+                                    <input type="checkbox" name="antispam_check_email_mx" value="1" class="rounded text-primary w-4 h-4" {{ ($settings['antispam_check_email_mx'] ?? '1') === '1' ? 'checked' : '' }}>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Google reCAPTCHA v3 / Enterprise (Server-Side Verified) -->
+                        <div class="pt-4 border-t border-slate-200/70">
+                            <div class="flex items-center justify-between mb-3">
+                                <h6 class="text-xs font-black uppercase tracking-wider text-primary flex items-center gap-2">
+                                    <i class="bi bi-google"></i> Google reCAPTCHA v3 / Enterprise (Server-Side Verified)
+                                </h6>
+                                <label class="inline-flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
+                                    <input type="hidden" name="antispam_recaptcha_enabled" value="0">
+                                    <input type="checkbox" name="antispam_recaptcha_enabled" value="1" class="rounded text-primary w-4 h-4" {{ ($settings['antispam_recaptcha_enabled'] ?? '1') === '1' ? 'checked' : '' }}>
+                                    <span>Enforce Server-Side Verify</span>
+                                </label>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label for="recaptcha_site_key" class="block text-xs font-bold text-slate-700 mb-1.5">reCAPTCHA Site Key</label>
+                                    <input type="text" name="recaptcha_site_key" id="recaptcha_site_key" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800" value="{{ $settings['recaptcha_site_key'] ?? '' }}" placeholder="Site Key">
+                                </div>
+                                <div>
+                                    <label for="recaptcha_secret_key" class="block text-xs font-bold text-slate-700 mb-1.5">reCAPTCHA Secret Key</label>
+                                    <input type="password" name="recaptcha_secret_key" id="recaptcha_secret_key" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800" value="{{ $settings['recaptcha_secret_key'] ?? '' }}" placeholder="Secret Key">
+                                </div>
+                                <div>
+                                    <label for="antispam_recaptcha_min_score" class="block text-xs font-bold text-slate-700 mb-1.5">Minimum Human Score (0.1 - 0.9)</label>
+                                    <input type="number" step="0.05" min="0.1" max="0.95" name="antispam_recaptcha_min_score" id="antispam_recaptcha_min_score" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800" value="{{ $settings['antispam_recaptcha_min_score'] ?? '0.5' }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cloudflare Turnstile (Optional Zero-Puzzle Secondary Challenge) -->
+                        <div class="pt-4 border-t border-slate-200/70">
+                            <div class="flex items-center justify-between mb-3">
+                                <h6 class="text-xs font-black uppercase tracking-wider text-amber-700 flex items-center gap-2">
+                                    <i class="bi bi-cloud-check-fill"></i> Cloudflare Turnstile (Zero-Puzzle Bot Challenge)
+                                </h6>
+                                <label class="inline-flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
+                                    <input type="hidden" name="turnstile_enabled" value="0">
+                                    <input type="checkbox" name="turnstile_enabled" value="1" class="rounded text-amber-600 w-4 h-4" {{ ($settings['turnstile_enabled'] ?? '0') === '1' ? 'checked' : '' }}>
+                                    <span>Enable Turnstile on Contact Form</span>
+                                </label>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="turnstile_site_key" class="block text-xs font-bold text-slate-700 mb-1.5">Turnstile Site Key</label>
+                                    <input type="text" name="turnstile_site_key" id="turnstile_site_key" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800" value="{{ $settings['turnstile_site_key'] ?? '' }}" placeholder="0x4AAAAAAA...">
+                                </div>
+                                <div>
+                                    <label for="turnstile_secret_key" class="block text-xs font-bold text-slate-700 mb-1.5">Turnstile Secret Key</label>
+                                    <input type="password" name="turnstile_secret_key" id="turnstile_secret_key" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800" value="{{ $settings['turnstile_secret_key'] ?? '' }}" placeholder="0x4AAAAAAA...">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Custom Blocked Keywords & Domains -->
+                        <div class="pt-4 border-t border-slate-200/70 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="antispam_custom_blocked_keywords" class="block text-xs font-bold text-slate-700 mb-1.5">Custom Blocked Spam Phrases (Comma or Newline Separated)</label>
+                                <textarea name="antispam_custom_blocked_keywords" id="antispam_custom_blocked_keywords" rows="2" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800" placeholder="e.g. buy backlinks, crypto airdrop, slot bonus">{{ $settings['antispam_custom_blocked_keywords'] ?? '' }}</textarea>
+                            </div>
+                            <div>
+                                <label for="antispam_custom_blocked_domains" class="block text-xs font-bold text-slate-700 mb-1.5">Custom Blocked Email Domains (Comma or Newline Separated)</label>
+                                <textarea name="antispam_custom_blocked_domains" id="antispam_custom_blocked_domains" rows="2" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800" placeholder="e.g. spamdomain.xyz, tempmail.example">{{ $settings['antispam_custom_blocked_domains'] ?? '' }}</textarea>
                             </div>
                         </div>
                     </div>

@@ -134,6 +134,24 @@ class AdminSystemHealthController extends Controller
         } catch (\Throwable) {
         }
 
+        $smtpHealth = [
+            'status' => 'unknown',
+            'context' => null,
+            'checked_at' => null,
+            'diagnosis' => null,
+        ];
+        $spamTelemetry = ['blocked_24h' => 0, 'blocked_7d' => 0, 'auto_ip_blocked_7d' => 0, 'quarantined_7d' => 0];
+        $quarantinedInquiries = 0;
+
+        try {
+            $smtpHealth = app(\App\Services\Mail\SmtpDiagnosticService::class)->getHealthStatus();
+            $spamTelemetry = app(\App\Services\Security\ContactSpamGuardService::class)->getTelemetrySummary();
+            if (Schema::hasTable('contacts') && Schema::hasColumn('contacts', 'is_spam')) {
+                $quarantinedInquiries = \App\Models\Contact::quarantined()->count();
+            }
+        } catch (\Throwable) {
+        }
+
         $system = [
             'php_version' => PHP_VERSION,
             'laravel_version' => app()->version(),
@@ -150,9 +168,10 @@ class AdminSystemHealthController extends Controller
             'errors_404_7d' => $error404Count,
             'log_size_mb' => $logSizeMb,
             'disk_free_gb' => $diskFreeGb,
+            'quarantined_inquiries' => $quarantinedInquiries,
         ];
 
-        return view('admin.health.index', compact('vitalsSummary', 'poorPages', 'recentFailedJobs', 'recentLogErrors', 'system'));
+        return view('admin.health.index', compact('vitalsSummary', 'poorPages', 'recentFailedJobs', 'recentLogErrors', 'system', 'smtpHealth', 'spamTelemetry'));
     }
 
     public function retryFailedJobs(ConfigAuditService $audit): RedirectResponse

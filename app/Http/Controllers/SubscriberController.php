@@ -28,12 +28,15 @@ class SubscriberController extends Controller
      */
     public function subscribe(Request $request): JsonResponse
     {
-        // 1. Anti-Bot Honeypot Protection
-        if (! empty($request->input('website_url'))) {
+        // 1. Multi-Layer Anti-Bot & Spam Shield (Honeypots + Name Sanity + Disposable Domains)
+        $leadGuard = app(\App\Services\Security\ContactSpamGuardService::class)->evaluateLeadSubmission($request, 'newsletter');
+        if (! $leadGuard['allowed']) {
             return response()->json([
-                'success' => true,
-                'message' => 'Thank you for subscribing!',
-            ]);
+                'success' => (bool) ($leadGuard['stealth_drop'] ?? false),
+                'message' => ($leadGuard['stealth_drop'] ?? false)
+                    ? 'Thank you for subscribing!'
+                    : ($leadGuard['message'] ?: 'Unable to complete subscription.'),
+            ], (int) ($leadGuard['http_status'] ?? 422));
         }
 
         // 2. Validate input

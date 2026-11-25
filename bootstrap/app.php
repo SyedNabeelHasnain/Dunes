@@ -42,6 +42,9 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\RobotsHeaderMiddleware::class,
             SetLocale::class,
         ]);
+        $middleware->api(prepend: [
+            \App\Http\Middleware\IpFirewallMiddleware::class,
+        ]);
         $middleware->api(append: [
             \App\Http\Middleware\RobotsHeaderMiddleware::class,
         ]);

@@ -138,11 +138,16 @@
 
                                 <form id="welcomeOfferForm" class="space-y-3.5">
                                     @csrf
+                                    <!-- Invisible anti-bot honeypot traps -->
+                                    <div style="position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;" aria-hidden="true">
+                                        <input type="text" id="welcomeWebsiteUrl" name="website_url" value="" tabindex="-1" autocomplete="new-password">
+                                        <input type="text" id="welcomeCompanyFax" name="company_fax" value="" tabindex="-1" autocomplete="new-password">
+                                    </div>
                                     <div>
                                         <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1" for="welcomeName">{{ __('ui.booking.name') }} <span class="text-red-500">*</span></label>
                                         <div class="relative rounded-xl shadow-2xs overflow-hidden border border-slate-200 bg-white focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
                                             <span class="absolute start-3.5 top-1/2 -translate-y-1/2 text-primary"><i class="bi bi-person-fill"></i></span>
-                                            <input type="text" class="w-full ps-10 pe-3 py-2.5 bg-transparent text-base sm:text-sm font-semibold text-slate-800 border-0 focus:outline-none placeholder:text-slate-400" id="welcomeName" name="name" placeholder="{{ __('ui.booking.name_placeholder') }}" required autocomplete="name">
+                                            <input type="text" maxlength="80" class="w-full ps-10 pe-3 py-2.5 bg-transparent text-base sm:text-sm font-semibold text-slate-800 border-0 focus:outline-none placeholder:text-slate-400" id="welcomeName" name="name" placeholder="{{ __('ui.booking.name_placeholder') }}" required autocomplete="name">
                                         </div>
                                     </div>
 
@@ -376,7 +381,13 @@
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
                     },
-                    body: JSON.stringify({ name: name, email: email, phone: phone })
+                    body: JSON.stringify({
+                        name: name,
+                        email: email,
+                        phone: phone,
+                        website_url: document.getElementById('welcomeWebsiteUrl')?.value || '',
+                        company_fax: document.getElementById('welcomeCompanyFax')?.value || ''
+                    })
                 })
                 .then(res => res.json().then(data => ({ status: res.status, body: data })))
                 .then(({ status, body }) => {

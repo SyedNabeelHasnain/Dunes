@@ -1533,6 +1533,8 @@ const App = {
         this.initTracking();
         this.initDateCards();
         this.initEmailVerification();
+        this.initContactEmailVerification();
+        this.initContactSecurityShield();
         this.initLegalModal();
         this.initSafariMatcher();
         this.initSunsetWidget();
@@ -2415,6 +2417,672 @@ const App = {
                 errEl.classList.remove('hidden');
                 errEl.classList.add('flex');
             }
+        }
+    },
+
+    // =========================================================================
+    // CONTACT FORM: ON-SPOT EMAIL OTP VERIFICATION & ANTI-SPAM SECURITY SHIELD
+    // =========================================================================
+    _contactOtpTimerInterval: null,
+    _contactEmailCheckDebounce: null,
+    _pendingContactSubmitAfterOtp: null,
+    _contactTelemetry: { keystrokes: 0, pointer: 0, focus: 0, scroll: 0, renderedAt: Date.now() },
+
+    isContactOtpRequired() {
+        const form = document.getElementById('contactForm');
+        if (!form) return false;
+        if (form.dataset.otpRequired === '0') return false;
+        if (form.dataset.otpRequired === '1') return true;
+        return window.DunesConfig?.contact_email_otp_required !== false;
+    },
+
+    initContactSecurityShield() {
+        const form = document.getElementById('contactForm');
+        if (!form || form.dataset.securityShieldBound === 'true') return;
+        form.dataset.securityShieldBound = 'true';
+
+        this._contactTelemetry = {
+            keystrokes: 0,
+            pointer: 0,
+            focus: 0,
+            scroll: 0,
+            renderedAt: Date.now(),
+        };
+
+        form.addEventListener('keydown', () => {
+            this._contactTelemetry.keystrokes = Math.min(500, this._contactTelemetry.keystrokes + 1);
+        }, { passive: true });
+
+        form.addEventListener('pointerdown', () => {
+            this._contactTelemetry.pointer = Math.min(500, this._contactTelemetry.pointer + 1);
+        }, { passive: true });
+
+        form.addEventListener('pointermove', () => {
+            this._contactTelemetry.pointer = Math.min(500, this._contactTelemetry.pointer + 1);
+        }, { passive: true, once: true });
+
+        form.addEventListener('focusin', () => {
+            this._contactTelemetry.focus = Math.min(200, this._contactTelemetry.focus + 1);
+        }, { passive: true });
+
+        window.addEventListener('scroll', () => {
+            this._contactTelemetry.scroll = Math.min(200, this._contactTelemetry.scroll + 1);
+        }, { passive: true, once: true });
+    },
+
+    async sha256Hex(str) {
+        if (window.crypto && window.crypto.subtle && typeof TextEncoder !== 'undefined') {
+            const buf = new TextEncoder().encode(str);
+            const hashBuf = await window.crypto.subtle.digest('SHA-256', buf);
+            return Array.from(new Uint8Array(hashBuf))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+        }
+        // Pure-JS SHA-256 fallback for non-HTTPS local preview environments
+        const rightRotate = (value, amount) => (value >>> amount) | (value << (32 - amount));
+        const mathPow = Math.pow;
+        const maxWord = mathPow(2, 32);
+        let result = '';
+        const words = [];
+        const asciiBitLength = str.length * 8;
+        const hash = [];
+        const k = [];
+        let primeCounter = 0;
+        const isComposite = {};
+        for (let candidate = 2; primeCounter < 64; candidate++) {
+            if (!isComposite[candidate]) {
+                for (let i = 0; i < 313; i += candidate) isComposite[i] = candidate;
+                hash[primeCounter] = (mathPow(candidate, 0.5) * maxWord) | 0;
+                k[primeCounter++] = (mathPow(candidate, 1 / 3) * maxWord) | 0;
+            }
+        }
+        str += '\x80';
+        while (str.length % 64 - 56) str += '\x00';
+        for (let i = 0; i < str.length; i++) {
+            const j = str.charCodeAt(i);
+            words[i >> 2] |= j << ((3 - i) % 4) * 8;
+        }
+        words[words.length] = ((asciiBitLength / maxWord) | 0);
+        words[words.length] = (asciiBitLength);
+        for (let j = 0; j < words.length;) {
+            const w = words.slice(j, j += 16);
+            const oldHash = hash.slice(0);
+            for (let i = 0; i < 64; i++) {
+                const w15 = w[i - 15], w2 = w[i - 2];
+                const a = hash[0], e = hash[4];
+                const temp1 = hash[7]
+                    + (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25))
+                    + ((e & hash[5]) ^ ((~e) & hash[6]))
+                    + k[i]
+                    + (w[i] = (i < 16) ? w[i] : (
+                        w[i - 16]
+                        + (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3))
+                        + w[i - 7]
+                        + (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10))
+                    ) | 0);
+                const temp2 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22))
+                    + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+                hash.unshift((temp1 + temp2) | 0);
+                hash[4] = (hash[4] + temp1) | 0;
+                hash.pop();
+            }
+            for (let i = 0; i < 8; i++) hash[i] = (hash[i] + oldHash[i]) | 0;
+        }
+        for (let i = 0; i < 8; i++) {
+            for (let j = 3; j + 1; j--) {
+                const b = (hash[i] >> (j * 8)) & 255;
+                result += ((b < 16) ? '0' : '') + b.toString(16);
+            }
+        }
+        return result;
+    },
+
+    async solveContactMicroPow(token, difficulty = 3) {
+        if (!token || difficulty <= 0) return '';
+        const prefix = '0'.repeat(Math.min(4, Math.max(1, difficulty)));
+        for (let nonce = 0; nonce < 150000; nonce++) {
+            const hex = await this.sha256Hex(`${token}:${nonce}`);
+            if (hex.startsWith(prefix)) {
+                return String(nonce);
+            }
+            if (nonce > 0 && nonce % 400 === 0) {
+                await new Promise(r => setTimeout(r, 0));
+            }
+        }
+        return '';
+    },
+
+    async refreshContactSecurityToken(challengeObj = null) {
+        const form = document.getElementById('contactForm');
+        const tokenEl = document.getElementById('contactSecurityToken');
+        const powEl = document.getElementById('contactSecurityPow');
+        if (!form || !tokenEl) return;
+
+        if (challengeObj && challengeObj.token) {
+            tokenEl.value = challengeObj.token;
+            if (challengeObj.difficulty !== undefined) {
+                form.dataset.powDifficulty = String(challengeObj.difficulty);
+            }
+            if (powEl) powEl.value = '';
+            this._contactTelemetry.renderedAt = Date.now();
+            return;
+        }
+
+        const endpoint = form.dataset.tokenEndpoint || '/security/form-token';
+        try {
+            const res = await fetch(endpoint, { headers: { Accept: 'application/json' } });
+            const data = await res.json();
+            if (data.success && data.challenge?.token) {
+                tokenEl.value = data.challenge.token;
+                if (data.challenge.difficulty !== undefined) {
+                    form.dataset.powDifficulty = String(data.challenge.difficulty);
+                }
+                if (powEl) powEl.value = '';
+                this._contactTelemetry.renderedAt = Date.now();
+            }
+        } catch (e) {}
+    },
+
+    initContactEmailVerification() {
+        const form = document.getElementById('contactForm');
+        const input = form?.querySelector('#email');
+        if (!form || !input || input.dataset.contactOtpBound === 'true') return;
+        if (!this.isContactOtpRequired()) return;
+        input.dataset.contactOtpBound = 'true';
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const sendOtpBtn = document.getElementById('contactSendEmailOtpBtn');
+        const verifyOtpBtn = document.getElementById('contactVerifyOtpBtn');
+        const resendOtpBtn = document.getElementById('contactResendOtpBtn');
+        const digitBoxes = Array.from(document.querySelectorAll('#contactOtpDigitsContainer .contact-otp-digit-box'));
+        const masterOtpInput = document.getElementById('contactOtpCode');
+
+        if (sendOtpBtn) {
+            sendOtpBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.startContactEmailVerification(input);
+            });
+        }
+
+        if (verifyOtpBtn) {
+            verifyOtpBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.verifyContactOtpCode(input);
+            });
+        }
+
+        if (resendOtpBtn) {
+            resendOtpBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (!resendOtpBtn.disabled) {
+                    this.startContactEmailVerification(input);
+                }
+            });
+        }
+
+        const syncMasterOtp = () => {
+            const code = digitBoxes.map(b => (b.value || '').replace(/\D/g, '')).join('');
+            if (masterOtpInput) masterOtpInput.value = code;
+            return code;
+        };
+
+        digitBoxes.forEach((box, idx) => {
+            box.addEventListener('focus', () => box.select());
+
+            box.addEventListener('keydown', (e) => {
+                const errEl = document.getElementById('contactOtpErrorMsg');
+                if (errEl) {
+                    errEl.classList.add('hidden');
+                    errEl.classList.remove('flex');
+                }
+                if (e.key === 'Backspace') {
+                    if (box.value) {
+                        box.value = '';
+                        syncMasterOtp();
+                        e.preventDefault();
+                    } else if (idx > 0) {
+                        digitBoxes[idx - 1].value = '';
+                        digitBoxes[idx - 1].focus();
+                        syncMasterOtp();
+                        e.preventDefault();
+                    }
+                    return;
+                }
+                if (e.key === 'ArrowLeft' && idx > 0) {
+                    e.preventDefault();
+                    digitBoxes[idx - 1].focus();
+                    return;
+                }
+                if (e.key === 'ArrowRight' && idx < digitBoxes.length - 1) {
+                    e.preventDefault();
+                    digitBoxes[idx + 1].focus();
+                    return;
+                }
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (syncMasterOtp().length === 6) this.verifyContactOtpCode(input);
+                    return;
+                }
+                if (e.ctrlKey || e.metaKey || ['Tab', 'Delete', 'Home', 'End'].includes(e.key)) return;
+                if (/^[0-9]$/.test(e.key)) {
+                    e.preventDefault();
+                    box.value = e.key;
+                    const code = syncMasterOtp();
+                    if (idx < digitBoxes.length - 1) digitBoxes[idx + 1].focus();
+                    if (code.length === 6) this.verifyContactOtpCode(input);
+                } else {
+                    e.preventDefault();
+                }
+            });
+
+            box.addEventListener('input', () => {
+                const cleaned = (box.value || '').replace(/\D/g, '');
+                if (cleaned.length > 1) {
+                    cleaned.slice(0, 6).split('').forEach((ch, offset) => {
+                        if (digitBoxes[idx + offset]) digitBoxes[idx + offset].value = ch;
+                    });
+                    digitBoxes[Math.min(idx + cleaned.length, digitBoxes.length - 1)]?.focus();
+                } else {
+                    box.value = cleaned;
+                    if (cleaned && idx < digitBoxes.length - 1) digitBoxes[idx + 1].focus();
+                }
+                if (syncMasterOtp().length === 6) this.verifyContactOtpCode(input);
+            });
+
+            box.addEventListener('paste', (e) => {
+                const pasted = (e.clipboardData || window.clipboardData)?.getData('text') || '';
+                const digits = pasted.replace(/\D/g, '').slice(0, 6);
+                if (!digits) return;
+                setTimeout(() => {
+                    digits.split('').forEach((d, i) => {
+                        if (digitBoxes[i]) digitBoxes[i].value = d;
+                    });
+                    digitBoxes[Math.min(digits.length, digitBoxes.length - 1)]?.focus();
+                    if (syncMasterOtp().length === 6) this.verifyContactOtpCode(input);
+                }, 0);
+            });
+        });
+
+        const triggerCheck = (immediate = false) => {
+            if (this._contactEmailCheckDebounce) {
+                clearTimeout(this._contactEmailCheckDebounce);
+                this._contactEmailCheckDebounce = null;
+            }
+            const email = input.value.trim().toLowerCase();
+            if (!email) {
+                this.resetContactEmailState(input);
+                return;
+            }
+            if (!emailRegex.test(email)) return;
+            if (input.classList.contains('is-verified') && input.dataset.verifiedEmail === email) return;
+            const otpWrapper = document.getElementById('contactOtpFieldsWrapper');
+            if (otpWrapper && !otpWrapper.classList.contains('hidden') && input.dataset.otpSentEmail === email) return;
+
+            const spinner = document.getElementById('contactEmailCheckSpinner');
+            if (spinner) { spinner.classList.remove('hidden'); spinner.classList.add('inline-flex'); }
+            if (sendOtpBtn) { sendOtpBtn.classList.add('hidden'); sendOtpBtn.classList.remove('inline-flex'); }
+
+            const delay = immediate || this.isLocallyVerifiedEmail(email) ? 30 : 250;
+            this._contactEmailCheckDebounce = setTimeout(() => this.checkContactEmailStatus(input), delay);
+        };
+
+        input.addEventListener('input', () => {
+            const currentVal = input.value.trim().toLowerCase();
+            if (input.classList.contains('is-verified') && input.dataset.verifiedEmail === currentVal) return;
+            this.resetContactEmailState(input);
+            if (emailRegex.test(currentVal)) triggerCheck(false);
+        });
+
+        input.addEventListener('change', () => {
+            if (emailRegex.test(input.value.trim().toLowerCase())) triggerCheck(true);
+        });
+
+        input.addEventListener('blur', async () => {
+            if (this._contactEmailCheckDebounce) {
+                clearTimeout(this._contactEmailCheckDebounce);
+                this._contactEmailCheckDebounce = null;
+            }
+            const email = input.value.trim().toLowerCase();
+            if (!email) {
+                this.resetContactEmailState(input);
+                return;
+            }
+            if (!emailRegex.test(email)) {
+                this.setContactEmailBadge('invalid', 'Invalid Email');
+                return;
+            }
+            if (input.classList.contains('is-verified') && input.dataset.verifiedEmail === email) return;
+            const otpWrapper = document.getElementById('contactOtpFieldsWrapper');
+            if (otpWrapper && !otpWrapper.classList.contains('hidden') && input.dataset.otpSentEmail === email) return;
+            await this.checkContactEmailStatus(input);
+        });
+    },
+
+    setContactEmailBadge(state, text = '') {
+        const badge = document.getElementById('contactEmailStatusBadge');
+        const container = document.getElementById('contactEmailContainer');
+        const helper = document.getElementById('contactEmailHelperText');
+        if (!badge) return;
+
+        badge.className = 'items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold tracking-wide transition-all';
+        if (!state || state === 'none') {
+            badge.classList.add('hidden');
+            if (container) container.classList.remove('border-emerald-400', 'border-rose-400', 'border-amber-400');
+            if (helper) { helper.textContent = ''; helper.classList.add('hidden'); }
+            return;
+        }
+
+        badge.classList.remove('hidden');
+        badge.classList.add('inline-flex');
+
+        if (state === 'verified') {
+            badge.classList.add('bg-emerald-100', 'text-emerald-800', 'border', 'border-emerald-200');
+            badge.innerHTML = `<i class="bi bi-patch-check-fill text-emerald-600"></i> <span>${text || 'Verified'}</span>`;
+            if (container) { container.classList.remove('border-rose-400', 'border-amber-400'); container.classList.add('border-emerald-400'); }
+            if (helper) {
+                helper.textContent = 'Email verified — ready to submit your inquiry.';
+                helper.className = 'text-[11px] font-semibold text-emerald-600 mt-1 block';
+            }
+        } else if (state === 'unverified') {
+            badge.classList.add('bg-amber-100', 'text-amber-800', 'border', 'border-amber-200');
+            badge.innerHTML = `<i class="bi bi-shield-exclamation text-amber-600"></i> <span>${text || 'Verify Email'}</span>`;
+            if (container) { container.classList.remove('border-emerald-400', 'border-rose-400'); container.classList.add('border-amber-400'); }
+            if (helper) {
+                helper.textContent = 'Click "Verify" for a quick 6-digit email confirmation code.';
+                helper.className = 'text-[11px] font-medium text-amber-700 mt-1 block';
+            }
+        } else if (state === 'sent') {
+            badge.classList.add('bg-orange-100', 'text-orange-800', 'border', 'border-orange-200');
+            badge.innerHTML = `<i class="bi bi-envelope-paper-fill text-orange-600"></i> <span>${text || 'Code Sent'}</span>`;
+            if (container) { container.classList.remove('border-emerald-400', 'border-rose-400'); container.classList.add('border-amber-400'); }
+            if (helper) helper.classList.add('hidden');
+        } else if (state === 'invalid') {
+            badge.classList.add('bg-rose-100', 'text-rose-700', 'border', 'border-rose-200');
+            badge.innerHTML = `<i class="bi bi-exclamation-circle-fill text-rose-600"></i> <span>${text || 'Invalid Email'}</span>`;
+            if (container) { container.classList.remove('border-emerald-400', 'border-amber-400'); container.classList.add('border-rose-400'); }
+            if (helper) {
+                helper.textContent = 'Please enter a valid email address.';
+                helper.className = 'text-[11px] font-semibold text-rose-600 mt-1 block';
+            }
+        }
+    },
+
+    resetContactEmailState(input) {
+        if (!input) return;
+        input.classList.remove('is-verified', 'field-valid', 'field-invalid');
+        delete input.dataset.isVerified;
+        delete input.dataset.verifiedEmail;
+        delete input.dataset.otpSentEmail;
+
+        if (this._contactOtpTimerInterval) {
+            clearInterval(this._contactOtpTimerInterval);
+            this._contactOtpTimerInterval = null;
+        }
+        this.setContactEmailBadge('none');
+
+        const spinner = document.getElementById('contactEmailCheckSpinner');
+        const sendBtn = document.getElementById('contactSendEmailOtpBtn');
+        const verifiedIcon = document.getElementById('contactEmailVerifiedIcon');
+        const otpWrapper = document.getElementById('contactOtpFieldsWrapper');
+        const otpError = document.getElementById('contactOtpErrorMsg');
+
+        if (spinner) { spinner.classList.add('hidden'); spinner.classList.remove('inline-flex'); }
+        if (sendBtn) {
+            sendBtn.classList.add('hidden');
+            sendBtn.classList.remove('inline-flex');
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = '<i class="bi bi-shield-lock-fill text-xs"></i><span>Verify</span>';
+        }
+        if (verifiedIcon) { verifiedIcon.classList.add('hidden'); verifiedIcon.classList.remove('inline-flex'); }
+        if (otpWrapper) otpWrapper.classList.add('hidden');
+        if (otpError) { otpError.classList.add('hidden'); otpError.classList.remove('flex'); }
+        document.querySelectorAll('#contactOtpDigitsContainer .contact-otp-digit-box').forEach(b => { b.value = ''; });
+        const masterOtp = document.getElementById('contactOtpCode');
+        if (masterOtp) masterOtp.value = '';
+    },
+
+    markContactEmailVerified(input) {
+        if (!input) return;
+        const cleanEmail = input.value.trim().toLowerCase();
+        this.resetContactEmailState(input);
+        input.classList.add('is-verified', 'field-valid');
+        input.dataset.isVerified = 'true';
+        input.dataset.verifiedEmail = cleanEmail;
+        this.rememberVerifiedEmail(cleanEmail);
+
+        const verifiedIcon = document.getElementById('contactEmailVerifiedIcon');
+        if (verifiedIcon) {
+            verifiedIcon.classList.remove('hidden');
+            verifiedIcon.classList.add('inline-flex');
+        }
+        this.setContactEmailBadge('verified', 'Verified');
+
+        if (this._pendingContactSubmitAfterOtp && this._pendingContactSubmitAfterOtp === input.closest('form')) {
+            const pendingForm = this._pendingContactSubmitAfterOtp;
+            this._pendingContactSubmitAfterOtp = null;
+            setTimeout(() => {
+                pendingForm.requestSubmit ? pendingForm.requestSubmit() : pendingForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+            }, 150);
+        }
+    },
+
+    showContactVerifyButton(input) {
+        if (!input || input.classList.contains('is-verified')) return;
+        const sendBtn = document.getElementById('contactSendEmailOtpBtn');
+        const verifiedIcon = document.getElementById('contactEmailVerifiedIcon');
+        const spinner = document.getElementById('contactEmailCheckSpinner');
+        if (spinner) { spinner.classList.add('hidden'); spinner.classList.remove('inline-flex'); }
+        if (verifiedIcon) { verifiedIcon.classList.add('hidden'); verifiedIcon.classList.remove('inline-flex'); }
+        if (sendBtn) {
+            sendBtn.classList.remove('hidden');
+            sendBtn.classList.add('inline-flex');
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = '<i class="bi bi-shield-lock-fill text-xs"></i><span>Verify</span>';
+        }
+        this.setContactEmailBadge('unverified', 'Verify Email');
+    },
+
+    async checkContactEmailStatus(input) {
+        if (!input) return false;
+        const email = input.value.trim().toLowerCase();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRegex.test(email)) return false;
+        if (input.classList.contains('is-verified') && input.dataset.verifiedEmail === email) return true;
+
+        const spinner = document.getElementById('contactEmailCheckSpinner');
+        const sendBtn = document.getElementById('contactSendEmailOtpBtn');
+        if (spinner) { spinner.classList.remove('hidden'); spinner.classList.add('inline-flex'); }
+        if (sendBtn) { sendBtn.classList.add('hidden'); sendBtn.classList.remove('inline-flex'); }
+
+        try {
+            const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || window.CSRF_TOKEN || '';
+            const res = await fetch('/api/v1/email/status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'X-CSRF-TOKEN': csrf },
+                body: JSON.stringify({ email }),
+            });
+            const data = await res.json();
+            if (input.value.trim().toLowerCase() !== email) return false;
+            if (data.success && data.verified) {
+                this.markContactEmailVerified(input);
+                return true;
+            }
+            const otpWrapper = document.getElementById('contactOtpFieldsWrapper');
+            if (!otpWrapper || otpWrapper.classList.contains('hidden')) {
+                this.showContactVerifyButton(input);
+            }
+            return false;
+        } catch (e) {
+            if (input.value.trim().toLowerCase() === email) this.showContactVerifyButton(input);
+            return false;
+        } finally {
+            if (spinner && input.value.trim().toLowerCase() === email) {
+                spinner.classList.add('hidden');
+                spinner.classList.remove('inline-flex');
+            }
+        }
+    },
+
+    async startContactEmailVerification(input) {
+        if (!input) return;
+        const email = input.value.trim().toLowerCase();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            this.setContactEmailBadge('invalid', 'Invalid Email');
+            return;
+        }
+
+        const sendBtn = document.getElementById('contactSendEmailOtpBtn');
+        const resendBtn = document.getElementById('contactResendOtpBtn');
+        if (sendBtn) {
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<span class="inline-block w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span><span>Sending</span>';
+            sendBtn.classList.remove('hidden');
+            sendBtn.classList.add('inline-flex');
+        }
+        if (resendBtn) resendBtn.disabled = true;
+
+        try {
+            const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || window.CSRF_TOKEN || '';
+            const res = await fetch('/api/v1/email/otp/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'X-CSRF-TOKEN': csrf },
+                body: JSON.stringify({
+                    email,
+                    website_url: document.getElementById('hp_website_url')?.value || '',
+                    company_fax: document.getElementById('hp_company_fax')?.value || '',
+                }),
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                if (data.already_verified || data.verified) {
+                    this.markContactEmailVerified(input);
+                    return;
+                }
+                input.dataset.otpSentEmail = email;
+                this.toast('6-digit verification code sent to ' + email, 'success');
+                if (sendBtn) { sendBtn.classList.add('hidden'); sendBtn.classList.remove('inline-flex'); }
+                this.setContactEmailBadge('sent', 'Code Sent');
+                this.showContactOtpInput(input);
+            } else {
+                const msg = data.message || 'Could not send verification code. Please try again.';
+                this.toast(msg, 'error');
+                if (msg.toLowerCase().includes('wait') && msg.toLowerCase().includes('before requesting')) {
+                    input.dataset.otpSentEmail = email;
+                    if (sendBtn) { sendBtn.classList.add('hidden'); sendBtn.classList.remove('inline-flex'); }
+                    this.showContactOtpInput(input);
+                } else if (sendBtn) {
+                    sendBtn.disabled = false;
+                    sendBtn.innerHTML = '<i class="bi bi-arrow-repeat text-xs"></i><span>Retry</span>';
+                }
+            }
+        } catch (e) {
+            this.toast('Network error — please check your connection and try again.', 'error');
+            if (sendBtn) {
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = '<i class="bi bi-arrow-repeat text-xs"></i><span>Retry</span>';
+            }
+        }
+    },
+
+    showContactOtpInput(input) {
+        const otpWrapper = document.getElementById('contactOtpFieldsWrapper');
+        if (!otpWrapper) return;
+        const targetEmailEl = document.getElementById('contactOtpTargetEmail');
+        if (targetEmailEl && input?.value) targetEmailEl.textContent = input.value.trim();
+
+        const errEl = document.getElementById('contactOtpErrorMsg');
+        if (errEl) { errEl.classList.add('hidden'); errEl.classList.remove('flex'); }
+
+        const digitBoxes = Array.from(document.querySelectorAll('#contactOtpDigitsContainer .contact-otp-digit-box'));
+        digitBoxes.forEach(b => { b.value = ''; });
+        const masterOtp = document.getElementById('contactOtpCode');
+        if (masterOtp) masterOtp.value = '';
+
+        otpWrapper.classList.remove('hidden');
+        otpWrapper.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        setTimeout(() => digitBoxes[0]?.focus(), 80);
+
+        if (this._contactOtpTimerInterval) clearInterval(this._contactOtpTimerInterval);
+        const timerEl = document.getElementById('contactOtpTimer');
+        const resendBtn = document.getElementById('contactResendOtpBtn');
+        let cooldown = 60;
+
+        const tick = () => {
+            if (cooldown > 0) {
+                if (timerEl) { timerEl.textContent = `Resend available in 0:${String(cooldown).padStart(2, '0')}`; timerEl.classList.remove('hidden'); }
+                if (resendBtn) { resendBtn.disabled = true; resendBtn.classList.add('opacity-50', 'pointer-events-none'); }
+                cooldown--;
+            } else {
+                clearInterval(this._contactOtpTimerInterval);
+                this._contactOtpTimerInterval = null;
+                if (timerEl) timerEl.textContent = "Didn't receive the code?";
+                if (resendBtn) { resendBtn.disabled = false; resendBtn.classList.remove('opacity-50', 'pointer-events-none'); }
+            }
+        };
+        tick();
+        this._contactOtpTimerInterval = setInterval(tick, 1000);
+    },
+
+    async verifyContactOtpCode(input) {
+        if (!input) input = document.querySelector('#contactForm #email');
+        if (!input) return;
+
+        const digitBoxes = Array.from(document.querySelectorAll('#contactOtpDigitsContainer .contact-otp-digit-box'));
+        const masterOtp = document.getElementById('contactOtpCode');
+        const code = (digitBoxes.map(b => b.value).join('') || masterOtp?.value || '').replace(/\D/g, '');
+        const errEl = document.getElementById('contactOtpErrorMsg');
+        const errText = document.getElementById('contactOtpErrorText');
+        const verifyBtn = document.getElementById('contactVerifyOtpBtn');
+
+        if (code.length < 6) {
+            if (errText) errText.textContent = 'Please enter all 6 digits of your verification code.';
+            if (errEl) { errEl.classList.remove('hidden'); errEl.classList.add('flex'); }
+            (digitBoxes.find(b => !b.value) || digitBoxes[0])?.focus();
+            return;
+        }
+
+        if (verifyBtn) {
+            verifyBtn.disabled = true;
+            verifyBtn.innerHTML = '<span class="inline-block w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span><span>Verifying...</span>';
+        }
+        digitBoxes.forEach(b => { b.disabled = true; });
+
+        try {
+            const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || window.CSRF_TOKEN || '';
+            const res = await fetch('/api/v1/email/otp/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'X-CSRF-TOKEN': csrf },
+                body: JSON.stringify({ email: input.value.trim(), otp: code }),
+            });
+            const data = await res.json();
+
+            digitBoxes.forEach(b => { b.disabled = false; });
+            if (verifyBtn) {
+                verifyBtn.disabled = false;
+                verifyBtn.innerHTML = '<i class="bi bi-check2-circle"></i><span>Verify Code</span>';
+            }
+
+            if (data.success) {
+                this.toast('Email verified successfully!', 'success');
+                this.markContactEmailVerified(input);
+            } else {
+                if (errText) errText.textContent = data.message || 'Invalid verification code. Please check and try again.';
+                if (errEl) { errEl.classList.remove('hidden'); errEl.classList.add('flex'); }
+                digitBoxes[0]?.focus();
+                digitBoxes[0]?.select();
+            }
+        } catch (e) {
+            digitBoxes.forEach(b => { b.disabled = false; });
+            if (verifyBtn) {
+                verifyBtn.disabled = false;
+                verifyBtn.innerHTML = '<i class="bi bi-check2-circle"></i><span>Verify Code</span>';
+            }
+            if (errText) errText.textContent = 'Verification failed. Please check your connection and try again.';
+            if (errEl) { errEl.classList.remove('hidden'); errEl.classList.add('flex'); }
         }
     },
 
@@ -4253,30 +4921,42 @@ const App = {
             form.addEventListener('submit', async e => {
                 e.preventDefault();
 
-                const errEl = document.getElementById('bookingError');
-                if (errEl) {
+                const isContactForm = form.id === 'contactForm';
+                const errEl = isContactForm ? document.getElementById('contactErrorMessage') : document.getElementById('bookingError');
+                const contactErrBanner = isContactForm ? document.getElementById('contactErrorAlert') : null;
+                const contactOkBanner = isContactForm ? document.getElementById('contactSuccessAlert') : null;
+                const showFormError = (msgHtml) => {
+                    if (isContactForm && contactErrBanner && errEl) {
+                        errEl.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i>' + msgHtml;
+                        contactErrBanner.classList.remove('hidden');
+                        contactErrBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    } else if (errEl) {
+                        errEl.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i>' + msgHtml;
+                        errEl.classList.remove('hidden', 'd-none');
+                    } else {
+                        this.toast(msgHtml, 'error');
+                    }
+                };
+
+                if (isContactForm) {
+                    if (contactErrBanner) contactErrBanner.classList.add('hidden');
+                    if (contactOkBanner) contactOkBanner.classList.add('hidden');
+                    if (errEl) errEl.textContent = '';
+                } else if (errEl) {
                     errEl.classList.add('hidden', 'd-none');
                     errEl.textContent = '';
                 }
 
                 if (typeof window.validateForm === 'function') {
                     if (!window.validateForm(form, null, true)) {
-                        if (errEl) {
-                            errEl.textContent = 'Please complete all required fields before continuing.';
-                            errEl.classList.remove('hidden', 'd-none');
-                        } else {
-                            this.toast('Please complete all required fields before continuing.', 'error');
-                        }
+                        showFormError('Please complete all required fields before continuing.');
                         return;
                     }
                 } else if (!form.checkValidity()) {
                     const invalidFields = form.querySelectorAll(':invalid');
                     invalidFields.forEach(field => this.showError(field, false));
                     if (invalidFields.length > 0) invalidFields[0].focus();
-                    if (errEl) {
-                        errEl.textContent = 'Please complete all required fields before continuing.';
-                        errEl.classList.remove('hidden', 'd-none');
-                    }
+                    showFormError('Please complete all required fields before continuing.');
                     return;
                 }
 
@@ -4298,13 +4978,45 @@ const App = {
                 });
 
                 if (phoneError) {
-                    if (errEl) {
-                        errEl.textContent = phoneError;
-                        errEl.classList.remove('hidden', 'd-none');
-                    } else {
-                        this.toast(phoneError, 'error');
-                    }
+                    showFormError(phoneError);
                     return;
+                }
+
+                // Interactive Email OTP Verification Check for Contact Form (same on-spot UX as Booking Form)
+                const contactEmailInput = isContactForm ? form.querySelector('#email') : null;
+                if (isContactForm && contactEmailInput && this.isContactOtpRequired() && !contactEmailInput.classList.contains('is-verified') && contactEmailInput.dataset.isVerified !== 'true') {
+                    const emailVal = contactEmailInput.value.trim().toLowerCase();
+                    if (!emailVal || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+                        this.setContactEmailBadge('invalid', 'Invalid Email');
+                        contactEmailInput.focus();
+                        return;
+                    }
+
+                    const otpWrapper = document.getElementById('contactOtpFieldsWrapper');
+                    const digitBoxes = Array.from(document.querySelectorAll('#contactOtpDigitsContainer .contact-otp-digit-box'));
+                    const enteredOtp = digitBoxes.map(b => b.value).join('').replace(/\D/g, '');
+
+                    if (otpWrapper && !otpWrapper.classList.contains('hidden')) {
+                        this._pendingContactSubmitAfterOtp = form;
+                        if (enteredOtp.length === 6) {
+                            await this.verifyContactOtpCode(contactEmailInput);
+                        } else {
+                            const otpErr = document.getElementById('contactOtpErrorMsg');
+                            const otpErrTxt = document.getElementById('contactOtpErrorText');
+                            if (otpErrTxt) otpErrTxt.textContent = 'Please enter the 6-digit verification code sent to your email.';
+                            if (otpErr) { otpErr.classList.remove('hidden'); otpErr.classList.add('flex'); }
+                            otpWrapper.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                            (digitBoxes.find(b => !b.value) || digitBoxes[0])?.focus();
+                        }
+                        return;
+                    }
+
+                    const alreadyVerified = await this.checkContactEmailStatus(contactEmailInput);
+                    if (!alreadyVerified) {
+                        this._pendingContactSubmitAfterOtp = form;
+                        await this.startContactEmailVerification(contactEmailInput);
+                        return;
+                    }
                 }
 
                 // Interactive Email OTP Verification Check for Booking Flow
@@ -4400,15 +5112,34 @@ const App = {
                         window.DunesJourneyTracker.injectIntoFormData(fd);
                     }
 
+                    // Contact Form Multi-Layer Security Shield (Behavioral Telemetry + SHA-256 Micro-PoW)
+                    if (isContactForm) {
+                        const tokenVal = String(fd.get('_dunes_token') || document.getElementById('contactSecurityToken')?.value || '');
+                        const powDiff = parseInt(form.dataset.powDifficulty || '3', 10) || 3;
+                        const telemetryPayload = {
+                            keystrokes: this._contactTelemetry.keystrokes || 0,
+                            pointer: this._contactTelemetry.pointer || 0,
+                            focus: this._contactTelemetry.focus || 0,
+                            scroll: this._contactTelemetry.scroll || 0,
+                            dwell_ms: Math.max(0, Date.now() - (this._contactTelemetry.renderedAt || Date.now())),
+                        };
+                        fd.set('_dunes_telemetry', JSON.stringify(telemetryPayload));
+                        if (tokenVal) {
+                            const solvedNonce = await this.solveContactMicroPow(tokenVal, powDiff);
+                            fd.set('_dunes_pow', solvedNonce);
+                        }
+                    }
+
                     // Google reCAPTCHA Enterprise
                     if ((action === 'booking' || action === 'contact' || action === 'logWhatsApp') && window.RECAPTCHA_SITE_KEY) {
                         try {
                             if (typeof window.grecaptcha === 'undefined' || !window.grecaptcha.enterprise || typeof window.grecaptcha.enterprise.execute !== 'function') {
-                                await new Promise(resolve => {
+                                await new Promise((resolve, reject) => {
                                     const s = document.createElement('script');
                                     s.src = 'https://www.google.com/recaptcha/enterprise.js?render=' + window.RECAPTCHA_SITE_KEY;
                                     s.async = true;
                                     s.onload = resolve;
+                                    s.onerror = reject;
                                     document.head.appendChild(s);
                                 });
                             }
@@ -4417,13 +5148,10 @@ const App = {
                             fd.set('g-recaptcha-response', token);
                         } catch (e) {
                             console.error('ReCaptcha error:', e);
-                            if (errEl) {
-                                errEl.textContent = 'Security verification failed. Please refresh and try again.';
-                                errEl.classList.remove('hidden', 'd-none');
-                            } else {
-                                this.toast('Security verification failed. Please refresh and try again.', 'error');
+                            if (!isContactForm) {
+                                showFormError('Security verification failed. Please refresh and try again.');
+                                return;
                             }
-                            return;
                         }
                     }
 
@@ -4435,7 +5163,7 @@ const App = {
                     const endpoint = form.getAttribute('action') || '/ajax.php';
                     const res = await fetch(endpoint, {
                         method: 'POST',
-                        headers: { 'X-CSRF-TOKEN': csrfToken },
+                        headers: { 'X-CSRF-TOKEN': csrfToken, Accept: 'application/json' },
                         body: fd
                     });
                     const raw = await res.text();
@@ -4443,12 +5171,7 @@ const App = {
                     try { data = JSON.parse(raw.replace(/^\uFEFF+/, '').trim()); } catch (e) { data = null; }
 
                     if (!data) {
-                        if (errEl) {
-                            errEl.textContent = 'Payment could not be initiated. Please try again.';
-                            errEl.classList.remove('hidden', 'd-none');
-                        } else {
-                            this.toast('Payment could not be initiated. Please try again.', 'error');
-                        }
+                        showFormError(isContactForm ? 'Could not submit your inquiry right now. Please refresh and try again.' : 'Payment could not be initiated. Please try again.');
                         return;
                     }
 
@@ -4503,9 +5226,31 @@ const App = {
                             setTimeout(() => this.toast('Reference: ' + data.reference, 'success'), 1500);
                         }
 
-                        Alpine.store('modal').close();
-                        form.reset();
+                        if (isContactForm) {
+                            const okMsg = document.getElementById('contactSuccessMessage');
+                            if (okMsg) okMsg.textContent = data.message || 'Thank you! Your message has been sent successfully.';
+                            if (contactOkBanner) {
+                                contactOkBanner.classList.remove('hidden');
+                                contactOkBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                            }
+                            form.reset();
+                            if (contactEmailInput) this.resetContactEmailState(contactEmailInput);
+                            await this.refreshContactSecurityToken(data.next_challenge || null);
+                            if (window.turnstile && typeof window.turnstile.reset === 'function') {
+                                try { window.turnstile.reset(); } catch (e) {}
+                            }
+                        } else {
+                            Alpine.store('modal').close();
+                            form.reset();
+                        }
                     } else {
+                        if (data.require_verification && isContactForm && contactEmailInput) {
+                            contactEmailInput.classList.remove('is-verified');
+                            delete contactEmailInput.dataset.isVerified;
+                            this._pendingContactSubmitAfterOtp = form;
+                            await this.startContactEmailVerification(contactEmailInput);
+                            return;
+                        }
                         if (data.require_verification && emailInput) {
                             emailInput.classList.remove('is-verified');
                             delete emailInput.dataset.isVerified;
@@ -4513,26 +5258,22 @@ const App = {
                             await this.startVerification(emailInput);
                             return;
                         }
+                        if (isContactForm && data.refresh_token) {
+                            await this.refreshContactSecurityToken();
+                            if (window.turnstile && typeof window.turnstile.reset === 'function') {
+                                try { window.turnstile.reset(); } catch (e) {}
+                            }
+                        }
 
                         let msg = data.message || 'An error occurred';
                         if (data.errors && typeof data.errors === 'object') {
                             const errorList = Object.values(data.errors).flat();
                             if (errorList.length > 0) msg = errorList.join('<br>');
                         }
-                        if (errEl) {
-                            errEl.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i>' + msg;
-                            errEl.classList.remove('hidden', 'd-none');
-                        } else {
-                            this.toast(msg, 'error');
-                        }
+                        showFormError(msg);
                     }
                 } catch (e) {
-                    if (errEl) {
-                        errEl.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i>Network error. Please try again.';
-                        errEl.classList.remove('hidden', 'd-none');
-                    } else {
-                        this.toast('Network error. Please try again.', 'error');
-                    }
+                    showFormError('Network error. Please try again.');
                 } finally {
                     if (btn) {
                         btn.disabled = false;

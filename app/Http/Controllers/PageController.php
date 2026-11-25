@@ -90,7 +90,39 @@ class PageController extends Controller
         $canonical = localized_route('contact');
         $pageRobots = ! empty($request->query()) ? 'noindex, follow' : 'index, follow';
 
-        return view('contact', compact('pageTitle', 'pageDesc', 'pageKeys', 'canonical', 'ogImage', 'pageRobots'));
+        $spamGuard = app(\App\Services\Security\ContactSpamGuardService::class);
+        $contactSecurityChallenge = $spamGuard->issueChallengeToken('contact');
+        $turnstileEnabled = $settings->get('turnstile_enabled', '0') === '1'
+            && trim((string) $settings->get('turnstile_site_key', '')) !== '';
+        $turnstileSiteKey = trim((string) $settings->get('turnstile_site_key', ''));
+        $contactOtpRequired = $spamGuard->isContactOtpRequired();
+
+        return view('contact', compact(
+            'pageTitle',
+            'pageDesc',
+            'pageKeys',
+            'canonical',
+            'ogImage',
+            'pageRobots',
+            'contactSecurityChallenge',
+            'turnstileEnabled',
+            'turnstileSiteKey',
+            'contactOtpRequired'
+        ));
+    }
+
+    /**
+     * Issue a fresh signed challenge token for the Contact form (used after form reset/retry).
+     */
+    public function issueContactSecurityToken(Request $request): JsonResponse
+    {
+        $spamGuard = app(\App\Services\Security\ContactSpamGuardService::class);
+        $challenge = $spamGuard->issueChallengeToken('contact');
+
+        return response()->json([
+            'success' => true,
+            'challenge' => $challenge,
+        ]);
     }
 
     /**
@@ -133,26 +165,49 @@ class PageController extends Controller
     }
 
     /**
-     * Handle Contact form AJAX submission.
+     * Handle Contact form AJAX submission with full 6-layer Anti-Spam Shield & Email OTP verification.
      */
     public function submitContact(Request $request): JsonResponse
     {
+        // Execute complete ordered 6-layer Anti-Spam & Email OTP Guard FIRST so oversized phishing/bot
+        // payloads are always scored, logged in spam_events, and auto-blocked in IP Firewall.
+        $spamGuard = app(\App\Services\Security\ContactSpamGuardService::class);
+        $evaluation = $spamGuard->evaluateContactSubmission($request);
+
+        if ($evaluation['verdict'] === 'block') {
+            return response()->json([
+                'success' => (bool) ($evaluation['stealth_drop'] ?? false),
+                'message' => $evaluation['message'],
+                'blocked' => ! ($evaluation['stealth_drop'] ?? false),
+                'refresh_token' => ! ($evaluation['stealth_drop'] ?? false),
+            ], (int) ($evaluation['http_status'] ?? 422));
+        }
+
+        if ($evaluation['verdict'] === 'require_otp') {
+            return response()->json([
+                'success' => false,
+                'require_verification' => true,
+                'message' => $evaluation['message'],
+            ], 422);
+        }
+
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
+            'name' => 'required|string|min:2|max:120',
+            'email' => 'required|email:filter|max:255',
             'phone' => 'nullable|string|max:50',
-            'subject' => 'nullable|string|max:255',
-            'message' => 'required|string',
+            'subject' => 'nullable|string|max:160',
+            'message' => 'required|string|min:5|max:5000',
         ]);
 
-        $name = trim($request->input('name'));
-        $email = trim(strtolower($request->input('email')));
-        $phone = trim($request->input('phone', ''));
-        $subject = trim($request->input('subject', 'Inquiry from Contact Form'));
-        $messageText = trim($request->input('message'));
+        $name = trim((string) $request->input('name'));
+        $email = trim(strtolower((string) $request->input('email')));
+        $phone = trim((string) $request->input('phone', ''));
+        $subject = trim((string) $request->input('subject', '')) ?: 'Inquiry from Contact Form';
+        $messageText = trim((string) $request->input('message'));
 
         // Check if email is verified
         $isVerified = VerifiedEmail::isVerified($email);
+        $isQuarantined = ($evaluation['verdict'] === 'quarantine');
 
         // Collect request context
         $gpsPost = [
@@ -170,7 +225,7 @@ class PageController extends Controller
         $ctx = $this->tracker->collectRequestContext('contact', $gpsPost);
 
         try {
-            // Save contact record with full attribution context
+            // Save contact record with full attribution & anti-spam telemetry context
             $trafficChannel = $request->input('traffic_channel') ?? ($ctx['traffic_channel'] ?? \App\Services\VisitorTrackerService::determineChannel($ctx['utm_source'] ?? null, $ctx['utm_medium'] ?? null, $ctx['gclid'] ?? null, $ctx['fbclid'] ?? null, $ctx['referrer_url'] ?? null));
 
             $contact = Contact::create([
@@ -179,7 +234,12 @@ class PageController extends Controller
                 'phone' => $phone,
                 'subject' => $subject,
                 'message' => $messageText,
-                'status' => 'new',
+                'status' => $isQuarantined ? 'spam' : 'new',
+                'is_spam' => $isQuarantined,
+                'spam_score' => (int) ($evaluation['score'] ?? 0),
+                'spam_reasons' => ! empty($evaluation['reasons']) ? $evaluation['reasons'] : null,
+                'quarantined_at' => $isQuarantined ? now() : null,
+                'security_meta' => $evaluation['meta'] ?? null,
                 'is_verified' => $isVerified,
                 'ip_address' => $ctx['client_ip'],
                 'traffic_channel' => $trafficChannel,
@@ -200,17 +260,20 @@ class PageController extends Controller
                 $contact->update(['request_log_id' => $logId]);
             }
 
-            // Send Email Notifications
-            try {
-                app(\App\Services\NotificationManagementService::class)->notifyContactInquiry($contact);
-            } catch (\Throwable $e) {
-                Log::error('Failed to send contact emails: '.$e->getMessage());
+            // NEVER dispatch outbound emails or webhooks for quarantined spam inquiries
+            if (! $isQuarantined) {
+                try {
+                    app(\App\Services\NotificationManagementService::class)->notifyContactInquiry($contact);
+                } catch (\Throwable $e) {
+                    Log::error('Failed to send contact emails: '.$e->getMessage());
+                }
             }
 
             return response()->json([
                 'success' => true,
-                'message' => 'Thank you! Your message has been sent successfully.',
+                'message' => $evaluation['message'] ?: 'Thank you! Your message has been sent successfully.',
                 'verified' => $isVerified,
+                'next_challenge' => $spamGuard->issueChallengeToken('contact'),
             ]);
 
         } catch (\Throwable $e) {

@@ -371,6 +371,7 @@ class AdminBookingController extends Controller
             );
 
             Mail::to($toEmail)->send($mailable);
+            app(\App\Services\Mail\SmtpDiagnosticService::class)->recordSuccess('draft_recovery');
 
             $existingRequests = (string) $draft->special_requests;
             $dispatchTag = '[RECOVERY_DISPATCHED: '.now()->format('Y-m-d H:i:s').' to '.$toEmail.']';
@@ -390,15 +391,18 @@ class AdminBookingController extends Controller
             return redirect()->back()->with('success', "Recovery email sent to {$toEmail}.");
         } catch (\Throwable $e) {
             Log::error("Failed to send draft recovery email for draft #{$draft->id}: ".$e->getMessage());
+            $diagnosis = app(\App\Services\Mail\SmtpDiagnosticService::class)->recordFailure('draft_recovery', $e, $toEmail);
+            $friendlyMessage = $diagnosis['title'].' — '.$diagnosis['summary'].' (SMTP details: '.$e->getMessage().')';
 
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Failed to send recovery email: '.$e->getMessage(),
+                    'message' => $friendlyMessage,
+                    'diagnosis' => $diagnosis,
                 ], 500);
             }
 
-            return redirect()->back()->with('error', 'Error sending recovery email: '.$e->getMessage());
+            return redirect()->back()->with('error', $friendlyMessage);
         }
     }
 

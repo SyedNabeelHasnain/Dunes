@@ -20,16 +20,19 @@ class EmailMarketingService
     }
 
     /**
-     * Dynamically apply SMTP configuration from database settings at runtime.
+     * Dynamically apply Primary + Optional Secondary Failover SMTP configuration from database settings at runtime.
      */
-    public function applySmtpConfig(): void
+    public function applySmtpConfig(bool $forceInTesting = false): void
     {
-        if (app()->environment('testing')) {
+        if (app()->environment('testing') && ! $forceInTesting) {
             return;
         }
 
         $configuredHost = trim((string) $this->settings->get('smtp_host', ''));
-        if ($configuredHost === '') {
+        $fallbackEnabled = $this->settings->get('smtp_fallback_enabled', '0') === '1';
+        $fallbackHost = trim((string) $this->settings->get('smtp_fallback_host', ''));
+
+        if ($configuredHost === '' && ! ($fallbackEnabled && $fallbackHost !== '')) {
             return;
         }
 
@@ -42,11 +45,7 @@ class EmailMarketingService
         $fromAddress = $this->settings->get('smtp_from_address', config('mail.from.address'));
         $fromName = $this->settings->get('smtp_from_name', config('mail.from.name', $this->settings->get('site_name', 'Dunes Discovery Tourism')));
 
-        if (! empty($driver)) {
-            Config::set('mail.default', $driver);
-        }
-
-        if ($driver === 'smtp' && ! empty($host)) {
+        if ($driver === 'smtp' && $host !== '') {
             Config::set('mail.mailers.smtp.host', $host);
             Config::set('mail.mailers.smtp.port', $port);
             Config::set('mail.mailers.smtp.encryption', $encryption === 'none' ? null : $encryption);
@@ -60,6 +59,33 @@ class EmailMarketingService
             }
         }
 
+        // Configure optional Secondary / Failover Transactional SMTP Relay (e.g., Brevo / Resend / Postmark / SES)
+        $hasActiveFailover = false;
+        if ($fallbackEnabled && $fallbackHost !== '') {
+            $fbPort = (int) $this->settings->get('smtp_fallback_port', 587);
+            $fbEnc = (string) $this->settings->get('smtp_fallback_encryption', 'tls');
+            $fbUser = (string) $this->settings->get('smtp_fallback_username', '');
+            $fbPass = (string) $this->settings->get('smtp_fallback_password', '');
+
+            Config::set('mail.mailers.smtp_fallback.transport', 'smtp');
+            Config::set('mail.mailers.smtp_fallback.host', $fallbackHost);
+            Config::set('mail.mailers.smtp_fallback.port', $fbPort);
+            Config::set('mail.mailers.smtp_fallback.encryption', $fbEnc === 'none' ? null : $fbEnc);
+            Config::set('mail.mailers.smtp_fallback.scheme', $fbEnc === 'ssl' ? 'smtps' : null);
+            Config::set('mail.mailers.smtp_fallback.username', $fbUser !== '' ? $fbUser : null);
+            Config::set('mail.mailers.smtp_fallback.password', $fbPass !== '' ? $fbPass : null);
+            $hasActiveFailover = true;
+        }
+
+        if ($hasActiveFailover && $driver === 'smtp') {
+            $mailersChain = $host !== '' ? ['smtp', 'smtp_fallback'] : ['smtp_fallback'];
+            Config::set('mail.mailers.failover.mailers', $mailersChain);
+            Config::set('mail.mailers.failover.retry_after', 15);
+            Config::set('mail.default', 'failover');
+        } elseif (! empty($driver)) {
+            Config::set('mail.default', $driver);
+        }
+
         if (! empty($fromAddress)) {
             Config::set('mail.from.address', $fromAddress);
             Config::set('mail.from.name', $fromName);
@@ -67,7 +93,9 @@ class EmailMarketingService
 
         try {
             Mail::purge('smtp');
-            if (! empty($driver) && $driver !== 'smtp') {
+            Mail::purge('smtp_fallback');
+            Mail::purge('failover');
+            if (! empty($driver) && ! in_array($driver, ['smtp', 'smtp_fallback', 'failover'], true)) {
                 Mail::purge($driver);
             }
         } catch (\Throwable $e) {
@@ -302,14 +330,27 @@ class EmailMarketingService
     }
 
     /**
-     * Send a single diagnostic test email to any address.
+     * Send a single diagnostic test email to any address (supports primary, fallback, or auto failover).
      */
-    public function sendTestEmail(string $recipientEmail, string $subject, string $htmlContent): array
+    public function sendTestEmail(string $recipientEmail, string $subject, string $htmlContent, string $target = 'auto'): array
     {
         $this->applySmtpConfig();
 
+        $diagnostics = app(\App\Services\Mail\SmtpDiagnosticService::class);
+
         $fromAddress = $this->settings->get('smtp_from_address', config('mail.from.address'));
         $fromName = $this->settings->get('smtp_from_name', $this->settings->get('site_name', 'Dunes Discovery Tourism'));
+
+        if ($target === 'fallback') {
+            $fbFrom = trim((string) $this->settings->get('smtp_fallback_from_address', ''));
+            $fbName = trim((string) $this->settings->get('smtp_fallback_from_name', ''));
+            if ($fbFrom !== '') {
+                $fromAddress = $fbFrom;
+            }
+            if ($fbName !== '') {
+                $fromName = $fbName;
+            }
+        }
 
         // Dummy subscriber for preview tag parsing
         $dummySubscriber = new Subscriber([
@@ -319,26 +360,40 @@ class EmailMarketingService
             'unsubscribe_token' => 'sample-test-token',
         ]);
 
-        $renderedSubject = '[TEST] '.$this->parseTags($subject, $dummySubscriber);
+        $renderedSubject = str_starts_with($subject, '[TEST]')
+            ? $this->parseTags($subject, $dummySubscriber)
+            : '[TEST] '.$this->parseTags($subject, $dummySubscriber);
         $renderedHtml = $this->renderHtml($htmlContent, $dummySubscriber);
 
         try {
-            Mail::html($renderedHtml, function ($message) use ($recipientEmail, $renderedSubject, $fromAddress, $fromName) {
+            $mailer = match ($target) {
+                'primary' => Mail::mailer('smtp'),
+                'fallback' => Mail::mailer('smtp_fallback'),
+                default => Mail::mailer(),
+            };
+
+            $mailer->html($renderedHtml, function ($message) use ($recipientEmail, $renderedSubject, $fromAddress, $fromName) {
                 $message->to($recipientEmail)
                     ->subject($renderedSubject)
                     ->from($fromAddress, $fromName);
             });
 
+            $diagnostics->recordSuccess("smtp_test:{$target}", $target);
+
             return [
                 'success' => true,
-                'message' => "Test email dispatched successfully to {$recipientEmail}!",
+                'mailer' => $target,
+                'message' => "Test email dispatched successfully to {$recipientEmail} (mode: {$target})!",
             ];
         } catch (\Throwable $e) {
-            Log::error('Test email dispatch failed: '.$e->getMessage());
+            Log::error("Test email dispatch failed ({$target}): ".$e->getMessage());
+            $diagnosis = $diagnostics->recordFailure("smtp_test:{$target}", $e, $recipientEmail);
 
             return [
                 'success' => false,
-                'message' => 'Dispatch failed: '.$e->getMessage(),
+                'mailer' => $target,
+                'message' => $diagnosis['title'].': '.$diagnosis['summary'],
+                'diagnosis' => $diagnosis,
             ];
         }
     }

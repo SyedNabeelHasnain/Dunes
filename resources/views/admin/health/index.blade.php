@@ -38,6 +38,55 @@
         </div>
     </div>
 
+    <!-- SMTP Delivery Health & Anti-Spam Shield Telemetry -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="rounded-2xl border {{ ($smtpHealth['status'] ?? 'unknown') === 'degraded' ? 'border-rose-300 bg-rose-50/40' : 'border-slate-200 bg-white' }} p-6 shadow-xs space-y-3">
+            <div class="flex items-center justify-between gap-3">
+                <h6 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                    <i class="bi bi-envelope-check-fill {{ ($smtpHealth['status'] ?? 'unknown') === 'degraded' ? 'text-rose-600' : 'text-emerald-600' }}"></i>
+                    SMTP Mail Delivery Health
+                </h6>
+                <a href="{{ route('admin.settings.mail') }}" class="text-xs font-bold text-primary hover:underline">Manage SMTP &amp; Failover &rarr;</a>
+            </div>
+            @if(($smtpHealth['status'] ?? 'unknown') === 'degraded' && !empty($smtpHealth['diagnosis']))
+                <div class="rounded-xl border border-rose-200 bg-white p-3.5 text-xs space-y-1">
+                    <div class="font-black text-rose-800">{{ $smtpHealth['diagnosis']['title'] ?? 'SMTP Degraded' }} ({{ $smtpHealth['diagnosis']['smtp_code'] ?? 'SMTP' }})</div>
+                    <p class="text-slate-700">{{ $smtpHealth['diagnosis']['summary'] ?? '' }}</p>
+                </div>
+            @elseif(($smtpHealth['status'] ?? 'unknown') === 'healthy')
+                <div class="text-xs text-emerald-800 font-semibold">
+                    Last outbound SMTP transmission succeeded {{ !empty($smtpHealth['checked_at']) ? \Carbon\Carbon::parse($smtpHealth['checked_at'])->diffForHumans() : 'recently' }}.
+                </div>
+            @else
+                <div class="text-xs text-slate-500">No recent SMTP diagnostic telemetry recorded yet. Run Live SMTP Tester in Mail Settings to verify connectivity.</div>
+            @endif
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-3">
+            <div class="flex items-center justify-between gap-3">
+                <h6 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                    <i class="bi bi-shield-fill-check text-emerald-600"></i>
+                    Anti-Spam &amp; Bot Shield Telemetry
+                </h6>
+                <a href="{{ route('admin.inquiries.index', ['view' => 'quarantine']) }}" class="text-xs font-bold text-primary hover:underline">Open Quarantine &rarr;</a>
+            </div>
+            <div class="grid grid-cols-3 gap-3 text-xs">
+                <div class="rounded-xl bg-slate-50 border border-slate-200 p-3">
+                    <div class="text-slate-500">Blocked (24h / 7d)</div>
+                    <div class="font-black text-slate-900">{{ number_format($spamTelemetry['blocked_24h'] ?? 0) }} / {{ number_format($spamTelemetry['blocked_7d'] ?? 0) }}</div>
+                </div>
+                <div class="rounded-xl bg-slate-50 border border-slate-200 p-3">
+                    <div class="text-slate-500">IPs Auto-Blocked</div>
+                    <div class="font-black text-rose-700">{{ number_format($spamTelemetry['auto_ip_blocked_7d'] ?? 0) }}</div>
+                </div>
+                <div class="rounded-xl bg-slate-50 border border-slate-200 p-3">
+                    <div class="text-slate-500">Quarantined Rows</div>
+                    <div class="font-black text-amber-700">{{ number_format($system['quarantined_inquiries'] ?? 0) }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Poor Performing Routes & System Health Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">

@@ -67,7 +67,8 @@ Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index
 Route::post('/api/gallery/report-broken', [GalleryController::class, 'reportBroken'])->middleware('throttle:10,1')->name('api.gallery.report-broken');
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
-Route::post('/contact', [PageController::class, 'submitContact'])->name('contact.submit');
+Route::post('/contact', [PageController::class, 'submitContact'])->middleware('throttle:10,1')->name('contact.submit');
+Route::get('/security/form-token', [PageController::class, 'issueContactSecurityToken'])->middleware('throttle:30,1')->name('security.form-token');
 Route::get('/faq', [PageController::class, 'faq'])->name('faq');
 Route::redirect('/faqs', '/faq', 301);
 Route::get('/rate-card', [RateCardController::class, 'index'])->name('rate-card');
@@ -326,10 +327,13 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::post('/video-reviews/{id}/toggle-status', [AdminVideoReviewController::class, 'toggleStatus'])->name('video-reviews.toggle-status');
     Route::get('/inquiries/export/csv', [AdminDashboardController::class, 'exportInquiriesCsv'])->name('inquiries.export');
     Route::post('/inquiries/bulk-action', [AdminDashboardController::class, 'bulkInquiriesAction'])->name('inquiries.bulk');
+    Route::post('/inquiries/scan-purge-spam', [AdminDashboardController::class, 'scanAndPurgeSpam'])->name('inquiries.scan-purge-spam');
     Route::get('/inquiries', [AdminDashboardController::class, 'inquiries'])->name('inquiries.index');
     Route::get('/inquiries/{id}', [AdminDashboardController::class, 'viewInquiry'])->name('inquiries.show');
     Route::post('/inquiries/{id}/mark-read', [AdminDashboardController::class, 'markInquiryRead'])->name('inquiries.mark-read');
     Route::post('/inquiries/{id}/status', [AdminDashboardController::class, 'updateInquiryStatus'])->name('inquiries.status');
+    Route::post('/inquiries/{id}/mark-spam', [AdminDashboardController::class, 'markInquirySpam'])->name('inquiries.mark-spam');
+    Route::post('/inquiries/{id}/restore-spam', [AdminDashboardController::class, 'restoreInquirySpam'])->name('inquiries.restore-spam');
     Route::delete('/inquiries/{id}', [AdminDashboardController::class, 'deleteInquiry'])->name('inquiries.destroy');
 
     // Unified Media Library & Asset Management (Images & Videos)

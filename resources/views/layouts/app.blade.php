@@ -1366,6 +1366,9 @@
         };
         window.DunesConfig = {
             email_verification_required: {{ ($settings['email_verification_required'] ?? '1') === '1' ? 'true' : 'false' }},
+            contact_email_otp_required: {{ ($settings['contact_email_otp_required'] ?? '1') === '1' ? 'true' : 'false' }},
+            turnstile_enabled: {{ ($settings['turnstile_enabled'] ?? '0') === '1' && !empty($settings['turnstile_site_key'] ?? '') ? 'true' : 'false' }},
+            turnstile_site_key: @json($settings['turnstile_site_key'] ?? ''),
             site_phone: @json($settings['site_phone'] ?? '+971 50 245 6056'),
             site_whatsapp: @json($settings['site_whatsapp'] ?? '971502456056')
         };

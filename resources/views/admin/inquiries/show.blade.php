@@ -17,16 +17,43 @@
                         'new' => 'bg-rose-50 text-rose-700 border-rose-200',
                         'read' => 'bg-amber-50 text-amber-700 border-amber-200',
                         'replied' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                        'spam' => 'bg-rose-100 text-rose-800 border-rose-300',
                         default => 'bg-slate-100 text-slate-700 border-slate-200',
                     };
                 @endphp
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border capitalize {{ $statusBadge }}">
-                    {{ $inquiry->status === 'new' ? 'Action Needed' : ($inquiry->status === 'read' ? 'In Review' : 'Replied') }}
+                    {{ $inquiry->status === 'new' ? 'Action Needed' : ($inquiry->status === 'read' ? 'In Review' : ($inquiry->status === 'spam' ? 'Spam Quarantine' : 'Replied')) }}
                 </span>
+                @if($inquiry->is_verified)
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <i class="bi bi-patch-check-fill"></i> Email Verified
+                    </span>
+                @endif
+                @if((int)($inquiry->spam_score ?? 0) > 0)
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                        <i class="bi bi-shield-exclamation"></i> Risk Score: {{ (int)$inquiry->spam_score }}/100
+                    </span>
+                @endif
             </div>
         </div>
         
         <div class="flex flex-wrap items-center gap-2">
+            @if($inquiry->is_spam || $inquiry->status === 'spam')
+                <form action="{{ route('admin.inquiries.restore-spam', $inquiry->id) }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition-all cursor-pointer">
+                        <i class="bi bi-arrow-counterclockwise"></i> Not Spam (Restore)
+                    </button>
+                </form>
+            @else
+                <form action="{{ route('admin.inquiries.mark-spam', $inquiry->id) }}" method="POST" class="inline">
+                    @csrf
+                    <input type="hidden" name="block_ip" value="1">
+                    <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-xs transition-all cursor-pointer">
+                        <i class="bi bi-shield-fill-x"></i> Mark Spam &amp; Block IP
+                    </button>
+                </form>
+            @endif
             <a href="{{ route('admin.bookings.create', ['name' => $inquiry->name, 'email' => $inquiry->email, 'phone' => $inquiry->phone, 'special_requests' => 'Inquiry #' . $inquiry->id . ': ' . $inquiry->subject]) }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold shadow-xs transition-all">
                 <i class="bi bi-calendar-plus-fill"></i> Convert to Booking
             </a>

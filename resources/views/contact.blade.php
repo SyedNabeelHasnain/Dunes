@@ -149,13 +149,25 @@
             <div class="{{ $cmsSvc->isSectionVisible('contact', 'office_info') ? 'lg:col-span-7' : 'lg:col-span-12 max-w-3xl mx-auto w-full' }}">
                 <div class="bg-white rounded-2xl p-6 sm:p-10 border border-slate-200 shadow-md">
                     <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-6">{{ __('ui.contact_page.send_message') }}</h2>
-                    <form id="contactForm" method="POST" action="/ajax.php" autocomplete="off" class="needs-validation space-y-5" novalidate>
+                    <form id="contactForm" method="POST" action="{{ route('contact.submit') }}" autocomplete="off" class="needs-validation space-y-5" novalidate
+                          data-pow-difficulty="{{ (int) ($contactSecurityChallenge['difficulty'] ?? 3) }}"
+                          data-min-dwell="{{ (int) ($contactSecurityChallenge['min_dwell_seconds'] ?? 3) }}"
+                          data-otp-required="{{ ($contactOtpRequired ?? true) ? '1' : '0' }}"
+                          data-token-endpoint="{{ route('security.form-token') }}">
                         @csrf
-                        <!-- Honeypot field -->
-                        <div style="position:absolute;left:-9999px">
-                            <input type="text" name="website_url" value="" tabindex="-1" autocomplete="off">
+                        <!-- Multi-Trap Invisible Honeypot Fields (never filled by real humans) -->
+                        <div style="position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;" aria-hidden="true">
+                            <label for="hp_website_url">Website</label>
+                            <input type="text" id="hp_website_url" name="website_url" value="" tabindex="-1" autocomplete="new-password">
+                            <label for="hp_company_fax">Fax</label>
+                            <input type="text" id="hp_company_fax" name="company_fax" value="" tabindex="-1" autocomplete="new-password">
+                            <label for="hp_confirm_email_alt">Confirm Alternate Email</label>
+                            <input type="email" id="hp_confirm_email_alt" name="confirm_email_alt" value="" tabindex="-1" autocomplete="new-password">
                         </div>
                         <input type="hidden" name="action" value="contact">
+                        <input type="hidden" name="_dunes_token" id="contactSecurityToken" value="{{ $contactSecurityChallenge['token'] ?? '' }}">
+                        <input type="hidden" name="_dunes_pow" id="contactSecurityPow" value="">
+                        <input type="hidden" name="_dunes_telemetry" id="contactSecurityTelemetry" value="">
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
@@ -167,21 +179,95 @@
                                     'placeholder' => __('ui.contact_page.full_name'),
                                     'autocomplete' => 'name',
                                     'required' => true,
-                                    'inputAttrs' => ['data-form' => 'contact', 'data-field' => 'name']
+                                    'inputAttrs' => ['maxlength' => '80', 'data-form' => 'contact', 'data-field' => 'name']
                                 ]) !!}
                             </div>
-                            <div>
-                                {!! renderFloatingInput([
-                                    'type' => 'email',
-                                    'id' => 'email',
-                                    'name' => 'email',
-                                    'label' => __('ui.contact_page.email_address'),
-                                    'placeholder' => __('ui.contact_page.email_address'),
-                                    'autocomplete' => 'email',
-                                    'required' => true,
-                                    'inputAttrs' => ['data-form' => 'contact', 'data-field' => 'email']
-                                ]) !!}
+
+                            <!-- Email Address + Interactive On-Spot OTP Verification (Mirroring Booking Flow) -->
+                            <div id="contactEmailSection">
+                                <div class="flex items-center justify-between mb-1">
+                                    <label class="block text-[11px] font-extrabold text-slate-700 uppercase tracking-wider" for="email">{{ __('ui.contact_page.email_address') }} <span class="text-rose-500">*</span></label>
+                                    <span id="contactEmailStatusBadge" class="hidden items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold tracking-wide transition-all"></span>
+                                </div>
+                                <div class="relative flex items-center rounded-xl bg-white border border-slate-300 shadow-2xs focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all" id="contactEmailContainer">
+                                    <input type="email"
+                                           class="w-full pl-3.5 pr-24 py-3 rounded-xl bg-transparent text-sm font-semibold text-slate-900 border-0 focus:outline-none placeholder:text-slate-400"
+                                           id="email"
+                                           name="email"
+                                           placeholder="{{ __('ui.contact_page.email_address') }}"
+                                           autocomplete="email"
+                                           required
+                                           data-form="contact"
+                                           data-field="email">
+                                    <div class="absolute right-1.5 inset-y-1.5 flex items-center" id="contactEmailActionSlot">
+                                        <span id="contactEmailCheckSpinner" class="hidden px-2.5 text-primary items-center">
+                                            <span class="inline-block w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
+                                        </span>
+                                        <button type="button" id="contactSendEmailOtpBtn" class="hidden h-full px-3 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-[11px] uppercase tracking-wider shadow-xs transition-all cursor-pointer items-center gap-1 shrink-0">
+                                            <i class="bi bi-shield-lock-fill text-xs"></i>
+                                            <span>{{ __('ui.booking.verify') }}</span>
+                                        </button>
+                                        <span id="contactEmailVerifiedIcon" class="hidden px-2.5 text-emerald-500 text-lg items-center" title="Email Verified">
+                                            <i class="bi bi-patch-check-fill"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <p id="contactEmailHelperText" class="text-[11px] font-medium text-slate-500 mt-1 hidden"></p>
                             </div>
+
+                            <!-- Interactive 6-Digit OTP Verification Card (Full Width Below Name/Email Row) -->
+                            <div class="sm:col-span-2 hidden transition-all duration-300" id="contactOtpFieldsWrapper">
+                                <div class="rounded-2xl bg-gradient-to-br from-orange-50/90 via-white to-amber-50/60 border-2 border-orange-200/90 p-4 shadow-md">
+                                    <div class="flex items-start justify-between gap-2 mb-3">
+                                        <div class="flex items-center gap-2.5 min-w-0">
+                                            <div class="w-8 h-8 rounded-xl bg-orange-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                                                <i class="bi bi-envelope-check-fill text-sm"></i>
+                                            </div>
+                                            <div class="min-w-0">
+                                                <div class="text-xs font-black text-slate-900 uppercase tracking-wide leading-tight">{{ __('ui.booking.email_verification') }}</div>
+                                                <div class="text-[11px] text-slate-600 truncate mt-0.5">
+                                                    6-digit verification code sent to <span id="contactOtpTargetEmail" class="font-bold text-slate-900">your email</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200/80 text-[10px] font-extrabold shrink-0">Valid 5m</span>
+                                    </div>
+
+                                    <input type="hidden" id="contactOtpCode" value="">
+
+                                    <div class="grid grid-cols-6 gap-1.5 sm:gap-2.5 my-2.5 max-w-md mx-auto" id="contactOtpDigitsContainer" dir="ltr">
+                                        @for($d = 0; $d < 6; $d++)
+                                        <input type="text"
+                                               inputmode="numeric"
+                                               pattern="[0-9]*"
+                                               maxlength="1"
+                                               data-contact-otp-index="{{ $d }}"
+                                               autocomplete="{{ $d === 0 ? 'one-time-code' : 'off' }}"
+                                               aria-label="Verification Digit {{ $d + 1 }}"
+                                               class="contact-otp-digit-box w-full h-11 sm:h-12 text-center font-mono font-black text-base sm:text-lg text-slate-900 bg-white border-2 border-slate-200 rounded-xl shadow-2xs focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all">
+                                        @endfor
+                                    </div>
+
+                                    <div id="contactOtpErrorMsg" class="hidden items-center gap-1.5 text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2 my-2">
+                                        <i class="bi bi-exclamation-circle-fill shrink-0"></i>
+                                        <span id="contactOtpErrorText">Invalid verification code.</span>
+                                    </div>
+
+                                    <div class="flex flex-wrap items-center justify-between gap-2 mt-3 pt-2.5 border-t border-orange-200/60">
+                                        <div class="flex items-center gap-2 text-xs">
+                                            <span class="text-slate-500 font-semibold text-[11px]" id="contactOtpTimer"></span>
+                                            <button type="button" class="font-extrabold text-primary hover:text-primary-dark hover:underline text-xs cursor-pointer disabled:opacity-50 disabled:pointer-events-none py-1" id="contactResendOtpBtn">
+                                                <i class="bi bi-arrow-repeat me-0.5"></i>{{ __('ui.booking.resend_code') }}
+                                            </button>
+                                        </div>
+                                        <button type="button" id="contactVerifyOtpBtn" class="px-4 py-2 min-h-[42px] rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-sm transition-all cursor-pointer inline-flex items-center gap-1.5 ms-auto">
+                                            <i class="bi bi-check2-circle"></i>
+                                            <span>{{ __('ui.booking.verify') }} Code</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div>
                                 {!! renderFloatingInput([
                                     'type' => 'tel',
@@ -202,7 +288,7 @@
                                     'label' => __('ui.contact_page.subject'),
                                     'placeholder' => __('ui.contact_page.subject'),
                                     'autocomplete' => 'off',
-                                    'inputAttrs' => ['data-form' => 'contact', 'data-field' => 'subject']
+                                    'inputAttrs' => ['maxlength' => '160', 'data-form' => 'contact', 'data-field' => 'subject']
                                 ]) !!}
                             </div>
                         </div>
@@ -215,9 +301,15 @@
                                 'placeholder' => __('ui.contact_page.your_message'),
                                 'autocomplete' => 'off',
                                 'required' => true,
-                                'inputAttrs' => ['style' => 'height: 140px', 'data-form' => 'contact', 'data-field' => 'message']
+                                'inputAttrs' => ['maxlength' => '5000', 'style' => 'height: 140px', 'data-form' => 'contact', 'data-field' => 'message']
                             ]) !!}
                         </div>
+
+                        @if(!empty($turnstileEnabled) && !empty($turnstileSiteKey))
+                        <div class="pt-1">
+                            <div class="cf-turnstile" data-sitekey="{{ $turnstileSiteKey }}" data-theme="light"></div>
+                        </div>
+                        @endif
 
                         <div>
                             <div class="legal-agreement-wrapper flex items-start gap-2.5 min-h-[44px]">
@@ -235,14 +327,18 @@
 
                         <!-- Success Message Banner -->
                         <div class="hidden" id="contactSuccessAlert">
-                            <div class="bg-emerald-50 text-emerald-700 border border-emerald-200 p-3 rounded-xl text-xs sm:text-sm font-semibold">Thank you! Your message has been sent successfully.</div>
+                            <div class="bg-emerald-50 text-emerald-700 border border-emerald-200 p-3 rounded-xl text-xs sm:text-sm font-semibold" id="contactSuccessMessage">Thank you! Your message has been sent successfully.</div>
                         </div>
 
-                        <div class="text-center pt-2">
+                        <div class="text-center pt-2 space-y-2.5">
                             <button type="submit" class="btn-desert-animated text-base font-bold rounded-full px-8 py-3.5 text-white shadow-md inline-flex items-center gap-2 cursor-pointer w-full sm:w-auto justify-center" id="submitContactBtn">
                                 <span>{{ __('ui.contact_page.send_btn') }}</span>
                                 <i class="bi bi-send"></i>
                             </button>
+                            <div class="text-[11px] text-slate-400 flex items-center justify-center gap-1.5">
+                                <i class="bi bi-shield-lock-fill text-emerald-600"></i>
+                                <span>Protected by Multi-Layer Anti-Spam &amp; Instant Email Verification</span>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -323,4 +419,9 @@
         </div>
     </div>
 </section>
+@if(!empty($turnstileEnabled) && !empty($turnstileSiteKey))
+@push('scripts')
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+@endpush
+@endif
 @endsection

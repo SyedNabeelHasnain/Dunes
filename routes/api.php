@@ -32,13 +32,13 @@ Route::prefix('v1')->group(function () {
 
     // Email OTP Verification
     Route::post('/email/status', [EmailVerificationController::class, 'status'])->middleware('throttle:20,1');
-    Route::post('/email/otp/send', [EmailVerificationController::class, 'sendOtp'])->middleware('throttle:6,1');
+    Route::post('/email/otp/send', [EmailVerificationController::class, 'sendOtp'])->middleware('throttle:5,1');
     Route::post('/email/otp/verify', [EmailVerificationController::class, 'verifyOtp'])->middleware('throttle:10,1');
 
     // Coupon Validation & Marketing
     Route::post('/coupon/validate', [CouponController::class, 'validateCoupon'])->middleware('throttle:30,1');
     Route::get('/coupon/featured', [CouponController::class, 'featured']);
-    Route::post('/welcome-offer/claim', [WelcomeOfferController::class, 'claimOffer'])->middleware('throttle:15,1');
+    Route::post('/welcome-offer/claim', [WelcomeOfferController::class, 'claimOffer'])->middleware('throttle:6,1');
 
     // Booking Checkout & Draft Lead Recovery
     Route::post('/booking/checkout', [BookingController::class, 'checkout'])->middleware('throttle:20,1');
@@ -49,7 +49,7 @@ Route::prefix('v1')->group(function () {
     Route::post('/webhooks/ziina', [ZiinaWebhookController::class, 'handleWebhook'])->middleware('throttle:60,1');
 
     // Contact submission
-    Route::post('/contact/submit', [PageController::class, 'submitContact'])->middleware('throttle:20,1');
+    Route::post('/contact/submit', [PageController::class, 'submitContact'])->middleware('throttle:6,1');
 
     // WhatsApp lead logging
     Route::post('/whatsapp/log', [PageController::class, 'logWhatsapp'])->middleware('throttle:20,1');

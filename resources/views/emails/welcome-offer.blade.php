@@ -8,7 +8,10 @@
             Exclusive Welcome Gift
         </span>
         <h1 style="color: #1a1a1a; font-size: 24px; font-weight: 800; margin: 0 0 10px 0;">Unlock 25% OFF Your Dubai Desert Adventure</h1>
-        <p style="color: #666; font-size: 15px; line-height: 1.5; margin: 0;">Dear {{ $name }}, here is your exclusive one-time discount voucher for your upcoming Dubai safari experience!</p>
+        @php
+            $safeWelcomeName = \App\Services\Security\ContactSpamGuardService::sanitizeGreetingName($name ?? null);
+        @endphp
+        <p style="color: #666; font-size: 15px; line-height: 1.5; margin: 0;">Dear {{ $safeWelcomeName }}, here is your exclusive one-time discount voucher for your upcoming Dubai safari experience!</p>
     </div>
 
     <!-- Voucher Ticket Box -->

@@ -91,7 +91,10 @@ class AdminSettingController extends Controller
     {
         $settings = Setting::where('setting_key', 'like', 'google_%')
             ->orWhere('setting_key', 'like', 'recaptcha_%')
+            ->orWhere('setting_key', 'like', 'turnstile_%')
+            ->orWhere('setting_key', 'like', 'antispam_%')
             ->orWhereIn('setting_key', [
+                'contact_email_otp_required',
                 'site_latitude', 'site_longitude', 'site_postal_code',
                 'company_license_number', 'site_address', 'site_name', 'site_phone',
                 'google_place_id', 'google_cid', 'google_review_url',
@@ -100,7 +103,9 @@ class AdminSettingController extends Controller
             ->get()
             ->pluck('setting_value', 'setting_key');
 
-        return view('admin.settings.google', compact('settings'));
+        $spamTelemetry = app(\App\Services\Security\ContactSpamGuardService::class)->getTelemetrySummary();
+
+        return view('admin.settings.google', compact('settings', 'spamTelemetry'));
     }
 
     /**
@@ -192,6 +197,7 @@ class AdminSettingController extends Controller
             'notification_contact_admin_enabled',
             'notification_contact_recipients',
             'notification_contact_customer_enabled',
+            'notification_contact_customer_mode',
             'notification_review_admin_enabled',
             'notification_review_recipients',
             'notification_webhook_enabled',
@@ -230,6 +236,7 @@ class AdminSettingController extends Controller
             'notification_contact_admin_enabled' => 'nullable|in:0,1',
             'notification_contact_recipients' => 'nullable|string|max:1000',
             'notification_contact_customer_enabled' => 'nullable|in:0,1',
+            'notification_contact_customer_mode' => 'nullable|string|in:verified_only,clean_all,disabled',
             'notification_review_admin_enabled' => 'nullable|in:0,1',
             'notification_review_recipients' => 'nullable|string|max:1000',
             'notification_webhook_enabled' => 'nullable|in:0,1',
@@ -263,6 +270,7 @@ class AdminSettingController extends Controller
             'notification_booking_recipients',
             'notification_whatsapp_recipients',
             'notification_contact_recipients',
+            'notification_contact_customer_mode',
             'notification_review_recipients',
             'notification_webhook_url',
             'notification_webhook_secret',
@@ -374,6 +382,11 @@ class AdminSettingController extends Controller
             'google_active', 'google_gtm_id', 'google_ga4_id', 'google_analytics_id', 'google_tag_manager_id',
             'google_ads_id', 'google_conversion_label', 'google_site_verification', 'bing_site_verification', 'yandex_site_verification', 'baidu_site_verification', 'clarity_id', 'clarity_active', 'google_maps_api_key', 'google_places_api_key',
             'recaptcha_site_key', 'recaptcha_secret_key',
+            'turnstile_enabled', 'turnstile_site_key', 'turnstile_secret_key',
+            'antispam_enabled', 'antispam_mode', 'antispam_recaptcha_enabled', 'antispam_recaptcha_min_score',
+            'antispam_min_dwell_seconds', 'antispam_auto_block_ip_enabled', 'antispam_auto_block_threshold',
+            'antispam_check_email_mx', 'antispam_custom_blocked_keywords', 'antispam_custom_blocked_domains',
+            'contact_email_otp_required',
             'google_place_id', 'google_cid', 'google_review_url',
             'site_latitude', 'site_longitude', 'site_postal_code',
             'google_business_hours', 'google_service_area', 'google_primary_category',

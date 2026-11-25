@@ -50,6 +50,15 @@ class EmailVerificationController extends Controller
             ]);
         }
 
+        // Anti-OTP-Bombing & Disposable/MX Domain Guard
+        $otpGuard = app(\App\Services\Security\ContactSpamGuardService::class)->guardOtpRequest($request, $email);
+        if (! $otpGuard['allowed']) {
+            return response()->json([
+                'success' => false,
+                'message' => $otpGuard['message'] ?: 'Unable to dispatch verification code at this time.',
+            ], (int) ($otpGuard['http_status'] ?? 422));
+        }
+
         // Global rate limiting per email (max 5 OTPs per 10 minutes)
         $emailRateKey = 'send_otp:'.md5($email);
         if (RateLimiter::tooManyAttempts($emailRateKey, 5)) {
@@ -99,19 +108,24 @@ class EmailVerificationController extends Controller
             Log::error('Failed to write email OTP audit log: '.$e->getMessage());
         }
 
-        // Send the OTP email using Laravel Mail facade
+        // Send the OTP email using live runtime SMTP / Failover config
         try {
+            if (! app()->environment('testing')) {
+                app(\App\Services\EmailMarketingService::class)->applySmtpConfig();
+            }
             $fromEmail = app(SettingsService::class)->getFromEmail();
             Mail::to($email)->send((new OtpMail($otp))->from($fromEmail, 'Dunes Discovery Tourism'));
+            app(\App\Services\Mail\SmtpDiagnosticService::class)->recordSuccess('email_otp');
 
             return response()->json(['success' => true, 'message' => 'OTP sent successfully to '.$email]);
 
         } catch (\Throwable $e) {
             Log::error("Failed to dispatch OTP email to {$email}: ".$e->getMessage());
+            app(\App\Services\Mail\SmtpDiagnosticService::class)->recordFailure('email_otp', $e, $email);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to send OTP. Please check your email address and try again.',
+                'message' => 'Failed to send verification code. Please check your email address or contact us on WhatsApp.',
             ]);
         }
     }
