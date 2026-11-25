@@ -102,6 +102,7 @@ class AdminBlogController extends Controller
 
         Cache::forget('sitemap_blogs_xml');
         Cache::forget('sitemap_images_xml');
+        \App\Http\Controllers\SitemapController::flushAllSitemapCaches();
 
         return redirect()->route('admin.blogs.index')->with('success', 'Blog post created successfully.');
     }
@@ -169,6 +170,14 @@ class AdminBlogController extends Controller
 
         $post->update($data);
 
+        try {
+            if (method_exists($post, 'recordRevision')) {
+                $post->refresh();
+                $post->recordRevision('Updated blog article via CMS editor');
+            }
+        } catch (\Throwable) {
+        }
+
         // Sync tags
         if ($request->has('tags')) {
             $tagsInput = (array) $request->input('tags', []);
@@ -190,6 +199,7 @@ class AdminBlogController extends Controller
 
         Cache::forget('sitemap_blogs_xml');
         Cache::forget('sitemap_images_xml');
+        \App\Http\Controllers\SitemapController::flushAllSitemapCaches();
 
         return redirect()->route('admin.blogs.index')->with('success', 'Blog post updated successfully.');
     }
@@ -204,6 +214,7 @@ class AdminBlogController extends Controller
 
         Cache::forget('sitemap_blogs_xml');
         Cache::forget('sitemap_images_xml');
+        \App\Http\Controllers\SitemapController::flushAllSitemapCaches();
 
         return redirect()->route('admin.blogs.index')->with('success', 'Blog post deleted successfully.');
     }
@@ -222,6 +233,7 @@ class AdminBlogController extends Controller
 
         Cache::forget('sitemap_blogs_xml');
         Cache::forget('sitemap_images_xml');
+        \App\Http\Controllers\SitemapController::flushAllSitemapCaches();
 
         return response()->json([
             'success' => true,

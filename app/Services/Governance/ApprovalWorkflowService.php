@@ -2,14 +2,17 @@
 
 namespace App\Services\Governance;
 
+use App\Http\Controllers\SitemapController;
 use App\Models\ChangeApproval;
 use App\Models\RedirectRule;
 use App\Models\SeoTemplate;
 use App\Models\Setting;
 use App\Models\User;
 use App\Services\RedirectManagerService;
+use App\Services\Seo\RobotsTxtService;
 use App\Services\SettingsService;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
 /**
@@ -67,35 +70,37 @@ class ApprovalWorkflowService
 
         $payload = is_array($approval->payload) ? $approval->payload : [];
 
-        match ($approval->section) {
-            'robots_txt' => $this->applyRobotsTxt($payload),
-            'seo_global', 'privacy', 'security', 'tracking' => $this->applySettingsBatch($payload),
-            'seo_template' => $this->applySeoTemplate($payload),
-            'redirect_rule' => $this->applyRedirectRule($payload),
-            default => null,
-        };
+        return DB::transaction(function () use ($approval, $reviewer, $notes, $payload) {
+            match ($approval->section) {
+                'robots_txt' => $this->applyRobotsTxt($payload),
+                'seo_global', 'privacy', 'security', 'tracking' => $this->applySettingsBatch($payload),
+                'seo_template' => $this->applySeoTemplate($payload),
+                'redirect_rule' => $this->applyRedirectRule($payload),
+                default => null,
+            };
 
-        $approval->update([
-            'status' => 'applied',
-            'reviewed_by' => $reviewer->id,
-            'review_notes' => $notes,
-            'reviewed_at' => now(),
-            'applied_at' => now(),
-        ]);
+            $approval->update([
+                'status' => 'applied',
+                'reviewed_by' => $reviewer->id,
+                'review_notes' => $notes,
+                'reviewed_at' => now(),
+                'applied_at' => now(),
+            ]);
 
-        $this->audit->log(
-            section: $approval->section,
-            action: 'approved',
-            settingKey: $approval->target_key,
-            oldValue: $approval->previous_payload,
-            newValue: $payload,
-            entityType: ChangeApproval::class,
-            entityId: $approval->id,
-            summary: "Approved & applied (#{$approval->id}): {$approval->summary}",
-            actor: $reviewer,
-        );
+            $this->audit->log(
+                section: $approval->section,
+                action: 'approved',
+                settingKey: $approval->target_key,
+                oldValue: $approval->previous_payload,
+                newValue: $payload,
+                entityType: ChangeApproval::class,
+                entityId: $approval->id,
+                summary: "Approved & applied (#{$approval->id}): {$approval->summary}",
+                actor: $reviewer,
+            );
 
-        return $approval->fresh();
+            return $approval->fresh();
+        });
     }
 
     public function reject(ChangeApproval $approval, User $reviewer, ?string $notes = null): ChangeApproval
@@ -129,7 +134,7 @@ class ApprovalWorkflowService
     private function applyRobotsTxt(array $payload): void
     {
         if (array_key_exists('robots_txt_content', $payload)) {
-            Setting::setVal('robots_txt_content', (string) $payload['robots_txt_content']);
+            app(RobotsTxtService::class)->persistContent((string) $payload['robots_txt_content']);
         }
         if (array_key_exists('robots_ai_policy', $payload)) {
             Setting::setVal('robots_ai_policy', json_encode($payload['robots_ai_policy']));
@@ -146,6 +151,11 @@ class ApprovalWorkflowService
             }
             Setting::setVal((string) $key, is_array($val) ? json_encode($val) : (string) $val);
         }
+        Cache::forget('site_settings_cache');
+        Cache::forget('site_home_cache');
+        Cache::forget('site_llms_txt');
+        Cache::forget('site_llms_full_txt');
+        SitemapController::flushAllSitemapCaches();
         app(SettingsService::class)->clearCache();
     }
 
@@ -160,6 +170,7 @@ class ApprovalWorkflowService
             ['content_type' => $contentType],
             collect($payload)->except('content_type')->all()
         );
+        SitemapController::flushAllSitemapCaches();
     }
 
     private function applyRedirectRule(array $payload): void

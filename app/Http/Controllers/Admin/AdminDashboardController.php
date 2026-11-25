@@ -346,14 +346,42 @@ class AdminDashboardController extends Controller
                 ->limit(5)
                 ->get();
 
-            // 9. Recent Request Logs (Paginated)
+            // 9. Observed Conversion Funnel Telemetry (Real DB counts only)
+            $tourSessionViews = $applyFilter(RequestLog::where('request_timestamp', '>=', $startDate)
+                ->where('bot_indicator', 'Likely Human')
+                ->where(function ($q) {
+                    $q->where('entity_type', 'tour')
+                        ->orWhere('request_uri', 'like', '%safari%')
+                        ->orWhere('request_uri', 'like', '%buggy%')
+                        ->orWhere('request_uri', 'like', '%tour%');
+                }))
+                ->distinct('session_id')
+                ->count('session_id');
+            $draftCheckouts = Booking::where('created_at', '>=', $startDate)->count();
+            $whatsappLeadsWindow = WhatsappInquiry::where('created_at', '>=', $startDate)->count();
+            $confirmedBookingsWindow = Booking::where('created_at', '>=', $startDate)
+                ->whereIn('status', ['confirmed', 'completed'])
+                ->count();
+
+            $conversionFunnel = [
+                'human_sessions' => $uniqueVisitors,
+                'tour_interest_sessions' => $tourSessionViews,
+                'lead_or_checkout_starts' => $draftCheckouts + $whatsappLeadsWindow,
+                'draft_checkouts' => $draftCheckouts,
+                'whatsapp_leads' => $whatsappLeadsWindow,
+                'confirmed_bookings' => $confirmedBookingsWindow,
+                'session_to_lead_pct' => $uniqueVisitors > 0 ? round((($draftCheckouts + $whatsappLeadsWindow) / $uniqueVisitors) * 100, 1) : 0.0,
+                'session_to_booking_pct' => $uniqueVisitors > 0 ? round(($confirmedBookingsWindow / $uniqueVisitors) * 100, 2) : 0.0,
+            ];
+
+            // 10. Recent Request Logs (Paginated)
             $logs = $applyFilter(RequestLog::orderBy('request_timestamp', 'desc'))->paginate(25);
             $ignoredCount = count($ignoredIps);
 
             return view('admin.analytics.index', compact(
                 'days', 'totalPageviews', 'humanPageviews', 'uniqueVisitors', 'uniqueIPs',
                 'topPages', 'topCountries', 'trafficSources', 'topReferrers', 'campaigns', 'dailyTrend',
-                'devices', 'browsers', 'logs', 'ignoredCount', 'ignoredIps'
+                'devices', 'browsers', 'logs', 'ignoredCount', 'ignoredIps', 'conversionFunnel'
             ));
         } catch (\Throwable $e) {
             Log::error('Admin analytics error: '.$e->getMessage(), [

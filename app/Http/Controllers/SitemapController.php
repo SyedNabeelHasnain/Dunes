@@ -6,6 +6,7 @@ use App\Models\BlogPost;
 use App\Models\Language;
 use App\Models\Page;
 use App\Models\RedirectRule;
+use App\Models\SeoTemplate;
 use App\Models\Tour;
 use App\Models\WikiArticle;
 use App\Models\WikiPillar;
@@ -26,9 +27,43 @@ class SitemapController extends Controller
             'sitemap_images_xml',
             'sitemap_wiki_xml',
             'sitemap_videos_xml',
+            'site_llms_txt',
+            'site_llms_full_txt',
         ] as $key) {
             Cache::forget($key);
         }
+    }
+
+    /**
+     * Resolve content-type SEO template sitemap preferences (priority, changefreq, enabled).
+     */
+    protected function loadSeoTemplate(string $contentType): ?SeoTemplate
+    {
+        try {
+            if (! Schema::hasTable('seo_templates')) {
+                return null;
+            }
+
+            return SeoTemplate::where('content_type', $contentType)->first();
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * Determine whether an entity has an explicit external cross-domain canonical URL.
+     */
+    protected function isExternalCanonical(?string $canonicalUrl): bool
+    {
+        $canonicalUrl = trim((string) $canonicalUrl);
+        if ($canonicalUrl === '' || (! str_starts_with($canonicalUrl, 'http://') && ! str_starts_with($canonicalUrl, 'https://'))) {
+            return false;
+        }
+
+        $targetHost = strtolower((string) parse_url($canonicalUrl, PHP_URL_HOST));
+        $appHost = strtolower((string) parse_url(url('/'), PHP_URL_HOST));
+
+        return $targetHost !== '' && $appHost !== '' && $targetHost !== $appHost;
     }
 
     /**
@@ -99,14 +134,26 @@ class SitemapController extends Controller
         $wikiUpdatedAt = $latestWiki?->updated_at;
         $latestImageDate = collect([$tourUpdatedAt, $blogUpdatedAt, $wikiUpdatedAt])->filter()->max();
 
-        $subMaps = [
-            url('/sitemap-tours.xml') => $tourUpdatedAt ? $tourUpdatedAt->toAtomString() : $now,
-            url('/sitemap-blogs.xml') => $blogUpdatedAt ? $blogUpdatedAt->toAtomString() : $now,
-            url('/sitemap-wiki.xml') => $wikiUpdatedAt ? $wikiUpdatedAt->toAtomString() : $now,
-            url('/sitemap-pages.xml') => $now,
-            url('/sitemap-images.xml') => $latestImageDate ? $latestImageDate->toAtomString() : $now,
-            url('/sitemap-videos.xml') => $now,
-        ];
+        $subMaps = [];
+        $tourTpl = $this->loadSeoTemplate('tour');
+        $blogTpl = $this->loadSeoTemplate('blog_post');
+        $wikiTpl = $this->loadSeoTemplate('wiki_article');
+        $pageTpl = $this->loadSeoTemplate('page');
+
+        if (! $tourTpl || $tourTpl->sitemap_enabled !== false) {
+            $subMaps[url('/sitemap-tours.xml')] = $tourUpdatedAt ? $tourUpdatedAt->toAtomString() : $now;
+        }
+        if (! $blogTpl || $blogTpl->sitemap_enabled !== false) {
+            $subMaps[url('/sitemap-blogs.xml')] = $blogUpdatedAt ? $blogUpdatedAt->toAtomString() : $now;
+        }
+        if (! $wikiTpl || $wikiTpl->sitemap_enabled !== false) {
+            $subMaps[url('/sitemap-wiki.xml')] = $wikiUpdatedAt ? $wikiUpdatedAt->toAtomString() : $now;
+        }
+        if (! $pageTpl || $pageTpl->sitemap_enabled !== false) {
+            $subMaps[url('/sitemap-pages.xml')] = $now;
+        }
+        $subMaps[url('/sitemap-images.xml')] = $latestImageDate ? $latestImageDate->toAtomString() : $now;
+        $subMaps[url('/sitemap-videos.xml')] = $now;
 
         foreach ($subMaps as $loc => $lastmod) {
             $xml .= "  <sitemap>\n";
@@ -129,6 +176,16 @@ class SitemapController extends Controller
     public function tours(): Response
     {
         $content = Cache::remember('sitemap_tours_xml', 3600, function () {
+            $template = $this->loadSeoTemplate('tour');
+            if ($template && $template->sitemap_enabled === false) {
+                return '<?xml version="1.0" encoding="UTF-8"?>'."\n".'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>';
+            }
+
+            $changefreq = ($template && $template->is_active && ! empty($template->sitemap_changefreq)) ? $template->sitemap_changefreq : 'daily';
+            $priority = ($template && $template->is_active && $template->sitemap_priority !== null)
+                ? number_format((float) $template->sitemap_priority, 1, '.', '')
+                : '0.9';
+
             $tours = Tour::where('status', 'active')
                 ->select('id', 'slug', 'name', 'hero_image', 'updated_at')
                 ->with('seoMeta')
@@ -145,6 +202,9 @@ class SitemapController extends Controller
 
             foreach ($tours as $tour) {
                 if ($this->shouldExcludeFromSitemap('/'.$tour->slug, $tour, $redirectMap)) {
+                    continue;
+                }
+                if ($this->isExternalCanonical($tour->seoMeta?->canonical_override)) {
                     continue;
                 }
                 $lastmod = $tour->updated_at ? $tour->updated_at->toAtomString() : now()->toAtomString();
@@ -164,8 +224,8 @@ class SitemapController extends Controller
                     $xml .= "  <url>\n";
                     $xml .= '    <loc>'.$this->xmlEscape($pageLoc)."</loc>\n";
                     $xml .= '    <lastmod>'.$this->xmlEscape($lastmod)."</lastmod>\n";
-                    $xml .= "    <changefreq>daily</changefreq>\n";
-                    $xml .= "    <priority>0.9</priority>\n";
+                    $xml .= '    <changefreq>'.$this->xmlEscape($changefreq)."</changefreq>\n";
+                    $xml .= '    <priority>'.$this->xmlEscape($priority)."</priority>\n";
 
                     foreach ($alternates as $hreflang => $altUrl) {
                         $xml .= '    <xhtml:link rel="alternate" hreflang="'.$this->xmlEscape($hreflang).'" href="'.$this->xmlEscape($altUrl)."\" />\n";
@@ -196,6 +256,16 @@ class SitemapController extends Controller
     public function blogs(): Response
     {
         $content = Cache::remember('sitemap_blogs_xml', 3600, function () {
+            $template = $this->loadSeoTemplate('blog_post');
+            if ($template && $template->sitemap_enabled === false) {
+                return '<?xml version="1.0" encoding="UTF-8"?>'."\n".'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>';
+            }
+
+            $changefreq = ($template && $template->is_active && ! empty($template->sitemap_changefreq)) ? $template->sitemap_changefreq : 'weekly';
+            $priority = ($template && $template->is_active && $template->sitemap_priority !== null)
+                ? number_format((float) $template->sitemap_priority, 1, '.', '')
+                : '0.8';
+
             $blogs = BlogPost::where('status', 'published')
                 ->select('id', 'slug', 'title', 'featured_image', 'canonical_url', 'robots', 'updated_at')
                 ->with('seoMeta')
@@ -216,6 +286,9 @@ class SitemapController extends Controller
                 }
                 $lastmod = $blog->updated_at ? $blog->updated_at->toAtomString() : now()->toAtomString();
                 $rawCanonical = $blog->seoMeta?->canonical_override ?: $blog->canonical_url;
+                if ($this->isExternalCanonical($rawCanonical)) {
+                    continue;
+                }
                 $enUrl = ! empty($rawCanonical) && str_starts_with($rawCanonical, 'http') ? $rawCanonical : url('/blog/'.$blog->slug);
 
                 $alternates = [
@@ -230,8 +303,8 @@ class SitemapController extends Controller
                     $xml .= "  <url>\n";
                     $xml .= '    <loc>'.$this->xmlEscape($pageLoc)."</loc>\n";
                     $xml .= '    <lastmod>'.$this->xmlEscape($lastmod)."</lastmod>\n";
-                    $xml .= "    <changefreq>weekly</changefreq>\n";
-                    $xml .= "    <priority>0.8</priority>\n";
+                    $xml .= '    <changefreq>'.$this->xmlEscape($changefreq)."</changefreq>\n";
+                    $xml .= '    <priority>'.$this->xmlEscape($priority)."</priority>\n";
 
                     foreach ($alternates as $hreflang => $altUrl) {
                         $xml .= '    <xhtml:link rel="alternate" hreflang="'.$this->xmlEscape($hreflang).'" href="'.$this->xmlEscape($altUrl)."\" />\n";
@@ -376,13 +449,17 @@ class SitemapController extends Controller
     public function images(): Response
     {
         $content = Cache::remember('sitemap_images_xml', 3600, function () {
-            $tours = Tour::where('status', 'active')->whereNotNull('hero_image')->get();
-            $blogs = BlogPost::where('status', 'published')->whereNotNull('featured_image')->get();
+            $redirectMap = $this->activeRedirectSourceMap();
+            $tours = Tour::where('status', 'active')->whereNotNull('hero_image')->with('seoMeta')->get();
+            $blogs = BlogPost::where('status', 'published')->whereNotNull('featured_image')->with('seoMeta')->get();
 
             $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
             $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">'."\n";
 
             foreach ($tours as $tour) {
+                if ($this->shouldExcludeFromSitemap('/'.$tour->slug, $tour, $redirectMap)) {
+                    continue;
+                }
                 $imgUrl = resolve_tour_image($tour->hero_image);
                 $xml .= "  <url>\n";
                 $xml .= '    <loc>'.$this->xmlEscape(url('/'.$tour->slug))."</loc>\n";
@@ -395,6 +472,9 @@ class SitemapController extends Controller
             }
 
             foreach ($blogs as $blog) {
+                if ($this->shouldExcludeFromSitemap('/blog/'.$blog->slug, $blog, $redirectMap)) {
+                    continue;
+                }
                 $imgUrl = $this->resolveDiskImage($blog->featured_image, 'images/blog');
                 $xml .= "  <url>\n";
                 $xml .= '    <loc>'.$this->xmlEscape(url('/blog/'.$blog->slug))."</loc>\n";
@@ -453,6 +533,16 @@ class SitemapController extends Controller
     public function wiki(): Response
     {
         $content = Cache::remember('sitemap_wiki_xml', 3600, function () {
+            $template = $this->loadSeoTemplate('wiki_article');
+            if ($template && $template->sitemap_enabled === false) {
+                return '<?xml version="1.0" encoding="UTF-8"?>'."\n".'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>';
+            }
+
+            $artChangefreq = ($template && $template->is_active && ! empty($template->sitemap_changefreq)) ? $template->sitemap_changefreq : 'weekly';
+            $artPriority = ($template && $template->is_active && $template->sitemap_priority !== null)
+                ? number_format((float) $template->sitemap_priority, 2, '.', '')
+                : '0.85';
+
             try {
                 $languages = Language::getActive();
             } catch (\Throwable $e) {
@@ -544,8 +634,8 @@ class SitemapController extends Controller
                         $xml .= "  <url>\n";
                         $xml .= '    <loc>'.$this->xmlEscape($pageLoc)."</loc>\n";
                         $xml .= '    <lastmod>'.$this->xmlEscape($artLastmod)."</lastmod>\n";
-                        $xml .= "    <changefreq>weekly</changefreq>\n";
-                        $xml .= "    <priority>0.85</priority>\n";
+                        $xml .= '    <changefreq>'.$this->xmlEscape($artChangefreq)."</changefreq>\n";
+                        $xml .= '    <priority>'.$this->xmlEscape($artPriority)."</priority>\n";
 
                         foreach ($artAlternates as $hreflang => $altUrl) {
                             $xml .= '    <xhtml:link rel="alternate" hreflang="'.$this->xmlEscape($hreflang).'" href="'.$this->xmlEscape($altUrl)."\" />\n";

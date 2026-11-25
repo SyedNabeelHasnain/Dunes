@@ -33,6 +33,7 @@ class AdminTranslationSettingController extends Controller
             'deepl_auth_key',
             'deepl_endpoint_type',
             'google_translate_api_key',
+            'translation_require_review',
         ])->pluck('setting_value', 'setting_key')->toArray();
 
         $activeService = strtolower(trim($settings['translation_active_service'] ?? 'none'));
@@ -50,7 +51,10 @@ class AdminTranslationSettingController extends Controller
             'deepl_auth_key' => 'nullable|string|max:255',
             'deepl_endpoint_type' => 'nullable|in:free,pro',
             'google_translate_api_key' => 'nullable|string|max:255',
+            'translation_require_review' => 'nullable|boolean',
         ]);
+
+        $validated['translation_require_review'] = $request->boolean('translation_require_review') ? '1' : '0';
 
         foreach ($validated as $key => $value) {
             Setting::updateOrCreate(

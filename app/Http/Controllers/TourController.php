@@ -491,12 +491,82 @@ class TourController extends Controller
                 ];
             })->values();
 
+            $articles = [];
+            $locations = [];
+            if ($cleanQuery !== '') {
+                try {
+                    $matchedBlogs = BlogPost::where('status', 'published')
+                        ->where(function ($qBuilder) use ($cleanQuery) {
+                            $qBuilder->where('title', 'like', "%{$cleanQuery}%")
+                                ->orWhere('excerpt', 'like', "%{$cleanQuery}%")
+                                ->orWhere('slug', 'like', "%{$cleanQuery}%");
+                        })
+                        ->orderByDesc('published_at')
+                        ->limit(4)
+                        ->get();
+
+                    foreach ($matchedBlogs as $b) {
+                        $articles[] = [
+                            'type' => 'blog',
+                            'title' => (string) $b->title,
+                            'excerpt' => Str::limit(strip_tags((string) $b->excerpt), 90),
+                            'url' => function_exists('localized_route') ? localized_route('blog.show', $b->slug) : url('/blog/'.$b->slug),
+                        ];
+                    }
+
+                    $matchedWiki = \App\Models\WikiArticle::published()
+                        ->whereHas('pillar', fn ($pq) => $pq->where('status', 'active'))
+                        ->where(function ($qBuilder) use ($cleanQuery) {
+                            $qBuilder->where('title', 'like', "%{$cleanQuery}%")
+                                ->orWhere('excerpt', 'like', "%{$cleanQuery}%")
+                                ->orWhere('slug', 'like', "%{$cleanQuery}%");
+                        })
+                        ->with('pillar')
+                        ->limit(4)
+                        ->get();
+
+                    foreach ($matchedWiki as $wa) {
+                        if (! $wa->pillar) {
+                            continue;
+                        }
+                        $articles[] = [
+                            'type' => 'wiki',
+                            'title' => (string) $wa->title,
+                            'excerpt' => Str::limit(strip_tags((string) $wa->excerpt), 90),
+                            'url' => function_exists('localized_route')
+                                ? localized_route('wiki.article', ['pillarSlug' => $wa->pillar->slug, 'articleSlug' => $wa->slug])
+                                : url('/wiki/'.$wa->pillar->slug.'/'.$wa->slug),
+                        ];
+                    }
+
+                    $hubs = [
+                        'Lahbab Red Dunes', 'Downtown Dubai', 'Dubai Marina', 'Palm Jumeirah',
+                        'JBR (Jumeirah Beach Residence)', 'Business Bay', 'Deira', 'Bur Dubai',
+                        'Al Barsha', 'Dubai Creek', 'Port Rashid Cruise Terminal', 'Abu Dhabi',
+                    ];
+                    $qLower = mb_strtolower($cleanQuery);
+                    foreach ($hubs as $hub) {
+                        if (str_contains(mb_strtolower($hub), $qLower)) {
+                            $locations[] = [
+                                'name' => $hub,
+                                'type' => 'pickup_or_destination',
+                                'url' => function_exists('localized_route') ? localized_route('tours.index') : url('/tours'),
+                            ];
+                        }
+                    }
+                } catch (\Throwable) {
+                    // Non-blocking supplementary search enrichment
+                }
+            }
+
             return response()->json([
                 'success' => true,
                 'query' => $cleanQuery,
                 'count' => $results->count(),
                 'categories' => $availableCategories,
                 'results' => $results,
+                'articles' => $articles,
+                'locations' => $locations,
             ]);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('liveSearch unexpected error: '.$e->getMessage(), [

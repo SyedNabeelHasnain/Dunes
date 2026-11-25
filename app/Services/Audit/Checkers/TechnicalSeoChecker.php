@@ -3,10 +3,13 @@
 namespace App\Services\Audit\Checkers;
 
 use App\Http\Controllers\SitemapController;
+use App\Models\BlogPost;
 use App\Models\Language;
 use App\Models\RedirectRule;
 use App\Models\Tour;
+use App\Models\WikiArticle;
 use App\Services\RedirectManagerService;
+use App\Services\Seo\CrawlerLogAnalyzerService;
 use Illuminate\Support\Facades\File;
 
 class TechnicalSeoChecker implements AuditCheckerInterface
@@ -136,6 +139,97 @@ class TechnicalSeoChecker implements AuditCheckerInterface
                     'recommended_action' => 'Use standard 2-letter codes (e.g. en, ar, ru, es, it).',
                 ];
             }
+        }
+
+        // 6. Probed Live HTML Canonical & Hreflang Reciprocity Verification
+        foreach (($context['probed_pages'] ?? []) as $path => $probe) {
+            if ((int) ($probe['status'] ?? 500) !== 200) {
+                continue;
+            }
+            $html = (string) ($probe['html'] ?? '');
+            if ($html === '') {
+                continue;
+            }
+            $isNoindex = preg_match('/<meta[^>]+name=["\']robots["\'][^>]+content=["\'][^"\']*noindex/i', $html) === 1;
+            if (! preg_match('/<link[^>]+rel=["\']canonical["\'][^>]+href=["\']([^"\']+)["\']/i', $html)) {
+                $issues[] = [
+                    'category' => 'technical_seo',
+                    'check_key' => 'tech_seo_missing_canonical',
+                    'title' => "Missing Canonical Tag on {$path}",
+                    'description' => 'Rendered HTML lacks a self-referential <link rel="canonical"> declaration.',
+                    'severity' => 'high',
+                    'verification_type' => 'automated',
+                    'affected_url' => url($path),
+                    'evidence' => "No canonical link element found on {$path}.",
+                    'recommended_action' => 'Ensure layout <head> outputs an absolute canonical URL.',
+                ];
+            }
+            if (! $isNoindex && ! preg_match('/<link[^>]+rel=["\']alternate["\'][^>]+hreflang=["\']x-default["\']/i', $html)) {
+                $issues[] = [
+                    'category' => 'technical_seo',
+                    'check_key' => 'tech_seo_missing_hreflang_xdefault',
+                    'title' => "Missing hreflang=\"x-default\" on {$path}",
+                    'description' => 'Indexable multilingual page is missing an x-default hreflang alternate tag.',
+                    'severity' => 'medium',
+                    'verification_type' => 'automated',
+                    'affected_url' => url($path),
+                    'evidence' => "No hreflang='x-default' alternate found on {$path}.",
+                    'recommended_action' => 'Verify international hreflang loop in layouts/app.blade.php.',
+                ];
+            }
+        }
+
+        // 7. Contextual Orphan Page Detection (Published blogs/wiki with 0 inbound contextual links)
+        try {
+            $publishedBlogs = BlogPost::where('status', 'published')->get(['id', 'slug', 'title', 'content']);
+            $publishedWikis = WikiArticle::where('status', 'published')->with('pillar:id,slug')->get(['id', 'pillar_id', 'slug', 'title', 'content']);
+            $tourBodies = Tour::where('status', 'active')->pluck('full_desc')->implode("\n");
+            $allCorpus = strtolower(
+                $tourBodies."\n"
+                .$publishedBlogs->pluck('content')->implode("\n")."\n"
+                .$publishedWikis->pluck('content')->implode("\n")
+            );
+
+            $orphanCount = 0;
+            foreach ($publishedBlogs as $b) {
+                if ($orphanCount >= 5) {
+                    break;
+                }
+                if (! str_contains($allCorpus, '/blog/'.strtolower((string) $b->slug))) {
+                    $orphanCount++;
+                    $issues[] = [
+                        'category' => 'technical_seo',
+                        'check_key' => 'tech_seo_orphan_internal_linking',
+                        'title' => "No Contextual Inbound Links to Blog '{$b->title}'",
+                        'description' => 'While listed on the blog archive, no other tour, blog post, or wiki article links contextually to this URL.',
+                        'severity' => 'low',
+                        'verification_type' => 'partial_automated',
+                        'affected_url' => url('/blog/'.$b->slug),
+                        'evidence' => "Zero occurrences of '/blog/{$b->slug}' across published body copy.",
+                        'recommended_action' => 'Add 1–2 contextual internal links from related tours, wiki pillars, or blog guides.',
+                    ];
+                }
+            }
+        } catch (\Throwable) {
+        }
+
+        // 8. Observed Crawl Waste Anomaly Check (from Request Logs)
+        try {
+            $crawl = app(CrawlerLogAnalyzerService::class)->analyze(14);
+            if (($crawl['total_bot_hits'] ?? 0) >= 20 && ($crawl['crawl_waste_pct'] ?? 0) >= 25.0) {
+                $issues[] = [
+                    'category' => 'technical_seo',
+                    'check_key' => 'tech_seo_elevated_crawl_waste',
+                    'title' => "Elevated Crawler Waste Detected ({$crawl['crawl_waste_pct']}% of Bot Hits)",
+                    'description' => 'Over 25% of observed bot hits in the last 14 days targeted 404 URLs or parameterized query URLs.',
+                    'severity' => 'medium',
+                    'verification_type' => 'automated',
+                    'affected_url' => route('admin.ai-visibility.index'),
+                    'evidence' => "Bot 404 hits: {$crawl['wasted_404_bot_hits']}, Query-param bot hits: {$crawl['wasted_query_bot_hits']} of {$crawl['total_bot_hits']} total bot hits.",
+                    'recommended_action' => 'Review Crawler Log Analyzer and map top 404 paths in Redirect Manager.',
+                ];
+            }
+        } catch (\Throwable) {
         }
 
         return $issues;

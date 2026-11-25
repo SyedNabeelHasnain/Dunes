@@ -3,6 +3,7 @@
 namespace App\Services\Audit\Checkers;
 
 use App\Models\BlogPost;
+use App\Models\SeoMetadata;
 use App\Models\Tour;
 use App\Models\WikiArticle;
 
@@ -12,11 +13,14 @@ class ContentQualityChecker implements AuditCheckerInterface
     {
         $issues = [];
 
-        // 1. Thin Blog Posts (< 250 words)
+        // 1. Thin Blog Posts (< 250 words), Duplicate Body Fingerprints & Body Heading Hierarchy
         $posts = BlogPost::where('status', 'published')->get();
+        $bodyFingerprints = [];
         foreach ($posts as $post) {
-            $text = strip_tags((string) $post->content);
+            $rawHtml = (string) $post->content;
+            $text = trim((string) preg_replace('/\s+/', ' ', strip_tags($rawHtml)));
             $wordCount = str_word_count($text);
+            $postUrl = url('/blog/' . $post->slug);
 
             if ($wordCount < 250) {
                 $issues[] = [
@@ -26,9 +30,40 @@ class ContentQualityChecker implements AuditCheckerInterface
                     'description' => "Google Helpful Content System and E-E-A-T guidelines deprecate thin, uninformative articles. Comprehensive travel guides typically require at least 500-1200 words.",
                     'severity' => 'medium',
                     'verification_type' => 'automated',
-                    'affected_url' => url('/blog/' . $post->slug),
+                    'affected_url' => $postUrl,
                     'evidence' => "Word count: {$wordCount} words (minimum recommended: 250)",
                     'recommended_action' => 'Expand the article with first-hand travel insights, practical itinerary tips, FAQs, and high-quality photography.',
+                ];
+            } elseif ($wordCount >= 120) {
+                $fp = hash('sha256', strtolower(substr($text, 0, 400)));
+                if (isset($bodyFingerprints[$fp])) {
+                    $issues[] = [
+                        'category' => 'content_quality',
+                        'check_key' => 'content_near_duplicate_body',
+                        'title' => "Near-Duplicate Article Body Detected on '{$post->title}'",
+                        'description' => 'Substantial opening body text duplicates another published URL, risking duplicate content filtering.',
+                        'severity' => 'medium',
+                        'verification_type' => 'automated',
+                        'affected_url' => $postUrl,
+                        'evidence' => 'Matches opening body fingerprint of: '.$bodyFingerprints[$fp],
+                        'recommended_action' => 'Rewrite or consolidate overlapping content and apply canonical or 301 redirect if redundant.',
+                    ];
+                } else {
+                    $bodyFingerprints[$fp] = $postUrl;
+                }
+            }
+
+            if (preg_match('/<h1\b/i', $rawHtml)) {
+                $issues[] = [
+                    'category' => 'content_quality',
+                    'check_key' => 'content_embedded_h1_in_body',
+                    'title' => "Embedded <h1> Inside Blog Body on '{$post->title}'",
+                    'description' => 'Blog templates already render the primary page <h1>; embedding another <h1> inside article HTML breaks document outline semantics.',
+                    'severity' => 'low',
+                    'verification_type' => 'automated',
+                    'affected_url' => $postUrl,
+                    'evidence' => 'Detected <h1> tag inside BlogPost::content.',
+                    'recommended_action' => 'Demote body headings to <h2> and <h3> inside the Blog Editor.',
                 ];
             }
 
@@ -41,14 +76,83 @@ class ContentQualityChecker implements AuditCheckerInterface
                     'description' => 'E-E-A-T (Experience, Expertise, Authoritativeness, Trustworthiness) relies on verifiable author bylines to evaluate content reliability.',
                     'severity' => 'low',
                     'verification_type' => 'automated',
-                    'affected_url' => url('/blog/' . $post->slug),
+                    'affected_url' => $postUrl,
                     'evidence' => "Author: '" . ($post->author_name ?: 'None') . "', Bio length: " . strlen((string)$post->author_bio),
                     'recommended_action' => 'Assign a verified author profile with a concise biography describing their desert guiding or tourism credentials.',
                 ];
             }
         }
 
-        // 2. Active Tours Missing Detailed Inclusions or Descriptions
+        // 2. Wiki Knowledge Articles: Depth & Reviewer Verification
+        try {
+            $wikiArticles = WikiArticle::where('status', 'published')->with('pillar:id,slug')->get();
+            foreach ($wikiArticles as $article) {
+                $wUrl = url('/wiki/'.($article->pillar?->slug ?? 'guide').'/'.$article->slug);
+                $wWords = str_word_count(strip_tags((string) $article->content));
+                if ($wWords < 200) {
+                    $issues[] = [
+                        'category' => 'content_quality',
+                        'check_key' => 'content_thin_wiki_article',
+                        'title' => "Thin Knowledge Wiki Article '{$article->title}' ({$wWords} words)",
+                        'description' => 'Reference wiki guides should deliver deep, authoritative answers (>= 200 words).',
+                        'severity' => 'medium',
+                        'verification_type' => 'automated',
+                        'affected_url' => $wUrl,
+                        'evidence' => "Word count: {$wWords}",
+                        'recommended_action' => 'Expand with verified operational specifications, safety facts, and cross-links.',
+                    ];
+                }
+                if (empty($article->reviewed_by_name)) {
+                    $issues[] = [
+                        'category' => 'content_quality',
+                        'check_key' => 'content_wiki_missing_reviewer',
+                        'title' => "Wiki Article '{$article->title}' Missing Subject-Matter Reviewer",
+                        'description' => 'Assigning a named reviewer strengthens E-E-A-T and AI citation authority.',
+                        'severity' => 'low',
+                        'verification_type' => 'automated',
+                        'affected_url' => $wUrl,
+                        'evidence' => 'reviewed_by_name is empty.',
+                        'recommended_action' => 'Set reviewer credentials in Wiki Article Editor.',
+                    ];
+                }
+            }
+        } catch (\Throwable) {
+        }
+
+        // 3. Stale Content Governance Check (honoring SeoMetadata.stale_after_days)
+        try {
+            $staleConfigs = SeoMetadata::whereNotNull('stale_after_days')
+                ->where('stale_after_days', '>', 0)
+                ->with('entity')
+                ->limit(50)
+                ->get();
+
+            foreach ($staleConfigs as $meta) {
+                $entity = $meta->entity;
+                if (! $entity) {
+                    continue;
+                }
+                $lastTouch = $meta->reviewed_at ?? $entity->updated_at;
+                if ($lastTouch && $lastTouch->lt(now()->subDays((int) $meta->stale_after_days))) {
+                    $daysOld = (int) $lastTouch->diffInDays(now());
+                    $label = (string) ($entity->title ?? $entity->name ?? (class_basename($entity).' #'.$entity->getKey()));
+                    $issues[] = [
+                        'category' => 'content_quality',
+                        'check_key' => 'content_stale_review_overdue',
+                        'title' => "Stale Content Review Overdue on '{$label}' ({$daysOld}d old)",
+                        'description' => "Configured freshness threshold ({$meta->stale_after_days} days) has been exceeded without editorial verification.",
+                        'severity' => 'low',
+                        'verification_type' => 'automated',
+                        'affected_url' => isset($entity->slug) ? url('/'.ltrim((string) $entity->slug, '/')) : url('/'),
+                        'evidence' => "Last verified/updated: {$lastTouch->toDateString()} ({$daysOld} days ago; threshold: {$meta->stale_after_days}d).",
+                        'recommended_action' => 'Review seasonal pricing, schedules, and facts, then save & approve in the SEO & Editorial panel.',
+                    ];
+                }
+            }
+        } catch (\Throwable) {
+        }
+
+        // 4. Active Tours Missing Detailed Inclusions or Descriptions
         $thinTours = Tour::where('status', 'active')
             ->where(function ($q) {
                 $q->whereNull('full_desc')

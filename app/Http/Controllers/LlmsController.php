@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
 use App\Models\Faq;
+use App\Models\Review;
 use App\Models\Setting;
 use App\Models\Tour;
 use App\Models\WikiArticle;
@@ -15,6 +16,45 @@ use Illuminate\Support\Str;
 
 class LlmsController extends Controller
 {
+    protected function isExcludedFromAiDiscovery(mixed $entity): bool
+    {
+        if (! $entity) {
+            return false;
+        }
+        $meta = method_exists($entity, 'seoMeta') ? $entity->seoMeta : null;
+        if ($meta && $meta->include_in_sitemap === false) {
+            return true;
+        }
+        if ($meta && in_array($meta->editorial_status, ['draft', 'needs_revision'], true)) {
+            return true;
+        }
+        $robots = strtolower((string) ($meta?->robots_directive ?: ($entity->robots ?? '')));
+
+        return str_contains($robots, 'noindex');
+    }
+
+    protected function resolveReviewSummaryLine(array $settings): string
+    {
+        if (($settings['schema_use_verified_review_count'] ?? '0') === '1') {
+            try {
+                $count = Review::where('status', 'approved')->count();
+                if ($count > 0) {
+                    $avg = round((float) (Review::where('status', 'approved')->avg('rating') ?? 5.0), 1);
+
+                    return "{$count} verified guest reviews ({$avg}/5.0 average rating in platform database)";
+                }
+
+                return 'verified guest feedback collected via Google Maps and TripAdvisor';
+            } catch (\Throwable) {
+                return 'verified guest feedback collected via Google Maps and TripAdvisor';
+            }
+        }
+
+        $configuredCount = (int) ($settings['schema_homepage_review_count'] ?? 2847);
+        $configuredRating = (string) ($settings['schema_homepage_rating'] ?? '4.9');
+
+        return number_format($configuredCount)."+ verified 5-star traveler reviews ({$configuredRating}/5.0)";
+    }
     /**
      * Standard /llms.txt summary index following llmstxt.org format.
      */
@@ -72,6 +112,7 @@ class LlmsController extends Controller
 
         try {
             $safariTours = Tour::where('status', 'active')
+                ->with('seoMeta')
                 ->where(function ($q) {
                     $q->where('name', 'like', '%Desert%')
                         ->orWhere('name', 'like', '%Buggy%')
@@ -79,29 +120,39 @@ class LlmsController extends Controller
                         ->orWhere('name', 'like', '%Safari%');
                 })
                 ->orderBy('priority', 'asc')
-                ->get();
+                ->get()
+                ->reject(fn ($t) => $this->isExcludedFromAiDiscovery($t))
+                ->values();
 
             $cityTours = Tour::where('status', 'active')
+                ->with('seoMeta')
                 ->where(function ($q) {
                     $q->where('name', 'like', '%City%')
                         ->orWhere('name', 'like', '%Cruise%')
                         ->orWhere('name', 'like', '%Abu Dhabi%');
                 })
                 ->orderBy('priority', 'asc')
-                ->get();
+                ->get()
+                ->reject(fn ($t) => $this->isExcludedFromAiDiscovery($t))
+                ->values();
 
             $blogs = BlogPost::where('status', 'published')
+                ->with('seoMeta')
                 ->orderBy('published_at', 'desc')
+                ->take(12)
+                ->get()
+                ->reject(fn ($b) => $this->isExcludedFromAiDiscovery($b))
                 ->take(8)
-                ->get();
+                ->values();
         } catch (\Throwable $e) {
             $safariTours = collect();
             $cityTours = collect();
             $blogs = collect();
         }
 
+        $reviewSummary = $this->resolveReviewSummaryLine($settings);
         $md = "# Dunes Discovery Tourism\n\n";
-        $md .= "> Dunes Discovery Tourism LLC is an officially licensed Destination Management Company (DMC) based in Dubai, United Arab Emirates (DET Tourism License #{$license}). Specializing in luxury Dubai Desert Safaris, self-drive 1000cc Can-Am & Polaris Dune Buggy rentals, Quad Biking ATV tours, City Sightseeing Tours, and 5-Star luxury Dhow Cruises with 2,847+ verified 5-star traveler reviews (4.9/5.0).\n\n";
+        $md .= "> Dunes Discovery Tourism LLC is an officially licensed Destination Management Company (DMC) based in Dubai, United Arab Emirates (DET Tourism License #{$license}). Specializing in luxury Dubai Desert Safaris, self-drive 1000cc Can-Am & Polaris Dune Buggy rentals, Quad Biking ATV tours, City Sightseeing Tours, and 5-Star luxury Dhow Cruises with {$reviewSummary}.\n\n";
 
         $md .= "## Desert Safaris & Off-Road Adventures\n\n";
         $md .= '- [Dune Buggy Rental Dubai]('.url('/dune-buggy-rental-dubai')."): Self-drive 1000cc Can-Am Maverick X3 Turbo & Polaris RZR buggy rentals in Lahbab Red Dunes with full rally gear and expert guides.\n";
@@ -218,9 +269,11 @@ class LlmsController extends Controller
 
         try {
             $tours = Tour::where('status', 'active')
-                ->with(['tiers', 'itineraries', 'category'])
+                ->with(['tiers', 'itineraries', 'category', 'seoMeta'])
                 ->orderBy('priority', 'asc')
-                ->get();
+                ->get()
+                ->reject(fn ($t) => $this->isExcludedFromAiDiscovery($t))
+                ->values();
 
             $faqs = Faq::where('status', 'active')
                 ->orderBy('priority', 'asc')
@@ -230,6 +283,7 @@ class LlmsController extends Controller
             $faqs = collect();
         }
 
+        $reviewSummaryFull = $this->resolveReviewSummaryLine($settings);
         $md = "# Dunes Discovery Tourism - Comprehensive LLM Knowledge Base & Entity Specification\n";
         $md .= "> Authoritative, full-text reference guide for Artificial Intelligence (AI) search engines, Generative Engine Optimization (GEO), LLMs (ChatGPT, Claude, Gemini, Perplexity), and Travel Knowledge Graphs.\n\n";
         $md .= "---\n\n";
@@ -244,7 +298,7 @@ class LlmsController extends Controller
         $md .= "- **Tourism License Number**: {$license}\n";
         $md .= "- **Commercial Registry / D-U-N-S**: Registered UAE LLC Operator\n";
         $md .= "- **Business Category**: Destination Management Company (DMC), Licensed Tour Operator, Desert Motorsports Fleet Provider\n";
-        $md .= "- **Verified Traveler Reviews**: 2,847+ Verified 5-Star Reviews across Google Maps and TripAdvisor. Aggregate Rating: 4.9 / 5.0.\n";
+        $md .= "- **Verified Traveler Reviews**: {$reviewSummaryFull}.\n";
         $md .= "- **Direct Customer Contacts**:\n";
         $md .= '  - WhatsApp Concierge: +'.preg_replace('/[^0-9]/', '', $waPhone).' (https://wa.me/'.preg_replace('/[^0-9]/', '', $waPhone).")\n";
         $md .= "  - Phone: {$phone}\n";

@@ -74,6 +74,14 @@ class AdminSecurityController extends Controller
             'total_blocked_hits' => (int) IpRule::where('mode', 'block')->sum('blocked_attempts_count'),
         ];
 
+        $allSettings = app(\App\Services\SettingsService::class)->all();
+        $securityHeaders = [
+            'security_referrer_policy' => (string) ($allSettings['security_referrer_policy'] ?? 'strict-origin-when-cross-origin'),
+            'security_permissions_policy' => (string) ($allSettings['security_permissions_policy'] ?? 'camera=(), microphone=(), geolocation=(self)'),
+            'security_hsts_enabled' => (string) ($allSettings['security_hsts_enabled'] ?? '1'),
+            'security_csp_extra' => (string) ($allSettings['security_csp_extra'] ?? ''),
+        ];
+
         return view('admin.security.ip-rules', compact(
             'rules',
             'unblockRequests',
@@ -81,8 +89,81 @@ class AdminSecurityController extends Controller
             'currentAdminIp',
             'currentAdminRule',
             'tab',
-            'appealStatus'
+            'appealStatus',
+            'securityHeaders'
         ));
+    }
+
+    /**
+     * Update runtime HTTP Security Headers & CSP overrides (enforced by SecurityHeaders middleware).
+     */
+    public function updateHeaders(Request $request)
+    {
+        $validated = $request->validate([
+            'security_referrer_policy' => [
+                'required',
+                'string',
+                'in:no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,same-origin,strict-origin,strict-origin-when-cross-origin,unsafe-url',
+            ],
+            'security_permissions_policy' => ['nullable', 'string', 'max:500'],
+            'security_hsts_enabled' => ['nullable', 'boolean'],
+            'security_csp_extra' => ['nullable', 'string', 'max:1500'],
+        ]);
+
+        $cleanPolicy = static fn (?string $val): string => trim((string) preg_replace('/[\r\n]+/', ' ', (string) $val));
+
+        $cspExtra = $cleanPolicy($validated['security_csp_extra'] ?? '');
+        if ($cspExtra !== '' && preg_match('/<\s*script|javascript:/i', $cspExtra)) {
+            return back()->withErrors(['security_csp_extra' => 'Invalid directive characters in CSP override.'])->withInput();
+        }
+
+        $newPayload = [
+            'security_referrer_policy' => $cleanPolicy($validated['security_referrer_policy']),
+            'security_permissions_policy' => $cleanPolicy($validated['security_permissions_policy'] ?? '') ?: 'camera=(), microphone=(), geolocation=(self)',
+            'security_hsts_enabled' => $request->boolean('security_hsts_enabled') ? '1' : '0',
+            'security_csp_extra' => $cspExtra,
+        ];
+
+        $existing = \App\Models\Setting::whereIn('setting_key', array_keys($newPayload))
+            ->pluck('setting_value', 'setting_key')
+            ->toArray();
+
+        $user = $request->user();
+        if ($user && method_exists($user, 'hasAnyPermission') && ! $user->hasAnyPermission(['governance.approve', '*'])) {
+            $approval = app(\App\Services\Governance\ApprovalWorkflowService::class)->propose(
+                section: 'security',
+                targetKey: 'security_http_headers',
+                summary: 'Proposed HTTP Security Headers & CSP update',
+                payload: $newPayload,
+                previousPayload: $existing,
+                requester: $user,
+            );
+
+            return redirect()->route('admin.security.ip-rules', ['tab' => 'headers'])
+                ->with('success', "HTTP Security Headers update submitted for peer approval (#{$approval->id}).");
+        }
+
+        $audit = app(\App\Services\Governance\ConfigAuditService::class);
+        foreach ($newPayload as $key => $val) {
+            \App\Models\Setting::setVal($key, $val, 'security');
+            if ((string) ($existing[$key] ?? '') !== $val) {
+                $audit->log(
+                    section: 'security',
+                    action: 'updated',
+                    settingKey: $key,
+                    oldValue: $existing[$key] ?? null,
+                    newValue: $val,
+                    summary: "Updated HTTP security header setting {$key}",
+                    actor: $user,
+                );
+            }
+        }
+
+        \Illuminate\Support\Facades\Cache::forget('site_settings_cache');
+        app(\App\Services\SettingsService::class)->clearCache();
+
+        return redirect()->route('admin.security.ip-rules', ['tab' => 'headers'])
+            ->with('success', 'HTTP Security Headers & CSP policy updated and live immediately.');
     }
 
     /**

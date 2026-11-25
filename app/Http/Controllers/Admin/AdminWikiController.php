@@ -22,6 +22,7 @@ class AdminWikiController extends Controller
         Cache::forget('sitemap_images_xml');
         Cache::forget('site_wiki_hub_pillars');
         Cache::forget('site_wiki_glossary_all');
+        \App\Http\Controllers\SitemapController::flushAllSitemapCaches();
     }
 
     /**
@@ -258,6 +259,14 @@ class AdminWikiController extends Controller
         }
 
         $article->update($data);
+
+        try {
+            if (method_exists($article, 'recordRevision')) {
+                $article->refresh();
+                $article->recordRevision('Updated wiki article via CMS editor');
+            }
+        } catch (\Throwable) {
+        }
 
         if ($request->has('tours')) {
             $article->tours()->sync($request->input('tours'));

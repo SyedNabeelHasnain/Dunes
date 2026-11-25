@@ -39,7 +39,11 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\TrackBacklinkReferralMiddleware::class,
             \App\Http\Middleware\DynamicRedirectMiddleware::class,
             SecurityHeaders::class,
+            \App\Http\Middleware\RobotsHeaderMiddleware::class,
             SetLocale::class,
+        ]);
+        $middleware->api(append: [
+            \App\Http\Middleware\RobotsHeaderMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

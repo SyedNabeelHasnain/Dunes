@@ -132,6 +132,116 @@ class AccessibilityChecker implements AuditCheckerInterface
                     'recommended_action' => 'Add descriptive alt="..." attributes to rendered Blade view images.',
                 ];
             }
+
+            // DOM-based Form Labels & Empty Interactive Controls Audit (WCAG 2.2 SC 1.3.1, 2.4.4, 4.1.2)
+            try {
+                $prevLibxml = libxml_use_internal_errors(true);
+                $dom = new \DOMDocument();
+                $dom->loadHTML('<?xml encoding="utf-8" ?>'.$html, LIBXML_NOWARNING | LIBXML_NOERROR);
+                libxml_clear_errors();
+                libxml_use_internal_errors($prevLibxml);
+
+                $xpath = new \DOMXPath($dom);
+                $labelFors = [];
+                foreach ($xpath->query('//label[@for]') ?: [] as $lbl) {
+                    /** @var \DOMElement $lbl */
+                    $forId = trim($lbl->getAttribute('for'));
+                    if ($forId !== '') {
+                        $labelFors[$forId] = true;
+                    }
+                }
+
+                $unlabeledControls = 0;
+                foreach ($xpath->query('//input|//select|//textarea') ?: [] as $ctrl) {
+                    /** @var \DOMElement $ctrl */
+                    $tag = strtolower($ctrl->tagName);
+                    if ($tag === 'input') {
+                        $type = strtolower(trim($ctrl->getAttribute('type') ?: 'text'));
+                        if (in_array($type, ['hidden', 'submit', 'button', 'reset', 'image'], true)) {
+                            continue;
+                        }
+                    }
+                    if (trim($ctrl->getAttribute('aria-label')) !== ''
+                        || trim($ctrl->getAttribute('aria-labelledby')) !== ''
+                        || trim($ctrl->getAttribute('title')) !== ''
+                        || $ctrl->getAttribute('aria-hidden') === 'true'
+                    ) {
+                        continue;
+                    }
+                    $id = trim($ctrl->getAttribute('id'));
+                    if ($id !== '' && isset($labelFors[$id])) {
+                        continue;
+                    }
+                    // Check ancestor <label>
+                    $inLabel = false;
+                    $p = $ctrl->parentNode;
+                    while ($p instanceof \DOMElement) {
+                        if (strtolower($p->tagName) === 'label') {
+                            $inLabel = true;
+                            break;
+                        }
+                        $p = $p->parentNode;
+                    }
+                    if (! $inLabel) {
+                        $unlabeledControls++;
+                    }
+                }
+
+                if ($unlabeledControls > 0) {
+                    $issues[] = [
+                        'category' => 'accessibility',
+                        'check_key' => 'a11y_unlabeled_form_controls',
+                        'title' => "{$unlabeledControls} Form Control(s) Missing Accessible Label on {$path}",
+                        'description' => 'WCAG 2.2 SC 1.3.1 / 4.1.2 requires visible inputs, selects, and textareas to have an explicit <label>, aria-label, or aria-labelledby.',
+                        'severity' => 'medium',
+                        'verification_type' => 'automated',
+                        'affected_url' => url($path),
+                        'evidence' => "Unlabeled form controls detected on {$path}: {$unlabeledControls}",
+                        'recommended_action' => 'Associate every form control with a <label for="..."> element or descriptive aria-label.',
+                    ];
+                }
+
+                $emptyControls = 0;
+                foreach ($xpath->query('//button|//a[@href]') ?: [] as $interactive) {
+                    /** @var \DOMElement $interactive */
+                    if ($interactive->getAttribute('aria-hidden') === 'true') {
+                        continue;
+                    }
+                    $text = trim(preg_replace('/\s+/', ' ', (string) $interactive->textContent) ?? '');
+                    if ($text !== ''
+                        || trim($interactive->getAttribute('aria-label')) !== ''
+                        || trim($interactive->getAttribute('aria-labelledby')) !== ''
+                        || trim($interactive->getAttribute('title')) !== ''
+                    ) {
+                        continue;
+                    }
+                    $hasAltImg = false;
+                    foreach ($interactive->getElementsByTagName('img') as $childImg) {
+                        if (trim($childImg->getAttribute('alt')) !== '') {
+                            $hasAltImg = true;
+                            break;
+                        }
+                    }
+                    if (! $hasAltImg) {
+                        $emptyControls++;
+                    }
+                }
+
+                if ($emptyControls > 0) {
+                    $issues[] = [
+                        'category' => 'accessibility',
+                        'check_key' => 'a11y_empty_interactive_control',
+                        'title' => "{$emptyControls} Empty Link/Button Without Accessible Name on {$path}",
+                        'description' => 'Icon-only buttons and links without visible text or aria-label are announced generically by screen readers (WCAG 2.2 SC 2.4.4 / 4.1.2).',
+                        'severity' => 'medium',
+                        'verification_type' => 'automated',
+                        'affected_url' => url($path),
+                        'evidence' => "Icon-only or empty interactive controls on {$path}: {$emptyControls}",
+                        'recommended_action' => 'Add aria-label="..." to every icon-only button and anchor element.',
+                    ];
+                }
+            } catch (\Throwable) {
+            }
         }
 
         // 4. Contrast & Focus Management (Informational Guideline)

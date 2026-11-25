@@ -63,6 +63,9 @@ class AdminSettingController extends Controller
             'google_site_verification', 'bing_site_verification', 'yandex_site_verification', 'baidu_site_verification',
             'clarity_id', 'clarity_active',
             'seo_index_tracking_params', 'schema_use_verified_review_count',
+            'schema_homepage_rating', 'schema_homepage_review_count',
+            'twitter_handle', 'site_description',
+            'gsc_property_url', 'gsc_oauth_access_token', 'bing_webmaster_api_key',
             'site_hero_poster', 'site_default_image',
         ];
 
@@ -339,7 +342,7 @@ class AdminSettingController extends Controller
     {
         $allowedKeys = [
             // Site Identity & Licensing
-            'site_name', 'site_phone', 'site_whatsapp', 'site_email', 'site_support_email',
+            'site_name', 'site_description', 'twitter_handle', 'site_phone', 'site_whatsapp', 'site_email', 'site_support_email',
             'site_address', 'company_license_number', 'google_maps_embed_url',
             'social_tripadvisor', 'social_google', 'social_facebook', 'social_instagram',
             'social_youtube', 'social_tiktok', 'footer_about', 'site_copyright',
@@ -356,6 +359,8 @@ class AdminSettingController extends Controller
             'seo_rate_card_title', 'seo_rate_card_description', 'seo_rate_card_keywords', 'seo_rate_card_og_image',
             'seo_sunset_title', 'seo_sunset_description', 'seo_sunset_keywords', 'seo_sunset_og_image',
             'seo_press_title', 'seo_press_description', 'seo_press_keywords', 'seo_press_og_image',
+            'seo_index_tracking_params', 'schema_use_verified_review_count', 'schema_homepage_rating', 'schema_homepage_review_count',
+            'gsc_property_url', 'gsc_oauth_access_token', 'bing_webmaster_api_key',
             'indexnow_enabled', 'indexnow_key',
 
             // Marketing & Promos
@@ -531,13 +536,21 @@ class AdminSettingController extends Controller
 
         if ($request->has('seo_form_submitted')) {
             $settings['seo_index_tracking_params'] = $request->has('seo_index_tracking_params') ? '1' : '0';
+            if ($request->has('schema_use_verified_review_count_present')) {
+                $settings['schema_use_verified_review_count'] = $request->has('schema_use_verified_review_count') ? '1' : '0';
+            }
         }
 
         $actor = $request->user();
         $settingKeys = array_keys($settings);
         $hasSecurityKeys = collect($settingKeys)->contains(fn ($k) => str_starts_with($k, 'security_'));
         $hasPrivacyKeys = collect($settingKeys)->contains(fn ($k) => str_starts_with($k, 'privacy_'));
-        $hasSeoKeys = collect($settingKeys)->contains(fn ($k) => str_starts_with($k, 'seo_') || str_starts_with($k, 'indexnow_') || str_starts_with($k, 'robots_'));
+        $hasSeoKeys = collect($settingKeys)->contains(fn ($k) => str_starts_with($k, 'seo_')
+            || str_starts_with($k, 'indexnow_')
+            || str_starts_with($k, 'robots_')
+            || str_starts_with($k, 'schema_')
+            || str_starts_with($k, 'gsc_')
+            || str_starts_with($k, 'bing_'));
 
         if ($actor && method_exists($actor, 'hasPermission')) {
             if ($hasSecurityKeys && ! $actor->hasAnyPermission(['security.manage', '*'])) {
@@ -623,6 +636,7 @@ class AdminSettingController extends Controller
         app(SettingsService::class)->clearCache();
         app(IndexNowService::class)->ensureKeyFileExists();
         GoogleThingsToDoFeedController::flushCache();
+        \App\Http\Controllers\SitemapController::flushAllSitemapCaches();
 
         return back()->with('success', 'Settings updated successfully.');
     }

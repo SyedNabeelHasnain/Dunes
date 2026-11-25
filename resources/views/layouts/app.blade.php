@@ -114,9 +114,13 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @php
         $privacyStrictGating = ($settings['privacy_strict_consent_gating'] ?? '1') !== '0';
+        $privacyConsentVersion = trim((string) ($settings['privacy_consent_version'] ?? '1.0'));
         $cookieConsentRaw = request()->cookie('ddt_consent_v1');
         $cookieConsentDecoded = is_string($cookieConsentRaw) ? json_decode($cookieConsentRaw, true) : null;
-        $serverMarketingConsented = is_array($cookieConsentDecoded) && !empty($cookieConsentDecoded['marketing']);
+        $cookieVersionMatches = is_array($cookieConsentDecoded)
+            && ((string) ($cookieConsentDecoded['version'] ?? $privacyConsentVersion) === $privacyConsentVersion);
+        $serverAnalyticsConsented = $cookieVersionMatches && !empty($cookieConsentDecoded['analytics']);
+        $serverMarketingConsented = $cookieVersionMatches && !empty($cookieConsentDecoded['marketing']);
     @endphp
     <script>
         window.CSRF_TOKEN = "{{ csrf_token() }}";
@@ -125,6 +129,7 @@
 
         window.DunesConsent = (function() {
             var strictGating = {{ $privacyStrictGating ? 'true' : 'false' }};
+            var policyVersion = {!! json_encode($privacyConsentVersion, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) !!};
             var cookieName = 'ddt_consent_v1=';
             function readStored() {
                 try {
@@ -134,6 +139,9 @@
                         if (c.indexOf(cookieName) === 0) {
                             var parsed = JSON.parse(decodeURIComponent(c.substring(cookieName.length)));
                             if (parsed && typeof parsed === 'object') {
+                                if (parsed.version && String(parsed.version) !== String(policyVersion)) {
+                                    return { necessary: true, analytics: false, marketing: false, functional: false, decided: false, version: policyVersion };
+                                }
                                 parsed.decided = true;
                                 return parsed;
                             }
@@ -142,10 +150,15 @@
                     var ls = localStorage.getItem('ddt_consent_v1');
                     if (ls) {
                         var parsedLs = JSON.parse(ls);
-                        if (parsedLs && typeof parsedLs === 'object') return parsedLs;
+                        if (parsedLs && typeof parsedLs === 'object') {
+                            if (parsedLs.version && String(parsedLs.version) !== String(policyVersion)) {
+                                return { necessary: true, analytics: false, marketing: false, functional: false, decided: false, version: policyVersion };
+                            }
+                            return parsedLs;
+                        }
                     }
                 } catch (e) {}
-                return { necessary: true, analytics: false, marketing: false, functional: false, decided: false };
+                return { necessary: true, analytics: false, marketing: false, functional: false, decided: false, version: policyVersion };
             }
             var state = readStored();
             function syncGtagConsent(s) {
@@ -162,6 +175,7 @@
             }
             return {
                 isStrict: strictGating,
+                version: policyVersion,
                 get: function() { return state; },
                 has: function(cat) {
                     if (cat === 'necessary') return true;
@@ -169,11 +183,12 @@
                     return !!(state && state[cat]);
                 },
                 update: function(next) {
-                    state = Object.assign({ necessary: true, decided: true }, next || {});
+                    state = Object.assign({ necessary: true, decided: true, version: policyVersion }, next || {}, { version: policyVersion });
                     try {
                         var serialized = JSON.stringify(state);
                         localStorage.setItem('ddt_consent_v1', serialized);
-                        document.cookie = 'ddt_consent_v1=' + encodeURIComponent(serialized) + '; path=/; max-age=15552000; SameSite=Lax';
+                        var secureFlag = window.location && window.location.protocol === 'https:' ? '; Secure' : '';
+                        document.cookie = 'ddt_consent_v1=' + encodeURIComponent(serialized) + '; path=/; max-age=15552000; SameSite=Lax' + secureFlag;
                     } catch (e) {}
                     syncGtagConsent(state);
                     window.dispatchEvent(new CustomEvent('dunes:consent-updated', { detail: state }));
@@ -320,12 +335,30 @@
     </script>
     @endif
 
+    @if($googleActive && !empty($gtmId) && str_starts_with($gtmId, 'GTM-'))
+    <!-- Google Tag Manager (Consent-Gated Execution) -->
+    <script>
+      window._loadGtm = function() {
+        if (window._gtmLoaded) return;
+        if (window.DunesConsent && !window.DunesConsent.has('analytics') && !window.DunesConsent.has('marketing')) return;
+        window._gtmLoaded = true;
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({'gtm.start': new Date().getTime(), event: 'gtm.js'});
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtm.js?id={{ $gtmId }}';
+        document.head.appendChild(s);
+      };
+    </script>
+    @endif
+
     <script>
       // Consent-aware third-party analytics bootstrap
       (function() {
         function initConsentedTags() {
           if (window.DunesConsent && (window.DunesConsent.has('analytics') || window.DunesConsent.has('marketing'))) {
             if (typeof loadGoogleAnalytics === 'function') loadGoogleAnalytics();
+            if (typeof window._loadGtm === 'function') window._loadGtm();
           }
           if (window.DunesConsent && window.DunesConsent.has('marketing')) {
             if (typeof window._loadMetaPixel === 'function') window._loadMetaPixel();
@@ -578,7 +611,7 @@
             },
             {
               "@@type": "ContactPoint",
-              "telephone": "+971502456056",
+              "telephone": {!! json_encode('+'.ltrim(preg_replace('/[^0-9]/', '', (string) $waPhone) ?: '971502456056', '+'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
               "contactType": "reservations",
               "areaServed": ["AE", "SA", "GB", "DE", "FR", "IT", "ES", "RU", "US"],
               "availableLanguage": ["en", "ar", "ru", "es", "it", "English", "Arabic", "Russian", "Spanish", "Italian"]
@@ -590,17 +623,24 @@
             "opens": "00:00",
             "closes": "23:59"
           },
-          "sameAs": [
-            @if(!empty($googleReviewUrl))
-            {!! json_encode($googleReviewUrl, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
-            @endif
-            @if(!empty($googleCid))
-            {!! json_encode("https://maps.google.com/?cid={$googleCid}", JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
-            @endif
-            "https://www.facebook.com/dunesdiscoverytourism",
-            "https://www.instagram.com/dunesdiscoverytourism",
-            "https://www.tripadvisor.com"
-          ],
+          @php
+              $sameAsLinks = array_values(array_unique(array_filter([
+                  $googleReviewUrl ?: null,
+                  !empty($googleCid) ? "https://maps.google.com/?cid={$googleCid}" : null,
+                  !empty($settings['social_facebook']) ? $settings['social_facebook'] : null,
+                  !empty($settings['social_instagram']) ? $settings['social_instagram'] : null,
+                  !empty($settings['social_tripadvisor']) ? $settings['social_tripadvisor'] : null,
+                  !empty($settings['social_youtube']) ? $settings['social_youtube'] : null,
+                  !empty($settings['social_tiktok']) ? $settings['social_tiktok'] : null,
+              ])));
+              if ($sameAsLinks === []) {
+                  $sameAsLinks = [
+                      'https://www.facebook.com/dunesdiscoverytourism',
+                      'https://www.instagram.com/dunesdiscoverytourism',
+                  ];
+              }
+          @endphp
+          "sameAs": {!! json_encode($sameAsLinks, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
           "hasMerchantReturnPolicy": {
             "@@type": "MerchantReturnPolicy",
             "applicableCountry": "AE",
@@ -614,7 +654,7 @@
           "@@type": "WebSite",
           "@@id": {!! json_encode(url('/') . '#website', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
           "url": {!! json_encode(url('/'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
-          "name": "Dunes Discovery Tourism",
+          "name": {!! json_encode($settings['site_name'] ?? 'Dunes Discovery Tourism', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!},
           "publisher": {
             "@@id": {!! json_encode(url('/') . '#organization', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}
           },
@@ -653,7 +693,7 @@
     <!-- WCAG 2.2 SC 2.4.1 Skip to Main Content Link -->
     <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:start-4 focus:z-50 focus:px-4 focus:py-2.5 focus:bg-primary focus:text-white focus:rounded-xl focus:shadow-lg focus:font-bold">Skip to main content</a>
 
-    @if($googleActive && !empty($gtmId) && str_starts_with($gtmId, 'GTM-'))
+    @if($googleActive && !empty($gtmId) && str_starts_with($gtmId, 'GTM-') && (!$privacyStrictGating || $serverAnalyticsConsented || $serverMarketingConsented))
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ $gtmId }}" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     @endif
     @if($metaActive && !empty($metaPixelId) && (!$privacyStrictGating || $serverMarketingConsented))

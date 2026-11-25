@@ -69,6 +69,61 @@ class SecurityChecker implements AuditCheckerInterface
             ];
         }
 
+        // 4. Live Probed HTTP Security Header Enforcement Check
+        $requiredHeaders = [
+            'content-security-policy' => 'Content-Security-Policy',
+            'x-content-type-options' => 'X-Content-Type-Options',
+            'x-frame-options' => 'X-Frame-Options',
+            'referrer-policy' => 'Referrer-Policy',
+        ];
+        foreach (($context['probed_pages'] ?? []) as $path => $probe) {
+            if ((int) ($probe['status'] ?? 500) !== 200) {
+                continue;
+            }
+            $headers = $probe['headers'] ?? null;
+            if (! is_array($headers) || $headers === []) {
+                continue;
+            }
+            $missing = [];
+            foreach ($requiredHeaders as $hdrKey => $hdrLabel) {
+                if (empty($headers[$hdrKey])) {
+                    $missing[] = $hdrLabel;
+                }
+            }
+            if ($missing !== []) {
+                $issues[] = [
+                    'category' => 'security',
+                    'check_key' => 'sec_missing_live_response_headers',
+                    'title' => "Missing Live HTTP Security Headers on {$path}",
+                    'description' => 'Probed HTTP response omitted one or more baseline OWASP security headers.',
+                    'severity' => 'high',
+                    'verification_type' => 'automated',
+                    'affected_url' => url($path),
+                    'evidence' => 'Missing headers: '.implode(', ', $missing),
+                    'recommended_action' => 'Verify SecurityHeaders middleware and Security > HTTP Security Headers policy.',
+                ];
+            }
+            break;
+        }
+
+        // 5. Production Cron Token Advisory
+        if ($appEnv === 'production') {
+            $cronToken = trim((string) (Config::get('services.cron.secret') ?: env('CRON_SECRET_TOKEN', '')));
+            if ($cronToken === '' || $cronToken === 'dunes_cron_2026') {
+                $issues[] = [
+                    'category' => 'security',
+                    'check_key' => 'sec_default_cron_token',
+                    'title' => 'Production CRON_SECRET_TOKEN Using Default or Empty Value',
+                    'description' => 'Web cron trigger endpoint should use a unique high-entropy CRON_SECRET_TOKEN in production .env.',
+                    'severity' => 'high',
+                    'verification_type' => 'automated',
+                    'affected_url' => url('/cron/run'),
+                    'evidence' => 'CRON_SECRET_TOKEN is unset or still matches the legacy default value.',
+                    'recommended_action' => 'Set a strong 32+ character CRON_SECRET_TOKEN in production .env and update scheduled curl jobs.',
+                ];
+            }
+        }
+
         return $issues;
     }
 }

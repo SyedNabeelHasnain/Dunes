@@ -141,6 +141,35 @@
                                     <p class="text-[11px] text-slate-500 mt-0.5">Recommended <strong>OFF</strong> (default): prevents duplicate URL indexing in Google Search Console by applying <code>noindex, follow</code> when tracking parameters are present while keeping canonical URLs clean.</p>
                                 </div>
                             </div>
+
+                            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="p-4 bg-white rounded-xl border border-slate-200 space-y-2">
+                                    <label for="twitter_handle" class="block text-xs font-bold text-slate-700">Twitter / X Brand Handle</label>
+                                    <input type="text" name="twitter_handle" id="twitter_handle" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800" value="{{ $settings['twitter_handle'] ?? '@dunesdiscovery' }}" placeholder="@dunesdiscovery">
+                                    <label for="site_description" class="block text-xs font-bold text-slate-700 pt-1">Organization Entity Description (JSON-LD)</label>
+                                    <textarea name="site_description" id="site_description" rows="2" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800" placeholder="Licensed Dubai Destination Management Company...">{{ $settings['site_description'] ?? '' }}</textarea>
+                                </div>
+                                <div class="p-4 bg-white rounded-xl border border-slate-200 space-y-2.5">
+                                    <input type="hidden" name="schema_use_verified_review_count_present" value="1">
+                                    <label class="flex items-start gap-2.5 cursor-pointer">
+                                        <input type="checkbox" name="schema_use_verified_review_count" id="schema_use_verified_review_count" value="1" {{ ($settings['schema_use_verified_review_count'] ?? '0') === '1' ? 'checked' : '' }} class="mt-0.5 rounded border-slate-300 text-primary focus:ring-primary">
+                                        <div>
+                                            <span class="block text-xs font-bold text-slate-800">Use Strictly Live DB-Approved Reviews in Schema &amp; llms.txt</span>
+                                            <span class="text-[11px] text-slate-500">When enabled, AggregateRating &amp; AI summaries compute rating/count strictly from approved first-party DB reviews instead of manual override numbers.</span>
+                                        </div>
+                                    </label>
+                                    <div class="grid grid-cols-2 gap-3 pt-1">
+                                        <div>
+                                            <label for="schema_homepage_rating" class="block text-[11px] font-bold text-slate-600 mb-1">Fallback Rating</label>
+                                            <input type="text" name="schema_homepage_rating" id="schema_homepage_rating" class="w-full rounded-xl border border-slate-200 px-3 py-1.5 text-xs" value="{{ $settings['schema_homepage_rating'] ?? '4.9' }}">
+                                        </div>
+                                        <div>
+                                            <label for="schema_homepage_review_count" class="block text-[11px] font-bold text-slate-600 mb-1">Fallback Review Count</label>
+                                            <input type="number" name="schema_homepage_review_count" id="schema_homepage_review_count" min="0" class="w-full rounded-xl border border-slate-200 px-3 py-1.5 text-xs" value="{{ $settings['schema_homepage_review_count'] ?? '2847' }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -708,6 +737,32 @@
                                 </div>
                                 <p class="text-[11px] text-slate-500 mb-2">Baidu Webmaster token for Chinese inbound tourists. Rendered as <code>&lt;meta name="baidu-site-verification"&gt;</code>.</p>
                                 <input type="text" name="baidu_site_verification" id="baidu_site_verification" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-hidden transition focus:border-primary focus:ring-1 focus:ring-primary font-mono" value="{{ $settings['baidu_site_verification'] ?? '' }}" placeholder="Enter Baidu verification token">
+                            </div>
+
+                            <!-- Optional Live Search Console & Bing Webmaster API Credentials -->
+                            <div class="p-4 bg-white rounded-xl border border-slate-200 space-y-3">
+                                <div class="flex items-center justify-between flex-wrap gap-2">
+                                    <div class="flex items-center gap-2">
+                                        <i class="bi bi-plug-fill text-primary"></i>
+                                        <span class="text-xs font-bold text-slate-900">Google Search Console &amp; Bing Webmaster API (Optional)</span>
+                                    </div>
+                                    <a href="{{ route('admin.ai-visibility.index') }}" class="text-[11px] font-bold text-primary hover:underline">Open Crawler &amp; API Diagnostics &rarr;</a>
+                                </div>
+                                <p class="text-[11px] text-slate-500">Provide verified OAuth / API credentials to enable live Search Analytics &amp; crawl diagnostics. Leave blank if not yet provisioned — the platform never fabricates external search rankings or click metrics.</p>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                    <div>
+                                        <label for="gsc_property_url" class="block text-[11px] font-bold text-slate-700 mb-1">Verified Property URL</label>
+                                        <input type="text" name="gsc_property_url" id="gsc_property_url" value="{{ $settings['gsc_property_url'] ?? url('/') }}" placeholder="https://dunesdiscoverytourism.com/" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs font-mono">
+                                    </div>
+                                    <div>
+                                        <label for="gsc_oauth_access_token" class="block text-[11px] font-bold text-slate-700 mb-1">Google Search Console OAuth Token</label>
+                                        <input type="password" name="gsc_oauth_access_token" id="gsc_oauth_access_token" value="{{ $settings['gsc_oauth_access_token'] ?? '' }}" autocomplete="new-password" placeholder="Optional Bearer token" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs font-mono">
+                                    </div>
+                                    <div>
+                                        <label for="bing_webmaster_api_key" class="block text-[11px] font-bold text-slate-700 mb-1">Bing Webmaster API Key</label>
+                                        <input type="password" name="bing_webmaster_api_key" id="bing_webmaster_api_key" value="{{ $settings['bing_webmaster_api_key'] ?? '' }}" autocomplete="new-password" placeholder="Optional Bing API key" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs font-mono">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

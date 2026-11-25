@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\AdminKeywordController;
 use App\Http\Controllers\Admin\AdminPrivacyController;
 use App\Http\Controllers\Admin\AdminRedirectController;
 use App\Http\Controllers\Admin\AdminRobotsController;
+use App\Http\Controllers\Admin\AdminSecurityController;
 use App\Http\Controllers\Admin\AdminSeoTemplatesController;
 use App\Http\Controllers\Admin\AdminSystemHealthController;
 use App\Http\Controllers\Admin\AdminUserRoleController;
@@ -85,13 +86,29 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', AdminNoCacheMiddlewa
         ->middleware('permission:audit.page_view,audit.run')
         ->name('audit.page');
 
-    // ── Privacy & Consent Mode v2, System Health & CWV, AI Visibility ────────
+    // ── Privacy & Consent Mode v2, DSAR, Security Headers, System Health & AI Visibility ──
     Route::get('/settings/privacy', [AdminPrivacyController::class, 'index'])
         ->middleware('permission:privacy.manage')
         ->name('settings.privacy.index');
     Route::post('/settings/privacy', [AdminPrivacyController::class, 'update'])
         ->middleware('permission:privacy.manage')
         ->name('settings.privacy.update');
+    Route::get('/settings/privacy/dsar', [AdminPrivacyController::class, 'dsarLookup'])
+        ->middleware('permission:privacy.manage')
+        ->name('settings.privacy.dsar');
+    Route::post('/settings/privacy/dsar-export', [AdminPrivacyController::class, 'dsarExport'])
+        ->middleware('permission:privacy.manage')
+        ->name('settings.privacy.dsar-export');
+    Route::post('/settings/privacy/dsar-erase', [AdminPrivacyController::class, 'dsarErase'])
+        ->middleware('permission:privacy.manage')
+        ->name('settings.privacy.dsar-erase');
+    Route::post('/settings/privacy/purge-expired', [AdminPrivacyController::class, 'purgeExpired'])
+        ->middleware('permission:privacy.manage')
+        ->name('settings.privacy.purge-expired');
+
+    Route::post('/security/headers', [AdminSecurityController::class, 'updateHeaders'])
+        ->middleware('permission:security.manage')
+        ->name('security.headers.update');
 
     Route::get('/health', [AdminSystemHealthController::class, 'index'])
         ->middleware('permission:system_health.view,performance.manage')
@@ -103,6 +120,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', AdminNoCacheMiddlewa
     Route::get('/ai-visibility', [AdminAiVisibilityController::class, 'index'])
         ->middleware('permission:ai_visibility.manage,seo.view')
         ->name('ai-visibility.index');
+    Route::get('/seo/crawl-analytics', [AdminAiVisibilityController::class, 'index'])
+        ->middleware('permission:seo.view,seo.manage,system_health.view')
+        ->name('seo.crawl-analytics');
+    Route::post('/ai-visibility/search-console/test', [AdminAiVisibilityController::class, 'testSearchConsole'])
+        ->middleware('permission:ai_visibility.manage,seo.manage')
+        ->name('ai-visibility.search-console.test');
     Route::post('/ai-visibility/observations', [AdminAiVisibilityController::class, 'storeObservation'])
         ->middleware('permission:ai_visibility.manage')
         ->name('ai-visibility.observations.store');

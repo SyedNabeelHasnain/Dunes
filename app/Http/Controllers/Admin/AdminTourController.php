@@ -257,6 +257,14 @@ class AdminTourController extends Controller
 
         $tour->update($data);
 
+        try {
+            if (method_exists($tour, 'recordRevision')) {
+                $tour->refresh();
+                $tour->recordRevision('Updated tour content via CMS editor');
+            }
+        } catch (\Throwable) {
+        }
+
         // Sync Tiers & Addons
         if ($request->has('tiers')) {
             $tiersData = [];
@@ -795,6 +803,7 @@ class AdminTourController extends Controller
         Cache::forget('sitemap_tours_xml');
         Cache::forget('sitemap_images_xml');
         Cache::forget('sitemap_pages_xml');
+        \App\Http\Controllers\SitemapController::flushAllSitemapCaches();
         \App\Http\Controllers\GoogleThingsToDoFeedController::flushCache();
     }
 }

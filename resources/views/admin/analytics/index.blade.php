@@ -101,6 +101,43 @@
         </div>
     </div>
 
+    @if(isset($conversionFunnel))
+    <!-- Observed Conversion Funnel Telemetry -->
+    <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+            <div>
+                <h2 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                    <i class="bi bi-funnel-fill text-primary"></i> Observed Booking &amp; Lead Conversion Funnel ({{ $days }}d)
+                </h2>
+                <p class="text-xs text-slate-400">Real first-party telemetry across human sessions, tour engagement, checkout/WhatsApp leads, and confirmed bookings.</p>
+            </div>
+            <div class="flex items-center gap-2 text-xs font-bold">
+                <span class="rounded-full bg-sky-50 text-sky-700 border border-sky-200 px-3 py-1">Session &rarr; Lead: {{ $conversionFunnel['session_to_lead_pct'] }}%</span>
+                <span class="rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1">Session &rarr; Booking: {{ $conversionFunnel['session_to_booking_pct'] }}%</span>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div class="rounded-xl bg-slate-50 border border-slate-200 p-3.5">
+                <div class="text-[11px] font-bold uppercase text-slate-400">1. Human Sessions</div>
+                <div class="text-xl font-black text-slate-900 mt-1">{{ number_format($conversionFunnel['human_sessions']) }}</div>
+            </div>
+            <div class="rounded-xl bg-slate-50 border border-slate-200 p-3.5">
+                <div class="text-[11px] font-bold uppercase text-slate-400">2. Tour Interest Sessions</div>
+                <div class="text-xl font-black text-sky-700 mt-1">{{ number_format($conversionFunnel['tour_interest_sessions']) }}</div>
+            </div>
+            <div class="rounded-xl bg-slate-50 border border-slate-200 p-3.5">
+                <div class="text-[11px] font-bold uppercase text-slate-400">3. Checkouts + WhatsApp Leads</div>
+                <div class="text-xl font-black text-amber-600 mt-1">{{ number_format($conversionFunnel['lead_or_checkout_starts']) }}</div>
+                <div class="text-[10px] text-slate-500 mt-0.5">{{ $conversionFunnel['draft_checkouts'] }} checkouts &middot; {{ $conversionFunnel['whatsapp_leads'] }} WhatsApp</div>
+            </div>
+            <div class="rounded-xl bg-emerald-50/60 border border-emerald-200 p-3.5">
+                <div class="text-[11px] font-bold uppercase text-emerald-700">4. Confirmed / Completed</div>
+                <div class="text-xl font-black text-emerald-700 mt-1">{{ number_format($conversionFunnel['confirmed_bookings']) }}</div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <!-- Visual Analytics Charts Row -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div class="lg:col-span-8 bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs">

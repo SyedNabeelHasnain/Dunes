@@ -49,6 +49,7 @@ class InternalHttpProbeService
             $results[$norm] = [
                 'status' => $probed['status'],
                 'html' => $probed['html'],
+                'headers' => $probed['headers'] ?? [],
             ];
         }
 
@@ -123,6 +124,10 @@ class InternalHttpProbeService
             $status = $subRes->getStatusCode();
             $contentType = (string) $subRes->headers->get('Content-Type', '');
             $location = (string) $subRes->headers->get('Location', '');
+            $flatHeaders = [];
+            foreach ($subRes->headers->all() as $hName => $hVals) {
+                $flatHeaders[strtolower((string) $hName)] = is_array($hVals) ? (string) ($hVals[0] ?? '') : (string) $hVals;
+            }
             $html = (str_contains($contentType, 'html') || $status === 200)
                 ? (string) $subRes->getContent()
                 : '';
@@ -132,6 +137,7 @@ class InternalHttpProbeService
                 'html' => $html,
                 'content_type' => $contentType,
                 'location' => $location,
+                'headers' => $flatHeaders,
             ];
         } catch (\Throwable) {
             return [
@@ -139,6 +145,7 @@ class InternalHttpProbeService
                 'html' => '',
                 'content_type' => '',
                 'location' => '',
+                'headers' => [],
             ];
         } finally {
             self::$probing = $wasProbing;

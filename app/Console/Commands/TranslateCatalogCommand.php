@@ -382,10 +382,23 @@ class TranslateCatalogCommand extends Command
         }
 
         // 4. Save any updated records
+        $requireReview = (string) (Setting::where('setting_key', 'translation_require_review')->value('setting_value') ?? '0') === '1';
         if (! $dryRun) {
             foreach ($records as $record) {
                 if ($record->isDirty()) {
                     $record->saveQuietly();
+                    if ($requireReview && in_array($modelClass, [Tour::class, BlogPost::class, WikiArticle::class], true)) {
+                        try {
+                            \App\Models\SeoMetadata::updateOrCreate(
+                                ['entity_type' => $modelClass, 'entity_id' => $record->getKey()],
+                                [
+                                    'editorial_status' => 'in_review',
+                                    'review_notes' => 'Auto-translated via '.$driver->getName().' on '.now()->toDateTimeString().' — awaiting human localization review.',
+                                ]
+                            );
+                        } catch (\Throwable) {
+                        }
+                    }
                 }
             }
         }

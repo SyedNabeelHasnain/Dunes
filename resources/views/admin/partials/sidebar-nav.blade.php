@@ -91,10 +91,10 @@
             </a>
 
             <a href="{{ route('admin.ai-visibility.index') }}" 
-               class="relative flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.ai-visibility.*') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
+               class="relative flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.ai-visibility.*') || request()->routeIs('admin.seo.crawl-analytics') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
                 <div class="flex items-center gap-2">
-                    <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.ai-visibility.*') ? 'bg-violet-400' : 'bg-slate-600' }}"></span>
-                    <span>AI Visibility &amp; GEO</span>
+                    <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.ai-visibility.*') || request()->routeIs('admin.seo.crawl-analytics') ? 'bg-violet-400' : 'bg-slate-600' }}"></span>
+                    <span>AI Visibility &amp; Crawlers</span>
                 </div>
             </a>
 
@@ -152,12 +152,12 @@
                 </div>
             </a>
 
-            <!-- IP Firewall & Filters -->
+            <!-- IP Firewall, Headers & Filters -->
             <a href="{{ route('admin.security.ip-rules') }}" 
                class="relative flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.security.ip-rules') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
                 <div class="flex items-center gap-2">
                     <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.security.ip-rules') ? 'bg-rose-400' : 'bg-slate-600' }}"></span>
-                    <span>IP Firewall &amp; Filters</span>
+                    <span>Security, Firewall &amp; Headers</span>
                 </div>
             </a>
         </div>

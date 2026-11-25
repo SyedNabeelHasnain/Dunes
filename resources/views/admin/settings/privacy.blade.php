@@ -76,10 +76,64 @@
                 </div>
             </div>
 
-            <div class="flex justify-end">
-                <button type="submit" class="px-5 py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:opacity-90">Save Privacy Configuration</button>
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <span class="text-[11px] text-slate-500">Scheduled purge runs daily via <code>privacy:purge-expired</code> honoring the retention window above.</span>
+                <div class="flex items-center gap-2">
+                    <button type="submit" formaction="{{ route('admin.settings.privacy.purge-expired') }}" class="px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-700 text-xs font-bold hover:bg-slate-50 cursor-pointer">
+                        Run Retention Purge Now
+                    </button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:opacity-90 cursor-pointer">Save Privacy Configuration</button>
+                </div>
             </div>
         </form>
+    </div>
+
+    <!-- GDPR / UAE PDPL Data Subject Rights (DSAR) Operations -->
+    <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">
+        <div class="flex flex-wrap items-start justify-between gap-3">
+            <div>
+                <h5 class="text-base font-extrabold text-slate-900">Data Subject Rights (DSAR Lookup, Export &amp; Anonymization)</h5>
+                <p class="text-xs text-slate-500 mt-0.5">Search, export portable JSON records, or anonymize marketing/inquiry PII by subject email. Legal counsel review is required for jurisdiction-specific GDPR/PDPL sign-off.</p>
+            </div>
+            <span class="rounded-full bg-amber-50 border border-amber-200 px-3 py-1 text-[11px] font-bold text-amber-800">Audit-Logged Action</span>
+        </div>
+
+        <form method="GET" action="{{ route('admin.settings.privacy.dsar') }}" class="flex flex-wrap items-center gap-3">
+            <input type="email" name="email" value="{{ $dsarEmail ?? '' }}" required placeholder="Enter data subject email address..." class="flex-1 min-w-64 rounded-xl border border-slate-200 px-3.5 py-2 text-xs">
+            <button type="submit" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 cursor-pointer">Lookup Subject Records</button>
+        </form>
+
+        @if(!empty($dsarEmail) && isset($dsarResults))
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-3 text-xs">
+                <div class="font-bold text-slate-900">Records matched for <code>{{ $dsarEmail }}</code>:</div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div class="rounded-lg bg-white border border-slate-200 p-3"><div class="text-slate-400">Subscribers</div><div class="text-lg font-black">{{ $dsarResults['counts']['subscribers'] }}</div></div>
+                    <div class="rounded-lg bg-white border border-slate-200 p-3"><div class="text-slate-400">Contact Inquiries</div><div class="text-lg font-black">{{ $dsarResults['counts']['contacts'] }}</div></div>
+                    <div class="rounded-lg bg-white border border-slate-200 p-3"><div class="text-slate-400">WhatsApp Leads</div><div class="text-lg font-black">{{ $dsarResults['counts']['whatsapp_leads'] }}</div></div>
+                    <div class="rounded-lg bg-white border border-slate-200 p-3"><div class="text-slate-400">Bookings (Statutory)</div><div class="text-lg font-black">{{ $dsarResults['counts']['bookings'] }}</div></div>
+                </div>
+                <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-200">
+                    <form method="POST" action="{{ route('admin.settings.privacy.dsar-export') }}">
+                        @csrf
+                        <input type="hidden" name="email" value="{{ $dsarEmail }}">
+                        <button type="submit" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 cursor-pointer">
+                            <i class="bi bi-download me-1"></i> Export Portable JSON
+                        </button>
+                    </form>
+                    <form method="POST" action="{{ route('admin.settings.privacy.dsar-erase') }}" class="flex flex-wrap items-center gap-3" onsubmit="return confirm('Permanently anonymize subscriber, contact, and WhatsApp lead PII for this email? Statutory booking ledgers are preserved.');">
+                        @csrf
+                        <input type="hidden" name="email" value="{{ $dsarEmail }}">
+                        <label class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-rose-700">
+                            <input type="checkbox" name="confirm_erase" value="1" required class="rounded border-rose-300 text-rose-600">
+                            Confirm verified identity &amp; irreversible anonymization
+                        </label>
+                        <button type="submit" class="px-4 py-2 rounded-xl bg-rose-600 text-white text-xs font-bold hover:bg-rose-700 cursor-pointer">
+                            Anonymize Marketing &amp; Inquiry PII
+                        </button>
+                    </form>
+                </div>
+            </div>
+        @endif
     </div>
 
     <div class="rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden">

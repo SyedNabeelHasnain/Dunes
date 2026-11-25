@@ -281,6 +281,18 @@
                 </div>
             </div>
 
+            <!-- Editorial Review Gate for Auto-Translated Content -->
+            <div class="mb-6 p-4 rounded-xl border border-slate-200 bg-slate-50/70">
+                <label class="flex items-start gap-2.5 cursor-pointer">
+                    <input type="hidden" name="translation_require_review" value="0">
+                    <input type="checkbox" name="translation_require_review" value="1" @checked(($settings['translation_require_review'] ?? '0') === '1') class="mt-0.5 rounded border-slate-300 text-primary focus:ring-primary">
+                    <div>
+                        <span class="block text-xs font-bold text-slate-800">Require Editorial Human Review After Automated Machine Translation</span>
+                        <span class="text-[11px] text-slate-500">When enabled, running catalog auto-translation automatically marks modified Tours, Blog Posts, and Wiki Articles as <code>in_review</code> in Editorial Metadata until a bilingual editor verifies quality.</span>
+                    </div>
+                </label>
+            </div>
+
             <!-- Submit -->
             <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
                 <button type="submit" class="px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-hover text-white text-xs font-bold transition shadow-xs cursor-pointer">

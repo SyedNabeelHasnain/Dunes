@@ -63,6 +63,7 @@ class AdminVideoReviewController extends Controller
         $path = $this->getJsonPath();
         File::put($path, json_encode(array_values($records), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
         $this->galleryService->clearCache();
+        \App\Http\Controllers\SitemapController::flushAllSitemapCaches();
     }
 
     /**

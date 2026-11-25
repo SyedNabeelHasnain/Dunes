@@ -6,6 +6,8 @@ use App\Models\BlogPost;
 use App\Models\Page;
 use App\Models\Setting;
 use App\Models\Tour;
+use App\Models\WikiArticle;
+use App\Services\Seo\KeywordIntelligenceService;
 
 class SeoAuditChecker implements AuditCheckerInterface
 {
@@ -53,6 +55,7 @@ class SeoAuditChecker implements AuditCheckerInterface
         // 2. Check Tour Pages (Meta title length, descriptions, cannibalization)
         $tours = Tour::where('status', 'active')->get();
         $seenTitles = [];
+        $seenDescriptions = [];
 
         foreach ($tours as $tour) {
             $url = url('/' . $tour->slug);
@@ -132,6 +135,25 @@ class SeoAuditChecker implements AuditCheckerInterface
             } else {
                 $seenTitles[$normalizedTitle] = $url;
             }
+
+            $normalizedDesc = strtolower(trim($metaDesc));
+            if (mb_strlen($normalizedDesc) >= 25) {
+                if (isset($seenDescriptions[$normalizedDesc])) {
+                    $issues[] = [
+                        'category' => 'seo',
+                        'check_key' => 'seo_duplicate_meta_description',
+                        'title' => "Duplicate Meta Description on '{$tour->name}'",
+                        'description' => 'Multiple indexable URLs share an identical meta description, reducing snippet uniqueness in SERPs.',
+                        'severity' => 'medium',
+                        'verification_type' => 'automated',
+                        'affected_url' => $url,
+                        'evidence' => 'Matches description already used on: '.$seenDescriptions[$normalizedDesc],
+                        'recommended_action' => 'Write a distinct, value-specific 120–155 character meta description for this URL.',
+                    ];
+                } else {
+                    $seenDescriptions[$normalizedDesc] = $url;
+                }
+            }
         }
 
         // 3. Check Blog Posts
@@ -151,7 +173,8 @@ class SeoAuditChecker implements AuditCheckerInterface
                     'recommended_action' => 'Set an informative title for this post.',
                 ];
             }
-            if (empty($post->meta_desc) && empty($post->excerpt)) {
+            $postDesc = trim((string) ($post->meta_desc ?: $post->excerpt));
+            if ($postDesc === '') {
                 $issues[] = [
                     'category' => 'seo',
                     'check_key' => 'seo_blog_missing_meta_desc',
@@ -163,7 +186,66 @@ class SeoAuditChecker implements AuditCheckerInterface
                     'evidence' => 'meta_desc and excerpt are both empty.',
                     'recommended_action' => 'Add an engaging 120-155 character excerpt summarizing the article findings.',
                 ];
+            } elseif (mb_strlen($postDesc) >= 25) {
+                $normPostDesc = strtolower($postDesc);
+                if (isset($seenDescriptions[$normPostDesc])) {
+                    $issues[] = [
+                        'category' => 'seo',
+                        'check_key' => 'seo_duplicate_meta_description',
+                        'title' => "Duplicate Meta Description on Blog '{$post->title}'",
+                        'description' => 'This blog post shares an identical meta description with another published URL.',
+                        'severity' => 'medium',
+                        'verification_type' => 'automated',
+                        'affected_url' => $url,
+                        'evidence' => 'Matches description already used on: '.$seenDescriptions[$normPostDesc],
+                        'recommended_action' => 'Differentiate the meta description for this article.',
+                    ];
+                } else {
+                    $seenDescriptions[$normPostDesc] = $url;
+                }
             }
+        }
+
+        // 4. Wiki Article Metadata Coverage
+        try {
+            $wikiArticles = WikiArticle::where('status', 'published')->with('pillar:id,slug')->get();
+            foreach ($wikiArticles as $article) {
+                $wUrl = url('/wiki/'.($article->pillar?->slug ?? 'guide').'/'.$article->slug);
+                if (empty($article->meta_description) && empty($article->excerpt)) {
+                    $issues[] = [
+                        'category' => 'seo',
+                        'check_key' => 'seo_wiki_missing_meta_desc',
+                        'title' => "Wiki Article '{$article->title}' Missing Meta Description",
+                        'description' => 'Published wiki guide lacks both meta description and excerpt.',
+                        'severity' => 'medium',
+                        'verification_type' => 'automated',
+                        'affected_url' => $wUrl,
+                        'evidence' => "WikiArticle #{$article->id} has empty meta_description and excerpt.",
+                        'recommended_action' => 'Add a concise 120–155 character summary in the Wiki Editor.',
+                    ];
+                }
+            }
+        } catch (\Throwable) {
+        }
+
+        // 5. Focus Keyword Cannibalization Check
+        try {
+            $kwReport = app(KeywordIntelligenceService::class)->buildReport();
+            foreach (array_slice($kwReport['cannibalization'] ?? [], 0, 8) as $group) {
+                $urls = collect($group['items'] ?? [])->pluck('path')->implode(', ');
+                $issues[] = [
+                    'category' => 'seo',
+                    'check_key' => 'seo_keyword_cannibalization',
+                    'title' => "Keyword Cannibalization on '{$group['keyword']}' ({$group['count']} URLs)",
+                    'description' => 'Multiple indexable pages target the exact same focus keyword.',
+                    'severity' => ($group['severity'] ?? 'medium') === 'high' ? 'high' : 'medium',
+                    'verification_type' => 'automated',
+                    'affected_url' => route('admin.settings.keywords.index'),
+                    'evidence' => "Competing URLs: {$urls}",
+                    'recommended_action' => (string) ($group['recommendation'] ?? 'Differentiate focus keywords or consolidate overlapping pages.'),
+                ];
+            }
+        } catch (\Throwable) {
         }
 
         return $issues;

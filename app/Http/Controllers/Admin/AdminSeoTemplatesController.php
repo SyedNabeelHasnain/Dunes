@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\SitemapController;
 use App\Models\SeoTemplate;
+use App\Services\Governance\ApprovalWorkflowService;
 use App\Services\Governance\ConfigAuditService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,6 +15,7 @@ class AdminSeoTemplatesController extends Controller
 {
     public function __construct(
         protected ConfigAuditService $audit,
+        protected ApprovalWorkflowService $approvals,
     ) {}
 
     public function index(): View
@@ -43,8 +46,7 @@ class AdminSeoTemplatesController extends Controller
         ]);
 
         $old = $template->only(array_keys($validated));
-
-        $template->update([
+        $newValues = [
             'title_pattern' => $validated['title_pattern'] ?? $template->title_pattern,
             'description_pattern' => $validated['description_pattern'] ?? $template->description_pattern,
             'keywords_pattern' => $validated['keywords_pattern'] ?? $template->keywords_pattern,
@@ -56,7 +58,25 @@ class AdminSeoTemplatesController extends Controller
             'sitemap_enabled' => $request->boolean('sitemap_enabled'),
             'is_active' => $request->boolean('is_active'),
             'updated_by' => auth()->id(),
-        ]);
+        ];
+
+        $user = $request->user();
+        if ($user && method_exists($user, 'hasAnyPermission') && ! $user->hasAnyPermission(['governance.approve', '*'])) {
+            $approval = $this->approvals->propose(
+                section: 'seo_template',
+                targetKey: "seo_template:{$contentType}",
+                summary: "Proposed SEO inheritance template update for {$template->label}",
+                payload: array_merge(['content_type' => $contentType], $newValues),
+                previousPayload: $old,
+                requester: $user,
+            );
+
+            return redirect()->route('admin.settings.seo-templates.index')
+                ->with('success', "SEO template update for '{$template->label}' submitted for approval (#{$approval->id}).");
+        }
+
+        $template->update($newValues);
+        SitemapController::flushAllSitemapCaches();
 
         $this->audit->log(
             section: 'seo_template',
@@ -83,6 +103,7 @@ class AdminSeoTemplatesController extends Controller
 
         $old = $template->toArray();
         $template->update(array_merge($defaults[$contentType], ['is_active' => true, 'updated_by' => auth()->id()]));
+        SitemapController::flushAllSitemapCaches();
 
         $this->audit->log(
             section: 'seo_template',

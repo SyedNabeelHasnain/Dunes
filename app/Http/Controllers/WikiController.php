@@ -240,10 +240,18 @@ class WikiController extends Controller
             ->take(5)
             ->get()
             ->map(function ($t) {
+                $article = $t->article;
+                $hasPublicArticle = $article
+                    && $article->status === 'published'
+                    && $article->pillar
+                    && $article->pillar->status === 'active';
+
                 return [
                     'term' => $t->term,
                     'definition' => Str::limit($t->definition, 100),
-                    'url' => $t->article ? localized_route('wiki.article', ['pillarSlug' => $t->article->pillar->slug, 'articleSlug' => $t->article->slug]) : localized_route('wiki.glossary'),
+                    'url' => $hasPublicArticle
+                        ? localized_route('wiki.article', ['pillarSlug' => $article->pillar->slug, 'articleSlug' => $article->slug])
+                        : localized_route('wiki.glossary'),
                 ];
             });
 

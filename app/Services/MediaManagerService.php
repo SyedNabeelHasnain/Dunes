@@ -758,6 +758,18 @@ class MediaManagerService
         // Move to public destination
         $file->move($targetDir, $uniqueFilename);
         $fullPath = $targetDir . DIRECTORY_SEPARATOR . $uniqueFilename;
+
+        try {
+            if ($ext === 'svg') {
+                \App\Services\Security\SvgSanitizer::sanitizeFile($fullPath);
+            } else {
+                \App\Services\Security\SvgSanitizer::assertNoScriptPolyglot($fullPath, $ext);
+            }
+        } catch (\Throwable $secEx) {
+            @unlink($fullPath);
+            throw $secEx;
+        }
+
         $relativePath = $subfolder . '/' . $uniqueFilename;
         $publicUrl = '/' . $relativePath;
         $sizeBytes = filesize($fullPath);
@@ -825,6 +837,13 @@ class MediaManagerService
         try {
             // Overwrite target file
             $newFile->move($targetDir, basename($targetFullPath));
+
+            $replaceExt = strtolower((string) pathinfo($targetFullPath, PATHINFO_EXTENSION));
+            if ($replaceExt === 'svg') {
+                \App\Services\Security\SvgSanitizer::sanitizeFile($targetFullPath);
+            } else {
+                \App\Services\Security\SvgSanitizer::assertNoScriptPolyglot($targetFullPath, $replaceExt);
+            }
 
             // Update asset metadata
             $sizeBytes = filesize($targetFullPath);

@@ -14,7 +14,9 @@
         saving: false,
         init() {
             const current = window.DunesConsent ? window.DunesConsent.get() : null;
-            if (!current || !current.decided) {
+            const currentVersion = window.DunesConsent ? String(window.DunesConsent.version || '') : '';
+            const versionMismatch = current && current.version && currentVersion && String(current.version) !== currentVersion;
+            if (!current || !current.decided || versionMismatch) {
                 this.showBanner = true;
             } else {
                 this.analytics = !!current.analytics;

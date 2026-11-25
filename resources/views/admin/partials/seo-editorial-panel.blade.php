@@ -24,6 +24,7 @@
         $rawBody,
         $resolvedSeo['focus_keyword']
     );
+    $itemLinkSuggestions = $keywordSvc->suggestLinksForItem($rawBody, (string) ($entity->slug ?? ''));
 
     $publicTargetUrl = match ($entityType ?? '') {
         'blog_post' => url('/blog/'.$entity->slug),
@@ -171,8 +172,8 @@
             </form>
 
             <!-- Live On-Page Scorecard -->
-            <div class="rounded-xl bg-slate-50 border border-slate-200 p-4 space-y-2">
-                <div class="text-xs font-extrabold text-slate-800">Readability &amp; On-Page Checks ({{ $scorecard['title_chars'] }} title chars / ~{{ $scorecard['title_pixels'] }}px · {{ $scorecard['description_chars'] }} desc chars · {{ $scorecard['read_minutes'] }} min read)</div>
+            <div class="rounded-xl bg-slate-50 border border-slate-200 p-4 space-y-3">
+                <div class="text-xs font-extrabold text-slate-800">Readability, Accessibility &amp; On-Page Checks ({{ $scorecard['title_chars'] }} title chars / ~{{ $scorecard['title_pixels'] }}px · {{ $scorecard['description_chars'] }} desc chars · {{ $scorecard['read_minutes'] }} min read)</div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
                     @foreach($scorecard['checks'] as $chk)
                         <div class="flex items-center gap-2 {{ $chk['status'] === 'pass' ? 'text-emerald-700' : ($chk['status'] === 'warn' ? 'text-amber-700' : 'text-slate-600') }}">
@@ -180,7 +181,25 @@
                             <span>{{ $chk['label'] }}</span>
                         </div>
                     @endforeach
+                    @foreach(($scorecard['accessibility_checks'] ?? []) as $achk)
+                        <div class="flex items-center gap-2 {{ $achk['status'] === 'pass' ? 'text-emerald-700' : 'text-amber-700' }}">
+                            <i class="bi {{ $achk['status'] === 'pass' ? 'bi-universal-access-circle' : 'bi-exclamation-triangle-fill' }}"></i>
+                            <span>{{ $achk['label'] }}</span>
+                        </div>
+                    @endforeach
                 </div>
+                @if(!empty($itemLinkSuggestions))
+                    <div class="pt-3 border-t border-slate-200">
+                        <div class="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Contextual Internal Linking Opportunities</div>
+                        <div class="flex flex-wrap gap-2">
+                            @foreach($itemLinkSuggestions as $ls)
+                                <span class="inline-flex items-center gap-1.5 rounded-lg bg-white border border-slate-200 px-2.5 py-1 text-[11px] text-slate-700">
+                                    Link <strong>{{ $ls['anchor'] }}</strong> &rarr; <code class="text-primary">{{ $ls['target_url'] }}</code>
+                                </span>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
 

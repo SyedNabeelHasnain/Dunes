@@ -229,6 +229,63 @@ class KeywordIntelligenceService
             $checks[] = ['status' => 'info', 'label' => 'Assign a unique Focus Keyword to prevent cannibalization.'];
         }
 
+        // Editor-level WCAG & Semantic Accessibility Checks on body HTML
+        $a11yChecks = [];
+        if ($bodyHtml !== '') {
+            preg_match_all('/<img\b[^>]*>/i', $bodyHtml, $imgMatches);
+            $missingAlt = 0;
+            foreach ($imgMatches[0] ?? [] as $imgTag) {
+                if (! preg_match('/\balt\s*=\s*["\'][^"\']+["\']/i', $imgTag)) {
+                    $missingAlt++;
+                }
+            }
+            if ($missingAlt > 0) {
+                $score -= 6;
+                $a11yChecks[] = ['status' => 'warn', 'label' => "{$missingAlt} embedded image(s) missing descriptive alt text."];
+            } else {
+                $a11yChecks[] = ['status' => 'pass', 'label' => 'All embedded body images include alt attributes (or none embedded).'];
+            }
+
+            if (preg_match_all('/<h([1-6])\b/i', $bodyHtml, $hMatches)) {
+                $levels = array_map('intval', $hMatches[1]);
+                $skipped = false;
+                $prev = 1;
+                foreach ($levels as $lvl) {
+                    if ($lvl === 1) {
+                        $a11yChecks[] = ['status' => 'warn', 'label' => 'Avoid <h1> inside body HTML (page already renders one primary <h1>); use <h2>–<h4>.'];
+                        $score -= 4;
+                        $skipped = true;
+                        break;
+                    }
+                    if (($lvl - $prev) > 1) {
+                        $a11yChecks[] = ['status' => 'warn', 'label' => "Skipped heading level in body (<h{$prev}> to <h{$lvl}>)."];
+                        $score -= 4;
+                        $skipped = true;
+                        break;
+                    }
+                    $prev = $lvl;
+                }
+                if (! $skipped) {
+                    $a11yChecks[] = ['status' => 'pass', 'label' => 'Body heading hierarchy is sequential (H2 -> H3 -> H4).'];
+                }
+            }
+
+            preg_match_all('/<a\b[^>]*>(.*?)<\/a>/is', $bodyHtml, $anchorMatches);
+            $genericAnchors = 0;
+            foreach ($anchorMatches[1] ?? [] as $aText) {
+                $cleanA = strtolower(trim(strip_tags($aText)));
+                if (in_array($cleanA, ['click here', 'read more', 'learn more', 'here', 'link', 'more'], true)) {
+                    $genericAnchors++;
+                }
+            }
+            if ($genericAnchors > 0) {
+                $score -= 4;
+                $a11yChecks[] = ['status' => 'warn', 'label' => "{$genericAnchors} generic link anchor(s) ('click here' / 'read more'). Use descriptive anchor text."];
+            } else {
+                $a11yChecks[] = ['status' => 'pass', 'label' => 'No non-descriptive generic anchor text detected.'];
+            }
+        }
+
         return [
             'score' => max(0, $score),
             'word_count' => $wordCount,
@@ -237,6 +294,46 @@ class KeywordIntelligenceService
             'title_pixels' => $estPixelWidth,
             'description_chars' => $descLen,
             'checks' => $checks,
+            'accessibility_checks' => $a11yChecks,
         ];
+    }
+
+    /**
+     * Suggest contextual internal links for a single item's body copy directly inside the editor panel.
+     */
+    public function suggestLinksForItem(string $bodyHtml, ?string $excludeSlug = null): array
+    {
+        $lower = strtolower($bodyHtml);
+        if (trim($lower) === '') {
+            return [];
+        }
+
+        $suggestions = [];
+        try {
+            $tours = Tour::where('status', 'active')->with('seoMeta')->orderBy('priority')->limit(30)->get();
+            foreach ($tours as $tour) {
+                if ($excludeSlug && $tour->slug === $excludeSlug) {
+                    continue;
+                }
+                if (str_contains($lower, '/'.$tour->slug)) {
+                    continue;
+                }
+                $name = (string) $tour->getTranslation('name', 'en', true);
+                $kw = trim((string) ($tour->seoMeta?->focus_keyword ?: $name));
+                if ($kw !== '' && (str_contains($lower, strtolower($kw)) || str_contains($lower, strtolower($name)))) {
+                    $suggestions[] = [
+                        'anchor' => $kw,
+                        'target_title' => $name,
+                        'target_url' => '/'.$tour->slug,
+                    ];
+                }
+                if (count($suggestions) >= 6) {
+                    break;
+                }
+            }
+        } catch (\Throwable) {
+        }
+
+        return $suggestions;
     }
 }

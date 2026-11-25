@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AiCitationObservation;
 use App\Models\RequestLog;
+use App\Services\Seo\CrawlerLogAnalyzerService;
+use App\Services\Seo\SearchConsoleIntegrationService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +17,10 @@ use Illuminate\View\View;
 
 class AdminAiVisibilityController extends Controller
 {
+    public function __construct(
+        protected CrawlerLogAnalyzerService $crawlerAnalyzer,
+        protected SearchConsoleIntegrationService $searchConsole,
+    ) {}
     private const AI_BOT_TOKENS = [
         'GPTBot',
         'ChatGPT-User',
@@ -34,8 +41,9 @@ class AdminAiVisibilityController extends Controller
         'copilot.microsoft.com',
     ];
 
-    public function index(): View
+    public function index(Request $request): View
     {
+        $days = max(1, min(90, (int) $request->input('days', 30)));
         $botHits = [];
         $aiReferrals = collect();
 
@@ -43,7 +51,7 @@ class AdminAiVisibilityController extends Controller
             if (class_exists(RequestLog::class) && Schema::hasTable('request_logs')) {
                 foreach (self::AI_BOT_TOKENS as $bot) {
                     $botHits[$bot] = RequestLog::where('user_agent', 'like', "%{$bot}%")
-                        ->where('request_timestamp', '>=', now()->subDays(30))
+                        ->where('request_timestamp', '>=', now()->subDays($days))
                         ->count();
                 }
 
@@ -54,7 +62,7 @@ class AdminAiVisibilityController extends Controller
                             $q->orWhere('referrer_url', 'like', "%{$domain}%");
                         }
                     })
-                    ->where('request_timestamp', '>=', now()->subDays(30))
+                    ->where('request_timestamp', '>=', now()->subDays($days))
                     ->select('referrer_url', DB::raw('COUNT(*) as visits'), DB::raw('MAX(request_timestamp) as last_visit'))
                     ->groupBy('referrer_url')
                     ->orderByDesc('visits')
@@ -65,8 +73,40 @@ class AdminAiVisibilityController extends Controller
         }
 
         $observations = AiCitationObservation::latest('observed_at')->paginate(20);
+        $crawlReport = $this->crawlerAnalyzer->analyze($days);
+        $searchConsoleStatus = $this->searchConsole->getStatusSummary();
 
-        return view('admin.ai-visibility.index', compact('botHits', 'aiReferrals', 'observations'));
+        return view('admin.ai-visibility.index', compact(
+            'botHits',
+            'aiReferrals',
+            'observations',
+            'crawlReport',
+            'searchConsoleStatus',
+            'days'
+        ));
+    }
+
+    public function testSearchConsole(Request $request): RedirectResponse|JsonResponse
+    {
+        $validated = $request->validate([
+            'provider' => ['required', Rule::in(['google', 'bing'])],
+        ]);
+
+        $result = $validated['provider'] === 'google'
+            ? $this->searchConsole->fetchGoogleSearchAnalytics(28)
+            : $this->searchConsole->fetchBingCrawlStats();
+
+        if ($request->wantsJson()) {
+            return response()->json($result, $result['success'] ? 200 : 200);
+        }
+
+        if ($result['success']) {
+            $count = count($result['rows'] ?? $result['stats'] ?? []);
+
+            return back()->with('success', strtoupper($validated['provider'])." Search Console API connected cleanly ({$count} records returned).");
+        }
+
+        return back()->with('error', (string) ($result['message'] ?? 'Search Console API is awaiting valid credentials.'));
     }
 
     public function storeObservation(Request $request): RedirectResponse

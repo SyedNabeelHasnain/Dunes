@@ -64,7 +64,16 @@ class AdminPageController extends Controller
 
         $page->update($updatePayload);
 
+        try {
+            if (method_exists($page, 'recordRevision')) {
+                $page->refresh();
+                $page->recordRevision('Updated page metadata via CMS editor');
+            }
+        } catch (\Throwable) {
+        }
+
         app(CmsContentService::class)->clearCache();
+        \App\Http\Controllers\SitemapController::flushAllSitemapCaches();
 
         return redirect()->route('admin.pages.edit', $id)->with('success', 'Page content updated successfully.');
     }

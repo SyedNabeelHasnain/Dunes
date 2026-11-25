@@ -134,10 +134,10 @@
     </div>
 
     <!-- Main Tabs -->
-    <div x-data="{ currentTab: '{{ request()->has('appeals_page') || $appealStatus !== 'all' ? 'appeals' : 'rules' }}' }" class="space-y-4">
+    <div x-data="{ currentTab: '{{ $tab === 'headers' ? 'headers' : (request()->has('appeals_page') || $appealStatus !== 'all' ? 'appeals' : 'rules') }}' }" class="space-y-4">
         <!-- Tab Pill Navigation -->
-        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
-            <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2">
+            <div class="flex flex-wrap items-center gap-2">
                 <button type="button" @click="currentTab = 'rules'" :class="currentTab === 'rules' ? 'bg-slate-900 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer">
                     <i class="bi bi-sliders"></i> IP Access Rules
                     <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20 text-white font-mono">{{ $rules->total() }}</span>
@@ -149,6 +149,9 @@
                     @else
                         <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-200 text-slate-700 font-mono">{{ $unblockRequests->total() }}</span>
                     @endif
+                </button>
+                <button type="button" @click="currentTab = 'headers'" :class="currentTab === 'headers' ? 'bg-slate-900 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer">
+                    <i class="bi bi-shield-check"></i> HTTP Security Headers &amp; CSP
                 </button>
             </div>
 
@@ -431,6 +434,58 @@
                     {{ $unblockRequests->appends(request()->query())->links() }}
                 </div>
                 @endif
+            </div>
+        </div>
+
+        <!-- ==================== TAB 3: HTTP SECURITY HEADERS & CSP ==================== -->
+        <div x-show="currentTab === 'headers'" x-cloak class="space-y-4">
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs space-y-5">
+                <div class="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 pb-4">
+                    <div>
+                        <h2 class="text-base font-extrabold text-slate-900">Runtime HTTP Security Headers &amp; CSP Directives</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Enforced globally by <code>SecurityHeaders</code> middleware on every HTML, JSON, PDF, and streamed response. Changes by non-approver roles route through Governance two-person approval.</p>
+                    </div>
+                    <span class="rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-[11px] font-bold text-emerald-700">OWASP Top 10:2025</span>
+                </div>
+
+                @php $secHdrs = $securityHeaders ?? []; @endphp
+                <form method="POST" action="{{ route('admin.security.headers.update') }}" class="space-y-4">
+                    @csrf
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="security_referrer_policy" class="block text-xs font-bold text-slate-700 mb-1">Referrer-Policy</label>
+                            <select name="security_referrer_policy" id="security_referrer_policy" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-mono">
+                                @foreach(['strict-origin-when-cross-origin', 'no-referrer', 'same-origin', 'strict-origin', 'origin-when-cross-origin', 'no-referrer-when-downgrade'] as $rp)
+                                    <option value="{{ $rp }}" @selected(($secHdrs['security_referrer_policy'] ?? 'strict-origin-when-cross-origin') === $rp)>{{ $rp }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label for="security_permissions_policy" class="block text-xs font-bold text-slate-700 mb-1">Permissions-Policy</label>
+                            <input type="text" name="security_permissions_policy" id="security_permissions_policy" value="{{ old('security_permissions_policy', $secHdrs['security_permissions_policy'] ?? 'camera=(), microphone=(), geolocation=(self)') }}" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-mono">
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                        <label class="inline-flex items-center gap-2.5 text-xs font-bold text-slate-800 cursor-pointer">
+                            <input type="hidden" name="security_hsts_enabled" value="0">
+                            <input type="checkbox" name="security_hsts_enabled" value="1" @checked(($secHdrs['security_hsts_enabled'] ?? '1') !== '0') class="rounded border-slate-300 text-primary">
+                            Emit Strict-Transport-Security (HSTS: <code>max-age=31536000; includeSubDomains; preload</code>)
+                        </label>
+                    </div>
+
+                    <div>
+                        <label for="security_csp_extra" class="block text-xs font-bold text-slate-700 mb-1">Additional Content-Security-Policy Directives (Appended to Safe Baseline)</label>
+                        <p class="text-[11px] text-slate-500 mb-1.5">Baseline always enforces: <code>upgrade-insecure-requests; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; form-action 'self' https:;</code></p>
+                        <textarea name="security_csp_extra" id="security_csp_extra" rows="2" placeholder="Optional extra directives e.g. report-to csp-endpoint;" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-mono">{{ old('security_csp_extra', $secHdrs['security_csp_extra'] ?? '') }}</textarea>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button type="submit" class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold cursor-pointer">
+                            <i class="bi bi-shield-check me-1"></i> Save Security Headers Policy
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
