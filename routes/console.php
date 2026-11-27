@@ -53,3 +53,7 @@ Schedule::command('privacy:purge-expired')->dailyAt('03:45')->timezone('Asia/Dub
 Schedule::command('audit:run --type=incremental')->dailyAt('05:00')->timezone('Asia/Dubai')->withoutOverlapping(30);
 Schedule::command('audit:run --type=full')->weeklyOn(0, '05:30')->timezone('Asia/Dubai')->withoutOverlapping(60);
 
+// Automated configurable E2E Visitor Journey Simulator (Booking, WhatsApp & Contact Us)
+Schedule::command('qa:run-synthetic-tests --scheduled')->everyMinute()->withoutOverlapping(15);
+Schedule::command('qa:run-synthetic-tests --prune')->dailyAt('03:55')->timezone('Asia/Dubai')->withoutOverlapping(30);
+

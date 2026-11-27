@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\AdminSpotlightController;
 use App\Http\Controllers\Admin\AdminSubscriberController;
 use App\Http\Controllers\Admin\AdminSubscriberGroupController;
+use App\Http\Controllers\Admin\AdminSyntheticTestController;
 use App\Http\Controllers\Admin\AdminTourController;
 use App\Http\Controllers\Admin\AdminTranslationApiController;
 use App\Http\Controllers\Admin\AdminTranslationSettingController;
@@ -428,6 +429,15 @@ Route::middleware(['auth', AdminNoCacheMiddleware::class])->prefix('admin')->nam
     Route::get('/audit/run/{id}', [AdminAuditController::class, 'show'])->name('audit.show');
     Route::put('/audit/issues/{id}', [AdminAuditController::class, 'updateIssue'])->name('audit.issues.update');
     Route::get('/audit/export/{id}/{format?}', [AdminAuditController::class, 'export'])->name('audit.export');
+
+    // ── Automated Visitor Journey Simulator & E2E Flow Testing ───────────────
+    Route::get('/qa-simulator', [AdminSyntheticTestController::class, 'index'])->name('qa-simulator.index');
+    Route::post('/qa-simulator/run', [AdminSyntheticTestController::class, 'run'])->name('qa-simulator.run');
+    Route::get('/qa-simulator/runs/{id}', [AdminSyntheticTestController::class, 'show'])->name('qa-simulator.show');
+    Route::post('/qa-simulator/settings', [AdminSyntheticTestController::class, 'updateSettings'])->name('qa-simulator.settings.update');
+    Route::post('/qa-simulator/runs/{id}/cleanup', [AdminSyntheticTestController::class, 'cleanup'])->name('qa-simulator.cleanup');
+    Route::get('/qa-simulator/runs/{id}/export', [AdminSyntheticTestController::class, 'export'])->name('qa-simulator.export');
+    Route::delete('/qa-simulator/runs/{id}', [AdminSyntheticTestController::class, 'destroy'])->name('qa-simulator.destroy');
 
     // Integrations & Portal Settings (General, SEO, Marketing, Google, Meta, Currency, Cache)
     Route::get('/settings', [AdminSettingController::class, 'general'])->name('settings.index');

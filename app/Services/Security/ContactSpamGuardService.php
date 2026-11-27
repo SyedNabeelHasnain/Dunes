@@ -7,6 +7,7 @@ use App\Models\SpamEvent;
 use App\Models\VerifiedEmail;
 use App\Services\IpSecurityService;
 use App\Services\SettingsService;
+use App\Services\SyntheticTesting\SyntheticVisitorSession;
 use App\Services\VisitorTrackerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -177,7 +178,7 @@ class ContactSpamGuardService
         }
 
         $minDwell = $this->getMinDwellSeconds();
-        if ($elapsed < $minDwell) {
+        if (! (SyntheticVisitorSession::isSimulating() && ! SyntheticVisitorSession::isBotShieldProbe()) && $elapsed < $minDwell) {
             return [
                 'valid' => false,
                 'reason' => 'submitted_too_fast',
@@ -265,7 +266,7 @@ class ContactSpamGuardService
         }
 
         // ── LAYER 1B: Multi-Tier Rate Limiting (IP + Email) ───────────────────
-        if (! app()->runningUnitTests() || config('antispam.enforce_rate_limits_in_tests', false)) {
+        if ((! app()->runningUnitTests() || config('antispam.enforce_rate_limits_in_tests', false)) && ! SyntheticVisitorSession::isSimulating()) {
             $ipMinKey = "antispam:contact:ip_min:{$clientIp}";
             $ipHourKey = "antispam:contact:ip_hr:{$clientIp}";
             $emailKey = 'antispam:contact:email:'.md5($email);
@@ -374,7 +375,7 @@ class ContactSpamGuardService
         }
 
         // ── LAYER 3: Server-Side Bot Verification (reCAPTCHA + Turnstile) ─────
-        if ($enforceInteractive) {
+        if ($enforceInteractive && ! SyntheticVisitorSession::isSimulating()) {
             $botVerify = $this->verifyExternalChallenges($request, $clientIp, 'contact');
             $meta['bot_challenges'] = $botVerify;
             $score += $botVerify['score_penalty'];
@@ -557,7 +558,7 @@ class ContactSpamGuardService
         }
 
         // Per-IP OTP send cap across ALL target emails (stops bots bombing 100 different Gmail victims!)
-        if (! app()->runningUnitTests() || config('antispam.enforce_rate_limits_in_tests', false)) {
+        if ((! app()->runningUnitTests() || config('antispam.enforce_rate_limits_in_tests', false)) && ! SyntheticVisitorSession::isSimulating()) {
             $ipOtpKey = "antispam:otp_ip:{$clientIp}";
             if (RateLimiter::tooManyAttempts($ipOtpKey, 5)) {
                 $wait = RateLimiter::availableIn($ipOtpKey);
@@ -731,7 +732,7 @@ class ContactSpamGuardService
         }
 
         // 6. Cross-IP Fuzzy Template Burst Detection (stops distributed rotating-IP botnets!)
-        if ($trackBurst && mb_strlen($combined) >= 25) {
+        if ($trackBurst && ! SyntheticVisitorSession::isSimulating() && mb_strlen($combined) >= 25) {
             $templateHash = $this->computeTemplateFingerprint($name, $message);
             if ($templateHash !== null) {
                 $burstKey = "antispam_template_burst:{$templateHash}";
@@ -989,7 +990,9 @@ class ContactSpamGuardService
         string $actionTaken,
         array $reasons,
     ): void {
-        $escalated = $this->escalateIpIfAbusive($ip, $reasons);
+        $escalated = SyntheticVisitorSession::isSimulating()
+            ? false
+            : $this->escalateIpIfAbusive($ip, $reasons);
         $finalAction = $escalated ? 'auto_ip_blocked' : $actionTaken;
         $this->logSpamEvent($request, $channel, $ip, $email, $name, $subject, $score, $finalAction, $reasons);
     }

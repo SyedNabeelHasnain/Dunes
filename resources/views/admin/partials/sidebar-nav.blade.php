@@ -1,6 +1,6 @@
 @php
     $isMobile = $isMobile ?? false;
-    $isAnalyticsGroup = request()->routeIs('admin.analytics.*') || request()->routeIs('admin.reports.*') || request()->routeIs('admin.security.ip-rules') || request()->routeIs('admin.audit.*') || request()->routeIs('admin.governance.*') || request()->routeIs('admin.health.*') || request()->routeIs('admin.ai-visibility.*') || request()->routeIs('admin.seo.crawl-analytics') || request()->routeIs('admin.settings.privacy*');
+    $isAnalyticsGroup = request()->routeIs('admin.analytics.*') || request()->routeIs('admin.reports.*') || request()->routeIs('admin.security.ip-rules') || request()->routeIs('admin.audit.*') || request()->routeIs('admin.qa-simulator.*') || request()->routeIs('admin.governance.*') || request()->routeIs('admin.health.*') || request()->routeIs('admin.ai-visibility.*') || request()->routeIs('admin.seo.crawl-analytics') || request()->routeIs('admin.settings.privacy*');
     $isBookingsGroup = request()->routeIs('admin.bookings.*') || request()->routeIs('admin.pricing.*');
     $isOperationsGroup = request()->routeIs('admin.operations.*') || request()->routeIs('admin.drivers.*') || request()->routeIs('admin.vehicles.*');
     $isCatalogGroup = request()->routeIs('admin.tours.*') || request()->routeIs('admin.addons.*') || request()->routeIs('admin.tiers.*');
@@ -88,6 +88,15 @@
                     <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.health.*') ? 'bg-cyan-400' : 'bg-slate-600' }}"></span>
                     <span>CWV &amp; System Health</span>
                 </div>
+            </a>
+
+            <a href="{{ route('admin.qa-simulator.index') }}" 
+               class="relative flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.qa-simulator.*') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.qa-simulator.*') ? 'bg-cyan-400' : 'bg-slate-600' }}"></span>
+                    <span>Journey Simulator &amp; QA</span>
+                </div>
+                <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">E2E</span>
             </a>
 
             <a href="{{ route('admin.ai-visibility.index') }}" 
@@ -685,6 +694,15 @@
                class="relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.settings.notifications*') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
                 <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.settings.notifications*') ? 'bg-primary' : 'bg-slate-600' }}"></span>
                 <span>Notifications & Alerts</span>
+            </a>
+
+            <a href="{{ route('admin.qa-simulator.index') }}" 
+               class="relative flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('admin.qa-simulator.*') ? 'bg-primary/20 text-primary-light font-semibold ring-1 ring-primary/40' : 'text-slate-400 hover:text-white hover:bg-slate-900/60' }}">
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('admin.qa-simulator.*') ? 'bg-cyan-400' : 'bg-slate-600' }}"></span>
+                    <span>Automated E2E QA</span>
+                </div>
+                <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">E2E</span>
             </a>
 
             <a href="{{ route('admin.security.ip-rules') }}" 

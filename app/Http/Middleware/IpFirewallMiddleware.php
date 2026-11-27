@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Services\Http\InternalHttpProbeService;
 use App\Services\IpSecurityService;
+use App\Services\SyntheticTesting\SyntheticVisitorSession;
 use App\Services\VisitorTrackerService;
 use Closure;
 use Illuminate\Http\Request;
@@ -25,7 +26,7 @@ class IpFirewallMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (InternalHttpProbeService::isProbing()) {
+        if (InternalHttpProbeService::isProbing() || SyntheticVisitorSession::isSimulating()) {
             return $next($request);
         }
 

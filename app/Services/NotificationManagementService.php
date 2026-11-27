@@ -13,6 +13,7 @@ use App\Models\Contact;
 use App\Models\Review;
 use App\Models\Tour;
 use App\Models\WhatsappInquiry;
+use App\Services\SyntheticTesting\SyntheticVisitorSession;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -35,6 +36,10 @@ class NotificationManagementService
      */
     protected function prepareMailEnvironment(): void
     {
+        if (SyntheticVisitorSession::shouldSuppressExternalSideEffects()) {
+            return;
+        }
+
         if (! app()->environment('testing')) {
             try {
                 $this->emailMarketing->applySmtpConfig();
@@ -474,6 +479,10 @@ class NotificationManagementService
      */
     public function dispatchWebhook(string $event, array $payload): void
     {
+        if (SyntheticVisitorSession::shouldSuppressExternalSideEffects()) {
+            return;
+        }
+
         $enabled = $this->settings->get('notification_webhook_enabled', '0') === '1';
         $url = trim((string) $this->settings->get('notification_webhook_url', ''));
 

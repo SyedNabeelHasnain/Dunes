@@ -87,6 +87,28 @@
         </div>
     </div>
 
+    <!-- Automated E2E Visitor Journey Simulator Status -->
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-cyan-50 border border-cyan-200 text-cyan-700 flex items-center justify-center text-lg">
+                <i class="bi bi-robot"></i>
+            </div>
+            <div>
+                <h6 class="text-sm font-extrabold text-slate-900">Automated E2E Visitor Journey Simulator</h6>
+                <p class="text-xs text-slate-500">
+                    @if(!empty($latestSyntheticRun))
+                        Latest Run #{{ $latestSyntheticRun->id }} ({{ strtoupper($latestSyntheticRun->status) }}): {{ $latestSyntheticRun->summary }} · {{ $latestSyntheticRun->created_at?->diffForHumans() }}
+                    @else
+                        No automated or manual visitor journey test runs recorded yet.
+                    @endif
+                </p>
+            </div>
+        </div>
+        <a href="{{ route('admin.qa-simulator.index') }}" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition">
+            Open Journey Simulator &rarr;
+        </a>
+    </div>
+
     <!-- Poor Performing Routes & System Health Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">

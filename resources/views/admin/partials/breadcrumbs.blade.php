@@ -44,6 +44,14 @@
                 ['label' => 'Analytics & Intelligence', 'url' => route('admin.analytics.index')],
                 ['label' => 'CWV & System Health'],
             ],
+            'admin.qa-simulator.index' => [
+                ['label' => 'Analytics & Intelligence', 'url' => route('admin.analytics.index')],
+                ['label' => 'Journey Simulator & E2E QA'],
+            ],
+            'admin.qa-simulator.show' => [
+                ['label' => 'Journey Simulator & E2E QA', 'url' => route('admin.qa-simulator.index')],
+                ['label' => isset($run) ? 'Run #'.$run->id : 'Run Waterfall'],
+            ],
             'admin.ai-visibility.index' => [
                 ['label' => 'Analytics & Intelligence', 'url' => route('admin.analytics.index')],
                 ['label' => 'AI Visibility & Crawlers'],

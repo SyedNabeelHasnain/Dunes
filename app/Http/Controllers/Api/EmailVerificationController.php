@@ -7,6 +7,7 @@ use App\Mail\OtpMail;
 use App\Models\EmailOtp;
 use App\Models\VerifiedEmail;
 use App\Services\SettingsService;
+use App\Services\SyntheticTesting\SyntheticVisitorSession;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -62,7 +63,7 @@ class EmailVerificationController extends Controller
 
         // Global rate limiting per email (max 5 OTPs per 10 minutes)
         $emailRateKey = 'send_otp:'.md5($email);
-        if (RateLimiter::tooManyAttempts($emailRateKey, 5)) {
+        if (! SyntheticVisitorSession::isSimulating() && RateLimiter::tooManyAttempts($emailRateKey, 5)) {
             $seconds = RateLimiter::availableIn($emailRateKey);
 
             return response()->json([
@@ -74,7 +75,7 @@ class EmailVerificationController extends Controller
         // Cooldown check (60 seconds) backed by Cache (works across stateless API & session requests)
         $rateKey = 'otp_sent_'.md5($email);
         $lastSent = (int) (Cache::get($rateKey) ?: ($request->hasSession() ? session($rateKey, 0) : 0));
-        if ($lastSent > 0) {
+        if (! SyntheticVisitorSession::isSimulating() && $lastSent > 0) {
             $elapsed = time() - $lastSent;
             if ($elapsed < 60) {
                 $wait = 60 - $elapsed;
@@ -86,7 +87,9 @@ class EmailVerificationController extends Controller
             }
         }
 
-        RateLimiter::hit($emailRateKey, 600);
+        if (! SyntheticVisitorSession::isSimulating()) {
+            RateLimiter::hit($emailRateKey, 600);
+        }
 
         // Generate 6-digit OTP
         $otp = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
@@ -115,7 +118,7 @@ class EmailVerificationController extends Controller
 
         // Send the OTP email using live runtime SMTP / Failover config
         try {
-            if (! app()->environment('testing')) {
+            if (! app()->environment('testing') && ! SyntheticVisitorSession::shouldSuppressExternalSideEffects()) {
                 app(\App\Services\EmailMarketingService::class)->applySmtpConfig();
             }
             $fromEmail = app(SettingsService::class)->getFromEmail();

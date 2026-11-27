@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\RumVitalsController;
 use App\Models\RequestLog;
+use App\Models\SyntheticTestRun;
 use App\Models\WebVitalsMetric;
 use App\Services\Governance\ConfigAuditService;
 use Illuminate\Http\RedirectResponse;
@@ -171,7 +172,15 @@ class AdminSystemHealthController extends Controller
             'quarantined_inquiries' => $quarantinedInquiries,
         ];
 
-        return view('admin.health.index', compact('vitalsSummary', 'poorPages', 'recentFailedJobs', 'recentLogErrors', 'system', 'smtpHealth', 'spamTelemetry'));
+        $latestSyntheticRun = null;
+        try {
+            if (Schema::hasTable('synthetic_test_runs')) {
+                $latestSyntheticRun = SyntheticTestRun::latest('id')->first();
+            }
+        } catch (\Throwable) {
+        }
+
+        return view('admin.health.index', compact('vitalsSummary', 'poorPages', 'recentFailedJobs', 'recentLogErrors', 'system', 'smtpHealth', 'spamTelemetry', 'latestSyntheticRun'));
     }
 
     public function retryFailedJobs(ConfigAuditService $audit): RedirectResponse

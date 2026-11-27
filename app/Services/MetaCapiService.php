@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Jobs\SendMetaCapiEvent;
+use App\Services\SyntheticTesting\SyntheticVisitorSession;
 
 class MetaCapiService
 {
@@ -21,7 +22,7 @@ class MetaCapiService
      */
     public function dispatchEvent(string $eventName, array $data = []): void
     {
-        if (! $this->isActive()) {
+        if (SyntheticVisitorSession::shouldSuppressExternalSideEffects() || ! $this->isActive()) {
             return;
         }
 

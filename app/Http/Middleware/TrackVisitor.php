@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Services\Http\InternalHttpProbeService;
+use App\Services\SyntheticTesting\SyntheticVisitorSession;
 use App\Services\VisitorTrackerService;
 use Closure;
 use Illuminate\Http\Request;
@@ -64,7 +65,7 @@ class TrackVisitor
      */
     public function terminate(Request $request, Response $response): void
     {
-        if (app()->runningUnitTests() || InternalHttpProbeService::isProbing()) {
+        if (app()->runningUnitTests() || InternalHttpProbeService::isProbing() || SyntheticVisitorSession::isSimulating()) {
             return;
         }
 
